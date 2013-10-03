@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Core.Logging;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.packager {
     public class InstalledPackage

@@ -11,7 +11,7 @@ using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
 using umbraco.interfaces;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.workflow
 {

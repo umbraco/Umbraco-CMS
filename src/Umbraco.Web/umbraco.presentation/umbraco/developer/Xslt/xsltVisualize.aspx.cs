@@ -7,7 +7,7 @@ using System.Web.UI.WebControls;
 using System.Text;
 using System.Xml;
 using System.IO;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.presentation.umbraco.developer.Xslt
 {

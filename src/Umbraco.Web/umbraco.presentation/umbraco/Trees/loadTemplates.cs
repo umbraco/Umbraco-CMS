@@ -81,11 +81,11 @@ namespace umbraco
 
         private void RenderTemplateFolderItems(string folder, string folderPath, ref XmlTree tree)
         {
-            string relPath = IO.SystemDirectories.Masterpages + "/" + folder;
+            string relPath = SystemDirectories.Masterpages + "/" + folder;
             if (!string.IsNullOrEmpty(folderPath))
                 relPath += folderPath;
 
-            string fullPath = IO.IOHelper.MapPath(relPath);
+            string fullPath = IOHelper.MapPath(relPath);
 
             foreach (string dir in System.IO.Directory.GetDirectories(fullPath))
             {
@@ -155,7 +155,7 @@ namespace umbraco
         {
             if (base.m_id == -1)
             {
-                foreach (string s in Directory.GetDirectories(IO.IOHelper.MapPath(IO.SystemDirectories.Masterpages)))
+                foreach (string s in Directory.GetDirectories(IOHelper.MapPath(SystemDirectories.Masterpages)))
                 {
                     var _s = Path.GetFileNameWithoutExtension(s);
 

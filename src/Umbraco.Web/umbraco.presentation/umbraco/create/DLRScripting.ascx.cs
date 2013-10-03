@@ -63,8 +63,8 @@ namespace umbraco.presentation.create
 
         private void _loadTemplates(ListBox list, string scriptType)
         {
-            string path = IO.SystemDirectories.Umbraco + "/scripting/templates/" + scriptType + "/";
-            string abPath = IO.IOHelper.MapPath(path);
+            string path = SystemDirectories.Umbraco + "/scripting/templates/" + scriptType + "/";
+            string abPath = IOHelper.MapPath(path);
             list.Items.Clear();
 
             // always add the option of an empty one

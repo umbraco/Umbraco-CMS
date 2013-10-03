@@ -1,7 +1,7 @@
 using System;
 using System.Web;
 using System.Xml.Linq;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.presentation.preview;
 using umbraco.BusinessLogic;
 using System.Xml;

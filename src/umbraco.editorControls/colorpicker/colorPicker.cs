@@ -3,7 +3,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.ComponentModel;
 using System.Collections;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using System.Collections.Generic;
 
 namespace umbraco.editorControls

@@ -19,7 +19,7 @@ using umbraco.presentation.channels.businesslogic;
 using umbraco.uicontrols;
 using umbraco.providers;
 using umbraco.cms.presentation.Trees;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using Umbraco.Core;
 
 namespace umbraco.cms.presentation.user

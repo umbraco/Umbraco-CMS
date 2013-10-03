@@ -7,7 +7,7 @@ using System.Web;
 using System.Web.Services;
 using System.Xml;
 using System.IO;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.presentation.webservices;
 
 namespace umbraco.developer

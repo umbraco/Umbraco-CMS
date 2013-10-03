@@ -42,7 +42,7 @@ namespace umbraco.controls.Images
 
 			//load the control with the specified properties and render the output as a string and return it
 			Page page = new Page();
-			string path = umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/controls/Images/ImageViewer.ascx";
+			string path = Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco) + "/controls/Images/ImageViewer.ascx";
 			
 			ImageViewer imageViewer = page.LoadControl(path) as ImageViewer;
 			imageViewer.MediaId = mediaId;

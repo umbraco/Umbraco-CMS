@@ -1,6 +1,6 @@
 using System;
 using System.Xml;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco
 {

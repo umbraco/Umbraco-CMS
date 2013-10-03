@@ -10,7 +10,7 @@ using umbraco.interfaces;
 using umbraco.editorControls;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.datatype;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.editorControls.relatedlinks
 {

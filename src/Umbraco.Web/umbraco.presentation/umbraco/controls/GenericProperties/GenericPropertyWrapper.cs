@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.propertytype;
 
 namespace umbraco.controls.GenericProperties

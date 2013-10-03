@@ -20,7 +20,7 @@ using Post = CookComputing.MetaWeblog.Post;
 
 using System.Collections.Generic;
 using System.Web.Security;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using Umbraco.Core;
 
 namespace umbraco.presentation.channels

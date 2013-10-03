@@ -15,7 +15,7 @@ using umbraco.BusinessLogic.Actions;
 using umbraco.BusinessLogic;
 using umbraco.uicontrols;
 using umbraco.cms.presentation.Trees;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.presentation.user
 {

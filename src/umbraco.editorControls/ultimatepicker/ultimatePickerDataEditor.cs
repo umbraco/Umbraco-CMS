@@ -409,7 +409,7 @@ namespace umbraco.editorControls.ultimatepicker
             string autoCompleteScript =
                  "jQuery(\"#"
                  + childtxt.ClientID + "\").autocomplete(\""
-                 + umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)
+                 + Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco)
                  + "/webservices/UltimatePickerAutoCompleteHandler.ashx\",{minChars: 2,max: 100, extraParams:{id:\"" + parentNodeId.ToString() + "\",showchildren:\"" + config[3] + "\",filter:\"" + config[2] + "\",rnd:\"" + DateTime.Now.Ticks + "\"}});";
 
 

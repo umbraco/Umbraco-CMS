@@ -13,7 +13,7 @@ using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 
 using umbraco.editorControls;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using System.Collections.Generic;
 using umbraco.cms.businesslogic.datatype;
 
@@ -68,7 +68,7 @@ namespace umbraco.editorControls.userControlGrapper
 
 			// populate the usercontrol dropdown
 			_dropdownlistUserControl.Items.Add(new ListItem(ui.Text("choose"), ""));
-			populateUserControls( IOHelper.MapPath( SystemDirectories.Usercontrols) );
+			populateUserControls( IOHelper.MapPath( SystemDirectories.UserControls) );
 
 		   
 		}
@@ -79,11 +79,11 @@ namespace umbraco.editorControls.userControlGrapper
 
 			foreach (FileInfo uc in di.GetFiles("*.ascx"))
 			{
-                string ucRoot = IOHelper.MapPath(SystemDirectories.Usercontrols);
+                string ucRoot = IOHelper.MapPath(SystemDirectories.UserControls);
 
 				_dropdownlistUserControl.Items.Add(
-					
-					new ListItem( SystemDirectories.Usercontrols +
+
+                    new ListItem(SystemDirectories.UserControls +
                             uc.FullName.Substring(ucRoot.Length).Replace(IOHelper.DirSepChar, '/'))
 
 					/*
