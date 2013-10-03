@@ -170,6 +170,40 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
          * @ngdoc method
+         * @name umbraco.resources.contentResource#unPublish
+         * @methodOf umbraco.resources.contentResource
+         *
+         * @description
+         * Unpublishes a content item with a given Id
+         *
+         * ##usage
+         * <pre>
+         * contentResource.unPublish(1234)
+         *    .then(function() {
+         *        alert("node was unpulished");
+         *    }, function(err){
+         *      alert("node wasnt unpublished:" + err.data.Message); 
+         *    });
+         * </pre> 
+         * @param {Int} id the ID of the node to unpublish
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        unPublish: function (id) {
+            if (!id) {
+                throw "id cannot be null";
+            }
+         
+            return umbRequestHelper.resourcePromise(
+                           $http.post(
+                               umbRequestHelper.getApiUrl(
+                                   "contentApiBaseUrl",
+                                   "PostUnPublish",
+                                   [{ id: id }])),
+                           'Failed to publish content with id ' + id);
+        },
+        /**
+         * @ngdoc method
          * @name umbraco.resources.contentResource#emptyRecycleBin
          * @methodOf umbraco.resources.contentResource
          *

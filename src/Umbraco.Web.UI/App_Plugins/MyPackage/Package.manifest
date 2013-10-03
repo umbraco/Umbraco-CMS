@@ -59,8 +59,5 @@
 				]
 			}
 		}	
-	],    
-    javascript: [
-		'~/App_Plugins/MyPackage/PropertyEditors/Js/propertyeditors.controller.js'
-    ]
+	]
 }

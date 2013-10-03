@@ -271,6 +271,21 @@ namespace Umbraco.Tests.Manifest
             Assert.AreEqual(2, result.ElementAt(3).JavaScriptInitialize.Count);
         }
 
+        [Test]
+        public void Parse_Stylesheet_Initialization()
+        {
+            var content1 = "{}";
+            var content2 = "{css: []}";
+            var content3 = "{css: ['~/style.css', '~/folder-name/sdsdsd/stylesheet.css']}";
+            var content4 = "{propertyEditors: [], css: ['~/stylesheet.css', '~/random-long-name.css']}";
+
+            var result = ManifestParser.CreateManifests(null, content1, content2, content3, content4);
+
+            Assert.AreEqual(4, result.Count());
+            Assert.AreEqual(0, result.ElementAt(1).StyleSheetInitialize.Count);
+            Assert.AreEqual(2, result.ElementAt(2).StyleSheetInitialize.Count);
+            Assert.AreEqual(2, result.ElementAt(3).StyleSheetInitialize.Count);
+        }
         
 
     }
