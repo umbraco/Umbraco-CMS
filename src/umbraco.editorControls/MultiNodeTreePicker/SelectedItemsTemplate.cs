@@ -4,7 +4,7 @@ using System.Web.UI;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using umbraco.controls.Images;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.editorControls.MultiNodeTreePicker
 {

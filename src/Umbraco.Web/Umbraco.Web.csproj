@@ -308,6 +308,7 @@
     <Compile Include="Controllers\LoginStatusController.cs" />
     <Compile Include="Editors\ContentPostValidateAttribute.cs" />
     <Compile Include="Editors\DashboardController.cs" />
+    <Compile Include="Editors\DashboardSecurity.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\LogController.cs" />
@@ -334,13 +335,14 @@
     <Compile Include="PropertyEditors\ParameterEditors\TextAreaParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\TextParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\TrueFalseParameterEditor.cs" />
+    <Compile Include="PropertyEditors\RelatedLinksPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RteEmbedController.cs" />
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Editors\MediaPostValidateAttribute.cs" />
     <Compile Include="Editors\MemberController.cs" />
     <Compile Include="Editors\UserController.cs" />
     <Compile Include="Install\Steps\MajorUpgradeReport.cs" />
-    <Compile Include="Models\ContentEditing\Control.cs" />
+    <Compile Include="Models\ContentEditing\DashboardControl.cs" />
     <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\DataTypeSave.cs" />
     <Compile Include="Models\ContentEditing\EntityBasic.cs" />
@@ -381,7 +383,9 @@
     <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
     <Compile Include="Trees\MemberTreeController.cs" />
+    <Compile Include="Trees\MenuRenderingEventArgs.cs" />
     <Compile Include="Trees\Menu\CreateChildEntity.cs" />
+    <Compile Include="Trees\Menu\MenuItemList.cs" />
     <Compile Include="UI\JavaScript\CssInitialization.cs" />
     <Compile Include="umbraco.presentation\umbraco\create.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>

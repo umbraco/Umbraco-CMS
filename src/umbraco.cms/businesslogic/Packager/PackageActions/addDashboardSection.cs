@@ -1,6 +1,7 @@
 using System;
 using System.Xml;
-using umbraco.IO;
+using Umbraco.Core;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.packager.standardPackageActions
 {
@@ -46,11 +47,11 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
 				string dbConfig = SystemFiles.DashboardConfig;
 
 				XmlNode section = xmlData.SelectSingleNode("./section");
-				XmlDocument dashboardFile = xmlHelper.OpenAsXmlDocument(dbConfig);
+				XmlDocument dashboardFile = XmlHelper.OpenAsXmlDocument(dbConfig);
 
 				XmlNode importedSection = dashboardFile.ImportNode(section, true);
 
-				XmlAttribute alias = xmlHelper.addAttribute(dashboardFile, "alias", sectionAlias);
+                XmlAttribute alias = XmlHelper.AddAttribute(dashboardFile, "alias", sectionAlias);
 				importedSection.Attributes.Append(alias);
 
 				dashboardFile.DocumentElement.AppendChild(importedSection);
@@ -74,7 +75,7 @@ namespace umbraco.cms.businesslogic.packager.standardPackageActions
 
 			string sectionAlias = xmlData.Attributes["dashboardAlias"].Value;
 			string dbConfig = SystemFiles.DashboardConfig;
-			XmlDocument dashboardFile = xmlHelper.OpenAsXmlDocument(dbConfig);
+            XmlDocument dashboardFile = XmlHelper.OpenAsXmlDocument(dbConfig);
 
 			XmlNode section = dashboardFile.SelectSingleNode("//section [@alias = '" + sectionAlias + "']");
 

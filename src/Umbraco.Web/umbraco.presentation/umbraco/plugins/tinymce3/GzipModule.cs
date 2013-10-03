@@ -10,7 +10,7 @@ using System.Web;
 using System.Text.RegularExpressions;
 using System.IO;
 using Umbraco.Core.Logging;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.presentation.plugins.tinymce3
 {
@@ -39,7 +39,7 @@ namespace umbraco.presentation.plugins.tinymce3
 
             // UMBRACO: Populate the configsection if it's empty
             configSection.Add("GzipEnabled", "true");
-            configSection.Add("InstallPath", IOHelper.ResolveUrl(SystemDirectories.Umbraco_client) + "/tinymce3");
+            configSection.Add("InstallPath", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient) + "/tinymce3");
             configSection.Add("GzipExpiresOffset", TimeSpan.FromDays(10).Ticks.ToString());
 
             // Setup cache

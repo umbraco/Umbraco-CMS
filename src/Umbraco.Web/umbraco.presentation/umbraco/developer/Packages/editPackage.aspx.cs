@@ -12,7 +12,7 @@ using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.presentation.Trees;
 using umbraco.controls;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.presentation.developer.packages
 {
@@ -226,7 +226,7 @@ namespace umbraco.presentation.developer.packages
 
                     if (!string.IsNullOrEmpty(pack.PackagePath)) {
 
-                        packageUmbFile.Text = " &nbsp; <a href='" + IO.IOHelper.ResolveUrl(pack.PackagePath) + "'>Download</a>";
+                        packageUmbFile.Text = " &nbsp; <a href='" + IOHelper.ResolveUrl(pack.PackagePath) + "'>Download</a>";
 
                         this.ClientTools.ShowSpeechBubble(BasePages.BasePage.speechBubbleIcon.success, "Package saved and published", "");
                     } else {

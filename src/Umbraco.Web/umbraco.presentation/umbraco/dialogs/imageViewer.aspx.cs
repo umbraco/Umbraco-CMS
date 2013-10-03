@@ -11,7 +11,7 @@ using System.Web.UI.HtmlControls;
 
 using System.IO;
 using umbraco.BusinessLogic;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using Umbraco.Core;
 
 namespace umbraco.dialogs

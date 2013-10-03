@@ -25,8 +25,8 @@ namespace Umbraco.Core.Configuration
             //now validate and set the raw value
             if (RawXml.HasElements)
                 throw new InvalidOperationException("An InnerTextConfigurationElement cannot contain any child elements, only attributes and a value");
-            RawValue = RawXml.Value;
-            
+            RawValue = RawXml.Value.Trim();
+
             //RawValue = reader.ReadElementContentAsString();
         }
 

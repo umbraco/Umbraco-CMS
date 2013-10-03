@@ -26,6 +26,7 @@ using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
+using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
 
 
 namespace Umbraco.Web
@@ -71,9 +72,9 @@ namespace Umbraco.Web
                 new MasterControllerFactory(FilteredControllerFactoriesResolver.Current));
 
             //set the render view engine
-            ViewEngines.Engines.Add(new ProfilingViewEngine(new RenderViewEngine()));
+            ViewEngines.Engines.Add(new RenderViewEngine());
             //set the plugin view engine
-            ViewEngines.Engines.Add(new ProfilingViewEngine(new PluginViewEngine()));
+            ViewEngines.Engines.Add(new PluginViewEngine());
 
             //set model binder
             ModelBinders.Binders.Add(new KeyValuePair<Type, IModelBinder>(typeof(RenderModel), new RenderModelBinder()));
@@ -127,7 +128,16 @@ namespace Umbraco.Web
         /// <returns></returns>
         public override IBootManager Complete(Action<ApplicationContext> afterComplete)
         {
-            //set routes
+			//Wrap viewengines in the profiling engine
+	        IViewEngine[] engines = ViewEngines.Engines.Select(e => e).ToArray();
+			ViewEngines.Engines.Clear();
+	        foreach (var engine in engines)
+	        {
+		        var wrappedEngine = engine is ProfilingViewEngine ? engine : new ProfilingViewEngine(engine);
+		        ViewEngines.Engines.Add(wrappedEngine);
+	        }
+
+	        //set routes
             CreateRoutes();
 
             base.Complete(afterComplete);

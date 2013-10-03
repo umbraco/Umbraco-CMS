@@ -16,7 +16,7 @@ using Umbraco.Web;
 using Umbraco.Web.Cache;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using System.Web;
 
 namespace umbraco

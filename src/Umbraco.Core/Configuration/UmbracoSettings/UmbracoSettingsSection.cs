@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    [ConfigurationKey("umbracoConfiguration/settings")]
+
     public class UmbracoSettingsSection : ConfigurationSection, IUmbracoSettingsSection
     {
         [ConfigurationProperty("content")]

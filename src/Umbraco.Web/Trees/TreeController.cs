@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
+using Umbraco.Core.Events;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Trees.Menu;
 using Umbraco.Web.WebApi;
@@ -18,7 +19,6 @@ namespace Umbraco.Web.Trees
     public abstract class TreeController : UmbracoAuthorizedApiController
     {
         private readonly TreeAttribute _attribute;
-        private readonly MenuItemCollection _menuItemCollection;
 
         /// <summary>
         /// Remove the xml formatter... only support JSON!
@@ -45,21 +45,8 @@ namespace Umbraco.Web.Trees
 
             //assign the properties of this object to those of the metadata attribute
             _attribute = treeAttributes.First();
-
-            //Create the menu item collection with the area nem already specified
-            _menuItemCollection = Metadata.AreaName.IsNullOrWhiteSpace() 
-                ? new MenuItemCollection() 
-                : new MenuItemCollection(Metadata.AreaName);
         }
-
-        /// <summary>
-        /// Returns a menu item collection to be used to return the menu items from GetMenuForNode
-        /// </summary>
-        public MenuItemCollection MenuItems
-        {
-            get { return _menuItemCollection; }
-        }
-
+        
         /// <summary>
         /// The method called to render the contents of the tree structure
         /// </summary>
@@ -178,7 +165,10 @@ namespace Umbraco.Web.Trees
         public MenuItemCollection GetMenu(string id, FormDataCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = new FormDataCollection("");
-            return GetMenuForNode(id, queryStrings);
+            var menu = GetMenuForNode(id, queryStrings);
+            //raise the event
+            OnMenuRendering(this, new MenuRenderingEventArgs(id, menu, queryStrings));
+            return menu;
         }
 
         /// <summary>
@@ -318,7 +308,14 @@ namespace Umbraco.Web.Trees
         #endregion
 
         #region Events
-        public static event EventHandler<TreeNodesRenderingEventArgs> TreeNodesRendering;
+
+        /// <summary>
+        /// An event that allows developers to modify the tree node collection that is being rendered
+        /// </summary>
+        /// <remarks>
+        /// Developers can add/remove/replace/insert/update/etc... any of the tree items in the collection.
+        /// </remarks>
+        public static event TypedEventHandler<TreeController, TreeNodesRenderingEventArgs> TreeNodesRendering;
 
         private static void OnTreeNodesRendering(TreeController instance, TreeNodesRenderingEventArgs e)
         {
@@ -326,55 +323,32 @@ namespace Umbraco.Web.Trees
             if (handler != null) handler(instance, e);
         }
 
-        public static event EventHandler<TreeNodeRenderingEventArgs> RootNodeRendering;
+        /// <summary>
+        /// An event that allows developer to modify the root tree node that is being rendered
+        /// </summary>
+        public static event TypedEventHandler<TreeController, TreeNodeRenderingEventArgs> RootNodeRendering;
 
         private static void OnRootNodeRendering(TreeController instance, TreeNodeRenderingEventArgs e)
         {
             var handler = RootNodeRendering;
             if (handler != null) handler(instance, e);
-        } 
-        #endregion
-
-        #region Metadata
-        /// <summary>
-        /// stores the metadata about plugin controllers
-        /// </summary>
-        private static readonly ConcurrentDictionary<Type, PluginControllerMetadata> MetadataStorage = new ConcurrentDictionary<Type, PluginControllerMetadata>();
-
-        /// <summary>
-        /// Returns the metadata for this instance
-        /// </summary>
-        internal PluginControllerMetadata Metadata
-        {
-            get { return GetMetadata(this.GetType()); }
         }
 
         /// <summary>
-        /// Returns the metadata for a PluginController
+        /// An event that allows developers to modify the meun that is being rendered
         /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        internal static PluginControllerMetadata GetMetadata(Type type)
+        /// <remarks>
+        /// Developers can add/remove/replace/insert/update/etc... any of the tree items in the collection.
+        /// </remarks>
+        public static event TypedEventHandler<TreeController, MenuRenderingEventArgs> MenuRendering;
+        
+        private static void OnMenuRendering(TreeController instance, MenuRenderingEventArgs e)
         {
+            var handler = MenuRendering;
+            if (handler != null) handler(instance, e);
+        }
 
-            return MetadataStorage.GetOrAdd(type, type1 =>
-            {
-                var attribute = type.GetCustomAttribute<PluginControllerAttribute>(false);
-
-                var meta = new PluginControllerMetadata()
-                {
-                    AreaName = attribute == null ? null : attribute.AreaName,
-                    ControllerName = ControllerExtensions.GetControllerName(type),
-                    ControllerNamespace = type.Namespace,
-                    ControllerType = type
-                };
-
-                MetadataStorage.TryAdd(type, meta);
-
-                return meta;
-            });
-
-        } 
         #endregion
+        
     }
 }

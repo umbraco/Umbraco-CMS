@@ -75,7 +75,7 @@ namespace Umbraco.Web.Trees
                     throw new ApplicationException(msg);
                 }
 
-                foreach (var menuItem in attempt.Result.MenuItems)
+                foreach (var menuItem in attempt.Result.Items)
                 {
                     menuItem.Name = global::umbraco.ui.Text("actions", menuItem.Alias);
                 }
@@ -90,7 +90,7 @@ namespace Umbraco.Web.Trees
                     LogHelper.Error<LegacyTreeController>(msg, attempt.Exception);
                     throw new ApplicationException(msg);
                 }
-                foreach (var menuItem in attempt.Result.MenuItems)
+                foreach (var menuItem in attempt.Result.Items)
                 {
                     menuItem.Name = global::umbraco.ui.Text("actions", menuItem.Alias);
                 }

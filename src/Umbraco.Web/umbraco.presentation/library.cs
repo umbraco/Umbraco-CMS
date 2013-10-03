@@ -29,7 +29,7 @@ using umbraco.cms.helpers;
 using umbraco.scripting;
 using umbraco.DataLayer;
 using umbraco.cms.businesslogic.language;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using UmbracoContext = umbraco.presentation.UmbracoContext;
 
 namespace umbraco
@@ -1116,7 +1116,7 @@ namespace umbraco
         /// </summary>
         public static void AddJquery()
         {
-            RegisterJavaScriptFile("jQuery", String.Format("{0}/ui/jquery.js", IOHelper.ResolveUrl(SystemDirectories.Umbraco_client)));
+            RegisterJavaScriptFile("jQuery", String.Format("{0}/ui/jquery.js", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)));
         }
 
 

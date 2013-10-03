@@ -5,6 +5,7 @@ using System.Configuration;
 using System.Linq;
 using System.Threading;
 using Umbraco.Core.Configuration.BaseRest;
+using Umbraco.Core.Configuration.Dashboard;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 
@@ -31,7 +32,7 @@ namespace Umbraco.Core.Configuration
         /// </summary>
         private UmbracoConfig()
         {
-            if (UmbracoSettings() == null)
+            if (_umbracoSettings == null)
             {
                 var umbracoSettings = ConfigurationManager.GetSection("umbracoConfiguration/settings") as IUmbracoSettingsSection;
                 if (umbracoSettings == null)
@@ -41,7 +42,7 @@ namespace Umbraco.Core.Configuration
                 SetUmbracoSettings(umbracoSettings);
             }
 
-            if (BaseRestExtensions() == null)
+            if (_baseRestExtensions == null)
             {
                 var baseRestExtensions = ConfigurationManager.GetSection("umbracoConfiguration/BaseRestExtensions") as IBaseRestSection;
                 if (baseRestExtensions == null)
@@ -50,6 +51,16 @@ namespace Umbraco.Core.Configuration
                 }
                 SetBaseRestExtensions(baseRestExtensions);
             }
+
+            if (_dashboardSection == null)
+            {
+                var dashboardConfig = ConfigurationManager.GetSection("umbracoConfiguration/dashBoard") as IDashboardSection;
+                if (dashboardConfig == null)
+                {
+                    LogHelper.Warn<UmbracoConfig>("Could not load the " + typeof(IDashboardSection) + " from config file!");
+                }
+                SetDashboardSettings(dashboardConfig);
+            }
         }
 
         /// <summary>
@@ -57,13 +68,31 @@ namespace Umbraco.Core.Configuration
         /// </summary>
         /// <param name="umbracoSettings"></param>
         /// <param name="baseRestSettings"></param>
-        public UmbracoConfig(IUmbracoSettingsSection umbracoSettings, IBaseRestSection baseRestSettings)
+        /// <param name="dashboardSettings"></param>
+        public UmbracoConfig(IUmbracoSettingsSection umbracoSettings, IBaseRestSection baseRestSettings, IDashboardSection dashboardSettings)
         {
             SetUmbracoSettings(umbracoSettings);
             SetBaseRestExtensions(baseRestSettings);
+            SetDashboardSettings(dashboardSettings);
         }
 
+        private IDashboardSection _dashboardSection;
         private IUmbracoSettingsSection _umbracoSettings;
+        private IBaseRestSection _baseRestExtensions;
+
+        /// <summary>
+        /// Gets the IDashboardSection
+        /// </summary>
+        public IDashboardSection DashboardSettings()
+        {
+            return _dashboardSection;
+        }        
+
+        //ONLY for unit testing
+        internal void SetDashboardSettings(IDashboardSection value)
+        {
+            _dashboardSection = value;
+        }
 
         //ONLY for unit testing
         internal void SetUmbracoSettings(IUmbracoSettingsSection value)
@@ -78,9 +107,7 @@ namespace Umbraco.Core.Configuration
         {
             return _umbracoSettings;
         }
-
-        private IBaseRestSection _baseRestExtensions;
-
+        
         //ONLY for unit testing
         public void SetBaseRestExtensions(IBaseRestSection value)
         {

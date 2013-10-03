@@ -21,7 +21,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;
 using umbraco.DataLayer;
 using System.Collections.Specialized;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.uicontrols;
 
 namespace umbraco.cms.presentation.Trees

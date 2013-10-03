@@ -3,7 +3,7 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Collections;
 using System.IO;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using System.Linq;
 
 namespace umbraco.controls

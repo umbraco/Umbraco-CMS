@@ -5,7 +5,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
 using umbraco.BasePages;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.UI.Controls
 {

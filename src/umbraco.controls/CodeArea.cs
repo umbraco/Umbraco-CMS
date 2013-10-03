@@ -12,7 +12,6 @@ using ClientDependency.Core;
 using System.Linq;
 using ClientDependency.Core.Controls;
 using Umbraco.Core.Configuration;
-using umbraco.IO;
 
 namespace umbraco.uicontrols
 {

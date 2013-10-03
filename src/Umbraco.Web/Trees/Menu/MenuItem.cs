@@ -15,6 +15,7 @@ namespace Umbraco.Web.Trees.Menu
         public MenuItem()
         {
             AdditionalData = new Dictionary<string, object>();
+            Icon = "folder";
         }
 
         public MenuItem(string alias, string name)

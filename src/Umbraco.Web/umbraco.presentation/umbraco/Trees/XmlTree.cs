@@ -9,7 +9,7 @@ using System.Web.Script.Serialization;
 using System.Text;
 using umbraco.businesslogic.Utils;
 using umbraco.BasePages;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.presentation.Trees
 {

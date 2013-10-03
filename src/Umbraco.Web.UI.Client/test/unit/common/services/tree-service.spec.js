@@ -40,7 +40,23 @@ describe('tree service tests', function () {
 
     beforeEach(inject(function ($injector) {
         treeService = $injector.get('treeService');
-    })); 
+    }));
+
+    describe('lookup plugin based trees', function() {
+
+        it('can find a plugin based tree', function () {
+            //we know this exists in the mock umbraco server vars
+            var found = treeService.getTreePackageFolder("myTree");
+            expect(found).toBe("MyPackage");
+        });
+        
+        it('returns undefined for a not found tree', function () {
+            //we know this exists in the mock umbraco server vars
+            var found = treeService.getTreePackageFolder("asdfasdf");
+            expect(found).not.toBeDefined();
+        });
+
+    });
 
     describe('query existing node structure of the tree', function () {
 

@@ -11,7 +11,7 @@ using umbraco.BusinessLogic.Utils;
 using umbraco.businesslogic;
 using umbraco.cms.businesslogic.cache;
 using System.Web.Caching;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.interfaces;
 
 

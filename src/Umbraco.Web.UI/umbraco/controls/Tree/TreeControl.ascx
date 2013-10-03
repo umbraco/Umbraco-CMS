@@ -44,8 +44,8 @@ jQuery(document).ready(function() {
         functionToCall : functionToCall,
         nodeKey : nodeKey,
         treeMode: "<%#Mode.ToString().ToLower()%>",
-        dataUrl: "<%#umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)%>/webservices/TreeDataService.ashx",
-        serviceUrl: "<%#umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco)%>/webservices/TreeClientService.asmx/GetInitAppTreeData"});
+        dataUrl: "<%#Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco)%>/webservices/TreeDataService.ashx",
+        serviceUrl: "<%#Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco)%>/webservices/TreeClientService.asmx/GetInitAppTreeData"});
         
      //add event handler for ajax errors, this will refresh the whole application
     var mainTree = UmbClientMgr.mainTree();

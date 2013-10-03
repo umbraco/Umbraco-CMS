@@ -197,7 +197,23 @@ namespace Umbraco.Core.PropertyEditors
             switch (GetDatabaseType())
             {
                 case DataTypeDatabaseType.Ntext:                    
-                case DataTypeDatabaseType.Nvarchar:                    
+                case DataTypeDatabaseType.Nvarchar:
+                    //if it is a string type, we will attempt to see if it is json stored data, if it is we'll try to convert
+                    //to a real json object so we can pass the true json object directly to angular!
+                    var asString = dbValue.ToString();
+                    if (asString.DetectIsJson())
+                    {
+                        try
+                        {
+                            var json = JsonConvert.DeserializeObject(asString);
+                            return json;
+                        }
+                        catch
+                        {
+                            //swallow this exception, we thought it was json but it really isn't so continue returning a string
+                        }
+                    }
+                    return dbValue.ToString();
                 case DataTypeDatabaseType.Integer:
                     //we can just ToString() any of these types
                     return dbValue.ToString();

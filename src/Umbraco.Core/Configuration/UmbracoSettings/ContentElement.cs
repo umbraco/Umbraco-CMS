@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
-    [ConfigurationKey("umbracoConfiguration/settings/content")]
+
     internal class ContentElement : ConfigurationElement, IContentSection
     {
         [ConfigurationProperty("imaging")]
