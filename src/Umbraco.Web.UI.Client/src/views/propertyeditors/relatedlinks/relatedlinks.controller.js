@@ -47,7 +47,7 @@
                     $scope.relatedLinks.push(newIntLink);
                 }
                 $scope.newCaption = '';
-                $scope.newLink = '';
+                $scope.newLink = 'http://';
                 $scope.newNewWindow = false;
                 $scope.newInternal = null;
                 $scope.newInternalName = '';
