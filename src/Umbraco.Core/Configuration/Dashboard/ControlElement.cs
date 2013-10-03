@@ -1,33 +1,54 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Configuration;
 using System.Linq;
 using System.Xml.Linq;
 
 namespace Umbraco.Core.Configuration.Dashboard
 {
+    
     internal class ControlElement : RawXmlConfigurationElement, IControl
     {
-        [ConfigurationProperty("showOnce", DefaultValue = false)]
         public bool ShowOnce
         {
-            get { return (bool)this["showOnce"]; }
+            get
+            {
+                return RawXml.Attribute("showOnce") == null
+                           ? false
+                           : bool.Parse(RawXml.Attribute("showOnce").Value);
+            }
         }
 
-        [ConfigurationProperty("addPanel", DefaultValue = true)]
         public bool AddPanel
         {
-            get { return (bool)this["addPanel"]; }
+            get
+            {
+                return RawXml.Attribute("addPanel") == null
+                           ? true
+                           : bool.Parse(RawXml.Attribute("addPanel").Value);
+            }
         }
 
-        [ConfigurationProperty("panelCaption", DefaultValue = "")]
         public string PanelCaption
         {
-            get { return (string)this["panelCaption"]; }
+            get
+            {
+                return RawXml.Attribute("panelCaption") == null
+                           ? ""
+                           : RawXml.Attribute("panelCaption").Value;
+            }
         }
 
-        [ConfigurationProperty("access")]
         public AccessElement Access
         {
-            get { return (AccessElement)this["access"]; }
+            get
+            {
+                var access = RawXml.Element("access");
+                if (access == null)
+                {
+                    return new AccessElement();
+                }
+                return new AccessElement(access);
+            }
         }
 
         public string ControlPath 
@@ -40,8 +61,14 @@ namespace Umbraco.Core.Configuration.Dashboard
                 {
                     throw new ConfigurationErrorsException("The control element must contain a text node indicating the control path");
                 }
-                return txt.Value;
+                return txt.Value.Trim();
             }
+        }
+
+
+        IAccess IControl.AccessRights
+        {
+            get { return Access; }
         }
     }
 }

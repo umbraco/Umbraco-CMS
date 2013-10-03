@@ -9,5 +9,7 @@
         string PanelCaption { get; }
 
         string ControlPath { get; }
+
+        IAccess AccessRights { get; }
     }
 }
