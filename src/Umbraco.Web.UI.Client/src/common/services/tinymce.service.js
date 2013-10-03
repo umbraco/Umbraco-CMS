@@ -6,8 +6,27 @@
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
-function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeout, macroResource, macroService, $routeParams) {
+function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macroResource, macroService, $routeParams, umbRequestHelper) {
     return {
+
+        /**
+        * @ngdoc method
+        * @name umbraco.services.tinyMceService#configuration
+        * @methodOf umbraco.services.tinyMceService
+        *
+        * @description
+        * Returns a collection of plugins available to the tinyMCE editor
+        *
+        */
+        configuration: function () {
+               return umbRequestHelper.resourcePromise(
+                  $http.get(
+                      umbRequestHelper.getApiUrl(
+                          "rteApiBaseUrl",
+                          "GetConfiguration")),
+                  'Failed to retreive entity data for id '); 
+        },
+
 
         /**
         * @ngdoc method
