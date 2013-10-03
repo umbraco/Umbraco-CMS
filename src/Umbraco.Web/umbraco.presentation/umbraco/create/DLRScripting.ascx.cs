@@ -11,6 +11,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Xml.Linq;
 using Umbraco.Core;
+using Umbraco.Core.IO;
 using Umbraco.Web.UI;
 using umbraco.cms.businesslogic.macro;
 using umbraco.scripting;
