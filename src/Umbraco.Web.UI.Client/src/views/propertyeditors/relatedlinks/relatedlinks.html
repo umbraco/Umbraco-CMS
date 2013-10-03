@@ -11,14 +11,27 @@
             </thead>
             <tbody>
                 <tr ng-repeat="link in relatedLinks">
-                    <td>{{link.caption}}</td>
-                    <td><a href="{{link.link}}" target="_blank">{{link.link}}</a></td>
-                    <td>{{link.newWindow}}</td>
+                    <td>
+                        <span ng-show="!link.edit">{{link.caption}}</span>
+                        <input type="text" ng-model="link.caption" ng-show="link.edit"/>
+                    </td>
+                    <td>
+                        <a href="{{link.link}}" target="_blank" ng-show="!link.edit">{{link.link}}</a>
+                         <input type="text" ng-model="link.link" ng-show="link.edit"/>
+                    </td>
+                    <td>
+                        <span ng-show="!link.edit">{{link.newWindow}}</span>
+                        <input type="checkbox" ng-model="link.newWindow" ng-show="link.edit"/>
+                    </td>
                     <td>
                        
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-default">Edit</button>
+                        <div class="btn-group" ng-show="!link.edit">
+                            <button type="button" class="btn btn-default" ng-click="edit($index)">Edit</button>
                             <button type="button" class="btn btn-default" ng-click="delete($index)">Delete</button>
+                        </div>
+                        <div class="btn-group" ng-show="link.edit">
+                            <button type="button" class="btn btn-default" ng-click="cancelEdit($index)">Cancel</button>
+                            <button type="button" class="btn btn-default" ng-click="cancelEdit($index)">Save</button>
                         </div>
                     </td>
                 </tr>

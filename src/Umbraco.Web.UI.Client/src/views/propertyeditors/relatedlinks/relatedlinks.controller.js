@@ -10,9 +10,9 @@
             $scope.addExternal = true;
             
             $scope.relatedLinks = [
-                { caption: 'Google', link: "http://google.com", newWindow: false },
-                { caption: 'Umbraco', link: "http://umbraco.com", newWindow: false },
-                { caption: 'Nibble', link: "http://nibble.be", newWindow: false }
+                { caption: 'Google', link: "http://google.com", newWindow: false, edit:false },
+                { caption: 'Umbraco', link: "http://umbraco.com", newWindow: false, edit: false },
+                { caption: 'Nibble', link: "http://nibble.be", newWindow: false, edit: false }
             ];
 
             $scope.internal = function ($event) {
@@ -20,11 +20,21 @@
 
                 $event.preventDefault();
             };
-            
 
+            $scope.edit = function (idx) {
+                for (var i = 0; i < $scope.relatedLinks.length; i++) {
+                    $scope.relatedLinks[i].edit = false;
+                }
+                $scope.relatedLinks[idx].edit = true;
+            };
+
+            $scope.cancelEdit = function(idx) {
+                $scope.relatedLinks[idx].edit = false;
+            };
             
             $scope.delete = function (idx) {
-                $scope.relatedLinks.splice($scope.relatedLinks[idx], 1);
+                
+              $scope.relatedLinks.splice($scope.relatedLinks[idx], 1);
                 
             };
 
