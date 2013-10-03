@@ -13,7 +13,7 @@
                 <tr ng-repeat="link in relatedLinks">
                     <td>{{link.caption}}</td>
                     <td><a href="{{link.link}}" target="_blank">{{link.link}}</a></td>
-                    <td>{{link.newWindow}} {{$index}}</td>
+                    <td>{{link.newWindow}}</td>
                     <td>
                        
                         <div class="btn-group">
@@ -25,7 +25,18 @@
                 <tr>
                     <form ng-submit="add()">
                     <td><input type="text" ng-model="newCaption" placeholder="Enter a new caption" required/></td>
-                    <td><input type="text" ng-model="newLink" placeholder="Enter the link" required/></td>
+                        <td>
+                            <div ng-show="addExternal">
+                                <input type="text" ng-model="newLink" placeholder="Enter the link" required/>
+                                <br/> or
+                                <a href="#" ng-click="switch($event)">choose internal page</a>
+                            </div>
+                            
+                            <div ng-show="!addExternal">
+                                <span ng-bind="newInternalName"></span> <a href="#" ng-click="internal($event)">Choose</a><br/>
+                                or <a href="#" ng-click="switch($event)">enter external link</a>
+                            </div>
+                        </td>
                     <td><input type="checkbox" ng-model="newNewWindow"/> </td>
                     <td>
                         <div class="btn-group">
