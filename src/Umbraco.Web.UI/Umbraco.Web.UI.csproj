@@ -594,11 +594,10 @@
     <Compile Include="Umbraco\TreeInit.aspx.designer.cs">
       <DependentUpon>treeInit.aspx</DependentUpon>
     </Compile>
+    <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\CustomJson.html" />
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
-    <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\CsvEditor.js" />
-    <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\PostcodeEditor.js" />
-    <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\RegexEditor.js" />
+    <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\propertyeditors.controller.js" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\CsvEditor.html" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\PostcodeEditor.html" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\RegexEditor.html" />
@@ -2543,8 +2542,6 @@
   <ItemGroup>
     <Folder Include="App_Code\" />
     <Folder Include="App_Data\" />
-    <Folder Include="App_Plugins\MyPackage\PropertyEditors\Css\" />
-    <Folder Include="App_Plugins\MyPackage\Views\" />
     <Folder Include="Css\" />
     <Folder Include="MasterPages\" />
     <Folder Include="Media\" />

@@ -139,6 +139,10 @@ namespace Umbraco.Core.PropertyEditors
                     // about the Id, just the value so ignore the id.
                     defaultPreVals[item.Key] = item.Value.Value;
                 }
+                //now we're going to try to see if any of the values are JSON, if they are we'll convert them to real JSON objects
+                // so they can be consumed as real json in angular!
+                ConvertItemsToJsonIfDetected(defaultPreVals);
+
                 return defaultPreVals;
             }
 
@@ -150,8 +154,40 @@ namespace Umbraco.Core.PropertyEditors
                 //each item is of type PreValue but we don't want the ID, just the value so ignore the ID
                 result.Add(i.ToInvariantString(), asArray[i].Value);
             }
+
+            //now we're going to try to see if any of the values are JSON, if they are we'll convert them to real JSON objects
+            // so they can be consumed as real json in angular!
+            ConvertItemsToJsonIfDetected(result);
+
             return result;
-        } 
+        }
+
+        private void ConvertItemsToJsonIfDetected(IDictionary<string, object> result)
+        {
+            //now we're going to try to see if any of the values are JSON, if they are we'll convert them to real JSON objects
+            // so they can be consumed as real json in angular!
+
+            var keys = result.Keys.ToArray();
+            for (var i = 0; i < keys.Length; i++)
+            {
+                if (result[keys[i]] is string)
+                {
+                    var asString = result[keys[i]].ToString();
+                    if (asString.DetectIsJson())
+                    {
+                        try
+                        {
+                            var json = JsonConvert.DeserializeObject(asString);
+                            result[keys[i]] = json;
+                        }
+                        catch
+                        {
+                            //swallow this exception, we thought it was json but it really isn't so continue returning a string
+                        }
+                    }
+                }
+            }
+        }
 
     }
 }
