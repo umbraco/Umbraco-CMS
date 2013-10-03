@@ -7,6 +7,8 @@
     **/
 function publishedContentResource($q, $http, umbRequestHelper) {
 
+    //TODO: Why do we have this ? If we want a URL why isn't it just on the content controller ?
+
     //the factory object returned
     return {
         

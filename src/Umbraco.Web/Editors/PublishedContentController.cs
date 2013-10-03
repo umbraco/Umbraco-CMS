@@ -7,13 +7,16 @@ using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Editors
 {
+
+    //TODO: Why do we have this ? If we want a URL why isn't it just on the content controller ?
+
     [PluginController("UmbracoApi")]
     public class PublishedContentController : UmbracoAuthorizedJsonController
     {
-        UmbracoHelper helper = new UmbracoHelper(UmbracoContext.Current);
+        
         public string GetNiceUrl(int id)
         {
-            return helper.NiceUrl(id);
+            return Umbraco.NiceUrl(id);
         }
     }
 }

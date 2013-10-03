@@ -69,7 +69,7 @@ namespace Umbraco.Web.PropertyEditors
                                  Command = n.SelectSingleNode("./tinyMceCommand").FirstChild.Value,
                                  Alias = n.SelectSingleNode("./umbracoAlias").FirstChild.Value.ToLower(),
                                  UserInterface = n.SelectSingleNode("./tinyMceCommand").Attributes.GetNamedItem("userInterface").Value,
-                                 FrontendCommand = n.SelectSingleNode("./tinyMceCommand").Attributes.GetNamedItem("frontendCommand").Value,
+                                 FrontEndCommand = n.SelectSingleNode("./tinyMceCommand").Attributes.GetNamedItem("frontendCommand").Value,
                                  Value = n.SelectSingleNode("./tinyMceCommand").Attributes.GetNamedItem("value").Value,
                                  Priority = int.Parse(n.SelectSingleNode("./priority").FirstChild.Value)
                              }
