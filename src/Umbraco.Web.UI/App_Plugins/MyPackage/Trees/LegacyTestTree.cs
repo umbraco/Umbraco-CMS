@@ -33,7 +33,7 @@ namespace Umbraco.Web.UI.App_Plugins.MyPackage.Trees
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
         {
             var menu = new MenuItemCollection();
-            menu.Add(new MenuItem("create", "Create"));
+            menu.Items.Add(new MenuItem("create", "Create"));
             return menu;
         }
     }
