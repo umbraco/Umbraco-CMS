@@ -7,6 +7,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web;
 using Umbraco.Core.Profiling;
+using Umbraco.Core.Strings;
 
 namespace umbraco
 {
@@ -181,7 +182,7 @@ namespace umbraco
                 else if (helper.FindAttribute(attributes, "case") == "upper")
                     _fieldContent = _fieldContent.ToUpper();
                 else if (helper.FindAttribute(attributes, "case") == "title")
-                    _fieldContent = _fieldContent.ConvertCase(StringAliasCaseType.PascalCase);
+                    _fieldContent = _fieldContent.ToCleanString(CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.PascalCase);
 
                 // OTHER FORMATTING FUNCTIONS
                 // If we use masterpages, this is moved to the ItemRenderer to add support for before/after in inline XSLT

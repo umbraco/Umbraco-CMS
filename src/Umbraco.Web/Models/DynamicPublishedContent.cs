@@ -14,6 +14,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core;
 using System.Reflection;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Strings;
 using ContentType = umbraco.cms.businesslogic.ContentType;
 
 namespace Umbraco.Web.Models
@@ -354,9 +355,9 @@ namespace Umbraco.Web.Models
 			{
 				//if we cannot get with the current alias, try changing it's case
 				attempt = alias[0].IsUpperCase()
-					? getMember(alias.ConvertCase(StringAliasCaseType.CamelCase))
-					: getMember(alias.ConvertCase(StringAliasCaseType.PascalCase));
-			}
+                    ? getMember(alias.ToCleanString(CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.CamelCase))
+                    : getMember(alias.ToCleanString(CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.PascalCase));
+            }
 
 			return !attempt.Success
 				? null

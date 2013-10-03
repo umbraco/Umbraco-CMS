@@ -584,6 +584,8 @@
     <Compile Include="Profiling\LogProfiler.cs" />
     <Compile Include="Profiling\ProfilerExtensions.cs" />
     <Compile Include="Profiling\ProfilerResolver.cs" />
+    <Compile Include="Profiling\ProfilingView.cs" />
+    <Compile Include="Profiling\ProfilingViewEngine.cs" />
     <Compile Include="Profiling\WebProfiler.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />
     <Compile Include="Dynamics\ClassFactory.cs" />

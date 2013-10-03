@@ -18,7 +18,7 @@ using umbraco.BusinessLogic.Actions;
 using umbraco.interfaces;
 using umbraco.cms.presentation.Trees;
 using System.Xml.XPath;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.presentation.user
 {

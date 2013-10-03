@@ -7,7 +7,7 @@ using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.macro;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 
 namespace umbraco.cms.businesslogic.packager {
@@ -104,7 +104,7 @@ namespace umbraco.cms.businesslogic.packager {
 					int outInt = 0;
 
 					//Path checking...
-					string localPath = IOHelper.MapPath(IO.SystemDirectories.Media + "/" + pack.Folder);
+					string localPath = IOHelper.MapPath(SystemDirectories.Media + "/" + pack.Folder);
 
 					if (!System.IO.Directory.Exists(localPath))
 						System.IO.Directory.CreateDirectory(localPath);
@@ -271,7 +271,7 @@ namespace umbraco.cms.businesslogic.packager {
 					//string packPath = Settings.PackagerRoot.Replace(System.IO.Path.DirectorySeparatorChar.ToString(), "/") + "/" + pack.Name.Replace(' ', '_') + "_" + pack.Version.Replace(' ', '_') + "." + Settings.PackageFileExtension;
 
 					// check if there's a packages directory below media
-					string packagesDirectory = IO.SystemDirectories.Media + "/created-packages";
+					string packagesDirectory = SystemDirectories.Media + "/created-packages";
 					if (!System.IO.Directory.Exists(IOHelper.MapPath(packagesDirectory)))
 						System.IO.Directory.CreateDirectory(IOHelper.MapPath(packagesDirectory));
 

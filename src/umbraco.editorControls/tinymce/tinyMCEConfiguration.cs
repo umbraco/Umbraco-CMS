@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Collections;
 using System.Xml;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.editorControls.tinymce
 {
@@ -44,7 +44,7 @@ namespace umbraco.editorControls.tinymce
         }
 
         public static string PluginPath = IOHelper.ResolveUrl( SystemDirectories.Umbraco ) + "/plugins/tinymce3";
-        public static string JavascriptPath = IOHelper.ResolveUrl( SystemDirectories.Umbraco_client ) + "/tinymce3";
+        public static string JavascriptPath = IOHelper.ResolveUrl( SystemDirectories.UmbracoClient ) + "/tinymce3";
 
         private static string _invalidElements;
 

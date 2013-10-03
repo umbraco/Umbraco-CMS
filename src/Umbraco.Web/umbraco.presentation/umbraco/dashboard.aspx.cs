@@ -13,7 +13,7 @@ using System.IO;
 using System.Xml;
 using System.Xml.XPath;
 using umbraco.uicontrols;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.cms.helpers;
 using umbraco.BusinessLogic;
 

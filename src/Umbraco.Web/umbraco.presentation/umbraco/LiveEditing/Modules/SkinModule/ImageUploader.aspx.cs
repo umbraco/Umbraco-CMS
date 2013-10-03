@@ -8,6 +8,7 @@ using System.IO;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using Umbraco.Core.IO;
 using umbraco.BusinessLogic;
 
 namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
@@ -36,7 +37,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
             {
                 
                 Guid g = Guid.NewGuid();
-                DirectoryInfo updir = new DirectoryInfo(IO.IOHelper.MapPath("~/media/upload/" + g));
+                DirectoryInfo updir = new DirectoryInfo(IOHelper.MapPath("~/media/upload/" + g));
                
                 if (!updir.Exists)
                     updir.Create();
@@ -55,7 +56,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
                         if (Convert.ToInt32(Request["w"]) > MaxWidth || Convert.ToInt32(Request["h"]) > MaxHeight)
                         {
-                            System.Drawing.Image img = System.Drawing.Image.FromFile(IO.IOHelper.MapPath(Image.Value));
+                            System.Drawing.Image img = System.Drawing.Image.FromFile(IOHelper.MapPath(Image.Value));
 
                             Image1.Width = img.Width / 2;
                             Image1.Height = img.Height / 2;
@@ -91,7 +92,7 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
         protected void bt_crop_Click(object sender, EventArgs e)
         {
-            System.Drawing.Image imgToResize = System.Drawing.Image.FromFile(IO.IOHelper.MapPath(Image.Value));
+            System.Drawing.Image imgToResize = System.Drawing.Image.FromFile(IOHelper.MapPath(Image.Value));
 
             int sourceWidth = imgToResize.Width;
             int sourceHeight = imgToResize.Height;
@@ -126,12 +127,12 @@ namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 
 
             Guid id = Guid.NewGuid();
-            DirectoryInfo updir = new DirectoryInfo(IO.IOHelper.MapPath("~/media/upload/" + id));
+            DirectoryInfo updir = new DirectoryInfo(IOHelper.MapPath("~/media/upload/" + id));
 
             if (!updir.Exists)
                 updir.Create();
 
-            FileInfo img = new FileInfo(IO.IOHelper.MapPath(Image.Value));
+            FileInfo img = new FileInfo(IOHelper.MapPath(Image.Value));
             // Copy metadata
             ImageCodecInfo[] codecs = ImageCodecInfo.GetImageEncoders();
             ImageCodecInfo codec = null;

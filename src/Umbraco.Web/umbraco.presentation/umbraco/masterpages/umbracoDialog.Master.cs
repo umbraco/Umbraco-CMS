@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core.IO;
 
 namespace umbraco.presentation.masterpages
 {
@@ -16,7 +17,7 @@ namespace umbraco.presentation.masterpages
 		protected void Page_Load(object sender, EventArgs e)
 		{
 			ClientLoader.DataBind();
-			ScriptManager.RegisterStartupScript(Page, Page.GetType(), "setRoot", "UmbClientMgr.setUmbracoPath(\"" + IO.IOHelper.ResolveUrl(IO.SystemDirectories.Umbraco) + "\");", true);
+			ScriptManager.RegisterStartupScript(Page, Page.GetType(), "setRoot", "UmbClientMgr.setUmbracoPath(\"" + IOHelper.ResolveUrl(SystemDirectories.Umbraco) + "\");", true);
 			FireOnLoad(e);
 		}
 

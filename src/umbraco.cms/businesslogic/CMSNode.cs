@@ -13,7 +13,7 @@ using umbraco.BusinessLogic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using System.Collections;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.workflow;
@@ -57,7 +57,7 @@ namespace umbraco.cms.businesslogic
 
         #region Private static
 
-        private static readonly string DefaultIconCssFile = IOHelper.MapPath(SystemDirectories.Umbraco_client + "/Tree/treeIcons.css");
+        private static readonly string DefaultIconCssFile = IOHelper.MapPath(SystemDirectories.UmbracoClient + "/Tree/treeIcons.css");
         private static readonly List<string> InternalDefaultIconClasses = new List<string>();
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
 

@@ -26,7 +26,7 @@ using umbraco.DataLayer;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
 using umbraco.BusinessLogic.Actions;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using Umbraco.Core;
 
 

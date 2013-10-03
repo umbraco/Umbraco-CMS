@@ -6,7 +6,7 @@
 
   <style type="text/css">
     #propertyMapping thead tr th{border-bottom:1px solid #ccc; padding: 4px; padding-right: 25px;
-                                background-image: url(<%= umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco_client) %>/tableSorting/img/bg.gif);     
+                                background-image: url(<%= Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.UmbracoClient) %>/tableSorting/img/bg.gif);     
                                 cursor: pointer; 
                                 font-weight: bold; 
                                 background-repeat: no-repeat; 

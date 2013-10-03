@@ -62,10 +62,10 @@
 
             var templateCode = UmbEditor.GetCode();
             var selectedTemplate = templateDropDown.options[templateDropDown.selectedIndex].id;
-            var masterTemplate = "<%= umbraco.IO.SystemDirectories.Masterpages%>/" + selectedTemplate + ".master";
+            var masterTemplate = "<%= Umbraco.Core.IO.SystemDirectories.Masterpages%>/" + selectedTemplate + ".master";
 
             if (selectedTemplate == "")
-                masterTemplate = "<%= umbraco.IO.SystemDirectories.Umbraco%>/masterpages/default.master";
+                masterTemplate = "<%= Umbraco.Core.IO.SystemDirectories.Umbraco%>/masterpages/default.master";
 
             var regex = /MasterPageFile=[~a-z0-9/._"-]+/im;
 

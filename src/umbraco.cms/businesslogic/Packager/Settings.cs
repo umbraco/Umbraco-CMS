@@ -8,7 +8,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using System.IO;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.packager
 {

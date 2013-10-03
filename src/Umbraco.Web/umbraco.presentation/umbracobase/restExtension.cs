@@ -6,7 +6,7 @@ using Umbraco.Core;
 using Umbraco.Web;
 using umbraco.BusinessLogic.Utils;
 using umbraco.cms.businesslogic.member;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.presentation.umbracobase
 {

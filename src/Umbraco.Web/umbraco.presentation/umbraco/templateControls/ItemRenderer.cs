@@ -21,7 +21,7 @@ using Umbraco.Web.Templates;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.web;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.presentation.templateControls
 {

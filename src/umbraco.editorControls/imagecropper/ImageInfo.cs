@@ -3,7 +3,7 @@ using System.Drawing;
 using System.IO;
 using System.Web;
 using umbraco.editorControls.imagecropper;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.editorControls.imagecropper
 {

@@ -999,7 +999,7 @@ namespace Umbraco.Core
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <returns>The clean string.</returns>
         /// <remarks>The string is cleaned in the context of the IShortStringHelper default culture.</remarks>
-        public static string ToCleanString(string text, CleanStringType stringType)
+        public static string ToCleanString(this string text, CleanStringType stringType)
         {
             return ShortStringHelper.CleanString(text, stringType);
         }
@@ -1013,7 +1013,7 @@ namespace Umbraco.Core
         /// <param name="separator">The separator.</param>
         /// <returns>The clean string.</returns>
         /// <remarks>The string is cleaned in the context of the IShortStringHelper default culture.</remarks>
-        public static string ToCleanString(string text, CleanStringType stringType, char separator)
+        public static string ToCleanString(this string text, CleanStringType stringType, char separator)
         {
             return ShortStringHelper.CleanString(text, stringType, separator);
         }
@@ -1026,7 +1026,7 @@ namespace Umbraco.Core
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The clean string.</returns>
-        public static string ToCleanString(string text, CleanStringType stringType, CultureInfo culture)
+        public static string ToCleanString(this string text, CleanStringType stringType, CultureInfo culture)
         {
             return ShortStringHelper.CleanString(text, stringType, culture);
         }
@@ -1040,7 +1040,7 @@ namespace Umbraco.Core
         /// <param name="separator">The separator.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The clean string.</returns>
-        public static string ToCleanString(string text, CleanStringType stringType, char separator, CultureInfo culture)
+        public static string ToCleanString(this string text, CleanStringType stringType, char separator, CultureInfo culture)
         {
             return ShortStringHelper.CleanString(text, stringType, separator, culture);
         }

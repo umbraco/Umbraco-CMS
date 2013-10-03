@@ -9,7 +9,6 @@ using StackExchange.Profiling.MVCHelpers;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.Dynamics;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Profiling;
@@ -27,9 +26,8 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
-using umbraco.businesslogic;
-using umbraco.cms.businesslogic;
 using umbraco.presentation.cache;
+using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
 
 
 namespace Umbraco.Web
@@ -75,9 +73,9 @@ namespace Umbraco.Web
                 new MasterControllerFactory(FilteredControllerFactoriesResolver.Current));
 
             //set the render view engine
-            ViewEngines.Engines.Add(new ProfilingViewEngine(new RenderViewEngine()));
+            ViewEngines.Engines.Add(new RenderViewEngine());
             //set the plugin view engine
-            ViewEngines.Engines.Add(new ProfilingViewEngine(new PluginViewEngine()));
+            ViewEngines.Engines.Add(new PluginViewEngine());
 
             //set model binder
             ModelBinders.Binders.Add(new KeyValuePair<Type, IModelBinder>(typeof(RenderModel), new RenderModelBinder()));
@@ -131,7 +129,16 @@ namespace Umbraco.Web
         /// <returns></returns>
         public override IBootManager Complete(Action<ApplicationContext> afterComplete)
         {
-            //set routes
+			//Wrap viewengines in the profiling engine
+	        IViewEngine[] engines = ViewEngines.Engines.Select(e => e).ToArray();
+			ViewEngines.Engines.Clear();
+	        foreach (var engine in engines)
+	        {
+		        var wrappedEngine = engine is ProfilingViewEngine ? engine : new ProfilingViewEngine(engine);
+		        ViewEngines.Engines.Add(wrappedEngine);
+	        }
+
+	        //set routes
             CreateRoutes();
 
             base.Complete(afterComplete);

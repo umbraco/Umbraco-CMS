@@ -12,7 +12,7 @@ using ClientDependency.Core;
 using System.Web;
 using ClientDependency.Core.Controls;
 using umbraco.presentation;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.editorControls.macrocontainer
 {
@@ -49,7 +49,7 @@ namespace umbraco.editorControls.macrocontainer
             {
                 presentation.webservices.ajaxHelpers.EnsureLegacyCalls(base.Page);
                 ScriptManager sm = ScriptManager.GetCurrent(base.Page);
-                ServiceReference webservicePath = new ServiceReference(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/webservices/MacroContainerService.asmx");
+                ServiceReference webservicePath = new ServiceReference(Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco) + "/webservices/MacroContainerService.asmx");
 
                 if (!sm.Services.Contains(webservicePath))
                     sm.Services.Add(webservicePath);
