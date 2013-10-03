@@ -12,7 +12,7 @@ function logResource($q, $http, umbRequestHelper) {
         
         /**
          * @ngdoc method
-         * @name umbraco.resources.userResource#getEntityLog
+         * @name umbraco.resources.logResource#getEntityLog
          * @methodOf umbraco.resources.logResource
          *
          * @description
@@ -42,7 +42,7 @@ function logResource($q, $http, umbRequestHelper) {
         
         /**
          * @ngdoc method
-         * @name umbraco.resources.userResource#getUserLog
+         * @name umbraco.resources.logResource#getUserLog
          * @methodOf umbraco.resources.logResource
          *
          * @description
@@ -73,7 +73,7 @@ function logResource($q, $http, umbRequestHelper) {
 
         /**
          * @ngdoc method
-         * @name umbraco.resources.userResource#getLog
+         * @name umbraco.resources.logResource#getLog
          * @methodOf umbraco.resources.logResource
          *
          * @description
