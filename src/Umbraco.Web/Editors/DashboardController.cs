@@ -30,7 +30,7 @@ namespace Umbraco.Web.Editors
     public class DashboardController : UmbracoAuthorizedJsonController
     {
 
-        public IEnumerable<Tab<Control>> GetDashboard(string section)
+        public IEnumerable<Tab<DashboardControl>> GetDashboard(string section)
         {
             return GetDashboardFromXml(section);
 
@@ -38,13 +38,13 @@ namespace Umbraco.Web.Editors
         }
 
         //TODO migrate this into a more managed class
-        private IEnumerable<Tab<Control>> GetDashboardFromXml(string section)
+        private IEnumerable<Tab<DashboardControl>> GetDashboardFromXml(string section)
         {
 
             XmlDocument dashBoardXml = new XmlDocument();
             dashBoardXml.Load(IOHelper.MapPath(SystemFiles.DashboardConfig));
             var user = UmbracoContext.Security.CurrentUser;
-            var tabs = new List<Tab<Control>>();
+            var tabs = new List<Tab<DashboardControl>>();
 
             // test for new tab interface
             foreach (XmlNode dashboard in dashBoardXml.DocumentElement.SelectNodes("//section [areas/area = '" + section.ToLower() + "']"))
@@ -60,9 +60,9 @@ namespace Umbraco.Web.Editors
                         {
                             i++;
 
-                            Tab<Control> tab = new Tab<Control>();
+                            Tab<DashboardControl> tab = new Tab<DashboardControl>();
                             tab.Label = entry.Attributes.GetNamedItem("caption").Value;
-                            var props = new List<Control>();
+                            var props = new List<DashboardControl>();
                             tab.Id = i;
                             tab.Alias = tab.Label.ToLower().Replace(" ", "_");
                             tab.IsActive = i == 1;
@@ -71,7 +71,7 @@ namespace Umbraco.Web.Editors
                             {
                                 if (ValidateAccess(uc, user))
                                 {
-                                    Control ctrl = new Control();
+                                    DashboardControl ctrl = new DashboardControl();
                                     
                                     string control = Core.XmlHelper.GetNodeValue(uc).Trim(' ', '\r', '\n');
                                     ctrl.Path = IOHelper.FindFile(control);

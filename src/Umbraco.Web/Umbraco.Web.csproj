@@ -333,7 +333,7 @@
     <Compile Include="Editors\MemberController.cs" />
     <Compile Include="Editors\UserController.cs" />
     <Compile Include="Install\Steps\MajorUpgradeReport.cs" />
-    <Compile Include="Models\ContentEditing\Control.cs" />
+    <Compile Include="Models\ContentEditing\DashboardControl.cs" />
     <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\DataTypeSave.cs" />
     <Compile Include="Models\ContentEditing\EntityBasic.cs" />
