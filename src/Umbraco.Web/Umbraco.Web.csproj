@@ -372,7 +372,9 @@
     <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
     <Compile Include="Trees\MemberTreeController.cs" />
+    <Compile Include="Trees\MenuRenderingEventArgs.cs" />
     <Compile Include="Trees\Menu\CreateChildEntity.cs" />
+    <Compile Include="Trees\Menu\MenuItemList.cs" />
     <Compile Include="UI\JavaScript\CssInitialization.cs" />
     <Compile Include="umbraco.presentation\umbraco\create.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>

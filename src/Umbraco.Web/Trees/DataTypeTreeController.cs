@@ -47,13 +47,13 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 // root actions              
-                menu.AddMenuItem<CreateChildEntity, ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
-                menu.AddMenuItem<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+                menu.Items.Add<CreateChildEntity, ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
+                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
-
+            
             //only have delete for each node
-            menu.AddMenuItem<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));            
+            menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));            
             return menu;
         }
     }
