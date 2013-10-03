@@ -10,6 +10,7 @@ using System.Web.UI;
 using System.Reflection;
 using System.Collections.Specialized;
 using System.Xml;
+using Umbraco.Core.IO;
 using umbraco;
 using umbraco.cms.businesslogic.member;
 using System.Web.SessionState;
@@ -40,7 +41,7 @@ namespace umbraco.presentation.umbracobase
             HttpApplication httpApp = (HttpApplication)sender;
             string url = httpApp.Context.Request.RawUrl;
 
-            string urlStart = IO.IOHelper.ResolveUrl( IO.SystemDirectories.Base ).TrimEnd('/').ToLower() + "/";
+            string urlStart = IOHelper.ResolveUrl( SystemDirectories.Base ).TrimEnd('/').ToLower() + "/";
 
             if (url.ToLower().StartsWith(urlStart))
             {
@@ -61,7 +62,7 @@ namespace umbraco.presentation.umbracobase
 
             //remove extension and split the url
             string url = httpApp.Context.Request.RawUrl;
-            string urlStart = IO.IOHelper.ResolveUrl(IO.SystemDirectories.Base).TrimEnd('/').ToLower() + "/";
+            string urlStart = IOHelper.ResolveUrl(SystemDirectories.Base).TrimEnd('/').ToLower() + "/";
 
             if (url.ToLower().StartsWith(urlStart))
             {                
@@ -73,7 +74,7 @@ namespace umbraco.presentation.umbracobase
                     HttpContext.Current.Handler = resourceHttpHandler.OriginalHandler;
                 }
 
-                string basedir = "/" + IO.SystemDirectories.Base.TrimStart('~').Trim('/') + "/";
+                string basedir = "/" + SystemDirectories.Base.TrimStart('~').Trim('/') + "/";
                 int indexOfBase = url.ToLower().IndexOf(basedir);
                 url = url.Substring(indexOfBase);
 

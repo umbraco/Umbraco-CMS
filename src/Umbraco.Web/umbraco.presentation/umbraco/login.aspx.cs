@@ -13,7 +13,7 @@ using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using System.Web.Security;
 using umbraco.businesslogic.Exceptions;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.web;
 using System.Linq;
 using Umbraco.Core;

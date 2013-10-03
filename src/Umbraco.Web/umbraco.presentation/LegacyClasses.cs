@@ -9,7 +9,7 @@ using System.Web;
 using System.Web.UI;
 using System.Xml;
 using Umbraco.Core;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.NodeFactory;
 using umbraco.cms.businesslogic.web;
 using umbraco.interfaces;

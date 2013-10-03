@@ -1,5 +1,5 @@
 using System;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.scripting
 {

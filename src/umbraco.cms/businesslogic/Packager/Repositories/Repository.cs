@@ -5,7 +5,7 @@ using System.Xml;
 using System.IO;
 using System.Net;
 using Umbraco.Core.Logging;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.packager.repositories {
     public class Repository {

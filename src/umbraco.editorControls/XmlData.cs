@@ -1,4 +1,5 @@
 ﻿using System.Xml;
+using Umbraco.Core;
 using umbraco.cms.businesslogic.datatype;
 
 namespace umbraco.editorControls
@@ -25,7 +26,7 @@ namespace umbraco.editorControls
         public override XmlNode ToXMl(XmlDocument data)
         {
             // check that the value isn't null and starts with an opening angle-bracket.
-            if (this.Value != null && xmlHelper.CouldItBeXml(this.Value.ToString()))
+            if (this.Value != null && XmlHelper.CouldItBeXml(this.Value.ToString()))
             {
                 // load the value into an XML document.
                 var xd = new XmlDocument();

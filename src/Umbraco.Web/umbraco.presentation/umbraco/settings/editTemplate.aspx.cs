@@ -10,7 +10,7 @@ using umbraco.cms.businesslogic.skinning;
 using umbraco.cms.businesslogic.template;
 using umbraco.cms.presentation.Trees;
 using umbraco.DataLayer;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.uicontrols;
 using System.Linq;
 
@@ -33,9 +33,9 @@ namespace umbraco.cms.presentation.settings
 			base.OnPreRender(e);
 
 			ScriptManager.GetCurrent(Page).Services.Add(
-				new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.Webservices + "/codeEditorSave.asmx")));
+				new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.WebServices + "/codeEditorSave.asmx")));
 			ScriptManager.GetCurrent(Page).Services.Add(
-				new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.Webservices + "/legacyAjaxCalls.asmx")));
+                new ServiceReference(IOHelper.ResolveUrl(SystemDirectories.WebServices + "/legacyAjaxCalls.asmx")));
 		}
 
         protected string TemplateTreeSyncPath { get; private set; }
@@ -125,7 +125,7 @@ namespace umbraco.cms.presentation.settings
 			//uicontrols.MenuIconI umbMacro = Panel1.Menu.NewIcon();
 			//umbMacro.ImageURL = UmbracoPath + "/images/editor/insMacro.gif";
 			//umbMacro.AltText = ui.Text("template", "insertMacro");
-			//umbMacro.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/editMacro.aspx?objectId=" + editorSource.ClientID, ui.Text("template", "insertMacro"), 470, 530);
+			//umbMacro.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco) + "/dialogs/editMacro.aspx?objectId=" + editorSource.ClientID, ui.Text("template", "insertMacro"), 470, 530);
 
 			Panel1.Menu.NewElement("div", "splitButtonMacroPlaceHolder", "sbPlaceHolder", 40);
 
@@ -162,7 +162,7 @@ namespace umbraco.cms.presentation.settings
 				MenuIconI umbContainer = Panel1.Menu.NewIcon();
 				umbContainer.ImageURL = UmbracoPath + "/images/editor/skin.gif";
 				umbContainer.AltText = ui.Text("template", "modifyTemplateSkin");
-				//umbContainer.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/TemplateSkinning.aspx?&id=" + _template.Id.ToString(), ui.Text("template", "modifyTemplateSkin"), 570, 420);
+				//umbContainer.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco) + "/dialogs/TemplateSkinning.aspx?&id=" + _template.Id.ToString(), ui.Text("template", "modifyTemplateSkin"), 570, 420);
 				umbContainer.OnClickCommand = "window.open('" + GlobalSettings.Path + "/canvas.aspx?redir=" +
 											  ResolveUrl("~/") + "&umbSkinning=true&umbSkinningConfigurator=true" +
 											  "','canvas')";

@@ -7,7 +7,7 @@ using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using GlobalSettings = umbraco.GlobalSettings;
 
 namespace Umbraco.Tests.BusinessLogic
