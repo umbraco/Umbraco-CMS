@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
 using Umbraco.Core;
+using Umbraco.Core.Events;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.Trees.Menu;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
@@ -42,7 +46,7 @@ namespace Umbraco.Web.Trees
             //assign the properties of this object to those of the metadata attribute
             _attribute = treeAttributes.First();
         }
-
+        
         /// <summary>
         /// The method called to render the contents of the tree structure
         /// </summary>
@@ -161,7 +165,10 @@ namespace Umbraco.Web.Trees
         public MenuItemCollection GetMenu(string id, FormDataCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = new FormDataCollection("");
-            return GetMenuForNode(id, queryStrings);
+            var menu = GetMenuForNode(id, queryStrings);
+            //raise the event
+            OnMenuRendering(this, new MenuRenderingEventArgs(id, menu, queryStrings));
+            return menu;
         }
 
         /// <summary>
@@ -300,7 +307,15 @@ namespace Umbraco.Web.Trees
 
         #endregion
 
-        public static event EventHandler<TreeNodesRenderingEventArgs> TreeNodesRendering;
+        #region Events
+
+        /// <summary>
+        /// An event that allows developers to modify the tree node collection that is being rendered
+        /// </summary>
+        /// <remarks>
+        /// Developers can add/remove/replace/insert/update/etc... any of the tree items in the collection.
+        /// </remarks>
+        public static event TypedEventHandler<TreeController, TreeNodesRenderingEventArgs> TreeNodesRendering;
 
         private static void OnTreeNodesRendering(TreeController instance, TreeNodesRenderingEventArgs e)
         {
@@ -308,12 +323,32 @@ namespace Umbraco.Web.Trees
             if (handler != null) handler(instance, e);
         }
 
-        public static event EventHandler<TreeNodeRenderingEventArgs> RootNodeRendering;
+        /// <summary>
+        /// An event that allows developer to modify the root tree node that is being rendered
+        /// </summary>
+        public static event TypedEventHandler<TreeController, TreeNodeRenderingEventArgs> RootNodeRendering;
 
         private static void OnRootNodeRendering(TreeController instance, TreeNodeRenderingEventArgs e)
         {
             var handler = RootNodeRendering;
             if (handler != null) handler(instance, e);
         }
+
+        /// <summary>
+        /// An event that allows developers to modify the meun that is being rendered
+        /// </summary>
+        /// <remarks>
+        /// Developers can add/remove/replace/insert/update/etc... any of the tree items in the collection.
+        /// </remarks>
+        public static event TypedEventHandler<TreeController, MenuRenderingEventArgs> MenuRendering;
+        
+        private static void OnMenuRendering(TreeController instance, MenuRenderingEventArgs e)
+        {
+            var handler = MenuRendering;
+            if (handler != null) handler(instance, e);
+        }
+
+        #endregion
+        
     }
 }

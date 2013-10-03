@@ -84,15 +84,34 @@ app.config(function ($routeProvider) {
             resolve: checkAuth(true)
         })
         .when('/:section/:tree/:method/:id', {
-            templateUrl: function (rp) {
-                if (!rp.tree || !rp.method) {
-                    return "views/common/dashboard.html";
+            //This allows us to dynamically change the template for this route since you cannot inject services into the templateUrl method.
+            template: "<div ng-include='templateUrl'></div>",
+            //This controller will execute for this route, then we replace the template dynamnically based on the current tree.
+            controller: function ($scope, $route, $routeParams, treeService) {
+
+                if (!$routeParams.tree || !$routeParams.method) {
+                    $scope.templateUrl = "views/common/dashboard.html";
                 }
-                    
-                //we don't need to put views into section folders since theoretically trees
-                // could be moved among sections, we only need folders for specific trees.
-                return 'views/' + rp.tree + '/' + rp.method + '.html';
-            },
+
+                // Here we need to figure out if this route is for a package tree and if so then we need
+                // to change it's convention view path to:
+                // /App_Plugins/{mypackage}/umbraco/{treetype}/{method}.html
+                
+                // otherwise if it is a core tree we use the core paths:
+                // views/{treetype}/{method}.html
+
+                var packageTreeFolder = treeService.getTreePackageFolder($routeParams.tree);
+
+                if (packageTreeFolder) {
+                    $scope.templateUrl = Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
+                        "/" + packageTreeFolder +
+                        "/umbraco/" + $routeParams.tree + "/" + $routeParams.method + ".html";
+                }
+                else {
+                    $scope.templateUrl = 'views/' + $routeParams.tree + '/' + $routeParams.method + '.html';
+                }
+                
+            },            
             resolve: checkAuth(true)
         })        
         .otherwise({ redirectTo: '/login' });

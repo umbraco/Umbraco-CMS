@@ -7,6 +7,7 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
+using Umbraco.Web.Trees;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.media;
@@ -18,7 +19,7 @@ namespace umbraco.cms.presentation.Trees
     /// <summary>
     /// All ITree's should inherit from BaseTree.
     /// </summary>
-    public abstract class BaseTree : ITree, ITreeService
+    public abstract class BaseTree : ITree, ITreeService //, IApplicationEventHandler
     {
 
         public BaseTree(string application)
@@ -580,9 +581,75 @@ namespace umbraco.cms.presentation.Trees
         }
 
         #endregion
+
+        //void IApplicationEventHandler.OnApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        //{
+        //}
+
+        //void IApplicationEventHandler.OnApplicationStarting(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        //{
+        //}
+
+        //void IApplicationEventHandler.OnApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        //{
+        //    TreeController.TreeNodesRendering += TreeController_TreeNodesRendering;
+        //}
         
-        
+        //static void TreeController_TreeNodesRendering(TreeController sender, TreeNodesRenderingEventArgs e)
+        //{
+        //    var baseTree = new NullTree("");
+        //    var legacyTree = new XmlTree();
+        //    var toRemove = new List<TreeNode>();
+
+        //    foreach (var node in e.Nodes)
+        //    {
+        //        //make the legacy node
+        //        var xNode = XmlTreeNode.Create(baseTree);
+        //        xNode.HasChildren = node.HasChildren;
+        //        xNode.IconClass = node.Icon;
+        //        xNode.NodeID = node.NodeId;                
+        //        xNode.NodeType = sender.TreeAlias;
+        //        xNode.Text = node.Title;
+        //        xNode.TreeType = sender.TreeAlias;
+        //        //we cannot support this
+        //        //xNode.OpenIcon = node.Icon;
+        //        //xNode.Menu = ??
+
+        //        baseTree.OnBeforeNodeRender(ref legacyTree, ref xNode, new EventArgs());
+        //        //if the user has nulled this item, then we need to remove it
+        //        if (xNode == null)
+        //        {
+        //            toRemove.Add(node);
+        //        }
+        //        else
+        //        {
+        //            //add to the legacy tree - this mimics what normally happened in legacy trees
+        //            legacyTree.Add(xNode);
+
+        //            //now fire the after event
+        //            baseTree.OnAfterNodeRender(ref legacyTree, ref xNode, new EventArgs());
+
+        //            //ok now we need to determine if we need to map any changes back to the real node
+        //            // these are the only properties that can be mapped back.
+        //            node.HasChildren = xNode.HasChildren;
+        //            node.Icon = xNode.IconClass;
+        //            if (xNode.Icon.IsNullOrWhiteSpace() == false)
+        //            {
+        //                node.Icon = xNode.Icon;
+        //            }
+        //            node.NodeType = xNode.NodeType;
+        //            node.Title = xNode.Text;
+        //        }
+        //    }
+
+        //    //now remove the nodes that were removed
+        //    foreach (var r in toRemove)
+        //    {
+        //        e.Nodes.Remove(r);
+        //    }
+        //}
 
 
     }
+
 }

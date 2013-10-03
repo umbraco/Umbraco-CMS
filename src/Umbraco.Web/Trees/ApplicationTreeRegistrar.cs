@@ -7,6 +7,9 @@ using umbraco.businesslogic;
 
 namespace Umbraco.Web.Trees
 {
+    //TODO: Is there any way to get this to execute lazily when needed? 
+    // i.e. When the back office loads so that this doesn't execute on startup for a content request.
+
     /// <summary>
     /// A startup handler for putting the tree config in the config file based on attributes found
     /// </summary>

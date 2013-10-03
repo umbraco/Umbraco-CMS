@@ -143,11 +143,11 @@ namespace Umbraco.Web.Trees
                 if (t is ContextMenuSeperator && numAdded > 0)
                 {
                     //store the index for which the seperator should be placed
-                    seperators.Add(collection.MenuItems.Count());
+                    seperators.Add(collection.Items.Count());
                 }
                 else
                 {
-                    var menuItem = collection.AddMenuItem(t);
+                    var menuItem = collection.Items.Add(t, ui.Text("actions", t.Alias));
 
                     var currentAction = t;
 
@@ -164,12 +164,12 @@ namespace Umbraco.Web.Trees
                     numAdded++;
                 }
             }
-            var length = collection.MenuItems.Count();
+            var length = collection.Items.Count();
             foreach (var s in seperators)
             {
                 if (length >= s)
                 {
-                    collection.MenuItems.ElementAt(s).SeperatorBefore = true;
+                    collection.Items.ElementAt(s).SeperatorBefore = true;
                 }
             }
 

@@ -3,7 +3,7 @@ using System.IO;
 using System.Web;
 using System.Xml;
 using umbraco.BusinessLogic;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.presentation.channels.businesslogic
 {

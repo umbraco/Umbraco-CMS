@@ -11,7 +11,7 @@ using System.Web.UI.HtmlControls;
 using System.Xml;
 using System.Xml.XPath;
 using Umbraco.Core.Configuration;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.presentation.developer.packages {
     public partial class BrowseRepository : BasePages.UmbracoEnsuredPage {

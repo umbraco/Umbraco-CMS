@@ -7,6 +7,7 @@ using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Trees.Menu;
+using umbraco;
 using umbraco.BusinessLogic.Actions;
 using Constants = Umbraco.Core.Constants;
 
@@ -14,6 +15,7 @@ namespace Umbraco.Web.Trees
 {
     [Tree(Constants.Applications.Developer, Constants.Trees.DataTypes, "Data Types")]
     [PluginController("UmbracoTrees")]
+    [CoreTree]
     public class DataTypeTreeController : TreeController
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
@@ -45,13 +47,13 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 // root actions              
-                menu.AddMenuItem<CreateChildEntity, ActionNew>();
-                menu.AddMenuItem<RefreshNode, ActionRefresh>(true);
+                menu.Items.Add<CreateChildEntity, ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
+                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
-
+            
             //only have delete for each node
-            menu.AddMenuItem<ActionDelete>();            
+            menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));            
             return menu;
         }
     }

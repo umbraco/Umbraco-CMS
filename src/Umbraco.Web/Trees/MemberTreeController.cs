@@ -17,6 +17,7 @@ namespace Umbraco.Web.Trees
     [LegacyBaseTree(typeof (loadMembers))]
     [Tree(Constants.Applications.Members, Constants.Trees.Members, "Members")]
     [PluginController("UmbracoTrees")]
+    [CoreTree]
     public class MemberTreeController : TreeController
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
@@ -79,13 +80,13 @@ namespace Umbraco.Web.Trees
                 menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
                 // root actions         
-                menu.AddMenuItem<ActionNew>();
-                menu.AddMenuItem<RefreshNode, ActionRefresh>(true);
+                menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
+                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
 
-            menu.AddMenuItem<ActionDelete>();
-            menu.AddMenuItem<RefreshNode, ActionRefresh>(true);
+            menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+            menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
             return menu;
         }
     }

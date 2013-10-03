@@ -13,7 +13,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Web.UI;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.presentation.umbraco.create
 {

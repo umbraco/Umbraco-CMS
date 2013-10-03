@@ -324,6 +324,9 @@ angular.module('umbraco.services')
             if (!args.action) {
                 throw "The args parameter must have an 'action' property as the clicked menu action object";
             }
+            if (!args.node) {
+                throw "The args parameter must have a 'node' as the active tree node";
+            }
 
             //ensure the current dialog is cleared before creating another!
             if (this.ui.currentDialog) {
@@ -348,11 +351,7 @@ angular.module('umbraco.services')
             var templateUrl;
             var iframe;
 
-            //TODO: fix hardcoded hack for content/media... once these trees are converted over to 
-            // new c# trees we won't need to do this any longer.
-            var isCreateForContent = args.action.alias === "create" && (this.ui.currentSection === "content" || this.ui.currentSection === "media");
-
-            if (args.action.metaData["actionUrl"] && !isCreateForContent) {
+            if (args.action.metaData["actionUrl"]) {
                 templateUrl = args.action.metaData["actionUrl"];
                 iframe = true;
             }
@@ -361,7 +360,25 @@ angular.module('umbraco.services')
                 iframe = false;
             }
             else {
-                templateUrl = "views/" + this.ui.currentSection + "/" + args.action.alias + ".html";
+                
+                //by convention we will look into the /views/{treetype}/{action}.html
+                // for example: /views/content/create.html
+
+                //we will also check for a 'packageName' for the current tree, if it exists then the convention will be:
+                // for example: /App_Plugins/{mypackage}/umbraco/{treetype}/create.html
+
+                var treeAlias = treeService.getTreeAlias(args.node);
+                var packageTreeFolder = treeService.getTreePackageFolder(treeAlias);
+
+                if (packageTreeFolder) {
+                    templateUrl = Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath + 
+                        "/" + packageTreeFolder +
+                        "/umbraco/" + treeAlias + "/" + args.action.alias + ".html";
+                }
+                else {
+                    templateUrl = "views/" + treeAlias + "/" + args.action.alias + ".html";
+                }
+
                 iframe = false;
             }
 

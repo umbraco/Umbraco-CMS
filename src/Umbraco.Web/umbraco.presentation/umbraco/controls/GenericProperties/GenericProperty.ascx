@@ -10,7 +10,7 @@
 			<h3 style="padding: 0px; margin: 0px;">
 			<asp:ImageButton ID="DeleteButton2" Runat="server"></asp:ImageButton>
 			 
-			<a href="javascript:expandCollapse('<%=this.ClientID%>');"><img src="<%= umbraco.IO.IOHelper.ResolveUrl( umbraco.IO.SystemDirectories.Umbraco )%>/images/expand.png" style="FLOAT: right"/>
+			<a href="javascript:expandCollapse('<%=this.ClientID%>');"><img src="<%= Umbraco.Core.IO.IOHelper.ResolveUrl( Umbraco.Core.IO.SystemDirectories.Umbraco )%>/images/expand.png" style="FLOAT: right"/>
 			  <asp:Literal ID="FullHeader" Runat="server"></asp:Literal>
 			</a>
 			
@@ -21,7 +21,7 @@
 			
 			<h3 style="padding: 0px; margin: 0px;">
 			  <asp:ImageButton ID="DeleteButton" Runat="server"></asp:ImageButton>
-			  <a href="javascript:expandCollapse('<%=this.ClientID%>');"><img src="<%= umbraco.IO.IOHelper.ResolveUrl(  umbraco.IO.SystemDirectories.Umbraco )%>/images/collapse.png" id="<%=this.ClientID%>_fold" style="FLOAT: right"  />
+			  <a href="javascript:expandCollapse('<%=this.ClientID%>');"><img src="<%= Umbraco.Core.IO.IOHelper.ResolveUrl(  Umbraco.Core.IO.SystemDirectories.Umbraco )%>/images/collapse.png" id="<%=this.ClientID%>_fold" style="FLOAT: right"  />
 			  Edit "<asp:Literal ID="Header" Runat="server"></asp:Literal>"</a>
 			</h3>
 			

@@ -96,8 +96,8 @@ namespace Umbraco.Web.Trees
             if (RecycleBinId.ToInvariantString() == id)
             {
                 var menu = new MenuItemCollection();
-                menu.AddMenuItem<ActionEmptyTranscan>();
-                menu.AddMenuItem<ActionRefresh>(true);
+                menu.Items.Add<ActionEmptyTranscan>(ui.Text("actions", ActionEmptyTranscan.Instance.Alias));
+                menu.Items.Add<ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
             return PerformGetMenuForNode(id, queryStrings);
@@ -113,7 +113,7 @@ namespace Umbraco.Web.Trees
         {
             var userAllowedActions = userAllowedMenuItems.Where(x => x.Action != null).Select(x => x.Action).ToArray();
 
-            var notAllowed = menuWithAllItems.MenuItems.Where(
+            var notAllowed = menuWithAllItems.Items.Where(
                 a => (a.Action != null
                       && a.Action.CanBePermissionAssigned
                       && (a.Action.CanBePermissionAssigned == false || userAllowedActions.Contains(a.Action) == false)))
@@ -122,7 +122,7 @@ namespace Umbraco.Web.Trees
             //remove the ones that aren't allowed.
             foreach (var m in notAllowed)
             {
-                menuWithAllItems.RemoveMenuItem(m);
+                menuWithAllItems.Items.Remove(m);
             }
         }
 

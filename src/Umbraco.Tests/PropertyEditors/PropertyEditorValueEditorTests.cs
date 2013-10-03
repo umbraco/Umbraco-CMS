@@ -8,6 +8,21 @@ namespace Umbraco.Tests.PropertyEditors
     [TestFixture]
     public class PropertyEditorValueEditorTests
     {
+        [TestCase("{prop1: 'val1', prop2: 'val2'}", true)]
+        [TestCase("{1,2,3,4}", false)]
+        [TestCase("[1,2,3,4]", true)]
+        [TestCase("hello world", false)]
+        public void Value_Editor_Can_Convert_To_Json_Object_For_Editor(string value, bool isOk)
+        {
+            var valueEditor = new PropertyValueEditor
+                {
+                    ValueType = "STRING"
+                };
+
+            var result = valueEditor.FormatDataForEditor(value);
+            Assert.AreEqual(isOk, !(result is string));
+        }
+
         [TestCase("STRING", "hello", "hello")]
         [TestCase("TEXT", "hello", "hello")]
         [TestCase("INT", "123", 123)]

@@ -42,12 +42,25 @@
 					}
 				}				
 			}
-		}		
+		},
+		{
+			alias: "MyPackage.CustomJson",
+			name: "Custom editor",
+			editor: {
+				view: "~/App_Plugins/MyPackage/PropertyEditors/Views/CustomJson.html"							
+			},
+			prevalues: {
+				fields: [
+					{
+						label: "Json preval",
+						key: "value",
+						view: "~/App_Plugins/MyPackage/PropertyEditors/Views/CustomJson.html"				
+					}
+				]
+			}
+		}	
 	],    
     javascript: [
-        '~/App_Plugins/MyPackage/Common/Js/MyPackage.js',
-		'~/App_Plugins/MyPackage/PropertyEditors/Js/CsvEditor.js',
-		'~/App_Plugins/MyPackage/PropertyEditors/Js/PostcodeEditor.js',
-		'~/App_Plugins/MyPackage/PropertyEditors/Js/RegexEditor.js'
+		'~/App_Plugins/MyPackage/PropertyEditors/Js/propertyeditors.controller.js'
     ]
 }

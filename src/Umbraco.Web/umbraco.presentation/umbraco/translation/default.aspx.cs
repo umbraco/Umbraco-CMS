@@ -18,7 +18,7 @@ using ICSharpCode.SharpZipLib.Zip;
 using ICSharpCode.SharpZipLib.Zip.Compression;
 using ICSharpCode.SharpZipLib.Zip.Compression.Streams;
 using ICSharpCode.SharpZipLib.GZip;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using System.Collections.Generic;
 
 namespace umbraco.presentation.translation

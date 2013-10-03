@@ -1,6 +1,6 @@
 using umbraco.BusinessLogic;
 using System;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.web;
 
 namespace dashboardUtilities

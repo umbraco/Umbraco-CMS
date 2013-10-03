@@ -6,7 +6,7 @@ namespace Umbraco.Web.Trees
     {
         public TreeNode Node { get; private set; }
 
-        public TreeNodeRenderingEventArgs(TreeNode node, FormDataCollection queryStrings) 
+        public TreeNodeRenderingEventArgs(TreeNode node, FormDataCollection queryStrings)
             : base(queryStrings)
         {
             Node = node;

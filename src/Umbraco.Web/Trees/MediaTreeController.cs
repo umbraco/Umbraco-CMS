@@ -18,6 +18,7 @@ namespace Umbraco.Web.Trees
     [LegacyBaseTree(typeof(loadMedia))]
     [Tree(Constants.Applications.Media, Constants.Trees.Media, "Media")]
     [PluginController("UmbracoTrees")]
+    [CoreTree]
     public class MediaTreeController : ContentTreeControllerBase
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
@@ -76,9 +77,9 @@ namespace Umbraco.Web.Trees
                 }
 
                 // root actions         
-                menu.AddMenuItem<ActionNew>();
-                menu.AddMenuItem<ActionSort>(true).ConvertLegacyMenuItem(null, "media", "media");
-                menu.AddMenuItem<RefreshNode, ActionRefresh>(true);
+                menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
+                menu.Items.Add<ActionSort>(ui.Text("actions", ActionSort.Instance.Alias), true).ConvertLegacyMenuItem(null, "media", "media");
+                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }
 
@@ -93,11 +94,11 @@ namespace Umbraco.Web.Trees
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
             //return a normal node menu:
-            menu.AddMenuItem<ActionNew>();
-            menu.AddMenuItem<ActionMove>();
-            menu.AddMenuItem<ActionDelete>();
-            menu.AddMenuItem<ActionSort>().ConvertLegacyMenuItem(null, "media", "media");
-            menu.AddMenuItem<ActionRefresh>(true);
+            menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
+            menu.Items.Add<ActionMove>(ui.Text("actions", ActionMove.Instance.Alias));
+            menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+            menu.Items.Add<ActionSort>(ui.Text("actions", ActionSort.Instance.Alias)).ConvertLegacyMenuItem(null, "media", "media");
+            menu.Items.Add<ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
             return menu;
         }
 

@@ -3,7 +3,7 @@ using System.Configuration;
 
 namespace Umbraco.Core.Configuration.BaseRest
 {
-    [ConfigurationKey("BaseRestExtensions")]
+
     internal class BaseRestSection : UmbracoConfigurationSection, IBaseRestSection
     {
         private const string KeyEnabled = "enabled";
