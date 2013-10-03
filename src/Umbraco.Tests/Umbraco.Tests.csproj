@@ -68,6 +68,10 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Web.Mvc.FixedDisplayModes, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Umbraco.Web.UI\bin\Microsoft.Web.Mvc.FixedDisplayModes.dll</HintPath>
+    </Reference>
     <Reference Include="Moq">
       <HintPath>..\packages\Moq.4.1.1309.1617\lib\net40\Moq.dll</HintPath>
     </Reference>
@@ -146,6 +150,7 @@
     <Compile Include="AttemptTests.cs" />
     <Compile Include="Auditing\AuditTests.cs" />
     <Compile Include="BootManagers\CoreBootManagerTests.cs" />
+    <Compile Include="BootManagers\WebBootManagerTester.cs" />
     <Compile Include="BusinessLogic\DictionaryTest.cs" />
     <Compile Include="Cache\CacheHelperTests.cs" />
     <Compile Include="CodeFirst\Attributes\AliasAttribute.cs" />
