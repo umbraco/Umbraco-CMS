@@ -7,11 +7,6 @@ namespace Umbraco.Web.Trees.Menu
     public static class MenuItemExtensions
     {
         /// <summary>
-        /// Used as a key for the AdditionalData to specify which package folder the menu launcher should look in for views
-        /// </summary>
-        internal const string PackageName = "packageName";
-
-        /// <summary>
         /// Used as a key for the AdditionalData to specify a specific dialog title instead of the menu title
         /// </summary>
         internal const string DialogTitleKey = "dialogTitle";
@@ -31,16 +26,6 @@ namespace Umbraco.Web.Trees.Menu
         /// Used to specify the angular view that the dialog will launch
         /// </summary>
         internal const string ActionViewKey = "actionView";
-
-        /// <summary>
-        /// Sets the package folder to look for views in
-        /// </summary>
-        /// <param name="menuItem"></param>
-        /// <param name="packageFolder"></param>
-        internal static void SetPackageFolder(this MenuItem menuItem, string packageFolder)
-        {
-            menuItem.AdditionalData[PackageName] = packageFolder;
-        }
 
         /// <summary>
         /// Sets the menu item to display a dialog based on an angular view path

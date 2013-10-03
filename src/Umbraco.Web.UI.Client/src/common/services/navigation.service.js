@@ -364,16 +364,19 @@ angular.module('umbraco.services')
                 //by convention we will look into the /views/{treetype}/{action}.html
                 // for example: /views/content/create.html
 
-                //we will also check for a 'packageName' in metaData, if it exists, we'll look by convention in that folder
+                //we will also check for a 'packageName' for the current tree, if it exists then the convention will be:
                 // for example: /App_Plugins/{mypackage}/umbraco/{treetype}/create.html
 
-                if (args.action.metaData["packageName"]) {
+                var treeAlias = treeService.getTreeAlias(args.node);
+                var packageTreeFolder = treeService.getTreePackageFolder(treeAlias);
 
-                    templateUrl = Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
-                        "/umbraco/views/" + treeService.getTreeAlias(args.node) + "/" + args.action.alias + ".html";
+                if (packageTreeFolder) {
+                    templateUrl = Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath + 
+                        "/" + packageTreeFolder +
+                        "/umbraco/" + treeAlias + "/" + args.action.alias + ".html";
                 }
                 else {
-                    templateUrl = "views/" + treeService.getTreeAlias(args.node) + "/" + args.action.alias + ".html";
+                    templateUrl = "views/" + treeAlias + "/" + args.action.alias + ".html";
                 }
 
                 iframe = false;

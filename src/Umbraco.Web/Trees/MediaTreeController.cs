@@ -18,6 +18,7 @@ namespace Umbraco.Web.Trees
     [LegacyBaseTree(typeof(loadMedia))]
     [Tree(Constants.Applications.Media, Constants.Trees.Media, "Media")]
     [PluginController("UmbracoTrees")]
+    [CoreTree]
     public class MediaTreeController : ContentTreeControllerBase
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)

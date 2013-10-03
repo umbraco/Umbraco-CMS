@@ -58,6 +58,33 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             }
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.services.treeService#getTreePackageFolder
+         * @methodOf umbraco.services.treeService
+         * @function
+         *
+         * @description
+         * Determines if the current tree is a plugin tree and if so returns the package folder it has declared
+         * so we know where to find it's views, otherwise it will just return undefined.
+         * 
+         * @param {String} treeAlias The tree alias to check
+         */
+        getTreePackageFolder: function(treeAlias) {            
+            //we determine this based on the server variables
+            if (Umbraco.Sys.ServerVariables.umbracoPlugins &&
+                Umbraco.Sys.ServerVariables.umbracoPlugins.trees &&
+                angular.isArray(Umbraco.Sys.ServerVariables.umbracoPlugins.trees)) {
+
+                var found = _.find(Umbraco.Sys.ServerVariables.umbracoPlugins.trees, function(item) {
+                    return item.alias === treeAlias;
+                });
+                
+                return found ? found.packageFolder : undefined;
+            }
+            return undefined;
+        },
+
         /** clears the tree cache */
         clearCache: function() {
             treeArray = [];

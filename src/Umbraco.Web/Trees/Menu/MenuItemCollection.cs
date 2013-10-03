@@ -12,7 +12,7 @@ namespace Umbraco.Web.Trees.Menu
     [DataContract(Name = "menuItems", Namespace = "")]
     public class MenuItemCollection
     {
-        private readonly string _packageFolderName;
+        //private readonly string _packageFolderName;
         private readonly List<MenuItem> _menuItems;
         
         public MenuItemCollection()
@@ -24,19 +24,7 @@ namespace Umbraco.Web.Trees.Menu
         {
             _menuItems = new List<MenuItem>(items);
         }
-
-        public MenuItemCollection(string packageFolderName)
-            : this()
-        {
-            _packageFolderName = packageFolderName;
-        }
-
-        public MenuItemCollection(string packageFolderName, IEnumerable<MenuItem> items)
-        {
-            _packageFolderName = packageFolderName;
-            _menuItems = new List<MenuItem>(items);
-        }
-
+        
         /// <summary>
         /// Sets the default menu item alias to be shown when the menu is launched - this is optional and if not set then the menu will just be shown normally.
         /// </summary>
@@ -63,7 +51,7 @@ namespace Umbraco.Web.Trees.Menu
 
             DetectLegacyActionMenu(action.GetType(), item);
 
-            AddItemToCollection(item);
+            _menuItems.Add(item);
             return item;
         }
 
@@ -81,7 +69,7 @@ namespace Umbraco.Web.Trees.Menu
         /// </summary>
         public void AddMenuItem(MenuItem item)
         {
-            AddItemToCollection(item);
+            _menuItems.Add(item);
         }
         
         /// <summary>
@@ -109,7 +97,7 @@ namespace Umbraco.Web.Trees.Menu
                     Action = item.Action
                 };
 
-            AddItemToCollection(customMenuItem);
+            _menuItems.Add(customMenuItem);
 
             return customMenuItem;
         }
@@ -152,7 +140,7 @@ namespace Umbraco.Web.Trees.Menu
             var item = CreateMenuItem<T>(name, hasSeparator, additionalData);
             if (item != null) 
             {
-                AddItemToCollection(item);
+                _menuItems.Add(item);
                 return item;
             }
             return null;
@@ -224,18 +212,6 @@ namespace Umbraco.Web.Trees.Menu
             }
         }
 
-        /// <summary>
-        /// This handles adding a menu item to the internal collection and will configure it accordingly
-        /// </summary>
-        /// <param name="menuItem"></param>
-        private void AddItemToCollection(MenuItem menuItem)
-        {
-            if (_packageFolderName.IsNullOrWhiteSpace() == false)
-            {
-                menuItem.SetPackageFolder(_packageFolderName);
-            }
-            _menuItems.Add(menuItem);
-        }
 
     }
 }

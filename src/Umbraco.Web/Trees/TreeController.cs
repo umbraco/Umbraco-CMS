@@ -18,7 +18,6 @@ namespace Umbraco.Web.Trees
     public abstract class TreeController : UmbracoAuthorizedApiController
     {
         private readonly TreeAttribute _attribute;
-        private readonly MenuItemCollection _menuItemCollection;
 
         /// <summary>
         /// Remove the xml formatter... only support JSON!
@@ -45,21 +44,8 @@ namespace Umbraco.Web.Trees
 
             //assign the properties of this object to those of the metadata attribute
             _attribute = treeAttributes.First();
-
-            //Create the menu item collection with the area nem already specified
-            _menuItemCollection = Metadata.AreaName.IsNullOrWhiteSpace() 
-                ? new MenuItemCollection() 
-                : new MenuItemCollection(Metadata.AreaName);
         }
-
-        /// <summary>
-        /// Returns a menu item collection to be used to return the menu items from GetMenuForNode
-        /// </summary>
-        public MenuItemCollection MenuItems
-        {
-            get { return _menuItemCollection; }
-        }
-
+        
         /// <summary>
         /// The method called to render the contents of the tree structure
         /// </summary>
@@ -334,47 +320,6 @@ namespace Umbraco.Web.Trees
             if (handler != null) handler(instance, e);
         } 
         #endregion
-
-        #region Metadata
-        /// <summary>
-        /// stores the metadata about plugin controllers
-        /// </summary>
-        private static readonly ConcurrentDictionary<Type, PluginControllerMetadata> MetadataStorage = new ConcurrentDictionary<Type, PluginControllerMetadata>();
-
-        /// <summary>
-        /// Returns the metadata for this instance
-        /// </summary>
-        internal PluginControllerMetadata Metadata
-        {
-            get { return GetMetadata(this.GetType()); }
-        }
-
-        /// <summary>
-        /// Returns the metadata for a PluginController
-        /// </summary>
-        /// <param name="type"></param>
-        /// <returns></returns>
-        internal static PluginControllerMetadata GetMetadata(Type type)
-        {
-
-            return MetadataStorage.GetOrAdd(type, type1 =>
-            {
-                var attribute = type.GetCustomAttribute<PluginControllerAttribute>(false);
-
-                var meta = new PluginControllerMetadata()
-                {
-                    AreaName = attribute == null ? null : attribute.AreaName,
-                    ControllerName = ControllerExtensions.GetControllerName(type),
-                    ControllerNamespace = type.Namespace,
-                    ControllerType = type
-                };
-
-                MetadataStorage.TryAdd(type, meta);
-
-                return meta;
-            });
-
-        } 
-        #endregion
+        
     }
 }

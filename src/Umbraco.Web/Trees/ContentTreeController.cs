@@ -22,6 +22,7 @@ namespace Umbraco.Web.Trees
     [LegacyBaseTree(typeof(loadContent))]
     [Tree(Constants.Applications.Content, Constants.Trees.Content, "Content")]
     [PluginController("UmbracoTrees")]
+    [CoreTree]
     public class ContentTreeController : ContentTreeControllerBase
     {
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
