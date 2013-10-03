@@ -312,11 +312,18 @@
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\LogController.cs" />
     <Compile Include="Editors\MacroController.cs" />
+    <Compile Include="Editors\PublishedContentController.cs" />
+    <Compile Include="Models\ContentEditing\StyleSheet.cs" />
+    <Compile Include="Editors\StylesheetController.cs" />
     <Compile Include="Models\ContentEditing\AuditLog.cs" />
     <Compile Include="Models\ContentEditing\MoveOrCopy.cs" />
     <Compile Include="Models\ContentEditing\MacroParameter.cs" />
     <Compile Include="Models\ContentEditing\MemberDisplay.cs" />
     <Compile Include="Models\ContentEditing\MemberSave.cs" />
+    <Compile Include="Models\ContentEditing\RichTextEditorCommand.cs" />
+    <Compile Include="Models\ContentEditing\RichTextEditorConfiguration.cs" />
+    <Compile Include="Models\ContentEditing\RichTextEditorPlugin.cs" />
+    <Compile Include="Models\ContentEditing\StylesheetRule.cs" />
     <Compile Include="Models\ContentEditing\UmbracoEntityTypes.cs" />
     <Compile Include="Models\ContentEditing\AuditLogType.cs" />
     <Compile Include="Models\Mapping\LogModelMapper.cs" />
@@ -360,6 +367,8 @@
     <Compile Include="PropertyEditors\PublishValuesMultipleValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownMultipleWithKeysPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RadioButtonsPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\RichTextPreValueController.cs" />
+    <Compile Include="PropertyEditors\RichTextPreValueEditor.cs" />
     <Compile Include="PropertyEditors\TagsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\UserPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ValueListPreValueEditor.cs" />

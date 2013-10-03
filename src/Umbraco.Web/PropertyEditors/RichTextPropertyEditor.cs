@@ -17,6 +17,12 @@ namespace Umbraco.Web.PropertyEditors
             return new RichTextPropertyValueEditor(base.CreateValueEditor());
         }
 
+        protected override PreValueEditor CreatePreValueEditor()
+        {
+            return new RichTextPreValueEditor();
+        }
+
+
         /// <summary>
         /// A custom value editor to ensure that macro syntax is parsed when being persisted and formatted correctly for display in the editor
         /// </summary>
