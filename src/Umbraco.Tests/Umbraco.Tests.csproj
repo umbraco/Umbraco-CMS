@@ -301,6 +301,7 @@
     <Compile Include="AsynchronousRollingFileAppenderTests.cs" />
     <Compile Include="BusinessLogic\ApplicationTest.cs" />
     <Compile Include="BusinessLogic\ApplicationTreeTest.cs" />
+    <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserType.cs" />
     <Compile Include="BusinessLogic\BaseTest.cs" />

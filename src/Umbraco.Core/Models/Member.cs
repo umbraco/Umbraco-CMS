@@ -20,19 +20,26 @@ namespace Umbraco.Core.Models
         private object _providerUserKey;
         private Type _userTypeKey;
 
-        public Member(string name, int parentId, IMemberType contentType, PropertyCollection properties) : base(name, parentId, contentType, properties)
+        public Member(string name, string email, string username, string password, int parentId, IMemberType contentType)
+            : base(name, parentId, contentType, new PropertyCollection())
         {
             Mandate.ParameterNotNull(contentType, "contentType");
 
             _contentType = contentType;
+            _email = email;
+            _username = username;
+            _password = password;
         }
 
-        public Member(string name, IContentBase parent, IMemberType contentType, PropertyCollection properties)
-            : base(name, parent, contentType, properties)
+        public Member(string name, string email, string username, string password, IContentBase parent, IMemberType contentType)
+            : base(name, parent, contentType, new PropertyCollection())
         {
             Mandate.ParameterNotNull(contentType, "contentType");
 
             _contentType = contentType;
+            _email = email;
+            _username = username;
+            _password = password;
         }
 
         private static readonly PropertyInfo DefaultContentTypeAliasSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.ContentTypeAlias);
