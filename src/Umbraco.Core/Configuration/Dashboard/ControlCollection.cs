@@ -18,7 +18,7 @@ namespace Umbraco.Core.Configuration.Dashboard
 
         protected override object GetElementKey(ConfigurationElement element)
         {
-            return ((ControlElement)element).Value;
+            return ((ControlElement)element).ControlPath;
         }
 
         IEnumerator<IControl> IEnumerable<IControl>.GetEnumerator()

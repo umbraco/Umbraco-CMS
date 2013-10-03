@@ -16,6 +16,12 @@ namespace Umbraco.Core.Configuration.Dashboard
         {
             get { return (AreasElement)this["areas"]; }
         }
+        
+        [ConfigurationProperty("access")]
+        public AccessElement Access
+        {
+            get { return (AccessElement)this["access"]; }
+        }
 
         [ConfigurationCollection(typeof(SectionCollection), AddItemName = "tab")]
         [ConfigurationProperty("", IsDefaultCollection = true)]
@@ -33,6 +39,11 @@ namespace Umbraco.Core.Configuration.Dashboard
         string ISection.Area
         {
             get { return Area.AreaName; }
+        }
+
+        IAccess ISection.AccessRights
+        {
+            get { return Access; }
         }
     }
 }

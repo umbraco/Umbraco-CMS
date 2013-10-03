@@ -9,5 +9,7 @@ namespace Umbraco.Core.Configuration.Dashboard
         string Area { get; }
 
         IEnumerable<ITab> Tabs { get; }
+
+        IAccess AccessRights { get; }
     }
 }
