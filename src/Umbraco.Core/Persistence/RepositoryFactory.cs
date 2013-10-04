@@ -33,6 +33,12 @@ namespace Umbraco.Core.Persistence
 
         }
 
+        public virtual ITagsRepository CreateTagsRepository(IDatabaseUnitOfWork uow)
+        {
+            return new TagsRepository(
+                uow,
+                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current);
+        }
 
         public virtual IContentRepository CreateContentRepository(IDatabaseUnitOfWork uow)
         {

@@ -10,6 +10,7 @@ namespace Umbraco.Core.Models
 
         [DataMember]
         string Group { get; set; }
+
         //TODO: enable this at some stage
         //int ParentId { get; set; }
     }
