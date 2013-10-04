@@ -320,6 +320,24 @@ angular.module('umbraco.services')
 
            /**
             * @ngdoc method
+            * @name umbraco.services.dialogService#linkPicker
+            * @methodOf umbraco.services.dialogService
+            *
+            * @description
+            * Opens a link picker tree in a modal, the callback returns a single link
+            * @param {Object} options content picker dialog options object
+            * @param {$scope} options.scope dialog scope
+            * @param {Function} options.callback callback function
+            * @returns {Object} modal object
+            */
+           linkPicker: function (options) {
+               options.template = 'views/common/dialogs/linkPicker.html';
+               options.show = true;
+              return openDialog(options);
+           },
+
+           /**
+            * @ngdoc method
             * @name umbraco.services.dialogService#macroPicker
             * @methodOf umbraco.services.dialogService
             *

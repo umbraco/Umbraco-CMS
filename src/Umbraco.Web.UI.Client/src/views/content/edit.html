@@ -34,6 +34,8 @@
                         <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                             <li><a href="#" ng-click="save()"
                              prevent-default data-hotkey="ctrl+s">Save draft</a></li>
+                            <li ng-show="content.publishDate"><a href="#" ng-click="unPublish()"
+                             prevent-default>Unpublish</a></li> 
                          </ul>
                      </div>
                  </div>
@@ -54,4 +56,6 @@
         </umb-tab-view>
 
     </umb-panel>
+
+    {{content | json}}
 </form>

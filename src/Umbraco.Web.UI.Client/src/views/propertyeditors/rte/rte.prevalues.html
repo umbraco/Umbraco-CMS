@@ -1,0 +1,35 @@
+<div ng-controller="Umbraco.PrevalueEditors.RteController">
+
+	<umb-control-group label="Toolbar">
+		<div ng-repeat="cmd in tinyMceConfig.commands">
+			<input type="checkbox" 
+				ng-checked="selected(cmd.frontEndCommand, model.value.toolbar)" 
+				ng-model="cmd.selected" 
+				ng-change="selectCommand(cmd)"
+				/> 
+
+				<img src="{{cmd.icon}}" />
+
+				{{cmd.frontEndCommand}}
+		</div>
+	</umb-control-group>
+
+	<umb-control-group label="Stylesheets">
+		<div ng-repeat="css in stylesheets">
+			<input type="checkbox" 
+				ng-checked="selected(css.path, model.value.stylesheets)" 
+				ng-model="css.selected" 
+				ng-change="selectStylesheet(css)"
+				/> 
+				{{css.name}}
+		</div>
+	</umb-control-group>
+
+	<umb-control-group label="Dimensions">
+		<input type="number" ng-model="model.value.dimensions.height" class="umb-editor-tiny" placeholder="Height" /> x <input type="number" ng-model="model.value.dimensions.width" class="umb-editor umb-editor-tiny" placeholder="Width" /> Pixels   
+	</umb-control-group>
+
+	{{model.value | json}}
+
+	{{tinyMceConfig | json}}
+</div>

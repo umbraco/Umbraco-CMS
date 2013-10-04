@@ -38,6 +38,20 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
 
     //TODO: Need to figure out a way to share the saving and event broadcasting with all editors!
 
+    $scope.unPublish = function () {
+        
+        $scope.setStatus("Unpublishing...");
+
+        contentResource.unPublish($scope.content.id)
+            .then(function (data) {
+                contentEditingHelper.handleSuccessfulSave({
+                    scope: $scope,
+                    newContent: data,
+                    rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
+                });
+            });   
+    };
+
     $scope.saveAndPublish = function () {
         
         $scope.setStatus("Publishing...");

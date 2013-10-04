@@ -24,10 +24,38 @@ namespace Umbraco.Core.PropertyEditors
             View = view;
         }
 
+        public PreValueFieldAttribute(string name, string view)
+        {
+            Name = name;
+            View = view;
+        }
+
+        /// <summary>
+        /// The description to display for the pre-value field
+        /// </summary>
         public string Description { get; set; }
+
+        /// <summary>
+        /// The key to store the pre-value against in the databaes
+        /// </summary>
+        /// <remarks>
+        /// If this is not specified and the attribute is being used at the property level then the property name will become the key
+        /// </remarks>
         public string Key { get; private set; }
+
+        /// <summary>
+        /// The name (label) of the pre-value field
+        /// </summary>
         public string Name { get; private set; }
+
+        /// <summary>
+        /// The view to use to render the pre-value field
+        /// </summary>
         public string View { get; private set; }
+
+        /// <summary>
+        /// Whether or not to hide the label for the pre-value field
+        /// </summary>
         public bool HideLabel { get; set; }
 
         /// <summary>

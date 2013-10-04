@@ -33,6 +33,12 @@ namespace Umbraco.Core.Persistence
 
         }
 
+        public virtual ITagsRepository CreateTagsRepository(IDatabaseUnitOfWork uow)
+        {
+            return new TagsRepository(
+                uow,
+                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current);
+        }
 
         public virtual IContentRepository CreateContentRepository(IDatabaseUnitOfWork uow)
         {
@@ -40,7 +46,8 @@ namespace Umbraco.Core.Persistence
                 uow,
                 _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
                 CreateContentTypeRepository(uow),
-                CreateTemplateRepository(uow)) { EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming };
+                CreateTemplateRepository(uow),
+                CreateTagsRepository(uow)) { EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming };
         }
 
         public virtual IContentTypeRepository CreateContentTypeRepository(IDatabaseUnitOfWork uow)

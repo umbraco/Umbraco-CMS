@@ -10,6 +10,7 @@ using Umbraco.Core;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
+using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Web.Editors
 {
@@ -75,6 +76,9 @@ namespace Umbraco.Web.Editors
                                 {"dashboardApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<DashboardController>("GetDashboard")},
                                 {"logApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<LogController>("GetEntityLog")},
                                 {"memberApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberController>("GetByLogin")},
+                                {"rteApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RichTextPreValueController>("GetConfiguration")},
+                                {"stylesheetApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<StylesheetController>("GetAll")}
+                               
                             }
                     },
                     {

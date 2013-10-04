@@ -19,6 +19,12 @@
 									description: "If value is blank, the editor will show this",
 									key: "defaultValue",
 									view: "textarea"
+								},
+								{
+									label: "RTE Test",
+									description: "If value is blank, the editor will show this",
+									key: "rte",
+									view: "rte"
 								}
 							]
 						}

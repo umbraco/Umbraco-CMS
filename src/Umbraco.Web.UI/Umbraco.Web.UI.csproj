@@ -622,6 +622,8 @@
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
+    <Content Include="Config\appSettings.Release.config" />
+    <Content Include="Config\appSettings.config" />
     <None Include="Config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -632,6 +634,8 @@
     <None Include="Config\BaseRestExtensions.Release.config">
       <DependentUpon>BaseRestExtensions.config</DependentUpon>
     </None>
+    <Content Include="Config\connectionStrings.Release.config" />
+    <Content Include="Config\connectionStrings.config" />
     <None Include="Config\log4net.Release.config">
       <DependentUpon>log4net.config</DependentUpon>
     </None>
@@ -2120,6 +2124,8 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Views\Web.config.transform" />
+    <None Include="Web.Debug.config.transformed" />
+    <None Include="Web.Release.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -2529,7 +2535,9 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Config\metablogConfig.config" />
-    <Content Include="Config\tinyMceConfig.config" />
+    <Content Include="Config\tinyMceConfig.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Config\umbracoSettings.config">
       <SubType>Designer</SubType>
     </Content>

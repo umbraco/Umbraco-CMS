@@ -6,8 +6,27 @@
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
-function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeout, macroResource, macroService, $routeParams) {
+function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macroResource, macroService, $routeParams, umbRequestHelper) {
     return {
+
+        /**
+        * @ngdoc method
+        * @name umbraco.services.tinyMceService#configuration
+        * @methodOf umbraco.services.tinyMceService
+        *
+        * @description
+        * Returns a collection of plugins available to the tinyMCE editor
+        *
+        */
+        configuration: function () {
+               return umbRequestHelper.resourcePromise(
+                  $http.get(
+                      umbRequestHelper.getApiUrl(
+                          "rteApiBaseUrl",
+                          "GetConfiguration")),
+                  'Failed to retreive entity data for id '); 
+        },
+
 
         /**
         * @ngdoc method
@@ -56,6 +75,7 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
                             if (img) {
                                 var imagePropVal = imageHelper.getImagePropertyValue({ imageModel: img, scope: $scope });
                                 var data = {
+                                    alt: "Some description",
                                     src: (imagePropVal) ? imagePropVal : "nothing.jpg",
                                     id: '__mcenew'
                                 };
@@ -76,6 +96,38 @@ function tinyMceService(dialogService, $log, imageHelper, assetsService, $timeou
 
                                 }, 500);
                             }
+                        }
+                    });
+                }
+            });
+        },
+
+        /**
+        * @ngdoc method
+        * @name umbraco.services.tinyMceService#createLinkPicker
+        * @methodOf umbraco.services.tinyMceService
+        *
+        * @description
+        * Creates the umbrco insert link tinymce plugin
+        *
+        * @param {Object} editor the TinyMCE editor instance        
+        * @param {Object} $scope the current controller scope
+        */
+        createLinkPicker: function (editor, $scope) {
+            editor.addButton('link', {
+                icon: 'custom icon-link',
+                tooltip: 'Link Picker',
+                onclick: function () {
+                    dialogService.linkPicker({
+                        scope: $scope, callback: function (link) {
+                            if (link) {
+                                var data = {
+                                    title: "Some description",
+                                    href: "",
+                                    id: '__mcenew'
+                                };
+                                editor.insertContent(editor.dom.createHTML('a', data));
+                           }
                         }
                     });
                 }

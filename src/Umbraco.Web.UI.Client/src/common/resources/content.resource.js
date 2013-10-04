@@ -170,6 +170,40 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
          * @ngdoc method
+         * @name umbraco.resources.contentResource#unPublish
+         * @methodOf umbraco.resources.contentResource
+         *
+         * @description
+         * Unpublishes a content item with a given Id
+         *
+         * ##usage
+         * <pre>
+         * contentResource.unPublish(1234)
+         *    .then(function() {
+         *        alert("node was unpulished");
+         *    }, function(err){
+         *      alert("node wasnt unpublished:" + err.data.Message); 
+         *    });
+         * </pre> 
+         * @param {Int} id the ID of the node to unpublish
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        unPublish: function (id) {
+            if (!id) {
+                throw "id cannot be null";
+            }
+         
+            return umbRequestHelper.resourcePromise(
+                           $http.post(
+                               umbRequestHelper.getApiUrl(
+                                   "contentApiBaseUrl",
+                                   "PostUnPublish",
+                                   [{ id: id }])),
+                           'Failed to publish content with id ' + id);
+        },
+        /**
+         * @ngdoc method
          * @name umbraco.resources.contentResource#emptyRecycleBin
          * @methodOf umbraco.resources.contentResource
          *
@@ -336,6 +370,35 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "GetEmpty",
                        [{ contentTypeAlias: alias }, { parentId: parentId }])),
                'Failed to retreive data for empty content item type ' + alias);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.contentResource#getNiceUrl
+         * @methodOf umbraco.resources.contentResource
+         *
+         * @description
+         * Returns a url, given a node ID
+         *
+         * ##usage
+         * <pre>
+         * contentResource.getNiceUrl()
+         *    .then(function(stylesheets) {
+         *        alert('its here!');
+         *    });
+         * </pre> 
+         * 
+         * @param {Int} id Id of node to return the public url to
+         * @returns {Promise} resourcePromise object containing the url.
+         *
+         */
+        getNiceUrl: function (id) {            
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentApiBaseUrl",
+                       "GetNiceUrl",[{id: id}])),
+               'Failed to retrieve url for id:' + id);
         },
 
         /**

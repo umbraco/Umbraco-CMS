@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web.Configuration;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Migrations;
@@ -248,20 +249,10 @@ namespace Umbraco.Core
 
             _connectionString = connectionString;
             _providerName = providerName;
-
-            var webConfig = new WebConfigurationFileMap();
-            var vDir = GlobalSettings.FullpathToRoot;
-            foreach (VirtualDirectoryMapping v in webConfig.VirtualDirectories)
-            {
-                if (v.IsAppRoot)
-                {
-                    vDir = v.PhysicalDirectory;
-                }
-            }
-
-            var fileName = Path.Combine(vDir, "web.config");
+            
+            var fileName = IOHelper.MapPath(string.Format("{0}/connectionStrings.config", SystemDirectories.Config));
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
-            var connectionstrings = xml.Root.Descendants("connectionStrings").Single();
+            var connectionstrings = xml.Root.DescendantsAndSelf("connectionStrings").Single();
 
             // Update connectionString if it exists, or else create a new appSetting for the given key and value
             var setting = connectionstrings.Descendants("add").FirstOrDefault(s => s.Attribute("name").Value == GlobalSettings.UmbracoConnectionName);

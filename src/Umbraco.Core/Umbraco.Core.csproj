@@ -382,6 +382,7 @@
     <Compile Include="Models\PreValue.cs" />
     <Compile Include="Models\MemberType.cs" />
     <Compile Include="Models\PreValueCollection.cs" />
+    <Compile Include="Models\PropertyTags.cs" />
     <Compile Include="Models\Rdbms\MemberReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\MemberTypeReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\PropertyDataReadOnlyDto.cs" />
@@ -464,6 +465,7 @@
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\UpdateControlIdToPropertyEditorAlias.cs" />
     <Compile Include="Persistence\Relators\MacroPropertyRelator.cs" />
     <Compile Include="Persistence\Repositories\Interfaces\IMacroRepository.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\ITagsRepository.cs" />
     <Compile Include="Persistence\Repositories\MacroRepository.cs" />
     <Compile Include="Persistence\Repositories\TagsRepository.cs" />
     <Compile Include="PropertyEditors\BackwardsCompatibleData.cs" />

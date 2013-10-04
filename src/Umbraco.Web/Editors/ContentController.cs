@@ -108,7 +108,18 @@ namespace Umbraco.Web.Editors
             var emptyContent = new Content("", parentId, contentType);
             return Mapper.Map<IContent, ContentItemDisplay>(emptyContent);
         }
-        
+
+        /// <summary>
+        /// Gets the Url for a given node ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public string GetNiceUrl(int id)
+        {
+            var url = Umbraco.NiceUrl(id);
+            return url;
+        }
+
         /// <summary>
         /// Gets the children for the content id passed in
         /// </summary>
@@ -379,7 +390,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Copies a 
+        /// Copies a content item and places the copy as a child of a given parent Id
         /// </summary>
         /// <param name="copy"></param>
         /// <returns></returns>
@@ -391,6 +402,23 @@ namespace Umbraco.Web.Editors
             Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal);
 
             return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        /// <summary>
+        /// Unpublishes a node with a given Id and returns the unpublished entity
+        /// </summary>
+        /// <param name="copy"></param>
+        /// <returns></returns>
+        [EnsureUserPermissionForContent("id", 'Z')]
+        public ContentItemDisplay PostUnPublish(int id)
+        {
+            var foundContent = Services.ContentService.GetById(id);
+            if (foundContent == null)
+                HandleContentNotFound(id);
+
+            Services.ContentService.UnPublish(foundContent);
+            var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+            return content;
         }
 
         /// <summary>
