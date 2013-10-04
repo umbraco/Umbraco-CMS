@@ -628,6 +628,10 @@
     <None Include="Config\BaseRestExtensions.Release.config">
       <DependentUpon>BaseRestExtensions.config</DependentUpon>
     </None>
+    <Content Include="Config\appSettings.config" />
+    <Content Include="Config\appSettings.Release.config">
+      <DependentUpon>appSettings.config</DependentUpon>
+    </Content>
     <None Include="Config\log4net.Release.config">
       <DependentUpon>log4net.config</DependentUpon>
     </None>
