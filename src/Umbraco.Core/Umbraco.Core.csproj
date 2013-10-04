@@ -361,6 +361,7 @@
     <Compile Include="Models\PreValue.cs" />
     <Compile Include="Models\MemberType.cs" />
     <Compile Include="Models\PreValueCollection.cs" />
+    <Compile Include="Models\PropertyTags.cs" />
     <Compile Include="Models\PublishedPropertyDefinition.cs" />
     <Compile Include="Models\Rdbms\MemberReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\MemberTypeReadOnlyDto.cs" />

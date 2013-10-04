@@ -16,6 +16,7 @@ namespace Umbraco.Core.Models
         private readonly PropertyType _propertyType;
         private Guid _version;
         private object _value;
+        private readonly PropertyTags _tagSupport = new PropertyTags();
 
         protected Property()
         {
@@ -43,6 +44,14 @@ namespace Umbraco.Core.Models
 
         private static readonly PropertyInfo ValueSelector = ExpressionHelper.GetPropertyInfo<Property, object>(x => x.Value);
         private static readonly PropertyInfo VersionSelector = ExpressionHelper.GetPropertyInfo<Property, Guid>(x => x.Version);
+
+        /// <summary>
+        /// Returns the instance of the tag support, by default tags are not enabled
+        /// </summary>
+        internal PropertyTags TagSupport
+        {
+            get { return _tagSupport; }
+        }
 
         /// <summary>
         /// Returns the Alias of the PropertyType, which this Property is based on
