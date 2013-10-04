@@ -622,7 +622,9 @@
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
-    <Content Include="Config\appSettings.Release.config" />
+    <Content Include="Config\appSettings.Release.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Config\appSettings.config" />
     <None Include="Config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>

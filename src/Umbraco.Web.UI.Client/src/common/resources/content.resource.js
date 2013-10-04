@@ -382,8 +382,8 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *
          * ##usage
          * <pre>
-         * contentResource.getNiceUrl()
-         *    .then(function(stylesheets) {
+         * contentResource.getNiceUrl(id)
+         *    .then(function(url) {
          *        alert('its here!');
          *    });
          * </pre> 
@@ -399,6 +399,35 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "contentApiBaseUrl",
                        "GetNiceUrl",[{id: id}])),
                'Failed to retrieve url for id:' + id);
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.contentResource#getPath
+         * @methodOf umbraco.resources.contentResource
+         *
+         * @description
+         * Returns a url, given a node ID
+         *
+         * ##usage
+         * <pre>
+         * contentResource.getPath(id)
+         *    .then(function(pathArray) {
+         *        alert('its here!');
+         *    });
+         * </pre> 
+         * 
+         * @param {Int} id Id of node to return the public url to
+         * @returns {Promise} resourcePromise object containing the url.
+         *
+         */
+        getPath: function (id) {            
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "contentApiBaseUrl",
+                       "GetPath",[{id: id}])),
+               'Failed to retrieve path for id:' + id);
         },
 
         /**

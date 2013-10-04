@@ -121,6 +121,22 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Gets the path for a given node ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public IEnumerable<int> GetPath(int id)
+        {
+            var foundContent = GetEntityFromRequest(() => Services.ContentService.GetById(id));
+            if (foundContent == null)
+            {
+                HandleContentNotFound(id);
+            }
+
+            return foundContent.Path.Split(',').Select(x => int.Parse(x));
+        }
+
+        /// <summary>
         /// Gets the children for the content id passed in
         /// </summary>
         /// <returns></returns>        
