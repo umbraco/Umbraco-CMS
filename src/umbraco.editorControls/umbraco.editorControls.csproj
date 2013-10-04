@@ -170,10 +170,6 @@
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
       <Package>{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</Package>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.macroRenderings\umbraco.macroRenderings.csproj">
-      <Project>{52AB8F1F-FB76-4E8C-885F-0747B6CE71EC}</Project>
-      <Name>umbraco.macroRenderings</Name>
-    </ProjectReference>
     <Reference Include="System.Xml" />
     <Reference Include="System.Xml.Linq" />
   </ItemGroup>
@@ -330,6 +326,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="PrevalueEditorExtensions.cs" />
+    <Compile Include="PropertyTypePicker.cs" />
     <Compile Include="radiobuttonlist\radiobox.cs">
       <SubType>Code</SubType>
     </Compile>

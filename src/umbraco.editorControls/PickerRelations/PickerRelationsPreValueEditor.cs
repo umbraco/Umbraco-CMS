@@ -4,7 +4,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.cms.businesslogic.datatype;
 using umbraco.cms.businesslogic.relation;
-using umbraco.macroRenderings;
+
 
 namespace umbraco.editorControls.PickerRelations
 {
@@ -19,7 +19,7 @@ namespace umbraco.editorControls.PickerRelations
         /// Prepopulated Umbraco Propery Picker, lists all aliases (could refine this by asking for the context in which this relation wire-up will
         /// be used, and then only listing the aliases for that context)
         /// </summary>
-        private propertyTypePicker pickerPropertyAliasPicker = new propertyTypePicker();
+        private PropertyTypePicker pickerPropertyAliasPicker = new PropertyTypePicker();
 
         /// <summary>
         /// RequiredFieldValidator for the ProperyAliasPicker
