@@ -75,6 +75,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                             if (img) {
                                 var imagePropVal = imageHelper.getImagePropertyValue({ imageModel: img, scope: $scope });
                                 var data = {
+                                    alt: "Some description",
                                     src: (imagePropVal) ? imagePropVal : "nothing.jpg",
                                     id: '__mcenew'
                                 };

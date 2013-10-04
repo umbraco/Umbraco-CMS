@@ -5,8 +5,8 @@ angular.module("umbraco")
         tinyMceService.configuration().then(function(tinyMceConfig){
 
             //config value from general tinymce.config file
-            var validElements = tinyMceConfig.validElements;
-            var invalidElements = tinyMceConfig.inValidElements;
+            //var validElements = tinyMceConfig.validElements;
+            //var invalidElements = tinyMceConfig.inValidElements;
             var plugins = _.map(tinyMceConfig.plugins, function(plugin){ 
                                             if(plugin.useOnFrontend){
                                                 return plugin.name;   
@@ -17,7 +17,7 @@ angular.module("umbraco")
             var editorConfig = angular.fromJson($scope.model.config.editor);
 
             //config value on the data type
-            var toolbar = editorConfig.toolbar.join(" ");
+            var toolbar = editorConfig.toolbar.join(" | ");
             
 
             assetsService.loadJs("lib/tinymce/tinymce.min.js", $scope).then(function () {
@@ -25,6 +25,8 @@ angular.module("umbraco")
                 /** Loads in the editor */
                 function loadTinyMce() {
                     
+                    //valid_elements: validElements,
+                            
                     //we need to add a timeout here, to force a redraw so TinyMCE can find
                     //the elements needed
                     $timeout(function () {
@@ -34,10 +36,9 @@ angular.module("umbraco")
                             elements: $scope.model.alias + "_rte",
                             skin: "umbraco",
                             plugins: plugins,
-                            valid_elements: validElements,
                             menubar: false,
                             statusbar: false,
-                            height: 340,
+                            height: editorConfig.dimensions.height,
                             toolbar: toolbar,
                             setup: function (editor) {
 
