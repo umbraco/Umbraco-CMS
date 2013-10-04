@@ -58,7 +58,7 @@ namespace Umbraco.Core.Models
         internal static bool ShouldCreateNewVersion(this IContent entity, PublishedState publishedState)
         {
             var dirtyEntity = (ICanBeDirty)entity;
-            
+
             //check if the published state has changed or the language
             var contentChanged =
                 (dirtyEntity.IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished)
@@ -71,9 +71,9 @@ namespace Umbraco.Core.Models
             }
 
             //check if any user prop has changed
-            var propertyValueChanged = ((Content) entity).IsAnyUserPropertyDirty();
+            var propertyValueChanged = ((Content)entity).IsAnyUserPropertyDirty();
             //check if any content prop has changed
-            var contentDataChanged = ((Content) entity).IsEntityDirty();
+            var contentDataChanged = ((Content)entity).IsEntityDirty();
 
             //return true if the item is published and a property has changed or if any content property has changed
             return (propertyValueChanged && publishedState == PublishedState.Published) || contentDataChanged;
@@ -296,7 +296,7 @@ namespace Umbraco.Core.Models
                                                           .Select(propertyType => propertyType.Id)
                                                           .Contains(property.PropertyTypeId))
                           .OrderBy(x => x.PropertyType.SortOrder);
-        } 
+        }
 
         /// <summary>
         /// Set property values by alias with an annonymous object
@@ -333,6 +333,8 @@ namespace Umbraco.Core.Models
                 }
             }
         }
+
+        #region SetValue for setting file contents
 
         /// <summary>
         /// Sets and uploads the file from a HttpPostedFileBase object as the property value
@@ -380,7 +382,7 @@ namespace Umbraco.Core.Models
         {
             SetValue(content, propertyTypeAlias, (HttpPostedFileBase)value);
         }
-        
+
         /// <summary>
         /// Sets and uploads the file from a <see cref="Stream"/> as the property value
         /// </summary>
@@ -416,7 +418,7 @@ namespace Umbraco.Core.Models
 
             var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
             fs.AddFile(fileName, fileStream);
-            
+
             //Check if file supports resizing and create thumbnails
             var supportsResizing = UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.InvariantContains(extension);
 
@@ -461,14 +463,14 @@ namespace Umbraco.Core.Models
                     }
 
                     ImageHelper.GenerateMediaThumbnails(fs, fileName, extension, originalImage, additionalSizes);
-                    
+
                     //while the image is still open, we'll check if we need to auto-populate the image properties
                     if (uploadFieldConfigNode != null)
                     {
                         content.SetValue(uploadFieldConfigNode.WidthFieldAlias, originalImage.Width.ToString(CultureInfo.InvariantCulture));
                         content.SetValue(uploadFieldConfigNode.HeightFieldAlias, originalImage.Height.ToString(CultureInfo.InvariantCulture));
                     }
-   
+
                 }
             }
 
@@ -482,12 +484,15 @@ namespace Umbraco.Core.Models
             //Set the value of the property to that of the uploaded file's url
             property.Value = fs.GetUrl(fileName);
         }
-        
-		/// <summary>
-		/// Gets the <see cref="IProfile"/> for the Creator of this media item.
-		/// </summary>
-		public static IProfile GetCreatorProfile(this IMedia media)
-		{
+
+        #endregion
+
+        #region User/Profile methods
+        /// <summary>
+        /// Gets the <see cref="IProfile"/> for the Creator of this media item.
+        /// </summary>
+        public static IProfile GetCreatorProfile(this IMedia media)
+        {
             return ApplicationContext.Current.Services.UserService.GetProfileById(media.CreatorId);
         }
 
@@ -506,6 +511,7 @@ namespace Umbraco.Core.Models
         {
             return ApplicationContext.Current.Services.UserService.GetProfileById(content.WriterId);
         }
+        #endregion
 
         /// <summary>
         /// Checks whether an <see cref="IContent"/> item has any published versions
@@ -519,7 +525,77 @@ namespace Umbraco.Core.Models
 
             return ApplicationContext.Current.Services.ContentService.HasPublishedVersion(content.Id);
         }
+        
+        #region Tag methods
 
+        /// <summary>
+        /// Sets tags for the property - will add tags to the tags table and set the property value to be the comma delimited value of the tags.
+        /// </summary>
+        /// <param name="content">The content item to assign the tags to</param>
+        /// <param name="propertyAlias">The property alias to assign the tags to</param>
+        /// <param name="tags">The tags to assign</param>
+        /// <param name="replaceTags">True to replace the tags on the current property with the tags specified or false to merge them with the currently assigned ones</param>
+        /// <param name="tagGroup">The group/category to assign the tags, the default value is "default"</param>
+        /// <returns></returns>
+        public static void SetTags(this IContent content, string propertyAlias, IEnumerable<string> tags, bool replaceTags, string tagGroup = "default")
+        {
+            var property = content.Properties["propertyAlias"];
+            if (property == null)
+            {
+                throw new IndexOutOfRangeException("No property exists with name " + propertyAlias);
+            }
+
+            var trimmedTags = tags.Select(x => x.Trim()).ToArray();
+
+            property.TagSupport.Enable = true;
+            property.TagSupport.Tags = trimmedTags.Select(x => new Tuple<string, string>(x, tagGroup));
+            property.TagSupport.Behavior = replaceTags ? PropertyTagBehavior.Replace : PropertyTagBehavior.Merge;
+
+            //ensure the property value is set to the same thing
+            if (replaceTags)
+            {
+                property.Value = string.Join(",", trimmedTags);
+            }
+            else
+            {
+                var currTags = property.Value.ToString().Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries)
+                                       .Select(x => x.Trim());
+                property.Value = string.Join(",", trimmedTags.Union(currTags));
+            }
+            
+        }
+
+        /// <summary>
+        /// Remove any of the tags specified in the collection from the property if they are currently assigned.
+        /// </summary>
+        /// <param name="content"></param>
+        /// <param name="propertyAlias"></param>
+        /// <param name="tags"></param>
+        /// <param name="tagGroup">The group/category that the tags are currently assigned to, the default value is "default"</param>
+        public static void RemoveTags(this IContent content, string propertyAlias, IEnumerable<string> tags, string tagGroup = "default")
+        {
+            var property = content.Properties["propertyAlias"];
+            if (property == null)
+            {
+                throw new IndexOutOfRangeException("No property exists with name " + propertyAlias);
+            }
+
+            var trimmedTags = tags.Select(x => x.Trim()).ToArray();
+
+            property.TagSupport.Behavior = PropertyTagBehavior.Remove;
+            property.TagSupport.Enable = true;
+            property.TagSupport.Tags = trimmedTags.Select(x => new Tuple<string, string>(x, tagGroup));
+
+            //set the property value
+            var currTags = property.Value.ToString().Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                       .Select(x => x.Trim());
+
+            property.Value = string.Join(",", currTags.Except(trimmedTags));
+        }
+
+        #endregion
+
+        #region XML methods
         /// <summary>
         /// Creates the full xml representation for the <see cref="IContent"/> object and all of it's descendants
         /// </summary>
@@ -567,5 +643,10 @@ namespace Umbraco.Core.Models
             //If current IContent is published we should get latest unpublished version
             return content.ToXml();
         }
+        
+        #endregion
     }
+        
+
+
 }

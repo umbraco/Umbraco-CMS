@@ -43,7 +43,15 @@ namespace umbraco.presentation.webservices
             if (!String.IsNullOrEmpty(global::Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus))
             {
                 isUpgrade = true;
-                legacyAjaxCalls.Authorize();
+                try
+                {
+                    legacyAjaxCalls.Authorize();
+                }
+                catch (Exception)
+                {
+                    //we don't want to throw the exception back to JS
+                    return;
+                }
             }
 
             // Check for current install Id

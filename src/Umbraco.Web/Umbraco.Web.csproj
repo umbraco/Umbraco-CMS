@@ -241,10 +241,6 @@
       <Project>{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}</Project>
       <Name>Umbraco.Core</Name>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.macroRenderings\umbraco.macroRenderings.csproj">
-      <Project>{52AB8F1F-FB76-4E8C-885F-0747B6CE71EC}</Project>
-      <Name>umbraco.macroRenderings</Name>
-    </ProjectReference>
     <ProjectReference Include="..\umbraco.controls\umbraco.controls.csproj">
       <Project>{6EDD2061-82F2-461B-BB6E-879245A832DE}</Project>
       <Name>umbraco.controls</Name>

@@ -23,7 +23,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public string UserInterface { get; set; }
         
         [DataMember(Name = "frontEndCommand")]
-        public string FrontendCommand { get; set; }
+        public string FrontEndCommand { get; set; }
         
         [DataMember(Name = "value")]
         public string Value { get; set; }

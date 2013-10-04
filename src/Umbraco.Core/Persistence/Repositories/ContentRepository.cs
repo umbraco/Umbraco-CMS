@@ -23,23 +23,26 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly ITemplateRepository _templateRepository;
+        private readonly ITagsRepository _tagRepository;
 
-		public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository)
+        public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository)
             : base(work)
         {
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
+		    _tagRepository = tagRepository;
 
-            EnsureUniqueNaming = true;
+		    EnsureUniqueNaming = true;
         }
 
-		public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository)
+        public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository)
             : base(work, cache)
         {
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
+            _tagRepository = tagRepository;
 
-		    EnsureUniqueNaming = true;
+            EnsureUniqueNaming = true;
         }
 
         public bool EnsureUniqueNaming { get; set; }
@@ -373,6 +376,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Update(newContentDto);
             }
 
+            //a flag that we'll use later to create the tags in the tag db table
+            var isNewPublishedVersion = false;
+
             //If Published state has changed then previous versions should have their publish state reset.
             //If state has been changed to unpublished the previous versions publish state should also be reset.
             //if (((ICanBeDirty)entity).IsPropertyDirty("Published") && (entity.Published || publishedState == PublishedState.Unpublished))
@@ -385,6 +391,9 @@ namespace Umbraco.Core.Persistence.Repositories
                     docDto.Published = false;
                     Database.Update(docDto);
                 }
+
+                //this is a newly published version so we'll update the tags table too (end of this method)
+                isNewPublishedVersion = true;
             }
 
             //Look up (newest) entries by id in cmsDocument table to set newest = false
@@ -443,6 +452,31 @@ namespace Umbraco.Core.Persistence.Repositories
                     if(keyDictionary.ContainsKey(property.PropertyTypeId) == false) continue;
 
                     property.Id = keyDictionary[property.PropertyTypeId];
+                }
+            }
+
+            //lastly, check if we are a newly published version and then update the tags table
+            if (isNewPublishedVersion)
+            {
+                foreach (var tagProp in entity.Properties.Where(x => x.TagSupport.Enable))
+                {
+                    if (tagProp.TagSupport.Behavior == PropertyTagBehavior.Remove)
+                    {
+                        //remove the specific tags
+                        _tagRepository.RemoveTagsFromProperty(
+                            entity.Id,
+                            tagProp.Alias,
+                            tagProp.TagSupport.Tags.Select(x => new Tag {Text = x.Item1, Group = x.Item2}));
+                    }
+                    else
+                    {
+                        //assign the tags
+                        _tagRepository.AssignTagsToProperty(
+                            entity.Id,
+                            tagProp.Alias,
+                            tagProp.TagSupport.Tags.Select(x => new Tag {Text = x.Item1, Group = x.Item2}),
+                            tagProp.TagSupport.Behavior == PropertyTagBehavior.Replace);
+                    }                    
                 }
             }
 

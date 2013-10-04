@@ -265,10 +265,10 @@ namespace Umbraco.Core.Configuration
         /// <param name="value">Value of the setting to be saved.</param>
         internal static void SaveSetting(string key, string value)
         {
-            var fileName = GetFullWebConfigFileName();
+            var fileName = IOHelper.MapPath(string.Format("{0}/appSettings.config", SystemDirectories.Config));
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
-            var appSettings = xml.Root.Descendants("appSettings").Single();
+            var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();
 
             // Update appSetting if it exists, or else create a new appSetting for the given key and value
             var setting = appSettings.Descendants("add").FirstOrDefault(s => s.Attribute("key").Value == key);
@@ -287,10 +287,10 @@ namespace Umbraco.Core.Configuration
         /// <param name="key">Key of the setting to be removed.</param>
         internal static void RemoveSetting(string key)
         {
-            var fileName = GetFullWebConfigFileName();
+            var fileName = IOHelper.MapPath(string.Format("{0}/appSettings.config", SystemDirectories.Config));
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
-            var appSettings = xml.Root.Descendants("appSettings").Single();
+            var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();
             var setting = appSettings.Descendants("add").FirstOrDefault(s => s.Attribute("key").Value == key);
 
             if (setting != null)
@@ -299,21 +299,6 @@ namespace Umbraco.Core.Configuration
                 xml.Save(fileName, SaveOptions.DisableFormatting);
                 ConfigurationManager.RefreshSection("appSettings");
             }
-        }
-
-        private static string GetFullWebConfigFileName()
-        {
-            var webConfig = new WebConfigurationFileMap();
-            var vDir = FullpathToRoot;
-
-            foreach (VirtualDirectoryMapping v in webConfig.VirtualDirectories)
-            {
-                if (v.IsAppRoot)
-                    vDir = v.PhysicalDirectory;
-            }
-
-            var fileName = System.IO.Path.Combine(vDir, "web.config");
-            return fileName;
         }
 
         /// <summary>

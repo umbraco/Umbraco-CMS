@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using Newtonsoft.Json;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -38,7 +39,15 @@ namespace Umbraco.Core.PropertyEditors
                             var instance = (PreValueField) Activator.CreateInstance(att.PreValueFieldType);
                             //overwrite values if they are assigned
                             if (!att.Key.IsNullOrWhiteSpace())
+                            {
                                 instance.Key = att.Key;
+                            }
+                            //if the key is still empty then assign it to be the property name
+                            if (instance.Key.IsNullOrWhiteSpace())
+                            {
+                                instance.Key = p.Name;
+                            }
+                                
                             if (!att.Name.IsNullOrWhiteSpace())
                                 instance.Name = att.Name;
                             if (!att.View.IsNullOrWhiteSpace())
@@ -58,7 +67,7 @@ namespace Umbraco.Core.PropertyEditors
                     }
                     else
                     {
-                        fields.Add(MapAttributeToField(att));
+                        fields.Add(MapAttributeToField(att, p));
                     }
                 }
             }
@@ -66,11 +75,12 @@ namespace Umbraco.Core.PropertyEditors
             Fields = fields;
         }
 
-        private static PreValueField MapAttributeToField(PreValueFieldAttribute att)
+        private static PreValueField MapAttributeToField(PreValueFieldAttribute att, PropertyInfo prop)
         {
             return new PreValueField
                 {
-                    Key = att.Key,
+                    //set the key to the property name if it is empty
+                    Key = att.Key.IsNullOrWhiteSpace() ? prop.Name : att.Key,
                     Name = att.Name,
                     Description = att.Description,
                     HideLabel = att.HideLabel,

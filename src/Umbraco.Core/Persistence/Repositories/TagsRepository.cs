@@ -1,17 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class TagsRepository : PetaPocoRepositoryBase<int, ITag>
+    internal class TagsRepository : PetaPocoRepositoryBase<int, ITag>, ITagsRepository
     {
         protected TagsRepository(IDatabaseUnitOfWork work)
             : this(work, RuntimeCacheProvider.Current)
@@ -20,7 +22,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         internal TagsRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
             : base(work, cache)
-        {     
+        {
         }
 
         protected override ITag PerformGet(int id)
@@ -152,8 +154,228 @@ namespace Umbraco.Core.Persistence.Repositories
             var dto = factory.BuildDto(entity);
 
             Database.Update(dto);
-            
+
             ((ICanBeDirty)entity).ResetDirtyProperties();
+        }
+
+        //TODO: Consider caching implications.
+
+        public IEnumerable<ITag> GetTagsForContent(int contentId)
+        {
+            var sql = new Sql()
+                .Select("DISTINCT cmsTags.*")
+                .From<TagDto>()
+                .InnerJoin<TagRelationshipDto>()
+                .On("cmsTagRelationship.tagId = cmsTags.id")
+                .Where<TagRelationshipDto>(dto => dto.NodeId == contentId);
+
+            var factory = new TagFactory();
+
+            return Database.Fetch<TagDto>(sql).Select(factory.BuildEntity);
+        }
+
+        public IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyAlias)
+        {
+            var sql = new Sql()
+                .Select("DISTINCT cmsTags.*")
+                .From<TagDto>()
+                .InnerJoin<TagRelationshipDto>()
+                .On<TagRelationshipDto, TagDto>(left => left.TagId, right => right.Id)
+                .InnerJoin<PropertyTypeDto>()
+                .On<PropertyTypeDto, TagRelationshipDto>(left => left.Id, right => right.PropertyTypeId)
+                .Where<TagRelationshipDto>(dto => dto.NodeId == contentId)
+                .Where<PropertyTypeDto>(dto => dto.Alias == propertyAlias);
+
+            var factory = new TagFactory();
+
+            return Database.Fetch<TagDto>(sql).Select(factory.BuildEntity);
+        }
+
+        /// <summary>
+        /// Assigns the given tags to a content item's property
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <param name="propertyAlias"></param>
+        /// <param name="tags">The tags to assign</param>
+        /// <param name="replaceTags">
+        /// If set to true, this will replace all tags with the given tags, 
+        /// if false this will append the tags that already exist for the content item
+        /// </param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This can also be used to remove all tags from a property by specifying replaceTags = true and an empty tag list.
+        /// </remarks>
+        public void AssignTagsToProperty(int contentId, string propertyAlias, IEnumerable<ITag> tags, bool replaceTags)
+        {
+            //First we need to ensure there are no duplicates
+            var asArray = tags.Distinct(new TagComparer()).ToArray();
+
+            //we don't have to do anything if there are no tags assigning and we're not replacing them
+            if (asArray.Length == 0 && replaceTags == false)
+            {
+                return;
+            }
+
+            var propertyTypeId = EnsureContentProperty(contentId, propertyAlias);
+
+            //next check if we're removing all of the tags
+            if (asArray.Length == 0 && replaceTags)
+            {
+                Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId=" + contentId + " AND propertyTypeId=" + propertyTypeId);
+                return;
+            }
+
+            //ok so now we're actually assigning tags...
+            //NOTE: There's some very clever logic in the umbraco.cms.businesslogic.Tags.Tag to insert tags where they don't exist, 
+            // and assign where they don't exist which we've borrowed here. The queries are pretty zany but work, otherwise we'll end up 
+            // with quite a few additional queries.
+            
+            //do all this in one transaction
+            using (var trans = Database.GetTransaction())
+            {
+                //var factory = new TagFactory();
+
+                var tagSetSql = GetTagSet(asArray);
+
+                //adds any tags found in the collection that aren't in cmsTag
+                var insertTagsSql = string.Concat("insert into cmsTags (Tag,",
+                                                  SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group"),
+                                                  ") ",
+                                                  " select TagSet.Tag, TagSet.",
+                                                  SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group"),
+                                                  " from ",
+                                                  tagSetSql,
+                                                  " left outer join cmsTags on (TagSet.Tag = cmsTags.Tag and TagSet.",
+                                                  SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group"),
+                                                  " = cmsTags.",
+                                                  SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group"),
+                                                  ")",
+                                                  " where cmsTags.Id is null ");
+                //insert the tags that don't exist
+                Database.Execute(insertTagsSql);
+
+                if (replaceTags)
+                {
+                    //if we are replacing the tags then remove them first
+                    Database.Execute("DELETE FROM cmsTagRelationship WHERE nodeId=" + contentId + " AND propertyTypeId=" + propertyTypeId);
+                }
+
+                //adds any tags found in csv that aren't in tagrelationships
+                var insertTagRelationsSql = string.Concat("insert into cmsTagRelationship (tagId,nodeId,propertyTypeId) ",
+                                                          "select NewTagsSet.Id, " + contentId + ", " + propertyTypeId + " from  ",
+                                                          "( ",
+                                                          "select NewTags.Id from  ",
+                                                          tagSetSql,
+                                                          " inner join cmsTags as NewTags on (TagSet.Tag = NewTags.Tag and TagSet.",
+                                                          SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group"),
+                                                          " = TagSet.",
+                                                          SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("Group"),
+                                                          ") ",
+                                                          ") as NewTagsSet ",
+                                                          "left outer join cmsTagRelationship ",
+                                                          "on (cmsTagRelationship.TagId = NewTagsSet.Id and cmsTagRelationship.nodeId = ",
+                                                          contentId,
+                                                          "and cmsTagRelationship.propertyTypeId = ",
+                                                          propertyTypeId,
+                                                          ") ",
+                                                          "where cmsTagRelationship.tagId is null ");
+
+                //insert the tags relations that don't exist
+                Database.Execute(insertTagRelationsSql);
+
+                //GO!
+                trans.Complete();
+            }
+        }
+
+        /// <summary>
+        /// Removes any of the given tags from the property association
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <param name="propertyAlias"></param>
+        /// <param name="tags">The tags to remove from the property</param>
+        public void RemoveTagsFromProperty(int contentId, string propertyAlias, IEnumerable<ITag> tags)
+        {
+            var propertyTypeId = EnsureContentProperty(contentId, propertyAlias);
+            
+            var tagSetSql = GetTagSet(tags);
+            
+            var deleteSql = string.Concat("DELETE FROM cmsTagRelationship WHERE nodeId = ",
+                                          contentId,
+                                          " AND propertyTypeId = ",
+                                          propertyTypeId,
+                                          " AND tagId IN ",
+                                          "(SELECT id FROM cmsTags INNER JOIN ",
+                                          tagSetSql,
+                                          " ON (TagSet.Tag = cmsTags.Tag and TagSet.[Group] = cmsTags.[Group]))");
+
+            Database.Execute(deleteSql);
+        }
+
+        /// <summary>
+        /// This is a clever way to produce an SQL statement like this:
+        /// 
+        ///     (select 'Spacesdd' as Tag, 'default' as [Group] 
+        ///     union 
+        ///     select 'Cool' as Tag, 'default' as [Group]
+        ///     ) as TagSet
+        /// 
+        /// This allows us to use the tags to be inserted as a temporary in memory table. 
+        /// </summary>
+        /// <param name="tagsToInsert"></param>
+        /// <returns></returns>
+        private static string GetTagSet(IEnumerable<ITag> tagsToInsert)
+        {
+            var array = tagsToInsert.Select(tag => string.Format("select '{0}' as Tag, '{1}' as [Group]", tag.Text, tag.Group)).ToArray();
+            return "(" + string.Join(" union ", array).Replace("  ", " ") + ") as TagSet";
+        }
+
+        private class TagComparer : IEqualityComparer<ITag>
+        {
+            public bool Equals(ITag x, ITag y)
+            {
+                return x.Text == y.Text && x.Group == y.Group;
+            }
+
+            public int GetHashCode(ITag obj)
+            {
+                unchecked
+                {
+                    return (obj.Text.GetHashCode() * 397) ^ obj.Group.GetHashCode();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Ensures the content and property alias exist, then returns the property type id for the alias
+        /// </summary>
+        /// <param name="contentId"></param>
+        /// <param name="propertyAlias"></param>
+        /// <returns></returns>
+        private int EnsureContentProperty(int contentId, string propertyAlias)
+        {
+            //ensure that there's content and a property to assign - NOTE: we cannot use the content repository here 
+            // because the content repository requires one of us TagsRepository instance, then we'll have circular dependencies
+            // instead we'll just look it up ourselves.
+
+            var sql = new Sql()
+                .Select("cmsPropertyType.id")
+                .From<ContentDto>()
+                .InnerJoin<ContentTypeDto>()
+                .On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
+                .InnerJoin<PropertyTypeDto>()
+                .On<PropertyTypeDto, ContentTypeDto>(left => left.ContentTypeId, right => right.NodeId)
+                .Where<ContentDto>(dto => dto.NodeId == contentId)
+                .Where<PropertyTypeDto>(dto => dto.Alias == propertyAlias);
+
+            var result = Database.Fetch<int>(sql).ToArray();
+
+            if (result.Length == 0)
+            {
+                throw new InvalidOperationException("Cannot modify tags for content id " + contentId + " and property " + propertyAlias + " because the content item does not exist with this property");
+            }
+
+            return result.First();
         }
     }
 }
