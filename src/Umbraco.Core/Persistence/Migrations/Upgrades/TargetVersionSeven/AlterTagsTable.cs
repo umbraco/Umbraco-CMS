@@ -17,6 +17,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                   .PrimaryColumn("id")
                   .OnDelete(Rule.None)
                   .OnUpdate(Rule.None);
+
+            //add an index to tag/group since it's queried often
+            Create.Index("IX_cmsTags").OnTable("cmsTags").OnColumn("tag").Ascending().OnColumn("group").Ascending().WithOptions().NonClustered();
         }
 
         public override void Down()
