@@ -116,7 +116,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public string GetNiceUrl(int id)
         {
-            return Umbraco.NiceUrl(id);
+            var url = Umbraco.NiceUrl(id);
+            return url;
         }
 
         /// <summary>

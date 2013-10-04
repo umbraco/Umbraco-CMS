@@ -12,23 +12,33 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 
 		eventsService.publish("Umbraco.Dialogs.LinkPickerController.Select", args).then(function(args){
 				var c = $(args.event.target.parentElement);
+
+				//clearing
 				if($scope.selectedEl){
 					$scope.selectedEl.find(".temporary").remove();
 					$scope.selectedEl.find("i.umb-tree-icon").show();
 				}
 
-				c.find("i.umb-tree-icon")
-				 .hide()
-				 .after("<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>");
-				
-				$scope.selectedEl = c;
-				$scope.target = args.node;
-				$scope.target.title = args.node.name;
+				//renewing
+				if(c !== $scope.selectedEl){
+					c.find("i.umb-tree-icon")
+					 .hide()
+					 .after("<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>");
+					
+					$scope.selectedEl = c;
 
-				if(args.node.id < 0){
-					$scope.target.url = "/";
+					$scope.target = args.node;
+					$scope.target.title = args.node.name;
+
+					if(args.node.id < 0){
+						$scope.target.url = "/";
+					}else{
+						$scope.target.url = contentResource.getNiceUrl(args.node.id);
+					}
 				}else{
-					$scope.target.url = contentResource.getNiceUrl(args.node.id);
+					//resetting
+					$scope.selectedEl = null;
+					$scope.target = {};
 				}
 		});
 

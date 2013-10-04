@@ -5,7 +5,9 @@
 				<input type="text" 
 					placeholder="Enter url" 
 					class="umb-editor umb-textstring" 
-					ng-model="target.url" />
+					ng-model="target.url"
+					ng-disabled="target.id"
+					 />
 			</umb-control-group>
 			<umb-control-group label="Title">
 				<input type="text" 
