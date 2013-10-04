@@ -104,6 +104,38 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
 
         /**
         * @ngdoc method
+        * @name umbraco.services.tinyMceService#createLinkPicker
+        * @methodOf umbraco.services.tinyMceService
+        *
+        * @description
+        * Creates the umbrco insert link tinymce plugin
+        *
+        * @param {Object} editor the TinyMCE editor instance        
+        * @param {Object} $scope the current controller scope
+        */
+        createLinkPicker: function (editor, $scope) {
+            editor.addButton('link', {
+                icon: 'custom icon-link',
+                tooltip: 'Link Picker',
+                onclick: function () {
+                    dialogService.linkPicker({
+                        scope: $scope, callback: function (link) {
+                            if (link) {
+                                var data = {
+                                    title: "Some description",
+                                    href: "",
+                                    id: '__mcenew'
+                                };
+                                editor.insertContent(editor.dom.createHTML('a', data));
+                           }
+                        }
+                    });
+                }
+            });
+        },
+
+        /**
+        * @ngdoc method
         * @name umbraco.services.tinyMceService#createUmbracoMacro
         * @methodOf umbraco.services.tinyMceService
         *

@@ -12,34 +12,7 @@ function publishedContentResource($q, $http, umbRequestHelper) {
     //the factory object returned
     return {
         
-        /**
-         * @ngdoc method
-         * @name umbraco.resources.publishedContentResource#getUrl
-         * @methodOf umbraco.resources.publishedContentResource
-         *
-         * @description
-         * Returns a url, given a node ID
-         *
-         * ##usage
-         * <pre>
-         * publishedContentResource.getUrl()
-         *    .then(function(stylesheets) {
-         *        alert('its here!');
-         *    });
-         * </pre> 
-         * 
-         * @param {Int} id Id of node to return the public url to
-         * @returns {Promise} resourcePromise object containing the url.
-         *
-         */
-        getUrl: function (id) {            
-            return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "publishedContentApiBaseUrl",
-                       "GetUrl",[{id: id}])),
-               'Failed to retreive url for id:' + id);
-        }
+        
     };
 }
 

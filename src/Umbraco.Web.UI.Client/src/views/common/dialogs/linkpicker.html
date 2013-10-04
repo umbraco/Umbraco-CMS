@@ -1,5 +1,5 @@
 <div class="umb-panel" ng-controller="Umbraco.Dialogs.LinkPickerController">
-	<div class="umb-panel-body no-header">
+	<div class="umb-panel-body no-header with-footer">
 		<umb-pane>
 			<umb-control-group label="Title">
 				<input type="text" 
@@ -15,18 +15,18 @@
 			</umb-control-group>
 		</umb-pane>
 
-		<umb-pane>
 				<umb-tree 
 					section="content" 
-					cachekey="contentpickerDialog" 
+					cachekey="linkpickerDialog" 
 					showheader="true" 
 					showoptions="false"
 					eventhandler="dialogTreeEventHandler">
 				</umb-tree>
-		</umb-pane>
+
+
 	</div>
 
-	<div class="umb-panel-footer" ng-show="multipicker">
+	<div class="umb-panel-footer">
 		<div class="umb-el-wrap umb-panel-buttons">
 	        <div class="btn-toolbar umb-btn-toolbar">
 	         	<input type="button" ng-click="submit(dialogData)" class="btn btn-primary" value="select" />

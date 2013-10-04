@@ -257,6 +257,10 @@
       <Project>{89C09045-1064-466B-B94A-DB3AFE2A5853}</Project>
       <Name>umbraco.MacroEngines</Name>
     </ProjectReference>
+    <ProjectReference Include="..\umbraco.macroRenderings\umbraco.macroRenderings.csproj">
+      <Project>{52AB8F1F-FB76-4E8C-885F-0747B6CE71EC}</Project>
+      <Name>umbraco.macroRenderings</Name>
+    </ProjectReference>
     <ProjectReference Include="..\umbraco.controls\umbraco.controls.csproj">
       <Project>{6EDD2061-82F2-461B-BB6E-879245A832DE}</Project>
       <Name>umbraco.controls</Name>
@@ -618,6 +622,7 @@
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
+    <Content Include="Config\appSettings.Release.config" />
     <None Include="Config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -628,14 +633,7 @@
     <None Include="Config\BaseRestExtensions.Release.config">
       <DependentUpon>BaseRestExtensions.config</DependentUpon>
     </None>
-    <Content Include="Config\appSettings.config" />
-    <Content Include="Config\appSettings.Release.config">
-      <DependentUpon>appSettings.config</DependentUpon>
-    </Content>
-    <Content Include="Config\connectionStrings.config" />
-    <Content Include="Config\connectionStrings.Release.config">
-      <DependentUpon>connectionStrings.config</DependentUpon>
-    </Content>
+    <Content Include="Config\connectionStrings.Release.config" />
     <None Include="Config\log4net.Release.config">
       <DependentUpon>log4net.config</DependentUpon>
     </None>
@@ -2124,6 +2122,8 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Views\Web.config.transform" />
+    <None Include="Web.Debug.config.transformed" />
+    <None Include="Web.Release.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -2533,7 +2533,9 @@
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Config\metablogConfig.config" />
-    <Content Include="Config\tinyMceConfig.config" />
+    <Content Include="Config\tinyMceConfig.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Config\umbracoSettings.config">
       <SubType>Designer</SubType>
     </Content>
@@ -2597,13 +2599,6 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
   <Target Name="BeforeBuild">
     <!-- Create web.config file from Template if it doesn't exist -->
     <Copy SourceFiles="$(ProjectDir)web.Template.config" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Web.config')" />
-	
-	<!-- Create appSettings.config file from Template if it doesn't exist -->
-    <Copy SourceFiles="$(ProjectDir)config\appSettings.release.config" DestinationFiles="$(ProjectDir)config\appSettings.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)config\appSettings.config')" />
-	
-	<!-- Create connectionStrings.config file from Template if it doesn't exist -->
-    <Copy SourceFiles="$(ProjectDir)config\connectionStrings.release.config" DestinationFiles="$(ProjectDir)config\connectionStrings.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)config\connectionStrings.config')" />
-	
     <!-- Transform the local Web.config file in Visual Studio -->
     <TransformXml Source="$(ProjectDir)Web.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="$(ProjectDir)Web.$(Configuration).config.transformed" Condition="$(BuildingInsideVisualStudio) == true" />
     <!-- Always transform the Template file when not in VS (ie: build.bat) -->

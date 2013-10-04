@@ -309,7 +309,6 @@
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\LogController.cs" />
     <Compile Include="Editors\MacroController.cs" />
-    <Compile Include="Editors\PublishedContentController.cs" />
     <Compile Include="Models\ContentEditing\StyleSheet.cs" />
     <Compile Include="Editors\StylesheetController.cs" />
     <Compile Include="Models\ContentEditing\AuditLog.cs" />

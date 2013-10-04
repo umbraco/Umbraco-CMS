@@ -108,7 +108,17 @@ namespace Umbraco.Web.Editors
             var emptyContent = new Content("", parentId, contentType);
             return Mapper.Map<IContent, ContentItemDisplay>(emptyContent);
         }
-        
+
+        /// <summary>
+        /// Gets the Url for a given node ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public string GetNiceUrl(int id)
+        {
+            return Umbraco.NiceUrl(id);
+        }
+
         /// <summary>
         /// Gets the children for the content id passed in
         /// </summary>
