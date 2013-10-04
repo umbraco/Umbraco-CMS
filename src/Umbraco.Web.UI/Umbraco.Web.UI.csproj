@@ -632,6 +632,10 @@
     <Content Include="Config\appSettings.Release.config">
       <DependentUpon>appSettings.config</DependentUpon>
     </Content>
+    <Content Include="Config\connectionStrings.config" />
+    <Content Include="Config\connectionStrings.Release.config">
+      <DependentUpon>connectionStrings.config</DependentUpon>
+    </Content>
     <None Include="Config\log4net.Release.config">
       <DependentUpon>log4net.config</DependentUpon>
     </None>
