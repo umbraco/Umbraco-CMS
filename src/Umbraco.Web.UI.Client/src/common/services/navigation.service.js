@@ -115,13 +115,38 @@ angular.module('umbraco.services')
          * only changes if the section is different from the current one
 		 * @param {string} sectionAlias The alias of the section the tree should load data from
 		 */
-        showTree: function (sectionAlias) {
+        showTree: function (sectionAlias, treeAlias, path) {
             if (sectionAlias !== this.ui.currentSection) {
-                this.ui.currentSection = sectionAlias;
-                setMode("tree");
+                this.syncTree(sectionAlias, treeAlias, path);
             }
+            setMode("tree");
         },
         
+        /**
+         * @ngdoc method
+         * @name umbraco.services.navigationService#syncTree
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * Syncs the tree with a given section alias and a given path
+         * The path format is: ["treeAlias","itemId","itemId"], and so on
+         * so to sync to a specific document type node do:
+         * <pre>
+         * navigationService.syncTree("content", "nodeTypes", [-1,1023,3453]);  
+         * </pre>
+         * @param {string} sectionAlias The alias of the section the tree should load data from
+         * @param {string} treeAlias The alias of tree to auto-expand
+         * @param {array} path array of ascendant ids, ex: [,1023,1243] (loads a specific document type into the settings tree)
+         */
+        syncTree: function (sectionAlias, treeAlias, path) {
+                //TODO: investicate if we need to halt watch triggers
+                //and instead pause them and then manually tell the tree to digest path changes
+                //as this might be a bit heavy loading
+                this.ui.currentSection = sectionAlias;
+                this.ui.currentTree = treeAlias;
+                this.ui.currentPath = path;
+        },
+
 
         /**
          * @ngdoc method

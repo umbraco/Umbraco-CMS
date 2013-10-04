@@ -78,10 +78,14 @@
                 </ul>    
             </div>
             
-
             <!-- the tree -->
             <div id="tree" class="umb-modalcolumn-body">
-                <umb-tree eventhandler="treeEventHandler" section="{{nav.ui.currentSection}}" ></umb-tree>
+                <umb-tree 
+                    eventhandler="treeEventHandler" 
+                    path="{{nav.ui.currentPath}}" 
+                    section="{{nav.ui.currentSection}}"
+                    activetree="{{nav.ui.currentTree}}" >
+                </umb-tree>
             </div>
         </div>
 

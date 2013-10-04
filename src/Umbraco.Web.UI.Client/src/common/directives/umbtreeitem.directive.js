@@ -27,14 +27,16 @@ angular.module("umbraco.directives")
       section: '@',
       cachekey: '@',
       eventhandler: '=',
-      node:'='
+      path: '@',
+      node:'=',
+      activetree:'@'
     },
 
     template: '<li ng-swipe-right="options(this, node, $event)"><div ng-style="setTreePadding(node)" ng-class="{\'loading\': node.loading}">' +
         '<ins ng-hide="node.hasChildren" style="background:none;width:18px;"></ins>' +        
         '<ins ng-show="node.hasChildren" ng-class="{\'icon-navigation-right\': !node.expanded, \'icon-navigation-down\': node.expanded}" ng-click="load(this, node)"></ins>' +
         '<i title="#{{node.routePath}}" class="{{node.cssClass}}" style="{{node.style}}"></i>' +
-        '<a href ng-click="select(this, node, $event)" >{{node.name}}</a>' +
+        '<a href ng-click="select(this, node, $event)" >{{node.name}} {{path}}</a>' +
         '<a href class="umb-options" ng-hide="!node.menuUrl" ng-click="options(this, node, $event)"><i></i><i></i><i></i></a>' +
         '<div ng-show="node.loading" class="l"><div></div></div>' +
         '</div>' +
@@ -91,32 +93,35 @@ angular.module("umbraco.directives")
           emits treeNodeCollapsing event if already expanded and treeNodeExpanding if collapsed
         */
         scope.load = function(arrow, node) {
-
             if (node.expanded) {
                 enableDeleteAnimations = false;
                 emitEvent("treeNodeCollapsing", { element: arrow, node: node });
-                node.expanded = false;                
+                node.expanded = false;
             }
             else {
+                scope.loadChildren(arrow, node, false);
+            }
+        };
 
-                //emit treeNodeExpanding event, if a callback object is set on the tree
-                emitEvent("treeNodeExpanding", { element: arrow, node: node });
-                
-                if (!node.children || (angular.isArray(node.children) && node.children.length === 0)) {
-                    //get the children from the tree service
-                    treeService.loadNodeChildren({ node: node, section: scope.section })
-                        .then(function(data) {
-                            //emit expanded event
-                            emitEvent("treeNodeExpanded", { element: arrow, node: node, children: data });
-                            enableDeleteAnimations = true;
-                        });
-                }
-                else {
-                    emitEvent("treeNodeExpanded", { element: arrow, node: node, children: node.children });
-                    node.expanded = true;
-                    enableDeleteAnimations = true;
-                }
-            }            
+        /* helper to force reloading children of a tree node */
+        scope.loadChildren = function(arrow, node, forceReload){
+            //emit treeNodeExpanding event, if a callback object is set on the tree
+            emitEvent("treeNodeExpanding", { element: arrow, node: node });
+            
+            if (forceReload || !node.children || (angular.isArray(node.children) && node.children.length === 0)) {
+                //get the children from the tree service
+                treeService.loadNodeChildren({ node: node, section: scope.section })
+                    .then(function(data) {
+                        //emit expanded event
+                        emitEvent("treeNodeExpanded", { element: arrow, node: node, children: data });
+                        enableDeleteAnimations = true;
+                    });
+            }
+            else {
+                emitEvent("treeNodeExpanded", { element: arrow, node: node, children: node.children });
+                node.expanded = true;
+                enableDeleteAnimations = true;
+            }
         };
 
         /**
@@ -128,7 +133,19 @@ angular.module("umbraco.directives")
           return { 'padding-left': (node.level * 20) + "px" };
         };
         
-        var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item ng-repeat="child in node.children" eventhandler="eventhandler" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
+        scope.expandActivePath = function(node, activeTree, activePath) {
+            if(activePath || activeTree){
+              if( (node.metaData.treeAlias && activeTree === node.metaData.treeAlias) || activePath.indexOf(node.id) >= 0){
+                  scope.loadChildren(null, scope.node, true);
+              }
+            }
+        };
+
+        //if the current path contains the node id, we will auto-expand the tree item children
+        
+        scope.expandActivePath(scope.node, scope.activetree, scope.path);
+
+        var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item  ng-repeat="child in node.children" eventhandler="eventhandler" activetree="{{activetree}}" path="{{path}}" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
         var newElement = angular.element(template);
         $compile(newElement)(scope);
         element.append(newElement);
