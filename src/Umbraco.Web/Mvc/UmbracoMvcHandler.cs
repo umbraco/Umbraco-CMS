@@ -1,23 +1,18 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace Umbraco.Web.Mvc
 {
     /// <summary>
-    /// Mvc handler class to intercept creation of controller and store it for later use.
-    /// This means we create two instances of the same controller to support some features later on.
+    /// MVC handler to facilitate the TemplateRenderer. This handler can execute an MVC request and return it as a string.
     /// 
-    /// The alternate option for this is to completely rewrite all MvcHandler methods.
+    /// Original:
     /// 
-    /// This is currently needed for the 'return CurrentUmbracoPage()' surface controller functionality 
+    /// This handler also used to intercept creation of controllers and store it for later use.
+    /// This was needed for the 'return CurrentUmbracoPage()' surface controller functionality 
     /// because it needs to send data back to the page controller.
+    /// 
+    /// The creation of this controller has been moved to the UmbracoPageResult class which will create a controller when needed.
     /// </summary>
     internal class UmbracoMvcHandler : MvcHandler
     {
