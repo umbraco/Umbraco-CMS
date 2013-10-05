@@ -16,7 +16,7 @@ using umbraco.DataLayer;
 using System.Diagnostics;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.template;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.packager
 {
@@ -961,10 +961,10 @@ namespace umbraco.cms.businesslogic.packager
             if (path.Contains("[$"))
             {
                 //this is experimental and undocumented...
-                path = path.Replace("[$UMBRACO]", IO.SystemDirectories.Umbraco);
-                path = path.Replace("[$UMBRACOCLIENT]", IO.SystemDirectories.Umbraco_client);
-                path = path.Replace("[$CONFIG]", IO.SystemDirectories.Config);
-                path = path.Replace("[$DATA]", IO.SystemDirectories.Data);
+                path = path.Replace("[$UMBRACO]", SystemDirectories.Umbraco);
+                path = path.Replace("[$UMBRACOCLIENT]", SystemDirectories.UmbracoClient);
+                path = path.Replace("[$CONFIG]", SystemDirectories.Config);
+                path = path.Replace("[$DATA]", SystemDirectories.Data);
             }
 
             //to support virtual dirs we try to lookup the file... 

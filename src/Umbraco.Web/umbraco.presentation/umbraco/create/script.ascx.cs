@@ -10,7 +10,7 @@ using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.presentation.umbraco.create
 {

@@ -87,14 +87,16 @@ namespace Umbraco.Tests.Resolvers
         [ExpectedException(typeof(InvalidOperationException))]
         public void ResolutionCanDetectIfNotFrozen()
         {
-            Resolution.EnsureIsFrozen(); // throws
+            using (Resolution.Reader()) // throws
+            {}
         }
 
         [Test]
         public void ResolutionCanEnsureIsFrozen()
         {
             Resolution.Freeze();
-            Resolution.EnsureIsFrozen();
+            using (Resolution.Reader()) // ok
+            {}
         }
 
         [Test]

@@ -6,7 +6,7 @@ using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.ObjectResolution;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Media.ThumbnailProviders
 {

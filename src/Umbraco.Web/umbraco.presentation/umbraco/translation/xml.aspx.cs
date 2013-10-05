@@ -15,7 +15,7 @@ using Umbraco.Core;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.web;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.presentation.translation
 {

@@ -264,14 +264,17 @@ namespace Umbraco.Core
 			PropertyEditorValueConvertersResolver.Current.AddType<TinyMcePropertyEditorValueConverter>();
 			PropertyEditorValueConvertersResolver.Current.AddType<YesNoPropertyEditorValueConverter>();
 
-            // this is how we'd switch over to DefaultShortStringHelper _and_ still use
-            // UmbracoSettings UrlReplaceCharacters...
-            //ShortStringHelperResolver.Current = new ShortStringHelperResolver(
-            //    new DefaultShortStringHelper().WithConfig(DefaultShortStringHelper.ApplyUrlReplaceCharacters));
-
-            // use the Legacy one for now
+            // use the new DefaultShortStringHelper but sort-of remain compatible
+            // - use UmbracoSettings UrlReplaceCharacters
+            // - allow underscores in terms, allow leading digits
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(
-		        new LegacyShortStringHelper());
+                new DefaultShortStringHelper()
+                    .WithConfig(CleanStringType.Url, DefaultShortStringHelper.ApplyUrlReplaceCharacters, 
+                        allowUnderscoreInTerm: true, allowLeadingDigits: true));
+
+            // that was the old one
+            //ShortStringHelperResolver.Current = new ShortStringHelperResolver(
+            //    new LegacyShortStringHelper());
 
 		    UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(
 		        typeof (DefaultUrlSegmentProvider));

@@ -9,7 +9,7 @@ using System.Web.UI.WebControls;
 using umbraco.cms.businesslogic.macro;
 using System.Reflection;
 using System.Collections;
-using umbraco.IO;
+using Umbraco.Core.IO;
 namespace umbraco.controls
 {
     [DefaultProperty("Text")]

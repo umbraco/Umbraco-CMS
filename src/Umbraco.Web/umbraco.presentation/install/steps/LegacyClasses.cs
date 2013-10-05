@@ -54,8 +54,8 @@ namespace umbraco.presentation.install
             {
                 // check if sql ce is present
                 if (
-                    !File.Exists(IO.IOHelper.MapPath(Path.Combine(IO.IOHelper.ResolveUrl(IO.SystemDirectories.Bin), "System.Data.SqlServerCe.dll"))) ||
-                    !File.Exists(IO.IOHelper.MapPath(Path.Combine(IO.IOHelper.ResolveUrl(IO.SystemDirectories.Bin), "SQLCE4Umbraco.dll")))
+                    !File.Exists(IOHelper.MapPath(Path.Combine(IOHelper.ResolveUrl(SystemDirectories.Bin), "System.Data.SqlServerCe.dll"))) ||
+                    !File.Exists(IOHelper.MapPath(Path.Combine(IOHelper.ResolveUrl(SystemDirectories.Bin), "SQLCE4Umbraco.dll")))
                     )
                     return false;
                 else
@@ -679,8 +679,8 @@ namespace umbraco.presentation.install
     [Obsolete("This class is no longer used and will be removed from the codebase in the future. The UserControl that supercedes this is Umbraco.Web.UI.Install.Steps.Renaming")]
     public partial class renaming : System.Web.UI.UserControl
     {
-        private string _oldAccessFilePath = IO.IOHelper.MapPath(IO.SystemDirectories.Data + "/access.xml");
-        private string _newAccessFilePath = IO.IOHelper.MapPath(IO.SystemDirectories.Data + "/access.config");
+        private string _oldAccessFilePath = IOHelper.MapPath(SystemDirectories.Data + "/access.xml");
+        private string _newAccessFilePath = IOHelper.MapPath(SystemDirectories.Data + "/access.config");
         private bool _changesNeeded = false;
 
         protected void Page_Load(object sender, EventArgs e)
@@ -756,7 +756,7 @@ namespace umbraco.presentation.install
 
         private void updateExtensionPaths(string filename)
         {
-            filename = IO.IOHelper.MapPath(IO.SystemDirectories.Config + "/" + filename);
+            filename = IOHelper.MapPath(SystemDirectories.Config + "/" + filename);
             XmlDocument xsltExt = new XmlDocument();
             xsltExt.Load(filename);
 
@@ -785,7 +785,7 @@ namespace umbraco.presentation.install
             {
                 try
                 {
-                    File.Move(_oldAccessFilePath, IO.IOHelper.MapPath(IO.SystemFiles.AccessXml));
+                    File.Move(_oldAccessFilePath, IOHelper.MapPath(SystemFiles.AccessXml));
                     progressText += String.Format("<li>Public Access file renamed</li>");
                 }
                 catch (Exception ee)
@@ -832,7 +832,7 @@ namespace umbraco.presentation.install
 
             // Load the XSLT extensions configuration
             XmlDocument xsltExt = new XmlDocument();
-            xsltExt.Load(IO.IOHelper.MapPath(IO.SystemDirectories.Config + "/" + filename));
+            xsltExt.Load(IOHelper.MapPath(SystemDirectories.Config + "/" + filename));
 
             return xsltExt.SelectNodes("//" + elementName);
         }
@@ -921,7 +921,7 @@ namespace umbraco.presentation.install
         }
         private void showStarterKits()
         {
-            ph_starterKits.Controls.Add(new UserControl().LoadControl(IO.SystemDirectories.Install + "/steps/Skinning/loadStarterKits.ascx"));
+            ph_starterKits.Controls.Add(new UserControl().LoadControl(SystemDirectories.Install + "/steps/Skinning/loadStarterKits.ascx"));
 
             pl_starterKit.Visible = true;
             pl_starterKitDesign.Visible = false;
@@ -931,7 +931,7 @@ namespace umbraco.presentation.install
 
         public void showStarterKitDesigns(Guid starterKitGuid)
         {
-            steps.Skinning.loadStarterKitDesigns ctrl = (steps.Skinning.loadStarterKitDesigns)new UserControl().LoadControl(IO.SystemDirectories.Install + "/steps/Skinning/loadStarterKitDesigns.ascx");
+            steps.Skinning.loadStarterKitDesigns ctrl = (steps.Skinning.loadStarterKitDesigns)new UserControl().LoadControl(SystemDirectories.Install + "/steps/Skinning/loadStarterKitDesigns.ascx");
             ctrl.ID = "StarterKitDesigns";
 
             ctrl.StarterKitGuid = starterKitGuid;

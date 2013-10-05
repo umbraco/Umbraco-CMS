@@ -781,8 +781,21 @@ namespace Umbraco.Core
         /// does initialise the resolver.</remarks>
         private static IShortStringHelper ShortStringHelper
         {
-            get { return ShortStringHelperResolver.HasCurrent ?  ShortStringHelperResolver.Current.Helper : new LegacyShortStringHelper(); }
+            get
+            {
+                if (ShortStringHelperResolver.HasCurrent)
+                    return ShortStringHelperResolver.Current.Helper;
+                if (_helper != null)
+                    return _helper;
+
+                // there *has* to be a short string helper, even if the resolver has not
+                // been initialized - used the default one with default configuration.
+                _helper = new DefaultShortStringHelper().WithConfig(allowLeadingDigits: true);
+                _helper.Freeze();
+                return _helper;
+            }
         }
+        private static IShortStringHelper _helper;
 
         /// <summary>
         /// Returns a new string in which all occurences of specified strings are replaced by other specified strings.
@@ -986,7 +999,7 @@ namespace Umbraco.Core
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <returns>The clean string.</returns>
         /// <remarks>The string is cleaned in the context of the IShortStringHelper default culture.</remarks>
-        public static string ToCleanString(string text, CleanStringType stringType)
+        public static string ToCleanString(this string text, CleanStringType stringType)
         {
             return ShortStringHelper.CleanString(text, stringType);
         }
@@ -1000,7 +1013,7 @@ namespace Umbraco.Core
         /// <param name="separator">The separator.</param>
         /// <returns>The clean string.</returns>
         /// <remarks>The string is cleaned in the context of the IShortStringHelper default culture.</remarks>
-        public static string ToCleanString(string text, CleanStringType stringType, char separator)
+        public static string ToCleanString(this string text, CleanStringType stringType, char separator)
         {
             return ShortStringHelper.CleanString(text, stringType, separator);
         }
@@ -1013,7 +1026,7 @@ namespace Umbraco.Core
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The clean string.</returns>
-        public static string ToCleanString(string text, CleanStringType stringType, CultureInfo culture)
+        public static string ToCleanString(this string text, CleanStringType stringType, CultureInfo culture)
         {
             return ShortStringHelper.CleanString(text, stringType, culture);
         }
@@ -1027,7 +1040,7 @@ namespace Umbraco.Core
         /// <param name="separator">The separator.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The clean string.</returns>
-        public static string ToCleanString(string text, CleanStringType stringType, char separator, CultureInfo culture)
+        public static string ToCleanString(this string text, CleanStringType stringType, char separator, CultureInfo culture)
         {
             return ShortStringHelper.CleanString(text, stringType, separator, culture);
         }

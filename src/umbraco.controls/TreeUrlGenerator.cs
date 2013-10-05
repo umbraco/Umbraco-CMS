@@ -79,7 +79,7 @@ namespace umbraco.uicontrols
 		/// <returns>Tree service url as a string</returns>
 		public string GetServiceUrl()
 		{
-            return umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/" + GetUrl(TREE_URL);
+            return Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco) + "/" + GetUrl(TREE_URL);
 		}
 
 		/// <summary>
@@ -115,7 +115,7 @@ namespace umbraco.uicontrols
 		/// <returns></returns>
 		public string GetInitUrl()
 		{
-            return umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/" + GetUrl(INIT_URL);
+            return Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco) + "/" + GetUrl(INIT_URL);
 		}
 
 		/// <summary>
@@ -161,7 +161,7 @@ namespace umbraco.uicontrols
         /// </summary>
         public string GetPickerUrl()
         {
-            return umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/dialogs/" + GetUrl(PICKER_URL);
+            return Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco) + "/dialogs/" + GetUrl(PICKER_URL);
         }
 
         [Obsolete("No longer used as useSubModal no longer has any relavence")]

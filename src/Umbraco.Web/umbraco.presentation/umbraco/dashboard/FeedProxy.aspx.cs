@@ -9,7 +9,7 @@ namespace dashboardUtilities
     using umbraco;
     using umbraco.BasePages;
     using umbraco.BusinessLogic;
-    using umbraco.IO;
+    using Umbraco.Core.IO;
 
     public partial class FeedProxy : UmbracoEnsuredPage
     {

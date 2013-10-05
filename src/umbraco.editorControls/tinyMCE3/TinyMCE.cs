@@ -11,7 +11,7 @@ using umbraco.editorControls.tinymce;
 using umbraco.editorControls.tinyMCE3.webcontrol;
 using umbraco.editorControls.wysiwyg;
 using umbraco.interfaces;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.presentation;
 using umbraco.uicontrols;
 
@@ -265,7 +265,7 @@ namespace umbraco.editorControls.tinyMCE3
                         }
                     }
 
-                    //if (HttpContext.Current.Request.Path.IndexOf(umbraco.IO.SystemDirectories.Umbraco) > -1)
+                    //if (HttpContext.Current.Request.Path.IndexOf(Umbraco.Core.IO.SystemDirectories.Umbraco) > -1)
                     //    config.Add("language", User.GetUser(BasePage.GetUserId(BasePage.umbracoUserContextID)).Language);
                     //else
                     //    config.Add("language", System.Threading.Thread.CurrentThread.CurrentCulture.TwoLetterISOLanguageName);

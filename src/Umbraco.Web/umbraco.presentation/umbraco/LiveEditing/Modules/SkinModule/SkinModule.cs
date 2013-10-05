@@ -3,7 +3,7 @@ using umbraco.presentation.LiveEditing.Modules;
 using ClientDependency.Core;
 using System.Web.UI.WebControls;
 using umbraco.presentation.LiveEditing.Controls;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using System.Web.UI;
 using umbraco.cms.businesslogic.skinning;
 using ClientDependency.Core.Controls;

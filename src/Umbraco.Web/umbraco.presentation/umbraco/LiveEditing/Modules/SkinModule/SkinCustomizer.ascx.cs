@@ -9,7 +9,7 @@ using umbraco.cms.businesslogic.skinning;
 using System.Xml;
 using System.Text;
 using umbraco.interfaces.skinning;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.template;
 using umbraco.BusinessLogic;
 using umbraco.NodeFactory;
@@ -87,7 +87,7 @@ namespace umbraco.presentation.LiveEditing.Modules.SkinModule
 
                 //save
 
-                StreamWriter sw = File.AppendText(IO.IOHelper.MapPath(SystemDirectories.Css) + "/" + this.ActiveSkin.Css.TargetFile);
+                StreamWriter sw = File.AppendText(IOHelper.MapPath(SystemDirectories.Css) + "/" + this.ActiveSkin.Css.TargetFile);
                 sw.Write(content);
                 sw.Close();
             }
