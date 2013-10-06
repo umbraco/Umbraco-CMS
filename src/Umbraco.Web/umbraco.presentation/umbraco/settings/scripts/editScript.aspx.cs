@@ -135,7 +135,7 @@ namespace umbraco.cms.presentation.settings.scripts
                 Panel1.Menu.InsertSplitter();
 
                 uicontrols.MenuIconI helpIcon = Panel1.Menu.NewIcon();
-                helpIcon.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) + "/settings/modals/showumbracotags.aspx?alias=", ui.Text("template", "quickGuide"), 600, 580);
+                helpIcon.OnClickCommand = umbraco.BasePages.ClientTools.Scripts.OpenModalWindow(Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco) + "/settings/modals/showumbracotags.aspx?alias=", ui.Text("template", "quickGuide"), 600, 580);
                 helpIcon.ImageURL = UmbracoPath + "/images/editor/help.png";
                 helpIcon.AltText = ui.Text("template", "quickGuide");
 

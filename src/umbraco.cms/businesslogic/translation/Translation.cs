@@ -8,7 +8,7 @@ using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.web;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.translation
 {

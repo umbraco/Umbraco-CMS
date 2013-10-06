@@ -64,9 +64,9 @@ namespace Umbraco.Tests.CodeFirst
             }
 
             Assert.That(list.Count, Is.EqualTo(3));
-            Assert.That(list.Any(x => x == "meta"), Is.True);
-            Assert.That(list.Any(x => x == "metaSeo"), Is.True);
-            Assert.That(list.Any(x => x == "base"), Is.True);
+            Assert.Contains("Meta", list);
+            Assert.Contains("MetaSeo", list);
+            Assert.Contains("Base", list);
         }
 
         [Test]

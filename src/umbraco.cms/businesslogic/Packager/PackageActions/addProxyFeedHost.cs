@@ -1,5 +1,5 @@
 using System.Xml;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.packager.standardPackageActions
 {

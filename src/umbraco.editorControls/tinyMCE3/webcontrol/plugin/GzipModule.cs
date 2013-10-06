@@ -9,7 +9,7 @@ using System;
 using System.Web;
 using System.Text.RegularExpressions;
 using System.IO;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.editorControls.tinyMCE3.webcontrol.plugin
 {

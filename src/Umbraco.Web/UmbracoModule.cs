@@ -467,11 +467,15 @@ namespace Umbraco.Web
         /// <param name="http"></param>
         private static void DisposeHttpContextItems(HttpContext http)
         {
+            // do not process if client-side request
+            if (http.Request.Url.IsClientSideRequest())
+                return;
+
             //get a list of keys to dispose
             var keys = new HashSet<object>();            
             foreach (DictionaryEntry i in http.Items)
             {
-                if (i.Value is IDisposable || i.Key is IDisposable)
+                if (i.Value is IDisposeOnRequestEnd || i.Key is IDisposeOnRequestEnd)
                 {
                     keys.Add(i.Key);
                 }

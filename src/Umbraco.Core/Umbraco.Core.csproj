@@ -166,6 +166,7 @@
     <Compile Include="Events\SaveEventArgs.cs" />
     <Compile Include="Events\SendToPublishEventArgs.cs" />
     <Compile Include="IApplicationEventHandler.cs" />
+    <Compile Include="IDisposeOnRequestEnd.cs" />
     <Compile Include="IO\ResizedImage.cs" />
     <Compile Include="IO\UmbracoMediaFile.cs" />
     <Compile Include="Media\MediaSubfolderCounter.cs" />
@@ -561,6 +562,8 @@
     <Compile Include="Profiling\LogProfiler.cs" />
     <Compile Include="Profiling\ProfilerExtensions.cs" />
     <Compile Include="Profiling\ProfilerResolver.cs" />
+    <Compile Include="Profiling\ProfilingView.cs" />
+    <Compile Include="Profiling\ProfilingViewEngine.cs" />
     <Compile Include="Profiling\WebProfiler.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="Dictionary\ICultureDictionary.cs" />

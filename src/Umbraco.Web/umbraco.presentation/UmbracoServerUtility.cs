@@ -4,7 +4,7 @@ using umbraco.presentation.LiveEditing;
 using umbraco.BasePages;
 using umbraco.cms.businesslogic.web;
 using System.Xml.Linq;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.presentation.preview;
 using umbraco.BusinessLogic;
 using System.Xml;

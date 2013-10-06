@@ -6,7 +6,7 @@ using System.Collections;
 using System.IO;
 
 using System.Web.Security;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.web
 {

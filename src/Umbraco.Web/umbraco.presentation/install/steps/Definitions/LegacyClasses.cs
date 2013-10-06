@@ -27,7 +27,7 @@ namespace umbraco.presentation.install.steps.Definitions
 
         public override string UserControl
         {
-            get { return IO.SystemDirectories.Install + "/steps/welcome.ascx"; }
+            get { return SystemDirectories.Install + "/steps/welcome.ascx"; }
         }
 
         public override bool Completed()
@@ -60,7 +60,7 @@ namespace umbraco.presentation.install.steps.Definitions
 
         public override string UserControl
         {
-            get { return IO.SystemDirectories.Install + "/steps/skinning.ascx"; }
+            get { return SystemDirectories.Install + "/steps/skinning.ascx"; }
         }
 
         public override bool Completed()
@@ -85,7 +85,7 @@ namespace umbraco.presentation.install.steps.Definitions
 
         public override string UserControl
         {
-            get { return IO.SystemDirectories.Install + "/steps/theend.ascx"; }
+            get { return SystemDirectories.Install + "/steps/theend.ascx"; }
         }
 
         public override bool Completed()
@@ -110,7 +110,7 @@ namespace umbraco.presentation.install.steps.Definitions
 
         public override string UserControl
         {
-            get { return IO.SystemDirectories.Install + "/steps/skinning.ascx"; }
+            get { return SystemDirectories.Install + "/steps/skinning.ascx"; }
         }
 
         public override bool Completed()
@@ -146,7 +146,7 @@ namespace umbraco.presentation.install.steps.Definitions
 
         public override string UserControl
         {
-            get { return IO.SystemDirectories.Install + "/steps/license.ascx"; }
+            get { return SystemDirectories.Install + "/steps/license.ascx"; }
         }
 
         public override bool Completed()
@@ -214,7 +214,7 @@ namespace umbraco.presentation.install.steps.Definitions
 
         public override string UserControl
         {
-            get { return IO.SystemDirectories.Install + "/steps/defaultuser.ascx"; }
+            get { return SystemDirectories.Install + "/steps/defaultuser.ascx"; }
         }
 
         public override bool Completed()

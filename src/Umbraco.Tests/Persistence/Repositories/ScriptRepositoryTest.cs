@@ -4,6 +4,7 @@ using System.Text;
 using NUnit.Framework;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -30,7 +31,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-			var repository = new ScriptRepository(unitOfWork, _fileSystem);
+            var repository = new ScriptRepository(unitOfWork, _fileSystem);
 
             // Assert
             Assert.That(repository, Is.Not.Null);

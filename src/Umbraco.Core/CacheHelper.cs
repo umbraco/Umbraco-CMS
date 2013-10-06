@@ -110,6 +110,14 @@ namespace Umbraco.Core
             }
         }
 
+	    internal void ClearStaticCacheObjectTypes<T>(Func<string, T, bool> predicate)
+	    {
+	        if (_enableCache)
+                _staticCache.ClearCacheObjectTypes(predicate);
+            else
+                _nullStaticCache.ClearCacheObjectTypes(predicate);
+	    }
+
         /// <summary>
         /// Clears all static cache items that starts with the key passed.
         /// </summary>

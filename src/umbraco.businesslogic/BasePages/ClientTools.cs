@@ -4,7 +4,7 @@ using System.Text;
 using System.Web;
 using umbraco.BasePages;
 using System.Web.UI;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.BusinessLogic;
 
 namespace umbraco.BasePages

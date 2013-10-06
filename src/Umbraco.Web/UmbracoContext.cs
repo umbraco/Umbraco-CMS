@@ -7,7 +7,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using umbraco;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.presentation;
 using umbraco.presentation.LiveEditing;
 using umbraco.BasePages;
@@ -24,7 +24,7 @@ namespace Umbraco.Web
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
-    public class UmbracoContext : DisposableObject
+    public class UmbracoContext : DisposableObject, IDisposeOnRequestEnd
     {
         private const string HttpContextItemName = "Umbraco.Web.UmbracoContext";
         private static readonly object Locker = new object();

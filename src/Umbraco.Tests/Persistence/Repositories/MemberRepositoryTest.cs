@@ -4,29 +4,23 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
-using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
-using Umbraco.Core.Publishing;
-using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
-    [TestFixture, NUnit.Framework.Ignore]
-    public class MemberRepositoryTest : MemberRepositoryBaseTest
+    [TestFixture]
+    public class MemberRepositoryTest : BaseDatabaseFactoryTest
     {
-        #region Overrides of MemberRepositoryBaseTest
-
         [SetUp]
         public override void Initialize()
         {
             base.Initialize();
-
-            SqlSyntaxContext.SqlSyntaxProvider = SqlServerSyntax.Provider;
         }
 
         [TearDown]
@@ -35,102 +29,163 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
-        public override string ConnectionString
+        private MemberRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MemberTypeRepository memberTypeRepository)
         {
-            get { return @"server=.\SQLEXPRESS;database=EmptyForTest;user id=umbraco;password=umbraco"; }
+            memberTypeRepository = new MemberTypeRepository(unitOfWork, NullCacheProvider.Current);
+            var repository = new MemberRepository(unitOfWork, NullCacheProvider.Current, memberTypeRepository);
+            return repository;
         }
-
-        public override string ProviderName
-        {
-            get { return "System.Data.SqlClient"; }
-        }
-
-        #endregion
 
         [Test]
+        public void Can_Instantiate_Repository_From_Resolver()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+
+            // Act
+            var repository = RepositoryResolver.Current.ResolveByType<IMemberRepository>(unitOfWork);
+
+            // Assert
+            Assert.That(repository, Is.Not.Null);
+        }
+
+        [Test, NUnit.Framework.Ignore]
         public void MemberRepository_Can_Get_Member_By_Id()
         {
-            var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.Factory.CreateMemberRepository(unitOfWork);
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
 
-            var member = repository.Get(1341);
+                var member = repository.Get(1341);
 
-            Assert.That(member, Is.Not.Null);
+                Assert.That(member, Is.Not.Null);
+            }
         }
 
-        [Test]
+        [Test, NUnit.Framework.Ignore]
         public void MemberRepository_Can_Get_Specific_Members()
         {
-            var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.Factory.CreateMemberRepository(unitOfWork);
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
 
-            var members = repository.GetAll(1341, 1383);
+                var members = repository.GetAll(1341, 1383);
 
-            Assert.That(members, Is.Not.Null);
-            Assert.That(members.Any(x => x == null), Is.False);
-            Assert.That(members.Count(), Is.EqualTo(2));
+                Assert.That(members, Is.Not.Null);
+                Assert.That(members.Any(x => x == null), Is.False);
+                Assert.That(members.Count(), Is.EqualTo(2));
+            }
         }
 
-        [Test]
+        [Test, NUnit.Framework.Ignore]
         public void MemberRepository_Can_Get_All_Members()
         {
-            var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.Factory.CreateMemberRepository(unitOfWork);
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
 
-            var members = repository.GetAll();
+                var members = repository.GetAll();
 
-            Assert.That(members, Is.Not.Null);
-            Assert.That(members.Any(x => x == null), Is.False);
-            Assert.That(members.Count(), Is.EqualTo(6));
+                Assert.That(members, Is.Not.Null);
+                Assert.That(members.Any(x => x == null), Is.False);
+                Assert.That(members.Count(), Is.EqualTo(6));
+            }
         }
 
-        [Test]
+        [Test, NUnit.Framework.Ignore]
         public void MemberRepository_Can_Perform_GetByQuery_With_Key()
         {
             // Arrange
-            var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.Factory.CreateMemberRepository(unitOfWork);
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
 
-            // Act
-            var query = Query<IMember>.Builder.Where(x => x.Key == new Guid("A6B9CA6B-0615-42CA-B5F5-338417EC76BE"));
-            var result = repository.GetByQuery(query);
+                // Act
+                var query = Query<IMember>.Builder.Where(x => x.Key == new Guid("A6B9CA6B-0615-42CA-B5F5-338417EC76BE"));
+                var result = repository.GetByQuery(query);
 
-            // Assert
-            Assert.That(result.Count(), Is.EqualTo(1));
-            Assert.That(result.First().Id, Is.EqualTo(1341));
+                // Assert
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Id, Is.EqualTo(1341));
+            }
         }
 
-        [Test]
+        [Test, NUnit.Framework.Ignore]
         public void MemberRepository_Can_Perform_GetByQuery_With_Property_Value()
         {
             // Arrange
-            var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.Factory.CreateMemberRepository(unitOfWork);
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
 
-            // Act
-            var query = Query<IMember>.Builder.Where(x => ((Member)x).ShortStringPropertyValue.EndsWith("piquet_h"));
-            var result = repository.GetByQuery(query);
+                // Act
+                var query = Query<IMember>.Builder.Where(x => ((Member) x).ShortStringPropertyValue.EndsWith("piquet_h"));
+                var result = repository.GetByQuery(query);
 
-            // Assert
-            Assert.That(result.Any(x => x == null), Is.False);
-            Assert.That(result.Count(), Is.EqualTo(1));
-            Assert.That(result.First().Id, Is.EqualTo(1341));
+                // Assert
+                Assert.That(result.Any(x => x == null), Is.False);
+                Assert.That(result.Count(), Is.EqualTo(1));
+                Assert.That(result.First().Id, Is.EqualTo(1341));
+            }
         }
 
-        [Test]
+        [Test, NUnit.Framework.Ignore]
         public void MemberRepository_Can_Perform_GetByQuery_With_Property_Alias_And_Value()
         {
             // Arrange
-            var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.Factory.CreateMemberRepository(unitOfWork);
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
 
-            // Act
-            var query = Query<IMember>.Builder.Where(x => ((Member)x).LongStringPropertyValue.Contains("1095") && ((Member)x).PropertyTypeAlias == "headshot");
-            var result = repository.GetByQuery(query);
+                // Act
+                var query = Query<IMember>.Builder.Where(x => ((Member) x).LongStringPropertyValue.Contains("1095") && ((Member) x).PropertyTypeAlias == "headshot");
+                var result = repository.GetByQuery(query);
 
-            // Assert
-            Assert.That(result.Any(x => x == null), Is.False);
-            Assert.That(result.Count(), Is.EqualTo(5));
+                // Assert
+                Assert.That(result.Any(x => x == null), Is.False);
+                Assert.That(result.Count(), Is.EqualTo(5));
+            }
+        }
+
+        [Test]
+        public void MemberRepository_Can_Persist_Member()
+        {
+            IMember sut;
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
+                var memberType = MockedContentTypes.CreateSimpleMemberType();
+                memberTypeRepository.AddOrUpdate(memberType);
+                unitOfWork.Commit();
+
+                var member = MockedMember.CreateSimpleContent(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty", -1);
+                repository.AddOrUpdate(member);
+                unitOfWork.Commit();
+
+                sut = repository.Get(member.Id);
+
+                Assert.That(sut, Is.Not.Null);
+                Assert.That(sut.ContentType.PropertyGroups.Count(), Is.EqualTo(1));
+                Assert.That(sut.ContentType.PropertyTypes.Count(), Is.EqualTo(12));
+
+                Assert.That(sut.Properties.Count(), Is.EqualTo(12));
+                Assert.That(sut.Properties.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
+            }
         }
 
         [Test]
@@ -210,110 +265,5 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             get { return new Guid(Constants.ObjectTypes.Member); }
         }
-    }
-
-    [TestFixture, NUnit.Framework.Ignore]
-    public class MemberTypeRepositoryTest : MemberRepositoryBaseTest
-    {
-        #region Overrides of MemberRepositoryBaseTest
-
-        [SetUp]
-        public override void Initialize()
-        {
-            base.Initialize();
-
-            SqlSyntaxContext.SqlSyntaxProvider = SqlServerSyntax.Provider;
-        }
-
-        [TearDown]
-        public override void TearDown()
-        {
-            base.TearDown();
-        }
-
-        public override string ConnectionString
-        {
-            get { return @"server=.\SQLEXPRESS;database=Kloud-Website-Production;user id=umbraco;password=umbraco"; }
-        }
-
-        public override string ProviderName
-        {
-            get { return "System.Data.SqlClient"; }
-        }
-
-        #endregion
-
-        [Test]
-        public void MemberTypeRepository_Can_Get_MemberType_By_Id()
-        {
-            var unitOfWork = UnitOfWorkProvider.GetUnitOfWork();
-            var repository = RepositoryResolver.Current.Factory.CreateMemberTypeRepository(unitOfWork);
-
-            var memberType = repository.Get(1340);
-
-            Assert.That(memberType, Is.Not.Null);
-            Assert.That(memberType.PropertyTypes.Count(), Is.EqualTo(13));
-            Assert.That(memberType.PropertyGroups.Any(), Is.False);
-
-            repository.AddOrUpdate(memberType);
-            unitOfWork.Commit();
-            Assert.That(memberType.PropertyTypes.Any(x => x.HasIdentity == false), Is.False);
-        }
-    }
-
-    [TestFixture]
-    public abstract class MemberRepositoryBaseTest
-    {
-        [SetUp]
-        public virtual void Initialize()
-        {
-            TestHelper.SetupLog4NetForTests();
-            TestHelper.InitializeContentDirectories();
-
-            string path = TestHelper.CurrentAssemblyDirectory;
-            AppDomain.CurrentDomain.SetData("DataDirectory", path);
-
-            RepositoryResolver.Current = new RepositoryResolver(
-                new RepositoryFactory());
-            
-            MappingResolver.Current = new MappingResolver(
-                () => PluginManager.Current.ResolveAssignedMapperTypes());
-
-            
-            var dbFactory = new DefaultDatabaseFactory(ConnectionString, ProviderName);
-            UnitOfWorkProvider = new PetaPocoUnitOfWorkProvider(dbFactory);
-
-            ApplicationContext.Current = new ApplicationContext(
-                //assign the db context
-                new DatabaseContext(new DefaultDatabaseFactory()),
-                //assign the service context
-                new ServiceContext(UnitOfWorkProvider, new FileUnitOfWorkProvider(), new PublishingStrategy()),
-                //disable cache
-                false)
-            {
-                IsReady = true
-            };
-
-            Resolution.Freeze();
-        }
-
-        [TearDown]
-        public virtual void TearDown()
-        {
-            SqlSyntaxContext.SqlSyntaxProvider = null;
-            AppDomain.CurrentDomain.SetData("DataDirectory", null);
-
-            //reset the app context
-            ApplicationContext.Current = null;
-
-            RepositoryResolver.Reset();
-            MappingResolver.Reset();
-        }
-
-        public abstract string ConnectionString { get; }
-
-        public abstract string ProviderName { get; }
-
-        public PetaPocoUnitOfWorkProvider UnitOfWorkProvider { get; set; }
     }
 }

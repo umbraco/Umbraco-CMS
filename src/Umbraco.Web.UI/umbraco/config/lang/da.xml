@@ -61,7 +61,7 @@
     <key alias="justifyLeft">Venstrestil afsnit</key>
     <key alias="justifyRight">Højrestil afsnit</key>
     <key alias="linkInsert">Indsæt link</key>
-    <key alias="linkLocal">Indsæt lokaltlink (anker)</key>
+    <key alias="linkLocal">Indsæt lokalt link (anker)</key>
     <key alias="listBullet">Punktopstilling</key>
     <key alias="listNumeric">Nummerorden</key>
     <key alias="macroInsert">Indsæt makro</key>
@@ -77,13 +77,13 @@
   </area>
   <area alias="content">
     <key alias="about">Om siden</key>
-    <key alias="alias">Alternativ link</key>
-    <key alias="alternativeTextHelp">(hvordan ville du f.eks beskrive billedet via telefonen)</key>
+    <key alias="alias">Alias</key>
+    <key alias="alternativeTextHelp">(hvordan ville du f.eks. beskrive billedet via telefonen?)</key>
     <key alias="alternativeUrls">Alternative links</key>
     <key alias="clickToEdit">Klik på musen for at redigere dette punkt</key>
     <key alias="createBy">Oprettet af</key>
     <key alias="createDate">Oprettet den</key>
-    <key alias="documentType">Dokumenttype</key>
+    <key alias="documentType">Dokumenttype</kaey>
     <key alias="editing">Redigerer</key>
     <key alias="expireDate">Nedtagningsdato</key>
     <key alias="itemChanged">Dette punkt er ændret siden udgivelsen</key>
@@ -96,7 +96,7 @@
     <key alias="noDate">Ingen dato valgt</key>
     <key alias="nodeName">Sidetitel</key>
     <key alias="otherElements">Egenskaber</key>
-    <key alias="parentNotPublished">Dette dokument er udgivet, men ikke synligt da den ovenliggende side '%0%' ikke er udgivet!</key>
+    <key alias="parentNotPublished">Dette dokument er udgivet, men ikke synligt da den overliggende side '%0%' ikke er udgivet!</key>
     <key alias="publish">Udgivet</key>
     <key alias="publishStatus">Udgivelses status</key>
     <key alias="releaseDate">Udgivelsesdato</key>
@@ -168,7 +168,7 @@
     <key alias="templateContentAreaHelp"><![CDATA[<strong>Vælg et placeholder id</strong> Ved at sætte et id på en placeholder kan du indskyde indhold fra undertemplates ved at referere til dette ID vha. et <code>&lt;asp:content /&gt;</code> element.]]></key>
     <key alias="templateContentPlaceHolderHelp"><![CDATA[<strong>Vælg et placeholder id</strong> fra listen herunder. Du kan kun vælge id'er fra den nuværende masterskabelon.]]></key>
     <key alias="thumbnailimageclickfororiginal">Klik på billedet for at se den fulde størrelse</key>
-    <key alias="treepicker">Vælg punkt</key>
+    <key alias="treepicker">Vælg</key>
     <key alias="viewCacheItem">Se Cache Item</key>
   </area>
   <area alias="dictionaryItem">
@@ -224,8 +224,8 @@
     <key alias="stylesNoStylesOnPage">Der er ingen aktive styles eller formatteringer på denne side</key>
     <key alias="tableColMergeLeft">Du skal stå til venstre for de 2 celler du ønsker at samle!</key>
     <key alias="tableSplitNotSplittable">Du kan ikke opdele en celle, som ikke allerede er delt.</key>
-    <key alias="xsltErrorHeader">Fejl i xslt kode</key>
-    <key alias="xsltErrorText">Din xslt er ikke opdateret, da det indeholdt en fejl</key>
+    <key alias="xsltErrorHeader">Fejl i XSLT kode</key>
+    <key alias="xsltErrorText">Din XSLT er ikke opdateret, da det indeholdt en fejl</key>
   </area>
   <area alias="general">
     <key alias="about">Om</key>
@@ -495,10 +495,10 @@ Mange hilsner fra umbraco robotten
   <area alias="publish">
     <key alias="contentPublishedFailedByEvent">%0% kunne ikke udgives, fordi et 3. parts modul annullerede handlingen</key>
     <key alias="includeUnpublished">Medtag ikke-udgivede undersider</key>
-    <key alias="inProgress">Publiserer - vent venligst...</key>
+    <key alias="inProgress">Publicerer - vent venligst...</key>
     <key alias="inProgressCounter">%0% ud af %1% sider er blevet udgivet...</key>
-    <key alias="nodePublish">%0% er nu publiseret</key>
-    <key alias="nodePublishAll">%0% og alle undersider er nu publiseret</key>
+    <key alias="nodePublish">%0% er nu publiceret</key>
+    <key alias="nodePublishAll">%0% og alle undersider er nu publiceret</key>
     <key alias="publishAll">Publisér alle undersider</key>
     <key alias="publishHelp"><![CDATA[Klik <em>ok</em> for at udgive <strong>%0%</strong> og derved gøre indholdet offentligt tilgængeligt..<br/><br /> Du kan udgive denne side og dens undersider ved at klikke <em>Udgiv alle undersider</em> forneden]]></key>
   </area>
@@ -574,10 +574,10 @@ Mange hilsner fra umbraco robotten
     <key alias="dataTypeSaved">Datatype gemt</key>
     <key alias="dictionaryItemSaved">Ordbogsnøgle gemt</key>
     <key alias="editContentPublishedFailedByParent">Udgivelsen fejlede fordi en overordnet side ikke er publiceret</key>
-    <key alias="editContentPublishedHeader">Indhold publiseret</key>
+    <key alias="editContentPublishedHeader">Indhold publiceret</key>
     <key alias="editContentPublishedText">og nu synligt for besøgende</key>
     <key alias="editContentSavedHeader">Indhold gemt</key>
-    <key alias="editContentSavedText">Husk at publisere for at gøre det synligt for besøgende</key>
+    <key alias="editContentSavedText">Husk at publicere for at gøre det synligt for besøgende</key>
     <key alias="editContentSendToPublish">Send til Godkendelse</key>
     <key alias="editContentSendToPublishText">Rettelser er blevet sendt til godkendelse</key>
     <key alias="editMemberSaved">Medlem gemt</key>
@@ -602,8 +602,8 @@ Mange hilsner fra umbraco robotten
     <key alias="xsltErrorHeader">XSLT'en blev ikke gemt</key>
     <key alias="xsltErrorText">XSLT'en indeholdt fejl</key>
     <key alias="xsltPermissionErrorText">XSLT kunne ikke gemmes, check filrettigheder</key>
-    <key alias="xsltSavedHeader">Xslt gemt</key>
-    <key alias="xsltSavedText">Der var ingen fejl i din xslt!</key>
+    <key alias="xsltSavedHeader">XSLT gemt</key>
+    <key alias="xsltSavedText">Der var ingen fejl i din XSLT!</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Bruger CSS-syntax f.eks. h1, .redheader, .blueTex</key>

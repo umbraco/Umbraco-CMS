@@ -1,6 +1,6 @@
 ﻿using System;
 using umbraco.interfaces.skinning;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using HtmlAgilityPack;
 
 namespace umbraco.cms.businesslogic.skinning.tasks
@@ -24,7 +24,7 @@ namespace umbraco.cms.businesslogic.skinning.tasks
             //open template
 
             HtmlDocument doc = new HtmlDocument();
-            doc.Load(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" +TargetFile);
+            doc.Load(IOHelper.MapPath(SystemDirectories.Masterpages) + "/" +TargetFile);
 
             if (doc.DocumentNode.SelectNodes(string.Format("//*[@id = '{0}']", TargetID)) != null)
             {
@@ -49,7 +49,7 @@ namespace umbraco.cms.businesslogic.skinning.tasks
                     }
                 }
             }
-            doc.Save(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
+            doc.Save(IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
 
             d.TaskExecutionStatus = TaskExecutionStatus.Completed;
             d.NewValue = Value;

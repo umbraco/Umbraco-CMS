@@ -140,7 +140,7 @@ namespace umbraco.uicontrols.TreePicker
                     ModalWidth.ToString(),
                     ModalHeight.ToString(),
                     ShowHeader.ToString().ToLower(),
-                    umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco).TrimEnd('/')
+                    Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco).TrimEnd('/')
                  });
         }
 

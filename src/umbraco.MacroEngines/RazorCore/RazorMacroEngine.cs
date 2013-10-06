@@ -9,7 +9,7 @@ using System.Web.WebPages;
 using Umbraco.Core;
 using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.MacroEngines
 {

@@ -12,7 +12,7 @@
     }
   </script>
   
-  <link href="<%= umbraco.IO.IOHelper.ResolveUrl( umbraco.IO.SystemDirectories.Umbraco_client ) %>/ui/default.css" type="text/css" rel="stylesheet"/>
+  <link href="<%= Umbraco.Core.IO.IOHelper.ResolveUrl( Umbraco.Core.IO.SystemDirectories.UmbracoClient ) %>/ui/default.css" type="text/css" rel="stylesheet"/>
   <style type="text/css">
     body {
       text-align: center;

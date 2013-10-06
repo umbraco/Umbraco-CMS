@@ -105,7 +105,7 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual string GetDbConnectionString()
         {
-            return @"Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;File Access Retry Timeout=10";            
+            return @"Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;";            
         }
 
         /// <summary>
@@ -171,7 +171,7 @@ namespace Umbraco.Tests.TestHelpers
                 () => PluginManager.Current.ResolveDataTypes());
 
             RepositoryResolver.Current = new RepositoryResolver(
-                new RepositoryFactory());
+                new RepositoryFactory(true)); //disable all repo caches for tests!
 
             SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
                 new List<Type> { typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqlServerSyntaxProvider) }) { CanResolveBeforeFrozen = true };

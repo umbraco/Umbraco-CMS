@@ -157,7 +157,7 @@
         var initApp = '<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["app"]%>';
         var rightAction = '<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["rightAction"]%>';
         var rightActionId = '<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["id"]%>';
-        var base = '<%=string.Format("{0}/", umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco))%>';
+        var base = '<%=string.Format("{0}/", Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco))%>';
         var url = ''
         if (rightActionId && rightActionId != '') {
             url = base + rightAction + ".aspx?id=" + rightActionId
@@ -166,7 +166,7 @@
         }
         jQuery(document).ready(function () {
 
-            UmbClientMgr.setUmbracoPath("<%=umbraco.IO.IOHelper.ResolveUrl(umbraco.IO.SystemDirectories.Umbraco) %>");
+            UmbClientMgr.setUmbracoPath("<%=Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco) %>");
 
             //call wresize first for IE/FF resize issues
             jQuery(window).wresize(function () { resizePage(); });

@@ -230,7 +230,7 @@
     <key alias="stylesNoStylesOnPage">没有可用的样式</key>
     <key alias="tableColMergeLeft">请把光标放在您要合并的两个单元格中的左边单元格</key>
     <key alias="tableSplitNotSplittable">非合并单元格不能分离。</key>
-    <key alias="xsltErrorHeader">xslt源码出错</key>
+    <key alias="xsltErrorHeader">XSLT源码出错</key>
     <key alias="xsltErrorText">XSLT未保存，因为包含错误。</key>
   </area>
   <area alias="general">
