@@ -4,7 +4,7 @@ Filename (without .xslt): <asp:RequiredFieldValidator id="RequiredFieldValidator
 <asp:TextBox id="rename" Runat="server" CssClass="bigInput" Width="350"></asp:TextBox>
 
 
-<div style="MARGIN-TOP: 10px">Choose a template:<br />
+<div style="MARGIN-TOP: 10px">Choose a snippet:<br />
 <asp:ListBox id="xsltTemplate" Runat="server" Width="350" CssClass="bigInput" Rows="1" SelectionMode="Single">
 	<asp:ListItem Value="clean.xslt">Clean</asp:ListItem>
 </asp:ListBox>
