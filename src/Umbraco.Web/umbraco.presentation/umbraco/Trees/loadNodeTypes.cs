@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.language;
 using Umbraco.Core.Services;
 using umbraco.businesslogic;
 using umbraco.interfaces;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
+using Umbraco.Web.umbraco.presentation.umbraco.Trees;
 
 
 namespace umbraco
@@ -69,7 +68,7 @@ function openNodeType(id) {
 
                 XmlTreeNode xNode = XmlTreeNode.Create(this);
                 xNode.NodeID = docType.Id.ToString(CultureInfo.InvariantCulture);
-                xNode.Text = GetTranslatedNodeTypeName(docType.Name);
+                xNode.Text = TranslateTreeNames.GetTranslatedName(docType.Name);
                 xNode.Action = "javascript:openNodeType(" + docType.Id + ");";
                 xNode.Icon = "settingDataType.gif";
                 xNode.OpenIcon = "settingDataType.gif";
@@ -93,24 +92,6 @@ function openNodeType(id) {
         private IContentTypeService Service
         {
             get { return Services.ContentTypeService; }
-        }
-
-        private string GetTranslatedNodeTypeName(string originalName)
-        {
-
-            if (originalName.StartsWith("#") == false)
-                return originalName;
-            
-            var lang = Language.GetByCultureCode(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
-
-            if (lang != null && Dictionary.DictionaryItem.hasKey(originalName.Substring(1, originalName.Length - 1)))
-            {
-                var dictionaryItem = new Dictionary.DictionaryItem(originalName.Substring(1, originalName.Length - 1));
-                if (dictionaryItem != null)
-                    return dictionaryItem.Value(lang.id);
-            }
-
-            return "[" + originalName + "]";
         }
     }
 }
