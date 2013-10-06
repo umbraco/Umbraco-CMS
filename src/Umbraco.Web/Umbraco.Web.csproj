@@ -404,7 +404,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Controllers\LoginController.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\TranslateDictionaryItems.cs" />
+    <Compile Include="umbraco.presentation\umbraco\Trees\TranslateTreeNames.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="UrlHelperRenderExtensions.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
