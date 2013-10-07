@@ -597,7 +597,6 @@
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\CustomJson.html" />
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
-    <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\propertyeditors.controller.js" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\CsvEditor.html" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\PostcodeEditor.html" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\RegexEditor.html" />
@@ -2552,6 +2551,7 @@
   <ItemGroup>
     <Folder Include="App_Code\" />
     <Folder Include="App_Data\" />
+    <Folder Include="App_Plugins\MyPackage\PropertyEditors\Js\" />
     <Folder Include="Css\" />
     <Folder Include="MasterPages\" />
     <Folder Include="Media\" />
