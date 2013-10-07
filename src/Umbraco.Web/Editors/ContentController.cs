@@ -339,11 +339,9 @@ namespace Umbraco.Web.Editors
         /// attributed with EnsureUserPermissionForContent to verify the user has access to the recycle bin
         /// </remarks>
         [HttpDelete]
-        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent)]
+       /* [EnsureUserPermissionForContent(Constants.System.RecycleBinContent)]*/
         public HttpResponseMessage EmptyRecycleBin()
         {            
-            //TODO: We need to check if the user is allowed access to the recycle bin!
-
             Services.ContentService.EmptyRecycleBin();
             return Request.CreateResponse(HttpStatusCode.OK);
         }

@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, editorContextService) {
+function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, editorContextService) {
        
     //initialize the file manager
     fileManager.clearFiles();
@@ -49,6 +49,8 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
                     newContent: data,
                     rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                 });
+
+                navigationService.syncPath(data.path.split(","));
             });   
     };
 
@@ -73,6 +75,8 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
                     rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                 });
                 
+                navigationService.syncPath(data.path.split(","));
+
             }, function (err) {
 
                 contentEditingHelper.handleSaveError({
@@ -124,8 +128,9 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
                     rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                 });
 
-                deferred.resolve(data);
+                navigationService.syncPath(data.path.split(","));
                 
+                deferred.resolve(data);
             }, function (err) {
                 contentEditingHelper.handleSaveError({
                     err: err,
