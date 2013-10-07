@@ -36,7 +36,7 @@ angular.module("umbraco.directives")
         '<ins ng-hide="node.hasChildren" style="background:none;width:18px;"></ins>' +        
         '<ins ng-show="node.hasChildren" ng-class="{\'icon-navigation-right\': !node.expanded, \'icon-navigation-down\': node.expanded}" ng-click="load(this, node)"></ins>' +
         '<i title="#{{node.routePath}}" class="{{node.cssClass}}" style="{{node.style}}"></i>' +
-        '<a href ng-click="select(this, node, $event)" >{{node.name}} {{path}}</a>' +
+        '<a href ng-click="select(this, node, $event)" >{{node.name}}</a>' +
         '<a href class="umb-options" ng-hide="!node.menuUrl" ng-click="options(this, node, $event)"><i></i><i></i><i></i></a>' +
         '<div ng-show="node.loading" class="l"><div></div></div>' +
         '</div>' +
@@ -108,7 +108,7 @@ angular.module("umbraco.directives")
             //emit treeNodeExpanding event, if a callback object is set on the tree
             emitEvent("treeNodeExpanding", { element: arrow, node: node });
             
-            if (forceReload || !node.children || (angular.isArray(node.children) && node.children.length === 0)) {
+            if (node.hasChildren && (forceReload || !node.children || (angular.isArray(node.children) && node.children.length === 0))) {
                 //get the children from the tree service
                 treeService.loadNodeChildren({ node: node, section: scope.section })
                     .then(function(data) {
@@ -135,7 +135,9 @@ angular.module("umbraco.directives")
         
         scope.expandActivePath = function(node, activeTree, activePath) {
             if(activePath || activeTree){
-              if( (node.metaData.treeAlias && activeTree === node.metaData.treeAlias) || activePath.indexOf(node.id) >= 0){
+              if(node.metaData.treeAlias && activeTree === node.metaData.treeAlias){
+                  scope.loadChildren(null, scope.node, true);
+              }else if( !node.metaData.treeAlias && activePath.indexOf(node.id) >= 0){
                   scope.loadChildren(null, scope.node, true);
               }
             }
