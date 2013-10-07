@@ -81,7 +81,7 @@ angular.module('umbraco.services')
          * @param {String} source The URL to load into the iframe
          */
         loadLegacyIFrame: function (source) {
-            $location.path("/framed/" + encodeURIComponent(source));
+            $location.path("/" + this.ui.currentSection + "/framed/" + encodeURIComponent(source));
         },
 
         /**
@@ -142,11 +142,26 @@ angular.module('umbraco.services')
                 //TODO: investicate if we need to halt watch triggers
                 //and instead pause them and then manually tell the tree to digest path changes
                 //as this might be a bit heavy loading
-                this.ui.currentSection = sectionAlias;
-                this.ui.currentTree = treeAlias;
-                this.ui.currentPath = path;
+                if(sectionAlias){
+                    this.ui.currentSection = sectionAlias;
+                }
+                if(treeAlias){
+                    this.ui.currentTree = treeAlias;
+                }
+                if(path){
+                    this.ui.currentPath = path;
+                }
         },
 
+        /* this is to support the legacy ways to sync the tree, so you can do it in 2 steps 
+            For all new operations, its recommend to just use syncTree()
+        */
+        syncPath: function (path) {
+                //TODO: investicate if we need to halt watch triggers
+                //and instead pause them and then manually tell the tree to digest path changes
+                //as this might be a bit heavy loading
+                this.ui.currentPath = path;
+        },
 
         /**
          * @ngdoc method

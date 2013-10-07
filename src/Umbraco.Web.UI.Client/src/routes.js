@@ -58,7 +58,7 @@ app.config(function ($routeProvider) {
             },
             resolve: checkAuth(true)
         })
-        .when('/framed/:url', {
+        .when('/:section/framed/:url', {
             //This occurs when we need to launch some content in an iframe
             templateUrl: function (rp) {
                 if (!rp.url)
