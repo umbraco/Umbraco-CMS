@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
-	function ($scope, eventsService, contentResource, $log) {	
+	function ($scope, eventsService, entityResource, contentResource, $log) {
 	var dialogOptions = $scope.$parent.dialogOptions;
 	
 	$scope.dialogTreeEventHandler = $({});
@@ -12,10 +12,10 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 		//if we a node ID, we fetch the current node to build the form data
 		if($scope.target.id){
 
-			if(!$scope.target.path){
-				contentResource.getPath($scope.target.id).then(function(path){
-					$scope.target.path = path;
-				})
+			if(!$scope.target.path) {
+			    entityResource.getPath($scope.target.id, "Document").then(function (path) {
+			        $scope.target.path = path;
+			    });
 			}
 
 			contentResource.getNiceUrl($scope.target.id).then(function(url){
