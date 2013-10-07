@@ -650,7 +650,6 @@
     <None Include="Config\Dashboard.Release.config">
       <DependentUpon>Dashboard.config</DependentUpon>
     </None>
-    <Content Include="MacroScripts\Twitter.cshtml" />
     <None Include="packages.config" />
     <None Include="Umbraco\Config\Create\UI.Release.xml">
       <DependentUpon>UI.xml</DependentUpon>
