@@ -191,7 +191,7 @@ namespace Umbraco.Web
 				    var contentType = _umbracoContext.HttpContext.Response.ContentType;
 					var traceIsEnabled = containerPage.Trace.IsEnabled;
 					containerPage.Trace.IsEnabled = false;
-					_umbracoContext.HttpContext.Server.Execute(containerPage, output, false);
+					_umbracoContext.HttpContext.Server.Execute(containerPage, output, true);
 					containerPage.Trace.IsEnabled = traceIsEnabled;
                     //reset the content type
 				    _umbracoContext.HttpContext.Response.ContentType = contentType;
