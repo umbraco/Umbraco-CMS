@@ -27,8 +27,6 @@ namespace Umbraco.Web.Mvc
 		    {
                 controller = CreateController(context, factory, routeDef);
                 
-                controller.ViewData.ModelState.Merge(context.Controller.ViewData.ModelState);
-
                 CopyControllerData(context, controller);
 
 		        ExecuteControllerAction(context, controller);
@@ -73,14 +71,29 @@ namespace Umbraco.Web.Mvc
         }
 
         /// <summary>
-        /// Ensure TempData and ViewData is copied across
+        /// Ensure ModelState, ViewData and TempData is copied across
         /// </summary>
         private static void CopyControllerData(ControllerContext context, ControllerBase controller)
         {
+            controller.ViewData.ModelState.Merge(context.Controller.ViewData.ModelState);
+
             foreach (var d in context.Controller.ViewData)
                 controller.ViewData[d.Key] = d.Value;
 
-            controller.TempData = context.Controller.TempData;
+            //We cannot simply merge the temp data because during controller execution it will attempt to 'load' temp data
+            // but since it has not been saved, there will be nothing to load and it will revert to nothing, so the trick is 
+            // to Save the state of the temp data first then it will automatically be picked up.
+            // http://issues.umbraco.org/issue/U4-1339
+
+            var targetController = controller as Controller;
+            var sourceController = context.Controller as Controller;
+            if (targetController != null && sourceController != null)
+            {
+                targetController.TempDataProvider = sourceController.TempDataProvider;
+                targetController.TempData = sourceController.TempData;
+                targetController.TempData.Save(sourceController.ControllerContext, sourceController.TempDataProvider);    
+            }
+            
         }
 
         /// <summary>
