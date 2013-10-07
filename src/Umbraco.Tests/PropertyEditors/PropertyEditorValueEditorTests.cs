@@ -19,7 +19,7 @@ namespace Umbraco.Tests.PropertyEditors
                     ValueType = "STRING"
                 };
 
-            var result = valueEditor.FormatDataForEditor(value);
+            var result = valueEditor.ConvertDbToEditor(value);
             Assert.AreEqual(isOk, !(result is string));
         }
 
@@ -67,7 +67,7 @@ namespace Umbraco.Tests.PropertyEditors
                     ValueType = valueType
                 };
 
-            var result = valueEditor.FormatDataForEditor(val);
+            var result = valueEditor.ConvertDbToEditor(val);
             Assert.AreEqual(expected, result);
         }
 
@@ -80,7 +80,7 @@ namespace Umbraco.Tests.PropertyEditors
                     ValueType = "DATE"
                 };
 
-            var result = valueEditor.FormatDataForEditor(now);
+            var result = valueEditor.ConvertDbToEditor(now);
             Assert.AreEqual(now.ToIsoString(), result);
         }
     }

@@ -38,7 +38,7 @@ namespace Umbraco.Web.PropertyEditors
             /// </summary>
             /// <param name="dbValue"></param>
             /// <returns></returns>
-            public override object FormatDataForEditor(object dbValue)
+            public override object ConvertDbToEditor(object dbValue)
             {
                 if (dbValue == null)
                     return dbValue;
@@ -53,7 +53,7 @@ namespace Umbraco.Web.PropertyEditors
             /// <param name="editorValue"></param>
             /// <param name="currentValue"></param>
             /// <returns></returns>
-            public override object FormatDataForPersistence(Core.Models.Editors.ContentPropertyData editorValue, object currentValue)
+            public override object ConvertEditorToDb(Core.Models.Editors.ContentPropertyData editorValue, object currentValue)
             {
                 if (editorValue.Value == null)
                     return null;

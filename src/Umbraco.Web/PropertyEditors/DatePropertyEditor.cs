@@ -47,7 +47,7 @@ namespace Umbraco.Web.PropertyEditors
                 Validators.Add(new DateTimeValidator());
             }
 
-            public override object FormatDataForEditor(object dbValue)
+            public override object ConvertDbToEditor(object dbValue)
             {
                 var date = dbValue.TryConvertTo<DateTime?>();
                 if (date.Success == false || date.Result == null)

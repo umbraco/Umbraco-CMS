@@ -42,7 +42,7 @@ namespace Umbraco.Core.Models
             var propertyEditor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
             if (propertyEditor != null)
             {
-                var cacheValue = propertyEditor.ValueEditor.FormatValueForCache(property);
+                var cacheValue = propertyEditor.ValueEditor.ConvertDbToString(property);
 
                 switch (property.PropertyType.DataTypeDatabaseType)
                 {                                        

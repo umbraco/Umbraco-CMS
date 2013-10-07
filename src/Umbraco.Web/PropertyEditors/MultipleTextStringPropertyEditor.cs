@@ -123,7 +123,7 @@ namespace Umbraco.Web.PropertyEditors
             /// <remarks>
             /// We will also check the pre-values here, if there are more items than what is allowed we'll just trim the end
             /// </remarks>
-            public override object FormatDataForPersistence(ContentPropertyData editorValue, object currentValue)
+            public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
             {
                 var asArray = editorValue.Value as JArray;
                 if (asArray == null)
@@ -165,7 +165,7 @@ namespace Umbraco.Web.PropertyEditors
             /// <remarks>
             /// The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
             /// </remarks>
-            public override object FormatDataForEditor(object dbValue)
+            public override object ConvertDbToEditor(object dbValue)
             {
                 return dbValue == null
                                   ? new JObject[] {}
