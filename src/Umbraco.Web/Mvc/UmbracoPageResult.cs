@@ -1,5 +1,6 @@
 using System;
 using System.Web.Mvc;
+using System.Web.Routing;
 using Umbraco.Core;
 
 namespace Umbraco.Web.Mvc
@@ -11,54 +12,100 @@ namespace Umbraco.Web.Mvc
 	{
 		public override void ExecuteResult(ControllerContext context)
 		{
+			ResetRouteData(context.RouteData);
 
-			//since we could be returning the current page from a surface controller posted values in which the routing values are changed, we 
-			//need to revert these values back to nothing in order for the normal page to render again.
-			context.RouteData.DataTokens["area"] = null;
-			context.RouteData.DataTokens["Namespaces"] = null;
-
-			//validate that the current page execution is not being handled by the normal umbraco routing system
-			if (!context.RouteData.DataTokens.ContainsKey("umbraco-route-def"))
-			{
-				throw new InvalidOperationException("Can only use " + typeof(UmbracoPageResult).Name + " in the context of an Http POST when using a SurfaceController form");
-			}
+            ValidateRouteData(context.RouteData);
 
 			var routeDef = (RouteDefinition)context.RouteData.DataTokens["umbraco-route-def"];
+            var factory = ControllerBuilder.Current.GetControllerFactory();
 
-            var targetController = ((Controller)routeDef.Controller);
-		    var sourceController = ((Controller) context.Controller);
-
-			//ensure the original template is reset
 			context.RouteData.Values["action"] = routeDef.ActionName;
 
-			//ensure ModelState is copied across
-            routeDef.Controller.ViewData.ModelState.Merge(sourceController.ViewData.ModelState);
+		    ControllerBase controller = null;
 
-			//ensure TempData and ViewData is copied across
-            foreach (var d in sourceController.ViewData)
-				routeDef.Controller.ViewData[d.Key] = d.Value;
+		    try
+		    {
+                controller = CreateController(context, factory, routeDef);
+                
+                controller.ViewData.ModelState.Merge(context.Controller.ViewData.ModelState);
 
+                CopyControllerData(context, controller);
 
-            //We cannot simply merge the temp data because during controller execution it will attempt to 'load' temp data
-            // but since it has not been saved, there will be nothing to load and it will revert to nothing, so the trick is 
-            // to Save the state of the temp data first then it will automatically be picked up.
-            // http://issues.umbraco.org/issue/U4-1339
-            targetController.TempDataProvider = sourceController.TempDataProvider;
-		    targetController.TempData = sourceController.TempData;
-            targetController.TempData.Save(sourceController.ControllerContext, sourceController.TempDataProvider);
-
-			using (DisposableTimer.TraceDuration<UmbracoPageResult>("Executing Umbraco RouteDefinition controller", "Finished"))
-			{
-				try
-				{
-                    ((IController)targetController).Execute(context.RequestContext);
-				}
-				finally
-				{
-					routeDef.Controller.DisposeIfDisposable();
-				}
-			}
-
+		        ExecuteControllerAction(context, controller);
+		    }
+		    finally
+		    {
+		        CleanupController(controller, factory);
+		    }
 		}
+
+        /// <summary>
+        /// Executes the controller action
+        /// </summary>
+	    private static void ExecuteControllerAction(ControllerContext context, IController controller)
+	    {
+	        using (DisposableTimer.TraceDuration<UmbracoPageResult>("Executing Umbraco RouteDefinition controller", "Finished"))
+	        {
+	            controller.Execute(context.RequestContext);
+	        }
+	    }
+        
+	    /// <summary>
+        /// Since we could be returning the current page from a surface controller posted values in which the routing values are changed, we 
+        /// need to revert these values back to nothing in order for the normal page to render again.
+        /// </summary>
+        private static void ResetRouteData(RouteData routeData)
+	    {
+            routeData.DataTokens["area"] = null;
+            routeData.DataTokens["Namespaces"] = null;
+	    }
+
+        /// <summary>
+        /// Validate that the current page execution is not being handled by the normal umbraco routing system
+        /// </summary>
+        private static void ValidateRouteData(RouteData routeData)
+        {
+            if (!routeData.DataTokens.ContainsKey("umbraco-route-def"))
+            {
+                throw new InvalidOperationException("Can only use " + typeof(UmbracoPageResult).Name +
+                                                    " in the context of an Http POST when using a SurfaceController form");
+            }
+        }
+
+        /// <summary>
+        /// Ensure TempData and ViewData is copied across
+        /// </summary>
+        private static void CopyControllerData(ControllerContext context, ControllerBase controller)
+        {
+            foreach (var d in context.Controller.ViewData)
+                controller.ViewData[d.Key] = d.Value;
+
+            controller.TempData = context.Controller.TempData;
+        }
+
+        /// <summary>
+        /// Creates a controller using the controller factory
+        /// </summary>
+        private static ControllerBase CreateController(ControllerContext context, IControllerFactory factory, RouteDefinition routeDef)
+        {
+            var controller = factory.CreateController(context.RequestContext, routeDef.ControllerName) as ControllerBase;
+
+            if (controller == null)
+                throw new InvalidOperationException("Could not create controller with name " + routeDef.ControllerName + ".");
+
+            return controller;
+        }
+
+        /// <summary>
+        /// Cleans up the controller by releasing it using the controller factory, and by disposing it.
+        /// </summary>
+        private static void CleanupController(IController controller, IControllerFactory factory)
+        {
+            if (controller != null)
+                factory.ReleaseController(controller);
+
+            if (controller != null)
+                controller.DisposeIfDisposable();
+        }
 	}
 }
