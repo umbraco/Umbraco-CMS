@@ -6,6 +6,25 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 	$scope.dialogTreeEventHandler = $({});
 	$scope.target = {};
 
+	if(dialogOptions.currentTarget){
+		$scope.target = dialogOptions.currentTarget;
+
+		//if we a node ID, we fetch the current node to build the form data
+		if($scope.target.id){
+
+			if(!$scope.target.path){
+				contentResource.getPath($scope.target.id).then(function(path){
+					$scope.target.path = path;
+				})
+			}
+
+			contentResource.getNiceUrl($scope.target.id).then(function(url){
+				$scope.target.url = angular.fromJson(url);
+			});
+		}
+	}
+
+
 	$scope.dialogTreeEventHandler.bind("treeNodeSelect", function(ev, args){
 		args.event.preventDefault();
 		args.event.stopPropagation();
@@ -13,32 +32,35 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 		eventsService.publish("Umbraco.Dialogs.LinkPickerController.Select", args).then(function(args){
 				var c = $(args.event.target.parentElement);
 
-				//clearing
-				if($scope.selectedEl){
-					$scope.selectedEl.find(".temporary").remove();
-					$scope.selectedEl.find("i.umb-tree-icon").show();
-				}
-
 				//renewing
-				if(c !== $scope.selectedEl){
-					c.find("i.umb-tree-icon")
+				if(args.node !== $scope.target){
+					if($scope.selectedEl){
+						$scope.selectedEl.find(".temporary").remove();
+						$scope.selectedEl.find("i.umb-tree-icon").show();
+					}
+
+					$scope.selectedEl = c;
+					$scope.target = args.node;
+					$scope.target.name = args.node.name;
+
+					$scope.selectedEl.find("i.umb-tree-icon")
 					 .hide()
 					 .after("<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>");
 					
-					$scope.selectedEl = c;
-
-					$scope.target = args.node;
-					$scope.target.title = args.node.name;
-
 					if(args.node.id < 0){
 						$scope.target.url = "/";
 					}else{
-						$scope.target.url = contentResource.getNiceUrl(args.node.id);
+						contentResource.getNiceUrl(args.node.id).then(function(url){
+							$scope.target.url = angular.fromJson(url);
+						});
 					}
 				}else{
+					$scope.target = undefined;
 					//resetting
-					$scope.selectedEl = null;
-					$scope.target = {};
+					if($scope.selectedEl){
+						$scope.selectedEl.find(".temporary").remove();
+						$scope.selectedEl.find("i.umb-tree-icon").show();
+					}
 				}
 		});
 
