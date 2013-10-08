@@ -13,5 +13,41 @@
         {
             treeNode.AdditionalData[LegacyJsCallbackKey] = jsCallback;
         }
+
+        /// <summary>
+        /// Sets the node style to show that it is currently protected publicly
+        /// </summary>
+        /// <param name="treeNode"></param>
+        public static void SetProtectedStyle(this TreeNode treeNode)
+        {
+            if (treeNode.CssClasses.Contains("protected") == false)
+            {
+                treeNode.CssClasses.Add("protected");
+            }
+        }
+
+        /// <summary>
+        /// Sets the node style to show that it is has unpublished versions (but is currently published)
+        /// </summary>
+        /// <param name="treeNode"></param>
+        public static void SetHasUnpublishedVersionStyle(this TreeNode treeNode)
+        {
+            if (treeNode.CssClasses.Contains("has-unpublished-version") == false)
+            {
+                treeNode.CssClasses.Add("has-unpublished-version");
+            }
+        }
+
+        /// <summary>
+        /// Sets the node style to show that it is is not published
+        /// </summary>
+        /// <param name="treeNode"></param>
+        public static void SetNotPublishedStyle(this TreeNode treeNode)
+        {
+            if (treeNode.CssClasses.Contains("not-published") == false)
+            {
+                treeNode.CssClasses.Add("not-published");
+            }
+        }
     }
 }

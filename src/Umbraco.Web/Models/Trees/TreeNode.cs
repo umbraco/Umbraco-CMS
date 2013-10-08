@@ -28,7 +28,7 @@ namespace Umbraco.Web.Models.Trees
             AdditionalData = new Dictionary<string, object>();
             ChildNodesUrl = getChildNodesUrl;
             MenuUrl = menuUrl;
-            //default
+             //default
             Icon = "icon-folder-close";
         }
 
@@ -51,17 +51,45 @@ namespace Umbraco.Web.Models.Trees
         public string Title { get; set; }
 
         /// <summary>
+        /// The tree nodetype which refers to the type of node rendered in the tree
+        /// </summary>
+        [DataMember(Name = "nodetype")]
+        public string NodeType { get; set; }
+        
+        /// <summary>
+        /// Optional: The Route path for the editor for this node
+        /// </summary>
+        /// <remarks>
+        /// If this is not set, then the route path will be automatically determined by: {section}/edit/{id}
+        /// </remarks>
+        [DataMember(Name = "routePath")]
+        public string RoutePath { get; set; }
+
+        /// <summary>
+        /// The JSON url to load the nodes children
+        /// </summary>
+        [DataMember(Name = "childNodesUrl")]
+        public string ChildNodesUrl { get; set; }
+
+        /// <summary>
+        /// The JSON url to load the menu from
+        /// </summary>
+        [DataMember(Name = "menuUrl")]
+        public string MenuUrl { get; set; }
+
+        /// <summary>
+        /// A dictionary to support any additional meta data that should be rendered for the node which is 
+        /// useful for custom action commands such as 'create', 'copy', etc...
+        /// </summary>
+        [DataMember(Name = "metaData")]
+        public Dictionary<string, object> AdditionalData { get; private set; }
+
+        /// <summary>
         /// The icon to use for the node, this can be either a path to an image or a Css class. 
         /// If a '/' is found in the string then it will be considered a path to an image.
         /// </summary>
         [DataMember(Name = "icon")]
         public string Icon { get; set; }
-
-        /// <summary>
-        /// The tree nodetype which refers to the type of node rendered in the tree
-        /// </summary>
-        [DataMember(Name = "nodetype")]
-        public string NodeType { get; set; }
 
         /// <summary>
         /// Returns true if the icon represents a CSS class instead of a file path
@@ -95,36 +123,10 @@ namespace Umbraco.Web.Models.Trees
         }
 
         /// <summary>
-        /// Optional: The Route path for the editor for this node
+        /// A list of additional/custom css classes to assign to the node
         /// </summary>
-        /// <remarks>
-        /// If this is not set, then the route path will be automatically determined by: {section}/edit/{id}
-        /// </remarks>
-        [DataMember(Name = "routePath")]
-        public string RoutePath { get; set; }
-
-        /// <summary>
-        /// The JSON url to load the nodes children
-        /// </summary>
-        [DataMember(Name = "childNodesUrl")]
-        public string ChildNodesUrl { get; set; }
-
-        /// <summary>
-        /// The JSON url to load the menu from
-        /// </summary>
-        [DataMember(Name = "menuUrl")]
-        public string MenuUrl { get; set; }
-
-        /// <summary>
-        /// A dictionary to support any additional meta data that should be rendered for the node which is 
-        /// useful for custom action commands such as 'create', 'copy', etc...
-        /// </summary>
-        [DataMember(Name = "metaData")]
-        public Dictionary<string, object> AdditionalData { get; private set; }
-        
-        ///// <summary>
-        ///// The UI style to give the model
-        ///// </summary>
-        //public NodeStyle Style { get; private set; }
+        [DataMember(Name = "cssClasses")]
+        public IList<string> CssClasses { get; private set; }
     }
+
 }
