@@ -288,5 +288,14 @@ namespace Umbraco.Core
                 return xmlDoc.DocumentElement;
             }
         }
+
+        public static XmlNode GetXmlNode(this XNode element, XmlDocument xmlDoc)
+        {
+            using (XmlReader xmlReader = element.CreateReader())
+            {
+                xmlDoc.Load(xmlReader);
+                return xmlDoc.DocumentElement;
+            }
+        }
 	}
 }
