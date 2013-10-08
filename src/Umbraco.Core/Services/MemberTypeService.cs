@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -32,6 +34,25 @@ namespace Umbraco.Core.Services
             using (var repository = _repositoryFactory.CreateMemberTypeRepository(_uowProvider.GetUnitOfWork()))
             {
                 return repository.GetAll(ids);
+            }
+        }
+
+        public IMemberType GetMemberType(string alias)
+        {
+            using (var repository = _repositoryFactory.CreateMemberTypeRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IMemberType>.Builder.Where(x => x.Alias == alias);
+                var memberTypes = repository.GetByQuery(query);
+
+                return memberTypes.FirstOrDefault();
+            }
+        }
+
+        public IMemberType GetMemberType(int id)
+        {
+            using (var repository = _repositoryFactory.CreateMemberTypeRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(id);
             }
         }
 

@@ -11,5 +11,8 @@ namespace Umbraco.Core.Services
         /// <param name="ids">Optional list of ids</param>
         /// <returns>An Enumerable list of <see cref="IContentType"/> objects</returns>
         IEnumerable<IMemberType> GetAllMemberTypes(params int[] ids);
+
+        IMemberType GetMemberType(string alias);
+        IMemberType GetMemberType(int id);
     }
 }
