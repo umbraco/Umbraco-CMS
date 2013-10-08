@@ -158,8 +158,6 @@ namespace umbraco.presentation.dialogs
                 feedBackMsg.Text = ui.Text("rollback", "documentRolledBack", vars, new global::umbraco.BusinessLogic.User(0)) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
                 diffPanel.Visible = false;
                 pl_buttons.Visible = false;
-
-                ClientTools.ChangeContentFrameUrl("editContent.aspx?Id=" + d.Id.ToString());
             }
 		}
 	}
