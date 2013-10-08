@@ -1,0 +1,32 @@
+@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@*
+	This snippet shows how simple it is to fetch only children of a certain Document Type using Razor. Instead of
+	calling .Children, simply call .AliasOfDocumentType in plural.
+	For instance .Textpages or .NewsArticles (you can find the alias of your Document Type by editing it in the 
+	Settings section).
+*@
+
+
+@{    
+	@*Build a query and return the visible items *@
+    var selection= CurrentPage.Textpages.Where("Visible");
+    
+    @*
+       Example of more querying, if you have a true/false property with the alias of shouldBeFeatured:
+       var selection= Model.Textpages.Where("shouldBeFeatured == true").Where("Visible");
+    *@
+}
+
+
+@*Determine if there are any nodes in the selection, then render list *@
+@if(selection.Any()){
+
+   <ul>
+     @foreach(var page in selection){                
+       <li><a href="@page.Url">@page.Name</a></li> 
+     }                 
+   </ul>             
+
+}
+

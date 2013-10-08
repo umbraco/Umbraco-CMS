@@ -331,6 +331,10 @@
     <Compile Include="PropertyEditors\PropertyValueTypeAttribute.cs" />
     <Compile Include="PropertyEditors\PropertyCacheLevel.cs" />
     <Compile Include="PropertyEditors\PropertyValueConverterBase.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\IntegerValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MultipleTextStringValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\SimpleEditorValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\TextStringValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\TinyMceValueConverter.cs" />
     <Compile Include="PropertyEditors\IPropertyValueConverter.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentOrderedSet.cs" />

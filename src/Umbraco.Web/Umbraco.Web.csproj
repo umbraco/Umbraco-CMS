@@ -397,6 +397,8 @@
     <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Models\ProfileModel.cs" />
     <Compile Include="Models\LoginStatusModel.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\SimpleEditorValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\TextStringValueConverter.cs" />
     <Compile Include="PublishedContentPropertyExtension.cs" />
     <Compile Include="Models\UmbracoProperty.cs" />
     <Compile Include="Mvc\MergeParentContextViewDataAttribute.cs" />
@@ -586,6 +588,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="umbraco.presentation\umbraco\Trees\TranslateTreeNames.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="Editors\MediaController.cs" />
     <Compile Include="UrlHelperRenderExtensions.cs" />
@@ -749,7 +752,7 @@
     <Compile Include="umbraco.presentation\umbraco\ping.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\MacroPartialViewTasks.cs" />
+    <Compile Include="umbraco.presentation\umbraco\create\PartialViewMacrosTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\PartialViewTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -1831,9 +1834,7 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\search.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx" />
-    <Content Include="umbraco.presentation\umbraco\create\script.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="umbraco.presentation\umbraco\create\script.ascx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\InsertAnchor.aspx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertChar.aspx" />
     <Content Include="umbraco.presentation\umbraco\webservices\TreeClientService.asmx" />

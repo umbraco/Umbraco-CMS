@@ -2100,7 +2100,6 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="Umbraco\Scripting\templates\cshtml\MultinodeTree-picker.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\TwitterFeed.cshtml" />
     <Content Include="Umbraco\Views\Default.cshtml" />
     <Content Include="Umbraco\PartialViews\Templates\EmptyTemplate.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\EditProfile.cshtml" />
@@ -2108,9 +2107,40 @@
     <Content Include="Umbraco\PartialViewMacros\Templates\Login.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\LoginStatus.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\RegisterMember.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\EmptyTemplate %28ForUseWithCustomViews%29.cshtml">
+    <Content Include="Umbraco\PartialViewMacros\Templates\EmptyTemplate %28ForUseWithCustomViews%29.cshtml">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListAncestorsFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\Breadcrumb.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\Gallery.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListChildPagesFromChangeableSource.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListChildPagesFromCurrentPage.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListChildPagesOrderedByDate.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListChildPagesOrderedByName.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListChildPagesOrderedByProperty.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListChildPagesWithDoctype.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListDescendantsFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListImagesFromMediaFolder.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\MultinodeTree-picker.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\Navigation.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\SiteMap.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\Breadcrumb.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\EmptyTemplate %28ForUseWithCustomViews%29.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\ListAncestorsFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\ListChildPagesFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\ListChildPagesOrderedByDate.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\ListChildPagesOrderedByName.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\ListChildPagesWithDoctype.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\ListDescendantsFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\EditProfile.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\Login.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\LoginStatus.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\RegisterMember.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\MultinodeTree-picker.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\Navigation.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\SiteMap.cshtml" />
     <None Include="Umbraco_client\CodeMirror\js\mode\coffeescript\LICENSE" />
     <None Include="Umbraco_client\CodeMirror\js\mode\pascal\LICENSE" />
     <None Include="Umbraco_client\CodeMirror\js\mode\perl\LICENSE" />
