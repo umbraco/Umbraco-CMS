@@ -13,6 +13,7 @@ angular.module('umbraco.services')
 
 				_.each(data, function(el){
 					el.menuUrl = "UmbracoTrees/ContentTree/GetMenu?id=" + el.id + "&application=content";
+					el.metaData = {treeAlias: "content"};
 				});
 
 				m.results.push({
@@ -32,6 +33,7 @@ angular.module('umbraco.services')
 
 				_.each(data, function(el){
 					el.menuUrl = "UmbracoTrees/MediaTree/GetMenu?id=" + el.id + "&application=media";
+					el.metaData = {treeAlias: "media"};
 				});
 
 				m.results.push({

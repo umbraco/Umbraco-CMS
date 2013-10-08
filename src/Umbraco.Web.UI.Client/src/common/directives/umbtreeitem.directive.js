@@ -29,7 +29,8 @@ angular.module("umbraco.directives")
       eventhandler: '=',
       path: '@',
       node:'=',
-      activetree:'@'
+      activetree:'@',
+      tree:'='
     },
 
     template: '<li ng-swipe-right="options(this, node, $event)"><div ng-style="setTreePadding(node)" class="{{node.stateCssClass}}" ng-class="{\'loading\': node.loading}">' +
@@ -61,7 +62,7 @@ angular.module("umbraco.directives")
           about it.
         */
         scope.options = function(e, n, ev){ 
-          emitEvent("treeOptionsClick", {element: e, node: n, event: ev});
+          emitEvent("treeOptionsClick", {element: e, tree: scope.tree, node: n, event: ev});
         };
 
         /**
@@ -71,7 +72,7 @@ angular.module("umbraco.directives")
           defined on the tree
         */
         scope.select = function(e,n,ev){
-            emitEvent("treeNodeSelect", { element: e, node: n, event: ev });
+            emitEvent("treeNodeSelect", { element: e, tree: scope.tree, node: n, event: ev });
         };
 
         /** method to set the current animation for the node. 
@@ -95,7 +96,7 @@ angular.module("umbraco.directives")
         scope.load = function(arrow, node) {
             if (node.expanded) {
                 enableDeleteAnimations = false;
-                emitEvent("treeNodeCollapsing", { element: arrow, node: node });
+                emitEvent("treeNodeCollapsing", { element: arrow, tree: scope.tree, node: node });
                 node.expanded = false;
             }
             else {
@@ -106,19 +107,19 @@ angular.module("umbraco.directives")
         /* helper to force reloading children of a tree node */
         scope.loadChildren = function(arrow, node, forceReload){
             //emit treeNodeExpanding event, if a callback object is set on the tree
-            emitEvent("treeNodeExpanding", { element: arrow, node: node });
+            emitEvent("treeNodeExpanding", { element: arrow, tree: scope.tree, node: node });
             
             if (node.hasChildren && (forceReload || !node.children || (angular.isArray(node.children) && node.children.length === 0))) {
                 //get the children from the tree service
                 treeService.loadNodeChildren({ node: node, section: scope.section })
                     .then(function(data) {
                         //emit expanded event
-                        emitEvent("treeNodeExpanded", { element: arrow, node: node, children: data });
+                        emitEvent("treeNodeExpanded", { element: arrow, tree: scope.tree, node: node, children: data });
                         enableDeleteAnimations = true;
                     });
             }
             else {
-                emitEvent("treeNodeExpanded", { element: arrow, node: node, children: node.children });
+                emitEvent("treeNodeExpanded", { element: arrow, tree: scope.tree, node: node, children: node.children });
                 node.expanded = true;
                 enableDeleteAnimations = true;
             }
@@ -152,7 +153,7 @@ angular.module("umbraco.directives")
         scope.expandActivePath(scope.node, scope.activetree, scope.path);
         scope.node.stateCssClass = scope.node.cssClasses.join(" ");
 
-        var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item  ng-repeat="child in node.children" eventhandler="eventhandler" activetree="{{activetree}}" path="{{path}}" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
+        var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item  ng-repeat="child in node.children" eventhandler="eventhandler" activetree="{{activetree}}" path="{{path}}" tree="tree" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
         var newElement = angular.element(template);
         $compile(newElement)(scope);
         element.append(newElement);

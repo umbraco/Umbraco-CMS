@@ -43,6 +43,7 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
         }
     });
         
+
     //this reacts to the options item in the tree
     $scope.treeEventHandler.bind("treeOptionsClick", function (ev, args) {
         ev.stopPropagation();
@@ -64,9 +65,8 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
         $scope.currentNode = args.node;
         args.scope = $scope;
 
-        if(args.event && args.event.altKey){
-            args.skipDefault = true;
-        }
+        //always skip default
+        args.skipDefault = true;
 
         navigationService.showMenu(ev, args);
     };

@@ -13,20 +13,23 @@
 			<uc1:ContentTypeControlNew id="ContentTypeControlNew1" HideStructure="true" runat="server"></uc1:ContentTypeControlNew>
 			<cc1:Pane id="Pane1andmore" runat="server">
 			
-			<asp:DataGrid id="dgEditExtras" runat="server" AutoGenerateColumns="False" Width="100%" BorderStyle="None" HeaderStyle-CssClass="gridHeader" ItemStyle-CssClass="gridItem" GridLines="Horizontal" HeaderStyle-Font-Bold=True OnItemDataBound="dgEditExtras_itemdatabound">
+			<asp:DataGrid id="dgEditExtras" runat="server" ItemStyle-BorderStyle="NotSet" HeaderStyle-BorderStyle="NotSet" BorderStyle="NotSet" AutoGenerateColumns="False" CssClass="table"  OnItemDataBound="dgEditExtras_itemdatabound">
 				<Columns>
 					<asp:BoundColumn DataField="id" HeaderText="" Visible="False"></asp:BoundColumn>
 					<asp:BoundColumn DataField="name" HeaderText="Property name"></asp:BoundColumn>
+
 					<asp:TemplateColumn HeaderText="Member can edit">
 						<ItemTemplate>
 							<asp:CheckBox ID="ckbMemberCanEdit" Runat="server"></asp:CheckBox>
 						</ItemTemplate>
 					</asp:TemplateColumn>
+
 					<asp:TemplateColumn HeaderText="Show on profile">
 						<ItemTemplate>
 							<asp:CheckBox ID="ckbMemberCanView" Runat="server"></asp:CheckBox>
 						</ItemTemplate>
 					</asp:TemplateColumn>
+
 				</Columns>
 			</asp:DataGrid>
 			

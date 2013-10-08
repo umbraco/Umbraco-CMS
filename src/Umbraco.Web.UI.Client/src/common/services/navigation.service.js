@@ -168,6 +168,10 @@ angular.module('umbraco.services')
                 //TODO: investicate if we need to halt watch triggers
                 //and instead pause them and then manually tell the tree to digest path changes
                 //as this might be a bit heavy loading
+                if(!angular.isArray(path)){
+                    path = path.split(",");
+                }
+
                 this.ui.currentPath = path;
         },
 
