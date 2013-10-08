@@ -24,15 +24,13 @@ namespace Umbraco.Core.Models
         {
             var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "data" : property.Alias.ToSafeAlias();
 
-            var xd = new XmlDocument();
-            var xmlNode = xd.CreateNode(XmlNodeType.Element, nodeName, "");
+            var xElement = new XElement(nodeName);
 
             //Add the property alias to the legacy schema
             if (UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema)
             {
-                var alias = xd.CreateAttribute("alias");
-                alias.Value = property.Alias.ToSafeAlias();
-                xmlNode.Attributes.Append(alias);
+                var a = new XAttribute("alias", property.Alias.ToSafeAlias());
+                xElement.Add(a);
             }
 
             // * Get the XML result from the property editor if there is one, otherwise just construct a simple
@@ -42,26 +40,11 @@ namespace Umbraco.Core.Models
             var propertyEditor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
             if (propertyEditor != null)
             {
-                var cacheValue = propertyEditor.ValueEditor.ConvertDbToString(property);
-
-                switch (property.PropertyType.DataTypeDatabaseType)
-                {                                        
-                    case DataTypeDatabaseType.Date:
-                    case DataTypeDatabaseType.Integer:
-                        xmlNode.AppendChild(xd.CreateTextNode(cacheValue.ToString()));    
-                        break;
-                    case DataTypeDatabaseType.Nvarchar:
-                    case DataTypeDatabaseType.Ntext:
-                        //put text in cdata
-                        xmlNode.AppendChild(xd.CreateCDataSection(cacheValue.ToString()));
-                        break;                    
-                    default:
-                        throw new ArgumentOutOfRangeException();
-                }
+                var xmlValue = propertyEditor.ValueEditor.ConvertDbToXml(property);
+                xElement.Add(xmlValue);
             }
-           
-            var element = xmlNode.GetXElement();
-            return element;
+
+            return xElement;
         }
     }
 }

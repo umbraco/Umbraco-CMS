@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
@@ -236,6 +237,31 @@ namespace Umbraco.Core.PropertyEditors
                 default:
                     throw new ArgumentOutOfRangeException();
             }            
+        }
+
+        /// <summary>
+        /// Converts the property db value to an XML fragment
+        /// </summary>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// By default this will just return the value of ConvertDbToString but ensure that if the db value type is nvarchar or text
+        /// it is a CDATA fragment, otherwise it is just a text fragment.
+        /// </remarks>
+        public virtual XNode ConvertDbToXml(Property property)
+        {
+            switch (GetDatabaseType())
+            {
+                case DataTypeDatabaseType.Date:
+                case DataTypeDatabaseType.Integer:
+                    return new XText(ConvertDbToString(property));                    
+                case DataTypeDatabaseType.Nvarchar:
+                case DataTypeDatabaseType.Ntext:
+                    //put text in cdata
+                    return new XCData(ConvertDbToString(property));
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         /// <summary>
