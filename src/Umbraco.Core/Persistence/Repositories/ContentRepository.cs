@@ -28,6 +28,9 @@ namespace Umbraco.Core.Persistence.Repositories
         public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository)
             : base(work)
         {
+            if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");
+            if (templateRepository == null) throw new ArgumentNullException("templateRepository");
+            if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
 		    _tagRepository = tagRepository;
@@ -38,6 +41,9 @@ namespace Umbraco.Core.Persistence.Repositories
         public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository)
             : base(work, cache)
         {
+            if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");
+            if (templateRepository == null) throw new ArgumentNullException("templateRepository");
+            if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
             _tagRepository = tagRepository;

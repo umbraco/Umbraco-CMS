@@ -451,6 +451,47 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         }
 
+        [Test]
+        public void Cascade_Deletes_Tag_Relations()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
+            {
+                //create data to relate to
+                var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+                var content1 = MockedContent.CreateSimpleContent(contentType);
+                contentRepository.AddOrUpdate(content1);
+                unitOfWork.Commit();
+
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignPublishedTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Alias,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"},
+                                new Tag {Text = "tag3", Group = "test"},
+                                new Tag {Text = "tag4", Group = "test"}
+                            }, false);
+                    
+                    contentRepository.Delete(content1);
+
+                    unitOfWork.Commit();
+
+                    Assert.AreEqual(0, DatabaseContext.Database.ExecuteScalar<int>(
+                        "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
+                        new { nodeId = content1.Id, propTypeId = contentType.PropertyTypes.First().Id }));
+                }
+            }
+
+        }
+
         private ContentRepository CreateContentRepository(IDatabaseUnitOfWork unitOfWork, out ContentTypeRepository contentTypeRepository)
         {
             var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);

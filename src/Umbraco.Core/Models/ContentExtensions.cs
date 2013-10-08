@@ -537,7 +537,7 @@ namespace Umbraco.Core.Models
         /// <param name="replaceTags">True to replace the tags on the current property with the tags specified or false to merge them with the currently assigned ones</param>
         /// <param name="tagGroup">The group/category to assign the tags, the default value is "default"</param>
         /// <returns></returns>
-        public static void SetTags(this IContent content, string propertyTypeAlias, IEnumerable<string> tags, bool replaceTags, string tagGroup = "default")
+        public static void SetTags(this IContentBase content, string propertyTypeAlias, IEnumerable<string> tags, bool replaceTags, string tagGroup = "default")
         {
             var property = content.Properties[propertyTypeAlias];
             if (property == null)
@@ -572,7 +572,7 @@ namespace Umbraco.Core.Models
         /// <param name="propertyTypeAlias"></param>
         /// <param name="tags"></param>
         /// <param name="tagGroup">The group/category that the tags are currently assigned to, the default value is "default"</param>
-        public static void RemoveTags(this IContent content, string propertyTypeAlias, IEnumerable<string> tags, string tagGroup = "default")
+        public static void RemoveTags(this IContentBase content, string propertyTypeAlias, IEnumerable<string> tags, string tagGroup = "default")
         {
             var property = content.Properties[propertyTypeAlias];
             if (property == null)
