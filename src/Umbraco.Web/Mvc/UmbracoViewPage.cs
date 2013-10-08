@@ -1,5 +1,6 @@
 using System;
 using System.Text;
+using System.Web;
 using System.Web.Mvc;
 using System.Web.WebPages;
 using Umbraco.Core;
@@ -175,6 +176,11 @@ namespace Umbraco.Web.Mvc
         }
 
         public HelperResult RenderSection(string name, string defaultContents)
+        {
+            return WebViewPageExtensions.RenderSection(this, name, defaultContents);
+        }
+        
+        public HelperResult RenderSection(string name, IHtmlString defaultContents)
         {
             return WebViewPageExtensions.RenderSection(this, name, defaultContents);
         }

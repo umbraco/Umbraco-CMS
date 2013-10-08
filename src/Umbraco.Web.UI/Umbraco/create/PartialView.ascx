@@ -12,12 +12,8 @@ Filename (without .cshtml):
     <asp:TextBox ID="FileName" runat="server" CssClass="bigInput"></asp:TextBox>
 </div>
 <div>
-    Choose a template:<br />
+    Choose a snippet:<br />
     <asp:ListBox ID="PartialViewTemplate" runat="server" Width="350" CssClass="bigInput" Rows="1"  SelectionMode="Single" />
-</div>
-
-<div>
-    <asp:CheckBox ID="CreateMacroCheckBox" runat="server" Checked="true" Text="Create Macro"></asp:CheckBox>
 </div>
 
 <div class="submit-footer">

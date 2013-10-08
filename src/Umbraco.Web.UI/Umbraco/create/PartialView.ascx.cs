@@ -21,18 +21,19 @@ namespace Umbraco.Web.UI.Umbraco.Create
 
         private static void LoadTemplates(ListControl list)
         {
-            var path = IOHelper.MapPath(SystemDirectories.Umbraco + "/partialviews/templates/");
+            var path = IOHelper.MapPath(SystemDirectories.Umbraco + "/PartialViews/Templates/");
             list.Items.Clear();
 
-            // always add the option of an empty one
-            list.Items.Add(new ListItem("Empty template", "EmptyTemplate.cshtml"));
+            // always add the options of empty templates
+            list.Items.Add(new ListItem("Empty Template", "EmptyTemplate.cshtml"));
+            list.Items.Add(new ListItem("Empty Template (For Use With Custom Views)", "EmptyTemplate (ForUseWithCustomViews).cshtml"));
 
             if (System.IO.Directory.Exists(path))
             {
                 const string extension = ".cshtml";
 
                 //Already adding Empty Template as the first item, so don't add it again
-                foreach (var fileInfo in new System.IO.DirectoryInfo(path).GetFiles("*" + extension).Where(f => f.Name != "EmptyTemplate.cshtml"))
+                foreach (var fileInfo in new System.IO.DirectoryInfo(path).GetFiles("*" + extension).Where(f => f.Name.StartsWith("EmptyTemplate") == false))
                 {
                     var filename = System.IO.Path.GetFileName(fileInfo.FullName);
 
@@ -50,9 +51,6 @@ namespace Umbraco.Web.UI.Umbraco.Create
 				// http://issues.umbraco.org/issue/U4-1373
 
 				var createMacroVal = 0;
-				if (CreateMacroCheckBox.Checked)
-					createMacroVal = 1;
-
 
                 string returnUrl = dialogHandler_temp.Create(Request.GetItemAsString("nodeType"),
                     createMacroVal, //apparently we need to pass this value to 'ParentID'... of course! :P then we'll extract it in PartialViewTasks to create it.

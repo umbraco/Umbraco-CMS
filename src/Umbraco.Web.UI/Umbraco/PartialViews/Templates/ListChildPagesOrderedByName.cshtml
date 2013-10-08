@@ -1,0 +1,8 @@
+@inherits Umbraco.Web.Macros.PartialViewMacroPage
+<ul>
+	@*OrderBy() takes the property to sort by*@
+    @foreach (var page in CurrentPage.Children.Where("Visible").OrderBy("Name"))
+    { 
+        <li><a href="@page.Url">@page.Name</a></li>
+    }
+</ul>
