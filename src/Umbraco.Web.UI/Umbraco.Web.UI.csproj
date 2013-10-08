@@ -2599,8 +2599,7 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <Target Name="BeforeBuild"> 
     <!-- Create web.config file from Template if it doesn't exist -->
-    <Copy SourceFiles="$(ProjectDir)web.Template.config" DestinationFiles="$(ProjectDir)W
-eb.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Web.config')" />
+    <Copy SourceFiles="$(ProjectDir)web.Template.config" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Web.config')" />
     <!-- Create connectionStrings.config file from Template if it doesn't exist -->
 	<Copy SourceFiles="$(ProjectDir)config\connectionStrings.Release.config" DestinationFiles="$(ProjectDir)config\connectionStrings.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)config\connectionStrings.config')" />
 	<!-- Create appSettings.config file from Template if it doesn't exist -->
