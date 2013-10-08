@@ -7,7 +7,7 @@ using Umbraco.Web.Models.ContentEditing;
 namespace Umbraco.Web.Models.Mapping
 {
     /// <summary>
-    /// Defines mappings for content/media (and i'm sure one day member) type mappings
+    /// Defines mappings for content/media/members type mappings
     /// </summary>
     internal class ContentTypeModelMapper : MapperConfiguration
     {    
@@ -15,6 +15,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             config.CreateMap<IMediaType, ContentTypeBasic>();
             config.CreateMap<IContentType, ContentTypeBasic>();
+            config.CreateMap<IMemberType, ContentTypeBasic>();
         }
     }
 }

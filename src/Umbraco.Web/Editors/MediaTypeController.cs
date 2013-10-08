@@ -11,10 +11,15 @@ using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors
 {
+
+    //TODO:  We'll need to be careful about the security on this controller, when we start implementing 
+    // methods to modify content types we'll need to enforce security on the individual methods, we
+    // cannot put security on the whole controller because things like GetAllowedChildren are required for content editing.
+
     /// <summary>
-    /// An API controller used for dealing with content types
+    /// An API controller used for dealing with media types
     /// </summary>
-    [PluginController("UmbracoApi")]
+    [PluginController("UmbracoApi")]    
     public class MediaTypeController : UmbracoAuthorizedJsonController
     {
         /// <summary>
