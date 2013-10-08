@@ -31,7 +31,7 @@ angular.module('umbraco.services')
                 ui.showContextMenu = false;
                 ui.showContextMenuDialog = false;
                 ui.stickyNavigation = false;
-
+                ui.showTray = false;
                 service.hideUserDialog();
                 //$("#search-form input").focus();    
                 break;
@@ -60,6 +60,7 @@ angular.module('umbraco.services')
                 ui.showContextMenuDialog = false;
                 ui.showSearchResults = false;
                 ui.stickyNavigation = false;
+                ui.showTray = false;
                 break;
         }
     }
@@ -122,6 +123,13 @@ angular.module('umbraco.services')
             setMode("tree");
         },
         
+        showTray: function () {
+            ui.showTray = true;
+        },
+
+        hideTray: function () {
+            ui.showTray = false;
+        },
         /**
          * @ngdoc method
          * @name umbraco.services.navigationService#syncTree
@@ -191,7 +199,6 @@ angular.module('umbraco.services')
             if(!event){
                 return;
             }
-
 
             service.active = false;
 

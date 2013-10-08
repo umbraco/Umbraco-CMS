@@ -1,37 +1,10 @@
 <div id="leftcolumn" ng-controller="Umbraco.NavigationController" 
     ng-mouseleave="nav.leaveTree($event)" ng-mouseenter="nav.enterTree($event)" >
-    <div id="applications" ng-class="{faded:nav.ui.stickyNavigation}">
-        <ul class="sections">
-            
-            <li class="avatar">
-                <a href="#" ng-click="nav.showUserDialog()" title="{{user.name}}" prevent-default>
-                    <img ng-src="{{avatar}}" />
-                </a>
-            </li>
-
-            <li ng-repeat="section in sections" ng-class="{current: section.alias == currentSection}">
-                <a href="#/{{section.alias}}"
-                   ng-dblclick="nav.changeSection(section.alias)"
-                   ng-click="nav.showTree(section.alias)"
-                   prevent-default>
-                    <section-icon icon="{{section.cssclass}}"></section-icon>  
-                    <span>{{section.name}}</span>
-                </a>
-            </li>
-
-            <li class="help">
-                <a class="help" href="#/help">
-                    <i class="icon-help-alt"></i>
-                    <span>Help</span>
-                </a>
-            </li>
-        </ul>
-    </div>
+    
+    <umb-sections sections="sections" current-section="currentSection"></umb-sections>
 
     <!-- navigation container -->
-    <div id="navigation" class="fill shadow umb-modalcolumn"
-            ng-show="nav.ui.showNavigation" 
-            ng-animate="'slide'">
+    <div id="navigation" ng-show="nav.ui.showNavigation" class="fill shadow umb-modalcolumn" ng-animate="'slide'">
 
         <div ng-swipe-left="nav.hideNavigation()" class="navigation-inner-container span6" style="z-index: 100">
 

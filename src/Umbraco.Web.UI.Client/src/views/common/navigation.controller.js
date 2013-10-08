@@ -30,20 +30,10 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
 
     //the tree event handler i used to subscribe to the main tree click events
     $scope.treeEventHandler = $({});
-
     $scope.selectedId = navigationService.currentId;
-    $scope.sections = navigationService.sections;
     
-    //When the user logs in
-    $scope.$on("authenticated", function (evt, data) {
-        //populate their sections if the user has changed
-        if (data.lastUserId !== data.user.id) {
-            sectionResource.getSections()
-                .then(function (result) {
-                    $scope.sections = result;
-                });
-        }        
-    });
+    
+    
 
     //This reacts to clicks passed to the body element which emits a global call to close all dialogs
     $rootScope.$on("closeDialogs", function (event) {

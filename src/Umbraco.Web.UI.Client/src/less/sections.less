@@ -6,6 +6,7 @@ ul.sections {
 	display: block;
 	background: @blackLight;
 	height: 100%;
+	width: 80px;
 }
 
 ul.sections li {
@@ -97,8 +98,7 @@ ul.sections li.current a{
     padding-left: 0px;
 }
 
-ul.sections li.help {
-	
+ul.sections li.help {	
 	margin: 0;
 	position: absolute;
 	bottom: 0;
@@ -109,4 +109,13 @@ ul.sections li.help {
 
 ul.sections li.help a {
 	border-bottom: none;
+}
+
+// Section slide-out tray for additional apps
+// -------------------------
+li.expand a, li.expand{border: none !Important;}
+
+ul.sections-tray {
+	padding-top: 100px;
+	width: 80px;
 }
