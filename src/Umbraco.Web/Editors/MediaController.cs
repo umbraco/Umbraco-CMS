@@ -1,9 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
+using System.Net.Http.Headers;
+using System.Security.AccessControl;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -13,6 +16,7 @@ using Umbraco.Core;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Media;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Membership;
@@ -58,6 +62,63 @@ namespace Umbraco.Web.Editors
         public MediaController(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
+        }
+
+        /// <summary>
+        /// Gets the big thumbnail image for the media id
+        /// </summary>
+        /// <param name="mediaId"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// If there is no image property then this will return not found.
+        /// </remarks>
+        public HttpResponseMessage GetBigThumbnail(int mediaId)
+        {
+            var media = Services.MediaService.GetById(mediaId);
+            if (media == null)
+            {
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+            }
+            var imageProp = media.Properties[Constants.Conventions.Media.File];
+            if (imageProp == null)
+            {
+                return new HttpResponseMessage(HttpStatusCode.NotFound);
+            }
+
+            var imagePath = imageProp.Value.ToString();
+            var bigThumbPath = imagePath.Substring(0, imagePath.LastIndexOf('.')) + "_big-thumb" + ".jpg";            
+            var thumbFilePath = IOHelper.MapPath(bigThumbPath);
+            if (System.IO.File.Exists(thumbFilePath) == false)
+            {
+                //we need to generate it
+                var origFilePath = IOHelper.MapPath(imagePath);
+                if (System.IO.File.Exists(origFilePath) == false)
+                {
+                    return new HttpResponseMessage(HttpStatusCode.NotFound);
+                }
+                var mediaFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+                using (var fileStream = new FileStream(origFilePath, FileMode.Open, FileAccess.Read))
+                {
+                    if (fileStream.CanSeek) fileStream.Seek(0, 0);
+                    using (var originalImage = Image.FromStream(fileStream))
+                    {
+                        ImageHelper.GenerateThumbnail(
+                            originalImage,
+                            500,
+                            string.Format("{0}_{1}.jpg", origFilePath.Substring(0, origFilePath.LastIndexOf(".")), "big-thumb"),
+                            Path.GetExtension(origFilePath).Substring(1).ToLowerInvariant(),
+                            mediaFileSystem);
+                    }    
+                }
+            }
+
+            var result = new HttpResponseMessage(HttpStatusCode.OK);
+            //NOTE: That we are not closing this stream as the framework will do that for us, if we try it will
+            // fail. See http://stackoverflow.com/questions/9541351/returning-binary-file-from-controller-in-asp-net-web-api
+            var stream = new FileStream(thumbFilePath, FileMode.Open, FileAccess.Read);
+            result.Content = new StreamContent(stream);
+            result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
+            return result;
         }
 
         /// <summary>

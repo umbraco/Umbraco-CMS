@@ -16,8 +16,15 @@ namespace Umbraco.Core.Media
     /// <summary>
     /// A helper class used for imaging
     /// </summary>
-    internal class ImageHelper
+    internal static class ImageHelper
     {
+        public static string GetMimeType(this Image image)
+        {
+            var format = image.RawFormat;
+            var codec = ImageCodecInfo.GetImageDecoders().First(c => c.FormatID == format.Guid);
+            return codec.MimeType;
+        }
+
         internal static IEnumerable<ResizedImage> GenerateMediaThumbnails(
             IFileSystem fs, 
             string fileName, 

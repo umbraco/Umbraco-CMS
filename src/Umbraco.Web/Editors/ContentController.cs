@@ -405,7 +405,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Unpublishes a node with a given Id and returns the unpublished entity
         /// </summary>
-        /// <param name="copy"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
         [EnsureUserPermissionForContent("id", 'Z')]
         public ContentItemDisplay PostUnPublish(int id)
