@@ -208,6 +208,20 @@ li.root > div > a.umb-options {
 	float: left
 }
 
+
+// Tree item states
+// -------------------------
+div.not-published > i.icon,div.not-published > a{
+	color: @grayLight;
+}
+div.protected:before{
+	content:"\e256";
+	font-family: 'icomoon';
+	color: red;
+	position: absolute;
+}
+
+
 // Tree context menu
 // -------------------------
 .umb-actions {

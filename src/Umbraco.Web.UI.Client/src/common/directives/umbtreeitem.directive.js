@@ -32,7 +32,7 @@ angular.module("umbraco.directives")
       activetree:'@'
     },
 
-    template: '<li ng-swipe-right="options(this, node, $event)"><div ng-style="setTreePadding(node)" ng-class="{\'loading\': node.loading}">' +
+    template: '<li ng-swipe-right="options(this, node, $event)"><div ng-style="setTreePadding(node)" class="{{node.stateCssClass}}" ng-class="{\'loading\': node.loading}">' +
         '<ins ng-hide="node.hasChildren" style="background:none;width:18px;"></ins>' +        
         '<ins ng-show="node.hasChildren" ng-class="{\'icon-navigation-right\': !node.expanded, \'icon-navigation-down\': node.expanded}" ng-click="load(this, node)"></ins>' +
         '<i title="#{{node.routePath}}" class="{{node.cssClass}}" style="{{node.style}}"></i>' +
@@ -139,6 +139,10 @@ angular.module("umbraco.directives")
                   scope.loadChildren(null, scope.node, true);
               }else if( !node.metaData.treeAlias && activePath.indexOf(node.id) >= 0){
                   scope.loadChildren(null, scope.node, true);
+
+                  scope.path = activePath.filter( function(element) {
+                                    return listToDelete.indexOf(obj.id) === -1;
+                                });
               }
             }
         };
@@ -146,6 +150,7 @@ angular.module("umbraco.directives")
         //if the current path contains the node id, we will auto-expand the tree item children
         
         scope.expandActivePath(scope.node, scope.activetree, scope.path);
+        scope.node.stateCssClass = scope.node.cssClasses.join(" ");
 
         var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item  ng-repeat="child in node.children" eventhandler="eventhandler" activetree="{{activetree}}" path="{{path}}" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
         var newElement = angular.element(template);

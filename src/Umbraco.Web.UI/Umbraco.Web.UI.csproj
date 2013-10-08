@@ -623,7 +623,6 @@
     <Content Include="Config\appSettings.Release.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Config\appSettings.config" />
     <None Include="Config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -635,7 +634,6 @@
       <DependentUpon>BaseRestExtensions.config</DependentUpon>
     </None>
     <Content Include="Config\connectionStrings.Release.config" />
-    <Content Include="Config\connectionStrings.config" />
     <None Include="Config\log4net.Release.config">
       <DependentUpon>log4net.config</DependentUpon>
     </None>
