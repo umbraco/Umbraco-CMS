@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             using (var repository = CreateRepository(unitOfWork))
             {
-                Assert.Throws<InvalidOperationException>(() => repository.AssignTagsToProperty(1234, "hello", Enumerable.Empty<ITag>(), true));
+                Assert.Throws<InvalidOperationException>(() => repository.AssignPublishedTagsToProperty(1234, "hello", Enumerable.Empty<ITag>(), true));
             }
 
         }
@@ -134,7 +134,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 using (var repository = CreateRepository(unitOfWork))
                 {
-                    repository.AssignTagsToProperty(
+                    repository.AssignPublishedTagsToProperty(
                         content.Id,
                         contentType.PropertyTypes.First().Alias,
                         new[]
@@ -143,7 +143,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                 new Tag {Text = "tag2", Group = "test"},
                             }, false);
 
-                    Assert.AreEqual(2, repository.GetTagsForContent(content.Id).Count());
+                    Assert.AreEqual(2, repository.GetPublishedTagsForContent(content.Id).Count());
                 }
             }
         }
@@ -166,7 +166,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 using (var repository = CreateRepository(unitOfWork))
                 {
-                    repository.AssignTagsToProperty(
+                    repository.AssignPublishedTagsToProperty(
                         content.Id,
                         contentType.PropertyTypes.First().Alias,
                         new[]
@@ -175,7 +175,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                 new Tag {Text = "tag2", Group = "test"},
                             }, false);
 
-                    repository.AssignTagsToProperty(
+                    repository.AssignPublishedTagsToProperty(
                         content.Id,
                         contentType.PropertyTypes.First().Alias,
                         new[]
@@ -184,7 +184,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                 new Tag {Text = "tag4", Group = "test"},
                             }, false);
 
-                    Assert.AreEqual(4, repository.GetTagsForContent(content.Id).Count());
+                    Assert.AreEqual(4, repository.GetPublishedTagsForContent(content.Id).Count());
                 }
             }
         }
@@ -207,7 +207,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 using (var repository = CreateRepository(unitOfWork))
                 {
-                    repository.AssignTagsToProperty(
+                    repository.AssignPublishedTagsToProperty(
                         content.Id,
                         contentType.PropertyTypes.First().Alias,
                         new[]
@@ -216,7 +216,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                 new Tag {Text = "tag2", Group = "test"},
                             }, false);
 
-                    repository.AssignTagsToProperty(
+                    repository.AssignPublishedTagsToProperty(
                         content.Id,
                         contentType.PropertyTypes.First().Alias,
                         new[]
@@ -225,7 +225,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                 new Tag {Text = "tag4", Group = "test"},
                             }, true);
 
-                    var result = repository.GetTagsForContent(content.Id);
+                    var result = repository.GetPublishedTagsForContent(content.Id);
                     Assert.AreEqual(2, result.Count());
                     Assert.AreEqual("tag3", result.ElementAt(0).Text);
                     Assert.AreEqual("tag4", result.ElementAt(1).Text);
@@ -251,7 +251,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 using (var repository = CreateRepository(unitOfWork))
                 {
-                    repository.AssignTagsToProperty(
+                    repository.AssignPublishedTagsToProperty(
                         content.Id,
                         contentType.PropertyTypes.First().Alias,
                         new[]
@@ -260,7 +260,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                 new Tag {Text = "tag2", Group = "test"},
                             }, false);
 
-                    repository.AssignTagsToProperty(
+                    repository.AssignPublishedTagsToProperty(
                         content.Id,
                         contentType.PropertyTypes.First().Alias,
                         new[]
@@ -269,7 +269,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                 new Tag {Text = "tag3", Group = "test"},
                             }, false);
 
-                    var result = repository.GetTagsForContent(content.Id);
+                    var result = repository.GetPublishedTagsForContent(content.Id);
                     Assert.AreEqual(3, result.Count());                    
                 }
             }
@@ -293,7 +293,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 using (var repository = CreateRepository(unitOfWork))
                 {
-                    repository.AssignTagsToProperty(
+                    repository.AssignPublishedTagsToProperty(
                         content.Id,
                         contentType.PropertyTypes.First().Alias,
                         new[]
@@ -302,12 +302,12 @@ namespace Umbraco.Tests.Persistence.Repositories
                                 new Tag {Text = "tag2", Group = "test"},
                             }, false);
 
-                    repository.AssignTagsToProperty(
+                    repository.AssignPublishedTagsToProperty(
                         content.Id,
                         contentType.PropertyTypes.First().Alias,
                         Enumerable.Empty<ITag>(), true);                    
 
-                    var result = repository.GetTagsForContent(content.Id);
+                    var result = repository.GetPublishedTagsForContent(content.Id);
                     Assert.AreEqual(0, result.Count());
                 }
             }
@@ -331,7 +331,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 using (var repository = CreateRepository(unitOfWork))
                 {
-                    repository.AssignTagsToProperty(
+                    repository.AssignPublishedTagsToProperty(
                         content.Id,
                         contentType.PropertyTypes.First().Alias,
                         new[]
@@ -342,7 +342,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                 new Tag {Text = "tag4", Group = "test"}
                             }, false);
 
-                    repository.RemoveTagsFromProperty(
+                    repository.RemovePublishedTagsFromProperty(
                         content.Id,
                         contentType.PropertyTypes.First().Alias,
                         new[]
@@ -351,7 +351,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                 new Tag {Text = "tag3", Group = "test"}                             
                             });
 
-                    var result = repository.GetTagsForContent(content.Id);
+                    var result = repository.GetPublishedTagsForContent(content.Id);
                     Assert.AreEqual(2, result.Count());
                     Assert.AreEqual("tag1", result.ElementAt(0).Text);
                     Assert.AreEqual("tag4", result.ElementAt(1).Text);
@@ -379,7 +379,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 using (var repository = CreateRepository(unitOfWork))
                 {
-                    repository.AssignTagsToProperty(
+                    repository.AssignPublishedTagsToProperty(
                         content1.Id,
                         contentType.PropertyTypes.First().Alias,
                         new[]
@@ -390,7 +390,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                 new Tag {Text = "tag4", Group = "test"}
                             }, false);
 
-                    repository.AssignTagsToProperty(
+                    repository.AssignPublishedTagsToProperty(
                         content2.Id,
                         contentType.PropertyTypes.First().Alias,
                         new[]
@@ -399,7 +399,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                 new Tag {Text = "tag2", Group = "test"}
                             }, false);
 
-                    var result = repository.GetTagsForContent(content2.Id);
+                    var result = repository.GetPublishedTagsForContent(content2.Id);
                     Assert.AreEqual(2, result.Count());
                 }
             }
@@ -423,7 +423,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 using (var repository = CreateRepository(unitOfWork))
                 {
-                    repository.AssignTagsToProperty(
+                    repository.AssignPublishedTagsToProperty(
                         content1.Id,
                         contentType.PropertyTypes.First().Alias,
                         new[]
@@ -434,7 +434,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                                 new Tag {Text = "tag4", Group = "test"}
                             }, false);
 
-                    repository.AssignTagsToProperty(
+                    repository.AssignPublishedTagsToProperty(
                         content1.Id,
                         contentType.PropertyTypes.Last().Alias,
                         new[]
@@ -443,9 +443,50 @@ namespace Umbraco.Tests.Persistence.Repositories
                                 new Tag {Text = "tag2", Group = "test"}
                             }, false);
 
-                    var result1 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.First().Alias).ToArray();
-                    var result2 = repository.GetTagsForProperty(content1.Id, contentType.PropertyTypes.Last().Alias).ToArray();
+                    var result1 = repository.GetPublishedTagsForProperty(content1.Id, contentType.PropertyTypes.First().Alias).ToArray();
+                    var result2 = repository.GetPublishedTagsForProperty(content1.Id, contentType.PropertyTypes.Last().Alias).ToArray();
                     Assert.AreEqual(2, result2.Count());
+                }
+            }
+
+        }
+
+        [Test]
+        public void Cascade_Deletes_Tag_Relations()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            ContentTypeRepository contentTypeRepository;
+            using (var contentRepository = CreateContentRepository(unitOfWork, out contentTypeRepository))
+            {
+                //create data to relate to
+                var contentType = MockedContentTypes.CreateSimpleContentType("test", "Test");
+                contentTypeRepository.AddOrUpdate(contentType);
+                unitOfWork.Commit();
+                var content1 = MockedContent.CreateSimpleContent(contentType);
+                contentRepository.AddOrUpdate(content1);
+                unitOfWork.Commit();
+
+                using (var repository = CreateRepository(unitOfWork))
+                {
+                    repository.AssignPublishedTagsToProperty(
+                        content1.Id,
+                        contentType.PropertyTypes.First().Alias,
+                        new[]
+                            {
+                                new Tag {Text = "tag1", Group = "test"},
+                                new Tag {Text = "tag2", Group = "test"},
+                                new Tag {Text = "tag3", Group = "test"},
+                                new Tag {Text = "tag4", Group = "test"}
+                            }, false);
+                    
+                    contentRepository.Delete(content1);
+
+                    unitOfWork.Commit();
+
+                    Assert.AreEqual(0, DatabaseContext.Database.ExecuteScalar<int>(
+                        "SELECT COUNT(*) FROM cmsTagRelationship WHERE nodeId=@nodeId AND propertyTypeId=@propTypeId",
+                        new { nodeId = content1.Id, propTypeId = contentType.PropertyTypes.First().Id }));
                 }
             }
 

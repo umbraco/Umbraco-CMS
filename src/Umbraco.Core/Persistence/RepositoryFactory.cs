@@ -85,7 +85,8 @@ namespace Umbraco.Core.Persistence
             return new MediaRepository(
                 uow,
                 _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
-                CreateMediaTypeRepository(uow)) { EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming };
+                CreateMediaTypeRepository(uow),
+                CreateTagsRepository(uow)) { EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming };
         }
 
         public virtual IMediaTypeRepository CreateMediaTypeRepository(IDatabaseUnitOfWork uow)
@@ -154,7 +155,10 @@ namespace Umbraco.Core.Persistence
 
         internal virtual IMemberRepository CreateMemberRepository(IDatabaseUnitOfWork uow)
         {
-            return new MemberRepository(uow, _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current, CreateMemberTypeRepository(uow));
+            return new MemberRepository(uow, 
+                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current, 
+                CreateMemberTypeRepository(uow),
+                CreateTagsRepository(uow));
         }
 
         internal virtual IMemberTypeRepository CreateMemberTypeRepository(IDatabaseUnitOfWork uow)

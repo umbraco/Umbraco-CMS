@@ -5,7 +5,7 @@ using System.Net.Http.Formatting;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
-using Umbraco.Web.Trees.Menu;
+using Umbraco.Web.Models.Trees;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 

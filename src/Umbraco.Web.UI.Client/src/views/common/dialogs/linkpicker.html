@@ -1,7 +1,7 @@
 <div class="umb-panel" ng-controller="Umbraco.Dialogs.LinkPickerController">
-	<div class="umb-panel-body no-header with-footer">
+	<div class="umb-panel-body no-header with-footer compact">
 		<umb-pane>
-			<umb-control-group label="Title">
+			<umb-control-group label="Url">
 				<input type="text" 
 					placeholder="Enter url" 
 					class="umb-editor umb-textstring" 
@@ -13,25 +13,25 @@
 				<input type="text" 
 					placeholder="Enter title" 
 					class="umb-editor umb-textstring" 
-					ng-model="target.title" />
+					ng-model="target.name" />
 			</umb-control-group>
 		</umb-pane>
 
-				<umb-tree 
-					section="content" 
-					cachekey="linkpickerDialog" 
-					showheader="true" 
-					showoptions="false"
-					eventhandler="dialogTreeEventHandler">
-				</umb-tree>
-
-
+		<umb-tree 
+			section="content" 
+			cachekey="linkpickerDialog" 
+			showheader="true" 
+			showoptions="false"
+			eventhandler="dialogTreeEventHandler"
+			path="targte.path"
+			>
+		</umb-tree>
 	</div>
 
 	<div class="umb-panel-footer">
 		<div class="umb-el-wrap umb-panel-buttons">
-	        <div class="btn-toolbar umb-btn-toolbar">
-	         	<input type="button" ng-click="submit(dialogData)" class="btn btn-primary" value="select" />
+	        <div class="btn-toolbar umb-btn-toolbar pull-right">
+	         	<input type="button" ng-click="submit(target)" class="btn btn-primary" value="select" />
 	        </div>
 		</div>
 	</div>

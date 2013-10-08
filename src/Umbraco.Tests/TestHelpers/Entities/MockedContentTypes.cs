@@ -286,7 +286,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             {
                 Alias = "simple",
                 Name = "Simple Page",
-                Description = "ContentType used for simple text pages",
+                Description = "Some member type",
                 Icon = ".sprTreeDoc3",
                 Thumbnail = "doc.png",
                 SortOrder = 1,

@@ -35,7 +35,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="property"></param>
         /// <returns></returns>
-        public override object FormatValueForCache(Property property)
+        public override string ConvertDbToString(Property property)
         {
             var idAttempt = property.Value.TryConvertTo<int>();
             if (idAttempt.Success)
@@ -55,7 +55,7 @@ namespace Umbraco.Web.PropertyEditors
 
 
 
-            return base.FormatValueForCache(property);
+            return base.ConvertDbToString(property);
         }
 
         protected IDictionary<string, PreValue> GetPreValues(Property property)

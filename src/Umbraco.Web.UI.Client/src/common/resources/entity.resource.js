@@ -37,6 +37,37 @@ function entityResource($q, $http, umbRequestHelper) {
         
         /**
          * @ngdoc method
+         * @name umbraco.resources.entityResource#getPath
+         * @methodOf umbraco.resources.entityResource
+         *
+         * @description
+         * Returns a path, given a node ID and type
+         *
+         * ##usage
+         * <pre>
+         * entityResource.getPath(id)
+         *    .then(function(pathArray) {
+         *        alert('its here!');
+         *    });
+         * </pre> 
+         * 
+         * @param {Int} id Id of node to return the public url to
+         * @param {string} type Object type name     
+         * @returns {Promise} resourcePromise object containing the url.
+         *
+         */
+        getPath: function (id, type) {
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "entityApiBaseUrl",
+                       "GetPath",
+                       [{ id: id, type: type }])),
+               'Failed to retrieve path for id:' + id);
+        },
+
+        /**
+         * @ngdoc method
          * @name umbraco.resources.entityResource#getById
          * @methodOf umbraco.resources.entityResource
          *
@@ -54,7 +85,7 @@ function entityResource($q, $http, umbRequestHelper) {
          * </pre> 
          * 
          * @param {Int} id id of entity to return
-         * @param {string} type optional Object type name        
+         * @param {string} type Object type name        
          * @returns {Promise} resourcePromise object containing the entity.
          *
          */
@@ -87,7 +118,7 @@ function entityResource($q, $http, umbRequestHelper) {
          * </pre> 
          * 
          * @param {Array} ids ids of entities to return as an array
-         * @param {string} type optional type name        
+         * @param {string} type type name        
          * @returns {Promise} resourcePromise object containing the entity array.
          *
          */

@@ -20,19 +20,26 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class MediaRepository : VersionableRepositoryBase<int, IMedia>, IMediaRepository
     {
         private readonly IMediaTypeRepository _mediaTypeRepository;
+        private readonly ITagsRepository _tagRepository;
 
-		public MediaRepository(IDatabaseUnitOfWork work, IMediaTypeRepository mediaTypeRepository)
+        public MediaRepository(IDatabaseUnitOfWork work, IMediaTypeRepository mediaTypeRepository, ITagsRepository tagRepository)
             : base(work)
         {
+            if (mediaTypeRepository == null) throw new ArgumentNullException("mediaTypeRepository");
+            if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _mediaTypeRepository = mediaTypeRepository;
+            _tagRepository = tagRepository;
 
             EnsureUniqueNaming = true;
         }
 
-		public MediaRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMediaTypeRepository mediaTypeRepository)
+        public MediaRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMediaTypeRepository mediaTypeRepository, ITagsRepository tagRepository)
             : base(work, cache)
         {
+            if (mediaTypeRepository == null) throw new ArgumentNullException("mediaTypeRepository");
+            if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _mediaTypeRepository = mediaTypeRepository;
+            _tagRepository = tagRepository;
 
             EnsureUniqueNaming = true;
         }
@@ -247,6 +254,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 property.Id = keyDictionary[property.PropertyTypeId];
             }
 
+            UpdatePropertyTags(entity, _tagRepository);
+
             ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
@@ -324,6 +333,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
+            UpdatePropertyTags(entity, _tagRepository);
+
             ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
@@ -358,7 +369,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
-
+        
         private PropertyCollection GetPropertyCollection(int id, Guid versionId, IMediaType contentType, DateTime createDate, DateTime updateDate)
         {
             var sql = new Sql();

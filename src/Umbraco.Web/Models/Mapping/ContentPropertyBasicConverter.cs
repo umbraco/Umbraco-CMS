@@ -34,7 +34,7 @@ namespace Umbraco.Web.Models.Mapping
             var result = new T
                 {
                     Id = property.Id,
-                    Value = editor.ValueEditor.FormatDataForEditor(property.Value),
+                    Value = editor.ValueEditor.ConvertDbToEditor(property.Value),
                     Alias = property.Alias
                 };
 

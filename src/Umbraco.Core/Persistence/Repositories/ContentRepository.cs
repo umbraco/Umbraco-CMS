@@ -28,6 +28,9 @@ namespace Umbraco.Core.Persistence.Repositories
         public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository)
             : base(work)
         {
+            if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");
+            if (templateRepository == null) throw new ArgumentNullException("templateRepository");
+            if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
 		    _tagRepository = tagRepository;
@@ -38,6 +41,9 @@ namespace Umbraco.Core.Persistence.Repositories
         public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository)
             : base(work, cache)
         {
+            if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");
+            if (templateRepository == null) throw new ArgumentNullException("templateRepository");
+            if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
             _tagRepository = tagRepository;
@@ -319,6 +325,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 property.Id = keyDictionary[property.PropertyTypeId];
             }
 
+            //lastly, check if we are a creating a published version , then update the tags table
+            if (entity.Published)
+            {
+                UpdatePropertyTags(entity, _tagRepository);
+            }
+
             ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
@@ -458,26 +470,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //lastly, check if we are a newly published version and then update the tags table
             if (isNewPublishedVersion)
             {
-                foreach (var tagProp in entity.Properties.Where(x => x.TagSupport.Enable))
-                {
-                    if (tagProp.TagSupport.Behavior == PropertyTagBehavior.Remove)
-                    {
-                        //remove the specific tags
-                        _tagRepository.RemoveTagsFromProperty(
-                            entity.Id,
-                            tagProp.Alias,
-                            tagProp.TagSupport.Tags.Select(x => new Tag {Text = x.Item1, Group = x.Item2}));
-                    }
-                    else
-                    {
-                        //assign the tags
-                        _tagRepository.AssignTagsToProperty(
-                            entity.Id,
-                            tagProp.Alias,
-                            tagProp.TagSupport.Tags.Select(x => new Tag {Text = x.Item1, Group = x.Item2}),
-                            tagProp.TagSupport.Behavior == PropertyTagBehavior.Replace);
-                    }                    
-                }
+                UpdatePropertyTags(entity, _tagRepository);
             }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();

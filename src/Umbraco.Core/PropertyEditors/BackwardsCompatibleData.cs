@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Xml;
+using Umbraco.Core.Models;
 using umbraco.interfaces;
 
 namespace Umbraco.Core.PropertyEditors
@@ -11,6 +12,13 @@ namespace Umbraco.Core.PropertyEditors
     /// </summary>
     internal class BackwardsCompatibleData : IData
     {
+        private readonly string _propertyEditorAlias;
+
+        public BackwardsCompatibleData(string propertyEditorAlias)
+        {
+            _propertyEditorAlias = propertyEditorAlias;
+        }
+
         public int PropertyId { set; get; }
         
         public object Value { get; set; }
@@ -18,9 +26,28 @@ namespace Umbraco.Core.PropertyEditors
 
         public XmlNode ToXMl(XmlDocument data)
         {
-            //TODO: We need to get the xml property value converters in place, then this method will need to call in to that converter to 
-            // get the xml, for now we're just creating a CDATA section with the raw value.
+            //we'll get the property editor by alias, if it exists (which it absolutely should), then we'll have to create a 
+            // fake 'Property' object and pass it to the ConvertDbToXml method so we can get the correct XML fragment that 
+            // it needs to make.
+            var propertyEditor = PropertyEditorResolver.Current.GetByAlias(_propertyEditorAlias);
+            if (propertyEditor != null)
+            {
+                //create a 'fake' property - we will never know the actual db type here so we'll just make it nvarchar, this shouldn't
+                // make any difference for the conversion process though.
+                var property = new Property(new PropertyType(_propertyEditorAlias, DataTypeDatabaseType.Nvarchar))
+                    {
+                        Id = PropertyId,
+                        Value = Value
+                    };
+                var xd = new XmlDocument();
+                var xml = propertyEditor.ValueEditor.ConvertDbToXml(property);
+                xml.GetXmlNode(xd);
 
+                // return the XML node.
+                return data.ImportNode(xd.DocumentElement, true);
+            }
+
+            //if for some reason the prop editor wasn't found we'll default to returning the string value in a CDATA block.
             var sValue = Value != null ? Value.ToString() : String.Empty;
             return data.CreateCDataSection(sValue);
 

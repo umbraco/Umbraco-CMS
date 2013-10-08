@@ -13,10 +13,12 @@ angular.module("umbraco.directives")
 
       scope: {
         section: '@',
+        activetree: '@',
         showoptions: '@',
         showheader: '@',
         cachekey: '@',
-        eventhandler: '='
+        eventhandler: '=',
+        path: '@'
       },
 
       compile: function (element, attrs) {
@@ -34,7 +36,7 @@ angular.module("umbraco.directives")
            '</div>';
          }
          template += '<ul>' +
-                  '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
+                  '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" path="{{path}}" activetree="{{activetree}}" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
                   '</ul>' +
                 '</li>' +
                '</ul>';
@@ -121,8 +123,7 @@ angular.module("umbraco.directives")
 
             //watch for section changes
             scope.$watch("section", function (newVal, oldVal) {
-
-              if(!scope.tree){
+                if(!scope.tree){
                   loadTree();  
                 }
 
@@ -137,6 +138,24 @@ angular.module("umbraco.directives")
                     //store the new section to be loaded as the last section
                     lastSection = newVal;
                 }
+            });
+
+            //watch for path changes
+            scope.$watch("path", function (newVal, oldVal) {
+              if(!scope.tree || newVal){
+                  loadTree(); 
+              }
+            });
+
+            //watch for active tree changes
+            scope.$watch("activetree", function (newVal, oldVal) {
+
+              if(!scope.tree){
+                  loadTree(); 
+              }else if (newVal && newVal !== oldVal) {
+                  //only reload the tree data and Dom if the newval is different from the old one
+                  loadTree();
+              }
             });
 
             //When the user logs in

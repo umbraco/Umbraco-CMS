@@ -27,7 +27,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
 		internal RepositoryBase(IUnitOfWork work, IRepositoryCacheProvider cache)
         {
-            _work = work;
+		    if (work == null) throw new ArgumentNullException("work");
+		    if (cache == null) throw new ArgumentNullException("cache");
+		    _work = work;
             _cache = cache;
         }
 

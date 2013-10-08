@@ -14,9 +14,6 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "contentType", Namespace = "")]
     public class ContentTypeBasic : EntityBasic
     {
-        [DataMember(Name = "alias", IsRequired = true)]
-        [Required]
-        public string Alias { get; set; }
 
         [DataMember(Name = "description")]
         public string Description { get; set; }

@@ -5,8 +5,8 @@ using System.Net.Http.Formatting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
+using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.Trees.Menu;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 

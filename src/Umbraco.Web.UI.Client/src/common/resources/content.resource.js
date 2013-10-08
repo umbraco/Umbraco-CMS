@@ -382,8 +382,8 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *
          * ##usage
          * <pre>
-         * contentResource.getNiceUrl()
-         *    .then(function(stylesheets) {
+         * contentResource.getNiceUrl(id)
+         *    .then(function(url) {
          *        alert('its here!');
          *    });
          * </pre> 

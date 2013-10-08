@@ -27,6 +27,7 @@ namespace Umbraco.Core.Services
         private Lazy<ApplicationTreeService> _treeService;
         private Lazy<SectionService> _sectionService;
         private Lazy<MacroService> _macroService;
+        private Lazy<MemberTypeService> _memberTypeService;
 
 		/// <summary>
 		/// Constructor
@@ -99,6 +100,9 @@ namespace Umbraco.Core.Services
 
             if (_macroService == null)
                 _macroService = new Lazy<MacroService>(() => new MacroService(provider, repositoryFactory.Value));
+
+            if (_memberTypeService == null)
+                _memberTypeService = new Lazy<MemberTypeService>(() => new MemberTypeService(provider, repositoryFactory.Value));
         }
 
         /// <summary>
@@ -219,6 +223,14 @@ namespace Umbraco.Core.Services
         internal ApplicationTreeService ApplicationTreeService
         {
             get { return _treeService.Value; }
+        }
+
+        /// <summary>
+        /// Gets the MemberTypeService
+        /// </summary>
+        internal MemberTypeService MemberTypeService
+        {
+            get { return _memberTypeService.Value; }
         }
     }
 }

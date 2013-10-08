@@ -48,7 +48,20 @@ namespace Umbraco.Web.Editors
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + type);
             }
-        } 
+        }
+
+        /// <summary>
+        /// Gets the path for a given node ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public IEnumerable<int> GetPath(int id, UmbracoEntityTypes type)
+        {
+            var foundContent = GetResultForId(id, type);
+
+            return foundContent.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
+        }
 
         public EntityBasic GetById(int id, UmbracoEntityTypes type)
         {
@@ -235,7 +248,12 @@ namespace Umbraco.Web.Editors
             var objectType = ConvertToObjectType(entityType);
             if (objectType.HasValue)
             {
-                return Mapper.Map<EntityBasic>(Services.EntityService.Get(id, objectType.Value));
+                var found = Services.EntityService.Get(id, objectType.Value);
+                if (found == null)
+                {
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                }
+                return Mapper.Map<EntityBasic>(found);
             }                
             //now we need to convert the unknown ones
             switch (entityType)

@@ -532,17 +532,17 @@ namespace Umbraco.Core.Models
         /// Sets tags for the property - will add tags to the tags table and set the property value to be the comma delimited value of the tags.
         /// </summary>
         /// <param name="content">The content item to assign the tags to</param>
-        /// <param name="propertyAlias">The property alias to assign the tags to</param>
+        /// <param name="propertyTypeAlias">The property alias to assign the tags to</param>
         /// <param name="tags">The tags to assign</param>
         /// <param name="replaceTags">True to replace the tags on the current property with the tags specified or false to merge them with the currently assigned ones</param>
         /// <param name="tagGroup">The group/category to assign the tags, the default value is "default"</param>
         /// <returns></returns>
-        public static void SetTags(this IContent content, string propertyAlias, IEnumerable<string> tags, bool replaceTags, string tagGroup = "default")
+        public static void SetTags(this IContentBase content, string propertyTypeAlias, IEnumerable<string> tags, bool replaceTags, string tagGroup = "default")
         {
-            var property = content.Properties["propertyAlias"];
+            var property = content.Properties[propertyTypeAlias];
             if (property == null)
             {
-                throw new IndexOutOfRangeException("No property exists with name " + propertyAlias);
+                throw new IndexOutOfRangeException("No property exists with name " + propertyTypeAlias);
             }
 
             var trimmedTags = tags.Select(x => x.Trim()).ToArray();
@@ -569,15 +569,15 @@ namespace Umbraco.Core.Models
         /// Remove any of the tags specified in the collection from the property if they are currently assigned.
         /// </summary>
         /// <param name="content"></param>
-        /// <param name="propertyAlias"></param>
+        /// <param name="propertyTypeAlias"></param>
         /// <param name="tags"></param>
         /// <param name="tagGroup">The group/category that the tags are currently assigned to, the default value is "default"</param>
-        public static void RemoveTags(this IContent content, string propertyAlias, IEnumerable<string> tags, string tagGroup = "default")
+        public static void RemoveTags(this IContentBase content, string propertyTypeAlias, IEnumerable<string> tags, string tagGroup = "default")
         {
-            var property = content.Properties["propertyAlias"];
+            var property = content.Properties[propertyTypeAlias];
             if (property == null)
             {
-                throw new IndexOutOfRangeException("No property exists with name " + propertyAlias);
+                throw new IndexOutOfRangeException("No property exists with name " + propertyTypeAlias);
             }
 
             var trimmedTags = tags.Select(x => x.Trim()).ToArray();

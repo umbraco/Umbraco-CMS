@@ -35,17 +35,17 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="property"></param>
         /// <returns></returns>
-        public override object FormatValueForCache(Property property)
+        public override string ConvertDbToString(Property property)
         {
             if (_publishIds)
             {
-                return base.FormatValueForCache(property);
+                return base.ConvertDbToString(property);
             }
 
             var selectedIds = property.Value.ToString().Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
             if (selectedIds.Any() == false)
             {
-                return base.FormatValueForCache(property);
+                return base.ConvertDbToString(property);
             }
 
             var preValues = GetPreValues(property);
@@ -56,7 +56,7 @@ namespace Umbraco.Web.PropertyEditors
                                    preValues.Where(x => selectedIds.Contains(x.Value.Id.ToInvariantString())).Select(x => x.Value.Value));
             }
 
-            return base.FormatValueForCache(property);
+            return base.ConvertDbToString(property);
         }
 
         /// <summary>
@@ -64,9 +64,9 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="dbValue"></param>
         /// <returns></returns>
-        public override object FormatDataForEditor(object dbValue)
+        public override object ConvertDbToEditor(object dbValue)
         {
-            var delimited = base.FormatDataForEditor(dbValue).ToString();
+            var delimited = base.ConvertDbToEditor(dbValue).ToString();
             return delimited.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
         }
 
@@ -77,7 +77,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <param name="editorValue"></param>
         /// <param name="currentValue"></param>
         /// <returns></returns>
-        public override object FormatDataForPersistence(Core.Models.Editors.ContentPropertyData editorValue, object currentValue)
+        public override object ConvertEditorToDb(Core.Models.Editors.ContentPropertyData editorValue, object currentValue)
         {
             var json = editorValue.Value as JArray;
             if (json == null)

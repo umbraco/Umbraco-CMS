@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
@@ -8,6 +9,14 @@ using Umbraco.Core.Models.Editors;
 
 namespace Umbraco.Core.PropertyEditors
 {
+    /// <summary>
+    /// An interface that indicates that a property editor supports tags and will store it's published tags into the tag db table
+    /// </summary>
+    public interface ISupportTags
+    {
+        
+    }
+
     /// <summary>
     /// Represents the value editor for the property editor during content editing
     /// </summary>
@@ -169,7 +178,7 @@ namespace Umbraco.Core.PropertyEditors
         /// If overridden then the object returned must match the type supplied in the ValueType, otherwise persisting the 
         /// value to the DB will fail when it tries to validate the value type.
         /// </remarks>
-        public virtual object FormatDataForPersistence(ContentPropertyData editorValue, object currentValue)
+        public virtual object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
         {
             var result = TryConvertValueToCrlType(editorValue.Value);
             if (result.Success == false)
@@ -182,7 +191,7 @@ namespace Umbraco.Core.PropertyEditors
         //TODO: Change the result to object so we can pass back JSON or json converted clr types if we want!
 
         /// <summary>
-        /// A method used to format the databse value to a value that can be used by the editor
+        /// A method used to format the database value to a value that can be used by the editor
         /// </summary>
         /// <param name="dbValue"></param>
         /// <returns></returns>
@@ -190,7 +199,7 @@ namespace Umbraco.Core.PropertyEditors
         /// The object returned will automatically be serialized into json notation. For most property editors
         /// the value returned is probably just a string but in some cases a json structure will be returned.
         /// </remarks>
-        public virtual object FormatDataForEditor(object dbValue)
+        public virtual object ConvertDbToEditor(object dbValue)
         {
             if (dbValue == null) return string.Empty;
 
@@ -231,11 +240,36 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         /// <summary>
+        /// Converts the property db value to an XML fragment
+        /// </summary>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// By default this will just return the value of ConvertDbToString but ensure that if the db value type is nvarchar or text
+        /// it is a CDATA fragment, otherwise it is just a text fragment.
+        /// </remarks>
+        public virtual XNode ConvertDbToXml(Property property)
+        {
+            switch (GetDatabaseType())
+            {
+                case DataTypeDatabaseType.Date:
+                case DataTypeDatabaseType.Integer:
+                    return new XText(ConvertDbToString(property));                    
+                case DataTypeDatabaseType.Nvarchar:
+                case DataTypeDatabaseType.Ntext:
+                    //put text in cdata
+                    return new XCData(ConvertDbToString(property));
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        /// <summary>
         /// Converts the property value for use in the front-end cache
         /// </summary>
         /// <param name="property"></param>
         /// <returns></returns>
-        public virtual object FormatValueForCache(Property property)
+        public virtual string ConvertDbToString(Property property)
         {
             if (property.Value == null)
             {

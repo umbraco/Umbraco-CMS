@@ -594,10 +594,8 @@
     <Compile Include="Umbraco\TreeInit.aspx.designer.cs">
       <DependentUpon>treeInit.aspx</DependentUpon>
     </Compile>
-    <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\CustomJson.html" />
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
-    <Content Include="App_Plugins\MyPackage\PropertyEditors\Js\propertyeditors.controller.js" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\CsvEditor.html" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\PostcodeEditor.html" />
     <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\RegexEditor.html" />
@@ -622,7 +620,9 @@
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
-    <Content Include="Config\appSettings.Release.config" />
+    <Content Include="Config\appSettings.Release.config">
+      <SubType>Designer</SubType>
+    </Content>
     <Content Include="Config\appSettings.config" />
     <None Include="Config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
@@ -2550,6 +2550,7 @@
   <ItemGroup>
     <Folder Include="App_Code\" />
     <Folder Include="App_Data\" />
+    <Folder Include="App_Plugins\MyPackage\PropertyEditors\Js\" />
     <Folder Include="Css\" />
     <Folder Include="MasterPages\" />
     <Folder Include="Media\" />

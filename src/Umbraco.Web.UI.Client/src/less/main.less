@@ -17,12 +17,13 @@
 .umb-scrollable, .umb-auto-overflow {
 	overflow: auto;
 }
+
 .umb-abstract {
-	display: block;
-	margin-top: 0px;
-	margin-bottom: 15px;
-	font-size: 14px;
-	color: #b3b3b3
+    display: block;
+    margin-top: 0px;
+    margin-bottom: 15px;
+    font-size: 14px;
+    color: #b3b3b3
 }
 
 h5{
@@ -33,27 +34,7 @@ h5{
   margin-top: 15px;
 }
 
-/* STYLES FOR SPECIFIC EDITOR COMPONENTS - for all property editors and other reusable editing components*/
 
-/* content picker */
-.umb-contentpicker-popover .search-holder {
-    padding: 10px;
-}
-
-
-/* CODEMIRROR DATATYPE */
-div.umb-codeeditor {
-    border: 1px solid #e8e8e8;
-}
-div.umb-codeeditor .umb-el-wrap {
-    padding: 0px;
-}
-div.umb-codeeditor .umb-btn-toolbar {
-    padding: 0px;
-    margin: 0px;
-    border-bottom: #e8e8e8 1px solid;
-    background: #f7f7f7
-}
 
 
 
@@ -121,11 +102,16 @@ div.umb-codeeditor .umb-btn-toolbar {
 .umb-pane {
   margin: 30px 20px;
 }
-
 .umb-control-group {
   border-bottom: 1px solid @grayLighter;
   padding-bottom: 30px;
   margin-bottom: 25px !important;
+}
+/*COMPACT MODE */
+.compact .umb-control-group {
+  border-bottom: 1px solid @grayLighter;
+  padding-bottom: 15px;
+  margin-bottom: 10px !important;
 }
 
 .umb-pane > .umb-control-group:last-child {
@@ -136,6 +122,8 @@ div.umb-codeeditor .umb-btn-toolbar {
 .umb-control-group .umb-el-wrap {
   padding: 0
 }
+
+/* LABELS*/
 .umb-control-group label.control-label {
   text-align: left
 }

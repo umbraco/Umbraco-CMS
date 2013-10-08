@@ -51,6 +51,7 @@ namespace umbraco.BasePages
 			public static string ReloadContentFrameUrlIfPathLoaded(string url) {
                 return string.Format(ClientMgrScript + ".reloadContentFrameUrlIfPathLoaded('{0}');", url);
 			}
+
 			public static string ChildNodeCreated = GetMainTree + ".childNodeCreated();";
 			public static string SyncTree { get { return GetMainTree + ".syncTree('{0}', {1});"; } }
 			public static string ClearTreeCache { get { return GetMainTree + ".clearTreeCache();"; } }
@@ -240,7 +241,7 @@ namespace umbraco.BasePages
 		/// </example>
 		public ClientTools SyncTree(string path, bool forceReload)
 		{
-			//RegisterClientScript(string.Format(Scripts.SyncTree, path, forceReload.ToString().ToLower()));
+			RegisterClientScript(string.Format(Scripts.SyncTree, path, forceReload.ToString().ToLower()));
 			return this;
 		}
 

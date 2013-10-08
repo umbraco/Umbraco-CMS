@@ -2,9 +2,9 @@
 using System.Net.Http.Formatting;
 using System.Text;
 using Umbraco.Core;
+using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Trees;
-using Umbraco.Web.Trees.Menu;
 using umbraco.cms.presentation.Trees;
 using Constants = Umbraco.Core.Constants;
 

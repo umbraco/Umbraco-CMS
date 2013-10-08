@@ -323,11 +323,9 @@ namespace Umbraco.Web.Editors
         /// attributed with EnsureUserPermissionForContent to verify the user has access to the recycle bin
         /// </remarks>
         [HttpDelete]
-        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent)]
+       /* [EnsureUserPermissionForContent(Constants.System.RecycleBinContent)]*/
         public HttpResponseMessage EmptyRecycleBin()
         {            
-            //TODO: We need to check if the user is allowed access to the recycle bin!
-
             Services.ContentService.EmptyRecycleBin();
             return Request.CreateResponse(HttpStatusCode.OK);
         }
@@ -407,7 +405,7 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Unpublishes a node with a given Id and returns the unpublished entity
         /// </summary>
-        /// <param name="copy"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
         [EnsureUserPermissionForContent("id", 'Z')]
         public ContentItemDisplay PostUnPublish(int id)

@@ -1,7 +1,7 @@
 angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
     function ($scope, $timeout, tinyMceService, stylesheetResource) {
         var cfg = {};
-        cfg.toolbar = ["code", "bold", "italic", "umbracocss","alignleft", "aligncenter", "alignright", "bullist","numlist", "outdent", "indent", "link", "image", ",umbmediapicker", "umbembeddialog", "umbmacro"];
+        cfg.toolbar = ["code", "bold", "italic", "umbracocss","alignleft", "aligncenter", "alignright", "bullist","numlist", "outdent", "indent", "link", "image", "umbmediapicker", "umbembeddialog", "umbmacro"];
         cfg.stylesheets = [];
         cfg.dimensions = {height: 400, width: 600};
 

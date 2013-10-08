@@ -1,0 +1,31 @@
+<div class="umb-dialog-body with-footer" ng-controller="Umbraco.Editors.Member.CreateController">
+	<div class="umb-pane">
+
+	<h5>Create a new member</h5>
+		<ul class="umb-actions">
+			<li class="action">
+				<ul class="umb-actions-child">
+
+					<li ng-repeat="docType in allowedTypes">
+					    <a href="#media/media/edit/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
+
+					        <i class="large {{docType.icon}}"></i>
+					        
+					        <span class="menu-label">
+	        		        	{{docType.name}}
+	        		            <small>
+	        		                {{docType.description}}
+	        		            </small>
+	        		        </span>
+					    </a>
+					</li>
+				</ul>
+			</li>
+		</ul>
+	</div>
+</div>
+
+	
+<div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+		<button class="btn" ng-click="nav.hideDialog()">Do something else</button>
+</div>

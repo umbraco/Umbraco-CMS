@@ -29,7 +29,7 @@ namespace Umbraco.Core.PropertyEditors
                 Id = legacyId,
                 DataTypeName = propEdAlias,
                 DataTypeDefinitionId = dataTypeDefId,
-                Data = new BackwardsCompatibleData()
+                Data = new BackwardsCompatibleData(propEdAlias)
             };
 
             return dt;

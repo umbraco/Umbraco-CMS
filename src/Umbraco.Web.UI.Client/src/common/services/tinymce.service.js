@@ -114,6 +114,10 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
         * @param {Object} $scope the current controller scope
         */
         createLinkPicker: function (editor, $scope) {
+
+            
+            
+            /*
             editor.addButton('link', {
                 icon: 'custom icon-link',
                 tooltip: 'Link Picker',
@@ -126,12 +130,21 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                                     href: "",
                                     id: '__mcenew'
                                 };
-                                editor.insertContent(editor.dom.createHTML('a', data));
+
+                                editor.execCommand("mceInsertLink", false, {
+                                                href: "wat",
+                                                title: "muh",
+                                                target: null,
+                                                "class": null
+                                            });
+
+
+                                //editor.insertContent(editor.dom.createHTML('a', data));
                            }
                         }
                     });
                 }
-            });
+            });*/
         },
 
         /**
