@@ -70,7 +70,7 @@ namespace Umbraco.Web.Editors
         /// <param name="mediaId"></param>
         /// <returns></returns>
         /// <remarks>
-        /// If there is no image property then this will return not found.
+        /// If there is no media, image property or image file is found then this will return not found.
         /// </remarks>
         public HttpResponseMessage GetBigThumbnail(int mediaId)
         {
@@ -86,7 +86,21 @@ namespace Umbraco.Web.Editors
             }
 
             var imagePath = imageProp.Value.ToString();
-            var bigThumbPath = imagePath.Substring(0, imagePath.LastIndexOf('.')) + "_big-thumb" + ".jpg";            
+            return GetBigThumbnail(imagePath);
+        }
+
+        /// <summary>
+        /// Gets the big thumbnail image for the original image path
+        /// </summary>
+        /// <param name="originalImagePath"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// If there is no original image is found then this will return not found.
+        /// </remarks>
+        public HttpResponseMessage GetBigThumbnail(string originalImagePath)
+        {
+            var imagePath = originalImagePath;
+            var bigThumbPath = imagePath.Substring(0, imagePath.LastIndexOf('.')) + "_big-thumb" + ".jpg";
             var thumbFilePath = IOHelper.MapPath(bigThumbPath);
             if (System.IO.File.Exists(thumbFilePath) == false)
             {
@@ -108,7 +122,7 @@ namespace Umbraco.Web.Editors
                             string.Format("{0}_{1}.jpg", origFilePath.Substring(0, origFilePath.LastIndexOf(".")), "big-thumb"),
                             Path.GetExtension(origFilePath).Substring(1).ToLowerInvariant(),
                             mediaFileSystem);
-                    }    
+                    }
                 }
             }
 
@@ -120,6 +134,7 @@ namespace Umbraco.Web.Editors
             result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
             return result;
         }
+
 
         /// <summary>
         /// Gets an empty content item for the 

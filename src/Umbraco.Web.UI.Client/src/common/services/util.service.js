@@ -93,6 +93,11 @@ function imageHelper() {
                 var imageProp = _.find(props, function (item) {
                     return item.alias === 'umbracoFile';
                 });
+                
+                if (!imageProp) {
+                    return "";
+                }
+
                 var imageVal;
 
                 //our default images might store one or many images (as csv)
