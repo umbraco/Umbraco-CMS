@@ -28,6 +28,7 @@ namespace Umbraco.Web.Models.Trees
             AdditionalData = new Dictionary<string, object>();
             ChildNodesUrl = getChildNodesUrl;
             MenuUrl = menuUrl;
+            CssClasses = new List<string>();
              //default
             Icon = "icon-folder-close";
         }
