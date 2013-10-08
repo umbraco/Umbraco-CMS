@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.XPath;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.presentation.Trees;
 
@@ -115,7 +119,19 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                                     var currId =
                                         this.GetPersistedCookieValue(
                                             x => x.MntpGetCurrentEditingNode(this.GetDataTypeId()), uQuery.RootNodeId);
-                                    var currNode = umbraco.library.GetXmlNodeById(currId.ToString());
+
+                                    // Load live XML if possible, generate preview XML if not
+                                    XPathNodeIterator currNode;
+                                    var currDoc = new Document(currId);
+                                    if (!currDoc.HasPublishedVersion())
+                                    {
+                                        currNode = GetPreviewXmlNodeByID(currId, currDoc);
+                                    }
+                                    else
+                                    {
+                                        currNode = umbraco.library.GetXmlNodeById(currId.ToString());
+                                    }
+
                                     if (currNode.MoveNext())
                                     {
                                         if (currNode.Current != null)
@@ -146,6 +162,45 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                 }
                 return m_DefinedStartNodeDoc;
             }
+        }
+
+        private static XPathNodeIterator GetPreviewXmlNodeByID(int idToFind, Document documentToPreview)
+        {
+
+            XmlDocument XmlContent;
+            XmlContent = (XmlDocument)content.Instance.XmlContent.Clone();
+
+            var previewNodes = new List<Document>();
+
+            var parentId = documentToPreview.Level == 1 ? -1 : documentToPreview.Parent.Id;
+
+            while (parentId > 0 && XmlContent.GetElementById(parentId.ToString(CultureInfo.InvariantCulture)) == null)
+            {
+                var document = new Document(parentId);
+                previewNodes.Insert(0, document);
+                parentId = document.ParentId;
+            }
+
+            previewNodes.Add(documentToPreview);
+
+            foreach (var document in previewNodes)
+            {
+                //Inject preview xml
+                parentId = document.Level == 1 ? -1 : document.Parent.Id;
+                var previewXml = document.ToPreviewXml(XmlContent);
+                content.AppendDocumentXml(document.Id, document.Level, parentId, previewXml, XmlContent);
+            }
+
+
+            foreach (var prevNode in documentToPreview.GetNodesForPreview(true))
+            {
+                XmlContent = content.AppendDocumentXml(prevNode.NodeId, prevNode.Level, prevNode.ParentId, XmlContent.ReadNode(XmlReader.Create(new StringReader(prevNode.Xml))), XmlContent);
+            }
+
+            XPathNavigator xp = XmlContent.CreateNavigator();
+            xp.MoveToId(idToFind.ToString());
+
+            return xp.Select(".");
         }
 
         #region Overridden methods
