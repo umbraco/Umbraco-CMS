@@ -53,6 +53,11 @@ angular.module('umbraco.services')
                 ui.showContextMenu = false;
                 ui.showSearchResults = true;
                 ui.showContextMenuDialog = false;
+
+                $timeout(function(){
+                    $(".form-search input").focus();
+                });
+                
                 break;
             default:
                 ui.showNavigation = false;
@@ -122,7 +127,7 @@ angular.module('umbraco.services')
             }
             setMode("tree");
         },
-        
+
         showTray: function () {
             ui.showTray = true;
         },

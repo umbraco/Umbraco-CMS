@@ -25,7 +25,7 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
 
     //trigger search with a hotkey:
     keyboardService.bind("ctrl+shift+s", function(){
-        $scope.nav.showTree("");
+        $scope.nav.showSearch();
     });
 
     //the tree event handler i used to subscribe to the main tree click events

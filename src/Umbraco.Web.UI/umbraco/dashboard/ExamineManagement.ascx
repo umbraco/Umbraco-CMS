@@ -28,15 +28,14 @@
 
     <div class="propertypane">
         <div class="propertyItem">
-            <div class="dashboardWrapper">
-                <h2>Examine Management</h2>
-                <img src="<%= GlobalSettings.ClientPath %>/Dashboards/ExamineManagementIco.png" alt="Examine Management" class="dashboardIcon">
-
+            
+                <h3>Examine Management</h3>
+                
                 <div data-bind="visible: loading()">
                     <cc1:ProgressBar runat="server" ID="ProgBar1" Text="Loading..." />
                 </div>
 
-                <h3>Indexers</h3>
+                <h4>Indexers</h4>
 
                 <div data-bind="foreach: indexerDetails, visible: !loading()">
                     <div class="provider">
@@ -151,7 +150,7 @@
                     </div>
                 </div>
 
-                <h3>Searchers</h3>
+                <h4>Searchers</h4>
 
                 <div data-bind="foreach: searcherDetails, visible: !loading()">
                     <div class="provider">
@@ -212,7 +211,6 @@
                 </div>
 
             </div>
-        </div>
     </div>
 
 </div>
