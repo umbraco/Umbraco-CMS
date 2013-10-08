@@ -142,13 +142,8 @@ angular.module("umbraco.directives")
 
             //watch for path changes
             scope.$watch("path", function (newVal, oldVal) {
-
-              if(!scope.tree){
+              if(!scope.tree || newVal){
                   loadTree(); 
-              }
-              if (newVal && newVal !== oldVal) {
-                  //only reload the tree data and Dom if the newval is different from the old one
-                  loadTree();
               }
             });
 
@@ -157,9 +152,7 @@ angular.module("umbraco.directives")
 
               if(!scope.tree){
                   loadTree(); 
-              }
-
-              if (newVal && newVal !== oldVal) {
+              }else if (newVal && newVal !== oldVal) {
                   //only reload the tree data and Dom if the newval is different from the old one
                   loadTree();
               }
