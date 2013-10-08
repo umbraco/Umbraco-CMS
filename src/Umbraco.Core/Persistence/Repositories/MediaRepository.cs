@@ -254,7 +254,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 property.Id = keyDictionary[property.PropertyTypeId];
             }
 
-            UpdatePropertyTags(entity);
+            UpdatePropertyTags(entity, _tagRepository);
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
         }
@@ -333,7 +333,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            UpdatePropertyTags(entity);
+            UpdatePropertyTags(entity, _tagRepository);
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
         }
@@ -369,35 +369,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
-
-        /// <summary>
-        /// Updates the tag repository with any tag enabled properties and their values
-        /// </summary>
-        /// <param name="entity"></param>
-        private void UpdatePropertyTags(IContentBase entity)
-        {
-            foreach (var tagProp in entity.Properties.Where(x => x.TagSupport.Enable))
-            {
-                if (tagProp.TagSupport.Behavior == PropertyTagBehavior.Remove)
-                {
-                    //remove the specific tags
-                    _tagRepository.RemovePublishedTagsFromProperty(
-                        entity.Id,
-                        tagProp.Alias,
-                        tagProp.TagSupport.Tags.Select(x => new Tag { Text = x.Item1, Group = x.Item2 }));
-                }
-                else
-                {
-                    //assign the tags
-                    _tagRepository.AssignPublishedTagsToProperty(
-                        entity.Id,
-                        tagProp.Alias,
-                        tagProp.TagSupport.Tags.Select(x => new Tag { Text = x.Item1, Group = x.Item2 }),
-                        tagProp.TagSupport.Behavior == PropertyTagBehavior.Replace);
-                }
-            }
-        }
-
+        
         private PropertyCollection GetPropertyCollection(int id, Guid versionId, IMediaType contentType, DateTime createDate, DateTime updateDate)
         {
             var sql = new Sql();

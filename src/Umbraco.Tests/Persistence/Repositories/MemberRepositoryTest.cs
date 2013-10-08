@@ -32,7 +32,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         private MemberRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MemberTypeRepository memberTypeRepository)
         {
             memberTypeRepository = new MemberTypeRepository(unitOfWork, NullCacheProvider.Current);
-            var repository = new MemberRepository(unitOfWork, NullCacheProvider.Current, memberTypeRepository);
+            var tagRepo = new TagsRepository(unitOfWork, NullCacheProvider.Current);
+            var repository = new MemberRepository(unitOfWork, NullCacheProvider.Current, memberTypeRepository, tagRepo);
             return repository;
         }
 

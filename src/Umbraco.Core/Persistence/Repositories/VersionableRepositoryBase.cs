@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
@@ -90,5 +91,34 @@ namespace Umbraco.Core.Persistence.Repositories
         protected abstract void PerformDeleteVersion(int id, Guid versionId);
 
         #endregion
+
+        /// <summary>
+        /// Updates the tag repository with any tag enabled properties and their values
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="tagRepo"></param>
+        protected void UpdatePropertyTags(IContentBase entity, ITagsRepository tagRepo)
+        {
+            foreach (var tagProp in entity.Properties.Where(x => x.TagSupport.Enable))
+            {
+                if (tagProp.TagSupport.Behavior == PropertyTagBehavior.Remove)
+                {
+                    //remove the specific tags
+                    tagRepo.RemovePublishedTagsFromProperty(
+                        entity.Id,
+                        tagProp.Alias,
+                        tagProp.TagSupport.Tags.Select(x => new Tag { Text = x.Item1, Group = x.Item2 }));
+                }
+                else
+                {
+                    //assign the tags
+                    tagRepo.AssignPublishedTagsToProperty(
+                        entity.Id,
+                        tagProp.Alias,
+                        tagProp.TagSupport.Tags.Select(x => new Tag { Text = x.Item1, Group = x.Item2 }),
+                        tagProp.TagSupport.Behavior == PropertyTagBehavior.Replace);
+                }
+            }
+        }
     }
 }

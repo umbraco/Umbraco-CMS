@@ -21,16 +21,24 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class MemberRepository : VersionableRepositoryBase<int, IMember>, IMemberRepository
     {
         private readonly IMemberTypeRepository _memberTypeRepository;
+        private readonly ITagsRepository _tagRepository;
 
-        public MemberRepository(IDatabaseUnitOfWork work, IMemberTypeRepository memberTypeRepository) : base(work)
+        public MemberRepository(IDatabaseUnitOfWork work, IMemberTypeRepository memberTypeRepository, ITagsRepository tagRepository)
+            : base(work)
         {
+            if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
+            if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _memberTypeRepository = memberTypeRepository;
+            _tagRepository = tagRepository;
         }
 
-        public MemberRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMemberTypeRepository memberTypeRepository)
+        public MemberRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMemberTypeRepository memberTypeRepository, ITagsRepository tagRepository)
             : base(work, cache)
         {
+            if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
+            if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _memberTypeRepository = memberTypeRepository;
+            _tagRepository = tagRepository;
         }
 
         #region Overrides of RepositoryBase<int, IMembershipUser>
@@ -247,6 +255,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 property.Id = keyDictionary[property.PropertyTypeId];
             }
 
+            UpdatePropertyTags(entity, _tagRepository);
+
             ((Member)entity).ResetDirtyProperties();
         }
 
@@ -324,6 +334,8 @@ namespace Umbraco.Core.Persistence.Repositories
                     property.Id = keyDictionary[property.PropertyTypeId];
                 }
             }
+
+            UpdatePropertyTags(entity, _tagRepository);
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
         }
