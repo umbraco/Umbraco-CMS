@@ -160,7 +160,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         //TODO: Consider caching implications.
 
-        public IEnumerable<ITag> GetTagsForContent(int contentId)
+        public IEnumerable<ITag> GetPublishedTagsForContent(int contentId)
         {
             var sql = new Sql()
                 .Select("DISTINCT cmsTags.*")
@@ -174,7 +174,7 @@ namespace Umbraco.Core.Persistence.Repositories
             return Database.Fetch<TagDto>(sql).Select(factory.BuildEntity);
         }
 
-        public IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyAlias)
+        public IEnumerable<ITag> GetPublishedTagsForProperty(int contentId, string propertyAlias)
         {
             var sql = new Sql()
                 .Select("DISTINCT cmsTags.*")
@@ -205,7 +205,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <remarks>
         /// This can also be used to remove all tags from a property by specifying replaceTags = true and an empty tag list.
         /// </remarks>
-        public void AssignTagsToProperty(int contentId, string propertyAlias, IEnumerable<ITag> tags, bool replaceTags)
+        public void AssignPublishedTagsToProperty(int contentId, string propertyAlias, IEnumerable<ITag> tags, bool replaceTags)
         {
             //First we need to ensure there are no duplicates
             var asArray = tags.Distinct(new TagComparer()).ToArray();
@@ -294,7 +294,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="contentId"></param>
         /// <param name="propertyAlias"></param>
         /// <param name="tags">The tags to remove from the property</param>
-        public void RemoveTagsFromProperty(int contentId, string propertyAlias, IEnumerable<ITag> tags)
+        public void RemovePublishedTagsFromProperty(int contentId, string propertyAlias, IEnumerable<ITag> tags)
         {
             var propertyTypeId = EnsureContentProperty(contentId, propertyAlias);
             

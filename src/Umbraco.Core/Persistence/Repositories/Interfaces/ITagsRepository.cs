@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="contentId">The content item id to get tags for</param>
         /// <returns></returns>
-        IEnumerable<ITag> GetTagsForContent(int contentId);
+        IEnumerable<ITag> GetPublishedTagsForContent(int contentId);
 
         /// <summary>
         /// Returns all tags that exist on the content item for the property specified - Content/Media/Member
@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="contentId">The content item id to get tags for</param>
         /// <param name="propertyAlias">The property alias to get tags for</param>
         /// <returns></returns>
-        IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyAlias);
+        IEnumerable<ITag> GetPublishedTagsForProperty(int contentId, string propertyAlias);
 
         /// <summary>
         /// Assigns the given tags to a content item's property
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <remarks>
         /// This can also be used to remove all tags from a property by specifying replaceTags = true and an empty tag list.
         /// </remarks>
-        void AssignTagsToProperty(int contentId, string propertyAlias, IEnumerable<ITag> tags, bool replaceTags);
+        void AssignPublishedTagsToProperty(int contentId, string propertyAlias, IEnumerable<ITag> tags, bool replaceTags);
 
         /// <summary>
         /// Removes any of the given tags from the property association
@@ -43,6 +43,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="contentId"></param>
         /// <param name="propertyAlias"></param>
         /// <param name="tags">The tags to remove from the property</param>
-        void RemoveTagsFromProperty(int contentId, string propertyAlias, IEnumerable<ITag> tags);
+        void RemovePublishedTagsFromProperty(int contentId, string propertyAlias, IEnumerable<ITag> tags);
     }
 }
