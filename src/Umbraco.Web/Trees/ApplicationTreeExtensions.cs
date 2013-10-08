@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using System.Web.Http.Controllers;
 using System.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Web.Trees.Menu;
+using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
 using umbraco.cms.presentation.Trees;

@@ -4,7 +4,7 @@ using Umbraco.Core;
 using umbraco.BusinessLogic.Actions;
 using umbraco.interfaces;
 
-namespace Umbraco.Web.Trees.Menu
+namespace Umbraco.Web.Models.Trees
 {
     /// <summary>
     /// A custom menu list

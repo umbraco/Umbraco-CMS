@@ -9,7 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Services;
-using Umbraco.Web.Trees.Menu;
+using Umbraco.Web.Models.Trees;
 using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
