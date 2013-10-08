@@ -20,6 +20,12 @@ namespace Umbraco.Core.Models
             return property.ToXml(ApplicationContext.Current.Services.DataTypeService);
         }
 
+        /// <summary>
+        /// Creates the xml representation for the <see cref="Property"/> object
+        /// </summary>
+        /// <param name="property"><see cref="Property"/> to generate xml for</param>
+        /// <param name="dataTypeService"></param>
+        /// <returns>Xml of the property and its value</returns>
         internal static XElement ToXml(this Property property, IDataTypeService dataTypeService)
         {
             var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "data" : property.Alias.ToSafeAlias();
@@ -33,10 +39,7 @@ namespace Umbraco.Core.Models
                 xElement.Add(a);
             }
 
-            // * Get the XML result from the property editor if there is one, otherwise just construct a simple
-            //      XML construct from the value returned from the Property Editor.
-            // More details discussed here: https://groups.google.com/forum/?fromgroups=#!topic/umbraco-dev/fieWZzHj7oY
-
+            //Get the property editor for thsi property and let it convert it to the xml structure
             var propertyEditor = PropertyEditorResolver.Current.GetByAlias(property.PropertyType.PropertyEditorAlias);
             if (propertyEditor != null)
             {

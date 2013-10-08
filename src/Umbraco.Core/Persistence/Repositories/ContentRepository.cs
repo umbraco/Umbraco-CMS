@@ -319,6 +319,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 property.Id = keyDictionary[property.PropertyTypeId];
             }
 
+            //lastly, check if we are a creating a published version , then update the tags table
+            if (entity.Published)
+            {
+                UpdatePropertyTags(entity);
+            }
+
             ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
@@ -458,26 +464,7 @@ namespace Umbraco.Core.Persistence.Repositories
             //lastly, check if we are a newly published version and then update the tags table
             if (isNewPublishedVersion)
             {
-                foreach (var tagProp in entity.Properties.Where(x => x.TagSupport.Enable))
-                {
-                    if (tagProp.TagSupport.Behavior == PropertyTagBehavior.Remove)
-                    {
-                        //remove the specific tags
-                        _tagRepository.RemoveTagsFromProperty(
-                            entity.Id,
-                            tagProp.Alias,
-                            tagProp.TagSupport.Tags.Select(x => new Tag {Text = x.Item1, Group = x.Item2}));
-                    }
-                    else
-                    {
-                        //assign the tags
-                        _tagRepository.AssignTagsToProperty(
-                            entity.Id,
-                            tagProp.Alias,
-                            tagProp.TagSupport.Tags.Select(x => new Tag {Text = x.Item1, Group = x.Item2}),
-                            tagProp.TagSupport.Behavior == PropertyTagBehavior.Replace);
-                    }                    
-                }
+                UpdatePropertyTags(entity);
             }
 
             ((ICanBeDirty)entity).ResetDirtyProperties();
@@ -576,6 +563,34 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
         
+        /// <summary>
+        /// Updates the tag repository with any tag enabled properties and their values
+        /// </summary>
+        /// <param name="entity"></param>
+        private void UpdatePropertyTags(IContentBase entity)
+        {
+            foreach (var tagProp in entity.Properties.Where(x => x.TagSupport.Enable))
+            {
+                if (tagProp.TagSupport.Behavior == PropertyTagBehavior.Remove)
+                {
+                    //remove the specific tags
+                    _tagRepository.RemoveTagsFromProperty(
+                        entity.Id,
+                        tagProp.Alias,
+                        tagProp.TagSupport.Tags.Select(x => new Tag { Text = x.Item1, Group = x.Item2 }));
+                }
+                else
+                {
+                    //assign the tags
+                    _tagRepository.AssignTagsToProperty(
+                        entity.Id,
+                        tagProp.Alias,
+                        tagProp.TagSupport.Tags.Select(x => new Tag { Text = x.Item1, Group = x.Item2 }),
+                        tagProp.TagSupport.Behavior == PropertyTagBehavior.Replace);
+                }
+            }
+        }
+
         /// <summary>
         /// Private method to create a content object from a DocumentDto, which is used by Get and GetByVersion.
         /// </summary>
