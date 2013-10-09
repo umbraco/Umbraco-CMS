@@ -34,7 +34,6 @@ namespace Umbraco.Core.Models
             _parentId = parentId;
             _controlId = controlId;
             _additionalData = new Dictionary<string, object>();
-            _additionalData = new Dictionary<string, object>();
         }
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<DataTypeDefinition, string>(x => x.Name);
