@@ -1,4 +1,4 @@
-angular.module("umbraco").controller("Umbraco.Editors.DropdownController",
+angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownController",
     function($scope) {
 
         //setup the default config

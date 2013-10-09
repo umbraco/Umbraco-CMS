@@ -1,5 +1,5 @@
 angular.module("umbraco")
-    .controller("Umbraco.Editors.ListViewController", 
+    .controller("Umbraco.PropertyEditors.ListViewController",
         function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource, editorContextService, notificationsService) {
 
         $scope.selected = [];
