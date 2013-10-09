@@ -818,6 +818,15 @@ namespace Umbraco.Core.Configuration
 			}
 		}
 
+        /// <summary>
+        /// Gets the notification host domain.
+        /// </summary>
+        /// <value>The notification host domain.</value>
+        internal static string NotificationHostDomain
+        {
+            get { return GetKey("/settings/content/notifications/hostDomain"); }
+        }
+
 		/// <summary>
 		/// Gets the allowed attributes on images.
 		/// </summary>

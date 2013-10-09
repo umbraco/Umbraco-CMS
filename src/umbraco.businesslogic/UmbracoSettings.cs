@@ -355,6 +355,16 @@ namespace umbraco
         }
 
         /// <summary>
+        /// Gets the notification host domain.
+        /// </summary>
+        /// <value>The notification host domain.</value>
+        public static string NotificationHostDomain
+        {
+            get { return Umbraco.Core.Configuration.UmbracoSettings.NotificationHostDomain; }
+        }
+
+
+        /// <summary>
         /// Gets a value indicating whether notification-emails are HTML.
         /// </summary>
         /// <value>
