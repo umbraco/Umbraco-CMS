@@ -24,8 +24,8 @@ namespace Umbraco.Core.Services
         private Lazy<ServerRegistrationService> _serverRegistrationService;
         private Lazy<IEntityService> _entityService;
         private Lazy<RelationService> _relationService;
-        private Lazy<ApplicationTreeService> _treeService;
-        private Lazy<SectionService> _sectionService;
+        private Lazy<IApplicationTreeService> _treeService;
+        private Lazy<ISectionService> _sectionService;
         private Lazy<IMacroService> _macroService;
         private Lazy<IMemberTypeService> _memberTypeService;
 
@@ -41,7 +41,19 @@ namespace Umbraco.Core.Services
         /// <param name="packagingService"></param>
         /// <param name="entityService"></param>
         /// <param name="relationService"></param>
-        public ServiceContext(IContentService contentService, IMediaService mediaService, IContentTypeService contentTypeService, IDataTypeService dataTypeService, IFileService fileService, ILocalizationService localizationService, PackagingService packagingService, IEntityService entityService, RelationService relationService)
+        /// <param name="sectionService"></param>
+        public ServiceContext(
+            IContentService contentService, 
+            IMediaService mediaService, 
+            IContentTypeService contentTypeService, 
+            IDataTypeService dataTypeService, 
+            IFileService fileService, 
+            ILocalizationService localizationService, 
+            PackagingService packagingService, 
+            IEntityService entityService, 
+            RelationService relationService,
+            ISectionService sectionService,
+            IApplicationTreeService treeService)
         {
             _contentService = new Lazy<IContentService>(() => contentService);        
             _mediaService = new Lazy<IMediaService>(() => mediaService);
@@ -52,6 +64,8 @@ namespace Umbraco.Core.Services
             _packagingService = new Lazy<PackagingService>(() => packagingService);
             _entityService = new Lazy<IEntityService>(() => entityService);
             _relationService = new Lazy<RelationService>(() => relationService);
+            _sectionService = new Lazy<ISectionService>(() => sectionService);
+            _treeService = new Lazy<IApplicationTreeService>(() => treeService);
         }
 
         /// <summary>
@@ -118,10 +132,10 @@ namespace Umbraco.Core.Services
                 _relationService = new Lazy<RelationService>(() => new RelationService(provider, repositoryFactory.Value, _entityService.Value));
 
             if (_treeService == null)
-                _treeService = new Lazy<ApplicationTreeService>(() => new ApplicationTreeService(cache));
+                _treeService = new Lazy<IApplicationTreeService>(() => new ApplicationTreeService(cache));
 
             if (_sectionService == null)
-                _sectionService = new Lazy<SectionService>(() => new SectionService(_userService.Value, _treeService.Value, cache));
+                _sectionService = new Lazy<ISectionService>(() => new SectionService(_userService.Value, _treeService.Value, cache));
 
             if (_macroService == null)
                 _macroService = new Lazy<IMacroService>(() => new MacroService(provider, repositoryFactory.Value));
@@ -237,7 +251,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the <see cref="SectionService"/>
         /// </summary>
-        internal SectionService SectionService
+        public ISectionService SectionService
         {
             get { return _sectionService.Value; }
         }
@@ -245,7 +259,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the <see cref="ApplicationTreeService"/>
         /// </summary>
-        internal ApplicationTreeService ApplicationTreeService
+        internal IApplicationTreeService ApplicationTreeService
         {
             get { return _treeService.Value; }
         }

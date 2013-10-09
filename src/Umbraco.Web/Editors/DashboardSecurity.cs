@@ -14,7 +14,7 @@ namespace Umbraco.Web.Editors
     {
         //TODO: Unit test all this!!! :/
 
-        public static bool AuthorizeAccess(ISection dashboardSection, IUser user, SectionService sectionService)
+        public static bool AuthorizeAccess(ISection dashboardSection, IUser user, ISectionService sectionService)
         {
             if (user.Id.ToString() == 0.ToInvariantString())
             {
@@ -28,7 +28,7 @@ namespace Umbraco.Web.Editors
             return CheckUserAccessByRules(user, sectionService, denyTypes, grantedTypes, grantedBySectionTypes);
         }
 
-        public static bool AuthorizeAccess(IDashboardTab dashboardTab, IUser user, SectionService sectionService)
+        public static bool AuthorizeAccess(IDashboardTab dashboardTab, IUser user, ISectionService sectionService)
         {
             if (user.Id.ToString() == Constants.System.Root.ToInvariantString())
             {
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Editors
             return CheckUserAccessByRules(user, sectionService, denyTypes, grantedTypes, grantedBySectionTypes);
         }
 
-        public static bool AuthorizeAccess(IDashboardControl dashboardTab, IUser user, SectionService sectionService)
+        public static bool AuthorizeAccess(IDashboardControl dashboardTab, IUser user, ISectionService sectionService)
         {
             if (user.Id.ToString() == Constants.System.Root.ToInvariantString())
             {
@@ -56,7 +56,7 @@ namespace Umbraco.Web.Editors
             return CheckUserAccessByRules(user, sectionService, denyTypes, grantedTypes, grantedBySectionTypes);
         }
 
-        public static bool CheckUserAccessByRules(IUser user, SectionService sectionService, IAccessItem[] denyTypes, IAccessItem[] grantedTypes, IAccessItem[] grantedBySectionTypes)
+        public static bool CheckUserAccessByRules(IUser user, ISectionService sectionService, IAccessItem[] denyTypes, IAccessItem[] grantedTypes, IAccessItem[] grantedBySectionTypes)
         {
             var allowedSoFar = false;
 

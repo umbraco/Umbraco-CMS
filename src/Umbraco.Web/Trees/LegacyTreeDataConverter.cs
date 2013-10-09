@@ -66,7 +66,7 @@ namespace Umbraco.Web.Trees
 
                 var treeDef = new TreeDefinition(
                     legacyAtt.BaseTreeType,
-                    new ApplicationTree(false, true, appTree.SortOrder, appTree.ApplicationAlias, appTree.Alias, appTree.Title, appTree.IconClosed, appTree.IconOpened, "", legacyAtt.BaseTreeType.GetFullNameWithAssembly(), ""),
+                    new ApplicationTree(false, true, (byte)appTree.SortOrder, appTree.ApplicationAlias, appTree.Alias, appTree.Title, appTree.IconClosed, appTree.IconOpened, "", legacyAtt.BaseTreeType.GetFullNameWithAssembly(), ""),
                     new Application(appTree.Alias, appTree.Alias, "", 0));
 
                 tree = treeDef.CreateInstance();
@@ -93,7 +93,7 @@ namespace Umbraco.Web.Trees
         /// <param name="appTreeService"></param>
         /// <param name="treeType"></param>
         /// <returns></returns>
-        internal static BaseTree GetLegacyTreeForLegacyServices(ApplicationTreeService appTreeService, string treeType)
+        internal static BaseTree GetLegacyTreeForLegacyServices(IApplicationTreeService appTreeService, string treeType)
         {
             if (appTreeService == null) throw new ArgumentNullException("appTreeService");
             if (treeType == null) throw new ArgumentNullException("treeType");

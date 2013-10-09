@@ -47,7 +47,9 @@ namespace Umbraco.Tests
                 new RelationService(
                     new Mock<IDatabaseUnitOfWorkProvider>().Object,
                     new RepositoryFactory(true),
-                    new Mock<IEntityService>().Object));
+                    new Mock<IEntityService>().Object),
+                new Mock<ISectionService>().Object,
+                new Mock<IApplicationTreeService>().Object);
             Assert.Pass();
         }
 
@@ -64,26 +66,28 @@ namespace Umbraco.Tests
             var appCtx = new ApplicationContext(
                 new DatabaseContext(new Mock<IDatabaseFactory>().Object),
                 new ServiceContext(
-                new Mock<IContentService>().Object,
-                new Mock<IMediaService>().Object,
-                new Mock<IContentTypeService>().Object,
-                new Mock<IDataTypeService>().Object,
-                new Mock<IFileService>().Object,
-                new Mock<ILocalizationService>().Object,
-                new PackagingService(
                     new Mock<IContentService>().Object,
-                    new Mock<IContentTypeService>().Object,
                     new Mock<IMediaService>().Object,
+                    new Mock<IContentTypeService>().Object,
                     new Mock<IDataTypeService>().Object,
                     new Mock<IFileService>().Object,
                     new Mock<ILocalizationService>().Object,
-                    new RepositoryFactory(true),
-                    new Mock<IDatabaseUnitOfWorkProvider>().Object),
-                new Mock<IEntityService>().Object,
-                new RelationService(
-                    new Mock<IDatabaseUnitOfWorkProvider>().Object,
-                    new RepositoryFactory(true),
-                    new Mock<IEntityService>().Object)),
+                    new PackagingService(
+                        new Mock<IContentService>().Object,
+                        new Mock<IContentTypeService>().Object,
+                        new Mock<IMediaService>().Object,
+                        new Mock<IDataTypeService>().Object,
+                        new Mock<IFileService>().Object,
+                        new Mock<ILocalizationService>().Object,
+                        new RepositoryFactory(true),
+                        new Mock<IDatabaseUnitOfWorkProvider>().Object),
+                    new Mock<IEntityService>().Object,
+                    new RelationService(
+                        new Mock<IDatabaseUnitOfWorkProvider>().Object,
+                        new RepositoryFactory(true),
+                        new Mock<IEntityService>().Object),
+                    new Mock<ISectionService>().Object,
+                    new Mock<IApplicationTreeService>().Object),
                 CacheHelper.CreateDisabledCacheHelper());
             Assert.Pass();
         }
