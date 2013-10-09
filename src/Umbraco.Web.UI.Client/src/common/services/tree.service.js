@@ -234,7 +234,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                 .then(function(data) {
                     //this will be called once the tree app data has loaded
                     var result = {
-                        name: section,
+                        name: data.name,
                         alias: section,
                         root: data
                     };
