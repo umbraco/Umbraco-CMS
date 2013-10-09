@@ -1,64 +1,74 @@
-<div class="umb-dialog-body with-footer" ng-controller="Umbraco.Editors.Member.CreateController">
-    <div class="umb-pane">
+<form ng-controller="Umbraco.Editors.Member.CreateController" novalidate name="memberCreate" ng-submit="submitMember()">
+    <div class="umb-dialog-body with-footer">
+        <div class="umb-pane">
 
-        <h5>Create a new member</h5>
+            <h5>Create a new member</h5>
 
-        <div ng-switch="currentStep">
+            <div ng-switch="currentStep">
 
-            <ul class="umb-actions" ng-switch-when="1">
-                <li class="action">
-                    <ul class="umb-actions-child">
+                <ul class="umb-actions" ng-switch-when="1">
+                    <li class="action">
+                        <ul class="umb-actions-child">
 
-                        <li ng-repeat="docType in allowedTypes">
-                            <a href="" ng-click="selectMemberType(docType.alias)">
+                            <li ng-repeat="docType in allowedTypes">
+                                <a href="" ng-click="selectMemberType(docType.alias)">
 
-                                <i class="large {{docType.icon}}"></i>
+                                    <i class="large {{docType.icon}}"></i>
 
-                                <span class="menu-label">{{docType.name}}
-                                    <small>{{docType.description}}
-                                    </small>
-                                </span>
-                            </a>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+                                    <span class="menu-label">{{docType.name}}
+                                        <small>{{docType.description}}</small>
+                                    </span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
 
-            <form novalidate name="memberCreate" ng-submit="submitMember()" ng-switch-when="2">
-                <div class="umb-panel" val-show-validation>
+                <div class="umb-panel" val-show-validation ng-switch-when="2">
 
-                    <div class="umb-panel-footer">
-                        <div class="btn-toolbar umb-btn-toolbar pull-right">
-                            <button type="button" class="btn btn-link" ng-click="close()">Cancel</button>
-                            <button type="submit" class="btn btn-primary">Ok</button>
+                    <div class="umb-pane">
+                        <div class="control-group umb-control-group" ng-class="{error: memberCreate.name.$invalid}">
+                            <label class="control-label" for="inputName">Name</label>
+                            <input type="text" name="name" id="inputName" class="umb-editor" required placeholder="Name" ng-model="memberModel.name" />
+                            <span class="help-block text-right" val-msg-for="name" val-toggle-msg="required">Required</span>
+                        </div>
+                        <div class="control-group umb-control-group" ng-class="{error: memberCreate.login.$invalid}">
+                            <label class="control-label" for="inputLogin">Login name</label>
+                            <input type="text" name="login" id="inputLogin" class="umb-editor" required placeholder="Login" ng-model="memberModel.login" />
+                            <span class="help-block text-right" val-msg-for="login" val-toggle-msg="required">Required</span>
+                        </div>
+                        <div class="control-group umb-control-group" ng-class="{error: memberCreate.email.$invalid}">
+                            <label class="control-label" for="inputEmail">Email</label>
+                            <input type="email" name="email" id="inputEmail" class="umb-editor" required placeholder="Email" ng-model="memberModel.email" />
+                            <span class="help-block text-right" val-msg-for="email" val-toggle-msg="required">Required</span>
+                            <span class="help-block text-right" val-msg-for="email" val-toggle-msg="email">Invalid email</span>
+                        </div>
+                        <div class="control-group umb-control-group" ng-class="{error: memberCreate.password.$invalid}">
+                            <label class="control-label" for="inputPassword">Password</label>
+                            <input type="text" name="password" id="inputPassword" class="umb-editor" required placeholder="Password" ng-model="memberModel.password" />
+                            <span class="help-block text-right" val-msg-for="password" val-toggle-msg="required">Required</span>
                         </div>
                     </div>
 
-
-                    <div class="control-group umb-control-group" ng-class="{error: memberCreate.$invalid}">
-                        <label for="inputName">Name</label>
-                        <input type="text" id="inputName" required placeholder="Name" ng-model="memberModel.name">
-
-                        <label for="inputLogin">Login name</label>
-                        <input type="text" id="inputLogin" required placeholder="Login" ng-model="memberModel.login">
-
-                        <label for="inputEmail">Email</label>
-                        <input type="text" id="inputEmail" required placeholder="Email" ng-model="memberModel.email">
-
-                        <label for="inputPassword">Password</label>
-                        <input type="text" id="inputPassword" required placeholder="Password" ng-model="memberModel.password">
-
-                        <button type="submit" class="btn">Submit</button>
-                    </div>
-
                 </div>
-            </form>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-switch="currentStep">
+
+        <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-switch-when="1">
+            <button type="button" class="btn" ng-click="nav.hideDialog()">Do something else</button>
+        </div>
+
+        <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-switch-when="2">
+            <button type="button" class="btn btn-link" ng-click="close()">Cancel</button>
+            <button type="submit" class="btn btn-primary">Ok</button>
         </div>
 
     </div>
-</div>
 
+</form>
 
-<div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="currentStep > 1">
-    <button class="btn" ng-click="nav.hideDialog()">Do something else</button>
-</div>
