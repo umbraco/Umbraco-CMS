@@ -283,6 +283,30 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Publishes a document with a given ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// The CanAccessContentAuthorize attribute will deny access to this method if the current user
+        /// does not have Publish access to this node.
+        /// </remarks>
+        /// 
+        [EnsureUserPermissionForContent("id", 'P')]
+        public HttpResponseMessage PostPublishById(int id)
+        {
+            var foundContent = Services.ContentService.GetById(id);
+            if (foundContent == null)
+            {
+                return HandleContentNotFound(id, false);
+            }
+
+            Services.ContentService.Publish(foundContent, UmbracoUser.Id);
+            return Request.CreateResponse(HttpStatusCode.OK);
+
+        }
+
+        /// <summary>
         /// Moves an item to the recycle bin, if it is already there then it will permanently delete it
         /// </summary>
         /// <param name="id"></param>
@@ -292,6 +316,7 @@ namespace Umbraco.Web.Editors
         /// does not have Delete access to this node.
         /// </remarks>
         [EnsureUserPermissionForContent("id", 'D')]
+        [HttpDelete]
         public HttpResponseMessage DeleteById(int id)
         {
             //TODO: We need to check if the user is allowed to do this!
