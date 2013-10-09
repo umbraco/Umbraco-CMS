@@ -1,4 +1,4 @@
-//this controller simply tells the dialogs service to open a mediaPicker window
+//this controller simply tells the dialogs service to open a memberPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco')
 .controller("Umbraco.PropertyEditors.MemberPickerController",
@@ -8,7 +8,7 @@ angular.module('umbraco')
 		$scope.renderModel = [];
 		$scope.multipicker = true;
 
-		entityResource.getByIds($scope.ids, "Document").then(function(data){
+		entityResource.getByIds($scope.ids, "Member").then(function(data){
 			$(data).each(function(i, item){
 				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
 				$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});
@@ -16,7 +16,7 @@ angular.module('umbraco')
 		});
 
 		$scope.openMemberPicker =function(){
-			var d = dialogService.contentPicker({scope: $scope, multipicker: $scope.multipicker, callback: populate});
+			var d = dialogService.memberPicker({scope: $scope, multipicker: $scope.multipicker, callback: populate});
 		};
 
 		$scope.remove =function(index){
