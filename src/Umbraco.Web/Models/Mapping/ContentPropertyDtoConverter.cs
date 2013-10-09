@@ -23,7 +23,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             var propertyDto = base.ConvertCore(originalProperty);
 
-            var dataTypeService = (DataTypeService)_dataTypeService.Value;
+            var dataTypeService = _dataTypeService.Value;
 
             propertyDto.IsRequired = originalProperty.PropertyType.Mandatory;
             propertyDto.ValidationRegExp = originalProperty.PropertyType.ValidationRegExp;

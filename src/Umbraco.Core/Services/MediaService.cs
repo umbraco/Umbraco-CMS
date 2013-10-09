@@ -211,7 +211,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="ids">Ids of the Media to retrieve</param>
         /// <returns><see cref="IMedia"/></returns>
-        internal IEnumerable<IMedia> GetByIds(IEnumerable<int> ids)
+        public IEnumerable<IMedia> GetByIds(IEnumerable<int> ids)
         {
             using (var repository = _repositoryFactory.CreateMediaRepository(_uowProvider.GetUnitOfWork()))
             {

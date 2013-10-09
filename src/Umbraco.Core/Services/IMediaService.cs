@@ -9,6 +9,8 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IMediaService : IService
     {
+        IEnumerable<IMedia> GetByIds(IEnumerable<int> ids);
+
         /// <summary>
         /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>
         /// that this Media should based on.

@@ -10,7 +10,9 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentService : IService
     {
-        
+
+        IEnumerable<IContent> GetByIds(IEnumerable<int> ids);
+
         /// <summary>
         /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
         /// that this Content should based on.

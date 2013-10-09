@@ -67,7 +67,7 @@ namespace Umbraco.Web.Editors
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemDisplay>))]
         public IEnumerable<ContentItemDisplay> GetByIds([FromUri]int[] ids)
         {
-            var foundContent = ((ContentService) Services.ContentService).GetByIds(ids);
+            var foundContent = Services.ContentService.GetByIds(ids);
             return foundContent.Select(Mapper.Map<IContent, ContentItemDisplay>);
         }
 
@@ -355,7 +355,7 @@ namespace Umbraco.Web.Editors
             var sortedContent = new List<IContent>();
             try
             {
-                sortedContent.AddRange(((ContentService) Services.ContentService).GetByIds(sorted.IdSortOrder));
+                sortedContent.AddRange(Services.ContentService.GetByIds(sorted.IdSortOrder));
 
                 // Save content with new sort order and update content xml in db accordingly
                 if (contentService.Sort(sortedContent) == false)

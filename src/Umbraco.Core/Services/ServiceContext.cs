@@ -42,6 +42,7 @@ namespace Umbraco.Core.Services
         /// <param name="entityService"></param>
         /// <param name="relationService"></param>
         /// <param name="sectionService"></param>
+        /// <param name="treeService"></param>
         public ServiceContext(
             IContentService contentService, 
             IMediaService mediaService, 

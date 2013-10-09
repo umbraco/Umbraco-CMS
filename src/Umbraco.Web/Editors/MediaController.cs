@@ -178,7 +178,7 @@ namespace Umbraco.Web.Editors
         [FilterAllowedOutgoingMedia(typeof(IEnumerable<MediaItemDisplay>))]
         public IEnumerable<MediaItemDisplay> GetByIds([FromUri]int[] ids)
         {
-            var foundMedia = ((MediaService)Services.MediaService).GetByIds(ids);
+            var foundMedia = Services.MediaService.GetByIds(ids);
             return foundMedia.Select(Mapper.Map<IMedia, MediaItemDisplay>);
         }
 
