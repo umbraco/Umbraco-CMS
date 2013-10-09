@@ -41,9 +41,9 @@ namespace Umbraco.Web.Models.Mapping
         /// setting up the properties such as Created date, udpated date, template selected, etc...
         /// </remarks>
         public static void MapGenericProperties<TPersisted>(
-            TPersisted content, 
+            TPersisted content,
             ContentItemDisplayBase<ContentPropertyDisplay, TPersisted> display,
-            params ContentPropertyDisplay[] customProperties) 
+            params ContentPropertyDisplay[] customProperties)
             where TPersisted : IContentBase
         {
 
@@ -105,6 +105,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //re-assign
             genericProps.Properties = contentProps;
+
         }
 
         protected override IEnumerable<Tab<ContentPropertyDisplay>> ResolveCore(IContentBase content)
@@ -141,7 +142,7 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         Id = rootGroup.Id,
                         Alias = rootGroup.Name,
-                        Label = rootGroup.Name,
+                        Label = TranslateTab(rootGroup.Name),
                         Properties = aggregateProperties,
                         IsActive = false
                     });
@@ -155,16 +156,45 @@ namespace Umbraco.Web.Models.Mapping
             aggregateTabs.Add(new Tab<ContentPropertyDisplay>
                 {
                     Id = 0,
-                    Label = "Generic properties",
+                    Label = ui.Text("general", "properties"),
                     Alias = "Generic properties",
                     Properties = Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(orphanProperties)
                 });
 
-            
+
             //set the first tab to active
             aggregateTabs.First().IsActive = true;
 
             return aggregateTabs;
+        }
+
+        private string TranslateTab(string tabName)
+        {
+            
+            if (!tabName.StartsWith("#"))
+                return tabName;
+
+            return tabName.Substring(1);
+
+            /*
+             * The below currently doesnt work on my machine, since the dictonary always creates an entry with lang id = 0, but I dont have a lang id zero
+             * so the query always fails, which is odd
+             * 
+            var local = ApplicationContext.Current.Services.LocalizationService;
+            var dic = local.GetDictionaryItemByKey(tabName);
+            if (dic == null || !dic.Translations.Any())
+                return tabName;
+
+            var lang = local.GetLanguageByCultureCode(UmbracoContext.Current.Security.CurrentUser.Language);
+            if (lang == null)
+                return tabName;
+
+
+            var translation = dic.Translations.Where(x => x.Language == lang).FirstOrDefault();
+            if (translation == null)
+                return tabName;
+
+            return translation.Value;*/
         }
     }
 }

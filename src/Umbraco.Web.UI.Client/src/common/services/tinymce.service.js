@@ -27,6 +27,22 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                   'Failed to retreive entity data for id '); 
         },
 
+        /**
+        * @ngdoc method
+        * @name umbraco.services.tinyMceService#defaultPrevalues
+        * @methodOf umbraco.services.tinyMceService
+        *
+        * @description
+        * Returns a default configration to fallback on in case none is provided
+        *
+        */
+        defaultPrevalues: function () {
+               var cfg = {};
+                       cfg.toolbar = ["code", "bold", "italic", "umbracocss","alignleft", "aligncenter", "alignright", "bullist","numlist", "outdent", "indent", "link", "image", "umbmediapicker", "umbembeddialog", "umbmacro"];
+                       cfg.stylesheets = [];
+                       cfg.dimensions = {height: 400, width: 600};
+                return cfg;
+        },
 
         /**
         * @ngdoc method
