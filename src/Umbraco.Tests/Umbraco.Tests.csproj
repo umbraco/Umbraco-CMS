@@ -144,7 +144,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AttemptTests.cs" />
-    <Compile Include="Auditing\AuditTests.cs" />
+    <Compile Include="MockTests.cs" />
+    <Compile Include="Persistence\Auditing\AuditTests.cs" />
     <Compile Include="BootManagers\CoreBootManagerTests.cs" />
     <Compile Include="BusinessLogic\DictionaryTest.cs" />
     <Compile Include="Cache\CacheHelperTests.cs" />
@@ -355,7 +356,7 @@
     <Compile Include="Routing\NiceUrlProviderTests.cs" />
     <Compile Include="Routing\RenderRouteHandlerTests.cs" />
     <Compile Include="Routing\RouteTestExtensions.cs" />
-    <Compile Include="Stubs\TestControllerFactory.cs" />
+    <Compile Include="TestHelpers\Stubs\TestControllerFactory.cs" />
     <Compile Include="TestHelpers\BaseUsingSqlCeSyntax.cs" />
     <Compile Include="TestHelpers\BaseWebTest.cs" />
     <Compile Include="TestHelpers\BaseDatabaseTest.cs" />
@@ -391,7 +392,7 @@
     <Compile Include="Resolvers\PackageActionsResolverTests.cs" />
     <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="PluginManagerTests.cs" />
-    <Compile Include="Stubs\FakeLastChanceFinder.cs" />
+    <Compile Include="TestHelpers\Stubs\FakeLastChanceFinder.cs" />
     <Compile Include="TestHelpers\TestHelper.cs" />
     <Compile Include="EnumerableExtensionsTests.cs" />
     <Compile Include="IO\AbstractFileSystemTests.cs" />

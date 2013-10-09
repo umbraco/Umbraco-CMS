@@ -28,7 +28,7 @@ namespace Umbraco.Core
         private string _providerName;
         private DatabaseSchemaResult _result;
 
-        internal DatabaseContext(IDatabaseFactory factory)
+        public DatabaseContext(IDatabaseFactory factory)
         {
             _factory = factory;
         }

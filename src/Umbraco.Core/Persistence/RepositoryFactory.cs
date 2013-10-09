@@ -17,7 +17,7 @@ namespace Umbraco.Core.Persistence
             
         }
 
-        internal RepositoryFactory(bool disableAllCache)
+        public RepositoryFactory(bool disableAllCache)
         {
             _disableAllCache = disableAllCache;
         }

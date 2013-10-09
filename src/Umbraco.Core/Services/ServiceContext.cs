@@ -22,7 +22,7 @@ namespace Umbraco.Core.Services
         private Lazy<ILocalizationService> _localizationService;
         private Lazy<PackagingService> _packagingService;
         private Lazy<ServerRegistrationService> _serverRegistrationService;
-        private Lazy<EntityService> _entityService;
+        private Lazy<IEntityService> _entityService;
         private Lazy<RelationService> _relationService;
         private Lazy<IMemberTypeService> _memberTypeService;
 
@@ -36,23 +36,19 @@ namespace Umbraco.Core.Services
         /// <param name="fileService"></param>
         /// <param name="localizationService"></param>
         /// <param name="packagingService"></param>
-        /// <param name="serverRegistrationService"></param>
         /// <param name="entityService"></param>
         /// <param name="relationService"></param>
-        /// <param name="memberTypeService"></param>
-        public ServiceContext(Lazy<IContentService> contentService, Lazy<IMediaService> mediaService, Lazy<IContentTypeService> contentTypeService, Lazy<IDataTypeService> dataTypeService, Lazy<IFileService> fileService, Lazy<ILocalizationService> localizationService, Lazy<PackagingService> packagingService, Lazy<ServerRegistrationService> serverRegistrationService, Lazy<EntityService> entityService, Lazy<RelationService> relationService, Lazy<IMemberTypeService> memberTypeService)
+        public ServiceContext(IContentService contentService, IMediaService mediaService, IContentTypeService contentTypeService, IDataTypeService dataTypeService, IFileService fileService, ILocalizationService localizationService, PackagingService packagingService, IEntityService entityService, RelationService relationService)
         {
-            _contentService = contentService;        
-            _mediaService = mediaService;
-            _contentTypeService = contentTypeService;
-            _dataTypeService = dataTypeService;
-            _fileService = fileService;
-            _localizationService = localizationService;
-            _packagingService = packagingService;
-            _serverRegistrationService = serverRegistrationService;
-            _entityService = entityService;
-            _relationService = relationService;
-            _memberTypeService = memberTypeService;
+            _contentService = new Lazy<IContentService>(() => contentService);        
+            _mediaService = new Lazy<IMediaService>(() => mediaService);
+            _contentTypeService = new Lazy<IContentTypeService>(() => contentTypeService);
+            _dataTypeService = new Lazy<IDataTypeService>(() => dataTypeService);
+            _fileService = new Lazy<IFileService>(() => fileService);
+            _localizationService = new Lazy<ILocalizationService>(() => localizationService);
+            _packagingService = new Lazy<PackagingService>(() => packagingService);
+            _entityService = new Lazy<IEntityService>(() => entityService);
+            _relationService = new Lazy<RelationService>(() => relationService);
         }
 
         /// <summary>
@@ -112,7 +108,7 @@ namespace Umbraco.Core.Services
                 _packagingService = new Lazy<PackagingService>(() => new PackagingService(_contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, repositoryFactory.Value, provider));
 
             if (_entityService == null)
-                _entityService = new Lazy<EntityService>(() => new EntityService(provider, repositoryFactory.Value, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value));
+                _entityService = new Lazy<IEntityService>(() => new EntityService(provider, repositoryFactory.Value, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value));
 
             if (_relationService == null)
                 _relationService = new Lazy<RelationService>(() => new RelationService(provider, repositoryFactory.Value, _entityService.Value));
@@ -132,7 +128,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the <see cref="EntityService"/>
         /// </summary>
-        public EntityService EntityService
+        public IEntityService EntityService
         {
             get { return _entityService.Value; }
         }
