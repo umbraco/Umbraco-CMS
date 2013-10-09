@@ -11,12 +11,7 @@ namespace Umbraco.Web.Mvc
 	{
 		public string ControllerName { get; set; }
 		public string ActionName { get; set; }
-
-		/// <summary>
-		/// The Controller instance found for routing to
-		/// </summary>
-		public ControllerBase Controller { get; set; }
-
+        
         /// <summary>
         /// The Controller type found for routing to
         /// </summary>

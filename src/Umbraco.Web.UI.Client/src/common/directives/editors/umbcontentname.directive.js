@@ -21,7 +21,7 @@ angular.module("umbraco.directives")
 
 				ngModel.$render = function(){
 					$timeout(function(){
-						if(scope.model === ""){
+						if(!scope.model){
 							scope.goEdit();
 						}
 					}, 100);
@@ -37,7 +37,10 @@ angular.module("umbraco.directives")
 				scope.exitEdit = function(){
 					scope.editMode = false;
 
-					if(scope.model === ""){
+					if (!scope.model) {
+					    //TODO: This will not solve the problem of showing validation!
+					    // if this is a duplicate name the server will return a server side valiation
+					    // message - and we still have no place for this to display.
 						scope.model = "Empty...";
 					}
 				};

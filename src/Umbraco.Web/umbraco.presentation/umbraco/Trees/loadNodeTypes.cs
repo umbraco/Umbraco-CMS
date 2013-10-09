@@ -9,6 +9,7 @@ using umbraco.interfaces;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
+using Umbraco.Web.umbraco.presentation.umbraco.Trees;
 
 
 namespace umbraco
@@ -21,8 +22,8 @@ namespace umbraco
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
         {
-			rootNode.NodeType = "init" + TreeAlias;
-			rootNode.NodeID = "init";
+            rootNode.NodeType = "init" + TreeAlias;
+            rootNode.NodeID = "init";
         }
 
         protected override void CreateRootNodeActions(ref List<IAction> actions)
@@ -67,7 +68,7 @@ function openNodeType(id) {
 
                 XmlTreeNode xNode = XmlTreeNode.Create(this);
                 xNode.NodeID = docType.Id.ToString(CultureInfo.InvariantCulture);
-                xNode.Text = docType.Name;
+                xNode.Text = TranslateTreeNames.GetTranslatedName(docType.Name);
                 xNode.Action = "javascript:openNodeType(" + docType.Id + ");";
                 xNode.Icon = "icon-item-arrangement";
                 xNode.OpenIcon = "icon-item-arrangement";

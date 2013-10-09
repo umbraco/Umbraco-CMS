@@ -74,6 +74,24 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Gets an empty content item for the 
+        /// </summary>
+        /// <param name="contentTypeAlias"></param>
+        /// <param name="parentId"></param>
+        /// <returns></returns>
+        public MemberDisplay GetEmpty(string contentTypeAlias, string username, string password)
+        {
+            var contentType = Services.MemberTypeService.GetMemberType(contentTypeAlias);
+            if (contentType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var emptyContent = new Core.Models.Member("", "", "", "", -1, contentType);
+            return Mapper.Map<IMember, MemberDisplay>(emptyContent);
+        }
+
+        /// <summary>
         /// Saves member
         /// </summary>
         /// <returns></returns>        

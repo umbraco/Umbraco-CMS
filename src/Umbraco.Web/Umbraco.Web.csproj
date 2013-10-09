@@ -387,6 +387,12 @@
     <Compile Include="umbraco.presentation\umbraco\create.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\create\DLRScripting.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackager.cs" />
     <Compile Include="WebApi\Binders\MemberBinder.cs" />
     <Compile Include="WebApi\ControllerContextExtensions.cs" />
@@ -584,6 +590,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="umbraco.presentation\umbraco\Trees\TranslateTreeNames.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="Editors\MediaController.cs" />
     <Compile Include="UrlHelperRenderExtensions.cs" />
@@ -747,7 +754,7 @@
     <Compile Include="umbraco.presentation\umbraco\ping.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\MacroPartialViewTasks.cs" />
+    <Compile Include="umbraco.presentation\umbraco\create\PartialViewMacrosTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\PartialViewTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -1008,13 +1015,6 @@
     <Compile Include="umbraco.presentation\umbraco\create\CreatedPackageTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\DataTypeTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\dictionaryTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\DLRScripting.ascx.cs">
-      <DependentUpon>DLRScripting.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\DLRScripting.ascx.designer.cs">
-      <DependentUpon>DLRScripting.ascx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\DLRScriptingTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\macroTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\MediaTypeTasks.cs" />
@@ -1178,13 +1178,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\languageTasks.cs">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.cs">
-      <DependentUpon>xslt.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.designer.cs">
-      <DependentUpon>xslt.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\LatestEdits.ascx.cs">
       <DependentUpon>LatestEdits.ascx</DependentUpon>
@@ -1795,9 +1788,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericProperty.ascx" />
-    <Content Include="umbraco.presentation\umbraco\create\DLRScripting.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\controls\Images\ImageViewerUpdater.asmx" />
     <Content Include="umbraco.presentation\umbraco\controls\Images\UploadMediaImage.ascx">
       <SubType>ASPXCodeBehind</SubType>
@@ -1826,9 +1816,7 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\search.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx" />
-    <Content Include="umbraco.presentation\umbraco\create\script.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="umbraco.presentation\umbraco\create\script.ascx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\InsertAnchor.aspx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertChar.aspx" />
     <Content Include="umbraco.presentation\umbraco\webservices\TreeClientService.asmx" />
@@ -1916,25 +1904,14 @@
     <Content Include="umbraco.presentation\umbraco\translation\preview.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\translationTasks.dtd" />
     <Content Include="umbraco.presentation\umbraco\translation\xml.aspx" />
-    <Content Include="umbraco.presentation\umbraco\create\content.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="umbraco.presentation\umbraco\create\content.ascx" />
     <Content Include="umbraco.presentation\umbraco\create\language.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\create\media.ascx" />
-    <Content Include="umbraco.presentation\umbraco\create\member.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\create\nodeType.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\create\simple.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\create\xslt.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="umbraco.presentation\umbraco\create\member.ascx" />
+    <Content Include="umbraco.presentation\umbraco\create\nodeType.ascx" />
+    <Content Include="umbraco.presentation\umbraco\create\simple.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\LatestEdits.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

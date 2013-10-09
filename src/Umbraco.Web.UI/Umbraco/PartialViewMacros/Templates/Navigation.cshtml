@@ -1,0 +1,22 @@
+@inherits Umbraco.Web.Macros.PartialViewMacroPage
+
+@*
+    Macro to display child pages below the root page of a standard website.
+    Also highlights the current active page/section in the navigation with
+    the css class "current".
+*@
+
+
+@{
+    @*Get the root of the website *@
+    var root = CurrentPage.AncestorOrSelf(1);
+}
+
+<ul>
+    @foreach (var page in root.Children.Where("Visible"))
+    {
+        <li class="@(page.IsAncestorOrSelf(CurrentPage) ? "current" : null)">
+            <a href="@page.Url">@page.Name</a>
+        </li>
+    }
+</ul>

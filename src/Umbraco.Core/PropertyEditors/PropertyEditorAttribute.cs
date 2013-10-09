@@ -52,5 +52,10 @@ namespace Umbraco.Core.PropertyEditors
         public string EditorView { get; private set; }
         public string ValueType { get; set; }
         public bool IsParameterEditor { get; set; }
+
+        /// <summary>
+        /// If this is is true than the editor will be displayed full width without a label
+        /// </summary>
+        public bool HideLabel { get; set; }
     }
 }

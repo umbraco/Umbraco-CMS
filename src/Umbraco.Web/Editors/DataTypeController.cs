@@ -107,7 +107,7 @@ namespace Umbraco.Web.Editors
             //If we've made it here, then everything has been wired up and validated by the attribute
 
             //finally we need to save the data type and it's pre-vals
-            var dtService = (DataTypeService) ApplicationContext.Services.DataTypeService;
+            var dtService = ApplicationContext.Services.DataTypeService;
 
             //TODO: Check if the property editor has changed, if it has ensure we don't pass the 
             // existing values to the new property editor!

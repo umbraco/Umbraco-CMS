@@ -127,25 +127,7 @@ namespace Umbraco.Core.Services
                 return list;
             }
         }
-
-        /// <summary>
-        /// Gets all prevalues for an <see cref="IDataTypeDefinition"/>
-        /// </summary>
-        /// <remarks>
-        /// This method should be kept internal until a proper PreValue object model is introduced.
-        /// </remarks>
-        /// <param name="id">Id of the <see cref="IDataTypeDefinition"/> to retrieve prevalues from</param>
-        /// <returns>An enumerable list of Tuples containing Id, Alias, SortOrder, Value</returns>
-        internal IEnumerable<Tuple<int, string, int, string>> GetDetailedPreValuesByDataTypeId(int id)
-        {
-            using (var uow = _uowProvider.GetUnitOfWork())
-            {
-                var dtos = uow.Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = id });
-                var list = dtos.Select(x => new Tuple<int, string, int, string>(x.Id, x.Alias, x.SortOrder, x.Value)).ToList();
-                return list;
-            }
-        }
-
+        
         /// <summary>
         /// Returns the PreValueCollection for the specified data type
         /// </summary>
@@ -313,7 +295,7 @@ namespace Umbraco.Core.Services
         /// <param name="dataTypeDefinition"></param>
         /// <param name="values"></param>
         /// <param name="userId"></param>
-        internal void SaveDataTypeAndPreValues(IDataTypeDefinition dataTypeDefinition, IDictionary<string, string> values, int userId = 0)
+        public void SaveDataTypeAndPreValues(IDataTypeDefinition dataTypeDefinition, IDictionary<string, string> values, int userId = 0)
         {
             if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this))
                 return;

@@ -32,7 +32,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// Good for unit testing
         /// </remarks>
-        internal static CacheHelper CreateDisabledCacheHelper()
+        public static CacheHelper CreateDisabledCacheHelper()
         {
             return new CacheHelper(null, null, null, false);
         }

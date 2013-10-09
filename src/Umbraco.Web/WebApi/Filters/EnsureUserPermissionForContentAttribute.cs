@@ -30,7 +30,7 @@ namespace Umbraco.Web.WebApi.Filters
     {
         private readonly int? _nodeId;
         private readonly string _paramName;
-        private readonly char _permissionToCheck;
+        private readonly char? _permissionToCheck;
 
         /// <summary>
         /// This constructor will only be able to test the start node access

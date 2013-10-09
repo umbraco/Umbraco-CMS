@@ -1,7 +1,7 @@
 ﻿using Moq;
 using NUnit.Framework;
-using Umbraco.Tests.Stubs;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.template;
