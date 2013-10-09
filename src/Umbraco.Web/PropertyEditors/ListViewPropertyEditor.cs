@@ -8,7 +8,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.ListViewAlias, "List view", "listview")]
+    [PropertyEditor(Constants.PropertyEditors.ListViewAlias, "List view", "listview", HideLabel = true)]
     public class ListViewPropertyEditor : PropertyEditor
     {
 

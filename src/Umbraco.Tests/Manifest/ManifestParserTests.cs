@@ -82,16 +82,19 @@ namespace Umbraco.Tests.Manifest
     },
     {
         alias: 'Test.Test2',
-        name: 'Test 2',
+        name: 'Test 2',        
         defaultConfig: { key1: 'some default pre val' },
         editor: {
-            view: '~/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html'
+            view: '~/App_Plugins/MyPackage/PropertyEditors/CsvEditor.html',
+            hideLabel: true
         }
     }
 ]");
             var parser = ManifestParser.GetPropertyEditors(a);
 
             Assert.AreEqual(2, parser.Count());
+
+            Assert.AreEqual(false, parser.ElementAt(0).ValueEditor.HideLabel);
             Assert.AreEqual("Test.Test1", parser.ElementAt(0).Alias);
             Assert.AreEqual("Test 1", parser.ElementAt(0).Name);
             Assert.AreEqual("/App_Plugins/MyPackage/PropertyEditors/MyEditor.html", parser.ElementAt(0).ValueEditor.View);
@@ -104,6 +107,7 @@ namespace Umbraco.Tests.Manifest
             Assert.IsNotNull(manifestValidator2);
             Assert.AreEqual("regex", manifestValidator2.Type);
 
+            Assert.AreEqual(true, parser.ElementAt(1).ValueEditor.HideLabel);
             Assert.AreEqual("Test.Test2", parser.ElementAt(1).Alias);
             Assert.AreEqual("Test 2", parser.ElementAt(1).Name);
             Assert.IsTrue(parser.ElementAt(1).DefaultPreValues.ContainsKey("key1"));

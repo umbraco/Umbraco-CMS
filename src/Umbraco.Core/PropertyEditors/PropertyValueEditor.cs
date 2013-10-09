@@ -124,6 +124,12 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         /// <summary>
+        /// If this is is true than the editor will be displayed full width without a label
+        /// </summary>
+        [JsonProperty("hideLabel")]
+        public bool HideLabel { get; set; }
+
+        /// <summary>
         /// Set this to true if the property editor is for display purposes only
         /// </summary>
         public virtual bool IsReadOnly

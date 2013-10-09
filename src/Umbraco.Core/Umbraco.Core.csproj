@@ -450,6 +450,7 @@
     <Compile Include="Persistence\Repositories\TagsRepository.cs" />
     <Compile Include="PropertyEditors\BackwardsCompatibleData.cs" />
     <Compile Include="PropertyEditors\BackwardsCompatibleDataType.cs" />
+    <Compile Include="PropertyEditors\IParameterEditor.cs" />
     <Compile Include="PropertyEditors\LegacyParameterEditorAliasConverter.cs" />
     <Compile Include="PropertyEditors\LegacyPropertyEditorIdToAliasConverter.cs" />
     <Compile Include="Persistence\Mappers\MapperForAttribute.cs" />

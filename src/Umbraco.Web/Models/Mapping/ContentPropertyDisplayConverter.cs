@@ -28,6 +28,7 @@ namespace Umbraco.Web.Models.Mapping
             display.Alias = originalProp.Alias;
             display.Description = originalProp.PropertyType.Description;
             display.Label = originalProp.PropertyType.Name;
+            display.HideLabel = display.PropertyEditor.ValueEditor.HideLabel;
 
             var dataTypeService = _dataTypeService.Value;
 

@@ -10,6 +10,7 @@ namespace Umbraco.Web.PropertyEditors
     {
         public PropertyValueEditorWrapper(PropertyValueEditor wrapped)
         {
+            this.HideLabel = wrapped.HideLabel;
             this.View = wrapped.View;
             this.ValueType = wrapped.ValueType;
             foreach (var v in wrapped.Validators)
