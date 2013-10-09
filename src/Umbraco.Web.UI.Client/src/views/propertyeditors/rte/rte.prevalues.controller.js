@@ -1,15 +1,11 @@
 angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
     function ($scope, $timeout, tinyMceService, stylesheetResource) {
-        var cfg = {};
-        cfg.toolbar = ["code", "bold", "italic", "umbracocss","alignleft", "aligncenter", "alignright", "bullist","numlist", "outdent", "indent", "link", "image", "umbmediapicker", "umbembeddialog", "umbmacro"];
-        cfg.stylesheets = [];
-        cfg.dimensions = {height: 400, width: 600};
+        var cfg = tinyMceService.defaultPrevalues();
 
         if($scope.model.value){
             if(angular.isString($scope.model.value)){
-                $scope.model.value = angular.fromJson($scope.model.value);
+                $scope.model.value = cfg;
             }
-            angular.extend($scope.model.value, cfg);
         }else{
             $scope.model.value = cfg;
         }
