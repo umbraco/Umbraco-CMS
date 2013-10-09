@@ -12,46 +12,71 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ServiceContext
     {
-        private Lazy<ContentService> _contentService;
-        private Lazy<UserService> _userService;
-        private Lazy<MemberService> _memberService;
-        private Lazy<MediaService> _mediaService;
-        private Lazy<ContentTypeService> _contentTypeService;
-        private Lazy<DataTypeService> _dataTypeService;
-        private Lazy<FileService> _fileService;
-        private Lazy<LocalizationService> _localizationService;
+        private Lazy<IContentService> _contentService;
+        private Lazy<IUserService> _userService;
+        private Lazy<IMemberService> _memberService;
+        private Lazy<IMediaService> _mediaService;
+        private Lazy<IContentTypeService> _contentTypeService;
+        private Lazy<IDataTypeService> _dataTypeService;
+        private Lazy<IFileService> _fileService;
+        private Lazy<ILocalizationService> _localizationService;
         private Lazy<PackagingService> _packagingService;
         private Lazy<ServerRegistrationService> _serverRegistrationService;
-        private Lazy<EntityService> _entityService;
+        private Lazy<IEntityService> _entityService;
         private Lazy<RelationService> _relationService;
         private Lazy<ApplicationTreeService> _treeService;
         private Lazy<SectionService> _sectionService;
-        private Lazy<MacroService> _macroService;
-        private Lazy<MemberTypeService> _memberTypeService;
+        private Lazy<IMacroService> _macroService;
+        private Lazy<IMemberTypeService> _memberTypeService;
 
-		/// <summary>
-		/// Constructor
-		/// </summary>
-		/// <param name="dbUnitOfWorkProvider"></param>
-		/// <param name="fileUnitOfWorkProvider"></param>
-		/// <param name="publishingStrategy"></param>
+        /// <summary>
+        /// public ctor - will generally just be used for unit testing
+        /// </summary>
+        /// <param name="contentService"></param>
+        /// <param name="mediaService"></param>
+        /// <param name="contentTypeService"></param>
+        /// <param name="dataTypeService"></param>
+        /// <param name="fileService"></param>
+        /// <param name="localizationService"></param>
+        /// <param name="packagingService"></param>
+        /// <param name="entityService"></param>
+        /// <param name="relationService"></param>
+        public ServiceContext(IContentService contentService, IMediaService mediaService, IContentTypeService contentTypeService, IDataTypeService dataTypeService, IFileService fileService, ILocalizationService localizationService, PackagingService packagingService, IEntityService entityService, RelationService relationService)
+        {
+            _contentService = new Lazy<IContentService>(() => contentService);        
+            _mediaService = new Lazy<IMediaService>(() => mediaService);
+            _contentTypeService = new Lazy<IContentTypeService>(() => contentTypeService);
+            _dataTypeService = new Lazy<IDataTypeService>(() => dataTypeService);
+            _fileService = new Lazy<IFileService>(() => fileService);
+            _localizationService = new Lazy<ILocalizationService>(() => localizationService);
+            _packagingService = new Lazy<PackagingService>(() => packagingService);
+            _entityService = new Lazy<IEntityService>(() => entityService);
+            _relationService = new Lazy<RelationService>(() => relationService);
+        }
+
+        /// <summary>
+        /// Constructor used to instantiate the core services
+        /// </summary>
+        /// <param name="dbUnitOfWorkProvider"></param>
+        /// <param name="fileUnitOfWorkProvider"></param>
+        /// <param name="publishingStrategy"></param>
 		internal ServiceContext(IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, IUnitOfWorkProvider fileUnitOfWorkProvider, BasePublishingStrategy publishingStrategy, CacheHelper cache)
-		{   
+        {
 			BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy, cache,
-				//this needs to be lazy because when we create the service context it's generally before the
-				//resolvers have been initialized!
-				new Lazy<RepositoryFactory>(() => RepositoryResolver.Current.Factory));
-		}
+                              //this needs to be lazy because when we create the service context it's generally before the
+                              //resolvers have been initialized!
+                              new Lazy<RepositoryFactory>(() => RepositoryResolver.Current.Factory));
+        }
 
         /// <summary>
         /// Builds the various services
         /// </summary>
-		private void BuildServiceCache(
-			IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, 
-			IUnitOfWorkProvider fileUnitOfWorkProvider, 
-			BasePublishingStrategy publishingStrategy, 
+        private void BuildServiceCache(
+            IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider,
+            IUnitOfWorkProvider fileUnitOfWorkProvider,
+            BasePublishingStrategy publishingStrategy,
             CacheHelper cache,
-			Lazy<RepositoryFactory> repositoryFactory)
+            Lazy<RepositoryFactory> repositoryFactory)
         {
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
@@ -59,37 +84,37 @@ namespace Umbraco.Core.Services
             if (_serverRegistrationService == null)
                 _serverRegistrationService = new Lazy<ServerRegistrationService>(() => new ServerRegistrationService(provider, repositoryFactory.Value));
 
-			if (_userService == null)
-				_userService = new Lazy<UserService>(() => new UserService(provider, repositoryFactory.Value));
+            if (_userService == null)
+                _userService = new Lazy<IUserService>(() => new UserService(provider, repositoryFactory.Value));
 
             if (_memberService == null)
-                _memberService = new Lazy<MemberService>(() => new MemberService(provider, repositoryFactory.Value));
+                _memberService = new Lazy<IMemberService>(() => new MemberService(provider, repositoryFactory.Value));
 
             if (_contentService == null)
-				_contentService = new Lazy<ContentService>(() => new ContentService(provider, repositoryFactory.Value, publishingStrategy));
+                _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory.Value, publishingStrategy));
 
-            if(_mediaService == null)
-                _mediaService = new Lazy<MediaService>(() => new MediaService(provider, repositoryFactory.Value));
+            if (_mediaService == null)
+                _mediaService = new Lazy<IMediaService>(() => new MediaService(provider, repositoryFactory.Value));
 
-            if(_contentTypeService == null)
-				_contentTypeService = new Lazy<ContentTypeService>(() => new ContentTypeService(provider, repositoryFactory.Value, _contentService.Value, _mediaService.Value));
+            if (_contentTypeService == null)
+                _contentTypeService = new Lazy<IContentTypeService>(() => new ContentTypeService(provider, repositoryFactory.Value, _contentService.Value, _mediaService.Value));
 
-            if(_dataTypeService == null)
-				_dataTypeService = new Lazy<DataTypeService>(() => new DataTypeService(provider, repositoryFactory.Value));
+            if (_dataTypeService == null)
+                _dataTypeService = new Lazy<IDataTypeService>(() => new DataTypeService(provider, repositoryFactory.Value));
 
-            if(_fileService == null)
-				_fileService = new Lazy<FileService>(() => new FileService(fileProvider, provider, repositoryFactory.Value));
+            if (_fileService == null)
+                _fileService = new Lazy<IFileService>(() => new FileService(fileProvider, provider, repositoryFactory.Value));
 
-            if(_localizationService == null)
-				_localizationService = new Lazy<LocalizationService>(() => new LocalizationService(provider, repositoryFactory.Value));
+            if (_localizationService == null)
+                _localizationService = new Lazy<ILocalizationService>(() => new LocalizationService(provider, repositoryFactory.Value));
 
-            if(_packagingService == null)
+            if (_packagingService == null)
                 _packagingService = new Lazy<PackagingService>(() => new PackagingService(_contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, repositoryFactory.Value, provider));
 
             if (_entityService == null)
-                _entityService = new Lazy<EntityService>(() => new EntityService(provider, repositoryFactory.Value, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value));
+                _entityService = new Lazy<IEntityService>(() => new EntityService(provider, repositoryFactory.Value, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value));
 
-            if(_relationService == null)
+            if (_relationService == null)
                 _relationService = new Lazy<RelationService>(() => new RelationService(provider, repositoryFactory.Value, _entityService.Value));
 
             if (_treeService == null)
@@ -116,7 +141,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the <see cref="EntityService"/>
         /// </summary>
-        internal MacroService MacroService
+        internal IMacroService MacroService
         {
             get { return _macroService.Value; }
         }
@@ -124,7 +149,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the <see cref="EntityService"/>
         /// </summary>
-        public EntityService EntityService
+        public IEntityService EntityService
         {
             get { return _entityService.Value; }
         }
@@ -150,7 +175,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         public IContentTypeService ContentTypeService
         {
-			get { return _contentTypeService.Value; }
+            get { return _contentTypeService.Value; }
         }
 
         /// <summary>
@@ -158,7 +183,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         public IDataTypeService DataTypeService
         {
-			get { return _dataTypeService.Value; }
+            get { return _dataTypeService.Value; }
         }
 
         /// <summary>
@@ -166,7 +191,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         public IFileService FileService
         {
-			get { return _fileService.Value; }
+            get { return _fileService.Value; }
         }
 
         /// <summary>
@@ -174,7 +199,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         public ILocalizationService LocalizationService
         {
-			get { return _localizationService.Value; }
+            get { return _localizationService.Value; }
         }
 
         /// <summary>
@@ -182,7 +207,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         public IMediaService MediaService
         {
-			get { return _mediaService.Value; }
+            get { return _mediaService.Value; }
         }
 
         /// <summary>
@@ -198,7 +223,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         internal IUserService UserService
         {
-			get { return _userService.Value; }
+            get { return _userService.Value; }
         }
 
         /// <summary>
@@ -232,5 +257,14 @@ namespace Umbraco.Core.Services
         {
             get { return _memberTypeService.Value; }
         }
+        
+        /// <summary>
+        /// Gets the MemberTypeService
+        /// </summary>
+        internal IMemberTypeService MemberTypeService
+        {
+            get { return _memberTypeService.Value; }
+        }
+
     }
 }
