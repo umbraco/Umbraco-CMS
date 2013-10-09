@@ -1011,11 +1011,19 @@ namespace umbraco
         private bool IsValidDiskCachePresent()
         {
             if (File.Exists(UmbracoXmlDiskCacheFileName))
-            {
-                // Only return true if we don't have a zero-byte file
+            {                
                 var f = new FileInfo(UmbracoXmlDiskCacheFileName);
+
+                //WT: First condition: We need to check if we don't have a zero-byte file
                 if (f.Length > 0)
-                    return true;
+                {
+                    //WT: Derive last updateDate from cmsDocument of publishing or unpublishing
+                    DateTime lastContentModificationDate = SqlHelper.ExecuteScalar<DateTime>("SELECT TOP 1 updateDate FROM cmsDocument WHERE newest = 0 ORDER BY updateDate DESC");
+                    FileInfo diskCacheFileInfo = new FileInfo(UmbracoXmlDiskCacheFileName);
+
+                    //WT: Second condition: We need to check if we don't have up to date disk cache
+                    return diskCacheFileInfo.LastWriteTime >= lastContentModificationDate;                 
+                }
             }
             return false;
         }

@@ -950,6 +950,9 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
+                //WT: We need to refresh updateDate of published version
+                SqlHelper.ExecuteNonQuery("update cmsDocument set updateDate = getdate() where nodeId = @id AND published = 1", SqlHelper.CreateParameter("@id", Id));
+
                 _published = ApplicationContext.Current.Services.ContentService.UnPublish(Content);
                 
                 FireAfterUnPublish(e);
