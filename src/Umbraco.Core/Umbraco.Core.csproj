@@ -719,11 +719,13 @@
     <Compile Include="Services\IMediaService.cs" />
     <Compile Include="Services\IMemberService.cs" />
     <Compile Include="Services\IMembershipUserService.cs" />
+    <Compile Include="Services\IMemberTypeService.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\LocalizationService.cs" />
     <Compile Include="Services\MediaService.cs" />
     <Compile Include="Services\MemberService.cs" />
+    <Compile Include="Services\MemberTypeService.cs" />
     <Compile Include="Services\RelationService.cs" />
     <Compile Include="Services\ServerRegistrationService.cs" />
     <Compile Include="Services\PackagingService.cs" />
