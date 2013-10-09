@@ -43,12 +43,7 @@ function sectionsDirective($timeout, $window, navigationService, sectionResource
 					loadSections();
 				}        
 			});	
-
-			//on page refresh:
-			if(!scope.sections){
-				loadSections();	
-			}
-
+            
 			//on page resize
 			window.onresize = calculateHeight;
 			
