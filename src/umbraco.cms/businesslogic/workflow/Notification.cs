@@ -44,13 +44,14 @@ namespace umbraco.cms.businesslogic.workflow
             {
                 return UmbracoSettings.NotificationHostDomain;
             }
+
             if (HttpContext.Current != null)
             {
                 return HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + ":"
                        + HttpContext.Current.Request.Url.Port;
             }
-            LogHelper.Debug<Notification>("Notification could not determine HttpContext and hostDomain setting wasn't found in umbracoSettings.config");
-            return string.Empty;
+
+            return null;
         }
 
         /// <summary>
@@ -70,21 +71,33 @@ namespace umbraco.cms.businesslogic.workflow
         /// <param name="Action">The action.</param>
         public static void GetNotifications(CMSNode Node, User user, IAction Action)
         {
-            User[] allUsers = User.getAll();
-            foreach (User u in allUsers)
+            if (GetHostDomain() != null)
             {
-                try
+                User[] allUsers = User.getAll();
+                foreach (User u in allUsers)
                 {
-                    if (!u.Disabled && u.GetNotifications(Node.Path).IndexOf(Action.Letter.ToString()) > -1)
+                    try
                     {
-                        LogHelper.Debug<Notification>(string.Format("Notification about {0} sent to {1} ({2})", ui.Text(Action.Alias, u), u.Name, u.Email));
-                        sendNotification(user, u, (Document)Node, Action);
+                        if (!u.Disabled && u.GetNotifications(Node.Path).IndexOf(Action.Letter.ToString()) > -1)
+                        {
+                            LogHelper.Debug<Notification>(
+                                string.Format(
+                                    "Notification about {0} sent to {1} ({2})",
+                                    ui.Text(Action.Alias, u),
+                                    u.Name,
+                                    u.Email));
+                            sendNotification(user, u, (Document)Node, Action);
+                        }
+                    }
+                    catch (Exception notifyExp)
+                    {
+                        LogHelper.Error<Notification>("Error in notification", notifyExp);
                     }
                 }
-                catch (Exception notifyExp)
-                {
-					LogHelper.Error<Notification>("Error in notification", notifyExp);
-                }
+            }
+            else
+            {
+                LogHelper.Warn<Notification>("Notification could not determine HttpContext and hostDomain setting wasn't found in umbracoSettings.config");
             }
         }
 
