@@ -190,7 +190,6 @@ namespace Umbraco.Web.Editors
             
             //TODO: We need to support 'send to publish'
 
-            //TODO: We'll need to save the new template, publishat, etc... values here
             contentItem.PersistedContent.ExpireDate = contentItem.ExpireDate;
             contentItem.PersistedContent.ReleaseDate = contentItem.ReleaseDate;
             //only set the template if it didn't change
@@ -323,7 +322,7 @@ namespace Umbraco.Web.Editors
         /// attributed with EnsureUserPermissionForContent to verify the user has access to the recycle bin
         /// </remarks>
         [HttpDelete]
-       /* [EnsureUserPermissionForContent(Constants.System.RecycleBinContent)]*/
+        [EnsureUserPermissionForContent(Constants.System.RecycleBinContent)]
         public HttpResponseMessage EmptyRecycleBin()
         {            
             Services.ContentService.EmptyRecycleBin();
@@ -532,11 +531,11 @@ namespace Umbraco.Web.Editors
             IUserService userService,
             IContentService contentService,
             int nodeId,
-            char permissionToCheck,
+            char? permissionToCheck = null,
             IContent contentItem = null)
         {
            
-            if (contentItem == null && nodeId != Constants.System.Root)
+            if (contentItem == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinContent)
             {
                 contentItem = contentService.GetById(nodeId);
                 //put the content item into storage so it can be retreived 
@@ -544,29 +543,41 @@ namespace Umbraco.Web.Editors
                 storage[typeof(IContent).ToString()] = contentItem;
             }
 
-            if (contentItem == null && nodeId != Constants.System.Root)
+            if (contentItem == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinContent)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
             var hasPathAccess = (nodeId == Constants.System.Root)
-                                    ? UserExtensions.HasPathAccess("-1", user.StartContentId, Constants.System.RecycleBinContent)
-                                    : user.HasPathAccess(contentItem);
+                                    ? UserExtensions.HasPathAccess(
+                                        Constants.System.Root.ToInvariantString(),
+                                        user.StartContentId,
+                                        Constants.System.RecycleBinContent)
+                                    : (nodeId == Constants.System.RecycleBinContent)
+                                          ? UserExtensions.HasPathAccess(
+                                              Constants.System.RecycleBinContent.ToInvariantString(),
+                                              user.StartContentId,
+                                              Constants.System.RecycleBinContent)
+                                          : user.HasPathAccess(contentItem);
 
             if (hasPathAccess == false)
             {
                 return false;
             }
 
-            var permission = userService.GetPermissions(user, nodeId).FirstOrDefault();
-            if (permission == null || permission.AssignedPermissions.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))
+            if (permissionToCheck.HasValue == false)
             {
                 return true;
             }
-            else
+
+            var permission = userService.GetPermissions(user, nodeId).FirstOrDefault();
+            
+            if (permission != null && permission.AssignedPermissions.Contains(permissionToCheck.Value.ToString(CultureInfo.InvariantCulture)))
             {
-                return false;
+                return true;
             }
+
+            return false;
         }
 
     }

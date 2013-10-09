@@ -464,7 +464,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         internal static bool CheckPermissions(IDictionary<string, object> storage, IUser user, IMediaService mediaService, int nodeId, IMedia media = null)
         {
-            if (media == null && nodeId != Constants.System.Root)
+            if (media == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinMedia)
             {
                 media = mediaService.GetById(nodeId);
                 //put the content item into storage so it can be retreived 
@@ -472,14 +472,22 @@ namespace Umbraco.Web.Editors
                 storage[typeof(IMedia).ToString()] = media;
             }
 
-            if (media == null && nodeId != Constants.System.Root)
+            if (media == null && nodeId != Constants.System.Root && nodeId != Constants.System.RecycleBinMedia)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
             var hasPathAccess = (nodeId == Constants.System.Root)
-                                    ? UserExtensions.HasPathAccess("-1", user.StartMediaId, Constants.System.RecycleBinMedia)
-                                    : user.HasPathAccess(media);
+                                    ? UserExtensions.HasPathAccess(
+                                        Constants.System.Root.ToInvariantString(),
+                                        user.StartMediaId,
+                                        Constants.System.RecycleBinMedia)
+                                    : (nodeId == Constants.System.RecycleBinMedia)
+                                          ? UserExtensions.HasPathAccess(
+                                              Constants.System.RecycleBinMedia.ToInvariantString(),
+                                              user.StartMediaId,
+                                              Constants.System.RecycleBinMedia)
+                                          : user.HasPathAccess(media);
 
             return hasPathAccess;
         }
