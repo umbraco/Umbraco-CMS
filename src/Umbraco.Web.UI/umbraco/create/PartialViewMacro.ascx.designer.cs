@@ -13,15 +13,6 @@ namespace Umbraco.Web.UI.Umbraco.Create {
     public partial class PartialViewMacro {
         
         /// <summary>
-        /// RequiredFieldValidator1 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator1;
-        
-        /// <summary>
         /// FileName control.
         /// </summary>
         /// <remarks>
@@ -29,6 +20,15 @@ namespace Umbraco.Web.UI.Umbraco.Create {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox FileName;
+        
+        /// <summary>
+        /// RequiredFieldValidator2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator2;
         
         /// <summary>
         /// PartialViewTemplate control.
@@ -47,6 +47,15 @@ namespace Umbraco.Web.UI.Umbraco.Create {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.CheckBox CreateMacroCheckBox;
+        
+        /// <summary>
+        /// Textbox2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox Textbox2;
         
         /// <summary>
         /// SubmitButton control.

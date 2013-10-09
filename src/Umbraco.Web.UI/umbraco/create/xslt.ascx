@@ -7,7 +7,7 @@
         <asp:RequiredFieldValidator id="RequiredFieldValidator1" ErrorMessage="*" ControlToValidate="rename" runat="server">*</asp:RequiredFieldValidator>
     </cc1:PropertyPanel>
 
-    <cc1:PropertyPanel runat="server" Text="Template">
+    <cc1:PropertyPanel runat="server" Text="Choose a snippet:">
         <asp:ListBox id="xsltTemplate" Runat="server" CssClass="bigInput input-large-type input-block-level" Rows="1" SelectionMode="Single">
 	        <asp:ListItem Value="clean.xslt">Clean</asp:ListItem>
         </asp:ListBox>
