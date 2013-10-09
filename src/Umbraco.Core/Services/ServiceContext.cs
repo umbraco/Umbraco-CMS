@@ -124,10 +124,10 @@ namespace Umbraco.Core.Services
                 _sectionService = new Lazy<SectionService>(() => new SectionService(_userService.Value, _treeService.Value, cache));
 
             if (_macroService == null)
-                _macroService = new Lazy<MacroService>(() => new MacroService(provider, repositoryFactory.Value));
+                _macroService = new Lazy<IMacroService>(() => new MacroService(provider, repositoryFactory.Value));
 
             if (_memberTypeService == null)
-                _memberTypeService = new Lazy<MemberTypeService>(() => new MemberTypeService(provider, repositoryFactory.Value));
+                _memberTypeService = new Lazy<IMemberTypeService>(() => new MemberTypeService(provider, repositoryFactory.Value));
         }
 
         /// <summary>
@@ -253,18 +253,10 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the MemberTypeService
         /// </summary>
-        internal MemberTypeService MemberTypeService
-        {
-            get { return _memberTypeService.Value; }
-        }
-        
-        /// <summary>
-        /// Gets the MemberTypeService
-        /// </summary>
         internal IMemberTypeService MemberTypeService
         {
             get { return _memberTypeService.Value; }
         }
-
+        
     }
 }
