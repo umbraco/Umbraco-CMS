@@ -26,7 +26,7 @@ namespace Umbraco.Web.UI.JavaScript
             JArray merged = new JArray();    
             foreach (var m in _parser.GetManifests())
             {
-                ManifestParser.MergeJArrays(merged, m.StyleSheetInitialize);
+                ManifestParser.MergeJArrays(merged, m.StylesheetInitialize);
             }
 
             return ParseMain(merged);

@@ -13,7 +13,7 @@ function MemberEditController($scope, $routeParams, $q, $timeout, $window, membe
 
     if ($routeParams.create) {
         //we are creating so get an empty member item
-        memberResource.getScaffold($routeParams.id, $routeParams.doctype)
+        memberResource.getScaffold($routeParams.doctype)
             .then(function(data) {
                 $scope.loaded = true;
                 $scope.content = data;

@@ -450,6 +450,7 @@
     <Compile Include="Persistence\Repositories\TagsRepository.cs" />
     <Compile Include="PropertyEditors\BackwardsCompatibleData.cs" />
     <Compile Include="PropertyEditors\BackwardsCompatibleDataType.cs" />
+    <Compile Include="PropertyEditors\IParameterEditor.cs" />
     <Compile Include="PropertyEditors\LegacyParameterEditorAliasConverter.cs" />
     <Compile Include="PropertyEditors\LegacyPropertyEditorIdToAliasConverter.cs" />
     <Compile Include="Persistence\Mappers\MapperForAttribute.cs" />
@@ -919,9 +920,11 @@
     <Compile Include="Services\DataTypeService.cs" />
     <Compile Include="Services\EntityService.cs" />
     <Compile Include="Services\FileService.cs" />
+    <Compile Include="Services\IApplicationTreeService.cs" />
     <Compile Include="Services\IContentService.cs" />
     <Compile Include="Services\IContentTypeService.cs" />
     <Compile Include="Services\IDataTypeService.cs" />
+    <Compile Include="Services\IEntityService.cs" />
     <Compile Include="Services\IFileService.cs" />
     <Compile Include="Services\ILocalizationService.cs" />
     <Compile Include="Services\IMacroService.cs" />
@@ -929,6 +932,7 @@
     <Compile Include="Services\IMemberService.cs" />
     <Compile Include="Services\IMembershipUserService.cs" />
     <Compile Include="Services\IMemberTypeService.cs" />
+    <Compile Include="Services\ISectionService.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\LocalizationService.cs" />

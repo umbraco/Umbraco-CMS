@@ -26,13 +26,15 @@ namespace umbraco.presentation.create
         protected void Page_Load(object sender, System.EventArgs e)
         {
             sbmt.Text = ui.Text("create");
-            if (!Page.IsPostBack) {
-                foreach (MacroEngineLanguage lang in MacroEngineFactory.GetSupportedUILanguages()) {
+            if (!Page.IsPostBack)
+            {
+                foreach (MacroEngineLanguage lang in MacroEngineFactory.GetSupportedUILanguages())
+                {
                     filetype.Items.Add(new ListItem(string.Format(".{0} ({1})", lang.Extension.ToLowerInvariant(), lang.EngineName), lang.Extension));
                 }
                 filetype.SelectedIndex = 0;
             }
-            _loadTemplates(template, filetype.SelectedValue);
+            LoadTemplates(template, filetype.SelectedValue);
         }
 
         protected void sbmt_Click(object sender, System.EventArgs e)
@@ -47,7 +49,7 @@ namespace umbraco.presentation.create
                     new HttpContextWrapper(Context),
                     BasePage.Current.getUser(),
                     helper.Request("nodeType"),
-                    createMacroVal, 
+                    createMacroVal,
                     template.SelectedValue + "|||" + rename.Text + "." + filetype.SelectedValue);
 
                 BasePage.Current.ClientTools
@@ -59,10 +61,10 @@ namespace umbraco.presentation.create
 
         public void loadTemplates(object sender, EventArgs e)
         {
-            _loadTemplates(template, filetype.SelectedValue);
+            LoadTemplates(template, filetype.SelectedValue);
         }
 
-        private void _loadTemplates(ListBox list, string scriptType)
+        private void LoadTemplates(ListBox list, string scriptType)
         {
             string path = SystemDirectories.Umbraco + "/scripting/templates/" + scriptType + "/";
             string abPath = IOHelper.MapPath(path);
@@ -87,5 +89,77 @@ namespace umbraco.presentation.create
                 }
             }
         }
+
+        /// <summary>
+        /// rename control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox rename;
+
+        /// <summary>
+        /// RequiredFieldValidator1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator1;
+
+        /// <summary>
+        /// UpdatePanel1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.UpdatePanel UpdatePanel1;
+
+        /// <summary>
+        /// filetype control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ListBox filetype;
+
+        /// <summary>
+        /// template control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ListBox template;
+
+        /// <summary>
+        /// createMacro control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CheckBox createMacro;
+
+        /// <summary>
+        /// sbmt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button sbmt;
+
+        /// <summary>
+        /// Textbox1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox Textbox1;
     }
 }

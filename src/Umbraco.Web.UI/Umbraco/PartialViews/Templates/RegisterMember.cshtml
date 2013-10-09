@@ -1,0 +1,90 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using System.Web.Mvc.Html
+@using ClientDependency.Core.Mvc
+@using Umbraco.Web
+@using Umbraco.Web.Models
+@using Umbraco.Web.Controllers
+
+@{
+    var registerModel = new RegisterModel();
+    
+    @*
+        Configurable here:
+
+        registerModel.MemberTypeAlias   - the default is "Member"
+
+        registerModel.RedirectOnSucces  - the default is false
+
+        registerModel.RedirectUrl       - what page do we go to if the registration was successful? 
+                                          the default is "/" unless RedirectOnSuccess is set to false
+
+        registerModel.UsernameIsEmail   - the default is true
+                                          if you want the username to be different from the email
+                                          address, set this to true and add a new Username field in
+                                          the form below
+
+                                          @Html.LabelFor(m => registerModel.Username)
+                                          @Html.TextBoxFor(m => registerModel.Username)
+                                          @Html.ValidationMessageFor(m => registerModel.Username)
+    *@
+  
+    Html.EnableClientValidation();
+    Html.EnableUnobtrusiveJavaScript();
+    Html.RequiresJs("/umbraco_client/ui/jquery.js");
+    Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.min.js");
+    Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.unobtrusive.min.js");
+    
+    var success = TempData["FormSuccess"] != null;
+}
+
+@if (success) 
+{ 
+    // This message will show if RedirectOnSucces is set to false (default)
+    <p>Registration succeeeded.</p>
+} 
+else 
+{   
+    using (Html.BeginUmbracoForm<RegisterController>("HandleRegisterMember"))
+    {
+        <fieldset>
+            <legend>Register Member</legend>
+
+            @Html.ValidationSummary(true)
+
+            @Html.LabelFor(m => registerModel.Name)
+            @Html.TextBoxFor(m => registerModel.Name)
+            @Html.ValidationMessageFor(m => registerModel.Name)
+            <br />
+
+            @Html.LabelFor(m => registerModel.Email)
+            @Html.TextBoxFor(m => registerModel.Email)
+            @Html.ValidationMessageFor(m => registerModel.Email)
+            <br />
+
+            @Html.LabelFor(m => registerModel.Password)
+            @Html.PasswordFor(m => registerModel.Password)
+            @Html.ValidationMessageFor(m => registerModel.Password)
+            <br />
+        
+            @if (registerModel.MemberProperties != null) { 
+                for (var i = 0; i < registerModel.MemberProperties.Count; i++)
+                {
+                    @Html.LabelFor(m => registerModel.MemberProperties[i].Value, registerModel.MemberProperties[i].Name)
+                    @Html.EditorFor(m => registerModel.MemberProperties[i].Value)
+                    @Html.HiddenFor(m => registerModel.MemberProperties[i].Alias)
+                    <br />
+                }
+            }
+
+            @Html.HiddenFor(m => registerModel.MemberTypeAlias)
+            @Html.HiddenFor(m => registerModel.RedirectOnSucces)
+            @Html.HiddenFor(m => registerModel.RedirectUrl)      
+            @Html.HiddenFor(m => registerModel.UsernameIsEmail)
+
+            <button>Register</button>
+        </fieldset>  
+    
+        @Html.RenderJsHere()
+    }
+}

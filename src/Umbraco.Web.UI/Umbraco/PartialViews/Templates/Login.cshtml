@@ -1,0 +1,40 @@
+﻿@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@using System.Web.Mvc.Html
+@using ClientDependency.Core.Mvc
+@using Umbraco.Web
+@using Umbraco.Web.Models
+@using Umbraco.Web.Controllers
+
+@{
+    var loginModel = new LoginModel();
+    
+    Html.EnableClientValidation();
+    Html.EnableUnobtrusiveJavaScript();
+    Html.RequiresJs("/umbraco_client/ui/jquery.js");
+    Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.min.js");
+    Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.unobtrusive.min.js");
+}
+
+@Html.RenderJsHere()
+
+@using (Html.BeginUmbracoForm<LoginController>("HandleLogin"))
+{
+    <fieldset>
+        <legend>Login</legend>
+        
+        @Html.ValidationSummary(true)
+
+        @Html.LabelFor(m => loginModel.Username)
+        @Html.TextBoxFor(m => loginModel.Username)
+        @Html.ValidationMessageFor(m => loginModel.Username)
+        <br />
+
+        @Html.LabelFor(m => loginModel.Password)
+        @Html.PasswordFor(m => loginModel.Password)
+        @Html.ValidationMessageFor(m => loginModel.Password)
+        <br />
+
+        <button>Login</button>
+    </fieldset>  
+}

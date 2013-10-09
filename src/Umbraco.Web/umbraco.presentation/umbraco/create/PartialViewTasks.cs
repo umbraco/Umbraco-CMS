@@ -52,7 +52,7 @@ namespace umbraco
             //create the file
             using (var sw = File.CreateText(fullFilePath))
             {
-                using (var templateFile = File.OpenText(IOHelper.MapPath(SystemDirectories.Umbraco + "/partialviews/templates/" + template)))
+                using (var templateFile = File.OpenText(IOHelper.MapPath(SystemDirectories.Umbraco + "/PartialViews/Templates/" + template)))
                 {
                     var templateContent = templateFile.ReadToEnd();
                     sw.Write(templateContent);
@@ -72,13 +72,6 @@ namespace umbraco
             _returnUrl = string.Format(EditViewFile + "?file={0}", HttpUtility.UrlEncode(ParentFolderName.EnsureEndsWith('/') + fileName));
             return true;
 	    }
-
-        protected virtual void WriteTemplateHeader(StreamWriter sw)
-        {
-            //write out the template header
-            sw.Write("@inherits ");
-			sw.Write(typeof(UmbracoTemplatePage).FullName.TrimEnd("`1"));
-		}
 
 	    public override bool PerformDelete()
 	    {

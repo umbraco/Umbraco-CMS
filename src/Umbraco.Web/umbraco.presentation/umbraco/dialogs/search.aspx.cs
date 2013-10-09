@@ -71,16 +71,19 @@ namespace umbraco.presentation.dialogs
             }
             else
             {
-                var operation = criteria.Field("__nodeName", txt.MultipleCharacterWildcard());
+                var words = txt.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Select(w => w.ToLower().MultipleCharacterWildcard()).ToList();
+                var operation = criteria.GroupedOr(new[] { "__nodeName" }, new[] { words[0] });
+                words.RemoveAt(0);
+                foreach (var word in words)
+                    operation = operation.And().GroupedOr(new[] { "__nodeName" }, new[] { word });
 
                 // ensure the user can only find nodes they are allowed to see
-                if (CurrentUser.StartNodeId > 0)
+                if (UmbracoContext.Current.UmbracoUser.StartNodeId > 0)
                 {
-                    operation = operation.And().Id(CurrentUser.StartNodeId);
+                    operation = operation.And().Id(UmbracoContext.Current.UmbracoUser.StartNodeId);
                 }
 
                 results = internalSearcher.Search(operation.Compile());
-
             }
 
             nothingFound.Visible = !results.Any();

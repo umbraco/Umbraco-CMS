@@ -1,4 +1,4 @@
-angular.module("umbraco").controller("Umbraco.Editors.DatepickerController",
+angular.module("umbraco").controller("Umbraco.PropertyEditors.DatepickerController",
     function ($scope, notificationsService, assetsService) {
 
         //setup the default config

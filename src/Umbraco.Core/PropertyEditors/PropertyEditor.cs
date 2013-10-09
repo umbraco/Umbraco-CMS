@@ -116,6 +116,7 @@ namespace Umbraco.Core.PropertyEditors
 
             editor.View = _attribute.EditorView;
             editor.ValueType = _attribute.ValueType;
+            editor.HideLabel = _attribute.HideLabel;
             return editor;
 
         }

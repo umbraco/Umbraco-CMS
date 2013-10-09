@@ -237,7 +237,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="ids">Ids of the Content to retrieve</param>
         /// <returns><see cref="IContent"/></returns>
-        internal IEnumerable<IContent> GetByIds(IEnumerable<int> ids)
+        public IEnumerable<IContent> GetByIds(IEnumerable<int> ids)
         {
             using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
             {

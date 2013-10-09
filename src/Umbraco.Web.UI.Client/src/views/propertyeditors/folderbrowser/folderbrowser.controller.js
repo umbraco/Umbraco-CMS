@@ -10,7 +10,7 @@ angular.module("umbraco")
             }
         };
 })
-.controller("Umbraco.Editors.FolderBrowserController",
+.controller("Umbraco.PropertyEditors.FolderBrowserController",
     function ($rootScope, $scope, assetsService, $routeParams, $timeout, $element, $location, umbRequestHelper, mediaResource, imageHelper) {
         var dialogOptions = $scope.$parent.dialogOptions;
 

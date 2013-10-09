@@ -1,12 +1,15 @@
 ﻿<form novalidate name="contentForm" 
       ng-controller="Umbraco.Editors.Member.EditController" 
       ng-show="loaded" 
-      ng-submit="save()">
+      ng-submit="save()"
+      val-status-changed>
     <umb-panel val-show-validation>  
         <umb-header tabs="content.tabs">
             
             <div class="span4">
-                <umb-content-name ng-model="content.name" placeholder="Enter a page title"></umb-content-name>
+                <umb-content-name 
+                    placeholder="Enter a name..." 
+                    ng-model="content.name"></umb-content-name>
             </div>
 
             <div class="span8">
@@ -24,7 +27,6 @@
 
         <umb-tab-view>
             <umb-tab id="tab{{tab.id}}" rel="{{tab.id}}" ng-repeat="tab in content.tabs">
-
                 <div class="umb-pane">
                     <umb-property 
                         property="property"
@@ -33,7 +35,6 @@
                         <umb-editor model="property"></umb-editor>
                     </umb-property>
                 </div>
-
             </umb-tab>
         </umb-tab-view>
     </umb-panel>

@@ -10,6 +10,8 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IDataTypeService : IService
     {
+        void SaveDataTypeAndPreValues(IDataTypeDefinition dataTypeDefinition, IDictionary<string, string> values, int userId = 0);
+
         /// <summary>
         /// Gets a <see cref="IDataTypeDefinition"/> by its Id
         /// </summary>

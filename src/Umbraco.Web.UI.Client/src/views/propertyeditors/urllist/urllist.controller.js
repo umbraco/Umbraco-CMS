@@ -1,4 +1,4 @@
-angular.module('umbraco').controller("Umbraco.Editors.UrlListController",
+angular.module('umbraco').controller("Umbraco.PropertyEditors.UrlListController",
 	function($rootScope, $scope, $filter) {
 
         function formatDisplayValue() {

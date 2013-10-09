@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
     public class ContentControllerUnitTests
     {
         [Test]
-        public void Does_Not_Throw_Exception_When_Access_Allowed_By_Path()
+        public void Access_Allowed_By_Path()
         {
             //arrange
             var userMock = new Mock<IUser>();
@@ -26,13 +26,9 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             var contentServiceMock = new Mock<IContentService>();
             contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
             var contentService = contentServiceMock.Object;
-            var userServiceMock = new Mock<IUserService>();            
-            var permissions = new List<EntityPermission>();
-            userServiceMock.Setup(x => x.GetPermissions(user, 1234)).Returns(permissions);
-            var userService = userServiceMock.Object;
 
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, null, contentService, 1234);
 
             //assert
             Assert.IsTrue(result);
@@ -62,7 +58,7 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         }
 
         [Test]
-        public void Throws_Exception_When_No_Access_By_Path()
+        public void No_Access_By_Path()
         {
             //arrange
             var userMock = new Mock<IUser>();
@@ -88,7 +84,7 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         }
 
         [Test]
-        public void Throws_Exception_When_No_Access_By_Permission()
+        public void No_Access_By_Permission()
         {
             //arrange
             var userMock = new Mock<IUser>();
@@ -117,7 +113,7 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         }
 
         [Test]
-        public void Does_Not_Throw_Exception_When_Access_Allowed_By_Permission()
+        public void Access_Allowed_By_Permission()
         {
             //arrange
             var userMock = new Mock<IUser>();
@@ -146,34 +142,166 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         }
 
         [Test]
-        public void Does_Not_Throw_Exception_When_No_Permissions_Assigned()
+        public void Access_To_Root_By_Path()
         {
             //arrange
             var userMock = new Mock<IUser>();
-            userMock.Setup(u => u.Id).Returns(9);
+            userMock.Setup(u => u.Id).Returns(0);
             userMock.Setup(u => u.StartContentId).Returns(-1);
             var user = userMock.Object;
-            var contentMock = new Mock<IContent>();
-            contentMock.Setup(c => c.Path).Returns("-1,1234,5678");
-            var content = contentMock.Object;
-            var contentServiceMock = new Mock<IContentService>();
-            contentServiceMock.Setup(x => x.GetById(1234)).Returns(content);
-            var contentService = contentServiceMock.Object;
-            var userServiceMock = new Mock<IUserService>();    
-            var permissions = new List<EntityPermission>();
-            userServiceMock.Setup(x => x.GetPermissions(user, 1234)).Returns(permissions);
-            var userService = userServiceMock.Object;
-
+            
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, null, null, -1);
 
             //assert
             Assert.IsTrue(result);
         }
 
-    }
+        [Test]
+        public void Access_To_Recycle_Bin_By_Path()
+        {
+            //arrange
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.StartContentId).Returns(-1);
+            var user = userMock.Object;
+            
+            //act
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, null, null, -20);
 
-    //we REALLY need a way to nicely mock the service context, etc... so we don't have to do integration tests... coming soon.
+            //assert
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void No_Access_To_Recycle_Bin_By_Path()
+        {
+            //arrange
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.StartContentId).Returns(1234);
+            var user = userMock.Object;
+
+            //act
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, null, null, -20);
+
+            //assert
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void No_Access_To_Root_By_Path()
+        {
+            //arrange
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.StartContentId).Returns(1234);
+            var user = userMock.Object;
+
+            //act
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, null, null, -1);
+
+            //assert
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void Access_To_Root_By_Permission()
+        {
+            //arrange
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.StartContentId).Returns(-1);
+            var user = userMock.Object;
+
+            var userServiceMock = new Mock<IUserService>();
+            var permissions = new List<EntityPermission>
+                {
+                    new EntityPermission(9, 1234, new string[]{ "A" })
+                };
+            userServiceMock.Setup(x => x.GetPermissions(user, -1)).Returns(permissions);
+            var userService = userServiceMock.Object;
+
+            //act
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, null, -1, 'A');
+
+            //assert
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void No_Access_To_Root_By_Permission()
+        {
+            //arrange
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.StartContentId).Returns(-1);
+            var user = userMock.Object;
+
+            var userServiceMock = new Mock<IUserService>();
+            var permissions = new List<EntityPermission>
+                {
+                    new EntityPermission(9, 1234, new string[]{ "A" })
+                };
+            userServiceMock.Setup(x => x.GetPermissions(user, -1)).Returns(permissions);
+            var userService = userServiceMock.Object;
+
+            //act
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, null, -1, 'B');
+
+            //assert
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void Access_To_Recycle_Bin_By_Permission()
+        {
+            //arrange
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.StartContentId).Returns(-1);
+            var user = userMock.Object;
+
+            var userServiceMock = new Mock<IUserService>();
+            var permissions = new List<EntityPermission>
+                {
+                    new EntityPermission(9, 1234, new string[]{ "A" })
+                };
+            userServiceMock.Setup(x => x.GetPermissions(user, -20)).Returns(permissions);
+            var userService = userServiceMock.Object;
+
+            //act
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, null, -20, 'A');
+
+            //assert
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void No_Access_To_Recycle_Bin_By_Permission()
+        {
+            //arrange
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.StartContentId).Returns(-1);
+            var user = userMock.Object;
+
+            var userServiceMock = new Mock<IUserService>();
+            var permissions = new List<EntityPermission>
+                {
+                    new EntityPermission(9, 1234, new string[]{ "A" })
+                };
+            userServiceMock.Setup(x => x.GetPermissions(user, -20)).Returns(permissions);
+            var userService = userServiceMock.Object;
+
+            //act
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, null, -20, 'B');
+
+            //assert
+            Assert.IsFalse(result);
+        }
+
+    }
 
     //NOTE: The below self hosted stuff does work so need to get some tests written. Some are not possible atm because
     // of the legacy SQL calls like checking permissions.

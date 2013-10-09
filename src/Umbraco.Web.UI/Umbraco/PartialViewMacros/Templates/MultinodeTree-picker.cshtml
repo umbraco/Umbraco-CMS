@@ -1,0 +1,20 @@
+@inherits Umbraco.Web.Macros.PartialViewMacroPage
+
+@*
+	Macro to list nodes from a Multinode tree picker, using the pickers default settings.
+	Content Values stored as xml.
+
+	To get it working with any site's data structure, simply set the selection equal to the property which has the 
+	multinode treepicker (so: replace "PropertyWithPicker" with the alias of your property).
+*@
+
+@* Lists each selected value from the picker as a link *@
+<ul>
+	@foreach(var id in CurrentPage.PropertyWithPicker){
+
+		@*For each link, get the node, and display its name and url*@
+		var content = Umbraco.Content(id.InnerText);
+
+		<li><a href="@content.Url">@content.Name</a></li>	
+	}
+</ul>

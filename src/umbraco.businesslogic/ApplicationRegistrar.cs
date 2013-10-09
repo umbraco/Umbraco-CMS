@@ -30,19 +30,7 @@ namespace umbraco.BusinessLogic
                              .Where(x => applicationContext.Services.SectionService.GetByAlias(x.Alias) == null)
                              .ToArray();
 
-            var allAliases = applicationContext.Services.SectionService.GetSections().Select(x => x.Alias).Concat(attrs.Select(x => x.Alias));
-
-            applicationContext.Services.SectionService.LoadXml(doc =>
-            {
-                foreach (var attr in attrs)
-                {
-                    doc.Root.Add(new XElement("add",
-                                              new XAttribute("alias", attr.Alias),
-                                              new XAttribute("name", attr.Name),
-                                              new XAttribute("icon", attr.Icon),
-                                              new XAttribute("sortOrder", attr.SortOrder)));
-                }
-            }, true);
+            applicationContext.Services.SectionService.Initialize(attrs.Select(x => new Section(x.Name, x.Alias, x.Icon, x.SortOrder)));                
         }
 
         public void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)

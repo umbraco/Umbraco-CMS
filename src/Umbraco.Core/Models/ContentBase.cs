@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -50,7 +51,7 @@ namespace Umbraco.Core.Models
             _contentTypeId = int.Parse(contentType.Id.ToString(CultureInfo.InvariantCulture));
             _properties = properties;
             _properties.EnsurePropertyTypes(PropertyTypes);
-            AdditionalData = new Dictionary<string, object>();
+            _additionalData = new Dictionary<string, object>();
         }
 
         /// <summary>
@@ -74,7 +75,7 @@ namespace Umbraco.Core.Models
 			_contentTypeId = int.Parse(contentType.Id.ToString(CultureInfo.InvariantCulture));
 			_properties = properties;
 			_properties.EnsurePropertyTypes(PropertyTypes);
-            AdditionalData = new Dictionary<string, object>();
+            _additionalData = new Dictionary<string, object>();
 		}
 
 	    private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentBase, string>(x => x.Name);
@@ -253,6 +254,16 @@ namespace Umbraco.Core.Models
                 _properties = value;
                 _properties.CollectionChanged += PropertiesChanged;
             }
+        }
+
+        private readonly IDictionary<string, object> _additionalData;
+        /// <summary>
+        /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IDictionary<string, object> IUmbracoEntity.AdditionalData
+        {
+            get { return _additionalData; }
         }
 
         /// <summary>

@@ -31,4 +31,4 @@
 
 }
 
-angular.module("umbraco").controller("Umbraco.Editors.MultipleTextBoxController", MultipleTextBoxController);
+angular.module("umbraco").controller("Umbraco.PropertyEditors.MultipleTextBoxController", MultipleTextBoxController);

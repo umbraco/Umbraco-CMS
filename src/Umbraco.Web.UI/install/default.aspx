@@ -2,9 +2,7 @@
 
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
-<%@ Register Src="~/install/Title.ascx" TagPrefix="umb1" TagName="PageTitle" %>
-
-<!DOCTYPE html>
+<%@ Register Src="~/install/Title.ascx" TagPrefix="umb1" TagName="PageTitle" %><!DOCTYPE html>
 <html>
 <head runat="server">
 

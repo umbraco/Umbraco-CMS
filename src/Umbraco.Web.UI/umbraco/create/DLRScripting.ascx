@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="DLRScripting.ascx.cs" Inherits="umbraco.presentation.create.DLRScripting" %>
+﻿<%@ Control Language="C#" AutoEventWireup="True" CodeBehind="DlrScripting.ascx.cs" Inherits="Umbraco.Web.UI.Umbraco.Create.DlrScripting" %>
 <%@ Import Namespace="umbraco" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
@@ -15,7 +15,7 @@
                     SelectionMode="Single" AutoPostBack="true" OnSelectedIndexChanged="loadTemplates">
                 </asp:ListBox>
             </cc1:PropertyPanel>
-           <cc1:PropertyPanel runat="server" text="Template">
+           <cc1:PropertyPanel runat="server" text="Choose a snippet:">
                 <asp:ListBox id="template" Runat="server" CssClass="bigInput input-large-type input-block-level" Rows="1" SelectionMode="Single">
                 </asp:ListBox>
            </cc1:PropertyPanel>

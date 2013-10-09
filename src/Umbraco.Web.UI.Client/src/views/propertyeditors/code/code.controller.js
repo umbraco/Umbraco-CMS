@@ -1,4 +1,4 @@
-angular.module("umbraco").controller("Umbraco.Editors.CodeMirrorController", 
+angular.module("umbraco").controller("Umbraco.PropertyEditors.CodeMirrorController",
     function ($scope, $rootScope, assetsService) {
     
     /*   

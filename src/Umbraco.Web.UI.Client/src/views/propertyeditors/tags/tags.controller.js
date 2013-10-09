@@ -1,5 +1,5 @@
 angular.module("umbraco")
-.controller("Umbraco.Editors.TagsController",
+.controller("Umbraco.PropertyEditors.TagsController",
     function ($rootScope, $scope, $log, assetsService) {
 		
 		assetsService.loadJs(

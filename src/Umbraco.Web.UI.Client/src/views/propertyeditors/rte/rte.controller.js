@@ -1,5 +1,5 @@
 angular.module("umbraco")
-    .controller("Umbraco.Editors.RTEController",
+    .controller("Umbraco.PropertyEditors.RTEController",
     function ($rootScope, $element, $scope, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper) {
 
         tinyMceService.configuration().then(function(tinyMceConfig){

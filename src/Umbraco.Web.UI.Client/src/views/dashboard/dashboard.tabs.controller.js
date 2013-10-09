@@ -84,7 +84,15 @@ function ChangePasswordDashboardController($scope, xmlhelper, $log, userResource
     //this is the model we will pass to the service
     $scope.profile = {};
 
-    $scope.changePassword = function (p) {   
+    $scope.changePassword = function (p) {
+        
+        //ensure form is dirty so the styles validate
+        $scope.passwordForm.$setDirty(true);
+        
+        if ($scope.passwordForm.$invalid) {
+            return;
+        }
+
         userResource.changePassword(p.oldPassword, p.newPassword).then(function () {
             $scope.passwordForm.$setValidity(true);
         }, function () {

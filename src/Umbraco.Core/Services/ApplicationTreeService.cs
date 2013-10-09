@@ -12,7 +12,7 @@ using File = System.IO.File;
 
 namespace Umbraco.Core.Services
 {
-    internal class ApplicationTreeService
+    internal class ApplicationTreeService : IApplicationTreeService
     {
         private readonly CacheHelper _cache;
 
@@ -93,6 +93,26 @@ namespace Umbraco.Core.Services
 
                         return list;
                     });
+        }
+
+        public void Intitialize(IEnumerable<ApplicationTree> existingTrees)
+        {
+            LoadXml(doc =>
+            {
+                foreach (var tree in existingTrees)
+                {
+                    doc.Root.Add(new XElement("add",
+                                              new XAttribute("initialize", tree.Initialize),
+                                              new XAttribute("sortOrder", tree.SortOrder),
+                                              new XAttribute("alias", tree.Alias),
+                                              new XAttribute("application", tree.ApplicationAlias),
+                                              new XAttribute("title", tree.Title),
+                                              new XAttribute("iconClosed", tree.IconClosed),
+                                              new XAttribute("iconOpen", tree.IconOpened),
+                                              new XAttribute("type", tree.Type)));
+                }
+
+            }, true);
         }
 
         /// <summary>
@@ -205,14 +225,14 @@ namespace Umbraco.Core.Services
         /// Gets the application tree for the applcation with the specified alias
         /// </summary>
         /// <param name="applicationAlias">The application alias.</param>
-        /// <param name="onlyInitializedApplications"></param>
+        /// <param name="onlyInitialized"></param>
         /// <returns>Returns a ApplicationTree Array</returns>
-        public IEnumerable<ApplicationTree> GetApplicationTrees(string applicationAlias, bool onlyInitializedApplications)
+        public IEnumerable<ApplicationTree> GetApplicationTrees(string applicationAlias, bool onlyInitialized)
         {
             var list = GetAppTrees().FindAll(
                 t =>
                     {
-                        if (onlyInitializedApplications)
+                        if (onlyInitialized)
                             return (t.ApplicationAlias == applicationAlias && t.Initialize);
                         return (t.ApplicationAlias == applicationAlias);
                     }

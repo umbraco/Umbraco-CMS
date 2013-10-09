@@ -14,15 +14,15 @@ using File = System.IO.File;
 
 namespace Umbraco.Core.Services
 {
-    internal class SectionService
+    internal class SectionService : ISectionService
     {
         private readonly IUserService _userService;
-        private readonly ApplicationTreeService _applicationTreeService;
+        private readonly IApplicationTreeService _applicationTreeService;
         private readonly CacheHelper _cache;
 
         public SectionService(
-            IUserService userService,             
-            ApplicationTreeService applicationTreeService, 
+            IUserService userService,
+            IApplicationTreeService applicationTreeService, 
             CacheHelper cache)
         {
             if (applicationTreeService == null) throw new ArgumentNullException("applicationTreeService");
@@ -57,9 +57,28 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Ensures all available sections exist in the storage medium
+        /// </summary>
+        /// <param name="existingSections"></param>
+        public void Initialize(IEnumerable<Section> existingSections)
+        {
+            LoadXml(doc =>
+            {
+                foreach (var attr in existingSections)
+                {
+                    doc.Root.Add(new XElement("add",
+                                              new XAttribute("alias", attr.Alias),
+                                              new XAttribute("name", attr.Name),
+                                              new XAttribute("icon", attr.Icon),
+                                              new XAttribute("sortOrder", attr.SortOrder)));
+                }
+            }, true);
+        }
+
+        /// <summary>
         /// The cache storage for all applications
         /// </summary>
-        internal IEnumerable<Section> GetSections()
+        public IEnumerable<Section> GetSections()
         {
             return _cache.GetCacheItem(
                 CacheKeys.ApplicationsCacheKey,

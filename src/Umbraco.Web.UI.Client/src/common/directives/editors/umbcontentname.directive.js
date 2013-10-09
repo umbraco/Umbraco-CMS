@@ -19,9 +19,11 @@ angular.module("umbraco.directives")
 			},
 			link: function(scope, element, attrs, ngModel) {
 
+			    var inputElement = element.find("input");
+
 				ngModel.$render = function(){
 					$timeout(function(){
-						if(scope.model === ""){
+						if(!scope.model){
 							scope.goEdit();
 						}
 					}, 100);
@@ -29,15 +31,21 @@ angular.module("umbraco.directives")
 
 				scope.goEdit = function(){
 					scope.editMode = true;
-					$timeout(function(){
-						element.find("input").focus();
+					$timeout(function () {					    
+					    inputElement.focus();
+					    if (inputElement.val() === "Empty...") {
+					        inputElement.select();
+					    }
 					}, 100);
 				};
 
 				scope.exitEdit = function(){
 					scope.editMode = false;
 
-					if(scope.model === ""){
+					if (!scope.model) {
+					    //TODO: This will not solve the problem of showing validation!
+					    // if this is a duplicate name the server will return a server side valiation
+					    // message - and we still have no place for this to display.
 						scope.model = "Empty...";
 					}
 				};
