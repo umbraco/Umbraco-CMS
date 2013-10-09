@@ -24,6 +24,7 @@ namespace Umbraco.Core.Services
         private Lazy<ServerRegistrationService> _serverRegistrationService;
         private Lazy<EntityService> _entityService;
         private Lazy<RelationService> _relationService;
+        private Lazy<MemberTypeService> _memberTypeService;
 
 		/// <summary>
 		/// Constructor
@@ -86,6 +87,9 @@ namespace Umbraco.Core.Services
 
             if(_relationService == null)
                 _relationService = new Lazy<RelationService>(() => new RelationService(provider, repositoryFactory.Value, _entityService.Value));
+
+            if (_memberTypeService == null)
+                _memberTypeService = new Lazy<MemberTypeService>(() => new MemberTypeService(provider, repositoryFactory.Value));
         }
 
         /// <summary>
@@ -183,5 +187,13 @@ namespace Umbraco.Core.Services
         {
             get { return _memberService.Value; }
         }
+        }
+
+        /// <summary>
+        /// Gets the MemberTypeService
+        /// </summary>
+        internal MemberTypeService MemberTypeService
+        {
+            get { return _memberTypeService.Value; }
     }
 }
