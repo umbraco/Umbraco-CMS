@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.Editors.ListViewController", 
-        function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource, editorContextService, notificationsService) {
+        function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource, editorContextService, notificationsService, iconHelper) {
 
         $scope.selected = [];
         $scope.actionInProgress = false;
@@ -78,17 +78,26 @@ angular.module("umbraco")
             }
         };
 
-        $scope.updateSelection = function ($event, id) {
-            var checkbox = $event.target;
-            var action = (checkbox.checked ? 'add' : 'remove');
-            updateSelected(action, id);
+        $scope.updateSelection = function ($event, item) {
+            if(item.selected){
+                item.selected = false;
+                var index = $scope.selected.indexOf(item.id);
+                if(index){
+                    $scope.selected.splice(index, 1);
+                }
+            }else{
+                item.selected = true;
+                $scope.selected.push(item.id);
+            }
         };
 
         $scope.selectAll = function ($event) {
             var checkbox = $event.target;
             var action = (checkbox.checked ? 'add' : 'remove');
+
             for (var i = 0; i < $scope.listViewResultSet.items.length; i++) {
                 var entity = $scope.listViewResultSet.items[i];
+                entity.selected = checkbox.checked;
                 updateSelected(action, entity.id);
             }
         };
@@ -110,6 +119,10 @@ angular.module("umbraco")
 
         $scope.isAnythingSelected = function() {
             return $scope.selected.length > 0;
+        };
+
+        $scope.getIcon = function(entry){
+            return iconHelper.convertFromLegacyIcon(entry.icon);
         };
 
         $scope.delete = function () {
@@ -142,25 +155,43 @@ angular.module("umbraco")
             var current = 1;
             var total = $scope.selected.length;
             for (var i = 0; i < $scope.selected.length; i++) {
-                $scope.bulkStatus = "Publishing doc " + current + " out of " + total + " documents";
+                $scope.bulkStatus = "Publishing " + current + " out of " + total + " documents";
                 
-                contentResource.getById($scope.selected[i]).then(function(content) {
-                    contentResource.publish(content, false)
-                        .then(function(content){
-                            if (current == total) {
-                                notificationsService.success("Bulk action", "Published " + total + "documents");
-                                $scope.bulkStatus = "";
-                                $scope.reloadView($scope.content.id);
-                                $scope.actionInProgress = false;
-                            }
-                            current++;
-                        });
-                });
+                contentResource.publishById($scope.selected[i])
+                    .then(function(content){
+                        if (current == total) {
+                            notificationsService.success("Bulk action", "Published " + total + "documents");
+                            $scope.bulkStatus = "";
+                            $scope.reloadView($scope.content.id);
+                            $scope.actionInProgress = false;
+                        }
+                        current++;
+                    });
+              
             }
         };
  
         $scope.unpublish = function () {
+            $scope.actionInProgress = true;
+            $scope.bulkStatus = "Starting with publish";
+            var current = 1;
+            var total = $scope.selected.length;
+            for (var i = 0; i < $scope.selected.length; i++) {
+                $scope.bulkStatus = "Unpublishing " + current + " out of " + total + " documents";
+                
+                contentResource.unPublish($scope.selected[i])
+                    .then(function(content){
+                        
+                        if (current == total) {
+                            notificationsService.success("Bulk action", "Published " + total + "documents");
+                            $scope.bulkStatus = "";
+                            $scope.reloadView($scope.content.id);
+                            $scope.actionInProgress = false;
+                        }
 
+                        current++;
+                    });
+            }
         };
             
         if($routeParams.id){

@@ -21,7 +21,10 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "createDate")]
         public DateTime CreateDate { get; set; }
-        
+
+        [DataMember(Name = "published")]
+        public bool Published { get; set; }
+
         [DataMember(Name = "owner")]
         public UserBasic Owner { get; set; }
 
