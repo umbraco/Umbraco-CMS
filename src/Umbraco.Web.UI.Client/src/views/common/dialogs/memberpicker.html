@@ -1,0 +1,21 @@
+<div class="umb-panel" ng-controller="Umbraco.Dialogs.MemberPickerController">
+	<div class="umb-panel-body no-header">
+		<umb-pane>
+				<umb-tree 
+					section="members" 
+					cachekey="memberpickerDialog" 
+					showheader="true" 
+					showoptions="false"
+					eventhandler="dialogTreeEventHandler">
+				</umb-tree>
+		</umb-pane>
+	</div>
+
+	<div class="umb-panel-footer" ng-show="multipicker">
+		<div class="umb-el-wrap umb-panel-buttons">
+	        <div class="btn-toolbar umb-btn-toolbar">
+	         	<input type="button" ng-click="submit(dialogData)" class="btn btn-primary" value="select" />
+	        </div>
+		</div>
+	</div>
+</div>

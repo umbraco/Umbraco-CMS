@@ -1,0 +1,21 @@
+<div ng-controller="Umbraco.PropertyEditors.MemberPickerController" class="umb-editor umb-memberpicker">
+    
+
+    <ul class="unstyled">	
+		<li ng-repeat="node in renderModel">
+			<a href="#" prevent-default ng-click="remove($index)">
+				<i class="icon icon-delete red hover-show"></i>
+				<i class="{{node.icon}} hover-hide"></i> 
+					{{node.name}}
+			</a>
+		</li>
+	</ul>
+
+	<ul class="unstyled">	
+		<li>
+			<a href="#" ng-click="openMemberPicker()" prevent-default>
+				<i class="icon icon-add"></i> Add
+			</a>
+		</li>
+	</ul>
+</div>
