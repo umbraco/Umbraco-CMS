@@ -18,7 +18,6 @@
         <asp:CheckBox ID="CreateMacroCheckBox" Runat="server" Checked="true" Text="Create Macro"></asp:CheckBox>
     </cc1:PropertyPanel>
 </cc1:Pane>
-
 <!-- added to support missing postback on enter in IE -->
 <asp:TextBox runat="server" style="visibility:hidden;display:none;" ID="Textbox1"/>
 <input type="hidden" name="nodeType" value="-1">

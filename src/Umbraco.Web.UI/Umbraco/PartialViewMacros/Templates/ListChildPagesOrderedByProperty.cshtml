@@ -1,0 +1,21 @@
+@inherits Umbraco.Web.Macros.PartialViewMacroPage
+@*
+    Macro parameter to be set on the macro
+    Show:True   Alias:propertyAlias     Name:Property Alias    Type:Textstring
+*@   
+
+
+@{
+    
+    @* Get the property alias we want to filter on from the macro parameter *@
+    var propertyAlias = Model.MacroParameters["propertyAlias"];
+    var selection = CurrentPage.Children.Where("Visible").OrderBy(propertyAlias);
+}
+
+
+<ul>
+    @foreach (var page in selection)
+    { 
+        <li><a href="@page.Url">@page.Name</a></li>
+    }
+</ul>

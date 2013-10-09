@@ -324,7 +324,7 @@
   </nodeType>
   <nodeType alias="partialViews">
     <header>Macro</header>
-    <usercontrol>/Create/PartialView.ascx</usercontrol>
+		<usercontrol>/Create/PartialView.ascx</usercontrol>
     <tasks>
       <create assembly="umbraco" type="PartialViewTasks" />
       <delete assembly="umbraco" type="PartialViewTasks" />
@@ -334,8 +334,8 @@
     <header>Macro</header>
     <usercontrol>/Create/PartialViewMacro.ascx</usercontrol>
     <tasks>
-      <create assembly="umbraco" type="MacroPartialViewTasks" />
-      <delete assembly="umbraco" type="MacroPartialViewTasks" />
+			<create assembly="umbraco" type="PartialViewMacroTasks" />
+			<delete assembly="umbraco" type="PartialViewMacroTasks" />
     </tasks>
   </nodeType>
   <nodeType alias="forms">

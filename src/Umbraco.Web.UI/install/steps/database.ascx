@@ -201,7 +201,7 @@
                             <div class="step">
                                 <div class="container">
                                     <p>
-                                        <strong>2. Connection details:</strong> Please fill out the connection information for your database.</strong>
+                                        <strong>2. Connection details:</strong> Please fill out the connection information for your database.
                                     </p>
 
                                     <div class="instruction-hold">
