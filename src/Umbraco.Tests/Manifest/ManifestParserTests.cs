@@ -12,7 +12,7 @@ namespace Umbraco.Tests.Manifest
     [TestFixture]
     public class ManifestParserTests
     {
-
+        
         [Test]
         public void Parse_Property_Editors_With_Pre_Vals()
         {
@@ -260,6 +260,46 @@ namespace Umbraco.Tests.Manifest
         //}
 
         [Test]
+        public void Create_Manifest_With_Line_Comments()
+        {
+            var content4 = @"{
+//here's the property editors
+propertyEditors: [], 
+//and here's the javascript
+javascript: ['~/test.js', '~/test2.js']}";
+
+            var result = ManifestParser.CreateManifests(null, content4);
+
+            Assert.AreEqual(1, result.Count()); 
+        }
+
+        [Test]
+        public void Create_Manifest_With_Surround_Comments()
+        {
+            var content4 = @"{
+propertyEditors: []/*we have empty property editors**/, 
+javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2.js']}";
+
+            var result = ManifestParser.CreateManifests(null, content4);
+
+            Assert.AreEqual(1, result.Count());
+        }
+
+        [Test]
+        public void Create_Manifest_With_Error()
+        {
+            //NOTE: This is missing the final closing ]
+            var content4 = @"{
+propertyEditors: []/*we have empty property editors**/, 
+javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2.js' }";
+
+            var result = ManifestParser.CreateManifests(null, content4);
+
+            //an error has occurred and been logged but processing continues
+            Assert.AreEqual(0, result.Count());
+        }
+
+        [Test]
         public void Create_Manifest_From_File_Content()
         {
             var content1 = "{}";
@@ -286,9 +326,9 @@ namespace Umbraco.Tests.Manifest
             var result = ManifestParser.CreateManifests(null, content1, content2, content3, content4);
 
             Assert.AreEqual(4, result.Count());
-            Assert.AreEqual(0, result.ElementAt(1).StyleSheetInitialize.Count);
-            Assert.AreEqual(2, result.ElementAt(2).StyleSheetInitialize.Count);
-            Assert.AreEqual(2, result.ElementAt(3).StyleSheetInitialize.Count);
+            Assert.AreEqual(0, result.ElementAt(1).StylesheetInitialize.Count);
+            Assert.AreEqual(2, result.ElementAt(2).StylesheetInitialize.Count);
+            Assert.AreEqual(2, result.ElementAt(3).StylesheetInitialize.Count);
         }
         
 

@@ -1,5 +1,5 @@
 ﻿{    	
-	propertyEditors: [		
+	propertyEditors: 	
 		{
 			alias: "MyPackage.Regex",
 			name: "Regex",

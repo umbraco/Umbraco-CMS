@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Manifest
@@ -18,7 +19,8 @@ namespace Umbraco.Core.Manifest
         private readonly DirectoryInfo _pluginsDir;
         
         //used to strip comments
-        private static readonly Regex Comments = new Regex("(/\\*.*\\*/)", RegexOptions.Compiled);
+        private static readonly Regex CommentsSurround = new Regex(@"/\*([^*]|[\r\n]|(\*+([^*/]|[\r\n])))*\*+/", RegexOptions.Compiled);
+        private static readonly Regex CommentsLine = new Regex(@"//.*?$", RegexOptions.Compiled | RegexOptions.Multiline);
 
         public ManifestParser(DirectoryInfo pluginsDir)
         {
@@ -116,11 +118,20 @@ namespace Umbraco.Core.Manifest
             {
                 if (m.IsNullOrWhiteSpace()) continue;
 
-                //remove any comments first, NOTE: I think JSON.Net will do this for us! but we'll leave it here for now
-                Comments.Replace(m, match => "");
+                //remove any comments first
+                var replaced = CommentsSurround.Replace(m, match => " ");
+                replaced = CommentsLine.Replace(replaced, match => "");
 
-                
-                var deserialized = JsonConvert.DeserializeObject<JObject>(m);
+                JObject deserialized;
+                try
+                {
+                    deserialized = JsonConvert.DeserializeObject<JObject>(replaced);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<ManifestParser>("An error occurred parsing manifest with contents: " + m, ex);
+                    continue;
+                }
 
                 //validate the javascript
                 var init = deserialized.Properties().Where(x => x.Name == "javascript").ToArray();
@@ -130,10 +141,10 @@ namespace Umbraco.Core.Manifest
                 }
 
                 //validate the css
-                var cssinit = deserialized.Properties().Where(x => x.Name == "stylesheet").ToArray();
+                var cssinit = deserialized.Properties().Where(x => x.Name == "css").ToArray();
                 if (cssinit.Length > 1)
                 {
-                    throw new FormatException("The manifest is not formatted correctly contains more than one 'stylesheet' element");
+                    throw new FormatException("The manifest is not formatted correctly contains more than one 'css' element");
                 }
 
                 //validate the property editors section
@@ -146,7 +157,7 @@ namespace Umbraco.Core.Manifest
                 var jConfig = init.Any() ? (JArray)deserialized["javascript"] : new JArray();
                 ReplaceVirtualPaths(jConfig);
 
-                var cssConfig = cssinit.Any() ? (JArray)deserialized["stylesheet"] : new JArray();
+                var cssConfig = cssinit.Any() ? (JArray)deserialized["css"] : new JArray();
                 ReplaceVirtualPaths(cssConfig);
 
                 //replace virtual paths for each property editor
@@ -168,7 +179,7 @@ namespace Umbraco.Core.Manifest
                 var manifest = new PackageManifest()
                     {
                         JavaScriptInitialize = jConfig,
-                        StyleSheetInitialize = cssConfig,
+                        StylesheetInitialize = cssConfig,
                         PropertyEditors = propEditors.Any() ? (JArray)deserialized["propertyEditors"] : new JArray(),
                         ParameterEditors = propEditors.Any() ? (JArray)deserialized["parameterEditors"] : new JArray()
                     };
