@@ -19,6 +19,8 @@ angular.module("umbraco.directives")
 			},
 			link: function(scope, element, attrs, ngModel) {
 
+			    var inputElement = element.find("input");
+
 				ngModel.$render = function(){
 					$timeout(function(){
 						if(!scope.model){
@@ -29,8 +31,11 @@ angular.module("umbraco.directives")
 
 				scope.goEdit = function(){
 					scope.editMode = true;
-					$timeout(function(){
-						element.find("input").focus();
+					$timeout(function () {					    
+					    inputElement.focus();
+					    if (inputElement.val() === "Empty...") {
+					        inputElement.select();
+					    }
 					}, 100);
 				};
 
