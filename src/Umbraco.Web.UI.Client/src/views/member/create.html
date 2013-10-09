@@ -1,31 +1,64 @@
 <div class="umb-dialog-body with-footer" ng-controller="Umbraco.Editors.Member.CreateController">
-	<div class="umb-pane">
+    <div class="umb-pane">
 
-	<h5>Create a new member</h5>
-		<ul class="umb-actions">
-			<li class="action">
-				<ul class="umb-actions-child">
+        <h5>Create a new member</h5>
 
-					<li ng-repeat="docType in allowedTypes">
-					    <a href="#media/media/edit/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
+        <div ng-switch="currentStep">
 
-					        <i class="large {{docType.icon}}"></i>
-					        
-					        <span class="menu-label">
-	        		        	{{docType.name}}
-	        		            <small>
-	        		                {{docType.description}}
-	        		            </small>
-	        		        </span>
-					    </a>
-					</li>
-				</ul>
-			</li>
-		</ul>
-	</div>
+            <ul class="umb-actions" ng-switch-when="1">
+                <li class="action">
+                    <ul class="umb-actions-child">
+
+                        <li ng-repeat="docType in allowedTypes">
+                            <a href="" ng-click="selectMemberType(docType.alias)">
+
+                                <i class="large {{docType.icon}}"></i>
+
+                                <span class="menu-label">{{docType.name}}
+                                    <small>{{docType.description}}
+                                    </small>
+                                </span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+            <form novalidate name="memberCreate" ng-submit="submitMember()" ng-switch-when="2">
+                <div class="umb-panel" val-show-validation>
+
+                    <div class="umb-panel-footer">
+                        <div class="btn-toolbar umb-btn-toolbar pull-right">
+                            <button type="button" class="btn btn-link" ng-click="close()">Cancel</button>
+                            <button type="submit" class="btn btn-primary">Ok</button>
+                        </div>
+                    </div>
+
+
+                    <div class="control-group umb-control-group" ng-class="{error: memberCreate.$invalid}">
+                        <label for="inputName">Name</label>
+                        <input type="text" id="inputName" required placeholder="Name" ng-model="memberModel.name">
+
+                        <label for="inputLogin">Login name</label>
+                        <input type="text" id="inputLogin" required placeholder="Login" ng-model="memberModel.login">
+
+                        <label for="inputEmail">Email</label>
+                        <input type="text" id="inputEmail" required placeholder="Email" ng-model="memberModel.email">
+
+                        <label for="inputPassword">Password</label>
+                        <input type="text" id="inputPassword" required placeholder="Password" ng-model="memberModel.password">
+
+                        <button type="submit" class="btn">Submit</button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+
+    </div>
 </div>
 
-	
-<div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
-		<button class="btn" ng-click="nav.hideDialog()">Do something else</button>
+
+<div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="currentStep > 1">
+    <button class="btn" ng-click="nav.hideDialog()">Do something else</button>
 </div>
