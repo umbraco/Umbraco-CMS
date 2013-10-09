@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Models.EntityBase
+﻿using System.Collections.Generic;
+
+namespace Umbraco.Core.Models.EntityBase
 {
     public interface IUmbracoEntity : IAggregateRoot
     {
@@ -41,5 +43,10 @@
         /// Not all entities support being trashed, they'll always return false.
         /// </remarks>
         bool Trashed { get; }
+
+        /// <summary>
+        /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
+        /// </summary>
+        IDictionary<string, object> AdditionalData { get; }
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
@@ -31,6 +33,8 @@ namespace Umbraco.Core.Models
         {
             _parentId = parentId;
             _controlId = controlId;
+            _additionalData = new Dictionary<string, object>();
+            _additionalData = new Dictionary<string, object>();
         }
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<DataTypeDefinition, string>(x => x.Name);
@@ -160,9 +164,11 @@ namespace Umbraco.Core.Models
                     _trashed = value;
                     return _trashed;
                 }, _trashed, TrashedSelector);
+                //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
+                _additionalData["Trashed"] = value;
             }
         }
-
+               
         /// <summary>
         /// Id of the DataType control
         /// </summary>
@@ -177,6 +183,8 @@ namespace Umbraco.Core.Models
                     _controlId = value;
                     return _controlId;
                 }, _controlId, ControlIdSelector);
+                //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
+                _additionalData["ControlId"] = value;
             }
         }
 
@@ -194,7 +202,20 @@ namespace Umbraco.Core.Models
                     _databaseType = value;
                     return _databaseType;
                 }, _databaseType, DatabaseTypeSelector);
+
+                //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
+                _additionalData["DatabaseType"] = value;
             }
+        }
+
+         private readonly IDictionary<string, object> _additionalData;
+        /// <summary>
+        /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IDictionary<string, object> IUmbracoEntity.AdditionalData
+        {
+            get { return _additionalData; }
         }
 
         internal override void AddingEntity()
