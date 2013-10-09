@@ -1,4 +1,4 @@
-<%@ Control Language="c#" AutoEventWireup="True" Codebehind="xslt.ascx.cs" Inherits="umbraco.presentation.create.xslt" TargetSchema="http://schemas.microsoft.com/intellisense/ie5"%>
+<%@ Control Language="c#" AutoEventWireup="True" Codebehind="xslt.ascx.cs" Inherits="Umbraco.Web.UI.Umbraco.Create.Xslt" TargetSchema="http://schemas.microsoft.com/intellisense/ie5"%>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <cc1:Pane runat="server">

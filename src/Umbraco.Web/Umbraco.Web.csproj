@@ -387,6 +387,12 @@
     <Compile Include="umbraco.presentation\umbraco\create.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\create\DLRScripting.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackager.cs" />
     <Compile Include="WebApi\Binders\MemberBinder.cs" />
     <Compile Include="WebApi\ControllerContextExtensions.cs" />
@@ -1009,13 +1015,6 @@
     <Compile Include="umbraco.presentation\umbraco\create\CreatedPackageTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\DataTypeTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\dictionaryTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\DLRScripting.ascx.cs">
-      <DependentUpon>DLRScripting.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\DLRScripting.ascx.designer.cs">
-      <DependentUpon>DLRScripting.ascx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\DLRScriptingTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\macroTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\MediaTypeTasks.cs" />
@@ -1179,13 +1178,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\languageTasks.cs">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.cs">
-      <DependentUpon>xslt.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.designer.cs">
-      <DependentUpon>xslt.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\LatestEdits.ascx.cs">
       <DependentUpon>LatestEdits.ascx</DependentUpon>
@@ -1796,9 +1788,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericProperty.ascx" />
-    <Content Include="umbraco.presentation\umbraco\create\DLRScripting.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\controls\Images\ImageViewerUpdater.asmx" />
     <Content Include="umbraco.presentation\umbraco\controls\Images\UploadMediaImage.ascx">
       <SubType>ASPXCodeBehind</SubType>
@@ -1922,10 +1911,7 @@
     <Content Include="umbraco.presentation\umbraco\create\media.ascx" />
     <Content Include="umbraco.presentation\umbraco\create\member.ascx" />
     <Content Include="umbraco.presentation\umbraco\create\nodeType.ascx" />
-    
     <Content Include="umbraco.presentation\umbraco\create\simple.ascx" />
-    <Content Include="umbraco.presentation\umbraco\create\xslt.ascx" />
-    
     <Content Include="umbraco.presentation\umbraco\dashboard\LatestEdits.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

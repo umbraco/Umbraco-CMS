@@ -435,6 +435,13 @@
     <Compile Include="Umbraco\Create.aspx.designer.cs">
       <DependentUpon>create.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\Create\DlrScripting.ascx.cs">
+      <DependentUpon>DlrScripting.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Create\DlrScripting.ascx.designer.cs">
+      <DependentUpon>DlrScripting.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Create\PartialView.ascx.cs">
       <DependentUpon>PartialView.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -448,6 +455,13 @@
     </Compile>
     <Compile Include="Umbraco\Create\PartialViewMacro.ascx.designer.cs">
       <DependentUpon>PartialViewMacro.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Umbraco\Create\xslt.ascx.cs">
+      <DependentUpon>xslt.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Create\xslt.ascx.designer.cs">
+      <DependentUpon>xslt.ascx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Dashboard\ExamineManagement.ascx.cs">
       <DependentUpon>ExamineManagement.ascx</DependentUpon>
@@ -1803,7 +1817,7 @@
     <Content Include="Umbraco_Client\DateTimePicker\timepicker.js" />
     <Content Include="Umbraco\Controls\ContentTypeControlNew.ascx" />
     <Content Include="Umbraco\Controls\GenericProperties\GenericProperty.ascx" />
-    <Content Include="Umbraco\Create\DLRScripting.ascx" />
+    <Content Include="Umbraco\Create\DlrScripting.ascx" />
     <Content Include="Umbraco\Images\Umbraco\developerRuby.gif" />
     <Content Include="Umbraco\Images\Umbraco\developerScript.gif" />
     <Content Include="Umbraco_Client\Tree\sprites.png" />
@@ -2627,17 +2641,15 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
     </PostBuildEvent>
   </PropertyGroup>
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
-  <Target Name="BeforeBuild"> 
+  <Target Name="BeforeBuild">
     <!-- Create web.config file from Template if it doesn't exist -->
     <Copy SourceFiles="$(ProjectDir)web.Template.config" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Web.config')" />
     <!-- Create connectionStrings.config file from Template if it doesn't exist -->
-	<Copy SourceFiles="$(ProjectDir)config\connectionStrings.Release.config" DestinationFiles="$(ProjectDir)config\connectionStrings.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)config\connectionStrings.config')" />
-	<!-- Create appSettings.config file from Template if it doesn't exist -->
-	<Copy SourceFiles="$(ProjectDir)config\appSettings.Release.config" DestinationFiles="$(ProjectDir)config\appSettings.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)config\appSettings.config')" />
-	
+    <Copy SourceFiles="$(ProjectDir)config\connectionStrings.Release.config" DestinationFiles="$(ProjectDir)config\connectionStrings.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)config\connectionStrings.config')" />
+    <!-- Create appSettings.config file from Template if it doesn't exist -->
+    <Copy SourceFiles="$(ProjectDir)config\appSettings.Release.config" DestinationFiles="$(ProjectDir)config\appSettings.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)config\appSettings.config')" />
     <!-- Transform the local Web.config file in Visual Studio -->
     <TransformXml Source="$(ProjectDir)Web.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="$(ProjectDir)Web.$(Configuration).config.transformed" Condition="$(BuildingInsideVisualStudio) == true" />
-	
     <!-- Always transform the Template file when not in VS (ie: build.bat) -->
     <TransformXml Source="$(ProjectDir)Web.Template.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="$(ProjectDir)Web.$(Configuration).config.transformed" Condition="$(BuildingInsideVisualStudio) != true" />
   </Target>
