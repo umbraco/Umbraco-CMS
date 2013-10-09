@@ -95,7 +95,7 @@ app.config(function ($routeProvider) {
 
                 // Here we need to figure out if this route is for a package tree and if so then we need
                 // to change it's convention view path to:
-                // /App_Plugins/{mypackage}/umbraco/{treetype}/{method}.html
+                // /App_Plugins/{mypackage}/backoffice/{treetype}/{method}.html
                 
                 // otherwise if it is a core tree we use the core paths:
                 // views/{treetype}/{method}.html
@@ -105,7 +105,7 @@ app.config(function ($routeProvider) {
                 if (packageTreeFolder) {
                     $scope.templateUrl = Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
                         "/" + packageTreeFolder +
-                        "/umbraco/" + $routeParams.tree + "/" + $routeParams.method + ".html";
+                        "/backoffice/" + $routeParams.tree + "/" + $routeParams.method + ".html";
                 }
                 else {
                     $scope.templateUrl = 'views/' + $routeParams.tree + '/' + $routeParams.method + '.html';
