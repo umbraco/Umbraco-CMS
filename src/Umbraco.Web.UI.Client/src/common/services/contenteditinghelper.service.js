@@ -213,7 +213,7 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
             }
 
             args.scope.$broadcast("saved", { scope: args.scope });
-            if (!this.redirectToCreatedContent(args.newContent.id)) {
+            if (!this.redirectToCreatedContent(args.redirectId ? args.redirectId : args.newContent.id)) {
                 
                 //we are not redirecting because this is not new content, it is existing content. In this case
                 // we need to detect what properties have changed and re-bind them with the server data.

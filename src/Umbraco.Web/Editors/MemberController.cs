@@ -1,20 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
-using System.Web.Http.Controllers;
-using System.Web.Http.Filters;
 using System.Web.Http.ModelBinding;
+using System.Web.Security;
 using AutoMapper;
 using Examine.LuceneEngine.SearchCriteria;
 using Examine.SearchCriteria;
-using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -23,7 +21,6 @@ using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using Constants = Umbraco.Core.Constants;
 using Examine;
-using System.Web.Security;
 using Member = umbraco.cms.businesslogic.member.Member;
 
 namespace Umbraco.Web.Editors
@@ -104,6 +101,11 @@ namespace Umbraco.Web.Editors
             [ModelBinder(typeof(MemberBinder))]
                 MemberSave contentItem)
         {
+            if (Membership.Provider.Name != Constants.Conventions.Member.UmbracoMemberProviderName)
+            {
+                throw new NotSupportedException("Currently the member editor does not support providers that are not the default Umbraco membership provider ");
+            }
+
             //If we've reached here it means:
             // * Our model has been bound
             // * and validated
@@ -111,23 +113,53 @@ namespace Umbraco.Web.Editors
             // * we have a reference to the DTO object and the persisted object
             // * Permissions are valid
 
-            UpdateName(contentItem);
-
-            //map the custom properties - this will already be set for new entities in our member binder
-            contentItem.PersistedContent.Email = contentItem.Email;
-            contentItem.PersistedContent.Username = contentItem.Username;
-            
+            //map the properties to the persisted entity
             MapPropertyValues(contentItem);
 
             //Unlike content/media - if there are errors for a member, we do NOT proceed to save them, we cannot so return the errors
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid == false)
             {                
                 var forDisplay = Mapper.Map<IMember, MemberDisplay>(contentItem.PersistedContent);
                 forDisplay.Errors = ModelState.ToErrorDictionary();
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
             }
 
+            //TODO: WE need to support this! - requires UI updates, etc...
+            if (Membership.Provider.RequiresQuestionAndAnswer)
+            {
+                throw new NotSupportedException("Currently the member editor does not support providers that have RequiresQuestionAndAnswer specified");
+            }
+
+            //Depending on the action we need to first do a create or update using the membership provider
+            // this ensures that passwords are formatted correclty and also performs the validation on the provider itself.
+            switch (contentItem.Action)
+            {
+                case ContentSaveAction.Save:
+                    //TODO: Update with the provider! - change password, etc...
+                    break;
+                case ContentSaveAction.SaveNew:
+                    MembershipCreateStatus status;
+                    CreateWithUmbracoProvider(contentItem, out status);
+                    break;
+                default:
+                    //we don't support anything else for members
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+            }            
+
+            //If we've had problems creating/updating the user with the provider then return the error
+            if (ModelState.IsValid == false)
+            {
+                var forDisplay = Mapper.Map<IMember, MemberDisplay>(contentItem.PersistedContent);
+                forDisplay.Errors = ModelState.ToErrorDictionary();
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
+            }
+            
             //save the item
+            //NOTE: We are setting the password to NULL - this indicates to the system to not actually save the password
+            // so it will not get overwritten!
+            contentItem.PersistedContent.Password = null;
+
+            //create/save the IMember
             Services.MemberService.Save(contentItem.PersistedContent);
 
             //return the updated model
@@ -148,6 +180,106 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
+        /// <summary>
+        /// Maps the property values to the persisted entity
+        /// </summary>
+        /// <param name="contentItem"></param>
+        private void MapPropertyValues(MemberSave contentItem)
+        {
+            UpdateName(contentItem);
+
+            //map the custom properties - this will already be set for new entities in our member binder
+            contentItem.PersistedContent.Email = contentItem.Email;
+            contentItem.PersistedContent.Username = contentItem.Username;
+
+            //use the base method to map the rest of the properties
+            base.MapPropertyValues(contentItem);
+        }
+
+        /// <summary>
+        /// This is going to create the user with the membership provider and check for validation
+        /// </summary>
+        /// <param name="contentItem"></param>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// If this is successful, it will go and re-fetch the IMember from the db because it will now have an ID because the Umbraco provider 
+        /// uses the umbraco data store - then of course we need to re-map it to the saved property values.
+        /// </remarks>
+        private MembershipUser CreateWithUmbracoProvider(MemberSave contentItem, out MembershipCreateStatus status)
+        {
+            //if we are creating a new one, create the member using the membership provider first
+
+            //TODO: I think we should detect if the Umbraco membership provider is active, if so then we'll create the member first  and the provider key doesn't matter
+            // but if we are using a 3rd party membership provider - then we should create our IMember first and use it's key as their provider user key!
+            
+            //NOTE: We are casting directly to the umbraco membership provider so we can specify the member type that we want to use!
+            
+            var umbracoMembershipProvider = (global::umbraco.providers.members.UmbracoMembershipProvider)Membership.Provider;
+            var membershipUser = umbracoMembershipProvider.CreateUser(
+                contentItem.ContentTypeAlias, contentItem.Username, contentItem.Password, contentItem.Email, "", "", true, Guid.NewGuid(), out status);
+
+            //TODO: Localize these!
+            switch (status)
+            {
+                case MembershipCreateStatus.Success:
+                    
+                    //Go and re-fetch the persisted item
+                    contentItem.PersistedContent = Services.MemberService.GetByUsername(contentItem.Username.Trim());
+                    //remap the values to save
+                    MapPropertyValues(contentItem);
+
+                    break;
+                case MembershipCreateStatus.InvalidUserName:
+                    ModelState.AddPropertyError(
+                        new ValidationResult("Invalid user name", new[] { "value" }),
+                        string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                    break;
+                case MembershipCreateStatus.InvalidPassword:
+                    ModelState.AddPropertyError(
+                        new ValidationResult("Invalid password", new[] { "value" }),
+                        string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                    break;
+                case MembershipCreateStatus.InvalidQuestion:
+                case MembershipCreateStatus.InvalidAnswer:
+                    throw new NotSupportedException("Currently the member editor does not support providers that have RequiresQuestionAndAnswer specified");
+                case MembershipCreateStatus.InvalidEmail:
+                    ModelState.AddPropertyError(
+                        new ValidationResult("Invalid email", new[] { "value" }),
+                        string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                    break;
+                case MembershipCreateStatus.DuplicateUserName:
+                    ModelState.AddPropertyError(
+                        new ValidationResult("Username is already in use", new[] { "value" }),
+                        string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                    break;
+                case MembershipCreateStatus.DuplicateEmail:
+                    ModelState.AddPropertyError(
+                        new ValidationResult("Email address is already in use", new[] { "value" }),
+                        string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+                    break;
+                case MembershipCreateStatus.InvalidProviderUserKey:
+                    ModelState.AddPropertyError(
+                        //specify 'default' just so that it shows up as a notification - is not assigned to a property
+                       new ValidationResult("Invalid provider user key"), "default");
+                    break;
+                case MembershipCreateStatus.DuplicateProviderUserKey:
+                    ModelState.AddPropertyError(
+                        //specify 'default' just so that it shows up as a notification - is not assigned to a property
+                       new ValidationResult("Duplicate provider user key"), "default");
+                    break;
+                case MembershipCreateStatus.ProviderError:
+                case MembershipCreateStatus.UserRejected:
+                    ModelState.AddPropertyError(
+                        //specify 'default' just so that it shows up as a notification - is not assigned to a property
+                        new ValidationResult("User could not be created (rejected by provider)"), "default");
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+
+            return membershipUser;
+        }
 
         /// <summary>
         /// Permanently deletes a member
@@ -165,77 +297,6 @@ namespace Umbraco.Web.Editors
             Services.MemberService.Delete(foundMember);
 
             return Request.CreateResponse(HttpStatusCode.OK);
-        }
-    }
-
-    /// <summary>
-    /// This validates the submitted data in regards to the current membership provider
-    /// </summary>
-    internal class MembershipProviderValidationFilterAttribute : ActionFilterAttribute
-    {
-        public override void OnActionExecuting(HttpActionContext actionContext)
-        {
-            base.OnActionExecuting(actionContext);
-
-            var membershipProvider = Membership.Providers[Constants.Conventions.Member.UmbracoMemberProviderName];
-            if (membershipProvider == null)
-            {
-                throw new InvalidOperationException("No membership provider found with name " + Constants.Conventions.Member.UmbracoMemberProviderName);
-            }
-
-            var contentItem = (MemberSave) actionContext.ActionArguments["contentItem"];
-
-            var validEmail = ValidateUniqueEmail(contentItem, membershipProvider, actionContext);
-            if (validEmail == false)
-            {
-                actionContext.ModelState.AddPropertyError(new ValidationResult("Email address is already in use"), "umb_email");
-            }
-        }
-
-        internal bool ValidateUniqueEmail(MemberSave contentItem, MembershipProvider membershipProvider, HttpActionContext actionContext)
-        {
-            if (contentItem == null) throw new ArgumentNullException("contentItem");
-            if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
-
-            if (membershipProvider.RequiresUniqueEmail == false)
-            {
-                return true;
-            }
-
-            int totalRecs;
-            var existingByEmail = membershipProvider.FindUsersByEmail(contentItem.Email.Trim(), 0, int.MaxValue, out totalRecs);            
-            switch (contentItem.Action)
-            {
-                case ContentSaveAction.Save:
-                    //ok, we're updating the member, we need to check if they are changing their email and if so, does it exist already ?
-                    if (contentItem.PersistedContent.Email.InvariantEquals(contentItem.Email.Trim()) == false)
-                    {
-                        //they are changing their email
-                        if (existingByEmail.Cast<MembershipUser>().Select(x => x.Email)
-                            .Any(x => x.InvariantEquals(contentItem.Email.Trim())))
-                        {
-                            //the user cannot use this email
-                            return false;
-                        }
-                    }
-                    break;
-                case ContentSaveAction.SaveNew:
-                    //check if the user's email already exists
-                    if (existingByEmail.Cast<MembershipUser>().Select(x => x.Email)
-                        .Any(x => x.InvariantEquals(contentItem.Email.Trim())))
-                    {
-                        //the user cannot use this email
-                        return false;
-                    }
-                    break;
-                case ContentSaveAction.Publish:
-                case ContentSaveAction.PublishNew:
-                default:
-                    //we don't support this for members
-                    throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
-
-            return true;
         }
     }
 }

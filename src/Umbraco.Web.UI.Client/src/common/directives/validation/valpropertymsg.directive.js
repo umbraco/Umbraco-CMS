@@ -102,7 +102,9 @@ function valPropertyMsg(serverValidationManager) {
 
                 var errCount = 0;
                 for (var e in formCtrl.$error) {
-                    errCount++;
+                    if (e) {
+                        errCount++;
+                    }
                 }
 
                 if ((errCount === 1 && formCtrl.$error.valPropertyMsg !== undefined) ||

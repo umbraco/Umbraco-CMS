@@ -65,6 +65,8 @@ function MemberEditController($scope, $routeParams, $q, $timeout, $window, membe
                 contentEditingHelper.handleSuccessfulSave({
                     scope: $scope,
                     newContent: data,
+                    //specify a custom id to redirect to since we want to use the GUID
+                    redirectId: data.key,
                     rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                 });
 

@@ -185,32 +185,7 @@ namespace Umbraco.Web.Editors
             // * any file attachments have been saved to their temporary location for us to use
             // * we have a reference to the DTO object and the persisted object
             // * Permissions are valid
-            
-            UpdateName(contentItem);
-            
-            //TODO: We need to support 'send to publish'
-
-            contentItem.PersistedContent.ExpireDate = contentItem.ExpireDate;
-            contentItem.PersistedContent.ReleaseDate = contentItem.ReleaseDate;
-            //only set the template if it didn't change
-            var templateChanged = (contentItem.PersistedContent.Template == null && contentItem.TemplateAlias.IsNullOrWhiteSpace() == false)
-                                  || (contentItem.PersistedContent.Template != null && contentItem.PersistedContent.Template.Alias != contentItem.TemplateAlias)
-                                  || (contentItem.PersistedContent.Template != null && contentItem.TemplateAlias.IsNullOrWhiteSpace());
-            if (templateChanged)
-            {
-                var template = Services.FileService.GetTemplate(contentItem.TemplateAlias);
-                if (template == null && contentItem.TemplateAlias.IsNullOrWhiteSpace() == false)
-                {
-                    //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
-                    LogHelper.Warn<ContentController>("No template exists with the specified alias: " + contentItem.TemplateAlias);
-                }
-                else
-                {
-                    //NOTE: this could be null if there was a template and the posted template is null, this should remove the assigned template
-                    contentItem.PersistedContent.Template = template;
-                }
-            }
-
+          
             MapPropertyValues(contentItem);
 
             //We need to manually check the validation results here because:
@@ -279,6 +254,40 @@ namespace Umbraco.Web.Editors
             }
 
             return display;
+        }
+
+        /// <summary>
+        /// Maps the dto property values to the persisted model
+        /// </summary>
+        /// <param name="contentItem"></param>
+        private void MapPropertyValues(ContentItemSave contentItem)
+        {
+            UpdateName(contentItem);
+
+            //TODO: We need to support 'send to publish'
+
+            contentItem.PersistedContent.ExpireDate = contentItem.ExpireDate;
+            contentItem.PersistedContent.ReleaseDate = contentItem.ReleaseDate;
+            //only set the template if it didn't change
+            var templateChanged = (contentItem.PersistedContent.Template == null && contentItem.TemplateAlias.IsNullOrWhiteSpace() == false)
+                                  || (contentItem.PersistedContent.Template != null && contentItem.PersistedContent.Template.Alias != contentItem.TemplateAlias)
+                                  || (contentItem.PersistedContent.Template != null && contentItem.TemplateAlias.IsNullOrWhiteSpace());
+            if (templateChanged)
+            {
+                var template = Services.FileService.GetTemplate(contentItem.TemplateAlias);
+                if (template == null && contentItem.TemplateAlias.IsNullOrWhiteSpace() == false)
+                {
+                    //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
+                    LogHelper.Warn<ContentController>("No template exists with the specified alias: " + contentItem.TemplateAlias);
+                }
+                else
+                {
+                    //NOTE: this could be null if there was a template and the posted template is null, this should remove the assigned template
+                    contentItem.PersistedContent.Template = template;
+                }
+            }
+
+            base.MapPropertyValues(contentItem);
         }
 
         /// <summary>
