@@ -1,7 +1,7 @@
 <div class="umb-panel" ng-controller="Umbraco.Dialogs.LinkPickerController">
 	<div class="umb-panel-body no-header with-footer compact">
 		<umb-pane>
-			<umb-control-group label="Url">
+			<umb-control-group label="@content_urls">
 				<input type="text" 
 					placeholder="Enter url" 
 					class="umb-editor umb-textstring" 
@@ -9,12 +9,15 @@
 					ng-disabled="target.id"
 					 />
 			</umb-control-group>
-			<umb-control-group label="Title">
-				<input type="text" 
-					placeholder="Enter title" 
+
+			<umb-control-group label="@content_nodeName">
+				<input type="text"
+					localize="placeholder" 
+					placeholder="@assignDomain_domainCreated:target.name" 
 					class="umb-editor umb-textstring" 
 					ng-model="target.name" />
 			</umb-control-group>
+
 		</umb-pane>
 
 		<umb-tree 
@@ -23,8 +26,7 @@
 			showheader="true" 
 			showoptions="false"
 			eventhandler="dialogTreeEventHandler"
-			path="targte.path"
-			>
+			path="target.path">
 		</umb-tree>
 	</div>
 

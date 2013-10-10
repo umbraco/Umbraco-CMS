@@ -20,13 +20,17 @@
                     </div>
 
                     <div class="btn-group">
-                        <a class="btn" ng-click="preview(content)">Preview page</a>
+                        <a class="btn" ng-click="preview(content)">
+                            <localize key="buttons_showPage">Preview page</localize>
+                        </a>
                     </div>
 
                     <div class="btn-group">
 
                         <a class="btn btn-success" href="#" ng-click="saveAndPublish()"
-                        prevent-default data-hotkey="ctrl+p">Publish</a>
+                        prevent-default data-hotkey="ctrl+p">
+                            <localize key="buttons_saveAndPublish">Publish</localize>
+                        </a>
                        
                         <a class="btn btn-success dropdown-toggle" data-toggle="dropdown">
                             <span class="caret"></span>
@@ -34,9 +38,11 @@
 
                         <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                             <li><a href="#" ng-click="save()"
-                             prevent-default data-hotkey="ctrl+s">Save draft</a></li>
+                             prevent-default data-hotkey="ctrl+s">
+                                <localize key="buttons_save">Save</localize>
+                            </a></li>
                             <li ng-show="content.publishDate"><a href="#" ng-click="unPublish()"
-                             prevent-default>Unpublish</a></li> 
+                             prevent-default><localize key="content_unPublish">Unpublish</localize></a></li> 
                          </ul>
                      </div>
                  </div>

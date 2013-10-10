@@ -27,8 +27,6 @@ namespace umbraco.js
 				if(x == null)
 					continue;
 
-                sb.Append("\n");
-
                 for (int i = 0; i < x.ChildNodes.Count; i++)
                 {
                     sb.Append("\n");
@@ -46,7 +44,7 @@ namespace umbraco.js
                     string _tempKey = string.Format("{0}_{1}", n1.Value, n2.Value);
 
                     // we need to remove linie breaks as they can't break js
-                    string tmpStr = key.FirstChild.Value.Replace("\\", "\\\\").Replace("\"", "'").Replace("\r", "").Replace("\n", "");
+                    string tmpStr = key.FirstChild.Value.Replace("\\", "\\\\").Replace("\"", "'").Replace("\t", "").Replace("\r", "").Replace("\n", "");
 
                     sb.Append("\"" + _tempKey + "\": \"" + tmpStr + "\",");
 

@@ -13,6 +13,8 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
+using umbraco;
+
 namespace Umbraco.Web.Trees
 {
 
@@ -47,11 +49,15 @@ namespace Umbraco.Web.Trees
             var appTrees = ApplicationContext.Current.Services.ApplicationTreeService.GetApplicationTrees(application, true).ToArray();
             if (appTrees.Count() == 1)
             {
-                return GetRootForSingleAppTree(
+                var tree = GetRootForSingleAppTree(
                     appTrees.Single(),
                     Constants.System.Root.ToString(CultureInfo.InvariantCulture),
                     queryStrings, 
                     application);
+
+                //PP: should this be further down in the logic?
+                tree.Title = ui.Text("sections", application);
+                return tree;
             }
 
             var collection = new TreeNodeCollection();
@@ -62,7 +68,9 @@ namespace Umbraco.Web.Trees
                 collection.Add(rootNode); 
             }
 
-            return SectionRootNode.CreateMultiTreeSectionRoot(rootId, collection);
+            var multiTree = SectionRootNode.CreateMultiTreeSectionRoot(rootId, collection);
+            multiTree.Title = ui.Text("sections", application);
+            return multiTree;
         }
 
         /// <summary>

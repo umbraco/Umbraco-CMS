@@ -531,7 +531,24 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          */
         publish: function (content, isNew, files) {
             return saveContentItem(content, "publish" + (isNew ? "New" : ""), files);
+        },
+
+        publishById: function(id){
+
+            if (!id) {
+                throw "id cannot be null";
+            }
+         
+            return umbRequestHelper.resourcePromise(
+                           $http.post(
+                               umbRequestHelper.getApiUrl(
+                                   "contentApiBaseUrl",
+                                   "PostPublishById",
+                                   [{ id: id }])),
+                           'Failed to publish content with id ' + id);
+         
         }
+
 
     };
 }

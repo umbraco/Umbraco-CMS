@@ -1,19 +1,21 @@
 <div class="umb-panel" ng-controller="Umbraco.Dialogs.ContentPickerController">
 	<div class="umb-panel-body no-header">
-		<umb-pane>
-				<umb-tree 
-					section="content" 
-					cachekey="contentpickerDialog" 
-					showheader="true" 
-					showoptions="false"
-					eventhandler="dialogTreeEventHandler">
-				</umb-tree>
-		</umb-pane>
+				
+				<div class="umb-pane">
+					<umb-tree 
+						section="content" 
+						cachekey="linkpickerDialog" 
+						showheader="true" 
+						showoptions="false"
+						eventhandler="dialogTreeEventHandler">
+					</umb-tree>
+				</div>
+		
 	</div>
 
 	<div class="umb-panel-footer" ng-show="multipicker">
 		<div class="umb-el-wrap umb-panel-buttons">
-	        <div class="btn-toolbar umb-btn-toolbar">
+	        <div class="btn-toolbar umb-btn-toolbar pull-right">
 	         	<input type="button" ng-click="submit(dialogData)" class="btn btn-primary" value="select" />
 	        </div>
 		</div>
