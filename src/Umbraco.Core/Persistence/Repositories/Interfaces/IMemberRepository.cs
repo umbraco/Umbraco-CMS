@@ -11,5 +11,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="groupName"></param>
         /// <returns></returns>
         IEnumerable<IMember> GetByMemberGroup(string groupName);
+
+        IEnumerable<IMember> GetMembersByEmails(params string[] emails);
     }
 }

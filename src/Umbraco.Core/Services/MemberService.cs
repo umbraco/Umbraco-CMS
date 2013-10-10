@@ -108,6 +108,14 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IEnumerable<IMember> GetMembersByEmails(params string[] emails)
+        {
+            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetMembersByEmails(emails);
+            }
+        }
+
         /// <summary>
         /// Gets a list of Members with a certain string property value
         /// </summary>
