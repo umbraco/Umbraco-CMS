@@ -33,6 +33,28 @@ namespace umbraco.cms.businesslogic.workflow
         public char ActionId { get; private set; }
 
         /// <summary>
+        /// Get the host domain
+        /// </summary>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
+        public static string GetHostDomain()
+        {
+            if (string.IsNullOrWhiteSpace(UmbracoSettings.NotificationHostDomain) == false)
+            {
+                return UmbracoSettings.NotificationHostDomain;
+            }
+
+            if (HttpContext.Current != null)
+            {
+                return HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + ":"
+                       + HttpContext.Current.Request.Url.Port;
+            }
+
+            return null;
+        }
+
+        /// <summary>
         /// Gets the SQL helper.
         /// </summary>
         /// <value>The SQL helper.</value>
@@ -49,21 +71,33 @@ namespace umbraco.cms.businesslogic.workflow
         /// <param name="Action">The action.</param>
         public static void GetNotifications(CMSNode Node, User user, IAction Action)
         {
-            User[] allUsers = User.getAll();
-            foreach (User u in allUsers)
+            if (GetHostDomain() != null)
             {
-                try
+                User[] allUsers = User.getAll();
+                foreach (User u in allUsers)
                 {
-                    if (!u.Disabled && u.GetNotifications(Node.Path).IndexOf(Action.Letter.ToString()) > -1)
+                    try
                     {
-                        LogHelper.Debug<Notification>(string.Format("Notification about {0} sent to {1} ({2})", ui.Text(Action.Alias, u), u.Name, u.Email));
-                        sendNotification(user, u, (Document)Node, Action);
+                        if (!u.Disabled && u.GetNotifications(Node.Path).IndexOf(Action.Letter.ToString()) > -1)
+                        {
+                            LogHelper.Debug<Notification>(
+                                string.Format(
+                                    "Notification about {0} sent to {1} ({2})",
+                                    ui.Text(Action.Alias, u),
+                                    u.Name,
+                                    u.Email));
+                            sendNotification(user, u, (Document)Node, Action);
+                        }
+                    }
+                    catch (Exception notifyExp)
+                    {
+                        LogHelper.Error<Notification>("Error in notification", notifyExp);
                     }
                 }
-                catch (Exception notifyExp)
-                {
-					LogHelper.Error<Notification>("Error in notification", notifyExp);
-                }
+            }
+            else
+            {
+                LogHelper.Warn<Notification>("Notification could not determine HttpContext and hostDomain setting wasn't found in umbracoSettings.config");
             }
         }
 
@@ -134,21 +168,18 @@ namespace umbraco.cms.businesslogic.workflow
 
 
             string[] subjectVars = {
-                                       HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + ":" +
-                                       HttpContext.Current.Request.Url.Port +
+                                       GetHostDomain() +
                                        IOHelper.ResolveUrl(SystemDirectories.Umbraco), ui.Text(Action.Alias)
                                        ,
                                        documentObject.Text
                                    };
             string[] bodyVars = {
                                     mailingUser.Name, ui.Text(Action.Alias), documentObject.Text, performingUser.Name,
-                                    HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + ":" +
-                                    HttpContext.Current.Request.Url.Port +
+                                    GetHostDomain() +
                                     IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                                     documentObject.Id.ToString(), summary.ToString(),
                                     String.Format("{2}://{0}/{1}",
-                                                  HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + ":" +
-                                                  HttpContext.Current.Request.Url.Port,
+                                                  GetHostDomain(),
                                                   /*umbraco.library.NiceUrl(documentObject.Id))*/
                                                   documentObject.Id + ".aspx",
                                                   protocol)
@@ -181,7 +212,7 @@ namespace umbraco.cms.businesslogic.workflow
             // adding the server name to make sure we don't replace external links
             if (GlobalSettings.UseSSL && !String.IsNullOrEmpty(mail.Body))
             {
-                string serverName = HttpContext.Current.Request.ServerVariables["SERVER_NAME"];
+                string serverName = GetHostDomain();
                 mail.Body = mail.Body.Replace(
                     string.Format("http://{0}", serverName),
                     string.Format("https://{0}", serverName));
@@ -195,8 +226,7 @@ namespace umbraco.cms.businesslogic.workflow
         private static string replaceLinks(string text)
         {
             string domain = GlobalSettings.UseSSL ? "https://" : "http://";
-            domain += HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + ":" +
-                      HttpContext.Current.Request.Url.Port + "/";
+            domain += GetHostDomain();
             text = text.Replace("href=\"/", "href=\"" + domain);
             text = text.Replace("src=\"/", "src=\"" + domain);
             return text;
