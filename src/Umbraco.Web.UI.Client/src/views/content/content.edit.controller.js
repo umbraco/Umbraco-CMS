@@ -26,8 +26,10 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
             .then(function(data) {
                 $scope.loaded = true;
                 $scope.content = data;
-                editorContextService.setContext($scope.content);
 
+                editorContextService.setContext($scope.content);
+                navigationService.syncPath(data.path.split(","));
+                
                 //in one particular special case, after we've created a new item we redirect back to the edit
                 // route but there might be server validation errors in the collection which we need to display
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors

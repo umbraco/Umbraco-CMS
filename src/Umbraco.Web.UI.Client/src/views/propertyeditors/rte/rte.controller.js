@@ -5,8 +5,8 @@ angular.module("umbraco")
         tinyMceService.configuration().then(function(tinyMceConfig){
 
             //config value from general tinymce.config file
-            //var validElements = tinyMceConfig.validElements;
-            //var invalidElements = tinyMceConfig.inValidElements;
+            var validElements = tinyMceConfig.validElements;
+            var invalidElements = tinyMceConfig.inValidElements;
             var plugins = _.map(tinyMceConfig.plugins, function(plugin){ 
                                             if(plugin.useOnFrontend){
                                                 return plugin.name;   

@@ -10,8 +10,10 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.UI.App_Plugins.MyPackage.Trees
 {
+    /*
+     * Commenting this out for the beta to avoid confusion :)
     [Tree("settings", "myTree", "My Tree")]
-    [PluginController("MyPackage")]
+    [PluginController("MyPackage")]*/
     public class MyCustomTreeController : TreeController
     {
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
