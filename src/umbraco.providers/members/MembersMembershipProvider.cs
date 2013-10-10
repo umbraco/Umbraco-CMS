@@ -18,8 +18,6 @@ using System.Security.Permissions;
 using System.Runtime.CompilerServices;
 using Member = umbraco.cms.businesslogic.member.Member;
 using MemberType = umbraco.cms.businesslogic.member.MemberType;
-using Umbraco.Core.Models.Membership;
-using User = umbraco.BusinessLogic.User;
 
 #endregion
 
@@ -452,7 +450,7 @@ namespace umbraco.providers.members
             var collection = new MembershipUserCollection();            
             foreach (var m in byEmail.Skip(pagedResult.SkipSize).Take(pageSize))
             {
-                collection.Add(m.AsConcreteMembershipUser());
+                collection.Add(ConvertToMembershipUser(m));
             }
             return collection;
         }
@@ -766,7 +764,27 @@ namespace umbraco.providers.members
 
             return null;
         }
-        
+
+        private static string GetMemberProperty(IMember m, string propertyAlias, bool isBool)
+        {
+            if (!String.IsNullOrEmpty(propertyAlias))
+            {
+                if (m.Properties[propertyAlias] != null &&
+                    m.Properties[propertyAlias].Value != null)
+                {
+                    if (isBool)
+                    {
+                        // Umbraco stored true as 1, which means it can be bool.tryParse'd
+                        return m.Properties[propertyAlias].Value.ToString().Replace("1", "true").Replace("0", "false");
+                    }
+                    else
+                        return m.Properties[propertyAlias].Value.ToString();
+                }
+            }
+
+            return null;
+        }
+
         /// <summary>
         /// Verifies that the specified user name and password exist in the data source.
         /// </summary>
@@ -989,6 +1007,52 @@ namespace umbraco.providers.members
             }
         }
 
+        /// <summary>
+        /// Converts to membership user.
+        /// </summary>
+        /// <param name="m">The m.</param>
+        /// <returns></returns>
+        private MembershipUser ConvertToMembershipUser(IMember m)
+        {
+            if (m == null) return null;
+            else
+            {
+                DateTime lastLogin = DateTime.Now;
+                bool isApproved = true;
+                bool isLocked = false;
+                string comment = "";
+                string passwordQuestion = "";
+
+                // last login
+                if (!String.IsNullOrEmpty(m_LastLoginPropertyTypeAlias))
+                {
+                    DateTime.TryParse(GetMemberProperty(m, m_LastLoginPropertyTypeAlias, false), out lastLogin);
+                }
+                // approved
+                if (!String.IsNullOrEmpty(m_ApprovedPropertyTypeAlias))
+                {
+                    bool.TryParse(GetMemberProperty(m, m_ApprovedPropertyTypeAlias, true), out isApproved);
+                }
+                // locked
+                if (!String.IsNullOrEmpty(m_LockPropertyTypeAlias))
+                {
+                    bool.TryParse(GetMemberProperty(m, m_LockPropertyTypeAlias, true), out isLocked);
+                }
+                // comment
+                if (!String.IsNullOrEmpty(m_CommentPropertyTypeAlias))
+                {
+                    comment = GetMemberProperty(m, m_CommentPropertyTypeAlias, false);
+                }
+                // password question
+                if (!String.IsNullOrEmpty(m_PasswordRetrievalQuestionPropertyTypeAlias))
+                {
+                    passwordQuestion = GetMemberProperty(m, m_PasswordRetrievalQuestionPropertyTypeAlias, false);
+                }
+
+                return new MembershipUser(m_providerName, m.Username, m.Id, m.Email, passwordQuestion, comment, isApproved, isLocked, m.CreateDate, lastLogin,
+                  DateTime.Now, DateTime.Now, DateTime.Now);
+            }
+        }
         #endregion
     }
 }
