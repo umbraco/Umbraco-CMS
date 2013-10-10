@@ -5,8 +5,9 @@
 * @element textarea
 * @requires formController
 * @description This directive is used to control the display of the property level validation message.
-*    We will listen for server side validation changes
-*    and when an error is detected for this property we'll show the error message
+* We will listen for server side validation changes
+* and when an error is detected for this property we'll show the error message.
+* In order for this directive to work, the valStatusChanged directive must be placed on the containing form.
 **/
 function valPropertyMsg(serverValidationManager) {    
     return {
@@ -32,17 +33,16 @@ function valPropertyMsg(serverValidationManager) {
             scope.errorMsg = "";
 
             //listen for form error changes
-            scope.$watch(function() {
-                return formCtrl.$error;
-            }, function() {
-                if (formCtrl.$invalid) {
+            scope.$on("valStatusChanged", function(evt, args) {
+                if (args.form.$invalid) {
 
                     //first we need to check if the valPropertyMsg validity is invalid
                     if (formCtrl.$error.valPropertyMsg && formCtrl.$error.valPropertyMsg.length > 0) {
                         //since we already have an error we'll just return since this means we've already set the 
                         // hasError and errorMsg properties which occurs below in the serverValidationManager.subscribe
                         return;
-                    } else if (element.closest(".umb-control-group").find(".ng-invalid").length > 0) {
+                    }
+                    else if (element.closest(".umb-control-group").find(".ng-invalid").length > 0) {
                         //check if it's one of the properties that is invalid in the current content property
                         hasError = true;
                         //update the validation message if we don't already have one assigned.
@@ -54,18 +54,20 @@ function valPropertyMsg(serverValidationManager) {
                             }
                             scope.errorMsg = err ? err.errorMsg : "Property has errors";
                         }
-                    } else {
+                    }
+                    else {
                         hasError = false;
                         scope.errorMsg = "";
                     }
-                } else {
+                }
+                else {
                     hasError = false;
                     scope.errorMsg = "";
                 }
             }, true);
 
             //listen for the forms saving event
-            scope.$on("saving", function (ev, args) {
+            scope.$on("saving", function(ev, args) {
                 showValidation = true;
                 if (hasError && scope.errorMsg === "") {
                     var err;
@@ -73,7 +75,7 @@ function valPropertyMsg(serverValidationManager) {
                     if (scope.property) {
                         err = serverValidationManager.getPropertyError(scope.property.alias, "");
                     }
-                    scope.errorMsg = err ? err.errorMsg : "Property has errors";                    
+                    scope.errorMsg = err ? err.errorMsg : "Property has errors";
                 }
                 else if (!hasError) {
                     scope.errorMsg = "";
@@ -93,14 +95,16 @@ function valPropertyMsg(serverValidationManager) {
             // So once a field is changed that has a server error assigned to it
             // we need to re-validate it for the server side validator so the user can resubmit
             // the form. Of course normal client-side validators will continue to execute.          
-            scope.$watch("property.value", function (newValue) {
+            scope.$watch("property.value", function(newValue) {
                 //we are explicitly checking for valServer errors here, since we shouldn't auto clear
                 // based on other errors. We'll also check if there's no other validation errors apart from valPropertyMsg, if valPropertyMsg
                 // is the only one, then we'll clear.
 
                 var errCount = 0;
                 for (var e in formCtrl.$error) {
-                    errCount++;
+                    if (e) {
+                        errCount++;
+                    }
                 }
 
                 if ((errCount === 1 && formCtrl.$error.valPropertyMsg !== undefined) ||

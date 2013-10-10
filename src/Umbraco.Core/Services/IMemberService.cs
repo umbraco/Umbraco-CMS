@@ -14,7 +14,7 @@ namespace Umbraco.Core.Services
         IEnumerable<IMember> GetMembersByMemberType(string memberTypeAlias);
         IEnumerable<IMember> GetMembersByGroup(string memberGroupName);
         IEnumerable<IMember> GetAllMembers(params int[] ids);
-
+        
         //TODO: Need to get all members that start with a certain letter
     }
 
@@ -37,5 +37,7 @@ namespace Umbraco.Core.Services
         void Delete(IMember membershipUser);
 
         void Save(IMember membershipUser);
+
+        IEnumerable<IMember> FindMembersByEmail(string emailStringToMatch);
     }
 }

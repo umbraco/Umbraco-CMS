@@ -45,4 +45,4 @@ function ReadOnlyValueController($rootScope, $scope, $filter) {
     });
 }
 
-angular.module('umbraco').controller("Umbraco.Editors.ReadOnlyValueController", ReadOnlyValueController);
+angular.module('umbraco').controller("Umbraco.PropertyEditors.ReadOnlyValueController", ReadOnlyValueController);

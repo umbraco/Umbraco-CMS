@@ -99,14 +99,14 @@ The main angular route to load in editors is */:section/:tree/:method/:id*
 Umbraco will load in views for this route based on these conventions:
 
  * If it is a core tree - views will be loaded from: */umbraco/views/{treetype}/{method}.html*
- * If it is a custom (package) tree - views will be loaded from: */App_Plugins/{mypackage}/umbraco/{treetype}/{method}.html*
+ * If it is a custom (package) tree - views will be loaded from: */App_Plugins/{mypackage}/BackOffice/{treetype}/{method}.html*
 
 ###Editor locations
 
 By default each tree node's 'method' is assigned as 'edit' therefore these are the view paths for an editor when a tree node is clicked:
 
  * If it is a core tree - views will be loaded from: */umbraco/views/{treetype}/edit.html*
- * If it is a custom (package) tree - views will be loaded from: */App_Plugins/{mypackage}/umbraco/{treetype}/edit.html*
+ * If it is a custom (package) tree - views will be loaded from: */App_Plugins/{mypackage}/BackOffice/{treetype}/edit.html*
 
 Developers can specify a custom `RoutePath` for any tree node which will cause umbraco to route to that specific location.
 
@@ -115,7 +115,7 @@ Developers can specify a custom `RoutePath` for any tree node which will cause u
 Dialog view path locations are similar to editors:
 
  * If it is a core tree - views will be loaded from: umbraco/views/{treetype}/{action}.html
- * If it is a custom (package) tree - views will be loaded from: /App_Plugins/{mypackage}/umbraco/{treetype}/{action}.html
+ * If it is a custom (package) tree - views will be loaded from: /App_Plugins/{mypackage}/BackOffice/{treetype}/{action}.html
 
 'action' is the alias of your menu item, for example in the menu item in the example above this would be 'create'.
 
@@ -127,7 +127,7 @@ An editor is simply an angular view (html file) so you can really do whatever yo
 
 First thing we'll do is create an angular controller for the editor, this controller will be contained in a file found beside the view - *the file naming conventions are based on the controller file naming conventions in the Umbraco core*.
 
-/App_Plugins/MyPackage/Umbraco/MyTree/mypackage.mytree.edit.controller.js
+/App_Plugins/MyPackage/BackOffice/MyTree/mypackage.mytree.edit.controller.js
 
 The controller is super simple, at it is going to do is assign a property to the $scope which shows the current item id being edited:
 
@@ -146,7 +146,7 @@ The controller is super simple, at it is going to do is assign a property to the
 
 As per the conventions above our editor view will need to be located at:
 
-/App_Plugins/MyPackage/Umbraco/MyTree/edit.html
+/App_Plugins/MyPackage/BackOffice/MyTree/edit.html
 
 The view is simple, it is just going to show the current id being edited
 
@@ -161,5 +161,5 @@ The view is simple, it is just going to show the current id being edited
 
 This is the same principle as an editor, you just need to follow conventions. Based on the above conventions the 'create' dialog view will be located here:
 
-/App_Plugins/MyPackage/Umbraco/MyTree/create.html
+/App_Plugins/MyPackage/BackOffice/MyTree/create.html
 

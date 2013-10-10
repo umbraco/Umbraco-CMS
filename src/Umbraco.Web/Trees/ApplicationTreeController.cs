@@ -13,6 +13,8 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
+using umbraco;
+
 namespace Umbraco.Web.Trees
 {
 
@@ -37,7 +39,7 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings"></param>
         /// <returns></returns>
         [HttpQueryStringFilter("queryStrings")]
-        public SectionRootNode GetApplicationTrees(string application, FormDataCollection queryStrings)
+        public SectionRootNode GetApplicationTrees(string application, string tree, FormDataCollection queryStrings)
         {
             if (application == null) throw new ArgumentNullException("application");
 
@@ -45,24 +47,40 @@ namespace Umbraco.Web.Trees
 
             //find all tree definitions that have the current application alias
             var appTrees = ApplicationContext.Current.Services.ApplicationTreeService.GetApplicationTrees(application, true).ToArray();
-            if (appTrees.Count() == 1)
+
+            if (appTrees.Count() == 1 || !string.IsNullOrEmpty(tree) )
             {
-                return GetRootForSingleAppTree(
-                    appTrees.Single(),
+                ApplicationTree apptree;
+
+                if (!string.IsNullOrEmpty(tree))
+                    apptree = appTrees.Where(x => x.Alias == tree).Single();
+                else
+                    apptree = appTrees.Single();
+
+
+                var result = GetRootForSingleAppTree(
+                    apptree,
                     Constants.System.Root.ToString(CultureInfo.InvariantCulture),
                     queryStrings, 
                     application);
+
+                //PP: should this be further down in the logic?
+                result.Title = ui.Text("sections", application);
+                return result;
             }
 
+
             var collection = new TreeNodeCollection();
-            foreach (var tree in appTrees)
+            foreach (var apptree in appTrees)
             {
                 //return the root nodes for each tree in the app
-                var rootNode = GetRootForMultipleAppTree(tree, queryStrings);                
+                var rootNode = GetRootForMultipleAppTree(apptree, queryStrings);                
                 collection.Add(rootNode); 
             }
 
-            return SectionRootNode.CreateMultiTreeSectionRoot(rootId, collection);
+            var multiTree = SectionRootNode.CreateMultiTreeSectionRoot(rootId, collection);
+            multiTree.Title = ui.Text("sections", application);
+            return multiTree;
         }
 
         /// <summary>

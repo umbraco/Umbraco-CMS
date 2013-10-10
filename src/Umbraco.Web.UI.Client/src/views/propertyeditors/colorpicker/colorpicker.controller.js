@@ -4,4 +4,4 @@ function ColorPickerController($scope) {
     };
 }
 
-angular.module("umbraco").controller("Umbraco.Editors.ColorPickerController", ColorPickerController);
+angular.module("umbraco").controller("Umbraco.PropertyEditors.ColorPickerController", ColorPickerController);

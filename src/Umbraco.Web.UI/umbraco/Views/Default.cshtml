@@ -22,7 +22,7 @@
 
 </head>
 <body ng-class="{touch:touchDevice}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
-    <div ng-cloak id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
+    <div ng-hide="!authenticated" ng-cloak id="mainwrapper"  id="mainwrapper" class="clearfix" ng-click="closeDialogs($event)">
 
         <umb-navigation></umb-navigation>
 

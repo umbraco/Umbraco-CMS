@@ -13,10 +13,10 @@ namespace Umbraco.Core.Services
     {
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly RepositoryFactory _repositoryFactory;
-        private readonly EntityService _entityService;
+        private readonly IEntityService _entityService;
 
         public RelationService(IDatabaseUnitOfWorkProvider uowProvider, RepositoryFactory repositoryFactory,
-                               EntityService entityService)
+                               IEntityService entityService)
         {
             _uowProvider = uowProvider;
             _repositoryFactory = repositoryFactory;

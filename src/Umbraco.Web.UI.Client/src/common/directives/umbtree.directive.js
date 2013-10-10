@@ -13,12 +13,13 @@ angular.module("umbraco.directives")
 
       scope: {
         section: '@',
+        treealias: '@',
+        path: '@',
         activetree: '@',
         showoptions: '@',
         showheader: '@',
         cachekey: '@',
-        eventhandler: '=',
-        path: '@'
+        eventhandler: '='
       },
 
       compile: function (element, attrs) {
@@ -31,12 +32,12 @@ angular.module("umbraco.directives")
 
          if(!hideheader){ 
            template +='<div>' + 
-           '<h5><a href="#{{section}}" ng-click="select(this, tree.root, $event)"  class="root-link">{{tree.name}}</a></h5>' +
+           '<h5><a href="#/{{section}}" ng-click="select(this, tree.root, $event)"  class="root-link">{{tree.name}}</a></h5>' +
                '<a href class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(this, tree.root, $event)" ng-swipe-right="options(this, tree.root, $event)"><i></i><i></i><i></i></a>' +
            '</div>';
          }
          template += '<ul>' +
-                  '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" path="{{path}}" activetree="{{activetree}}" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
+                  '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" path="{{path}}" activetree="{{activetree}}" node="child" tree="child" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
                   '</ul>' +
                 '</li>' +
                '</ul>';
@@ -65,24 +66,29 @@ angular.module("umbraco.directives")
 
             /** Method to load in the tree data */
             function loadTree() {                
-                if (scope.section) {
+                if (!scope.loading && scope.section) {
+
+                    scope.loading = true;
 
                     //anytime we want to load the tree we need to disable the delete animations
                     enableDeleteAnimations = false;
 
                     //use $q.when because a promise OR raw data might be returned.
-                    $q.when(treeService.getTree({ section: scope.section, cachekey: scope.cachekey }))
+                    $q.when(treeService.getTree({ section: scope.section, tree: scope.treealias, cachekey: scope.cachekey }))
                         .then(function (data) {
                             //set the data once we have it
                             scope.tree = data;
 
                             //do timeout so that it re-enables them after this digest
                             $timeout(function() {
+                                
                                 //enable delete animations
                                 enableDeleteAnimations = true;
                             });
 
+                            scope.loading = false;
                         }, function (reason) {
+                            scope.loading = false;
                             notificationsService.error("Tree Error", reason);
                         });
                 }
@@ -123,21 +129,23 @@ angular.module("umbraco.directives")
 
             //watch for section changes
             scope.$watch("section", function (newVal, oldVal) {
-                if(!scope.tree){
-                  loadTree();  
-                }
+              
+                  if(!scope.tree){
+                    loadTree();  
+                  }
 
-                if (!newVal) {
-                    //store the last section loaded
-                    lastSection = oldVal;
-                }else if (newVal !== oldVal && newVal !== lastSection) {
-                    //only reload the tree data and Dom if the newval is different from the old one
-                    // and if the last section loaded is different from the requested one.
-                    loadTree();
-                    
-                    //store the new section to be loaded as the last section
-                    lastSection = newVal;
-                }
+                  if (!newVal) {
+                      //store the last section loaded
+                      lastSection = oldVal;
+                  }else if (newVal !== oldVal && newVal !== lastSection) {
+                      //only reload the tree data and Dom if the newval is different from the old one
+                      // and if the last section loaded is different from the requested one.
+                      loadTree();
+                      
+                      //store the new section to be loaded as the last section
+                      lastSection = newVal;
+                  }
+              
             });
 
             //watch for path changes

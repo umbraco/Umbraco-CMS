@@ -34,20 +34,12 @@ namespace Umbraco.Web.Editors
     public class EntityController : UmbracoAuthorizedJsonController
     {   
         [HttpGet]
-        public IEnumerable<EntityBasic> Search([FromUri] string query, UmbracoEntityTypes type)
+        public ISearchResults Search([FromUri] string query, UmbracoEntityTypes type)
         {
             if (string.IsNullOrEmpty(query))
                 return null;
 
-            switch (type)
-            {
-                case UmbracoEntityTypes.Document:
-                    return ExamineSearch(query, true);
-                case UmbracoEntityTypes.Media:
-                    return ExamineSearch(query, false);
-                default:
-                    throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + type);
-            }
+            return ExamineSearch(query, type);
         }
 
         /// <summary>
@@ -92,24 +84,46 @@ namespace Umbraco.Web.Editors
             return GetResultForAll(type, postFilter, postFilterParams);
         }
         
-        private IEnumerable<EntityBasic> ExamineSearch(string query, bool isContent)
+        private ISearchResults ExamineSearch(string query, UmbracoEntityTypes entityType)
         {
-            //TODO: WE should really just allow passing in a lucene raw query
-            
-            var internalSearcher = ExamineManager.Instance.SearchProviderCollection[Constants.Examine.InternalSearcher];
-            var criteria = internalSearcher.CreateSearchCriteria(isContent ? "content" : "media", BooleanOperation.Or);
+            var searcher = Constants.Examine.InternalSearcher;
+            var type = "content";
             var fields = new[] { "id", "__nodeName", "bodyText" };
+            
+            //TODO: WE should really just allow passing in a lucene raw query
+            switch (entityType)
+            {
+                case UmbracoEntityTypes.Member:
+                    searcher = Constants.Examine.InternalMemberSearcher;
+                    type = "member";
+                    fields = new[] { "id", "email", "login","name", "nodename"};
+                    break;
+                case UmbracoEntityTypes.Media:
+                    type = "media";
+                    break;
+                case UmbracoEntityTypes.Document:
+                    break;
+                default:
+                    throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);
+                    
+            }
+
+            var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
+            var criteria = internalSearcher.CreateSearchCriteria(type, BooleanOperation.Or);
             
             var term = new[] { query.ToLower().Escape() };
             var operation = criteria.GroupedOr(fields, term).Compile();
 
+            return internalSearcher.Search(operation);
+
+            /*
             var results = internalSearcher.Search(operation)
                 .Select(x =>  int.Parse(x["id"]));
 
             //TODO: Just create a basic entity from the results!! why double handling and going to the database... this will be ultra slow.
 
-            return GetResultForIds(results.ToArray(), isContent ? UmbracoEntityTypes.Document : UmbracoEntityTypes.Media)
-                .WhereNotNull();
+            return GetResultForIds(results.ToArray(), entityType)
+                .WhereNotNull();*/
         }
 
         private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)

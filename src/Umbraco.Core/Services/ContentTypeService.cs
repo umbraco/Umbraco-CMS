@@ -346,36 +346,7 @@ namespace Umbraco.Core.Services
                 Audit.Add(AuditTypes.Delete, string.Format("Delete ContentTypes performed by user"), userId, -1);
             }
         }
-
-        /// <summary>
-        /// Gets an <see cref="IMemberType"/> object by its Id
-        /// </summary>
-        /// <param name="id">Id of the <see cref="IMemberType"/> to retrieve</param>
-        /// <returns><see cref="IMemberType"/></returns>
-        public IMemberType GetMemberType(int id)
-        {
-            using (var repository = _repositoryFactory.CreateMemberTypeRepository(_uowProvider.GetUnitOfWork()))
-            {
-                return repository.Get(id);
-            }
-        }
-
-        /// <summary>
-        /// Gets an <see cref="IMemberType"/> object by its Alias
-        /// </summary>
-        /// <param name="alias">Alias of the <see cref="IMemberType"/> to retrieve</param>
-        /// <returns><see cref="IMemberType"/></returns>
-        public IMemberType GetMemberType(string alias)
-        {
-            using (var repository = _repositoryFactory.CreateMemberTypeRepository(_uowProvider.GetUnitOfWork()))
-            {
-                var query = Query<IMemberType>.Builder.Where(x => x.Alias == alias);
-                var contentTypes = repository.GetByQuery(query);
-
-                return contentTypes.FirstOrDefault();
-            }
-        }
-
+        
         /// <summary>
         /// Gets an <see cref="IMediaType"/> object by its Id
         /// </summary>

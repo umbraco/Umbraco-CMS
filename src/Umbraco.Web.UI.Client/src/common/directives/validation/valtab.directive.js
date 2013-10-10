@@ -4,6 +4,7 @@
 * @name umbraco.directives.directive:valTab
 * @restrict A
 * @description Used to show validation warnings for a tab to indicate that the tab content has validations errors in its data.
+* In order for this directive to work, the valStatusChanged directive must be placed on the containing form.
 **/
 function valTab() {
     return {
@@ -15,23 +16,22 @@ function valTab() {
                         
             scope.tabHasError = false;
 
-            //watch the current form's validation for the current field name
-            scope.$watch(function() {
-                return formCtrl.$valid;
-            }, function() {
-                var tabContent = element.closest(".umb-panel").find("#" + tabId);
-
-                if (formCtrl.$invalid) {
+            //listen for form validation changes
+            scope.$on("valStatusChanged", function(evt, args) {
+                if (!args.form.$valid) {
+                    var tabContent = element.closest(".umb-panel").find("#" + tabId);
                     //check if the validation messages are contained inside of this tabs 
                     if (tabContent.find(".ng-invalid").length > 0) {
                         scope.tabHasError = true;
                     } else {
                         scope.tabHasError = false;
                     }
-                } else {
+                }
+                else {
                     scope.tabHasError = false;
                 }
             });
+
         }
     };
 }

@@ -95,7 +95,7 @@ function entityResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "GetById",
-                       [{ id: id, type: type }])),
+                       [{ id: id}, {type: type }])),
                'Failed to retreive entity data for id ' + id);
         },
         

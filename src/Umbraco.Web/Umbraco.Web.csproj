@@ -309,7 +309,9 @@
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\LogController.cs" />
     <Compile Include="Editors\MacroController.cs" />
+    <Compile Include="Editors\MembershipProviderValidationFilterAttribute.cs" />
     <Compile Include="Editors\MemberTypeController.cs" />
+    <Compile Include="Models\ContentEditing\MemberPassword.cs" />
     <Compile Include="Models\ContentEditing\StyleSheet.cs" />
     <Compile Include="Editors\StylesheetController.cs" />
     <Compile Include="Models\ContentEditing\AuditLog.cs" />
@@ -327,7 +329,9 @@
     <Compile Include="Models\Mapping\MacroModelMapper.cs" />
     <Compile Include="Models\Mapping\MemberModelMapper.cs" />
     <Compile Include="PropertyEditors\ColorListPreValueEditor.cs" />
+    <Compile Include="PropertyEditors\EmailAddressPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ListViewPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MemberPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\TextAreaParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\TextParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\TrueFalseParameterEditor.cs" />
@@ -351,7 +355,6 @@
     <Compile Include="Models\Mapping\DataTypeModelMapper.cs" />
     <Compile Include="Models\Mapping\EntityModelMapper.cs" />
     <Compile Include="Models\Mapping\PreValueDisplayResolver.cs" />
-    <Compile Include="Models\PagedResult.cs" />
     <Compile Include="PropertyEditors\CheckBoxListPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ColorPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\DatePropertyEditor.cs" />
@@ -367,6 +370,7 @@
     <Compile Include="PropertyEditors\RadioButtonsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RichTextPreValueController.cs" />
     <Compile Include="PropertyEditors\RichTextPreValueEditor.cs" />
+    <Compile Include="PropertyEditors\UltraSimplePropertyEditor.cs" />
     <Compile Include="PropertyEditors\TagsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\UserPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ValueListPreValueEditor.cs" />
@@ -387,6 +391,13 @@
     <Compile Include="umbraco.presentation\umbraco\create.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\create\DLRScripting.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\Trees\loadPackager.cs" />
     <Compile Include="WebApi\Binders\MemberBinder.cs" />
     <Compile Include="WebApi\ControllerContextExtensions.cs" />
     <Compile Include="WebApi\CustomDateTimeConvertor.cs" />
@@ -1013,13 +1024,6 @@
     <Compile Include="umbraco.presentation\umbraco\create\CreatedPackageTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\DataTypeTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\dictionaryTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\create\DLRScripting.ascx.cs">
-      <DependentUpon>DLRScripting.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\DLRScripting.ascx.designer.cs">
-      <DependentUpon>DLRScripting.ascx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\DLRScriptingTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\macroTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\MediaTypeTasks.cs" />
@@ -1183,13 +1187,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\languageTasks.cs">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.cs">
-      <DependentUpon>xslt.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.designer.cs">
-      <DependentUpon>xslt.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\LatestEdits.ascx.cs">
       <DependentUpon>LatestEdits.ascx</DependentUpon>
@@ -1593,7 +1590,6 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\BaseTree.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\ContentRecycleBin.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\FileSystemTree.cs" />
-    <Compile Include="umbraco.presentation\umbraco\Trees\loadPackager.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadContent.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadcontentItemType.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\loadDataTypes.cs" />
@@ -1800,12 +1796,7 @@
     <Content Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericProperty.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\create\DLRScripting.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericProperty.ascx" />
     <Content Include="umbraco.presentation\umbraco\controls\Images\ImageViewerUpdater.asmx" />
     <Content Include="umbraco.presentation\umbraco\controls\Images\UploadMediaImage.ascx">
       <SubType>ASPXCodeBehind</SubType>
@@ -1929,18 +1920,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\create\media.ascx" />
-    <Content Include="umbraco.presentation\umbraco\create\member.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\create\nodeType.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\create\simple.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\create\xslt.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="umbraco.presentation\umbraco\create\member.ascx" />
+    <Content Include="umbraco.presentation\umbraco\create\nodeType.ascx" />
+    <Content Include="umbraco.presentation\umbraco\create\simple.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\LatestEdits.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

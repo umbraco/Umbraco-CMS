@@ -1,0 +1,50 @@
+<div>
+    <div style="position:absolute; top: 1; background: red">
+        {{overflowingSections}} {{maxSections}} {{totalSections}}
+    </div>
+    <div id="applications" ng-class="{faded:nav.ui.stickyNavigation}"> 
+        <ul class="sections">
+            <li class="avatar">
+                <a href="#" ng-click="avatarClick()" title="{{user.name}}" prevent-default>
+                    <img ng-src="{{avatar}}" />
+                </a>
+            </li>
+            <li ng-repeat="section in sections | limitTo: maxSections" ng-class="{current: section.alias == currentSection}">
+                <a href="#/{{section.alias}}"
+                   ng-dblclick="sectionDblClick(section)"
+                   ng-click="sectionClick(section)"
+                   prevent-default>
+                    <section-icon icon="{{section.cssclass}}"></section-icon>  
+                    <span>{{section.name}}</span>
+                </a>
+            </li>
+            
+            <li class="expand" ng-show="needTray">
+                <a href ng-click="trayClick()">
+                    <i class="icon icon-arrow-right"></i>
+                </a>
+            </li>
+
+            <li class="help">
+                <a class="help" href="#/help">
+                    <i class="icon-help-alt"></i>
+                    <span>Help</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div id="applications-tray" ng-show="nav.ui.showTray" ng-animate="'slide'">
+        <ul class="sections sections-tray">
+            <li ng-repeat="section in sections | limitTo: overflowingSections" ng-class="{current: section.alias == currentSection}">
+                <a href="#/{{section.alias}}"
+                   ng-dblclick="sectionDblClick(section)"
+                   ng-click="sectionClick(section)"
+                   prevent-default>
+                    <section-icon icon="{{section.cssclass}}"></section-icon>  
+                    <span>{{section.name}}</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</div>

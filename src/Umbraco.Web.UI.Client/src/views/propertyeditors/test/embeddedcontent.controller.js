@@ -1,6 +1,6 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-angular.module('umbraco').controller("Umbraco.Editors.EmbeddedContentController", 
+angular.module('umbraco').controller("Umbraco.PropertyEditors.EmbeddedContentController",
 	function($rootScope, $scope, $log){
     
 	$scope.showForm = false;

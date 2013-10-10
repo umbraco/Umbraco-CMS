@@ -1,5 +1,5 @@
 ﻿angular.module("umbraco")
-    .controller("Umbraco.Editors.RelatedLinksController", 
+    .controller("Umbraco.PropertyEditors.RelatedLinksController",
         function ($rootScope, $scope, dialogService, $routeParams, contentResource, contentTypeResource, editorContextService, notificationsService) {
 
             $scope.newCaption = '';

@@ -138,6 +138,12 @@
 	background: @grayLighter
 }
 
+.umb-tree small.search-subtitle{
+	color: @grayLight;
+	display: block;
+	padding-left: 35px;
+}
+
 a.umb-options {
 	visibility: hidden;	
 	cursor: pointer;
@@ -206,6 +212,32 @@ li.root > div > a.umb-options {
 }
 .umb-icon-item .umb-spr {
 	float: left
+}
+
+
+// Tree item states
+// -------------------------
+div.not-published > i.icon,div.not-published > a{
+	color: @grayLight;
+}
+div.protected:before{
+	content:"\e256";
+	font-family: 'icomoon';
+	color: @red;
+	position: absolute;
+	font-size: 20px;
+	padding-left: 7px;
+	padding-top: 7px;
+}
+
+div.has-unpublished-version:before{
+	content:"\e25a";
+	font-family: 'icomoon';
+	color: @green;
+	position: absolute;
+	font-size: 20px;
+	padding-left: 7px;
+	padding-top: 7px;
 }
 
 // Tree context menu

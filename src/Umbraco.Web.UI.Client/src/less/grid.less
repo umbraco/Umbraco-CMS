@@ -66,12 +66,24 @@ body {
   position: absolute;
 }
 
-/* refactor colors into a seperate class */
 #applications {
   z-index: 1000;
   height: 100%;
-  position: relative;
+  left: 0px;
+  top: 0;
+  bottom: 0;
+  position: absolute;
   text-align: center
+}
+
+#applications-tray {
+  z-index: 900;
+  left: 80px;
+  top: 0;
+  bottom: 0;
+  position: absolute;
+  height: 100%;
+  text-align: center;
 }
 
 #search-form {
@@ -104,7 +116,6 @@ body {
     right: 0px;
     padding-top: 100px;
 }
-
 
 #dialog {
   min-width: 500px;

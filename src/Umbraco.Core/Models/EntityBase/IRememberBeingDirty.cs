@@ -9,5 +9,6 @@
         bool WasDirty();
         bool WasPropertyDirty(string propertyName);
         void ForgetPreviouslyDirtyProperties();
+        void ResetDirtyProperties(bool rememberPreviouslyChangedProperties);
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Validation;
 
@@ -9,6 +10,11 @@ namespace Umbraco.Web.Models.ContentEditing
     /// </summary>
     public class MemberSave : ContentBaseItemSave<IMember>
     {
+        public MemberSave()
+        {
+            Password = new MemberPassword();
+        }
+
         [DataMember(Name = "username", IsRequired = true)]
         [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
         public string Username { get; set; }
@@ -16,8 +22,8 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "email", IsRequired = true)]
         [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
         public string Email { get; set; }
-
-        [DataMember(Name = "password")]        
-        public string Password { get; set; }
+        
+        [DataMember(Name = "password")]
+        public MemberPassword Password { get; set; }
     }
 }

@@ -6,14 +6,14 @@
  * @description
  * The controller for the member editor
  */
-function MemberEditController($scope, $routeParams, $q, $timeout, $window, memberResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, editorContextService) {
+function MemberEditController($scope, $routeParams, $location, $q, $timeout, $window, memberResource, entityResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, editorContextService) {
        
     //initialize the file manager
     fileManager.clearFiles();
 
     if ($routeParams.create) {
         //we are creating so get an empty member item
-        memberResource.getScaffold($routeParams.id, $routeParams.doctype)
+        memberResource.getScaffold($routeParams.doctype)
             .then(function(data) {
                 $scope.loaded = true;
                 $scope.content = data;
@@ -21,19 +21,29 @@ function MemberEditController($scope, $routeParams, $q, $timeout, $window, membe
             });
     }
     else {
-        //we are editing so get the content item from the server
-        memberResource.getByKey($routeParams.id)
-            .then(function(data) {
-                $scope.loaded = true;
-                $scope.content = data;
-                editorContextService.setContext($scope.content);
-
-                //in one particular special case, after we've created a new item we redirect back to the edit
-                // route but there might be server validation errors in the collection which we need to display
-                // after the redirect, so we will bind all subscriptions which will show the server validation errors
-                // if there are any and then clear them so the collection no longer persists them.
-                serverValidationManager.executeAndClearAllSubscriptions();
+        //so, we usually refernce all editors with the Int ID, but with members we have
+        //a different pattern, adding a route-redirect here to handle this: 
+        //isNumber doesnt work here since its seen as a string
+        if($routeParams.id && $routeParams.id.length < 9){
+            entityResource.getById($routeParams.id, "Member").then(function(entity){
+                $location.path("member/member/edit/" + entity.key);
             });
+        }else{
+            //we are editing so get the content item from the server
+            memberResource.getByKey($routeParams.id)
+                .then(function(data) {
+                    $scope.loaded = true;
+                    $scope.content = data;
+                    editorContextService.setContext($scope.content);
+
+                    //in one particular special case, after we've created a new item we redirect back to the edit
+                    // route but there might be server validation errors in the collection which we need to display
+                    // after the redirect, so we will bind all subscriptions which will show the server validation errors
+                    // if there are any and then clear them so the collection no longer persists them.
+                    serverValidationManager.executeAndClearAllSubscriptions();
+                });
+        }
+
     }
 
     //TODO: Need to figure out a way to share the saving and event broadcasting with all editors!
@@ -65,6 +75,8 @@ function MemberEditController($scope, $routeParams, $q, $timeout, $window, membe
                 contentEditingHelper.handleSuccessfulSave({
                     scope: $scope,
                     newContent: data,
+                    //specify a custom id to redirect to since we want to use the GUID
+                    redirectId: data.key,
                     rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                 });
 

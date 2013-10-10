@@ -2,6 +2,7 @@
 using Umbraco.Core;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Web.Models.ContentEditing;
+using umbraco;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -10,6 +11,9 @@ namespace Umbraco.Web.Models.Mapping
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<Section, Core.Models.Section>()
+                .ForMember(
+                      dto => dto.Name,
+                      expression => expression.MapFrom(section => ui.Text("sections", section.Alias)))
                   .ReverseMap(); //backwards too!
         }
     }

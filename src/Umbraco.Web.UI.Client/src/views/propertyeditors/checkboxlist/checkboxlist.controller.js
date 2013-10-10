@@ -1,4 +1,4 @@
-angular.module("umbraco").controller("Umbraco.Editors.CheckboxListController",
+angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListController",
     function($scope) {
         
         if (!angular.isObject($scope.model.config.items)) {

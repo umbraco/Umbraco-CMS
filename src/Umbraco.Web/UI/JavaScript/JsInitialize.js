@@ -1,5 +1,5 @@
 ﻿[
-    'lib/jquery/jquery-2.0.3.min.js',
+    
     
     /* the jquery ui elements we need */
     /* NOTE: I've opted not to use the full lib, just the parts we need to save on DL */
@@ -12,7 +12,6 @@
     'lib/jquery/jquery.ui.effect-highlight.min.js',*/
     
     /* 1.1.5 */
-    'lib/angular/1.1.5/angular.min.js',
     'lib/angular/1.1.5/angular-cookies.min.js',
     'lib/angular/1.1.5/angular-mobile.min.js',
     'lib/angular/1.1.5/angular-sanitize.min.js',
@@ -38,7 +37,6 @@
     'lib/jquery/jquery.upload/js/jquery.fileupload-angular.js',
 
     'lib/bootstrap/js/bootstrap.js',
-	'lib/underscore/underscore.js',
 	'lib/umbraco/Extensions.js',
     
     'lib/umbraco/NamespaceManager.js',

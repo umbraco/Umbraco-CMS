@@ -13,7 +13,7 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
     public class MediaControllerUnitTests
     {
         [Test]
-        public void Does_Not_Throw_Exception_When_Access_Allowed_By_Path()
+        public void Access_Allowed_By_Path()
         {
             //arrange
             var userMock = new Mock<IUser>();
@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
         }
 
         [Test]
-        public void Throws_Exception_When_No_Access_By_Path()
+        public void No_Access_By_Path()
         {
             //arrange
             var userMock = new Mock<IUser>();
@@ -75,5 +75,68 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             Assert.IsFalse(result);
         }
 
+        [Test]
+        public void Access_To_Root_By_Path()
+        {
+            //arrange
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.StartMediaId).Returns(-1);
+            var user = userMock.Object;
+            
+            //act
+            var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, null, -1);
+
+            //assert
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void No_Access_To_Root_By_Path()
+        {
+            //arrange
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.StartMediaId).Returns(1234);
+            var user = userMock.Object;
+
+            //act
+            var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, null, -1);
+
+            //assert
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public void Access_To_Recycle_Bin_By_Path()
+        {
+            //arrange
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.StartMediaId).Returns(-1);
+            var user = userMock.Object;
+
+            //act
+            var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, null, -21);
+
+            //assert
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void No_Access_To_Recycle_Bin_By_Path()
+        {
+            //arrange
+            var userMock = new Mock<IUser>();
+            userMock.Setup(u => u.Id).Returns(0);
+            userMock.Setup(u => u.StartMediaId).Returns(1234);
+            var user = userMock.Object;
+
+            //act
+            var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, null, -21);
+
+            //assert
+            Assert.IsFalse(result);
+        }
     }
 }

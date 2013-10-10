@@ -5,14 +5,15 @@
         <h1 ng-click="goEdit()" ng-hide="editMode">{{model}}</h1>
         
         <input
+            class="input-xlarge"
         	on-blur="exitEdit()" 
         	ng-show="editMode" 
         	name="name" 
         	type="text" 
         	placeholder="{{placeholder}}" 
         	ng-model="model" 
-               required   
-               val-server-field="Name" />
+            required   
+            val-server-field="Name" />
 
         <span class="help-inline" val-msg-for="name" val-toggle-msg="required">Required</span>
         <span class="help-inline" val-msg-for="name" val-toggle-msg="valServerField">{{contentNameForm.name.errorMsg}}</span>

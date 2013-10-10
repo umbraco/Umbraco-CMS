@@ -1,5 +1,5 @@
 angular.module("umbraco")
-    .controller("Umbraco.Editors.RTEController",
+    .controller("Umbraco.PropertyEditors.RTEController",
     function ($rootScope, $element, $scope, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper) {
 
         tinyMceService.configuration().then(function(tinyMceConfig){
@@ -13,13 +13,14 @@ angular.module("umbraco")
                                             }
                                         }).join(" ");
             
-            //serialize the property editor config (most likely not needed due to shannons fixes)
-            var editorConfig = angular.fromJson($scope.model.config.editor);
+            var editorConfig = $scope.model.config.editor;
+            if(!editorConfig || angular.isString(editorConfig)){
+                editorConfig = tinyMceService.defaultPrevalues();
+            }
 
             //config value on the data type
             var toolbar = editorConfig.toolbar.join(" | ");
             
-
             assetsService.loadJs("lib/tinymce/tinymce.min.js", $scope).then(function () {
                 
                 /** Loads in the editor */

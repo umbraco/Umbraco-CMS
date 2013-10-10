@@ -100,7 +100,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                   .ForeignColumn("propertyTypeId")
                   .ToTable("cmsPropertyType")
                   .PrimaryColumn("id")
-                  .OnDelete(Rule.Cascade)
+                  .OnDelete(Rule.None)
                   .OnUpdate(Rule.None);
             
             //now we need to add a foreign key to the nodeId column to cmsContent (intead of the original umbracoNode)
@@ -109,7 +109,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                   .ForeignColumn("nodeId")
                   .ToTable("cmsContent")
                   .PrimaryColumn("nodeId")
-                  .OnDelete(Rule.Cascade)
+                  .OnDelete(Rule.None)
                   .OnUpdate(Rule.None);
         }
 

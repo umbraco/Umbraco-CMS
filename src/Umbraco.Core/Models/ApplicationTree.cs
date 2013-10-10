@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace Umbraco.Core.Models
 {
     [DebuggerDisplay("Tree - {Title} ({ApplicationAlias})")]
-    internal class ApplicationTree
+    public class ApplicationTree
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationTree"/> class.
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Models
         /// <param name="iconClosed">The icon closed.</param>
         /// <param name="iconOpened">The icon opened.</param>
         /// <param name="type">The tree type.</param>
-        public ApplicationTree(bool initialize, byte sortOrder, string applicationAlias, string alias, string title, string iconClosed, string iconOpened, string type)
+        public ApplicationTree(bool initialize, int sortOrder, string applicationAlias, string alias, string title, string iconClosed, string iconOpened, string type)
         {
             this.Initialize = initialize;
             this.SortOrder = sortOrder;
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the sort order.
         /// </summary>
         /// <value>The sort order.</value>
-        public byte SortOrder { get; set; }
+        public int SortOrder { get; set; }
 
         /// <summary>
         /// Gets the application alias.

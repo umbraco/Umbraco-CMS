@@ -25,7 +25,8 @@ namespace Umbraco.Web.WebApi.Binders
 
         protected override IMember GetExisting(MemberSave model)
         {
-            //TODO: We're going to remove the built-in member properties from this editor - not sure if we should be persisting them elsewhere ?
+            //TODO: We're going to remove the built-in member properties from this editor - We didn't support these in 6.x so 
+            // pretty hard to support them in 7 when the member type editor is using the old APIs!
             var toRemove = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
 
             var member =  ApplicationContext.Services.MemberService.GetByUsername(model.Username);
@@ -38,12 +39,22 @@ namespace Umbraco.Web.WebApi.Binders
         
         protected override IMember CreateNew(MemberSave model)
         {
-            var contentType = ApplicationContext.Services.ContentTypeService.GetMemberType(model.ContentTypeAlias);
+            var contentType = ApplicationContext.Services.MemberTypeService.GetMemberType(model.ContentTypeAlias);
             if (contentType == null)
             {
                 throw new InvalidOperationException("No member type found wth alias " + model.ContentTypeAlias);
             }
-            return new Member(model.Name, model.Email, model.Username, model.Password, -1, contentType);
+
+            //TODO: We're going to remove the built-in member properties from this editor - We didn't support these in 6.x so 
+            // pretty hard to support them in 7 when the member type editor is using the old APIs!
+            var toRemove = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
+            foreach (var remove in toRemove)
+            {
+                contentType.RemovePropertyType(remove);
+            }
+
+            //return the new member with the details filled in
+            return new Member(model.Name, model.Email, model.Username, model.Password.NewPassword, -1, contentType);
         }
 
         protected override ContentItemDto<IMember> MapFromPersisted(MemberSave model)

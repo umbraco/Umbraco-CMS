@@ -120,5 +120,5 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
     });
 
 };
-angular.module("umbraco").controller('Umbraco.Editors.FileUploadController', fileUploadController);
+angular.module("umbraco").controller('Umbraco.PropertyEditors.FileUploadController', fileUploadController);
 

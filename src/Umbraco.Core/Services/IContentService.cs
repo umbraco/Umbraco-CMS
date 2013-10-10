@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Publishing;
 
 namespace Umbraco.Core.Services
 {
@@ -10,7 +11,9 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentService : IService
     {
-        
+
+        IEnumerable<IContent> GetByIds(IEnumerable<int> ids);
+
         /// <summary>
         /// Creates an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
         /// that this Content should based on.
@@ -244,7 +247,16 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to publish</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
+        [Obsolete("Use PublishWithStatus instead, that method will provide more detailed information on the outcome")]
         bool Publish(IContent content, int userId = 0);
+
+        /// <summary>
+        /// Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>The published status attempt</returns>
+        Attempt<PublishStatus> PublishWithStatus(IContent content, int userId = 0);
 
         /// <summary>
         /// Publishes a <see cref="IContent"/> object and all its children
@@ -252,7 +264,17 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
+        [Obsolete("Use PublishWithChildrenWithStatus instead, that method will provide more detailed information on the outcome and also allows the includeUnpublished flag")]
         bool PublishWithChildren(IContent content, int userId = 0);
+
+        /// <summary>
+        /// Publishes a <see cref="IContent"/> object and all its children
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="includeUnpublished"></param>
+        /// <returns>The list of statuses for all published items</returns>
+        IEnumerable<Attempt<PublishStatus>> PublishWithChildrenWithStatus(IContent content, int userId = 0, bool includeUnpublished = false);
 
         /// <summary>
         /// UnPublishes a single <see cref="IContent"/> object
@@ -269,7 +291,17 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise save events.</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
+        [Obsolete("Use SaveAndPublishWithStatus instead, that method will provide more detailed information on the outcome")]
         bool SaveAndPublish(IContent content, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
+        /// Saves and Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to save and publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise save events.</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        Attempt<PublishStatus> SaveAndPublishWithStatus(IContent content, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Permanently deletes an <see cref="IContent"/> object.

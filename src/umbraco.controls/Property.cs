@@ -37,7 +37,7 @@ namespace umbraco.uicontrols
             var inGroup = this.Parent.GetType() == typeof(PropertyGroup);
 
             if (string.IsNullOrEmpty(m_Text))
-                CssClass += " hideLabel";
+                CssClass += " hidelabel";
 
           
             writer.WriteLine("<div class=\"umb-el-wrap " + CssClass + "\">");

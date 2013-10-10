@@ -20,6 +20,17 @@ namespace Umbraco.Core.Models
         private object _providerUserKey;
         private Type _userTypeKey;
 
+        /// <summary>
+        /// Constructor for creating a Member object
+        /// </summary>
+        /// <param name="name">Name of the content</param>
+        /// <param name="contentType">ContentType for the current Content object</param>
+        public Member(string name, IMemberType contentType)
+            : base(name, -1, contentType, new PropertyCollection())
+        {
+            _contentType = contentType;
+        }
+
         public Member(string name, string email, string username, string password, int parentId, IMemberType contentType)
             : base(name, parentId, contentType, new PropertyCollection())
         {
@@ -427,7 +438,7 @@ namespace Umbraco.Core.Models
 
         public override void ChangeTrashedState(bool isTrashed, int parentId = -20)
         {
-            throw new NotImplementedException("Members can't be trashed as no Recycle Bin exists, so use of this method is invalid");
+            throw new NotSupportedException("Members can't be trashed as no Recycle Bin exists, so use of this method is invalid");
         }
 
         /* Internal experiment - only used for mapping queries. 

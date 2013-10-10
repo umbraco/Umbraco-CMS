@@ -23,4 +23,4 @@ function booleanEditorController($scope, $rootScope, assetsService) {
     };
 
 }
-angular.module("umbraco").controller("Umbraco.Editors.BooleanController", booleanEditorController);
+angular.module("umbraco").controller("Umbraco.PropertyEditors.BooleanController", booleanEditorController);

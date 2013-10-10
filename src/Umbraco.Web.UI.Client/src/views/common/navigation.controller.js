@@ -25,25 +25,15 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
 
     //trigger search with a hotkey:
     keyboardService.bind("ctrl+shift+s", function(){
-        $scope.nav.showTree("");
+        $scope.nav.showSearch();
     });
 
     //the tree event handler i used to subscribe to the main tree click events
     $scope.treeEventHandler = $({});
-
     $scope.selectedId = navigationService.currentId;
-    $scope.sections = navigationService.sections;
     
-    //When the user logs in
-    $scope.$on("authenticated", function (evt, data) {
-        //populate their sections if the user has changed
-        if (data.lastUserId !== data.user.id) {
-            sectionResource.getSections()
-                .then(function (result) {
-                    $scope.sections = result;
-                });
-        }        
-    });
+    
+    
 
     //This reacts to clicks passed to the body element which emits a global call to close all dialogs
     $rootScope.$on("closeDialogs", function (event) {
@@ -53,6 +43,7 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
         }
     });
         
+
     //this reacts to the options item in the tree
     $scope.treeEventHandler.bind("treeOptionsClick", function (ev, args) {
         ev.stopPropagation();
@@ -74,9 +65,8 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
         $scope.currentNode = args.node;
         args.scope = $scope;
 
-        if(args.event && args.event.altKey){
-            args.skipDefault = true;
-        }
+        //always skip default
+        args.skipDefault = true;
 
         navigationService.showMenu(ev, args);
     };

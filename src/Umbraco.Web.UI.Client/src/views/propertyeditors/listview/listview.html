@@ -1,5 +1,5 @@
 
-<div class="umb-editor umb-listview" ng-controller="Umbraco.Editors.ListViewController">
+<div class="umb-editor umb-listview" ng-controller="Umbraco.PropertyEditors.ListViewController">
 	<div class="row-fluid">
 		<div class="umb-sub-header">
 
@@ -47,9 +47,16 @@
 			</thead>
 
 			<tbody>
-				<tr ng-repeat="result in listViewResultSet.items">
-					<td><!--<i class="icon {{result.icon}}"></i>--><input type="checkbox" ng-checked="isSelected(result.id)" ng-click="updateSelection($event, result.id)"></td> 
-					<td><a href="#/content/content/edit/{{result.id}}">{{result.name}}</a></td> 
+				<tr ng-repeat="result in listViewResultSet.items" 
+					ng-class="{selected:result.selected}">
+
+					<td>
+						<i class="icon {{result.icon}}" ng-class="getIcon(result)"></i>
+
+						<input type="checkbox" 
+						ng-checked="result.selected" ng-click="updateSelection($event, result)"></td> 
+					<td>
+						<a ng-class="{inactive:!result.published}" href="#/content/content/edit/{{result.id}}">{{result.name}}</a></td> 
 				    <td>{{result.updateDate|date:'medium'}} 
 				        <!--<<span class="label label-success">Publish</span>-->
 					</td>

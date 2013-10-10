@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -42,7 +43,7 @@ namespace Umbraco.Core.Models
             _allowedContentTypes = new List<ContentTypeSort>();
             _propertyGroups = new PropertyGroupCollection();
             _propertyTypes = new PropertyTypeCollection();
-            AdditionalData = new Dictionary<string, object>();
+            _additionalData = new Dictionary<string, object>();
         }
 
 		protected ContentTypeBase(IContentTypeBase parent)
@@ -53,7 +54,7 @@ namespace Umbraco.Core.Models
 			_allowedContentTypes = new List<ContentTypeSort>();
 			_propertyGroups = new PropertyGroupCollection();
             _propertyTypes = new PropertyTypeCollection();
-            AdditionalData = new Dictionary<string, object>();
+            _additionalData = new Dictionary<string, object>();
 		}
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Name);
@@ -314,6 +315,16 @@ namespace Umbraco.Core.Models
                     return _trashed;
                 }, _trashed, TrashedSelector);
             }
+        }
+
+        private readonly IDictionary<string, object> _additionalData;
+        /// <summary>
+        /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IDictionary<string, object> IUmbracoEntity.AdditionalData
+        {
+            get { return _additionalData; }
         }
 
         /// <summary>

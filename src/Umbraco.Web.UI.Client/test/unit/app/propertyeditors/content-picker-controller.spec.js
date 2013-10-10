@@ -23,7 +23,7 @@ describe('Content picker controller tests', function () {
         //see /mocks/content.mocks.js for how its setup
         entityMocks.register();
 
-        controller = $controller('Umbraco.Editors.ContentPickerController', {
+        controller = $controller('Umbraco.PropertyEditors.ContentPickerController', {
             $scope: scope,
             $routeParams: routeParams
         });

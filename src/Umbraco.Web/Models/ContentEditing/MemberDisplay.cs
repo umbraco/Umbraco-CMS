@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -15,6 +16,12 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "email")]
         public string Email { get; set; }
+
+        /// <summary>
+        /// This is the unique Id stored in the database - but could also be the unique id for a custom membership provider
+        /// </summary>
+        [DataMember(Name = "key")]
+        public Guid Key { get; set; }
 
     }
 }

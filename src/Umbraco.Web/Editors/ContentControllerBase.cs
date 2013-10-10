@@ -78,7 +78,12 @@ namespace Umbraco.Web.Editors
             return null;
         }
 
-        protected void MapPropertyValues<TPersisted>(ContentBaseItemSave<TPersisted> contentItem)
+        /// <summary>
+        /// Maps the dto property values to the persisted model
+        /// </summary>
+        /// <typeparam name="TPersisted"></typeparam>
+        /// <param name="contentItem"></param>
+        protected virtual void MapPropertyValues<TPersisted>(ContentBaseItemSave<TPersisted> contentItem)
             where TPersisted : IContentBase
         {
             //Map the property values

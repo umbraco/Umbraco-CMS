@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using umbraco.businesslogic;
 
 namespace Umbraco.Web.Trees
@@ -25,69 +26,38 @@ namespace Umbraco.Web.Trees
         /// </summary>
         private static void ScanTrees(ApplicationContext applicationContext)
         {
-            applicationContext.Services.ApplicationTreeService.LoadXml(doc =>
-                {
-                    var added = new List<string>();
+            var added = new List<string>();
 
-                    // Load all Controller Trees by attribute and add them to the XML config
-                    // we also need to make sure that any alias added with the new trees is not also added
-                    // with the legacy trees.
-                    var types = PluginManager.Current.ResolveAttributedTreeControllers();
+            // Load all Controller Trees by attribute and add them to the XML config
+            // we also need to make sure that any alias added with the new trees is not also added
+            // with the legacy trees.
+            var types = PluginManager.Current.ResolveAttributedTreeControllers();
 
-                    var items = types
-                        .Select(x =>
-                                new Tuple<Type, TreeAttribute>(x, x.GetCustomAttributes<TreeAttribute>(false).Single()))
-                        .Where(x => applicationContext.Services.ApplicationTreeService.GetByAlias(x.Item2.Alias) == null);
+            //get all non-legacy application tree's
+            var items = types
+                .Select(x =>
+                        new Tuple<Type, TreeAttribute>(x, x.GetCustomAttributes<TreeAttribute>(false).Single()))
+                .Where(x => applicationContext.Services.ApplicationTreeService.GetByAlias(x.Item2.Alias) == null)
+                .Select(x => new ApplicationTree(x.Item2.Initialize, x.Item2.SortOrder, x.Item2.ApplicationAlias, x.Item2.Alias, x.Item2.Title, x.Item2.IconClosed, x.Item2.IconOpen, x.Item1.GetFullNameWithAssembly()))
+                .ToArray();
+                
+            added.AddRange(items.Select(x => x.Alias));
 
-                    foreach (var tuple in items)
-                    {
-                        var type = tuple.Item1;
-                        var attr = tuple.Item2;
+            //find the legacy trees
+            var legacyTreeTypes = PluginManager.Current.ResolveAttributedTrees();
 
-                        //Add the new tree that doesn't exist in the config that was found by type finding
+            var legacyItems = legacyTreeTypes
+                .Select(x =>
+                        new Tuple<Type, global::umbraco.businesslogic.TreeAttribute>(
+                            x, 
+                            x.GetCustomAttributes<global::umbraco.businesslogic.TreeAttribute>(false).Single()))
+                .Where(x => applicationContext.Services.ApplicationTreeService.GetByAlias(x.Item2.Alias) == null
+                    //make sure the legacy tree isn't added on top of the controller tree!        
+                            && added.InvariantContains(x.Item2.Alias) == false)
+                .Select(x => new ApplicationTree(x.Item2.Initialize, x.Item2.SortOrder, x.Item2.ApplicationAlias, x.Item2.Alias, x.Item2.Title, x.Item2.IconClosed, x.Item2.IconOpen, x.Item1.GetFullNameWithAssembly()));
 
-                        doc.Root.Add(new XElement("add",
-                                                  new XAttribute("initialize", attr.Initialize),
-                                                  new XAttribute("sortOrder", attr.SortOrder),
-                                                  new XAttribute("alias", attr.Alias),
-                                                  new XAttribute("application", attr.ApplicationAlias),
-                                                  new XAttribute("title", attr.Title),
-                                                  new XAttribute("iconClosed", attr.IconClosed),
-                                                  new XAttribute("iconOpen", attr.IconOpen),
-                                                  new XAttribute("type", type.GetFullNameWithAssembly())));
+            applicationContext.Services.ApplicationTreeService.Intitialize(items.Concat(legacyItems));
 
-                        added.Add(attr.Alias);
-                    }
-
-
-                    // Load all LEGACY Trees by attribute and add them to the XML config
-                    var legacyTreeTypes = PluginManager.Current.ResolveAttributedTrees();
-
-                    var legacyItems = legacyTreeTypes
-                        .Select(x =>
-                                new Tuple<Type, global::umbraco.businesslogic.TreeAttribute>(x, x.GetCustomAttributes<global::umbraco.businesslogic.TreeAttribute>(false).Single()))
-                        .Where(x => applicationContext.Services.ApplicationTreeService.GetByAlias(x.Item2.Alias) == null
-                                    //make sure the legacy tree isn't added on top of the controller tree!        
-                                    && !added.InvariantContains(x.Item2.Alias));
-
-                    foreach (var tuple in legacyItems)
-                    {
-                        var type = tuple.Item1;
-                        var attr = tuple.Item2;
-
-                        //Add the new tree that doesn't exist in the config that was found by type finding
-                        doc.Root.Add(new XElement("add",
-                                                  new XAttribute("initialize", attr.Initialize),
-                                                  new XAttribute("sortOrder", attr.SortOrder),
-                                                  new XAttribute("alias", attr.Alias),
-                                                  new XAttribute("application", attr.ApplicationAlias),
-                                                  new XAttribute("title", attr.Title),
-                                                  new XAttribute("iconClosed", attr.IconClosed),
-                                                  new XAttribute("iconOpen", attr.IconOpen),
-                                                  new XAttribute("type", type.GetFullNameWithAssembly())));
-                    }
-
-                }, true);
         }
     }
 }
