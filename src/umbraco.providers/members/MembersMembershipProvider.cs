@@ -381,7 +381,13 @@ namespace umbraco.providers.members
                 status = MembershipCreateStatus.DuplicateEmail;
             else
             {
-                Member m = Member.MakeNew(username, email, MemberType.GetByAlias(m_DefaultMemberTypeAlias), User.GetUser(0));
+                var memberType = MemberType.GetByAlias(m_DefaultMemberTypeAlias);
+                if (memberType == null)
+                {
+                    throw new InvalidOperationException("Could not find a member type with alias " + m_DefaultMemberTypeAlias + ". Ensure your membership provider configuration is up to date and that the default member type exists.");
+                }
+
+                Member m = Member.MakeNew(username, email, memberType, User.GetUser(0));
                 m.Password = password;
 
                 MembershipUser mUser =

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.ComponentModel.DataAnnotations;
 using System.Configuration.Provider;
 using System.Linq;
 using System.Security.Cryptography;
@@ -332,6 +333,9 @@ namespace Umbraco.Web.Security.Providers
             member.PasswordQuestion = passwordQuestion;
             member.PasswordAnswer = passwordAnswer;
             
+            //encrypts/hashes the password depending on the settings
+            member.Password = EncryptOrHashPassword(member.Password);
+
             MemberService.Save(member);
             
             status = MembershipCreateStatus.Success;
@@ -362,7 +366,7 @@ namespace Umbraco.Web.Security.Providers
             }
 
             var member = MemberService.GetByUsername(username);
-            var encodedPassword = EncodePassword(password);
+            var encodedPassword = EncryptOrHashPassword(password);
 
             if (member.Password == encodedPassword)
             {
@@ -429,12 +433,12 @@ namespace Umbraco.Web.Security.Providers
             var member = MemberService.GetByUsername(username);
             if (member == null) return false;
             
-            var encodedPassword = EncodePassword(oldPassword);
+            var encodedPassword = EncryptOrHashPassword(oldPassword);
 
             if (member.Password == encodedPassword)
             {
 
-                member.Password = EncodePassword(newPassword);
+                member.Password = EncryptOrHashPassword(newPassword);
                 MemberService.Save(member);
 
                 return true;
@@ -466,7 +470,7 @@ namespace Umbraco.Web.Security.Providers
             if (_requiresQuestionAndAnswer == false || (_requiresQuestionAndAnswer && answer == member.PasswordAnswer))
             {
                 member.Password =
-                    EncodePassword(Membership.GeneratePassword(_minRequiredPasswordLength,
+                    EncryptOrHashPassword(Membership.GeneratePassword(_minRequiredPasswordLength,
                                                                _minRequiredNonAlphanumericCharacters));
                 MemberService.Save(member);
             }
@@ -507,7 +511,7 @@ namespace Umbraco.Web.Security.Providers
             if (member.IsLockedOut)
                 throw new ProviderException("The member is locked out.");
 
-            var encodedPassword = EncodePassword(password);
+            var encodedPassword = EncryptOrHashPassword(password);
             
             var authenticated = (encodedPassword == member.Password);
 
@@ -725,11 +729,9 @@ namespace Umbraco.Web.Security.Providers
 
         private bool IsEmaiValid(string email)
         {
-            const string pattern = @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|" 
-                                   + @"([-a-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)" 
-                                   + @"@[a-z0-9][\w\.-]*[a-z0-9]\.[a-z][a-z\.]*[a-z]$";
+            var validator = new EmailAddressAttribute();
 
-            return Regex.IsMatch(email, pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+            return validator.IsValid(email);
         }
         
         /// <summary>
@@ -737,7 +739,7 @@ namespace Umbraco.Web.Security.Providers
         /// </summary>
         /// <param name="password">The password.</param>
         /// <returns>The encoded password.</returns>
-        private string EncodePassword(string password)
+        private string EncryptOrHashPassword(string password)
         {
             var encodedPassword = password;
             switch (PasswordFormat)
