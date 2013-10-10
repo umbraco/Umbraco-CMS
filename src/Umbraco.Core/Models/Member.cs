@@ -427,7 +427,7 @@ namespace Umbraco.Core.Models
 
         public override void ChangeTrashedState(bool isTrashed, int parentId = -20)
         {
-            throw new NotImplementedException("Members can't be trashed as no Recycle Bin exists, so use of this method is invalid");
+            throw new NotSupportedException("Members can't be trashed as no Recycle Bin exists, so use of this method is invalid");
         }
 
         /* Internal experiment - only used for mapping queries. 

@@ -211,6 +211,8 @@ namespace umbraco.cms.businesslogic.member
         /// <returns>The new member</returns>
         public static Member MakeNew(string Name, string LoginName, string Email, MemberType mbt, User u)
         {
+            if (mbt == null) throw new ArgumentNullException("mbt");
+
             var loginName = (!String.IsNullOrEmpty(LoginName)) ? LoginName : Name;
 
             if (String.IsNullOrEmpty(loginName))
