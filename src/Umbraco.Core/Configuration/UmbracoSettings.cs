@@ -1164,6 +1164,54 @@ namespace Umbraco.Core.Configuration
 			}
 		}
 
+        /// <summary>
+        /// Tells us whether the publishingService should publish or unpublish documents
+        /// Default is true
+        /// </summary>
+        internal static bool ChangePublishedStateOfDocumentsForReleaseAndExpiration
+        {
+            get
+            {
+                try
+                {
+                    bool changePublishedStateOfDocumentsForReleaseAndExpiration;
+                    string value = GetKey("/settings/content/ChangePublishedStateOfDocumentsForReleaseAndExpiration");
+                    if (bool.TryParse(value, out changePublishedStateOfDocumentsForReleaseAndExpiration))
+                        return !changePublishedStateOfDocumentsForReleaseAndExpiration;
+                    // Return default
+                    return true;
+                }
+                catch
+                {
+                    return true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Tells us whether the publishingService should change/refresh create date when publishing document for release
+        /// Default is false
+        /// </summary>
+        internal static bool ChangeCreateDateToRelease
+        {
+            get
+            {
+                try
+                {
+                    bool changeCreateDateToRelease;
+                    string value = GetKey("/settings/content/ChangeCreateDateToRelease");
+                    if (bool.TryParse(value, out changeCreateDateToRelease))
+                        return !changeCreateDateToRelease;
+                    // Return default
+                    return false;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
+
 		/// <summary>
 		/// Tells us whether to use a splash page while umbraco is initializing content. 
 		/// If not, requests are queued while umbraco loads content. For very large sites (+10k nodes) it might be usefull to 

@@ -592,6 +592,24 @@ namespace umbraco
         }
 
         /// <summary>
+        /// Tells us whether the publishingService should publish or unpublish documents
+        /// Default is true
+        /// </summary>
+        public static bool ChangePublishedStateOfDocumentsForReleaseAndExpiration
+        {
+            get { return Umbraco.Core.Configuration.UmbracoSettings.ChangePublishedStateOfDocumentsForReleaseAndExpiration; }
+        }
+
+        /// <summary>
+        /// Tells us whether the publishingService should change/refresh create date when publishing document for release
+        /// Default is false
+        /// </summary>
+        public static bool ChangeCreateDateToRelease
+        {
+            get { return Umbraco.Core.Configuration.UmbracoSettings.ChangeCreateDateToRelease; }
+        }
+
+        /// <summary>
         /// Configuration regarding webservices
         /// </summary>
         /// <remarks>Put in seperate class for more logik/seperation</remarks>
