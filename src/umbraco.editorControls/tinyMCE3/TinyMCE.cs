@@ -498,11 +498,18 @@ namespace umbraco.editorControls.tinyMCE3
 
         private string replaceMacroTags(string text)
         {
-            while (findStartTag(text) > -1)
+            Regex regEx = new Regex("<div([^>]|\n)*?ismacro=\"true\"(.|\n)*?<!--\\s*endUmbMacro\\s*-->\\s*</div>", RegexOptions.IgnoreCase);
+
+            string macroTags = string.Empty;
+
+            while (regEx.IsMatch(text))
             {
-                string result = text.Substring(findStartTag(text), findEndTag(text) - findStartTag(text));
-                text = text.Replace(result, generateMacroTag(result));
+                Match match = regEx.Match(text);
+                macroTags = match.Groups[0].Value;
+
+                text = regEx.Replace(text, generateMacroTag(macroTags), 1);
             }
+
             return text;
         }
 
