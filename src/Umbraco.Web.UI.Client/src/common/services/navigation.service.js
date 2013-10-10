@@ -33,6 +33,7 @@ angular.module('umbraco.services')
                 ui.stickyNavigation = false;
                 ui.showTray = false;
                 service.hideUserDialog();
+                service.hideHelpDialog();
                 //$("#search-form input").focus();    
                 break;
             case 'menu':
@@ -336,6 +337,26 @@ angular.module('umbraco.services')
 
         /**
          * @ngdoc method
+         * @name umbraco.services.navigationService#showUserDialog
+         * @methodOf umbraco.services.navigationService
+         *
+         * @description
+         * Opens the user dialog, next to the sections navigation
+         * template is located in views/common/dialogs/user.html
+         */
+        showHelpDialog: function () {
+            service.helpDialog = dialogService.open(
+                {
+                    template: "views/common/dialogs/help.html",
+                    modalClass: "umb-modal-left",
+                    show: true
+                });
+
+            return service.helpDialog;
+        },
+
+        /**
+         * @ngdoc method
          * @name umbraco.services.navigationService#hideUserDialog
          * @methodOf umbraco.services.navigationService
          *
@@ -350,6 +371,12 @@ angular.module('umbraco.services')
             } 
         },
 
+        hideHelpDialog: function () {
+            if(service.helpDialog){
+                service.helpDialog.close();
+                service.helpDialog = undefined;
+            } 
+        },
 
         /**
          * @ngdoc method

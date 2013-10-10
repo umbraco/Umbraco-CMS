@@ -85,9 +85,15 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             return undefined;
         },
 
-        /** clears the tree cache */
-        clearCache: function() {
-            treeArray = [];
+        /** clears the tree cache - with optional tree alias */
+        clearCache: function(treeAlias) {
+            if(!treeAlias){
+                treeArray.length = 0;  
+            }else{
+                if(treeArray && treeArray.indexOf(treeAlias) >= 0){
+                    treeArray.splice(treeArray.indexOf(treeAlias), 1);
+                }
+            }
         },
 
         /**
