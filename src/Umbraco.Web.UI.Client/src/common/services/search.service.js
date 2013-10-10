@@ -8,7 +8,7 @@ angular.module('umbraco.services')
 			entityResource.search(args.term, "Member").then(function(data){
 
 				_.each(data, function(el){
-					el.menuUrl = "UmbracoTrees/MemberTree/GetMenu?id=" + el.id + "&application=member";
+					el.menuUrl = "UmbracoTrees/MemberTree/GetMenu?id=" + el.Id + "&application=member";
 					el.metaData = {treeAlias: "member"};
 					el.title = el.Fields.nodeName;
 					el.subTitle = el.Fields.email;
@@ -25,12 +25,12 @@ angular.module('umbraco.services')
 			entityResource.search(args.term, "Document").then(function(data){
 
 				_.each(data, function(el){
-					el.menuUrl = "UmbracoTrees/ContentTree/GetMenu?id=" + el.id + "&application=content";
+					el.menuUrl = "UmbracoTrees/ContentTree/GetMenu?id=" + el.Id + "&application=content";
 					el.metaData = {treeAlias: "content"};
 					el.title = el.Fields.nodeName;
 
 					contentResource.getNiceUrl(el.Id).then(function(url){
-						el.subTitle = url;
+						el.subTitle = angular.fromJson(url);
 					});
 				});
 
@@ -45,7 +45,7 @@ angular.module('umbraco.services')
 			entityResource.search(args.term, "Media").then(function(data){
 
 				_.each(data, function(el){
-					el.menuUrl = "UmbracoTrees/MediaTree/GetMenu?id=" + el.id + "&application=media";
+					el.menuUrl = "UmbracoTrees/MediaTree/GetMenu?id=" + el.Id + "&application=media";
 					el.metaData = {treeAlias: "media"};
 					el.title = el.Fields.nodeName;
 				});
