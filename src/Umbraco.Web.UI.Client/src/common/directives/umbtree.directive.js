@@ -32,7 +32,7 @@ angular.module("umbraco.directives")
 
          if(!hideheader){ 
            template +='<div>' + 
-           '<h5><a href="#{{section}}" ng-click="select(this, tree.root, $event)"  class="root-link">{{tree.name}}</a></h5>' +
+           '<h5><a href="#/{{section}}" ng-click="select(this, tree.root, $event)"  class="root-link">{{tree.name}}</a></h5>' +
                '<a href class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(this, tree.root, $event)" ng-swipe-right="options(this, tree.root, $event)"><i></i><i></i><i></i></a>' +
            '</div>';
          }
