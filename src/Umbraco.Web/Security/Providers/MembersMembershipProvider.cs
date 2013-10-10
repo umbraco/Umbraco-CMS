@@ -257,8 +257,9 @@ namespace Umbraco.Web.Security.Providers
         }
 
         /// <summary>
-        /// Adds a new membership user to the data source.
+        /// Adds a new membership user to the data source with the specified member type
         /// </summary>
+        /// <param name="memberType">A specific member type to create the member for</param>
         /// <param name="username">The user name for the new user.</param>
         /// <param name="password">The password for the new user.</param>
         /// <param name="email">The e-mail address for the new user.</param>
@@ -270,16 +271,16 @@ namespace Umbraco.Web.Security.Providers
         /// <returns>
         /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the information for the newly created user.
         /// </returns>
-        public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer,
+        public MembershipUser CreateUser(string memberType, string username, string password, string email, string passwordQuestion, string passwordAnswer,
                                                   bool isApproved, object providerUserKey, out MembershipCreateStatus status)
         {
-            LogHelper.Debug<MembersMembershipProvider>("Member signup requested: username -> " + username + ". email -> " +email);
+            LogHelper.Debug<MembersMembershipProvider>("Member signup requested: username -> " + username + ". email -> " + email);
 
             // Validate password
             if (IsPasswordValid(password) == false)
             {
-               status = MembershipCreateStatus.InvalidPassword;
-               return null;
+                status = MembershipCreateStatus.InvalidPassword;
+                return null;
             }
 
             // Validate email
@@ -327,19 +328,39 @@ namespace Umbraco.Web.Security.Providers
                 return null;
             }
 
-            var member = MemberService.CreateMember(email, username, password, DefaultMemberTypeAlias);
+            var member = MemberService.CreateMember(email, username, password, memberType);
 
             member.IsApproved = isApproved;
             member.PasswordQuestion = passwordQuestion;
             member.PasswordAnswer = passwordAnswer;
-            
+
             //encrypts/hashes the password depending on the settings
             member.Password = EncryptOrHashPassword(member.Password);
 
             MemberService.Save(member);
-            
+
             status = MembershipCreateStatus.Success;
             return member.AsConcreteMembershipUser();
+        }
+
+        /// <summary>
+        /// Adds a new membership user to the data source.
+        /// </summary>
+        /// <param name="username">The user name for the new user.</param>
+        /// <param name="password">The password for the new user.</param>
+        /// <param name="email">The e-mail address for the new user.</param>
+        /// <param name="passwordQuestion">The password question for the new user.</param>
+        /// <param name="passwordAnswer">The password answer for the new user</param>
+        /// <param name="isApproved">Whether or not the new user is approved to be validated.</param>
+        /// <param name="providerUserKey">The unique identifier from the membership data source for the user.</param>
+        /// <param name="status">A <see cref="T:System.Web.Security.MembershipCreateStatus"></see> enumeration value indicating whether the user was created successfully.</param>
+        /// <returns>
+        /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the information for the newly created user.
+        /// </returns>
+        public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer,
+                                                  bool isApproved, object providerUserKey, out MembershipCreateStatus status)
+        {
+            return CreateUser(DefaultMemberTypeAlias, username, password, email, passwordQuestion, passwordAnswer, isApproved, providerUserKey, out status);
         }
 
         /// <summary>

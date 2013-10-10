@@ -363,6 +363,68 @@ namespace umbraco.providers.members
         /// <summary>
         /// Adds a new membership user to the data source.
         /// </summary>
+        /// <param name="memberTypeAlias"></param>
+        /// <param name="username">The user name for the new user.</param>
+        /// <param name="password">The password for the new user.</param>
+        /// <param name="email">The e-mail address for the new user.</param>
+        /// <param name="passwordQuestion">The password question for the new user.</param>
+        /// <param name="passwordAnswer">The password answer for the new user</param>
+        /// <param name="isApproved">Whether or not the new user is approved to be validated.</param>
+        /// <param name="providerUserKey">The unique identifier from the membership data source for the user.</param>
+        /// <param name="status">A <see cref="T:System.Web.Security.MembershipCreateStatus"></see> enumeration value indicating whether the user was created successfully.</param>
+        /// <returns>
+        /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the information for the newly created user.
+        /// </returns>
+        public MembershipUser CreateUser(string memberTypeAlias, string username, string password, string email, string passwordQuestion,
+                                                  string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
+        {
+            if (Member.GetMemberFromLoginName(username) != null)
+                status = MembershipCreateStatus.DuplicateUserName;
+            else if (Member.GetMemberFromEmail(email) != null && RequiresUniqueEmail)
+                status = MembershipCreateStatus.DuplicateEmail;
+            else
+            {
+                var memberType = MemberType.GetByAlias(memberTypeAlias);
+                if (memberType == null)
+                {
+                    throw new InvalidOperationException("Could not find a member type with alias " + memberTypeAlias + ". Ensure your membership provider configuration is up to date and that the default member type exists.");
+                }
+
+                Member m = Member.MakeNew(username, email, memberType, User.GetUser(0));
+                m.Password = password;
+
+                MembershipUser mUser =
+                    ConvertToMembershipUser(m);
+
+                // custom fields
+                if (!String.IsNullOrEmpty(m_PasswordRetrievalQuestionPropertyTypeAlias))
+                    UpdateMemberProperty(m, m_PasswordRetrievalQuestionPropertyTypeAlias, passwordQuestion);
+
+                if (!String.IsNullOrEmpty(m_PasswordRetrievalAnswerPropertyTypeAlias))
+                    UpdateMemberProperty(m, m_PasswordRetrievalAnswerPropertyTypeAlias, passwordAnswer);
+
+                if (!String.IsNullOrEmpty(m_ApprovedPropertyTypeAlias))
+                    UpdateMemberProperty(m, m_ApprovedPropertyTypeAlias, isApproved);
+
+                if (!String.IsNullOrEmpty(m_LastLoginPropertyTypeAlias))
+                {
+                    mUser.LastActivityDate = DateTime.Now;
+                    UpdateMemberProperty(m, m_LastLoginPropertyTypeAlias, mUser.LastActivityDate);
+                }
+
+                // save
+                m.Save();
+
+                status = MembershipCreateStatus.Success;
+
+                return mUser;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Adds a new membership user to the data source.
+        /// </summary>
         /// <param name="username">The user name for the new user.</param>
         /// <param name="password">The password for the new user.</param>
         /// <param name="email">The e-mail address for the new user.</param>
@@ -377,47 +439,7 @@ namespace umbraco.providers.members
         public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion,
             string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
         {
-            if (Member.GetMemberFromLoginName(username) != null)
-                status = MembershipCreateStatus.DuplicateUserName;
-            else if (Member.GetMemberFromEmail(email) != null && RequiresUniqueEmail)
-                status = MembershipCreateStatus.DuplicateEmail;
-            else
-            {
-                var memberType = MemberType.GetByAlias(m_DefaultMemberTypeAlias);
-                if (memberType == null)
-                {
-                    throw new InvalidOperationException("Could not find a member type with alias " + m_DefaultMemberTypeAlias + ". Ensure your membership provider configuration is up to date and that the default member type exists.");
-                }
-
-                Member m = Member.MakeNew(username, email, memberType, User.GetUser(0));
-                m.Password = password;
-
-                MembershipUser mUser =
-                    ConvertToMembershipUser(m);
-
-                // custom fields
-                if (!String.IsNullOrEmpty(m_PasswordRetrievalQuestionPropertyTypeAlias))
-                    UpdateMemberProperty(m, m_PasswordRetrievalQuestionPropertyTypeAlias, passwordQuestion);
-                
-                if (!String.IsNullOrEmpty(m_PasswordRetrievalAnswerPropertyTypeAlias))
-                    UpdateMemberProperty(m, m_PasswordRetrievalAnswerPropertyTypeAlias, passwordAnswer);
-                
-                if (!String.IsNullOrEmpty(m_ApprovedPropertyTypeAlias))
-                    UpdateMemberProperty(m, m_ApprovedPropertyTypeAlias, isApproved);
-                
-                if (!String.IsNullOrEmpty(m_LastLoginPropertyTypeAlias)) {
-                    mUser.LastActivityDate = DateTime.Now;
-                    UpdateMemberProperty(m, m_LastLoginPropertyTypeAlias, mUser.LastActivityDate);
-                }
-
-                // save
-                m.Save();
-
-                status = MembershipCreateStatus.Success;
-
-                return mUser;
-            }
-            return null;
+            return CreateUser(m_DefaultMemberTypeAlias, username, password, email, passwordQuestion, passwordAnswer, isApproved, providerUserKey, out status);
         }
 
         /// <summary>
