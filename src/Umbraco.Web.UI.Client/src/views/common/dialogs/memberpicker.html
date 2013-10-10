@@ -1,11 +1,44 @@
 <div class="umb-panel" ng-controller="Umbraco.Dialogs.MemberPickerController">
-	<div class="umb-panel-body no-header">
-		<div class="umb-pane">
+	<div class="umb-panel-header">
+		<div class="umb-el-wrap umb-panel-buttons">
+			        <div class="form-search">
+	                    <i class="icon-search"></i>
+	                    <input type="text" 
+	                           ng-model="term" 
+	                           class="umb-search-field search-query" 
+	                           placeholder="Filter..."
+	                           on-keyup="performSearch()">
+	                </div>
+	    </div>
+	</div>
+	<div class="umb-panel-body with-footer">
+		<!-- Search results -->
+		<div id="search-results" class="umb-pane" ng-show="showSearch">
+			<ul class="umb-tree">
+		        <li class="root">
+		            <ul class="umb-search-group" ng-repeat="resultGroup in results">
+		                <li ng-repeat="result in resultGroup.matches">
+		                    <div style="padding-left: 20px">
+		                    <a ng-class="{first:$first}" ng-href="#/{{resultGroup.editor}}{{result.id}}">
+		                           <i 
+		                            class="icon umb-tree-icon sprTree {{resultGroup.icon}}"></i>
+		                            {{result.name}}
+		                        </a>
+		                    </div>
+		                </li>
+		            </ul>
+
+		        </li>
+		    </ul>    
+		</div>
+
+		<div class="umb-pane" ng-hide="showSearch">
+
 				<umb-tree 
 				    section="member" 
-                    activetree = "members"
+                    treealias="member"
 				    cachekey="memberpickerDialog" 
-					showheader="true" 
+					showheader="false" 
 					showoptions="false"
 					eventhandler="dialogTreeEventHandler">
 				</umb-tree>

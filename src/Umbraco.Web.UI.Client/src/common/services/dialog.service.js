@@ -66,7 +66,7 @@ angular.module('umbraco.services')
            var scope = options.scope || $rootScope.$new();
            
            //Modal dom obj and unique id
-           dialog.element = $('<div ng-swipe-left="hide()" ng-swipe-right="hide()"  data-backdrop="false"></div>');
+           dialog.element = $('<div ng-swipe-right="hide()"  data-backdrop="false"></div>');
            var id = dialog.template.replace('.html', '').replace('.aspx', '').replace(/[\/|\.|:\&\?\=]/g, "-") + '-' + scope.$id;
 
            if (options.inline) {
@@ -320,25 +320,6 @@ angular.module('umbraco.services')
 
            /**
             * @ngdoc method
-            * @name umbraco.services.dialogService#memberPicker
-            * @methodOf umbraco.services.dialogService
-            *
-            * @description
-            * Opens a member picker tree in a modal, the callback returns an array of selected documents
-            * @param {Object} options member picker dialog options object
-            * @param {$scope} options.scope dialog scope
-            * @param {$scope} options.multipicker should the picker return one or multiple items
-            * @param {Function} options.callback callback function
-            * @returns {Object} modal object
-            */
-           memberPicker: function (options) {
-               options.template = 'views/common/dialogs/memberPicker.html';
-               options.show = true;
-               return openDialog(options);
-           },
-           
-           /**
-            * @ngdoc method
             * @name umbraco.services.dialogService#linkPicker
             * @methodOf umbraco.services.dialogService
             *
@@ -376,6 +357,25 @@ angular.module('umbraco.services')
 
            /**
             * @ngdoc method
+            * @name umbraco.services.dialogService#memberPicker
+            * @methodOf umbraco.services.dialogService
+            *
+            * @description
+            * Opens a member picker in a modal, the callback returns a object representing the selected member
+            * @param {Object} options member picker dialog options object
+            * @param {$scope} options.scope dialog scope
+            * @param {$scope} options.multiPicker should the tree pick one or multiple members before returning
+            * @param {Function} options.callback callback function
+            * @returns {Object} modal object
+            */
+           memberPicker: function (options) {
+               options.template = 'views/common/dialogs/memberPicker.html';
+               options.show = true;
+              return openDialog(options);
+           },
+
+           /**
+            * @ngdoc method
             * @name umbraco.services.dialogService#iconPicker
             * @methodOf umbraco.services.dialogService
             *
@@ -402,6 +402,7 @@ angular.module('umbraco.services')
             * @param {Object} options iconpicker dialog options object
             * @param {$scope} options.scope dialog scope
             * @param {$scope} options.section tree section to display
+            * @param {$scope} options.treeAlias specific tree to display
             * @param {$scope} options.multiPicker should the tree pick one or multiple items before returning
             * @param {Function} options.callback callback function
             * @returns {Object} modal object

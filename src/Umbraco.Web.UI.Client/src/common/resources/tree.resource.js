@@ -39,12 +39,19 @@ function treeResource($q, $http, umbRequestHelper) {
                 throw "The object specified for does not contain a 'section' property";
             }
 
+            if(!options.tree){
+                options.tree = "";
+            }                
+
             return umbRequestHelper.resourcePromise(
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "treeApplicationApiBaseUrl",
                         "GetApplicationTrees",
-                        [{ application: options.section }])),
+                            [
+                                {application: options.section}, 
+                                {tree: options.tree} 
+                            ])),
                 'Failed to retreive data for application tree ' + options.section);
         },
         

@@ -19,24 +19,31 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
          */
         dictionaryToQueryString: function (queryStrings) {
 
-            if (!angular.isArray(queryStrings)) {
-                throw "The queryString parameter is not an array of key value pairs";
+            
+            if (angular.isArray(queryStrings)) {
+                return _.map(queryStrings, function (item) {
+                    var key = null;
+                    var val = null;
+                    for (var k in item) {
+                        key = k;
+                        val = item[k];
+                        break;
+                    }
+                    if (key === null || val === null) {
+                        throw "The object in the array was not formatted as a key/value pair";
+                    }
+                    return key + "=" + val;
+                }).join("&");
             }
 
-            return _.map(queryStrings, function (item) {
-                var key = null;
-                var val = null;
-                for (var k in item) {
-                    key = k;
-                    val = item[k];
-                    break;
-                }
-                if (key == null || val == null) {
-                    throw "The object in the array was not formatted as a key/value pair";
-                }
-                return key + "=" + val;
-            }).join("&");
+            /*
+            //if we have a simple object, we can simply map with $.param
+            //but with the current structure we cant since an array is an object and an object is an array
+            if(angular.isObject(queryStrings)){
+                return decodeURIComponent($.param(queryStrings)); 
+            }*/
 
+            throw "The queryString parameter is not an array of key value pairs";
         },
 
         /**

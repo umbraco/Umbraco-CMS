@@ -1,8 +1,20 @@
 //used for the member picker dialog
 angular.module("umbraco").controller("Umbraco.Dialogs.MemberPickerController",
-	function ($scope, eventsService, $log) {	
+	function ($scope, eventsService, searchService, $log) {	
 	var dialogOptions = $scope.$parent.dialogOptions;
 	$scope.dialogTreeEventHandler = $({});
+	$scope.results = [];
+
+	$scope.performSearch = function(){
+		if($scope.term){
+			searchService.searchMembers({term: $scope.term, results: $scope.results});
+			$scope.showSearch = true;
+		}else{
+			$scope.showSearch = false;
+		}
+		
+	};
+
 
 	$scope.dialogTreeEventHandler.bind("treeNodeSelect", function(ev, args){
 		args.event.preventDefault();
@@ -21,7 +33,6 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberPickerController",
 					c.find(".temporary").remove();
 					c.find("i.umb-tree-icon").show();
 				}
-
 				$scope.select(args.node);
 
 			}else{
