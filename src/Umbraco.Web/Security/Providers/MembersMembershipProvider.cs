@@ -689,7 +689,7 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            var byEmail = MemberService.GetMembersByEmails(emailToMatch).ToArray();
+            var byEmail = MemberService.FindMembersByEmail(emailToMatch).ToArray();
             totalRecords = byEmail.Length;
             var pagedResult = new PagedResult<IMember>(totalRecords, pageIndex, pageSize);
 

@@ -445,7 +445,7 @@ namespace umbraco.providers.members
         /// </returns>
         public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            var byEmail = ApplicationContext.Current.Services.MemberService.GetMembersByEmails(emailToMatch).ToArray();
+            var byEmail = ApplicationContext.Current.Services.MemberService.FindMembersByEmail(emailToMatch).ToArray();
             totalRecords = byEmail.Length;
             var pagedResult = new PagedResult<IMember>(totalRecords, pageIndex, pageSize);
 

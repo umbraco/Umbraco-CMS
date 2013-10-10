@@ -404,28 +404,6 @@ namespace Umbraco.Core.Persistence.Repositories
             return BuildFromDtos(dtos);
         }
 
-        public IEnumerable<IMember> GetMembersByEmails(params string[] emails)
-        {
-            var sql = GetBaseQuery(false);
-            if (emails.Any())
-            {
-                var statement = string.Join(" OR ", 
-                    emails.Select(x => 
-                        string.Format(
-                        "cmsMember.Email='{0}'", 
-                        //we have to escape the @ symbol for petapoco to work!! with 2 @@ symbols
-                        Database.EscapeAtSymbols(x))));
-                sql.Where(statement);
-            }
-            sql.OrderByDescending<ContentVersionDto>(x => x.VersionDate);
-
-            var dtos =
-                Database.Fetch<MemberReadOnlyDto, PropertyDataReadOnlyDto, MemberReadOnlyDto>(
-                    new PropertyDataRelator().Map, sql);
-
-            return BuildFromDtos(dtos);
-        }
-
         private IMember BuildFromDto(List<MemberReadOnlyDto> dtos)
         {
             if (dtos == null || dtos.Any() == false)

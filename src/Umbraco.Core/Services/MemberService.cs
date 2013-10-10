@@ -108,11 +108,22 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IEnumerable<IMember> GetMembersByEmails(params string[] emails)
+        /// <summary>
+        /// Does a search for members that contain the specified string in their email address
+        /// </summary>
+        /// <param name="emailStringToMatch"></param>
+        /// <returns></returns>
+        public IEnumerable<IMember> FindMembersByEmail(string emailStringToMatch)
         {
-            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                return repository.GetMembersByEmails(emails);
+                var query = new Query<IMember>();
+
+
+                query.Where(member => member.Email.Contains(emailStringToMatch));
+
+                return repository.GetByQuery(query);
             }
         }
 

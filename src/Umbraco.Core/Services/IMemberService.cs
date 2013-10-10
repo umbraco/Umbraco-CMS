@@ -36,6 +36,6 @@ namespace Umbraco.Core.Services
 
         void Save(IMember membershipUser);
 
-        IEnumerable<IMember> GetMembersByEmails(params string[] emails);
+        IEnumerable<IMember> FindMembersByEmail(string emailStringToMatch);
     }
 }
