@@ -12,6 +12,7 @@ angular.module('umbraco.services')
 					el.metaData = {treeAlias: "member"};
 					el.title = el.Fields.nodeName;
 					el.subTitle = el.Fields.email;
+					el.id = el.Id;
 				});
 
 				args.results.push({
@@ -28,6 +29,7 @@ angular.module('umbraco.services')
 					el.menuUrl = "UmbracoTrees/ContentTree/GetMenu?id=" + el.Id + "&application=content";
 					el.metaData = {treeAlias: "content"};
 					el.title = el.Fields.nodeName;
+					el.id = el.Id;
 
 					contentResource.getNiceUrl(el.Id).then(function(url){
 						el.subTitle = angular.fromJson(url);
@@ -48,6 +50,7 @@ angular.module('umbraco.services')
 					el.menuUrl = "UmbracoTrees/MediaTree/GetMenu?id=" + el.Id + "&application=media";
 					el.metaData = {treeAlias: "media"};
 					el.title = el.Fields.nodeName;
+					el.id = el.Id;
 				});
 
 				args.results.push({

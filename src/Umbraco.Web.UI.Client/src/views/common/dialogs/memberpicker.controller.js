@@ -25,6 +25,10 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberPickerController",
 		args.event.preventDefault();
 		args.event.stopPropagation();
 
+		if(args.node.nodetype === "member-folder"){
+			return;
+		}
+		
 		eventsService.publish("Umbraco.Dialogs.MemberPickerController.Select", args).then(function(args){
 			if(dialogOptions && dialogOptions.multipicker){
 				
