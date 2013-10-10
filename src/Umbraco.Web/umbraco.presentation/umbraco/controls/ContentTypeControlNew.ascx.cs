@@ -120,6 +120,11 @@ namespace umbraco.controls
                 PanePropertiesInherited.Visible = true;
             }
 
+            if (string.IsNullOrEmpty(_contentType.IconUrl))
+                lt_icon.Text = "icon-document";
+            else
+                lt_icon.Text = _contentType.IconUrl.TrimStart('.');
+
             checkTxtAliasJs.Text = string.Format("checkAlias('{0}');", txtAlias.ClientID);
         }
         
@@ -263,6 +268,9 @@ namespace umbraco.controls
         /// <param name="e"></param>
         protected void save_click(object sender, EventArgs e)
         {
+
+            //sync state betweet lt and hidden value
+            lt_icon.Text = tb_icon.Value;
 
             var state = new SaveAsyncState(
                 UmbracoContext,

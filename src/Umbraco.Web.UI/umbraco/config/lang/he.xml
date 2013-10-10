@@ -35,6 +35,12 @@
     <key alias="toPublish">שלח לפירסום</key>
     <key alias="translate">תרגם</key>
     <key alias="update">עדכן</key>
+    <key alias="DeleteCMSImportAction">Delete</key>
+    <key alias="ExecuteCMSImportWizardAction">Execute</key>
+    <key alias="ScheduleCMSImportWizardAction">Schedule</key>
+    <key alias="StartCMSImportWizardAction">Import Data</key>
+    <key alias="StartCMSImportChildDefinitionAction">Create child definition</key>
+    <key alias="LastRunInfoAction">Scheduled task log</key>
   </area>
   <area alias="assignDomain">
     <key alias="addNew">הוסף דומיין חדש</key>
