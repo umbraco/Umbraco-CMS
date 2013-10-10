@@ -52,7 +52,7 @@ namespace Umbraco.Web.Trees
                         //get the members from our member data layer
                         nodes.AddRange(
                             Member.getMemberFromFirstLetter(id.ToCharArray()[0])
-                                        .Select(m => CreateTreeNode(m.UniqueId.ToString("N"), queryStrings, m.Text, "icon-user"));
+                                        .Select(m => CreateTreeNode(m.UniqueId.ToString("N"), queryStrings, m.Text, "icon-user")));
                     }
                     else
                     {
