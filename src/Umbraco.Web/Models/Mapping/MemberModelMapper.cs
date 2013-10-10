@@ -91,6 +91,7 @@ namespace Umbraco.Web.Models.Mapping
                                 { "hasPassword", member.Password.IsNullOrWhiteSpace() == false },
                                 { "minPasswordLength", membershipProvider.MinRequiredPasswordLength },
                                 { "enableReset", membershipProvider.EnablePasswordReset },
+                                { "enablePasswordRetrieval" , membershipProvider.EnablePasswordRetrieval },
                                 { "requiresQuestionAnswer", membershipProvider.RequiresQuestionAndAnswer }
                                 //TODO: Inject the other parameters in here to change the behavior of this control - based on the membership provider settings.
                             }

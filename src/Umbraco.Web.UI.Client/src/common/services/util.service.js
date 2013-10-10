@@ -221,12 +221,7 @@ function umbDataFormatter() {
             });
             saveModel.email = propEmail.value;
             saveModel.username = propLogin.value;
-            //NOTE: This would only be set for new members!            
-            if (angular.isString(propPass.value)) {
-                // if we are resetting or changing passwords then that data will come from the property editor and
-                // it's value will be an object not just a string.
-                saveModel.password = propPass.value;
-            }
+            saveModel.password = propPass.value;
 
             return saveModel;
         },

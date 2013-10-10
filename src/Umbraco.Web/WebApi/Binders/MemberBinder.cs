@@ -54,7 +54,7 @@ namespace Umbraco.Web.WebApi.Binders
             }
 
             //return the new member with the details filled in
-            return new Member(model.Name, model.Email, model.Username, model.Password, -1, contentType);
+            return new Member(model.Name, model.Email, model.Username, model.Password.NewPassword, -1, contentType);
         }
 
         protected override ContentItemDto<IMember> MapFromPersisted(MemberSave model)
