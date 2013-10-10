@@ -40,17 +40,6 @@ namespace Umbraco.Web.Editors
                 return null;
 
             return ExamineSearch(query, type);
-
-            /*
-            switch (type)
-            {
-                case UmbracoEntityTypes.Document:
-                    
-                case UmbracoEntityTypes.Media:
-                    return ExamineSearch(query, UmbracoEntityType);
-                default:
-                    throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + type);
-            }*/
         }
 
         /// <summary>
@@ -107,6 +96,7 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Member:
                     searcher = Constants.Examine.InternalMemberSearcher;
                     type = "member";
+                    fields = new[] { "id", "email", "login","name", "nodename"};
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
