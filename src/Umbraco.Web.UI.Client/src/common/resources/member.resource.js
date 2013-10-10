@@ -30,7 +30,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @methodOf umbraco.resources.memberResource
          *
          * @description
-         * Gets a member item with a given id
+         * Gets a member item with a given key
          *
          * ##usage
          * <pre>
@@ -41,7 +41,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *    });
          * </pre> 
          * 
-         * @param {Int} id id of member item to return        
+         * @param {Guid} key key of member item to return        
          * @returns {Promise} resourcePromise object containing the member item.
          *
          */
@@ -62,7 +62,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @methodOf umbraco.resources.memberResource
          *
          * @description
-         * Deletes a member item with a given id
+         * Deletes a member item with a given key
          *
          * ##usage
          * <pre>
@@ -72,7 +72,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *    });
          * </pre> 
          * 
-         * @param {Int} id id of member item to delete        
+         * @param {Guid} key id of member item to delete        
          * @returns {Promise} resourcePromise object.
          *
          */
