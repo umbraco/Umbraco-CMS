@@ -108,7 +108,7 @@ namespace Umbraco.Core.Models.EntityBase
         /// Please note that resetting the dirty properties could potentially
         /// obstruct the saving of a new or updated entity.
         /// </remarks>
-        internal virtual void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+        public virtual void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
         {
             if (rememberPreviouslyChangedProperties)
             {

@@ -464,7 +464,7 @@ namespace Umbraco.Core.Models
         /// also reset the dirty changes made to the content's Properties (user defined)
         /// </summary>
         /// <param name="rememberPreviouslyChangedProperties"></param>
-        internal override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+        public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
         {
             base.ResetDirtyProperties(rememberPreviouslyChangedProperties);
 
