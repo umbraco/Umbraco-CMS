@@ -13,12 +13,13 @@ angular.module("umbraco.directives")
 
       scope: {
         section: '@',
+        treealias: '@',
+        path: '@',
         activetree: '@',
         showoptions: '@',
         showheader: '@',
         cachekey: '@',
-        eventhandler: '=',
-        path: '@'
+        eventhandler: '='
       },
 
       compile: function (element, attrs) {
@@ -73,14 +74,14 @@ angular.module("umbraco.directives")
                     enableDeleteAnimations = false;
 
                     //use $q.when because a promise OR raw data might be returned.
-                    $q.when(treeService.getTree({ section: scope.section, cachekey: scope.cachekey }))
+                    $q.when(treeService.getTree({ section: scope.section, tree: scope.treealias, cachekey: scope.cachekey }))
                         .then(function (data) {
                             //set the data once we have it
-                            
+                            scope.tree = data;
 
                             //do timeout so that it re-enables them after this digest
                             $timeout(function() {
-                                scope.tree = data;
+                                
                                 //enable delete animations
                                 enableDeleteAnimations = true;
                             });
