@@ -190,6 +190,63 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void MemberRepository_Does_Not_Replace_Password_When_Null()
+        {
+            IMember sut;
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
+                var memberType = MockedContentTypes.CreateSimpleMemberType();
+                memberTypeRepository.AddOrUpdate(memberType);
+                unitOfWork.Commit();
+
+                var member = MockedMember.CreateSimpleContent(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty", -1);
+                repository.AddOrUpdate(member);
+                unitOfWork.Commit();
+
+                sut = repository.Get(member.Id);
+                //when the password is null it will not overwrite what is already there.
+                sut.Password = null;
+                repository.AddOrUpdate(sut);
+                unitOfWork.Commit();
+                sut = repository.Get(member.Id);
+
+                Assert.That(sut.Password, Is.EqualTo("123"));
+            }
+        }
+
+        [Test]
+        public void MemberRepository_Can_Update_Email_And_Login_When_Changed()
+        {
+            IMember sut;
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
+                var memberType = MockedContentTypes.CreateSimpleMemberType();
+                memberTypeRepository.AddOrUpdate(memberType);
+                unitOfWork.Commit();
+
+                var member = MockedMember.CreateSimpleContent(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty", -1);
+                repository.AddOrUpdate(member);
+                unitOfWork.Commit();
+
+                sut = repository.Get(member.Id);
+                sut.Username = "This is new";
+                sut.Email = "thisisnew@hello.com";
+                repository.AddOrUpdate(sut);
+                unitOfWork.Commit();
+                sut = repository.Get(member.Id);
+
+                Assert.That(sut.Email, Is.EqualTo("thisisnew@hello.com"));
+                Assert.That(sut.Username, Is.EqualTo("This is new"));
+            }
+        }
+
+        [Test]
         public void Can_Create_Correct_Subquery()
         {
             var query = Query<IMember>.Builder.Where(x =>
