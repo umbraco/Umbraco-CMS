@@ -57,7 +57,7 @@ namespace Umbraco.Web.Editors
                     {
                         //they are changing their login name
                         if (existingByEmail.Cast<MembershipUser>().Select(x => x.UserName)
-                            .Any(x => x.InvariantEquals(contentItem.Username.Trim())))
+                            .Any(x => x == contentItem.Username.Trim()))
                         {
                             //the user cannot use this login
                             return false;
@@ -67,7 +67,7 @@ namespace Umbraco.Web.Editors
                 case ContentSaveAction.SaveNew:
                     //check if the user's login already exists
                     if (existingByEmail.Cast<MembershipUser>().Select(x => x.UserName)
-                        .Any(x => x.InvariantEquals(contentItem.Username.Trim())))
+                        .Any(x => x == contentItem.Username.Trim()))
                     {
                         //the user cannot use this login
                         return false;

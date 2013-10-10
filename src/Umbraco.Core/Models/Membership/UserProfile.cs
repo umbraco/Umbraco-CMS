@@ -133,7 +133,7 @@ namespace Umbraco.Core.Models.Membership
         /// be flagged as dirty.
         /// </summary>
         /// <param name="rememberPreviouslyChangedProperties"></param>
-        internal override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+        public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
         {
             _addedSections.Clear();
             _removedSections.Clear();

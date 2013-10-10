@@ -172,7 +172,7 @@ namespace Umbraco.Core.Models
             OnPropertyChanged(PropertiesSelector);
         }
         
-        internal override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
+        public override void ResetDirtyProperties(bool rememberPreviouslyChangedProperties)
         {
             _addedProperties.Clear();
             _removedProperties.Clear();
