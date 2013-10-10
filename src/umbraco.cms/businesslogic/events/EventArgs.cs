@@ -7,7 +7,10 @@ using umbraco.cms.businesslogic.web;
 
 namespace umbraco.cms.businesslogic {
     //Content Event args
-    public class PublishEventArgs : System.ComponentModel.CancelEventArgs { }
+    public class PublishEventArgs : System.ComponentModel.CancelEventArgs 
+    {
+        public bool HasPreviouslyPublishedVersion { get; set; }
+    }
     public class MoveEventArgs : System.ComponentModel.CancelEventArgs { }
     public class CopyEventArgs : System.ComponentModel.CancelEventArgs
     {

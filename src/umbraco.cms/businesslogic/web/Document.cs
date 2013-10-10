@@ -431,6 +431,20 @@ namespace umbraco.cms.businesslogic.web
             ApplicationContext.Current.Services.ContentService.RePublishAll();
         }
 
+        public void RePublish()
+        {
+            XmlDocument xd = new XmlDocument();
+
+            try
+            {
+                new Document(Id, GetPublishedVersion().Version).XmlGenerate(xd);
+            }
+            catch (Exception ee)
+            {
+                Log.Add(LogTypes.Error, User.GetUser(0), Id, string.Format("Error generating xml: {0}", ee));
+            }
+        }
+
         public static void RegeneratePreviews()
         {
             XmlDocument xd = new XmlDocument();
@@ -810,6 +824,9 @@ namespace umbraco.cms.businesslogic.web
         internal bool PublishWithResult(User u, bool omitCacheRefresh)
         {
             var e = new PublishEventArgs();
+
+            e.HasPreviouslyPublishedVersion = HasPublishedVersion();
+
             FireBeforePublish(e);
 
             if (!e.Cancel)
@@ -1050,7 +1067,7 @@ namespace umbraco.cms.businesslogic.web
         {
             return Content.HasPublishedVersion();
         }
-
+        
         /// <summary>
         /// Pending changes means that there have been property/data changes since the last published version.
         /// This is determined by the comparing the version date to the updated date. if they are different by more than 2 seconds, 
