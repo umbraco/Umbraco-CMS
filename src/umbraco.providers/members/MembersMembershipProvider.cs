@@ -1,20 +1,26 @@
 #region namespace
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Web.Security;
 using System.Configuration;
+using Umbraco.Core;
+using Umbraco.Core.Models;
 using umbraco.BusinessLogic;
 using System.Security.Cryptography;
 using System.Web.Util;
 using System.Collections.Specialized;
 using System.Configuration.Provider;
 using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.member;
-
 using System.Security;
 using System.Security.Permissions;
 using System.Runtime.CompilerServices;
+using Member = umbraco.cms.businesslogic.member.Member;
+using MemberType = umbraco.cms.businesslogic.member.MemberType;
+using Umbraco.Core.Models.Membership;
+using User = umbraco.BusinessLogic.User;
+
 #endregion
 
 namespace umbraco.providers.members
@@ -439,7 +445,16 @@ namespace umbraco.providers.members
         /// </returns>
         public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            throw new Exception("The method or operation is not implemented.");
+            var byEmail = ApplicationContext.Current.Services.MemberService.GetMembersByEmails(emailToMatch).ToArray();
+            totalRecords = byEmail.Length;
+            var pagedResult = new PagedResult<IMember>(totalRecords, pageIndex, pageSize);
+
+            var collection = new MembershipUserCollection();            
+            foreach (var m in byEmail.Skip(pagedResult.SkipSize).Take(pageSize))
+            {
+                collection.Add(m.AsConcreteMembershipUser());
+            }
+            return collection;
         }
 
         /// <summary>
@@ -751,7 +766,7 @@ namespace umbraco.providers.members
 
             return null;
         }
-
+        
         /// <summary>
         /// Verifies that the specified user name and password exist in the data source.
         /// </summary>
@@ -973,6 +988,7 @@ namespace umbraco.providers.members
                   DateTime.Now, DateTime.Now, DateTime.Now);
             }
         }
+
         #endregion
     }
 }

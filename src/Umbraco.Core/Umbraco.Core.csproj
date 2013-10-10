@@ -209,6 +209,7 @@
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipUser.cs" />
     <Compile Include="Models\MemberType.cs" />
+    <Compile Include="Models\PagedResult.cs" />
     <Compile Include="Models\Rdbms\MemberReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\MemberTypeReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\PropertyDataReadOnlyDto.cs" />

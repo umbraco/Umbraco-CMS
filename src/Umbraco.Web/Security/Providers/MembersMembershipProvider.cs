@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Configuration.Provider;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -8,6 +9,7 @@ using System.Web.Hosting;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models.Membership;
 
@@ -687,7 +689,16 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            throw new System.NotImplementedException();
+            var byEmail = MemberService.GetMembersByEmails(emailToMatch).ToArray();
+            totalRecords = byEmail.Length;
+            var pagedResult = new PagedResult<IMember>(totalRecords, pageIndex, pageSize);
+
+            var collection = new MembershipUserCollection();
+            foreach (var m in byEmail.Skip(pagedResult.SkipSize).Take(pageSize))
+            {
+                collection.Add(m.AsConcreteMembershipUser());
+            }
+            return collection;
         }
 
         #region Private methods

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -16,6 +17,19 @@ namespace Umbraco.Core.Persistence
         internal delegate void CreateTableEventHandler(string tableName, Database db, TableCreationEventArgs e);
 
         internal static event CreateTableEventHandler NewTable;
+
+        /// <summary>
+        /// This will escape single @ symbols for peta poco values so it doesn't think it's a parameter
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static string EscapeAtSymbols(this Database db, string value)
+        {
+            //this fancy regex will only match a single @ not a double, etc...
+            var regex = new Regex("(?<!@)@(?!@)");
+            return regex.Replace(value, "@@");
+        }
 
         public static void CreateTable<T>(this Database db)
            where T : new()

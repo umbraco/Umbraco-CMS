@@ -44,3 +44,4 @@ using System.Security.Permissions;
 [assembly: InternalsVisibleTo("Concorde.Sync")]
 [assembly: InternalsVisibleTo("Umbraco.Belle")]
 [assembly: InternalsVisibleTo("Umbraco.VisualStudio")]
+[assembly: InternalsVisibleTo("umbraco.providers")]
