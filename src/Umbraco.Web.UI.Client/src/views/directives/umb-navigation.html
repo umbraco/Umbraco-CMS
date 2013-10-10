@@ -1,5 +1,5 @@
 <div id="leftcolumn" ng-controller="Umbraco.NavigationController" 
-    ng-mouseleave="nav.leaveTree($event)" ng-mouseenter="nav.enterTree($event)" >
+    ng-mouseleave="nav.leaveTree($event)" ng-mouseenter="nav.enterTree($event)">
     
     <umb-sections sections="sections" current-section="currentSection"></umb-sections>
 
@@ -38,9 +38,12 @@
                             <li ng-repeat="result in resultGroup.matches">
                                 <div style="padding-left: 20px">
                                 <a ng-class="{'first':$first}" ng-href="#/{{resultGroup.editor}}{{result.id}}">
-                                       <i 
-                                        class="icon umb-tree-icon sprTree {{resultGroup.icon}}"></i>
-                                        {{result.name}}
+
+                                       <i class="icon umb-tree-icon sprTree {{resultGroup.icon}}" style="height: 100%"></i>
+                                            {{result.title}}
+                                            <small class="search-subtitle" ng-show="result.subTitle">
+                                                {{result.subTitle}}
+                                            </small>
                                     </a>
 
                                     <a href ng-click="searchShowMenu($event, {node: result})" class="umb-options"><i></i><i></i><i></i></a>
@@ -79,5 +82,4 @@
             </div>
         </div>
     </div>
-
 </div>

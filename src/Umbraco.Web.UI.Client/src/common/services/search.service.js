@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-.factory('searchService', function ($q, $log, entityResource) {
+.factory('searchService', function ($q, $log, entityResource, contentResource) {
 	var m = {results: []};
 	var service = {
 		results: m,
@@ -10,6 +10,8 @@ angular.module('umbraco.services')
 				_.each(data, function(el){
 					el.menuUrl = "UmbracoTrees/MemberTree/GetMenu?id=" + el.id + "&application=member";
 					el.metaData = {treeAlias: "member"};
+					el.title = el.Fields.nodeName;
+					el.subTitle = el.Fields.email;
 				});
 
 				args.results.push({
@@ -25,6 +27,11 @@ angular.module('umbraco.services')
 				_.each(data, function(el){
 					el.menuUrl = "UmbracoTrees/ContentTree/GetMenu?id=" + el.id + "&application=content";
 					el.metaData = {treeAlias: "content"};
+					el.title = el.Fields.nodeName;
+
+					contentResource.getNiceUrl(el.Id).then(function(url){
+						el.subTitle = url;
+					});
 				});
 
 				args.results.push({
@@ -40,6 +47,7 @@ angular.module('umbraco.services')
 				_.each(data, function(el){
 					el.menuUrl = "UmbracoTrees/MediaTree/GetMenu?id=" + el.id + "&application=media";
 					el.metaData = {treeAlias: "media"};
+					el.title = el.Fields.nodeName;
 				});
 
 				args.results.push({

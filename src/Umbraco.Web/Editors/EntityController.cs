@@ -34,7 +34,7 @@ namespace Umbraco.Web.Editors
     public class EntityController : UmbracoAuthorizedJsonController
     {   
         [HttpGet]
-        public IEnumerable<EntityBasic> Search([FromUri] string query, UmbracoEntityTypes type)
+        public ISearchResults Search([FromUri] string query, UmbracoEntityTypes type)
         {
             if (string.IsNullOrEmpty(query))
                 return null;
@@ -95,7 +95,7 @@ namespace Umbraco.Web.Editors
             return GetResultForAll(type, postFilter, postFilterParams);
         }
         
-        private IEnumerable<EntityBasic> ExamineSearch(string query, UmbracoEntityTypes entityType)
+        private ISearchResults ExamineSearch(string query, UmbracoEntityTypes entityType)
         {
             var searcher = Constants.Examine.InternalSearcher;
             var type = "content";
@@ -124,13 +124,16 @@ namespace Umbraco.Web.Editors
             var term = new[] { query.ToLower().Escape() };
             var operation = criteria.GroupedOr(fields, term).Compile();
 
+            return internalSearcher.Search(operation);
+
+            /*
             var results = internalSearcher.Search(operation)
                 .Select(x =>  int.Parse(x["id"]));
 
             //TODO: Just create a basic entity from the results!! why double handling and going to the database... this will be ultra slow.
 
             return GetResultForIds(results.ToArray(), entityType)
-                .WhereNotNull();
+                .WhereNotNull();*/
         }
 
         private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)

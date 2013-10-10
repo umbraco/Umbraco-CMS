@@ -7,12 +7,17 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberPickerController",
 
 	$scope.performSearch = function(){
 		if($scope.term){
-			searchService.searchMembers({term: $scope.term, results: $scope.results});
-			$scope.showSearch = true;
+			if($scope.oldTerm !== $scope.term){
+				$scope.results = [];
+				searchService.searchMembers({term: $scope.term, results: $scope.results});
+				$scope.showSearch = true;
+				$scope.oldTerm = $scope.term;
+			}
 		}else{
+			$scope.oldTerm = "";
 			$scope.showSearch = false;
+			$scope.results = [];
 		}
-		
 	};
 
 

@@ -13,7 +13,7 @@
 	</div>
 	<div class="umb-panel-body with-footer">
 		<!-- Search results -->
-		<div id="search-results" class="umb-pane" ng-show="showSearch">
+		<div id="search-results" ng-show="showSearch">
 			<ul class="umb-tree">
 		        <li class="root">
 		            <ul class="umb-search-group" ng-repeat="resultGroup in results">
@@ -22,7 +22,10 @@
 		                    <a ng-class="{first:$first}" ng-href="#/{{resultGroup.editor}}{{result.id}}">
 		                           <i 
 		                            class="icon umb-tree-icon sprTree {{resultGroup.icon}}"></i>
-		                            {{result.name}}
+		                            {{result.title}}
+                                    <small class="search-subtitle" ng-show="result.subTitle">
+                                        {{result.subTitle}}
+                                    </small>
 		                        </a>
 		                    </div>
 		                </li>
@@ -33,7 +36,6 @@
 		</div>
 
 		<div class="umb-pane" ng-hide="showSearch">
-
 				<umb-tree 
 				    section="member" 
                     treealias="member"
@@ -47,7 +49,7 @@
 
 	<div class="umb-panel-footer" ng-show="multipicker">
 		<div class="umb-el-wrap umb-panel-buttons">
-	        <div class="btn-toolbar umb-btn-toolbar">
+	        <div class="btn-toolbar umb-btn-toolbar pull-right">
 	         	<input type="button" ng-click="submit(dialogData)" class="btn btn-primary" value="select" />
 	        </div>
 		</div>

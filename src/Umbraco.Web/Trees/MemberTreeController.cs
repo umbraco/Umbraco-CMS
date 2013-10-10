@@ -30,12 +30,16 @@ namespace Umbraco.Web.Trees
                 for (var i = 97; i < 123; i++)
                 {
                     var charString = ((char) i).ToString(CultureInfo.InvariantCulture);
-                    nodes.Add(CreateTreeNode(charString, queryStrings, charString, "icon-folder-close", true));
+                    var folder = CreateTreeNode(charString, queryStrings, charString, "icon-folder-close", true);
+                    folder.NodeType = "member-folder";
+                    nodes.Add(folder);
                 }
                 //list out 'Others' if the membership provider is umbraco
                 if (Member.InUmbracoMemberMode())
                 {
-                    nodes.Add(CreateTreeNode("others", queryStrings, "Others", "icon-folder-close", true));
+                    var folder = CreateTreeNode("others", queryStrings, "Others", "icon-folder-close", true);
+                    folder.NodeType = "member-folder";
+                    nodes.Add(folder);
                 }
             }
             else
@@ -48,7 +52,7 @@ namespace Umbraco.Web.Trees
                         //get the members from our member data layer
                         nodes.AddRange(
                             Member.getMemberFromFirstLetter(id.ToCharArray()[0])
-                                        .Select(m => CreateTreeNode(m.UniqueId.ToString("N"), queryStrings, m.Text, "icon-user")));
+                                        .Select(m => CreateTreeNode(m.UniqueId.ToString("N"), queryStrings, m.Text, "icon-user"));
                     }
                     else
                     {
