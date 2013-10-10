@@ -101,7 +101,7 @@ namespace Umbraco.Web.UI.Install.Steps {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox DatabaseName;
-        
+
         /// <summary>
         /// DatabaseIntegratedSecurity control.
         /// </summary>
