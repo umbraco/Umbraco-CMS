@@ -166,9 +166,29 @@ namespace umbraco
                     }
                 }
 
+                FireBeforeWritingPageContentToOutputStream(ref text);
+
                 // render
                 writer.Write(text);
             }
+        }
+
+        /// <summary>
+        /// The page render event handler
+        /// </summary>
+        public delegate void RenderUmbracoPageEventHandler(int pageId, ref string pageContents);
+        /// <summary>
+        /// Occurs before the page content is writing to the output stream
+        /// </summary>
+        public static event RenderUmbracoPageEventHandler BeforeWritingPageContentToOutputStream;
+        /// <summary>
+        /// Raises the <see cref="BeforeWritingPageContentToOutputStream"/> event.
+        /// </summary>
+        /// <param name="pageContents">The ref of rendered page content</param>
+        protected virtual void FireBeforeWritingPageContentToOutputStream(ref string pageContents)
+        {
+            if (BeforeWritingPageContentToOutputStream != null && _upage != null)
+                BeforeWritingPageContentToOutputStream(_upage.PageID, ref pageContents);
         }
 
         /// <summary>
