@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -66,6 +67,8 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="display"></param>
         private static void MapGenericCustomProperties(IMember member, MemberDisplay display)
         {
+            var membershipProvider = Membership.Provider;
+
             TabsAndPropertiesResolver.MapGenericProperties(
                 member, display,
                 new ContentPropertyDisplay
@@ -81,7 +84,16 @@ namespace Umbraco.Web.Models.Mapping
                         Alias = string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                         Label = ui.Text("password"),
                         Value = "",
-                        View = "changepassword" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                        View = "changepassword",//TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                        Config = new Dictionary<string, object>
+                            {
+                                //the password change toggle will only be displayed if there is already a password assigned.
+                                { "hasPassword", member.Password.IsNullOrWhiteSpace() == false },
+                                { "minPasswordLength", membershipProvider.MinRequiredPasswordLength },
+                                { "enableReset", membershipProvider.EnablePasswordReset },
+                                { "requiresQuestionAnswer", membershipProvider.RequiresQuestionAndAnswer }
+                                //TODO: Inject the other parameters in here to change the behavior of this control - based on the membership provider settings.
+                            }
                     },
                 new ContentPropertyDisplay
                     {

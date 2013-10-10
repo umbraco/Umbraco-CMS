@@ -11,6 +11,8 @@ using System.Web.Security;
 using AutoMapper;
 using Examine.LuceneEngine.SearchCriteria;
 using Examine.SearchCriteria;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web.WebApi;
@@ -21,7 +23,6 @@ using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using Constants = Umbraco.Core.Constants;
 using Examine;
-using Member = umbraco.cms.businesslogic.member.Member;
 
 namespace Umbraco.Web.Editors
 {
@@ -57,7 +58,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public MemberDisplay GetByKey(Guid key)
         {
-            if (Member.InUmbracoMemberMode())
+            if (Membership.Provider.Name == Constants.Conventions.Member.UmbracoMemberProviderName)
             {
                 var foundMember = Services.MemberService.GetByKey(key);
                 if (foundMember == null)
@@ -135,7 +136,7 @@ namespace Umbraco.Web.Editors
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
-                    //TODO: Update with the provider! - change password, etc...
+                    UpdateWithMembershipProvider(contentItem);
                     break;
                 case ContentSaveAction.SaveNew:
                     MembershipCreateStatus status;
@@ -194,6 +195,40 @@ namespace Umbraco.Web.Editors
 
             //use the base method to map the rest of the properties
             base.MapPropertyValues(contentItem);
+        }
+
+        /// <summary>
+        /// Update the membership user using the membership provider (for things like email, etc...)
+        /// </summary>
+        /// <param name="contentItem"></param>
+        private void UpdateWithMembershipProvider(MemberSave contentItem)
+        {
+            //Get the member from the provider
+            var membershipUser = Membership.Provider.GetUser(contentItem.PersistedContent.Username, false);
+            if (membershipUser == null)
+            {
+                //This should never happen! so we'll let it YSOD if it does.
+                throw new InvalidOperationException("Could not get member from membership provider " + Membership.Provider.Name + " with username " + contentItem.PersistedContent.Username);
+            }
+
+            //ok, first thing to do is check if they've changed their email 
+            //TODO: When we support the other membership provider data then we'll check if any of that's changed too.
+            if (contentItem.Email.Trim().InvariantEquals(membershipUser.Email))
+            {
+                membershipUser.Email = contentItem.Email.Trim();
+
+                try
+                {
+                    Membership.Provider.UpdateUser(membershipUser);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.WarnWithException<MemberController>("Could not update member, the provider returned an error", ex);
+                    ModelState.AddPropertyError(
+                        //specify 'default' just so that it shows up as a notification - is not assigned to a property
+                        new ValidationResult("Could not update member, the provider returned an error: " + ex.Message + " (see log for full details)"), "default");
+                }
+            }
         }
 
         /// <summary>

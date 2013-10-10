@@ -2167,7 +2167,6 @@
     </Content>
     <Content Include="Views\Web.config.transform" />
     <None Include="Web.Debug.config.transformed" />
-    <None Include="Web.Release.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
       <SubType>Designer</SubType>

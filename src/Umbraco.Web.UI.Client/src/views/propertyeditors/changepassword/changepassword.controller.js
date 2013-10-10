@@ -6,6 +6,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
         //based on the membership provider cannot always be ported to js from .net directly.        
         /*
         {
+            hasPassword: true/false,
             requiresQuestionAnswer: true/false,
             enableReset: true/false,
             minPasswordLength: 10
@@ -13,6 +14,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
         */
 
         //set defaults if they are not available
+        if (!$scope.model.config || !$scope.model.config.hasPassword) {
+            $scope.model.config.hasPassword = false;
+        }
         if (!$scope.model.config || !$scope.model.config.requiresQuestionAnswer) {
             $scope.model.config.requiresQuestionAnswer = false;
         }
@@ -20,15 +24,12 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
             $scope.model.config.enableReset = true;
         }
         if (!$scope.model.config || !$scope.model.config.minPasswordLength) {
-            $scope.model.config.minPasswordLength = 7;
+            $scope.model.config.minPasswordLength = 0;
         }
        
-        
         $scope.confirm = "";
 
-        $scope.hasPassword = $scope.model.value !== undefined && $scope.model.value !== null && $scope.model.value !== "";
-        
-        $scope.changing = !$scope.hasPassword;
+        $scope.changing = !$scope.model.config.hasPassword;
 
         $scope.doChange = function() {
             $scope.changing = true;
