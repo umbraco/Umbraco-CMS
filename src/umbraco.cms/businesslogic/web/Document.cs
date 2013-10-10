@@ -1293,7 +1293,7 @@ namespace umbraco.cms.businesslogic.web
         public override void XmlPopulate(XmlDocument xd, ref XmlNode x, bool Deep)
         {
             string urlName = this.Content.GetUrlSegment().ToLower();
-            foreach (Property p in GenericProperties.Where(p => p != null))
+            foreach (Property p in GenericProperties.Where(p => p != null && !string.IsNullOrEmpty(p.Value.ToString())))
                 x.AppendChild(p.ToXml(xd));
 
             // attributes
