@@ -936,10 +936,8 @@ namespace umbraco.providers.members
                       Convert.ToBase64String(EncryptPassword(Encoding.Unicode.GetBytes(password)));
                     break;
                 case MembershipPasswordFormat.Hashed:
-                    HMACSHA1 hash = new HMACSHA1();
-                    hash.Key = Encoding.Unicode.GetBytes(password);
-                    encodedPassword =
-                      Convert.ToBase64String(hash.ComputeHash(Encoding.Unicode.GetBytes(password)));
+                    //WT: Available hash algorithm types: Clear, SHA1, MD5
+                    encodedPassword = FormsAuthentication.HashPasswordForStoringInConfigFile(password, Membership.HashAlgorithmType);
                     break;
                 default:
                     throw new ProviderException("Unsupported password format.");
