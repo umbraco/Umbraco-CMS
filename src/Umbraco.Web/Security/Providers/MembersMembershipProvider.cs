@@ -750,9 +750,11 @@ namespace Umbraco.Web.Security.Providers
 
         private bool IsEmaiValid(string email)
         {
-            var validator = new EmailAddressAttribute();
-
-            return validator.IsValid(email);
+            const string pattern = @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|"
+                                   + @"([-a-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)"
+                                   + @"@[a-z0-9][\w\.-]*[a-z0-9]\.[a-z][a-z\.]*[a-z]$";
+            
+            return Regex.IsMatch(email, pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);            
         }
         
         /// <summary>
