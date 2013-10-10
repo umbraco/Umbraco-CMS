@@ -38,7 +38,11 @@ namespace Umbraco.Core.Persistence.Relators
             // Setup the new current MemberTypeReadOnlyDto
             Current = a;
             Current.PropertyTypes = new List<PropertyTypeReadOnlyDto>();
-            Current.PropertyTypes.Add(p);
+            //this can be null since we are doing a left join
+            if (p.Id.HasValue)
+            {
+                Current.PropertyTypes.Add(p);
+            }
 
             Current.PropertyTypeGroups = new List<PropertyTypeGroupReadOnlyDto>();
             if (g.Id.HasValue)

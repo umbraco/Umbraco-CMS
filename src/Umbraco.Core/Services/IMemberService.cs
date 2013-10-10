@@ -35,5 +35,7 @@ namespace Umbraco.Core.Services
         void Delete(IMember membershipUser);
 
         void Save(IMember membershipUser);
+
+        IEnumerable<IMember> FindMembersByEmail(string emailStringToMatch);
     }
 }

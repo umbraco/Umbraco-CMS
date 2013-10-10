@@ -235,6 +235,7 @@
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipUser.cs" />
     <Compile Include="Models\MemberType.cs" />
+    <Compile Include="Models\PagedResult.cs" />
     <Compile Include="Models\Rdbms\MemberReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\MemberTypeReadOnlyDto.cs" />
     <Compile Include="Models\Rdbms\PropertyDataReadOnlyDto.cs" />
@@ -737,16 +738,19 @@
     <Compile Include="Services\IContentService.cs" />
     <Compile Include="Services\IContentTypeService.cs" />
     <Compile Include="Services\IDataTypeService.cs" />
+    <Compile Include="Services\IEntityService.cs" />
     <Compile Include="Services\IFileService.cs" />
     <Compile Include="Services\ILocalizationService.cs" />
     <Compile Include="Services\IMediaService.cs" />
     <Compile Include="Services\IMemberService.cs" />
     <Compile Include="Services\IMembershipUserService.cs" />
+    <Compile Include="Services\IMemberTypeService.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\LocalizationService.cs" />
     <Compile Include="Services\MediaService.cs" />
     <Compile Include="Services\MemberService.cs" />
+    <Compile Include="Services\MemberTypeService.cs" />
     <Compile Include="Services\RelationService.cs" />
     <Compile Include="Services\ServerRegistrationService.cs" />
     <Compile Include="Services\PackagingService.cs" />

@@ -99,6 +99,10 @@ namespace Umbraco.Core
 		    /// </summary>
 		    public static class Member
 		    {
+                public static readonly string UmbracoMemberProviderName = "UmbracoMembershipProvider";
+
+                public static readonly string UmbracoRoleProviderName = "UmbracoRoleProvider";
+
                 /// <summary>
                 /// Property alias for a Members Password Question
                 /// </summary>

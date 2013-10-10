@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Specialized;
+using System.ComponentModel.DataAnnotations;
 using System.Configuration.Provider;
+using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -8,6 +10,7 @@ using System.Web.Hosting;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models.Membership;
 
@@ -254,8 +257,9 @@ namespace Umbraco.Web.Security.Providers
         }
 
         /// <summary>
-        /// Adds a new membership user to the data source.
+        /// Adds a new membership user to the data source with the specified member type
         /// </summary>
+        /// <param name="memberType">A specific member type to create the member for</param>
         /// <param name="username">The user name for the new user.</param>
         /// <param name="password">The password for the new user.</param>
         /// <param name="email">The e-mail address for the new user.</param>
@@ -267,16 +271,16 @@ namespace Umbraco.Web.Security.Providers
         /// <returns>
         /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the information for the newly created user.
         /// </returns>
-        public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer,
+        public MembershipUser CreateUser(string memberType, string username, string password, string email, string passwordQuestion, string passwordAnswer,
                                                   bool isApproved, object providerUserKey, out MembershipCreateStatus status)
         {
-            LogHelper.Debug<MembersMembershipProvider>("Member signup requested: username -> " + username + ". email -> " +email);
+            LogHelper.Debug<MembersMembershipProvider>("Member signup requested: username -> " + username + ". email -> " + email);
 
             // Validate password
             if (IsPasswordValid(password) == false)
             {
-               status = MembershipCreateStatus.InvalidPassword;
-               return null;
+                status = MembershipCreateStatus.InvalidPassword;
+                return null;
             }
 
             // Validate email
@@ -324,16 +328,39 @@ namespace Umbraco.Web.Security.Providers
                 return null;
             }
 
-            var member = MemberService.CreateMember(email, username, password, DefaultMemberTypeAlias);
+            var member = MemberService.CreateMember(email, username, password, memberType);
 
             member.IsApproved = isApproved;
             member.PasswordQuestion = passwordQuestion;
             member.PasswordAnswer = passwordAnswer;
-            
+
+            //encrypts/hashes the password depending on the settings
+            member.Password = EncryptOrHashPassword(member.Password);
+
             MemberService.Save(member);
-            
+
             status = MembershipCreateStatus.Success;
             return member.AsConcreteMembershipUser();
+        }
+
+        /// <summary>
+        /// Adds a new membership user to the data source.
+        /// </summary>
+        /// <param name="username">The user name for the new user.</param>
+        /// <param name="password">The password for the new user.</param>
+        /// <param name="email">The e-mail address for the new user.</param>
+        /// <param name="passwordQuestion">The password question for the new user.</param>
+        /// <param name="passwordAnswer">The password answer for the new user</param>
+        /// <param name="isApproved">Whether or not the new user is approved to be validated.</param>
+        /// <param name="providerUserKey">The unique identifier from the membership data source for the user.</param>
+        /// <param name="status">A <see cref="T:System.Web.Security.MembershipCreateStatus"></see> enumeration value indicating whether the user was created successfully.</param>
+        /// <returns>
+        /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the information for the newly created user.
+        /// </returns>
+        public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer,
+                                                  bool isApproved, object providerUserKey, out MembershipCreateStatus status)
+        {
+            return CreateUser(DefaultMemberTypeAlias, username, password, email, passwordQuestion, passwordAnswer, isApproved, providerUserKey, out status);
         }
 
         /// <summary>
@@ -360,7 +387,7 @@ namespace Umbraco.Web.Security.Providers
             }
 
             var member = MemberService.GetByUsername(username);
-            var encodedPassword = EncodePassword(password);
+            var encodedPassword = EncryptOrHashPassword(password);
 
             if (member.Password == encodedPassword)
             {
@@ -427,12 +454,12 @@ namespace Umbraco.Web.Security.Providers
             var member = MemberService.GetByUsername(username);
             if (member == null) return false;
             
-            var encodedPassword = EncodePassword(oldPassword);
+            var encodedPassword = EncryptOrHashPassword(oldPassword);
 
             if (member.Password == encodedPassword)
             {
 
-                member.Password = EncodePassword(newPassword);
+                member.Password = EncryptOrHashPassword(newPassword);
                 MemberService.Save(member);
 
                 return true;
@@ -464,7 +491,7 @@ namespace Umbraco.Web.Security.Providers
             if (_requiresQuestionAndAnswer == false || (_requiresQuestionAndAnswer && answer == member.PasswordAnswer))
             {
                 member.Password =
-                    EncodePassword(Membership.GeneratePassword(_minRequiredPasswordLength,
+                    EncryptOrHashPassword(Membership.GeneratePassword(_minRequiredPasswordLength,
                                                                _minRequiredNonAlphanumericCharacters));
                 MemberService.Save(member);
             }
@@ -505,7 +532,7 @@ namespace Umbraco.Web.Security.Providers
             if (member.IsLockedOut)
                 throw new ProviderException("The member is locked out.");
 
-            var encodedPassword = EncodePassword(password);
+            var encodedPassword = EncryptOrHashPassword(password);
             
             var authenticated = (encodedPassword == member.Password);
 
@@ -687,7 +714,16 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            throw new System.NotImplementedException();
+            var byEmail = MemberService.FindMembersByEmail(emailToMatch).ToArray();
+            totalRecords = byEmail.Length;
+            var pagedResult = new PagedResult<IMember>(totalRecords, pageIndex, pageSize);
+
+            var collection = new MembershipUserCollection();
+            foreach (var m in byEmail.Skip(pagedResult.SkipSize).Take(pageSize))
+            {
+                collection.Add(m.AsConcreteMembershipUser());
+            }
+            return collection;
         }
 
         #region Private methods
@@ -714,11 +750,9 @@ namespace Umbraco.Web.Security.Providers
 
         private bool IsEmaiValid(string email)
         {
-            const string pattern = @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|" 
-                                   + @"([-a-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)" 
-                                   + @"@[a-z0-9][\w\.-]*[a-z0-9]\.[a-z][a-z\.]*[a-z]$";
+            var validator = new EmailAddressAttribute();
 
-            return Regex.IsMatch(email, pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+            return validator.IsValid(email);
         }
         
         /// <summary>
@@ -726,7 +760,7 @@ namespace Umbraco.Web.Security.Providers
         /// </summary>
         /// <param name="password">The password.</param>
         /// <returns>The encoded password.</returns>
-        private string EncodePassword(string password)
+        private string EncryptOrHashPassword(string password)
         {
             var encodedPassword = password;
             switch (PasswordFormat)

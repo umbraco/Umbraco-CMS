@@ -35,12 +35,9 @@ namespace Umbraco.Core
         /// <param name="dbContext"></param>
         /// <param name="serviceContext"></param>
         /// <param name="enableCache"></param>
-        internal ApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext, bool enableCache)
+        public ApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext, bool enableCache)
             : this(enableCache)
         {
-            if (dbContext == null) throw new ArgumentNullException("dbContext");
-            if (serviceContext == null) throw new ArgumentNullException("serviceContext");
-
             _databaseContext = dbContext;
             _services = serviceContext;		
         }
@@ -57,7 +54,7 @@ namespace Umbraco.Core
         /// Constructor used to specify if we will enable application cache or not
         /// </summary>
         /// <param name="enableCache"></param>
-        internal ApplicationContext(bool enableCache)
+        public ApplicationContext(bool enableCache)
         {
             //create a new application cache from the HttpRuntime.Cache
             ApplicationCache = HttpRuntime.Cache == null
@@ -65,7 +62,55 @@ namespace Umbraco.Core
                 : new CacheHelper(HttpRuntime.Cache, enableCache);
         }
 
-		/// <summary>
+	    /// <summary>
+	    /// A method used to set and/or ensure that a global ApplicationContext singleton is created.
+	    /// </summary>
+	    /// <param name="appContext">
+	    /// The instance to set on the global application singleton
+	    /// </param>
+	    /// <param name="replaceContext">If set to true and the singleton is already set, it will be replaced</param>
+	    /// <returns></returns>
+	    /// <remarks>
+	    /// This is NOT thread safe 
+	    /// </remarks>
+	    public static ApplicationContext EnsureContext(ApplicationContext appContext, bool replaceContext)
+	    {
+            if (ApplicationContext.Current != null)
+            {
+                if (!replaceContext)
+                    return ApplicationContext.Current;
+            }
+            ApplicationContext.Current = appContext;
+            return ApplicationContext.Current;
+	    }
+
+	    /// <summary>
+	    /// A method used to create and ensure that a global ApplicationContext singleton is created.
+	    /// </summary>
+	    /// <param name="enableCache"></param>
+	    /// <param name="replaceContext">
+	    /// If set to true will replace the current singleton instance - This should only be used for unit tests or on app 
+	    /// startup if for some reason the boot manager is not the umbraco boot manager.
+	    /// </param>
+	    /// <param name="dbContext"></param>
+	    /// <param name="serviceContext"></param>
+	    /// <returns></returns>
+	    /// <remarks>
+	    /// This is NOT thread safe 
+	    /// </remarks>
+	    public static ApplicationContext EnsureContext(DatabaseContext dbContext, ServiceContext serviceContext, bool enableCache, bool replaceContext)
+        {
+            if (ApplicationContext.Current != null)
+            {
+                if (!replaceContext)
+                    return ApplicationContext.Current;
+            }
+            var ctx = new ApplicationContext(dbContext, serviceContext, enableCache);
+            ApplicationContext.Current = ctx;
+            return ApplicationContext.Current;
+        }
+
+	    /// <summary>
     	/// Singleton accessor
     	/// </summary>
     	public static ApplicationContext Current { get; internal set; }

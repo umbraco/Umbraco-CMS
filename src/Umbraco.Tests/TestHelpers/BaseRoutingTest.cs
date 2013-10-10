@@ -4,7 +4,7 @@ using System.Web.Routing;
 using NUnit.Framework;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models;
-using Umbraco.Tests.Stubs;
+using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
