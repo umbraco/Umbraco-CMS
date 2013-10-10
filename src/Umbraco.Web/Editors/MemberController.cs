@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Controllers;
+using System.Web.Http.Filters;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
 using Examine.LuceneEngine.SearchCriteria;
 using Examine.SearchCriteria;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.Models.ContentEditing;
@@ -77,9 +81,8 @@ namespace Umbraco.Web.Editors
         /// Gets an empty content item for the 
         /// </summary>
         /// <param name="contentTypeAlias"></param>
-        /// <param name="parentId"></param>
         /// <returns></returns>
-        public MemberDisplay GetEmpty(string contentTypeAlias, string username, string password)
+        public MemberDisplay GetEmpty(string contentTypeAlias)
         {
             var contentType = Services.MemberTypeService.GetMemberType(contentTypeAlias);
             if (contentType == null)
@@ -87,7 +90,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var emptyContent = new Core.Models.Member("", "", "", "", -1, contentType);
+            var emptyContent = new Core.Models.Member("", contentType);
             return Mapper.Map<IMember, MemberDisplay>(emptyContent);
         }
 
@@ -96,6 +99,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>        
         [FileUploadCleanupFilter]
+        [MembershipProviderValidationFilter]
         public MemberDisplay PostSave(
             [ModelBinder(typeof(MemberBinder))]
                 MemberSave contentItem)
@@ -109,30 +113,18 @@ namespace Umbraco.Web.Editors
 
             UpdateName(contentItem);
 
-            //map the custom properties
+            //map the custom properties - this will already be set for new entities in our member binder
             contentItem.PersistedContent.Email = contentItem.Email;
-            //TODO: If we allow changing the alias then we'll need to change URLs, etc... in the editor, would prefer to use 
-            // a unique id but then need to figure out how to handle that with custom membership providers - waiting on feedback from morten.
-
+            contentItem.PersistedContent.Username = contentItem.Username;
+            
             MapPropertyValues(contentItem);
 
-            //We need to manually check the validation results here because:
-            // * We still need to save the entity even if there are validation value errors
-            // * Depending on if the entity is new, and if there are non property validation errors (i.e. the name is null)
-            //      then we cannot continue saving, we can only display errors
-            // * If there are validation errors and they were attempting to publish, we can only save, NOT publish and display 
-            //      a message indicating this
+            //Unlike content/media - if there are errors for a member, we do NOT proceed to save them, we cannot so return the errors
             if (!ModelState.IsValid)
-            {
-                if (ValidationHelper.ModelHasRequiredForPersistenceErrors(contentItem)
-                    && (contentItem.Action == ContentSaveAction.SaveNew))
-                {
-                    //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
-                    // add the modelstate to the outgoing object and throw validation response
-                    var forDisplay = Mapper.Map<IMember, MemberDisplay>(contentItem.PersistedContent);
-                    forDisplay.Errors = ModelState.ToErrorDictionary();
-                    throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
-                }
+            {                
+                var forDisplay = Mapper.Map<IMember, MemberDisplay>(contentItem.PersistedContent);
+                forDisplay.Errors = ModelState.ToErrorDictionary();
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
             }
 
             //save the item
@@ -173,6 +165,77 @@ namespace Umbraco.Web.Editors
             Services.MemberService.Delete(foundMember);
 
             return Request.CreateResponse(HttpStatusCode.OK);
+        }
+    }
+
+    /// <summary>
+    /// This validates the submitted data in regards to the current membership provider
+    /// </summary>
+    internal class MembershipProviderValidationFilterAttribute : ActionFilterAttribute
+    {
+        public override void OnActionExecuting(HttpActionContext actionContext)
+        {
+            base.OnActionExecuting(actionContext);
+
+            var membershipProvider = Membership.Providers[Constants.Conventions.Member.UmbracoMemberProviderName];
+            if (membershipProvider == null)
+            {
+                throw new InvalidOperationException("No membership provider found with name " + Constants.Conventions.Member.UmbracoMemberProviderName);
+            }
+
+            var contentItem = (MemberSave) actionContext.ActionArguments["contentItem"];
+
+            var validEmail = ValidateUniqueEmail(contentItem, membershipProvider, actionContext);
+            if (validEmail == false)
+            {
+                actionContext.ModelState.AddPropertyError(new ValidationResult("Email address is already in use"), "umb_email");
+            }
+        }
+
+        internal bool ValidateUniqueEmail(MemberSave contentItem, MembershipProvider membershipProvider, HttpActionContext actionContext)
+        {
+            if (contentItem == null) throw new ArgumentNullException("contentItem");
+            if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
+
+            if (membershipProvider.RequiresUniqueEmail == false)
+            {
+                return true;
+            }
+
+            int totalRecs;
+            var existingByEmail = membershipProvider.FindUsersByEmail(contentItem.Email.Trim(), 0, int.MaxValue, out totalRecs);            
+            switch (contentItem.Action)
+            {
+                case ContentSaveAction.Save:
+                    //ok, we're updating the member, we need to check if they are changing their email and if so, does it exist already ?
+                    if (contentItem.PersistedContent.Email.InvariantEquals(contentItem.Email.Trim()) == false)
+                    {
+                        //they are changing their email
+                        if (existingByEmail.Cast<MembershipUser>().Select(x => x.Email)
+                            .Any(x => x.InvariantEquals(contentItem.Email.Trim())))
+                        {
+                            //the user cannot use this email
+                            return false;
+                        }
+                    }
+                    break;
+                case ContentSaveAction.SaveNew:
+                    //check if the user's email already exists
+                    if (existingByEmail.Cast<MembershipUser>().Select(x => x.Email)
+                        .Any(x => x.InvariantEquals(contentItem.Email.Trim())))
+                    {
+                        //the user cannot use this email
+                        return false;
+                    }
+                    break;
+                case ContentSaveAction.Publish:
+                case ContentSaveAction.PublishNew:
+                default:
+                    //we don't support this for members
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            return true;
         }
     }
 }

@@ -255,7 +255,7 @@ namespace Umbraco.Web.Editors
             else
             {
                 //publish the item and check if it worked, if not we will show a diff msg below
-                publishStatus = ((ContentService)Services.ContentService).SaveAndPublishInternal(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
+                publishStatus = Services.ContentService.SaveAndPublishWithStatus(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
             }
             
 

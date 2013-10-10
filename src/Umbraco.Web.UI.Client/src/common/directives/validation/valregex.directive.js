@@ -6,17 +6,36 @@
     *               NOTE: there's already an ng-pattern but this requires that a regex expression is set, not a regex string
     **/
 function valRegex() {
+    
     return {
         require: 'ngModel',
         restrict: "A",
         link: function (scope, elm, attrs, ctrl) {
 
+            var flags = "";
+            if (attrs.valRegexFlags) {
+                try {
+                    flags = scope.$eval(attrs.valRegexFlags);
+                    if (!flags) {
+                        flags = attrs.valRegexFlags;
+                    }
+                }
+                catch (e) {
+                    flags = attrs.valRegexFlags;
+                }
+            }
             var regex;
             try {
-                regex = new RegExp(scope.$eval(attrs.valRegex));
+                var resolved = scope.$eval(attrs.valRegex);                
+                if (resolved) {
+                    regex = new RegExp(resolved, flags);
+                }
+                else {
+                    regex = new RegExp(attrs.valRegex, flags);
+                }
             }
             catch(e) {
-                regex = new RegExp(attrs.valRegex);
+                regex = new RegExp(attrs.valRegex, flags);
             }
 
             var patternValidator = function (viewValue) {

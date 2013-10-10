@@ -12,6 +12,7 @@ function sectionsDirective($timeout, $window, navigationService, sectionResource
 			
 			scope.maxSections = 7;
 			scope.overflowingSections = 0;
+            scope.sections = [];
 
 			function loadSections(){
 				sectionResource.getSections()

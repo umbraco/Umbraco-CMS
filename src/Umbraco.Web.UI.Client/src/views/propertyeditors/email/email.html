@@ -1,3 +1,13 @@
-﻿<input type="email" name="textbox" ng-model="model.value" id="{{model.alias}}" class="umb-editor umb-textstring textstring" val-server="value" />
-<span class="help-inline" val-msg-for="textbox" val-toggle-msg="email">Invalid email</span>
-<span class="help-inline" val-msg-for="textbox" val-toggle-msg="valServer"></span>
+﻿<div>
+
+    <input type="email" name="textbox"
+        ng-model="model.value"
+        id="{{model.alias}}"
+        class="umb-editor umb-textstring textstring"
+        ng-required="model.config.IsRequired"
+        val-server="value" />
+    
+    <span class="help-inline" val-msg-for="textbox" val-toggle-msg="required">Required</span>
+    <span class="help-inline" val-msg-for="textbox" val-toggle-msg="email">Invalid email</span>
+    <span class="help-inline" val-msg-for="textbox" val-toggle-msg="valServer"></span>
+</div>
