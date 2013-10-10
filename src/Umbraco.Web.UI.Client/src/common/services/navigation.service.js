@@ -55,7 +55,7 @@ angular.module('umbraco.services')
                 ui.showContextMenuDialog = false;
 
                 $timeout(function(){
-                    $(".form-search input").focus();
+                    $("#search-field").focus();
                 });
                 
                 break;
