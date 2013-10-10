@@ -815,7 +815,7 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                var result = ((ContentService)ApplicationContext.Current.Services.ContentService).PublishInternal(Content, u.Id);
+                var result = ApplicationContext.Current.Services.ContentService.PublishWithStatus(Content, u.Id);
                 _published = result.Success;
                 
                 FireAfterPublish(e);
@@ -831,8 +831,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.PublishWithChildren()", false)]
         public bool PublishWithChildrenWithResult(User u)
         {
-            var result = ((ContentService)ApplicationContext.Current.Services.ContentService)
-                .PublishWithChildrenInternal(Content, u.Id, true);
+            var result = ApplicationContext.Current.Services.ContentService.PublishWithChildrenWithStatus(Content, u.Id, true);
             //This used to just return false only when the parent content failed, otherwise would always return true so we'll
             // do the same thing for the moment
             return result.Single(x => x.Result.ContentItem.Id == Id).Success;
@@ -872,8 +871,8 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                IEnumerable<Attempt<PublishStatus>> publishedResults = ((ContentService)ApplicationContext.Current.Services.ContentService)
-                    .PublishWithChildrenInternal(Content, u.Id);
+                IEnumerable<Attempt<PublishStatus>> publishedResults = ApplicationContext.Current.Services.ContentService
+                    .PublishWithChildrenWithStatus(Content, u.Id);
 
                 FireAfterPublish(e);
             }
@@ -889,8 +888,8 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                publishedResults = ((ContentService) ApplicationContext.Current.Services.ContentService)
-                    .PublishWithChildrenInternal(Content, userId, includeUnpublished);
+                publishedResults = ApplicationContext.Current.Services.ContentService
+                    .PublishWithChildrenWithStatus(Content, userId, includeUnpublished);
 
                 FireAfterPublish(e);
             }
@@ -918,8 +917,8 @@ namespace umbraco.cms.businesslogic.web
                 if (!publishArgs.Cancel)
                 {
                     //NOTE: The 'false' parameter will cause the PublishingStrategy events to fire which will ensure that the cache is refreshed.
-                    result = ((ContentService)ApplicationContext.Current.Services.ContentService)
-                        .SaveAndPublishInternal(Content, userId);
+                    result = ApplicationContext.Current.Services.ContentService
+                        .SaveAndPublishWithStatus(Content, userId);
                     base.VersionDate = Content.UpdateDate;
                     this.UpdateDate = Content.UpdateDate;
 
@@ -1007,8 +1006,8 @@ namespace umbraco.cms.businesslogic.web
                 if (!publishArgs.Cancel)
                 {
                     //NOTE: The 'false' parameter will cause the PublishingStrategy events to fire which will ensure that the cache is refreshed.
-                    var result = ((ContentService)ApplicationContext.Current.Services.ContentService)
-                        .SaveAndPublishInternal(Content, u.Id);
+                    var result = ApplicationContext.Current.Services.ContentService
+                        .SaveAndPublishWithStatus(Content, u.Id);
                     base.VersionDate = Content.UpdateDate;
                     this.UpdateDate = Content.UpdateDate;
 

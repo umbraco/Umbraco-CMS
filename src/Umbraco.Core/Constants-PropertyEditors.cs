@@ -411,6 +411,11 @@ namespace Umbraco.Core
             /// Alias for the XPath DropDownList datatype.
             /// </summary>
             public const string XPathDropDownListAlias = "Umbraco.XPathDropDownList";
+
+            /// <summary>
+            /// Alias for the email address property editor
+            /// </summary>
+            public const string EmailAddressAlias = "Umbraco.EmailAddress";
         }
 	}
 }

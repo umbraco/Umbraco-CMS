@@ -31,8 +31,8 @@ namespace umbraco.cms.businesslogic.member
     public class Member : Content
     {
         #region Constants and static members
-        public static readonly string UmbracoMemberProviderName = "UmbracoMembershipProvider";
-        public static readonly string UmbracoRoleProviderName = "UmbracoRoleProvider";
+        public static readonly string UmbracoMemberProviderName = Constants.Conventions.Member.UmbracoMemberProviderName;
+        public static readonly string UmbracoRoleProviderName = Constants.Conventions.Member.UmbracoRoleProviderName;
         public static readonly Guid _objectType = new Guid(Constants.ObjectTypes.Member);
 
         private static readonly object m_Locker = new object();
@@ -212,6 +212,8 @@ namespace umbraco.cms.businesslogic.member
         /// <returns>The new member</returns>
         public static Member MakeNew(string Name, string LoginName, string Email, MemberType mbt, User u)
         {
+            if (mbt == null) throw new ArgumentNullException("mbt");
+
             var loginName = (!String.IsNullOrEmpty(LoginName)) ? LoginName : Name;
 
             if (String.IsNullOrEmpty(loginName))

@@ -203,7 +203,7 @@ function umbDataFormatter() {
 
         /** formats the display model used to display the member to the model used to save the member */
         formatMemberPostData: function(displayModel, action) {
-            //this is basically the same as for media but we need to explicitly add the username,email to the save model
+            //this is basically the same as for media but we need to explicitly add the username,email, password to the save model
             var saveModel = this.formatMediaPostData(displayModel, action);
 
             var genericTab = _.find(displayModel.tabs, function (item) {
@@ -216,8 +216,17 @@ function umbDataFormatter() {
             var propEmail = _.find(genericTab.properties, function (item) {
                 return item.alias === "_umb_email";
             });
+            var propPass = _.find(genericTab.properties, function (item) {
+                return item.alias === "_umb_password";
+            });
             saveModel.email = propEmail.value;
             saveModel.username = propLogin.value;
+            //NOTE: This would only be set for new members!            
+            if (angular.isString(propPass.value)) {
+                // if we are resetting or changing passwords then that data will come from the property editor and
+                // it's value will be an object not just a string.
+                saveModel.password = propPass.value;
+            }
 
             return saveModel;
         },

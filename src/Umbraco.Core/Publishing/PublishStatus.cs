@@ -6,7 +6,7 @@ namespace Umbraco.Core.Publishing
     /// <summary>
     /// The result of publishing a content item
     /// </summary>
-    internal class PublishStatus
+    public class PublishStatus
     {
         public PublishStatus()
         {

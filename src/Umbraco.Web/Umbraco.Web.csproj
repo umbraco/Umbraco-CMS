@@ -309,6 +309,7 @@
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\LogController.cs" />
     <Compile Include="Editors\MacroController.cs" />
+    <Compile Include="Editors\MembershipProviderValidationFilterAttribute.cs" />
     <Compile Include="Editors\MemberTypeController.cs" />
     <Compile Include="Models\ContentEditing\StyleSheet.cs" />
     <Compile Include="Editors\StylesheetController.cs" />
@@ -327,6 +328,7 @@
     <Compile Include="Models\Mapping\MacroModelMapper.cs" />
     <Compile Include="Models\Mapping\MemberModelMapper.cs" />
     <Compile Include="PropertyEditors\ColorListPreValueEditor.cs" />
+    <Compile Include="PropertyEditors\EmailAddressPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ListViewPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MemberPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\TextAreaParameterEditor.cs" />
@@ -352,7 +354,6 @@
     <Compile Include="Models\Mapping\DataTypeModelMapper.cs" />
     <Compile Include="Models\Mapping\EntityModelMapper.cs" />
     <Compile Include="Models\Mapping\PreValueDisplayResolver.cs" />
-    <Compile Include="Models\PagedResult.cs" />
     <Compile Include="PropertyEditors\CheckBoxListPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ColorPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\DatePropertyEditor.cs" />

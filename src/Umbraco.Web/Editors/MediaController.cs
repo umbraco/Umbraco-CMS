@@ -287,8 +287,6 @@ namespace Umbraco.Web.Editors
             // * we have a reference to the DTO object and the persisted object
             // * Permissions are valid
 
-            UpdateName(contentItem);
-
             MapPropertyValues(contentItem);
 
             //We need to manually check the validation results here because:
@@ -331,6 +329,18 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
+        /// <summary>
+        /// Maps the property values to the persisted entity
+        /// </summary>
+        /// <param name="contentItem"></param>
+        protected override void MapPropertyValues<TPersisted>(ContentBaseItemSave<TPersisted> contentItem)
+        {
+            UpdateName(contentItem);
+
+            //use the base method to map the rest of the properties
+            base.MapPropertyValues(contentItem);
+        }
+        
         /// <summary>
         /// Change the sort order for media
         /// </summary>

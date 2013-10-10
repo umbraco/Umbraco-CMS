@@ -265,8 +265,10 @@ namespace Umbraco.Core.Persistence.Repositories
             //Updates Modified date
             ((Member)entity).UpdatingEntity();
 
+            var dirtyEntity = (ICanBeDirty) entity;
+
             //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
-            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            if (dirtyEntity.IsPropertyDirty("ParentId"))
             {
                 var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = ((IUmbracoEntity)entity).ParentId });
                 ((IUmbracoEntity)entity).Path = string.Concat(parent.Path, ",", entity.Id);
@@ -302,17 +304,44 @@ namespace Umbraco.Core.Persistence.Repositories
             //Updates the current version - cmsContentVersion
             //Assumes a Version guid exists and Version date (modified date) has been set/updated
             Database.Update(dto.ContentVersionDto);
-            //Updates the cmsMember entry
-            Database.Update(dto);
+            
+            //Updates the cmsMember entry if it has changed
+            var changedCols = new List<string>();
+            if (dirtyEntity.IsPropertyDirty("Email"))
+            {
+                changedCols.Add("Email");
+            }
+            if (dirtyEntity.IsPropertyDirty("Username"))
+            {
+                changedCols.Add("LoginName");
+            }
+            // DO NOT update the password if it is null or empty
+            if (dirtyEntity.IsPropertyDirty("Password") && entity.Password.IsNullOrWhiteSpace() == false)
+            {
+                changedCols.Add("Password");
+            }
+            //only update the changed cols
+            if (changedCols.Count > 0)
+            {
+                Database.Update(dto, changedCols);    
+            }
 
             //TODO ContentType for the Member entity
 
             //Create the PropertyData for this version - cmsPropertyData
-            var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
-            var propertyDataDtos = propertyFactory.BuildDto(((Member)entity).Properties);
+            var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);            
             var keyDictionary = new Dictionary<int, int>();
 
             //Add Properties
+            // - don't try to save the property if it doesn't exist (or doesn't have an ID) on the content type
+            // - this can occur if the member type doesn't contain the built-in properties that the
+            // - member object contains.
+            var existingProperties = entity.Properties
+                .Where(property => entity.ContentType.PropertyTypes.Any(x => x.Alias == property.Alias && x.HasIdentity))
+                .ToList();
+
+            var propertyDataDtos = propertyFactory.BuildDto(existingProperties);
+
             foreach (var propertyDataDto in propertyDataDtos)
             {
                 if (propertyDataDto.Id > 0)
@@ -337,7 +366,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             UpdatePropertyTags(entity, _tagRepository);
 
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            dirtyEntity.ResetDirtyProperties();
         }
 
         protected override void PersistDeletedItem(IMember entity)

@@ -139,7 +139,7 @@ namespace Umbraco.Web.WebApi.Filters
 
                 foreach (var result in editor.ValueEditor.Validators.SelectMany(v => v.Validate(postedValue, preValues, editor)))
                 {
-                    AddError(actionContext.ModelState, result, p.Alias);
+                    actionContext.ModelState.AddPropertyError(result, p.Alias);
                 }
 
                 //Now we need to validate the property based on the PropertyType validation (i.e. regex and required)
@@ -148,7 +148,7 @@ namespace Umbraco.Web.WebApi.Filters
                 {
                     foreach (var result in p.PropertyEditor.ValueEditor.RequiredValidator.Validate(postedValue, "", preValues, editor))
                     {
-                        AddError(actionContext.ModelState, result, p.Alias);
+                        actionContext.ModelState.AddPropertyError(result, p.Alias);
                     }
                 }
 
@@ -156,7 +156,7 @@ namespace Umbraco.Web.WebApi.Filters
                 {
                     foreach (var result in p.PropertyEditor.ValueEditor.RegexValidator.Validate(postedValue, p.ValidationRegExp, preValues, editor))
                     {
-                        AddError(actionContext.ModelState, result, p.Alias);
+                        actionContext.ModelState.AddPropertyError(result, p.Alias);
                     }
                 }
             }
@@ -164,30 +164,6 @@ namespace Umbraco.Web.WebApi.Filters
             return actionContext.ModelState.IsValid;
         }
 
-        /// <summary>
-        /// Adds the error to model state correctly for a property so we can use it on the client side.
-        /// </summary>
-        /// <param name="modelState"></param>
-        /// <param name="result"></param>
-        /// <param name="propertyAlias"></param>
-        private void AddError(ModelStateDictionary modelState, ValidationResult result, string propertyAlias)
-        {
-            //if there are no member names supplied then we assume that the validation message is for the overall property
-            // not a sub field on the property editor
-            if (!result.MemberNames.Any())
-            {
-                //add a model state error for the entire property
-                modelState.AddModelError(string.Format("{0}.{1}", "Properties", propertyAlias), result.ErrorMessage);
-            }
-            else
-            {
-                //there's assigned field names so we'll combine the field name with the property name
-                // so that we can try to match it up to a real sub field of this editor
-                foreach (var field in result.MemberNames)
-                {
-                    modelState.AddModelError(string.Format("{0}.{1}.{2}", "Properties", propertyAlias, field), result.ErrorMessage);
-                }
-            }
-        }
+        
     }
 }
