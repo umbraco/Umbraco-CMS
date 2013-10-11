@@ -228,7 +228,7 @@ namespace Umbraco.Tests.PublishedContent
     }
 
     [PublishedContentModel("ContentType2")]
-    public class ContentType2 : PublishedContentModel
+    internal class ContentType2 : PublishedContentModel
     {
         #region Plumbing
 
@@ -246,7 +246,7 @@ namespace Umbraco.Tests.PublishedContent
     }
 
     [PublishedContentModel("ContentType2Sub")]
-    public class ContentType2Sub : ContentType2
+    internal class ContentType2Sub : ContentType2
     {
         #region Plumbing
 
