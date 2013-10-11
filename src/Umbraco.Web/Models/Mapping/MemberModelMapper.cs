@@ -77,22 +77,27 @@ namespace Umbraco.Web.Models.Mapping
                         Label = ui.Text("login"),
                         Value = display.Username,
                         View = "textbox",
-                        Config = new Dictionary<string, object> { { "IsRequired", true } }
+                        Config = new Dictionary<string, object> {{"IsRequired", true}}
                     },
                 new ContentPropertyDisplay
                     {
                         Alias = string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                         Label = ui.Text("password"),
-                        Value = "",
-                        View = "changepassword",//TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
+                        //NOTE: The value here is a json value - but the only property we care about is the generatedPassword one if it exists - this is the only value we'll ever supply to the front-end
+                        Value = new Dictionary<string, object>
+                            {
+                                {"generatedPassword", member.AdditionalData.ContainsKey("GeneratedPassword") ? member.AdditionalData["GeneratedPassword"] : null}
+                            },
+                        //TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
+                        View = "changepassword",
                         Config = new Dictionary<string, object>
                             {
                                 //the password change toggle will only be displayed if there is already a password assigned.
-                                { "hasPassword", member.Password.IsNullOrWhiteSpace() == false },
-                                { "minPasswordLength", membershipProvider.MinRequiredPasswordLength },
-                                { "enableReset", membershipProvider.EnablePasswordReset },
-                                { "enablePasswordRetrieval" , membershipProvider.EnablePasswordRetrieval },
-                                { "requiresQuestionAnswer", membershipProvider.RequiresQuestionAndAnswer }
+                                {"hasPassword", member.Password.IsNullOrWhiteSpace() == false},
+                                {"minPasswordLength", membershipProvider.MinRequiredPasswordLength},
+                                {"enableReset", membershipProvider.EnablePasswordReset},
+                                {"enablePasswordRetrieval", membershipProvider.EnablePasswordRetrieval},
+                                {"requiresQuestionAnswer", membershipProvider.RequiresQuestionAndAnswer}
                                 //TODO: Inject the other parameters in here to change the behavior of this control - based on the membership provider settings.
                             }
                     },

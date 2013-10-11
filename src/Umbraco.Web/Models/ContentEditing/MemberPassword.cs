@@ -33,5 +33,11 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "answer")]
         public string Answer { get; set; }
+
+        /// <summary>
+        /// This is filled in on the server side if the password has been reset/generated
+        /// </summary>
+        [DataMember(Name = "generatedPassword")]
+        public string GeneratedPassword { get; set; }
     }
 }

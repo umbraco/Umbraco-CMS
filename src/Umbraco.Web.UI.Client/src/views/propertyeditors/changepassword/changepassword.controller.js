@@ -32,13 +32,23 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
                 $scope.model.config.minPasswordLength = 0;
             }
             
-            //set the model defaults - we never get supplied a password from the server so this is ok to overwrite.
-            $scope.model.value = {
-                newPassword: "",
-                oldPassword: null,
-                reset: null,
-                answer: null
-            };
+            //set the model defaults
+            if (!angular.isObject($scope.model.value)) {
+                //if it's not an object then just create a new one
+                $scope.model.value = {
+                    newPassword: "",
+                    oldPassword: null,
+                    reset: null,
+                    answer: null
+                };
+            }
+            else {
+                //just reset the values we need to
+                $scope.model.value.newPassword = "";
+                $scope.model.value.oldPassword = null;
+                $scope.model.value.reset = null;
+                $scope.model.value.answer = null;
+            }
 
             //the value to compare to match passwords
             $scope.model.confirm = "";
@@ -52,6 +62,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
 
         $scope.doChange = function() {
             $scope.changing = true;
+            //if there was a previously generated password displaying, clear it
+            $scope.model.value.generatedPassword = null;
         };
 
         $scope.cancelChange = function() {
@@ -64,4 +76,5 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
             $scope.changing = false;
             resetModel();
         });
+        
     });
