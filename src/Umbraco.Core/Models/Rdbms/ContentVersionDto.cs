@@ -15,6 +15,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("ContentId")]
         [ForeignKey(typeof(ContentDto), Column = "nodeId")]
+        [Index(IndexTypes.NonClustered, Name = "IX_cmsContentVersion_ContentId")]
         public int NodeId { get; set; }
 
         [Column("VersionId")]

@@ -15,11 +15,12 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("trashed")]
         [Constraint(Default = "0")]
+        [Index(IndexTypes.NonClustered, Name = "IX_umbracoNodeTrashed")]
         public bool Trashed { get; set; }
 
         [Column("parentID")]
         [ForeignKey(typeof(NodeDto))]
-        [IndexAttribute(IndexTypes.NonClustered, Name = "IX_umbracoNodeParentId")]
+        [Index(IndexTypes.NonClustered, Name = "IX_umbracoNodeParentId")]
         public int ParentId { get; set; }
 
         [Column("nodeUser")]
@@ -46,7 +47,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("nodeObjectType")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        [IndexAttribute(IndexTypes.NonClustered, Name = "IX_umbracoNodeObjectType")]
+        [Index(IndexTypes.NonClustered, Name = "IX_umbracoNodeObjectType")]
         public Guid? NodeObjectType { get; set; }
 
         [Column("createDate")]
