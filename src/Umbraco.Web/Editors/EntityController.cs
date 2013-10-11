@@ -96,7 +96,7 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Member:
                     searcher = Constants.Examine.InternalMemberSearcher;
                     type = "member";
-                    fields = new[] { "id", "email", "login","name", "nodename"};
+                    fields = new[] { "id", "email", "loginName","nodeName"};
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
