@@ -356,9 +356,16 @@ namespace umbraco
 			        return doc.CreatorName;
 	        }
 
+            // in 4.9.0 the method returned the raw XML from the cache, unparsed
+            // starting with 5c20f4f (4.10?) the method returns prop.Value.ToString()
+            //   where prop.Value is parsed for internal links + resolve urls - but not for macros
+            //   comments say "fixing U4-917 and U4-821" which are not related
+            // if we return DataValue.ToString() we're back to the original situation
+            // if we return Value.ToString() we'll have macros parsed and that's nice
+            //
+            // so, use Value.ToString() here.
 	        var prop = doc.GetProperty(alias);
 	        return prop == null ? string.Empty : prop.Value.ToString();
-
         }
 
         /// <summary>

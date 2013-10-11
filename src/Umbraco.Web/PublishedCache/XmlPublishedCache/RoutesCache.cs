@@ -48,7 +48,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             global::umbraco.content.AfterUpdateDocumentCache += (sender, e) => Clear();
             global::umbraco.content.AfterClearDocumentCache += (sender, e) => Clear();
 
-            // fixme - refactor when content events are refactored
+            // fixme - should refactor once content events are refactored
             // the content class needs to be refactored - at the moment 
             // content.XmlContentInternal setter does not trigger any event
             // content.UpdateDocumentCache(List<Document> Documents) does not trigger any event

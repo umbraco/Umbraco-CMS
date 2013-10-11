@@ -10,27 +10,29 @@ namespace umbraco.MacroEngines
 {
     public class PropertyResult : IProperty, IHtmlString
     {
-        private string _alias;
-        private string _value;
+        private readonly string _alias;
+        private readonly string _value;
 
         public PropertyResult(IProperty source)
         {
-            if (source != null)
-            {
-                this._alias = source.Alias;
-                this._value = source.Value;
-            }
+            if (source == null) return;
+
+            _alias = source.Alias;
+            _value = source.Value;
         }
+
         public PropertyResult(string alias, string value)
         {
-            this._alias = alias;
-            this._value = value;
+            _alias = alias;
+            _value = value;
         }
+
         public PropertyResult(Property source)
         {
-            this._alias = source.PropertyType.Alias;
-            this._value = string.Format("{0}", source.Value);
+            _alias = source.PropertyType.Alias;
+            _value = source.Value.ToString();
         }
+
         public string Alias
         {
             get { return _alias; }
@@ -45,6 +47,7 @@ namespace umbraco.MacroEngines
         {
             return Value == null;
         }
+
         public bool HasValue()
         {
             return !string.IsNullOrWhiteSpace(Value);
@@ -53,9 +56,9 @@ namespace umbraco.MacroEngines
         public int ContextId { get; set; }
         public string ContextAlias { get; set; }
 
+        // implements IHtmlString.ToHtmlString
         public string ToHtmlString()
         {
-            //Like a boss
             return Value;
         }
     }

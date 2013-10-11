@@ -1,18 +1,20 @@
-﻿using System;
+﻿// ENABLE THE FIX in 7.0.0
+// TODO if all goes well, remove the obsolete code eventually
+#define FIX_GET_PROPERTY_VALUE
+
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Dynamic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Web;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Core;
-using Umbraco.Core.PropertyEditors;
 using System.Reflection;
-using System.Xml.Linq;
-using umbraco.cms.businesslogic;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Strings;
 using ContentType = umbraco.cms.businesslogic.ContentType;
 
@@ -23,73 +25,46 @@ namespace Umbraco.Web.Models
 	/// The base dynamic model for views
 	/// </summary>
     [DebuggerDisplay("Content Id: {Id}, Name: {Name}")]
-    public class DynamicPublishedContent : DynamicObject, IPublishedContent, IOwnerCollectionAware<IPublishedContent>
+    public class DynamicPublishedContent : DynamicObject, IPublishedContent
 	{
 		protected internal IPublishedContent PublishedContent { get; private set; }
-		private DynamicPublishedContentList _cachedChildren;
-		private readonly ConcurrentDictionary<string, object> _cachedMemberOutput = new ConcurrentDictionary<string, object>();
-		
+	    private DynamicPublishedContentList _contentList;
+
+        // must implement that one if we implement IPublishedContent
+	    public IEnumerable<IPublishedContent> ContentSet
+	    {
+            // that is a definitively non-efficient way of doing it, though it should work
+	        get { return _contentList ?? (_contentList = new DynamicPublishedContentList(PublishedContent.ContentSet)); }
+	    }
+
+        public PublishedContentType ContentType { get { return PublishedContent.ContentType; } }
+
 		#region Constructors
 
 		public DynamicPublishedContent(IPublishedContent content)
 		{
 			if (content == null) throw new ArgumentNullException("content");
 			PublishedContent = content;
-		}		
+		}
+
+        internal DynamicPublishedContent(IPublishedContent content, DynamicPublishedContentList contentList)
+        {
+            PublishedContent = content;
+            _contentList = contentList;
+        }
 		
 		#endregion
 
-        private IEnumerable<IPublishedContent> _ownersCollection;
+        // these two here have leaked in v6 and so we cannot remove them anymore
+        // without breaking compatibility but... TODO: remove them in v7
+        public DynamicPublishedContentList ChildrenAsList { get { return Children; } }
+        public int parentId { get { return PublishedContent.Parent.Id; } }
+
+        #region DynamicObject
+
+        private readonly ConcurrentDictionary<string, object> _cachedMemberOutput = new ConcurrentDictionary<string, object>();
 
         /// <summary>
-        /// Need to get/set the owner collection when an item is returned from the result set of a query
-        /// </summary>
-        /// <remarks>
-        /// Based on this issue here: http://issues.umbraco.org/issue/U4-1797
-        /// </remarks>
-        IEnumerable<IPublishedContent> IOwnerCollectionAware<IPublishedContent>.OwnersCollection
-        {
-            get
-            {
-                var publishedContentBase = PublishedContent as IOwnerCollectionAware<IPublishedContent>;
-                if (publishedContentBase != null)
-                {
-                    return publishedContentBase.OwnersCollection;
-                }
-
-                //if the owners collection is null, we'll default to it's siblings
-                if (_ownersCollection == null)
-                {
-                    //get the root docs if parent is null
-                    _ownersCollection = this.Siblings();
-                }
-                return _ownersCollection;
-            }
-            set
-            {
-                var publishedContentBase = PublishedContent as IOwnerCollectionAware<IPublishedContent>;
-                if (publishedContentBase != null)
-                {
-                    publishedContentBase.OwnersCollection = value;
-                }
-                else
-                {
-                    _ownersCollection = value;    
-                }
-            }
-        }       
-        
-		public dynamic AsDynamic()
-		{
-			return this;
-		}
-
-		public bool HasProperty(string name)
-		{
-			return PublishedContent.HasProperty(name);
-		}
-
-		/// <summary>
 		/// Attempts to call a method on the dynamic object
 		/// </summary>
 		/// <param name="binder"></param>
@@ -131,10 +106,11 @@ namespace Umbraco.Web.Models
 			}
 			
 			//this is the result of an extension method execution gone wrong so we return dynamic null
-			if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod
-				&& attempt.Exception != null && attempt.Exception is TargetInvocationException) 				
+			if (attempt.Result != null
+                && attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod
+				&& attempt.Exception is TargetInvocationException) 				
 			{
-				result = new DynamicNull();
+			    result = DynamicNull.Null;
 				return true;	
 			}
 		
@@ -149,6 +125,10 @@ namespace Umbraco.Web.Models
 		/// <returns></returns>
 		protected virtual Attempt<object> TryGetCustomMember(GetMemberBinder binder)
 		{
+            // as of 4.5 the CLR is case-sensitive which means that the default binder
+            // will handle those methods only when using the proper casing. So what
+            // this method does is ensure that any casing is supported.
+
 			if (binder.Name.InvariantEquals("ChildrenAsList") || binder.Name.InvariantEquals("Children"))
 			{
 				return Attempt<object>.Succeed(Children);
@@ -163,6 +143,7 @@ namespace Umbraco.Web.Models
 				}
 				return Attempt<object>.Succeed(parent.Id);
 			}
+
 			return Attempt<object>.Fail();
 		}
 
@@ -196,7 +177,6 @@ namespace Umbraco.Web.Models
 		/// <returns></returns>
 		protected virtual Attempt<object> TryGetDocumentProperty(GetMemberBinder binder)
 		{
-			
 			var reflectedProperty = GetReflectedProperty(binder.Name);
 			var result = reflectedProperty != null
 				? reflectedProperty.Value
@@ -213,44 +193,15 @@ namespace Umbraco.Web.Models
 		protected virtual Attempt<object> TryGetUserProperty(GetMemberBinder binder)
 		{
 			var name = binder.Name;
-			var recursive = false;
+			var recurse = false;
 			if (name.StartsWith("_"))
 			{
 				name = name.Substring(1, name.Length - 1);
-				recursive = true;
+				recurse = true;
 			}
 
-			var userProperty = GetUserProperty(name, recursive);
-
-			if (userProperty == null)
-			{
-				return Attempt<object>.Fail();
-			}
-
-			var result = userProperty.Value;
-
-			if (PublishedContent.DocumentTypeAlias == null && userProperty.Alias == null)
-			{
-				throw new InvalidOperationException("No node alias or property alias available. Unable to look up the datatype of the property you are trying to fetch.");
-			}
-
-			//get the property editor alias for the current property
-			var propertyEditor = PublishedContentHelper.GetPropertyEditor(
-                ApplicationContext.Current,
-                userProperty.DocumentTypeAlias, 
-                userProperty.Alias,
-                ItemType);
-
-			//convert the string value to a known type
-		    var def = new PublishedPropertyDefinition(userProperty.Alias, userProperty.DocumentTypeAlias, propertyEditor);
-			var converted = PublishedContentHelper.ConvertPropertyValue(result, def);
-			if (converted.Success)
-			{
-				result = converted.Result;
-			}
-
-			return Attempt<object>.Succeed(result);
-
+		    var value = PublishedContent.GetPropertyValue(name, recurse);
+			return Attempt<object>.SucceedIf(value != null, value);
 		}
 
 		/// <summary>
@@ -313,7 +264,7 @@ namespace Umbraco.Web.Models
 			//and will make it false
 			//which means backwards equality (&& property != true) will pass
 			//forwwards equality (&& property or && property == true) will fail
-			result = new DynamicNull();
+            result = DynamicNull.Null;
 
 			//alwasy return true if we haven't thrown an exception though I'm wondering if we return 'false' if .Net throws an exception for us??
 			return true;
@@ -344,19 +295,18 @@ namespace Umbraco.Web.Models
 			var context = this;
 			var prop = GetPropertyInternal(alias, PublishedContent);
 
-			while (prop == null || !prop.HasValue())
+			while (prop == null || !prop.HasValue)
 			{
 				var parent = ((IPublishedContent) context).Parent;
 				if (parent == null) break;
 
                 // Update the context before attempting to retrieve the property again.
-                context = parent.AsDynamicPublishedContent();
+                context = parent.AsDynamicOrNull();
 				prop = context.GetPropertyInternal(alias, context.PublishedContent);
 			}
 
 			return prop;
 		}
-
 
 		private PropertyResult GetPropertyInternal(string alias, IPublishedContent content, bool checkUserProperty = true)
 		{
@@ -368,16 +318,17 @@ namespace Umbraco.Web.Models
 			{
 				var prop = content.GetProperty(alias);
 
-				return prop == null
-						? null
-						: new PropertyResult(prop, PropertyResultType.UserProperty)
-						{
-							DocumentTypeAlias = content.DocumentTypeAlias,
-							DocumentId = content.Id
-						};
+                // get wrap the result in a PropertyResult - just so it's an IHtmlString - ?!
+                return prop == null
+			        ? null
+			        : new PropertyResult(prop, PropertyResultType.UserProperty);
 			}
 
 			//reflect
+
+            // as of 4.5 the CLR is case-sensitive which means that the default binder
+            // can handle properties only when using the proper casing. So what this
+            // does is ensure that any casing is supported.
 
 			Func<string, Attempt<object>> getMember =
 				memberAlias =>
@@ -410,91 +361,128 @@ namespace Umbraco.Web.Models
             }
 
 			return !attempt.Success
-					? null
-					: new PropertyResult(alias, attempt.Result, PropertyResultType.ReflectedProperty)
-					{
-						DocumentTypeAlias = content.DocumentTypeAlias,
-						DocumentId = content.Id
-					};
+				? null
+				: new PropertyResult(alias, attempt.Result, PropertyResultType.ReflectedProperty);
 		}
 
-		
+        #endregion
 
-		//public DynamicNode Media(string propertyAlias)
-		//{
-		//    if (_n != null)
-		//    {
-		//        IProperty prop = _n.GetProperty(propertyAlias);
-		//        if (prop != null)
-		//        {
-		//            int mediaNodeId;
-		//            if (int.TryParse(prop.Value, out mediaNodeId))
-		//            {
-		//                return _razorLibrary.Value.MediaById(mediaNodeId);
-		//            }
-		//        }
-		//        return null;
-		//    }
-		//    return null;
-		//}
-		//public bool IsProtected
-		//{
-		//    get
-		//    {
-		//        if (_n != null)
-		//        {
-		//            return umbraco.library.IsProtected(_n.Id, _n.Path);
-		//        }
-		//        return false;
-		//    }
-		//}
-		//public bool HasAccess
-		//{
-		//    get
-		//    {
-		//        if (_n != null)
-		//        {
-		//            return umbraco.library.HasAccess(_n.Id, _n.Path);
-		//        }
-		//        return true;
-		//    }
-		//}
+        #region Explicit IPublishedContent implementation
 
-		//public string Media(string propertyAlias, string mediaPropertyAlias)
-		//{
-		//    if (_n != null)
-		//    {
-		//        IProperty prop = _n.GetProperty(propertyAlias);
-		//        if (prop == null && propertyAlias.Substring(0, 1).ToUpper() == propertyAlias.Substring(0, 1))
-		//        {
-		//            prop = _n.GetProperty(propertyAlias.Substring(0, 1).ToLower() + propertyAlias.Substring((1)));
-		//        }
-		//        if (prop != null)
-		//        {
-		//            int mediaNodeId;
-		//            if (int.TryParse(prop.Value, out mediaNodeId))
-		//            {
-		//                umbraco.cms.businesslogic.media.Media media = new cms.businesslogic.media.Media(mediaNodeId);
-		//                if (media != null)
-		//                {
-		//                    Property mprop = media.getProperty(mediaPropertyAlias);
-		//                    // check for nicer support of Pascal Casing EVEN if alias is camelCasing:
-		//                    if (prop == null && mediaPropertyAlias.Substring(0, 1).ToUpper() == mediaPropertyAlias.Substring(0, 1))
-		//                    {
-		//                        mprop = media.getProperty(mediaPropertyAlias.Substring(0, 1).ToLower() + mediaPropertyAlias.Substring((1)));
-		//                    }
-		//                    if (mprop != null)
-		//                    {
-		//                        return string.Format("{0}", mprop.Value);
-		//                    }
-		//                }
-		//            }
-		//        }
-		//    }
-		//    return null;
-		//}
+        IPublishedContent IPublishedContent.Parent
+        {
+            get { return PublishedContent.Parent; }
+        }
 
-		#region Standard Properties
+        int IPublishedContent.Id
+        {
+            get { return PublishedContent.Id; }
+        }
+
+        int IPublishedContent.TemplateId
+        {
+            get { return PublishedContent.TemplateId; }
+        }
+
+        int IPublishedContent.SortOrder
+        {
+            get { return PublishedContent.SortOrder; }
+        }
+
+        string IPublishedContent.Name
+        {
+            get { return PublishedContent.Name; }
+        }
+
+        string IPublishedContent.UrlName
+        {
+            get { return PublishedContent.UrlName; }
+        }
+
+        string IPublishedContent.DocumentTypeAlias
+        {
+            get { return PublishedContent.DocumentTypeAlias; }
+        }
+
+        int IPublishedContent.DocumentTypeId
+        {
+            get { return PublishedContent.DocumentTypeId; }
+        }
+
+        string IPublishedContent.WriterName
+        {
+            get { return PublishedContent.WriterName; }
+        }
+
+        string IPublishedContent.CreatorName
+        {
+            get { return PublishedContent.CreatorName; }
+        }
+
+        int IPublishedContent.WriterId
+        {
+            get { return PublishedContent.WriterId; }
+        }
+
+        int IPublishedContent.CreatorId
+        {
+            get { return PublishedContent.CreatorId; }
+        }
+
+        string IPublishedContent.Path
+        {
+            get { return PublishedContent.Path; }
+        }
+
+        DateTime IPublishedContent.CreateDate
+        {
+            get { return PublishedContent.CreateDate; }
+        }
+
+        DateTime IPublishedContent.UpdateDate
+        {
+            get { return PublishedContent.UpdateDate; }
+        }
+
+        Guid IPublishedContent.Version
+        {
+            get { return PublishedContent.Version; }
+        }
+
+        int IPublishedContent.Level
+        {
+            get { return PublishedContent.Level; }
+        }
+
+        bool IPublishedContent.IsDraft
+	    {
+            get { return PublishedContent.IsDraft; }
+	    }
+
+        int IPublishedContent.GetIndex()
+        {
+            return PublishedContent.GetIndex();
+        }
+
+        ICollection<IPublishedProperty> IPublishedContent.Properties
+        {
+            get { return PublishedContent.Properties; }
+        }
+
+        IEnumerable<IPublishedContent> IPublishedContent.Children
+        {
+            get { return PublishedContent.Children; }
+        }
+
+        IPublishedProperty IPublishedContent.GetProperty(string alias)
+        {
+            return PublishedContent.GetProperty(alias);
+        }
+
+        #endregion
+
+        #region IPublishedContent implementation
+
 		public int TemplateId
 		{
 			get { return PublishedContent.TemplateId; }
@@ -508,16 +496,6 @@ namespace Umbraco.Web.Models
 		public string Name
 		{
 			get { return PublishedContent.Name; }
-		}
-
-		public bool Visible
-		{
-			get { return PublishedContent.IsVisible(); }
-		}
-
-		public bool IsVisible()
-		{
-			return PublishedContent.IsVisible();
 		}
 
 		public string UrlName
@@ -590,7 +568,13 @@ namespace Umbraco.Web.Models
 			get { return PublishedContent.ItemType; }
 		}
 
-		public IEnumerable<IPublishedContentProperty> Properties
+        // see note in IPublishedContent
+        //public bool Published
+        //{
+        //    get { return PublishedContent.Published; }
+        //}
+
+		public IEnumerable<IPublishedProperty> Properties
 		{
 			get { return PublishedContent.Properties; }
 		}
@@ -600,629 +584,712 @@ namespace Umbraco.Web.Models
 			get { return PublishedContent[propertyAlias]; }
 		}
 
-		public DynamicPublishedContentList Children
-		{
-			get
-			{
-				if (_cachedChildren == null)
-				{
-					var children = PublishedContent.Children;
-					//testing, think this must be a special case for the root node ?
-					if (!children.Any() && PublishedContent.Id == 0)
-					{
-						_cachedChildren = new DynamicPublishedContentList(new List<DynamicPublishedContent> { new DynamicPublishedContent(this.PublishedContent) });
-					}
-					else
-					{
-						_cachedChildren = new DynamicPublishedContentList(PublishedContent.Children.Select(x => new DynamicPublishedContent(x)));
-					}
-				}
-				return _cachedChildren;
-			}
-		} 
-		#endregion
+        #endregion
 
-		public string GetTemplateAlias()
+        #region GetProperty
+
+        // enhanced versions of the extension methods that exist for IPublishedContent,
+        // here we support the recursive (_) and reflected (@) syntax
+
+        public IPublishedProperty GetProperty(string alias)
+        {
+            return alias.StartsWith("_")
+                ? GetProperty(alias.Substring(1), true)
+                : GetProperty(alias, false);
+        }
+
+        public IPublishedProperty GetProperty(string alias, bool recurse)
+        {
+            if (alias.StartsWith("@")) return GetReflectedProperty(alias.Substring(1));
+
+            // get wrap the result in a PropertyResult - just so it's an IHtmlString - ?!
+            var property = PublishedContent.GetProperty(alias, recurse);
+            return property == null ? null : new PropertyResult(property, PropertyResultType.UserProperty);
+        }
+
+        #endregion
+
+        // IPublishedContent extension methods:
+        //
+        // all these methods are IPublishedContent extension methods so they should in
+        // theory apply to DynamicPublishedContent since it is an IPublishedContent and
+        // we look for extension methods. But that lookup has to be pretty slow.
+        // Duplicating the methods here makes things much faster.
+
+        #region IPublishedContent extension methods - Template
+
+        public string GetTemplateAlias()
 		{
 			return PublishedContentExtensions.GetTemplateAlias(this);
 		}
+        
+        #endregion
 
-		#region Search
+        #region IPublishedContent extension methods - HasProperty
 
-		public DynamicPublishedContentList Search(string term, bool useWildCards = true, string searchProvider = null)
+        public bool HasProperty(string name)
+        {
+            return PublishedContent.HasProperty(name);
+        }
+        
+        #endregion
+
+        #region IPublishedContent extension methods - HasValue
+
+        public bool HasValue(string alias)
 		{
-			return new DynamicPublishedContentList(
-				PublishedContentExtensions.Search(this, term, useWildCards, searchProvider));
-		}
-
-		public DynamicPublishedContentList SearchDescendants(string term, bool useWildCards = true, string searchProvider = null)
-		{
-			return new DynamicPublishedContentList(
-				PublishedContentExtensions.SearchDescendants(this, term, useWildCards, searchProvider));
-		}
-
-		public DynamicPublishedContentList SearchChildren(string term, bool useWildCards = true, string searchProvider = null)
-		{
-			return new DynamicPublishedContentList(
-				PublishedContentExtensions.SearchChildren(this, term, useWildCards, searchProvider));
+			return PublishedContent.HasValue(alias);
 		}
 
-		public DynamicPublishedContentList Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
-		{
-			return new DynamicPublishedContentList(
-				PublishedContentExtensions.Search(this, criteria, searchProvider));
-		}
-
-		#endregion
-
-		#region GetProperty methods which can be used with the dynamic object
-
-		public IPublishedContentProperty GetProperty(string alias)
-		{
-            var prop = GetProperty(alias, false);
-			if (prop == null && alias.StartsWith("_"))
-			{
-			    //if it is prefixed and the first result failed, try to get it by recursive
-                var recursiveAlias = alias.Substring(1, alias.Length - 1);
-                return GetProperty(recursiveAlias, true);
-			}
-		    return prop;
-		}
-		public IPublishedContentProperty GetProperty(string alias, bool recursive)
-		{
-			return alias.StartsWith("@")
-				? GetReflectedProperty(alias.TrimStart('@'))
-				: GetUserProperty(alias, recursive);
-		}
-		public string GetPropertyValue(string alias)
-		{
-			return GetPropertyValue(alias, false);
-		}
-		public string GetPropertyValue(string alias, string fallback)
-		{
-			var prop = GetPropertyValue(alias);
-			return !prop.IsNullOrWhiteSpace() ? prop : fallback;
-		}
-		public string GetPropertyValue(string alias, bool recursive)
-		{
-			var p = alias.StartsWith("@")
-					? GetReflectedProperty(alias.TrimStart('@'))
-					: GetUserProperty(alias, recursive);
-			return p == null ? null : p.ValueAsString;
-		}
-		public string GetPropertyValue(string alias, bool recursive, string fallback)
-		{
-			var prop = GetPropertyValue(alias, recursive);
-			return !prop.IsNullOrWhiteSpace() ? prop : fallback;
-		}
-
-		#endregion
-		
-		#region HasValue
-		public bool HasValue(string alias)
-		{
-			return this.PublishedContent.HasValue(alias);
-		}
 		public bool HasValue(string alias, bool recursive)
 		{
-			return this.PublishedContent.HasValue(alias, recursive);
+			return PublishedContent.HasValue(alias, recursive);
 		}
+
 		public IHtmlString HasValue(string alias, string valueIfTrue, string valueIfFalse)
 		{
-			return this.PublishedContent.HasValue(alias, valueIfTrue, valueIfFalse);
+			return PublishedContent.HasValue(alias, valueIfTrue, valueIfFalse);
 		}
+
 		public IHtmlString HasValue(string alias, bool recursive, string valueIfTrue, string valueIfFalse)
 		{
-			return this.PublishedContent.HasValue(alias, recursive, valueIfTrue, valueIfFalse);
+			return PublishedContent.HasValue(alias, recursive, valueIfTrue, valueIfFalse);
 		}
+
 		public IHtmlString HasValue(string alias, string valueIfTrue)
 		{
-			return this.PublishedContent.HasValue(alias, valueIfTrue);
+			return PublishedContent.HasValue(alias, valueIfTrue);
 		}
+
 		public IHtmlString HasValue(string alias, bool recursive, string valueIfTrue)
 		{
-			return this.PublishedContent.HasValue(alias, recursive, valueIfTrue);
+			return PublishedContent.HasValue(alias, recursive, valueIfTrue);
 		} 
+
 		#endregion
 
-		#region Explicit IPublishedContent implementation
+        #region IPublishedContent extension methods - GetPropertyValue
 
-		IPublishedContent IPublishedContent.Parent
-		{
-			get { return PublishedContent.Parent; }
-		}
+        // for whatever reason, some methods returning strings were created in DynamicPublishedContent
+        // and are now considered a "feature" as of v6. So we can't have the proper GetPropertyValue
+        // methods returning objects, too. And we don't want to change it in v6 as that would be a 
+        // breaking change.
 
-		int IPublishedContent.Id
-		{
-			get { return PublishedContent.Id; }
-		}
+#if FIX_GET_PROPERTY_VALUE
 
-		int IPublishedContent.TemplateId
-		{
-			get { return PublishedContent.TemplateId; }
-		}
+        public object GetPropertyValue(string alias)
+        {
+            return PublishedContent.GetPropertyValue(alias);
+        }
 
-		int IPublishedContent.SortOrder
-		{
-			get { return PublishedContent.SortOrder; }
-		}
+        public object GetPropertyValue(string alias, string defaultValue)
+        {
+            return PublishedContent.GetPropertyValue(alias, defaultValue);
+        }
 
-		string IPublishedContent.Name
-		{
-			get { return PublishedContent.Name; }
-		}
+        public object GetPropertyValue(string alias, object defaultValue)
+        {
+            return PublishedContent.GetPropertyValue(alias, defaultValue);
+        }
 
-		string IPublishedContent.UrlName
-		{
-			get { return PublishedContent.UrlName; }
-		}
+        public object GetPropertyValue(string alias, bool recurse)
+        {
+            return PublishedContent.GetPropertyValue(alias, recurse);
+        }
 
-		string IPublishedContent.DocumentTypeAlias
-		{
-			get { return PublishedContent.DocumentTypeAlias; }
-		}
+        public object GetPropertyValue(string alias, bool recurse, object defaultValue)
+        {
+            return PublishedContent.GetPropertyValue(alias, recurse, defaultValue);
+        }
 
-		int IPublishedContent.DocumentTypeId
-		{
-			get { return PublishedContent.DocumentTypeId; }
-		}
+#else
 
-		string IPublishedContent.WriterName
-		{
-			get { return PublishedContent.WriterName; }
-		}
+        public string GetPropertyValue(string alias)
+        {
+            return GetPropertyValue(alias, false);
+        }
 
-		string IPublishedContent.CreatorName
-		{
-			get { return PublishedContent.CreatorName; }
-		}
+        public string GetPropertyValue(string alias, string defaultValue)
+        {
+            var value = GetPropertyValue(alias);
+            return value.IsNullOrWhiteSpace() ? defaultValue : value;
+        }
 
-		int IPublishedContent.WriterId
-		{
-			get { return PublishedContent.WriterId; }
-		}
+        public string GetPropertyValue(string alias, bool recurse, string defaultValue)
+        {
+            var value = GetPropertyValue(alias, recurse);
+            return value.IsNullOrWhiteSpace() ? defaultValue : value;
+        }
 
-		int IPublishedContent.CreatorId
-		{
-			get { return PublishedContent.CreatorId; }
-		}
+        public string GetPropertyValue(string alias, bool recursive)
+        {
+            var property = GetProperty(alias, recursive);
+            if (property == null || property.Value == null) return null;
+            return property.Value.ToString();
+        }
 
-		string IPublishedContent.Path
-		{
-			get { return PublishedContent.Path; }
-		}
+#endif
 
-		DateTime IPublishedContent.CreateDate
-		{
-			get { return PublishedContent.CreateDate; }
-		}
+        #endregion
 
-		DateTime IPublishedContent.UpdateDate
-		{
-			get { return PublishedContent.UpdateDate; }
-		}
+        #region IPublishedContent extension methods - GetPropertyValue<T>
 
-		Guid IPublishedContent.Version
-		{
-			get { return PublishedContent.Version; }
-		}
+        public T GetPropertyValue<T>(string alias)
+        {
+            return PublishedContent.GetPropertyValue<T>(alias);
+        }
 
-		int IPublishedContent.Level
-		{
-			get { return PublishedContent.Level; }
-		}
+        public T GetPropertyValue<T>(string alias, T defaultValue)
+        {
+            return PublishedContent.GetPropertyValue(alias, defaultValue);
+        }
 
-		ICollection<IPublishedContentProperty> IPublishedContent.Properties
-		{
-			get { return PublishedContent.Properties; }
-		}
+        public T GetPropertyValue<T>(string alias, bool recurse)
+        {
+            return PublishedContent.GetPropertyValue<T>(alias, recurse);
+        }
 
-		IEnumerable<IPublishedContent> IPublishedContent.Children
-		{
-			get { return PublishedContent.Children; }
-		}
+        public T GetPropertyValue<T>(string alias, bool recurse, T defaultValue)
+        {
+            return PublishedContent.GetPropertyValue(alias, recurse, defaultValue);
+        }
 
-		IPublishedContentProperty IPublishedContent.GetProperty(string alias)
-		{
-			return PublishedContent.GetProperty(alias);
-		} 
-		#endregion
+        #endregion
 
-		
-		#region Index/Position
-		public int Position()
-		{
-			return Umbraco.Web.PublishedContentExtensions.Position(this);
-		}
-		public int Index()
-		{
-			return Umbraco.Web.PublishedContentExtensions.Index(this);
-		} 
-		#endregion
+        #region IPublishedContent extension methods - Search
 
-		#region Is Helpers
+        public DynamicPublishedContentList Search(string term, bool useWildCards = true, string searchProvider = null)
+        {
+            return new DynamicPublishedContentList(PublishedContent.Search(term, useWildCards, searchProvider));
+        }
+
+        public DynamicPublishedContentList SearchDescendants(string term, bool useWildCards = true, string searchProvider = null)
+        {
+            return new DynamicPublishedContentList(PublishedContent.SearchDescendants(term, useWildCards, searchProvider));
+        }
+
+        public DynamicPublishedContentList SearchChildren(string term, bool useWildCards = true, string searchProvider = null)
+        {
+            return new DynamicPublishedContentList(PublishedContent.SearchChildren(term, useWildCards, searchProvider));
+        }
+
+        public DynamicPublishedContentList Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
+        {
+            return new DynamicPublishedContentList(PublishedContent.Search(criteria, searchProvider));
+        }
+
+        #endregion
+
+        #region IPublishedContent extension methods - AsDynamic
+
+        public dynamic AsDynamic()
+        {
+            return this;
+        }
+
+        public dynamic AsDynamicOrNull()
+        {
+            return this;
+        }
+        
+        #endregion
+
+        #region IPublishedContente extension methods - ContentSet
+
+        public int Position()
+        {
+            return Index();
+        }
+
+        public int Index()
+        {
+            return PublishedContent.GetIndex();
+        }
+
+        #endregion
+
+        #region IPublishedContent extension methods - IsSomething: misc
+
+        public bool Visible
+	    {
+	        get { return PublishedContent.IsVisible(); }
+	    }
+
+        public bool IsVisible()
+        {
+            return PublishedContent.IsVisible();
+        }
 
 		public bool IsDocumentType(string docTypeAlias)
 		{
-			return this.PublishedContent.IsDocumentType(docTypeAlias);
+			return PublishedContent.IsDocumentType(docTypeAlias);
 		}
 
 		public bool IsNull(string alias, bool recursive)
 		{
-			return this.PublishedContent.IsNull(alias, recursive);
+			return PublishedContent.IsNull(alias, recursive);
 		}
+
 		public bool IsNull(string alias)
 		{
-			return this.PublishedContent.IsNull(alias, false);
+			return PublishedContent.IsNull(alias, false);
 		}
-		public bool IsFirst()
+
+        #endregion 
+
+        #region IPublishedContent extension methods - IsSomething: position in set
+
+        public bool IsFirst()
 		{
-			return this.PublishedContent.IsFirst();
+			return PublishedContent.IsFirst();
 		}
+
 		public HtmlString IsFirst(string valueIfTrue)
 		{
-			return this.PublishedContent.IsFirst(valueIfTrue);
+			return PublishedContent.IsFirst(valueIfTrue);
 		}
+
 		public HtmlString IsFirst(string valueIfTrue, string valueIfFalse)
 		{
-			return this.PublishedContent.IsFirst(valueIfTrue, valueIfFalse);
+			return PublishedContent.IsFirst(valueIfTrue, valueIfFalse);
 		}
+
 		public bool IsNotFirst()
 		{
-			return this.PublishedContent.IsNotFirst();
+			return PublishedContent.IsNotFirst();
 		}
+
 		public HtmlString IsNotFirst(string valueIfTrue)
 		{
-			return this.PublishedContent.IsNotFirst(valueIfTrue);
+			return PublishedContent.IsNotFirst(valueIfTrue);
 		}
+
 		public HtmlString IsNotFirst(string valueIfTrue, string valueIfFalse)
 		{
-			return this.PublishedContent.IsNotFirst(valueIfTrue, valueIfFalse);
+			return PublishedContent.IsNotFirst(valueIfTrue, valueIfFalse);
 		}
+
 		public bool IsPosition(int index)
 		{
-			return this.PublishedContent.IsPosition(index);
+			return PublishedContent.IsPosition(index);
 		}
+
 		public HtmlString IsPosition(int index, string valueIfTrue)
 		{
-			return this.PublishedContent.IsPosition(index, valueIfTrue);
+			return PublishedContent.IsPosition(index, valueIfTrue);
 		}
+
 		public HtmlString IsPosition(int index, string valueIfTrue, string valueIfFalse)
 		{
-			return this.PublishedContent.IsPosition(index, valueIfTrue, valueIfFalse);
+			return PublishedContent.IsPosition(index, valueIfTrue, valueIfFalse);
 		}
+
 		public bool IsModZero(int modulus)
 		{
-			return this.PublishedContent.IsModZero(modulus);
+			return PublishedContent.IsModZero(modulus);
 		}
+
 		public HtmlString IsModZero(int modulus, string valueIfTrue)
 		{
-			return this.PublishedContent.IsModZero(modulus, valueIfTrue);
+			return PublishedContent.IsModZero(modulus, valueIfTrue);
 		}
+
 		public HtmlString IsModZero(int modulus, string valueIfTrue, string valueIfFalse)
 		{
-			return this.PublishedContent.IsModZero(modulus, valueIfTrue, valueIfFalse);
+			return PublishedContent.IsModZero(modulus, valueIfTrue, valueIfFalse);
 		}
 
 		public bool IsNotModZero(int modulus)
 		{
-			return this.PublishedContent.IsNotModZero(modulus);
+			return PublishedContent.IsNotModZero(modulus);
 		}
+
 		public HtmlString IsNotModZero(int modulus, string valueIfTrue)
 		{
-			return this.PublishedContent.IsNotModZero(modulus, valueIfTrue);
+			return PublishedContent.IsNotModZero(modulus, valueIfTrue);
 		}
+
 		public HtmlString IsNotModZero(int modulus, string valueIfTrue, string valueIfFalse)
 		{
-			return this.PublishedContent.IsNotModZero(modulus, valueIfTrue, valueIfFalse);
+			return PublishedContent.IsNotModZero(modulus, valueIfTrue, valueIfFalse);
 		}
+
 		public bool IsNotPosition(int index)
 		{
-			return this.PublishedContent.IsNotPosition(index);
+			return PublishedContent.IsNotPosition(index);
 		}
+
 		public HtmlString IsNotPosition(int index, string valueIfTrue)
 		{
-			return this.PublishedContent.IsNotPosition(index, valueIfTrue);
+			return PublishedContent.IsNotPosition(index, valueIfTrue);
 		}
+
 		public HtmlString IsNotPosition(int index, string valueIfTrue, string valueIfFalse)
 		{
-			return this.PublishedContent.IsNotPosition(index, valueIfTrue, valueIfFalse);
+			return PublishedContent.IsNotPosition(index, valueIfTrue, valueIfFalse);
 		}
+
 		public bool IsLast()
 		{
-			return this.PublishedContent.IsLast();
+			return PublishedContent.IsLast();
 		}
+
 		public HtmlString IsLast(string valueIfTrue)
 		{
-			return this.PublishedContent.IsLast(valueIfTrue);
+			return PublishedContent.IsLast(valueIfTrue);
 		}
+
 		public HtmlString IsLast(string valueIfTrue, string valueIfFalse)
 		{
-			return this.PublishedContent.IsLast(valueIfTrue, valueIfFalse);
+			return PublishedContent.IsLast(valueIfTrue, valueIfFalse);
 		}
+
 		public bool IsNotLast()
 		{
-			return this.PublishedContent.IsNotLast();
+			return PublishedContent.IsNotLast();
 		}
+
 		public HtmlString IsNotLast(string valueIfTrue)
 		{
-			return this.PublishedContent.IsNotLast(valueIfTrue);
+			return PublishedContent.IsNotLast(valueIfTrue);
 		}
+
 		public HtmlString IsNotLast(string valueIfTrue, string valueIfFalse)
 		{
-			return this.PublishedContent.IsNotLast(valueIfTrue, valueIfFalse);
+			return PublishedContent.IsNotLast(valueIfTrue, valueIfFalse);
 		}
+
 		public bool IsEven()
 		{
-			return this.PublishedContent.IsEven();
+			return PublishedContent.IsEven();
 		}
+
 		public HtmlString IsEven(string valueIfTrue)
 		{
-			return this.PublishedContent.IsEven(valueIfTrue);
+			return PublishedContent.IsEven(valueIfTrue);
 		}
+
 		public HtmlString IsEven(string valueIfTrue, string valueIfFalse)
 		{
-			return this.PublishedContent.IsEven(valueIfTrue, valueIfFalse);
+			return PublishedContent.IsEven(valueIfTrue, valueIfFalse);
 		}
+
 		public bool IsOdd()
 		{
-			return this.PublishedContent.IsOdd();
+			return PublishedContent.IsOdd();
 		}
+
 		public HtmlString IsOdd(string valueIfTrue)
 		{
-			return this.PublishedContent.IsOdd(valueIfTrue);
+			return PublishedContent.IsOdd(valueIfTrue);
 		}
+
 		public HtmlString IsOdd(string valueIfTrue, string valueIfFalse)
 		{
-			return this.PublishedContent.IsOdd(valueIfTrue, valueIfFalse);
+			return PublishedContent.IsOdd(valueIfTrue, valueIfFalse);
 		}
-		public bool IsEqual(DynamicPublishedContent other)
+
+        #endregion
+
+        #region IPublishedContent extension methods - IsSomething: equality
+
+        public bool IsEqual(DynamicPublishedContent other)
 		{
-			return this.PublishedContent.IsEqual(other);
+			return PublishedContent.IsEqual(other);
 		}
+
 		public HtmlString IsEqual(DynamicPublishedContent other, string valueIfTrue)
 		{
-			return this.PublishedContent.IsEqual(other, valueIfTrue);
+			return PublishedContent.IsEqual(other, valueIfTrue);
 		}
+
 		public HtmlString IsEqual(DynamicPublishedContent other, string valueIfTrue, string valueIfFalse)
 		{
-			return this.PublishedContent.IsEqual(other, valueIfTrue, valueIfFalse);
+			return PublishedContent.IsEqual(other, valueIfTrue, valueIfFalse);
 		}
+
 		public bool IsNotEqual(DynamicPublishedContent other)
 		{
-			return this.PublishedContent.IsNotEqual(other);
+			return PublishedContent.IsNotEqual(other);
 		}
+
 		public HtmlString IsNotEqual(DynamicPublishedContent other, string valueIfTrue)
 		{
-			return this.PublishedContent.IsNotEqual(other, valueIfTrue);
+			return PublishedContent.IsNotEqual(other, valueIfTrue);
 		}
+
 		public HtmlString IsNotEqual(DynamicPublishedContent other, string valueIfTrue, string valueIfFalse)
 		{
-			return this.PublishedContent.IsNotEqual(other, valueIfTrue, valueIfFalse);
+			return PublishedContent.IsNotEqual(other, valueIfTrue, valueIfFalse);
 		}
-		public bool IsDescendant(DynamicPublishedContent other)
+
+        #endregion
+
+        #region IPublishedContent extension methods - IsSomething: ancestors and descendants
+
+        public bool IsDescendant(DynamicPublishedContent other)
 		{
-			return this.PublishedContent.IsDescendant(other);
+			return PublishedContent.IsDescendant(other);
 		}
+
 		public HtmlString IsDescendant(DynamicPublishedContent other, string valueIfTrue)
 		{
-			return this.PublishedContent.IsDescendant(other, valueIfTrue);
+			return PublishedContent.IsDescendant(other, valueIfTrue);
 		}
+
 		public HtmlString IsDescendant(DynamicPublishedContent other, string valueIfTrue, string valueIfFalse)
 		{
-			return this.PublishedContent.IsDescendant(other, valueIfTrue, valueIfFalse);
+			return PublishedContent.IsDescendant(other, valueIfTrue, valueIfFalse);
 		}
+
 		public bool IsDescendantOrSelf(DynamicPublishedContent other)
 		{
-			return this.PublishedContent.IsDescendantOrSelf(other);
+			return PublishedContent.IsDescendantOrSelf(other);
 		}
+
 		public HtmlString IsDescendantOrSelf(DynamicPublishedContent other, string valueIfTrue)
 		{
-			return this.PublishedContent.IsDescendantOrSelf(other, valueIfTrue);
+			return PublishedContent.IsDescendantOrSelf(other, valueIfTrue);
 		}
+
 		public HtmlString IsDescendantOrSelf(DynamicPublishedContent other, string valueIfTrue, string valueIfFalse)
 		{
-			return this.PublishedContent.IsDescendantOrSelf(other, valueIfTrue, valueIfFalse);
+			return PublishedContent.IsDescendantOrSelf(other, valueIfTrue, valueIfFalse);
 		}
+
 		public bool IsAncestor(DynamicPublishedContent other)
 		{
-			return this.PublishedContent.IsAncestor(other);
+			return PublishedContent.IsAncestor(other);
 		}
+
 		public HtmlString IsAncestor(DynamicPublishedContent other, string valueIfTrue)
 		{
-			return this.PublishedContent.IsAncestor(other, valueIfTrue);
+			return PublishedContent.IsAncestor(other, valueIfTrue);
 		}
+
 		public HtmlString IsAncestor(DynamicPublishedContent other, string valueIfTrue, string valueIfFalse)
 		{
-			return this.PublishedContent.IsAncestor(other, valueIfTrue, valueIfFalse);
+			return PublishedContent.IsAncestor(other, valueIfTrue, valueIfFalse);
 		}
+
 		public bool IsAncestorOrSelf(DynamicPublishedContent other)
 		{
-			return this.PublishedContent.IsAncestorOrSelf(other);
+			return PublishedContent.IsAncestorOrSelf(other);
 		}
+
 		public HtmlString IsAncestorOrSelf(DynamicPublishedContent other, string valueIfTrue)
 		{
-			return this.PublishedContent.IsAncestorOrSelf(other, valueIfTrue);
+			return PublishedContent.IsAncestorOrSelf(other, valueIfTrue);
 		}
+
 		public HtmlString IsAncestorOrSelf(DynamicPublishedContent other, string valueIfTrue, string valueIfFalse)
 		{
-			return this.PublishedContent.IsAncestorOrSelf(other, valueIfTrue, valueIfFalse);
-		}		
+			return PublishedContent.IsAncestorOrSelf(other, valueIfTrue, valueIfFalse);
+		}
+
 		#endregion
 
-		#region Traversal
+        // all these methods wrap whatever PublishedContent returns in a new
+        // DynamicPublishedContentList, for dynamic usage.
+
+        #region Ancestors
+
+        public DynamicPublishedContentList Ancestors(int level)
+        {
+            return new DynamicPublishedContentList(PublishedContent.Ancestors(level));
+        }
+
+        public DynamicPublishedContentList Ancestors(string contentTypeAlias)
+        {
+            return new DynamicPublishedContentList(PublishedContent.Ancestors(contentTypeAlias));
+        }
+
+        public DynamicPublishedContentList Ancestors()
+        {
+            return new DynamicPublishedContentList(PublishedContent.Ancestors());
+        }
+
+        public DynamicPublishedContentList Ancestors(Func<IPublishedContent, bool> func)
+        {
+            return new DynamicPublishedContentList(PublishedContent.AncestorsOrSelf(false, func));
+        }
+
+        public DynamicPublishedContent AncestorOrSelf()
+        {
+            return PublishedContent.AncestorOrSelf().AsDynamicOrNull();
+        }
+
+        public DynamicPublishedContent AncestorOrSelf(int level)
+        {
+            return PublishedContent.AncestorOrSelf(level).AsDynamicOrNull();
+        }
+
+        public DynamicPublishedContent AncestorOrSelf(string contentTypeAlias)
+        {
+            return PublishedContent.AncestorOrSelf(contentTypeAlias).AsDynamicOrNull();
+        }
+
+        public DynamicPublishedContent AncestorOrSelf(Func<IPublishedContent, bool> func)
+        {
+            return PublishedContent.AncestorsOrSelf(true, func).FirstOrDefault().AsDynamicOrNull();
+        }
+
+        public DynamicPublishedContentList AncestorsOrSelf(Func<IPublishedContent, bool> func)
+        {
+            return new DynamicPublishedContentList(PublishedContent.AncestorsOrSelf(true, func));
+        }
+
+        public DynamicPublishedContentList AncestorsOrSelf()
+        {
+            return new DynamicPublishedContentList(PublishedContent.AncestorsOrSelf());
+        }
+
+        public DynamicPublishedContentList AncestorsOrSelf(string contentTypeAlias)
+        {
+            return new DynamicPublishedContentList(PublishedContent.AncestorsOrSelf(contentTypeAlias));
+        }
+
+        public DynamicPublishedContentList AncestorsOrSelf(int level)
+        {
+            return new DynamicPublishedContentList(PublishedContent.AncestorsOrSelf(level));
+        }
+
+        #endregion
+
+        #region Descendants
+
+        public DynamicPublishedContentList Descendants(string contentTypeAlias)
+        {
+            return new DynamicPublishedContentList(PublishedContent.Descendants(contentTypeAlias));
+        }
+        public DynamicPublishedContentList Descendants(int level)
+        {
+            return new DynamicPublishedContentList(PublishedContent.Descendants(level));
+        }
+        public DynamicPublishedContentList Descendants()
+        {
+            return new DynamicPublishedContentList(PublishedContent.Descendants());
+        }
+        public DynamicPublishedContentList DescendantsOrSelf(int level)
+        {
+            return new DynamicPublishedContentList(PublishedContent.DescendantsOrSelf(level));
+        }
+        public DynamicPublishedContentList DescendantsOrSelf(string contentTypeAlias)
+        {
+            return new DynamicPublishedContentList(PublishedContent.DescendantsOrSelf(contentTypeAlias));
+        }
+        public DynamicPublishedContentList DescendantsOrSelf()
+        {
+            return new DynamicPublishedContentList(PublishedContent.DescendantsOrSelf());
+        }
+
+        #endregion
+        
+        #region Traversal
+
 		public DynamicPublishedContent Up()
 		{
-			return Umbraco.Web.PublishedContentExtensions.Up(this).AsDynamicPublishedContent();
+			return PublishedContent.Up().AsDynamicOrNull();
 		}
+
 		public DynamicPublishedContent Up(int number)
 		{
-			return Umbraco.Web.PublishedContentExtensions.Up(this, number).AsDynamicPublishedContent();
+            return PublishedContent.Up(number).AsDynamicOrNull();
 		}
-		public DynamicPublishedContent Up(string nodeTypeAlias)
+
+		public DynamicPublishedContent Up(string contentTypeAlias)
 		{
-			return Umbraco.Web.PublishedContentExtensions.Up(this, nodeTypeAlias).AsDynamicPublishedContent();
+            return PublishedContent.Up(contentTypeAlias).AsDynamicOrNull();
 		}
+
 		public DynamicPublishedContent Down()
 		{
-			return Umbraco.Web.PublishedContentExtensions.Down(this).AsDynamicPublishedContent();
+            return PublishedContent.Down().AsDynamicOrNull();
 		}
+
 		public DynamicPublishedContent Down(int number)
 		{
-			return Umbraco.Web.PublishedContentExtensions.Down(this, number).AsDynamicPublishedContent();
+            return PublishedContent.Down(number).AsDynamicOrNull();
 		}
-		public DynamicPublishedContent Down(string nodeTypeAlias)
+
+		public DynamicPublishedContent Down(string contentTypeAlias)
 		{
-			return Umbraco.Web.PublishedContentExtensions.Down(this, nodeTypeAlias).AsDynamicPublishedContent();
+            return PublishedContent.Down(contentTypeAlias).AsDynamicOrNull();
 		}
+
 		public DynamicPublishedContent Next()
 		{
-			return Umbraco.Web.PublishedContentExtensions.Next(this).AsDynamicPublishedContent();
+            return PublishedContent.Next().AsDynamicOrNull();
 		}
+
 		public DynamicPublishedContent Next(int number)
 		{
-			return Umbraco.Web.PublishedContentExtensions.Next(this, number).AsDynamicPublishedContent();
+            return PublishedContent.Next(number).AsDynamicOrNull();
 		}
-		public DynamicPublishedContent Next(string nodeTypeAlias)
+
+		public DynamicPublishedContent Next(string contentTypeAlias)
 		{
-			return Umbraco.Web.PublishedContentExtensions.Next(this, nodeTypeAlias).AsDynamicPublishedContent();
+            return PublishedContent.Next(contentTypeAlias).AsDynamicOrNull();
 		}
 
 		public DynamicPublishedContent Previous()
 		{
-			return Umbraco.Web.PublishedContentExtensions.Previous(this).AsDynamicPublishedContent();
+            return PublishedContent.Previous().AsDynamicOrNull();
 		}
+
 		public DynamicPublishedContent Previous(int number)
 		{
-			return Umbraco.Web.PublishedContentExtensions.Previous(this, number).AsDynamicPublishedContent();
+            return PublishedContent.Previous(number).AsDynamicOrNull();
 		}
-		public DynamicPublishedContent Previous(string nodeTypeAlias)
+
+		public DynamicPublishedContent Previous(string contentTypeAlias)
 		{
-			return Umbraco.Web.PublishedContentExtensions.Previous(this, nodeTypeAlias).AsDynamicPublishedContent();
+            return PublishedContent.Previous(contentTypeAlias).AsDynamicOrNull();
 		}
+
 		public DynamicPublishedContent Sibling(int number)
 		{
-			return Umbraco.Web.PublishedContentExtensions.Previous(this, number).AsDynamicPublishedContent();
+            return PublishedContent.Previous(number).AsDynamicOrNull();
 		}
-		public DynamicPublishedContent Sibling(string nodeTypeAlias)
+
+		public DynamicPublishedContent Sibling(string contentTypeAlias)
 		{
-			return Umbraco.Web.PublishedContentExtensions.Previous(this, nodeTypeAlias).AsDynamicPublishedContent();
+			return PublishedContent.Previous(contentTypeAlias).AsDynamicOrNull();
 		} 
+
 		#endregion
 
-		#region Ancestors, Descendants and Parent
-		#region Ancestors
-		public DynamicPublishedContentList Ancestors(int level)
-		{
-			return new DynamicPublishedContentList(
-				Umbraco.Web.PublishedContentExtensions.Ancestors(this, level));
-		}
-		public DynamicPublishedContentList Ancestors(string nodeTypeAlias)
-		{
-			return new DynamicPublishedContentList(
-				Umbraco.Web.PublishedContentExtensions.Ancestors(this, nodeTypeAlias));
-		}
-		public DynamicPublishedContentList Ancestors()
-		{
-			return new DynamicPublishedContentList(
-				Umbraco.Web.PublishedContentExtensions.Ancestors(this));
-		}
-		public DynamicPublishedContentList Ancestors(Func<IPublishedContent, bool> func)
-		{
-			return new DynamicPublishedContentList(
-				Umbraco.Web.PublishedContentExtensions.Ancestors(this, func));
-		}
-		public DynamicPublishedContent AncestorOrSelf()
-		{
-			return Umbraco.Web.PublishedContentExtensions.AncestorOrSelf(this).AsDynamicPublishedContent();
-		}
-		public DynamicPublishedContent AncestorOrSelf(int level)
-		{
-			return Umbraco.Web.PublishedContentExtensions.AncestorOrSelf(this, level).AsDynamicPublishedContent();
-		}
-		public DynamicPublishedContent AncestorOrSelf(string nodeTypeAlias)
-		{
-			return Umbraco.Web.PublishedContentExtensions.AncestorOrSelf(this, nodeTypeAlias).AsDynamicPublishedContent();
-		}
-		public DynamicPublishedContent AncestorOrSelf(Func<IPublishedContent, bool> func)
-		{
-			return Umbraco.Web.PublishedContentExtensions.AncestorOrSelf(this, func).AsDynamicPublishedContent();
-		}
-		public DynamicPublishedContentList AncestorsOrSelf(Func<IPublishedContent, bool> func)
-		{
-			return new DynamicPublishedContentList(
-				Umbraco.Web.PublishedContentExtensions.AncestorsOrSelf(this, func));
-		}
-		public DynamicPublishedContentList AncestorsOrSelf()
-		{
-			return new DynamicPublishedContentList(
-				Umbraco.Web.PublishedContentExtensions.AncestorsOrSelf(this));
-		}
-		public DynamicPublishedContentList AncestorsOrSelf(string nodeTypeAlias)
-		{
-			return new DynamicPublishedContentList(
-				Umbraco.Web.PublishedContentExtensions.AncestorsOrSelf(this, nodeTypeAlias));
-		}
-		public DynamicPublishedContentList AncestorsOrSelf(int level)
-		{
-			return new DynamicPublishedContentList(
-				Umbraco.Web.PublishedContentExtensions.AncestorsOrSelf(this, level));
-		} 
-		#endregion
-		#region Descendants
-		public DynamicPublishedContentList Descendants(string nodeTypeAlias)
-		{
-			return new DynamicPublishedContentList(
-				Umbraco.Web.PublishedContentExtensions.Descendants(this, nodeTypeAlias));
-		}
-		public DynamicPublishedContentList Descendants(int level)
-		{
-			return new DynamicPublishedContentList(
-				Umbraco.Web.PublishedContentExtensions.Descendants(this, level));
-		}
-		public DynamicPublishedContentList Descendants()
-		{
-			return new DynamicPublishedContentList(
-				Umbraco.Web.PublishedContentExtensions.Descendants(this));
-		}
-		public DynamicPublishedContentList DescendantsOrSelf(int level)
-		{
-			return new DynamicPublishedContentList(
-				Umbraco.Web.PublishedContentExtensions.DescendantsOrSelf(this, level));
-		}
-		public DynamicPublishedContentList DescendantsOrSelf(string nodeTypeAlias)
-		{
-			return new DynamicPublishedContentList(
-				Umbraco.Web.PublishedContentExtensions.DescendantsOrSelf(this, nodeTypeAlias));
-		}
-		public DynamicPublishedContentList DescendantsOrSelf()
-		{
-			return new DynamicPublishedContentList(
-				Umbraco.Web.PublishedContentExtensions.DescendantsOrSelf(this));
-		} 
-		#endregion
+		#region Parent
 
 		public DynamicPublishedContent Parent
 		{
 			get
 			{
-				if (PublishedContent.Parent != null)
-				{
-					return PublishedContent.Parent.AsDynamicPublishedContent();
-				}
-				if (PublishedContent != null && PublishedContent.Id == 0)
-				{
-					return this;
-				}
-				return null;
+			    return PublishedContent.Parent != null ? PublishedContent.Parent.AsDynamicOrNull() : null;
 			}
 		} 
 		
 		#endregion
 
-		#region Where
+        #region Children
 
-		public HtmlString Where(string predicate, string valueIfTrue)
+        // we want to cache the dynamic list of children here
+        // whether PublishedContent.Children itself is cached, is not our concern
+
+        private DynamicPublishedContentList _children;
+
+        public DynamicPublishedContentList Children
+        {
+            get { return _children ?? (_children = new DynamicPublishedContentList(PublishedContent.Children)); }
+        }
+        
+        #endregion
+
+        // should probably cleanup what's below
+
+        #region Where
+
+        public HtmlString Where(string predicate, string valueIfTrue)
 		{
 			return Where(predicate, valueIfTrue, string.Empty);
 		}
@@ -1249,6 +1316,5 @@ namespace Umbraco.Web.Models
 		}
 
 		#endregion
-		
-	}
+    }
 }

@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Net;
 using System.Net.Security;
@@ -22,7 +23,9 @@ using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Macros;
+using Umbraco.Core.Xml.XPath;
 using Umbraco.Core.Profiling;
+using umbraco.interfaces;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Macros;
@@ -33,6 +36,7 @@ using umbraco.cms.businesslogic.member;
 using umbraco.DataLayer;
 using umbraco.NodeFactory;
 using umbraco.presentation.templateControls;
+using Umbraco.Web.umbraco.presentation;
 using Content = umbraco.cms.businesslogic.Content;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
 using MacroErrorEventArgs = Umbraco.Core.Events.MacroErrorEventArgs;
@@ -49,6 +53,7 @@ namespace umbraco
 
         /// <summary>Cache for <see cref="GetPredefinedXsltExtensions"/>.</summary>
         private static Dictionary<string, object> _predefinedExtensions;
+        private static XsltSettings _xsltSettings;
         private const string LoadUserControlKey = "loadUserControl";
         private readonly StringBuilder _content = new StringBuilder();
         private const string MacrosAddedKey = "macrosAdded";
@@ -57,6 +62,13 @@ namespace umbraco
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
+        }
+
+        static macro()
+        {
+            _xsltSettings = GlobalSettings.ApplicationTrustLevel > AspNetHostingPermissionLevel.Medium
+                ? XsltSettings.TrustedXslt
+                : XsltSettings.Default;
         }
 
         #endregion
@@ -814,14 +826,7 @@ namespace umbraco
 
             try
             {
-                if (GlobalSettings.ApplicationTrustLevel > AspNetHostingPermissionLevel.Medium)
-                {
-                    macroXslt.Load(xslReader, XsltSettings.TrustedXslt, xslResolver);
-                }
-                else
-                {
-                    macroXslt.Load(xslReader, XsltSettings.Default, xslResolver);
-                }
+                macroXslt.Load(xslReader, _xsltSettings, xslResolver);
             }
             finally
             {
@@ -852,21 +857,41 @@ namespace umbraco
             using (DisposableTimer.DebugDuration<macro>("Executing XSLT: " + XsltFile))
             {
                 XmlDocument macroXml = null;
+                MacroNavigator macroNavigator = null;
+                NavigableNavigator contentNavigator = null;
 
-                // get master xml document
-                var cache = UmbracoContext.Current.ContentCache.InnerCache as Umbraco.Web.PublishedCache.XmlPublishedCache.PublishedContentCache;
-                if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
-                XmlDocument umbracoXml = cache.GetXml(UmbracoContext.Current, UmbracoContext.Current.InPreviewMode);
-                macroXml = new XmlDocument();
-                macroXml.LoadXml("<macro/>");
-                foreach (var prop in macro.Model.Properties)
+                var canNavigate =
+                    UmbracoContext.Current.ContentCache.XPathNavigatorIsNavigable &&
+                    UmbracoContext.Current.MediaCache.XPathNavigatorIsNavigable;
+
+                if (!canNavigate)
                 {
-                    AddMacroXmlNode(umbracoXml, macroXml, prop.Key, prop.Type, prop.Value);
+                     // get master xml document
+                    var cache = UmbracoContext.Current.ContentCache.InnerCache as Umbraco.Web.PublishedCache.XmlPublishedCache.PublishedContentCache;
+                    if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
+                    XmlDocument umbracoXml = cache.GetXml(UmbracoContext.Current, UmbracoContext.Current.InPreviewMode);
+                    macroXml = new XmlDocument();
+                    macroXml.LoadXml("<macro/>");
+                    foreach (var prop in macro.Model.Properties)
+                    {
+                        AddMacroXmlNode(umbracoXml, macroXml, prop.Key, prop.Type, prop.Value);
+                    }
+                }
+                else
+                {
+                    var parameters = new List<MacroNavigator.MacroParameter>();
+                    contentNavigator = UmbracoContext.Current.ContentCache.GetXPathNavigator() as NavigableNavigator;
+                    var mediaNavigator = UmbracoContext.Current.MediaCache.GetXPathNavigator() as NavigableNavigator;
+                    foreach (var prop in macro.Model.Properties)
+                    {
+                        AddMacroParameter(parameters, contentNavigator, mediaNavigator, prop.Key, prop.Type, prop.Value);
+                    }
+                    macroNavigator = new MacroNavigator(parameters);
                 }
 
                 if (HttpContext.Current.Request.QueryString["umbDebug"] != null && GlobalSettings.DebugMode)
                 {
-                    var outerXml = macroXml.OuterXml;
+                    var outerXml = macroXml == null ? macroNavigator.OuterXml : macroXml.OuterXml;
                     return
                         new LiteralControl("<div style=\"border: 2px solid green; padding: 5px;\"><b>Debug from " +
                                            macro.Name +
@@ -882,7 +907,9 @@ namespace umbraco
                     {
                         try
                         {
-                            var transformed = GetXsltTransformResult(macroXml, xsltFile);
+                        var transformed = canNavigate
+                            ? GetXsltTransformResult(macroNavigator, contentNavigator, xsltFile) // better?
+                            : GetXsltTransformResult(macroXml, xsltFile); // document
                             var result = CreateControlsFromText(transformed);
 
                             return result;
@@ -1204,6 +1231,101 @@ namespace umbraco
             macroXml.FirstChild.AppendChild(macroXmlNode);
         }
 
+        // add parameters to the macro parameters collection
+        private void AddMacroParameter(ICollection<MacroNavigator.MacroParameter> parameters,
+            NavigableNavigator contentNavigator, NavigableNavigator mediaNavigator,
+            string macroPropertyAlias,string macroPropertyType, string macroPropertyValue)
+        {
+            // if no value is passed, then use the current "pageID" as value
+            var contentId = macroPropertyValue == string.Empty ? UmbracoContext.Current.PageId.ToString() : macroPropertyValue;
+
+	        TraceInfo("umbracoMacro",
+	                  "Xslt node adding search start (" + macroPropertyAlias + ",'" +
+	                  macroPropertyValue + "')");
+
+            // beware! do not use the raw content- or media- navigators, but clones !!
+
+            switch (macroPropertyType)
+            {
+                case "contentTree":
+                    parameters.Add(new MacroNavigator.MacroParameter(
+                        macroPropertyAlias,
+                        contentNavigator.CloneWithNewRoot(contentId), // null if not found - will be reported as empty
+                        attributes: new Dictionary<string, string> { { "nodeID", contentId } }));
+
+                    break;
+
+                case "contentPicker":
+                    parameters.Add(new MacroNavigator.MacroParameter(
+                        macroPropertyAlias,
+                        contentNavigator.CloneWithNewRoot(contentId), // null if not found - will be reported as empty
+                        0));
+                    break;
+
+                case "contentSubs":
+                    parameters.Add(new MacroNavigator.MacroParameter(
+                        macroPropertyAlias,
+                        contentNavigator.CloneWithNewRoot(contentId), // null if not found - will be reported as empty
+                        1));
+                    break;
+
+                case "contentAll":
+                    parameters.Add(new MacroNavigator.MacroParameter(macroPropertyAlias, contentNavigator.Clone()));
+                    break;
+
+                case "contentRandom":
+                    var nav = contentNavigator.Clone();
+                    if (nav.MoveToId(contentId))
+                    {
+                        var descendantIterator = nav.Select("./* [@isDoc]");
+                        if (descendantIterator.MoveNext())
+                        {
+                            // not empty - and won't change
+                            var descendantCount = descendantIterator.Count;
+
+                            int index;
+                            var r = library.GetRandom();
+                            lock (r)
+                            {
+                                index = r.Next(descendantCount);
+                            }
+
+                            while (index > 0 && descendantIterator.MoveNext())
+                                index--;
+
+                            var node = descendantIterator.Current.UnderlyingObject as INavigableContent;
+                            if (node != null)
+                            {
+                                nav = contentNavigator.CloneWithNewRoot(node.Id.ToString(CultureInfo.InvariantCulture));
+                                parameters.Add(new MacroNavigator.MacroParameter(macroPropertyAlias, nav, 0));                                
+                            }
+                            else
+                                throw new InvalidOperationException("Iterator contains non-INavigableContent elements.");
+                        }
+                        else
+							TraceWarn("umbracoMacro",
+									  "Error adding random node - parent (" + macroPropertyValue +
+									  ") doesn't have children!");
+                    }
+                    else
+                        TraceWarn("umbracoMacro",
+                                  "Error adding random node - parent (" + macroPropertyValue +
+                                  ") doesn't exists!");
+                    break;
+
+                case "mediaCurrent":
+                    parameters.Add(new MacroNavigator.MacroParameter(
+                        macroPropertyAlias,
+                        mediaNavigator.CloneWithNewRoot(contentId), // null if not found - will be reported as empty
+                        0));
+                    break;
+
+                default:
+                    parameters.Add(new MacroNavigator.MacroParameter(macroPropertyAlias, HttpContext.Current.Server.HtmlDecode(macroPropertyValue)));
+                    break;
+            }
+        }
+
         #endregion
 
 		/// <summary>
@@ -1217,7 +1339,7 @@ namespace umbraco
 			IMacroEngine engine = null;
 			
 			engine = MacroEngineFactory.GetEngine(PartialViewMacroEngine.EngineName);
-			var ret = engine.Execute(macro, Node.GetCurrent());
+			var ret = engine.Execute(macro, GetCurrentNode());
 
 			// if the macro engine supports success reporting and executing failed, then return an empty control so it's not cached
 			if (engine is IMacroEngineResultStatus)
@@ -1242,13 +1364,13 @@ namespace umbraco
                 engine = MacroEngineFactory.GetByExtension(macro.ScriptLanguage);
                 ret = engine.Execute(
                     macro,
-                    Node.GetCurrent());
+                    GetCurrentNode());
             }
             else
             {
                 string path = IOHelper.MapPath(SystemDirectories.MacroScripts + "/" + macro.ScriptName);
                 engine = MacroEngineFactory.GetByFilename(path);
-                ret = engine.Execute(macro, Node.GetCurrent());
+                ret = engine.Execute(macro, GetCurrentNode());
             }
 
             // if the macro engine supports success reporting and executing failed, then return an empty control so it's not cached
@@ -1801,6 +1923,13 @@ namespace umbraco
 
             value = false;
             return false;
+        }
+
+        private static INode GetCurrentNode()
+        {
+            var id = Node.getCurrentNodeId();
+            var content = UmbracoContext.Current.ContentCache.GetById(id);
+            return CompatibilityHelper.ConvertToNode(content);
         }
 
         #region Events

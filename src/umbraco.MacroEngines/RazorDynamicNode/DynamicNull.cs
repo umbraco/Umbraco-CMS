@@ -16,7 +16,7 @@ namespace umbraco.MacroEngines
 	[Obsolete("This class has been superceded by Umbraco.Core.Dynamics.DynamicNull")]
 	public class DynamicNull : DynamicObject, IEnumerable, IHtmlString
 	{
-		private readonly Umbraco.Core.Dynamics.DynamicNull _inner = new Umbraco.Core.Dynamics.DynamicNull();
+		private readonly Umbraco.Core.Dynamics.DynamicNull _inner = Umbraco.Core.Dynamics.DynamicNull.Null;
 
         public IEnumerator GetEnumerator()
         {

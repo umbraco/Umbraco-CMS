@@ -10,6 +10,7 @@ using System.Web.Routing;
 using System.Web.WebPages;
 using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.macro;
+using Umbraco.Core.Models;
 using umbraco.interfaces;
 using Umbraco.Web.Mvc;
 using Umbraco.Core;
@@ -98,10 +99,16 @@ namespace Umbraco.Web.Macros
             return true;
         }
 
-        public string Execute(MacroModel macro, INode currentPage)
+        public string Execute(MacroModel macro, INode node)
+        {
+            var umbCtx = _getUmbracoContext();
+            return Execute(macro, umbCtx.ContentCache.GetById(node.Id));
+        }
+
+        public string Execute(MacroModel macro, IPublishedContent content)
         {
             if (macro == null) throw new ArgumentNullException("macro");
-            if (currentPage == null) throw new ArgumentNullException("currentPage");
+            if (content == null) throw new ArgumentNullException("content");
 			if (macro.ScriptName.IsNullOrWhiteSpace()) throw new ArgumentException("The ScriptName property of the macro object cannot be null or empty");
 		
             var http = _getHttpContext();
@@ -127,7 +134,7 @@ namespace Umbraco.Web.Macros
 
             var request = new RequestContext(http, routeVals);
             string output;
-            using (var controller = new PartialViewMacroController(umbCtx, macro, currentPage))
+            using (var controller = new PartialViewMacroController(macro, content))
             {
 				//bubble up the model state from the main view context to our custom controller.
 				//when merging we'll create a new dictionary, otherwise you might run into an enumeration error

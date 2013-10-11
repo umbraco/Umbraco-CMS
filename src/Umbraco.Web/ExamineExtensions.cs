@@ -1,11 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml;
 using Examine;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
-using Umbraco.Web.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web
@@ -15,25 +14,39 @@ namespace Umbraco.Web
 	/// </summary>
 	internal static class ExamineExtensions
 	{
-		internal static IEnumerable<IPublishedContent> ConvertSearchResultToPublishedContent(
-			this IEnumerable<SearchResult> results,
+        internal static PublishedContentSet<IPublishedContent> ConvertSearchResultToPublishedContent(this IEnumerable<SearchResult> results,
 			ContextualPublishedCache cache)
 		{
 			//TODO: The search result has already returned a result which SHOULD include all of the data to create an IPublishedContent, 
-			// however thsi is currently not the case: 
+			// however this is currently not the case: 
 			// http://examine.codeplex.com/workitem/10350
 
-			var list = new List<IPublishedContent>();
+		    var list = new List<IPublishedContent>();
+            var set = new PublishedContentSet<IPublishedContent>(list);
 			
 			foreach (var result in results.OrderByDescending(x => x.Score))
 			{
-				var doc = cache.GetById(result.Id);
-				if (doc == null) continue; //skip if this doesn't exist in the cache				
-				doc.Properties.Add(
-					new PropertyResult("examineScore", result.Score.ToString(), PropertyResultType.CustomProperty));				
-				list.Add(doc);
+				var content = cache.GetById(result.Id);
+				if (content == null) continue; // skip if this doesn't exist in the cache
+
+                // need to extend the content as we're going to add a property to it,
+                // and we should not ever do it to the content we get from the cache,
+                // precisely because it is cached and shared by all requests.
+
+                // but we cannot wrap it because we need to respect the type that was
+                // returned by the cache, in case the cache can create real types.
+                // so we have to ask it to please extend itself.
+
+                list.Add(content);
+			    var extend = set.MapContent(content);
+
+			    var property = new PropertyResult("examineScore",
+                    result.Score,
+			        PropertyResultType.CustomProperty);
+                extend.AddProperty(property);
 			}
-			return list;
+
+            return set;
 		}
 	}
 }

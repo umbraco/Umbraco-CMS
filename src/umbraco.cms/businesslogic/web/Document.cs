@@ -133,7 +133,8 @@ namespace umbraco.cms.businesslogic.web
         #region Constants and Static members
         
         private const string SqlOptimizedForPreview = @"
-                select umbracoNode.id, umbracoNode.parentId, umbracoNode.level, umbracoNode.sortOrder, cmsDocument.versionId, cmsPreviewXml.xml from cmsDocument
+                select umbracoNode.id, umbracoNode.parentId, umbracoNode.level, umbracoNode.sortOrder, cmsDocument.versionId, cmsPreviewXml.xml, cmsDocument.published
+                from cmsDocument
                 inner join umbracoNode on umbracoNode.id = cmsDocument.nodeId
                 inner join cmsPreviewXml on cmsPreviewXml.nodeId = cmsDocument.nodeId and cmsPreviewXml.versionId = cmsDocument.versionId
                 where newest = 1 and trashed = 0 and path like '{0}'
@@ -1379,7 +1380,7 @@ namespace umbraco.cms.businesslogic.web
 
             IRecordsReader dr = SqlHelper.ExecuteReader(String.Format(SqlOptimizedForPreview, pathExp));
             while (dr.Read())
-                nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("versionId"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml")));
+                nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("versionId"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml"), !dr.GetBoolean("published")));
             dr.Close();
 
             return nodes;

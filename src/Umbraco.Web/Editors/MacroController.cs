@@ -1,18 +1,11 @@
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
-using System.Web;
 using System.Web.Http;
 using AutoMapper;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.Routing;
 using umbraco;
 
 namespace Umbraco.Web.Editors
@@ -58,6 +51,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public HttpResponseMessage GetMacroResultAsHtmlForEditor(string macroAlias, int pageId, [FromUri]IDictionary<string, object> macroParams)
         {
+            // note - here we should be using the cache, provided that the preview content is in the cache...
+
             var doc = Services.ContentService.GetById(pageId);
             if (doc == null)
             {
@@ -86,10 +81,7 @@ namespace Umbraco.Web.Editors
             //the 'easiest' way might be to create an IPublishedContent manually and populate the legacy 'page' object with that
             //and then set the legacy parameters.
 
-            var xml = doc.ToXml();
-            var publishedContent = new XmlPublishedContent(xml.ToXmlElement());
-            
-            var legacyPage = new global::umbraco.page(publishedContent);                    
+            var legacyPage = new global::umbraco.page(doc);                    
             UmbracoContext.HttpContext.Items["pageID"] = doc.Id;
             UmbracoContext.HttpContext.Items["pageElements"] = legacyPage.Elements;
             UmbracoContext.HttpContext.Items[global::Umbraco.Core.Constants.Conventions.Url.AltTemplate] = null;

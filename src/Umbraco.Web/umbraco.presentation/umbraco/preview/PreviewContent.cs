@@ -13,6 +13,7 @@ using System.Web.UI.WebControls.WebParts;
 using System.Xml.Linq;
 using System.Xml;
 using System.IO;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.web;
@@ -96,6 +97,9 @@ namespace umbraco.presentation.preview
                 //Inject preview xml
                 parentId = document.Level == 1 ? -1 : document.Parent.Id;
                 var previewXml = document.ToPreviewXml(XmlContent);
+                if (document.Content.Published == false 
+                    && ApplicationContext.Current.Services.ContentService.HasPublishedVersion(document.Id))
+                    previewXml.Attributes.Append(XmlContent.CreateAttribute("isDraft"));
                 content.AppendDocumentXml(document.Id, document.Level, parentId, previewXml, XmlContent);
             }
 
@@ -103,7 +107,10 @@ namespace umbraco.presentation.preview
             {
                 foreach (var prevNode in documentObject.GetNodesForPreview(true))
                 {
-                    XmlContent = content.AppendDocumentXml(prevNode.NodeId, prevNode.Level, prevNode.ParentId, XmlContent.ReadNode(XmlReader.Create(new StringReader(prevNode.Xml))), XmlContent);
+                    var previewXml = XmlContent.ReadNode(XmlReader.Create(new StringReader(prevNode.Xml)));
+                    if (prevNode.IsDraft)
+                        previewXml.Attributes.Append(XmlContent.CreateAttribute("isDraft"));
+                    XmlContent = content.AppendDocumentXml(prevNode.NodeId, prevNode.Level, prevNode.ParentId, previewXml, XmlContent);
                 }
             }
 

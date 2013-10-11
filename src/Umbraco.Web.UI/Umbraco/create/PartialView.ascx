@@ -13,7 +13,6 @@
             <asp:ListItem Value="clean.xslt">Clean</asp:ListItem>
         </asp:ListBox>
     </cc1:PropertyPanel>
-
 </cc1:Pane>
 
 <!-- added to support missing postback on enter in IE -->
