@@ -112,10 +112,12 @@ namespace Umbraco.Web.PropertyEditors
                 _invalidElements = xd.DocumentElement.SelectSingleNode("./invalidElements").FirstChild.Value;
             if (xd.DocumentElement.SelectSingleNode("./validElements") != null)
             {
-                string _val = xd.DocumentElement.SelectSingleNode("./validElements").FirstChild.Value.Replace("\r", "");
-                foreach (string s in _val.Split("\n".ToCharArray()))
+                string _val = xd.DocumentElement.SelectSingleNode("./validElements").FirstChild.Value.Replace("\r", "").Replace("\n", "");
+                _validElements = _val;
+
+                /*foreach (string s in _val.Split("\n".ToCharArray()))
                     _validElements += "'" + s + "' + \n";
-                _validElements = _validElements.Substring(0, _validElements.Length - 4);
+                _validElements = _validElements.Substring(0, _validElements.Length - 4);*/
             }
 
             _init = true;

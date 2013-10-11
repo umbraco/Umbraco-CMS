@@ -5,8 +5,13 @@ angular.module("umbraco")
         tinyMceService.configuration().then(function(tinyMceConfig){
 
             //config value from general tinymce.config file
-            //var validElements = tinyMceConfig.validElements;
-            //var invalidElements = tinyMceConfig.inValidElements;
+            var validElements = tinyMceConfig.validElements;
+
+            //These are absolutely required in order for the macros to render inline
+            //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
+            var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style]";
+
+            var invalidElements = tinyMceConfig.inValidElements;
             var plugins = _.map(tinyMceConfig.plugins, function(plugin){ 
                                             if(plugin.useOnFrontend){
                                                 return plugin.name;   
@@ -26,8 +31,6 @@ angular.module("umbraco")
                 /** Loads in the editor */
                 function loadTinyMce() {
                     
-                    //valid_elements: validElements,
-                            
                     //we need to add a timeout here, to force a redraw so TinyMCE can find
                     //the elements needed
                     $timeout(function () {
@@ -37,6 +40,9 @@ angular.module("umbraco")
                             elements: $scope.model.alias + "_rte",
                             skin: "umbraco",
                             plugins: plugins,
+                            valid_elements: validElements,
+                            invalid_elements: invalidElements,
+                            extended_valid_elements: extendedValidElements,
                             menubar: false,
                             statusbar: false,
                             height: editorConfig.dimensions.height,
@@ -62,7 +68,11 @@ angular.module("umbraco")
                                         $scope.model.value = editor.getContent();
                                     });
                                 });
-                                var unsubscribe = $scope.$on("saving", function () {
+                                //listen for formSubmitting event (the result is callback used to remove the event subscription)
+                                var unsubscribe = $scope.$on("formSubmitting", function () {
+
+                                    //TODO: Here we should parse out the macro rendered content so we can save on a lot of bytes in data xfer
+                                    // we do parse it out on the server side but would be nice to do that on the client side before as well.
                                     $scope.model.value = editor.getContent();
                                 });
 
@@ -95,6 +105,7 @@ angular.module("umbraco")
                 //this is instead of doing a watch on the model.value = faster
                 $scope.model.onValueChanged = function (newVal, oldVal) {
                     //update the display val again if it has changed from the server
+                    //TODO: Perhaps we don't need to re-load the whole editor, can probably just re-set the value ?
                     loadTinyMce();
                 };
             });

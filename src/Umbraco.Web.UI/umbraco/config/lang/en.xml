@@ -68,6 +68,9 @@
     <key alias="atViewingFor">Viewing for</key>
   </area>
   <area alias="buttons">
+    <key alias="select">Select</key>
+    <key alias="somethingElse">Do something else</key>
+    
     <key alias="bold">Bold</key>
     <key alias="deindent">Cancel Paragraph Indent</key>
     <key alias="formFieldInsert">Insert form field</key>
@@ -156,7 +159,7 @@
   </area>
   <area alias="create">
     <key alias="chooseNode">Where do you want to create the new %0%</key>
-    <key alias="createUnder">Create at</key>
+    <key alias="createUnder">Create a page under</key>
     <key alias="updateData">Choose a type and a title</key>
   </area>
   <area alias="dashboard">

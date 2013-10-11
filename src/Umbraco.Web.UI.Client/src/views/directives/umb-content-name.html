@@ -1,6 +1,5 @@
-<div class="umb-headline-editor-wrapper" ng-class="{error: contentNameForm.name.$invalid}">
-    
-    <ng-form name="contentNameForm">        
+<ng-form name="contentNameForm">        
+    <div class="umb-headline-editor-wrapper" ng-class="{'ng-invalid': contentNameForm.name.$invalid}">
         
         <h1 ng-click="goEdit()" ng-hide="editMode">{{model}}</h1>
         
@@ -18,6 +17,5 @@
         <span class="help-inline" val-msg-for="name" val-toggle-msg="required">Required</span>
         <span class="help-inline" val-msg-for="name" val-toggle-msg="valServerField">{{contentNameForm.name.errorMsg}}</span>
 
-    </ng-form>
-
-</div> 
+    </div> 
+</ng-form>

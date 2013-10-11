@@ -131,12 +131,13 @@ namespace Umbraco.Web.Editors
                 throw new NotSupportedException("Currently the member editor does not support providers that have RequiresQuestionAndAnswer specified");
             }
 
+            string generatedPassword = null;
             //Depending on the action we need to first do a create or update using the membership provider
             // this ensures that passwords are formatted correclty and also performs the validation on the provider itself.
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
-                    UpdateWithMembershipProvider(contentItem);
+                    generatedPassword = UpdateWithMembershipProvider(contentItem);
                     break;
                 case ContentSaveAction.SaveNew:
                     MembershipCreateStatus status;
@@ -163,9 +164,14 @@ namespace Umbraco.Web.Editors
             //create/save the IMember
             Services.MemberService.Save(contentItem.PersistedContent);
 
+            //set the generated password (if there was one) - in order to do this we'll chuck the gen'd password into the
+            // additional data of the IUmbracoEntity of the persisted item - then we can retreive this in the model mapper and set 
+            // the value to be given to the UI. Hooray for AdditionalData :)
+            contentItem.PersistedContent.AdditionalData["GeneratedPassword"] = generatedPassword;
+
             //return the updated model
             var display = Mapper.Map<IMember, MemberDisplay>(contentItem.PersistedContent);
-
+            
             //lasty, if it is not valid, add the modelstate to the outgoing object and throw a 403
             HandleInvalidModelState(display);
 
@@ -202,14 +208,17 @@ namespace Umbraco.Web.Editors
         /// If a password change is detected then we'll try that too.
         /// </summary>
         /// <param name="contentItem"></param>
+        /// <returns>
+        /// If the password has been reset then this method will return the reset/generated password, otherwise will return null.
+        /// </returns>
         /// <remarks>
         /// 
-        /// YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!
+        /// YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!        
         /// 
-        /// TODO: We need to update this method to return the new password if it has been reset and then show that to the UI!
+        /// TODO We should move this logic to a central helper class so we can re-use it when it comes to integrating with WebSecurity
         /// 
         /// </remarks>
-        private void UpdateWithMembershipProvider(MemberSave contentItem)
+        private string UpdateWithMembershipProvider(MemberSave contentItem)
         {
             //Get the member from the provider
             var membershipUser = Membership.Provider.GetUser(contentItem.PersistedContent.Username, false);
@@ -239,7 +248,7 @@ namespace Umbraco.Web.Editors
             }
 
             //password changes ?           
-            if (contentItem.Password == null) return;
+            if (contentItem.Password == null) return null;
 
             //Are we resetting the password??
             if (contentItem.Password.Reset.HasValue && contentItem.Password.Reset.Value)
@@ -265,7 +274,8 @@ namespace Umbraco.Web.Editors
                             membershipUser.UserName,
                             Membership.Provider.RequiresQuestionAndAnswer ? contentItem.Password.Answer : null);
 
-                        //TODO: How do we show this new password to the front-end ???
+                        //return the generated pword
+                        return newPass;
                     }
                     catch (Exception ex)
                     {
@@ -366,6 +376,7 @@ namespace Umbraco.Web.Editors
 
                 }
             }
+            return null;
         }
 
         /// <summary>

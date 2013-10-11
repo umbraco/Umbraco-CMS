@@ -150,19 +150,20 @@ angular.module("umbraco.directives")
 
             //watch for path changes
             scope.$watch("path", function (newVal, oldVal) {
-              if(!scope.tree || newVal){
-                  loadTree(); 
+
+              //resetting the path destroys the tree
+              if(newVal && newVal !== oldVal){
+                  scope.tree = null;
               }
+
             });
 
             //watch for active tree changes
             scope.$watch("activetree", function (newVal, oldVal) {
 
-              if(!scope.tree){
-                  loadTree(); 
-              }else if (newVal && newVal !== oldVal) {
+              if (newVal && newVal !== oldVal) {
+                  scope.tree = null;
                   //only reload the tree data and Dom if the newval is different from the old one
-                  loadTree();
               }
             });
 
@@ -176,6 +177,11 @@ angular.module("umbraco.directives")
                 }
             });
             
+            //When a section is double clicked
+            scope.$on("tree.clearCache", function (evt, data) {
+                treeService.clearCache(data.tree);
+                scope.tree = null;
+            });  
             
          };
        }

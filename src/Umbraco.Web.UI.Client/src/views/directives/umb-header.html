@@ -4,7 +4,7 @@
     	<div ng-transclude></div>
         
     	<ul ng-show="showTabs" class="nav nav-tabs umb-nav-tabs span12">
-            <li ng-class="{active: $first, error: tabHasError}" ng-repeat="tab in collectedTabs" val-tab>
+            <li ng-class="{active: $first, 'tab-error': tabHasError}" ng-repeat="tab in collectedTabs" val-tab>
     	        <a href="#tab{{tab.id}}" data-toggle="tab">{{ tab.label }}</a>
     	    </li>
     	</ul>	

@@ -1,7 +1,11 @@
 ﻿angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RelatedLinksController",
-        function ($rootScope, $scope, dialogService, $routeParams, contentResource, contentTypeResource, editorContextService, notificationsService) {
+        function ($rootScope, $scope, dialogService) {
 
+            if (!$scope.model.value) {
+                $scope.model.value = [];
+            }
+            
             $scope.newCaption = '';
             $scope.newLink = 'http://';
             $scope.newNewWindow = false;
@@ -9,11 +13,11 @@
             $scope.newInternalName = '';
             $scope.addExternal = true;
             
-            $scope.relatedLinks = [
-                { caption: 'Google', link: "http://google.com", newWindow: false, edit:false },
-                { caption: 'Umbraco', link: "http://umbraco.com", newWindow: false, edit: false },
-                { caption: 'Nibble', link: "http://nibble.be", newWindow: false, edit: false }
-            ];
+            //$scope.relatedLinks = [
+            //    { caption: 'Google', link: "http://google.com", newWindow: false, edit:false },
+            //    { caption: 'Umbraco', link: "http://umbraco.com", newWindow: false, edit: false },
+            //    { caption: 'Nibble', link: "http://nibble.be", newWindow: false, edit: false }
+            //];
 
             $scope.internal = function ($event) {
                 var d = dialogService.contentPicker({ scope: $scope, multipicker: false, callback: select });
@@ -22,19 +26,19 @@
             };
 
             $scope.edit = function (idx) {
-                for (var i = 0; i < $scope.relatedLinks.length; i++) {
-                    $scope.relatedLinks[i].edit = false;
+                for (var i = 0; i < $scope.model.value.length; i++) {
+                    $scope.model.value[i].edit = false;
                 }
-                $scope.relatedLinks[idx].edit = true;
+                $scope.model.value[idx].edit = true;
             };
 
             $scope.cancelEdit = function(idx) {
-                $scope.relatedLinks[idx].edit = false;
+                $scope.model.value[idx].edit = false;
             };
             
             $scope.delete = function (idx) {
                 
-              $scope.relatedLinks.splice($scope.relatedLinks[idx], 1);
+                $scope.model.value.splice($scope.model.value[idx], 1);
                 
             };
 
@@ -45,16 +49,18 @@
                         this.caption = $scope.newCaption;
                         this.link = $scope.newLink;
                         this.newWindow = $scope.newNewWindow;
+                        this.edit = false;
                     };
-                    $scope.relatedLinks.push(newExtLink);
+                    $scope.model.value.push(newExtLink);
                 } else {
                     var newIntLink = new function () {
                         this.caption = $scope.newCaption;
                         this.link = $scope.newLink;
                         this.newWindow = $scope.newNewWindow;
                         this.internal = $scope.newInternal;
+                        this.edit = false;
                     };
-                    $scope.relatedLinks.push(newIntLink);
+                    $scope.model.value.push(newIntLink);
                 }
                 $scope.newCaption = '';
                 $scope.newLink = 'http://';

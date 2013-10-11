@@ -7,7 +7,7 @@
  * The controller for the custom insert macro dialog. Until we upgrade the template editor to be angular this 
  * is actually loaded into an iframe with full html.
  */
-function InsertMacroController($scope, entityResource, macroResource, umbPropEditorHelper, macroService) {
+function InsertMacroController($scope, entityResource, macroResource, umbPropEditorHelper, macroService, formHelper) {
 
     /** changes the view to edit the params of the selected macro */
     function editParams() {
@@ -54,10 +54,6 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
         //need to find the macro alias for the selected id
         var macroAlias = $scope.selectedMacro.alias;
 
-         /* _.find($scope.macros, function (item) {
-            return item.id == $scope.selectedMacro.id;
-        }).alias;*/
-
         //get the syntax based on the rendering engine
         var syntax;
         if ($scope.dialogData.renderingEngine && $scope.dialogData.renderingEngine === "WebForms") {
@@ -80,24 +76,18 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
     
     $scope.submitForm = function () {
         
-        if ($scope.wizardStep === "paramSelect") {
-            //we need to broadcast the saving event for the toggle validators to work
-            $scope.$broadcast("saving");
-        }
+        if (formHelper.submitForm({ scope: $scope })) {
+        
+            formHelper.resetForm({ scope: $scope });
 
-        //ensure the drop down is dirty so the styles validate
-        $scope.insertMacroForm.$setDirty(true);
-        if ($scope.insertMacroForm.$invalid) {
-            return;
+            if ($scope.wizardStep === "macroSelect") {
+                editParams();
+            }
+            else {
+                submitForm();
+            }
+
         }
-        
-        if ($scope.wizardStep === "macroSelect") {
-            editParams();
-        }
-        else {
-            submitForm();
-        }
-        
     };
 
     //here we check to see if we've been passed a selected macro and if so we'll set the

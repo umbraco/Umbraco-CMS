@@ -1,5 +1,5 @@
-<form novalidate name="insertMacroForm" ng-submit="submitForm()" ng-controller="Umbraco.Dialogs.InsertMacroController">
-    <div class="umb-panel" val-show-validation>        
+<form novalidate name="insertMacroForm" ng-submit="submitForm()" ng-controller="Umbraco.Dialogs.InsertMacroController" val-form-manager>
+    <div class="umb-panel">        
 
         <div class="umb-panel-footer">
                 <div class="btn-toolbar umb-btn-toolbar pull-right">
@@ -8,32 +8,32 @@
                 </div>
         </div>
 
-        <div class="umb-panel-body no-header umb-scrollable" auto-scale="1">
-            <div class="umb-control-group" ng-switch="wizardStep">
-                <div class="umb-pane" ng-switch-when="macroSelect">
+        <div class="umb-panel-body no-header umb-scrollable" auto-scale="1" ng-switch="wizardStep">
+            
+            <umb-control-group label="Choose a macro" ng-switch-when="macroSelect">
+                <select class="umb-editor" ng-change="submitForm()" name="selectedMacro" ng-model="$parent.$parent.selectedMacro" ng-options="m as m.name for m in macros" required>
+                    <option value="">Choose macro...</option>
+                </select>
+                <span class="help-inline" val-msg-for="selectedMacro" val-toggle-msg="required">Required</span>
+            </umb-control-group>
 
-                    <label for="macroName">Choose a macro</label>
-                    <select class="umb-editor" ng-change="submitForm()" name="selectedMacro" ng-model="$parent.selectedMacro" ng-options="m as m.name for m in macros" required>
-                        <option value="">Choose macro...</option>
-                    </select>
-                </div>
 
-                <div class="umb-pane" ng-switch-when="paramSelect">
+            <div class="umb-pane" ng-switch-when="paramSelect">
 
-                    <h5>{{$parent.selectedMacro.name}}</h5>
+                <h5>{{$parent.$parent.selectedMacro.name}}</h5>
 
-                    <ul class="unstyled">
-                        <li ng-repeat="param in $parent.macroParams">
+                <ul class="unstyled">
+                    <li ng-repeat="param in $parent.macroParams">
+                        
+                        <umb-control-group label="{{param.name}}">
+                            <umb-editor model="param"></umb-editor>
+                        </umb-control-group>
+                        
+                    </li>
+                </ul>
 
-                            <div class="control-group umb-control-group" ng-class="{error: insertMacroForm.$invalid}">
-                                <label>{{param.name}}</label>
-                                <umb-editor model="param"></umb-editor>
-                            </div>
-                        </li>
-                    </ul>
-
-                </div>
             </div>
+
         </div>
 
     </div>

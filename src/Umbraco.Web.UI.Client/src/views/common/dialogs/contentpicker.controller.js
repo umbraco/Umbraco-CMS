@@ -5,7 +5,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.ContentPickerController",
 	$scope.dialogTreeEventHandler = $({});
 	$scope.results = [];
 
-	$scope.select = function(result){
+	$scope.selectResult = function(result){
 		entityResource.getById(result.id, "Document").then(function(ent){
 			if(dialogOptions && dialogOptions.multipicker){
 				

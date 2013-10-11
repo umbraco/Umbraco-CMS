@@ -4,7 +4,7 @@ using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 {
-    [Migration("7.0.0", 10, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.0.0", 9, GlobalSettings.UmbracoMigrationName)]
     public class AlterTagsTable : MigrationBase
     {
         public override void Up()

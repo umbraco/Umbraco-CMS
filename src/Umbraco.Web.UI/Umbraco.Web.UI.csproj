@@ -300,10 +300,6 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="App_Plugins\MyPackage\PropertyEditors\PostcodePropertyEditor.cs" />
-    <Compile Include="App_Plugins\MyPackage\PropertyEditors\PostcodeValidator.cs" />
-    <Compile Include="App_Plugins\MyPackage\PropertyEditors\ServerInfoPropertyEditor.cs" />
-    <Compile Include="App_Plugins\MyPackage\Trees\LegacyTestTree.cs" />
     <Compile Include="Install\Default.aspx.cs">
       <DependentUpon>default.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -610,9 +606,6 @@
     </Compile>
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
-    <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\CsvEditor.html" />
-    <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\PostcodeEditor.html" />
-    <Content Include="App_Plugins\MyPackage\PropertyEditors\Views\RegexEditor.html" />
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Install\Steps\UpgradeReport.ascx" />
@@ -630,7 +623,6 @@
       <SubType>
       </SubType>
     </Content>
-    <Content Include="App_Plugins\MyPackage\Package.manifest" />
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
@@ -2438,7 +2430,6 @@
     <Content Include="Umbraco\macroResultWrapper.aspx">
       <SubType>Form</SubType>
     </Content>
-    <Content Include="Umbraco\Members\EditMember.aspx" />
     <Content Include="Umbraco\Members\EditMemberGroup.aspx">
       <SubType>Form</SubType>
     </Content>
@@ -2591,7 +2582,7 @@
   <ItemGroup>
     <Folder Include="App_Code\" />
     <Folder Include="App_Data\" />
-    <Folder Include="App_Plugins\MyPackage\PropertyEditors\Js\" />
+    <Folder Include="App_Plugins\" />
     <Folder Include="Css\" />
     <Folder Include="MasterPages\" />
     <Folder Include="Media\" />

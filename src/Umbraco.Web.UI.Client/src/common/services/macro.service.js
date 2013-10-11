@@ -37,8 +37,8 @@ function macroService() {
 
         /**
          * @ngdoc function
-         * @name generateWebFormsSyntax
-         * @methodOf generateMacroSyntax.services.macroService
+         * @name umbraco.services.macroService#generateWebFormsSyntax
+         * @methodOf umbraco.services.macroService
          * @function    
          *
          * @description
@@ -68,7 +68,7 @@ function macroService() {
 
         /**
          * @ngdoc function
-         * @name generateWebFormsSyntax
+         * @name umbraco.services.macroService#generateWebFormsSyntax
          * @methodOf umbraco.services.macroService
          * @function    
          *
@@ -97,7 +97,7 @@ function macroService() {
         
         /**
          * @ngdoc function
-         * @name generateMvcSyntax
+         * @name umbraco.services.macroService#generateMvcSyntax
          * @methodOf umbraco.services.macroService
          * @function    
          *

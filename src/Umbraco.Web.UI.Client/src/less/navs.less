@@ -119,14 +119,20 @@
 }
 // Actual tabs (as links)
 .nav-tabs > li > a {
+  -webkit-border-radius: @tabsBorderRadius;
+  border-radius: @tabsBorderRadius;
+  color: @black;
   padding-top: 8px;
   padding-bottom: 8px;
   line-height: @baseLineHeight;
   border: 1px solid transparent;
   .border-radius(4px 4px 0 0);
+  &:hover {
+      color: @blue;
+  }
   &:hover,
   &:focus {
-    border-color: @grayLighter @grayLighter #ddd;
+    border-color: @grayLighter @grayLighter #ddd;    
   }
 }
 // Active state, and it's :hover/:focus to override normal :hover/:focus
@@ -141,26 +147,22 @@
 }
 
 //SD: NOTE: Added tab error states
-.show-validation .nav-tabs > li.error > a,
-.show-validation .nav-tabs > li.error > a:hover,
-.show-validation .nav-tabs > li.error > a:focus {
-  color: @formErrorText;
-  border-top-color: @formErrorBorder;
-  border-left-color: @formErrorBorder;
-  border-right-color: @formErrorBorder;
-  background-color: @formErrorBackground;
+.show-validation .tab-error a,
+.show-validation .tab-error a:hover,
+.show-validation .tab-error a:focus {
+  color: @red !important;
+  border-bottom: 1px solid @red !important;
 }
 
 .show-validation .nav-tabs > li.active.error > a,
 .show-validation .nav-tabs > li.active.error > a:hover,
 .show-validation .nav-tabs > li.active.error > a:focus {
-  color: @formErrorText;
-  border-top-color: @formErrorBorder;
-  border-left-color: @formErrorBorder;
-  border-right-color: @formErrorBorder;
-  background-color: @bodyBackground;
+  border-bottom-color: white !important;
 }
 
+.umb-nav-tabs {
+  margin: -8px 0 0 0;
+}
 
 // PILLS
 // -----

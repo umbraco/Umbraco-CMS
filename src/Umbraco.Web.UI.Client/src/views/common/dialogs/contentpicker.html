@@ -19,7 +19,7 @@
 		            <ul class="umb-search-group" ng-repeat="resultGroup in results">
 		                <li ng-repeat="result in resultGroup.matches">
 		                    <div style="padding-left: 20px">
-		                    <a ng-class="{first:$first}" ng-click="select(result)">
+		                    <a ng-class="{first:$first}" ng-click="selectResult(result)">
 		                           <i 
 		                            class="icon umb-tree-icon sprTree {{resultGroup.icon}}"></i>
 		                            {{result.title}}
@@ -49,7 +49,7 @@
 	<div class="umb-panel-footer" ng-show="multipicker">
 		<div class="umb-el-wrap umb-panel-buttons">
 	        <div class="btn-toolbar umb-btn-toolbar pull-right">
-	         	<input type="button" ng-click="submit(dialogData)" class="btn btn-primary" value="select" />
+	         	<input type="button" ng-click="submit(dialogData.selection)" class="btn btn-primary" value="select" />
 	        </div>
 		</div>
 	</div>

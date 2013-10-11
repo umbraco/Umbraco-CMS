@@ -44,7 +44,7 @@ function valToggleMsg(serverValidationManager) {
             });
             
             //listen for the saving event (the result is a callback method which is called to unsubscribe)
-            var unsubscribeSaving = scope.$on("saving", function (ev, args) {
+            var unsubscribeSaving = scope.$on("formSubmitting", function (ev, args) {
                 showValidation = true;
                 if (formCtrl[attr.valMsgFor].$error[attr.valToggleMsg]) {
                     element.show();
@@ -59,7 +59,7 @@ function valToggleMsg(serverValidationManager) {
             });
             
             //listen for the saved event (the result is a callback method which is called to unsubscribe)
-            var unsubscribeSaved = scope.$on("saved", function (ev, args) {
+            var unsubscribeSaved = scope.$on("formSubmitted", function (ev, args) {
                 showValidation = false;
                 element.hide();
             });

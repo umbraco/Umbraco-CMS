@@ -4,7 +4,7 @@
 * @name umbraco.directives.directive:valTab
 * @restrict A
 * @description Used to show validation warnings for a tab to indicate that the tab content has validations errors in its data.
-* In order for this directive to work, the valStatusChanged directive must be placed on the containing form.
+* In order for this directive to work, the valFormManager directive must be placed on the containing form.
 **/
 function valTab() {
     return {

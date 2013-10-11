@@ -4,20 +4,24 @@
 //TEST to mock iframe, this intercepts calls directly
 //to the old iframe, and funnels requests to angular directly
 //var right = {document: {location: {}}};
-/*Object.defineProperty(right.document.location, "href", {
-    get: function() {
-        return this._href ? this._href : "";
-    },
-    set: function(value) {
-        this._href = value;
-        UmbClientMgr.contentFrame(value);
-    },
-});*/
+/**/
 
 Umbraco.Sys.registerNamespace("Umbraco.Application");
 
 (function($) {
     Umbraco.Application.ClientManager = function() {
+
+        //to support those trying to call right.document.etc
+        var fakeFrame  = {};
+        Object.defineProperty(fakeFrame, "href", {
+            get: function() {
+                return this._href ? this._href : "";
+            },
+            set: function(value) {
+                this._href = value;
+                UmbClientMgr.contentFrame(value);
+            },
+        });
 
         /**
          * @ngdoc function
@@ -175,6 +179,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
 
             },
             
+            getFakeFrame : function() {
+                return fakeFrame;
+            },
+
             /** This is used to launch an angular based modal window instead of the legacy window */
             openAngularModalWindow: function (options) {
 

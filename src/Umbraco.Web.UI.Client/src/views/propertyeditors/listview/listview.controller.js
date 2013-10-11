@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.ListViewController", 
-        function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource, editorContextService, notificationsService, iconHelper) {
+        function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource, notificationsService, iconHelper) {
 
         $scope.selected = [];
         $scope.actionInProgress = false;
@@ -17,13 +17,13 @@ angular.module("umbraco")
         $scope.next = function(){
             if ($scope.options.pageNumber < $scope.listViewResultSet.totalPages) {
                 $scope.options.pageNumber++;
-                $scope.reloadView($scope.content.id);
+                $scope.reloadView($scope.contentId);
             }
         };
 
         $scope.goToPage = function (pageNumber) {
             $scope.options.pageNumber = pageNumber + 1;
-            $scope.reloadView($scope.content.id);
+            $scope.reloadView($scope.contentId);
         };
 
         $scope.sort = function (field) {
@@ -38,13 +38,13 @@ angular.module("umbraco")
             }
             
            
-            $scope.reloadView($scope.content.id);
+            $scope.reloadView($scope.contentId);
         };
 
         $scope.prev = function(){
             if ($scope.options.pageNumber > 1) {
                 $scope.options.pageNumber--;
-                $scope.reloadView($scope.content.id);
+                $scope.reloadView($scope.contentId);
             }
         };
 
@@ -139,7 +139,7 @@ angular.module("umbraco")
                             notificationsService.success("Bulk action", "Deleted " + total + "documents");
                             $scope.bulkStatus = "";
                             $scope.selected = [];
-                            $scope.reloadView($scope.content.id);
+                            $scope.reloadView($scope.contentId);
                             $scope.actionInProgress = false;
                         }
                         current++;
@@ -162,7 +162,7 @@ angular.module("umbraco")
                         if (current == total) {
                             notificationsService.success("Bulk action", "Published " + total + "documents");
                             $scope.bulkStatus = "";
-                            $scope.reloadView($scope.content.id);
+                            $scope.reloadView($scope.contentId);
                             $scope.actionInProgress = false;
                         }
                         current++;
@@ -185,7 +185,7 @@ angular.module("umbraco")
                         if (current == total) {
                             notificationsService.success("Bulk action", "Published " + total + "documents");
                             $scope.bulkStatus = "";
-                            $scope.reloadView($scope.content.id);
+                            $scope.reloadView($scope.contentId);
                             $scope.actionInProgress = false;
                         }
 
@@ -194,13 +194,13 @@ angular.module("umbraco")
             }
         };
             
-        if($routeParams.id){
+        if ($routeParams.id) {
             $scope.pagination = new Array(100);
             $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
             $scope.reloadView($routeParams.id);
 
-            $scope.content = editorContextService.getContext();
-            
+            $scope.contentId = $routeParams.id;
+
         }
         
 });

@@ -42,6 +42,8 @@ namespace Umbraco.Core.Models
         {
             _parentId = parentId;
             _propertyEditorAlias = propertyEditorAlias;
+
+            _additionalData = new Dictionary<string, object>();
         }
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<DataTypeDefinition, string>(x => x.Name);
@@ -190,7 +192,7 @@ namespace Umbraco.Core.Models
                     return _propertyEditorAlias;
                 }, _propertyEditorAlias, PropertyEditorAliasSelector);
                 //This is a custom property that is not exposed in IUmbracoEntity so add it to the additional data
-                AdditionalData["DatabaseType"] = value;
+                _additionalData["DatabaseType"] = value;
             }
         }
 

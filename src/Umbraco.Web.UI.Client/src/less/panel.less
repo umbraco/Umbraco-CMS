@@ -48,11 +48,9 @@ h1.headline{height: 40px; padding: 30px 0 0 20px;}
   height: 25px;
 }
 
+/*
 .umb-headline-editor-wrapper .help-inline{display: none !Important;}
-.umb-headline-editor-wrapper.error h1{
-  border-bottom: 1px dashed @red; color: @red; cursor: pointer;
-};
-
+*/
 .umb-panel-header .umb-nav-tabs{
   bottom: -1px;
   position: absolute;
@@ -105,22 +103,6 @@ h1.headline{height: 40px; padding: 30px 0 0 20px;}
 }
 
 
-/* TABS */
-
-.umb-nav-tabs {
-  margin: -8px 0 0 0;
-}
-
-.nav-tabs>li>a {
-  -webkit-border-radius: @tabsBorderRadius;
-  border-radius: @tabsBorderRadius;
-  color: @black
-}
-
-.nav-tabs>li>a:hover {
-  color: @blue;
-}
-
 /* Publish */
 
 .umb-btn-toolbar .dropdown-menu {
@@ -143,3 +125,27 @@ h1.headline{height: 40px; padding: 30px 0 0 20px;}
  }
 
 
+ // Utility classes
+
+ //SD: Had to add these because if we want to use the bootstrap text colors
+ // in a panel/editor they'll all show up as white on white - so we need to use the 
+ // form styles
+.umb-panel .muted               { color: @grayLight; }
+.umb-panel a.muted:hover,
+.umb-panel a.muted:focus        { color: darken(@grayLight, 10%); }
+
+.umb-panel .text-warning        { color: @formWarningText; }
+.umb-panel a.text-warning:hover,
+.umb-panel a.text-warning:focus { color: darken(@formWarningText, 10%); }
+
+.umb-panel .text-error          { color: @formErrorText; }
+.umb-panel a.text-error:hover,
+.umb-panel a.text-error:focus   { color: darken(@formErrorText, 10%); }
+
+.umb-panel .text-info           { color: @formInfoText; }
+.umb-panel a.text-info:hover,
+.umb-panel a.text-info:focus    { color: darken(@formInfoText, 10%); }
+
+.umb-panel .text-success        { color: @formSuccessText; }
+.umb-panel a.text-success:hover,
+.umb-panel a.text-success:focus { color: darken(@formSuccessText, 10%); }

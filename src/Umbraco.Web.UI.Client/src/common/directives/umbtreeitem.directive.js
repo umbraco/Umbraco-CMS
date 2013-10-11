@@ -140,10 +140,6 @@ angular.module("umbraco.directives")
                   scope.loadChildren(null, scope.node, true);
               }else if( !node.metaData.treeAlias && activePath.indexOf(node.id) >= 0){
                   scope.loadChildren(null, scope.node, true);
-
-                  scope.path = activePath.filter( function(element) {
-                                    return listToDelete.indexOf(obj.id) === -1;
-                                });
               }
             }
         };

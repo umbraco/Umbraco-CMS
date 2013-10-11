@@ -11,7 +11,7 @@
 		        <ul class="dropdown-menu">
 		            <li ng-repeat="contentType in listViewAllowedTypes">
 		                <a 
-		                	href="#/content/content/edit/{{content.id}}?doctype={{contentType.alias}}&create=true">
+		                	href="#/content/content/edit/{{contentId}}?doctype={{contentType.alias}}&create=true">
 		                    	<i class="icon-{{contentType.cssClass}}"></i> 
 		                    	{{contentType.name}}
 		                </a>
@@ -41,7 +41,7 @@
 					<td><a href="#" ng-click="sort('Owner')" prevent-default>Editor <i class="icon-sort"></i></a></td> 
 					<td with="20"><form class="pull-right" novalidate>
 					<i class="icon-search"></i>
-					<input type="text" ng-model="options.filter" on-keyup="reloadView(content.id)">
+					<input type="text" ng-model="options.filter" on-keyup="reloadView(contentId)">
 				</form></td>
 				</tr>
 			</thead>

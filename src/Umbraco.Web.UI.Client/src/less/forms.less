@@ -408,8 +408,6 @@ input[type="checkbox"][readonly] {
 }
 
 
-
-
 //SD: NOTE: Had to change these to use our 'form' prefixed colors since we cannot
 // share colors with the notifications/alerts. Also had to change them so that 
 // we do not show any errors unless the containing element has the show-validation
@@ -419,23 +417,19 @@ input[type="checkbox"][readonly] {
 // --------------------------
 
 // Warning
-.show-validation .control-group.warning,
-.show-validation .umb-headline-editor-wrapper.warning {
+.show-validation.ng-invalid .control-group.warning {
   .formFieldState(@formWarningText, @formWarningText, @formWarningBackground);
 }
 // Error
-.show-validation .control-group.error,
-.show-validation .umb-headline-editor-wrapper.error {
-  .formFieldState(@formErrorText, @formErrorText, @formErrorBackground);
+.show-validation.ng-invalid .control-group.error {
+    .formFieldState(@formErrorText, @formErrorText, @formErrorBackground);
 }
 // Success
-.show-validation .control-group.success,
-.show-validation .umb-headline-editor-wrapper.success {
+.show-validation.ng-invalid .control-group.success {
   .formFieldState(@formSuccessText, @formSuccessText, @formSuccessBackground);
 }
 // Success
-.show-validation .control-group.info
-.show-validation .umb-headline-editor-wrapper.info {
+.show-validation.ng-invalid .control-group.info {
   .formFieldState(@formInfoText, @formInfoText, @formInfoBackground);
 }
 
@@ -454,19 +448,20 @@ input[type="checkbox"][readonly] {
   }
 }
 
-//non-html5 states, pp: added default ng-invalid class
-input.highlight-error,
-select.highlight-error,
-textarea.highlight-error,
-.ng-dirty input.ng-invalid,
-.ng-dirty select.ng-invalid,
-.ng-dirty textarea.ng-invalid{
-  border-color: #953b39 !important;
-  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392;
-     -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392;
-          box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075), 0 0 6px #d59392;
+//disable the glowing border for the umb-content-name
+.show-validation .umb-headline-editor-wrapper input:focus:invalid,
+.show-validation .umb-headline-editor-wrapper textarea:focus:invalid,
+.show-validation .umb-headline-editor-wrapper select:focus:invalid {
+    border:none;
+    color:inherit;
+    border-color:inherit;
+    @shadow:inherit;
+    .box-shadow(@shadow);
 }
 
+.ng-invalid > .umb-headline-editor-wrapper h1{
+  border-bottom: 1px dashed @red; color: @red; cursor: pointer;
+};
 
 // FORM ACTIONS
 // ------------

@@ -5,10 +5,21 @@ angular.module('umbraco')
 	
 	function($scope, dialogService, entityResource, $log, iconHelper){
 		$scope.ids = $scope.model.value.split(',');
-		$scope.renderModel = [];
-		$scope.multipicker = true;
 
-		entityResource.getByIds($scope.ids, "Document").then(function(data){
+		$scope.renderModel = [];
+		$scope.cfg = {multiPicker: false, entityType: "Document", type: "content", treeAlias: "content", filter: ""};
+
+		if($scope.model.config){
+			$scope.cfg = angular.extend($scope.cfg, $scope.model.config);
+		}
+
+		if($scope.cfg.type === "member"){
+			$scope.cfg.entityType = "Member";
+		}else if($scope.cfg.type === "media"){
+			$scope.cfg.entityType = "Media";
+		}
+
+		entityResource.getByIds($scope.ids, $scope.cfg.entityType).then(function(data){
 			$(data).each(function(i, item){
 				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
 				$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});
@@ -16,7 +27,13 @@ angular.module('umbraco')
 		});
 
 		$scope.openContentPicker =function(){
-			var d = dialogService.contentPicker({scope: $scope, multipicker: $scope.multipicker, callback: populate});
+			var d = dialogService.treePicker({
+								section: $scope.cfg.type,
+								treeAlias: $scope.cfg.type,
+								scope: $scope, 
+								multiPicker: $scope.cfg.multiPicker,
+								filter: $scope.cfg.filter, 
+								callback: populate});
 		};
 
 		$scope.remove =function(index){
