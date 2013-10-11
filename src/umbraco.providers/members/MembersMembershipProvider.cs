@@ -18,6 +18,8 @@ using System.Security.Permissions;
 using System.Runtime.CompilerServices;
 using Member = umbraco.cms.businesslogic.member.Member;
 using MemberType = umbraco.cms.businesslogic.member.MemberType;
+using Umbraco.Core.Models.Membership;
+using User = umbraco.BusinessLogic.User;
 
 #endregion
 
