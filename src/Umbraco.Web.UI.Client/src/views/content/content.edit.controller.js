@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager) {
+function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper) {
     
     if ($routeParams.create) {
         //we are creating so get an empty content item
@@ -33,56 +33,55 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
             });
     }
 
-    //TODO: Need to figure out a way to share the saving and event broadcasting with all editors!
-
     $scope.unPublish = function () {
         
-        $scope.setStatus("Unpublishing...");
+        if (formHelper.submitForm({ scope: $scope, statusMessage: "Unpublishing...", skipValidation: true })) {
 
-        contentResource.unPublish($scope.content.id)
-            .then(function (data) {
-                contentEditingHelper.handleSuccessfulSave({
-                    scope: $scope,
-                    newContent: data,
-                    rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
+            contentResource.unPublish($scope.content.id)
+                .then(function (data) {
+                    
+                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+
+                    contentEditingHelper.handleSuccessfulSave({
+                        scope: $scope,
+                        newContent: data,
+                        rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
+                    });
+
+                    navigationService.syncPath(data.path.split(","));
                 });
-
-                navigationService.syncPath(data.path.split(","));
-            });   
+        }
+        
     };
 
-    $scope.saveAndPublish = function () {
-        
-        $scope.setStatus("Publishing...");
-        $scope.$broadcast("formSubmitting", { scope: $scope });
-        
-        var currentForm = angularHelper.getRequiredCurrentForm($scope);
-        
-        //don't continue if the form is invalid
-        if (currentForm.$invalid) return;
+    $scope.saveAndPublish = function() {
 
-        serverValidationManager.reset();
-        
-        contentResource.publish($scope.content, $routeParams.create, fileManager.getFiles())
-            .then(function (data) {
-                
-                contentEditingHelper.handleSuccessfulSave({
-                    scope: $scope,
-                    newContent: data,
-                    rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
+        if (formHelper.submitForm({ scope: $scope, statusMessage: "Publishing..." })) {
+            
+            contentResource.publish($scope.content, $routeParams.create, fileManager.getFiles())
+                .then(function(data) {
+
+                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+
+                    contentEditingHelper.handleSuccessfulSave({
+                        scope: $scope,
+                        newContent: data,
+                        rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
+                    });
+
+                    navigationService.syncPath(data.path.split(","));
+
+                }, function(err) {
+
+                    contentEditingHelper.handleSaveError({
+                        err: err,
+                        redirectOnFailure: true,
+                        allNewProps: contentEditingHelper.getAllProps(err.data),
+                        rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
+                    });
                 });
-                
-                navigationService.syncPath(data.path.split(","));
+        }
 
-            }, function (err) {
-
-                contentEditingHelper.handleSaveError({
-                    err: err,
-                    redirectOnFailure: true,
-                    allNewProps: contentEditingHelper.getAllProps(err.data),
-                    rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
-                });
-            });     
     };
 
     $scope.preview = function(content){
@@ -95,48 +94,38 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
             }    
     };
 
-    $scope.setStatus = function(status){
-        //add localization
-        $scope.status = status;
-        $timeout(function(){
-            $scope.status = undefined;
-        }, 2500);
-    };
-
-    $scope.save = function () {
+    $scope.save = function() {
         var deferred = $q.defer();
 
-        $scope.setStatus("Saving...");
-        $scope.$broadcast("formSubmitting", { scope: $scope });
-            
-        var currentForm = angularHelper.getRequiredCurrentForm($scope);
+        if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
 
-        //don't continue if the form is invalid
-        if (currentForm.$invalid) return;
+            contentResource.save($scope.content, $routeParams.create, fileManager.getFiles())
+                .then(function(data) {
 
-        serverValidationManager.reset();
+                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
 
-        contentResource.save($scope.content, $routeParams.create, fileManager.getFiles())
-            .then(function (data) {
-                
-                contentEditingHelper.handleSuccessfulSave({
-                    scope: $scope,
-                    newContent: data,
-                    rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
+                    contentEditingHelper.handleSuccessfulSave({
+                        scope: $scope,
+                        newContent: data,
+                        rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
+                    });
+
+                    navigationService.syncPath(data.path.split(","));
+
+                    deferred.resolve(data);
+                }, function(err) {
+                    contentEditingHelper.handleSaveError({
+                        err: err,
+                        allNewProps: contentEditingHelper.getAllProps(err.data),
+                        allOrigProps: contentEditingHelper.getAllProps($scope.content)
+                    });
+
+                    deferred.reject(err);
                 });
-
-                navigationService.syncPath(data.path.split(","));
-                
-                deferred.resolve(data);
-            }, function (err) {
-                contentEditingHelper.handleSaveError({
-                    err: err,
-                    allNewProps: contentEditingHelper.getAllProps(err.data),
-                    allOrigProps: contentEditingHelper.getAllProps($scope.content)
-                });
-
-                deferred.reject(err);
-        });
+        }
+        else {
+            deferred.reject();
+        }
 
         return deferred.promise;
     };

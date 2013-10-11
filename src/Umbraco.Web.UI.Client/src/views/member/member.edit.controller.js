@@ -6,7 +6,7 @@
  * @description
  * The controller for the member editor
  */
-function MemberEditController($scope, $routeParams, $location, $q, $timeout, $window, memberResource, entityResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager) {
+function MemberEditController($scope, $routeParams, $location, $q, $window, memberResource, entityResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper) {
     
     if ($routeParams.create) {
         //we are creating so get an empty member item
@@ -45,53 +45,34 @@ function MemberEditController($scope, $routeParams, $location, $q, $timeout, $wi
 
     }
 
-    //TODO: Need to figure out a way to share the saving and event broadcasting with all editors!
-    
-    $scope.setStatus = function(status){
-        //add localization
-        $scope.status = status;
-        $timeout(function(){
-            $scope.status = undefined;
-        }, 2500);
-    };
+    $scope.save = function() {
 
-    $scope.save = function () {
-        var deferred = $q.defer();
-
-        $scope.setStatus("Saving...");
-        $scope.$broadcast("formSubmitting", { scope: $scope });
+        if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
             
-        var currentForm = angularHelper.getRequiredCurrentForm($scope);
+            memberResource.save($scope.content, $routeParams.create, fileManager.getFiles())
+                .then(function(data) {
 
-        //don't continue if the form is invalid
-        if (currentForm.$invalid) return;
+                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
 
-        serverValidationManager.reset();
+                    contentEditingHelper.handleSuccessfulSave({
+                        scope: $scope,
+                        newContent: data,
+                        //specify a custom id to redirect to since we want to use the GUID
+                        redirectId: data.key,
+                        rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
+                    });
 
-        memberResource.save($scope.content, $routeParams.create, fileManager.getFiles())
-            .then(function (data) {
-                
-                contentEditingHelper.handleSuccessfulSave({
-                    scope: $scope,
-                    newContent: data,
-                    //specify a custom id to redirect to since we want to use the GUID
-                    redirectId: data.key,
-                    rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
+                }, function (err) {
+                    
+                    contentEditingHelper.handleSaveError({
+                        err: err,
+                        allNewProps: contentEditingHelper.getAllProps(err.data),
+                        allOrigProps: contentEditingHelper.getAllProps($scope.content)
+                    });
+
                 });
-
-                deferred.resolve(data);
-                
-            }, function (err) {
-                contentEditingHelper.handleSaveError({
-                    err: err,
-                    allNewProps: contentEditingHelper.getAllProps(err.data),
-                    allOrigProps: contentEditingHelper.getAllProps($scope.content)
-                });
-
-                deferred.reject(err);
-        });
-
-        return deferred.promise;
+        }
+        
     };
 
 }

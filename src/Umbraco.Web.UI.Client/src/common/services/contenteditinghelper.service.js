@@ -198,21 +198,10 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
             if (!args) {
                 throw "args cannot be null";
             }
-            if (!args.scope) {
-                throw "args.scope cannot be null";
-            }
-            if (!args.scope.content) {
-                throw "args.scope.content cannot be null";
-            }
             if (!args.newContent) {
                 throw "args.newContent cannot be null";
             }
 
-            for (var i = 0; i < args.newContent.notifications.length; i++) {
-                notificationsService.showNotification(args.newContent.notifications[i]);
-            }
-
-            args.scope.$broadcast("formSubmitted", { scope: args.scope });
             if (!this.redirectToCreatedContent(args.redirectId ? args.redirectId : args.newContent.id)) {
                 
                 //we are not redirecting because this is not new content, it is existing content. In this case
