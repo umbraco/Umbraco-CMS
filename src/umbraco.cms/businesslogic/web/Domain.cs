@@ -151,7 +151,7 @@ namespace umbraco.cms.businesslogic.web
                 () =>
                     {
                         var result = new List<Domain>();
-                        using (var dr = SqlHelper.ExecuteReader("SELECT Id, DomainName FFROM umbracoDomains ORDER BY Id"))
+                        using (var dr = SqlHelper.ExecuteReader("SELECT Id, DomainName FROM umbracoDomains ORDER BY Id"))
                         {
                             while (dr.Read())
                             {
