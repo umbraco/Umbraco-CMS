@@ -13,6 +13,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
@@ -186,6 +187,12 @@ namespace Umbraco.Tests.TestHelpers
 
             MappingResolver.Current = new MappingResolver(
                () => PluginManager.Current.ResolveAssignedMapperTypes());
+
+            if (PropertyValueConvertersResolver.HasCurrent == false)
+                PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver();
+
+            if (PublishedContentModelFactoryResolver.HasCurrent == false)
+                PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
 
             base.FreezeResolution();
         }

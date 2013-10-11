@@ -73,6 +73,13 @@ namespace umbraco
             return true;
 	    }
 
+        protected virtual void WriteTemplateHeader(StreamWriter sw)
+        {
+            //write out the template header
+            sw.Write("@inherits ");
+			sw.Write(typeof(UmbracoTemplatePage).FullName.TrimEnd("`1"));
+		}
+
 	    public override bool PerformDelete()
 	    {
             var path = IOHelper.MapPath(BasePath + Alias.TrimStart('/'));

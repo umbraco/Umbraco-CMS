@@ -477,7 +477,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal IEnumerable<Type> ResolvePropertyValueConverters()
         {
-            return ResolveTypes<PropertyValueConverter>();
+            return ResolveTypes<IPropertyValueConverter>();
         }
 
         /// <summary>

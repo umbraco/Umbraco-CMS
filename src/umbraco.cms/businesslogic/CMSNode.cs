@@ -468,7 +468,8 @@ namespace umbraco.cms.businesslogic
         {
             List<CMSPreviewNode> nodes = new List<CMSPreviewNode>();
             string sql = @"
-select umbracoNode.id, umbracoNode.parentId, umbracoNode.level, umbracoNode.sortOrder, cmsPreviewXml.xml from umbracoNode 
+select umbracoNode.id, umbracoNode.parentId, umbracoNode.level, umbracoNode.sortOrder, cmsPreviewXml.xml
+from umbracoNode 
 inner join cmsPreviewXml on cmsPreviewXml.nodeId = umbracoNode.id 
 where trashed = 0 and path like '{0}' 
 order by level,sortOrder";
@@ -477,7 +478,7 @@ order by level,sortOrder";
 
             IRecordsReader dr = SqlHelper.ExecuteReader(String.Format(sql, pathExp));
             while (dr.Read())
-                nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("uniqueID"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml")));
+                nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("uniqueID"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml"), false));
             dr.Close();
 
             return nodes;

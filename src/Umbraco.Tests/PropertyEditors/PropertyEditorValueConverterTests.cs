@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.PropertyEditors
@@ -8,42 +9,54 @@ namespace Umbraco.Tests.PropertyEditors
     [TestFixture]
 	public class PropertyEditorValueConverterTests
 	{
-		[TestCase("2012-11-10", true)]
-		[TestCase("2012/11/10", true)]
-		[TestCase("10/11/2012", true)]
-		[TestCase("11/10/2012", false)]
-		[TestCase("Sat 10, Nov 2012", true)]
-		[TestCase("Saturday 10, Nov 2012", true)]
-		[TestCase("Sat 10, November 2012", true)]
-		[TestCase("Saturday 10, November 2012", true)]
-		[TestCase("2012-11-10 13:14:15", true)]
-		[TestCase("", false)]
+        // see notes in the converter
+        // only ONE date format is expected here
+
+        //[TestCase("2012-11-10", true)]
+        //[TestCase("2012/11/10", true)]
+        //[TestCase("10/11/2012", true)]
+        //[TestCase("11/10/2012", false)]
+        //[TestCase("Sat 10, Nov 2012", true)]
+        //[TestCase("Saturday 10, Nov 2012", true)]
+        //[TestCase("Sat 10, November 2012", true)]
+        //[TestCase("Saturday 10, November 2012", true)]
+        //[TestCase("2012-11-10 13:14:15", true)]
+        [TestCase("2012-11-10 13:14:15", false)]
+        [TestCase("2012-11-10T13:14:15", true)]
+        [TestCase("", false)]
 		public void CanConvertDatePickerPropertyEditor(string date, bool expected)
 		{
-			var converter = new DatePickerPropertyValueConverter();
+			var converter = new DatePickerValueConverter();
 			var dateTime = new DateTime(2012, 11, 10, 13, 14, 15);
-			var result = converter.ConvertSourceToObject(date, null, false);
+			var result = converter.ConvertDataToSource(null, date, false); // does not use type for conversion
 
-			Assert.IsTrue(result.Success);
-			Assert.AreEqual(DateTime.Equals(dateTime.Date, ((DateTime) result.Result).Date), expected);
-		}
+		    if (expected)
+		        Assert.AreEqual(dateTime.Date, ((DateTime) result).Date);
+            else
+                Assert.AreNotEqual(dateTime.Date, ((DateTime)result).Date);
+        }
 
-		[TestCase("TRUE", true)]
-		[TestCase("True", true)]
-		[TestCase("true", true)]
+        // see the notes in the converter
+        // values such as "true" are NOT expected here
+
+        //[TestCase("TRUE", true)]
+        //[TestCase("True", true)]
+        //[TestCase("true", true)]
 		[TestCase("1", true)]
-		[TestCase("FALSE", false)]
-		[TestCase("False", false)]
-		[TestCase("false", false)]
+        //[TestCase("FALSE", false)]
+        //[TestCase("False", false)]
+        //[TestCase("false", false)]
 		[TestCase("0", false)]
 		[TestCase("", false)]
-		public void CanConvertYesNoPropertyEditor(string value, bool expected)
+        [TestCase("true", false)]
+        [TestCase("false", false)]
+        [TestCase("blah", false)]
+        public void CanConvertYesNoPropertyEditor(string value, bool expected)
 		{
-			var converter = new YesNoPropertyValueConverter();
-            var result = converter.ConvertSourceToObject(value, null, false);
+			var converter = new YesNoValueConverter();
+            var result = converter.ConvertDataToSource(null, value, false); // does not use type for conversion
 
-			Assert.IsTrue(result.Success);
-			Assert.AreEqual(expected, result.Result);
+			Assert.AreEqual(expected, result);
 		}
 	}
 }

@@ -19,7 +19,7 @@ namespace Umbraco.Tests.CodeFirst
 
             foreach (var property in content.Properties)
             {
-                var @alias = property.Alias.ToLowerInvariant();
+                var @alias = property.PropertyTypeAlias.ToLowerInvariant();
 
                 var propertyInfo = propertyInfos.FirstOrDefault(x => x.Name.ToLowerInvariant() == @alias);
                 if (propertyInfo == null) continue;

@@ -203,7 +203,7 @@ namespace Umbraco.Core.Dynamics
 			if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod
 				&& attempt.Exception != null && attempt.Exception is TargetInvocationException)
 			{
-				result = new DynamicNull();
+				result = DynamicNull.Null;
 				return true;
 			}
 

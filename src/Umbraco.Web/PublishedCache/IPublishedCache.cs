@@ -89,6 +89,12 @@ namespace Umbraco.Web.PublishedCache
         XPathNavigator GetXPathNavigator(UmbracoContext umbracoContext, bool preview);
 
         /// <summary>
+        /// Gets a value indicating whether <c>GetXPathNavigator</c> returns an <c>XPathNavigator</c>
+        /// and that navigator is a <c>NavigableNavigator</c>.
+        /// </summary>
+        bool XPathNavigatorIsNavigable { get; }
+
+        /// <summary>
         /// Gets a value indicating whether the cache contains published content.
         /// </summary>
         /// <param name="umbracoContext">The context.</param>

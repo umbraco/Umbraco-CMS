@@ -112,7 +112,8 @@ namespace Umbraco.Core.Dynamics
 						{
 							//don't log here, we return this exception because the caller may need to do something specific when
 							//this exception occurs.
-							return Attempt<TryInvokeMemberResult>.Fail(ext);
+						    var mresult = new TryInvokeMemberResult(null, TryInvokeMemberSuccessReason.FoundExtensionMethod);
+							return Attempt<TryInvokeMemberResult>.Fail(mresult, ext);
 						}
 						catch (Exception ex)
 						{
@@ -124,7 +125,8 @@ namespace Umbraco.Core.Dynamics
 								sb.Append(t + ",");
 							}
 							LogHelper.Error<DynamicInstanceHelper>(sb.ToString(), ex);
-							return Attempt<TryInvokeMemberResult>.Fail(ex);
+                            var mresult = new TryInvokeMemberResult(null, TryInvokeMemberSuccessReason.FoundExtensionMethod);
+                            return Attempt<TryInvokeMemberResult>.Fail(mresult, ex);
 						}	
 					}
 					return Attempt<TryInvokeMemberResult>.Fail();

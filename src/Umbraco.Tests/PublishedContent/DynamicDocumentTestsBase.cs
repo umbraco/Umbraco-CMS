@@ -8,6 +8,8 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Dynamics;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.PublishedContent
@@ -15,21 +17,44 @@ namespace Umbraco.Tests.PublishedContent
 	[TestFixture]
     public abstract class DynamicDocumentTestsBase<TDocument, TDocumentList> : PublishedContentTestBase
 	{
-
-        public override void Initialize()
-        {
-            base.Initialize();
-
-            var scriptingMock = Mock.Get(UmbracoSettings.Scripting);
-            scriptingMock.Setup(x => x.DataTypeModelStaticMappings).Returns(new List<IRazorStaticMapping>());
-        }
-
         protected override DatabaseBehavior DatabaseTestBehavior
         {
             get { return DatabaseBehavior.NoDatabasePerFixture; }
         }
 
-		protected override string GetXmlContent(int templateId)
+        public override void Initialize()
+        {
+            // required so we can access property.Value
+            //PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver();
+
+            base.Initialize();
+
+            var scriptingMock = Mock.Get(UmbracoSettings.Scripting);
+            scriptingMock.Setup(x => x.DataTypeModelStaticMappings).Returns(new List<IRazorStaticMapping>());
+
+            // need to specify a custom callback for unit tests
+            // AutoPublishedContentTypes generates properties automatically
+            // when they are requested, but we must declare those that we
+            // explicitely want to be here...
+
+            var propertyTypes = new[]
+                {
+                    // AutoPublishedContentType will auto-generate other properties
+                    new PublishedPropertyType("umbracoNaviHide", 0, "?"), 
+                    new PublishedPropertyType("selectedNodes", 0, "?"), 
+                    new PublishedPropertyType("umbracoUrlAlias", 0, "?"), 
+                    new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEv3Alias), 
+                    new PublishedPropertyType("testRecursive", 0, "?"), 
+                    new PublishedPropertyType("siteTitle", 0, "?"), 
+                    new PublishedPropertyType("creatorName", 0, "?"), 
+                    new PublishedPropertyType("blah", 0, "?"), // ugly error when that one is missing...
+                };
+            var type = new AutoPublishedContentType(0, "anything", propertyTypes);
+            PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
+
+        }
+        
+        protected override string GetXmlContent(int templateId)
 		{
 			return @"<?xml version=""1.0"" encoding=""utf-8""?>
 <!DOCTYPE root[ 
@@ -519,6 +544,11 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			var asDynamic = GetDynamicNode(1174);
 
+            // NOTE: that test breaks because of U4-3094 fix in DynamicPublishedContent
+            // previously, DynamicPublishedContent.GetProperty would honor the '_' and '@' syntax.
+            // now that it's just using the original proper IPublishedContent way, it does not anymore
+            // I *think* it makes sense. Then kill that test. Do we all agree? - Stephan
+
 			Assert.AreEqual("admin", asDynamic.GetPropertyValue("@creatorName"));
 			Assert.AreEqual("admin", asDynamic.GetPropertyValue("@CreatorName"));
 		}
@@ -573,7 +603,8 @@ namespace Umbraco.Tests.PublishedContent
 
 			Assert.IsNotNull(result);
 
-			Assert.AreEqual((int) 1046, (int) result.Id);
+            // ancestor-or-self has to be self!
+			Assert.AreEqual(1173, (int)result.Id);
 		}
 
 		[Test]

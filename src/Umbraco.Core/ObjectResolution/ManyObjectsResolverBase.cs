@@ -458,6 +458,21 @@ namespace Umbraco.Core.ObjectResolution
 			}
 		}
 
+        /// <summary>
+        /// Gets the types in the collection of types.
+        /// </summary>
+        /// <returns>The types in the collection of types.</returns>
+        /// <remarks>Returns an enumeration, the list cannot be modified.</remarks>
+        public virtual IEnumerable<Type> GetTypes()
+        {
+            Type[] types;
+            using (new ReadLock(_lock))
+            {
+                types = _instanceTypes.ToArray();
+            }
+            return types;
+        }
+
 		/// <summary>
 		/// Returns a value indicating whether the specified type is already in the collection of types.
 		/// </summary>

@@ -47,9 +47,9 @@ namespace Umbraco.Web.Media
                     }
                     else
                     {
-                        var itemPage = new page(content.Instance.XmlContent.GetElementById(nodeId.GetValueOrDefault().ToString(CultureInfo.InvariantCulture)));
-                        var value = itemPage.Elements[field];
-                        fieldValue = value != null ? value.ToString() : string.Empty;
+                        var p = UmbracoContext.Current.ContentCache.GetById(nodeId.GetValueOrDefault());
+                        var v = p.GetPropertyValue(field);
+                        fieldValue = v == null ? string.Empty : v.ToString();
                     }
                 }
                 else

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Web.PublishedCache;
@@ -22,9 +23,7 @@ namespace Umbraco.Web
         private static readonly object Locker = new object();
 
         private bool _replacing;
-        private PreviewContent _previewContent;
-        //explicit flag during ctor 
-        private bool? _isPreviewing;
+        private bool? _previewing;
 
         /// <summary>
         /// Used if not running in a web application (no real HttpContext)
@@ -200,7 +199,7 @@ namespace Umbraco.Web
 
             ContentCache = publishedCaches.CreateContextualContentCache(this);
             MediaCache = publishedCaches.CreateContextualMediaCache(this);
-            _isPreviewing = preview;
+            _previewing = preview;
             
             // set the urls...
             //original request url
@@ -401,9 +400,11 @@ namespace Umbraco.Web
         /// <summary>
         /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
         /// </summary>
-        public bool InPreviewMode 
+        /// <remarks>Can be internally set by the RTE macro rendering to render macros in the appropriate mode.</remarks>
+        public bool InPreviewMode
         {
-            get { return _isPreviewing ?? DetectInPreviewModeFromRequest(); }
+            get { return _previewing ?? (_previewing = DetectInPreviewModeFromRequest()).Value; }
+			set { _previewing = value; }
         }
 
         private bool DetectInPreviewModeFromRequest()
@@ -438,7 +439,6 @@ namespace Umbraco.Web
         {
             Security.DisposeIfDisposable();
             Security = null;
-            _previewContent = null;
             _umbracoContext = null;
             //ensure not to dispose this!
             Application = null;

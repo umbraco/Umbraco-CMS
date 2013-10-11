@@ -6,6 +6,7 @@ using Examine;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
@@ -16,22 +17,15 @@ using umbraco.BusinessLogic;
 namespace Umbraco.Tests.PublishedCache
 {
 	[TestFixture]
-    public class PublishMediaCacheTests : PublishedContentTestBase
+    public class PublishMediaCacheTests : BaseWebTest
 	{
-		public override void Initialize()
-		{
-			base.Initialize();				
-		}
-
-
-		
-
-		public override void TearDown()
-		{
-			base.TearDown();
-		}
-
-		[Test]
+        protected override void FreezeResolution()
+        {
+            PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
+            base.FreezeResolution();
+        }
+        
+        [Test]
 		public void Get_Root_Docs()
 		{
 			var user = new User(0);
@@ -249,11 +243,11 @@ namespace Umbraco.Tests.PublishedCache
 						a => null,
 					//we're not going to test this so ignore
 						a => new List<IPublishedContent>(),
-						(dd, a) => dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(a)), 
+						(dd, a) => dd.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(a)), 
 						false),
 				//callback to get the children
 				d => children,
-				(dd, a) => dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(a)), 
+				(dd, a) => dd.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(a)), 
 				false);
 			return dicDoc;
 		}
