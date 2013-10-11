@@ -10,7 +10,7 @@
                 </tr>
             </thead>
             <tbody>
-                <tr ng-repeat="link in relatedLinks">
+                <tr ng-repeat="link in $scope.model.value">
                     <td>
                         <span ng-show="!link.edit">{{link.caption}}</span>
                         <input type="text" ng-model="link.caption" ng-show="link.edit"/>
