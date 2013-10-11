@@ -2430,7 +2430,6 @@
     <Content Include="Umbraco\macroResultWrapper.aspx">
       <SubType>Form</SubType>
     </Content>
-    <Content Include="Umbraco\Members\EditMember.aspx" />
     <Content Include="Umbraco\Members\EditMemberGroup.aspx">
       <SubType>Form</SubType>
     </Content>
