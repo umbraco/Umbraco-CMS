@@ -6,6 +6,11 @@ angular.module("umbraco")
 
             //config value from general tinymce.config file
             var validElements = tinyMceConfig.validElements;
+
+            //These are absolutely required in order for the macros to render inline
+            //we put these as extended elements because they get merged on top of the normal allowed elements by tiny mce
+            var extendedValidElements = "@[id|class|style],-div[id|dir|class|align|style],ins[datetime|cite],-ul[class|style],-li[class|style]";
+
             var invalidElements = tinyMceConfig.inValidElements;
             var plugins = _.map(tinyMceConfig.plugins, function(plugin){ 
                                             if(plugin.useOnFrontend){
@@ -26,8 +31,6 @@ angular.module("umbraco")
                 /** Loads in the editor */
                 function loadTinyMce() {
                     
-                    //valid_elements: validElements,
-                            
                     //we need to add a timeout here, to force a redraw so TinyMCE can find
                     //the elements needed
                     $timeout(function () {
@@ -37,6 +40,9 @@ angular.module("umbraco")
                             elements: $scope.model.alias + "_rte",
                             skin: "umbraco",
                             plugins: plugins,
+                            valid_elements: validElements,
+                            invalid_elements: invalidElements,
+                            extended_valid_elements: extendedValidElements,
                             menubar: false,
                             statusbar: false,
                             height: editorConfig.dimensions.height,
