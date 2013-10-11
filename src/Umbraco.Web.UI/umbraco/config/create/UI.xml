@@ -338,28 +338,4 @@
       <delete assembly="umbraco" type="PartialViewMacroTasks" />
     </tasks>
   </nodeType>
-  <nodeType alias="forms">
-    <header>Forms</header>
-    <usercontrol>/plugins/umbracocontour/createform.ascx</usercontrol>
-    <tasks>
-      <create assembly="Umbraco.Forms.UI" type="Tasks.FormTasks" />
-      <delete assembly="Umbraco.Forms.UI" type="Tasks.FormTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="formdatasources">
-    <header>Datasources</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <create assembly="Umbraco.Forms.UI" type="Tasks.DataSourceTasks" />
-      <delete assembly="Umbraco.Forms.UI" type="Tasks.DataSourceTasks" />
-    </tasks>
-  </nodeType>
-  <nodeType alias="formprevaluesource">
-    <header>Prevalue source</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
-    <tasks>
-      <create assembly="Umbraco.Forms.UI" type="Tasks.PrevalueSourceTasks" />
-      <delete assembly="Umbraco.Forms.UI" type="Tasks.PrevalueSourceTasks" />
-    </tasks>
-  </nodeType>
 </createUI>
