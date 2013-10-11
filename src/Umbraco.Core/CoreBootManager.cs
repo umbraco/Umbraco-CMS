@@ -337,8 +337,8 @@ namespace Umbraco.Core
 		        typeof (DefaultUrlSegmentProvider));
 
             // keep it internal for now
-            //PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver(
-            //    new PublishedContentModelFactoryImpl());
+		    PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
+		    //    new PublishedContentModelFactoryImpl());
 		}
 	}
 }
