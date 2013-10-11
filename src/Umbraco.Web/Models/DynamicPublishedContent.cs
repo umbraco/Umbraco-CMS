@@ -1,5 +1,6 @@
-﻿// fixme - should #define - but when will it be OK?
-#undef FIX_GET_PROPERTY_VALUE
+﻿// ENABLE THE FIX in 7.0.0
+// TODO if all goes well, remove the obsolete code eventually
+#define FIX_GET_PROPERTY_VALUE
 
 using System;
 using System.Collections.Concurrent;
