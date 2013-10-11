@@ -7,13 +7,19 @@ angular.module('umbraco')
 		$scope.ids = $scope.model.value.split(',');
 
 		$scope.renderModel = [];
-		$scope.cfg = {multipicker: false, type: "content", filter: ""};
+		$scope.cfg = {multiPicker: false, entityType: "Document", type: "content", treeAlias: "content", filter: ""};
 
 		if($scope.model.config){
-			$scope.cfg = $scope.model.config;
+			$scope.cfg = angular.extend($scope.cfg, $scope.model.config);
 		}
 
-		entityResource.getByIds($scope.ids, "Document").then(function(data){
+		if($scope.cfg.type === "member"){
+			$scope.cfg.entityType = "Member";
+		}else if($scope.cfg.type === "media"){
+			$scope.cfg.entityType = "Media";
+		}
+
+		entityResource.getByIds($scope.ids, $scope.cfg.entityType).then(function(data){
 			$(data).each(function(i, item){
 				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
 				$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});

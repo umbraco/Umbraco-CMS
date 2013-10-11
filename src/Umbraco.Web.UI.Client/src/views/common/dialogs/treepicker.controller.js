@@ -5,7 +5,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	$scope.dialogTreeEventHandler = $({});
 	$scope.section = dialogOptions.section;
 	$scope.treeAlias = dialogOptions.treeAlias;
-
+	$scope.multiPicker = dialogOptions.multiPicker;
+	
 	//search defaults
 	$scope.searcher = searchService.searchContent;
 	$scope.entityType ="Document";
@@ -21,7 +22,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 
 	function select(id){
 		entityResource.getById(id, $scope.entityType).then(function(ent){
-			if(dialogOptions && dialogOptions.multiPicker){
+			if($scope.multiPicker){
 				
 				$scope.showSearch = false;
 				$scope.results = [];
@@ -64,7 +65,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 			
 			select(args.node.id);
 
-			if(dialogOptions && dialogOptions.multiPicker){
+			if($scope.multiPicker){
 				var c = $(args.event.target.parentElement);
 				if(!args.node.selected){
 					args.node.selected = true;
