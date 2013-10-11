@@ -208,6 +208,8 @@ namespace Umbraco.Web.Editors
         /// 
         /// TODO: We need to update this method to return the new password if it has been reset and then show that to the UI!
         /// 
+        /// TODO We should move this logic to a central helper class so we can re-use it when it comes to integrating with WebSecurity
+        /// 
         /// </remarks>
         private void UpdateWithMembershipProvider(MemberSave contentItem)
         {
