@@ -12,8 +12,8 @@ function valShowValidation(serverValidationManager) {
         link: function (scope, element, attr, ctrl) {
 
             var className = attr.valShowValidation ? attr.valShowValidation : "show-validation";
-            var savingEventName = attr.savingEvent ? attr.savingEvent : "saving";
-            var savedEvent = attr.savedEvent ? attr.savingEvent : "saved";
+            var savingEventName = attr.savingEvent ? attr.savingEvent : "formSubmitting";
+            var savedEvent = attr.savedEvent ? attr.savingEvent : "formSubmitted";
 
             //we should show validation if there are any msgs in the server validation collection
             if (serverValidationManager.items.length > 0) {

@@ -80,7 +80,7 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
     });
 
     $scope.save = function () {
-        $scope.$broadcast("saving", { scope: $scope });
+        $scope.$broadcast("formSubmitting", { scope: $scope });
     
         //ensure there is a form object assigned.
         var currentForm = angularHelper.getRequiredCurrentForm($scope);

@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, editorContextService) {
+function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager) {
        
     //initialize the file manager
     fileManager.clearFiles();
@@ -17,7 +17,6 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
             .then(function(data) {
                 $scope.loaded = true;
                 $scope.content = data;
-                editorContextService.setContext($scope.content);
             });
     }
     else {
@@ -27,7 +26,6 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
                 $scope.loaded = true;
                 $scope.content = data;
 
-                editorContextService.setContext($scope.content);
                 navigationService.syncPath(data.path.split(","));
                 
                 //in one particular special case, after we've created a new item we redirect back to the edit
@@ -59,7 +57,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
     $scope.saveAndPublish = function () {
         
         $scope.setStatus("Publishing...");
-        $scope.$broadcast("saving", { scope: $scope });
+        $scope.$broadcast("formSubmitting", { scope: $scope });
         
         var currentForm = angularHelper.getRequiredCurrentForm($scope);
         
@@ -112,7 +110,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
         var deferred = $q.defer();
 
         $scope.setStatus("Saving...");
-        $scope.$broadcast("saving", { scope: $scope });
+        $scope.$broadcast("formSubmitting", { scope: $scope });
             
         var currentForm = angularHelper.getRequiredCurrentForm($scope);
 

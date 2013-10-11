@@ -72,7 +72,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
         
         //listen for the saved event, when that occurs we'll 
         //change to changing = false;
-        $scope.$on("saved", function() {
+        $scope.$on("formSubmitted", function () {
             $scope.changing = false;
             resetModel();
         });

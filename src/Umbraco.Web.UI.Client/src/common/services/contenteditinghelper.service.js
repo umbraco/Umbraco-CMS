@@ -2,7 +2,7 @@
 /**
 * @ngdoc service
 * @name umbraco.services.contentEditingHelper
-* @description A helper service for content controllers when editing/creating/saving content.
+* @description A helper service for content/media/member controllers when editing/creating/saving content.
 **/
 function contentEditingHelper($location, $routeParams, notificationsService, serverValidationManager, dialogService) {
 
@@ -212,7 +212,7 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
                 notificationsService.showNotification(args.newContent.notifications[i]);
             }
 
-            args.scope.$broadcast("saved", { scope: args.scope });
+            args.scope.$broadcast("formSubmitted", { scope: args.scope });
             if (!this.redirectToCreatedContent(args.redirectId ? args.redirectId : args.newContent.id)) {
                 
                 //we are not redirecting because this is not new content, it is existing content. In this case

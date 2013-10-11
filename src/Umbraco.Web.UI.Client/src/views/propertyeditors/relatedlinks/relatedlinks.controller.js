@@ -1,6 +1,6 @@
 ﻿angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RelatedLinksController",
-        function ($rootScope, $scope, dialogService, $routeParams, contentResource, contentTypeResource, editorContextService, notificationsService) {
+        function ($rootScope, $scope, dialogService) {
 
             $scope.newCaption = '';
             $scope.newLink = 'http://';

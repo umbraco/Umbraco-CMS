@@ -67,7 +67,7 @@ function valPropertyMsg(serverValidationManager) {
             }, true);
 
             //listen for the forms saving event
-            scope.$on("saving", function(ev, args) {
+            scope.$on("formSubmitting", function (ev, args) {
                 showValidation = true;
                 if (hasError && scope.errorMsg === "") {
                     var err;
@@ -83,7 +83,7 @@ function valPropertyMsg(serverValidationManager) {
             });
 
             //listen for the forms saved event
-            scope.$on("saved", function (ev, args) {
+            scope.$on("formSubmitted", function (ev, args) {
                 showValidation = false;
                 scope.errorMsg = "";
                 formCtrl.$setValidity('valPropertyMsg', true);                

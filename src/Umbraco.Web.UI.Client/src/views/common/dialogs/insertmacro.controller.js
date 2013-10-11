@@ -82,7 +82,7 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
         
         if ($scope.wizardStep === "paramSelect") {
             //we need to broadcast the saving event for the toggle validators to work
-            $scope.$broadcast("saving");
+            $scope.$broadcast("formSubmitting");
         }
 
         //ensure the drop down is dirty so the styles validate

@@ -62,7 +62,7 @@ angular.module("umbraco")
                                         $scope.model.value = editor.getContent();
                                     });
                                 });
-                                var unsubscribe = $scope.$on("saving", function () {
+                                var unsubscribe = $scope.$on("formSubmitting", function () {
                                     $scope.model.value = editor.getContent();
                                 });
 

@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.ListViewController", 
-        function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource, editorContextService, notificationsService, iconHelper) {
+        function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource, notificationsService, iconHelper) {
 
         $scope.selected = [];
         $scope.actionInProgress = false;
@@ -194,13 +194,13 @@ angular.module("umbraco")
             }
         };
             
-        if($routeParams.id){
+        if ($routeParams.id) {
             $scope.pagination = new Array(100);
             $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
             $scope.reloadView($routeParams.id);
 
-            $scope.content = editorContextService.getContext();
-            
+            $scope.contentId = $routeParams.id;
+
         }
         
 });
