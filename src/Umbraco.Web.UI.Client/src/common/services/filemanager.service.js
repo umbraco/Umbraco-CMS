@@ -6,10 +6,18 @@
  * @description
  * Used by editors to manage any files that require uploading with the posted data, normally called by property editors
  * that need to attach files.
+ * When a route changes successfully, we ensure that the collection is cleared.
  */
-function fileManager() {
+function fileManager($rootScope) {
 
     var fileCollection = [];
+
+    //Whenever a route changes - clear the curent file collection, the file collection is only relavent
+    // when working in an editor and submitting data to the server.
+    //This ensures that memory remains clear of any files and that the editors don't have to manually clear the files.
+    $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
+        fileCollection = [];
+    });
 
     return {
         /**

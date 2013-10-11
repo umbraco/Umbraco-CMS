@@ -7,10 +7,7 @@
  * The controller for the member editor
  */
 function MemberEditController($scope, $routeParams, $location, $q, $timeout, $window, memberResource, entityResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager) {
-       
-    //initialize the file manager
-    fileManager.clearFiles();
-
+    
     if ($routeParams.create) {
         //we are creating so get an empty member item
         memberResource.getScaffold($routeParams.doctype)

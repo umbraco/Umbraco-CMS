@@ -7,10 +7,7 @@
  * The controller for the content editor
  */
 function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager) {
-       
-    //initialize the file manager
-    fileManager.clearFiles();
-
+    
     if ($routeParams.create) {
         //we are creating so get an empty content item
         contentResource.getScaffold($routeParams.id, $routeParams.doctype)

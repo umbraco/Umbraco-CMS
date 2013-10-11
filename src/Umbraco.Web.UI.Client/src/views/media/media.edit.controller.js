@@ -8,9 +8,6 @@
  */
 function mediaEditController($scope, $routeParams, mediaResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, $timeout) {
 
-    //initialize the file manager
-    fileManager.clearFiles();
-
     if ($routeParams.create) {
 
         mediaResource.getScaffold($routeParams.id, $routeParams.doctype)
