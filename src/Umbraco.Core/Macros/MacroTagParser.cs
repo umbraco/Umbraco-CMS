@@ -10,7 +10,7 @@ namespace Umbraco.Core.Macros
 	/// </summary>
 	internal class MacroTagParser
 	{
-        private static readonly Regex MacroRteContent = new Regex(@"(<div class=[""']umb-macro-holder.+?[""'].*?>.*?<!--\s*?)(<\?UMBRACO_MACRO.*?/>)(.*?</div>)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        private static readonly Regex MacroRteContent = new Regex(@"(<div.*?>.*?<!--\s*?)(<\?UMBRACO_MACRO.*?/>)(.*?</div>)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
         private static readonly Regex MacroPersistedFormat = new Regex(@"(<\?UMBRACO_MACRO macroAlias=[""'](\w+?)[""'].+?)(?:/>|>.*?</\?UMBRACO_MACRO>)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
 	    /// <summary>

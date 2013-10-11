@@ -68,7 +68,11 @@ angular.module("umbraco")
                                         $scope.model.value = editor.getContent();
                                     });
                                 });
+                                //listen for formSubmitting event (the result is callback used to remove the event subscription)
                                 var unsubscribe = $scope.$on("formSubmitting", function () {
+
+                                    //TODO: Here we should parse out the macro rendered content so we can save on a lot of bytes in data xfer
+                                    // we do parse it out on the server side but would be nice to do that on the client side before as well.
                                     $scope.model.value = editor.getContent();
                                 });
 
@@ -101,6 +105,7 @@ angular.module("umbraco")
                 //this is instead of doing a watch on the model.value = faster
                 $scope.model.onValueChanged = function (newVal, oldVal) {
                     //update the display val again if it has changed from the server
+                    //TODO: Perhaps we don't need to re-load the whole editor, can probably just re-set the value ?
                     loadTinyMce();
                 };
             });

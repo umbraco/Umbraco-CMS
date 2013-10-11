@@ -124,5 +124,38 @@ asdfsdf
 </body>
 </html>", result);
         }
+
+        [Test]
+        public void Format_RTE_Data_For_Persistence_No_Class()
+        {
+            var content = @"<html>
+<body>
+<h1>asdfasdf</h1>
+<div att1='asdf' att2='asdfasdfasdf' att3=""sdfsdfd"">
+<!-- <?UMBRACO_MACRO macroAlias=""myMacro"" param1=""test1"" param2=""test2"" /> -->
+asdfasdf 
+asdfas
+<span>asdfasdfasdf</span>
+<p>asdfasdf</p>
+</div>
+<span>asdfdasf</span>
+<div>
+asdfsdf
+</div>
+</body>
+</html>";
+            var result = MacroTagParser.FormatRichTextContentForPersistence(content);
+
+            Assert.AreEqual(@"<html>
+<body>
+<h1>asdfasdf</h1>
+<?UMBRACO_MACRO macroAlias=""myMacro"" param1=""test1"" param2=""test2"" />
+<span>asdfdasf</span>
+<div>
+asdfsdf
+</div>
+</body>
+</html>", result);
+        }
     }
 }
