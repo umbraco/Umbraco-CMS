@@ -16,6 +16,7 @@ namespace Umbraco.Core.Models.Rdbms
         public int NodeId { get; set; }
 
         [Column("published")]
+        [Index(IndexTypes.NonClustered, Name = "IX_cmsDocument_published")]
         public bool Published { get; set; }
 
         [Column("documentUser")]
@@ -51,6 +52,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("newest")]
         [Constraint(Default = "0")]
+        [Index(IndexTypes.NonClustered, Name = "IX_cmsDocument_newest")]
         public bool Newest { get; set; }
 
         [ResultColumn]
