@@ -626,9 +626,9 @@
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
-    <Content Include="Config\appSettings.Release.config">
+    <None Include="Config\appSettings.Release.config">
       <SubType>Designer</SubType>
-    </Content>
+    </None>
     <None Include="Config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -639,7 +639,7 @@
     <None Include="Config\BaseRestExtensions.Release.config">
       <DependentUpon>BaseRestExtensions.config</DependentUpon>
     </None>
-    <Content Include="Config\connectionStrings.Release.config" />
+    <None Include="Config\connectionStrings.Release.config" />
     <None Include="Config\log4net.Release.config">
       <DependentUpon>log4net.config</DependentUpon>
     </None>
