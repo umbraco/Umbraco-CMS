@@ -544,6 +544,11 @@ namespace Umbraco.Tests.PublishedContent
 		{
 			var asDynamic = GetDynamicNode(1174);
 
+            // NOTE: that test breaks because of U4-3094 fix in DynamicPublishedContent
+            // previously, DynamicPublishedContent.GetProperty would honor the '_' and '@' syntax.
+            // now that it's just using the original proper IPublishedContent way, it does not anymore
+            // I *think* it makes sense. Then kill that test. Do we all agree? - Stephan
+
 			Assert.AreEqual("admin", asDynamic.GetPropertyValue("@creatorName"));
 			Assert.AreEqual("admin", asDynamic.GetPropertyValue("@CreatorName"));
 		}
@@ -598,7 +603,8 @@ namespace Umbraco.Tests.PublishedContent
 
 			Assert.IsNotNull(result);
 
-			Assert.AreEqual((int) 1046, (int) result.Id);
+            // ancestor-or-self has to be self!
+			Assert.AreEqual(1173, (int)result.Id);
 		}
 
 		[Test]

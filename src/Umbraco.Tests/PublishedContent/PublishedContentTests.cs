@@ -317,24 +317,12 @@ namespace Umbraco.Tests.PublishedContent
 	    {
             var doc = GetNode(1046);
 
-	        var currentLevel = 0;
-	        var lastSortOrder = 0;
-            var levelChangesAt = new[] { 1046, 1173, 1174 };
+	        var expected = new[] {1046, 1173, 1174, 1177, 1178, 1176, 1175, 4444, 1172};
+	        var exindex = 0;
 
+            // must respect the XPath descendants-or-self axis!
             foreach (var d in doc.DescendantsOrSelf())
-            {
-                if (levelChangesAt.Contains(d.Id))
-                {
-                    Assert.Greater(d.Level, currentLevel);
-                    currentLevel = d.Level;                    
-                }
-                else
-                {
-                    Assert.AreEqual(currentLevel, d.Level);
-                    Assert.Greater(d.SortOrder, lastSortOrder);                    
-                }
-                lastSortOrder = d.SortOrder;
-            }
+                Assert.AreEqual(expected[exindex++], d.Id);
 	    }
 
 	    [Test]
@@ -521,7 +509,8 @@ namespace Umbraco.Tests.PublishedContent
 
 			Assert.IsNotNull(result);
 
-			Assert.AreEqual((int)1046, (int)result.Id);
+            // ancestor-or-self has to be self!
+            Assert.AreEqual(1173, result.Id);
 		}
 
 		[Test]
