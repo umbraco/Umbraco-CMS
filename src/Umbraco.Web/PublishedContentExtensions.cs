@@ -1,7 +1,6 @@
-// fixme - should #define - but when will it be OK?
-// axes navigation is broken in many ways... but fixes would not be 100%
-// backward compatible... so keep them for v7 or whenever appropriate.
-#undef FIX_AXES
+// ENABLE THE FIX in 7.0.0
+// TODO if all goes well, remove the obsolete code eventually
+#define FIX_AXES
 
 using System;
 using System.Collections.Generic;
