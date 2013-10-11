@@ -42,6 +42,8 @@ namespace Umbraco.Core.Models
         {
             _parentId = parentId;
             _propertyEditorAlias = propertyEditorAlias;
+
+            _additionalData = new Dictionary<string, object>();
         }
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<DataTypeDefinition, string>(x => x.Name);
