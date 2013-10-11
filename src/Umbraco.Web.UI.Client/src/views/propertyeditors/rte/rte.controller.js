@@ -47,6 +47,7 @@ angular.module("umbraco")
                             statusbar: false,
                             height: editorConfig.dimensions.height,
                             toolbar: toolbar,
+                            relative_urls: false,
                             setup: function (editor) {
 
                                 //We need to listen on multiple things here because of the nature of tinymce, it doesn't 
