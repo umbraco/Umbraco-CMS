@@ -80,25 +80,25 @@ function MediaFolderBrowserDashboardController($rootScope, $scope, assetsService
 angular.module("umbraco").controller("Umbraco.Dashboard.MediaFolderBrowserDashboardController", MediaFolderBrowserDashboardController);
 
 
-function ChangePasswordDashboardController($scope, xmlhelper, $log, userResource) {
+function ChangePasswordDashboardController($scope, xmlhelper, $log, userResource, formHelper) {
     //this is the model we will pass to the service
     $scope.profile = {};
 
-    $scope.changePassword = function (p) {
-        
-        //ensure form is dirty so the styles validate
-        $scope.passwordForm.$setDirty(true);
-        
-        if ($scope.passwordForm.$invalid) {
-            return;
-        }
+    $scope.changePassword = function(p) {
 
-        userResource.changePassword(p.oldPassword, p.newPassword).then(function () {
-            $scope.passwordForm.$setValidity(true);
-        }, function () {
-            //this only happens if there is a wrong oldPassword sent along
-            $scope.passwordForm.oldpass.$setValidity("oldPassword", false);
-        });
-    }
+        if (formHelper.submitForm({ scope: $scope })) {
+            userResource.changePassword(p.oldPassword, p.newPassword).then(function() {
+
+                formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+
+                //TODO: This is temporary - server validation will work automatically with the val-server directives.
+                $scope.passwordForm.$setValidity(true);
+            }, function () {
+                //TODO: This is temporary - server validation will work automatically with the val-server directives.
+                //this only happens if there is a wrong oldPassword sent along
+                $scope.passwordForm.oldpass.$setValidity("oldPassword", false);
+            });
+        }
+    };
 }
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupChangePasswordController", ChangePasswordDashboardController);
