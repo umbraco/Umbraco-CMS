@@ -1,9 +1,9 @@
 <form novalidate name="contentForm" 
       ng-controller="Umbraco.Editors.ContentType.EditController" 
-      ng-submit="save()">
-
-
-    <umb-panel val-show-validation>
+      ng-submit="save()"
+      val-form-manager>
+    
+    <umb-panel>
         <umb-header tabs="tabs">
             <div class="span4">
                 <umb-content-name 

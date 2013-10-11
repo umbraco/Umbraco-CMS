@@ -2,8 +2,8 @@
       ng-controller="Umbraco.Editors.Member.EditController" 
       ng-show="loaded" 
       ng-submit="save()"
-      val-status-changed>
-    <umb-panel val-show-validation>  
+      val-form-manager>
+    <umb-panel>  
         <umb-header tabs="content.tabs">
             
             <div class="span4">
@@ -14,7 +14,7 @@
 
             <div class="span8">
                 <div class="btn-toolbar pull-right umb-btn-toolbar">
-                    <div class="btn-group" ng-animate="'fade'" ng-show="status">
+                    <div class="btn-group" ng-animate="'fade'" ng-show="formStatus">
                         <p class="btn btn-link umb-status-label">{{formStatus}}</p>
                     </div>
 

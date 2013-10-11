@@ -408,8 +408,6 @@ input[type="checkbox"][readonly] {
 }
 
 
-
-
 //SD: NOTE: Had to change these to use our 'form' prefixed colors since we cannot
 // share colors with the notifications/alerts. Also had to change them so that 
 // we do not show any errors unless the containing element has the show-validation
@@ -419,23 +417,19 @@ input[type="checkbox"][readonly] {
 // --------------------------
 
 // Warning
-.show-validation .control-group.warning,
-.show-validation .umb-headline-editor-wrapper.warning {
+.show-validation.ng-invalid .control-group.warning {
   .formFieldState(@formWarningText, @formWarningText, @formWarningBackground);
 }
 // Error
-.show-validation .control-group.error,
-.show-validation .umb-headline-editor-wrapper.error {
-  .formFieldState(@formErrorText, @formErrorText, @formErrorBackground);
+.show-validation.ng-invalid .control-group.error {
+    .formFieldState(@formErrorText, @formErrorText, @formErrorBackground);
 }
 // Success
-.show-validation .control-group.success,
-.show-validation .umb-headline-editor-wrapper.success {
+.show-validation.ng-invalid .control-group.success {
   .formFieldState(@formSuccessText, @formSuccessText, @formSuccessBackground);
 }
 // Success
-.show-validation .control-group.info
-.show-validation .umb-headline-editor-wrapper.info {
+.show-validation.ng-invalid .control-group.info {
   .formFieldState(@formInfoText, @formInfoText, @formInfoBackground);
 }
 
@@ -453,6 +447,21 @@ input[type="checkbox"][readonly] {
     .box-shadow(@shadow);
   }
 }
+
+//disable the glowing border for the umb-content-name
+.show-validation .umb-headline-editor-wrapper input:focus:invalid,
+.show-validation .umb-headline-editor-wrapper textarea:focus:invalid,
+.show-validation .umb-headline-editor-wrapper select:focus:invalid {
+    border:none;
+    color:inherit;
+    border-color:inherit;
+    @shadow:inherit;
+    .box-shadow(@shadow);
+}
+
+.ng-invalid > .umb-headline-editor-wrapper h1{
+  border-bottom: 1px dashed @red; color: @red; cursor: pointer;
+};
 
 // FORM ACTIONS
 // ------------

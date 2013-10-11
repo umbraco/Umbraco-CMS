@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function DataTypeEditController($scope, $routeParams, $location, dataTypeResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper) {
+function DataTypeEditController($scope, $routeParams, $location, dataTypeResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, formHelper) {
 
     //method used to configure the pre-values when we retreive them from the server
     function createPreValueProps(preVals) {
@@ -79,38 +79,35 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
         }
     });
 
-    $scope.save = function () {
-        $scope.$broadcast("formSubmitting", { scope: $scope });
-    
-        //ensure there is a form object assigned.
-        var currentForm = angularHelper.getRequiredCurrentForm($scope);
+    $scope.save = function() {
 
-        //don't continue if the form is invalid
-        if (currentForm.$invalid) return;
+        if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+            
+            dataTypeResource.save($scope.content, $scope.preValues, $routeParams.create)
+                .then(function(data) {
 
-        serverValidationManager.reset();
-        
-        dataTypeResource.save($scope.content, $scope.preValues, $routeParams.create)
-            .then(function (data) {
-                
-                contentEditingHelper.handleSuccessfulSave({
-                    scope: $scope,
-                    newContent: data,
-                    rebindCallback: function() {
-                        createPreValueProps(data.preValues);
-                    }
+                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+
+                    contentEditingHelper.handleSuccessfulSave({
+                        scope: $scope,
+                        newContent: data,
+                        rebindCallback: function() {
+                            createPreValueProps(data.preValues);
+                        }
+                    });
+
+                }, function(err) {
+
+                    //NOTE: in the case of data type values we are setting the orig/new props 
+                    // to be the same thing since that only really matters for content/media.
+                    contentEditingHelper.handleSaveError({
+                        err: err,
+                        allNewProps: $scope.preValues,
+                        allOrigProps: $scope.preValues
+                    });
                 });
+        }
 
-            }, function (err) {
-                
-                //NOTE: in the case of data type values we are setting the orig/new props 
-                // to be the same thing since that only really matters for content/media.
-                contentEditingHelper.handleSaveError({
-                    err: err,
-                    allNewProps: $scope.preValues,
-                    allOrigProps: $scope.preValues
-                });
-        });
     };
 
 }

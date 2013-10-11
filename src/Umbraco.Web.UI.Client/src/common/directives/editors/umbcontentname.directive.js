@@ -32,22 +32,17 @@ angular.module("umbraco.directives")
 				scope.goEdit = function(){
 					scope.editMode = true;
 					$timeout(function () {					    
-					    inputElement.focus();
-					    if (inputElement.val() === "Empty...") {
-					        inputElement.select();
-					    }
+					    inputElement.focus();					    
 					}, 100);
 				};
 
 				scope.exitEdit = function(){
 					scope.editMode = false;
 
-					if (!scope.model) {
-					    //TODO: This will not solve the problem of showing validation!
-					    // if this is a duplicate name the server will return a server side valiation
-					    // message - and we still have no place for this to display.
-						scope.model = "Empty...";
-					}
+                    //SD: I've removed this since I don't agree with it - but please enable if that's what you want.
+					//if (!scope.model) {
+					//    scope.model = "Empty...";
+					//}
 				};
 			}
 	    };

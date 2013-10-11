@@ -1,5 +1,5 @@
-<form novalidate name="insertMacroForm" ng-submit="submitForm()" ng-controller="Umbraco.Dialogs.InsertMacroController">
-    <div class="umb-panel" val-show-validation>        
+<form novalidate name="insertMacroForm" ng-submit="submitForm()" ng-controller="Umbraco.Dialogs.InsertMacroController" val-form-manager>
+    <div class="umb-panel">        
 
         <div class="umb-panel-footer">
                 <div class="btn-toolbar umb-btn-toolbar pull-right">
@@ -26,7 +26,7 @@
                         <li ng-repeat="param in $parent.macroParams">
 
                             <div class="control-group umb-control-group" ng-class="{error: insertMacroForm.$invalid}">
-                                <label>{{param.name}}</label>
+                                <label class="control-label">{{param.name}}</label>
                                 <umb-editor model="param"></umb-editor>
                             </div>
                         </li>
