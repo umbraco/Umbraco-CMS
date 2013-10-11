@@ -792,7 +792,7 @@ namespace umbraco.providers.members
 
             return null;
         }
-
+        
         private static string GetMemberProperty(IMember m, string propertyAlias, bool isBool)
         {
             if (!String.IsNullOrEmpty(propertyAlias))
@@ -1081,6 +1081,7 @@ namespace umbraco.providers.members
                   DateTime.Now, DateTime.Now, DateTime.Now);
             }
         }
+
         #endregion
     }
 }
