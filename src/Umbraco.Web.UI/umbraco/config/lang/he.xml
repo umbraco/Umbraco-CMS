@@ -35,12 +35,12 @@
     <key alias="toPublish">שלח לפירסום</key>
     <key alias="translate">תרגם</key>
     <key alias="update">עדכן</key>
-    <key alias="DeleteCMSImportAction">Delete</key>
-    <key alias="ExecuteCMSImportWizardAction">Execute</key>
-    <key alias="ScheduleCMSImportWizardAction">Schedule</key>
-    <key alias="StartCMSImportWizardAction">Import Data</key>
-    <key alias="StartCMSImportChildDefinitionAction">Create child definition</key>
-    <key alias="LastRunInfoAction">Scheduled task log</key>
+    <key alias="DeleteCMSImportAction">מחק</key>
+    <key alias="ExecuteCMSImportWizardAction">בצע</key>
+    <key alias="ScheduleCMSImportWizardAction">תזמן</key>
+    <key alias="StartCMSImportWizardAction">ייבא נתונים</key>
+    <key alias="StartCMSImportChildDefinitionAction">צור הגדרות ילדים</key>
+    <key alias="LastRunInfoAction">יומן משימות מתוזמנות</key>
   </area>
   <area alias="assignDomain">
     <key alias="addNew">הוסף דומיין חדש</key>
@@ -156,7 +156,7 @@
     <key alias="linklocaltip">בעת שימוש בקישוריים פנימיים, הוסף "#" בתחילת הקישור</key>
     <key alias="linknewwindow">לפתוח בחלון חדש?</key>
     <key alias="macroContainerSettings">הגדרות מאקרו</key>
-    <key alias="macroDoesNotHaveProperties">This macro does not contain any properties you can edit</key>
+    <key alias="macroDoesNotHaveProperties">המאקרו לא מכיל מאפיינים שניתן לערוך</key>
     <key alias="paste">הדבק</key>
     <key alias="permissionsEdit">ערוך הרשאות עבור</key>
     <key alias="recycleBinDeleting">הפריטים הנמצאים בסל המיחזור נמחקים כעת, השאר חלון זה פתוח עד לגמר פעולת המחיקה.</key>
@@ -846,7 +846,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="disabled">נטרל משתמש</key>
     <key alias="documentType">שדה מסמך</key>
     <key alias="editors">עורך</key>
-    <key alias="excerptField">Excerpt field</key>
+    <key alias="excerptField">שדה תקציר</key>
     <key alias="language">שפה</key>
     <key alias="loginname">שם משתמש</key>
     <key alias="mediastartnode">התחלה בפריט המדיה</key>
