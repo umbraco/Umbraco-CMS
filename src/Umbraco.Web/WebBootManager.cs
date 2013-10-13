@@ -13,6 +13,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Media;
@@ -20,6 +21,7 @@ using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
@@ -287,10 +289,15 @@ namespace Umbraco.Web
             UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
                 PluginManager.Current.ResolveUmbracoApiControllers());
 
-            //the base creates the PropertyEditorValueConvertersResolver but we want to modify it in the web app and replace
-            //the TinyMcePropertyEditorValueConverter with the RteMacroRenderingPropertyEditorValueConverter
-            PropertyEditorValueConvertersResolver.Current.RemoveType<TinyMcePropertyEditorValueConverter>();
-            PropertyEditorValueConvertersResolver.Current.AddType<RteMacroRenderingPropertyEditorValueConverter>();
+            // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
+            // discovered when CoreBootManager configures the converters. We HAVE to remove one of them
+            // here because there cannot be two converters for one property editor - and we want the full
+            // RteMacroRenderingValueConverter that converts macros, etc. So remove TinyMceValueConverter.
+            // (the limited one, defined in Core, is there for tests)
+            PropertyValueConvertersResolver.Current.RemoveType<TinyMceValueConverter>();
+            // same for other converters
+            PropertyValueConvertersResolver.Current.RemoveType<Core.PropertyEditors.ValueConverters.TextStringValueConverter>();
+            PropertyValueConvertersResolver.Current.RemoveType<Core.PropertyEditors.ValueConverters.SimpleEditorValueConverter>();
 
             PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
                 new PublishedCache.XmlPublishedCache.PublishedContentCache(),

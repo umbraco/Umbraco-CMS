@@ -83,26 +83,35 @@ namespace Umbraco.Core
             return true;
         }
 
-        public static IEnumerable<Type> AllInterfaces(this Type target)
+        // that method is broken (will return duplicates) and useless (GetInterfaces already does the job)
+        //public static IEnumerable<Type> AllInterfaces(this Type target)
+        //{
+        //    foreach (var IF in target.GetInterfaces())
+        //    {
+        //        yield return IF;
+        //        foreach (var childIF in IF.AllInterfaces())
+        //        {
+        //            yield return childIF;
+        //        }
+        //    }
+        //}
+
+        public static IEnumerable<Type> GetBaseTypes(this Type type, bool andSelf)
         {
-            foreach (var IF in target.GetInterfaces())
-            {
-                yield return IF;
-                foreach (var childIF in IF.AllInterfaces())
-                {
-                    yield return childIF;
-                }
-            }
+            if (andSelf)
+                yield return type;
+
+            while ((type = type.BaseType) != null)
+                yield return type;
         }
 
         public static IEnumerable<MethodInfo> AllMethods(this Type target)
         {
-            var allTypes = target.AllInterfaces().ToList();
+            //var allTypes = target.AllInterfaces().ToList();
+            var allTypes = target.GetInterfaces().ToList(); // GetInterfaces is ok here
             allTypes.Add(target);
 
-            return from type in allTypes
-                   from method in type.GetMethods()
-                   select method;
+            return allTypes.SelectMany(t => t.GetMethods());
         }
  
 		/// <returns>

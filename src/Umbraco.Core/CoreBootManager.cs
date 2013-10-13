@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
@@ -12,6 +13,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Macros;
 using Umbraco.Core.Services;
@@ -125,8 +127,9 @@ namespace Umbraco.Core
             {
                 CanResolveBeforeFrozen = true
             };
-            //add custom types here that are internal
-            ApplicationEventsResolver.Current.AddType<PublishedContentHelper>();
+
+            // add custom types here that are internal, if needed
+            //ApplicationEventsResolver.Current.AddType<>();
         }
 
         /// <summary>
@@ -254,15 +257,14 @@ namespace Umbraco.Core
             //the database migration objects
             MigrationResolver.Current = new MigrationResolver(
                 () => PluginManager.Current.ResolveMigrationTypes());
-            
 
-
-			PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
+            // todo: remove once we drop IPropertyEditorValueConverter support.
+            PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
 				PluginManager.Current.ResolvePropertyEditorValueConverters());
-			//add the internal ones, these are not public currently so need to add them manually
-			PropertyEditorValueConvertersResolver.Current.AddType<DatePickerPropertyEditorValueConverter>();
-			PropertyEditorValueConvertersResolver.Current.AddType<TinyMcePropertyEditorValueConverter>();
-			PropertyEditorValueConvertersResolver.Current.AddType<YesNoPropertyEditorValueConverter>();
+
+            // initialize the new property value converters by discovering IPropertyValueConverter
+            PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
+                PluginManager.Current.ResolveTypes<IPropertyValueConverter>());
 
             // use the new DefaultShortStringHelper but sort-of remain compatible
             // - use UmbracoSettings UrlReplaceCharacters
@@ -278,6 +280,10 @@ namespace Umbraco.Core
 
 		    UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(
 		        typeof (DefaultUrlSegmentProvider));
+
+            // keep it internal for now
+		    PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
+		    //    new PublishedContentModelFactoryImpl());
 		}
 	}
 }

@@ -298,6 +298,9 @@
     <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Models\ProfileModel.cs" />
     <Compile Include="Models\LoginStatusModel.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\SimpleEditorValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\TextStringValueConverter.cs" />
+    <Compile Include="PublishedContentPropertyExtension.cs" />
     <Compile Include="Models\UmbracoProperty.cs" />
     <Compile Include="Mvc\MergeParentContextViewDataAttribute.cs" />
     <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />
@@ -344,7 +347,6 @@
     <Compile Include="Media\ImageUrlProviders\ImageUrlProvider.cs" />
     <Compile Include="Models\DynamicPublishedContent.cs" />
     <Compile Include="Models\DynamicPublishedContentList.cs" />
-    <Compile Include="Models\IOwnerCollectionAware.cs" />
     <Compile Include="Models\PartialViewMacroModel.cs" />
     <Compile Include="Models\PublishedContentBase.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
@@ -376,12 +378,14 @@
     <Compile Include="Mvc\IRenderMvcController.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\RoutesCache.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\UmbracoContextCache.cs" />
     <Compile Include="Routing\UrlProviderMode.cs" />
     <Compile Include="Search\ExamineIndexerModel.cs" />
     <Compile Include="Search\LuceneIndexerExtensions.cs" />
     <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="UI\CdfLogger.cs" />
+    <Compile Include="umbraco.presentation\CompatibilityHelper.cs" />
     <Compile Include="umbraco.presentation\LegacyClasses.cs" />
     <Compile Include="umbraco.presentation\umbraco\ActionHandlers\SimilarNodeNameComparer.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx.cs">
@@ -397,6 +401,7 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.designer.cs">
       <DependentUpon>AssignDomain2.aspx</DependentUpon>
     </Compile>
+    <Compile Include="UmbracoContextExtensions.cs" />
     <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -455,7 +460,7 @@
     <Compile Include="Mvc\SurfaceControllerFactory.cs" />
     <Compile Include="Mvc\PluginControllerMetadata.cs" />
     <Compile Include="Mvc\UmbracoPageResult.cs" />
-    <Compile Include="PropertyEditors\RteMacroRenderingPropertyEditorValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\RteMacroRenderingValueConverter.cs" />
     <Compile Include="RenderFieldCaseType.cs" />
     <Compile Include="RenderFieldEncodingType.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
@@ -633,8 +638,8 @@
     <Compile Include="Mvc\ViewDataContainerExtensions.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedContentCache.cs" />
     <Compile Include="Routing\PublishedContentNotFoundHandler.cs" />
-    <Compile Include="Models\XmlPublishedContent.cs" />
-    <Compile Include="Models\XmlPublishedContentProperty.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\XmlPublishedContent.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\XmlPublishedProperty.cs" />
     <Compile Include="Mvc\Constants.cs" />
     <Compile Include="Mvc\FilteredControllerFactoriesResolver.cs" />
     <Compile Include="Mvc\IFilteredControllerFactory.cs" />
@@ -1833,7 +1838,9 @@
     <Content Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericProperty.ascx" />
+    <Content Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericProperty.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\create\DLRScripting.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

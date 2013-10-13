@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web;
 
 namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
@@ -28,14 +29,11 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
     /// by casting the typed model to IPublishedContent, so the properties doesn't show up by default:
     /// ie. ((IPublishedContent)textpage).Url
     /// </summary>
-    public abstract class TypedModelBase : IPublishedContent
+    public abstract class TypedModelBase : PublishedContentWrapped // IPublishedContent
     {
-        private readonly IPublishedContent _publishedContent;
-
         protected TypedModelBase(IPublishedContent publishedContent)
-        {
-            _publishedContent = publishedContent;
-        }
+            : base(publishedContent)
+        { }
 
         protected readonly Func<MethodBase> Property = MethodBase.GetCurrentMethod;
         protected readonly Func<MethodBase> ContentTypeAlias = MethodBase.GetCurrentMethod;
@@ -50,7 +48,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 
         protected T Resolve<T>(string propertyTypeAlias)
         {
-            return _publishedContent.GetPropertyValue<T>(propertyTypeAlias);
+            return Content.GetPropertyValue<T>(propertyTypeAlias);
         }
 
         protected T Resolve<T>(MethodBase methodBase, T ifCannotConvert)
@@ -61,7 +59,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 
         protected T Resolve<T>(string propertyTypeAlias, T ifCannotConvert)
         {
-            return _publishedContent.GetPropertyValue<T>(propertyTypeAlias, false, ifCannotConvert);
+            return Content.GetPropertyValue<T>(propertyTypeAlias, false, ifCannotConvert);
         }
 
         protected T Resolve<T>(MethodBase methodBase, bool recursive, T ifCannotConvert)
@@ -72,7 +70,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 
         protected T Resolve<T>(string propertyTypeAlias, bool recursive, T ifCannotConvert)
         {
-            return _publishedContent.GetPropertyValue<T>(propertyTypeAlias, recursive, ifCannotConvert);
+            return Content.GetPropertyValue<T>(propertyTypeAlias, recursive, ifCannotConvert);
         }
         #endregion
 
@@ -83,7 +81,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
             if (constructorInfo == null)
                 throw new Exception("No valid constructor found");
 
-            return (T) constructorInfo.Invoke(new object[] {_publishedContent.Parent});
+            return (T) constructorInfo.Invoke(new object[] {Content.Parent});
         }
 
         protected IEnumerable<T> Children<T>(MethodBase methodBase) where T : TypedModelBase
@@ -100,7 +98,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 
             string singularizedDocTypeAlias = docTypeAlias.ToSingular();
 
-            return _publishedContent.Children.Where(x => x.DocumentTypeAlias == singularizedDocTypeAlias)
+            return Content.Children.Where(x => x.DocumentTypeAlias == singularizedDocTypeAlias)
                 .Select(x => (T)constructorInfo.Invoke(new object[] { x }));
         }
 
@@ -118,7 +116,7 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 
             string singularizedDocTypeAlias = docTypeAlias.ToSingular();
 
-            return _publishedContent.Ancestors().Where(x => x.DocumentTypeAlias == singularizedDocTypeAlias)
+            return Content.Ancestors().Where(x => x.DocumentTypeAlias == singularizedDocTypeAlias)
                 .Select(x => (T)constructorInfo.Invoke(new object[] { x }));
         }
 
@@ -136,40 +134,8 @@ namespace Umbraco.Tests.PublishedContent.StronglyTypedModels
 
             string singularizedDocTypeAlias = docTypeAlias.ToSingular();
 
-            return _publishedContent.Descendants().Where(x => x.DocumentTypeAlias == singularizedDocTypeAlias)
+            return Content.Descendants().Where(x => x.DocumentTypeAlias == singularizedDocTypeAlias)
                 .Select(x => (T)constructorInfo.Invoke(new object[] { x }));
-        }
-        #endregion
-
-        #region IPublishedContent
-        int IPublishedContent.Id { get { return _publishedContent.Id; } }
-        int IPublishedContent.TemplateId { get { return _publishedContent.TemplateId; } }
-        int IPublishedContent.SortOrder { get { return _publishedContent.SortOrder; } }
-        string IPublishedContent.Name { get { return _publishedContent.Name; } }
-        string IPublishedContent.UrlName { get { return _publishedContent.UrlName; } }
-        string IPublishedContent.DocumentTypeAlias { get { return _publishedContent.DocumentTypeAlias; } }
-        int IPublishedContent.DocumentTypeId { get { return _publishedContent.DocumentTypeId; } }
-        string IPublishedContent.WriterName { get { return _publishedContent.WriterName; } }
-        string IPublishedContent.CreatorName { get { return _publishedContent.CreatorName; } }
-        int IPublishedContent.WriterId { get { return _publishedContent.WriterId; } }
-        int IPublishedContent.CreatorId { get { return _publishedContent.CreatorId; } }
-        string IPublishedContent.Path { get { return _publishedContent.Path; } }
-        DateTime IPublishedContent.CreateDate { get { return _publishedContent.CreateDate; } }
-        DateTime IPublishedContent.UpdateDate { get { return _publishedContent.UpdateDate; } }
-        Guid IPublishedContent.Version { get { return _publishedContent.Version; } }
-        int IPublishedContent.Level { get { return _publishedContent.Level; } }
-        string IPublishedContent.Url { get { return _publishedContent.Url; } }
-        PublishedItemType IPublishedContent.ItemType { get { return _publishedContent.ItemType; } }
-        IPublishedContent IPublishedContent.Parent { get { return _publishedContent.Parent; } }
-        IEnumerable<IPublishedContent> IPublishedContent.Children { get { return _publishedContent.Children; } }
-
-        ICollection<IPublishedContentProperty> IPublishedContent.Properties { get { return _publishedContent.Properties; } }
-
-        object IPublishedContent.this[string propertyAlias] { get { return _publishedContent[propertyAlias]; } }
-
-        IPublishedContentProperty IPublishedContent.GetProperty(string alias)
-        {
-            return _publishedContent.GetProperty(alias);
         }
         #endregion
     }

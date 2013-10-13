@@ -379,7 +379,7 @@ namespace Umbraco.Web.Routing
 			get
 			{
 				if (_umbracoPage == null)
-					throw new InvalidOperationException("The umbraco page object is only available once Finalize()");
+					throw new InvalidOperationException("The UmbracoPage object has not been initialized yet.");
 
 				return _umbracoPage;
 			}

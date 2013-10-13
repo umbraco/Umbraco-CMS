@@ -76,7 +76,7 @@ namespace Umbraco.Tests.PublishedContent
             var mType = MockedContentTypes.CreateImageMediaType();
             //lets add an RTE to this
             mType.PropertyGroups.First().PropertyTypes.Add(
-                new PropertyType(new Guid(), DataTypeDatabaseType.Nvarchar)
+                new PropertyType(Guid.Parse(Constants.PropertyEditors.TinyMCEv3), DataTypeDatabaseType.Nvarchar)
                     {
                         Alias = "content", 
                         Name = "Rich Text",
@@ -90,15 +90,15 @@ namespace Umbraco.Tests.PublishedContent
             var publishedMedia = GetNode(media.Id);
 
             var propVal = publishedMedia.GetPropertyValue("content");
-            Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<IHtmlString>(propVal.GetType()));
+            Assert.IsInstanceOf<IHtmlString>(propVal);
             Assert.AreEqual("<div>This is some content</div>", propVal.ToString());
 
             var propVal2 = publishedMedia.GetPropertyValue<IHtmlString>("content");
-            Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<IHtmlString>(propVal2.GetType()));
+            Assert.IsInstanceOf<IHtmlString>(propVal2);
             Assert.AreEqual("<div>This is some content</div>", propVal2.ToString());
 
             var propVal3 = publishedMedia.GetPropertyValue("Content");
-            Assert.IsTrue(TypeHelper.IsTypeAssignableFrom<IHtmlString>(propVal3.GetType()));
+            Assert.IsInstanceOf<IHtmlString>(propVal3);
             Assert.AreEqual("<div>This is some content</div>", propVal3.ToString());
         }
 

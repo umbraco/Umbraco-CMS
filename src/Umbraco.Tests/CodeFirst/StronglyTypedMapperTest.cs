@@ -1,8 +1,12 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.CodeFirst.TestModels;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
@@ -58,9 +62,33 @@ namespace Umbraco.Tests.CodeFirst
         #region Test setup
         public override void Initialize()
         {
+            // required so we can access property.Value
+            //PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver();
+
             TestHelper.EnsureUmbracoSettingsConfig();
             
             base.Initialize();
+
+            // need to specify a custom callback for unit tests
+            // AutoPublishedContentTypes generates properties automatically
+            // when they are requested, but we must declare those that we
+            // explicitely want to be here...
+
+            var propertyTypes = new[]
+                {
+                    // AutoPublishedContentType will auto-generate other properties
+                    new PublishedPropertyType("siteDescription", 0, Guid.Empty), 
+                    new PublishedPropertyType("siteName", 0, Guid.Empty), 
+                    new PublishedPropertyType("articleContent", 0, Guid.Empty), 
+                    new PublishedPropertyType("articleAuthor", 0, Guid.Empty), 
+                    new PublishedPropertyType("articleDate", 0, Guid.Empty), 
+                    new PublishedPropertyType("pageTitle", 0, Guid.Empty), 
+                };
+            var type = new AutoPublishedContentType(0, "anything", propertyTypes);
+            PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
+            Console.WriteLine("INIT STRONG {0}",
+                PublishedContentType.Get(PublishedItemType.Content, "anything")
+                    .PropertyTypes.Count());
         }
 
         public override void TearDown()

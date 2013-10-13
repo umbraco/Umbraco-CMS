@@ -161,7 +161,7 @@ namespace Umbraco.Core
         //
         public bool IsConfigured
         {
-            // fixme - we should not do this - ok for now
+            // todo - we should not do this - ok for now
             get
             {
             	return Configured;
