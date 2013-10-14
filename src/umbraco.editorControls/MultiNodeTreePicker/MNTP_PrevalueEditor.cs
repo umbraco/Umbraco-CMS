@@ -342,7 +342,21 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                 ShowThumbnailsForMediaCheckBox.Checked = ShowThumbnailsForMedia;
 
                 StartNodeXPathExpressionTextBox.Text = StartNodeXPathExpression;
-                StartNodeXPathExpressionTypeRadioButtons.SelectedIndex = StartNodeXPathExpressionType == XPathExpressionType.Global ? 0 : 1;
+                switch (StartNodeXPathExpressionType)
+                {
+                    case XPathExpressionType.Global:
+                        StartNodeXPathExpressionTypeRadioButtons.SelectedIndex = 0;
+                        break;
+                    case XPathExpressionType.FromCurrent:
+                        StartNodeXPathExpressionTypeRadioButtons.SelectedIndex = 1;
+                        break;
+                    case XPathExpressionType.FromCurrentIncludingUnpublished:
+                        StartNodeXPathExpressionTypeRadioButtons.SelectedIndex = 2;
+                        break;
+                    default:
+                        StartNodeXPathExpressionTypeRadioButtons.SelectedIndex = 0;
+                        break;
+                }
                 StartNodeSelectionTypeRadioButtons.SelectedIndex = StartNodeSelectionType == NodeSelectionType.Picker ? 0 : 1;
 
                 switch (SelectedTreeType.ToLower())
@@ -399,6 +413,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
             StartNodeXPathExpressionTypeRadioButtons = new RadioButtonList { ID = "XPathExpressionTypeRadioButtons" };
             StartNodeXPathExpressionTypeRadioButtons.Items.Add(MNTPResources.Item_XPathExpressionType_Global);
             StartNodeXPathExpressionTypeRadioButtons.Items.Add(new ListItem(MNTPResources.Item_XPathExpressionType_CurrentNode, MNTPResources.Item_XPathExpressionType_CurrentNode.Replace(" ", "")));
+            StartNodeXPathExpressionTypeRadioButtons.Items.Add(new ListItem(MNTPResources.Item_XPathExpressionType_CurrentNodeUnPublished, MNTPResources.Item_XPathExpressionType_CurrentNodeUnPublished.Replace(" ", "")));
             StartNodeXPathExpressionTypeRadioButtons.RepeatDirection = RepeatDirection.Horizontal;
             AddPreValueRow(MNTPResources.Lbl_XPathExpressionType, MNTPResources.Desc_XPathExpressionType, StartNodeXPathExpressionTypeRadioButtons);
 

@@ -185,6 +185,17 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                 return ResourceManager.GetString("Item_XPathExpressionType_CurrentNode", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to From Current (Including from an Unpublished Node).
+        /// </summary>
+        public static string Item_XPathExpressionType_CurrentNodeUnPublished
+        {
+            get
+            {
+                return ResourceManager.GetString("Item_XPathExpressionType_CurrentNodeUnPublished", resourceCulture);
+            }
+        }
         
         /// <summary>
         ///   Looks up a localized string similar to Global.

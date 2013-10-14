@@ -108,6 +108,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                                     //we'll just use the first node found (THERE SHOULD ONLY BE ONE)
                                     m_DefinedStartNodeDoc = nodes.Any() ? new Document(nodes.First().Id) : null;
                                     break;
+                                case XPathExpressionType.FromCurrentIncludingUnpublished:
                                 case XPathExpressionType.FromCurrent:
                                     //if it's a relative query, then it cannot start with //!
                                     if (xpath.StartsWith("/"))
@@ -123,7 +124,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
                                     // Load live XML if possible, generate preview XML if not
                                     XPathNodeIterator currNode;
                                     var currDoc = new Document(currId);
-                                    if (!currDoc.HasPublishedVersion())
+                                    if (!currDoc.HasPublishedVersion() && expressionType == XPathExpressionType.FromCurrentIncludingUnpublished)
                                     {
                                         currNode = GetPreviewXmlNodeByID(currId, currDoc);
                                     }

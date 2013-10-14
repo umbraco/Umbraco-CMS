@@ -13,6 +13,11 @@
 		/// <summary>
 		/// 
 		/// </summary>
-		FromCurrent
+		FromCurrent,
+
+		/// <summary>
+		/// 
+		/// </summary>
+		FromCurrentIncludingUnpublished
 	}
 }
