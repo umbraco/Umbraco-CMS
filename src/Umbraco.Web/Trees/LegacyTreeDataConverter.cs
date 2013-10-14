@@ -312,7 +312,20 @@ namespace Umbraco.Web.Trees
             return Attempt<LegacyUrlAction>.Fail();
         }
 
-        internal static TreeNode ConvertFromLegacy(string parentId, XmlTreeNode xmlTreeNode, UrlHelper urlHelper, string currentSection, bool isRoot = false)
+        /// <summary>
+        /// Converts a legacy XmlTreeNode to a new TreeNode
+        /// </summary>
+        /// <param name="parentId"></param>
+        /// <param name="xmlTreeNode"></param>
+        /// <param name="urlHelper"></param>
+        /// <param name="currentSection"></param>
+        /// <param name="currentQueryStrings">
+        /// The current query strings for the request - this is used to append the query strings to the menu URL of the item being rendered since the menu
+        /// actually belongs to this same node (request) the query strings need to exist so the menu can be rendered in some cases.
+        /// </param>
+        /// <param name="isRoot"></param>
+        /// <returns></returns>
+        internal static TreeNode ConvertFromLegacy(string parentId, XmlTreeNode xmlTreeNode, UrlHelper urlHelper, string currentSection, FormDataCollection currentQueryStrings, bool isRoot = false)
         {
             //  /umbraco/tree.aspx?rnd=d0d0ff11a1c347dabfaa0fc75effcc2a&id=1046&treeType=content&contextMenu=false&isDialog=false
 
@@ -328,14 +341,28 @@ namespace Umbraco.Web.Trees
 
             //for the menu source we need to detect if this is a root node since we'll need to set the parentId and id to -1
             // for which we'll handle correctly on the server side.            
-            var menuSource = urlHelper.GetUmbracoApiService<LegacyTreeController>("GetMenu");
-            menuSource = menuSource.AppendQueryStringToUrl(new[]
+            //if there are no menu items, then this will be empty
+            var menuSource = "";
+            if (xmlTreeNode.Menu != null && xmlTreeNode.Menu.Any())
+            {
+                menuSource = urlHelper.GetUmbracoApiService<LegacyTreeController>("GetMenu");
+                //these are the absolute required query strings
+                var menuQueryStrings = new Dictionary<string, object>
+                    {
+                        {"id", (isRoot ? "-1" : xmlTreeNode.NodeID)},
+                        {"treeType", xmlTreeNode.TreeType},
+                        {"parentId", (isRoot ? "-1" : parentId)},
+                        {"section", currentSection}
+                    };
+                //append the extra ones on this request
+                foreach (var i in currentQueryStrings.Where(x => menuQueryStrings.Keys.Contains(x.Key) == false))
                 {
-                    "id=" + (isRoot ? "-1" : xmlTreeNode.NodeID),
-                    "treeType=" + xmlTreeNode.TreeType,
-                    "parentId=" + (isRoot ? "-1" : parentId),
-                    "section=" + currentSection
-                });
+                    menuQueryStrings.Add(i.Key, i.Value);
+                }
+                
+                menuSource = menuSource.AppendQueryStringToUrl(menuQueryStrings.ToQueryString());    
+            }
+            
 
             //TODO: Might need to add stuff to additional attributes
 
@@ -362,7 +389,7 @@ namespace Umbraco.Web.Trees
             return node;
         }
 
-        internal static TreeNodeCollection ConvertFromLegacy(string parentId, XmlTree xmlTree, UrlHelper urlHelper, string currentSection)
+        internal static TreeNodeCollection ConvertFromLegacy(string parentId, XmlTree xmlTree, UrlHelper urlHelper, string currentSection, FormDataCollection currentQueryStrings)
         {
             //TODO: Once we get the editor URL stuff working we'll need to figure out how to convert 
             // that over to use the old school ui.xml stuff for these old trees and however the old menu items worked.
@@ -370,7 +397,7 @@ namespace Umbraco.Web.Trees
             var collection = new TreeNodeCollection();
             foreach (var x in xmlTree.treeCollection)
             {
-                collection.Add(ConvertFromLegacy(parentId, x, urlHelper, currentSection));
+                collection.Add(ConvertFromLegacy(parentId, x, urlHelper, currentSection, currentQueryStrings));
             }
             return collection;
         }

@@ -10,8 +10,8 @@ function legacyResource($q, $http, umbRequestHelper) {
         /** Loads in the data to display the section list */
         deleteItem: function (args) {
             
-            if (!args.nodeId || !args.nodeType) {
-                throw "The args parameter is not formatted correct, it requires properties: nodeId, nodeType";
+            if (!args.nodeId || !args.nodeType || !args.alias) {
+                throw "The args parameter is not formatted correct, it requires properties: nodeId, nodeType, alias";
             } 
 
             return umbRequestHelper.resourcePromise(
@@ -19,7 +19,7 @@ function legacyResource($q, $http, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "legacyApiBaseUrl",
                         "DeleteLegacyItem",
-                        [{ nodeId: args.nodeId }, { nodeType: args.nodeType }])),
+                        [{ nodeId: args.nodeId }, { nodeType: args.nodeType }, { alias: args.alias }])),
                 'Failed to delete item ' + args.nodeId);
 
         }

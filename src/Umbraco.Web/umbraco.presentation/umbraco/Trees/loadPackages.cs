@@ -25,10 +25,10 @@ namespace umbraco
             
         }
         
-        private int m_id;
-        private string m_app;
-        private string m_packageType = "";
-        private string m_repoGuid = "";
+        private int _id;
+        private string _app;
+        private string _packageType = "";
+        private string _repoGuid = "";
 
         public override void RenderJS(ref StringBuilder Javascript)
         {
@@ -42,12 +42,17 @@ namespace umbraco
             ");
         }
 
+        protected override void CreateAllowedActions(ref List<IAction> actions)
+        {
+            actions.Clear();
+        }
+
         public override void Render(ref XmlTree tree)
         {
 
-            m_packageType = HttpContext.Current.Request.QueryString["packageType"];
+            _packageType = HttpContext.Current.Request.QueryString["packageType"];
            
-            switch (m_packageType)
+            switch (_packageType)
             {
                 case "installed":
                     Version v;
@@ -66,13 +71,12 @@ namespace umbraco
                         xNode.Icon = "icon-box";
                         xNode.OpenIcon = "icon-box";
                         xNode.NodeType = "createdPackageInstance";
-                        xNode.Menu = null;
                         tree.Add(xNode);
                     }
                     break;
 
                 case "created":
-                    foreach (cms.businesslogic.packager.CreatedPackage p in cms.businesslogic.packager.CreatedPackage.GetAllCreatedPackages())
+                    foreach (CreatedPackage p in CreatedPackage.GetAllCreatedPackages())
                     {
 
                         XmlTreeNode xNode = XmlTreeNode.Create(this);
@@ -82,8 +86,7 @@ namespace umbraco
                         xNode.Icon = "icon-box";
                         xNode.OpenIcon = "icon-box";
                         xNode.NodeType = "createdPackageInstance";
-//                        xNode.Menu.Add( umbraco.BusinessLogic.Actions.ActionDelete.Instance );
-
+                        xNode.Menu.Add(umbraco.BusinessLogic.Actions.ActionDelete.Instance);
                         tree.Add(xNode);
                     }
                     break;
@@ -100,28 +103,16 @@ namespace umbraco
                         xNode.OpenIcon = "icon-server-alt";
                         xNode.NodeType = "packagesRepo" + repo.Guid;
                         xNode.Menu.Add( umbraco.BusinessLogic.Actions.ActionRefresh.Instance );
-                        xNode.Source = "tree.aspx?app=" + this.m_app + "&id=" + this.m_id + "&treeType=packagerPackages&packageType=repository&repoGuid=" + repo.Guid + "&rnd=" + Guid.NewGuid();
+                        xNode.Source = "tree.aspx?app=" + this._app + "&id=" + this._id + "&treeType=packagerPackages&packageType=repository&repoGuid=" + repo.Guid + "&rnd=" + Guid.NewGuid();
                         tree.Add(xNode);
-                        /*
-                        XmlElement catElement = Tree.CreateElement("tree");
-                        catElement.SetAttribute("text", repo.Name);
-                        catElement.SetAttribute("menu", "L");
-
-                        catElement.SetAttribute("icon", "icon-server-alt");
-                        catElement.SetAttribute("openIcon", "icon-server-alt");
-
-                        catElement.SetAttribute("nodeType", "packagesRepo" + repo.Guid);
-                        catElement.SetAttribute("src", "tree.aspx?app=" + this.m_app + "&id=" + this.m_id + "&treeType=packagerPackages&packageType=repository&repoGuid=" + repo.Guid + "&rnd=" + Guid.NewGuid());
-                        catElement.SetAttribute("action", "javascript:openPackageCategory('BrowseRepository.aspx?repoGuid=" + repo.Guid + "');");
-                        root.AppendChild(catElement);
-                         * */
+                        
                     }
 
                     break;
                 case "repository":
 
-                    m_repoGuid = HttpContext.Current.Request.QueryString["repoGuid"];
-                    var currentRepo = cms.businesslogic.packager.repositories.Repository.getByGuid(m_repoGuid);
+                    _repoGuid = HttpContext.Current.Request.QueryString["repoGuid"];
+                    var currentRepo = cms.businesslogic.packager.repositories.Repository.getByGuid(_repoGuid);
                     if (currentRepo != null)
                     {
 
@@ -145,121 +136,4 @@ namespace umbraco
         
     }
 
-    public class _loadPackages : ITree
-    {
-
-        private int m_id;
-        private string m_app;
-        private string m_packageType = "";
-        private string m_repoGuid = "";
-
-        int ITree.id
-        {
-            set { m_id = value; }
-        }
-
-        string ITree.app
-        {
-            set { m_app = value; }
-        }
-
-
-        void ITree.Render(ref XmlDocument Tree)
-        {
-            m_packageType = HttpContext.Current.Request.QueryString["packageType"];
-            XmlNode root = Tree.DocumentElement;
-
-            switch (m_packageType)
-            {
-                case "installed":
-                    foreach (cms.businesslogic.packager.InstalledPackage p in cms.businesslogic.packager.InstalledPackage.GetAllInstalledPackages())
-                    {
-                        XmlElement treeElement = Tree.CreateElement("tree");
-                        treeElement.SetAttribute("nodeID", "package_" + p.Data.Id.ToString());
-                        treeElement.SetAttribute("text", p.Data.Name);
-                        treeElement.SetAttribute("action", "javascript:openInstalledPackage('" + p.Data.Id.ToString() + "');");
-                        treeElement.SetAttribute("menu", "");
-                        //treeElement.SetAttribute("src", "");
-                        treeElement.SetAttribute("icon", "icon-box");
-                        treeElement.SetAttribute("openIcon", "icon-box");
-                        treeElement.SetAttribute("nodeType", "createdPackageInstance");
-                        root.AppendChild(treeElement);
-                    }
-                    break;
-
-                case "created":
-                    foreach (cms.businesslogic.packager.CreatedPackage p in cms.businesslogic.packager.CreatedPackage.GetAllCreatedPackages())
-                    {
-                        XmlElement treeElement = Tree.CreateElement("tree");
-                        treeElement.SetAttribute("nodeID", "package_" + p.Data.Id.ToString());
-                        treeElement.SetAttribute("text", p.Data.Name);
-                        treeElement.SetAttribute("action", "javascript:openCreatedPackage('" + p.Data.Id.ToString() + "');");
-                        treeElement.SetAttribute("menu", "D");
-                        treeElement.SetAttribute("src", "");
-                        treeElement.SetAttribute("icon", "icon-box");
-                        treeElement.SetAttribute("openIcon", "icon-box");
-                        treeElement.SetAttribute("nodeType", "createdPackageInstance");
-                        root.AppendChild(treeElement);
-                    }
-                    break;
-
-                case "repositories":
-                    List<cms.businesslogic.packager.repositories.Repository> repos = cms.businesslogic.packager.repositories.Repository.getAll();
-
-                    foreach (cms.businesslogic.packager.repositories.Repository repo in repos)
-                    {
-                        XmlElement catElement = Tree.CreateElement("tree");
-                        catElement.SetAttribute("text", repo.Name);
-                        catElement.SetAttribute("menu", "L");
-
-                        catElement.SetAttribute("icon", "icon-server-alt");
-                        catElement.SetAttribute("openIcon", "icon-server-alt");
-
-                        catElement.SetAttribute("nodeType", "packagesRepo" + repo.Guid);
-                        catElement.SetAttribute("src", "tree.aspx?app=" + this.m_app + "&id=" + this.m_id + "&treeType=packagerPackages&packageType=repository&repoGuid=" + repo.Guid + "&rnd=" + Guid.NewGuid());
-                        catElement.SetAttribute("action", "javascript:openPackageCategory('BrowseRepository.aspx?repoGuid=" + repo.Guid + "');");
-                        root.AppendChild(catElement);
-                    }
-
-                    break;
-                case "repository":
-
-                    m_repoGuid = HttpContext.Current.Request.QueryString["repoGuid"];
-                    var currentRepo = cms.businesslogic.packager.repositories.Repository.getByGuid(m_repoGuid);
-                    if (currentRepo != null)
-                    {
-
-                        foreach (cms.businesslogic.packager.repositories.Category cat in currentRepo.Webservice.Categories(currentRepo.Guid))
-                        {
-                            XmlElement catElement = Tree.CreateElement("tree");
-                            catElement.SetAttribute("text", cat.Text);
-                            //catElement.SetAttribute("menu", "");
-                            catElement.SetAttribute("icon", "icon-folder");
-                            catElement.SetAttribute("openIcon", "icon-folder");
-                            catElement.SetAttribute("nodeType", "packagesCategory" + cat.Id);
-                            catElement.SetAttribute("action", "javascript:openPackageCategory('BrowseRepository.aspx?category=" + cat.Id + "&repoGuid=" + currentRepo.Guid + "');");
-                            root.AppendChild(catElement);
-                        }
-                    }
-                    break;
-            }
-
-            //SD: Commented this out... not sure why it was here??
-            //throw new Exception("The method or operation is not implemented.");
-        }
-
-        public void RenderJS(ref System.Text.StringBuilder Javascript)
-        {
-            Javascript.Append(@"
-            function openCreatedPackage(id) {
-	            UmbClientMgr.contentFrame('developer/packages/editPackage.aspx?id=' + id);
-            }
-            function openInstalledPackage(id) {
-	            UmbClientMgr.contentFrame('developer/packages/installedPackage.aspx?id=' + id);
-            }
-            ");
-        }
-
-    }
-    
 }

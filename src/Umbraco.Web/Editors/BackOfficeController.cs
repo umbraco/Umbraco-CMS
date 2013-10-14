@@ -101,7 +101,7 @@ namespace Umbraco.Web.Editors
                                 },
                                 {
                                     "legacyApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<LegacyController>(
-                                        controller => controller.DeleteLegacyItem(null, null))
+                                        controller => controller.DeleteLegacyItem(null, null, null))
                                 },
                                 {
                                     "entityApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<EntityController>(

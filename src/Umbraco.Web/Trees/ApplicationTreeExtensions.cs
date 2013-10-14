@@ -82,7 +82,7 @@ namespace Umbraco.Web.Trees
                 return Attempt<TreeNode>.Fail(xmlTreeNodeAttempt.Exception);
             }
             return Attempt.Succeed(
-                LegacyTreeDataConverter.ConvertFromLegacy(xmlTreeNodeAttempt.Result.NodeID, xmlTreeNodeAttempt.Result, urlHelper, currentSection, isRoot: true));
+                LegacyTreeDataConverter.ConvertFromLegacy(xmlTreeNodeAttempt.Result.NodeID, xmlTreeNodeAttempt.Result, urlHelper, currentSection, formCollection, isRoot: true));
         }
 
         internal static Attempt<XmlTreeNode> TryGetRootXmlNodeFromLegacyTree(this ApplicationTree appTree, FormDataCollection formCollection, UrlHelper urlHelper)
@@ -115,7 +115,7 @@ namespace Umbraco.Web.Trees
             {
                 return Attempt<TreeNodeCollection>.Fail(xTreeAttempt.Exception);
             }
-            return Attempt.Succeed(LegacyTreeDataConverter.ConvertFromLegacy(id, xTreeAttempt.Result, urlHelper, currentSection));
+            return Attempt.Succeed(LegacyTreeDataConverter.ConvertFromLegacy(id, xTreeAttempt.Result, urlHelper, currentSection, formCollection));
         }
 
         internal static Attempt<MenuItemCollection> TryGetMenuFromLegacyTreeRootNode(this ApplicationTree appTree, FormDataCollection formCollection, UrlHelper urlHelper)

@@ -15,7 +15,8 @@ function LegacyDeleteController($scope, legacyResource, treeService, navigationS
 
         legacyResource.deleteItem({            
             nodeId: $scope.currentNode.id,
-            nodeType: $scope.currentNode.nodetype
+            nodeType: $scope.currentNode.nodetype,
+            alias: $scope.currentNode.name,
         }).then(function () {
             $scope.currentNode.loading = false;
             //TODO: Need to sync tree, etc...

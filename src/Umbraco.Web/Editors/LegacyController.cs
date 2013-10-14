@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
@@ -40,26 +41,37 @@ namespace Umbraco.Web.Editors
         /// has functionality included in the ui.xml structure.
         /// </summary>
         /// <returns></returns>
-        public HttpResponseMessage DeleteLegacyItem(string nodeId, string nodeType)
+        public HttpResponseMessage DeleteLegacyItem(string nodeId, string alias, string nodeType)
         {
-            //TODO: Detect recycle bin node ids and delete permanently!
+            //U4-2686 - alias is html encoded, make sure to decode 
+            alias = HttpUtility.HtmlDecode(alias);
 
             //In order to process this request we MUST have an HttpContext available
             var httpContextAttempt = TryGetHttpContext();
             if (httpContextAttempt.Success)
             {
+                //this is a hack check based on legacy
+                if (nodeType == "memberGroup")
+                {
+                    LegacyDialogHandler.Delete(httpContextAttempt.Result, UmbracoUser, nodeType, 0, alias);
+                    return Request.CreateResponse(HttpStatusCode.OK);
+                }
+
                 int id;
                 if (int.TryParse(nodeId, out id))
                 {
-                    LegacyDialogHandler.Delete(httpContextAttempt.Result, UmbracoUser, nodeType, id, "");
-                    return new HttpResponseMessage(HttpStatusCode.OK);
+                    LegacyDialogHandler.Delete(httpContextAttempt.Result, UmbracoUser, nodeType, id, alias);
+                    return Request.CreateResponse(HttpStatusCode.OK);
                 }
-                //We must have an integer id for this to work
-                throw new HttpResponseException(HttpStatusCode.PreconditionFailed);
-            }
-            //We must have an HttpContext available for this to work.
-            throw new HttpResponseException(HttpStatusCode.PreconditionFailed);
 
+                //the way this legacy stuff used to work is that if the node id didn't parse, we would     
+                //pass the node id as the alias with an id of zero = sure whatevs.
+                LegacyDialogHandler.Delete(httpContextAttempt.Result, UmbracoUser, nodeType, 0, nodeId);
+                return Request.CreateResponse(HttpStatusCode.OK);
+            }
+
+            //We must have an HttpContext available for this to work.
+            return Request.CreateErrorResponse(HttpStatusCode.InternalServerError, new InvalidOperationException("No HttpContext found in the current request"));
         }
 
     }
