@@ -169,11 +169,11 @@ namespace Umbraco.Web.Models.Trees
                 if (attribute.MethodName.IsNullOrWhiteSpace())
                 {
                     //if no method name is supplied we will assume that the menu action is the type name of the current menu class
-                    menuItem.AdditionalData.Add("jsAction", string.Format("{0}.{1}", attribute.ServiceName, this.GetType().Name));
+                    menuItem.AdditionalData.Add(MenuItemExtensions.JsActionKey, string.Format("{0}.{1}", attribute.ServiceName, this.GetType().Name));
                 }
                 else
                 {
-                    menuItem.AdditionalData.Add("jsAction", string.Format("{0}.{1}", attribute.ServiceName, attribute.MethodName));
+                    menuItem.AdditionalData.Add(MenuItemExtensions.JsActionKey, string.Format("{0}.{1}", attribute.ServiceName, attribute.MethodName));
                 }
             }
         }

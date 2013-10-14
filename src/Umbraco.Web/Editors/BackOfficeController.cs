@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -197,10 +198,75 @@ namespace Umbraco.Web.Editors
             var javascript = new StringBuilder();
             javascript.AppendLine(LegacyTreeJavascript.GetLegacyTreeJavascript());
             javascript.AppendLine(LegacyTreeJavascript.GetLegacyIActionJavascript());
+            //add all of the menu blocks
+            foreach (var file in GetLegacyActionJs(LegacyJsActionType.JsBlock))
+            {
+                javascript.AppendLine(file);
+            }
             return JavaScript(javascript.ToString());
         }
 
+        /// <summary>
+        /// Renders out all JavaScript blocks that have bee declared in IActions
+        /// </summary>
+        private IEnumerable<string> GetLegacyActionJs(LegacyJsActionType type)
+        {
+            var blockList = new List<string>();
+            var urlList = new List<string>();
+            foreach (var jsFile in global::umbraco.BusinessLogic.Actions.Action.GetJavaScriptFileReferences())
+            {
+                //validate that this is a url, if it is not, we'll assume that it is a text block and render it as a text
+                //block instead.
+                var isValid = true;
+                
+                if (Uri.IsWellFormedUriString(jsFile, UriKind.RelativeOrAbsolute))
+                {
+                    //ok it validates, but so does alert('hello'); ! so we need to do more checks
+
+                    //here are the valid chars in a url without escaping
+                    if (Regex.IsMatch(jsFile, @"[^a-zA-Z0-9-._~:/?#\[\]@!$&'\(\)*\+,%;=]"))
+                        isValid = false;
+
+                    //we'll have to be smarter and just check for certain js patterns now too!
+                    var jsPatterns = new string[] {@"\+\s*\=", @"\);", @"function\s*\(", @"!=", @"=="};
+                    if (jsPatterns.Any(p => Regex.IsMatch(jsFile, p)))
+                    {
+                        isValid = false;
+                    }
+                    if (isValid)
+                    {
+                        //it is a valid URL add to Url list
+                        urlList.Add(jsFile);
+                    }
+                }
+                else
+                {
+                    isValid = false;
+                }
+
+                if (isValid == false)
+                {
+                    //it isn't a valid URL, must be a js block
+                    blockList.Add(jsFile);                     
+                }
+            }
+
+            switch (type)
+            {
+                case LegacyJsActionType.JsBlock:
+                    return blockList;
+                case LegacyJsActionType.JsUrl:
+                    return urlList;
+            }
+
+            return blockList;
+        }
         
+        private enum LegacyJsActionType
+        {
+            JsBlock,
+            JsUrl
+        }
 
     }
 }

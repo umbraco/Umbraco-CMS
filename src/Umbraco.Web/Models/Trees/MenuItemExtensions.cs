@@ -29,6 +29,21 @@ namespace Umbraco.Web.Models.Trees
         internal const string ActionViewKey = "actionView";
 
         /// <summary>
+        /// Used to specify the js method to execute for the menu item 
+        /// </summary>
+        internal const string JsActionKey = "jsAction";
+
+        /// <summary>
+        /// Adds the required meta data to the menu item so that angular knows to attempt to call the Js method.
+        /// </summary>
+        /// <param name="menuItem"></param>
+        /// <param name="jsToExecute"></param>
+        public static void LaunchLegacyJs(this MenuItem menuItem, string jsToExecute)
+        {
+            menuItem.SetJsAction(jsToExecute);
+        }
+
+        /// <summary>
         /// Sets the menu item to display a dialog based on an angular view path
         /// </summary>
         /// <param name="menuItem"></param>
@@ -50,6 +65,11 @@ namespace Umbraco.Web.Models.Trees
         {
             menuItem.SetDialogTitle(dialogTitle);
             menuItem.SetActionUrl(url);
+        }
+
+        private static void SetJsAction(this MenuItem menuItem, string jsToExecute)
+        {
+            menuItem.AdditionalData[JsActionKey] = jsToExecute;
         }
 
         /// <summary>

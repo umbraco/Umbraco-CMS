@@ -157,9 +157,10 @@ namespace Umbraco.Web.Trees
                         .Try(GetUrlAndTitleFromLegacyAction(currentAction, xmlTreeNode.NodeID, xmlTreeNode.NodeType, xmlTreeNode.Text, currentSection),
                              action => menuItem.LaunchDialogUrl(action.Url, action.DialogTitle))
                         .OnFailure(() => GetLegacyConfirmView(currentAction, currentSection),
-                                  view => menuItem.LaunchDialogView(
-                                      view, 
-                                      ui.GetText("defaultdialogs", "confirmdelete") + " '" + xmlTreeNode.Text + "' ?"));
+                                   view => menuItem.LaunchDialogView(
+                                       view,
+                                       ui.GetText("defaultdialogs", "confirmdelete") + " '" + xmlTreeNode.Text + "' ?"))
+                        .OnFailure(() => Attempt.Succeed(true), b => menuItem.LaunchLegacyJs(menuItem.Action.JsFunctionName));
                     
                     numAdded++;
                 }

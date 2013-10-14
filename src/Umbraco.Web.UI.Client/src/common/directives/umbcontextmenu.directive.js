@@ -15,25 +15,31 @@ angular.module("umbraco.directives")
                     //we'll try to get the jsAction from the injector
                     var menuAction = action.metaData["jsAction"].split('.');
                     if (menuAction.length !== 2) {
-                        throw "The jsAction assigned to a menu action must have two parts delimited by a '.' ";
-                    }
 
-                    var service = $injector.get(menuAction[0]);
-                    if (!service) {
-                        throw "The angular service " + menuAction[0] + " could not be found";
-                    }
+                        //if it is not two parts long then this most likely means that it's a legacy action                         
+                        var js = action.metaData["jsAction"];
+                        //there's not really a different way to acheive this except for eval 
+                        eval(js);
 
-                    var method = service[menuAction[1]];
-                    
-                    if (!method) {
-                        throw "The method " + menuAction[1] + " on the angular service " + menuAction[0] + " could not be found";
                     }
+                    else {
+                        var service = $injector.get(menuAction[0]);
+                        if (!service) {
+                            throw "The angular service " + menuAction[0] + " could not be found";
+                        }
 
-                    method.apply(this, [{
-                        treeNode: currentNode,
-                        action: action,
-                        section: currentSection
-                    }]);
+                        var method = service[menuAction[1]];
+
+                        if (!method) {
+                            throw "The method " + menuAction[1] + " on the angular service " + menuAction[0] + " could not be found";
+                        }
+
+                        method.apply(this, [{
+                            treeNode: currentNode,
+                            action: action,
+                            section: currentSection
+                        }]);
+                    }
                 }
                 else {
                     //by default we launch the dialog

@@ -204,7 +204,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 
                 //get our angular navigation service
                 var injector = getRootInjector();
-                var dialogService = injector.get("dialogService");
+                var dialogService = injector.get("dialogService"); 
 
                 var self = this;
 
@@ -219,12 +219,14 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 //add the callback to the jquery data for the modal so we can call it on close to support the legacy way dialogs worked.
                 dialog.element.data("modalCb", onCloseCallback);
                 //add the close triggers
-                for (var i = 0; i < closeTriggers.length; i++) {
-                    var e = dialog.find(closeTriggers[i]);
-                    if (e.length > 0) {
-                        e.click(function() {
-                            self.closeModalWindow();
-                        });
+                if (angular.isArray(closeTriggers)) {
+                    for (var i = 0; i < closeTriggers.length; i++) {
+                        var e = dialog.find(closeTriggers[i]);
+                        if (e.length > 0) {
+                            e.click(function () {
+                                self.closeModalWindow();
+                            });
+                        }
                     }
                 }
 
