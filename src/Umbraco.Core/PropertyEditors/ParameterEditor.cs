@@ -18,6 +18,7 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         public ParameterEditor()             
         {
+            Configuration = new Dictionary<string, object>();
             //assign properties based on the attribute if it is found
             _attribute = GetType().GetCustomAttribute<ParameterEditorAttribute>(false);
             if (_attribute != null)
@@ -50,7 +51,7 @@ namespace Umbraco.Core.PropertyEditors
         /// Allows a parameter editor to be re-used based on the configuration specified.
         /// </summary>
         [JsonProperty("config")]
-        public virtual IDictionary<string, object> Configuration { get; set; }
+        public IDictionary<string, object> Configuration { get; set; }
 
         [JsonIgnore]
         public ParameterValueEditor ValueEditor
