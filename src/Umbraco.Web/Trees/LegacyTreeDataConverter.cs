@@ -153,6 +153,7 @@ namespace Umbraco.Web.Trees
 
                     //First try to get a URL/title from the legacy action,
                     // if that doesn't work, try to get the legacy confirm view
+                    // if that doesn't work and there's no jsAction in there already then add the legacy js method call
                     Attempt
                         .Try(GetUrlAndTitleFromLegacyAction(currentAction, xmlTreeNode.NodeID, xmlTreeNode.NodeType, xmlTreeNode.Text, currentSection),
                              action => menuItem.LaunchDialogUrl(action.Url, action.DialogTitle))
@@ -160,7 +161,10 @@ namespace Umbraco.Web.Trees
                                    view => menuItem.LaunchDialogView(
                                        view,
                                        ui.GetText("defaultdialogs", "confirmdelete") + " '" + xmlTreeNode.Text + "' ?"))
-                        .OnFailure(() => Attempt.Succeed(true), b => menuItem.LaunchLegacyJs(menuItem.Action.JsFunctionName));
+                        .OnFailure(() => menuItem.AdditionalData.ContainsKey(MenuItemExtensions.JsActionKey)
+                                             ? Attempt.Fail(false)
+                                             : Attempt.Succeed(true),
+                                   b => menuItem.LaunchLegacyJs(menuItem.Action.JsFunctionName));
                     
                     numAdded++;
                 }

@@ -204,17 +204,38 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 
                 //get our angular navigation service
                 var injector = getRootInjector();
+                var navService = injector.get("navigationService");
                 var dialogService = injector.get("dialogService"); 
 
                 var self = this;
 
-                var dialog = dialogService.open({
-                    template: url,
-                    width: width,
-                    height: height,
-                    iframe: true,
-                    show: true
-                });
+                //based on what state the nav ui is in, depends on how we are going to launch a model / dialog. A modal
+                // will show up on the right hand side and a dialog will show up as if it is in the menu.
+                // with the legacy API we cannot know what is expected so we can only check if the menu is active, if it is
+                // we'll launch a dialog, otherwise a modal.
+                var dialog;
+                if (navService.ui.currentMode === "menu") {
+                    dialog = navService.showDialog({
+                        //create a 'fake' action to passin with the specified actionUrl since it needs to load into an iframe
+                        action: {
+                            name: name,
+                            metaData: {
+                                actionUrl: url
+                            }
+                        },
+                        node: {}
+                    });
+                }
+                else {
+                    dialog = dialogService.open({
+                        template: url,
+                        width: width,
+                        height: height,
+                        iframe: true,
+                        show: true
+                    });
+                }
+                
 
                 //add the callback to the jquery data for the modal so we can call it on close to support the legacy way dialogs worked.
                 dialog.element.data("modalCb", onCloseCallback);

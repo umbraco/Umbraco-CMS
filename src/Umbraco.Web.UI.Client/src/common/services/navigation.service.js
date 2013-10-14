@@ -18,15 +18,32 @@
 
 angular.module('umbraco.services')
 .factory('navigationService', function ($rootScope, $routeParams, $log, $location, $q, $timeout, dialogService, treeService, notificationsService) {
-
-
-    //TODO: would be nicer to set all of the options here first instead of implicitly below!
-    var ui = {};
+    
+    //Define all sub-properties for the UI object here
+    var ui = {
+        showNavigation: false,
+        showContextMenu: false,
+        showContextMenuDialog: false,
+        stickyNavigation: false,
+        showTray: false,
+        showSearchResults: false,
+        currentSection: undefined,
+        currentPath: undefined,
+        currentTree: undefined,
+        currentNode: undefined,
+        actions: undefined,
+        currentDialog: undefined,
+        dialogTitle: undefined,
+        //a string/name reference for the currently set ui mode
+        currentMode: "default"
+    };
+    
     $rootScope.$on("closeDialogs", function(){});
 
     function setMode(mode) {
         switch (mode) {
             case 'tree':
+                ui.currentMode = "tree";
                 ui.showNavigation = true;
                 ui.showContextMenu = false;
                 ui.showContextMenuDialog = false;
@@ -37,18 +54,21 @@ angular.module('umbraco.services')
                 //$("#search-form input").focus();    
                 break;
             case 'menu':
+                ui.currentMode = "menu";
                 ui.showNavigation = true;
                 ui.showContextMenu = true;
                 ui.showContextMenuDialog = false;
                 ui.stickyNavigation = true;
                 break;
             case 'dialog':
+                ui.currentMode = "dialog";
                 ui.stickyNavigation = true;
                 ui.showNavigation = true;
                 ui.showContextMenu = false;
                 ui.showContextMenuDialog = true;
                 break;
             case 'search':
+                ui.currentMode = "search";
                 ui.stickyNavigation = false;
                 ui.showNavigation = true;
                 ui.showContextMenu = false;
@@ -61,6 +81,7 @@ angular.module('umbraco.services')
                 
                 break;
             default:
+                ui.currentMode = "default";
                 ui.showNavigation = false;
                 ui.showContextMenu = false;
                 ui.showContextMenuDialog = false;
@@ -73,7 +94,6 @@ angular.module('umbraco.services')
 
     var service = {
         active: false,
-        mode: "default",
         touchDevice: false,
         userDialog: undefined,
         ui: ui,
