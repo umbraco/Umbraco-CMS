@@ -311,6 +311,7 @@
     <Compile Include="Editors\MacroController.cs" />
     <Compile Include="Editors\MembershipProviderValidationFilterAttribute.cs" />
     <Compile Include="Editors\MemberTypeController.cs" />
+    <Compile Include="Editors\TagExtractor.cs" />
     <Compile Include="Models\ContentEditing\MemberPassword.cs" />
     <Compile Include="Models\ContentEditing\StyleSheet.cs" />
     <Compile Include="Editors\StylesheetController.cs" />

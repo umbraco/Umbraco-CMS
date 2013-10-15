@@ -10,14 +10,6 @@ using Umbraco.Core.Models.Editors;
 namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
-    /// An interface that indicates that a property editor supports tags and will store it's published tags into the tag db table
-    /// </summary>
-    public interface ISupportTags
-    {
-        
-    }
-
-    /// <summary>
     /// Represents the value editor for the property editor during content editing
     /// </summary>
     /// <remarks>

@@ -9,10 +9,10 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Editors
 {
@@ -113,8 +113,17 @@ namespace Umbraco.Web.Editors
                     //don't persist any bound value if the editor is readonly
                     if (valueEditor.IsReadOnly == false)
                     {
-                        dboProperty.Value = p.PropertyEditor.ValueEditor.ConvertEditorToDb(data, dboProperty.Value);    
-                    }
+                        var propVal = p.PropertyEditor.ValueEditor.ConvertEditorToDb(data, dboProperty.Value);
+                        var supportTagsAttribute = TagExtractor.GetAttribute(p.PropertyEditor);
+                        if (supportTagsAttribute != null)
+                        {                            
+                            TagExtractor.SetPropertyTags(contentItem.PersistedContent, dboProperty, propVal, supportTagsAttribute);                            
+                        }
+                        else
+                        {
+                            dboProperty.Value = propVal;
+                        }
+                    }    
                     
                 }
             }

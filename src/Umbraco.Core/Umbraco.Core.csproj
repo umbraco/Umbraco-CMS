@@ -324,11 +324,14 @@
     <Compile Include="Models\PublishedContent\IPublishedContentModelFactory.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
+    <Compile Include="PropertyEditors\IValueEditor.cs" />
     <Compile Include="PropertyEditors\PropertyCacheValue.cs" />
     <Compile Include="PropertyEditors\PropertyValueCacheAttribute.cs" />
     <Compile Include="PropertyEditors\PropertyValueTypeAttribute.cs" />
     <Compile Include="PropertyEditors\PropertyCacheLevel.cs" />
     <Compile Include="PropertyEditors\PropertyValueConverterBase.cs" />
+    <Compile Include="PropertyEditors\SupportTagsAttribute.cs" />
+    <Compile Include="PropertyEditors\TagValueType.cs" />
     <Compile Include="PropertyEditors\ValueConverters\IntegerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultipleTextStringValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\SimpleEditorValueConverter.cs" />
