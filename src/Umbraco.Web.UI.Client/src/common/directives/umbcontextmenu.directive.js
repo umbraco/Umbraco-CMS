@@ -17,7 +17,7 @@ angular.module("umbraco.directives")
                     if (menuAction.length !== 2) {
 
                         //if it is not two parts long then this most likely means that it's a legacy action                         
-                        var js = action.metaData["jsAction"];
+                        var js = action.metaData["jsAction"].replace("javascript:", "");
                         //there's not really a different way to acheive this except for eval 
                         eval(js);
 

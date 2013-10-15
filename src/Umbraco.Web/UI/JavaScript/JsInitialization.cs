@@ -34,11 +34,17 @@ namespace Umbraco.Web.UI.JavaScript
         /// <summary>
         /// Processes all found manifest files and outputs the main.js file containing all plugin manifests
         /// </summary>
-        public string GetJavascriptInitialization(JArray umbracoInit)
+        public string GetJavascriptInitialization(JArray umbracoInit, JArray additionalJsFiles = null)
         {
             foreach (var m in _parser.GetManifests())
             {
                 ManifestParser.MergeJArrays(umbracoInit, m.JavaScriptInitialize);
+            }
+
+            //merge in the additional ones specified if there are any
+            if (additionalJsFiles != null)
+            {
+                ManifestParser.MergeJArrays(umbracoInit, additionalJsFiles);
             }
 
             return ParseMain(

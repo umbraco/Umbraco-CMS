@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
@@ -33,7 +34,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Returns the RequireJS file including all references found in manifests
+        /// Returns the JavaScript main file including all references found in manifests
         /// </summary>
         /// <returns></returns>
         public JavaScriptResult Application()
@@ -43,8 +44,10 @@ namespace Umbraco.Web.Editors
             var initJs = new JsInitialization(parser);
             var initCss = new CssInitialization(parser);
 
+            //get the legacy ActionJs file references to append as well
+            var legacyActionJsRef = new JArray(GetLegacyActionJs(LegacyJsActionType.JsUrl));
 
-            var result = initJs.GetJavascriptInitialization(JsInitialization.GetDefaultInitialization());
+            var result = initJs.GetJavascriptInitialization(JsInitialization.GetDefaultInitialization(), legacyActionJsRef);
             result += initCss.GetStylesheetInitialization();
            
             return JavaScript(result);
@@ -207,9 +210,9 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Renders out all JavaScript blocks that have bee declared in IActions
+        /// Renders out all JavaScript references that have bee declared in IActions
         /// </summary>
-        private IEnumerable<string> GetLegacyActionJs(LegacyJsActionType type)
+        private static IEnumerable<string> GetLegacyActionJs(LegacyJsActionType type)
         {
             var blockList = new List<string>();
             var urlList = new List<string>();

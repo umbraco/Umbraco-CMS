@@ -23,7 +23,7 @@ namespace Umbraco.Web.UI.JavaScript
         /// </summary>
         public string GetStylesheetInitialization()
         {
-            JArray merged = new JArray();    
+            var merged = new JArray();    
             foreach (var m in _parser.GetManifests())
             {
                 ManifestParser.MergeJArrays(merged, m.StylesheetInitialize);
@@ -36,11 +36,11 @@ namespace Umbraco.Web.UI.JavaScript
         /// <summary>
         /// Parses the CssResources.Main and returns a yepnop.injectCss format
         /// </summary>
-        /// <param name="replacements"></param>
+        /// <param name="files"></param>
         /// <returns></returns>
         internal static string ParseMain(JArray files)
         {
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             foreach (var file in files)
                 sb.AppendFormat("{0}yepnope.injectCss('{1}');", Environment.NewLine, file);
 
