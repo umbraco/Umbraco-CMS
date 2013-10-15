@@ -52,8 +52,20 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
                 });
             }
 
+            //a method to ignore built-in prop changes
+            var shouldIgnore = function(propName) {
+                return _.some(["tabs", "notifications", "ModelState", "tabs", "properties"], function(i) {
+                    return i === propName;
+                });
+            };
             //check for changed built-in properties of the content
             for (var o in origContent) {
+                
+                //ignore the ones listed in the array
+                if (shouldIgnore(o)) {
+                    continue;
+                }
+                
                 if (!_.isEqual(origContent[o], newContent[o])) {
                     origContent[o] = newContent[o];
                 }

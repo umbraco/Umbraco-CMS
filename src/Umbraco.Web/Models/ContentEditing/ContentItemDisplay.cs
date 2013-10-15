@@ -14,9 +14,6 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "content", Namespace = "")]
     public class ContentItemDisplay : ContentItemDisplayBase<ContentPropertyDisplay, IContent>
     {
-        [DataMember(Name = "path")]
-        public string Path { get; set; }
-
         [DataMember(Name = "publishDate")]
         public DateTime? PublishDate { get; set; }
 
