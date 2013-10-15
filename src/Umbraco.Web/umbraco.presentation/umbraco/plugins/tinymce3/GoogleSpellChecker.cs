@@ -5,6 +5,7 @@ using System.Web.Script.Serialization;
 using System.Net;
 using System.Text;
 using System.Xml;
+using System.Collections.Generic;
 
 // NB: This class was moved out of the client tinymce folder to aid with upgrades
 // but we'll keep the old namespace to make things easier for now (MB)
@@ -15,8 +16,16 @@ namespace umbraco.presentation.umbraco_client.tinymce3.plugins.spellchecker
         private static string SendRequest(string lang, string data)
         {
             string googleResponse;
-            string requestUriString = string.Format("https://www.google.com:443/tbproxy/spell?lang={0}&hl={0}", lang);
-            string s = string.Format("<?xml version=\"1.0\" encoding=\"utf-8\" ?><spellrequest textalreadyclipped=\"0\" ignoredups=\"0\" ignoredigits=\"1\" ignoreallcaps=\"1\"><text>{0}</text></spellrequest>", HttpContext.Current.Server.UrlEncode(data));
+            string requestUriString = "https://www.googleapis.com:443/rpc";
+            var requestData = new Dictionary<string, object>();
+            var requestParams = new Dictionary<string, object>();
+            requestParams.Add("language", lang);
+            requestParams.Add("text", data);
+            requestParams.Add("key", "AIzaSyCLlKc60a3z7lo8deV-hAyDU7rHYgL4HZg");
+            requestData.Add("method", "spelling.check");
+            requestData.Add("apiVersion", "v2");
+            requestData.Add("params", requestParams);
+            string jsonString = new JavaScriptSerializer().Serialize(requestData);
             StreamReader reader = null;
             HttpWebResponse response = null;
             Stream requestStream = null;
@@ -25,15 +34,10 @@ namespace umbraco.presentation.umbraco_client.tinymce3.plugins.spellchecker
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(requestUriString);
                 request.KeepAlive = false;
                 request.Method = "POST";
-                request.ContentType = "application/PTI26";
-                request.ContentLength = s.Length;
-                WebHeaderCollection headers = request.Headers;
-                headers.Add("MIME-Version: 1.0");
-                headers.Add("Request-number: 1");
-                headers.Add("Document-type: Request");
-                headers.Add("Interface-Version: Test 1.4");
+                request.ContentType = "application/json";
+                request.ContentLength = jsonString.Length;
                 requestStream = request.GetRequestStream();
-                byte[] bytes = new ASCIIEncoding().GetBytes(s);
+                byte[] bytes = new ASCIIEncoding().GetBytes(jsonString);
                 requestStream.Write(bytes, 0, bytes.Length);
                 response = (HttpWebResponse)request.GetResponse();
                 reader = new StreamReader(response.GetResponseStream());
@@ -65,16 +69,18 @@ namespace umbraco.presentation.umbraco_client.tinymce3.plugins.spellchecker
         /// <returns></returns>
         public override SpellCheckerResult CheckWords(string language, string[] words)
         {
-            XmlDocument document = new XmlDocument();
             string data = string.Join(" ", words); //turn them into a space-separated string as that's what google takes
-            string xml = SendRequest(language, data);
-            document.LoadXml(xml);
+            string json = SendRequest(language, data);
+            var jsonRes = new JavaScriptSerializer().Deserialize<JsonSpellCheckerResult>(json);
 
             var res = new SpellCheckerResult();
-            foreach (XmlNode node in document.SelectNodes("//c")) //go through each of the incorrectly spelt words
+            // Get list of misspelled words
+            if (jsonRes.result != null && jsonRes.result.spellingCheckResponse != null)
             {
-                XmlElement element = (XmlElement)node;
-                res.result.Add(data.Substring(Convert.ToInt32(element.GetAttribute("o")), Convert.ToInt32(element.GetAttribute("l"))));
+                foreach (var misspelling in jsonRes.result.spellingCheckResponse.misspellings)
+                {
+                    res.result.Add(data.Substring(misspelling.charStart, misspelling.charLength));
+                }
             }
 
             return res;
@@ -88,21 +94,22 @@ namespace umbraco.presentation.umbraco_client.tinymce3.plugins.spellchecker
         /// <returns></returns>
         public override SpellCheckerResult GetSuggestions(string language, string word)
         {
-            XmlDocument document = new XmlDocument();
-            string xml = SendRequest(language, word);
-            document.LoadXml(xml);
+            string json = SendRequest(language, word);
+            var jsonRes = new JavaScriptSerializer().Deserialize<JsonSpellCheckerResult>(json);
+
             var res = new SpellCheckerResult();
-            foreach (XmlNode node in document.SelectNodes("//c")) //select each incorrectly spelt work
+            // Get list of suggestions
+            if (jsonRes.result != null && jsonRes.result.spellingCheckResponse != null)
             {
-                XmlElement element = (XmlElement)node;
-                foreach (string s in element.InnerText.Split(new char[] { '\t' })) //they are tab-separated for suggestions
+                foreach (var misspelling in jsonRes.result.spellingCheckResponse.misspellings)
                 {
-                    if (!string.IsNullOrEmpty(s))
+                    foreach (var suggestion in misspelling.suggestions)
                     {
-                        res.result.Add(s);
+                        res.result.Add(suggestion.suggestion);
                     }
                 }
             }
+
             return res;
         }
 
@@ -131,7 +138,7 @@ namespace umbraco.presentation.umbraco_client.tinymce3.plugins.spellchecker
                     suggestions = new SpellCheckerResult();
                     break;
             }
-            
+
             suggestions.id = input.Id;
             JavaScriptSerializer ser = new JavaScriptSerializer();
             var res = ser.Serialize(suggestions);
