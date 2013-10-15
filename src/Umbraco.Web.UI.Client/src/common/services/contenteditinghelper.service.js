@@ -52,6 +52,12 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
                 });
             }
 
+            //check for changed built-in properties of the content
+            if (!_.isEqual(origContent.name, newContent.name)) {
+                origContent.name = newContent.name;
+            }
+
+            //check for changed properties of the content
             for (var p in allOrigProps) {
                 var newProp = getNewProp(allOrigProps[p].alias);
                 if (newProp && !_.isEqual(allOrigProps[p].value, newProp.value)) {
