@@ -21,7 +21,8 @@
             var self = this;
 
             //bind to the save event
-            this._opts.saveButton.click(function () {
+            this._opts.saveButton.click(function (event) {
+                event.preventDefault();
                 self.doSubmit();
             });
         },

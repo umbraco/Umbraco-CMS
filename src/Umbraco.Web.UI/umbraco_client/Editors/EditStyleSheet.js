@@ -21,7 +21,8 @@
             var self = this;
 
             //bind to the save event
-            this._opts.saveButton.click(function() {
+            this._opts.saveButton.click(function (event) {
+                event.preventDefault();
                 self.doSubmit();
             });
         },
@@ -39,6 +40,7 @@
                 fileName, self._opts.originalFileName, codeVal, self._opts.cssId,
                 function(t) { self.submitSucces(t); },
                 function(t) { self.submitFailure(t); });
+
 
         },
 
