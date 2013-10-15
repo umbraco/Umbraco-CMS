@@ -198,10 +198,10 @@ namespace Umbraco.Web.Mvc
                     //find the controller in the route table without an area
 		            surfaceRoute = RouteTable.Routes.OfType<Route>()
 		                                         .SingleOrDefault(x => x.Defaults != null &&
-		                                                               x.Defaults.ContainsKey("controller") &&
-		                                                               x.Defaults["controller"].ToString() == postedInfo.ControllerName &&
-                                                                       String.Equals(x.Defaults["action"].ToString(), postedInfo.ActionName, StringComparison.CurrentCultureIgnoreCase) &&
-		                                                               !x.DataTokens.ContainsKey("area"));                    
+                                                                       x.Defaults.ContainsKey("controller") &&
+                                                                       x.Defaults["controller"].ToString() == postedInfo.ControllerName &&
+                                                                       String.Equals(x.Defaults["action"].ToString(), postedInfo.ActionName, StringComparison.InvariantCultureIgnoreCase) &&
+                                                                       !x.DataTokens.ContainsKey("area"));                    
 		        }
                 else
 		        {
