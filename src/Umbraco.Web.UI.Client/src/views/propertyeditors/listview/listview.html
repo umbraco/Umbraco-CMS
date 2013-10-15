@@ -31,8 +31,8 @@
 		    </div>
 		    <span ng-bind="bulkStatus" ng-show="isAnythingSelected()"></span>
 		</div>
-
-		<table class="table table-striped">
+        
+	    <table class="table table-striped">
 			<thead>
 				<tr>
 					<td with="20"><input type="checkbox" ng-click="selectAll($event)" ng-checked="isSelectedAll()"></td>
@@ -53,8 +53,7 @@
 					<td>
 						<i class="icon {{result.icon}}" ng-class="getIcon(result)"></i>
 
-						<input type="checkbox" 
-						ng-checked="result.selected" ng-click="updateSelection($event, result)"></td> 
+						<input type="checkbox" ng-model="result.selected"></td> 
 					<td>
 						<a ng-class="{inactive:!result.published}" href="#/content/content/edit/{{result.id}}">{{result.name}}</a></td> 
 				    <td>{{result.updateDate|date:'medium'}} 

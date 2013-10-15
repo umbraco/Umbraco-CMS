@@ -309,7 +309,34 @@ namespace Umbraco.Web.Editors
                 return HandleContentNotFound(id, false);
             }
 
-            Services.ContentService.Publish(foundContent, UmbracoUser.Id);
+            var publishResult = Services.ContentService.PublishWithStatus(foundContent, UmbracoUser.Id);
+            if (publishResult.Success == false)
+            {
+                switch (publishResult.Result.StatusType)
+                {
+                    case PublishStatusType.FailedPathNotPublished:
+                        return Request.CreateValidationErrorResponse(
+                            ui.Text("publish", "contentPublishedFailedByParent",
+                                    string.Format("{0} ({1})", publishResult.Result.ContentItem.Name, publishResult.Result.ContentItem.Id),
+                                    Security.CurrentUser).Trim());
+                    case PublishStatusType.FailedCancelledByEvent:
+                        return Request.CreateValidationErrorResponse(
+                            ui.Text("speechBubbles", "contentPublishedFailedByEvent"));
+                    case PublishStatusType.FailedHasExpired:
+                    case PublishStatusType.FailedAwaitingRelease:
+                    case PublishStatusType.FailedIsTrashed:
+                    case PublishStatusType.FailedContentInvalid:
+                        return Request.CreateValidationErrorResponse(
+                           ui.Text("publish", "contentPublishedFailedInvalid",
+                                  new[]
+                                       {
+                                           string.Format("{0} ({1})", publishResult.Result.ContentItem.Name, publishResult.Result.ContentItem.Id),
+                                           string.Join(",", publishResult.Result.InvalidProperties.Select(x => x.Alias))
+                                       }, Security.CurrentUser));
+                }
+            }
+
+            //return ok
             return Request.CreateResponse(HttpStatusCode.OK);
 
         }

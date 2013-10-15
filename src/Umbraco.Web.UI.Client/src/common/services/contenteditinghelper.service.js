@@ -53,8 +53,10 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
             }
 
             //check for changed built-in properties of the content
-            if (!_.isEqual(origContent.name, newContent.name)) {
-                origContent.name = newContent.name;
+            for (var o in origContent) {
+                if (!_.isEqual(origContent[o], newContent[o])) {
+                    origContent[o] = newContent[o];
+                }
             }
 
             //check for changed properties of the content

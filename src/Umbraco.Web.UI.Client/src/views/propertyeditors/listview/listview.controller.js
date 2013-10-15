@@ -1,206 +1,213 @@
 angular.module("umbraco")
-    .controller("Umbraco.PropertyEditors.ListViewController", 
-        function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource, notificationsService, iconHelper) {
+    .controller("Umbraco.PropertyEditors.ListViewController",
+        function ($rootScope, $scope, $routeParams, contentResource, contentTypeResource, notificationsService, iconHelper, dialogService) {
 
-        $scope.selected = [];
-        $scope.actionInProgress = false;
-            
-        $scope.options = {
-            pageSize: 10,
-            pageNumber: 1,
-            filter: '',
-            orderBy: 'Id',
-            orderDirection: "desc"
-        };
+            $scope.actionInProgress = false;
+            $scope.listViewResultSet = {
+                totalPages: 0,
+                items: []
+            };
 
-        
-        $scope.next = function(){
-            if ($scope.options.pageNumber < $scope.listViewResultSet.totalPages) {
-                $scope.options.pageNumber++;
+            $scope.options = {
+                pageSize: 10,
+                pageNumber: 1,
+                filter: '',
+                orderBy: 'Id',
+                orderDirection: "desc"
+            };
+
+
+            $scope.next = function () {
+                if ($scope.options.pageNumber < $scope.listViewResultSet.totalPages) {
+                    $scope.options.pageNumber++;
+                    $scope.reloadView($scope.contentId);
+                }
+            };
+
+            $scope.goToPage = function (pageNumber) {
+                $scope.options.pageNumber = pageNumber + 1;
                 $scope.reloadView($scope.contentId);
-            }
-        };
+            };
 
-        $scope.goToPage = function (pageNumber) {
-            $scope.options.pageNumber = pageNumber + 1;
-            $scope.reloadView($scope.contentId);
-        };
+            $scope.sort = function (field) {
 
-        $scope.sort = function (field) {
-        
-            $scope.options.orderBy = field;
-            
-          
-            if ($scope.options.orderDirection === "desc") {
-                $scope.options.orderDirection = "asc";
-            }else{
-                $scope.options.orderDirection = "desc";
-            }
-            
-           
-            $scope.reloadView($scope.contentId);
-        };
+                $scope.options.orderBy = field;
 
-        $scope.prev = function(){
-            if ($scope.options.pageNumber > 1) {
-                $scope.options.pageNumber--;
+
+                if ($scope.options.orderDirection === "desc") {
+                    $scope.options.orderDirection = "asc";
+                } else {
+                    $scope.options.orderDirection = "desc";
+                }
+
+
                 $scope.reloadView($scope.contentId);
-            }
-        };
+            };
 
-        /*Loads the search results, based on parameters set in prev,next,sort and so on*/
-        /*Pagination is done by an array of objects, due angularJS's funky way of monitoring state
-        with simple values */
+            $scope.prev = function () {
+                if ($scope.options.pageNumber > 1) {
+                    $scope.options.pageNumber--;
+                    $scope.reloadView($scope.contentId);
+                }
+            };
+
+            /*Loads the search results, based on parameters set in prev,next,sort and so on*/
+            /*Pagination is done by an array of objects, due angularJS's funky way of monitoring state
+            with simple values */
+
+            $scope.reloadView = function (id) {
+                contentResource.getChildren(id, $scope.options).then(function (data) {
+
+                    $scope.listViewResultSet = data;
+                    $scope.pagination = [];
+
+                    for (var i = $scope.listViewResultSet.totalPages - 1; i >= 0; i--) {
+                        $scope.pagination[i] = { index: i, name: i + 1 };
+                    }
+
+                    if ($scope.options.pageNumber > $scope.listViewResultSet.totalPages) {
+                        $scope.options.pageNumber = $scope.listViewResultSet.totalPages;
+                    }
+
+                });
+            };
+
+            $scope.selectAll = function ($event) {
+                var checkbox = $event.target;
+
+                for (var i = 0; i < $scope.listViewResultSet.items.length; i++) {
+                    var entity = $scope.listViewResultSet.items[i];
+                    entity.selected = checkbox.checked;
+                }
+            };
+
+            $scope.isSelectedAll = function () {
+                return _.every($scope.listViewResultSet.items, function (item) {
+                    return item.selected;
+                });
+            };
+
+            $scope.isAnythingSelected = function () {
+                return _.some($scope.listViewResultSet.items, function (item) {
+                    return item.selected;
+                });
+            };
+
+            $scope.getIcon = function (entry) {
+                return iconHelper.convertFromLegacyIcon(entry.icon);
+            };
+
+            $scope.delete = function () {
+                var selected = _.filter($scope.listViewResultSet.items, function (item) {
+                    return item.selected;
+                });
+                var total = selected.length;
+                if (total === 0) {
+                    return;
+                }
+
+                if (confirm("Sure you want to delete?") == true) {
+                    $scope.actionInProgress = true;
+                    $scope.bulkStatus = "Starting with delete";
+                    var current = 1;
+
+                    for (var i = 0; i < selected.length; i++) {
+                        $scope.bulkStatus = "Deleted doc " + current + " out of " + total + " documents";
+                        contentResource.deleteById(selected[i].id).then(function (data) {
+                            if (current === total) {
+                                notificationsService.success("Bulk action", "Deleted " + total + "documents");
+                                $scope.bulkStatus = "";
+                                $scope.reloadView($scope.contentId);
+                                $scope.actionInProgress = false;
+                            }
+                            current++;
+                        });
+                    }
+                }
+
+            };
+
+            $scope.publish = function () {
+                var selected = _.filter($scope.listViewResultSet.items, function (item) {
+                    return item.selected;
+                });
+                var total = selected.length;
+                if (total === 0) {
+                    return;
+                }
                 
-        $scope.reloadView = function(id) {
-            contentResource.getChildren(id, $scope.options).then(function(data) {
-                
-                $scope.listViewResultSet = data;
-                $scope.pagination = [];
-
-                for (var i = $scope.listViewResultSet.totalPages - 1; i >= 0; i--) {
-                    $scope.pagination[i] = { index: i, name: i + 1 };
-                }
-
-                if ($scope.options.pageNumber > $scope.listViewResultSet.totalPages) {
-                    $scope.options.pageNumber = $scope.listViewResultSet.totalPages;
-                }
-
-            });
-        };
-
-        var updateSelected = function (action, id) {
-            if (action === 'add' && $scope.selected.indexOf(id) === -1) {
-                $scope.selected.push(id);
-            }
-            if (action === 'remove' && $scope.selected.indexOf(id) !== -1) {
-                $scope.selected.splice($scope.selected.indexOf(id), 1);
-            }
-        };
-
-        $scope.updateSelection = function ($event, item) {
-            if(item.selected){
-                item.selected = false;
-                var index = $scope.selected.indexOf(item.id);
-                if(index){
-                    $scope.selected.splice(index, 1);
-                }
-            }else{
-                item.selected = true;
-                $scope.selected.push(item.id);
-            }
-        };
-
-        $scope.selectAll = function ($event) {
-            var checkbox = $event.target;
-            var action = (checkbox.checked ? 'add' : 'remove');
-
-            for (var i = 0; i < $scope.listViewResultSet.items.length; i++) {
-                var entity = $scope.listViewResultSet.items[i];
-                entity.selected = checkbox.checked;
-                updateSelected(action, entity.id);
-            }
-        };
-
-        $scope.getSelectedClass = function (entity) {
-            return $scope.isSelected(entity.id) ? 'selected' : '';
-        };
-
-        $scope.isSelected = function (id) {
-            return $scope.selected.indexOf(id) >= 0;
-        };
-
-        $scope.isSelectedAll = function () {
-            if ($scope.listViewResultSet != null)
-                return $scope.selected.length === $scope.listViewResultSet.items.length;
-            else
-                return false;
-        };
-
-        $scope.isAnythingSelected = function() {
-            return $scope.selected.length > 0;
-        };
-
-        $scope.getIcon = function(entry){
-            return iconHelper.convertFromLegacyIcon(entry.icon);
-        };
-
-        $scope.delete = function () {
-
-            if (confirm("Sure you want to delete?") == true) {
                 $scope.actionInProgress = true;
-                $scope.bulkStatus = "Starting with delete";
+                $scope.bulkStatus = "Starting with publish";
                 var current = 1;
-                var total = $scope.selected.length;
-                for (var i = 0; i < $scope.selected.length; i++) {
-                    $scope.bulkStatus = "Deleted doc " + current + " out of " + total + " documents";
-                    contentResource.deleteById($scope.selected[i]).then(function(data) {
-                        if (current == total) {
-                            notificationsService.success("Bulk action", "Deleted " + total + "documents");
+
+                for (var i = 0; i < selected.length; i++) {
+                    $scope.bulkStatus = "Publishing " + current + " out of " + total + " documents";
+
+                    contentResource.publishById(selected[i].id)
+                        .then(function (content) {
+                            if (current == total) {
+                                notificationsService.success("Bulk action", "Published " + total + "documents");
+                                $scope.bulkStatus = "";
+                                $scope.reloadView($scope.contentId);
+                                $scope.actionInProgress = false;
+                            }
+                            current++;
+                        }, function (err) {
+
                             $scope.bulkStatus = "";
-                            $scope.selected = [];
                             $scope.reloadView($scope.contentId);
                             $scope.actionInProgress = false;
-                        }
-                        current++;
-                    });
+
+                            //if there are validation errors for publishing then we need to show them
+                            if (err.status === 400 && err.data && err.data.Message) {
+                                notificationsService.error("Publish error", err.data.Message);
+                            }
+                            else {
+                                dialogService.ysodDialog(err);
+                            }
+                        });
+
                 }
+            };
+
+            $scope.unpublish = function () {
+                var selected = _.filter($scope.listViewResultSet.items, function (item) {
+                    return item.selected;
+                });
+                var total = selected.length;
+                if (total === 0) {
+                    return;
+                }
+
+                $scope.actionInProgress = true;
+                $scope.bulkStatus = "Starting with publish";
+                var current = 1;
+
+                for (var i = 0; i < selected.length; i++) {
+                    $scope.bulkStatus = "Unpublishing " + current + " out of " + total + " documents";
+
+                    contentResource.unPublish(selected[i].id)
+                        .then(function (content) {
+
+                            if (current == total) {
+                                notificationsService.success("Bulk action", "Published " + total + "documents");
+                                $scope.bulkStatus = "";
+                                $scope.reloadView($scope.contentId);
+                                $scope.actionInProgress = false;
+                            }
+
+                            current++;
+                        });
+                }
+            };
+
+            if ($routeParams.id) {
+                $scope.pagination = new Array(100);
+                $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
+                $scope.reloadView($routeParams.id);
+
+                $scope.contentId = $routeParams.id;
+
             }
 
-        };
-
-        $scope.publish = function () {
-            $scope.actionInProgress = true;
-            $scope.bulkStatus = "Starting with publish";
-            var current = 1;
-            var total = $scope.selected.length;
-            for (var i = 0; i < $scope.selected.length; i++) {
-                $scope.bulkStatus = "Publishing " + current + " out of " + total + " documents";
-                
-                contentResource.publishById($scope.selected[i])
-                    .then(function(content){
-                        if (current == total) {
-                            notificationsService.success("Bulk action", "Published " + total + "documents");
-                            $scope.bulkStatus = "";
-                            $scope.reloadView($scope.contentId);
-                            $scope.actionInProgress = false;
-                        }
-                        current++;
-                    });
-              
-            }
-        };
- 
-        $scope.unpublish = function () {
-            $scope.actionInProgress = true;
-            $scope.bulkStatus = "Starting with publish";
-            var current = 1;
-            var total = $scope.selected.length;
-            for (var i = 0; i < $scope.selected.length; i++) {
-                $scope.bulkStatus = "Unpublishing " + current + " out of " + total + " documents";
-                
-                contentResource.unPublish($scope.selected[i])
-                    .then(function(content){
-                        
-                        if (current == total) {
-                            notificationsService.success("Bulk action", "Published " + total + "documents");
-                            $scope.bulkStatus = "";
-                            $scope.reloadView($scope.contentId);
-                            $scope.actionInProgress = false;
-                        }
-
-                        current++;
-                    });
-            }
-        };
-            
-        if ($routeParams.id) {
-            $scope.pagination = new Array(100);
-            $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
-            $scope.reloadView($routeParams.id);
-
-            $scope.contentId = $routeParams.id;
-
-        }
-        
-});
+        });
