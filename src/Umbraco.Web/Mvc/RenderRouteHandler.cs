@@ -200,6 +200,7 @@ namespace Umbraco.Web.Mvc
 		                                         .SingleOrDefault(x => x.Defaults != null &&
 		                                                               x.Defaults.ContainsKey("controller") &&
 		                                                               x.Defaults["controller"].ToString() == postedInfo.ControllerName &&
+                                                                   x.Defaults["action"].ToString().ToLower() == postedInfo.ActionName.ToLower() &&
 		                                                               !x.DataTokens.ContainsKey("area"));                    
 		        }
                 else
