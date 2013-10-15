@@ -16,6 +16,7 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(
                       detail => detail.EmailHash,
                       opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().ToMd5()));
+
             config.CreateMap<IProfile, UserBasic>()
                   .ForMember(detail => detail.UserId, opt => opt.MapFrom(profile => GetIntId(profile.Id)));
         } 

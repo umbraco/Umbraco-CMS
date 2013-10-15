@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-.factory('userService', function ($rootScope, $q, $location, $log, securityRetryQueue, authResource, dialogService) {
+.factory('userService', function ($rootScope, $q, $location, $log, securityRetryQueue, authResource, dialogService, $timeout) {
 
     var currentUser = null;
     var lastUserId = null;
@@ -32,6 +32,31 @@ angular.module('umbraco.services')
             securityRetryQueue.cancelAll();
             redirect();
         }
+    }
+
+    /** 
+    This methods will set the current user when it is resolved and 
+    will then start the counter to count in-memory how many seconds they have 
+    remaining on the auth session
+    */
+    function setCurrentUser(usr) {
+        if (!usr.remainingAuthSeconds) {
+            throw "The user object is invalid, the remainingAuthSeconds is required.";
+        }
+        currentUser = usr;
+        //start the timer
+        setCurrentUserTimeout(usr);
+    }
+    function setCurrentUserTimeout() {        
+        $timeout(function () {
+            if (currentUser) {
+                currentUser.remainingAuthSeconds -= 1;
+                if (currentUser.remainingAuthSeconds > 0) {
+                    //recurse!
+                    setCurrentUserTimeout();
+                }
+            }            
+        }, 1000);//every second
     }
 
     // Register a handler for when an item is added to the retry queue
@@ -76,7 +101,7 @@ angular.module('umbraco.services')
                 .then(function (data) {
 
                     //when it's successful, return the user data
-                    currentUser = data;
+                    setCurrentUser(data);
 
                     var result = { user: data, authenticated: true, lastUserId: lastUserId };
 
@@ -119,7 +144,7 @@ angular.module('umbraco.services')
                             $rootScope.$broadcast("authenticated", result);
                         }
 
-                        currentUser = data;
+                        setCurrentUser(data);
                         currentUser.avatar = 'http://www.gravatar.com/avatar/' + data.emailHash + '?s=40&d=404';
                         deferred.resolve(currentUser);
                     });
@@ -130,6 +155,12 @@ angular.module('umbraco.services')
             }
             
             return deferred.promise;
+        },
+        
+        setUserTimeout: function(newTimeout) {
+            if (currentUser && angular.isNumber(newTimeout)) {
+                currentUser.remainingAuthSeconds = newTimeout;
+            }
         }
     };
 

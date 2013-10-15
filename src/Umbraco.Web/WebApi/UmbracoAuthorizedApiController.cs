@@ -8,6 +8,14 @@ using umbraco.BusinessLogic;
 
 namespace Umbraco.Web.WebApi
 {
+    /// <summary>
+    /// A base controller that ensures all requests are authorized - the user is logged in. 
+    /// </summary>
+    /// <remarks>
+    /// This controller will also append a custom header to the response if the user is logged in using forms authentication 
+    /// which indicates the seconds remaining before their timeout expires.
+    /// </remarks>
+    [UmbracoUserTimeoutFilter]
     [UmbracoAuthorize]
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
     {

@@ -38,19 +38,17 @@ namespace Umbraco.Core.Security
         /// Renews the Umbraco authentication ticket
         /// </summary>
         /// <param name="http"></param>
-        /// <param name="timeoutInMinutes"></param>
         /// <returns></returns>
-        public static bool RenewUmbracoAuthTicket(this HttpContextBase http, int timeoutInMinutes = 60)
+        public static bool RenewUmbracoAuthTicket(this HttpContextBase http)
         {
             return RenewAuthTicket(http,
                 UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName,
-                UmbracoConfig.For.UmbracoSettings().Security.AuthCookieDomain, 
-                timeoutInMinutes);
+                UmbracoConfig.For.UmbracoSettings().Security.AuthCookieDomain);
         }
 
-        internal static bool RenewUmbracoAuthTicket(this HttpContext http, int timeoutInMinutes = 60)
+        internal static bool RenewUmbracoAuthTicket(this HttpContext http)
         {
-            return new HttpContextWrapper(http).RenewUmbracoAuthTicket(timeoutInMinutes);
+            return new HttpContextWrapper(http).RenewUmbracoAuthTicket();
         }
 
         /// <summary>
@@ -65,6 +63,7 @@ namespace Umbraco.Core.Security
                 http, 
                 userdata.Username, 
                 userDataString, 
+                //use the configuration timeout - this is the same timeout that will be used when renewing the ticket.
                 GlobalSettings.TimeOutInMinutes, 
                 //Umbraco has always persisted it's original cookie for 1 day so we'll keep it that way
                 1440, 
@@ -76,6 +75,23 @@ namespace Umbraco.Core.Security
         internal static void CreateUmbracoAuthTicket(this HttpContext http, UserData userdata)
         {
             new HttpContextWrapper(http).CreateUmbracoAuthTicket(userdata);
+        }
+
+        /// <summary>
+        /// returns the number of seconds the user has until their auth session times out
+        /// </summary>
+        /// <param name="http"></param>
+        /// <returns></returns>
+        public static double GetRemainingAuthSeconds(this HttpContextBase http)
+        {
+            var ticket = http.GetUmbracoAuthTicket();
+            if (ticket == null)
+            {
+                return 0;
+            }
+            var utcExpired = ticket.Expiration.ToUniversalTime();
+            var secondsRemaining = utcExpired.Subtract(DateTime.UtcNow).TotalSeconds;
+            return secondsRemaining;
         }
 
         /// <summary>
@@ -143,9 +159,8 @@ namespace Umbraco.Core.Security
         /// <param name="http"></param>
         /// <param name="cookieName"></param>
         /// <param name="cookieDomain"></param>
-        /// <param name="minutesPersisted"></param>
-        /// <returns></returns>
-        private static bool RenewAuthTicket(this HttpContextBase http, string cookieName, string cookieDomain, int minutesPersisted)
+        /// <returns>true if there was a ticket to renew otherwise false if there was no ticket</returns>
+        private static bool RenewAuthTicket(this HttpContextBase http, string cookieName, string cookieDomain)
         {
             //get the ticket
             var ticket = GetAuthTicket(http, cookieName);

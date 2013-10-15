@@ -252,12 +252,12 @@ namespace umbraco.BasePages
 
         private void UpdateLogin()
         {
-            Context.RenewUmbracoAuthTicket(UmbracoTimeOutInMinutes);
+            Context.RenewUmbracoAuthTicket();
         }
 
         public static void RenewLoginTimeout()
         {
-            HttpContext.Current.RenewUmbracoAuthTicket(UmbracoTimeOutInMinutes);           
+            HttpContext.Current.RenewUmbracoAuthTicket();           
         }
 
         /// <summary>

@@ -839,6 +839,7 @@
     <Compile Include="WebApi\UmbracoAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoAuthorizedApiController.cs" />
     <Compile Include="WebApi\Filters\ValidationFilterAttribute.cs" />
+    <Compile Include="WebApi\Filters\UmbracoUserTimeoutFilterAttribute.cs" />
     <Compile Include="WebApi\WebApiHelper.cs" />
     <Compile Include="WebBootManager.cs" />
     <Compile Include="Routing\LegacyRequestInitializer.cs" />

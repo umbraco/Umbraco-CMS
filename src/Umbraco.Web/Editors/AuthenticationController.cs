@@ -1,12 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
 using AutoMapper;
+using Umbraco.Core;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
+using Umbraco.Core.Security;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -31,6 +34,25 @@ namespace Umbraco.Web.Editors
             base.Initialize(controllerContext);
             controllerContext.Configuration.Formatters.Remove(controllerContext.Configuration.Formatters.XmlFormatter);
         }
+        
+        /// <summary>
+        /// This is a special method that will return the current users' remaining session seconds, the reason
+        /// it is special is because this route is ignored in the UmbracoModule so that the auth ticket doesn't get
+        /// updated with a new timeout.
+        /// </summary>
+        /// <returns></returns>
+        [WebApi.UmbracoAuthorize]
+        public double GetRemainingTimeoutSeconds()
+        {
+            var httpContextAttempt = TryGetHttpContext();
+            if (httpContextAttempt.Success)
+            {
+                return httpContextAttempt.Result.GetRemainingAuthSeconds();
+            }
+
+            //we need an http context
+            throw new NotSupportedException("An HttpContext is required for this request");
+        }
 
         /// <summary>
         /// Checks if the current user's cookie is valid and if so returns OK or a 400 (BadRequest)
@@ -53,22 +75,22 @@ namespace Umbraco.Web.Editors
 
 
         /// <summary>
-        /// Checks if the current user's cookie is valid and if so returns the user object associated
+        /// Returns the currently logged in Umbraco user
         /// </summary>
         /// <returns></returns>
+        [WebApi.UmbracoAuthorize]
         public UserDetail GetCurrentUser()
         {
-            var attempt = UmbracoContext.Security.AuthorizeRequest();
-            if (attempt == ValidateRequestAttempt.Success)
+            var user = Services.UserService.GetUserById(UmbracoContext.Security.GetUserId());
+            var result = Mapper.Map<UserDetail>(user);
+            var httpContextAttempt = TryGetHttpContext();
+            if (httpContextAttempt.Success)
             {
-                var user = Services.UserService.GetUserById(UmbracoContext.Security.GetUserId());
-                return Mapper.Map<UserDetail>(user);
+                //set their remaining seconds
+                result.SecondsUntilTimeout = httpContextAttempt.Result.GetRemainingAuthSeconds();
             }
-
-            //return Unauthorized (401) because the user is not authorized right now
-            throw new HttpResponseException(HttpStatusCode.Unauthorized);
+            return result;
         }
-
 
         /// <summary>
         /// Logs a user in
@@ -83,7 +105,14 @@ namespace Umbraco.Web.Editors
                 var user = Services.UserService.GetUserByUserName(username);
                 //TODO: Clean up the int cast!
                 UmbracoContext.Security.PerformLogin((int)user.Id);
-                return Mapper.Map<UserDetail>(user);
+                var result = Mapper.Map<UserDetail>(user);
+                var httpContextAttempt = TryGetHttpContext();
+                if (httpContextAttempt.Success)
+                {
+                    //set their remaining seconds
+                    result.SecondsUntilTimeout = httpContextAttempt.Result.GetRemainingAuthSeconds();
+                }
+                return result;
             }
 
             //return BadRequest (400), we don't want to return a 401 because that get's intercepted 

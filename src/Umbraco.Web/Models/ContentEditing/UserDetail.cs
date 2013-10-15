@@ -19,5 +19,11 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "emailHash")]
         public string EmailHash { get; set; }
+
+        /// <summary>
+        /// Gets/sets the number of seconds for the user's auth ticket to expire
+        /// </summary>
+        [DataMember(Name = "remainingAuthSeconds")]
+        public double SecondsUntilTimeout { get; set; }
     }
 }

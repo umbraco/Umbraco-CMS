@@ -166,7 +166,7 @@ namespace Umbraco.Web.Security
 
         public void RenewLoginTimeout()
         {
-            _httpContext.RenewUmbracoAuthTicket(UmbracoTimeOutInMinutes);
+            _httpContext.RenewUmbracoAuthTicket();
         }
 
         /// <summary>
@@ -229,7 +229,7 @@ namespace Umbraco.Web.Security
 
         internal void UpdateLogin()
         {
-            _httpContext.RenewUmbracoAuthTicket(UmbracoTimeOutInMinutes);
+            _httpContext.RenewUmbracoAuthTicket();
         }
 
         internal long GetTimeout()

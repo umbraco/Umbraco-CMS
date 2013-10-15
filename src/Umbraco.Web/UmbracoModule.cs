@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Principal;
 using System.Threading;
 using System.Web;
+using System.Web.Mvc;
 using System.Web.Routing;
 using Newtonsoft.Json;
 using Umbraco.Core;
@@ -13,6 +14,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Security;
+using Umbraco.Web.Editors;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using umbraco;
@@ -173,7 +175,9 @@ namespace Umbraco.Web
             if (ShouldAuthenticateRequest(req, UmbracoContext.Current.OriginalRequestUrl))
             {
                 var ticket = http.GetUmbracoAuthTicket();
-                if (ticket != null && !ticket.Expired && http.RenewUmbracoAuthTicket())
+                //if there was a ticket, it's not expired, its renewable - or it should not be renewed
+                if (ticket != null && ticket.Expired == false
+                    && (http.RenewUmbracoAuthTicket() || ShouldIgnoreTicketRenew(UmbracoContext.Current.OriginalRequestUrl, http)))
                 {
                     try
                     {
@@ -247,6 +251,35 @@ namespace Umbraco.Web
                 return true;
             }
             return false;
+        }
+
+        private static readonly ConcurrentHashSet<string> IgnoreTicketRenewUrls = new ConcurrentHashSet<string>(); 
+        /// <summary>
+        /// Determines if the authentication ticket should be renewed with a new timeout
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="httpContext"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// We do not want to renew the ticket when we are checking for the user's remaining timeout.
+        /// </remarks>
+        internal static bool ShouldIgnoreTicketRenew(Uri url, HttpContextBase httpContext)
+        {
+            //initialize the ignore ticket urls - we don't need to lock this, it's concurrent and a hashset
+            // we don't want to have to gen the url each request so this will speed things up a teeny bit.
+            if (IgnoreTicketRenewUrls.Any() == false)
+            {                
+                var urlHelper = new UrlHelper(new RequestContext(httpContext, new RouteData()));
+                var checkSessionUrl = urlHelper.GetUmbracoApiServiceBaseUrl<AuthenticationController>(controller => controller.GetRemainingTimeoutSeconds());
+                IgnoreTicketRenewUrls.Add(checkSessionUrl);
+            }
+
+            if (IgnoreTicketRenewUrls.Any(x => url.AbsolutePath.StartsWith(x)))
+            {
+                return true;
+            }
+
+            return false;            
         }
 
 		/// <summary>

@@ -35,21 +35,7 @@ namespace Umbraco.Web.WebApi
         /// <returns></returns>
         protected Attempt<HttpContextBase> TryGetHttpContext()
         {
-            object context;
-            if (Request.Properties.TryGetValue("MS_HttpContext", out context))
-            {
-                var httpContext = context as HttpContextBase;
-                if (httpContext != null)
-                {
-                    return Attempt.Succeed(httpContext);
-                }
-            }
-            if (HttpContext.Current != null)
-            {
-                return Attempt<HttpContextBase>.Succeed(new HttpContextWrapper(HttpContext.Current));
-            }
-
-            return Attempt<HttpContextBase>.Fail();
+            return Request.TryGetHttpContext();
         }
 
         /// <summary>

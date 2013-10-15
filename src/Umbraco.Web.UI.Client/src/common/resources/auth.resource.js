@@ -55,6 +55,17 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                         "IsAuthenticated")),
                 'Server call failed for checking authentication');
         },
+        
+        /** Gets the user's remaining seconds before their login times out */
+        getRemainingTimeoutSeconds: function () {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "authenticationApiBaseUrl",
+                        "GetRemainingTimeoutSeconds")),
+                'Server call failed for checking remaining seconds');
+        }
 
     };
 }

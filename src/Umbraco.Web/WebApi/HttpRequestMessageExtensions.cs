@@ -5,14 +5,39 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using Umbraco.Core;
 
 namespace Umbraco.Web.WebApi
 {
 
     public static class HttpRequestMessageExtensions
     {
+        /// <summary>
+        /// Tries to retreive the current HttpContext if one exists.
+        /// </summary>
+        /// <returns></returns>
+        public static Attempt<HttpContextBase> TryGetHttpContext(this HttpRequestMessage request)
+        {
+            object context;
+            if (request.Properties.TryGetValue("MS_HttpContext", out context))
+            {
+                var httpContext = context as HttpContextBase;
+                if (httpContext != null)
+                {
+                    return Attempt.Succeed(httpContext);
+                }
+            }
+            if (HttpContext.Current != null)
+            {
+                return Attempt<HttpContextBase>.Succeed(new HttpContextWrapper(HttpContext.Current));
+            }
+
+            return Attempt<HttpContextBase>.Fail();
+        }
+
         /// <summary>
         /// Create a 403 (Forbidden) response indicating that hte current user doesn't have access to the resource
         /// requested or the action it needs to take.

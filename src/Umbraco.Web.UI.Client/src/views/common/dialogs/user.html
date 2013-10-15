@@ -8,6 +8,10 @@
 
 		<h1 class="headline">{{user.name}}</h1>
 		
+	    <p class="muted">
+	        <small>Session expires in {{user.remainingAuthSeconds | number:0}} seconds</small>	        
+	    </p>
+
 	</div>
 	
 	<div class="umb-panel-body umb-scrollable">
