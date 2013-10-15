@@ -40,9 +40,9 @@ namespace Umbraco.Web.Models.ContentEditing
         public string Alias { get; set; }
 
         /// <summary>
-        /// For now we'll exclude this from the json results, this is needed for permissions check filtering
+        /// The path of the entity
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember(Name = "path")]
         public string Path { get; set; }
     }
 }

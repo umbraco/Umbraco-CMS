@@ -11,8 +11,7 @@ angular.module("umbraco")
     	};
 
 	    $scope.gotoHistory = function (link) {
-		    $location.path(link);
-	        $scope.$apply();
+		    $location.path(link);	        
 		    $scope.hide();
 		};
 });
