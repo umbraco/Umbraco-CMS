@@ -84,12 +84,44 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 var injector = getRootInjector();
                 var navService = injector.get("navigationService");
 
+                //mimic the API of the legacy tree
                 var tree = {
                     setActiveTreeType : function(treeType){
                          navService.syncTree(null, treeType, null);
                     },
                     syncTree : function(path,forceReload){
                         navService.syncPath(path);
+                    },
+                    getActionNode: function () {
+                        //need to replicate the legacy tree node
+                        var legacyNode = {
+                            nodeId: navService.ui.currentNode.id,
+                            nodeName: navService.ui.currentNode.name,
+                            nodeType: navService.ui.currentNode.nodeType,
+                            treeType: navService.ui.currentNode.nodeType,
+                            sourceUrl: navService.ui.currentNode.childNodesUrl,
+                            updateDefinition: function() {
+                                throw "'updateDefinition' method is not supported in Umbraco 7, consider upgrading to the new v7 APIs";
+                            }
+                        };
+                        //defined getters that will throw a not implemented/supported exception
+                        Object.defineProperty(legacyNode, "menu", {
+                            get: function () {
+                                throw "'menu' property is not supported in Umbraco 7, consider upgrading to the new v7 APIs";
+                            }
+                        });
+                        Object.defineProperty(legacyNode, "jsNode", {
+                            get: function () {
+                                throw "'jsNode' property is not supported in Umbraco 7, consider upgrading to the new v7 APIs";
+                            }
+                        });
+                        Object.defineProperty(legacyNode, "jsTree", {
+                            get: function () {
+                                throw "'jsTree' property is not supported in Umbraco 7, consider upgrading to the new v7 APIs";
+                            }
+                        });
+
+                        return legacyNode;
                     }
                 };
 

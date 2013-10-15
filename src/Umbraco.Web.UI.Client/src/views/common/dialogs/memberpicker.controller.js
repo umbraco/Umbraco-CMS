@@ -25,7 +25,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberPickerController",
 		args.event.preventDefault();
 		args.event.stopPropagation();
 
-		if(args.node.nodetype === "member-folder"){
+		if (args.node.nodeType === "member-folder") {
 			return;
 		}
 		

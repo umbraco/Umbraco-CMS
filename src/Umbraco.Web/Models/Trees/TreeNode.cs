@@ -54,7 +54,7 @@ namespace Umbraco.Web.Models.Trees
         /// <summary>
         /// The tree nodetype which refers to the type of node rendered in the tree
         /// </summary>
-        [DataMember(Name = "nodetype")]
+        [DataMember(Name = "nodeType")]
         public string NodeType { get; set; }
         
         /// <summary>
