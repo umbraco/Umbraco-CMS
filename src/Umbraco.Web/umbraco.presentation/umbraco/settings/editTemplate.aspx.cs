@@ -23,6 +23,7 @@ namespace umbraco.cms.presentation.settings
 	public partial class editTemplate : UmbracoEnsuredPage
 	{
 		private Template _template;
+        public MenuButton SaveButton;
 
 		public editTemplate()
 		{
@@ -97,13 +98,11 @@ namespace umbraco.cms.presentation.settings
             var props = Panel1.NewTabPage(ui.Text("properties"));
             props.Controls.Add(Pane7);
 
-            
-			var save = Panel1.Menu.NewButton();
-		    save.OnClientClick = "doSubmit()";
-            save.Text = ui.Text("save");
-            save.ButtonType = MenuButtonType.Primary;
-            save.ID = "save";
-
+            SaveButton = Panel1.Menu.NewButton();
+            SaveButton.Text = ui.Text("save");
+            SaveButton.ButtonType = MenuButtonType.Primary;
+            SaveButton.ID = "save";
+           
 			Panel1.Text = ui.Text("edittemplate");
 			pp_name.Text = ui.Text("name", UmbracoUser);
             pp_alias.Text = ui.Text("alias", UmbracoUser);

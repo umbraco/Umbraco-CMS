@@ -77,6 +77,12 @@
 
             var self = this;
 
+            //bind to the save event
+            this._opts.saveButton.click(function (event) {
+                event.preventDefault();
+                self.doSubmit();
+            });
+            
             $("#sb").click(function() {
                 self._insertCodeBlock();
             });
@@ -104,6 +110,10 @@
             $(".codeTemplate").click(function() {
                 self._insertCodeBlockFromTemplate($(this).attr("rel"));
             });
+        },
+
+        doSubmit: function() {            
+            this.save(jQuery('#' + this._opts.templateNameClientId).val(), jQuery('#' + this._opts.templateAliasClientId).val(), UmbEditor.GetCode());
         },
 
         save: function(templateName, templateAlias, codeVal) {
