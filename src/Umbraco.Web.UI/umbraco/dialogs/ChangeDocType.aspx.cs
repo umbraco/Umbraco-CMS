@@ -149,7 +149,7 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs
                     ddl.DataValueField = "Alias";
                     ddl.DataTextField = "Name";
                     ddl.DataBind();
-                    ddl.Items.Add(new ListItem("<" + global::umbraco.ui.Text("changeDocType", "none") + ">", string.Empty));
+                    ddl.Items.Insert(0, new ListItem("<" + global::umbraco.ui.Text("changeDocType", "none") + ">", string.Empty));
 
                     // Set default selection to be one with matching alias
                     var alias = ((HiddenField)ri.FindControl("Alias")).Value;
