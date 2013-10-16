@@ -175,9 +175,9 @@ namespace Umbraco.Web
             if (ShouldAuthenticateRequest(req, UmbracoContext.Current.OriginalRequestUrl))
             {
                 var ticket = http.GetUmbracoAuthTicket();
-                //if there was a ticket, it's not expired, its renewable - or it should not be renewed
+                //if there was a ticket, it's not expired, - it should not be renewed or its renewable
                 if (ticket != null && ticket.Expired == false
-                    && (http.RenewUmbracoAuthTicket() || ShouldIgnoreTicketRenew(UmbracoContext.Current.OriginalRequestUrl, http)))
+                    && (ShouldIgnoreTicketRenew(UmbracoContext.Current.OriginalRequestUrl, http) || http.RenewUmbracoAuthTicket()))
                 {
                     try
                     {
@@ -270,7 +270,7 @@ namespace Umbraco.Web
             if (IgnoreTicketRenewUrls.Any() == false)
             {                
                 var urlHelper = new UrlHelper(new RequestContext(httpContext, new RouteData()));
-                var checkSessionUrl = urlHelper.GetUmbracoApiServiceBaseUrl<AuthenticationController>(controller => controller.GetRemainingTimeoutSeconds());
+                var checkSessionUrl = urlHelper.GetUmbracoApiService<AuthenticationController>(controller => controller.GetRemainingTimeoutSeconds());
                 IgnoreTicketRenewUrls.Add(checkSessionUrl);
             }
 

@@ -11,12 +11,9 @@ angular.module('umbraco.security.interceptor', ['umbraco.security.retryQueue'])
                     //expires. Then we'll update the user in the user service accordingly.
                     var headers = originalResponse.headers();
                     if (headers["x-umb-user-seconds"]) {
-                        var asNumber = parseFloat(headers["x-umb-user-seconds"]);
-                        if (!isNaN(asNumber)) {
-                            // We must use $injector to get the $http service to prevent circular dependency
-                            var userService = $injector.get('userService');
-                            userService.setUserTimeout(asNumber);
-                        }
+                        // We must use $injector to get the $http service to prevent circular dependency
+                        var userService = $injector.get('userService');
+                        userService.setUserTimeout(headers["x-umb-user-seconds"]);
                     }
                     
                     return promise;

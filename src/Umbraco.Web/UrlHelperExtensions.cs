@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Management.Instrumentation;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Web.Mvc;
@@ -55,7 +56,22 @@ namespace Umbraco.Web
             where T : UmbracoApiController
         {
             var method = Umbraco.Core.ExpressionHelper.GetMethodInfo(methodSelector);
+            if (method == null)
+            {
+                throw new MissingMethodException("Could not find the method " + methodSelector + " on type " + typeof(T) + " or the result ");
+            }
             return url.GetUmbracoApiService<T>(method.Name).TrimEnd(method.Name);
+        }
+
+        public static string GetUmbracoApiService<T>(this UrlHelper url, Expression<Func<T, object>> methodSelector)
+            where T : UmbracoApiController
+        {
+            var method = Umbraco.Core.ExpressionHelper.GetMethodInfo(methodSelector);
+            if (method == null)
+            {
+                throw new MissingMethodException("Could not find the method " + methodSelector + " on type " + typeof(T) + " or the result ");
+            }
+            return url.GetUmbracoApiService<T>(method.Name);
         }
 
         /// <summary>
