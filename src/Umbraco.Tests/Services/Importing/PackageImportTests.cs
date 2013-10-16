@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting;
 using System.Xml.Linq;
 using NUnit.Framework;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using umbraco.editorControls.MultiNodeTreePicker;
 
@@ -205,7 +208,7 @@ namespace Umbraco.Tests.Services.Importing
             var contentTypes = packagingService.ImportContentTypes(docTypesElement);
             var contents = packagingService.ImportContent(element);
             var numberOfDocs = (from doc in element.Descendants()
-                                where (string) doc.Attribute("isDoc") == ""
+                                where (string)doc.Attribute("isDoc") == ""
                                 select doc).Count();
 
             // Assert
@@ -232,7 +235,7 @@ namespace Umbraco.Tests.Services.Importing
             var contentTypes = packagingService.ImportContentTypes(docTypesElement);
             var contents = packagingService.ImportContent(element);
             var numberOfDocs = (from doc in element.Descendants()
-                                where (string) doc.Attribute("isDoc") == ""
+                                where (string)doc.Attribute("isDoc") == ""
                                 select doc).Count();
 
             var database = ApplicationContext.DatabaseContext.Database;
@@ -349,13 +352,137 @@ namespace Umbraco.Tests.Services.Importing
             var templates = packagingService.ImportTemplates(templateElement);
             var templatesAfterUpdate = packagingService.ImportTemplates(templateElementUpdated);
             var allTemplates = fileService.GetTemplates();
-            
+
             // Assert
             Assert.That(templates.Any(), Is.True);
             Assert.That(templates.Count(), Is.EqualTo(numberOfTemplates));
             Assert.That(templatesAfterUpdate.Count(), Is.EqualTo(numberOfTemplates));
             Assert.That(allTemplates.Count(), Is.EqualTo(numberOfTemplates));
             Assert.That(allTemplates.First(x => x.Alias == "umbHomepage").Content, Contains.Substring("THIS HAS BEEN UPDATED!"));
+        }
+
+        [Test]
+        public void PackagingService_Can_Import_DictionaryItems()
+        {
+            // Arrange
+            const string expectedEnglishParentValue = "ParentValue";
+            const string expectedNorwegianParentValue = "ForelderVerdi";
+            const string expectedEnglishChildValue = "ChildValue";
+            const string expectedNorwegianChildValue = "BarnVerdi";
+
+            var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
+            var dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
+
+            AddLanguages();
+
+            // Act
+            ServiceContext.PackagingService.ImportDictionaryItems(dictionaryItemsElement);
+
+            // Assert
+            AssertDictionaryItem("Parent", expectedEnglishParentValue, "en-GB");
+            AssertDictionaryItem("Parent", expectedNorwegianParentValue, "nb-NO");
+            AssertDictionaryItem("Child", expectedEnglishChildValue, "en-GB");
+            AssertDictionaryItem("Child", expectedNorwegianChildValue, "nb-NO");
+        }
+
+        [Test]
+        public void PackagingService_WhenExistingDictionaryKey_ImportsNewChildren()
+        {
+            // Arrange
+            const string expectedEnglishParentValue = "ExistingParentValue";
+            const string expectedNorwegianParentValue = "EksisterendeForelderVerdi";
+            const string expectedEnglishChildValue = "ChildValue";
+            const string expectedNorwegianChildValue = "BarnVerdi";
+
+            var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
+            var dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
+
+            AddLanguages();
+            AddExistingEnglishAndNorwegianParentDictionaryItem(expectedEnglishParentValue, expectedNorwegianParentValue);
+
+            // Act
+            ServiceContext.PackagingService.ImportDictionaryItems(dictionaryItemsElement);
+
+            // Assert
+            AssertDictionaryItem("Parent", expectedEnglishParentValue, "en-GB");
+            AssertDictionaryItem("Parent", expectedNorwegianParentValue, "nb-NO");
+            AssertDictionaryItem("Child", expectedEnglishChildValue, "en-GB");
+            AssertDictionaryItem("Child", expectedNorwegianChildValue, "nb-NO");
+        }
+
+        [Test]
+        public void PackagingService_WhenExistingDictionaryKey_OnlyAddsNewLanguages()
+        {
+            // Arrange
+            const string expectedEnglishParentValue = "ExistingParentValue";
+            const string expectedNorwegianParentValue = "ForelderVerdi";
+            const string expectedEnglishChildValue = "ChildValue";
+            const string expectedNorwegianChildValue = "BarnVerdi";
+
+            var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
+            var dictionaryItemsElement = newPackageXml.Elements("DictionaryItems").First();
+
+            AddLanguages();
+            AddExistingEnglishParentDictionaryItem(expectedEnglishParentValue);
+
+            // Act
+            ServiceContext.PackagingService.ImportDictionaryItems(dictionaryItemsElement);
+
+            // Assert
+            AssertDictionaryItem("Parent", expectedEnglishParentValue, "en-GB");
+            AssertDictionaryItem("Parent", expectedNorwegianParentValue, "nb-NO");
+            AssertDictionaryItem("Child", expectedEnglishChildValue, "en-GB");
+            AssertDictionaryItem("Child", expectedNorwegianChildValue, "nb-NO");
+        }
+
+        private void AddLanguages()
+        {
+            var norwegian = new Core.Models.Language("nb-NO");
+            var english = new Core.Models.Language("en-GB");
+            ServiceContext.LocalizationService.Save(norwegian, 0);
+            ServiceContext.LocalizationService.Save(english, 0);
+        }
+
+        private void AssertDictionaryItem(string key, string expectedValue, string cultureCode)
+        {
+            Assert.That(ServiceContext.LocalizationService.DictionaryItemExists(key), "DictionaryItem key does not exist");
+            var dictionaryItem = ServiceContext.LocalizationService.GetDictionaryItemByKey(key);
+            var translation = dictionaryItem.Translations.SingleOrDefault(i => i.Language.IsoCode == cultureCode);
+            Assert.IsNotNull(translation, "Translation to {0} was not added", cultureCode);
+            var value = translation.Value;
+            Assert.That(value, Is.EqualTo(expectedValue), "Translation value was not set");
+        }
+
+        private void AddExistingEnglishParentDictionaryItem(string expectedEnglishParentValue)
+        {
+            var languages = ServiceContext.LocalizationService.GetAllLanguages().ToList();
+            var englishLanguage = languages.Single(l => l.IsoCode == "en-GB");
+            ServiceContext.LocalizationService.Save(
+                new DictionaryItem("Parent")
+                {
+                    Translations = new List<IDictionaryTranslation>
+				    {
+					    new DictionaryTranslation(englishLanguage, expectedEnglishParentValue),
+				    }
+                }
+            );
+        }
+
+        private void AddExistingEnglishAndNorwegianParentDictionaryItem(string expectedEnglishParentValue, string expectedNorwegianParentValue)
+        {
+            var languages = ServiceContext.LocalizationService.GetAllLanguages().ToList();
+            var englishLanguage = languages.Single(l => l.IsoCode == "en-GB");
+            var norwegianLanguage = languages.Single(l => l.IsoCode == "nb-NO");
+            ServiceContext.LocalizationService.Save(
+                new DictionaryItem("Parent")
+                {
+                    Translations = new List<IDictionaryTranslation>
+				    {
+					    new DictionaryTranslation(englishLanguage, expectedEnglishParentValue),
+					    new DictionaryTranslation(norwegianLanguage, expectedNorwegianParentValue),
+				    }
+                }
+            );
         }
     }
 }

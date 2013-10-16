@@ -180,7 +180,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
                 else
                 {
-                    translation.Id = Convert.ToInt32(Database.Insert(dto));
+                    translation.Id = Convert.ToInt32(Database.Insert(textDto));
                     translation.Key = entity.Key;
                 }
             }
