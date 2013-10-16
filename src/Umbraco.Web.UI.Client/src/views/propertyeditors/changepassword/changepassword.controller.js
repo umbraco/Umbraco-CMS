@@ -16,6 +16,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
             */
 
             //set defaults if they are not available
+            if (!$scope.model.config || $scope.model.config.disableToggle === undefined) {
+                $scope.model.config.disableToggle = false;
+            }
             if (!$scope.model.config || $scope.model.config.hasPassword === undefined) {
                 $scope.model.config.hasPassword = false;
             }
@@ -58,7 +61,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
 
         //if there is no password saved for this entity , it must be new so we do not allow toggling of the change password, it is always there
         //with validators turned on.
-        $scope.changing = !$scope.model.config.hasPassword;
+        $scope.changing = $scope.model.config.disableToggle === true || !$scope.model.config.hasPassword;
 
         $scope.doChange = function() {
             $scope.changing = true;
@@ -76,5 +79,29 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
             $scope.changing = false;
             resetModel();
         });
+
+        $scope.showReset = function() {
+            return $scope.model.config.hasPassword && $scope.model.config.enableReset;
+        };
+
+        $scope.showOldPass = function() {
+            return $scope.model.config.hasPassword && !$scope.model.config.enablePasswordRetrieval && !$scope.model.value.reset;
+        };
+
+        $scope.showNewPass = function () {
+            return !$scope.model.value.reset;
+        };
+
+        $scope.showConfirmPass = function() {
+            return !$scope.model.value.reset;
+        };
         
+        $scope.showCancelBtn = function() {
+            return $scope.model.config.disableToggle !== true && $scope.model.config.hasPassword;
+        };
+
+        $scope.oldPassRequired = function() {
+            return !$scope.model.value.reset && $scope.model.config.hasPassword && !$scope.model.config.enablePasswordRetrieval;
+        };
+
     });

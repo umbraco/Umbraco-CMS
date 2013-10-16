@@ -104,14 +104,10 @@ namespace Umbraco.Web.Editors
             {
                 var user = Services.UserService.GetUserByUserName(username);
                 //TODO: Clean up the int cast!
-                UmbracoContext.Security.PerformLogin((int)user.Id);
+                var timeoutSeconds = UmbracoContext.Security.PerformLogin((int)user.Id);
                 var result = Mapper.Map<UserDetail>(user);
-                var httpContextAttempt = TryGetHttpContext();
-                if (httpContextAttempt.Success)
-                {
-                    //set their remaining seconds
-                    result.SecondsUntilTimeout = httpContextAttempt.Result.GetRemainingAuthSeconds();
-                }
+                //set their remaining seconds
+                result.SecondsUntilTimeout = timeoutSeconds;
                 return result;
             }
 

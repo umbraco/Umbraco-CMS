@@ -5,7 +5,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// <summary>
     /// A model representing the data required to set a member/user password depending on the provider installed.
     /// </summary>
-    public class MemberPassword
+    public class ChangePasswordModel
     {
         /// <summary>
         /// The password value

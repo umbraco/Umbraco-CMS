@@ -56,10 +56,10 @@ namespace Umbraco.Core.Security
         /// </summary>
         /// <param name="http"></param>
         /// <param name="userdata"></param>
-        public static void CreateUmbracoAuthTicket(this HttpContextBase http, UserData userdata)
+        public static FormsAuthenticationTicket CreateUmbracoAuthTicket(this HttpContextBase http, UserData userdata)
         {
             var userDataString = JsonConvert.SerializeObject(userdata);
-            CreateAuthTicket(
+            return CreateAuthTicketAndCookie(
                 http, 
                 userdata.Username, 
                 userDataString, 
@@ -72,9 +72,9 @@ namespace Umbraco.Core.Security
                 UmbracoConfig.For.UmbracoSettings().Security.AuthCookieDomain);
         }
 
-        internal static void CreateUmbracoAuthTicket(this HttpContext http, UserData userdata)
+        internal static FormsAuthenticationTicket CreateUmbracoAuthTicket(this HttpContext http, UserData userdata)
         {
-            new HttpContextWrapper(http).CreateUmbracoAuthTicket(userdata);
+            return new HttpContextWrapper(http).CreateUmbracoAuthTicket(userdata);
         }
 
         /// <summary>
@@ -85,6 +85,16 @@ namespace Umbraco.Core.Security
         public static double GetRemainingAuthSeconds(this HttpContextBase http)
         {
             var ticket = http.GetUmbracoAuthTicket();
+            return ticket.GetRemainingAuthSeconds();
+        }
+
+        /// <summary>
+        /// returns the number of seconds the user has until their auth session times out
+        /// </summary>
+        /// <param name="ticket"></param>
+        /// <returns></returns>
+        public static double GetRemainingAuthSeconds(this FormsAuthenticationTicket ticket)
+        {
             if (ticket == null)
             {
                 return 0;
@@ -200,7 +210,7 @@ namespace Umbraco.Core.Security
         /// <param name="cookiePath">The cookie path.</param>
         /// <param name="cookieName">Name of the cookie.</param>
         /// <param name="cookieDomain">The cookie domain.</param>
-        private static void CreateAuthTicket(this HttpContextBase http,
+        private static FormsAuthenticationTicket CreateAuthTicketAndCookie(this HttpContextBase http,
                                             string username,
                                             string userData,
                                             int loginTimeoutMins,
@@ -237,6 +247,8 @@ namespace Umbraco.Core.Security
             cookie.HttpOnly = true;
 				
             http.Response.Cookies.Set(cookie);
+
+            return ticket;
         }
     }
 }

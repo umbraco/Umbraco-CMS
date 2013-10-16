@@ -177,8 +177,21 @@ namespace Umbraco.Core
 		public static MethodInfo GetMethodInfo<T1, T2>(Expression<Func<T1, T2>> fromExpression)
 		{
 			if (fromExpression == null) return null;
-			var body = fromExpression.Body as MethodCallExpression;
-			return body != null ? body.Method : null;
+
+            MethodCallExpression me;
+            switch (fromExpression.Body.NodeType)
+            {
+                case ExpressionType.Convert:
+                case ExpressionType.ConvertChecked:
+                    var ue = fromExpression.Body as UnaryExpression;
+                    me = ((ue != null) ? ue.Operand : null) as MethodCallExpression;
+                    break;
+                default:
+                    me = fromExpression.Body as MethodCallExpression;
+                    break;
+            }
+
+            return me != null ? me.Method : null;
 		}
 
 		/// <summary>

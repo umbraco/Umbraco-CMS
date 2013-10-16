@@ -32,20 +32,8 @@
         }
 
         userService.authenticate(login, password)
-            .then(function (data) {
-                
-                var iframe = $("#right");
-                if (iframe) {
-                    var url = decodeURIComponent($routeParams.url);
-                    if (!url) {
-                        url = "dashboard.aspx";
-                    }
-                    iframe.attr("src", url);
-                }
-
-                $scope.submit(true);
-                
-                
+            .then(function (data) {               
+                $scope.submit(true);                
             }, function (reason) {
                 $scope.errorMsg = reason.errorMsg;
                 

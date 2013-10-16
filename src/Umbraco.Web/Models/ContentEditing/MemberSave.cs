@@ -12,7 +12,7 @@ namespace Umbraco.Web.Models.ContentEditing
     {
         public MemberSave()
         {
-            Password = new MemberPassword();
+            Password = new ChangePasswordModel();
         }
 
         [DataMember(Name = "username", IsRequired = true)]
@@ -24,6 +24,6 @@ namespace Umbraco.Web.Models.ContentEditing
         public string Email { get; set; }
         
         [DataMember(Name = "password")]
-        public MemberPassword Password { get; set; }
+        public ChangePasswordModel Password { get; set; }
     }
 }

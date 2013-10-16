@@ -4,6 +4,9 @@ angular.module('umbraco.services')
     var currentUser = null;
     var lastUserId = null;
     var loginDialog = null;
+    //this tracks the last date/time that the user's remainingAuthSeconds was updated from the server
+    // this is used so that we know when to go and get the user's remaining seconds directly.
+    var lastServerTimeoutSet = null;
 
     // Redirect to the given url (defaults to '/')
     function redirect(url) {
@@ -11,14 +14,17 @@ angular.module('umbraco.services')
         $location.path(url);
     }
 
-    function openLoginDialog() {
+    function openLoginDialog(isTimedOut) {
         if (!loginDialog) {
             loginDialog = dialogService.open({
                 template: 'views/common/dialogs/login.html',
                 modalClass: "login-overlay",
                 animation: "slide",
                 show: true,
-                callback: onLoginDialogClose
+                callback: onLoginDialogClose,
+                dialogData: {
+                    isTimedOut: isTimedOut
+                }
             });
         }
     }
@@ -44,35 +50,83 @@ angular.module('umbraco.services')
             throw "The user object is invalid, the remainingAuthSeconds is required.";
         }
         currentUser = usr;
+        lastServerTimeoutSet = new Date();
         //start the timer
-        setCurrentUserTimeout(usr);
+        countdownUserTimeout();
     }
-    function setCurrentUserTimeout() {        
+    
+    /** 
+    Method to count down the current user's timeout seconds, 
+    this will continually count down their current remaining seconds every 2 seconds until
+    there are no more seconds remaining.
+    */
+    function countdownUserTimeout() {        
         $timeout(function () {
             if (currentUser) {
-                currentUser.remainingAuthSeconds -= 1;
-                if (currentUser.remainingAuthSeconds > 0) {
-                    //recurse!
-                    setCurrentUserTimeout();
+                //countdown by 2 seconds since that is how long our timer is for.
+                currentUser.remainingAuthSeconds -= 2;
+
+                //if there are more than 30 remaining seconds, recurse!
+                if (currentUser.remainingAuthSeconds > 30) {
+
+                    //we need to check when the last time the timeout was set from the server, if 
+                    // it has been more than 30 seconds then we'll manually go and retreive it from the 
+                    // server - this helps to keep our local countdown in check with the true timeout.
+                    if (lastServerTimeoutSet != null) {
+                        var now = new Date();
+                        var seconds = (now.getTime() - lastServerTimeoutSet.getTime()) / 1000;
+                        if (seconds > 30) {
+                            //first we'll set the lastServerTimeoutSet to null - this is so we don't get back in to this loop while we 
+                            // wait for a response from the server otherwise we'll be making double/triple/etc... calls while we wait.
+                            lastServerTimeoutSet = null;
+                            //now go get it from the server
+                            authResource.getRemainingTimeoutSeconds().then(function(result) {
+                                setUserTimeoutInternal(result);
+                            });
+                        }
+                    }
+
+                    //recurse the countdown!
+                    countdownUserTimeout();
+                }
+                else {
+                    
+                    //we are either timed out or very close to timing out so we need to show the login dialog.                    
+                    userAuthExpired();
                 }
             }            
-        }, 1000);//every second
+        }, 2000);//every 2 seconds
+    }
+    
+    /** Called to update the current user's timeout */
+    function setUserTimeoutInternal(newTimeout) {
+        var asNumber = parseFloat(newTimeout);
+        if (!isNaN(asNumber) && currentUser && angular.isNumber(asNumber)) {
+            currentUser.remainingAuthSeconds = newTimeout;
+            lastServerTimeoutSet = new Date();
+        }
+    }
+    
+    /** resets all user data, broadcasts the notAuthenticated event and shows the login dialog */
+    function userAuthExpired(isLogout) {
+        //store the last user id and clear the user
+        if (currentUser && currentUser.id !== undefined) {
+            lastUserId = currentUser.id;
+        }
+        currentUser.remainingAuthSeconds = 0;
+        lastServerTimeoutSet = null;
+        currentUser = null;
+        
+        //broadcast a global event that the user is no longer logged in
+        $rootScope.$broadcast("notAuthenticated");
+
+        openLoginDialog(isLogout === undefined ? true : !isLogout);
     }
 
     // Register a handler for when an item is added to the retry queue
     securityRetryQueue.onItemAddedCallbacks.push(function (retryItem) {
         if (securityRetryQueue.hasMore()) {
-            
-            //store the last user id and clear the user
-            if (currentUser && currentUser.id !== undefined) {
-                lastUserId = currentUser.id;
-            }
-            currentUser = null;
-
-            //broadcast a global event that the user is no longer logged in
-            $rootScope.$broadcast("notAuthenticated");
-
-            openLoginDialog();
+            userAuthExpired();
         }
     });
 
@@ -115,13 +169,9 @@ angular.module('umbraco.services')
         /** Logs the user out and redirects to the login page */
         logout: function () {
             return authResource.performLogout()
-                .then(function (data) {                   
+                .then(function (data) {
 
-                    lastUserId = currentUser.id;
-                    currentUser = null;
-
-                    //broadcast a global event
-                    $rootScope.$broadcast("notAuthenticated");
+                    userAuthExpired();
 
                     $location.path("/login").search({check: false});
 
@@ -157,10 +207,9 @@ angular.module('umbraco.services')
             return deferred.promise;
         },
         
+        /** Called whenever a server request is made that contains a x-umb-user-seconds response header for which we can update the user's remaining timeout seconds */
         setUserTimeout: function(newTimeout) {
-            if (currentUser && angular.isNumber(newTimeout)) {
-                currentUser.remainingAuthSeconds = newTimeout;
-            }
+            setUserTimeoutInternal(newTimeout);
         }
     };
 

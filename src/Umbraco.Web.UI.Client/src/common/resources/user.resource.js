@@ -98,7 +98,24 @@ function userResource($q, $http, umbRequestHelper) {
                        "PostChangePassword"),
                        { oldPassword: oldPassword, newPassword: newPassword }),
                'Failed to change password');
-        }
+        },
+        
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.userResource#getMembershipProviderConfig
+         * @methodOf umbraco.resources.userResource
+         *
+         * @description
+         * Gets the configuration of the user membership provider which is used to configure the change password form         
+         */
+        getMembershipProviderConfig: function () {
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "userApiBaseUrl",
+                       "GetMembershipProviderConfig")),
+               'Failed to retreive membership provider config');
+        },
     };
 }
 

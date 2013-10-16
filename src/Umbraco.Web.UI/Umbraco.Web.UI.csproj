@@ -605,6 +605,7 @@
       <DependentUpon>treeInit.aspx</DependentUpon>
     </Compile>
     <Content Include="Umbraco\create.aspx" />
+    <Content Include="Umbraco\Logout.aspx" />
     <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
