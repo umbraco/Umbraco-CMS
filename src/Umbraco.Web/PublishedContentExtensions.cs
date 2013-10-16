@@ -580,9 +580,45 @@ namespace Umbraco.Web
             return content.GetPropertyValue<bool>(Constants.Conventions.Content.NaviHide) == false;
         }
 
-		public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias)
+        /// <summary>
+        /// Determines whether the specified content is a specified content type.
+        /// </summary>
+        /// <param name="content">The content to determine content type of.</param>
+        /// <param name="docTypeAlias">The alias of the content type to test against.</param>
+        /// <returns>True if the content is of the specified content type; otherwise false.</returns>
+	    public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias)
+	    {
+	        return content.DocumentTypeAlias.InvariantEquals(docTypeAlias);
+	    }
+
+	    /// <summary>
+	    /// Determines whether the specified content is a specified content type or it's derived types.
+	    /// </summary>
+	    /// <param name="content">The content to determine content type of.</param>
+	    /// <param name="docTypeAlias">The alias of the content type to test against.</param>
+	    /// <param name="recursive">When true, recurses up the content type tree to check inheritance; when false just calls IsDocumentType(this IPublishedContent content, string docTypeAlias).</param>
+	    /// <returns>True if the content is of the specified content type or a derived content type; otherwise false.</returns>
+	    public static bool IsDocumentType(this IPublishedContent content, string docTypeAlias, bool recursive)
 		{
-			return content.DocumentTypeAlias == docTypeAlias;
+			if (content.IsDocumentType(docTypeAlias))
+				return true;
+
+			if (recursive)
+				return IsDocumentTypeRecursive(content, docTypeAlias);
+			return false;
+		}
+
+		private static bool IsDocumentTypeRecursive(IPublishedContent content, string docTypeAlias)
+		{
+			var contentTypeService = UmbracoContext.Current.Application.Services.ContentTypeService;
+			var type = contentTypeService.GetContentType(content.DocumentTypeAlias);
+			while (type.ParentId > 0)
+			{
+				type = contentTypeService.GetContentType(type.ParentId);
+				if (type.Alias.InvariantEquals(docTypeAlias))
+					return true;
+			}
+			return false;
 		}
 
 		public static bool IsNull(this IPublishedContent content, string alias, bool recurse)

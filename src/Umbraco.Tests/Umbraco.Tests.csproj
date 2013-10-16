@@ -199,6 +199,7 @@
     <Compile Include="Persistence\Repositories\MemberTypeRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserTypeRepositoryTest.cs" />
+    <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\CallingMethodTests.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\Subpage.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\Textpage.cs" />
