@@ -60,10 +60,11 @@ angular.module('umbraco.services')
     function countdownUserTimeout() {        
         $timeout(function () {
             if (currentUser) {
-                currentUser.remainingAuthSeconds -= 1;
+                //countdown by 2 seconds since that is how long our timer is for.
+                currentUser.remainingAuthSeconds -= 2;
 
-                //if there are remaining seconds, recurse!
-                if (currentUser.remainingAuthSeconds > 0) {                    
+                //if there are more than 30 remaining seconds, recurse!
+                if (currentUser.remainingAuthSeconds > 30) {
 
                     //we need to check when the last time the timeout was set from the server, if 
                     // it has been more than 30 seconds then we'll manually go and retreive it from the 
@@ -76,14 +77,23 @@ angular.module('umbraco.services')
                             // wait for a response from the server otherwise we'll be making double/triple/etc... calls while we wait.
                             lastServerTimeoutSet = null;
                             //now go get it from the server
-                            authResource.getRemainingTimeoutSeconds().then(function (result) {
+                            authResource.getRemainingTimeoutSeconds().then(function(result) {
                                 setUserTimeoutInternal(result);
                             });
                         }
                     }
-                    
+
                     //recurse the countdown!
                     countdownUserTimeout();
+                }
+                else {
+                    
+                    //we are either timed out or very close to timing out so we need to show the login dialog.
+                    //first reset these flags so the timer does not continue, it will be started automatically when 
+                    // the user logs in again.
+                    currentUser.remainingAuthSeconds = 0;
+                    lastServerTimeoutSet = null;
+                    openLoginDialog();
                 }
             }            
         }, 2000);//every 2 seconds
