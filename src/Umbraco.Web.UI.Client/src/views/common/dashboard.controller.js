@@ -14,7 +14,7 @@ function DashboardController($scope, $routeParams, dashboardResource, localizati
     	$scope.dashboard.name = name;
     });
     
-    dashboardResource.getDashboard($scope.dashboard.name).then(function(tabs){
+    dashboardResource.getDashboard($routeParams.section).then(function(tabs){
    		$scope.dashboard.tabs = tabs;
     });
 }
