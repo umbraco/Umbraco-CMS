@@ -14,14 +14,17 @@ angular.module('umbraco.services')
         $location.path(url);
     }
 
-    function openLoginDialog() {
+    function openLoginDialog(isTimedOut) {
         if (!loginDialog) {
             loginDialog = dialogService.open({
                 template: 'views/common/dialogs/login.html',
                 modalClass: "login-overlay",
                 animation: "slide",
                 show: true,
-                callback: onLoginDialogClose
+                callback: onLoginDialogClose,
+                dialogData: {
+                    isTimedOut: isTimedOut
+                }
             });
         }
     }
@@ -88,12 +91,8 @@ angular.module('umbraco.services')
                 }
                 else {
                     
-                    //we are either timed out or very close to timing out so we need to show the login dialog.
-                    //first reset these flags so the timer does not continue, it will be started automatically when 
-                    // the user logs in again.
-                    currentUser.remainingAuthSeconds = 0;
-                    lastServerTimeoutSet = null;
-                    openLoginDialog();
+                    //we are either timed out or very close to timing out so we need to show the login dialog.                    
+                    userAuthExpired();
                 }
             }            
         }, 2000);//every 2 seconds
@@ -107,21 +106,27 @@ angular.module('umbraco.services')
             lastServerTimeoutSet = new Date();
         }
     }
+    
+    /** resets all user data, broadcasts the notAuthenticated event and shows the login dialog */
+    function userAuthExpired() {
+        //store the last user id and clear the user
+        if (currentUser && currentUser.id !== undefined) {
+            lastUserId = currentUser.id;
+        }
+        currentUser.remainingAuthSeconds = 0;
+        lastServerTimeoutSet = null;
+        currentUser = null;
+        
+        //broadcast a global event that the user is no longer logged in
+        $rootScope.$broadcast("notAuthenticated");
+
+        openLoginDialog(true);
+    }
 
     // Register a handler for when an item is added to the retry queue
     securityRetryQueue.onItemAddedCallbacks.push(function (retryItem) {
         if (securityRetryQueue.hasMore()) {
-            
-            //store the last user id and clear the user
-            if (currentUser && currentUser.id !== undefined) {
-                lastUserId = currentUser.id;
-            }
-            currentUser = null;
-
-            //broadcast a global event that the user is no longer logged in
-            $rootScope.$broadcast("notAuthenticated");
-
-            openLoginDialog();
+            userAuthExpired();
         }
     });
 
@@ -164,13 +169,9 @@ angular.module('umbraco.services')
         /** Logs the user out and redirects to the login page */
         logout: function () {
             return authResource.performLogout()
-                .then(function (data) {                   
+                .then(function (data) {
 
-                    lastUserId = currentUser.id;
-                    currentUser = null;
-
-                    //broadcast a global event
-                    $rootScope.$broadcast("notAuthenticated");
+                    userAuthExpired();
 
                     $location.path("/login").search({check: false});
 
