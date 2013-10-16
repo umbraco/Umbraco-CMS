@@ -18,19 +18,7 @@ namespace Umbraco.Tests.PublishedContent
 
 		protected override DatabaseBehavior DatabaseTestBehavior
 		{
-			get { return DatabaseBehavior.NewDbFileAndSchemaPerFixture; }
-		}
-
-		[SetUp]
-		public override void Initialize()
-		{
-			base.Initialize();
-		}
-
-		[TearDown]
-		public override void TearDown()
-		{
-			base.TearDown();
+            get { return DatabaseBehavior.NewSchemaPerFixture; }
 		}
 
 		protected override string GetXmlContent(int templateId)
