@@ -132,7 +132,7 @@ namespace umbraco.cms.businesslogic.packager
         }
 
         #region Public Methods
-        
+
         /// <summary>
         /// Adds the macro to the package
         /// </summary>
@@ -142,7 +142,7 @@ namespace umbraco.cms.businesslogic.packager
         {
             _macros.Add(MacroToAdd);
         }
-        
+
         /// <summary>
         /// Imports the specified package
         /// </summary>
@@ -179,7 +179,7 @@ namespace umbraco.cms.businesslogic.packager
                 return tempDir;
             }
         }
-        
+
         public int CreateManifest(string tempDir, string guid, string repoGuid)
         {
             //This is the new improved install rutine, which chops up the process into 3 steps, creating the manifest, moving files, and finally handling umb objects
@@ -260,14 +260,14 @@ namespace umbraco.cms.businesslogic.packager
                     }
                     catch (Exception ex)
                     {
-						LogHelper.Error<Installer>("Package install error", ex);
+                        LogHelper.Error<Installer>("Package install error", ex);
                     }
                 }
 
                 insPack.Save();
             }
         }
-        
+
         public void InstallBusinessLogic(int packageId, string tempDir)
         {
             using (DisposableTimer.DebugDuration<Installer>(
@@ -294,7 +294,7 @@ namespace umbraco.cms.businesslogic.packager
 
                 #region DataTypes
                 var dataTypeElement = rootElement.Descendants("DataTypes").FirstOrDefault();
-                if(dataTypeElement != null)
+                if (dataTypeElement != null)
                 {
                     var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement, currentUser.Id);
                     foreach (var dataTypeDefinition in dataTypeDefinitions)
@@ -334,14 +334,14 @@ namespace umbraco.cms.businesslogic.packager
 
                 #region Dictionary items
 
-	            var dictionaryItemsElement = rootElement.Descendants("DictionaryItems").FirstOrDefault();
-	            if (dictionaryItemsElement != null)
-	            {
-		            var insertedDictionaryItems = packagingService.ImportDictionaryItems(dictionaryItemsElement);
-					insPack.Data.DictionaryItems.AddRange(insertedDictionaryItems.Select(d => d.Id.ToString()));
-	            }
+                var dictionaryItemsElement = rootElement.Descendants("DictionaryItems").FirstOrDefault();
+                if (dictionaryItemsElement != null)
+                {
+                    var insertedDictionaryItems = packagingService.ImportDictionaryItems(dictionaryItemsElement);
+                    insPack.Data.DictionaryItems.AddRange(insertedDictionaryItems.Select(d => d.Id.ToString()));
+                }
 
-				#endregion
+                #endregion
 
                 #region Macros
                 foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("//macro"))
@@ -357,7 +357,7 @@ namespace umbraco.cms.businesslogic.packager
 
                 //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
                 #endregion
-                
+
                 #region Templates
                 var templateElement = rootElement.Descendants("Templates").FirstOrDefault();
                 if (templateElement != null)
@@ -531,17 +531,17 @@ namespace umbraco.cms.businesslogic.packager
             }
         }
 
-		/// <summary>
-		/// Remove the temp installation folder
-		/// </summary>
-		/// <param name="packageId"></param>
-		/// <param name="tempDir"></param>
+        /// <summary>
+        /// Remove the temp installation folder
+        /// </summary>
+        /// <param name="packageId"></param>
+        /// <param name="tempDir"></param>
         public void InstallCleanUp(int packageId, string tempDir)
         {
-			if (Directory.Exists(tempDir))
-			{
-				Directory.Delete(tempDir, true);
-			}
+            if (Directory.Exists(tempDir))
+            {
+                Directory.Delete(tempDir, true);
+            }
         }
 
         /// <summary>
@@ -588,7 +588,7 @@ namespace umbraco.cms.businesslogic.packager
 
             #region DataTypes
             var dataTypeElement = rootElement.Descendants("DataTypes").FirstOrDefault();
-            if(dataTypeElement != null)
+            if (dataTypeElement != null)
             {
                 var dataTypeDefinitions = packagingService.ImportDataTypeDefinitions(dataTypeElement, currentUser.Id);
                 foreach (var dataTypeDefinition in dataTypeDefinitions)
@@ -762,8 +762,8 @@ namespace umbraco.cms.businesslogic.packager
             #endregion
 
             #region Install Documents
-            var documentElement = rootElement.Descendants("DocumentSet").FirstOrDefault(); 
-            if(documentElement != null)
+            var documentElement = rootElement.Descendants("DocumentSet").FirstOrDefault();
+            if (documentElement != null)
             {
                 var content = packagingService.ImportContent(documentElement, -1, currentUser.Id);
 
@@ -797,7 +797,7 @@ namespace umbraco.cms.businesslogic.packager
 
             insPack.Save();
         }
-        
+
         /// <summary>
         /// Reads the configuration of the package from the configuration xmldocument
         /// </summary>
@@ -899,7 +899,7 @@ namespace umbraco.cms.businesslogic.packager
             }
             catch { }
         }
-        
+
         /// <summary>
         /// This uses the old method of fetching and only supports the packages.umbraco.org repository.
         /// </summary>
@@ -919,7 +919,7 @@ namespace umbraco.cms.businesslogic.packager
 
             return "packages\\" + Package.ToString() + ".umb";
         }
-        
+
         #endregion
 
         #region Public Static Methods

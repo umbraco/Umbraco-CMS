@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Umbraco.Tests</RootNamespace>
     <AssemblyName>Umbraco.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
@@ -29,7 +29,6 @@
     <IsWebBootstrapper>false</IsWebBootstrapper>
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,7 +38,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -48,16 +46,11 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AutoMapper, Version=2.2.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+    <Reference Include="Examine, Version=0.1.52.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\AutoMapper.2.2.1\lib\net40\AutoMapper.dll</HintPath>
-    </Reference>
-    <Reference Include="Examine, Version=0.1.51.2941, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.51.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.52.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -103,7 +96,7 @@
       <HintPath>..\packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http.Formatting, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.4.0.20710.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.4.0.30506.0\lib\net40\System.Net.Http.Formatting.dll</HintPath>
     </Reference>
     <Reference Include="System.Net.Http.WebRequest, Version=2.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Net.Http.2.0.20710.0\lib\net40\System.Net.Http.WebRequest.dll</HintPath>
@@ -112,33 +105,33 @@
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.Helpers.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Http, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.4.0.20710.0\lib\net40\System.Web.Http.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.Core.4.0.30506.0\lib\net40\System.Web.Http.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Http.WebHost, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.4.0.20710.0\lib\net40\System.Web.Http.WebHost.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebApi.WebHost.4.0.30506.0\lib\net40\System.Web.Http.WebHost.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Mvc, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.Mvc.4.0.20710.0\lib\net40\System.Web.Mvc.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.Mvc.4.0.30506.0\lib\net40\System.Web.Mvc.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.Razor.2.0.20715.0\lib\net40\System.Web.Razor.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.Razor.2.0.30506.0\lib\net40\System.Web.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.WebPages, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.WebPages.Deployment, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.Deployment.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Deployment.dll</HintPath>
     </Reference>
     <Reference Include="System.Web.WebPages.Razor, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
-      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.20710.0\lib\net40\System.Web.WebPages.Razor.dll</HintPath>
+      <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.WebPages.Razor.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -151,7 +144,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AttemptTests.cs" />
-    <Compile Include="Auditing\AuditTests.cs" />
+    <Compile Include="MockTests.cs" />
+    <Compile Include="Persistence\Auditing\AuditTests.cs" />
     <Compile Include="BootManagers\CoreBootManagerTests.cs" />
     <Compile Include="BusinessLogic\DictionaryTest.cs" />
     <Compile Include="Cache\CacheHelperTests.cs" />
@@ -193,19 +187,31 @@
     <Compile Include="CodeFirst\TypeInheritanceTest.cs" />
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
+    <Compile Include="DynamicsAndReflection\ExtensionMethodFinderTests.cs" />
+    <Compile Include="DynamicsAndReflection\ReflectionTests.cs" />
     <Compile Include="Integration\CreateContent.cs" />
+    <Compile Include="Models\ContentExtensionsTests.cs" />
+    <Compile Include="Models\DataValueSetterTests.cs" />
+    <Compile Include="Mvc\MergeParentContextViewDataAttributeTests.cs" />
+    <Compile Include="Mvc\ViewDataDictionaryExtensionTests.cs" />
+    <Compile Include="Persistence\PetaPocoExtensionsTest.cs" />
+    <Compile Include="Persistence\Repositories\MemberRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\MemberTypeRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserTypeRepositoryTest.cs" />
+    <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\CallingMethodTests.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\Subpage.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\Textpage.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\TypedModelBase.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\UmbracoTemplatePage`T.cs" />
     <Compile Include="Services\LocalizationServiceTests.cs" />
+    <Compile Include="Services\PackagingServiceTests.cs" />
+    <Compile Include="Services\PerformanceTests.cs" />
     <Compile Include="Services\UserServiceTests.cs" />
     <Compile Include="TestHelpers\BaseSeleniumTest.cs" />
     <Compile Include="Integration\InstallPackage.cs" />
+    <Compile Include="CoreXml\NavigableNavigatorTests.cs" />
     <Compile Include="PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="CoreStrings\CmsHelperCasingTests.cs" />
     <Compile Include="CoreStrings\ShortStringHelperResolverTest.cs" />
@@ -251,9 +257,9 @@
     <Compile Include="PublishedContent\LegacyExamineBackedMediaTests.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
     <Compile Include="PublishedContent\PublishedContentTestBase.cs" />
+    <Compile Include="PublishedContent\PublishedContentTestElements.cs" />
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
-    <Compile Include="PublishedContent\StronglyTypedQueryTests.cs" />
     <Compile Include="HashCodeCombinerTests.cs" />
     <Compile Include="HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="IO\IOHelperTest.cs" />
@@ -295,11 +301,16 @@
     <Compile Include="Persistence\RepositoryResolverTests.cs" />
     <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
     <Compile Include="Persistence\SqlTableByTableTest.cs" />
+    <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
     <Compile Include="Publishing\PublishingStrategyTests.cs" />
     <Compile Include="Resolvers\ActionsResolverTests.cs" />
     <Compile Include="AsynchronousRollingFileAppenderTests.cs" />
+    <Compile Include="BusinessLogic\ApplicationTest.cs" />
+    <Compile Include="BusinessLogic\ApplicationTreeTest.cs" />
+    <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserType.cs" />
+    <Compile Include="BusinessLogic\BaseTest.cs" />
     <Compile Include="CacheRefresherFactoryTests.cs" />
     <Compile Include="PublishedContent\DynamicPublishedContentCustomExtensionMethods.cs" />
     <Compile Include="PublishedContent\DynamicPublishedContentTests.cs" />
@@ -307,6 +318,7 @@
     <Compile Include="PublishedContent\DynamicNodeTests.cs" />
     <Compile Include="ObjectExtensionsTests.cs" />
     <Compile Include="PublishedCache\PublishedContentCacheTests.cs" />
+    <Compile Include="DataTypeFactoryTests.cs" />
     <Compile Include="Resolvers\LazyManyObjectResolverTests.cs" />
     <Compile Include="Resolvers\ManyResolverTests.cs" />
     <Compile Include="Resolvers\SingleResolverTests.cs" />
@@ -349,7 +361,7 @@
     <Compile Include="Routing\NiceUrlProviderTests.cs" />
     <Compile Include="Routing\RenderRouteHandlerTests.cs" />
     <Compile Include="Routing\RouteTestExtensions.cs" />
-    <Compile Include="Stubs\TestControllerFactory.cs" />
+    <Compile Include="TestHelpers\Stubs\TestControllerFactory.cs" />
     <Compile Include="TestHelpers\BaseUsingSqlCeSyntax.cs" />
     <Compile Include="TestHelpers\BaseWebTest.cs" />
     <Compile Include="TestHelpers\BaseDatabaseTest.cs" />
@@ -357,6 +369,8 @@
     <Compile Include="TestHelpers\Entities\MockedContentTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
     <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
+    <Compile Include="Trees\BaseContentTreeTests.cs" />
+    <Compile Include="Trees\BaseMediaTreeTests.cs" />
     <Compile Include="UmbracoExamine\ContentServiceTest.cs" />
     <Compile Include="UmbracoExamine\EventsTest.cs" />
     <Compile Include="TypeHelperTests.cs" />
@@ -383,7 +397,7 @@
     <Compile Include="Resolvers\PackageActionsResolverTests.cs" />
     <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="PluginManagerTests.cs" />
-    <Compile Include="Stubs\FakeLastChanceFinder.cs" />
+    <Compile Include="TestHelpers\Stubs\FakeLastChanceFinder.cs" />
     <Compile Include="TestHelpers\TestHelper.cs" />
     <Compile Include="EnumerableExtensionsTests.cs" />
     <Compile Include="IO\AbstractFileSystemTests.cs" />
@@ -478,7 +492,6 @@
     <EmbeddedResource Include="Services\Importing\ImportResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="UmbracoExamine\TestFiles.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -518,7 +531,7 @@
     <Content Include="Migrations\SqlScripts\SqlCe-SchemaAndData-4110.sql" />
     <Content Include="Migrations\SqlScripts\SqlCeTotal-480.sql" />
     <Content Include="Migrations\SqlScripts\SqlServerTotal-480.sql" />
-    <Content Include="Services\Importing\Dictionary-Package.xml">
+    <Content Include="Services\Importing\CheckboxList-Content-Package.xml">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="UmbracoExamine\TestFiles\media.xml" />

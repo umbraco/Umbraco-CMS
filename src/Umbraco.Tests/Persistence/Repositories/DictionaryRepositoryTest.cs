@@ -63,7 +63,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(dictionaryItem.Translations.First().Value, Is.EqualTo("Read More"));
                 Assert.That(dictionaryItem.Translations.Last().Value, Is.EqualTo("Læs mere"));
             }
-            
+
         }
 
         [Test]
@@ -180,7 +180,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-		//[Ignore]
+        //[Ignore]
         [Test]
         public void Can_Perform_Update_On_DictionaryRepository()
         {
@@ -206,6 +206,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(dictionaryItem, Is.Not.Null);
                 Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(2));
                 Assert.That(dictionaryItem.Translations.FirstOrDefault().Value, Is.EqualTo("Read even more"));
+            }
         }
 
         [Test]
@@ -217,8 +218,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var languageRepository = new LanguageRepository(unitOfWork);
             var repository = new DictionaryRepository(unitOfWork, languageRepository);
 
-			var languageNo = new Language("nb-NO") { CultureName = "nb-NO" };
-			ServiceContext.LocalizationService.Save(languageNo);
+            var languageNo = new Language("nb-NO") { CultureName = "nb-NO" };
+            ServiceContext.LocalizationService.Save(languageNo);
 
             // Act
             var item = repository.Get(1);
@@ -235,7 +236,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(dictionaryItem, Is.Not.Null);
             Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(3));
             Assert.That(dictionaryItem.Translations.Single(t => t.Language.IsoCode == "nb-NO").Value, Is.EqualTo("Les mer"));
-            }
         }
 
         [Test]
