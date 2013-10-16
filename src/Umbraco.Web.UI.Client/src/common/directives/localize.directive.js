@@ -8,8 +8,9 @@ angular.module("umbraco.directives")
         replace: true,
         link: function (scope, element, attrs) {
             var key = scope.key;
-            var value = localizationService.localize(key);
-            element.html(value);
+            localizationService.localize(key).then(function(value){
+                element.html(value);
+            });
         }
     };
 })
@@ -19,26 +20,18 @@ angular.module("umbraco.directives")
         link: function (scope, element, attrs) {
             var keys = attrs.localize.split(',');
 
-            for (var i = keys.length - 1; i >= 0; i--) {
-                var attr = element.attr(keys[i]);
-
+            angular.forEach(keys, function(value, key){
+                var attr = element.attr(value);
                 if(attr){
-                    var localizer = attr.split(':');
-                    var tokens;
-                    var key = localizer[0];
-
-                    if(localizer.length > 0){
-                        tokens = localizer[1].split(',');
-                        for (var x = 0; x < tokens.length; x++) {
-                            tokens[x] = scope.$eval(tokens[x]);
-                        } 
-                    }
-
-                    if(key[0] === '@'){
-                        element.attr(keys[i], localizationService.localize(key.substring(1), tokens));    
+                    if(attr[0] === '@'){
+                        var t = localizationService.tokenize(attr.substring(1), scope);
+                        localizationService.localize(t.key, t.tokens).then(function(val){
+                                element.attr(value, val);
+                        });
                     }
                 }
-            }
+            });
+
         }
     };
 });

@@ -6,16 +6,18 @@ using umbraco.BusinessLogic;
 
 namespace umbraco.js
 {
-	public partial class language : UmbracoEnsuredPage
+	public partial class language : BasePage
 	{
 		protected void Page_Load(object sender, EventArgs e)
 		{
             Response.ContentType = "application/json";
-            User u = base.getUser();
-			if(u == null)
-				return;
-			string lang = u.Language;
-			XmlDocument all = ui.getLanguageFile(lang);
+            string lang = "en";
+            if(ValidateCurrentUser()){
+                lang = UmbracoUser.Language;
+            }
+
+    	    XmlDocument all = ui.getLanguageFile(lang);
+
 			if(all == null)
 				return;
 

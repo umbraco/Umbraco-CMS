@@ -17,7 +17,8 @@
                             id="search-field"
                             ng-model="nav.ui.searchTerm"
                             class="umb-search-field search-query"
-                            placeholder="Type to search..."
+                            localize="placeholder"
+                            placeholder="@placeholders_search"
                             on-blur="deActivateSearch()"
                             on-keyup="performSearch(nav.ui.searchTerm)">
                     </form>
@@ -31,7 +32,7 @@
                 <ul class="umb-tree">
                     <li class="root">
                         <div>
-                            <h5>Search results</h5>
+                            <h5><localize key="general_searchResults">Search results</localize></h5>
                         </div>
                         
                         <ul class="umb-search-group" ng-repeat="resultGroup in nav.ui.search.results">

@@ -52,7 +52,7 @@ angular.module('umbraco.services')
                     if(value){
                         var localizer = value.split(':');
                         var retval = {tokens: undefined, key: localizer[0].substring(0)};
-                        if(localizer.length > 0){
+                        if(localizer.length > 1){
                             retval.tokens = localizer[1].split(',');
                             for (var x = 0; x < retval.tokens.length; x++) {
                                 retval.tokens[x] = scope.$eval(retval.tokens[x]);
@@ -65,13 +65,19 @@ angular.module('umbraco.services')
 
             // checks the dictionary for a localized resource string
             localize: function(value,tokens) {
+                var deferred = $q.defer();
+
                 if(service.resourceFileLoaded){
-                    return service._lookup(value,tokens);
+                    var val = service._lookup(value,tokens);
+                    deferred.resolve(val);
                 }else{
                     service.initLocalizedResources().then(function(dic){
-                        return service._lookup(value,tokens);
+                           var val = service._lookup(value,tokens);
+                           deferred.resolve(val); 
                     });
                 }
+
+                return deferred.promise;
             },
             _lookup: function(value,tokens){
                 var entry = service.dictionary[value];

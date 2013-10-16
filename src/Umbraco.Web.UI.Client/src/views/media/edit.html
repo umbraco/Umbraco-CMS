@@ -7,8 +7,8 @@
         <umb-header tabs="content.tabs">
             
             <div class="span4">
-                <umb-content-name 
-                    placeholder="Enter a name..." 
+                <umb-content-name
+                    placeholder="@placeholders_name" 
                     ng-model="content.name"></umb-content-name>
             </div>
 
@@ -19,7 +19,9 @@
                     </div>
 
                     <div class="btn-group">
-                        <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">Save</button>
+                        <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
+                            <localize key="buttons_save">Save</localize>
+                        </button>
                     </div>
                 </div>
             </div>

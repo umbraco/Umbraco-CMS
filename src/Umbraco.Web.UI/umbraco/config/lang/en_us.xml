@@ -53,6 +53,14 @@
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
   </area>
+
+  <area alias="placeholders">
+    <key alias="username">Enter your username</key>
+    <key alias="password">Enter your password</key>
+    <key alias="search">Type to search</key>
+    <key alias="filter">Type to filter</key>
+  </area>
+
   <area alias="buttons">
     <key alias="bold">Bold</key>
     <key alias="deindent">Cancel Paragraph Indent</key>
@@ -536,9 +544,21 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="lockoutWillOccur">You've been idle and logout will automatically occur in</key>
     <key alias="renewSession">Renew now to save your work</key>
   </area>
+
+
   <area alias="login">
+    <key alias="greeting1">Happy super sunday</key>
+    <key alias="greeting2">Happy manic monday </key>
+    <key alias="greeting3">Happy tremendous tuesday</key>
+    <key alias="greeting4">Happy wonderfull wednesday</key>
+    <key alias="greeting5">Happy thunder thursday</key>
+    <key alias="greeting6">Happy friendly friday</key>
+    <key alias="greeting7">Happy shiny saturday</key>
+    <key alias="topText">log in below:</key>
+
+
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
-    <key alias="topText">Welcome to umbraco, type your username and password in the boxes below:</key>
+    
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>

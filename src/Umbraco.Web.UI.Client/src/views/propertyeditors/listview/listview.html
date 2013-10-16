@@ -5,7 +5,7 @@
 
 		    <div class="btn-group" ng-show="listViewAllowedTypes">
 		        <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-		            Create
+		            <localize key="actions_create">Create</localize>
 		            <span class="caret"></span>
 		        </a>
 		        <ul class="dropdown-menu">
@@ -21,13 +21,18 @@
 		    
            
 		    <div class="btn-group" ng-show="isAnythingSelected()">
-		        <a class="btn btn-success" ng-disabled="actionInProgress" ng-click="publish()" prevent-default>Publish</a>
+		        <a class="btn btn-success" ng-disabled="actionInProgress" ng-click="publish()" prevent-default>
+		        	<localize key="actions_publish">Publish</localize></a>
 		    </div>
 		    <div class="btn-group" ng-show="isAnythingSelected()">
-		        <a class="btn btn-warning" ng-disabled="actionInProgress" ng-click="unpublish()" prevent-default>Unpublish</a>
+		        <a class="btn btn-warning" ng-disabled="actionInProgress" ng-click="unpublish()" prevent-default>
+		        	<localize key="actions_unpublish">Unpublish</localize>
+		        </a>
 		    </div>
 		    <div class="btn-group" ng-show="isAnythingSelected()">
-		        <a class="btn btn-danger" ng-disabled="actionInProgress" ng-click="delete()" prevent-default>Delete</a>
+		        <a class="btn btn-danger" ng-disabled="actionInProgress" ng-click="delete()" prevent-default>
+		        	<localize key="actions_delete">Delete</localize>	
+		        </a>
 		    </div>
 		    <span ng-bind="bulkStatus" ng-show="isAnythingSelected()"></span>
 		</div>
@@ -36,9 +41,15 @@
 			<thead>
 				<tr>
 					<td with="20"><input type="checkbox" ng-click="selectAll($event)" ng-checked="isSelectedAll()"></td>
-					<td><a href="#" ng-click="sort('Name')" prevent-default>Name <i class="icon-sort"></i></a></td>
-					<td><a href="#" ng-click="sort('UpdateDate')" prevent-default>Last updated  <i class="icon-sort"></i></a></td> 
-					<td><a href="#" ng-click="sort('Owner')" prevent-default>Editor <i class="icon-sort"></i></a></td> 
+					<td><a href="#" ng-click="sort('Name')" prevent-default>
+						<localize key="general_name">Name</localize> 
+						<i class="icon-sort"></i></a></td>
+					<td><a href="#" ng-click="sort('UpdateDate')" prevent-default>
+						<localize key="defaultdialogs_lastEdited">Last edited</localize>
+						<i class="icon-sort"></i></a></td> 
+					<td><a href="#" ng-click="sort('Owner')" prevent-default>
+						<localize key="content_updatedBy">Updated by</localize>
+						<i class="icon-sort"></i></a></td> 
 					<td with="20"><form class="pull-right" novalidate>
 					<i class="icon-search"></i>
 					<input type="text" ng-model="options.filter" on-keyup="reloadView(contentId)">
@@ -72,14 +83,16 @@
 						</div>
 						<div class="pagination pagination-right">
 							<ul>
-								<li><a href="#" ng-click="prev()" prevent-default>Prev</a></li>
+								<li><a href="#" ng-click="prev()" prevent-default><localize key="general_previous">Previous</localize></a></li>
 
 								<li ng-repeat="pgn in pagination track by $index" 
 									ng-class="{active:$index==options.offset}">
 									<a href="#" ng-click="goToPage($index)"  prevent-default>{{$index + 1}}</a>
 								</li>
 
-								<li><a href="#" ng-click="next()" prevent-default>Next</a></li>
+								<li><a href="#" ng-click="next()" prevent-default>
+									<localize key="general_next">Next</localize>
+								</a></li>
 							</ul>
 						</div>
 
