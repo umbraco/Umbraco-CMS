@@ -44,7 +44,7 @@ namespace Umbraco.Tests.PublishedContent
 			InitializeInheritedContentTypes();
 
 			var publishedContent = ctx.ContentCache.GetById(1100);
-			Assert.That(publishedContent.IsDocumentType("inherited"));
+            Assert.That(publishedContent.IsDocumentType("inherited", false));
 		}
 
 		[Test]
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.PublishedContent
 			InitializeInheritedContentTypes();
 
 			var publishedContent = ctx.ContentCache.GetById(1100);
-			Assert.That(publishedContent.IsDocumentType("base"), Is.False);
+			Assert.That(publishedContent.IsDocumentType("base", false), Is.False);
 		}
 
 		[Test]
