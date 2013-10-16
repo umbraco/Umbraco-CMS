@@ -195,15 +195,26 @@ namespace Umbraco.Web.Mvc
 		        Route surfaceRoute;
 		        if (postedInfo.Area.IsNullOrWhiteSpace())
 		        {
-                    //find the controller in the route table without an area
-		            surfaceRoute = RouteTable.Routes.OfType<Route>()
-		                                         .SingleOrDefault(x => x.Defaults != null &&
-                                                                       x.Defaults.ContainsKey("controller") &&
-                                                                       x.Defaults["controller"].ToString() == postedInfo.ControllerName &&
-                                                                       String.Equals(x.Defaults["action"].ToString(), postedInfo.ActionName, StringComparison.InvariantCultureIgnoreCase) &&
-                                                                       !x.DataTokens.ContainsKey("area"));                    
+                //find the controller in the route table without an area
+		            var surfaceRoutes = RouteTable.Routes.OfType<Route>()
+		                                         .Where(x => x.Defaults != null &&
+                                                         x.Defaults.ContainsKey("controller") &&
+                                                         String.Equals(x.Defaults["controller"].ToString(), postedInfo.ControllerName, StringComparison.InvariantCultureIgnoreCase) &&
+                                                         !x.DataTokens.ContainsKey("area")).ToList();
+
+              // If more than one route is found, find one with a matching action
+		          if (surfaceRoutes.Count() > 1)
+		          {
+		            surfaceRoute = surfaceRoutes.SingleOrDefault(x =>
+		                           String.Equals(x.Defaults["action"].ToString(), postedInfo.ActionName, StringComparison.InvariantCultureIgnoreCase));
+		          }
+		          else
+		          {
+		            surfaceRoute = surfaceRoutes.SingleOrDefault();
+		          }
+ 
 		        }
-                else
+            else
 		        {
                     //find the controller in the route table with the specified area
 		            surfaceRoute = RouteTable.Routes.OfType<Route>()
