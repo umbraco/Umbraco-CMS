@@ -83,7 +83,7 @@
     <key alias="clickToEdit">Klik på musen for at redigere dette punkt</key>
     <key alias="createBy">Oprettet af</key>
     <key alias="createDate">Oprettet den</key>
-    <key alias="documentType">Dokumenttype</kaey>
+    <key alias="documentType">Dokumenttype</key>
     <key alias="editing">Redigerer</key>
     <key alias="expireDate">Nedtagningsdato</key>
     <key alias="itemChanged">Dette punkt er ændret siden udgivelsen</key>
