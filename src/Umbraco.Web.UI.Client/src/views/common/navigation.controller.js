@@ -59,6 +59,18 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
         navigationService.showMenu(ev, args);
     });
 
+    $scope.treeEventHandler.bind("treeNodeAltSelect", function (ev, args) {
+        ev.stopPropagation();
+        ev.preventDefault();
+        
+        $scope.currentNode = args.node;
+        args.scope = $scope;
+
+        args.skipDefault = true;
+        navigationService.showMenu(ev, args);
+    });
+
+
     //this reacts to the options item in the tree
     $scope.searchShowMenu = function (ev, args) {
         
@@ -79,7 +91,10 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
         
         var n = args.node;
 
-        //here we need to check for some legacy tree code
+        /*if(n.metaData && n.metaData.application){
+            $location.path(n.metaData.application).search("");
+        }else*/
+
         if (n.metaData && n.metaData["jsClickCallback"] && angular.isString(n.metaData["jsClickCallback"]) && n.metaData["jsClickCallback"] !== "") {
             //this is a legacy tree node!                
             var jsPrefix = "javascript:";
@@ -106,10 +121,13 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
             historyService.add({ name: n.name, link: n.routePath, icon: n.icon });
             //not legacy, lets just set the route value and clear the query string if there is one.
             $location.path(n.routePath).search("");
+        }else if(n.metaData && n.metaData.application){
+            $location.path("#/" + n.metaData.application);
         }
 
         navigationService.hideNavigation();
     });
+    
 
     /** Opens a dialog but passes in this scope instance to be used for the dialog */
     $scope.openDialog = function (currentNode, action, currentSection) {        
