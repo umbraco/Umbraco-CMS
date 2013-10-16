@@ -230,13 +230,14 @@ angular.module('umbraco.services')
                 return;
             }
 
-            service.active = false;
-
-            $timeout(function(){
-                if(!service.active){
-                    service.hideTree();
-                }
-            }, 300);
+            if(!service.touchDevice){
+                service.active = false;
+                $timeout(function(){
+                    if(!service.active){
+                        service.hideTree();
+                    }
+                }, 300);
+            }
         },
 
         /**
