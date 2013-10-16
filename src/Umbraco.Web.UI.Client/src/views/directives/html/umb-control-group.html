@@ -1,13 +1,13 @@
 <div class="umb-property">
-        <div class="control-group umb-control-group" ng-class="{error: propertyForm.$invalid}" >
-            <div class="umb-el-wrap">
-                <label class="control-label" for="{{alias}}">
-                    {{labelstring}}
+    <div class="control-group umb-control-group" ng-class="{error: !formValid()}">
+        <div class="umb-el-wrap">
+            <label class="control-label" for="{{alias}}">
+                {{labelstring}}
                     <small>{{description}}</small>
-                </label>
+            </label>
 
-                <div class="controls controls-row" ng-transclude>
-                </div>
+            <div class="controls controls-row" ng-transclude>
             </div>
         </div>
+    </div>
 </div>

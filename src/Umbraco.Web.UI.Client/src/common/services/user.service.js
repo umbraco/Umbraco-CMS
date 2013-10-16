@@ -108,7 +108,7 @@ angular.module('umbraco.services')
     }
     
     /** resets all user data, broadcasts the notAuthenticated event and shows the login dialog */
-    function userAuthExpired() {
+    function userAuthExpired(isLogout) {
         //store the last user id and clear the user
         if (currentUser && currentUser.id !== undefined) {
             lastUserId = currentUser.id;
@@ -120,7 +120,7 @@ angular.module('umbraco.services')
         //broadcast a global event that the user is no longer logged in
         $rootScope.$broadcast("notAuthenticated");
 
-        openLoginDialog(true);
+        openLoginDialog(isLogout === undefined ? true : !isLogout);
     }
 
     // Register a handler for when an item is added to the retry queue

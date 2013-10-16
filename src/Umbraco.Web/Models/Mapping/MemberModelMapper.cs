@@ -66,9 +66,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="member"></param>
         /// <param name="display"></param>
         private static void MapGenericCustomProperties(IMember member, MemberDisplay display)
-        {
-            var membershipProvider = Membership.Provider;
-
+        {            
             TabsAndPropertiesResolver.MapGenericProperties(
                 member, display,
                 new ContentPropertyDisplay
@@ -90,15 +88,12 @@ namespace Umbraco.Web.Models.Mapping
                             },
                         //TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
                         View = "changepassword",
-                        Config = new Dictionary<string, object>
+                        Config = new Dictionary<string, object>(
+                            //initialize the dictionary with the configuration from the default membership provider
+                            Membership.Provider.GetConfiguration())
                             {
                                 //the password change toggle will only be displayed if there is already a password assigned.
-                                {"hasPassword", member.Password.IsNullOrWhiteSpace() == false},
-                                {"minPasswordLength", membershipProvider.MinRequiredPasswordLength},
-                                {"enableReset", membershipProvider.EnablePasswordReset},
-                                {"enablePasswordRetrieval", membershipProvider.EnablePasswordRetrieval},
-                                {"requiresQuestionAnswer", membershipProvider.RequiresQuestionAndAnswer}
-                                //TODO: Inject the other parameters in here to change the behavior of this control - based on the membership provider settings.
+                                {"hasPassword", member.Password.IsNullOrWhiteSpace() == false}                                
                             }
                     },
                 new ContentPropertyDisplay

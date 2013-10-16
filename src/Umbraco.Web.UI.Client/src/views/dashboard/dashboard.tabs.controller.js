@@ -81,23 +81,40 @@ angular.module("umbraco").controller("Umbraco.Dashboard.MediaFolderBrowserDashbo
 
 
 function ChangePasswordDashboardController($scope, xmlhelper, $log, userResource, formHelper) {
-    //this is the model we will pass to the service
-    $scope.profile = {};
+
+    //create the initial model for change password property editor
+    $scope.changePasswordModel = {
+        alias: "password",
+        view: "changepassword",
+        config: {}
+    };
+
+    //go get the config for the membership provider and add it to the model
+    userResource.getMembershipProviderConfig().then(function(data) {
+        $scope.changePasswordModel.config = data;
+        //ensure the hasPassword config option is set to true (the user of course has a password already assigned)
+        //this will ensure the oldPassword is shown so they can change it
+        $scope.changePasswordModel.config.hasPassword = true;
+        $scope.changePasswordModel.config.disableToggle = true;
+    });
+
+    ////this is the model we will pass to the service
+    //$scope.profile = {};
 
     $scope.changePassword = function(p) {
 
         if (formHelper.submitForm({ scope: $scope })) {
-            userResource.changePassword(p.oldPassword, p.newPassword).then(function() {
+            //userResource.changePassword(p.oldPassword, p.newPassword).then(function() {
 
-                formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+            //    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
 
-                //TODO: This is temporary - server validation will work automatically with the val-server directives.
-                $scope.passwordForm.$setValidity(true);
-            }, function () {
-                //TODO: This is temporary - server validation will work automatically with the val-server directives.
-                //this only happens if there is a wrong oldPassword sent along
-                $scope.passwordForm.oldpass.$setValidity("oldPassword", false);
-            });
+            //    //TODO: This is temporary - server validation will work automatically with the val-server directives.
+            //    $scope.passwordForm.$setValidity(true);
+            //}, function () {
+            //    //TODO: This is temporary - server validation will work automatically with the val-server directives.
+            //    //this only happens if there is a wrong oldPassword sent along
+            //    $scope.passwordForm.oldpass.$setValidity("oldPassword", false);
+            //});
         }
     };
 }
