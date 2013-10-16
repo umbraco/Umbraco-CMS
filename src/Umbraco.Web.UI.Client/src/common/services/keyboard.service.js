@@ -11,11 +11,20 @@ angular.module('umbraco.services')
 		'keyCode':          false
 	};
 	
+	var isMac = navigator.platform.toUpperCase().indexOf('MAC')>=0;
+
 	// Store all keyboard combination shortcuts
 	keyboardManagerService.keyboardEvent = {};
 
+
 	// Add a new keyboard combination shortcut
 	keyboardManagerService.bind = function (label, callback, opt) {
+
+		//replace ctrl key with meta key
+		if(isMac){
+		  label = label.replace("ctrl","meta");
+		}
+
 		var fct, elt, code, k;
 		// Initialize opt object
 		opt   = angular.extend({}, defaultOpt, opt);
