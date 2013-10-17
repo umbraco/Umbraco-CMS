@@ -538,7 +538,7 @@ namespace umbraco.providers
             var user = found.First();
 
             //Yes, it's true, this actually makes a db call to set the password
-            user.Password = newPassword;
+            user.Password = EncodePassword(newPassword);
             //call this just for fun.
             user.Save();
 
