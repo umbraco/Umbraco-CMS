@@ -34,7 +34,7 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                var converted = UmbracoSettings.ObjectExtensions.TryConvertTo<T>(RawValue);
+                var converted = ObjectExtensions.TryConvertTo<T>(RawValue);
                 if (converted.Success == false)
                     throw new InvalidCastException("Could not convert value " + RawValue + " to type " + typeof(T));
                 return converted.Result;
