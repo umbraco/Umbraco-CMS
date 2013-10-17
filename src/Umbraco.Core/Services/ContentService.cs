@@ -1184,7 +1184,7 @@ namespace Umbraco.Core.Services
                 //NOTE This 'Relation' part should eventually be delegated to a RelationService
                 if (relateToOriginal)
                 {
-                    RelationType relationType = null;
+                    IRelationType relationType = null;
                     using (var relationTypeRepository = _repositoryFactory.CreateRelationTypeRepository(uow))
                     {
                         relationType = relationTypeRepository.Get(1);

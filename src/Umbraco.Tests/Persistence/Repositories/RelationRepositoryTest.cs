@@ -211,7 +211,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var query = Query<Relation>.Builder.Where(x => x.ParentId == 1046);
+                var query = Query<IRelation>.Builder.Where(x => x.ParentId == 1046);
                 int count = repository.Count(query);
 
                 // Assert
@@ -230,7 +230,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var query = Query<Relation>.Builder.Where(x => x.RelationTypeId == 2);
+                var query = Query<IRelation>.Builder.Where(x => x.RelationTypeId == 2);
                 var relations = repository.GetByQuery(query);
 
                 // Assert

@@ -201,7 +201,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var query = Query<RelationType>.Builder.Where(x => x.Alias.StartsWith("relate"));
+                var query = Query<IRelationType>.Builder.Where(x => x.Alias.StartsWith("relate"));
                 int count = repository.Count(query);
 
                 // Assert
@@ -220,7 +220,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var childObjType = new Guid(Constants.ObjectTypes.DocumentType);
-                var query = Query<RelationType>.Builder.Where(x => x.ChildObjectType == childObjType);
+                var query = Query<IRelationType>.Builder.Where(x => x.ChildObjectType == childObjType);
                 var result = repository.GetByQuery(query);
 
                 // Assert
