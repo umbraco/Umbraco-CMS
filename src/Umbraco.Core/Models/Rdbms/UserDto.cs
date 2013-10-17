@@ -41,7 +41,7 @@ namespace Umbraco.Core.Models.Rdbms
         public string Login { get; set; }
 
         [Column("userPassword")]
-        [Length(125)]
+        [Length(500)]
         public string Password { get; set; }
 
         [Column("userEmail")]
