@@ -260,7 +260,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the <see cref="ApplicationTreeService"/>
         /// </summary>
-        internal IApplicationTreeService ApplicationTreeService
+        public IApplicationTreeService ApplicationTreeService
         {
             get { return _treeService.Value; }
         }

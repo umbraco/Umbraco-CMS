@@ -122,6 +122,15 @@ namespace Umbraco.Tests
             Assert.AreEqual("Hello world", result.Result);
 	    }
 
+        [Test]
+        public virtual void CanConvertObjectToSameObject()
+        {
+            var obj = new MyTestObject();
+            var result = obj.TryConvertTo<object>();
+
+            Assert.AreEqual(obj, result);            
+        }
+
 
         private class MyTestObject
         {

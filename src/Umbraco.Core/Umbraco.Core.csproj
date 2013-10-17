@@ -233,7 +233,6 @@
     <Compile Include="Configuration\UmbracoSettings\NotDynamicXmlDocumentElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\NotDynamicXmlDocumentElementCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\NotificationsElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ObjectExtensions.cs" />
     <Compile Include="Configuration\OptionalCommaDelimitedConfigurationElement.cs" />
     <Compile Include="Configuration\OptionalInnerTextConfigurationElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ProvidersElement.cs" />
