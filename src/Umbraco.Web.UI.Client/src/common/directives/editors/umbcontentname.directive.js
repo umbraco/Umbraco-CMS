@@ -7,7 +7,7 @@
 * Used by editors that require naming an entity. Shows a textbox/headline with a required validator within it's own form.
 **/
 angular.module("umbraco.directives")
-	.directive('umbContentName', function ($timeout) {
+	.directive('umbContentName', function ($timeout, localizationService) {
 	    return {
 	        require: "ngModel",
 			restrict: 'E',
@@ -19,7 +19,13 @@ angular.module("umbraco.directives")
 			},
 			link: function(scope, element, attrs, ngModel) {
 
-			    var inputElement = element.find("input");
+				var inputElement = element.find("input");
+				if(scope.placeholder && scope.placeholder[0] === "@"){
+					localizationService.localize(scope.placeholder.substring(1))
+						.then(function(value){
+							scope.placeholder = value;	
+						});
+				}
 
 				ngModel.$render = function(){
 					$timeout(function(){

@@ -202,7 +202,7 @@ angular.module("umbraco")
             };
 
             if ($routeParams.id) {
-                $scope.pagination = new Array(100);
+                $scope.pagination = new Array(10);
                 $scope.listViewAllowedTypes = contentTypeResource.getAllowedTypes($routeParams.id);
                 $scope.reloadView($routeParams.id);
 

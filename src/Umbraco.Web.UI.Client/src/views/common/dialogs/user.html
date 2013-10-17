@@ -2,14 +2,17 @@
 	<div class="umb-panel-header">
 		<div class="umb-el-wrap umb-panel-buttons">
 	        <div class="btn-toolbar umb-btn-toolbar">
-	         	<input type="button" ng-click="logout()" class="btn btn-warning" value="Log out" />
+	        	<button ng-click="logout()" class="btn btn-warning">
+	        		<localize key="general_logout">Log out</localize>
+	        	</button>
 	        </div>
 		</div>
 
 		<h1 class="headline">{{user.name}}</h1>
 		
 	    <p class="muted">
-	        <small>Session expires in {{user.remainingAuthSeconds | number:0}} seconds</small>	        
+	        <small>
+	        	<localize key="user_sessionExpires" />: {{user.remainingAuthSeconds | timespan}}</small>	        
 	    </p>
 
 	</div>
@@ -18,15 +21,17 @@
 		<div class="tab-content umb-control-group">
 
 			<div class="umb-pane">
-				<h5>Your profile</h5>
+				<h5><localize key="user_yourProfile" /></h5>
 				<p>
-					<a href="#/users/framed/%252Fumbraco%252Fusers%252Fedituser.aspx%253Fid%253D{{user.id}}" class="btn btn-primary">Edit your profile</a>
+					<a href="#/users/framed/%252Fumbraco%252Fusers%252Fedituser.aspx%253Fid%253D{{user.id}}" class="btn btn-primary">
+						<localize key="general_edit">Edit</localize>
+					</a>
 				</p>
 			</div>
 
 
 			<div class="umb-pane">
-				<h5>Your recent history</h5>
+				<h5><localize key="user_yourHistory" /></h5>
 				<ul class="umb-tree">
 						<li ng-repeat="item in history | orderBy:'time'">
 							<a ng-href="{{item.link}}" ng-click="gotoHistory(item.link)" prevent-default>

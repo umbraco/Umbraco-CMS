@@ -32,7 +32,7 @@ angular.module("umbraco.directives")
 
          if(!hideheader){ 
            template +='<div>' + 
-           '<h5><a href="#/{{section}}" ng-click="select(this, tree.root, $event)"  class="root-link">{{tree.name}}</a></h5>' +
+           '<h5><a href="#/{{section}}" ng-click="select(this, tree.root, $event)" on-right-click="altSelect(this, node, $event)"  class="root-link">{{tree.name}}</a></h5>' +
                '<a href class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(this, tree.root, $event)" ng-swipe-right="options(this, tree.root, $event)"><i></i><i></i><i></i></a>' +
            '</div>';
          }
@@ -126,7 +126,10 @@ angular.module("umbraco.directives")
                 emitEvent("treeNodeSelect", { element: e, node: n, event: ev });
             };
             
-
+            scope.altSelect = function(e,n,ev){
+                emitEvent("treeNodeAltSelect", { element: e, tree: scope.tree, node: n, event: ev });
+            };
+            
             //watch for section changes
             scope.$watch("section", function (newVal, oldVal) {
               
