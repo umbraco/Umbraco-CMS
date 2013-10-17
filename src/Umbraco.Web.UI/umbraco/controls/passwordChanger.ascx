@@ -10,7 +10,7 @@
                     this.togglePasswordInputValidators(true);
                     $(e).closest(".propertyItem").replaceWith($("#umbPasswordChanger"));
                     $("#umbPasswordChanger").show();
-                    $("#<%=IsChangingPasswordField.ClientID%>").val(true);
+                    $("#<%=IsChangingPasswordField.ClientID%>").val("true");
                     $(e).hide();
                 }                
             },
@@ -20,11 +20,17 @@
                     ValidatorEnable(document.getElementById('<%=ConfirmPasswordValidator.ClientID %>'), true);
                     ValidatorEnable(document.getElementById('<%=NewPasswordLengthValidator.ClientID %>'), true);
                     if (!enablePassRetrieval) {
-                        ValidatorEnable(document.getElementById('<%=CurrentPasswordValidator.ClientID %>'), true);
+                        var currPassVal = document.getElementById('<%=CurrentPasswordValidator.ClientID %>');
+                        if (currPassVal) {
+                            ValidatorEnable(currPassVal, true);   
+                        }                        
                     }
                 }
                 else {
-                    ValidatorEnable(document.getElementById('<%=CurrentPasswordValidator.ClientID %>'), false);
+                    var currPassVal = document.getElementById('<%=CurrentPasswordValidator.ClientID %>');
+                    if (currPassVal) {
+                        ValidatorEnable(currPassVal, false);   
+                    }                        
                     ValidatorEnable(document.getElementById('<%=ConfirmPasswordValidator.ClientID %>'), false);
                     ValidatorEnable(document.getElementById('<%=NewPasswordRequiredValidator.ClientID %>'), false);
                     ValidatorEnable(document.getElementById('<%=NewPasswordLengthValidator.ClientID %>'), false);                    
@@ -57,9 +63,9 @@
 
 <a href="#" id="changePasswordButton">Change password</a><br />
 
-<asp:HiddenField runat="server" ID="IsChangingPasswordField" Value="false" />
-
 <div class="propertyItem" id="umbPasswordChanger" style="display: none;">
+    
+    <asp:HiddenField runat="server" ID="IsChangingPasswordField" Value="false" />
 
     <asp:PlaceHolder runat="server" ID="ResetPlaceHolder" Visible="<%#Provider.EnablePasswordReset %>">
         <div class="propertyItemheader"><%=umbraco.ui.GetText("user", "resetPassword")%></div>
@@ -69,7 +75,7 @@
     </asp:PlaceHolder>
 
     <div id="passwordInputArea">
-        <asp:PlaceHolder runat="server" ID="CurrentPasswordPlaceHolder" Visible="<%#Provider.EnablePasswordReset == false %>">
+        <asp:PlaceHolder runat="server" ID="CurrentPasswordPlaceHolder" Visible="<%#Provider.EnablePasswordRetrieval == false %>">
             <div class="propertyItemheader"><%=umbraco.ui.GetText("user", "passwordCurrent")%></div>
             <div class="propertyItemContent">
                 <asp:TextBox ID="umbPasswordChanger_passwordCurrent" autocomplete="off" AutoCompleteType="None" TextMode="password" runat="server"></asp:TextBox>
@@ -106,4 +112,11 @@
         </div>
     </div>
 
+</div>
+
+<div id="Div1" runat="server" class="success" style="margin-top:10px;width:300px;" Visible="<%# string.IsNullOrWhiteSpace(ChangingPasswordModel.GeneratedPassword) == false %>">
+    <p style="text-align: center">
+        Password has been reset to<br/><br/> 
+        <strong><%# ChangingPasswordModel.GeneratedPassword %></strong>
+    </p>
 </div>

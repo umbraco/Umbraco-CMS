@@ -12,8 +12,6 @@ namespace Umbraco.Web.UI.Umbraco.Controls {
     
     public partial class PasswordChanger {
         
-        
-        
         /// <summary>
         /// ResetPlaceHolder control.
         /// </summary>

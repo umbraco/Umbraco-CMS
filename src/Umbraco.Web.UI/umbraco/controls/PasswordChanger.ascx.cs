@@ -13,6 +13,12 @@ namespace Umbraco.Web.UI.Umbraco.Controls
         {
             base.OnPreRender(e);
 
+            //always reset the control vals
+            ResetPasswordCheckBox.Checked = false;
+            umbPasswordChanger_passwordCurrent.Text = null;
+            umbPasswordChanger_passwordNew.Text = null;
+            umbPasswordChanger_passwordNewConfirm.Text = null;
+            
             this.DataBind();
         } 
 

@@ -32,17 +32,16 @@ namespace umbraco.controls
             }
         }
 
+        private readonly ChangingPasswordModel _model = new ChangingPasswordModel();
+
         public ChangingPasswordModel ChangingPasswordModel
         {
             get
             {
-                var model = new ChangingPasswordModel
-                    {
-                        NewPassword = umbPasswordChanger_passwordNew.Text,
-                        OldPassword = umbPasswordChanger_passwordCurrent.Text,
-                        Reset = ResetPasswordCheckBox.Checked
-                    };
-                return model;
+                _model.NewPassword = umbPasswordChanger_passwordNew.Text;
+                _model.OldPassword = umbPasswordChanger_passwordCurrent.Text;
+                _model.Reset = ResetPasswordCheckBox.Checked;           
+                return _model;
             }
         }
 

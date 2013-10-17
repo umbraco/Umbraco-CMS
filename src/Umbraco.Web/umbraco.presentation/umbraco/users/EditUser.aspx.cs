@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Configuration.Provider;
 using System.Globalization;
 using System.IO;
 using System.Web;
@@ -65,6 +66,18 @@ namespace umbraco.cms.presentation.user
 
         private User u;
 
+        private MembershipProvider BackOfficeProvider
+        {
+            get
+            {
+                var provider = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider];
+                if (provider == null)
+                {
+                    throw new ProviderException("The membership provider " + UmbracoSettings.DefaultBackofficeProvider + " was not found");
+                }
+                return provider;
+            }
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -148,7 +161,25 @@ namespace umbraco.cms.presentation.user
             // Add password changer
             var passwordChanger = (passwordChanger) LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx");
             passwordChanger.MembershipProviderName = UmbracoSettings.DefaultBackofficeProvider;
+            
+            //Add a custom validation message for the password changer
+            var passwordValidation = new CustomValidator
+                {
+                    ID = "PasswordChangerValidator"
+                };
+            var validatorContainer = new HtmlGenericControl("div")
+                {
+                    Visible = false,
+                    EnableViewState = false
+                };
+            validatorContainer.Attributes["class"] = "error";
+            validatorContainer.Style.Add(HtmlTextWriterStyle.MarginTop, "10px");
+            validatorContainer.Style.Add(HtmlTextWriterStyle.Width, "300px");
+            var validatorContainer2 = new HtmlGenericControl("p");
+            validatorContainer.Controls.Add(validatorContainer2);
+            validatorContainer2.Controls.Add(passwordValidation);
             passw.Controls.Add(passwordChanger);
+            passw.Controls.Add(validatorContainer);
 
             pp.addProperty(ui.Text("user", "username", UmbracoUser), uname);
             pp.addProperty(ui.Text("user", "loginname", UmbracoUser), lname);
@@ -319,7 +350,7 @@ namespace umbraco.cms.presentation.user
 
             if (!IsPostBack)
             {
-                MembershipUser user = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(u.LoginName, true);
+                MembershipUser user = BackOfficeProvider.GetUser(u.LoginName, true);
                 uname.Text = u.Name;
                 lname.Text = (user == null) ? u.LoginName : user.UserName;
                 email.Text = (user == null) ? u.Email : user.Email;
@@ -386,33 +417,51 @@ namespace umbraco.cms.presentation.user
             {
                 try
                 {
-                    var membershipUser = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(u.LoginName, true);
-
-
-                    //TODO: We need to overhaul this editor like I have in v7 so that it dynamically creates the form based
-                    // on the membership provider and provides the correct validation feedback in the UI if things are not supported.
-                    //We need to also have this functionality put onto the change password dashboard.
-
-                    var passwordChangerControl = (passwordChanger) passw.Controls[0];
-                    
-                    UmbracoContext.Current.Security.ChangePassword()
-
-                    if (string.IsNullOrEmpty(tempPassword) == false)
+                    var membershipUser = BackOfficeProvider.GetUser(u.LoginName, true);
+                    if (membershipUser == null)
                     {
-                        // make sure password is not empty
-                        if (string.IsNullOrEmpty(u.Password)) u.Password = "default";
-                        membershipUser.ChangePassword(u.Password, tempPassword);
+                        throw new ProviderException("Could not find user in the membership provider with login name " + u.LoginName);
                     }
 
+                    var passwordChangerControl = (passwordChanger) passw.Controls[0];
+                    var passwordChangerValidator = (CustomValidator) passw.Controls[1].Controls[0].Controls[0];
+
+                    if (passwordChangerControl.IsChangingPassword)
+                    {
+                        //SD: not sure why this check is here but must have been for some reason at some point?
+                        if (string.IsNullOrEmpty(passwordChangerControl.ChangingPasswordModel.NewPassword) == false)
+                        {
+                            // make sure password is not empty
+                            if (string.IsNullOrEmpty(u.Password)) u.Password = "default";                            
+                        }
+
+                        var changePassResult = UmbracoContext.Current.Security.ChangePassword(
+                            membershipUser.UserName, passwordChangerControl.ChangingPasswordModel, BackOfficeProvider);    
+
+                        if (changePassResult.Success)
+                        {
+                            //if it is successful, we need to show the generated password if there was one, so set
+                            //that back on the control
+                            passwordChangerControl.ChangingPasswordModel.GeneratedPassword = changePassResult.Result.ResetPassword;
+                        }
+                        else
+                        {
+                            passwordChangerValidator.IsValid = false;
+                            passwordChangerValidator.ErrorMessage = changePassResult.Result.ChangeError.ErrorMessage;
+                            passw.Controls[1].Visible = true;
+                        }
+
+                    }
+                    
                     // Is it using the default membership provider
-                    if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is UsersMembershipProvider)
+                    if (BackOfficeProvider is UsersMembershipProvider)
                     {
                         // Save user in membership provider
                         UsersMembershipUser umbracoUser = membershipUser as UsersMembershipUser;
                         umbracoUser.FullName = uname.Text.Trim();
                         umbracoUser.Language = userLanguage.SelectedValue;
                         umbracoUser.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
-                        Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].UpdateUser(umbracoUser);
+                        BackOfficeProvider.UpdateUser(umbracoUser);
 
                         // Save user details
                         u.Email = email.Text.Trim();
@@ -425,9 +474,9 @@ namespace umbraco.cms.presentation.user
                         u.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
                         //SD: This check must be here for some reason but apparently we don't want to try to 
                         // update when the AD provider is active.
-                        if ((Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is ActiveDirectoryMembershipProvider) == false)
+                        if ((BackOfficeProvider is ActiveDirectoryMembershipProvider) == false)
                         {
-                            Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].UpdateUser(membershipUser);
+                            BackOfficeProvider.UpdateUser(membershipUser);
                         }
                     }
 
