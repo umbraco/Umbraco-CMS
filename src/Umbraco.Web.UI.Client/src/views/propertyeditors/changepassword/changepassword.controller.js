@@ -76,8 +76,14 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
         //listen for the saved event, when that occurs we'll 
         //change to changing = false;
         $scope.$on("formSubmitted", function () {
-            $scope.changing = false;
+            if ($scope.model.config.disableToggle === false) {
+                $scope.changing = false;
+            }
             resetModel();
+        });
+        $scope.$on("formSubmitting", function() {
+            //if there was a previously generated password displaying, clear it
+            $scope.model.value.generatedPassword = null;
         });
 
         $scope.showReset = function() {

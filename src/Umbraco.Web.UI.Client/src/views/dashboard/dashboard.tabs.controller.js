@@ -105,7 +105,12 @@ function ChangePasswordDashboardController($scope, xmlhelper, $log, userResource
     $scope.changePassword = function() {
 
         if (formHelper.submitForm({ scope: $scope })) {
-            userResource.changePassword($scope.changePasswordModel.value).then(function() {
+            userResource.changePassword($scope.changePasswordModel.value).then(function(data) {
+
+                //if the password has been reset, then update our model
+                if (data.value) {
+                    $scope.changePasswordModel.value.generatedPassword = data.value;
+                }
 
                 formHelper.resetForm({ scope: $scope, notifications: data.notifications });
                 

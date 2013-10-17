@@ -11,6 +11,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
+using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco;
 using umbraco.DataLayer;
