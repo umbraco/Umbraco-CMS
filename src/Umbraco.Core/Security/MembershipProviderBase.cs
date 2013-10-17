@@ -238,7 +238,7 @@ namespace Umbraco.Core.Security
             Strength
         }
 
-        protected internal Attempt<PasswordValidityError> IsPasswordValid(string password, int minRequiredNonAlphanumericChars, string strengthRegex, int minLength)
+        protected internal static Attempt<PasswordValidityError> IsPasswordValid(string password, int minRequiredNonAlphanumericChars, string strengthRegex, int minLength)
         {
             if (minRequiredNonAlphanumericChars > 0)
             {
