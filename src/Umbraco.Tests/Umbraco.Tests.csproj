@@ -117,6 +117,7 @@
     <Reference Include="System.Runtime.Caching" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.dll</HintPath>
@@ -164,6 +165,7 @@
     <Compile Include="AngularIntegration\JsInitializationTests.cs" />
     <Compile Include="AngularIntegration\ServerVariablesParserTests.cs" />
     <Compile Include="AttemptTests.cs" />
+    <Compile Include="Membership\MembershipProviderBaseTests.cs" />
     <Compile Include="MockTests.cs" />
     <Compile Include="Persistence\Auditing\AuditTests.cs" />
     <Compile Include="BootManagers\CoreBootManagerTests.cs" />
@@ -546,6 +548,10 @@
     <ProjectReference Include="..\umbraco.MacroEngines\umbraco.MacroEngines.csproj">
       <Project>{89C09045-1064-466B-B94A-DB3AFE2A5853}</Project>
       <Name>umbraco.MacroEngines</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\umbraco.providers\umbraco.providers.csproj">
+      <Project>{d7636876-0756-43cb-a192-138c6f0d5e42}</Project>
+      <Name>umbraco.providers</Name>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
