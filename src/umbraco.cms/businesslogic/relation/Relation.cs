@@ -11,6 +11,7 @@ namespace umbraco.cms.businesslogic.relation
 	/// <summary>
 	/// Summary description for Relation.
 	/// </summary>
+	[Obsolete("Use the RelationService instead")]
 	public class Relation
 	{
 		private int _id;
