@@ -44,8 +44,11 @@ function serverValidationManager($timeout) {
          * @function
          *
          * @description
-         *  This is primarily used for scenarios where the error collection needs to be persisted over a route change. Generally this 
-         *   is when a content item (or any item) is created. The controller should call this method once the data is bound to the scope
+         *  This method needs to be called once all field and property errors are wired up. 
+         * 
+         *  In some scenarios where the error collection needs to be persisted over a route change 
+         *   (i.e. when a content item (or any item) is created and the route redirects to the editor) 
+         *   the controller should call this method once the data is bound to the scope
          *   so that any persisted validation errors are re-bound to their controls. Once they are re-binded this then clears the validation
          *   colleciton so that if another route change occurs, the previously persisted validation errors are not re-bound to the new item.
          */

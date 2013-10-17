@@ -313,7 +313,7 @@
     <Compile Include="Editors\MemberTypeController.cs" />
     <Compile Include="Editors\TagExtractor.cs" />
     <Compile Include="MembershipProviderExtensions.cs" />
-    <Compile Include="Models\ContentEditing\ChangePasswordModel.cs" />
+    <Compile Include="Models\ContentEditing\ChangingPasswordModel.cs" />
     <Compile Include="Models\ContentEditing\StyleSheet.cs" />
     <Compile Include="Editors\StylesheetController.cs" />
     <Compile Include="Models\ContentEditing\AuditLog.cs" />

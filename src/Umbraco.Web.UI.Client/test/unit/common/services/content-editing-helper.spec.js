@@ -1,5 +1,5 @@
 describe('contentEditingHelper tests', function () {
-    var contentEditingHelper, $routeParams, serverValidationManager, mocksUtils, notificationsService;
+    var contentEditingHelper, $routeParams, serverValidationManager, mocksUtils, notificationsService, formHelper;
 
     beforeEach(module('umbraco.services'));
     beforeEach(module('umbraco.mocks'));
@@ -14,6 +14,7 @@ describe('contentEditingHelper tests', function () {
         serverValidationManager = $injector.get('serverValidationManager');
         mocksUtils = $injector.get('mocksUtils');
         notificationsService = $injector.get('notificationsService');
+        formHelper = $injector.get('formHelper');
     }));
 
     describe('handles http validation errors', function () {
@@ -88,7 +89,7 @@ describe('contentEditingHelper tests', function () {
             var allProps = contentEditingHelper.getAllProps(content);
 
             //act
-            contentEditingHelper.handleValidationErrors(allProps, { Name: ["Required"] });
+            formHelper.handleServerValidation({ Name: ["Required"] });
 
             //assert
             expect(serverValidationManager.items.length).toBe(1);
@@ -104,7 +105,7 @@ describe('contentEditingHelper tests', function () {
             var allProps = contentEditingHelper.getAllProps(content);
 
             //act
-            contentEditingHelper.handleValidationErrors(allProps, { "Property.bodyText": ["Required"] });
+            formHelper.handleServerValidation({ "Property.bodyText": ["Required"] });
 
             //assert
             expect(serverValidationManager.items.length).toBe(1);
@@ -120,7 +121,7 @@ describe('contentEditingHelper tests', function () {
             var allProps = contentEditingHelper.getAllProps(content);
 
             //act
-            contentEditingHelper.handleValidationErrors(allProps, { "Property.bodyText.value": ["Required"] });
+            formHelper.handleServerValidation({ "Property.bodyText.value": ["Required"] });
 
             //assert
             expect(serverValidationManager.items.length).toBe(1);
@@ -136,8 +137,7 @@ describe('contentEditingHelper tests', function () {
             var allProps = contentEditingHelper.getAllProps(content);
 
             //act
-            contentEditingHelper.handleValidationErrors(
-                allProps,
+            formHelper.handleServerValidation(
                 {
                     "Name": ["Required"],
                     "UpdateDate": ["Invalid date"],

@@ -77,26 +77,17 @@ function userResource($q, $http, umbRequestHelper) {
          *
          * @description
          * Changes the current users password
-         *
-         * ##usage
-         * <pre>
-         * contentResource.getAll()
-         *    .then(function(userArray) {
-         *        var myUsers = userArray; 
-         *        alert('they are here!');
-         *    });
-         * </pre> 
          * 
          * @returns {Promise} resourcePromise object containing the user array.
          *
          */
-        changePassword: function (oldPassword, newPassword) {
+        changePassword: function (changePasswordArgs) {
             return umbRequestHelper.resourcePromise(
                $http.post(
                    umbRequestHelper.getApiUrl(
                        "userApiBaseUrl",
                        "PostChangePassword"),
-                       { oldPassword: oldPassword, newPassword: newPassword }),
+                       changePasswordArgs),
                'Failed to change password');
         },
         

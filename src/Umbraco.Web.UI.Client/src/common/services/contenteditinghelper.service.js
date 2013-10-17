@@ -4,7 +4,7 @@
 * @name umbraco.services.contentEditingHelper
 * @description A helper service for content/media/member controllers when editing/creating/saving content.
 **/
-function contentEditingHelper($location, $routeParams, notificationsService, serverValidationManager, dialogService) {
+function contentEditingHelper($location, $routeParams, notificationsService, serverValidationManager, dialogService, formHelper) {
 
     return {
 
@@ -96,60 +96,6 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
         },
 
         /**
-         * @ngdoc method
-         * @name umbraco.services.contentEditingHelper#handleValidationErrors
-         * @methodOf umbraco.services.contentEditingHelper
-         * @function
-         *
-         * @description
-         * A function to handle the validation (modelState) errors collection which will happen on a 400 error indicating validation errors
-         *  It's worth noting that when a 400 occurs, the data is still saved just never published, though this depends on if the entity is a new
-         *  entity and whether or not the data fulfils the absolute basic requirements like having a mandatory Name.
-         */
-        handleValidationErrors: function (allProps, modelState) {
-            
-            //find the content property for the current error, for use in the loop below
-            function findContentProp(props, propAlias) {
-                return _.find(props, function (item) {
-                    return (item.alias === propAlias);
-                });
-            }
-
-            for (var e in modelState) {
-                //the alias in model state can be in dot notation which indicates
-                // * the first part is the content property alias
-                // * the second part is the field to which the valiation msg is associated with
-                //There will always be at least 2 parts since all model errors for properties are prefixed with "Properties"
-                var parts = e.split(".");
-                if (parts.length > 1) {
-                    var propertyAlias = parts[1];
-
-                    //find the content property for the current error
-                    var contentProperty = findContentProp(allProps, propertyAlias);
-
-                    if (contentProperty) {
-                        //if it contains 2 '.' then we will wire it up to a property's field
-                        if (parts.length > 2) {
-                            //add an error with a reference to the field for which the validation belongs too
-                            serverValidationManager.addPropertyError(contentProperty.alias, parts[2], modelState[e][0]);
-                        }
-                        else {
-                            //add a generic error for the property, no reference to a specific field
-                            serverValidationManager.addPropertyError(contentProperty.alias, "", modelState[e][0]);
-                        }
-                    }
-                }
-                else {
-                    //the parts are only 1, this means its not a property but a native content property
-                    serverValidationManager.addFieldError(parts[0], modelState[e][0]);
-                }
-
-                //add to notifications
-                notificationsService.error("Validation", modelState[e][0]);
-            }
-        },
-
-        /**
          * @ngdoc function
          * @name umbraco.services.contentEditingHelper#handleSaveError
          * @methodOf umbraco.services.contentEditingHelper
@@ -174,7 +120,8 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
                 //now we need to look through all the validation errors
                 if (args.err.data && (args.err.data.ModelState)) {
                     
-                    this.handleValidationErrors(args.allNewProps, args.err.data.ModelState);
+                    //wire up the server validation errs
+                    formHelper.handleServerValidation(args.err.data.ModelState);
 
                     if (!args.redirectOnFailure || !this.redirectToCreatedContent(args.err.data.id, args.err.data.ModelState)) {
                         //we are not redirecting because this is not new content, it is existing content. In this case

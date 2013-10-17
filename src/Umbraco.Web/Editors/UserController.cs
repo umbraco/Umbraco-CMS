@@ -11,6 +11,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi;
 using legacyUser = umbraco.BusinessLogic.User;
 using System.Net.Http;
 using System.Collections.Specialized;
@@ -60,18 +61,36 @@ namespace Umbraco.Web.Editors
         /// Changes the users password
         /// </summary>
         /// <param name="data"></param>
-        /// <returns></returns>
-        public HttpResponseMessage PostChangePassword(ChangePasswordModel data)
-        {   
-         
-            var u = UmbracoContext.Security.CurrentUser;
-            if (!UmbracoContext.Security.ValidateBackOfficeCredentials(u.Username, data.OldPassword))
-                return new HttpResponseMessage(HttpStatusCode.Forbidden);
+        /// <returns>
+        /// If the password is being reset it will return the newly reset password, otherwise will return null;
+        /// </returns>
+        public string PostChangePassword(ChangingPasswordModel data)
+        {
+            var userProvider = Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider];
+            if (userProvider == null)
+            {
+                throw new InvalidOperationException("No membership provider found with the name " + UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider);
+            }
 
-            if(!UmbracoContext.Security.ChangePassword(data.OldPassword, data.NewPassword))
-                return new HttpResponseMessage(HttpStatusCode.InternalServerError);
-            
-            return new HttpResponseMessage(HttpStatusCode.OK);
+            //TODO: WE need to support this! - requires UI updates, etc...
+            if (userProvider.RequiresQuestionAndAnswer)
+            {
+                throw new NotSupportedException("Currently the user editor does not support providers that have RequiresQuestionAndAnswer specified");
+            }
+
+            var passwordChangeResult = Security.ChangePassword(Security.CurrentUser.Username, data, userProvider);
+            if (passwordChangeResult.Success)
+            {
+                //even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
+                return passwordChangeResult.Result.ResetPassword;
+            }
+
+            //it wasn't successful, so add the change error to the model state
+            ModelState.AddPropertyError(
+                passwordChangeResult.Result.ChangeError,
+                string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
+
+            throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
         }
 
         /// <summary>

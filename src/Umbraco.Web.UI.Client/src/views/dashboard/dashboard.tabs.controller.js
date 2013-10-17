@@ -84,9 +84,10 @@ function ChangePasswordDashboardController($scope, xmlhelper, $log, userResource
 
     //create the initial model for change password property editor
     $scope.changePasswordModel = {
-        alias: "password",
+        alias: "_umb_password",
         view: "changepassword",
-        config: {}
+        config: {},
+        value: {}
     };
 
     //go get the config for the membership provider and add it to the model
@@ -101,20 +102,18 @@ function ChangePasswordDashboardController($scope, xmlhelper, $log, userResource
     ////this is the model we will pass to the service
     //$scope.profile = {};
 
-    $scope.changePassword = function(p) {
+    $scope.changePassword = function() {
 
         if (formHelper.submitForm({ scope: $scope })) {
-            //userResource.changePassword(p.oldPassword, p.newPassword).then(function() {
+            userResource.changePassword($scope.changePasswordModel.value).then(function() {
 
-            //    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
-
-            //    //TODO: This is temporary - server validation will work automatically with the val-server directives.
-            //    $scope.passwordForm.$setValidity(true);
-            //}, function () {
-            //    //TODO: This is temporary - server validation will work automatically with the val-server directives.
-            //    //this only happens if there is a wrong oldPassword sent along
-            //    $scope.passwordForm.oldpass.$setValidity("oldPassword", false);
-            //});
+                formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+                
+            }, function (err) {
+                
+                formHelper.handleError(err);
+                
+            });
         }
     };
 }

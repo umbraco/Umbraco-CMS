@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text;
@@ -250,132 +251,18 @@ namespace Umbraco.Web.Editors
             //password changes ?           
             if (contentItem.Password == null) return null;
 
-            //Are we resetting the password??
-            if (contentItem.Password.Reset.HasValue && contentItem.Password.Reset.Value)
+            var passwordChangeResult = Security.ChangePassword(membershipUser.UserName, contentItem.Password, Membership.Provider);
+            if (passwordChangeResult.Success)
             {
-                if (Membership.Provider.EnablePasswordReset == false)
-                {
-                    ModelState.AddPropertyError(
-                        new ValidationResult("Password reset is not enabled", new[] { "resetPassword" }),
-                        string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                }
-                else if (Membership.Provider.RequiresQuestionAndAnswer && contentItem.Password.Answer.IsNullOrWhiteSpace())
-                {
-                    ModelState.AddPropertyError(
-                        new ValidationResult("Password reset requires a password answer", new[] {"resetPassword"}),
-                        string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                }
-                else
-                {
-                    //ok, we should be able to reset it
-                    try
-                    {
-                        var newPass = Membership.Provider.ResetPassword(
-                            membershipUser.UserName,
-                            Membership.Provider.RequiresQuestionAndAnswer ? contentItem.Password.Answer : null);
-
-                        //return the generated pword
-                        return newPass;
-                    }
-                    catch (Exception ex)
-                    {
-                        LogHelper.WarnWithException<MemberController>("Could not reset member password", ex);
-                        ModelState.AddPropertyError(
-                            new ValidationResult("Could not reset password, error: " + ex.Message + " (see log for full details)", new[] {"resetPassword"}),
-                            string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                    }                    
-                }
+                //even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
+                return passwordChangeResult.Result.ResetPassword;
             }
-            else if (contentItem.Password.NewPassword.IsNullOrWhiteSpace() == false)
-            {
-                //we're not resetting it so we need to try to change it.
 
-                if (contentItem.Password.OldPassword.IsNullOrWhiteSpace() && Membership.Provider.EnablePasswordRetrieval == false)
-                {
-                    //if password retrieval is not enabled but there is no old password we cannot continue
+            //it wasn't successful, so add the change error to the model state
+            ModelState.AddPropertyError(
+                passwordChangeResult.Result.ChangeError,
+                string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
 
-                    ModelState.AddPropertyError(
-                        new ValidationResult("Password cannot be changed without the old password", new[] {"value"}),
-                        string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                }
-                else if (contentItem.Password.OldPassword.IsNullOrWhiteSpace() == false)
-                {
-                    //if an old password is suplied try to change it
-
-                    try
-                    {
-                        var result = Membership.Provider.ChangePassword(membershipUser.UserName, contentItem.Password.OldPassword, contentItem.Password.NewPassword);
-                        if (result == false)
-                        {
-                            ModelState.AddPropertyError(
-                                new ValidationResult("Could not change password", new[] {"value"}),
-                                string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        LogHelper.WarnWithException<MemberController>("Could not change member password", ex);
-                        ModelState.AddPropertyError(
-                            new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] {"value"}),
-                            string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                    }
-                }
-                else if (Membership.Provider.EnablePasswordRetrieval == false)
-                {
-                    //we cannot continue if we cannot get the current password
-
-                    ModelState.AddPropertyError(
-                        new ValidationResult("Password cannot be changed without the old password", new[] {"value"}),
-                        string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                }
-                else if (Membership.Provider.RequiresQuestionAndAnswer && contentItem.Password.Answer.IsNullOrWhiteSpace())
-                {
-                    //if the question answer is required but there isn't one, we cannot continue
-
-                    ModelState.AddPropertyError(
-                        new ValidationResult("Password cannot be changed without the password answer", new[] {"value"}),
-                        string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-
-                }
-                else
-                {
-                    //lets try to get the old one so we can change it
-
-                    try
-                    {
-                        var oldPassword = Membership.Provider.GetPassword(
-                                        membershipUser.UserName,
-                                        Membership.Provider.RequiresQuestionAndAnswer ? contentItem.Password.Answer : null);
-
-                        try
-                        {
-                            var result = Membership.Provider.ChangePassword(membershipUser.UserName, oldPassword, contentItem.Password.NewPassword);
-                            if (result == false)
-                            {
-                                ModelState.AddPropertyError(
-                                    new ValidationResult("Could not change password", new[] {"value"}),
-                                    string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                            }
-                        }
-                        catch (Exception ex1)
-                        {
-                            LogHelper.WarnWithException<MemberController>("Could not change member password", ex1);
-                            ModelState.AddPropertyError(
-                                new ValidationResult("Could not change password, error: " + ex1.Message + " (see log for full details)", new[] { "value" }),
-                                string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                        }
-
-                    }
-                    catch (Exception ex2)
-                    {
-                        LogHelper.WarnWithException<MemberController>("Could not retrieve member password", ex2);
-                        ModelState.AddPropertyError(
-                            new ValidationResult("Could not change password, error: " + ex2.Message + " (see log for full details)", new[] { "value" }),
-                            string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
-                    }
-
-                }
-            }
             return null;
         }
 
