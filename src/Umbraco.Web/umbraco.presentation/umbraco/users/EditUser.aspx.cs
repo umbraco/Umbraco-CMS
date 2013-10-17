@@ -383,6 +383,10 @@ namespace umbraco.cms.presentation.user
                 {
                     MembershipUser user = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(u.LoginName, true);
 
+                    
+                    //TODO: We need to overhaul this editor like I have in v7 so that it dynamically creates the form based
+                    // on the membership provider and provides the correct validation feedback in the UI if things are not supported.
+                    //We need to also have this functionality put onto the change password dashboard.
 
                     string tempPassword = ((controls.passwordChanger)passw.Controls[0]).Password;
                     if (!string.IsNullOrEmpty(tempPassword.Trim()))

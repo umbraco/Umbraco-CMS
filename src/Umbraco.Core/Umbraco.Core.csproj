@@ -720,6 +720,7 @@
     <Compile Include="Publishing\PublishStatusType.cs" />
     <Compile Include="RenderingEngine.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />
+    <Compile Include="Security\MembershipProviderBase.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
     <Compile Include="Security\UserData.cs" />
     <Compile Include="Serialization\AbstractSerializationService.cs" />

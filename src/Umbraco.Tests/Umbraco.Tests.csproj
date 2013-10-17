@@ -103,6 +103,7 @@
     </Reference>
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.ApplicationServices" />
     <Reference Include="System.Web.Helpers, Version=2.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.AspNet.WebPages.2.0.30506.0\lib\net40\System.Web.Helpers.dll</HintPath>
@@ -144,6 +145,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AttemptTests.cs" />
+    <Compile Include="Membership\MembershipProviderBaseTests.cs" />
     <Compile Include="MockTests.cs" />
     <Compile Include="Persistence\Auditing\AuditTests.cs" />
     <Compile Include="BootManagers\CoreBootManagerTests.cs" />
