@@ -233,23 +233,27 @@ namespace umbraco.providers
         /// </returns>
         public override bool ChangePassword(string username, string oldPassword, string newPassword)
         {
-            if (!User.validateCredentials(username, oldPassword))            
-                return false;
+            if (ValidateUser(username, oldPassword) == false) return false;
 
-            ValidatePasswordEventArgs args = new ValidatePasswordEventArgs(username, newPassword, false);
+            var args = new ValidatePasswordEventArgs(username, newPassword, false);
             OnValidatingPassword(args);
 
             if (args.Cancel)
+            {
                 if (args.FailureInformation != null)
                     throw args.FailureInformation;
-                else
-                    throw new MembershipPasswordException("Change password canceled due to new password validation failure.");
+                throw new MembershipPasswordException("Change password canceled due to new password validation failure.");
+            }
 
-            User user = new User(username);
-            string encodedPassword = EncodePassword(newPassword);            
-            user.Password = encodedPassword;            
+            var user = new User(username);
+            var encodedPassword = EncodePassword(newPassword);
+
+            //Yes, it's true, this actually makes a db call to set the password
+            user.Password = encodedPassword;
+            //call this just for fun.
             user.Save();
-            return (user.ValidatePassword(encodedPassword)) ? true : false;
+
+            return true;
         }
 
         /// <summary>
@@ -283,29 +287,28 @@ namespace umbraco.providers
         /// </returns>
         public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
         {
-            ValidatePasswordEventArgs args = new ValidatePasswordEventArgs(username, password, true);
+            var args = new ValidatePasswordEventArgs(username, password, true);
             OnValidatingPassword(args);
-
             if (args.Cancel)
             {
                 status = MembershipCreateStatus.InvalidPassword;
                 return null;
             }
 
-            // Does umbraco allow duplicate emails??
+            // TODO: Does umbraco allow duplicate emails??
             //if (RequiresUniqueEmail && !string.IsNullOrEmpty(GetUserNameByEmail(email)))
             //{
             //    status = MembershipCreateStatus.DuplicateEmail;
             //    return null;
             //}
 
-            UsersMembershipUser u = GetUser(username, false) as UsersMembershipUser;
+            var u = GetUser(username, false) as UsersMembershipUser;
             if (u == null)
             {
                 try
                 {
                     // Get the usertype of the current user
-                    BusinessLogic.UserType ut = BusinessLogic.UserType.GetUserType(1);
+                    var ut = UserType.GetUserType(1);
                     if (umbraco.BasePages.UmbracoEnsuredPage.CurrentUser != null)
                     {
                         ut = umbraco.BasePages.UmbracoEnsuredPage.CurrentUser.UserType;
@@ -319,11 +322,9 @@ namespace umbraco.providers
                 }
                 return GetUser(username, false);
             }
-            else
-            {
-                status = MembershipCreateStatus.DuplicateUserName;
-                return null;
-            }
+
+            status = MembershipCreateStatus.DuplicateUserName;
+            return null;
         }
 
         /// <summary>
@@ -506,11 +507,42 @@ namespace umbraco.providers
         /// <returns>The new password for the specified user.</returns>
         public override string ResetPassword(string username, string answer)
         {
-            
-            int userId = User.getUserId(username);
-            return (userId == -1) ? null : Membership.GeneratePassword(
-                    MinRequiredPasswordLength, 
-                    MinRequiredNonAlphanumericCharacters);   
+            if (EnablePasswordReset == false)
+            {
+                throw new NotSupportedException("Password reset is not supported");
+            }
+
+            //TODO: This should be here - but how do we update failure count in this provider??
+            //if (answer == null && RequiresQuestionAndAnswer)
+            //{
+            //    UpdateFailureCount(username, "passwordAnswer");
+
+            //    throw new ProviderException("Password answer required for password reset.");
+            //}
+
+            var newPassword = Membership.GeneratePassword(MinRequiredPasswordLength, MinRequiredNonAlphanumericCharacters);
+
+            var args = new ValidatePasswordEventArgs(username, newPassword, true);
+            OnValidatingPassword(args);
+            if (args.Cancel)
+            {
+                if (args.FailureInformation != null)
+                    throw args.FailureInformation;
+                throw new MembershipPasswordException("Reset password canceled due to password validation failure.");
+            }
+
+            var found = User.GetAllByLoginName(username, false);
+            if (found == null || found.Any() == false)
+                throw new MembershipPasswordException("The supplied user is not found");
+
+            var user = found.First();
+
+            //Yes, it's true, this actually makes a db call to set the password
+            user.Password = newPassword;
+            //call this just for fun.
+            user.Save();
+
+            return newPassword;
         }
 
         /// <summary>
@@ -571,19 +603,19 @@ namespace umbraco.providers
             // user will throw an exception
             try
             {
-                User user = new User(username);
-                if (user != null && user.Id != -1)
+                var user = new User(username);
+                if (user.Id != -1)
                 {
                     if (user.Disabled) return false;
-                    else return user.ValidatePassword(EncodePassword(password));
+                    return user.ValidatePassword(EncodePassword(password));
                 }
+                return false;
             }
             catch
             {
-                // nothing to catch here - move on
+                //the user doesn't exist
+                return false;
             }
-
-            return false;
         } 
         #endregion
        
