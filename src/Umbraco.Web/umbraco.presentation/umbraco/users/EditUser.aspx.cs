@@ -1,5 +1,6 @@
-using System;
+﻿using System;
 using System.Collections;
+using System.Globalization;
 using System.IO;
 using System.Web;
 using System.Web.Security;
@@ -14,6 +15,7 @@ using umbraco.businesslogic.Exceptions;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
+using umbraco.controls;
 using umbraco.presentation.channels.businesslogic;
 using umbraco.uicontrols;
 using umbraco.providers;
@@ -65,8 +67,8 @@ namespace umbraco.cms.presentation.user
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            
-           int UID = int.Parse(Request.QueryString["id"]);
+
+            int UID = int.Parse(Request.QueryString["id"]);
             u = BusinessLogic.User.GetUser(UID);
 
             //the true admin can only edit the true admin
@@ -80,7 +82,7 @@ namespace umbraco.cms.presentation.user
             {
                 throw new Exception("Admin users can only be edited by admins");
             }
-            
+
             // check if canvas editing is enabled
             DefaultToLiveEditing.Visible = UmbracoSettings.EnableCanvasEditing;
 
@@ -89,7 +91,7 @@ namespace umbraco.cms.presentation.user
             {
                 if (CurrentUser.IsAdmin() || ut.Alias != "admin")
                 {
-                    ListItem li = new ListItem(ui.Text("user", ut.Name.ToLower(), base.getUser()), ut.Id.ToString());
+                    ListItem li = new ListItem(ui.Text("user", ut.Name.ToLower(), UmbracoUser), ut.Id.ToString());
                     if (ut.Id == u.UserType.Id)
                         li.Selected = true;
 
@@ -143,32 +145,34 @@ namespace umbraco.cms.presentation.user
 
 
             // Add password changer
-            passw.Controls.Add(new UserControl().LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx"));
+            var passwordChanger = (passwordChanger) LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx");
+            passwordChanger.MembershipProviderName = UmbracoSettings.DefaultBackofficeProvider;
+            passw.Controls.Add(passwordChanger);
 
-            pp.addProperty(ui.Text("user", "username", base.getUser()), uname);
-            pp.addProperty(ui.Text("user", "loginname", base.getUser()), lname);
-            pp.addProperty(ui.Text("user", "password", base.getUser()), passw);
-            pp.addProperty(ui.Text("email", base.getUser()), email);
-            pp.addProperty(ui.Text("user", "usertype", base.getUser()), userType);
-            pp.addProperty(ui.Text("user", "language", base.getUser()), userLanguage);
+            pp.addProperty(ui.Text("user", "username", UmbracoUser), uname);
+            pp.addProperty(ui.Text("user", "loginname", UmbracoUser), lname);
+            pp.addProperty(ui.Text("user", "password", UmbracoUser), passw);
+            pp.addProperty(ui.Text("email", UmbracoUser), email);
+            pp.addProperty(ui.Text("user", "usertype", UmbracoUser), userType);
+            pp.addProperty(ui.Text("user", "language", UmbracoUser), userLanguage);
 
             //Media  / content root nodes
             Pane ppNodes = new Pane();
-            ppNodes.addProperty(ui.Text("user", "startnode", base.getUser()), content);
-            ppNodes.addProperty(ui.Text("user", "mediastartnode", base.getUser()), medias);
+            ppNodes.addProperty(ui.Text("user", "startnode", UmbracoUser), content);
+            ppNodes.addProperty(ui.Text("user", "mediastartnode", UmbracoUser), medias);
 
             //Generel umrbaco access
             Pane ppAccess = new Pane();
             if (UmbracoSettings.EnableCanvasEditing)
             {
-                ppAccess.addProperty(ui.Text("user", "defaultToLiveEditing", base.getUser()), DefaultToLiveEditing);
+                ppAccess.addProperty(ui.Text("user", "defaultToLiveEditing", UmbracoUser), DefaultToLiveEditing);
             }
-            ppAccess.addProperty(ui.Text("user", "noConsole", base.getUser()), NoConsole);
-            ppAccess.addProperty(ui.Text("user", "disabled", base.getUser()), Disabled);
+            ppAccess.addProperty(ui.Text("user", "noConsole", UmbracoUser), NoConsole);
+            ppAccess.addProperty(ui.Text("user", "disabled", UmbracoUser), Disabled);
 
             //access to which modules... 
             Pane ppModules = new Pane();
-            ppModules.addProperty(ui.Text("user", "modules", base.getUser()), lapps);
+            ppModules.addProperty(ui.Text("user", "modules", UmbracoUser), lapps);
             ppModules.addProperty(" ", sectionValidator);
 
             TabPage userInfo = UserTabs.NewTabPage(u.Name);
@@ -183,15 +187,15 @@ namespace umbraco.cms.presentation.user
 
             ImageButton save = userInfo.Menu.NewImageButton();
             save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
-            save.Click += new ImageClickEventHandler(saveUser_Click);
+            save.Click += new ImageClickEventHandler(SaveUser_Click);
 
             sectionValidator.ServerValidate += new ServerValidateEventHandler(sectionValidator_ServerValidate);
             sectionValidator.ControlToValidate = lapps.ID;
-            sectionValidator.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", ui.Text("user", "modules", base.getUser()), base.getUser());
+            sectionValidator.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", ui.Text("user", "modules", UmbracoUser), UmbracoUser);
             sectionValidator.CssClass = "error";
 
-            setupForm();
-            setupChannel();
+            SetupForm();
+            SetupChannel();
 
             ClientTools
                 .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadUsers>().Tree.Alias)
@@ -207,7 +211,7 @@ namespace umbraco.cms.presentation.user
                 args.IsValid = true;
         }
 
-        private void setupChannel()
+        private void SetupChannel()
         {
             Channel userChannel;
             try
@@ -273,19 +277,19 @@ namespace umbraco.cms.presentation.user
 
             // Setup the panes
             Pane ppInfo = new Pane();
-            ppInfo.addProperty(ui.Text("name", base.getUser()), cName);
-            ppInfo.addProperty(ui.Text("user", "startnode", base.getUser()), content);
-            ppInfo.addProperty(ui.Text("user", "searchAllChildren", base.getUser()), cFulltree);
-            ppInfo.addProperty(ui.Text("user", "mediastartnode", base.getUser()), medias);
+            ppInfo.addProperty(ui.Text("name", UmbracoUser), cName);
+            ppInfo.addProperty(ui.Text("user", "startnode", UmbracoUser), content);
+            ppInfo.addProperty(ui.Text("user", "searchAllChildren", UmbracoUser), cFulltree);
+            ppInfo.addProperty(ui.Text("user", "mediastartnode", UmbracoUser), medias);
 
             Pane ppFields = new Pane();
-            ppFields.addProperty(ui.Text("user", "documentType", base.getUser()), cDocumentType);
-            ppFields.addProperty(ui.Text("user", "descriptionField", base.getUser()), cDescription);
-            ppFields.addProperty(ui.Text("user", "categoryField", base.getUser()), cCategories);
-            ppFields.addProperty(ui.Text("user", "excerptField", base.getUser()), cExcerpt);
+            ppFields.addProperty(ui.Text("user", "documentType", UmbracoUser), cDocumentType);
+            ppFields.addProperty(ui.Text("user", "descriptionField", UmbracoUser), cDescription);
+            ppFields.addProperty(ui.Text("user", "categoryField", UmbracoUser), cCategories);
+            ppFields.addProperty(ui.Text("user", "excerptField", UmbracoUser), cExcerpt);
 
 
-            TabPage channelInfo = UserTabs.NewTabPage(ui.Text("user", "contentChannel", base.getUser()));
+            TabPage channelInfo = UserTabs.NewTabPage(ui.Text("user", "contentChannel", UmbracoUser));
 
             channelInfo.Controls.Add(ppInfo);
             channelInfo.Controls.Add(ppFields);
@@ -293,7 +297,7 @@ namespace umbraco.cms.presentation.user
             channelInfo.HasMenu = true;
             ImageButton save = channelInfo.Menu.NewImageButton();
             save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
-            save.Click += new ImageClickEventHandler(saveUser_Click);
+            save.Click += new ImageClickEventHandler(SaveUser_Click);
             save.ID = "save";
             if (!IsPostBack)
             {
@@ -309,7 +313,7 @@ namespace umbraco.cms.presentation.user
         /// <summary>
         /// Setups the form.
         /// </summary>
-        private void setupForm()
+        private void SetupForm()
         {
 
             if (!IsPostBack)
@@ -331,8 +335,8 @@ namespace umbraco.cms.presentation.user
                     passw.Visible = false;
                 }
 
-                contentPicker.Value = u.StartNodeId.ToString();
-                mediaPicker.Value = u.StartMediaId.ToString();
+                contentPicker.Value = u.StartNodeId.ToString(CultureInfo.InvariantCulture);
+                mediaPicker.Value = u.StartMediaId.ToString(CultureInfo.InvariantCulture);
 
                 // get the current users applications
                 string currentUserApps = ";";
@@ -351,7 +355,7 @@ namespace umbraco.cms.presentation.user
                 }
             }
         }
-        
+
         protected override void OnInit(EventArgs e)
         {
             base.OnInit(e);
@@ -367,7 +371,7 @@ namespace umbraco.cms.presentation.user
 
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/CMSNode.asmx"));
             //      ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
-            
+
         }
 
         /// <summary>
@@ -375,7 +379,7 @@ namespace umbraco.cms.presentation.user
         /// </summary>
         /// <param name="sender">The source of the event.</param>
         /// <param name="e">The <see cref="System.Web.UI.ImageClickEventArgs"/> instance containing the event data.</param>
-        private void saveUser_Click(object sender, ImageClickEventArgs e)
+        private void SaveUser_Click(object sender, ImageClickEventArgs e)
         {
             if (base.IsValid)
             {
@@ -383,7 +387,7 @@ namespace umbraco.cms.presentation.user
                 {
                     MembershipUser user = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(u.LoginName, true);
 
-                    
+
                     //TODO: We need to overhaul this editor like I have in v7 so that it dynamically creates the form based
                     // on the membership provider and provides the correct validation feedback in the UI if things are not supported.
                     //We need to also have this functionality put onto the change password dashboard.
@@ -493,18 +497,27 @@ namespace umbraco.cms.presentation.user
 
                     }
 
-                    ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editUserSaved", base.getUser()), "");
+                    ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editUserSaved", UmbracoUser), "");
                 }
                 catch (Exception ex)
                 {
-                    ClientTools.ShowSpeechBubble(speechBubbleIcon.error, ui.Text("speechBubbles", "editUserError", base.getUser()), "");
+                    ClientTools.ShowSpeechBubble(speechBubbleIcon.error, ui.Text("speechBubbles", "editUserError", UmbracoUser), "");
                     LogHelper.Error<EditUser>("Exception", ex);
                 }
             }
             else
             {
-                ClientTools.ShowSpeechBubble(speechBubbleIcon.error, ui.Text("speechBubbles", "editUserError", base.getUser()), "");
+                ClientTools.ShowSpeechBubble(speechBubbleIcon.error, ui.Text("speechBubbles", "editUserError", UmbracoUser), "");
             }
         }
+
+        /// <summary>
+        /// UserTabs control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.TabView UserTabs;
     }
 }
