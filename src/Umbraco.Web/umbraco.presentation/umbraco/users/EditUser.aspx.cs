@@ -9,6 +9,7 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Xml;
 using Umbraco.Core.Logging;
+using Umbraco.Web;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic.Exceptions;
@@ -385,26 +386,29 @@ namespace umbraco.cms.presentation.user
             {
                 try
                 {
-                    MembershipUser user = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(u.LoginName, true);
+                    var membershipUser = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(u.LoginName, true);
 
 
                     //TODO: We need to overhaul this editor like I have in v7 so that it dynamically creates the form based
                     // on the membership provider and provides the correct validation feedback in the UI if things are not supported.
                     //We need to also have this functionality put onto the change password dashboard.
 
-                    string tempPassword = ((controls.passwordChanger)passw.Controls[0]).Password;
-                    if (!string.IsNullOrEmpty(tempPassword.Trim()))
+                    var passwordChangerControl = (passwordChanger) passw.Controls[0];
+                    
+                    UmbracoContext.Current.Security.ChangePassword()
+
+                    if (string.IsNullOrEmpty(tempPassword) == false)
                     {
                         // make sure password is not empty
                         if (string.IsNullOrEmpty(u.Password)) u.Password = "default";
-                        user.ChangePassword(u.Password, tempPassword);
+                        membershipUser.ChangePassword(u.Password, tempPassword);
                     }
 
                     // Is it using the default membership provider
                     if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is UsersMembershipProvider)
                     {
                         // Save user in membership provider
-                        UsersMembershipUser umbracoUser = user as UsersMembershipUser;
+                        UsersMembershipUser umbracoUser = membershipUser as UsersMembershipUser;
                         umbracoUser.FullName = uname.Text.Trim();
                         umbracoUser.Language = userLanguage.SelectedValue;
                         umbracoUser.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
@@ -419,7 +423,12 @@ namespace umbraco.cms.presentation.user
                         u.Name = uname.Text.Trim();
                         u.Language = userLanguage.SelectedValue;
                         u.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
-                        if (!(Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is ActiveDirectoryMembershipProvider)) Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].UpdateUser(user);
+                        //SD: This check must be here for some reason but apparently we don't want to try to 
+                        // update when the AD provider is active.
+                        if ((Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is ActiveDirectoryMembershipProvider) == false)
+                        {
+                            Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].UpdateUser(membershipUser);
+                        }
                     }
 
 

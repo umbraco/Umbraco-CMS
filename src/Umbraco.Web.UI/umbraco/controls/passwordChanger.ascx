@@ -10,7 +10,7 @@
                     this.togglePasswordInputValidators(true);
                     $(e).closest(".propertyItem").replaceWith($("#umbPasswordChanger"));
                     $("#umbPasswordChanger").show();
-                    $("#<%=IsChangingPassword.ClientID%>").val(true);
+                    $("#<%=IsChangingPasswordField.ClientID%>").val(true);
                     $(e).hide();
                 }                
             },
@@ -57,7 +57,7 @@
 
 <a href="#" id="changePasswordButton">Change password</a><br />
 
-<asp:HiddenField runat="server" ID="IsChangingPassword" Value="false" />
+<asp:HiddenField runat="server" ID="IsChangingPasswordField" Value="false" />
 
 <div class="propertyItem" id="umbPasswordChanger" style="display: none;">
 

@@ -9,6 +9,7 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
+using Umbraco.Core;
 using Umbraco.Web.Models;
 
 namespace umbraco.controls
@@ -20,6 +21,15 @@ namespace umbraco.controls
         protected MembershipProvider Provider
         {
             get { return Membership.Providers[MembershipProviderName]; }
+        }
+
+        public bool IsChangingPassword
+        {
+            get
+            {
+                var convertAttempt = IsChangingPasswordField.Value.TryConvertTo<bool>();
+                return convertAttempt.Success && convertAttempt.Result;
+            }
         }
 
         public ChangingPasswordModel ChangingPasswordModel
@@ -36,6 +46,7 @@ namespace umbraco.controls
             }
         }
 
+        [Obsolete("Use the ChangingPasswordModel instead")]
         public string Password
         {
             get { return ChangingPasswordModel.NewPassword; }
@@ -91,7 +102,7 @@ namespace umbraco.controls
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.HiddenField IsChangingPassword;
+        protected global::System.Web.UI.WebControls.HiddenField IsChangingPasswordField;
 
         /// <summary>
         /// ResetPasswordCheckBox control.
