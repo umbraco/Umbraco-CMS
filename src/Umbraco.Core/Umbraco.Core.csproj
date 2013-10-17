@@ -317,6 +317,8 @@
     <Compile Include="Models\ContentTypeCompositionBase.cs" />
     <Compile Include="Models\ContentTypeExtensions.cs" />
     <Compile Include="Models\ContentTypeSort.cs" />
+    <Compile Include="Models\IRelation.cs" />
+    <Compile Include="Models\IRelationType.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentExtended.cs" />
     <Compile Include="Models\PublishedContent\PublishedPropertyBase.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryImpl.cs" />
@@ -955,6 +957,7 @@
     <Compile Include="Services\IMemberService.cs" />
     <Compile Include="Services\IMembershipUserService.cs" />
     <Compile Include="Services\IMemberTypeService.cs" />
+    <Compile Include="Services\IRelationService.cs" />
     <Compile Include="Services\ISectionService.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\IUserService.cs" />
