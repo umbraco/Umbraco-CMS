@@ -304,7 +304,6 @@
     <Compile Include="Controllers\LoginStatusController.cs" />
     <Compile Include="Editors\ContentPostValidateAttribute.cs" />
     <Compile Include="Editors\DashboardController.cs" />
-    <Compile Include="Models\ChangingPasswordModel.cs" />
     <Compile Include="Editors\DashboardSecurity.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
@@ -412,7 +411,6 @@
     <Compile Include="Editors\ContentTypeController.cs" />
     <Compile Include="Editors\LegacyController.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
-    <Compile Include="Models\PasswordChangedModel.cs" />
     <Compile Include="Models\ProfileModel.cs" />
     <Compile Include="Models\LoginStatusModel.cs" />
     <Compile Include="PropertyEditors\ValueConverters\SimpleEditorValueConverter.cs" />

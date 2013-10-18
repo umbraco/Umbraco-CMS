@@ -461,7 +461,6 @@
     <Compile Include="Persistence\FaultHandling\Strategies\SqlAzureTransientErrorDetectionStrategy.cs" />
     <Compile Include="Persistence\FaultHandling\ThrottlingCondition.cs" />
     <Compile Include="Persistence\Mappers\MacroMapper.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\AdditionalIndexesAndKeys.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AlterCmsMacroPropertyTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AddIndexToCmsMacroPropertyTable.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\AddIndexToCmsMacroTable.cs" />

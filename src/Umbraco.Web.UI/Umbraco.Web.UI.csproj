@@ -414,8 +414,8 @@
       <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Controls\Images\ImageViewer.ascx.cs">
-      <SubType>ASPXCodeBehind</SubType>
       <DependentUpon>ImageViewer.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Umbraco\Controls\Images\ImageViewer.ascx.designer.cs">
       <DependentUpon>ImageViewer.ascx</DependentUpon>
@@ -610,13 +610,13 @@
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Logout.aspx" />
     <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
-    </Compile>
     <Compile Include="Umbraco\Users\EditUser.aspx.cs">
       <DependentUpon>EditUser.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Umbraco\Users\EditUser.aspx.designer.cs">
       <DependentUpon>EditUser.aspx</DependentUpon>
+    </Compile>
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Install\Steps\UpgradeReport.ascx" />

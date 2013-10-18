@@ -210,7 +210,7 @@ namespace umbraco.cms.presentation.user
             userInfo.HasMenu = true;
 
             var save = userInfo.Menu.NewButton();
-            save.Click += saveUser_Click;
+            save.Click += SaveUser_Click;
             save.ID = "save";
             save.ToolTip = ui.Text("save");
             save.Text = ui.Text("save");
