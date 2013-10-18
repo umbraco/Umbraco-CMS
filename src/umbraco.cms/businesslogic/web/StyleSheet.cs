@@ -268,7 +268,7 @@ namespace umbraco.cms.businesslogic.web
         {
             using (StreamWriter SW = File.CreateText(IOHelper.MapPath(string.Format("{0}/{1}.css", SystemDirectories.Css, this.Text))))
             {
-                string tmpCss = this.Content + "\n\n";
+                string tmpCss = this.Content ;
                 tmpCss += "/* EDITOR PROPERTIES - PLEASE DON'T DELETE THIS LINE TO AVOID DUPLICATE PROPERTIES */\n";
                 foreach (StylesheetProperty p in this.Properties)
                 {
