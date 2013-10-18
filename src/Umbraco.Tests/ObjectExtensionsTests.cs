@@ -137,7 +137,7 @@ namespace Umbraco.Tests
             var obj = new MyTestObject();
             var result = obj.TryConvertTo<object>();
 
-            Assert.AreEqual(obj, result);            
+            Assert.AreEqual(obj, result.Result);            
         }
 		
 		private CultureInfo savedCulture;
@@ -145,7 +145,8 @@ namespace Umbraco.Tests
 	    /// <summary>
 		/// Run once before each test in derived test fixtures.
 		/// </summary>
-		public override void TestSetup()
+        [SetUp]
+		public void TestSetup()
 		{
 			savedCulture = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-GB"); // make sure the dates parse correctly
@@ -155,7 +156,8 @@ namespace Umbraco.Tests
 		/// <summary>
 		/// Run once after each test in derived test fixtures.
 		/// </summary>
-		public override void TestTearDown()
+	    [TearDown]
+		public void TestTearDown()
 		{
 			Thread.CurrentThread.CurrentCulture = savedCulture;
 			return;

@@ -114,8 +114,11 @@ namespace Umbraco.Web.Cache
 
             //Bind to member events
 
+            //TODO: Remove the legacy event handlers once we proxy the legacy members stuff through the new services
             Member.AfterSave += MemberAfterSave;
             Member.BeforeDelete += MemberBeforeDelete;
+            MemberService.Saved += MemberService_Saved;
+            MemberService.Deleting += MemberService_Deleting;
 
             //Bind to media events
 
@@ -539,6 +542,23 @@ namespace Umbraco.Web.Cache
         #endregion
 
         #region Member event handlers
+
+        static void MemberService_Saved(IMemberService sender, Core.Events.SaveEventArgs<IMember> e)
+        {
+            foreach (var m in e.SavedEntities)
+            {
+                DistributedCache.Instance.RefreshMemberCache(m.Id);
+            }
+        }
+
+        static void MemberService_Deleting(IMemberService sender, Core.Events.DeleteEventArgs<IMember> e)
+        {
+            foreach (var m in e.DeletedEntities)
+            {
+                DistributedCache.Instance.RemoveMemberCache(m.Id);
+            }
+        }
+
         static void MemberBeforeDelete(Member sender, DeleteEventArgs e)
         {
             DistributedCache.Instance.RemoveMemberCache(sender.Id);
