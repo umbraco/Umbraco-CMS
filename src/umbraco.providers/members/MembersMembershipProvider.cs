@@ -134,7 +134,7 @@ namespace umbraco.providers.members
             {
                 if (args.FailureInformation != null)
                     throw args.FailureInformation;
-                throw new MembershipPasswordException("Change password canceled due to new password validation failure.");
+                throw new MembershipPasswordException("Change password canceled due to password validation failure.");
             }
 
             string salt;
@@ -144,8 +144,6 @@ namespace umbraco.providers.members
 
             return true;
         }
-
-
 
         /// <summary>
         /// Processes a request to update the password question and answer for a membership user.
