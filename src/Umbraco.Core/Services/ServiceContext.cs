@@ -156,7 +156,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the <see cref="EntityService"/>
         /// </summary>
-        internal IMacroService MacroService
+        public IMacroService MacroService
         {
             get { return _macroService.Value; }
         }
