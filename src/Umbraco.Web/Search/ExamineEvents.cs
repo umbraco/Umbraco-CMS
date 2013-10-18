@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Security;
 using System.Xml;
@@ -36,7 +37,7 @@ namespace Umbraco.Web.Search
 		/// <remarks>
 		/// We need to do this on the Started event as to guarantee that all resolvers are setup properly.
 		/// </remarks>
-		[SecuritySafeCritical]
+		
 		protected override void ApplicationStarted(UmbracoApplicationBase httpApplication, ApplicationContext applicationContext)
 		{            
             LogHelper.Info<ExamineEvents>("Initializing Examine and binding to business logic events");
@@ -50,13 +51,11 @@ namespace Umbraco.Web.Search
 			if (registeredProviders == 0)
 				return;
 
-            //MediaService.Created += MediaServiceCreated;
             MediaService.Saved += MediaServiceSaved;
             MediaService.Deleted += MediaServiceDeleted;
             MediaService.Moved += MediaServiceMoved;
             MediaService.Trashed += MediaServiceTrashed;
 
-            //ContentService.Created += ContentServiceCreated;
             ContentService.Saved += ContentServiceSaved;
             ContentService.Deleted += ContentServiceDeleted;
             ContentService.Moved += ContentServiceMoved;
@@ -66,8 +65,11 @@ namespace Umbraco.Web.Search
 			content.AfterUpdateDocumentCache += ContentAfterUpdateDocumentCache;
 			content.AfterClearDocumentCache += ContentAfterClearDocumentCache;
 
+            //TODO: Remove the legacy event handlers once we proxy the legacy members stuff through the new services
 			Member.AfterSave += MemberAfterSave;
 			Member.AfterDelete += MemberAfterDelete;
+            MemberService.Saved += MemberServiceSaved;
+            MemberService.Deleted += MemberServiceDeleted;
 
 			var contentIndexer = ExamineManager.Instance.IndexProviderCollection["InternalIndexer"] as UmbracoContentIndexer;
 			if (contentIndexer != null)
@@ -81,37 +83,24 @@ namespace Umbraco.Web.Search
 			}
 		}
 
-        [SecuritySafeCritical]
-	    static void ContentServiceCreated(IContentService sender, Core.Events.NewEventArgs<IContent> e)
-        {
-            IndexConent(e.Entity);
-        }
-
-        [SecuritySafeCritical]
-	    static void MediaServiceCreated(IMediaService sender, Core.Events.NewEventArgs<IMedia> e)
-        {
-            IndexMedia(e.Entity);
-        }
-
-        [SecuritySafeCritical]
 	    static void ContentServiceTrashed(IContentService sender, Core.Events.MoveEventArgs<IContent> e)
         {
             IndexConent(e.Entity);
         }
 
-        [SecuritySafeCritical]
+        
 	    static void MediaServiceTrashed(IMediaService sender, Core.Events.MoveEventArgs<IMedia> e)
         {
             IndexMedia(e.Entity);
         }
 
-        [SecuritySafeCritical]
+        
         static void ContentServiceMoved(IContentService sender, Umbraco.Core.Events.MoveEventArgs<IContent> e)
         {
             IndexConent(e.Entity);
         }
 
-        [SecuritySafeCritical]
+        
         static void ContentServiceDeleted(IContentService sender, Umbraco.Core.Events.DeleteEventArgs<IContent> e)
         {
             e.DeletedEntities.ForEach(
@@ -121,19 +110,19 @@ namespace Umbraco.Web.Search
                     ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler)));
         }
 
-        [SecuritySafeCritical]
+        
         static void ContentServiceSaved(IContentService sender, Umbraco.Core.Events.SaveEventArgs<IContent> e)
         {
             e.SavedEntities.ForEach(IndexConent);
         }
 
-        [SecuritySafeCritical]
+        
         static void MediaServiceMoved(IMediaService sender, Umbraco.Core.Events.MoveEventArgs<IMedia> e)
         {
             IndexMedia(e.Entity);
         }
 
-        [SecuritySafeCritical]
+        
         static void MediaServiceDeleted(IMediaService sender, Umbraco.Core.Events.DeleteEventArgs<IMedia> e)
         {
             e.DeletedEntities.ForEach(
@@ -143,13 +132,36 @@ namespace Umbraco.Web.Search
                     ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>().Where(x => x.EnableDefaultEventHandler)));
         }
 
-        [SecuritySafeCritical]
+        
         static void MediaServiceSaved(IMediaService sender, Umbraco.Core.Events.SaveEventArgs<IMedia> e)
         {
             e.SavedEntities.ForEach(IndexMedia);
         }
 
-		[SecuritySafeCritical]
+        static void MemberServiceSaved(IMemberService sender, Core.Events.SaveEventArgs<IMember> e)
+        {
+            foreach (var m in e.SavedEntities)
+            {
+                var xml = m.ToXml();
+                //ensure that only the providers are flagged to listen execute
+                var providers = ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
+                    .Where(x => x.EnableDefaultEventHandler);
+                ExamineManager.Instance.ReIndexNode(xml, IndexTypes.Member, providers);
+            }
+        }
+
+        static void MemberServiceDeleted(IMemberService sender, Core.Events.DeleteEventArgs<IMember> e)
+        {
+            foreach (var m in e.DeletedEntities)
+            {
+                var nodeId = m.Id.ToString(CultureInfo.InvariantCulture);
+                //ensure that only the providers are flagged to listen execute
+                ExamineManager.Instance.DeleteFromIndex(nodeId,
+                    ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
+                        .Where(x => x.EnableDefaultEventHandler));
+            }
+        }
+
 		private static void MemberAfterSave(Member sender, SaveEventArgs e)
 		{
 			//ensure that only the providers are flagged to listen execute
@@ -159,10 +171,10 @@ namespace Umbraco.Web.Search
 			ExamineManager.Instance.ReIndexNode(xml, IndexTypes.Member, providers);
 		}
 
-		[SecuritySafeCritical]
+		
 		private static void MemberAfterDelete(Member sender, DeleteEventArgs e)
 		{
-			var nodeId = sender.Id.ToString();
+			var nodeId = sender.Id.ToString(CultureInfo.InvariantCulture);
 
 			//ensure that only the providers are flagged to listen execute
 			ExamineManager.Instance.DeleteFromIndex(nodeId,
@@ -175,7 +187,7 @@ namespace Umbraco.Web.Search
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		[SecuritySafeCritical]
+		
 		private static void ContentAfterUpdateDocumentCache(Document sender, DocumentCacheEventArgs e)
 		{
 			//ensure that only the providers that have DONT unpublishing support enabled       
@@ -191,7 +203,7 @@ namespace Umbraco.Web.Search
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		[SecuritySafeCritical]
+		
 		private static void ContentAfterClearDocumentCache(Document sender, DocumentCacheEventArgs e)
 		{
 			var nodeId = sender.Id.ToString();
@@ -209,7 +221,7 @@ namespace Umbraco.Web.Search
 		/// </summary>
 		/// <param name="sender"></param>
 		/// <param name="e"></param>
-		[SecuritySafeCritical]
+		
 		private static void IndexerDocumentWriting(object sender, DocumentWritingEventArgs e)
 		{
 			if (e.Fields.Keys.Contains("nodeName"))
@@ -253,7 +265,7 @@ namespace Umbraco.Web.Search
 		/// <param name="node"></param>
 		/// <param name="cacheOnly">true if data is going to be returned from cache</param>
 		/// <returns></returns>
-		[SecuritySafeCritical]
+		
         [Obsolete("This method is no longer used and will be removed from the core in future versions, the cacheOnly parameter has no effect. Use the other ToXDocument overload instead")]
 		public static XDocument ToXDocument(Content node, bool cacheOnly)
 		{			
@@ -265,7 +277,7 @@ namespace Umbraco.Web.Search
 		/// </summary>
 		/// <param name="node"></param>
 		/// <returns></returns>
-		[SecuritySafeCritical]
+		
 		private static XDocument ToXDocument(Content node)
 		{
             if (TypeHelper.IsTypeAssignableFrom<Document>(node))
