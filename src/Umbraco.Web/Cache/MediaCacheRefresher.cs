@@ -111,6 +111,8 @@ namespace Umbraco.Web.Cache
         {
             if (payloads == null) return;
 
+            ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
+
             payloads.ForEach(payload =>
                 {
                     foreach (var idPart in payload.Path.Split(','))
