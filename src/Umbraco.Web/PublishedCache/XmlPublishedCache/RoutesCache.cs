@@ -45,11 +45,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             // document - whenever a document is updated in, or removed from, the XML cache
             //  we must clear the cache - at the moment, we clear the entire cache
-            //  TODO could we do partial updates instead of clearing the whole cache?
             global::umbraco.content.AfterUpdateDocumentCache += (sender, e) => Clear();
             global::umbraco.content.AfterClearDocumentCache += (sender, e) => Clear();
 
-            // FIXME
+            // fixme - should refactor once content events are refactored
             // the content class needs to be refactored - at the moment 
             // content.XmlContentInternal setter does not trigger any event
             // content.UpdateDocumentCache(List<Document> Documents) does not trigger any event

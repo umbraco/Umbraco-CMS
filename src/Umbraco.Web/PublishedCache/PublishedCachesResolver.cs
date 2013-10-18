@@ -21,7 +21,7 @@ namespace Umbraco.Web.PublishedCache
         /// </summary>
         /// <param name="caches">The caches.</param>
         /// <remarks>For developers, at application startup.</remarks>
-        public void SetCache(IPublishedCaches caches)
+        public void SetCaches(IPublishedCaches caches)
 		{
 			Value = caches;
 		}

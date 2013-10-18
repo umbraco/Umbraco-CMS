@@ -18,18 +18,24 @@ namespace Umbraco.Web.Mvc
     public sealed class MemberAuthorizeAttribute : AuthorizeAttribute
     {
 
-        private readonly ApplicationContext _applicationContext;
         private readonly UmbracoContext _umbracoContext;
 
+        private UmbracoContext GetUmbracoContext()
+        {
+            return _umbracoContext ?? UmbracoContext.Current;
+        }
+
+        /// <summary>
+        /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
+        /// </summary>
+        /// <param name="umbracoContext"></param>
         public MemberAuthorizeAttribute(UmbracoContext umbracoContext)
         {
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
             _umbracoContext = umbracoContext;
-            _applicationContext = _umbracoContext.Application;
         }
 
         public MemberAuthorizeAttribute()
-            : this(UmbracoContext.Current)
         {
 
         }
@@ -76,7 +82,7 @@ namespace Umbraco.Web.Mvc
                 }
             }
 
-            return _umbracoContext.Security.IsMemberAuthorized(AllowAll,
+            return GetUmbracoContext().Security.IsMemberAuthorized(AllowAll,
                                                   AllowType.Split(','),
                                                   AllowGroup.Split(','),
                                                   members);

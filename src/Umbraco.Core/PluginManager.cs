@@ -20,7 +20,6 @@ using File = System.IO.File;
 
 namespace Umbraco.Core
 {
-
     /// <summary>
     /// Used to resolve all plugin types and cache them and is also used to instantiate plugin types
     /// </summary>
@@ -37,6 +36,7 @@ namespace Umbraco.Core
     internal class PluginManager
     {
         private readonly ApplicationContext _appContext;
+        private const string CacheKey = "umbraco-plugins.list";
 
         /// <summary>
         /// Creates a new PluginManager with an ApplicationContext instance which ensures that the plugin xml 
@@ -242,7 +242,7 @@ namespace Umbraco.Core
         {
             var filePath = GetPluginListFilePath();
             if (!File.Exists(filePath))
-                return Attempt<IEnumerable<string>>.False;
+                return Attempt<IEnumerable<string>>.Fail();
 
             try
             {
@@ -251,7 +251,7 @@ namespace Umbraco.Core
                 XDocument xml;
                 if (_appContext != null)
                 {
-                    xml = _appContext.ApplicationCache.GetCacheItem("umbraco-plugins.list",
+                    xml = _appContext.ApplicationCache.GetCacheItem(CacheKey,
                         new TimeSpan(0, 0, 5, 0),
                         () => XDocument.Load(filePath));
                 }
@@ -262,7 +262,7 @@ namespace Umbraco.Core
 
 
                 if (xml.Root == null)
-                    return Attempt<IEnumerable<string>>.False;
+                    return Attempt<IEnumerable<string>>.Fail();
 
                 var typeElement = xml.Root.Elements()
                     .SingleOrDefault(x =>
@@ -272,18 +272,16 @@ namespace Umbraco.Core
 
                 //return false but specify this exception type so we can detect it
                 if (typeElement == null)
-                    return new Attempt<IEnumerable<string>>(new CachedPluginNotFoundInFile());
+                    return Attempt<IEnumerable<string>>.Fail(new CachedPluginNotFoundInFile());
 
                 //return success
-                return new Attempt<IEnumerable<string>>(
-                    true,
-                    typeElement.Elements("add")
+                return Attempt.Succeed(typeElement.Elements("add")
                         .Select(x => (string)x.Attribute("type")));
             }
             catch (Exception ex)
             {
                 //if the file is corrupted, etc... return false
-                return new Attempt<IEnumerable<string>>(ex);
+                return Attempt<IEnumerable<string>>.Fail(ex);
             }
         }
 
@@ -304,18 +302,18 @@ namespace Umbraco.Core
 
             if (_appContext != null)
             {
-               _appContext.ApplicationCache.ClearCacheItem("umbraco-plugins.list");
+               _appContext.ApplicationCache.ClearCacheItem(CacheKey);
             }
         }
-
+        
         private string GetPluginListFilePath()
         {
-            return Path.Combine(_tempFolder, "umbraco-plugins.list");
+            return Path.Combine(_tempFolder, string.Format("umbraco-plugins.{0}.list", NetworkHelper.FileSafeMachineName));
         }
 
         private string GetPluginHashFilePath()
         {
-            return Path.Combine(_tempFolder, "umbraco-plugins.hash");
+            return Path.Combine(_tempFolder, string.Format("umbraco-plugins.{0}.hash", NetworkHelper.FileSafeMachineName));
         }
 
         /// <summary>
@@ -621,7 +619,7 @@ namespace Umbraco.Core
                             //here we need to identify if the CachedPluginNotFoundInFile was the exception, if it was then we need to re-scan
                             //in some cases the plugin will not have been scanned for on application startup, but the assemblies haven't changed
                             //so in this instance there will never be a result.
-                            if (fileCacheResult.Error != null && fileCacheResult.Error is CachedPluginNotFoundInFile)
+                            if (fileCacheResult.Exception != null && fileCacheResult.Exception is CachedPluginNotFoundInFile)
                             {
                                 //we don't have a cache for this so proceed to look them up by scanning
                                 LoadViaScanningAndUpdateCacheFile<T>(typeList, resolutionType, finder);

@@ -108,6 +108,7 @@ namespace umbraco.dialogs
 
                     if (validAction == false)
                     {
+                        panel_buttons.Visible = false;
                         ScriptManager.RegisterStartupScript(this, GetType(), "notvalid", "notValid();", true);
                     }
                 }
@@ -121,69 +122,35 @@ namespace umbraco.dialogs
             return CheckPermissions(cmsNode, currentAction);
         }
 
+        /// <summary>
+        /// Checks if the current user has permissions to execute this action against this node
+        /// </summary>
+        /// <param name="node"></param>
+        /// <param name="currentAction"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This used to do a recursive check for all descendent nodes but this is not required and is a massive CPU hog.
+        /// See: http://issues.umbraco.org/issue/U4-2632, https://groups.google.com/forum/?fromgroups=#!topic/umbraco-dev/L1D4LwVSP2Y
+        /// </remarks>
         private bool CheckPermissions(IContentBase node, IAction currentAction)
         {
             var currUserPermissions = new UserPermissions(CurrentUser);
             var lstCurrUserActions = currUserPermissions.GetExistingNodePermission(node.Id);
 
-            if (lstCurrUserActions.Contains(currentAction) == false)
-                return false;
-
-            
-            if (Umbraco.Core.Models.ContentExtensions.HasChildren(node, Services))
-            {
-                return Umbraco.Core.Models.ContentExtensions.Children(node, Services)
-                    .All(child => CheckPermissions(child, currentAction));
-            }
-            return true;
+            return lstCurrUserActions.Contains(currentAction);
         }
 
-        
-
-        //PPH Handle doctype copies..
         private void HandleDocumentTypeCopy()
         {
-            var documentType = new DocumentType(int.Parse(Request.GetItemAsString("id")));
+            var contentTypeService = ApplicationContext.Current.Services.ContentTypeService;
+            var contentType = contentTypeService.GetContentType(
+                int.Parse(Request.GetItemAsString("id")));
 
-            //Documentype exists.. create new doc type... 
-            var alias = rename.Text;
-            var newDocumentType = DocumentType.MakeNew(base.getUser(), alias.Replace("'", "''"));
+            var alias = rename.Text.Replace("'", "''");
+            var clone = ((Umbraco.Core.Models.ContentType) contentType).Clone(alias);
+            contentTypeService.Save(clone);
 
-            newDocumentType.IconUrl = documentType.IconUrl;
-            newDocumentType.Thumbnail = documentType.Thumbnail;
-            newDocumentType.Description = documentType.Description;
-            newDocumentType.allowedTemplates = documentType.allowedTemplates;
-            newDocumentType.DefaultTemplate = documentType.DefaultTemplate;
-            newDocumentType.AllowedChildContentTypeIDs = documentType.AllowedChildContentTypeIDs;
-            newDocumentType.AllowAtRoot = documentType.AllowAtRoot;
-
-            newDocumentType.MasterContentType = int.Parse(masterType.SelectedValue);
-
-            var oldNewTabIds = new Hashtable();
-            foreach (var tab in documentType.getVirtualTabs.Where(t => t.ContentType == documentType.Id))
-            {
-                int tabId = newDocumentType.AddVirtualTab(tab.Caption);
-                oldNewTabIds.Add(tab.Id, tabId);
-            }
-
-            foreach (var propertyType in documentType.PropertyTypes.Where(p => p.ContentTypeId == documentType.Id))
-            {
-                var newPropertyType = cms.businesslogic.propertytype.PropertyType.MakeNew(propertyType.DataTypeDefinition, newDocumentType, propertyType.Name, propertyType.Alias);
-                newPropertyType.ValidationRegExp = propertyType.ValidationRegExp;
-                newPropertyType.SortOrder = propertyType.SortOrder;
-                newPropertyType.Mandatory = propertyType.Mandatory;
-                newPropertyType.Description = propertyType.Description;
-
-                if (propertyType.TabId > 0 && oldNewTabIds[propertyType.TabId] != null)
-                {
-                    var newTabId = (int)oldNewTabIds[propertyType.TabId];
-                    newPropertyType.TabId = newTabId;
-                }
-            }
-
-            var returnUrl = string.Format("{0}/settings/editNodeTypeNew.aspx?id={1}", SystemDirectories.Umbraco, newDocumentType.Id);
-
-            newDocumentType.Save();
+            var returnUrl = string.Format("{0}/settings/editNodeTypeNew.aspx?id={1}", SystemDirectories.Umbraco, clone.Id);
 
             pane_settings.Visible = false;
             panel_buttons.Visible = false;
@@ -305,11 +272,15 @@ namespace umbraco.dialogs
                     {
                         if (CurrentApp == Constants.Applications.Content)
                         {
-                            Services.ContentService.Move((IContent)currContent, Request.GetItemAs<int>("copyTo"), getUser().Id);
+                            //Backwards comp. change, so old events are fired #U4-2731
+                            var doc = new Document(currContent as IContent);
+                            doc.Move(Request.GetItemAs<int>("copyTo"));
                         }
                         else
                         {
-                            Services.MediaService.Move((IMedia)currContent, Request.GetItemAs<int>("copyTo"), getUser().Id);
+                            //Backwards comp. change, so old events are fired #U4-2731
+                            var media = new umbraco.cms.businesslogic.media.Media(currContent as IMedia);
+                            media.Move(Request.GetItemAs<int>("copyTo"));
                             library.ClearLibraryCacheForMedia(currContent.Id);
                         }
 
@@ -323,7 +294,9 @@ namespace umbraco.dialogs
                     {
                         //NOTE: We ONLY support Copy on content not media for some reason.
 
-                        var newContent = Services.ContentService.Copy((IContent)currContent, Request.GetItemAs<int>("copyTo"), RelateDocuments.Checked, getUser().Id);
+                        //Backwards comp. change, so old events are fired #U4-2731
+                        var newContent = new Document(currContent as IContent);
+                        newContent.Copy(Request.GetItemAs<int>("copyTo"), getUser(), RelateDocuments.Checked);
                         
                         feedback.Text = ui.Text("moveOrCopy", "copyDone", nodes, getUser()) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
                         feedback.type = uicontrols.Feedback.feedbacktype.success;

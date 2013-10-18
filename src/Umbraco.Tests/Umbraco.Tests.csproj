@@ -48,9 +48,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Examine, Version=0.1.51.2941, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Examine, Version=0.1.52.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.51.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.52.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -68,6 +68,9 @@
       <Private>True</Private>
       <HintPath>..\packages\Microsoft.Web.Infrastructure.1.0.0.0\lib\net40\Microsoft.Web.Infrastructure.dll</HintPath>
     </Reference>
+    <Reference Include="Moq">
+      <HintPath>..\packages\Moq.4.1.1309.1617\lib\net40\Moq.dll</HintPath>
+    </Reference>
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
@@ -76,12 +79,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="Rhino.Mocks">
-      <HintPath>..\packages\RhinoMocks.3.6.1\lib\net\Rhino.Mocks.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data.Entity.Design" />
     <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <Private>True</Private>
       <HintPath>..\packages\SqlServerCE.4.0.0.0\lib\System.Data.SqlServerCe.dll</HintPath>
@@ -142,7 +143,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Auditing\AuditTests.cs" />
+    <Compile Include="AttemptTests.cs" />
+    <Compile Include="MockTests.cs" />
+    <Compile Include="Persistence\Auditing\AuditTests.cs" />
     <Compile Include="BootManagers\CoreBootManagerTests.cs" />
     <Compile Include="BusinessLogic\DictionaryTest.cs" />
     <Compile Include="Cache\CacheHelperTests.cs" />
@@ -184,13 +187,31 @@
     <Compile Include="CodeFirst\TypeInheritanceTest.cs" />
     <Compile Include="Configurations\FileSystemProviderTests.cs" />
     <Compile Include="CoreXml\FrameworkXmlTests.cs" />
+    <Compile Include="DynamicsAndReflection\ExtensionMethodFinderTests.cs" />
+    <Compile Include="DynamicsAndReflection\ReflectionTests.cs" />
     <Compile Include="Integration\CreateContent.cs" />
+    <Compile Include="Models\ContentExtensionsTests.cs" />
+    <Compile Include="Models\DataValueSetterTests.cs" />
+    <Compile Include="Mvc\MergeParentContextViewDataAttributeTests.cs" />
+    <Compile Include="Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\PetaPocoExtensionsTest.cs" />
+    <Compile Include="Persistence\Repositories\MemberRepositoryTest.cs" />
+    <Compile Include="Persistence\Repositories\MemberTypeRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserRepositoryTest.cs" />
     <Compile Include="Persistence\Repositories\UserTypeRepositoryTest.cs" />
+    <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
+    <Compile Include="PublishedContent\StronglyTypedModels\CallingMethodTests.cs" />
+    <Compile Include="PublishedContent\StronglyTypedModels\Subpage.cs" />
+    <Compile Include="PublishedContent\StronglyTypedModels\Textpage.cs" />
+    <Compile Include="PublishedContent\StronglyTypedModels\TypedModelBase.cs" />
+    <Compile Include="PublishedContent\StronglyTypedModels\UmbracoTemplatePage`T.cs" />
+    <Compile Include="Services\LocalizationServiceTests.cs" />
+    <Compile Include="Services\PackagingServiceTests.cs" />
+    <Compile Include="Services\PerformanceTests.cs" />
     <Compile Include="Services\UserServiceTests.cs" />
     <Compile Include="TestHelpers\BaseSeleniumTest.cs" />
     <Compile Include="Integration\InstallPackage.cs" />
+    <Compile Include="CoreXml\NavigableNavigatorTests.cs" />
     <Compile Include="PublishedCache\PublishedMediaCacheTests.cs" />
     <Compile Include="CoreStrings\CmsHelperCasingTests.cs" />
     <Compile Include="CoreStrings\ShortStringHelperResolverTest.cs" />
@@ -236,9 +257,9 @@
     <Compile Include="PublishedContent\LegacyExamineBackedMediaTests.cs" />
     <Compile Include="PublishedContent\PublishedContentDataTableTests.cs" />
     <Compile Include="PublishedContent\PublishedContentTestBase.cs" />
+    <Compile Include="PublishedContent\PublishedContentTestElements.cs" />
     <Compile Include="PublishedContent\PublishedContentTests.cs" />
     <Compile Include="PublishedContent\PublishedMediaTests.cs" />
-    <Compile Include="PublishedContent\StronglyTypedQueryTests.cs" />
     <Compile Include="HashCodeCombinerTests.cs" />
     <Compile Include="HtmlHelperExtensionMethodsTests.cs" />
     <Compile Include="IO\IOHelperTest.cs" />
@@ -280,11 +301,13 @@
     <Compile Include="Persistence\RepositoryResolverTests.cs" />
     <Compile Include="Persistence\SqlCeTableByTableTest.cs" />
     <Compile Include="Persistence\SqlTableByTableTest.cs" />
+    <Compile Include="PublishedContent\PublishedContentMoreTests.cs" />
     <Compile Include="Publishing\PublishingStrategyTests.cs" />
     <Compile Include="Resolvers\ActionsResolverTests.cs" />
     <Compile Include="AsynchronousRollingFileAppenderTests.cs" />
     <Compile Include="BusinessLogic\ApplicationTest.cs" />
     <Compile Include="BusinessLogic\ApplicationTreeTest.cs" />
+    <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserType.cs" />
     <Compile Include="BusinessLogic\BaseTest.cs" />
@@ -338,7 +361,7 @@
     <Compile Include="Routing\NiceUrlProviderTests.cs" />
     <Compile Include="Routing\RenderRouteHandlerTests.cs" />
     <Compile Include="Routing\RouteTestExtensions.cs" />
-    <Compile Include="Stubs\TestControllerFactory.cs" />
+    <Compile Include="TestHelpers\Stubs\TestControllerFactory.cs" />
     <Compile Include="TestHelpers\BaseUsingSqlCeSyntax.cs" />
     <Compile Include="TestHelpers\BaseWebTest.cs" />
     <Compile Include="TestHelpers\BaseDatabaseTest.cs" />
@@ -346,6 +369,8 @@
     <Compile Include="TestHelpers\Entities\MockedContentTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedEntity.cs" />
     <Compile Include="TestHelpers\Entities\MockedMedia.cs" />
+    <Compile Include="Trees\BaseContentTreeTests.cs" />
+    <Compile Include="Trees\BaseMediaTreeTests.cs" />
     <Compile Include="UmbracoExamine\ContentServiceTest.cs" />
     <Compile Include="UmbracoExamine\EventsTest.cs" />
     <Compile Include="TypeHelperTests.cs" />
@@ -372,7 +397,7 @@
     <Compile Include="Resolvers\PackageActionsResolverTests.cs" />
     <Compile Include="PluginManagerExtensions.cs" />
     <Compile Include="PluginManagerTests.cs" />
-    <Compile Include="Stubs\FakeLastChanceFinder.cs" />
+    <Compile Include="TestHelpers\Stubs\FakeLastChanceFinder.cs" />
     <Compile Include="TestHelpers\TestHelper.cs" />
     <Compile Include="EnumerableExtensionsTests.cs" />
     <Compile Include="IO\AbstractFileSystemTests.cs" />

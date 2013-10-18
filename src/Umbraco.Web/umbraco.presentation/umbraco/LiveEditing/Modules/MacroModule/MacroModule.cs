@@ -8,7 +8,7 @@ using umbraco.presentation.LiveEditing.Updates;
 using umbraco.presentation.templateControls;
 using UM = umbraco.cms.businesslogic.macro;
 using ClientDependency.Core;
-using umbraco.IO;
+using Umbraco.Core.IO;
 namespace umbraco.presentation.LiveEditing.Modules.MacroEditing
 {
 

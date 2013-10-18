@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using SqlCE4Umbraco;
 using Umbraco.Core;
@@ -47,7 +49,7 @@ namespace Umbraco.Tests.TestHelpers
 		/// </summary>
 		public static void InitializeDatabase()
 		{
-            ConfigurationManager.AppSettings.Set(Core.Configuration.GlobalSettings.UmbracoConnectionName, @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\UmbracoPetaPocoTests.sdf");
+            ConfigurationManager.AppSettings.Set(Core.Configuration.GlobalSettings.UmbracoConnectionName, @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\UmbracoPetaPocoTests.sdf;Flush Interval=1;");
 
 			ClearDatabase();
             
@@ -115,13 +117,52 @@ namespace Umbraco.Tests.TestHelpers
         }
 
 	    public static void CleanDirectories(string[] directories)
-        {
+	    {
+	        var preserves = new Dictionary<string, string[]>
+	        {
+	            { SystemDirectories.Masterpages, new[] {"dummy.txt"} },
+	            { SystemDirectories.MvcViews, new[] {"dummy.txt"} }
+	        };
             foreach (var directory in directories)
             {
                 var directoryInfo = new DirectoryInfo(IOHelper.MapPath(directory));
+                var preserve = preserves.ContainsKey(directory) ? preserves[directory] : null;
                 if (directoryInfo.Exists)
-                    directoryInfo.GetFiles().ForEach(x => x.Delete());
+                    directoryInfo.GetFiles().Where(x => preserve == null || preserve.Contains(x.Name) == false).ForEach(x => x.Delete());
             }
         }
+
+
+	    public static void EnsureUmbracoSettingsConfig()
+        {
+            var currDir = new DirectoryInfo(CurrentAssemblyDirectory);
+
+            var configPath = Path.Combine(currDir.Parent.Parent.FullName, "config");
+            if (Directory.Exists(configPath) == false)
+                Directory.CreateDirectory(configPath);
+
+            var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
+            if (File.Exists(umbracoSettingsFile) == false)
+                File.Copy(
+                        currDir.Parent.Parent.Parent.GetDirectories("Umbraco.Web.UI")
+                        .First()
+                        .GetDirectories("config").First()
+                        .GetFiles("umbracoSettings.Release.config").First().FullName,
+                    Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config"),
+                    true);
+            
+            Core.Configuration.UmbracoSettings.SettingsFilePath = IOHelper.MapPath(SystemDirectories.Config + Path.DirectorySeparatorChar, false);
+        }
+
+	    public static void CleanUmbracoSettingsConfig()
+        {
+            var currDir = new DirectoryInfo(CurrentAssemblyDirectory);
+
+            var umbracoSettingsFile = Path.Combine(currDir.Parent.Parent.FullName, "config", "umbracoSettings.config");
+            if (File.Exists(umbracoSettingsFile))
+                File.Delete(umbracoSettingsFile);
+        }
+
+
 	}
 }

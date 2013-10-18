@@ -82,7 +82,7 @@ namespace Umbraco.Core.Dynamics
 				                                null,
 				                                thisObject,
 				                                args);
-				return new Attempt<TryInvokeMemberResult>(true, new TryInvokeMemberResult(result, TryInvokeMemberSuccessReason.FoundProperty));
+				return Attempt.Succeed(new TryInvokeMemberResult(result, TryInvokeMemberSuccessReason.FoundProperty));
 			}
 			catch (MissingMethodException)
 			{
@@ -97,7 +97,7 @@ namespace Umbraco.Core.Dynamics
 					                                null,
 					                                thisObject,
 					                                args);
-					return new Attempt<TryInvokeMemberResult>(true, new TryInvokeMemberResult(result, TryInvokeMemberSuccessReason.FoundMethod));
+					return Attempt.Succeed(new TryInvokeMemberResult(result, TryInvokeMemberSuccessReason.FoundMethod));
 				}
 				catch (MissingMethodException)
 				{
@@ -106,13 +106,14 @@ namespace Umbraco.Core.Dynamics
 						try
 						{
 							result = FindAndExecuteExtensionMethod(thisObject, args, binder.Name, findExtensionMethodsOnTypes);
-							return new Attempt<TryInvokeMemberResult>(true, new TryInvokeMemberResult(result, TryInvokeMemberSuccessReason.FoundExtensionMethod));
+							return Attempt.Succeed(new TryInvokeMemberResult(result, TryInvokeMemberSuccessReason.FoundExtensionMethod));
 						}
 						catch (TargetInvocationException ext)
 						{
 							//don't log here, we return this exception because the caller may need to do something specific when
 							//this exception occurs.
-							return new Attempt<TryInvokeMemberResult>(ext);
+						    var mresult = new TryInvokeMemberResult(null, TryInvokeMemberSuccessReason.FoundExtensionMethod);
+							return Attempt<TryInvokeMemberResult>.Fail(mresult, ext);
 						}
 						catch (Exception ex)
 						{
@@ -124,16 +125,17 @@ namespace Umbraco.Core.Dynamics
 								sb.Append(t + ",");
 							}
 							LogHelper.Error<DynamicInstanceHelper>(sb.ToString(), ex);
-							return new Attempt<TryInvokeMemberResult>(ex);
+                            var mresult = new TryInvokeMemberResult(null, TryInvokeMemberSuccessReason.FoundExtensionMethod);
+                            return Attempt<TryInvokeMemberResult>.Fail(mresult, ex);
 						}	
 					}
-					return Attempt<TryInvokeMemberResult>.False;
+					return Attempt<TryInvokeMemberResult>.Fail();
 				}
 			}
 			catch (Exception ex)
 			{
 				LogHelper.Error<DynamicInstanceHelper>("An unhandled exception occurred in method TryInvokeMember", ex);
-				return new Attempt<TryInvokeMemberResult>(ex);
+				return Attempt<TryInvokeMemberResult>.Fail(ex);
 			}
 		}
 

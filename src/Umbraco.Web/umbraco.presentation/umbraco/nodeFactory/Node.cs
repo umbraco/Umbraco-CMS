@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Web;
 using System.Xml;
 using System.Xml.Serialization;
 using System.Xml.XPath;
@@ -10,6 +11,7 @@ using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.interfaces;
 using Umbraco.Core;
+using Umbraco.Web;
 
 namespace umbraco.NodeFactory
 {
@@ -541,11 +543,9 @@ namespace umbraco.NodeFactory
 
 		public static int getCurrentNodeId()
 		{
-			XmlNode n = ((IHasXmlNode)library.GetXmlNodeCurrent().Current).GetNode();
-			if (n.Attributes == null || n.Attributes.GetNamedItem("id") == null)
-				throw new ArgumentException("Current node is null. This might be due to previewing an unpublished node. As the NodeFactory works with published data, macros using the node factory won't work in preview mode.", "Current node is " + System.Web.HttpContext.Current.Items["pageID"].ToString());
-
-			return int.Parse(n.Attributes.GetNamedItem("id").Value);
+           if (HttpContext.Current.Items["pageID"] == null)
+                throw new InvalidOperationException("There is no current node.");
+		    return (int)HttpContext.Current.Items["pageID"];
 		}
 	}
 }

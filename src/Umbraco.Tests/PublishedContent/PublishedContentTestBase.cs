@@ -1,8 +1,12 @@
 using System;
 using System.IO;
+using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
@@ -19,18 +23,14 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.Initialize();
             
-            UmbracoSettings.SettingsFilePath = Core.IO.IOHelper.MapPath(Core.IO.SystemDirectories.Config + Path.DirectorySeparatorChar, false);
-
-            //need to specify a custom callback for unit tests
-            PublishedContentHelper.GetDataTypeCallback = (docTypeAlias, propertyAlias) =>
+            // need to specify a custom callback for unit tests
+            var propertyTypes = new[]
                 {
-                    if (propertyAlias.InvariantEquals("content"))
-                    {
-                        //return the rte type id
-                        return Guid.Parse(Constants.PropertyEditors.TinyMCEv3);
-                    }
-                    return Guid.Empty;
+                    // AutoPublishedContentType will auto-generate other properties
+                    new PublishedPropertyType("content", 0, Guid.Parse(Constants.PropertyEditors.TinyMCEv3)), 
                 };
+            var type = new AutoPublishedContentType(0, "anything", propertyTypes);
+            PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
 
             var rCtx = GetRoutingContext("/test", 1234);
             UmbracoContext.Current = rCtx.UmbracoContext;
@@ -39,16 +39,19 @@ namespace Umbraco.Tests.PublishedContent
 
         protected override void FreezeResolution()
         {
-            PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
+            PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
                 new[]
                     {
-                        typeof(DatePickerPropertyEditorValueConverter),
-                        typeof(TinyMcePropertyEditorValueConverter),
-                        typeof(YesNoPropertyEditorValueConverter)
+                        typeof(DatePickerValueConverter),
+                        typeof(TinyMceValueConverter),
+                        typeof(YesNoValueConverter)
                     });    
 
             PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
                 new PublishedContentCache(), new PublishedMediaCache()));
+
+            if (PublishedContentModelFactoryResolver.HasCurrent == false)
+                PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
 
             base.FreezeResolution();
         }

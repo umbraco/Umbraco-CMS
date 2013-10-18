@@ -3,6 +3,7 @@ using System.Data;
 using System.Linq;
 using System.Reflection;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
 {
@@ -107,6 +108,12 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
             var constraintAttribute = propertyInfo.FirstAttribute<ConstraintAttribute>();
             if (constraintAttribute != null)
             {
+                //Special case for MySQL as it can't have multiple default DateTime values, which 
+                //is what the umbracoServer table definition is trying to create
+                if (SqlSyntaxContext.SqlSyntaxProvider is MySqlSyntaxProvider && definition.TableName == "umbracoServer" &&
+                        definition.TableName.ToLowerInvariant() == "lastNotifiedDate".ToLowerInvariant())
+                    return definition;
+
                 definition.ConstraintName = constraintAttribute.Name ?? string.Empty;
                 definition.DefaultValue = constraintAttribute.Default ?? string.Empty;
             }

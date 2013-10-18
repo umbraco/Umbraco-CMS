@@ -1,13 +1,19 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Routing;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 using Umbraco.Web.Routing;
 using umbraco;
+using umbraco.BasePages;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Web.Configuration;
@@ -28,7 +34,7 @@ namespace Umbraco.Web
 		/// Begins to process a request.
 		/// </summary>
 		/// <param name="httpContext"></param>
-		void BeginRequest(HttpContextBase httpContext)
+		static void BeginRequest(HttpContextBase httpContext)
 		{
             //we need to set the initial url in our ApplicationContext, this is so our keep alive service works and this must
             //exist on a global context because the keep alive service doesn't run in a web context.
@@ -37,6 +43,7 @@ namespace Umbraco.Web
             //see: http://issues.umbraco.org/issue/U4-2059
             if (ApplicationContext.Current.OriginalRequestUrl.IsNullOrWhiteSpace())
             {
+                // the keepalive service will use that url
                 ApplicationContext.Current.OriginalRequestUrl = string.Format("{0}:{1}{2}", httpContext.Request.ServerVariables["SERVER_NAME"], httpContext.Request.ServerVariables["SERVER_PORT"], IOHelper.ResolveUrl(SystemDirectories.Umbraco));
             }
 
@@ -118,6 +125,58 @@ namespace Umbraco.Web
 				RewriteToUmbracoHandler(httpContext, pcr);
 		}
 
+        /// <summary>
+        /// Checks if the request is authenticated, if it is it sets the thread culture to the currently logged in user
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void AuthenticateRequest(object sender, EventArgs e)
+        {
+            var app = (HttpApplication)sender;
+            var http = new HttpContextWrapper(app.Context);
+
+            // do not process if client-side request
+            if (http.Request.Url.IsClientSideRequest())
+                return;
+
+            if (app.Request.Url.IsBackOfficeRequest() || app.Request.Url.IsInstallerRequest())
+            {
+                var ticket = http.GetUmbracoAuthTicket();
+                if (ticket != null)
+                {                   
+                    //create the Umbraco user identity 
+                    var identity = ticket.CreateUmbracoIdentity();
+                    if (identity != null)
+                    {
+
+                        //We'll leave setting custom identies/principals for 6.2, for now we'll just ensure that the cultures, etc.. are set
+                        ////set the principal object
+                        ////now we need to see if their session is still valid
+                        //var timeout = BasePage.GetTimeout(identity.UserContextId);
+                        //if (timeout > DateTime.Now.Ticks)
+                        //{                            
+                            //var principal = new GenericPrincipal(identity, identity.Roles);
+                            ////It is actually not good enough to set this on the current app Context and the thread, it also needs
+                            //// to be set explicitly on the HttpContext.Current !! This is a strange web api thing that is actually 
+                            //// an underlying fault of asp.net not propogating the User correctly.
+                            //if (HttpContext.Current != null)
+                            //{
+                            //    HttpContext.Current.User = principal;
+                            //}
+                            //app.Context.User = principal;
+                            //Thread.CurrentPrincipal = principal;
+                        //}
+
+                        //This is a back office/installer request, we will also set the culture/ui culture
+                        Thread.CurrentThread.CurrentCulture =
+                            Thread.CurrentThread.CurrentUICulture =
+                            new System.Globalization.CultureInfo(identity.Culture);
+
+                    }
+                }
+            }
+        }
+
         // returns a value indicating whether redirection took place and the request has
         // been completed - because we don't want to Response.End() here to terminate
         // everything properly.
@@ -166,23 +225,6 @@ namespace Umbraco.Web
             return end;
         }
 
-		/// <summary>
-		/// Checks if the xml cache file needs to be updated/persisted
-		/// </summary>
-		/// <param name="httpContext"></param>
-		/// <remarks>
-		/// TODO: This needs an overhaul, see the error report created here:
-		///   https://docs.google.com/document/d/1neGE3q3grB4lVJfgID1keWY2v9JYqf-pw75sxUUJiyo/edit		
-		/// </remarks>
-		void PersistXmlCache(HttpContextBase httpContext)
-		{
-			if (content.Instance.IsXmlQueuedForPersistenceToFile)
-			{
-				content.Instance.RemoveXmlFilePersistenceQueue();
-				content.Instance.PersistXmlToFile();
-			}
-		}
-
 		#endregion
 
 		#region Route helper methods
@@ -220,7 +262,7 @@ namespace Umbraco.Web
                 reason = EnsureRoutableOutcome.NoContent;
             }
 
-            return new Attempt<EnsureRoutableOutcome>(reason == EnsureRoutableOutcome.IsRoutable, reason);
+            return Attempt.If(reason == EnsureRoutableOutcome.IsRoutable, reason);
 		}
 
 		/// <summary>
@@ -350,7 +392,7 @@ namespace Umbraco.Web
 		/// </summary>		
 		/// <param name="context"></param>
         /// <param name="pcr"> </param>
-		private void RewriteToUmbracoHandler(HttpContextBase context, PublishedContentRequest pcr)
+		private static void RewriteToUmbracoHandler(HttpContextBase context, PublishedContentRequest pcr)
 		{
 			// NOTE: we do not want to use TransferRequest even though many docs say it is better with IIS7, turns out this is
 			// not what we need. The purpose of TransferRequest is to ensure that .net processes all of the rules for the newly
@@ -402,6 +444,64 @@ namespace Umbraco.Web
             }
 		}
 
+        /// <summary>
+        /// Checks if the xml cache file needs to be updated/persisted
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <remarks>
+        /// TODO: This needs an overhaul, see the error report created here:
+        ///   https://docs.google.com/document/d/1neGE3q3grB4lVJfgID1keWY2v9JYqf-pw75sxUUJiyo/edit		
+        /// </remarks>
+        static void PersistXmlCache(HttpContextBase httpContext)
+        {
+            if (content.Instance.IsXmlQueuedForPersistenceToFile)
+            {
+                content.Instance.RemoveXmlFilePersistenceQueue();
+                content.Instance.PersistXmlToFile();
+            }
+        }
+
+        /// <summary>
+        /// Any object that is in the HttpContext.Items collection that is IDisposable will get disposed on the end of the request
+        /// </summary>
+        /// <param name="http"></param>
+        private static void DisposeHttpContextItems(HttpContext http)
+        {
+            // do not process if client-side request
+            if (http.Request.Url.IsClientSideRequest())
+                return;
+
+            //get a list of keys to dispose
+            var keys = new HashSet<object>();            
+            foreach (DictionaryEntry i in http.Items)
+            {
+                if (i.Value is IDisposeOnRequestEnd || i.Key is IDisposeOnRequestEnd)
+                {
+                    keys.Add(i.Key);
+                }
+            }
+            //dispose each item and key that was found as disposable.
+            foreach (var k in keys)
+            {
+                try
+                {
+                    http.Items[k].DisposeIfDisposable();
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<UmbracoModule>("Could not dispose item with key " + k, ex);
+                }
+                try
+                {
+                    k.DisposeIfDisposable();
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<UmbracoModule>("Could not dispose item key " + k, ex);
+                }
+            }
+        }
+
 		#region IHttpModule
 
 		/// <summary>
@@ -418,6 +518,8 @@ namespace Umbraco.Web
 				    LogHelper.Debug<UmbracoModule>("Begin request: {0}.", () => httpContext.Request.Url);
                     BeginRequest(new HttpContextWrapper(httpContext));
 				};
+
+            app.AuthenticateRequest += AuthenticateRequest;
 
             app.PostResolveRequestCache += (sender, e) =>
 				{
@@ -468,18 +570,6 @@ namespace Umbraco.Web
 		}
 
 		#endregion
-
-		/// <summary>
-		/// Any object that is in the HttpContext.Items collection that is IDisposable will get disposed on the end of the request
-		/// </summary>
-		/// <param name="http"></param>
-		private static void DisposeHttpContextItems(HttpContext http)
-		{
-			foreach(var i in http.Items)
-			{
-				i.DisposeIfDisposable();
-			}
-		}
 
         #region Events
         internal static event EventHandler<RoutableAttemptEventArgs> RouteAttempt;

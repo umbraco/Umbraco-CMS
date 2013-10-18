@@ -28,7 +28,7 @@ namespace Umbraco.Core
         private string _providerName;
         private DatabaseSchemaResult _result;
 
-        internal DatabaseContext(IDatabaseFactory factory)
+        public DatabaseContext(IDatabaseFactory factory)
         {
             _factory = factory;
         }
@@ -112,7 +112,7 @@ namespace Umbraco.Core
         public void ConfigureEmbeddedDatabaseConnection()
         {
             const string providerName = "System.Data.SqlServerCe.4.0";
-            const string connectionString = @"Data Source=|DataDirectory|\Umbraco.sdf";
+            const string connectionString = @"Data Source=|DataDirectory|\Umbraco.sdf;Flush Interval=1;";
 
             SaveConnectionString(connectionString, providerName);
 
@@ -296,16 +296,15 @@ namespace Umbraco.Core
             if (databaseSettings != null && string.IsNullOrWhiteSpace(databaseSettings.ConnectionString) == false && string.IsNullOrWhiteSpace(databaseSettings.ProviderName) == false)
             {
                 var providerName = "System.Data.SqlClient";
+                string connString = null;
                 if (!string.IsNullOrEmpty(ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName))
                 {
                     providerName = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ProviderName;
-
-                    _connectionString =
-                        ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ConnectionString;
-
+                    connString = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName].ConnectionString;
                 }
+                Initialize(providerName, connString);
 
-                Initialize(providerName);
+                DetermineSqlServerVersion();
             }
             else if (ConfigurationManager.AppSettings.ContainsKey(GlobalSettings.UmbracoConnectionName) && string.IsNullOrEmpty(ConfigurationManager.AppSettings[GlobalSettings.UmbracoConnectionName]) == false)
             {
@@ -342,6 +341,8 @@ namespace Umbraco.Core
 
                 //Remove the legacy connection string, so we don't end up in a loop if something goes wrong.
                 GlobalSettings.RemoveSetting(GlobalSettings.UmbracoConnectionName);
+
+                DetermineSqlServerVersion();
             }
             else
             {
@@ -366,6 +367,55 @@ namespace Umbraco.Core
 
                 LogHelper.Info<DatabaseContext>("Initialization of the DatabaseContext failed with following error: " + e.Message);
                 LogHelper.Info<DatabaseContext>(e.StackTrace);
+            }
+        }
+
+        internal void Initialize(string providerName, string connectionString)
+        {
+            _connectionString = connectionString;
+            Initialize(providerName);
+        }
+
+        /// <summary>
+        /// Set the lazy resolution of determining the SQL server version if that is the db type we're using
+        /// </summary>
+        private void DetermineSqlServerVersion()
+        {
+            
+            var sqlServerSyntax = SqlSyntaxContext.SqlSyntaxProvider as SqlServerSyntaxProvider;
+            if (sqlServerSyntax != null)
+            {
+                //this will not execute now, it is lazy so will only execute when we need to actually know
+                // the sql server version.
+                sqlServerSyntax.VersionName = new Lazy<SqlServerVersionName>(() =>
+                {
+                    try
+                    {
+                        var database = this._factory.CreateDatabase();
+
+                        var version = database.ExecuteScalar<string>("SELECT SERVERPROPERTY('productversion')");
+                        var firstPart = version.Split('.')[0];
+                        switch (firstPart)
+                        {
+                            case "11":
+                                return SqlServerVersionName.V2012;
+                            case "10":
+                                return SqlServerVersionName.V2008;
+                            case "9":
+                                return SqlServerVersionName.V2005;
+                            case "8":
+                                return SqlServerVersionName.V2000;
+                            case "7":
+                                return SqlServerVersionName.V7;
+                            default:
+                                return SqlServerVersionName.Other;
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        return SqlServerVersionName.Invalid;
+                    }
+                });
             }
         }
 
@@ -459,6 +509,8 @@ namespace Umbraco.Core
                     var upgraded = runner.Execute(database, true);
                     message = message + "<p>Upgrade completed!</p>";
                 }
+
+                //now that everything is done, we need to determine the version of SQL server that is executing
 
                 LogHelper.Info<DatabaseContext>("Database configuration status: " + message);
 

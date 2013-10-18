@@ -9,7 +9,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco
 {

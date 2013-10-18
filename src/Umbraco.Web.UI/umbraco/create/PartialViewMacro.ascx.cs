@@ -1,24 +1,47 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using umbraco;
 using umbraco.BasePages;
+using Umbraco.Core;
+using Umbraco.Core.IO;
 using umbraco.presentation.create;
-using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Web.UI.Umbraco.Create
 {
-	public partial class PartialViewMacro : System.Web.UI.UserControl
+	public partial class PartialViewMacro : UserControl
 	{
 		protected override void OnLoad(EventArgs e)
 		{
 			base.OnLoad(e);
 			DataBind();
+
+		    LoadTemplates(PartialViewTemplate);
 		}
+
+        private static void LoadTemplates(ListControl list)
+        {
+            var path = IOHelper.MapPath(SystemDirectories.Umbraco + "/PartialViewMacros/Templates/");
+            list.Items.Clear();
+
+            // always add the options of empty templates
+            list.Items.Add(new ListItem("Empty Template", "EmptyTemplate.cshtml"));
+            list.Items.Add(new ListItem("Empty Template (For Use With Custom Views)", "EmptyTemplate (ForUseWithCustomViews).cshtml"));
+
+            if (System.IO.Directory.Exists(path))
+            {
+                const string extension = ".cshtml";
+
+                //Already adding Empty Template as the first item, so don't add it again
+                foreach (var fileInfo in new System.IO.DirectoryInfo(path).GetFiles("*" + extension).Where(f => f.Name.StartsWith("EmptyTemplate") == false))
+                {
+                    var filename = System.IO.Path.GetFileName(fileInfo.FullName);
+
+                    var liText = filename.Replace(extension, "").SplitPascalCasing().ToFirstUpperInvariant();
+                    list.Items.Add(new ListItem(liText, filename));
+                }
+            }
+        }
 
 		protected void SubmitButton_Click(object sender, System.EventArgs e)
 		{
@@ -30,18 +53,16 @@ namespace Umbraco.Web.UI.Umbraco.Create
 				var createMacroVal = 0;
 				if (CreateMacroCheckBox.Checked)
 					createMacroVal = 1;
-				
-				var returnUrl = dialogHandler_temp.Create(
-					Request.GetItemAsString("nodeType"),
-					createMacroVal, //apparently we need to pass this value to 'ParentID'... of course! :P then we'll extract it in PartialViewTasks to create it.
-					FileName.Text);
+                
+                string returnUrl = dialogHandler_temp.Create(Request.GetItemAsString("nodeType"),
+                    createMacroVal, //apparently we need to pass this value to 'ParentID'... of course! :P then we'll extract it in PartialViewTasks to create it.
+                    PartialViewTemplate.SelectedValue + "|||" + FileName.Text);
 				
 				BasePage.Current.ClientTools
 					.ChangeContentFrameUrl(returnUrl)
 					.ChildNodeCreated()
 					.CloseModalWindow();				
 			}
-
 		}
 	}
 }

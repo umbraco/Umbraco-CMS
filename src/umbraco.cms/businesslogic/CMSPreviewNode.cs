@@ -8,7 +8,7 @@ using umbraco.BusinessLogic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.ComponentModel;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic
 {
@@ -20,13 +20,14 @@ namespace umbraco.cms.businesslogic
         public int ParentId { get; set; }
         public int SortOrder { get; set; }
         public string Xml { get; set; }
+        public bool IsDraft { get; set; }
 
         public CMSPreviewNode()
         {
 
         }
 
-        public CMSPreviewNode(int nodeId, Guid version, int parentId, int level, int sortOrder, string xml)
+        public CMSPreviewNode(int nodeId, Guid version, int parentId, int level, int sortOrder, string xml, bool isDraft)
         {
             NodeId = nodeId;
             Version = version;
@@ -34,6 +35,7 @@ namespace umbraco.cms.businesslogic
             Level = level;
             SortOrder = sortOrder;
             Xml = xml;
+            IsDraft = isDraft;
         }
     }
 }

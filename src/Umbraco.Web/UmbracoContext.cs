@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Services;
@@ -7,7 +8,7 @@ using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
 using umbraco;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.presentation;
 using umbraco.presentation.LiveEditing;
 using umbraco.BasePages;
@@ -24,13 +25,12 @@ namespace Umbraco.Web
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
-    public class UmbracoContext
+    public class UmbracoContext : DisposableObject, IDisposeOnRequestEnd
     {
         private const string HttpContextItemName = "Umbraco.Web.UmbracoContext";
         private static readonly object Locker = new object();
 
         private bool _replacing;
-        private PreviewContent _previewContent;
 
         /// <summary>
         /// Used if not running in a web application (no real HttpContext)
@@ -334,7 +334,8 @@ namespace Umbraco.Web
         /// <summary>
         /// Determines whether the current user is in a preview mode and browsing the site (ie. not in the admin UI)
         /// </summary>
-        public bool InPreviewMode { get; private set; }
+        /// <remarks>Can be internally set by the RTE macro rendering to render macros in the appropriate mode.</remarks>
+        public bool InPreviewMode { get; internal set; }
 
         private bool DetectInPreviewModeFromRequest()
         {
@@ -361,7 +362,22 @@ namespace Umbraco.Web
                 return null;
             }
         }
+        
+        protected override void DisposeResources()
+        {
+            Security.DisposeIfDisposable();
+            Security = null;
+            _umbracoContext = null;
+            //ensure not to dispose this!
+            Application = null;
 
-
+            //Before we set these to null but in fact these are application lifespan singletons so 
+            //there's no reason we need to set them to null and this also caused a problem with packages
+            //trying to access the cache properties on RequestEnd.
+            //http://issues.umbraco.org/issue/U4-2734
+            //http://our.umbraco.org/projects/developer-tools/301-url-tracker/version-2/44327-Issues-with-URL-Tracker-in-614
+            //ContentCache = null;
+            //MediaCache = null;     
+        }
     }
 }

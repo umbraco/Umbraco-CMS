@@ -743,11 +743,11 @@
     <key alias="templateErrorText">Пожалуйста, проверьте, что нет двух шаблонов с одним и тем же алиасом (названием)</key>
     <key alias="templateSavedHeader">Шаблон сохранен</key>
     <key alias="templateSavedText">Шаблон сохранен без ошибок</key>
-    <key alias="xsltErrorHeader">Xslt-документ не сохранен</key>
-    <key alias="xsltErrorText">Xslt-документ содержит одну или несколько ошибок</key>
-    <key alias="xsltPermissionErrorText">Xslt-документ не может быть сохранен, проверьте установки файловых разрешений</key>
-    <key alias="xsltSavedHeader">Xslt-документ сохранен</key>
-    <key alias="xsltSavedText">Ошибок в Xslt-документе нет</key>
+    <key alias="xsltErrorHeader">XSLT-документ не сохранен</key>
+    <key alias="xsltErrorText">XSLT-документ содержит одну или несколько ошибок</key>
+    <key alias="xsltPermissionErrorText">XSLT-документ не может быть сохранен, проверьте установки файловых разрешений</key>
+    <key alias="xsltSavedHeader">XSLT-документ сохранен</key>
+    <key alias="xsltSavedText">Ошибок в XSLT-документе нет</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Используется синтаксис селекторов CSS, например: h1, .redHeader, .blueTex</key>

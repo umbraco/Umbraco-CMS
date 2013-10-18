@@ -6,7 +6,7 @@ using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.member;
 
 namespace umbraco
@@ -74,7 +74,7 @@ namespace umbraco
             string scriptContent = "";
             if (!string.IsNullOrEmpty(template))
             {
-                System.IO.StreamReader templateFile = System.IO.File.OpenText(IOHelper.MapPath(IO.SystemDirectories.Umbraco + "/scripting/templates/" + template));
+                System.IO.StreamReader templateFile = System.IO.File.OpenText(IOHelper.MapPath(SystemDirectories.Umbraco + "/scripting/templates/" + template));
                 scriptContent = templateFile.ReadToEnd();
                 templateFile.Close();
             }

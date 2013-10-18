@@ -27,50 +27,29 @@ namespace Umbraco.Core.Cache
 
         public override void ClearCacheObjectTypes(string typeName)
         {
-            foreach (var key in _staticCache.Keys)
-            {
-                if (_staticCache[key] != null
-                    && _staticCache[key].GetType().ToString().InvariantEquals(typeName))
-                {
-                    object val;
-                    _staticCache.TryRemove(key, out val);
-                }
-            }
+            _staticCache.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType().ToString().InvariantEquals(typeName));
         }
 
         public override void ClearCacheObjectTypes<T>()
         {
-            foreach (var key in _staticCache.Keys)
-            {
-                if (_staticCache[key] != null
-                    && _staticCache[key].GetType() == typeof(T))
-                {
-                    object val;
-                    _staticCache.TryRemove(key, out val);
-                }
-            }
+            var typeOfT = typeof (T);
+            _staticCache.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT);
+        }
+
+        public override void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
+        {
+            var typeOfT = typeof(T);
+            _staticCache.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT && predicate(kvp.Key, (T)kvp.Value));
         }
 
         public override void ClearCacheByKeySearch(string keyStartsWith)
         {
-            foreach (var key in _staticCache.Keys)
-            {
-                if (key.InvariantStartsWith(keyStartsWith))
-                {
-                    ClearCacheItem(key);
-                }
-            }
+            _staticCache.RemoveAll(kvp => kvp.Key.InvariantStartsWith(keyStartsWith));
         }
 
         public override void ClearCacheByKeyExpression(string regexString)
         {
-            foreach (var key in _staticCache.Keys)
-            {
-                if (Regex.IsMatch(key, regexString))
-                {
-                    ClearCacheItem(key);
-                }
-            }
+            _staticCache.RemoveAll(kvp => Regex.IsMatch(kvp.Key, regexString));
         }
 
         public override IEnumerable<T> GetCacheItemsByKeySearch<T>(string keyStartsWith)
@@ -95,7 +74,7 @@ namespace Umbraco.Core.Cache
 
         public override T GetCacheItem<T>(string cacheKey, Func<T> getCacheItem)
         {
-            return (T)_staticCache.GetOrAdd(cacheKey, getCacheItem);
+            return (T)_staticCache.GetOrAdd(cacheKey, key => getCacheItem());
         }
         
     }

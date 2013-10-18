@@ -18,6 +18,7 @@ using umbraco.cms.businesslogic.member;
 using umbraco.interfaces;
 using Content = umbraco.cms.businesslogic.Content;
 using Document = umbraco.cms.businesslogic.web.Document;
+using Member = umbraco.cms.businesslogic.member.Member;
 
 namespace Umbraco.Web.Search
 {
@@ -49,10 +50,13 @@ namespace Umbraco.Web.Search
 			if (registeredProviders == 0)
 				return;
 
+            MediaService.Created += MediaServiceCreated;
             MediaService.Saved += MediaServiceSaved;
             MediaService.Deleted += MediaServiceDeleted;
             MediaService.Moved += MediaServiceMoved;
             MediaService.Trashed += MediaServiceTrashed;
+
+            ContentService.Created += ContentServiceCreated;
             ContentService.Saved += ContentServiceSaved;
             ContentService.Deleted += ContentServiceDeleted;
             ContentService.Moved += ContentServiceMoved;
@@ -76,6 +80,18 @@ namespace Umbraco.Web.Search
 				memberIndexer.DocumentWriting += IndexerDocumentWriting;
 			}
 		}
+
+        [SecuritySafeCritical]
+	    static void ContentServiceCreated(IContentService sender, Core.Events.NewEventArgs<IContent> e)
+        {
+            IndexConent(e.Entity);
+        }
+
+        [SecuritySafeCritical]
+	    static void MediaServiceCreated(IMediaService sender, Core.Events.NewEventArgs<IMedia> e)
+        {
+            IndexMedia(e.Entity);
+        }
 
         [SecuritySafeCritical]
 	    static void ContentServiceTrashed(IContentService sender, Core.Events.MoveEventArgs<IContent> e)

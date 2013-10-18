@@ -88,14 +88,25 @@ namespace Umbraco.Web.Routing
 
         #region Utilities
 
-        private bool FindByUrlAliasEnabled
+        private static bool FindByUrlAliasEnabled
         {
             get
             {
-                var hasFinder = ContentFinderResolver.Current.ContainsType<ContentFinderByUrlAlias>();
-                var hasHandler = ContentFinderResolver.Current.ContainsType<ContentFinderByNotFoundHandlers>()
-                    && NotFoundHandlerHelper.CustomHandlerTypes.Contains(typeof(global::umbraco.SearchForAlias));
-                return hasFinder || hasHandler;
+                // finder
+                if (ContentFinderResolver.Current.ContainsType<ContentFinderByUrlAlias>())
+                    return true;
+
+                // handler wrapped into a finder
+                if (ContentFinderResolver.Current.ContainsType<ContentFinderByNotFoundHandler<global::umbraco.SearchForAlias>>())
+                    return true;
+
+                // handler wrapped into special finder
+                if (ContentFinderResolver.Current.ContainsType<ContentFinderByNotFoundHandlers>()
+                    && NotFoundHandlerHelper.IsNotFoundHandlerEnabled<global::umbraco.SearchForAlias>())
+                    return true;
+
+                // anything else, we can't detect
+                return false;
             }
         }
 

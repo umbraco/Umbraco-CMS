@@ -31,6 +31,15 @@ namespace Umbraco.Web.UI.Umbraco.Create {
         protected global::System.Web.UI.WebControls.TextBox FileName;
         
         /// <summary>
+        /// PartialViewTemplate control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.ListBox PartialViewTemplate;
+        
+        /// <summary>
         /// CreateMacroCheckBox control.
         /// </summary>
         /// <remarks>

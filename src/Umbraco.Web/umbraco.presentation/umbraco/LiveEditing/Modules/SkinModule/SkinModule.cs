@@ -1,21 +1,15 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using umbraco.presentation.LiveEditing.Modules;
 using ClientDependency.Core;
 using System.Web.UI.WebControls;
 using umbraco.presentation.LiveEditing.Controls;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using System.Web.UI;
 using umbraco.cms.businesslogic.skinning;
 using ClientDependency.Core.Controls;
 using umbraco.presentation.umbraco.controls;
 using HtmlAgilityPack;
 using umbraco.cms.businesslogic.template;
-using System.Text;
-using System.IO;
-using System.Collections;
 
 namespace umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule
 {

@@ -12,14 +12,15 @@ using SQLCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
@@ -46,37 +47,47 @@ namespace Umbraco.Tests.TestHelpers
         //Used to flag if its the first test in the current fixture
         private bool _isFirstTestInFixture = false;
 
+        private ApplicationContext _appContext;
+
         [SetUp]
         public override void Initialize()
         {
             InitializeFirstRunFlags();
-
-            base.Initialize();
-
+            
             var path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            ApplicationContext.Current = new ApplicationContext(
+            var dbFactory = new DefaultDatabaseFactory(
+                GetDbConnectionString(),
+                GetDbProviderName());
+            _appContext = new ApplicationContext(
 				//assign the db context
-				new DatabaseContext(new DefaultDatabaseFactory()),
+                new DatabaseContext(dbFactory),
 				//assign the service context
-				new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy()),
+                new ServiceContext(new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy()),
                 //disable cache
                 false)
                 {
                     IsReady = true
                 };
 
-            DatabaseContext.Initialize();
+            base.Initialize();
 
-            CreateDatabase();
+            DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
+
+            CreateSqlCeDatabase();
 
             InitializeDatabase();
 
             //ensure the configuration matches the current version for tests
             SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
         }
-        
+
+        protected override void SetupApplicationContext()
+        {
+            ApplicationContext.Current = _appContext;
+        }
+
         /// <summary>
         /// The database behavior to use for the test/fixture
         /// </summary>
@@ -85,10 +96,23 @@ namespace Umbraco.Tests.TestHelpers
             get { return DatabaseBehavior.NewSchemaPerTest; }
         }
 
+        protected virtual string GetDbProviderName()
+        {
+            return "System.Data.SqlServerCe.4.0";
+        }
+
+        /// <summary>
+        /// Get the db conn string
+        /// </summary>
+        protected virtual string GetDbConnectionString()
+        {
+            return @"Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;";            
+        }
+
         /// <summary>
         /// Creates the SqlCe database if required
         /// </summary>
-        protected virtual void CreateDatabase()
+        protected virtual void CreateSqlCeDatabase()
         {
             if (DatabaseTestBehavior == DatabaseBehavior.NoDatabasePerFixture)
                 return;
@@ -97,7 +121,9 @@ namespace Umbraco.Tests.TestHelpers
             
             //Get the connectionstring settings from config
             var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
-            ConfigurationManager.AppSettings.Set(Core.Configuration.GlobalSettings.UmbracoConnectionName, @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\UmbracoPetaPocoTests.sdf");
+            ConfigurationManager.AppSettings.Set(
+                Core.Configuration.GlobalSettings.UmbracoConnectionName, 
+                GetDbConnectionString());
 
             string dbFilePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
 
@@ -146,13 +172,19 @@ namespace Umbraco.Tests.TestHelpers
                 () => PluginManager.Current.ResolveDataTypes());
 
             RepositoryResolver.Current = new RepositoryResolver(
-                new RepositoryFactory());
+                new RepositoryFactory(true)); //disable all repo caches for tests!
 
             SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
                 new List<Type> { typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqlServerSyntaxProvider) }) { CanResolveBeforeFrozen = true };
 
             MappingResolver.Current = new MappingResolver(
                () => PluginManager.Current.ResolveAssignedMapperTypes());
+
+            if (PropertyValueConvertersResolver.HasCurrent == false)
+                PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver();
+
+            if (PublishedContentModelFactoryResolver.HasCurrent == false)
+                PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
 
             base.FreezeResolution();
         }

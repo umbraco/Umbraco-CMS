@@ -263,6 +263,41 @@ namespace Umbraco.Tests.Services
             Assert.That(homepage.CompositionPropertyTypes.Count(), Is.EqualTo(4));
         }
 
+        [Test]
+	    public void Can_Copy_ContentType_By_Performing_Clone()
+	    {
+	        // Arrange
+            var service = ServiceContext.ContentTypeService;
+            var metaContentType = MockedContentTypes.CreateMetaContentType();
+            service.Save(metaContentType);
+
+            var simpleContentType = MockedContentTypes.CreateSimpleContentType("category", "Category", metaContentType);
+            service.Save(simpleContentType);
+            var categoryId = simpleContentType.Id;
+
+            // Act
+            var sut = simpleContentType.Clone("newcategory");
+            service.Save(sut);
+
+            // Assert
+            Assert.That(sut.HasIdentity, Is.True);
+
+            var contentType = service.GetContentType(sut.Id);
+            var category = service.GetContentType(categoryId);
+
+            Assert.That(contentType.CompositionAliases().Any(x => x.Equals("meta")), Is.True);
+            Assert.AreEqual(contentType.ParentId, category.ParentId);
+            Assert.AreEqual(contentType.Level, category.Level);
+            Assert.AreEqual(contentType.PropertyTypes.Count(), category.PropertyTypes.Count());
+            Assert.AreNotEqual(contentType.Id, category.Id);
+            Assert.AreNotEqual(contentType.Key, category.Key);
+            Assert.AreNotEqual(contentType.Path, category.Path);
+            Assert.AreNotEqual(contentType.SortOrder, category.SortOrder);
+            Assert.AreNotEqual(contentType.PropertyTypes.First(x => x.Alias.Equals("title")).Id, category.PropertyTypes.First(x => x.Alias.Equals("title")).Id);
+            Assert.AreNotEqual(contentType.PropertyGroups.First(x => x.Name.Equals("Content")).Id, category.PropertyGroups.First(x => x.Name.Equals("Content")).Id);
+            
+	    }
+
         private ContentType CreateComponent()
         {
             var component = new ContentType(-1)

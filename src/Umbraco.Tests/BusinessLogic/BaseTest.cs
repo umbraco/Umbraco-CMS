@@ -7,7 +7,7 @@ using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using GlobalSettings = umbraco.GlobalSettings;
 
 namespace Umbraco.Tests.BusinessLogic
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.BusinessLogic
 
         private void InitializeDatabase()
         {
-            ConfigurationManager.AppSettings.Set(Core.Configuration.GlobalSettings.UmbracoConnectionName, @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\UmbracoPetaPocoTests.sdf");
+            ConfigurationManager.AppSettings.Set(Core.Configuration.GlobalSettings.UmbracoConnectionName, @"datalayer=SQLCE4Umbraco.SqlCEHelper,SQLCE4Umbraco;data source=|DataDirectory|\UmbracoPetaPocoTests.sdf;Flush Interval=1;");
 
 			ClearDatabase();
 

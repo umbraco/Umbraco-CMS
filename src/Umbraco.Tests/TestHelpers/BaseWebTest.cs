@@ -7,12 +7,13 @@ using SQLCE4Umbraco;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
-using Umbraco.Tests.Stubs;
+using Umbraco.Tests.PublishedContent;
 using Umbraco.Web;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
@@ -27,7 +28,12 @@ namespace Umbraco.Tests.TestHelpers
         [SetUp]
         public override void Initialize()
         {
-            base.Initialize();            
+            base.Initialize();
+
+            // need to specify a custom callback for unit tests
+            // AutoPublishedContentTypes generates properties automatically
+            var type = new AutoPublishedContentType(0, "anything", new PublishedPropertyType[] {});
+            PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
         }
         
         [TearDown]

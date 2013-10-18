@@ -4,7 +4,7 @@ using Microsoft.ApplicationBlocks.Data;
 using System.Data.SqlClient;
 using System.Web.UI;
 using ClientDependency.Core;
-using umbraco.IO;
+
 using umbraco.interfaces;
 using umbraco.uicontrols.TreePicker;
 

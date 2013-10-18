@@ -176,8 +176,8 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override void PerformDeleteVersion(int id, Guid versionId)
         {
             Database.Delete<PreviewXmlDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
-            Database.Delete<PropertyDataDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
-            Database.Delete<ContentVersionDto>("WHERE nodeId = @Id AND VersionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<PropertyDataDto>("WHERE contentNodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<ContentVersionDto>("WHERE ContentId = @Id AND VersionId = @VersionId", new { Id = id, VersionId = versionId });
         }
 
         #endregion
@@ -289,6 +289,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Update(newContentDto);
             }
 
+            //In order to update the ContentVersion we need to retreive its primary key id
+            var contentVerDto = Database.SingleOrDefault<ContentVersionDto>("WHERE VersionId = @Version", new { Version = entity.Version });
+            dto.Id = contentVerDto.Id;
             //Updates the current version - cmsContentVersion
             //Assumes a Version guid exists and Version date (modified date) has been set/updated
             Database.Update(dto);

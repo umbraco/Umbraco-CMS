@@ -160,14 +160,15 @@ namespace Umbraco.Tests
         {
             var tempFolder = IOHelper.MapPath("~/App_Data/TEMP/PluginCache");
             var manager = new PluginManager(false);
-            var filePath = Path.Combine(tempFolder, "umbraco-plugins.list");
+            var filePath= Path.Combine(tempFolder, string.Format("umbraco-plugins.{0}.list", NetworkHelper.FileSafeMachineName));
+
             File.WriteAllText(filePath, @"<?xml version=""1.0"" encoding=""utf-8""?>
 <plugins>
 <baseType type=""umbraco.interfaces.ICacheRefresher"">
 <add type=""umbraco.macroCacheRefresh, umbraco, Version=6.0.0.0, Culture=neutral, PublicKeyToken=null"" />
 </baseType>
 </plugins>");
-
+            
             Assert.IsTrue(manager.DetectLegacyPluginListFile());
 
             File.Delete(filePath);
@@ -267,7 +268,7 @@ namespace Umbraco.Tests
         public void Resolves_Assigned_Mappers()
         {
             var foundTypes1 = PluginManager.Current.ResolveAssignedMapperTypes();
-            Assert.AreEqual(17, foundTypes1.Count());
+            Assert.AreEqual(19, foundTypes1.Count());
         }
 
         [Test]
@@ -288,14 +289,14 @@ namespace Umbraco.Tests
         public void Resolves_Actions()
         {
             var actions = PluginManager.Current.ResolveActions();
-            Assert.AreEqual(37, actions.Count());
+            Assert.AreEqual(38, actions.Count());
         }
 
         [Test]
         public void Resolves_Trees()
         {
             var trees = PluginManager.Current.ResolveTrees();
-            Assert.AreEqual(36, trees.Count());
+            Assert.AreEqual(40, trees.Count());
         }
 
         [Test]

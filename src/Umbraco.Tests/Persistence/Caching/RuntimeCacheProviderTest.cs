@@ -35,6 +35,26 @@ namespace Umbraco.Tests.Persistence.Caching
         }
 
         [Test]
+        public void Tracked_Keys_Removed_When_Cache_Removed()
+        {
+            _registry = RuntimeCacheProvider.Current;
+
+            //Fill the registry with random entities
+            var entity1 = new MockedEntity { Id = 1, Key = 1.ToGuid(), Alias = "mocked1", Name = "Mocked1", Value = Guid.NewGuid().ToString("n") };
+            var entity2 = new MockedEntity { Id = 2, Key = 2.ToGuid(), Alias = "mocked2", Name = "Mocked2", Value = Guid.NewGuid().ToString("n") };
+            var entity3 = new MockedEntity { Id = 3, Key = 3.ToGuid(), Alias = "mocked3", Name = "Mocked3", Value = Guid.NewGuid().ToString("n") };
+
+            _registry.Save(typeof(MockedEntity), entity1);
+            _registry.Save(typeof(MockedEntity), entity2);
+            _registry.Save(typeof(MockedEntity), entity3);
+
+            //now clear the runtime cache internally
+            ((RuntimeCacheProvider)_registry).ClearDataCache();
+
+            Assert.AreEqual(0, _registry.GetAllByType(typeof (MockedEntity)).Count());
+        }
+
+        [Test]
         public void Can_Clear_By_Type()
         {
             var customObj1 = new CustomMockedEntity { Id = 5, Key = 5.ToGuid(), Alias = "mocked5", Name = "Mocked5", Value = Guid.NewGuid().ToString("n") };

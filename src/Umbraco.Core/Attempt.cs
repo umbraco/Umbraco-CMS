@@ -2,65 +2,165 @@ using System;
 
 namespace Umbraco.Core
 {
-	/// <summary>
-	/// Represents the result of an operation attempt
-	/// </summary>
-	/// <typeparam name="T"></typeparam>
-	/// <remarks></remarks>
-	[Serializable]
-	public struct Attempt<T>
-	{
-		private readonly bool _success;
-		private readonly T _result;
-		private readonly Exception _error;
+    /// <summary>
+    /// Provides ways to create attempts.
+    /// </summary>
+    public static class Attempt
+    {
+        /// <summary>
+        /// Creates a successful attempt with a result.
+        /// </summary>
+        /// <typeparam name="T">The type of the attempted operation result.</typeparam>
+        /// <param name="result">The result of the attempt.</param>
+        /// <returns>The successful attempt.</returns>
+        public static Attempt<T> Succeed<T>(T result)
+        {
+            return Attempt<T>.Succeed(result);
+        }
 
-		/// <summary>
-		/// Gets a value indicating whether this <see cref="Attempt{T}"/> represents a successful operation.
-		/// </summary>
-		/// <remarks></remarks>
-		public bool Success
-		{
-			get { return _success; }
-		}
+        /// <summary>
+        /// Creates a failed attempt with a result.
+        /// </summary>
+        /// <typeparam name="T">The type of the attempted operation result.</typeparam>
+        /// <param name="result">The result of the attempt.</param>
+        /// <returns>The failed attempt.</returns>
+        public static Attempt<T> Fail<T>(T result)
+        {
+            return Attempt<T>.Fail(result);
+        }
 
-		/// <summary>
-		/// Gets the error associated with an unsuccessful attempt.
-		/// </summary>
-		/// <value>The error.</value>
-		public Exception Error { get { return _error; } }
+        /// <summary>
+        /// Creates a failed attempt with a result and an exception.
+        /// </summary>
+        /// <typeparam name="T">The type of the attempted operation result.</typeparam>
+        /// <param name="result">The result of the attempt.</param>
+        /// <param name="exception">The exception causing the failure of the attempt.</param>
+        /// <returns>The failed attempt.</returns>
+        public static Attempt<T> Fail<T>(T result, Exception exception)
+        {
+            return Attempt<T>.Fail(result, exception);
+        }
 
-		/// <summary>
-		/// Gets the parse result.
-		/// </summary>
-		/// <remarks></remarks>
-		public T Result
-		{
-			get { return _result; }
-		}
+        /// <summary>
+        /// Creates a successful or a failed attempt, with a result.
+        /// </summary>
+        /// <typeparam name="T">The type of the attempted operation result.</typeparam>
+        /// <param name="success">A value indicating whether the attempt is successful.</param>
+        /// <param name="result">The result of the attempt.</param>
+        /// <returns>The attempt.</returns>
+        public static Attempt<T> If<T>(bool success, T result)
+        {
+            return Attempt<T>.SucceedIf(success, result);
+        }
 
-		/// <summary>
-		/// Represents an unsuccessful parse operation
-		/// </summary>
-		public static readonly Attempt<T> False = new Attempt<T>(false, default(T));
 
-		/// <summary>
-		/// Initializes a new instance of the <see cref="Attempt{T}"/> struct.
-		/// </summary>
-		/// <param name="success">If set to <c>true</c> this tuple represents a successful parse result.</param>
-		/// <param name="result">The parse result.</param>
-		/// <remarks></remarks>
-		public Attempt(bool success, T result)
-		{
-			_success = success;
-			_result = result;
-			_error = null;
-		}
+        /// <summary>
+        /// Executes an attempt function, with callbacks.
+        /// </summary>
+        /// <typeparam name="T">The type of the attempted operation result.</typeparam>
+        /// <param name="attempt">The attempt returned by the attempt function.</param>
+        /// <param name="onSuccess">An action to execute in case the attempt succeeds.</param>
+        /// <param name="onFail">An action to execute in case the attempt fails.</param>
+        /// <returns>The outcome of the attempt.</returns>
+        /// <remarks>Runs <paramref name="onSuccess"/> or <paramref name="onFail"/> depending on the
+        /// whether the attempt function reports a success or a failure.</remarks>
+        public static Outcome Try<T>(Attempt<T> attempt, Action<T> onSuccess, Action<Exception> onFail = null)
+        {
+            if (attempt.Success)
+            {
+                onSuccess(attempt.Result);
+                return Outcome.Success;
+            }
 
-		public Attempt(Exception error)
-		{
-			_success = false;
-			_result = default(T);
-			_error = error;
-		}
-	}
+            if (onFail != null)
+            {
+                onFail(attempt.Exception);
+            }
+
+            return Outcome.Failure;
+        }
+
+        /// <summary>
+        /// Represents the outcome of an attempt.
+        /// </summary>
+        /// <remarks>Can be a success or a failure, and allows for attempts chaining.</remarks>
+        public struct Outcome
+        {
+            private readonly bool _success;
+
+            /// <summary>
+            /// Gets an outcome representing a success.
+            /// </summary>
+            public static readonly Outcome Success = new Outcome(true);
+
+            /// <summary>
+            /// Gets an outcome representing a failure.
+            /// </summary>
+            public static readonly Outcome Failure = new Outcome(false);
+
+            private Outcome(bool success)
+            {
+                _success = success;
+            }
+
+            /// <summary>
+            /// Executes another attempt function, if the previous one failed, with callbacks.
+            /// </summary>
+            /// <typeparam name="T">The type of the attempted operation result.</typeparam>
+            /// <param name="nextFunction">The attempt function to execute, returning an attempt.</param>
+            /// <param name="onSuccess">An action to execute in case the attempt succeeds.</param>
+            /// <param name="onFail">An action to execute in case the attempt fails.</param>
+            /// <returns>If it executes, returns the outcome of the attempt, else returns a success outcome.</returns>
+            /// <remarks>
+            /// <para>Executes only if the previous attempt failed, else does not execute and return a success outcome.</para>
+            /// <para>If it executes, then runs <paramref name="onSuccess"/> or <paramref name="onFail"/> depending on the
+            /// whether the attempt function reports a success or a failure.</para>
+            /// </remarks>
+            public Outcome OnFailure<T>(Func<Attempt<T>> nextFunction, Action<T> onSuccess, Action<Exception> onFail = null)
+            {
+                return _success
+                    ? Success
+                    : ExecuteNextFunction(nextFunction, onSuccess, onFail);
+            }
+
+            /// <summary>
+            /// Executes another attempt function, if the previous one succeeded, with callbacks.
+            /// </summary>
+            /// <typeparam name="T">The type of the attempted operation result.</typeparam>
+            /// <param name="nextFunction">The attempt function to execute, returning an attempt.</param>
+            /// <param name="onSuccess">An action to execute in case the attempt succeeds.</param>
+            /// <param name="onFail">An action to execute in case the attempt fails.</param>
+            /// <returns>If it executes, returns the outcome of the attempt, else returns a failed outcome.</returns>
+            /// <remarks>
+            /// <para>Executes only if the previous attempt succeeded, else does not execute and return a success outcome.</para>
+            /// <para>If it executes, then runs <paramref name="onSuccess"/> or <paramref name="onFail"/> depending on the
+            /// whether the attempt function reports a success or a failure.</para>
+            /// </remarks>
+            public Outcome OnSuccess<T>(Func<Attempt<T>> nextFunction, Action<T> onSuccess, Action<Exception> onFail = null)
+            {
+                return _success
+                    ? ExecuteNextFunction(nextFunction, onSuccess, onFail) 
+                    : Failure;
+            }
+
+            private static Outcome ExecuteNextFunction<T>(Func<Attempt<T>> nextFunction, Action<T> onSuccess, Action<Exception> onFail = null)
+            {
+                var attempt = nextFunction();
+
+                if (attempt.Success)
+                {
+                    onSuccess(attempt.Result);
+                    return Success;
+                }
+
+                if (onFail != null)
+                {
+                    onFail(attempt.Exception);
+                }
+
+                return Failure;
+            }
+        }
+
+    }
 }

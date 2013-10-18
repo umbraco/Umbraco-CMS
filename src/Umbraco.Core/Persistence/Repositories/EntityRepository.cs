@@ -1,12 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Dynamic;
+using System.Globalization;
 using System.Linq;
+using System.Reflection;
+using System.Text;
 using Umbraco.Core.Models;
+using Umbraco.Core;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Strings;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -84,7 +90,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
                 bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
-                var sql = GetBaseWhere(GetBase, isContent, isMedia, objectTypeId).Append(GetGroupBy(isContent, isMedia));
+                var sql = GetBaseWhere(GetBase, isContent, isMedia, string.Empty, objectTypeId).Append(GetGroupBy(isContent, isMedia));
                 var dtos = isMedia
                                ? _work.Database.Fetch<UmbracoEntityDto, UmbracoPropertyDto, UmbracoEntityDto>(
                                    new UmbracoEntityRelator().Map, sql)
@@ -101,7 +107,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public virtual IEnumerable<IUmbracoEntity> GetByQuery(IQuery<IUmbracoEntity> query)
         {
-            var sqlClause = GetBase(false, false);
+            var wheres = string.Concat(" AND ", string.Join(" AND ", ((Query<IUmbracoEntity>) query).WhereClauses()));
+            var sqlClause = GetBase(false, false, wheres);
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
             var sql = translator.Translate().Append(GetGroupBy(false, false));
 
@@ -117,26 +124,56 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
             bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
-            var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, objectTypeId);
+
+            var wheres = string.Concat(" AND ", string.Join(" AND ", ((Query<IUmbracoEntity>)query).WhereClauses()));
+            var sqlClause = GetBaseWhere(GetBase, isContent, isMedia, wheres, objectTypeId);
             var translator = new SqlTranslator<IUmbracoEntity>(sqlClause, query);
             var sql = translator.Translate().Append(GetGroupBy(isContent, isMedia));
 
-            var dtos = isMedia
-                           ? _work.Database.Fetch<UmbracoEntityDto, UmbracoPropertyDto, UmbracoEntityDto>(
-                               new UmbracoEntityRelator().Map, sql)
-                           : _work.Database.Fetch<UmbracoEntityDto>(sql);
-
             var factory = new UmbracoEntityFactory();
-            var list = dtos.Select(factory.BuildEntity).Cast<IUmbracoEntity>().ToList();
 
-            return list;
+            if (isMedia)
+            {
+                //treat media differently for now
+                var dtos = _work.Database.Fetch<UmbracoEntityDto, UmbracoPropertyDto, UmbracoEntityDto>(
+                    new UmbracoEntityRelator().Map, sql);
+                return dtos.Select(factory.BuildEntity).Cast<IUmbracoEntity>().ToArray();
+            }
+            else
+            {
+                //use dynamic so that we can get ALL properties from the SQL
+                //we'll have to stitch stuff together manually but we can get our
+                //additional data to put in the dictionary.
+                var dtos = _work.Database.Fetch<dynamic>(sql);
+                var entityProps = TypeHelper.GetPublicProperties(typeof (IUmbracoEntity)).Select(x => x.Name).ToArray();
+                var result = new List<IUmbracoEntity>();
+                foreach (var d in dtos)
+                {
+                    //build the initial entity
+                    IUmbracoEntity entity = factory.BuildEntityFromDynamic(d);
+
+                    //convert the dynamic row to dictionary
+                    var asDictionary = (IDictionary<string, object>) d;
+                    
+                    //figure out what extra properties we have that are not on the IUmbracoEntity and add them to additional data
+                    foreach (var k in asDictionary.Keys
+                        .Select(x => new {orig = x, title = x.ConvertCase(StringAliasCaseType.PascalCase)})
+                        .Where(x => entityProps.InvariantContains(x.title) == false))
+                    {
+                        entity.AdditionalData[k.title] = asDictionary[k.orig];
+                    }
+
+                    result.Add(entity);
+                }
+                return result;
+            }
         }
 
         #endregion
 
         #region Sql Statements
 
-        protected virtual Sql GetBase(bool isContent, bool isMedia)
+        protected virtual Sql GetBase(bool isContent, bool isMedia, string additionWhereStatement = "")
         {
             var columns = new List<object>
                               {
@@ -156,11 +193,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
             if (isContent || isMedia)
             {
-                columns.Add("published.versionId as publishedVerison");
+                columns.Add("published.versionId as publishedVersion");
                 columns.Add("latest.versionId as newestVersion");
                 columns.Add("contenttype.alias");
                 columns.Add("contenttype.icon");
                 columns.Add("contenttype.thumbnail");
+                columns.Add("contenttype.isContainer");
             }
 
             if (isMedia)
@@ -187,42 +225,38 @@ namespace Umbraco.Core.Persistence.Repositories
                    .On("umbracoNode.id = latest.nodeId");
             }
 
-            /*if (isContent)
-            {
-                sql.LeftJoin(
-                    "(SELECT contentNodeId, versionId, dataNvarchar, controlId FROM cmsPropertyData INNER JOIN cmsPropertyType ON cmsPropertyType.id = cmsPropertyData.propertytypeid" +
-                    " INNER JOIN cmsDataType ON cmsPropertyType.dataTypeId = cmsDataType.nodeId) as property")
-                   .On("umbracoNode.id = property.contentNodeId AND latest.versionId = property.versionId");
-            }*/
             if (isMedia)
             {
                 sql.LeftJoin(
-                    "(SELECT contentNodeId, versionId, dataNvarchar, controlId FROM cmsPropertyData INNER JOIN cmsPropertyType ON cmsPropertyType.id = cmsPropertyData.propertytypeid" +
-                    " INNER JOIN cmsDataType ON cmsPropertyType.dataTypeId = cmsDataType.nodeId) as property")
+                    "(SELECT contentNodeId, versionId, dataNvarchar, controlId FROM cmsPropertyData " +
+                    "INNER JOIN umbracoNode ON cmsPropertyData.contentNodeId = umbracoNode.id " +
+                    "INNER JOIN cmsPropertyType ON cmsPropertyType.id = cmsPropertyData.propertytypeid " +
+                    "INNER JOIN cmsDataType ON cmsPropertyType.dataTypeId = cmsDataType.nodeId "+
+                    "WHERE umbracoNode.nodeObjectType = '" + Constants.ObjectTypes.Media + "'" + additionWhereStatement + ") as property")
                    .On("umbracoNode.id = property.contentNodeId");
             }
 
             return sql;
         }
 
-        protected virtual Sql GetBaseWhere(Func<bool, bool, Sql> baseQuery, bool isContent, bool isMedia, Guid id)
+        protected virtual Sql GetBaseWhere(Func<bool, bool, string, Sql> baseQuery, bool isContent, bool isMedia, string additionWhereStatement, Guid id)
         {
-            var sql = baseQuery(isContent, isMedia)
+            var sql = baseQuery(isContent, isMedia, additionWhereStatement)
                 .Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = id });
             return sql;
         }
 
-        protected virtual Sql GetBaseWhere(Func<bool, bool, Sql> baseQuery, bool isContent, bool isMedia, int id)
+        protected virtual Sql GetBaseWhere(Func<bool, bool, string, Sql> baseQuery, bool isContent, bool isMedia, int id)
         {
-            var sql = baseQuery(isContent, isMedia)
+            var sql = baseQuery(isContent, isMedia, " AND umbracoNode.id = '"+ id +"'")
                 .Where("umbracoNode.id = @Id", new { Id = id })
                 .Append(GetGroupBy(isContent, isMedia));
             return sql;
         }
 
-        protected virtual Sql GetBaseWhere(Func<bool, bool, Sql> baseQuery, bool isContent, bool isMedia, Guid objectId, int id)
+        protected virtual Sql GetBaseWhere(Func<bool, bool, string, Sql> baseQuery, bool isContent, bool isMedia, Guid objectId, int id)
         {
-            var sql = baseQuery(isContent, isMedia)
+            var sql = baseQuery(isContent, isMedia, " AND umbracoNode.id = '"+ id +"'")
                 .Where("umbracoNode.id = @Id AND umbracoNode.nodeObjectType = @NodeObjectType",
                        new {Id = id, NodeObjectType = objectId});
             return sql;
@@ -252,6 +286,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 columns.Add("contenttype.alias");
                 columns.Add("contenttype.icon");
                 columns.Add("contenttype.thumbnail");
+                columns.Add("contenttype.isContainer");
             }
 
             if (isMedia)
@@ -288,7 +323,7 @@ namespace Umbraco.Core.Persistence.Repositories
             [Column("children")]
             public int Children { get; set; }
 
-            [Column("publishedVerison")]
+            [Column("publishedVersion")]
             public Guid PublishedVersion { get; set; }
 
             [Column("newestVersion")]

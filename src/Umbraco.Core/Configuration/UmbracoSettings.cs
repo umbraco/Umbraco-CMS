@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Web;
 using System.Web.Caching;
+using System.Web.Security;
 using System.Xml;
 using System.Configuration;
 
@@ -299,6 +300,32 @@ namespace Umbraco.Core.Configuration
             }
         }
 
+        internal static string AuthCookieName
+        {
+            get
+            {
+                var value = GetKey("/settings/security/authCookieName");
+                if (string.IsNullOrEmpty(value) == false)
+                {
+                    return value;
+                }
+                return "UMB_UCONTEXT";
+            }
+        }
+
+        internal static string AuthCookieDomain
+        {
+            get
+            {
+                var value = GetKey("/settings/security/authCookieDomain");
+                if (string.IsNullOrEmpty(value) == false)
+                {
+                    return value;
+                }
+                return FormsAuthentication.CookieDomain;
+            }
+        }
+
         /// <summary>
         /// Enables the experimental canvas (live) editing on the frontend of the website
         /// </summary>
@@ -475,8 +502,12 @@ namespace Umbraco.Core.Configuration
 			}
 		}
 
-		//TODO: I"m not sure why we need this, need to ask Gareth what the deal is, pretty sure we can remove it or change it, seems like
-		// massive overkill.
+        // we have that one because we auto-discover when a property is "xml" and should be returned by Razor as
+        // dynamic xml. But, stuff such as "<p>hello</p>" can be parsed into xml and would be returned as xml,
+        // unless <p> has been defined in the exclusion list... this is dirty and not-efficient, we should at least
+        // cache the list somewhere!
+        //
+        // TODO get rid of that whole dynamic xml mess
 
 		/// <summary>
 		/// razor DynamicNode typecasting detects XML and returns DynamicXml - Root elements that won't convert to DynamicXml
@@ -487,12 +518,10 @@ namespace Umbraco.Core.Configuration
 			{
 				try
 				{
-					List<string> items = new List<string>();
-					XmlNode root = GetKeyAsNode("/settings/scripting/razor/notDynamicXmlDocumentElements");
-					foreach (XmlNode element in root.SelectNodes(".//element"))
-					{
-						items.Add(element.InnerText);
-					}
+					var items = new List<string>();
+					var root = GetKeyAsNode("/settings/scripting/razor/notDynamicXmlDocumentElements");
+                    if (root != null)
+                        items.AddRange(root.SelectNodes(".//element").Cast<XmlNode>().Select(n => n.InnerText));
 					return items;
 				}
 				catch

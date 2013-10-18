@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Web;
+using Moq;
 using NUnit.Framework;
-using Rhino.Mocks;
 using Umbraco.Core.Models;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Models
@@ -13,6 +14,33 @@ namespace Umbraco.Tests.Models
     [TestFixture]
     public class ContentTests
     {
+        [SetUp]
+        public void Init()
+        {
+            TestHelper.EnsureUmbracoSettingsConfig();
+        }
+
+        [TearDown]
+        public void Dispose()
+        {
+            TestHelper.CleanUmbracoSettingsConfig();
+        }
+
+        [Test]
+        public void All_Dirty_Properties_Get_Reset()
+        {
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+
+            content.ResetDirtyProperties(false);
+
+            Assert.IsFalse(content.IsDirty());
+            foreach (var prop in content.Properties)
+            {
+                Assert.IsFalse(prop.IsDirty());
+            }
+        }
+
         [Test]
         public void Can_Verify_Mocked_Content()
         {
@@ -66,14 +94,14 @@ namespace Umbraco.Tests.Models
             var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
 
             var stream = new MemoryStream(System.Text.Encoding.Default.GetBytes("TestContent"));
-            var httpPostedFileBase = MockRepository.GenerateMock<HttpPostedFileBase>();
-            httpPostedFileBase.Stub(x => x.ContentLength).Return(Convert.ToInt32(stream.Length));
-            httpPostedFileBase.Stub(x => x.ContentType).Return("text/plain");
-            httpPostedFileBase.Stub(x => x.FileName).Return("sample.txt");
-            httpPostedFileBase.Stub(x => x.InputStream).Return(stream);
+            var postedFileMock = new Mock<HttpPostedFileBase>();
+            postedFileMock.Setup(x => x.ContentLength).Returns(Convert.ToInt32(stream.Length));
+            postedFileMock.Setup(x => x.ContentType).Returns("text/plain");
+            postedFileMock.Setup(x => x.FileName).Returns("sample.txt");
+            postedFileMock.Setup(x => x.InputStream).Returns(stream);
 
             // Assert
-            content.SetValue("title", httpPostedFileBase);
+            content.SetValue("title", postedFileMock.Object);
 
             // Assert
             Assert.That(content.Properties.Any(), Is.True);

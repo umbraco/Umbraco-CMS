@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
@@ -9,7 +8,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Querying
 {
-    internal class PocoToSqlExpressionHelper<T>
+    internal class PocoToSqlExpressionHelper<T> : BaseExpressionHelper
     {
         private string sep = " ";
         private Database.PocoData pd;
@@ -251,11 +250,11 @@ namespace Umbraco.Core.Persistence.Querying
                 case "ToLower":
                     return string.Format("lower({0})", r);
                 case "StartsWith":
-                    return string.Format("upper({0}) like '{1}%'", r, RemoveQuote(args[0].ToString().ToUpper()));
+                    return string.Format("upper({0}) like '{1}%'", r, EscapeAtArgument(RemoveQuote(args[0].ToString().ToUpper())));
                 case "EndsWith":
-                    return string.Format("upper({0}) like '%{1}'", r, RemoveQuote(args[0].ToString()).ToUpper());
+                    return string.Format("upper({0}) like '%{1}'", r, EscapeAtArgument(RemoveQuote(args[0].ToString()).ToUpper()));
                 case "Contains":
-                    return string.Format("upper({0}) like '%{1}%'", r, RemoveQuote(args[0].ToString()).ToUpper());
+                    return string.Format("upper({0}) like '%{1}%'", r, EscapeAtArgument(RemoveQuote(args[0].ToString()).ToUpper()));
                 case "Substring":
                     var startIndex = Int32.Parse(args[0].ToString()) + 1;
                     if (args.Count == 2)
@@ -440,53 +439,7 @@ namespace Umbraco.Core.Persistence.Querying
 
         public virtual string GetQuotedValue(object value, Type fieldType)
         {
-            if (value == null) return "NULL";
-
-            if (!fieldType.UnderlyingSystemType.IsValueType && fieldType != typeof(string))
-            {
-                //if (TypeSerializer.CanCreateFromString(fieldType))
-                //{
-                //    return "'" + EscapeParam(TypeSerializer.SerializeToString(value)) + "'";
-                //}
-
-                throw new NotSupportedException(
-                    string.Format("Property of type: {0} is not supported", fieldType.FullName));
-            }
-
-            if (fieldType == typeof(int))
-                return ((int)value).ToString(CultureInfo.InvariantCulture);
-
-            if (fieldType == typeof(float))
-                return ((float)value).ToString(CultureInfo.InvariantCulture);
-
-            if (fieldType == typeof(double))
-                return ((double)value).ToString(CultureInfo.InvariantCulture);
-
-            if (fieldType == typeof(decimal))
-                return ((decimal)value).ToString(CultureInfo.InvariantCulture);
-
-            if (fieldType == typeof (DateTime))
-            {
-                return "'" + EscapeParam(((DateTime)value).ToIsoString()) + "'";
-            }
-                
-
-            if (fieldType == typeof(bool))
-                return ((bool)value) ? Convert.ToString(1, CultureInfo.InvariantCulture) : Convert.ToString(0, CultureInfo.InvariantCulture);
-
-            return ShouldQuoteValue(fieldType)
-                    ? "'" + EscapeParam(value) + "'"
-                    : value.ToString();
-        }
-
-        public virtual string EscapeParam(object paramValue)
-        {
-            return paramValue.ToString().Replace("'", "''");
-        }
-
-        public virtual bool ShouldQuoteValue(Type fieldType)
-        {
-            return true;
+            return GetQuotedValue(value, fieldType, EscapeParam, ShouldQuoteValue);
         }
 
         protected virtual string GetFieldName(Database.PocoData pocoData, string name)
@@ -495,30 +448,6 @@ namespace Umbraco.Core.Persistence.Querying
             return string.Format("{0}.{1}",
                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedTableName(pocoData.TableInfo.TableName),
                 SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(column.Value.ColumnName));
-        }
-
-        protected string RemoveQuote(string exp)
-        {
-
-            if (exp.StartsWith("'") && exp.EndsWith("'"))
-            {
-                exp = exp.Remove(0, 1);
-                exp = exp.Remove(exp.Length - 1, 1);
-            }
-            return exp;
-        }
-
-        protected string RemoveQuoteFromAlias(string exp)
-        {
-
-            if ((exp.StartsWith("\"") || exp.StartsWith("`") || exp.StartsWith("'"))
-                &&
-                (exp.EndsWith("\"") || exp.EndsWith("`") || exp.EndsWith("'")))
-            {
-                exp = exp.Remove(0, 1);
-                exp = exp.Remove(exp.Length - 1, 1);
-            }
-            return exp;
         }
 
         private string GetTrueExpression()

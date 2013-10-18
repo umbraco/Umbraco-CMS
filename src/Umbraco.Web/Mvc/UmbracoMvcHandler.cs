@@ -1,23 +1,18 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Web;
-using System.Web.Mvc;
+﻿using System.Web.Mvc;
 using System.Web.Routing;
 
 namespace Umbraco.Web.Mvc
 {
     /// <summary>
-    /// Mvc handler class to intercept creation of controller and store it for later use.
-    /// This means we create two instances of the same controller to support some features later on.
+    /// MVC handler to facilitate the TemplateRenderer. This handler can execute an MVC request and return it as a string.
     /// 
-    /// The alternate option for this is to completely rewrite all MvcHandler methods.
+    /// Original:
     /// 
-    /// This is currently needed for the 'return CurrentUmbracoPage()' surface controller functionality 
+    /// This handler also used to intercept creation of controllers and store it for later use.
+    /// This was needed for the 'return CurrentUmbracoPage()' surface controller functionality 
     /// because it needs to send data back to the page controller.
+    /// 
+    /// The creation of this controller has been moved to the UmbracoPageResult class which will create a controller when needed.
     /// </summary>
     internal class UmbracoMvcHandler : MvcHandler
     {
@@ -25,46 +20,13 @@ namespace Umbraco.Web.Mvc
             : base(requestContext)
         {
         }
-
-        private void StoreControllerInRouteDefinition()
-        {
-            var routeDef = (RouteDefinition)RequestContext.RouteData.DataTokens["umbraco-route-def"];
-
-            if (routeDef == null) return;
-
-            // Get the factory and controller and create a new instance of the controller
-            var factory = ControllerBuilder.Current.GetControllerFactory();
-            var controller = factory.CreateController(RequestContext, routeDef.ControllerName) as ControllerBase;
-
-            // Store the controller
-            routeDef.Controller = controller;
-        }
-
+       
         /// <summary>
         /// This is used internally purely to render an Umbraco MVC template to string and shouldn't be used for anything else.
         /// </summary>
         internal void ExecuteUmbracoRequest()
         {
-            StoreControllerInRouteDefinition();
             base.ProcessRequest(RequestContext.HttpContext);
         }
-
-        protected override void ProcessRequest(HttpContextBase httpContext)
-        {
-            StoreControllerInRouteDefinition();
-
-            // Let MVC do its magic and continue the request
-            base.ProcessRequest(httpContext);
-        }
-
-        protected override IAsyncResult BeginProcessRequest(HttpContextBase httpContext, AsyncCallback callback,
-                                                            object state)
-        {
-            StoreControllerInRouteDefinition();
-
-            return base.BeginProcessRequest(httpContext, callback, state);
-        }
     }
-
-
 }

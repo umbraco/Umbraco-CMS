@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Web.Mvc;
+using Umbraco.Core.Models;
 using Umbraco.Web.Models;
+using Umbraco.Web.Mvc;
 using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
 using System.Linq;
@@ -10,17 +12,16 @@ namespace Umbraco.Web.Macros
     /// <summary>
     /// Controller to render macro content for Parital View Macros
     /// </summary>
+    [MergeParentContextViewData]
     internal class PartialViewMacroController : Controller
     {
-        private readonly UmbracoContext _umbracoContext;
         private readonly MacroModel _macro;
-        private readonly INode _currentPage;
+        private readonly IPublishedContent _content;
 
-        public PartialViewMacroController(UmbracoContext umbracoContext, MacroModel macro, INode currentPage)
+        public PartialViewMacroController(MacroModel macro, IPublishedContent content)
         {
-            _umbracoContext = umbracoContext;
             _macro = macro;
-            _currentPage = currentPage;
+            _content = content;
         }
 
         /// <summary>
@@ -31,13 +32,12 @@ namespace Umbraco.Web.Macros
         public PartialViewResult Index()
         {
             var model = new PartialViewMacroModel(
-                _currentPage.ConvertFromNode(),
+                _content,
                 _macro.Id,
                 _macro.Alias,
                 _macro.Name,
                 _macro.Properties.ToDictionary(x => x.Key, x => (object)x.Value));
             return PartialView(_macro.ScriptName, model);
         }
-
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Web.UI.WebControls;
+using Umbraco.Core.IO;
 
 namespace umbraco.uicontrols
 {
@@ -17,7 +18,7 @@ namespace umbraco.uicontrols
             if(!string.IsNullOrEmpty(Title))
                 _title = Title;
 
-            base.ImageUrl = IO.SystemDirectories.Umbraco_client + "/images/progressBar.gif";
+            base.ImageUrl = SystemDirectories.UmbracoClient + "/images/progressBar.gif";
             base.AlternateText = _title;
 
             base.Render(writer);

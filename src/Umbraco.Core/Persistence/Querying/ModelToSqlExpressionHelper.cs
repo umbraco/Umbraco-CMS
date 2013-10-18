@@ -8,7 +8,7 @@ using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Querying
 {
-    internal class ModelToSqlExpressionHelper<T>
+    internal class ModelToSqlExpressionHelper<T> : BaseExpressionHelper
     {
         private string sep = " ";
         private BaseMapper _mapper;
@@ -246,11 +246,11 @@ namespace Umbraco.Core.Persistence.Querying
                 case "ToLower":
                     return string.Format("lower({0})", r);
                 case "StartsWith":
-                    return string.Format("upper({0}) like '{1}%'", r, RemoveQuote(args[0].ToString().ToUpper()));
+                    return string.Format("upper({0}) like '{1}%'", r, EscapeAtArgument(RemoveQuote(args[0].ToString().ToUpper())));
                 case "EndsWith":
-                    return string.Format("upper({0}) like '%{1}'", r, RemoveQuote(args[0].ToString()).ToUpper());
+                    return string.Format("upper({0}) like '%{1}'", r, EscapeAtArgument(RemoveQuote(args[0].ToString()).ToUpper()));
                 case "Contains":
-                    return string.Format("upper({0}) like '%{1}%'", r, RemoveQuote(args[0].ToString()).ToUpper());
+                    return string.Format("{0} like '%{1}%'", r, EscapeAtArgument(RemoveQuote(args[0].ToString()).ToUpper()));
                 case "Substring":
                     var startIndex = Int32.Parse(args[0].ToString()) + 1;
                     if (args.Count == 2)
@@ -435,72 +435,7 @@ namespace Umbraco.Core.Persistence.Querying
 
         public virtual string GetQuotedValue(object value, Type fieldType)
         {
-            if (value == null) return "NULL";
-
-            if (!fieldType.UnderlyingSystemType.IsValueType && fieldType != typeof(string))
-            {
-                throw new NotSupportedException(
-                    string.Format("Property of type: {0} is not supported", fieldType.FullName));
-            }
-
-            if (fieldType == typeof(int))
-                return ((int)value).ToString(CultureInfo.InvariantCulture);
-
-            if (fieldType == typeof(float))
-                return ((float)value).ToString(CultureInfo.InvariantCulture);
-
-            if (fieldType == typeof(double))
-                return ((double)value).ToString(CultureInfo.InvariantCulture);
-
-            if (fieldType == typeof(decimal))
-                return ((decimal)value).ToString(CultureInfo.InvariantCulture);
-
-            if (fieldType == typeof (DateTime))
-            {
-                return "'" + EscapeParam(((DateTime)value).ToIsoString()) + "'";
-            }
-                
-            
-            if (fieldType == typeof(bool))
-                return ((bool)value) ? Convert.ToString(1, CultureInfo.InvariantCulture) : Convert.ToString(0, CultureInfo.InvariantCulture);
-            
-            return ShouldQuoteValue(fieldType)
-                    ? "'" + EscapeParam(value) + "'"
-                    : value.ToString();
-        }
-
-        public virtual string EscapeParam(object paramValue)
-        {
-            return paramValue.ToString().Replace("'", "''");
-        }
-
-        public virtual bool ShouldQuoteValue(Type fieldType)
-        {
-            return true;
-        }
-
-        protected string RemoveQuote(string exp)
-        {
-
-            if (exp.StartsWith("'") && exp.EndsWith("'"))
-            {
-                exp = exp.Remove(0, 1);
-                exp = exp.Remove(exp.Length - 1, 1);
-            }
-            return exp;
-        }
-
-        protected string RemoveQuoteFromAlias(string exp)
-        {
-
-            if ((exp.StartsWith("\"") || exp.StartsWith("`") || exp.StartsWith("'"))
-                &&
-                (exp.EndsWith("\"") || exp.EndsWith("`") || exp.EndsWith("'")))
-            {
-                exp = exp.Remove(0, 1);
-                exp = exp.Remove(exp.Length - 1, 1);
-            }
-            return exp;
+            return GetQuotedValue(value, fieldType, EscapeParam, ShouldQuoteValue);
         }
 
         private string GetTrueExpression()

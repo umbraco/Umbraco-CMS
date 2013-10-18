@@ -13,7 +13,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic.Actions;
 using umbraco.presentation.umbraco.controls;
 using ClientDependency.Core;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule;
 using umbraco.cms.businesslogic.skinning;
 using umbraco.BusinessLogic;

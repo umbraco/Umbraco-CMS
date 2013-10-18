@@ -3,6 +3,8 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -21,15 +23,20 @@ namespace Umbraco.Tests.Persistence.Repositories
             CreateTestData();
         }
 
+        private RelationTypeRepository CreateRepository(IDatabaseUnitOfWork unitOfWork)
+        {
+            return new RelationTypeRepository(unitOfWork, NullCacheProvider.Current);
+        }
+
         [Test]
-        public void Can_Instantiate_Repository()
+        public void Can_Instantiate_Repository_From_Resolver()
         {
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            var repository = new RelationTypeRepository(unitOfWork);
+            var repository = RepositoryResolver.Current.ResolveByType<IRelationTypeRepository>(unitOfWork);  
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -41,21 +48,21 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new RelationTypeRepository(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
 
-            // Act
-            var relateMemberToContent = new RelationType(new Guid(Constants.ObjectTypes.Member),
-                                                         new Guid(Constants.ObjectTypes.Document),
-                                                         "relateMemberToContent")
-                                            {IsBidirectional = true, Name = "Relate Member to Content"};
-            
-            repository.AddOrUpdate(relateMemberToContent);
-            unitOfWork.Commit();
+                // Act
+                var relateMemberToContent = new RelationType(new Guid(Constants.ObjectTypes.Member),
+                                                             new Guid(Constants.ObjectTypes.Document),
+                                                             "relateMemberToContent") {IsBidirectional = true, Name = "Relate Member to Content"};
 
-            // Assert
-            Assert.That(relateMemberToContent.HasIdentity, Is.True);
-            Assert.That(repository.Exists(relateMemberToContent.Id), Is.True);
+                repository.AddOrUpdate(relateMemberToContent);
+                unitOfWork.Commit();
 
+                // Assert
+                Assert.That(relateMemberToContent.HasIdentity, Is.True);
+                Assert.That(repository.Exists(relateMemberToContent.Id), Is.True);
+            }
         }
 
         [Test]
@@ -64,22 +71,24 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new RelationTypeRepository(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
 
-            // Act
-            var relationType = repository.Get(3);
-            relationType.Alias = relationType.Alias + "Updated";
-            relationType.Name = relationType.Name + " Updated";
-            repository.AddOrUpdate(relationType);
-            unitOfWork.Commit();
+                // Act
+                var relationType = repository.Get(3);
+                relationType.Alias = relationType.Alias + "Updated";
+                relationType.Name = relationType.Name + " Updated";
+                repository.AddOrUpdate(relationType);
+                unitOfWork.Commit();
 
-            var relationTypeUpdated = repository.Get(3);
+                var relationTypeUpdated = repository.Get(3);
 
-            // Assert
-            Assert.That(relationTypeUpdated, Is.Not.Null);
-            Assert.That(relationTypeUpdated.HasIdentity, Is.True);
-            Assert.That(relationTypeUpdated.Alias, Is.EqualTo(relationType.Alias));
-            Assert.That(relationTypeUpdated.Name, Is.EqualTo(relationType.Name));
+                // Assert
+                Assert.That(relationTypeUpdated, Is.Not.Null);
+                Assert.That(relationTypeUpdated.HasIdentity, Is.True);
+                Assert.That(relationTypeUpdated.Alias, Is.EqualTo(relationType.Alias));
+                Assert.That(relationTypeUpdated.Name, Is.EqualTo(relationType.Name));
+            }
         }
 
         [Test]
@@ -88,17 +97,19 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new RelationTypeRepository(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
 
-            // Act
-            var relationType = repository.Get(3);
-            repository.Delete(relationType);
-            unitOfWork.Commit();
+                // Act
+                var relationType = repository.Get(3);
+                repository.Delete(relationType);
+                unitOfWork.Commit();
 
-            var exists = repository.Exists(3);
+                var exists = repository.Exists(3);
 
-            // Assert
-            Assert.That(exists, Is.False);
+                // Assert
+                Assert.That(exists, Is.False);
+            }
         }
 
         [Test]
@@ -107,16 +118,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new RelationTypeRepository(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
 
-            // Act
-            var relationType = repository.Get(2);
+                // Act
+                var relationType = repository.Get(2);
 
-            // Assert
-            Assert.That(relationType, Is.Not.Null);
-            Assert.That(relationType.HasIdentity, Is.True);
-            Assert.That(relationType.Alias, Is.EqualTo("relateContentOnCopy"));
-            Assert.That(relationType.Name, Is.EqualTo("Relate Content on Copy"));
+                // Assert
+                Assert.That(relationType, Is.Not.Null);
+                Assert.That(relationType.HasIdentity, Is.True);
+                Assert.That(relationType.Alias, Is.EqualTo("relateContentOnCopy"));
+                Assert.That(relationType.Name, Is.EqualTo("Relate Content on Copy"));
+            }
         }
 
         [Test]
@@ -125,16 +138,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new RelationTypeRepository(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
 
-            // Act
-            var relationTypes = repository.GetAll();
+                // Act
+                var relationTypes = repository.GetAll();
 
-            // Assert
-            Assert.That(relationTypes, Is.Not.Null);
-            Assert.That(relationTypes.Any(), Is.True);
-            Assert.That(relationTypes.Any(x => x == null), Is.False);
-            Assert.That(relationTypes.Count(), Is.EqualTo(3));
+                // Assert
+                Assert.That(relationTypes, Is.Not.Null);
+                Assert.That(relationTypes.Any(), Is.True);
+                Assert.That(relationTypes.Any(x => x == null), Is.False);
+                Assert.That(relationTypes.Count(), Is.EqualTo(3));
+            }
         }
 
         [Test]
@@ -143,16 +158,18 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new RelationTypeRepository(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
 
-            // Act
-            var relationTypes = repository.GetAll(2, 3);
+                // Act
+                var relationTypes = repository.GetAll(2, 3);
 
-            // Assert
-            Assert.That(relationTypes, Is.Not.Null);
-            Assert.That(relationTypes.Any(), Is.True);
-            Assert.That(relationTypes.Any(x => x == null), Is.False);
-            Assert.That(relationTypes.Count(), Is.EqualTo(2));
+                // Assert
+                Assert.That(relationTypes, Is.Not.Null);
+                Assert.That(relationTypes.Any(), Is.True);
+                Assert.That(relationTypes.Any(x => x == null), Is.False);
+                Assert.That(relationTypes.Count(), Is.EqualTo(2));
+            }
         }
 
         [Test]
@@ -161,15 +178,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new RelationTypeRepository(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
 
-            // Act
-            var exists = repository.Exists(3);
-            var doesntExist = repository.Exists(5);
+                // Act
+                var exists = repository.Exists(3);
+                var doesntExist = repository.Exists(5);
 
-            // Assert
-            Assert.That(exists, Is.True);
-            Assert.That(doesntExist, Is.False);
+                // Assert
+                Assert.That(exists, Is.True);
+                Assert.That(doesntExist, Is.False);
+            }
         }
 
         [Test]
@@ -178,14 +197,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new RelationTypeRepository(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
 
-            // Act
-            var query = Query<RelationType>.Builder.Where(x => x.Alias.StartsWith("relate"));
-            int count = repository.Count(query);
+                // Act
+                var query = Query<RelationType>.Builder.Where(x => x.Alias.StartsWith("relate"));
+                int count = repository.Count(query);
 
-            // Assert
-            Assert.That(count, Is.EqualTo(3));
+                // Assert
+                Assert.That(count, Is.EqualTo(3));
+            }
         }
 
         [Test]
@@ -194,18 +215,20 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new RelationTypeRepository(unitOfWork);
+            using (var repository = CreateRepository(unitOfWork))
+            {
 
-            // Act
-            var childObjType = new Guid(Constants.ObjectTypes.DocumentType);
-            var query = Query<RelationType>.Builder.Where(x => x.ChildObjectType == childObjType);
-            var result = repository.GetByQuery(query);
+                // Act
+                var childObjType = new Guid(Constants.ObjectTypes.DocumentType);
+                var query = Query<RelationType>.Builder.Where(x => x.ChildObjectType == childObjType);
+                var result = repository.GetByQuery(query);
 
-            // Assert
-            Assert.That(result, Is.Not.Null);
-            Assert.That(result.Any(), Is.True);
-            Assert.That(result.Any(x => x == null), Is.False);
-            Assert.That(result.Count(), Is.EqualTo(1));
+                // Assert
+                Assert.That(result, Is.Not.Null);
+                Assert.That(result.Any(), Is.True);
+                Assert.That(result.Any(x => x == null), Is.False);
+                Assert.That(result.Count(), Is.EqualTo(1));
+            }
         }
 
         [TearDown]

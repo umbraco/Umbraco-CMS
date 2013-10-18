@@ -306,12 +306,13 @@ namespace Umbraco.Tests.Services
         public void Can_RePublish_All_Content()
         {
             // Arrange
-            var contentService = ServiceContext.ContentService;
+            var contentService = (ContentService)ServiceContext.ContentService;
             var rootContent = contentService.GetRootContent();
             foreach (var c in rootContent)
             {
                 contentService.PublishWithChildren(c);
             }
+            var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants()));
             //for testing we need to clear out the contentXml table so we can see if it worked
             var provider = new PetaPocoUnitOfWorkProvider();
             var uow =  provider.GetUnitOfWork();
@@ -319,13 +320,49 @@ namespace Umbraco.Tests.Services
             {
                 uow.Database.TruncateTable("cmsContentXml");
             }
-
+            //for this test we are also going to save a revision for a content item that is not published, this is to ensure
+            //that it's published version still makes it into the cmsContentXml table!
+            contentService.Save(allContent.Last());
+            
             // Act
             var published = contentService.RePublishAll(0);
 
             // Assert
             Assert.IsTrue(published);
+            uow = provider.GetUnitOfWork();
+            using (var repo = RepositoryResolver.Current.ResolveByType<IContentRepository>(uow))
+            {
+                Assert.AreEqual(allContent.Count(), uow.Database.ExecuteScalar<int>("select count(*) from cmsContentXml"));
+            }
+        }
+
+        [Test]
+        public void Can_RePublish_All_Content_Of_Type()
+        {
+            // Arrange
+            var contentService = (ContentService)ServiceContext.ContentService;
+            var rootContent = contentService.GetRootContent();
+            foreach (var c in rootContent)
+            {
+                contentService.PublishWithChildren(c);
+            }
             var allContent = rootContent.Concat(rootContent.SelectMany(x => x.Descendants()));
+            //for testing we need to clear out the contentXml table so we can see if it worked
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var uow = provider.GetUnitOfWork();
+            using (RepositoryResolver.Current.ResolveByType<IContentRepository>(uow))
+            {
+                uow.Database.TruncateTable("cmsContentXml");
+            }
+            //for this test we are also going to save a revision for a content item that is not published, this is to ensure
+            //that it's published version still makes it into the cmsContentXml table!
+            contentService.Save(allContent.Last());
+
+
+            // Act
+            contentService.RePublishAll(new int[]{allContent.Last().ContentTypeId});
+
+            // Assert            
             uow = provider.GetUnitOfWork();
             using (var repo = RepositoryResolver.Current.ResolveByType<IContentRepository>(uow))
             {
@@ -688,15 +725,21 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = contentService.GetById(1048);
+            var temp = contentService.GetById(1048);
 
             // Act
-            var copy = contentService.Copy(content, content.ParentId, false, 0);
+            var copy = contentService.Copy(temp, temp.ParentId, false, 0);
+            var content = contentService.GetById(1048);
 
             // Assert
             Assert.That(copy, Is.Not.Null);
             Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
             Assert.AreNotSame(content, copy);
+            foreach (var property in copy.Properties)
+            {
+                Assert.AreNotEqual(property.Id, content.Properties[property.Alias].Id);
+                Assert.AreEqual(property.Value, content.Properties[property.Alias].Value);
+            }
             //Assert.AreNotEqual(content.Name, copy.Name);
         }
 
@@ -775,6 +818,66 @@ namespace Umbraco.Tests.Services
             Assert.That(homepage.Published, Is.False);
             Assert.That(hasPublishedVersion, Is.True);
         }
+
+	    [Test]
+	    public void Can_Verify_Property_Types_On_Content()
+	    {
+            // Arrange
+	        var contentTypeService = ServiceContext.ContentTypeService;
+            var contentType = MockedContentTypes.CreateAllTypesContentType("allDataTypes", "All DataTypes");
+            contentTypeService.Save(contentType);
+	        var contentService = ServiceContext.ContentService;
+	        var content = MockedContent.CreateAllTypesContent(contentType, "Random Content", -1);
+            contentService.Save(content);
+	        var id = content.Id;
+
+            // Act
+	        var sut = contentService.GetById(id);
+
+            // Arrange
+            Assert.That(sut.GetValue<bool>("isTrue"), Is.True);
+            Assert.That(sut.GetValue<int>("number"), Is.EqualTo(42));
+            Assert.That(sut.GetValue<string>("bodyText"), Is.EqualTo("Lorem Ipsum Body Text Test"));
+            Assert.That(sut.GetValue<string>("singleLineText"), Is.EqualTo("Single Line Text Test"));
+            Assert.That(sut.GetValue<string>("multilineText"), Is.EqualTo("Multiple lines \n in one box"));
+            Assert.That(sut.GetValue<string>("upload"), Is.EqualTo("/media/1234/koala.jpg"));
+            Assert.That(sut.GetValue<string>("label"), Is.EqualTo("Non-editable label"));
+            //SD: This is failing because the 'content' call to GetValue<DateTime> always has empty milliseconds
+            //MCH: I'm guessing this is an issue because of the format the date is actually stored as, right? Cause we don't do any formatting when saving or loading
+            Assert.That(sut.GetValue<DateTime>("dateTime").ToString("G"), Is.EqualTo(content.GetValue<DateTime>("dateTime").ToString("G")));
+            Assert.That(sut.GetValue<string>("colorPicker"), Is.EqualTo("black"));
+	        Assert.That(sut.GetValue<string>("folderBrowser"), Is.Empty);
+            Assert.That(sut.GetValue<string>("ddlMultiple"), Is.EqualTo("1234,1235"));
+            Assert.That(sut.GetValue<string>("rbList"), Is.EqualTo("random"));
+            Assert.That(sut.GetValue<DateTime>("date").ToString("G"), Is.EqualTo(content.GetValue<DateTime>("date").ToString("G")));
+            Assert.That(sut.GetValue<string>("ddl"), Is.EqualTo("1234"));
+            Assert.That(sut.GetValue<string>("chklist"), Is.EqualTo("randomc"));
+            Assert.That(sut.GetValue<int>("contentPicker"), Is.EqualTo(1090));
+            Assert.That(sut.GetValue<int>("mediaPicker"), Is.EqualTo(1091));
+            Assert.That(sut.GetValue<int>("memberPicker"), Is.EqualTo(1092));
+            Assert.That(sut.GetValue<string>("simpleEditor"), Is.EqualTo("This is simply edited"));
+            Assert.That(sut.GetValue<string>("ultimatePicker"), Is.EqualTo("1234,1235"));
+            Assert.That(sut.GetValue<string>("relatedLinks"), Is.EqualTo("<links><link title=\"google\" link=\"http://google.com\" type=\"external\" newwindow=\"0\" /></links>"));
+            Assert.That(sut.GetValue<string>("tags"), Is.EqualTo("this,is,tags"));
+            Assert.That(sut.GetValue<string>("macroContainer"), Is.Empty);
+            Assert.That(sut.GetValue<string>("imgCropper"), Is.Empty);
+	    }
+
+	    [Test]
+	    public void Can_Delete_Previous_Versions_Not_Latest()
+	    {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var content = contentService.GetById(1049);
+	        var version = content.Version;
+
+	        // Act
+            contentService.DeleteVersion(1049, version, true, 0);
+            var sut = contentService.GetById(1049);
+
+            // Assert
+            Assert.That(sut.Version, Is.EqualTo(version));
+	    }
 
         private IEnumerable<IContent> CreateContentHierarchy()
         {

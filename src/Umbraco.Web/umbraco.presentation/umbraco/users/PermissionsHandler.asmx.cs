@@ -14,7 +14,7 @@ using umbraco.BasePages;
 using System.Collections.Generic;
 using umbraco.interfaces;
 using umbraco.BusinessLogic.Actions;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.presentation.user
 {

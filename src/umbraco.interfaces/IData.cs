@@ -3,6 +3,15 @@ using System.Xml;
 
 namespace umbraco.interfaces
 {
+    /// <summary>
+    /// Internal interface used to decorate any IData that can be optimized when exporting
+    /// XML like in the packaging service. Instead of relying on the IData to go get the value
+    /// from the db, any IData that implements this can have it's value set from the packaging service.
+    /// </summary>
+    internal interface IDataValueSetter
+    {
+        void SetValue(object val, string strDbType);
+    }
 
     /// <summary>
     /// The IData is part of the IDataType interface for creating new data types in the umbraco backoffice. 

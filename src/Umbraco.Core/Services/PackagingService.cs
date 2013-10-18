@@ -28,6 +28,7 @@ namespace Umbraco.Core.Services
         private readonly IMediaService _mediaService;
         private readonly IDataTypeService _dataTypeService;
         private readonly IFileService _fileService;
+        private readonly ILocalizationService _localizationService;
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private Dictionary<string, IContentType> _importedContentTypes;
@@ -36,13 +37,21 @@ namespace Umbraco.Core.Services
         //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
-        public PackagingService(IContentService contentService, IContentTypeService contentTypeService, IMediaService mediaService, IDataTypeService dataTypeService, IFileService fileService, RepositoryFactory repositoryFactory, IDatabaseUnitOfWorkProvider uowProvider)
+        public PackagingService(IContentService contentService, 
+            IContentTypeService contentTypeService, 
+            IMediaService mediaService, 
+            IDataTypeService dataTypeService, 
+            IFileService fileService, 
+            ILocalizationService localizationService,
+            RepositoryFactory repositoryFactory, 
+            IDatabaseUnitOfWorkProvider uowProvider)
         {
             _contentService = contentService;
             _contentTypeService = contentTypeService;
             _mediaService = mediaService;
             _dataTypeService = dataTypeService;
             _fileService = fileService;
+            _localizationService = localizationService;
             _repositoryFactory = repositoryFactory;
             _uowProvider = uowProvider;
 
@@ -328,8 +337,6 @@ namespace Umbraco.Core.Services
 
             return content;
         }
-
-
 
         #endregion
 

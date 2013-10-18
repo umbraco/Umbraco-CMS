@@ -4,6 +4,9 @@ using System.Xml;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
@@ -15,11 +18,12 @@ using umbraco.BusinessLogic;
 namespace Umbraco.Tests.PublishedCache
 {
 	[TestFixture]
-	public class PublishContentCacheTests
+	public class PublishContentCacheTests : BaseWebTest
 	{
 		private FakeHttpContextFactory _httpContextFactory;
 		private UmbracoContext _umbracoContext;
 		private ContextualPublishedContentCache _cache;
+	    private XmlDocument _xml;
 
 		private string GetLegacyXml()
 		{
@@ -67,26 +71,20 @@ namespace Umbraco.Tests.PublishedCache
 		}
 
 		[SetUp]
-		public void SetUp()
-		{
-			TestHelper.SetupLog4NetForTests();
+        public override void Initialize()
+        {
+            base.Initialize();
 
-            //create the app context 
-            ApplicationContext.Current = new ApplicationContext(false);
-
-			_httpContextFactory = new FakeHttpContextFactory("~/Home");
-			//ensure the StateHelper is using our custom context
-			StateHelper.HttpContext = _httpContextFactory.HttpContext;
+            _httpContextFactory = new FakeHttpContextFactory("~/Home");
+            //ensure the StateHelper is using our custom context
+            StateHelper.HttpContext = _httpContextFactory.HttpContext;
 
 			UmbracoSettings.UseLegacyXmlSchema = false;
+            _xml = new XmlDocument();
+            _xml.LoadXml(GetXml());
             var cache = new PublishedContentCache
                 {
-                    GetXmlDelegate = (context, preview) =>
-                        {
-                            var doc = new XmlDocument();
-                            doc.LoadXml(GetXml());
-                            return doc;
-                        }
+                    GetXmlDelegate = (context, preview) => _xml
                 };
 
 		    _umbracoContext = new UmbracoContext(
@@ -95,30 +93,22 @@ namespace Umbraco.Tests.PublishedCache
                 new PublishedCaches(cache, new PublishedMediaCache()));
 
 		    _cache = _umbracoContext.ContentCache;
-		}
+        }
 
-		private void SetupForLegacy()
+	    private void SetupForLegacy()
 		{
-			Umbraco.Core.Configuration.UmbracoSettings.UseLegacyXmlSchema = true;
-
-            var cache = _umbracoContext.ContentCache.InnerCache as PublishedContentCache;
-            if (cache == null) throw new Exception("Unsupported IPublishedContentCache, only the Xml one is supported.");
-
-            cache.GetXmlDelegate = (context, preview) =>
-            {
-				var doc = new XmlDocument();
-				doc.LoadXml(GetLegacyXml());
-				return doc;
-			};
+			UmbracoSettings.UseLegacyXmlSchema = true;
+            _xml = new XmlDocument();
+            _xml.LoadXml(GetLegacyXml());
 		}
 
-		[TearDown]
-		public void TearDown()
-		{
-			UmbracoSettings.Reset();
-		}
+	    protected override void FreezeResolution()
+	    {
+            PublishedContentModelFactoryResolver.Current = new PublishedContentModelFactoryResolver();
+	        base.FreezeResolution();
+	    }
 
-		[Test]
+	    [Test]
 		public void Has_Content_LegacySchema()
 		{
 			SetupForLegacy();

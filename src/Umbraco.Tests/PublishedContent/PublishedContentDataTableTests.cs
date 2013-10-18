@@ -6,6 +6,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 
@@ -20,8 +21,14 @@ namespace Umbraco.Tests.PublishedContent
 		public override void Initialize()
 		{
 			base.Initialize();
-			//need to specify a different callback for testing
-			Umbraco.Web.PublishedContentExtensions.GetPropertyAliasesAndNames = s =>
+
+            // need to specify a custom callback for unit tests
+            // AutoPublishedContentTypes generates properties automatically
+            var type = new AutoPublishedContentType(0, "anything", new PublishedPropertyType[] {});
+            PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
+
+            // need to specify a different callback for testing
+			PublishedContentExtensions.GetPropertyAliasesAndNames = s =>
 				{
 					var userFields = new Dictionary<string, string>()
 						{
@@ -118,12 +125,13 @@ namespace Umbraco.Tests.PublishedContent
 
 		private IPublishedContent GetContent(bool createChildren, int indexVals)
 		{
+		    var contentTypeAlias = createChildren ? "Parent" : "Child";
 			var d = new TestPublishedContent
 				{
 					CreateDate = DateTime.Now,
 					CreatorId = 1,
 					CreatorName = "Shannon",
-					DocumentTypeAlias = createChildren? "Parent" : "Child",
+                    DocumentTypeAlias = contentTypeAlias,
 					DocumentTypeId = 2,
 					Id = 3,
 					SortOrder = 4,
@@ -137,8 +145,8 @@ namespace Umbraco.Tests.PublishedContent
 					WriterName = "Shannon",
 					Parent = null,
 					Level = 1,
-					Properties = new Collection<IPublishedContentProperty>(
-						new List<IPublishedContentProperty>()
+					Properties = new Collection<IPublishedProperty>(
+						new List<IPublishedProperty>()
 							{
 								new PropertyResult("property1", "value" + indexVals, Guid.NewGuid(), PropertyResultType.UserProperty),
 								new PropertyResult("property2", "value" + (indexVals + 1), Guid.NewGuid(), PropertyResultType.UserProperty)
@@ -166,50 +174,81 @@ namespace Umbraco.Tests.PublishedContent
 			return d;
 		}
 
+        // note - could probably rewrite those tests using SolidPublishedContentCache
+        // l8tr...
+	    private class TestPublishedContent : IPublishedContent
+	    {
+	        public string Url { get; set; }
+	        public PublishedItemType ItemType { get; set; }
 
-		private class TestPublishedContent : IPublishedContent
-		{
-			public string Url { get; set; }
-			public PublishedItemType ItemType { get; set; }
+	        IPublishedContent IPublishedContent.Parent
+	        {
+	            get { return Parent; }
+	        }
 
-			IPublishedContent IPublishedContent.Parent
-			{
-				get { return Parent; }
-			}
-			IEnumerable<IPublishedContent> IPublishedContent.Children
-			{
-				get { return Children; }
-			}
-			public IPublishedContent Parent { get; set; }
-			public int Id { get; set; }
-			public int TemplateId { get; set; }
-			public int SortOrder { get; set; }
-			public string Name { get; set; }
-			public string UrlName { get; set; }
-			public string DocumentTypeAlias { get; set; }
-			public int DocumentTypeId { get; set; }
-			public string WriterName { get; set; }
-			public string CreatorName { get; set; }
-			public int WriterId { get; set; }
-			public int CreatorId { get; set; }
-			public string Path { get; set; }
-			public DateTime CreateDate { get; set; }
-			public DateTime UpdateDate { get; set; }
-			public Guid Version { get; set; }
-			public int Level { get; set; }
-			public ICollection<IPublishedContentProperty> Properties { get; set; }
+	        IEnumerable<IPublishedContent> IPublishedContent.Children
+	        {
+	            get { return Children; }
+	        }
 
-			public object this[string propertyAlias]
-			{
-				get { return GetProperty(propertyAlias).Value; }
-			}
+	        public IPublishedContent Parent { get; set; }
+	        public int Id { get; set; }
+	        public int TemplateId { get; set; }
+	        public int SortOrder { get; set; }
+	        public string Name { get; set; }
+	        public string UrlName { get; set; }
+	        public string DocumentTypeAlias { get; set; }
+	        public int DocumentTypeId { get; set; }
+	        public string WriterName { get; set; }
+	        public string CreatorName { get; set; }
+	        public int WriterId { get; set; }
+	        public int CreatorId { get; set; }
+	        public string Path { get; set; }
+	        public DateTime CreateDate { get; set; }
+	        public DateTime UpdateDate { get; set; }
+	        public Guid Version { get; set; }
+	        public int Level { get; set; }
+            public bool IsDraft { get; set; }
+            public int GetIndex() { throw new NotImplementedException();}
+            
+            public ICollection<IPublishedProperty> Properties { get; set; }
 
-			public IEnumerable<IPublishedContent> Children { get; set; }
-			public IPublishedContentProperty GetProperty(string alias)
-			{
-				return Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
-			}
-		}
+	        public object this[string propertyAlias]
+	        {
+                get { return GetProperty(propertyAlias).Value; }
+	        }
 
+	        public IEnumerable<IPublishedContent> Children { get; set; }
+
+	        public IPublishedProperty GetProperty(string alias)
+	        {
+	            return Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
+	        }
+
+	        public IPublishedProperty GetProperty(string alias, bool recurse)
+	        {
+	            var property = GetProperty(alias);
+	            if (recurse == false) return property;
+
+	            IPublishedContent content = this;
+	            while (content != null && (property == null || property.HasValue == false))
+	            {
+	                content = content.Parent;
+	                property = content == null ? null : content.GetProperty(alias);
+	            }
+
+	            return property;
+	        }
+
+	        public IEnumerable<IPublishedContent> ContentSet
+	        {
+	            get { throw new NotImplementedException(); }
+	        }
+
+            public PublishedContentType ContentType 
+            {
+                get { throw new NotImplementedException(); }
+            }
+	    }
 	}
 }

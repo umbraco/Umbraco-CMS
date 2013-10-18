@@ -201,9 +201,9 @@ namespace Umbraco.Core.Dynamics
 
 			//this is the result of an extension method execution gone wrong so we return dynamic null
 			if (attempt.Result.Reason == DynamicInstanceHelper.TryInvokeMemberSuccessReason.FoundExtensionMethod
-				&& attempt.Error != null && attempt.Error is TargetInvocationException)
+				&& attempt.Exception != null && attempt.Exception is TargetInvocationException)
 			{
-				result = new DynamicNull();
+				result = DynamicNull.Null;
 				return true;
 			}
 
@@ -261,7 +261,7 @@ namespace Umbraco.Core.Dynamics
             var attributes = xmlElement.Attributes(name).Select(attr => attr.Value).ToArray();
             if (attributes.Any())
             {
-                return new Attempt<IEnumerable<string>>(true, attributes);
+                return Attempt<IEnumerable<string>>.Succeed(attributes);
             }
 
             if (!attributes.Any() && xmlElement.Name == "root" && xmlElement.Elements().Count() == 1)
@@ -271,12 +271,12 @@ namespace Umbraco.Core.Dynamics
                 if (childElements.Any())
                 {
                     //we've found a match by the first child of an element called 'root' (strange, but sure)
-                    return new Attempt<IEnumerable<string>>(true, childElements);
+                    return Attempt<IEnumerable<string>>.Succeed(childElements);
                 }
             }            
 
             //no deal
-            return Attempt<IEnumerable<string>>.False;
+            return Attempt<IEnumerable<string>>.Fail();
 	    }
 
 	    /// <summary>
@@ -293,7 +293,7 @@ namespace Umbraco.Core.Dynamics
             //Check if we've got any matches, if so then return true
             if (elements.Any())
             {
-                return new Attempt<IEnumerable<XElement>>(true, elements);
+                return Attempt<IEnumerable<XElement>>.Succeed(elements);
             }
 
             if (!elements.Any() && xmlElement.Name == "root" && xmlElement.Elements().Count() == 1)
@@ -303,12 +303,12 @@ namespace Umbraco.Core.Dynamics
                 if (childElements.Any())
                 {
                     //we've found a match by the first child of an element called 'root' (strange, but sure)
-                    return new Attempt<IEnumerable<XElement>>(true, childElements);
+                    return Attempt<IEnumerable<XElement>>.Succeed(childElements);
                 }
             }
             
             //no deal
-            return Attempt<IEnumerable<XElement>>.False;
+            return Attempt<IEnumerable<XElement>>.Fail();
         }
 
         private bool HandleIEnumerableXElement(IEnumerable<XElement> elements, out object result)

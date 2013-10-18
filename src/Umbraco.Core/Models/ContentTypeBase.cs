@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
@@ -42,6 +43,7 @@ namespace Umbraco.Core.Models
             _allowedContentTypes = new List<ContentTypeSort>();
             _propertyGroups = new PropertyGroupCollection();
             _propertyTypes = new PropertyTypeCollection();
+            _additionalData = new Dictionary<string, object>();
         }
 
 		protected ContentTypeBase(IContentTypeBase parent)
@@ -52,6 +54,7 @@ namespace Umbraco.Core.Models
 			_allowedContentTypes = new List<ContentTypeSort>();
 			_propertyGroups = new PropertyGroupCollection();
             _propertyTypes = new PropertyTypeCollection();
+            _additionalData = new Dictionary<string, object>();
 		}
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<ContentTypeBase, string>(x => x.Name);
@@ -314,6 +317,16 @@ namespace Umbraco.Core.Models
             }
         }
 
+        private readonly IDictionary<string, object> _additionalData;
+        /// <summary>
+        /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        IDictionary<string, object> IUmbracoEntity.AdditionalData
+        {
+            get { return _additionalData; }
+        }
+
         /// <summary>
         /// Gets or sets a list of integer Ids for allowed ContentTypes
         /// </summary>
@@ -493,6 +506,75 @@ namespace Umbraco.Core.Models
         public void SetLazyParentId(Lazy<int> id)
         {
             _parentId = id;
+        }
+
+        /// <summary>
+        /// PropertyTypes that are not part of a PropertyGroup
+        /// </summary>
+        [IgnoreDataMember]
+        internal PropertyTypeCollection PropertyTypeCollection
+        {
+             get { return _propertyTypes; }
+        }
+
+        /// <summary>
+        /// Indicates whether a specific property on the current <see cref="IContent"/> entity is dirty.
+        /// </summary>
+        /// <param name="propertyName">Name of the property to check</param>
+        /// <returns>True if Property is dirty, otherwise False</returns>
+        public override bool IsPropertyDirty(string propertyName)
+        {
+            bool existsInEntity = base.IsPropertyDirty(propertyName);
+
+            bool anyDirtyGroups = PropertyGroups.Any(x => x.IsPropertyDirty(propertyName));
+            bool anyDirtyTypes = PropertyTypes.Any(x => x.IsPropertyDirty(propertyName));
+
+            return existsInEntity || anyDirtyGroups || anyDirtyTypes;
+        }
+
+        /// <summary>
+        /// Indicates whether the current entity is dirty.
+        /// </summary>
+        /// <returns>True if entity is dirty, otherwise False</returns>
+        public override bool IsDirty()
+        {
+            bool dirtyEntity = base.IsDirty();
+
+            bool dirtyGroups = PropertyGroups.Any(x => x.IsDirty());
+            bool dirtyTypes = PropertyTypes.Any(x => x.IsDirty());
+
+            return dirtyEntity || dirtyGroups || dirtyTypes;
+        }
+
+        /// <summary>
+        /// Resets dirty properties by clearing the dictionary used to track changes.
+        /// </summary>
+        /// <remarks>
+        /// Please note that resetting the dirty properties could potentially
+        /// obstruct the saving of a new or updated entity.
+        /// </remarks>
+        public override void ResetDirtyProperties()
+        {
+            base.ResetDirtyProperties();
+
+            //loop through each property group to reset the property types
+            var propertiesReset = new List<int>();
+
+            foreach (var propertyGroup in PropertyGroups)
+            {
+                propertyGroup.ResetDirtyProperties();
+                foreach (var propertyType in propertyGroup.PropertyTypes)
+                {
+                    propertyType.ResetDirtyProperties();
+                    propertiesReset.Add(propertyType.Id);
+                }
+            }
+            //then loop through our property type collection since some might not exist on a property group
+            //but don't re-reset ones we've already done.
+            foreach (var propertyType in PropertyTypes.Where(x => propertiesReset.Contains(x.Id) == false))
+            {
+                propertyType.ResetDirtyProperties();
+            }
         }
     }
 }

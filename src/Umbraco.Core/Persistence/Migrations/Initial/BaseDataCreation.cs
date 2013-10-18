@@ -129,6 +129,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1041, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1041", SortOrder = 2, UniqueId = new Guid("b6b73142-b9c1-4bf8-a16d-e1c23320b549"), Text = "Tags", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1042, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1042", SortOrder = 2, UniqueId = new Guid("0a452bd5-83f9-4bc3-8403-1286e13fb77e"), Text = "Macro Container", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1043, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1043", SortOrder = 2, UniqueId = new Guid("1df9f033-e6d4-451f-b8d2-e0cbc50a836f"), Text = "Image Cropper", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
+            _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1044, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1044", SortOrder = 0, UniqueId = new Guid("d59be02f-1df9-4228-aa1e-01917d806cda"), Text = Constants.Conventions.MemberTypes.Member, NodeObjectType = new Guid(Constants.ObjectTypes.MemberType), CreateDate = DateTime.Now });
         }
 
         private void CreateCmsContentTypeData()
@@ -136,6 +137,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 532, NodeId = 1031, Alias = Constants.Conventions.MediaTypes.Folder, Icon = "folder.gif", Thumbnail = "folder.png", IsContainer = true, AllowAtRoot = true });
             _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 533, NodeId = 1032, Alias = Constants.Conventions.MediaTypes.Image, Icon = "mediaPhoto.gif", Thumbnail = "mediaPhoto.png" });
             _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 534, NodeId = 1033, Alias = Constants.Conventions.MediaTypes.File, Icon = "mediaFile.gif", Thumbnail = "mediaFile.png" });
+            _database.Insert("cmsContentType", "pk", false, new ContentTypeDto { PrimaryKey = 531, NodeId = 1044, Alias = Constants.Conventions.MemberTypes.Member, Icon = "member.gif", Thumbnail = "folder.png" });
         }
 
         private void CreateUmbracoUserData()
@@ -146,7 +148,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         
         private void CreateUmbracoUserTypeData()
         {
-            _database.Insert("umbracoUserType", "id", false, new UserTypeDto { Id = 1, Alias = "admin", Name = "Administrators", DefaultPermissions = "CADMOSKTPIURZ:5F" });
+            _database.Insert("umbracoUserType", "id", false, new UserTypeDto { Id = 1, Alias = "admin", Name = "Administrators", DefaultPermissions = "CADMOSKTPIURZ:5F7" });
             _database.Insert("umbracoUserType", "id", false, new UserTypeDto { Id = 2, Alias = "writer", Name = "Writer", DefaultPermissions = "CAH:F" });
             _database.Insert("umbracoUserType", "id", false, new UserTypeDto { Id = 3, Alias = "editor", Name = "Editors", DefaultPermissions = "CADMOSKTPUZ:5F" });
             _database.Insert("umbracoUserType", "id", false, new UserTypeDto { Id = 4, Alias = "translator", Name = "Translator", DefaultPermissions = "AF" });
@@ -223,8 +225,6 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 4, DataTypeId = -88, ControlId = new Guid(Constants.PropertyEditors.Textbox), DbType = "Nvarchar" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 5, DataTypeId = -89, ControlId = new Guid(Constants.PropertyEditors.TextboxMultiple), DbType = "Ntext" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 6, DataTypeId = -90, ControlId = new Guid(Constants.PropertyEditors.UploadField), DbType = "Nvarchar" });
-            //Dropdown list
-            //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 12, DataTypeId = -91, ControlId = new Guid("a74ea9c9-8e18-4d2a-8cf6-73c6206c5da6"), DbType = "Nvarchar" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 7, DataTypeId = -92, ControlId = new Guid(Constants.PropertyEditors.NoEdit), DbType = "Nvarchar" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 8, DataTypeId = -36, ControlId = new Guid(Constants.PropertyEditors.DateTime), DbType = "Date" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 9, DataTypeId = -37, ControlId = new Guid(Constants.PropertyEditors.ColorPicker), DbType = "Nvarchar" });
@@ -234,24 +234,6 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 13, DataTypeId = -41, ControlId = new Guid(Constants.PropertyEditors.Date), DbType = "Date" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 14, DataTypeId = -42, ControlId = new Guid(Constants.PropertyEditors.DropDownList), DbType = "Integer" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 15, DataTypeId = -43, ControlId = new Guid(Constants.PropertyEditors.CheckBoxList), DbType = "Nvarchar" });
-            // Fix for rich text editor backwards compatibility -> 83722133-f80c-4273-bdb6-1befaa04a612 TinyMCE DataType
-            //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 22, DataTypeId = -44, ControlId = new Guid("a3776494-0574-4d93-b7de-efdfdec6f2d1"), DbType = "Ntext" });
-            //Radiobutton list
-            //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 23, DataTypeId = -128, ControlId = new Guid("a52c7c1c-c330-476e-8605-d63d3b84b6a6"), DbType = "Nvarchar" });
-            //Dropdown list multiple
-            //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 24, DataTypeId = -129, ControlId = new Guid("928639ed-9c73-4028-920c-1e55dbb68783"), DbType = "Nvarchar" });
-            //Dropdown list
-            //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 25, DataTypeId = -130, ControlId = new Guid("a74ea9c9-8e18-4d2a-8cf6-73c6206c5da6"), DbType = "Nvarchar" });
-            //Dropdown list
-            //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 26, DataTypeId = -131, ControlId = new Guid("a74ea9c9-8e18-4d2a-8cf6-73c6206c5da6"), DbType = "Nvarchar" });
-            //Dropdown list
-            //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 27, DataTypeId = -132, ControlId = new Guid("a74ea9c9-8e18-4d2a-8cf6-73c6206c5da6"), DbType = "Nvarchar" });
-            //No edit
-            //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 28, DataTypeId = -133, ControlId = new Guid("6c738306-4c17-4d88-b9bd-6546f3771597"), DbType = "Ntext" });
-            //Dropdown list multiple
-            //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 29, DataTypeId = -134, ControlId = new Guid("928639ed-9c73-4028-920c-1e55dbb68783"), DbType = "Nvarchar" });
-            //Not found - maybe a legacy thing?
-            //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 30, DataTypeId = -50, ControlId = new Guid("aaf99bb2-dbbe-444d-a296-185076bf0484"), DbType = "Date" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 16, DataTypeId = 1034, ControlId = new Guid(Constants.PropertyEditors.ContentPicker), DbType = "Integer" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 17, DataTypeId = 1035, ControlId = new Guid(Constants.PropertyEditors.MediaPicker), DbType = "Integer" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 18, DataTypeId = 1036, ControlId = new Guid(Constants.PropertyEditors.MemberPicker), DbType = "Integer" });

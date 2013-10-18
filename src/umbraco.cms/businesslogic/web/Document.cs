@@ -132,7 +132,8 @@ namespace umbraco.cms.businesslogic.web
         #region Constants and Static members
         
         private const string SqlOptimizedForPreview = @"
-                select umbracoNode.id, umbracoNode.parentId, umbracoNode.level, umbracoNode.sortOrder, cmsDocument.versionId, cmsPreviewXml.xml from cmsDocument
+                select umbracoNode.id, umbracoNode.parentId, umbracoNode.level, umbracoNode.sortOrder, cmsDocument.versionId, cmsPreviewXml.xml, cmsDocument.published
+                from cmsDocument
                 inner join umbracoNode on umbracoNode.id = cmsDocument.nodeId
                 inner join cmsPreviewXml on cmsPreviewXml.nodeId = cmsDocument.nodeId and cmsPreviewXml.versionId = cmsDocument.versionId
                 where newest = 1 and trashed = 0 and path like '{0}'
@@ -428,48 +429,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Obsolete, Use Umbraco.Core.Services.ContentService.RePublishAll()", false)]
         public static void RePublishAll()
         {
-            var xd = new XmlDocument();
-
-            //Remove all Documents (not media or members), only Documents are stored in the cmsDocument table
-            SqlHelper.ExecuteNonQuery(@"DELETE FROM cmsContentXml WHERE nodeId IN
-                                        (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
-                                            INNER JOIN cmsDocument ON cmsContentXml.nodeId = cmsDocument.nodeId)");
-            
-            var dr = SqlHelper.ExecuteReader("select nodeId from cmsDocument where published = 1");
-
-            while (dr.Read())
-            {
-                try
-                {
-                    //create the document in optimized mode! 
-                    // (not sure why we wouldn't always do that ?!)
-
-                    new Document(true, dr.GetInt("nodeId"))
-                        .XmlGenerate(xd);
-
-                    //The benchmark results that I found based contructing the Document object with 'true' for optimized
-                    //mode, vs using the normal ctor. Clearly optimized mode is better!
-                    /*
-                     * The average page rendering time (after 10 iterations) for submitting /umbraco/dialogs/republish?xml=true when using 
-                     * optimized mode is
-                     * 
-                     * 0.060400555555556
-                     * 
-                     * The average page rendering time (after 10 iterations) for submitting /umbraco/dialogs/republish?xml=true when not
-                     * using optimized mode is
-                     * 
-                     * 0.107037777777778
-                     *                      
-                     * This means that by simply changing this to use optimized mode, it is a 45% improvement!
-                     * 
-                     */
-                }
-                catch (Exception ee)
-                {
-                    LogHelper.Error<Document>("Error generating xml", ee);                    
-                }
-            }
-            dr.Close();
+            ApplicationContext.Current.Services.ContentService.RePublishAll();
         }
 
         public static void RegeneratePreviews()
@@ -941,10 +901,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Don't use! Only used internally to support the legacy events", false)]
         internal Attempt<PublishStatus> SaveAndPublish(int userId)
         {
-            var result = new Attempt<PublishStatus>(false,
-                                                    new PublishStatus(Content,
-                                                                      PublishStatusType
-                                                                          .FailedCancelledByEvent));
+            var result = Attempt.Fail(new PublishStatus(Content, PublishStatusType.FailedCancelledByEvent));
             foreach (var property in GenericProperties)
             {
                 Content.SetValue(property.PropertyType.Alias, property.Value);
@@ -1069,10 +1026,10 @@ namespace umbraco.cms.businesslogic.web
                     return result;
                 }
 
-                return Attempt<PublishStatus>.False;
+                return Attempt<PublishStatus>.Fail();
             }
 
-            return Attempt<PublishStatus>.False;
+            return Attempt<PublishStatus>.Fail();
         }
 
         /// <summary>
@@ -1423,7 +1380,7 @@ namespace umbraco.cms.businesslogic.web
 
             IRecordsReader dr = SqlHelper.ExecuteReader(String.Format(SqlOptimizedForPreview, pathExp));
             while (dr.Read())
-                nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("versionId"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml")));
+                nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("versionId"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml"), !dr.GetBoolean("published")));
             dr.Close();
 
             return nodes;

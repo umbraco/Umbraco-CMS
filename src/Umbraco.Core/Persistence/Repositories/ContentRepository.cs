@@ -170,11 +170,54 @@ namespace Umbraco.Core.Persistence.Repositories
             return content;
         }
 
+        public override void DeleteVersion(Guid versionId)
+        {
+            var sql = new Sql()
+                .Select("*")
+                .From<DocumentDto>()
+                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, DocumentDto>(left => left.VersionId, right => right.VersionId)
+                .Where<ContentVersionDto>(x => x.VersionId == versionId)
+                .Where<DocumentDto>(x => x.Newest != true);
+            var dto = Database.Fetch<DocumentDto, ContentVersionDto>(sql).FirstOrDefault();
+
+            if(dto == null) return;
+
+            using (var transaction = Database.GetTransaction())
+            {
+                PerformDeleteVersion(dto.NodeId, versionId);
+
+                transaction.Complete();
+            }
+        }
+
+        public override void DeleteVersions(int id, DateTime versionDate)
+        {
+            var sql = new Sql()
+                .Select("*")
+                .From<DocumentDto>()
+                .InnerJoin<ContentVersionDto>().On<ContentVersionDto, DocumentDto>(left => left.VersionId, right => right.VersionId)
+                .Where<ContentVersionDto>(x => x.NodeId == id)
+                .Where<ContentVersionDto>(x => x.VersionDate < versionDate)
+                .Where<DocumentDto>(x => x.Newest != true);
+            var list = Database.Fetch<DocumentDto, ContentVersionDto>(sql);
+            if (list.Any() == false) return;
+
+            using (var transaction = Database.GetTransaction())
+            {
+                foreach (var dto in list)
+                {
+                    PerformDeleteVersion(id, dto.VersionId);
+                }
+
+                transaction.Complete();
+            }
+        }
+
         protected override void PerformDeleteVersion(int id, Guid versionId)
         {
             Database.Delete<PreviewXmlDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
-            Database.Delete<PropertyDataDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
-            Database.Delete<ContentVersionDto>("WHERE nodeId = @Id AND VersionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<PropertyDataDto>("WHERE contentNodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
+            Database.Delete<ContentVersionDto>("WHERE ContentId = @Id AND VersionId = @VersionId", new { Id = id, VersionId = versionId });
             Database.Delete<DocumentDto>("WHERE nodeId = @Id AND versionId = @VersionId", new { Id = id, VersionId = versionId });
         }
 
@@ -275,8 +318,9 @@ namespace Umbraco.Core.Persistence.Repositories
         protected override void PersistUpdatedItem(IContent entity)
         {
             var publishedState = ((Content) entity).PublishedState;
-            //A new version should only be created if published state (or language) has changed
-            bool shouldCreateNewVersion = (((ICanBeDirty)entity).IsPropertyDirty("Published") && publishedState != PublishedState.Unpublished) || ((ICanBeDirty)entity).IsPropertyDirty("Language");
+            
+            //check if we need to create a new version
+            bool shouldCreateNewVersion = entity.ShouldCreateNewVersion(publishedState);
             if (shouldCreateNewVersion)
             {
                 //Updates Modified date and Version Guid
@@ -327,7 +371,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //If Published state has changed then previous versions should have their publish state reset.
             //If state has been changed to unpublished the previous versions publish state should also be reset.
-            if (((ICanBeDirty)entity).IsPropertyDirty("Published") && (entity.Published || publishedState == PublishedState.Unpublished))
+            //if (((ICanBeDirty)entity).IsPropertyDirty("Published") && (entity.Published || publishedState == PublishedState.Unpublished))
+            if (entity.ShouldClearPublishedFlagForPreviousVersions(publishedState, shouldCreateNewVersion))            
             {
                 var publishedDocs = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND published = @IsPublished", new { Id = entity.Id, IsPublished = true });
                 foreach (var doc in publishedDocs)
@@ -338,19 +383,18 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
+            //Look up (newest) entries by id in cmsDocument table to set newest = false
+            var documentDtos = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND newest = @IsNewest", new { Id = entity.Id, IsNewest = true });
+            foreach (var documentDto in documentDtos)
+            {
+                var docDto = documentDto;
+                docDto.Newest = false;
+                Database.Update(docDto);
+            }
+
             var contentVersionDto = dto.ContentVersionDto;
             if (shouldCreateNewVersion)
             {
-                //Look up (newest) entries by id in cmsDocument table to set newest = false
-                //NOTE: This is only relevant when a new version is created, which is why its done inside this if-statement.
-                var documentDtos = Database.Fetch<DocumentDto>("WHERE nodeId = @Id AND newest = @IsNewest", new { Id = entity.Id, IsNewest = true });
-                foreach (var documentDto in documentDtos)
-                {
-                    var docDto = documentDto;
-                    docDto.Newest = false;
-                    Database.Update(docDto);
-                }
-
                 //Create a new version - cmsContentVersion
                 //Assumes a new Version guid and Version date (modified date) has been set
                 Database.Insert(contentVersionDto);
@@ -449,7 +493,19 @@ namespace Umbraco.Core.Persistence.Repositories
 
             foreach (var dto in dtos)
             {
-                yield return CreateContentFromDto(dto, dto.VersionId);
+                //Check in the cache first. If it exists there AND it is published
+                // then we can use that entity. Otherwise if it is not published (which can be the case
+                // because we only store the 'latest' entries in the cache which might not be the published
+                // version)
+                var fromCache = TryGetFromCache(dto.NodeId);
+                if (fromCache.Success && fromCache.Result.Published)
+                {
+                    yield return fromCache.Result;
+                }
+                else
+                {
+                    yield return CreateContentFromDto(dto, dto.VersionId);    
+                }
             }
         }
 
@@ -469,7 +525,7 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
-
+        
         /// <summary>
         /// Private method to create a content object from a DocumentDto, which is used by Get and GetByVersion.
         /// </summary>

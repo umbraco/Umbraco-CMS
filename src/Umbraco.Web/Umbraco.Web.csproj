@@ -101,9 +101,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\xmlrpcnet.2.5.0\lib\net20\CookComputing.XmlRpcV2.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=0.1.51.2941, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Examine, Version=0.1.52.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.51.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.52.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.6.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -149,6 +149,7 @@
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Data">
       <Name>System.Data</Name>
@@ -290,8 +291,22 @@
     <Compile Include="Cache\UserPermissionsCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Configuration\WebRouting.cs" />
+    <Compile Include="Controllers\ProfileController.cs" />
+    <Compile Include="Controllers\LoginStatusController.cs" />
     <Compile Include="Editors\MediaController.cs" />
     <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />
+    <Compile Include="Controllers\RegisterController.cs" />
+    <Compile Include="Models\ProfileModel.cs" />
+    <Compile Include="Models\LoginStatusModel.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\SimpleEditorValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\TextStringValueConverter.cs" />
+    <Compile Include="PublishedContentPropertyExtension.cs" />
+    <Compile Include="Models\UmbracoProperty.cs" />
+    <Compile Include="Mvc\MergeParentContextViewDataAttribute.cs" />
+    <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />
+    <Compile Include="Routing\ContentLastChanceFinderByNotFoundHandlers.cs" />
+    <Compile Include="Models\RegisterModel.cs" />
+    <Compile Include="Models\LoginModel.cs" />
     <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
     <Compile Include="Security\Providers\UsersMembershipProvider.cs" />
     <Compile Include="Standalone\ServiceContextManager.cs" />
@@ -332,7 +347,6 @@
     <Compile Include="Media\ImageUrlProviders\ImageUrlProvider.cs" />
     <Compile Include="Models\DynamicPublishedContent.cs" />
     <Compile Include="Models\DynamicPublishedContentList.cs" />
-    <Compile Include="Models\IOwnerCollectionAware.cs" />
     <Compile Include="Models\PartialViewMacroModel.cs" />
     <Compile Include="Models\PublishedContentBase.cs" />
     <Compile Include="Mvc\AreaRegistrationExtensions.cs" />
@@ -364,12 +378,14 @@
     <Compile Include="Mvc\IRenderMvcController.cs" />
     <Compile Include="Mvc\SurfaceRouteHandler.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\RoutesCache.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\UmbracoContextCache.cs" />
     <Compile Include="Routing\UrlProviderMode.cs" />
     <Compile Include="Search\ExamineIndexerModel.cs" />
     <Compile Include="Search\LuceneIndexerExtensions.cs" />
     <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="UI\CdfLogger.cs" />
+    <Compile Include="umbraco.presentation\CompatibilityHelper.cs" />
     <Compile Include="umbraco.presentation\LegacyClasses.cs" />
     <Compile Include="umbraco.presentation\umbraco\ActionHandlers\SimilarNodeNameComparer.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx.cs">
@@ -385,13 +401,17 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.designer.cs">
       <DependentUpon>AssignDomain2.aspx</DependentUpon>
     </Compile>
+    <Compile Include="UmbracoContextExtensions.cs" />
     <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="umbraco.presentation\umbraco\Trees\TranslateTreeNames.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
+    <Compile Include="UrlHelperRenderExtensions.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerResolver.cs" />
@@ -440,7 +460,7 @@
     <Compile Include="Mvc\SurfaceControllerFactory.cs" />
     <Compile Include="Mvc\PluginControllerMetadata.cs" />
     <Compile Include="Mvc\UmbracoPageResult.cs" />
-    <Compile Include="PropertyEditors\RteMacroRenderingPropertyEditorValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\RteMacroRenderingValueConverter.cs" />
     <Compile Include="RenderFieldCaseType.cs" />
     <Compile Include="RenderFieldEncodingType.cs" />
     <Compile Include="RouteCollectionExtensions.cs" />
@@ -568,7 +588,7 @@
     <Compile Include="umbraco.presentation\umbraco\ping.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\MacroPartialViewTasks.cs" />
+    <Compile Include="umbraco.presentation\umbraco\create\PartialViewMacrosTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\PartialViewTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\developer\Macros\editMacro.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -618,8 +638,8 @@
     <Compile Include="Mvc\ViewDataContainerExtensions.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedContentCache.cs" />
     <Compile Include="Routing\PublishedContentNotFoundHandler.cs" />
-    <Compile Include="Models\XmlPublishedContent.cs" />
-    <Compile Include="Models\XmlPublishedContentProperty.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\XmlPublishedContent.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\XmlPublishedProperty.cs" />
     <Compile Include="Mvc\Constants.cs" />
     <Compile Include="Mvc\FilteredControllerFactoriesResolver.cs" />
     <Compile Include="Mvc\IFilteredControllerFactory.cs" />
@@ -1780,6 +1800,7 @@
     <Compile Include="WebServices\UmbracoWebService.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="WebViewPageExtensions.cs" />
     <Content Include="umbraco.presentation\umbracobase\readme.txt" />
     <Content Include="umbraco.presentation\umbraco\controls\Tree\CustomTreeService.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx" />
@@ -1817,7 +1838,9 @@
     <Content Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericProperty.ascx" />
+    <Content Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericProperty.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\create\DLRScripting.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1841,9 +1864,7 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\republish.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\search.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\SendPublish.aspx" />
-    <Content Include="umbraco.presentation\umbraco\create\script.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="umbraco.presentation\umbraco\create\script.ascx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\InsertAnchor.aspx" />
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\insertChar.aspx" />
     <Content Include="umbraco.presentation\umbraco\webservices\TreeClientService.asmx" />
@@ -1872,9 +1893,13 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\importDocumenttype.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\insertMacro.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\insertTable.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\notifications.aspx" />
+    <Content Include="umbraco.presentation\umbraco\dialogs\notifications.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\protectPage.aspx" />
+    <Content Include="umbraco.presentation\umbraco\dialogs\protectPage.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\RegexWs.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx" />
@@ -1915,37 +1940,37 @@
     <Content Include="umbraco.presentation\umbraco\translation\preview.aspx" />
     <Content Include="umbraco.presentation\umbraco\translation\translationTasks.dtd" />
     <Content Include="umbraco.presentation\umbraco\translation\xml.aspx" />
-    <Content Include="umbraco.presentation\umbraco\create\content.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="umbraco.presentation\umbraco\create\content.ascx" />
     <Content Include="umbraco.presentation\umbraco\create\language.ascx">
       <SubType>UserControl</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\create\media.ascx" />
     <Content Include="umbraco.presentation\umbraco\create\member.ascx" />
-    <Content Include="umbraco.presentation\umbraco\create\nodeType.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="umbraco.presentation\umbraco\create\nodeType.ascx" />
     <Content Include="umbraco.presentation\umbraco\create\simple.ascx" />
-    <Content Include="umbraco.presentation\umbraco\create\xslt.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+    <Content Include="umbraco.presentation\umbraco\create\xslt.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\LatestEdits.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\developer\Macros\assemblyBrowser.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\autoDoc.aspx" />
-    <Content Include="umbraco.presentation\umbraco\developer\DataTypes\editDatatype.aspx" />
+    <Content Include="umbraco.presentation\umbraco\developer\DataTypes\editDatatype.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\getXsltStatus.asmx" />
     <Content Include="umbraco.presentation\umbraco\developer\Cache\viewCacheItem.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltInsertValueOf.aspx" />
     <Content Include="umbraco.presentation\umbraco\js\language.aspx" />
-    <Content Include="umbraco.presentation\umbraco\members\EditMember.aspx" />
+    <Content Include="umbraco.presentation\umbraco\members\EditMember.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx">
       <SubType>Form</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\members\EditMemberType.aspx" />
+    <Content Include="umbraco.presentation\umbraco\members\EditMemberType.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\schemas\umbraco.xsd">
       <SubType>Designer</SubType>
     </Content>
@@ -1955,7 +1980,9 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\users\EditUser.aspx" />
-    <Content Include="umbraco.presentation\umbraco\users\EditUserType.aspx" />
+    <Content Include="umbraco.presentation\umbraco\users\EditUserType.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <!--<Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx" />-->
     <Content Include="umbraco.presentation\umbraco\webService.asmx" />
     <Content Include="umbraco.presentation\umbraco\webservices\CacheRefresher.asmx">

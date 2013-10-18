@@ -9,11 +9,11 @@ using StackExchange.Profiling.MVCHelpers;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Dictionary;
-using Umbraco.Core.Dynamics;
 using Umbraco.Core.Logging;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Profiling;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Dictionary;
 using Umbraco.Web.Media;
@@ -21,13 +21,13 @@ using Umbraco.Web.Media.ThumbnailProviders;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
-using umbraco.businesslogic;
-using umbraco.cms.businesslogic;
 using umbraco.presentation.cache;
+using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
 
 
 namespace Umbraco.Web
@@ -73,9 +73,9 @@ namespace Umbraco.Web
                 new MasterControllerFactory(FilteredControllerFactoriesResolver.Current));
 
             //set the render view engine
-            ViewEngines.Engines.Add(new ProfilingViewEngine(new RenderViewEngine()));
+            ViewEngines.Engines.Add(new RenderViewEngine());
             //set the plugin view engine
-            ViewEngines.Engines.Add(new ProfilingViewEngine(new PluginViewEngine()));
+            ViewEngines.Engines.Add(new PluginViewEngine());
 
             //set model binder
             ModelBinders.Binders.Add(new KeyValuePair<Type, IModelBinder>(typeof(RenderModel), new RenderModelBinder()));
@@ -129,7 +129,16 @@ namespace Umbraco.Web
         /// <returns></returns>
         public override IBootManager Complete(Action<ApplicationContext> afterComplete)
         {
-            //set routes
+			//Wrap viewengines in the profiling engine
+	        IViewEngine[] engines = ViewEngines.Engines.Select(e => e).ToArray();
+			ViewEngines.Engines.Clear();
+	        foreach (var engine in engines)
+	        {
+		        var wrappedEngine = engine is ProfilingViewEngine ? engine : new ProfilingViewEngine(engine);
+		        ViewEngines.Engines.Add(wrappedEngine);
+	        }
+
+	        //set routes
             CreateRoutes();
 
             base.Complete(afterComplete);
@@ -280,10 +289,15 @@ namespace Umbraco.Web
             UmbracoApiControllerResolver.Current = new UmbracoApiControllerResolver(
                 PluginManager.Current.ResolveUmbracoApiControllers());
 
-            //the base creates the PropertyEditorValueConvertersResolver but we want to modify it in the web app and replace
-            //the TinyMcePropertyEditorValueConverter with the RteMacroRenderingPropertyEditorValueConverter
-            PropertyEditorValueConvertersResolver.Current.RemoveType<TinyMcePropertyEditorValueConverter>();
-            PropertyEditorValueConvertersResolver.Current.AddType<RteMacroRenderingPropertyEditorValueConverter>();
+            // both TinyMceValueConverter (in Core) and RteMacroRenderingValueConverter (in Web) will be
+            // discovered when CoreBootManager configures the converters. We HAVE to remove one of them
+            // here because there cannot be two converters for one property editor - and we want the full
+            // RteMacroRenderingValueConverter that converts macros, etc. So remove TinyMceValueConverter.
+            // (the limited one, defined in Core, is there for tests)
+            PropertyValueConvertersResolver.Current.RemoveType<TinyMceValueConverter>();
+            // same for other converters
+            PropertyValueConvertersResolver.Current.RemoveType<Core.PropertyEditors.ValueConverters.TextStringValueConverter>();
+            PropertyValueConvertersResolver.Current.RemoveType<Core.PropertyEditors.ValueConverters.SimpleEditorValueConverter>();
 
             PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
                 new PublishedCache.XmlPublishedCache.PublishedContentCache(),
@@ -302,23 +316,31 @@ namespace Umbraco.Web
                     typeof(DefaultUrlProvider)
                 );
 
-            // the legacy 404 will run from within ContentFinderByNotFoundHandlers below
-            // so for the time being there is no last chance finder
-			ContentLastChanceFinderResolver.Current = new ContentLastChanceFinderResolver();
+            ContentLastChanceFinderResolver.Current = new ContentLastChanceFinderResolver(
+                // handled by ContentLastChanceFinderByNotFoundHandlers for the time being
+                // soon as we get rid of INotFoundHandler support, we must enable this
+                //new ContentFinderByLegacy404()
+
+                // implement INotFoundHandler support... remove once we get rid of it
+                new ContentLastChanceFinderByNotFoundHandlers());
 
 			ContentFinderResolver.Current = new ContentFinderResolver(
-				// add all known resolvers in the correct order, devs can then modify this list
-                // on application startup either by binding to events or in their own global.asax
-						typeof (ContentFinderByPageIdQuery),
-						typeof (ContentFinderByNiceUrl),
-						typeof (ContentFinderByIdPath),
-                        // these will be handled by ContentFinderByNotFoundHandlers
-                        // so they can be enabled/disabled even though resolvers are not public yet
-						//typeof (ContentFinderByNiceUrlAndTemplate),
-						//typeof (ContentFinderByProfile),
-						//typeof (ContentFinderByUrlAlias),
-                        typeof (ContentFinderByNotFoundHandlers)
-					);
+                // all built-in finders in the correct order, devs can then modify this list
+                // on application startup via an application event handler.
+                typeof (ContentFinderByPageIdQuery),
+                typeof (ContentFinderByNiceUrl),
+                typeof (ContentFinderByIdPath),
+
+                // these will be handled by ContentFinderByNotFoundHandlers so they can be enabled/disabled
+                // via the config file... soon as we get rid of INotFoundHandler support, we must enable
+                // them here.
+                //typeof (ContentFinderByNiceUrlAndTemplate),
+                //typeof (ContentFinderByProfile),
+                //typeof (ContentFinderByUrlAlias),
+
+                // implement INotFoundHandler support... remove once we get rid of it
+                typeof (ContentFinderByNotFoundHandlers)
+			);
 
             SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
 

@@ -36,7 +36,9 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
                 }
                 else {
                     //this is a wrapper for CodeMirror
+                    this._editor.focus();
                     this._editor.setValue(code);
+                    this._editor.focus();
                 }
             },
             GetSelection: function(code) {
@@ -150,4 +152,3 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls.CodeEditor");
         return obj;
     };
 })(jQuery); 
-

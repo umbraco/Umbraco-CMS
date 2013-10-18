@@ -10,6 +10,7 @@ using System.Xml;
 using Umbraco.Core.Logging;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
+using umbraco.businesslogic.Exceptions;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.web;
@@ -17,7 +18,7 @@ using umbraco.presentation.channels.businesslogic;
 using umbraco.uicontrols;
 using umbraco.providers;
 using umbraco.cms.presentation.Trees;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using Umbraco.Core;
 
 namespace umbraco.cms.presentation.user
@@ -64,20 +65,22 @@ namespace umbraco.cms.presentation.user
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
-            int UID = int.Parse(Request.QueryString["id"]);
+            
+           int UID = int.Parse(Request.QueryString["id"]);
             u = BusinessLogic.User.GetUser(UID);
 
-            // do initial check for edit rights
+            //the true admin can only edit the true admin
             if (u.Id == 0 && CurrentUser.Id != 0)
             {
                 throw new Exception("Only the root user can edit the 'root' user (id:0)");
             }
-            else if (u.IsAdmin() && !CurrentUser.IsAdmin())
+
+            //only another admin can edit another admin (who is not the true admin)
+            if (u.IsAdmin() && CurrentUser.IsAdmin() == false)
             {
                 throw new Exception("Admin users can only be edited by admins");
             }
-
+            
             // check if canvas editing is enabled
             DefaultToLiveEditing.Visible = UmbracoSettings.EnableCanvasEditing;
 
@@ -348,16 +351,14 @@ namespace umbraco.cms.presentation.user
                 }
             }
         }
-
-        #region Web Form Designer generated code
-
+        
         protected override void OnInit(EventArgs e)
         {
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
             base.OnInit(e);
+
+            //lapps.SelectionMode = ListSelectionMode.Multiple;
+            lapps.RepeatLayout = RepeatLayout.Flow;
+            lapps.RepeatDirection = RepeatDirection.Vertical;
         }
 
         protected override void OnPreRender(EventArgs e)
@@ -366,22 +367,8 @@ namespace umbraco.cms.presentation.user
 
             ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/CMSNode.asmx"));
             //      ScriptManager.GetCurrent(Page).Services.Add(new ServiceReference("../webservices/legacyAjaxCalls.asmx"));
-
-
+            
         }
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-            //lapps.SelectionMode = ListSelectionMode.Multiple;
-            lapps.RepeatLayout = RepeatLayout.Flow;
-            lapps.RepeatDirection = RepeatDirection.Vertical;
-        }
-
-        #endregion
 
         /// <summary>
         /// Handles the Click event of the saveUser control.

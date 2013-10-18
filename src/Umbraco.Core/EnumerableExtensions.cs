@@ -13,16 +13,45 @@ namespace Umbraco.Core
     {
         public static IEnumerable<IEnumerable<T>> InGroupsOf<T>(this IEnumerable<T> source, int groupSize)
         {
-            var i = 0;
-            var length = source.Count();
+            if (source == null)
+               throw new NullReferenceException("source");
 
-            while ((i * groupSize) < length)
-            {
-                yield return source.Skip(i * groupSize).Take(groupSize);
-                i++;
-            }
+            // enumerate the source only once!
+            return new InGroupsEnumerator<T>(source, groupSize).Groups();
         }
 
+        // this class makes sure that the source is enumerated only ONCE
+        // which means that when it is enumerated, the actual groups content
+        // has to be evaluated at the same time, and stored in an array.
+        private class InGroupsEnumerator<T>
+        {
+            private readonly IEnumerator<T> _source;
+            private readonly int _count;
+            private bool _mightHaveNext;
+
+            public InGroupsEnumerator(IEnumerable<T> source, int count)
+            {
+                _source = source.GetEnumerator();
+                _count = count;
+                _mightHaveNext = true;
+            }
+
+            public IEnumerable<IEnumerable<T>> Groups()
+            {
+                while (_mightHaveNext && _source.MoveNext())
+                    yield return Group().ToArray(); // see note above
+            }
+
+            private IEnumerable<T> Group()
+            {
+                var c = 0;
+                do
+                {
+                    yield return _source.Current;
+                } while (++c < _count && _source.MoveNext());
+                _mightHaveNext = c == _count;
+            }
+        }
 
         /// <summary>The distinct by.</summary>
         /// <param name="source">The source.</param>
@@ -243,23 +272,45 @@ namespace Umbraco.Core
                 });
         }
 
-        ///<summary>Finds the index of the first item matching an expression in an enumerable.</summary>
-        ///<param name="items">The enumerable to search.</param>
-        ///<param name="predicate">The expression to test the items against.</param>
-        ///<returns>The index of the first matching item, or -1 if no items match.</returns>
+        /// <summary>
+        /// Finds the index of the first item matching an expression in an enumerable.
+        /// </summary>
+        /// <typeparam name="T">The type of the enumerated objects.</typeparam>
+        /// <param name="items">The enumerable to search.</param>
+        /// <param name="predicate">The expression to test the items against.</param>
+        /// <returns>The index of the first matching item, or -1.</returns>
         public static int FindIndex<T>(this IEnumerable<T> items, Func<T, bool> predicate)
+        {
+            return FindIndex(items, 0, predicate);
+        }
+
+        /// <summary>
+        /// Finds the index of the first item matching an expression in an enumerable.
+        /// </summary>
+        /// <typeparam name="T">The type of the enumerated objects.</typeparam>
+        /// <param name="items">The enumerable to search.</param>
+        /// <param name="startIndex">The index to start at.</param>
+        /// <param name="predicate">The expression to test the items against.</param>
+        /// <returns>The index of the first matching item, or -1.</returns>
+        public static int FindIndex<T>(this IEnumerable<T> items, int startIndex, Func<T, bool> predicate)
         {
             if (items == null) throw new ArgumentNullException("items");
             if (predicate == null) throw new ArgumentNullException("predicate");
+            if (startIndex < 0) throw new ArgumentOutOfRangeException("startIndex");
 
-            var retVal = 0;
+            var index = startIndex;
+            if (index > 0)
+                items = items.Skip(index);
+
             foreach (var item in items)
             {
-                if (predicate(item)) return retVal;
-                retVal++;
+                if (predicate(item)) return index;
+                index++;
             }
+
             return -1;
         }
+
         ///<summary>Finds the index of the first occurence of an item in an enumerable.</summary>
         ///<param name="items">The enumerable to search.</param>
         ///<param name="item">The item to find.</param>

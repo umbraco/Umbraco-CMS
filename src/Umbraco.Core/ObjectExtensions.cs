@@ -16,7 +16,6 @@ namespace Umbraco.Core
 {
 	public static class ObjectExtensions
 	{
-		
 		//private static readonly ConcurrentDictionary<Type, Func<object>> ObjectFactoryCache = new ConcurrentDictionary<Type, Func<object>>();
 
 		public static IEnumerable<T> AsEnumerableOfOne<T>(this T input)
@@ -58,14 +57,14 @@ namespace Umbraco.Core
                 try
                 {
                     var converted = (T) input;
-                    return new Attempt<T>(true, converted);
+                    return Attempt<T>.Succeed(converted);
                 }
                 catch (Exception e)
                 {
-                    return new Attempt<T>(e);
+                    return Attempt<T>.Fail(e);
                 }
             }
-			return !result.Success ? Attempt<T>.False : new Attempt<T>(true, (T)result.Result);
+			return !result.Success ? Attempt<T>.Fail() : Attempt<T>.Succeed((T)result.Result);
 		}
 
 		/// <summary>
@@ -77,14 +76,39 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		public static Attempt<object> TryConvertTo(this object input, Type destinationType)
 		{
-			if (input == null) return Attempt<object>.False;
+			if (input == null) return Attempt<object>.Fail();
 
-			if (destinationType == typeof(object)) return new Attempt<object>(true, input);
+			if (destinationType == typeof(object)) return Attempt.Succeed(input);
 
-			if (input.GetType() == destinationType) return new Attempt<object>(true, input);
+			if (input.GetType() == destinationType) return Attempt.Succeed(input);
 
-			if (!destinationType.IsGenericType || destinationType.GetGenericTypeDefinition() != typeof(Nullable<>))
+            //check for string so that overloaders of ToString() can take advantage of the conversion.
+            if (destinationType == typeof(string)) return Attempt<object>.Succeed(input.ToString());
+
+			// if we've got a nullable of something, we try to convert directly to that thing.
+			if (destinationType.IsGenericType && destinationType.GetGenericTypeDefinition() == typeof(Nullable<>))
 			{
+				// recursively call into myself with the inner (not-nullable) type and handle the outcome
+				var nonNullable = input.TryConvertTo(Nullable.GetUnderlyingType(destinationType));
+
+				// and if sucessful, fall on through to rewrap in a nullable; if failed, pass on the exception
+				if (nonNullable.Success)
+					input = nonNullable.Result; // now fall on through...
+				else
+					return Attempt<object>.Fail(nonNullable.Exception);
+			}
+
+			// we've already dealed with nullables, so any other generic types need to fall through
+			if (!destinationType.IsGenericType)
+			{
+				if (input is string)
+				{
+					var result = TryConvertToFromString(input as string, destinationType);
+
+					// if we processed the string (succeed or fail), we're done
+					if (result.HasValue) return result.Value;
+				}
+
                 //TODO: Do a check for destination type being IEnumerable<T> and source type implementing IEnumerable<T> with
                 // the same 'T', then we'd have to find the extension method for the type AsEnumerable() and execute it.
 
@@ -94,11 +118,11 @@ namespace Umbraco.Core
                     try
                     {
                         var casted = Convert.ChangeType(input, destinationType);
-                        return new Attempt<object>(true, casted);
+                        return Attempt.Succeed(casted);
                     }
                     catch (Exception e)
                     {
-                        return new Attempt<object>(e);
+                        return Attempt<object>.Fail(e);
                     }
 				}
 			}
@@ -109,11 +133,11 @@ namespace Umbraco.Core
 				try
 				{
 					var converted = inputConverter.ConvertTo(input, destinationType);
-					return new Attempt<object>(true, converted);
+					return Attempt.Succeed(converted);
 				}
 				catch (Exception e)
 				{
-					return new Attempt<object>(e);
+					return Attempt<object>.Fail(e);
 				}
 			}
 
@@ -125,11 +149,11 @@ namespace Umbraco.Core
 					try
 					{
 						var converted = boolConverter.ConvertFrom(input);
-						return new Attempt<object>(true, converted);
+						return Attempt.Succeed(converted);
 					}
 					catch (Exception e)
 					{
-						return new Attempt<object>(e);
+						return Attempt<object>.Fail(e);
 					}
 				}
 			}
@@ -140,29 +164,141 @@ namespace Umbraco.Core
 				try
 				{
 					var converted = outputConverter.ConvertFrom(input);
-					return new Attempt<object>(true, converted);
+					return Attempt.Succeed(converted);
 				}
 				catch (Exception e)
 				{
-					return new Attempt<object>(e);
+					return Attempt<object>.Fail(e);
 				}
 			}
-
 
 			if (TypeHelper.IsTypeAssignableFrom<IConvertible>(input))
 			{
 				try
 				{
 					var casted = Convert.ChangeType(input, destinationType);
-					return new Attempt<object>(true, casted);
+					return Attempt.Succeed(casted);
 				}
 				catch (Exception e)
 				{
-					return new Attempt<object>(e);
+					return Attempt<object>.Fail(e);
 				}
 			}
 
-			return Attempt<object>.False;
+			return Attempt<object>.Fail();
+		}
+
+		private static Nullable<Attempt<object>> TryConvertToFromString(this string input, Type destinationType)
+		{
+			if (destinationType == typeof(string))
+				return Attempt<object>.Succeed(input);
+
+			if (input == null || input.Length == 0)
+			{
+				if (destinationType == typeof(Boolean))
+					return Attempt<object>.Succeed(false);   // special case for booleans, null/empty == false
+				else if (destinationType == typeof(DateTime))
+					return Attempt<object>.Succeed(DateTime.MinValue);
+			}
+
+			// we have a non-empty string, look for type conversions in the expected order of frequency of use...
+			if (destinationType.IsPrimitive)
+			{
+				if (destinationType == typeof(Int32))
+				{
+					Int32 value;
+					return Int32.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+				}
+				else if (destinationType == typeof(Int64))
+				{
+					Int64 value;
+					return Int64.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+				}
+				else if (destinationType == typeof(Boolean))
+				{
+					Boolean value;
+					if (Boolean.TryParse(input, out value))
+						return Attempt<object>.Succeed(value);  // don't declare failure so the CustomBooleanTypeConverter can try
+				}
+				else if (destinationType == typeof(Int16))
+				{
+					Int16 value;
+					return Int16.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+				}
+				else if (destinationType == typeof(Double))
+				{
+					Double value;
+					return Double.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+				}
+				else if (destinationType == typeof(Single))
+				{
+					Single value;
+					return Single.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+				}
+				else if (destinationType == typeof(Char))
+				{
+					Char value;
+					return Char.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+				}
+				else if (destinationType == typeof(Byte))
+				{
+					Byte value;
+					return Byte.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+				}
+				else if (destinationType == typeof(SByte))
+				{
+					SByte value;
+					return SByte.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+				}
+				else if (destinationType == typeof(UInt32))
+				{
+					UInt32 value;
+					return UInt32.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+				}
+				else if (destinationType == typeof(UInt16))
+				{
+					UInt16 value;
+					return UInt16.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+				}
+				else if (destinationType == typeof(UInt64))
+				{
+					UInt64 value;
+					return UInt64.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+				}
+			}
+			else if (destinationType == typeof(Guid))
+			{
+				Guid value;
+				return Guid.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			}
+			else if (destinationType == typeof(DateTime))
+			{
+				DateTime value;
+				return DateTime.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			}
+			else if (destinationType == typeof(DateTimeOffset))
+			{
+				DateTimeOffset value;
+				return DateTimeOffset.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			}
+			else if (destinationType == typeof(TimeSpan))
+			{
+				TimeSpan value;
+				return TimeSpan.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			}
+			else if (destinationType == typeof(Decimal))
+			{
+				Decimal value;
+				return Decimal.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			}
+			else if (destinationType == typeof(Version))
+			{
+				Version value;
+				return Version.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			}
+			// E_NOTIMPL IPAddress, BigInteger
+
+			return null; // we can't decide...
 		}
 
 		internal static void CheckThrowObjectDisposed(this IDisposable disposable, bool isDisposed, string objectname)
@@ -286,7 +422,7 @@ namespace Umbraco.Core
 				{
 					return "\"{0}\"".InvariantFormat(obj);
 				}
-				if (obj is int || obj is Int16 || obj is Int64 || obj is double || obj is bool || obj is int? || obj is Int16? || obj is Int64? || obj is double? || obj is bool?)
+                if (obj is int || obj is Int16 || obj is Int64 || obj is float || obj is double || obj is bool || obj is int? || obj is Int16? || obj is Int64? || obj is float? || obj is double? || obj is bool?)
 				{
 					return "{0}".InvariantFormat(obj);
 				}
@@ -351,11 +487,11 @@ namespace Umbraco.Core
 			try
 			{
 				var output = value.ToXmlString(type);
-				return new Attempt<string>(true, output);
+				return Attempt.Succeed(output);
 			}
 			catch (NotSupportedException ex)
 			{
-				return new Attempt<string>(ex);
+				return Attempt<string>.Fail(ex);
 			}
 		}
 
@@ -413,6 +549,5 @@ namespace Umbraco.Core
 				return "[GetPropertyValueException]";
 			}
 		}
-
 	}
 }

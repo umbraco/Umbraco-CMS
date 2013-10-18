@@ -16,7 +16,7 @@ using umbraco.DataLayer;
 using System.Diagnostics;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.template;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.packager
 {
@@ -189,6 +189,7 @@ namespace umbraco.cms.businesslogic.packager
             string _packVersion = xmlHelper.GetNodeValue(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/package/version"));
             string _packReadme = xmlHelper.GetNodeValue(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/readme"));
             string _packLicense = xmlHelper.GetNodeValue(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/package/license "));
+            string _packUrl = xmlHelper.GetNodeValue(_packageConfig.DocumentElement.SelectSingleNode("/umbPackage/info/package/url "));
 
             bool _enableSkins = false;
             string _skinRepoGuid = "";
@@ -209,6 +210,7 @@ namespace umbraco.cms.businesslogic.packager
             insPack.Data.Version = _packVersion;
             insPack.Data.Readme = _packReadme;
             insPack.Data.License = _packLicense;
+            insPack.Data.Url = _packUrl;
 
             //skinning
             insPack.Data.EnableSkins = _enableSkins;
@@ -959,10 +961,10 @@ namespace umbraco.cms.businesslogic.packager
             if (path.Contains("[$"))
             {
                 //this is experimental and undocumented...
-                path = path.Replace("[$UMBRACO]", IO.SystemDirectories.Umbraco);
-                path = path.Replace("[$UMBRACOCLIENT]", IO.SystemDirectories.Umbraco_client);
-                path = path.Replace("[$CONFIG]", IO.SystemDirectories.Config);
-                path = path.Replace("[$DATA]", IO.SystemDirectories.Data);
+                path = path.Replace("[$UMBRACO]", SystemDirectories.Umbraco);
+                path = path.Replace("[$UMBRACOCLIENT]", SystemDirectories.UmbracoClient);
+                path = path.Replace("[$CONFIG]", SystemDirectories.Config);
+                path = path.Replace("[$DATA]", SystemDirectories.Data);
             }
 
             //to support virtual dirs we try to lookup the file... 

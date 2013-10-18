@@ -44,9 +44,9 @@
     <DocumentationFile>bin\Release\UmbracoExamine.PDF.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Examine, Version=0.1.51.2941, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Examine, Version=0.1.52.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.51.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.52.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib">
       <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>

@@ -27,7 +27,7 @@ namespace Umbraco.Web.Routing
             // legacy - umbOriginalUrl used by presentation/umbraco/urlRewriter/UrlRewriterFormWriter which handles <form action="..."
             // legacy - umbOriginalUrl also in Umbraco's back-end!
             _httpContext.Items["umbOriginalUrl"] = uri.AbsolutePath;
-            // legacy - umbPage used by default.aspx to get the "clean url"... whatever... fixme - we prob. don't want it anymore
+            // legacy - umbPage used by default.aspx to get the "clean url"... whatever...
             _httpContext.Items["UmbPage"] = uri.AbsolutePath;
             // legacy - virtualUrl used by presentation/template.cs to handle <form action="..."
             // legacy - virtualUrl used by presentation/umbraco/urlRewriter/UrlRewriterFormWriter which handles <form action="..." too

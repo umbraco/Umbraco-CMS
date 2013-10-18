@@ -14,9 +14,9 @@ namespace Umbraco.Core.Persistence
 	/// </remarks>
 	internal class DefaultDatabaseFactory : DisposableObject, IDatabaseFactory
 	{
-		private readonly string _connectionStringName;
-        private readonly string _connectionString;
-		private readonly string _providerName;
+	    private readonly string _connectionStringName;
+        public string ConnectionString { get; private set; }
+        public string ProviderName { get; private set; }
         
         //very important to have ThreadStatic:
         // see: http://issues.umbraco.org/issue/U4-2172
@@ -52,8 +52,8 @@ namespace Umbraco.Core.Persistence
 		{
 			Mandate.ParameterNotNullOrEmpty(connectionString, "connectionString");
 			Mandate.ParameterNotNullOrEmpty(providerName, "providerName");
-			_connectionString = connectionString;
-			_providerName = providerName;
+			ConnectionString = connectionString;
+			ProviderName = providerName;
 		}
 
 		public UmbracoDatabase CreateDatabase()
@@ -68,8 +68,8 @@ namespace Umbraco.Core.Persistence
 						//double check
                         if (_nonHttpInstance == null)
 						{
-                            _nonHttpInstance = string.IsNullOrEmpty(_connectionString) == false && string.IsNullOrEmpty(_providerName) == false
-						                          ? new UmbracoDatabase(_connectionString, _providerName)
+                            _nonHttpInstance = string.IsNullOrEmpty(ConnectionString) == false && string.IsNullOrEmpty(ProviderName) == false
+						                          ? new UmbracoDatabase(ConnectionString, ProviderName)
 						                          : new UmbracoDatabase(_connectionStringName);
 						}
 					}
@@ -81,8 +81,8 @@ namespace Umbraco.Core.Persistence
 			if (HttpContext.Current.Items.Contains(typeof(DefaultDatabaseFactory)) == false)
 			{
 			    HttpContext.Current.Items.Add(typeof (DefaultDatabaseFactory),
-			                                  string.IsNullOrEmpty(_connectionString) == false && string.IsNullOrEmpty(_providerName) == false
-			                                      ? new UmbracoDatabase(_connectionString, _providerName)
+			                                  string.IsNullOrEmpty(ConnectionString) == false && string.IsNullOrEmpty(ProviderName) == false
+			                                      ? new UmbracoDatabase(ConnectionString, ProviderName)
 			                                      : new UmbracoDatabase(_connectionStringName));
 			}
 			return (UmbracoDatabase)HttpContext.Current.Items[typeof(DefaultDatabaseFactory)];

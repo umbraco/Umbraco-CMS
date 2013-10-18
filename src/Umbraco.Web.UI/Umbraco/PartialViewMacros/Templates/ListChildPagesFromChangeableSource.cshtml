@@ -1,0 +1,21 @@
+@inherits Umbraco.Web.Macros.PartialViewMacroPage
+@*
+    === Macro Parameters To Create ===
+    Show:True   Alias:nodeId Name:Node ID    Type:Content Picker
+*@
+
+@if (Model.MacroParameters["startNodeID"] != null)
+{
+    @* Get the start node as a dynamic node *@
+    var startNode = Umbraco.Content(Model.MacroParameters["startNodeID"]);
+    
+    if (startNode.Children.Where("Visible").Any())
+    {
+        <ul>
+            @foreach (var page in startNode.Children.Where("Visible"))
+            { 
+                <li><a href="@page.Url">@page.Name</a></li>
+            }
+        </ul>
+    }    
+}

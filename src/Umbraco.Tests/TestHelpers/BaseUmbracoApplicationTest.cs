@@ -18,12 +18,15 @@ namespace Umbraco.Tests.TestHelpers
         {
             TestHelper.SetupLog4NetForTests();
             TestHelper.InitializeContentDirectories();
+            TestHelper.EnsureUmbracoSettingsConfig();
 
             SettingsForTests.UseLegacyXmlSchema = false;
             SettingsForTests.ForceSafeAliases = true;
             SettingsForTests.UmbracoLibraryCacheDuration = 1800;
             
             SetupPluginManager();
+
+            SetupApplicationContext();
 
             FreezeResolution();
         }
@@ -35,12 +38,13 @@ namespace Umbraco.Tests.TestHelpers
             SettingsForTests.Reset();
             UmbracoContext.Current = null;
             TestHelper.CleanContentDirectories();
+            TestHelper.CleanUmbracoSettingsConfig();
             //reset the app context, this should reset most things that require resetting like ALL resolvers
             ApplicationContext.Current.DisposeIfDisposable();
             ApplicationContext.Current = null;
             ResetPluginManager();
         }
-
+        
         /// <summary>
         /// By default this returns false which means the plugin manager will not be reset so it doesn't need to re-scan 
         /// all of the assemblies. Inheritors can override this if plugin manager resetting is required, generally needs

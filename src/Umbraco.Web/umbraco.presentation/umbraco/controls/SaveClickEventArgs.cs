@@ -8,7 +8,7 @@ using System.Web.UI.HtmlControls;
 using System.Collections;
 using System.Web.UI;
 using ClientDependency.Core;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.presentation;
 using System.Collections.Generic;
 using System.Linq;

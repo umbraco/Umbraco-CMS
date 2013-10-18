@@ -5,7 +5,9 @@ using System.Xml;
 using StackExchange.Profiling;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Web;
 using Umbraco.Core.Profiling;
+using Umbraco.Core.Strings;
 
 namespace umbraco
 {
@@ -68,8 +70,9 @@ namespace umbraco
                     }
                     else
                     {
-                        var recursiveVal = publishedContent.GetRecursiveValue(_fieldName);
-                        _fieldContent = recursiveVal.IsNullOrWhiteSpace() ? _fieldContent : recursiveVal;
+					    var pval = publishedContent.GetPropertyValue(_fieldName, true);
+					    var rval = pval == null ? string.Empty : pval.ToString();
+					    _fieldContent = rval.IsNullOrWhiteSpace() ? _fieldContent : rval;
                     }
                 }
                 else
@@ -179,7 +182,7 @@ namespace umbraco
                 else if (helper.FindAttribute(attributes, "case") == "upper")
                     _fieldContent = _fieldContent.ToUpper();
                 else if (helper.FindAttribute(attributes, "case") == "title")
-                    _fieldContent = _fieldContent.ConvertCase(StringAliasCaseType.PascalCase);
+                    _fieldContent = _fieldContent.ToCleanString(CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.PascalCase);
 
                 // OTHER FORMATTING FUNCTIONS
                 // If we use masterpages, this is moved to the ItemRenderer to add support for before/after in inline XSLT

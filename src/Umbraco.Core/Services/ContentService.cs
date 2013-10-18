@@ -13,6 +13,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Publishing;
 
@@ -250,6 +251,17 @@ namespace Umbraco.Core.Services
             }
         }
 
+        internal IEnumerable<IContent> GetPublishedContentOfContentType(int id)
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == id);
+                var contents = repository.GetByPublishedVersion(query);
+
+                return contents;
+            }
+        }
+
         /// <summary>
         /// Gets a collection of <see cref="IContent"/> objects by Level
         /// </summary>
@@ -428,6 +440,19 @@ namespace Umbraco.Core.Services
                 var contents = repository.GetByQuery(query);
 
                 return contents;
+            }
+        }
+
+        /// <summary>
+        /// Gets all published content items
+        /// </summary>
+        /// <returns></returns>
+        internal IEnumerable<IContent> GetAllPublished()
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IContent>.Builder.Where(x => x.Trashed == false);
+                return repository.GetByPublishedVersion(query);
             }
         }
 
@@ -775,15 +800,13 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Permanently deletes versions from an <see cref="IContent"/> object prior to a specific date.
+        /// This method will never delete the latest version of a content item.
         /// </summary>
         /// <param name="id">Id of the <see cref="IContent"/> object to delete versions from</param>
         /// <param name="versionDate">Latest version date</param>
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
         public void DeleteVersions(int id, DateTime versionDate, int userId = 0)
         {
-            //TODO: We should check if we are going to delete the most recent version because if that happens it means the 
-            // entity is completely deleted and we should raise the normal Deleting/Deleted event
-
             if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, dateToRetain: versionDate), this))
                 return;
 
@@ -801,6 +824,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Permanently deletes specific version(s) from an <see cref="IContent"/> object.
+        /// This method will never delete the latest version of a content item.
         /// </summary>
         /// <param name="id">Id of the <see cref="IContent"/> object to delete a version from</param>
         /// <param name="versionId">Id of the version to delete</param>
@@ -810,17 +834,14 @@ namespace Umbraco.Core.Services
         {
             using (new WriteLock(Locker))
             {
-                //TODO: We should check if we are going to delete the most recent version because if that happens it means the 
-                // entity is completely deleted and we should raise the normal Deleting/Deleted event
+                if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, specificVersion: versionId), this))
+                    return;
 
                 if (deletePriorVersions)
                 {
                     var content = GetByVersion(versionId);
                     DeleteVersions(id, content.UpdateDate, userId);
                 }
-
-                if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, specificVersion: versionId), this))
-                    return;
 
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentRepository(uow))
@@ -986,27 +1007,29 @@ namespace Umbraco.Core.Services
         /// </summary>
         public void EmptyRecycleBin()
         {
-            //TODO: Why don't we have a base class to share between MediaService/ContentService as some of this is exacty the same?
-
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            using (new WriteLock(Locker))
             {
-                var query = Query<IContent>.Builder.Where(x => x.Trashed == true);
-                var contents = repository.GetByQuery(query).OrderByDescending(x => x.Level);
+                List<int> ids;
+                List<string> files;
+                bool success;
+                var nodeObjectType = new Guid(Constants.ObjectTypes.Document);
 
-                foreach (var content in contents)
+                using (var repository = _repositoryFactory.CreateRecycleBinRepository(_uowProvider.GetUnitOfWork()))
                 {
-                    if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(content), this))
-                        continue;
+                    ids = repository.GetIdsOfItemsInRecycleBin(nodeObjectType);
+                    files = repository.GetFilesInRecycleBin(nodeObjectType);
 
-                    repository.Delete(content);
+                    if (EmptyingRecycleBin.IsRaisedEventCancelled(new RecycleBinEventArgs(nodeObjectType, ids, files), this))
+                        return;
 
-                    Deleted.RaiseEvent(new DeleteEventArgs<IContent>(content, false), this);
+                    success = repository.EmptyRecycleBin(nodeObjectType);
+                    if (success)
+                        repository.DeleteFiles(files);
                 }
-                uow.Commit();
-            }
 
-            Audit.Add(AuditTypes.Delete, "Empty Recycle Bin performed by user", 0, -20);
+                EmptiedRecycleBin.RaiseEvent(new RecycleBinEventArgs(nodeObjectType, ids, files, success), this);
+            }
+            Audit.Add(AuditTypes.Delete, "Empty Content Recycle Bin performed by user", 0, -20);
         }
 
         /// <summary>
@@ -1353,46 +1376,45 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentRepository(uow))
                 {
-                    if (contentTypeIds.Any() == false)
-                    {
-                        //Remove all Document records from the cmsContentXml table (DO NOT REMOVE Media/Members!)
-                        uow.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
-                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
-                                                    INNER JOIN cmsDocument ON cmsContentXml.nodeId = cmsDocument.nodeId)");
-                        
-                        //get all content items that are published
-                        //  Consider creating a Path query instead of recursive method:
-                        //  var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith("-1"));
-                        var rootContent = GetRootContent();
-                        foreach (var content in rootContent.Where(content => content.Published))
-                        {
-                            list.Add(content);
-                            list.AddRange(GetPublishedDescendants(content));
-                        }                        
-                    }
-                    else
-                    {
-                        foreach (var id in contentTypeIds)
-                        {
-                            //first we'll clear out the data from the cmsContentXml table for this type
-                            uow.Database.Execute(@"delete from cmsContentXml where nodeId in 
-(select cmsDocument.nodeId from cmsDocument 
-	inner join cmsContent on cmsDocument.nodeId = cmsContent.nodeId
-	where published = 1 and contentType = @contentTypeId)", new {contentTypeId = id});
+                    //First we're going to get the data that needs to be inserted before clearing anything, this 
+                    //ensures that we don't accidentally leave the content xml table empty if something happens
+                    //during the lookup process.
 
-                            //now get all published content objects of this type and add to the list
-                            list.AddRange(GetContentOfContentType(id).Where(content => content.Published));
-                        }
-                    }
+                    list.AddRange(contentTypeIds.Any() == false 
+                        ? GetAllPublished() 
+                        : contentTypeIds.SelectMany(GetPublishedContentOfContentType));
 
+                    var xmlItems = new List<ContentXmlDto>();
                     foreach (var c in list)
                     {
-                        //generate the xml
                         var xml = c.ToXml();
-                        //create the dto to insert
-                        var poco = new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) };
-                        //insert it into the database
-                        uow.Database.Insert(poco);
+                        xmlItems.Add(new ContentXmlDto {NodeId = c.Id, Xml = xml.ToString(SaveOptions.None)});
+                    }
+
+                    //Ok, now we need to remove the data and re-insert it, we'll do this all in one transaction too.
+                    using (var tr = uow.Database.GetTransaction())
+                    {
+                        if (contentTypeIds.Any() == false)
+                        {
+                            //Remove all Document records from the cmsContentXml table (DO NOT REMOVE Media/Members!)
+                            uow.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
+                                                    INNER JOIN cmsDocument ON cmsContentXml.nodeId = cmsDocument.nodeId)");
+                        }
+                        else
+                        {
+                            foreach (var id in contentTypeIds)
+                            {
+                                //first we'll clear out the data from the cmsContentXml table for this type
+                                uow.Database.Execute(@"delete from cmsContentXml where nodeId in 
+(select cmsDocument.nodeId from cmsDocument 
+	inner join cmsContent on cmsDocument.nodeId = cmsContent.nodeId
+	where published = 1 and contentType = @contentTypeId)", new { contentTypeId = id });
+                            }
+                        }
+
+                        //bulk insert it into the database
+                        uow.Database.BulkInsertRecords(xmlItems, tr);
                     }
                 }
                 Audit.Add(AuditTypes.Publish, "RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
@@ -1426,7 +1448,7 @@ namespace Umbraco.Core.Services
                         string.Format(
                             "Content '{0}' with Id '{1}' could not be published because its parent or one of its ancestors is not published.",
                             content.Name, content.Id));
-                    result.Add(new Attempt<PublishStatus>(false, new PublishStatus(content, PublishStatusType.FailedPathNotPublished)));
+                    result.Add(Attempt.Fail(new PublishStatus(content, PublishStatusType.FailedPathNotPublished)));
                     return result;
                 }
 
@@ -1436,7 +1458,12 @@ namespace Umbraco.Core.Services
                     LogHelper.Info<ContentService>(
                         string.Format("Content '{0}' with Id '{1}' could not be published because of invalid properties.",
                                       content.Name, content.Id));
-                    result.Add(new Attempt<PublishStatus>(false, new PublishStatus(content, PublishStatusType.FailedContentInvalid)));
+                    result.Add(
+                        Attempt.Fail(
+                            new PublishStatus(content, PublishStatusType.FailedContentInvalid)
+                                {
+                                    InvalidProperties = ((ContentBase) content).LastInvalidProperties
+                                }));
                     return result;
                 }
 
@@ -1538,7 +1565,7 @@ namespace Umbraco.Core.Services
             {
                 if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
                 {
-                    return new Attempt<PublishStatus>(false, new PublishStatus(content, PublishStatusType.FailedCancelledByEvent));
+                    return Attempt.Fail(new PublishStatus(content, PublishStatusType.FailedCancelledByEvent));
                 }
             }
 
@@ -1550,11 +1577,14 @@ namespace Umbraco.Core.Services
 
                 //Check if parent is published (although not if its a root node) - if parent isn't published this Content cannot be published
                 publishStatus.StatusType = CheckAndLogIsPublishable(content);
-                //Content contains invalid property values and can therefore not be published - fire event?
-                publishStatus.StatusType = CheckAndLogIsValid(content);
-                //set the invalid properties (if there are any)
-                publishStatus.InvalidProperties = ((ContentBase) content).LastInvalidProperties;
-
+                //if it is not successful, then check if the props are valid
+                if ((int)publishStatus.StatusType < 10)
+                {
+                    //Content contains invalid property values and can therefore not be published - fire event?
+                    publishStatus.StatusType = CheckAndLogIsValid(content);
+                    //set the invalid properties (if there are any)
+                    publishStatus.InvalidProperties = ((ContentBase)content).LastInvalidProperties;    
+                }
                 //if we're still successful, then publish using the strategy
                 if (publishStatus.StatusType == PublishStatusType.Success)
                 {
@@ -1608,7 +1638,7 @@ namespace Umbraco.Core.Services
 
                 Audit.Add(AuditTypes.Publish, "Save and Publish performed by user", userId, content.Id);
 
-                return new Attempt<PublishStatus>(publishStatus.StatusType == PublishStatusType.Success, publishStatus);
+                return Attempt.If(publishStatus.StatusType == PublishStatusType.Success, publishStatus);
 	        }	        	        
         }
 
@@ -1854,7 +1884,7 @@ namespace Umbraco.Core.Services
         /// Occurs after Create
         /// </summary>
         /// <remarks>
-        /// Please note that the Content object has been created, but not saved
+        /// Please note that the Content object has been created, but might not have been saved
         /// so it does not have an identity yet (meaning no Id has been set).
         /// </remarks>
         public static event TypedEventHandler<IContentService, NewEventArgs<IContent>> Created;
@@ -1908,6 +1938,16 @@ namespace Umbraco.Core.Services
         /// Occurs after Send to Publish
         /// </summary>
         public static event TypedEventHandler<IContentService, SendToPublishEventArgs<IContent>> SentToPublish;
+
+        /// <summary>
+        /// Occurs before the Recycle Bin is emptied
+        /// </summary>
+        public static event TypedEventHandler<IContentService, RecycleBinEventArgs> EmptyingRecycleBin;
+
+        /// <summary>
+        /// Occurs after the Recycle Bin has been Emptied
+        /// </summary>
+        public static event TypedEventHandler<IContentService, RecycleBinEventArgs> EmptiedRecycleBin;
         #endregion
     }
 }

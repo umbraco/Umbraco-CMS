@@ -28,6 +28,38 @@ namespace Umbraco.Core
         [UmbracoWillObsolete("Do not use this constants. See IShortStringHelper.CleanStringForSafeAliasJavaScriptCode.")]
         public const string UmbracoInvalidFirstCharacters = "01234567890";
 
+        private static readonly char[] ToCSharpHexDigitLower = "0123456789abcdef".ToCharArray();
+        private static readonly char[] ToCSharpEscapeChars;
+        
+        static StringExtensions()
+        {
+            var escapes = new[] { "\aa", "\bb", "\ff", "\nn", "\rr", "\tt", "\vv", "\"\"", "\\\\", "??", "\00" };
+            ToCSharpEscapeChars = new char[escapes.Max(e => e[0]) + 1];
+            foreach (var escape in escapes)
+                ToCSharpEscapeChars[escape[0]] = escape[1];
+        }
+
+        internal static string ReplaceNonAlphanumericChars(this string input, char replacement)
+        {
+            //any character that is not alphanumeric, convert to a hyphen
+            var mName = input;
+            foreach (var c in mName.ToCharArray().Where(c => !char.IsLetterOrDigit(c)))
+            {
+                mName = mName.Replace(c, replacement);
+            }
+            return mName;
+        }
+
+        public static string ExceptChars(this string str, HashSet<char> toExclude)
+        {
+            var sb = new StringBuilder(str.Length);
+            foreach (var c in str.Where(c => toExclude.Contains(c) == false))
+            {
+                sb.Append(c);
+            }
+            return sb.ToString();
+        }
+
 		/// <summary>
 		/// Encrypt the string using the MachineKey in medium trust
 		/// </summary>
@@ -749,8 +781,21 @@ namespace Umbraco.Core
         /// does initialise the resolver.</remarks>
         private static IShortStringHelper ShortStringHelper
         {
-            get { return ShortStringHelperResolver.HasCurrent ?  ShortStringHelperResolver.Current.Helper : new LegacyShortStringHelper(); }
+            get
+            {
+                if (ShortStringHelperResolver.HasCurrent)
+                    return ShortStringHelperResolver.Current.Helper;
+                if (_helper != null)
+                    return _helper;
+
+                // there *has* to be a short string helper, even if the resolver has not
+                // been initialized - used the default one with default configuration.
+                _helper = new DefaultShortStringHelper().WithConfig(allowLeadingDigits: true);
+                _helper.Freeze();
+                return _helper;
+            }
         }
+        private static IShortStringHelper _helper;
 
         /// <summary>
         /// Returns a new string in which all occurences of specified strings are replaced by other specified strings.
@@ -954,7 +999,7 @@ namespace Umbraco.Core
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <returns>The clean string.</returns>
         /// <remarks>The string is cleaned in the context of the IShortStringHelper default culture.</remarks>
-        public static string ToCleanString(string text, CleanStringType stringType)
+        public static string ToCleanString(this string text, CleanStringType stringType)
         {
             return ShortStringHelper.CleanString(text, stringType);
         }
@@ -968,7 +1013,7 @@ namespace Umbraco.Core
         /// <param name="separator">The separator.</param>
         /// <returns>The clean string.</returns>
         /// <remarks>The string is cleaned in the context of the IShortStringHelper default culture.</remarks>
-        public static string ToCleanString(string text, CleanStringType stringType, char separator)
+        public static string ToCleanString(this string text, CleanStringType stringType, char separator)
         {
             return ShortStringHelper.CleanString(text, stringType, separator);
         }
@@ -981,7 +1026,7 @@ namespace Umbraco.Core
         /// strings are cleaned up to camelCase and Ascii.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The clean string.</returns>
-        public static string ToCleanString(string text, CleanStringType stringType, CultureInfo culture)
+        public static string ToCleanString(this string text, CleanStringType stringType, CultureInfo culture)
         {
             return ShortStringHelper.CleanString(text, stringType, culture);
         }
@@ -995,7 +1040,7 @@ namespace Umbraco.Core
         /// <param name="separator">The separator.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The clean string.</returns>
-        public static string ToCleanString(string text, CleanStringType stringType, char separator, CultureInfo culture)
+        public static string ToCleanString(this string text, CleanStringType stringType, char separator, CultureInfo culture)
         {
             return ShortStringHelper.CleanString(text, stringType, separator, culture);
         }
@@ -1064,5 +1109,46 @@ namespace Umbraco.Core
 
             return source;
         }
+
+        /// <summary>
+        /// Converts a literal string into a C# expression.
+        /// </summary>
+        /// <param name="s">Current instance of the string.</param>
+        /// <returns>The string in a C# format.</returns>
+        public static string ToCSharpString(this string s)
+        {
+            if (s == null) return "<null>";
+
+            // http://stackoverflow.com/questions/323640/can-i-convert-a-c-sharp-string-value-to-an-escaped-string-literal
+
+            var sb = new StringBuilder(s.Length + 2);
+            for (var rp = 0; rp < s.Length; rp++)
+            {
+                var c = s[rp];
+                if (c < ToCSharpEscapeChars.Length && '\0' != ToCSharpEscapeChars[c])
+                    sb.Append('\\').Append(ToCSharpEscapeChars[c]);
+                else if ('~' >= c && c >= ' ')
+                    sb.Append(c);
+                else
+                    sb.Append(@"\x")
+                      .Append(ToCSharpHexDigitLower[c >> 12 & 0x0F])
+                      .Append(ToCSharpHexDigitLower[c >> 8 & 0x0F])
+                      .Append(ToCSharpHexDigitLower[c >> 4 & 0x0F])
+                      .Append(ToCSharpHexDigitLower[c & 0x0F]);
+            }
+
+            return sb.ToString();
+
+            // requires full trust
+            /*
+            using (var writer = new StringWriter())
+            using (var provider = CodeDomProvider.CreateProvider("CSharp"))
+            {
+                provider.GenerateCodeFromExpression(new CodePrimitiveExpression(s), writer, null);
+                return writer.ToString().Replace(string.Format("\" +{0}\t\"", Environment.NewLine), "");
+            }
+            */
+        }
+
     }
 }

@@ -13,6 +13,20 @@ namespace Umbraco.Web.WebApi
         private readonly ApplicationContext _applicationContext;
         private readonly UmbracoContext _umbracoContext;
 
+        private ApplicationContext GetApplicationContext()
+        {
+            return _applicationContext ?? ApplicationContext.Current;
+        }
+
+        private UmbracoContext GetUmbracoContext()
+        {
+            return _umbracoContext ?? UmbracoContext.Current;
+        }
+
+        /// <summary>
+        /// THIS SHOULD BE ONLY USED FOR UNIT TESTS
+        /// </summary>
+        /// <param name="umbracoContext"></param>
         public UmbracoAuthorizeAttribute(UmbracoContext umbracoContext)
         {
             if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
@@ -21,9 +35,7 @@ namespace Umbraco.Web.WebApi
         }
 
         public UmbracoAuthorizeAttribute()
-            : this(UmbracoContext.Current)
         {
-
         }
 
         protected override bool IsAuthorized(System.Web.Http.Controllers.HttpActionContext actionContext)
@@ -31,9 +43,10 @@ namespace Umbraco.Web.WebApi
             try
             {
                 //we need to that the app is configured and that a user is logged in
-                if (!_applicationContext.IsConfigured)
+                if (!GetApplicationContext().IsConfigured)
                     return false;
-                var isLoggedIn = _umbracoContext.Security.ValidateUserContextId(_umbracoContext.Security.UmbracoUserContextId);
+                var umbCtx = GetUmbracoContext();
+                var isLoggedIn = umbCtx.Security.ValidateUserContextId(umbCtx.Security.UmbracoUserContextId);
                 return isLoggedIn;
             }
             catch (Exception)

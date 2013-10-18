@@ -13,7 +13,7 @@ using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using System.Web.Security;
 using umbraco.businesslogic.Exceptions;
-using umbraco.IO;
+using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.web;
 using System.Linq;
 using Umbraco.Core;
@@ -161,14 +161,15 @@ namespace umbraco.cms.presentation
         /// Maps active directory account to umbraco user account
         /// </summary>
         /// <param name="loginName">Name of the login.</param>
+        /// <param name="email">Email address of the user</param>
         private void ActiveDirectoryMapping(string loginName, string email)
         {
             // Password is not copied over because it is stored in active directory for security!
             // The user is create with default access to content and as a writer user type
             if (BusinessLogic.User.getUserId(loginName) == -1)
             {
-                BusinessLogic.User.MakeNew(loginName, loginName, string.Empty, email, BusinessLogic.UserType.GetUserType(2));
-                BusinessLogic.User u = new BusinessLogic.User(loginName);
+                BusinessLogic.User.MakeNew(loginName, loginName, string.Empty, email ?? "", UserType.GetUserType(2));
+                var u = new User(loginName);
                 u.addApplication(Constants.Applications.Content);
             }
         }

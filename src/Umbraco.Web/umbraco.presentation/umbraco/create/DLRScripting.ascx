@@ -10,7 +10,7 @@ Filename (without extension): <asp:RequiredFieldValidator id="RequiredFieldValid
 <asp:ListBox id="filetype" Runat="server" Width="350" CssClass="bigInput" Rows="1" SelectionMode="Single" AutoPostBack="true" OnSelectedIndexChanged="loadTemplates"></asp:ListBox>
 </div>
 
-<div style="MARGIN-TOP: 10px">Choose a template:<br />
+<div style="MARGIN-TOP: 10px">Choose a snippet:<br /> 
 <asp:ListBox id="template" Runat="server" Width="350" CssClass="bigInput" Rows="1" SelectionMode="Single"></asp:ListBox>
 </div>
 </ContentTemplate>

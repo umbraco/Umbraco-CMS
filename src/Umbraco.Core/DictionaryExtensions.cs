@@ -131,30 +131,48 @@ namespace Umbraco.Core
 			return n;
 		}
 
-		/// <summary>
-		/// Returns a new dictionary of this ... others merged leftward.
-		/// </summary>
-		/// <typeparam name="T"></typeparam>
-		/// <typeparam name="TK"></typeparam>
-		/// <typeparam name="TV"></typeparam>
-		/// <param name="me"></param>
-		/// <param name="others"></param>
-		/// <returns></returns>
-		/// <remarks>
-		/// Reference: http://stackoverflow.com/questions/294138/merging-dictionaries-in-c
-		/// </remarks>
-		public static T MergeLeft<T, TK, TV>(this T me, params IDictionary<TK, TV>[] others)
-			where T : IDictionary<TK, TV>, new()
-		{
-			var newMap = new T();
-			foreach (var p in (new List<IDictionary<TK, TV>> { me }).Concat(others).SelectMany(src => src))
-			{
-				newMap[p.Key] = p.Value;
-			}
-			return newMap;
-		}
+	    /// <summary>
+	    /// Merges all key/values from the sources dictionaries into the destination dictionary
+	    /// </summary>
+	    /// <typeparam name="T"></typeparam>
+	    /// <typeparam name="TK"></typeparam>
+	    /// <typeparam name="TV"></typeparam>
+	    /// <param name="destination">The source dictionary to merge other dictionaries into</param>
+	    /// <param name="overwrite">
+	    /// By default all values will be retained in the destination if the same keys exist in the sources but 
+	    /// this can changed if overwrite = true, then any key/value found in any of the sources will overwritten in the destination. Note that
+	    /// it will just use the last found key/value if this is true.
+	    /// </param>
+	    /// <param name="sources">The other dictionaries to merge values from</param>
+        public static void MergeLeft<T, TK, TV>(this T destination, IEnumerable<IDictionary<TK, TV>> sources, bool overwrite = false)
+			where T : IDictionary<TK, TV>
+	    {
+	        foreach (var p in sources.SelectMany(src => src).Where(p => overwrite || destination.ContainsKey(p.Key) == false))
+	        {
+	            destination[p.Key] = p.Value;
+	        }
+	    }
 
-		/// <summary>
+        /// <summary>
+        /// Merges all key/values from the sources dictionaries into the destination dictionary
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="TK"></typeparam>
+        /// <typeparam name="TV"></typeparam>
+        /// <param name="destination">The source dictionary to merge other dictionaries into</param>
+        /// <param name="overwrite">
+        /// By default all values will be retained in the destination if the same keys exist in the sources but 
+        /// this can changed if overwrite = true, then any key/value found in any of the sources will overwritten in the destination. Note that
+        /// it will just use the last found key/value if this is true.
+        /// </param>
+        /// <param name="source">The other dictionary to merge values from</param>
+        public static void MergeLeft<T, TK, TV>(this T destination, IDictionary<TK, TV> source, bool overwrite = false)
+            where T : IDictionary<TK, TV>
+        {
+            destination.MergeLeft(new[] {source}, overwrite);
+        }
+
+	    /// <summary>
 		/// Returns the value of the key value based on the key, if the key is not found, a null value is returned
 		/// </summary>
 		/// <typeparam name="TKey">The type of the key.</typeparam>
@@ -185,6 +203,25 @@ namespace Umbraco.Core
 				return d[key].ToString();
 			}
 			return String.Empty;
+		}
+
+	    /// <summary>
+	    /// Returns the value of the key value based on the key as it's string value, if the key is not found or is an empty string, then the provided default value is returned
+	    /// </summary>
+	    /// <param name="d"></param>
+	    /// <param name="key"></param>
+	    /// <param name="defaultValue"></param>
+	    /// <returns></returns>
+	    public static string GetValueAsString<TKey, TVal>(this IDictionary<TKey, TVal> d, TKey key, string defaultValue)
+		{
+			if (d.ContainsKey(key))
+			{
+				var value = d[key].ToString();
+			    if (value != string.Empty)
+                    return value;
+			}
+			
+            return defaultValue;
 		}
 
 		/// <summary>contains key ignore case.</summary>

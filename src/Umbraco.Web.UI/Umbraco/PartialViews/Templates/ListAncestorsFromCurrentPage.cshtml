@@ -1,0 +1,16 @@
+@inherits Umbraco.Web.Mvc.UmbracoTemplatePage
+
+@* Check the current page has ancestors *@
+@if (CurrentPage.Ancestors().Any())
+{ 
+    <ul>
+        @* For each page in the ancestors collection which have been ordered by Level (so we start with the highest top node first) *@
+        @foreach (var page in CurrentPage.Ancestors().OrderBy("Level"))
+        {
+            <li><a href="@page.Url">@page.Name</a> &raquo;</li>
+        }
+
+        @* Display the current page as the last item in the list *@
+        <li>@CurrentPage.Name</li>
+    </ul>
+}

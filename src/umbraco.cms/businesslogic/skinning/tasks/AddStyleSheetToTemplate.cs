@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using umbraco.interfaces.skinning;
 using HtmlAgilityPack;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.skinning.tasks
 {
@@ -26,7 +23,7 @@ namespace umbraco.cms.businesslogic.skinning.tasks
 
 
             HtmlDocument doc = new HtmlDocument();
-            doc.Load(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
+            doc.Load(IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
 
             //if (doc.DocumentNode.SelectSingleNode(string.Format("//link [@href = '{0}']", Value)) == null)
             //{
@@ -50,7 +47,7 @@ namespace umbraco.cms.businesslogic.skinning.tasks
 
                     target.AppendChild(s);
 
-                    doc.Save(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
+                    doc.Save(IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
 
                     d.TaskExecutionStatus = TaskExecutionStatus.Completed;
                     d.NewValue = Value;
@@ -67,7 +64,7 @@ namespace umbraco.cms.businesslogic.skinning.tasks
         public override TaskExecutionStatus RollBack(string OriginalValue)
         {
             HtmlDocument doc = new HtmlDocument();
-            doc.Load(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
+            doc.Load(IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
 
             HtmlNode s = doc.DocumentNode.SelectSingleNode(string.Format("//link [@href = '{0}']", Value));
 
@@ -75,7 +72,7 @@ namespace umbraco.cms.businesslogic.skinning.tasks
             {
                 s.RemoveAll();
 
-                doc.Save(IO.IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
+                doc.Save(IOHelper.MapPath(SystemDirectories.Masterpages) + "/" + TargetFile);
 
                 return TaskExecutionStatus.Completed;
             }

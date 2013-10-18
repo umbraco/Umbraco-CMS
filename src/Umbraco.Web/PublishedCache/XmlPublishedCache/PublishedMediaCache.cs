@@ -12,6 +12,7 @@ using Umbraco.Core;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Models;
 using UmbracoExamine;
@@ -27,7 +28,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 	/// <remarks>
 	/// NOTE: In the future if we want to properly cache all media this class can be extended or replaced when these classes/interfaces are exposed publicly.
 	/// </remarks>
-	internal class PublishedMediaCache : IPublishedMediaCache
+    internal class PublishedMediaCache : IPublishedMediaCache
 	{
 		public PublishedMediaCache()
 		{			
@@ -91,6 +92,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         {
             throw new NotImplementedException("PublishedMediaCache does not support XPath.");
         }
+
+        public bool XPathNavigatorIsNavigable { get { return false; } }
 
         public virtual bool HasContent(UmbracoContext context, bool preview) { throw new NotImplementedException(); }
 
@@ -237,7 +240,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			}
 
 
-			return new DictionaryPublishedContent(values,
+			var content = new DictionaryPublishedContent(values,
 			                                      d => d.ParentId != -1 //parent should be null if -1
 				                                           ? GetUmbracoMedia(d.ParentId)
 				                                           : null,
@@ -245,6 +248,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			                                      d => GetChildrenMedia(d.Id),
 			                                      GetProperty,
 			                                      true);
+		    return PublishedContentModelFactory.CreateModel(content);
 		}
 
 		internal IPublishedContent ConvertFromXPathNavigator(XPathNavigator xpath)
@@ -295,7 +299,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				}
 			}
 
-			return new DictionaryPublishedContent(values, 
+			var content = new DictionaryPublishedContent(values, 
 				d => d.ParentId != -1 //parent should be null if -1
 					? GetUmbracoMedia(d.ParentId) 
 					: null,
@@ -303,6 +307,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				d => GetChildrenMedia(d.Id, xpath),
 				GetProperty,
 				false);
+		    return PublishedContentModelFactory.CreateModel(content);
 		}
 
 		/// <summary>
@@ -312,19 +317,23 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		/// <param name="dd"> </param>
 		/// <param name="alias"></param>
 		/// <returns></returns>
-		private IPublishedContentProperty GetProperty(DictionaryPublishedContent dd, string alias)
+		private IPublishedProperty GetProperty(DictionaryPublishedContent dd, string alias)
 		{
 			if (dd.LoadedFromExamine)
 			{
 				//if this is from Examine, lets check if the alias does not exist on the document
-				if (dd.Properties.All(x => x.Alias != alias))
+				if (dd.Properties.All(x => x.PropertyTypeAlias != alias))
 				{
 					//ok it doesn't exist, we might assume now that Examine didn't index this property because the index is not set up correctly
 					//so before we go loading this from the database, we can check if the alias exists on the content type at all, this information
 					//is cached so will be quicker to look up.
-					if (dd.Properties.Any(x => x.Alias == UmbracoContentIndexer.NodeTypeAliasFieldName))
+					if (dd.Properties.Any(x => x.PropertyTypeAlias == UmbracoContentIndexer.NodeTypeAliasFieldName))
 					{
-						var aliasesAndNames = ContentType.GetAliasesAndNames(dd.Properties.First(x => x.Alias.InvariantEquals(UmbracoContentIndexer.NodeTypeAliasFieldName)).Value.ToString());
+                        // so in dd.Properties, there is an IPublishedProperty with property type alias "__NodeTypeAlias" and
+                        // that special property would contain the node type alias, which we use to get "aliases & names". That
+                        // special property is going to be a PropertyResult (with Value == DataValue) and we
+                        // want its value in the most simple way = it is OK to use DataValue here.
+						var aliasesAndNames = ContentType.GetAliasesAndNames(dd.Properties.First(x => x.PropertyTypeAlias.InvariantEquals(UmbracoContentIndexer.NodeTypeAliasFieldName)).DataValue.ToString());
 						if (aliasesAndNames != null)
 						{
 							if (!aliasesAndNames.ContainsKey(alias))
@@ -341,7 +350,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 					{
 						media.MoveNext();
 						var mediaDoc = ConvertFromXPathNavigator(media.Current);
-						return mediaDoc.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+						return mediaDoc.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
 					}					
 				}							
 			}
@@ -349,9 +358,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             //We've made it here which means that the value is stored in the Examine index.
             //We are going to check for a special field however, that is because in some cases we store a 'Raw'
             //value in the index such as for xml/html.
-            var rawValue = dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(UmbracoContentIndexer.RawFieldPrefix + alias));
+            var rawValue = dd.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(UmbracoContentIndexer.RawFieldPrefix + alias));
 		    return rawValue
-		           ?? dd.Properties.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
+		           ?? dd.Properties.FirstOrDefault(x => x.PropertyTypeAlias.InvariantEquals(alias));
 		}
 
 		/// <summary>
@@ -464,12 +473,15 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 		/// </remarks>
 		internal class DictionaryPublishedContent : PublishedContentBase
 		{
+            // note: I'm not sure this class fully complies with IPublishedContent rules especially
+            // I'm not sure that _properties contains all properties including those without a value,
+            // neither that GetProperty will return a property without a value vs. null... @zpqrtbnk
 
 			public DictionaryPublishedContent(
 				IDictionary<string, string> valueDictionary, 
 				Func<DictionaryPublishedContent, IPublishedContent> getParent,
 				Func<DictionaryPublishedContent, IEnumerable<IPublishedContent>> getChildren,
-				Func<DictionaryPublishedContent, string, IPublishedContentProperty> getProperty,
+				Func<DictionaryPublishedContent, string, IPublishedProperty> getProperty,
 				bool fromExamine)
 			{
 				if (valueDictionary == null) throw new ArgumentNullException("valueDictionary");
@@ -507,15 +519,30 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 						}						
 					}, "parentID");
 
-				_properties = new Collection<IPublishedContentProperty>();
+			    _contentType = PublishedContentType.Get(PublishedItemType.Media, _documentTypeAlias);
+				_properties = new Collection<IPublishedProperty>();
 
 				//loop through remaining values that haven't been applied
 				foreach (var i in valueDictionary.Where(x => !_keysAdded.Contains(x.Key)))
 				{
-					//this is taken from examine
-					_properties.Add(i.Key.InvariantStartsWith("__") 
-					               	? new PropertyResult(i.Key, i.Value, Guid.Empty, PropertyResultType.CustomProperty) 
-					               	: new PropertyResult(i.Key, i.Value, Guid.Empty, PropertyResultType.UserProperty));
+				    IPublishedProperty property;
+
+                    // must ignore that one
+				    if (i.Key == "version") continue;
+
+                    if (i.Key.InvariantStartsWith("__"))
+				    {
+                        // no type for tha tone, dunno how to convert
+				        property = new PropertyResult(i.Key, i.Value, Guid.Empty, PropertyResultType.CustomProperty);
+				    }
+                    else
+                    {
+                        // use property type to ensure proper conversion
+                        var propertyType = _contentType.GetPropertyType(i.Key);
+                        property = new XmlPublishedProperty(propertyType, false, i.Value); // false :: never preview a media
+                    }
+
+					_properties.Add(property);
 				}
 			}
 
@@ -544,7 +571,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
 			private readonly Func<DictionaryPublishedContent, IPublishedContent> _getParent;
 			private readonly Func<DictionaryPublishedContent, IEnumerable<IPublishedContent>> _getChildren;
-			private readonly Func<DictionaryPublishedContent, string, IPublishedContentProperty> _getProperty;
+			private readonly Func<DictionaryPublishedContent, string, IPublishedProperty> _getProperty;
 
 			/// <summary>
 			/// Returns 'Media' as the item type
@@ -644,7 +671,12 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				get { return _level; }
 			}
 
-			public override ICollection<IPublishedContentProperty> Properties
+            public override bool IsDraft
+            {
+                get { return false; }
+            }
+
+			public override ICollection<IPublishedProperty> Properties
 			{
 				get { return _properties; }
 			}
@@ -654,10 +686,48 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				get { return _getChildren(this); }
 			}
 
-			public override IPublishedContentProperty GetProperty(string alias)
+			public override IPublishedProperty GetProperty(string alias)
 			{
 				return _getProperty(this, alias);
 			}
+
+            public override PublishedContentType ContentType
+            {
+                get { return _contentType; }
+            }
+
+            // override to implement cache
+            //   cache at context level, ie once for the whole request
+            //   but cache is not shared by requests because we wouldn't know how to clear it
+            public override IPublishedProperty GetProperty(string alias, bool recurse)
+            {
+                if (recurse == false) return GetProperty(alias);
+
+                IPublishedProperty property;
+                string key = null;
+                var cache = UmbracoContextCache.Current;
+                
+                if (cache != null)
+                {
+                    key = string.Format("RECURSIVE_PROPERTY::{0}::{1}", Id, alias.ToLowerInvariant());
+                    object o;
+                    if (cache.TryGetValue(key, out o))
+                    {
+                        property = o as IPublishedProperty;
+                        if (property == null)
+                            throw new InvalidOperationException("Corrupted cache.");
+                        return property;
+                    }
+                }
+
+                // else get it for real, no cache
+                property = base.GetProperty(alias, true);
+
+                if (cache != null)
+                    cache[key] = property;
+
+                return property;
+            }
 
 			private readonly List<string> _keysAdded = new List<string>();
 			private int _id;
@@ -676,7 +746,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 			private DateTime _updateDate;
 			private Guid _version;
 			private int _level;
-			private readonly ICollection<IPublishedContentProperty> _properties;
+			private readonly ICollection<IPublishedProperty> _properties;
+		    private readonly PublishedContentType _contentType;
 
 			private void ValidateAndSetProperty(IDictionary<string, string> valueDictionary, Action<string> setProperty, params string[] potentialKeys)
 			{
@@ -689,6 +760,6 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				setProperty(valueDictionary[key]);
 				_keysAdded.Add(key);
 			}
-		}
+        }
 	}
 }

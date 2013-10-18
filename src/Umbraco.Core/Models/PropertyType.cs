@@ -378,6 +378,14 @@ namespace Umbraco.Core.Models
             return true;
         }
 
+        internal PropertyType Clone()
+        {
+            var clone = (PropertyType) this.MemberwiseClone();
+            clone.ResetIdentity();
+            clone.ResetDirtyProperties(false);
+            return clone;
+        }
+
         public bool Equals(PropertyType other)
         {
             //Check whether the compared object is null. 

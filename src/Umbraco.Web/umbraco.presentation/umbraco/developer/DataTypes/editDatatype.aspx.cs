@@ -3,7 +3,7 @@ using System.Collections;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using umbraco.cms.presentation.Trees;
-using umbraco.IO;
+using Umbraco.Core.IO;
 
 namespace umbraco.cms.presentation.developer
 {

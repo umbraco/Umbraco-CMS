@@ -46,6 +46,7 @@
     <IISExpressUseClassicPipelineMode />
     <SolutionDir Condition="$(SolutionDir) == '' Or $(SolutionDir) == '*Undefined*'">..\</SolutionDir>
     <RestorePackages>true</RestorePackages>
+    <MvcProjectUpgradeChecked>true</MvcProjectUpgradeChecked>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <OutputPath>bin\</OutputPath>
@@ -108,9 +109,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\ClientDependency-Mvc.1.7.0.4\lib\ClientDependency.Core.Mvc.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=0.1.51.2941, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Examine, Version=0.1.52.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.51.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.52.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -412,6 +413,13 @@
     <Compile Include="Umbraco\Create.aspx.designer.cs">
       <DependentUpon>create.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\Create\PartialView.ascx.cs">
+      <DependentUpon>PartialView.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Create\PartialView.ascx.designer.cs">
+      <DependentUpon>PartialView.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Create\PartialViewMacro.ascx.cs">
       <DependentUpon>PartialViewMacro.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -453,6 +461,13 @@
     </Compile>
     <Compile Include="Umbraco\Developer\Python\EditPython.aspx.designer.cs">
       <DependentUpon>editPython.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.cs">
+      <DependentUpon>ChangeDocType.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Dialogs\ChangeDocType.aspx.designer.cs">
+      <DependentUpon>ChangeDocType.aspx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Dialogs\EditMacro.aspx.cs">
       <DependentUpon>EditMacro.aspx</DependentUpon>
@@ -559,6 +574,7 @@
     </Compile>
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
+    <Content Include="Umbraco\Create\PartialView.ascx" />
     <Content Include="Umbraco\Images\PinnedIcons\task_content.ico" />
     <Content Include="Umbraco\Images\PinnedIcons\task_default.ico" />
     <Content Include="Umbraco\Images\PinnedIcons\task_developer.ico" />
@@ -663,6 +679,9 @@
     <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionDeleteRelationType.js" />
     <Content Include="Umbraco\Developer\RelationTypes\TreeMenu\ActionNewRelationType.js" />
     <Content Include="Umbraco\Dialogs\AssignDomain2.aspx" />
+    <Content Include="Umbraco\Dialogs\ChangeDocType.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="Umbraco\Dialogs\EditMacro.aspx" />
     <Content Include="Umbraco\Images\delete.gif" />
     <Content Include="Umbraco\Images\delete.png" />
@@ -695,7 +714,9 @@
     <Content Include="Umbraco\Plugins\UGoLive\throbber.gif" />
     <Content Include="Umbraco\Plugins\UGoLive\tick.png" />
     <Content Include="Umbraco\Settings\Views\EditView.aspx" />
+    <Content Include="Umbraco_Client\Application\JQuery\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.min.js" />
+    <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.unobtrusive.min.js" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Lib\codemirror.css" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Lib\codemirror.js" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Lib\Util\closetag.js" />
@@ -916,6 +937,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Langs\no.js" />
     <Content Include="Umbraco_Client\Tinymce3\Langs\pl.js" />
     <Content Include="Umbraco_Client\Tinymce3\Langs\pt.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Langs\ru.js" />
     <Content Include="Umbraco_Client\Tinymce3\Langs\sv.js" />
     <Content Include="Umbraco_Client\Tinymce3\Langs\zh.js" />
     <Content Include="Umbraco_Client\Tinymce3\license.txt" />
@@ -936,6 +958,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advhr\Langs\no_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advhr\Langs\pl_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advhr\Langs\pt_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Advhr\Langs\ru_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advhr\Langs\sv_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advhr\Langs\zh_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advhr\rule.htm" />
@@ -958,6 +981,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advimage\Langs\no_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advimage\Langs\pl_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advimage\Langs\pt_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Advimage\Langs\ru_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advimage\Langs\sv_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advimage\Langs\zh_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advlink\Css\advlink.css" />
@@ -977,6 +1001,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advlink\Langs\no_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advlink\Langs\pl_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advlink\Langs\pt_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Advlink\Langs\ru_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advlink\Langs\sv_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advlink\Langs\zh_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Advlink\link.htm" />
@@ -1029,6 +1054,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Emotions\Langs\no_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Emotions\Langs\pl_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Emotions\Langs\pt_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Emotions\Langs\ru_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Emotions\Langs\sv_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Emotions\Langs\zh_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Example\dialog.htm" />
@@ -1058,6 +1084,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Fullpage\Langs\no_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Fullpage\Langs\pl_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Fullpage\Langs\pt_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Fullpage\Langs\ru_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Fullpage\Langs\sv_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Fullpage\Langs\zh_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Fullscreen\editor_plugin.js" />
@@ -1091,6 +1118,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Layer\editor_plugin_src.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Legacyoutput\editor_plugin.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Legacyoutput\editor_plugin_src.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Langs\ru_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Lists\editor_plugin.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Lists\editor_plugin_src.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Media\Css\media.css" />
@@ -1140,6 +1168,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Paste\Langs\no_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Paste\Langs\pl_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Paste\Langs\pt_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Paste\Langs\ru_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Paste\Langs\sv_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Paste\Langs\zh_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Paste\pastetext.htm" />
@@ -1170,6 +1199,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Searchreplace\Langs\no_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Searchreplace\Langs\pl_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Searchreplace\Langs\pt_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Searchreplace\Langs\ru_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Searchreplace\Langs\sv_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Searchreplace\Langs\zh_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Searchreplace\searchreplace.htm" />
@@ -1194,6 +1224,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Style\Langs\no_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Style\Langs\pl_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Style\Langs\pt_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Style\Langs\ru_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Style\Langs\sv_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Style\Langs\zh_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Style\props.htm" />
@@ -1223,6 +1254,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Table\Langs\no_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Table\Langs\pl_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Table\Langs\pt_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Table\Langs\ru_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Table\Langs\sv_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Table\Langs\zh_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Table\merge_cells.htm" />
@@ -1246,6 +1278,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Template\Langs\no_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Template\Langs\pl_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Template\Langs\pt_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Template\Langs\ru_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Template\Langs\sv_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Template\Langs\zh_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Template\template.htm" />
@@ -1260,8 +1293,12 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\it.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\it_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\ja.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\ja_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\ru.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\ru_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\sv.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\sv_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\zh.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracocss\Langs\zh_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\dialog.htm" />
@@ -1270,6 +1307,8 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Img\ajax-loader.gif" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Img\embed.gif" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Js\dialog.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\da.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\da_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\de.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\de_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\en.js" />
@@ -1278,8 +1317,12 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\it.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\it_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\ja.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\ja_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\ru.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\ru_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\sv.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\sv_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\zh.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoembed\Langs\zh_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoimg\editor_plugin_src.js" />
@@ -1287,8 +1330,10 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoimg\Langs\en_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoimg\Langs\en_us_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoimg\Langs\he_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoimg\Langs\it_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoimg\Langs\ja_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoimg\Langs\ru_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoimg\Langs\sv_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoimg\Langs\zh_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\editor_plugin_src.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Js\umbracolink.js" />
@@ -1297,6 +1342,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\he_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\ja_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\ru_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\sv_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\zh_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracomacro\dialog.htm" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracomacro\editor_plugin_src.js" />
@@ -1312,6 +1358,8 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracomacro\Langs\ja_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracomacro\Langs\ru.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracomacro\Langs\ru_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracomacro\Langs\sv.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracomacro\Langs\sv_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracomacro\Langs\zh.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracomacro\Langs\zh_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracopaste\editor_plugin_src.js" />
@@ -1353,6 +1401,7 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Xhtmlxtras\Langs\no_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Xhtmlxtras\Langs\pl_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Xhtmlxtras\Langs\pt_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Xhtmlxtras\Langs\ru_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Xhtmlxtras\Langs\sv_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Xhtmlxtras\Langs\zh_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Themes\Advanced\about.htm" />
@@ -2093,7 +2142,46 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="Umbraco\Scripting\templates\cshtml\MultinodeTree-picker.cshtml" />
-    <Content Include="Umbraco\Scripting\templates\cshtml\TwitterFeed.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\EmptyTemplate.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\EditProfile.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\EmptyTemplate.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\Login.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\LoginStatus.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\RegisterMember.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\EmptyTemplate %28ForUseWithCustomViews%29.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListAncestorsFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\Breadcrumb.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\Gallery.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListChildPagesFromChangeableSource.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListChildPagesFromCurrentPage.cshtml">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListChildPagesOrderedByDate.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListChildPagesOrderedByName.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListChildPagesOrderedByProperty.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListChildPagesWithDoctype.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListDescendantsFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\ListImagesFromMediaFolder.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\MultinodeTree-picker.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\Navigation.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\SiteMap.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\Breadcrumb.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\EmptyTemplate %28ForUseWithCustomViews%29.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\ListAncestorsFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\ListChildPagesFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\ListChildPagesOrderedByDate.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\ListChildPagesOrderedByName.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\ListChildPagesWithDoctype.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\ListDescendantsFromCurrentPage.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\EditProfile.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\Login.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\LoginStatus.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\RegisterMember.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\MultinodeTree-picker.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\Navigation.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\SiteMap.cshtml" />
     <None Include="Umbraco_client\CodeMirror\js\mode\coffeescript\LICENSE" />
     <None Include="Umbraco_client\CodeMirror\js\mode\pascal\LICENSE" />
     <None Include="Umbraco_client\CodeMirror\js\mode\perl\LICENSE" />
@@ -2554,6 +2642,8 @@
     <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
     <Folder Include="Umbraco_Client\Tags\images\" />
     <Folder Include="UserControls\" />
+    <Folder Include="Views\MacroPartials\" />
+    <Folder Include="Views\Partials\" />
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
@@ -2574,9 +2664,9 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>6130</DevelopmentServerPort>
+          <DevelopmentServerPort>6200</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:6130</IISUrl>
+          <IISUrl>http://localhost:6200</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

@@ -11,10 +11,11 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Publishing;
 
 namespace Umbraco.Core.Services
 {
-	/// <summary>
+    /// <summary>
 	/// Represents the Media Service, which is an easy access to operations involving <see cref="IMedia"/>
 	/// </summary>
 	public class MediaService : IMediaService
@@ -536,27 +537,29 @@ namespace Umbraco.Core.Services
 		/// </summary>
 		public void EmptyRecycleBin()
 		{
-			//TODO: Why don't we have a base class to share between MediaService/ContentService as some of this is exacty the same?
+            using (new WriteLock(Locker))
+            {
+                List<int> ids;
+                List<string> files;
+                bool success;
+                var nodeObjectType = new Guid(Constants.ObjectTypes.Media);
 
-			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
-			{
-				var query = Query<IMedia>.Builder.Where(x => x.Trashed == true);
-				var contents = repository.GetByQuery(query).OrderByDescending(x => x.Level);
+                using (var repository = _repositoryFactory.CreateRecycleBinRepository(_uowProvider.GetUnitOfWork()))
+                {
+                    ids = repository.GetIdsOfItemsInRecycleBin(nodeObjectType);
+                    files = repository.GetFilesInRecycleBin(nodeObjectType);
 
-				foreach (var content in contents)
-				{
-					if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMedia>(content), this))
-						continue;
+                    if (EmptyingRecycleBin.IsRaisedEventCancelled(new RecycleBinEventArgs(nodeObjectType, ids, files), this))
+                        return;
 
-					repository.Delete(content);
+                    success = repository.EmptyRecycleBin(nodeObjectType);
+                    if (success)
+                        repository.DeleteFiles(files);
+                }
 
-					Deleted.RaiseEvent(new DeleteEventArgs<IMedia>(content, false), this);
-				}
-				uow.Commit();
-			}
-
-            Audit.Add(AuditTypes.Delete, "Empty Recycle Bin performed by user", 0, -20);
+                EmptiedRecycleBin.RaiseEvent(new RecycleBinEventArgs(nodeObjectType, ids, files, success), this);
+            }
+            Audit.Add(AuditTypes.Delete, "Empty Media Recycle Bin performed by user", 0, -21);
 		}
 
 	    /// <summary>
@@ -638,6 +641,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Permanently deletes versions from an <see cref="IMedia"/> object prior to a specific date.
+        /// This method will never delete the latest version of a content item.
         /// </summary>
         /// <param name="id">Id of the <see cref="IMedia"/> object to delete versions from</param>
         /// <param name="versionDate">Latest version date</param>
@@ -661,6 +665,7 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Permanently deletes specific version(s) from an <see cref="IMedia"/> object.
+        /// This method will never delete the latest version of a content item.
         /// </summary>
         /// <param name="id">Id of the <see cref="IMedia"/> object to delete a version from</param>
         /// <param name="versionId">Id of the version to delete</param>
@@ -668,14 +673,14 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User deleting versions of a Content object</param>
         public void DeleteVersion(int id, Guid versionId, bool deletePriorVersions, int userId = 0)
         {
+            if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, specificVersion: versionId), this))
+                return;
+
             if (deletePriorVersions)
             {
                 var content = GetByVersion(versionId);
                 DeleteVersions(id, content.UpdateDate, userId);
             }
-
-			if (DeletingVersions.IsRaisedEventCancelled(new DeleteRevisionsEventArgs(id, specificVersion:versionId), this))
-				return;
 
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
@@ -875,15 +880,16 @@ namespace Umbraco.Core.Services
                         }
                     }
 
+                    var xmlItems = new List<ContentXmlDto>();
                     foreach (var c in list)
                     {
                         //generate the xml
                         var xml = c.ToXml();
                         //create the dto to insert
-                        var poco = new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) };
-                        //insert it into the database
-                        uow.Database.Insert(poco);
+                        xmlItems.Add(new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) });
                     }
+                    //bulk insert it into the database
+                    uow.Database.BulkInsertRecords(xmlItems);
                 }
                 Audit.Add(AuditTypes.Publish, "RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
             }
@@ -1009,6 +1015,16 @@ namespace Umbraco.Core.Services
 		/// Occurs after Move
 		/// </summary>
 		public static event TypedEventHandler<IMediaService, MoveEventArgs<IMedia>> Moved;
+
+        /// <summary>
+        /// Occurs before the Recycle Bin is emptied
+        /// </summary>
+        public static event TypedEventHandler<IMediaService, RecycleBinEventArgs> EmptyingRecycleBin;
+
+        /// <summary>
+        /// Occurs after the Recycle Bin has been Emptied
+        /// </summary>
+        public static event TypedEventHandler<IMediaService, RecycleBinEventArgs> EmptiedRecycleBin;
 		#endregion
 	}
 }

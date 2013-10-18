@@ -6,7 +6,7 @@
 
 <script type="text/javascript">
     jQuery(document).ready(function () {
-        jQuery("#umbSearchField").UmbQuickSearch('<%= umbraco.IO.IOHelper.ResolveUrl( umbraco.IO.SystemDirectories.Umbraco ) + "/Search/QuickSearchHandler.ashx" %>');
+        jQuery("#umbSearchField").UmbQuickSearch('<%= Umbraco.Core.IO.IOHelper.ResolveUrl( Umbraco.Core.IO.SystemDirectories.Umbraco ) + "/Search/QuickSearchHandler.ashx" %>');
 
         UmbClientMgr.historyManager().addEventHandler("navigating", function (e, app) {
             jQuery("#umbSearchField").flushCache();

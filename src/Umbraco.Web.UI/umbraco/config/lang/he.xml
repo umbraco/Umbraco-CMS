@@ -228,7 +228,7 @@
     <key alias="stylesNoStylesOnPage">סגנונות עיצוב פעילים לא זמינים</key>
     <key alias="tableColMergeLeft">יש למקם את הסמן משמאל לשני התאים אותם תרצה למזג</key>
     <key alias="tableSplitNotSplittable">אין אפשרות לפצל תא שלא מוזג לפני כן.</key>
-    <key alias="xsltErrorHeader">שגיאה במקור xslt</key>
+    <key alias="xsltErrorHeader">שגיאה במקור XSLT</key>
     <key alias="xsltErrorText">קובץ ה- XSLT לא נשמר, הקובץ מכיל שגיאות.</key>
   </area>
   <area alias="general">
@@ -695,11 +695,11 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="templateErrorText">שים לב שאין 2 תבניות עם אותו השם/כינוי</key>
     <key alias="templateSavedHeader">התבנית נשמרה</key>
     <key alias="templateSavedText">התבנית נשמרה ללא שגיאות!</key>
-    <key alias="xsltErrorHeader">הקובץ Xslt לאנשמר</key>
-    <key alias="xsltErrorText">הקובץ Xslt מכיל שגיאה</key>
-    <key alias="xsltPermissionErrorText">אין אפשרות לשמור את ה- Xslt, בדוק הרשאות קובץ לפני</key>
-    <key alias="xsltSavedHeader">הקובץ Xslt נשמר</key>
-    <key alias="xsltSavedText">אין שגיאות ב- xslt</key>
+    <key alias="xsltErrorHeader">הקובץ XSLT לאנשמר</key>
+    <key alias="xsltErrorText">הקובץ XSLT מכיל שגיאה</key>
+    <key alias="xsltPermissionErrorText">אין אפשרות לשמור את ה- XSLT, בדוק הרשאות קובץ לפני</key>
+    <key alias="xsltSavedHeader">הקובץ XSLT נשמר</key>
+    <key alias="xsltSavedText">אין שגיאות ב- XSLT</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">השתמש בסינטקס CSS לדוגמא: h1, .redHeader, .blueTex</key>
