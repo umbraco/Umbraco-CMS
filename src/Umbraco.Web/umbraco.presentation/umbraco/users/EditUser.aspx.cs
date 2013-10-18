@@ -167,7 +167,7 @@ namespace umbraco.cms.presentation.user
                     Visible = false,
                     EnableViewState = false
                 };
-            validatorContainer.Attributes["class"] = "error";
+            validatorContainer.Attributes["class"] = "alert alert-error";
             validatorContainer.Style.Add(HtmlTextWriterStyle.MarginTop, "10px");
             validatorContainer.Style.Add(HtmlTextWriterStyle.Width, "300px");
             var validatorContainer2 = new HtmlGenericControl("p");
