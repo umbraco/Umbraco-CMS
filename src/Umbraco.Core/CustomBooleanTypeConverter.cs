@@ -22,8 +22,8 @@ namespace Umbraco.Core
 			if (value is string)
 			{
 				var str = (string)value;
+				if (str == null || str.Length == 0 || str == "0") return false;
 				if (str == "1") return true;
-				if (str == "0" || str == "") return false;
 			}
 
 			return base.ConvertFrom(context, culture, value);
