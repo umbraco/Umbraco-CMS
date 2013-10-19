@@ -18,7 +18,7 @@ namespace umbraco.providers
     /// </summary>
     public class UsersMembershipProvider : MembershipProviderBase
     {
-        public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
+        public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config) 
         {
             if (config == null) throw new ArgumentNullException("config");
             if (string.IsNullOrEmpty(name)) name = "UsersMembershipProvider";

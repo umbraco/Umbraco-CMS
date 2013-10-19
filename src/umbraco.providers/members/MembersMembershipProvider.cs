@@ -123,6 +123,7 @@ namespace umbraco.providers.members
         /// </returns>
         public override bool ChangePassword(string username, string oldPassword, string newPassword)
         {
+            
             // in order to support updating passwords from the umbraco core, we can't validate the old password
             var m = Member.GetMemberFromLoginNameAndPassword(username, oldPassword);
             if (m == null) return false;
