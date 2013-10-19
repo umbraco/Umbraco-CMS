@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Globalization;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -9,6 +10,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Linq;
@@ -27,26 +29,10 @@ namespace umbraco.cms.businesslogic.macro
 	/// 
 	/// </summary>
     [Obsolete("This is no longer used, use the IMacroService and related models instead")]
-	public class Macro		
+	public class Macro
 	{
-        
-		int _id;
-		bool _useInEditor;
-        bool _renderContent;
-        bool _cachePersonalized;
-        bool _cacheByPage;
-
-		int _refreshRate;
-		string _alias;
-		string _name;
-		string _assembly;
-		string _type;
-		string _xslt;
-        string _scriptingFile;
-
-		MacroProperty[] _properties;
-
-        bool m_propertiesLoaded = false;
+        //initialize empty model
+	    internal IMacro MacroItem = new Umbraco.Core.Models.Macro();
 
         protected static ISqlHelper SqlHelper
         {
@@ -58,7 +44,7 @@ namespace umbraco.cms.businesslogic.macro
 		/// </summary>
 		public int Id 
 		{
-			get {return _id;}
+			get { return MacroItem.Id; }
 		}
 		
 		/// <summary>
@@ -66,12 +52,8 @@ namespace umbraco.cms.businesslogic.macro
 		/// </summary>
 		public bool UseInEditor 
 		{
-			get {return _useInEditor;}
-			set 
-			{
-				_useInEditor = value;
-				SqlHelper.ExecuteNonQuery("update cmsMacro set macroUseInEditor = @macroAlias where id = @id", SqlHelper.CreateParameter("@macroAlias", value), SqlHelper.CreateParameter("@id", this.Id));
-			}
+            get { return MacroItem.UseInEditor; }
+			set { MacroItem.UseInEditor = value; }
 		}
 
 		/// <summary>
@@ -82,12 +64,8 @@ namespace umbraco.cms.businesslogic.macro
 		/// </summary>
 		public int RefreshRate
 		{
-			get {return _refreshRate;}
-			set 
-			{
-				_refreshRate = value;
-				SqlHelper.ExecuteNonQuery("update cmsMacro set macroRefreshRate = @macroAlias where id = @id", SqlHelper.CreateParameter("@macroAlias", value), SqlHelper.CreateParameter("@id", this.Id));
-			}
+            get { return MacroItem.CacheDuration; }
+			set { MacroItem.CacheDuration = value; }
 		}
 
         /// <summary>
@@ -97,12 +75,8 @@ namespace umbraco.cms.businesslogic.macro
         /// </summary>
 		public string Alias
 		{
-			get {return _alias;}
-			set 
-			{
-				_alias = value;
-				SqlHelper.ExecuteNonQuery("update cmsMacro set macroAlias = @macroAlias where id = @id", SqlHelper.CreateParameter("@macroAlias", value), SqlHelper.CreateParameter("@id", this.Id));
-			}
+			get { return MacroItem.Alias; }
+			set { MacroItem.Alias = value; }
 		}
 		
 		/// <summary>
@@ -110,12 +84,8 @@ namespace umbraco.cms.businesslogic.macro
 		/// </summary>
 		public string Name
 		{
-			get {return _name;}
-			set 
-			{
-				_name = value;
-				SqlHelper.ExecuteNonQuery("update cmsMacro set macroName = @macroAlias where id = @id", SqlHelper.CreateParameter("@macroAlias", value), SqlHelper.CreateParameter("@id", this.Id));
-			}
+            get { return MacroItem.Name; }
+            set { MacroItem.Name = value; }
 		}
 
 		/// <summary>
@@ -125,12 +95,8 @@ namespace umbraco.cms.businesslogic.macro
 		/// </summary>
 		public string Assembly
 		{
-			get {return _assembly;}
-			set 
-			{
-				_assembly = value;
-				SqlHelper.ExecuteNonQuery("update cmsMacro set macroScriptAssembly = @macroAlias where id = @id", SqlHelper.CreateParameter("@macroAlias", value), SqlHelper.CreateParameter("@id", this.Id));
-			}
+            get { return MacroItem.ControlAssembly; }
+            set { MacroItem.ControlAssembly = value; }
 		}
 
 		/// <summary>
@@ -141,12 +107,8 @@ namespace umbraco.cms.businesslogic.macro
 		/// </remarks>
 		public string Type
 		{
-			get {return _type;}
-			set 
-			{
-				_type = value;
-				SqlHelper.ExecuteNonQuery("update cmsMacro set macroScriptType = @macroAlias where id = @id", SqlHelper.CreateParameter("@macroAlias", value), SqlHelper.CreateParameter("@id", this.Id));
-			}
+            get { return MacroItem.ControlType; }
+            set { MacroItem.ControlType = value; }
 		}
 
 		/// <summary>
@@ -156,92 +118,79 @@ namespace umbraco.cms.businesslogic.macro
 		/// </summary>
 		public string Xslt
 		{
-			get {return _xslt;}
-			set 
-			{
-				_xslt = value;
-				SqlHelper.ExecuteNonQuery("update cmsMacro set macroXSLT = @macroXslt where id = @id", SqlHelper.CreateParameter("@macroXslt", value), SqlHelper.CreateParameter("@id", this.Id));
-			}
+            get { return MacroItem.XsltPath; }
+            set { MacroItem.XsltPath = value; }
 		}
 
-        /// <summary>
-        /// This field is used to store the file value for any scripting macro such as python, ruby, razor macros or Partial View Macros        
-        /// </summary>
-        /// <remarks>
-        /// Depending on how the file is stored depends on what type of macro it is. For example if the file path is a full virtual path
-        /// starting with the ~/Views/MacroPartials then it is deemed to be a Partial View Macro, otherwise the file extension of the file
-        /// saved will determine which macro engine will be used to execute the file.
-        /// </remarks>
-        public string ScriptingFile {
-            get { return _scriptingFile; }
-            set {
-                _scriptingFile = value;
-                SqlHelper.ExecuteNonQuery("update cmsMacro set macroPython = @macroPython where id = @id", SqlHelper.CreateParameter("@macroPython", value), SqlHelper.CreateParameter("@id", this.Id));
-            }
-        }
+	    /// <summary>
+	    /// This field is used to store the file value for any scripting macro such as python, ruby, razor macros or Partial View Macros        
+	    /// </summary>
+	    /// <remarks>
+	    /// Depending on how the file is stored depends on what type of macro it is. For example if the file path is a full virtual path
+	    /// starting with the ~/Views/MacroPartials then it is deemed to be a Partial View Macro, otherwise the file extension of the file
+	    /// saved will determine which macro engine will be used to execute the file.
+	    /// </remarks>
+	    public string ScriptingFile
+	    {
+	        get { return MacroItem.ScriptPath; }
+            set { MacroItem.ScriptPath = value; }
+	    }
 
-        /// <summary>
-        /// The python file used to be executed
-        /// 
-        /// Umbraco assumes that the python file is present in the "/python" folder
-        /// </summary>
-        public bool RenderContent {
-            get { return _renderContent; }
-            set {
-                _renderContent = value;
-                SqlHelper.ExecuteNonQuery("update cmsMacro set macroDontRender = @macroDontRender where id = @id", SqlHelper.CreateParameter("@macroDontRender", !value), SqlHelper.CreateParameter("@id", this.Id));
-            }
-        }
+	    /// <summary>
+	    /// The python file used to be executed
+	    /// 
+	    /// Umbraco assumes that the python file is present in the "/python" folder
+	    /// </summary>
+	    public bool RenderContent
+	    {
+            get { return MacroItem.DontRender == false; }
+            set { MacroItem.DontRender = value == false; }
+	    }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether [cache personalized].
-        /// </summary>
-        /// <value><c>true</c> if [cache personalized]; otherwise, <c>false</c>.</value>
-        public bool CachePersonalized {
-            get { return _cachePersonalized; }
-            set {
-                _cachePersonalized = value;
-                SqlHelper.ExecuteNonQuery("update cmsMacro set macroCachePersonalized = @macroCachePersonalized where id = @id", SqlHelper.CreateParameter("@macroCachePersonalized", value), SqlHelper.CreateParameter("@id", this.Id));
-            }
-        }
+	    /// <summary>
+	    /// Gets or sets a value indicating whether [cache personalized].
+	    /// </summary>
+	    /// <value><c>true</c> if [cache personalized]; otherwise, <c>false</c>.</value>
+	    public bool CachePersonalized
+	    {
+            get { return MacroItem.CacheByMember; }
+            set { MacroItem.CacheByMember = value; }
+	    }
 
-        /// <summary>
-        /// Gets or sets a value indicating whether the macro is cached for each individual page.
-        /// </summary>
-        /// <value><c>true</c> if [cache by page]; otherwise, <c>false</c>.</value>
-        public bool CacheByPage {
-            get { return _cacheByPage; }
-            set {
-                _cacheByPage = value;
-                SqlHelper.ExecuteNonQuery("update cmsMacro set macroCacheByPage = @macroCacheByPage where id = @id", SqlHelper.CreateParameter("@macroCacheByPage", value), SqlHelper.CreateParameter("@id", this.Id));
-            }
-        }
+	    /// <summary>
+	    /// Gets or sets a value indicating whether the macro is cached for each individual page.
+	    /// </summary>
+	    /// <value><c>true</c> if [cache by page]; otherwise, <c>false</c>.</value>
+	    public bool CacheByPage
+	    {
+            get { return MacroItem.CacheByPage; }
+            set { MacroItem.CacheByPage = value; }
+	    }
 
-		/// <summary>
-		/// Properties which are used to send parameters to the xsl/usercontrol/customcontrol of the macro
-		/// </summary>
-		public MacroProperty[] Properties
-		{
-			get {
-                // Add lazy loading
-                if (!m_propertiesLoaded)
-                {
-                    LoadProperties();
-                }
-                return _properties;
-            }
-		}
-
-        private void LoadProperties()
-        {
-            _properties = MacroProperty.GetProperties(Id);
-            m_propertiesLoaded = true;
-        }
-
+	    /// <summary>
+	    /// Properties which are used to send parameters to the xsl/usercontrol/customcontrol of the macro
+	    /// </summary>
+	    public MacroProperty[] Properties
+	    {
+	        get
+	        {
+	            return MacroItem.Properties.Select(x => new MacroProperty
+	                {
+	                    Alias = x.Alias,
+	                    Name = x.Name,
+                        SortOrder = x.SortOrder,
+                        Macro = this,
+                        ParameterEditorAlias = x.EditorAlias
+	                }).ToArray();
+	        }
+	    }
+        
 		/// <summary>
 		/// Macro initializer
 		/// </summary>
-		public Macro() {}
+		public Macro()
+		{
+		}
 
 		/// <summary>
 		/// Macro initializer
@@ -249,9 +198,13 @@ namespace umbraco.cms.businesslogic.macro
 		/// <param name="Id">The id of the macro</param>
 		public Macro(int Id)
 		{
-			_id = Id;
-			setup();
+            Setup(Id);
 		}
+
+        internal Macro(IMacro macro)
+        {
+            MacroItem = macro;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Macro"/> class.
@@ -259,70 +212,53 @@ namespace umbraco.cms.businesslogic.macro
         /// <param name="alias">The alias.</param>
         public Macro(string alias)
         {
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select id from cmsMacro where macroAlias = @alias", SqlHelper.CreateParameter("@alias", alias)))
-            {
-                if (dr.Read())
-                {
-                    _id = dr.GetInt("id");
-                    setup();
-                }
-                else
-                {
-                    throw new IndexOutOfRangeException(string.Format("Alias '{0}' does not match an existing macro", alias));
-                }
-            }
+            Setup(alias);
         }
 
-        /// <summary>
-        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
-        /// </summary>
-        public virtual void Save()
-        {
-            //event
-            var e = new SaveEventArgs();
-            FireBeforeSave(e);
+	    /// <summary>
+	    /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
+	    /// </summary>
+	    public virtual void Save()
+	    {
+	        //event
+	        var e = new SaveEventArgs();
+	        FireBeforeSave(e);
 
-            if (!e.Cancel) {
-                FireAfterSave(e);
-            }
-        }
+	        if (e.Cancel == false)
+	        {
+	            ApplicationContext.Current.Services.MacroService.Save(MacroItem);
 
+	            FireAfterSave(e);
+	        }
+	    }
 
-		/// <summary>
+	    /// <summary>
 		/// Deletes the current macro
 		/// </summary>
 		public void Delete() 
 		{
             //event
-            DeleteEventArgs e = new DeleteEventArgs();
+            var e = new DeleteEventArgs();
             FireBeforeDelete(e);
 
-            if (!e.Cancel) {
-                foreach (MacroProperty p in this.Properties)
-                    p.Delete();
-                SqlHelper.ExecuteNonQuery("delete from cmsMacro where id = @id", SqlHelper.CreateParameter("@id", this._id));
+		    if (e.Cancel == false)
+		    {
+		        ApplicationContext.Current.Services.MacroService.Delete(MacroItem);
 
-                FireAfterDelete(e);
-            }
-        }
+		        FireAfterDelete(e);
+		    }
+		}
 
         public static Macro Import(XmlNode n)
         {
-
-            Macro m = null;
-            string alias = XmlHelper.GetNodeValue(n.SelectSingleNode("alias"));
-            try
-            {
-                //check to see if the macro alreay exists in the system
-                //it's better if it does and we keep using it, alias *should* be unique remember
-                m = new Macro(alias);
-                Macro.GetByAlias(alias);
-            }
-            catch (IndexOutOfRangeException)
+            var alias = XmlHelper.GetNodeValue(n.SelectSingleNode("alias"));
+            //check to see if the macro alreay exists in the system
+            //it's better if it does and we keep using it, alias *should* be unique remember
+            var m = Macro.GetByAlias(alias);
+            if (m == null)
             {
                 m = MakeNew(XmlHelper.GetNodeValue(n.SelectSingleNode("name")));
             }
-
             try
             {
                 m.Alias = alias;
@@ -332,11 +268,15 @@ namespace umbraco.cms.businesslogic.macro
                 m.RefreshRate = int.Parse(XmlHelper.GetNodeValue(n.SelectSingleNode("refreshRate")));
 
                 // we need to validate if the usercontrol is missing the tilde prefix requirement introduced in v6
-                if (String.IsNullOrEmpty(m.Assembly) && !String.IsNullOrEmpty(m.Type) && !m.Type.StartsWith("~"))
+                if (string.IsNullOrEmpty(m.Assembly) && string.IsNullOrEmpty(m.Type) == false && m.Type.StartsWith("~") == false)
+                {
                     m.Type = "~/" + m.Type;
+                }
 
                 if (n.SelectSingleNode("scriptingFile") != null)
+                {
                     m.ScriptingFile = XmlHelper.GetNodeValue(n.SelectSingleNode("scriptingFile"));
+                }
 
                 try
                 {
@@ -344,7 +284,7 @@ namespace umbraco.cms.businesslogic.macro
                 }
                 catch (Exception macroExp)
                 {
-					LogHelper.Error<Macro>("Error creating macro property", macroExp);
+                    LogHelper.Error<Macro>("Error creating macro property", macroExp);
                 }
 
                 // macro properties
@@ -352,7 +292,7 @@ namespace umbraco.cms.businesslogic.macro
                 {
                     try
                     {
-                        string propertyAlias = mp.Attributes.GetNamedItem("alias").Value;
+                        var propertyAlias = mp.Attributes.GetNamedItem("alias").Value;
                         var property = m.Properties.SingleOrDefault(p => p.Alias == propertyAlias);
                         if (property != null)
                         {
@@ -368,85 +308,77 @@ namespace umbraco.cms.businesslogic.macro
                                 propertyAlias,
                                 mp.Attributes.GetNamedItem("name").Value,
                                 mp.Attributes.GetNamedItem("propertyType").Value
-                            );
+                                );
                         }
                     }
                     catch (Exception macroPropertyExp)
                     {
-						LogHelper.Error<Macro>("Error creating macro property", macroPropertyExp);
+                        LogHelper.Error<Macro>("Error creating macro property", macroPropertyExp);
                     }
                 }
 
                 m.Save();
             }
-            catch { return null; }
+            catch (Exception ex)
+            {
+                LogHelper.Error<Macro>("An error occurred importing a macro", ex);
+                return null;
+            }
 
             return m;
         }
 
-		private void setup() 
+		private void Setup(int id)
 		{
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select id, macroUseInEditor, macroRefreshRate, macroAlias, macroName, macroScriptType, macroScriptAssembly, macroXSLT, macroPython, macroDontRender, macroCacheByPage, macroCachePersonalized  from cmsMacro where id = @id", SqlHelper.CreateParameter("@id", _id)))
-			{
-                if (dr.Read())
-                {
-                    PopulateMacroInfo(dr);
-                }
-                else
-                {
-                    throw new ArgumentException("No macro found for the id specified");
-                }
-			}
+            var macro = ApplicationContext.Current.Services.MacroService.GetById(id);
+
+            if (macro == null)
+                throw new ArgumentException(string.Format("No Macro exists with id '{0}'", id));
+
+		    MacroItem = macro;
 		}
 
-        private void PopulateMacroInfo(IRecordsReader dr)
+        private void Setup(string alias)
         {
-            _useInEditor = dr.GetBoolean("macroUseInEditor");
-            _refreshRate = dr.GetInt("macroRefreshRate");
-            _alias = dr.GetString("macroAlias");
-            _id = dr.GetInt("id");
-            _name = dr.GetString("macroName");
-            _assembly = dr.GetString("macroScriptAssembly");
-            _type = dr.GetString("macroScriptType");
-            _xslt = dr.GetString("macroXSLT");
-            _scriptingFile = dr.GetString("macroPython");
+            var macro = ApplicationContext.Current.Services.MacroService.GetByAlias(alias);
 
-            _cacheByPage = dr.GetBoolean("macroCacheByPage");
-            _cachePersonalized = dr.GetBoolean("macroCachePersonalized");
-            _renderContent = !dr.GetBoolean("macroDontRender");
+            if (macro == null)
+                throw new ArgumentException(string.Format("No Macro exists with alias '{0}'", alias));
+
+            MacroItem = macro;
         }
 
-		/// <summary>
-		/// Get an xmlrepresentation of the macro, used for exporting the macro to a package for distribution
-		/// </summary>
-		/// <param name="xd">Current xmldocument context</param>
-		/// <returns>An xmlrepresentation of the macro</returns>
-		public XmlNode ToXml(XmlDocument xd) {
+	    /// <summary>
+	    /// Get an xmlrepresentation of the macro, used for exporting the macro to a package for distribution
+	    /// </summary>
+	    /// <param name="xd">Current xmldocument context</param>
+	    /// <returns>An xmlrepresentation of the macro</returns>
+	    public XmlNode ToXml(XmlDocument xd)
+	    {
+	        XmlNode doc = xd.CreateElement("macro");
 
-            XmlNode doc = xd.CreateElement("macro");
+	        // info section
+	        doc.AppendChild(XmlHelper.AddTextNode(xd, "name", this.Name));
+	        doc.AppendChild(XmlHelper.AddTextNode(xd, "alias", this.Alias));
+	        doc.AppendChild(XmlHelper.AddTextNode(xd, "scriptType", this.Type));
+	        doc.AppendChild(XmlHelper.AddTextNode(xd, "scriptAssembly", this.Assembly));
+	        doc.AppendChild(XmlHelper.AddTextNode(xd, "xslt", this.Xslt));
+	        doc.AppendChild(XmlHelper.AddTextNode(xd, "useInEditor", this.UseInEditor.ToString()));
+	        doc.AppendChild(XmlHelper.AddTextNode(xd, "refreshRate", this.RefreshRate.ToString(CultureInfo.InvariantCulture)));
+	        doc.AppendChild(XmlHelper.AddTextNode(xd, "scriptingFile", this.ScriptingFile));
 
-			// info section
-			doc.AppendChild(XmlHelper.AddTextNode(xd, "name", this.Name));
-			doc.AppendChild(XmlHelper.AddTextNode(xd, "alias", this.Alias));
-			doc.AppendChild(XmlHelper.AddTextNode(xd, "scriptType", this.Type));
-			doc.AppendChild(XmlHelper.AddTextNode(xd, "scriptAssembly", this.Assembly));
-			doc.AppendChild(XmlHelper.AddTextNode(xd, "xslt", this.Xslt));
-			doc.AppendChild(XmlHelper.AddTextNode(xd, "useInEditor", this.UseInEditor.ToString()));
-			doc.AppendChild(XmlHelper.AddTextNode(xd, "refreshRate", this.RefreshRate.ToString()));
-            doc.AppendChild(XmlHelper.AddTextNode(xd, "scriptingFile", this.ScriptingFile));
+	        // properties
+	        XmlNode props = xd.CreateElement("properties");
+	        foreach (var p in this.Properties)
+	            props.AppendChild(p.ToXml(xd));
+	        doc.AppendChild(props);
 
-			// properties
-            XmlNode props = xd.CreateElement("properties");
-			foreach (MacroProperty p in this.Properties)
-				props.AppendChild(p.ToXml(xd));
-			doc.AppendChild(props);
+	        return doc;
+	    }
 
-			return doc;
-		}
-
+	    [Obsolete("This does nothing")]
         public void RefreshProperties()
-        {
-            m_propertiesLoaded = false;
+        {           
         }
 
 
@@ -460,17 +392,18 @@ namespace umbraco.cms.businesslogic.macro
         [MethodImpl(MethodImplOptions.Synchronized)]
 		public static Macro MakeNew(string Name) 
 		{
-            int macroId = 0;
-            // The method is synchronized
-            SqlHelper.ExecuteNonQuery("INSERT INTO cmsMacro (macroAlias, macroName) values (@macroAlias, @macroName)",
-                SqlHelper.CreateParameter("@macroAlias", Name.Replace(" ", String.Empty)),
-                SqlHelper.CreateParameter("@macroName", Name));
-            macroId = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsMacro");
+		    var macro = new Umbraco.Core.Models.Macro
+		        {
+                    Name = Name,
+                    Alias = Name.Replace(" ", String.Empty)
+		        };
 
-            Macro newMacro = new Macro(macroId);
+		    ApplicationContext.Current.Services.MacroService.Save(macro);
+
+            var newMacro = new Macro(macro);
            
             //fire new event
-            NewEventArgs e = new NewEventArgs();
+            var e = new NewEventArgs();
             newMacro.OnNew(e);
             
             return newMacro;
@@ -480,13 +413,11 @@ namespace umbraco.cms.businesslogic.macro
 		/// Retrieve all macroes
 		/// </summary>
 		/// <returns>A list of all macroes</returns>
-		public static Macro[] GetAll() 
+		public static Macro[] GetAll()
 		{
-			// zb-00001 #29927 : refactor
-			IRecordsReader dr = SqlHelper.ExecuteReader("select id from cmsMacro order by macroName");
-			var list = new System.Collections.Generic.List<Macro>();
-			while (dr.Read()) list.Add(new Macro(dr.GetInt("id")));
-			return list.ToArray();
+		    return ApplicationContext.Current.Services.MacroService.GetAll()
+		                             .Select(x => new Macro(x))
+		                             .ToArray();
 		}
 
 		/// <summary>
@@ -499,16 +430,11 @@ namespace umbraco.cms.businesslogic.macro
 		    return ApplicationContext.Current.ApplicationCache.GetCacheItem(
 		        GetCacheKey(alias),
 		        TimeSpan.FromMinutes(30),
-		        delegate
+		        () =>
 		            {
-		                try
-		                {
-		                    return new Macro(alias);
-		                }
-		                catch
-		                {
-		                    return null;
-		                }
+		                var macro = ApplicationContext.Current.Services.MacroService.GetByAlias(alias);
+		                if (macro == null) return null;
+		                return new Macro(macro);
 		            });
 		}
 
@@ -517,25 +443,20 @@ namespace umbraco.cms.businesslogic.macro
             return ApplicationContext.Current.ApplicationCache.GetCacheItem(
                 GetCacheKey(string.Format("macro_via_id_{0}", id)),
                 TimeSpan.FromMinutes(30),
-                delegate
+                () =>
                     {
-                        try
-                        {
-                            return new Macro(id);
-                        }
-                        catch
-                        {
-                            return null;
-                        }
+                        var macro = ApplicationContext.Current.Services.MacroService.GetById(id);
+                        if (macro == null) return null;
+                        return new Macro(macro);
                     });
         }
 
         public static MacroTypes FindMacroType(string xslt, string scriptFile, string scriptType, string scriptAssembly)
         {
-            if (!string.IsNullOrEmpty(xslt))
+            if (string.IsNullOrEmpty(xslt) == false)
                 return MacroTypes.XSLT;
 	        
-			if (!string.IsNullOrEmpty(scriptFile))
+			if (string.IsNullOrEmpty(scriptFile) == false)
 			{
 				//we need to check if the file path saved is a virtual path starting with ~/Views/MacroPartials, if so then this is 
 				//a partial view macro, not a script macro
@@ -546,10 +467,10 @@ namespace umbraco.cms.businesslogic.macro
 					       : MacroTypes.Script;
 			}
 
-	        if (!string.IsNullOrEmpty(scriptType) && scriptType.InvariantContains(".ascx"))
+	        if (string.IsNullOrEmpty(scriptType) == false && scriptType.InvariantContains(".ascx"))
 		        return MacroTypes.UserControl;
 	        
-			if (!string.IsNullOrEmpty(scriptType) && !string.IsNullOrEmpty(scriptAssembly))
+			if (string.IsNullOrEmpty(scriptType) == false && !string.IsNullOrEmpty(scriptAssembly))
 		        return MacroTypes.CustomControl;
 
 	        return MacroTypes.Unknown;
@@ -561,13 +482,13 @@ namespace umbraco.cms.businesslogic.macro
                 throw new ArgumentNullException("input", "An MD5 hash cannot be generated when 'input' parameter is null!");
 
             // step 1, calculate MD5 hash from input
-            MD5 md5 = System.Security.Cryptography.MD5.Create();
-            byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
-            byte[] hash = md5.ComputeHash(inputBytes);
+            var md5 = MD5.Create();
+            var inputBytes = Encoding.ASCII.GetBytes(input);
+            var hash = md5.ComputeHash(inputBytes);
 
             // step 2, convert byte array to hex string
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < hash.Length; i++)
+            var sb = new StringBuilder();
+            for (var i = 0; i < hash.Length; i++)
             {
                 sb.Append(hash[i].ToString("X2"));
             }

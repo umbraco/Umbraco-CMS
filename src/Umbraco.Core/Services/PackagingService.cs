@@ -855,6 +855,31 @@ namespace Umbraco.Core.Services
         #region Macros
         #endregion
 
+        #region Members
+
+        /// <summary>
+        /// Exports an <see cref="IMedia"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="member">Member to export</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the Member object</returns>
+        internal XElement Export(IMember member)
+        {
+            //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
+            var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : member.ContentType.Alias.ToSafeAliasWithForcingCheck();
+
+            var xml = Export(member, nodeName);
+            xml.Add(new XAttribute("nodeType", member.ContentType.Id));
+            xml.Add(new XAttribute("nodeTypeAlias", member.ContentType.Alias));
+
+            xml.Add(new XAttribute("loginName", member.Username));
+            xml.Add(new XAttribute("email", member.Email));
+            xml.Add(new XAttribute("key", member.Key));
+
+            return xml;
+        }
+
+        #endregion
+
         #region Media
 
         /// <summary>

@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
+using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Tests.TestHelpers;
@@ -82,8 +84,8 @@ namespace Umbraco.Tests
 			{
 				var result = testCase.Key.TryConvertTo<bool>();
 
-				Assert.IsTrue(result.Success);
-				Assert.AreEqual(testCase.Value, result.Result);
+				Assert.IsTrue(result.Success, testCase.Key);
+				Assert.AreEqual(testCase.Value, result.Result, testCase.Key);
 			}
 		}
 
@@ -95,42 +97,71 @@ namespace Umbraco.Tests
 			{
 				{"2012-11-10", true},
 				{"2012/11/10", true},
-				{"10/11/2012", true},
-				{"11/10/2012", false},
+				{"10/11/2012", true},   // assuming your culture uses DD/MM/YYYY
+				{"11/10/2012", false},  // assuming your culture uses DD/MM/YYYY
 				{"Sat 10, Nov 2012", true},
 				{"Saturday 10, Nov 2012", true},
 				{"Sat 10, November 2012", true},
 				{"Saturday 10, November 2012", true},
-				{"2012-11-10 13:14:15", true},
-				{"", false}
+				{"2012-11-10 13:14:15", true}
 			};
 
 			foreach (var testCase in testCases)
 			{
 				var result = testCase.Key.TryConvertTo<DateTime>();
 
-				Assert.IsTrue(result.Success);
-				Assert.AreEqual(DateTime.Equals(dateTime.Date, result.Result.Date), testCase.Value);
+				Assert.IsTrue(result.Success, testCase.Key);
+				Assert.AreEqual(DateTime.Equals(dateTime.Date, result.Result.Date), testCase.Value, testCase.Key);
 			}
 		}
-	    [Test]
-	    public virtual void CanConvertObjectToString_Using_ToString_Overload()
-	    {
-	        var result = new MyTestObject().TryConvertTo<string>();
+		[Test]
+		public virtual void CanConvertBlankStringToDateTime()
+		{
+			var result = "".TryConvertTo<DateTime>();
+			Assert.IsTrue(result.Success);
+			Assert.AreEqual(DateTime.MinValue, result.Result);
+		}
 
-            Assert.IsTrue(result.Success);
-            Assert.AreEqual("Hello world", result.Result);
-	    }
+		[Test]
+		public virtual void CanConvertObjectToString_Using_ToString_Overload()
+		{
+			var result = new MyTestObject().TryConvertTo<string>();
 
-        [Test]
+			Assert.IsTrue(result.Success);
+			Assert.AreEqual("Hello world", result.Result);
+		}
+
+		        [Test]
         public virtual void CanConvertObjectToSameObject()
         {
             var obj = new MyTestObject();
             var result = obj.TryConvertTo<object>();
 
-            Assert.AreEqual(obj, result);            
+            Assert.AreEqual(obj, result.Result);            
         }
+		
+		private CultureInfo savedCulture;
 
+	    /// <summary>
+		/// Run once before each test in derived test fixtures.
+		/// </summary>
+        [SetUp]
+		public void TestSetup()
+		{
+			savedCulture = Thread.CurrentThread.CurrentCulture;
+			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-GB"); // make sure the dates parse correctly
+			return;
+		}
+
+		/// <summary>
+		/// Run once after each test in derived test fixtures.
+		/// </summary>
+	    [TearDown]
+		public void TestTearDown()
+		{
+			Thread.CurrentThread.CurrentCulture = savedCulture;
+			return;
+		}
 
         private class MyTestObject
         {

@@ -3,18 +3,18 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Factories
 {
-    internal class RelationFactory : IEntityFactory<Relation, RelationDto>
+    internal class RelationFactory : IEntityFactory<IRelation, RelationDto>
     {
-        private readonly RelationType _relationType;
+        private readonly IRelationType _relationType;
 
-        public RelationFactory(RelationType relationType)
+        public RelationFactory(IRelationType relationType)
         {
             _relationType = relationType;
         }
 
         #region Implementation of IEntityFactory<Relation,RelationDto>
 
-        public Relation BuildEntity(RelationDto dto)
+        public IRelation BuildEntity(RelationDto dto)
         {
             var entity = new Relation(dto.ParentId, dto.ChildId, _relationType)
                              {
@@ -29,7 +29,7 @@ namespace Umbraco.Core.Persistence.Factories
             return entity;
         }
 
-        public RelationDto BuildDto(Relation entity)
+        public RelationDto BuildDto(IRelation entity)
         {
             var dto = new RelationDto
                           {

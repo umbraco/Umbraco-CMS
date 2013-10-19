@@ -8,13 +8,31 @@ using System.Web.Security;
 using NUnit.Framework;
 using Umbraco.Core.Security;
 using Umbraco.Web.Security.Providers;
-using umbraco.providers;
 
 namespace Umbraco.Tests.Membership
 {
     [TestFixture]
     public class MembershipProviderBaseTests
     {
+        [TestCase("hello", 0, "", 5, true)]
+        [TestCase("hello", 0, "", 4, true)]
+        [TestCase("hello", 0, "", 6, false)]
+        [TestCase("hello", 1, "", 5, false)]
+        [TestCase("hello!", 1, "", 0, true)]
+        [TestCase("hello!", 2, "", 0, false)]
+        [TestCase("hello!!", 2, "", 0, true)]
+        //8 characters or more in length, at least 1 lowercase letter,at least 1 character that is not a lower letter.
+        [TestCase("hello", 0, "(?=.{8,})[a-z]+[^a-z]+|[^a-z]+[a-z]+", 0, false)]
+        [TestCase("helloooo", 0, "(?=.{8,})[a-z]+[^a-z]+|[^a-z]+[a-z]+", 0, false)]
+        [TestCase("helloooO", 0, "(?=.{8,})[a-z]+[^a-z]+|[^a-z]+[a-z]+", 0, true)]
+        [TestCase("HELLOOOO", 0, "(?=.{8,})[a-z]+[^a-z]+|[^a-z]+[a-z]+", 0, false)]
+        [TestCase("HELLOOOo", 0, "(?=.{8,})[a-z]+[^a-z]+|[^a-z]+[a-z]+", 0, true)]
+        public void Valid_Password(string password, int minRequiredNonAlphanumericChars, string strengthRegex, int minLength, bool pass)
+        {
+            var result = MembershipProviderBase.IsPasswordValid(password, minRequiredNonAlphanumericChars, strengthRegex, minLength);
+            Assert.AreEqual(pass, result.Success);
+        }
+
         /// <summary>
         /// The salt generated is always the same length
         /// </summary>

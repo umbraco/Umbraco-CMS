@@ -345,6 +345,8 @@ namespace Umbraco.Core.Services
         /// <param name="content"><see cref="IContent"/> to retrieve ancestors for</param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IContent> GetAncestors(IContent content);
+
+        /// <summary>
         /// Sorts a collection of <see cref="IContent"/> objects by updating the SortOrder according
         /// to the ordering of items in the passed in <see cref="IEnumerable{T}"/>.
         /// </summary>
@@ -371,6 +373,8 @@ namespace Umbraco.Core.Services
         /// <param name="content"><see cref="IContent"/> to retrieve the parent from</param>
         /// <returns>Parent <see cref="IContent"/> object</returns>
         IContent GetParent(IContent content);
+
+        /// <summary>
         /// Creates and saves an <see cref="IContent"/> object using the alias of the <see cref="IContentType"/>
         /// that this Content should based on.
         /// </summary>

@@ -1,24 +1,7 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models
 {
-    /// <summary>
-    /// A model representing an attempt at changing a password
-    /// </summary>
-    public class PasswordChangedModel
-    {
-        /// <summary>
-        /// The error affiliated with the failing password changes, null if changing was successful
-        /// </summary>
-        public ValidationResult ChangeError { get; set; }
-
-        /// <summary>
-        /// If the password was reset, this is the value it has been changed to
-        /// </summary>
-        public string ResetPassword { get; set; }
-    }
-
     /// <summary>
     /// A model representing the data required to set a member/user password depending on the provider installed.
     /// </summary>

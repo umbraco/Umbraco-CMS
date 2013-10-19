@@ -23,7 +23,7 @@ namespace Umbraco.Core.Services
         private Lazy<PackagingService> _packagingService;
         private Lazy<ServerRegistrationService> _serverRegistrationService;
         private Lazy<IEntityService> _entityService;
-        private Lazy<RelationService> _relationService;
+        private Lazy<IRelationService> _relationService;
         private Lazy<IApplicationTreeService> _treeService;
         private Lazy<ISectionService> _sectionService;
         private Lazy<IMacroService> _macroService;
@@ -51,8 +51,8 @@ namespace Umbraco.Core.Services
             IFileService fileService, 
             ILocalizationService localizationService, 
             PackagingService packagingService, 
-            IEntityService entityService, 
-            RelationService relationService,
+            IEntityService entityService,
+            IRelationService relationService,
             ISectionService sectionService,
             IApplicationTreeService treeService)
         {
@@ -64,7 +64,7 @@ namespace Umbraco.Core.Services
             _localizationService = new Lazy<ILocalizationService>(() => localizationService);
             _packagingService = new Lazy<PackagingService>(() => packagingService);
             _entityService = new Lazy<IEntityService>(() => entityService);
-            _relationService = new Lazy<RelationService>(() => relationService);
+            _relationService = new Lazy<IRelationService>(() => relationService);
             _sectionService = new Lazy<ISectionService>(() => sectionService);
             _treeService = new Lazy<IApplicationTreeService>(() => treeService);
         }
@@ -130,7 +130,7 @@ namespace Umbraco.Core.Services
                 _entityService = new Lazy<IEntityService>(() => new EntityService(provider, repositoryFactory.Value, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value));
 
             if (_relationService == null)
-                _relationService = new Lazy<RelationService>(() => new RelationService(provider, repositoryFactory.Value, _entityService.Value));
+                _relationService = new Lazy<IRelationService>(() => new RelationService(provider, repositoryFactory.Value, _entityService.Value));
 
             if (_treeService == null)
                 _treeService = new Lazy<IApplicationTreeService>(() => new ApplicationTreeService(cache));
@@ -156,7 +156,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the <see cref="EntityService"/>
         /// </summary>
-        internal IMacroService MacroService
+        public IMacroService MacroService
         {
             get { return _macroService.Value; }
         }
@@ -172,7 +172,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the <see cref="RelationService"/>
         /// </summary>
-        public RelationService RelationService
+        public IRelationService RelationService
         {
             get { return _relationService.Value; }
         }

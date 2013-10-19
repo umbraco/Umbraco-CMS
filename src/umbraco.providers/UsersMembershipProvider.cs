@@ -53,7 +53,7 @@ namespace umbraco.providers
                 {
                     if (args.FailureInformation != null)
                         throw args.FailureInformation;
-                    throw new MembershipPasswordException("Change password canceled due to new password validation failure.");
+                    throw new MembershipPasswordException("Change password canceled due to password validation failure.");
                 }
 
                 var user = new User(username);

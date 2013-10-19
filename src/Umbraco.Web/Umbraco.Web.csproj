@@ -332,6 +332,7 @@
     <Compile Include="Models\Mapping\MacroModelMapper.cs" />
     <Compile Include="Models\Mapping\MemberModelMapper.cs" />
     <Compile Include="Models\UpgradeCheckResponse.cs" />
+    <Compile Include="Models\PasswordChangedModel.cs" />
     <Compile Include="PropertyEditors\ColorListPreValueEditor.cs" />
     <Compile Include="PropertyEditors\EmailAddressPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ListViewPropertyEditor.cs" />
@@ -583,6 +584,9 @@
     <Compile Include="UI\CdfLogger.cs" />
     <Compile Include="umbraco.presentation\CompatibilityHelper.cs" />
     <Compile Include="umbraco.presentation\umbraco\ActionHandlers\SimilarNodeNameComparer.cs" />
+    <Compile Include="umbraco.presentation\umbraco\controls\PasswordChanger.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -595,6 +599,9 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.designer.cs">
       <DependentUpon>AssignDomain2.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\users\EditUser.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="UmbracoContextExtensions.cs" />
     <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx.cs">
@@ -992,13 +999,6 @@
     <Compile Include="umbraco.presentation\umbraco\controls\GenericValidation.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\LabelButton.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\macroParameterControl.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\passwordChanger.ascx.cs">
-      <DependentUpon>passwordChanger.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\passwordChanger.ascx.designer.cs">
-      <DependentUpon>passwordChanger.ascx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx.cs">
       <DependentUpon>ProgressBar.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1632,13 +1632,6 @@
       <DependentUpon>XmlTree.xsd</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\urlRewriter\UrlRewriterFormWriter.cs" />
-    <Compile Include="umbraco.presentation\umbraco\users\EditUser.aspx.cs">
-      <DependentUpon>EditUser.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\users\EditUser.aspx.designer.cs">
-      <DependentUpon>EditUser.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\EditUserType.aspx.cs">
       <DependentUpon>EditUserType.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1798,7 +1791,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\Preview.aspx" />
-    <Content Include="umbraco.presentation\umbraco\controls\passwordChanger.ascx" />
     <Content Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

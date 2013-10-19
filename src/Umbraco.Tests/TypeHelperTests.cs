@@ -7,6 +7,7 @@ using System.Data.SqlClient;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Web;
+using Umbraco.Web.Cache;
 using UmbracoExamine;
 using UmbracoExamine.DataServices;
 using umbraco;
@@ -67,7 +68,7 @@ namespace Umbraco.Tests
 
             var t6 = TypeHelper.GetLowestBaseType(typeof (IApplicationEventHandler),
                                                   typeof (LegacyScheduledTasks),
-                                                  typeof(CacheHelperExtensions.CacheHelperApplicationEventListener));
+                                                  typeof(CacheRefresherEventHandler));
             Assert.IsTrue(t6.Success);
             Assert.AreEqual(typeof(IApplicationEventHandler), t6.Result);
 

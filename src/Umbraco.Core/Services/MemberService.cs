@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
@@ -311,28 +312,68 @@ namespace Umbraco.Core.Services
         /// <param name="member"></param>
         public void Delete(IMember member)
         {
+            if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMember>(member), this))
+                return;
+
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
                 repository.Delete(member);
                 uow.Commit();
             }
+
+            Deleted.RaiseEvent(new DeleteEventArgs<IMember>(member, false), this);
         }
 
         /// <summary>
         /// Saves an updated Member
         /// </summary>
         /// <param name="member"></param>
-        public void Save(IMember member)
+        /// <param name="raiseEvents"></param>
+        public void Save(IMember member, bool raiseEvents = true)
         {
+            if (raiseEvents)
+            {
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(member), this))
+                    return;
+            }
+
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
                 repository.AddOrUpdate(member);
                 uow.Commit();
             }
+
+            if (raiseEvents)
+                Saved.RaiseEvent(new SaveEventArgs<IMember>(member, false), this);
         }
 
+        #endregion
+
+        #region Event Handlers
+
+
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>
+        public static event TypedEventHandler<IMemberService, DeleteEventArgs<IMember>> Deleting;
+
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        public static event TypedEventHandler<IMemberService, DeleteEventArgs<IMember>> Deleted;
+
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saving;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saved;
+        
         #endregion
     }
 }

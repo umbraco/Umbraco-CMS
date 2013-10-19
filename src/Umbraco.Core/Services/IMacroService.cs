@@ -6,7 +6,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Defines the MacroService, which is an easy access to operations involving <see cref="IMacro"/>
     /// </summary>
-    internal interface IMacroService : IService
+    public interface IMacroService : IService
     {
 
         /// <summary>

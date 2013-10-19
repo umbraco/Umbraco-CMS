@@ -632,6 +632,16 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Creates the xml representation for the <see cref="IMedia"/> object
+        /// </summary>
+        /// <param name="member"><see cref="IContent"/> to generate xml for</param>
+        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+        public static XElement ToXml(this IMember member)
+        {
+            return ApplicationContext.Current.Services.PackagingService.Export(member);
+        }
+        
+        /// <summary>
         /// Creates the xml representation for the <see cref="IContent"/> object
         /// </summary>
         /// <param name="content"><see cref="IContent"/> to generate xml for</param>

@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Sync;
@@ -58,6 +59,7 @@ namespace Umbraco.Web.Cache
         /// <param name="id">The id.</param>
         public override void Refresh(int id)
         {
+            ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
             content.Instance.UpdateDocumentCache(id);
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
@@ -70,6 +72,7 @@ namespace Umbraco.Web.Cache
         /// <param name="id">The id.</param>
         public override void Remove(int id)
         {
+            ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
             content.Instance.ClearDocumentCache(id);
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
@@ -78,6 +81,7 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(IContent instance)
         {
+            ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
             content.Instance.UpdateDocumentCache(new Document(instance));
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();
@@ -86,6 +90,7 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(IContent instance)
         {
+            ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
             content.Instance.ClearDocumentCache(new Document(instance));
             DistributedCache.Instance.ClearAllMacroCacheOnCurrentServer();
             DistributedCache.Instance.ClearXsltCacheOnCurrentServer();

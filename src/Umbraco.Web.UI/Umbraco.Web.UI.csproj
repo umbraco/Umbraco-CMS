@@ -413,12 +413,19 @@
     <Compile Include="Umbraco\Controls\ContentTypeControlNew.ascx.designer.cs">
       <DependentUpon>ContentTypeControlNew.ascx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\controls\Images\ImageViewer.ascx.cs">
+    <Compile Include="Umbraco\Controls\Images\ImageViewer.ascx.cs">
+      <DependentUpon>ImageViewer.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Controls\Images\ImageViewer.ascx.designer.cs">
       <DependentUpon>ImageViewer.ascx</DependentUpon>
     </Compile>
-    <Compile Include="Umbraco\controls\Images\ImageViewer.ascx.designer.cs">
-      <DependentUpon>ImageViewer.ascx</DependentUpon>
+    <Compile Include="Umbraco\Controls\PasswordChanger.ascx.cs">
+      <DependentUpon>passwordChanger.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Controls\PasswordChanger.ascx.designer.cs">
+      <DependentUpon>passwordChanger.ascx</DependentUpon>
     </Compile>
     <Compile Include="Umbraco\Create.aspx.cs">
       <DependentUpon>create.aspx</DependentUpon>
@@ -603,6 +610,13 @@
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Logout.aspx" />
     <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
+    <Compile Include="Umbraco\Users\EditUser.aspx.cs">
+      <DependentUpon>EditUser.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Users\EditUser.aspx.designer.cs">
+      <DependentUpon>EditUser.aspx</DependentUpon>
+    </Compile>
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Install\Steps\UpgradeReport.ascx" />

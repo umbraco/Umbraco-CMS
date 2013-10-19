@@ -4,6 +4,8 @@ using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.PropertyEditors;
 
@@ -185,6 +187,20 @@ namespace Umbraco.Core.Models.PublishedContent
             bool b;
             if (bool.TryParse(stringSource, out b))
                 return b;
+
+            //try json - expensive
+            if (stringSource.DetectIsJson())
+            {
+                try
+                {
+                    var obj = JsonConvert.DeserializeObject(stringSource);
+                    return obj;
+                }
+                catch
+                {
+                    //swallow, continue trying other things
+                }
+            }
 
             // try xml - that is expensive, performance-wise
             XElement elt;

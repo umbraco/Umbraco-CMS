@@ -3,6 +3,7 @@ using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Security.Cryptography;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Security;
@@ -211,6 +212,58 @@ namespace Umbraco.Core.Security
             if ((PasswordFormat == MembershipPasswordFormat.Hashed) && EnablePasswordRetrieval)
                 throw new ProviderException("Provider can not retrieve hashed password");
 
+        }
+
+        /// <summary>
+        /// Override this method to ensure the password is valid before raising the event
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnValidatingPassword(ValidatePasswordEventArgs e)
+        {
+            var attempt = IsPasswordValid(e.Password, MinRequiredNonAlphanumericCharacters, PasswordStrengthRegularExpression, MinRequiredPasswordLength);
+            if (attempt.Success == false)
+            {
+                e.Cancel = true;
+                return;
+            }
+
+            base.OnValidatingPassword(e);
+        }
+
+        protected internal enum PasswordValidityError
+        {
+            Ok,
+            Length,
+            AlphanumericChars,
+            Strength
+        }
+
+        protected internal static Attempt<PasswordValidityError> IsPasswordValid(string password, int minRequiredNonAlphanumericChars, string strengthRegex, int minLength)
+        {
+            if (minRequiredNonAlphanumericChars > 0)
+            {
+                var nonAlphaNumeric = Regex.Replace(password, "[a-zA-Z0-9]", "", RegexOptions.Multiline | RegexOptions.IgnoreCase);
+                if (nonAlphaNumeric.Length < minRequiredNonAlphanumericChars)
+                {
+                    return Attempt.Fail(PasswordValidityError.AlphanumericChars);
+                }
+            }
+
+            if (string.IsNullOrEmpty(strengthRegex) == false)
+            {
+                if (Regex.IsMatch(password, strengthRegex, RegexOptions.Compiled) == false)
+                {
+                    return Attempt.Fail(PasswordValidityError.Strength);
+                }
+                
+            }
+
+            if (password.Length < minLength)
+            {
+                return Attempt.Fail(PasswordValidityError.Length);
+            }
+
+            return Attempt.Succeed(PasswordValidityError.Ok);
         }
 
         /// <summary>
