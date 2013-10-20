@@ -21,6 +21,32 @@ function legacyJsLoader(assetsService, umbRequestHelper) {
 angular.module('umbraco.services').factory('legacyJsLoader', legacyJsLoader);
 
 /**
+ * @ngdoc function
+ * @name umbraco.services.updateChecker
+ * @function
+ *
+ * @description
+ * used to check for updates and display a notifcation
+ */
+function updateChecker($http, umbRequestHelper) {
+    return {
+        
+        /** Called to load in the legacy tree js which is required on startup if a user is logged in or 
+         after login, but cannot be called until they are authenticated which is why it needs to be lazy loaded. */
+        check: function() {
+                
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "updateCheckApiBaseUrl",
+                       "GetCheck")),
+               'Failed to retreive update status');
+        }  
+    };
+}
+angular.module('umbraco.services').factory('updateChecker', updateChecker);
+
+/**
 * @ngdoc service
 * @name umbraco.services.umbPropertyEditorHelper
 * @description A helper object used for property editors

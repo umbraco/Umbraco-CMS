@@ -26,43 +26,60 @@ angular.module('umbraco.services')
 
 	var nArray = [];
 
-	function add(item) {	    
-	    angularHelper.safeApply($rootScope, function () {
-	        
-	        //add a colon after the headline if there is a message as well
-	        if (item.message) {
-	            item.headline += ":";
-	            if(item.message.length > 200) {
-	                item.sticky = true;
-	            }
-	        }
+	var service = {
 
-	        //we need to ID the item, going by index isn't good enough because people can remove at different indexes 
-	        // whenever they want. Plus once we remove one, then the next index will be different. The only way to 
-	        // effectively remove an item is by an Id.
-	        item.id = String.CreateGuid();
-	        
-	        nArray.push(item);
-            
-            if(!item.sticky) {
-                $timeout(function() {
-                    var found = _.find(nArray, function(i) {
-                        return i.id === item.id;
-                    });
+		/**
+		* @ngdoc method
+		* @name umbraco.services.notificationsService#add
+		* @methodOf umbraco.services.notificationsService
+		*
+		* @description
+		* Lower level api for adding notifcations, support more advanced options
+		* @param {Object} item The notification item
+		* @param {String} item.headline Short headline
+		* @param {String} item.message longer text for the notication, trimmed after 200 characters, which can then be exanded
+		* @param {String} item.type Notification type, can be: "success","warning","error" or "info" 
+		* @param {String} item.url url to open when notification is clicked
+		* @param {Boolean} item.sticky if set to true, the notification will not auto-close
+		* @returns {Object} args notification object
+		*/
 
-                    if (found) {
-                        var index = nArray.indexOf(found);
-                        nArray.splice(index, 1);
-                    }
+		add: function(item) {
+			angularHelper.safeApply($rootScope, function () {
 
-                }, 7000);
-            }
+				//add a colon after the headline if there is a message as well
+				if (item.message) {
+					item.headline += ":";
+					if(item.message.length > 200) {
+						item.sticky = true;
+					}
+				}
 
-	        return item;
-	    });
-	}
+				//we need to ID the item, going by index isn't good enough because people can remove at different indexes 
+				// whenever they want. Plus once we remove one, then the next index will be different. The only way to 
+				// effectively remove an item is by an Id.
+				item.id = String.CreateGuid();
 
-	return {
+				nArray.push(item);
+
+				if(!item.sticky) {
+					$timeout(function() {
+						var found = _.find(nArray, function(i) {
+						return i.id === item.id;
+					});
+
+					if (found) {
+						var index = nArray.indexOf(found);
+						nArray.splice(index, 1);
+					}
+
+					}, 7000);
+				}
+
+				return item;
+			});
+
+		},
 
 	    /**
 		 * @ngdoc method
@@ -123,9 +140,8 @@ angular.module('umbraco.services')
 		 * @returns {Object} notification object
 		 */
 	    success: function (headline, message) {
-	        return add({ headline: headline, message: message, type: 'success', time: new Date() });
-	        
-		},
+	        return service.add({ headline: headline, message: message, type: 'success', time: new Date() });
+	    },
 		/**
 		 * @ngdoc method
 		 * @name umbraco.services.notificationsService#error
@@ -140,7 +156,7 @@ angular.module('umbraco.services')
 		 * @returns {Object} notification object
 		 */
 	    error: function (headline, message) {
-	        return add({ headline: headline, message: message, type: 'error', time: new Date() });
+	        return service.add({ headline: headline, message: message, type: 'error', time: new Date() });
 		},
 
 		/**
@@ -158,7 +174,7 @@ angular.module('umbraco.services')
 		 * @returns {Object} notification object
 		 */
 	    warning: function (headline, message) {
-	        return add({ headline: headline, message: message, type: 'warning', time: new Date() });
+	        return service.add({ headline: headline, message: message, type: 'warning', time: new Date() });
 		},
 
 		/**
@@ -176,7 +192,7 @@ angular.module('umbraco.services')
 		 * @returns {Object} notification object
 		 */
 	    info: function (headline, message) {
-	        return add({ headline: headline, message: message, type: 'info', time: new Date() });
+	        return service.add({ headline: headline, message: message, type: 'info', time: new Date() });
 		},
 
 		/**
@@ -233,4 +249,6 @@ angular.module('umbraco.services')
 			return nArray;
 		}
 	};
+
+	return service;
 });

@@ -8,7 +8,7 @@
  * The main application controller
  * 
  */
-function MainController($scope, $location, $routeParams, $rootScope, $timeout, $http, $log, notificationsService, userService, navigationService, legacyJsLoader) {
+function MainController($scope, $location, $routeParams, $rootScope, $timeout, $http, $log, notificationsService, userService, navigationService, legacyJsLoader, updateChecker) {
 
     var legacyTreeJsLoaded = false;
     
@@ -57,10 +57,8 @@ function MainController($scope, $location, $routeParams, $rootScope, $timeout, $
 
     //when a user logs out or timesout
     $scope.$on("notAuthenticated", function() {
-
         $scope.authenticated = null;
         $scope.user = null;
-
     });
     
     //when a user is authorized setup the data
@@ -78,6 +76,21 @@ function MainController($scope, $location, $routeParams, $rootScope, $timeout, $
 
         $scope.authenticated = data.authenticated;
         $scope.user = data.user;
+
+        updateChecker.check().then(function(update){
+            if(update && update !== "null"){
+                if(update.type !== "Nones"){
+                    var notification = {
+                           headline: "Update available",
+                           message: "Click to download",
+                           sticky: true,
+                           type: "info",
+                           url: update.url
+                    };
+                    notificationsService.add(notification);
+                }
+            }
+        });
 
         //if the user has changed we need to redirect to the root so they don't try to continue editing the
         //last item in the URL

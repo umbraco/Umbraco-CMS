@@ -9,10 +9,12 @@ using Umbraco.Core.Configuration;
 
 namespace Umbraco.Web.Models
 {
+    [DataContract(Name = "upgrade", Namespace = "")]
     public class UpgradeCheckResponse
     {
         [DataMember(Name = "type")]
         public string Type { get; set; }
+
         [DataMember(Name = "comment")]
         public string Comment { get; set; }
 
