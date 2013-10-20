@@ -79,7 +79,7 @@ function MainController($scope, $location, $routeParams, $rootScope, $timeout, $
 
         updateChecker.check().then(function(update){
             if(update && update !== "null"){
-                if(update.type !== "Nones"){
+                if(update.type !== "None"){
                     var notification = {
                            headline: "Update available",
                            message: "Click to download",
