@@ -87,9 +87,7 @@ namespace Umbraco.Web.Editors
             
             var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
             return content;
-
-//            content.Tabs.ElementAt(0).Properties.
-        }
+       }
 
         /// <summary>
         /// Gets an empty content item for the 

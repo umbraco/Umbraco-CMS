@@ -61,8 +61,53 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         parentId: args.parentId,
                         idSortOrder: args.sortedIds
                     }),
-                'Failed to sort content');
+                'Failed to sort media');
         },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaResource#move
+         * @methodOf umbraco.resources.mediaResource
+         *
+         * @description
+         * Moves a node underneath a new parentId
+         *
+         * ##usage
+         * <pre>
+         * mediaResource.move({ parentId: 1244, id: 123 })
+         *    .then(function() {
+         *        alert("node was moved");
+         *    }, function(err){
+         *      alert("node didnt move:" + err.data.Message); 
+         *    });
+         * </pre> 
+         * @param {Object} args arguments object
+         * @param {Int} args.idd the ID of the node to move
+         * @param {Int} args.parentId the ID of the parent node to move to
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        move: function (args) {
+            if (!args) {
+                throw "args cannot be null";
+            }
+            if (!args.parentId) {
+                throw "args.parentId cannot be null";
+            }
+            if (!args.id) {
+                throw "args.id cannot be null";
+            }
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostMove"),
+                    {
+                        parentId: args.parentId,
+                        id: args.id
+                    }),
+                'Failed to move media');
+        },
+
+
         /**
          * @ngdoc method
          * @name umbraco.resources.mediaResource#getById

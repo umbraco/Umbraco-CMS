@@ -271,6 +271,22 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Change the sort order for media
+        /// </summary>
+        /// <param name="move"></param>
+        /// <returns></returns>
+        [EnsureUserPermissionForMedia("move.Id")]
+        public HttpResponseMessage PostMove(MoveOrCopy move)
+        {
+            
+            var toMove = ValidateMoveOrCopy(move);
+
+            Services.MediaService.Move(toMove, move.ParentId);
+
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+        /// <summary>
         /// Saves content
         /// </summary>
         /// <returns></returns>        
@@ -460,7 +476,61 @@ namespace Umbraco.Web.Editors
 
             return new HttpResponseMessage(HttpStatusCode.OK);
         }
-       
+
+
+        /// <summary>
+        /// Ensures the item can be moved/copied to the new location
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private IMedia ValidateMoveOrCopy(MoveOrCopy model)
+        {
+            if (model == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var mediaService = Services.MediaService;
+            var toMove = mediaService.GetById(model.Id);
+            if (toMove == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            if (model.ParentId < 0)
+            {
+                //cannot move if the content item is not allowed at the root
+                if (toMove.ContentType.AllowedAsRoot == false)
+                {
+                    throw new HttpResponseException(
+                        Request.CreateValidationErrorResponse(ui.Text("moveOrCopy", "notAllowedAtRoot", Security.CurrentUser)));
+                }
+            }
+            else
+            {
+                var parent = mediaService.GetById(model.ParentId);
+                if (parent == null)
+                {
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                }
+
+                //check if the item is allowed under this one
+                if (parent.ContentType.AllowedContentTypes.Select(x => x.Id).ToArray()
+                    .Any(x => x.Value == toMove.ContentType.Id) == false)
+                {
+                    throw new HttpResponseException(
+                        Request.CreateValidationErrorResponse(ui.Text("moveOrCopy", "notAllowedByContentType", Security.CurrentUser)));
+                }
+
+                // Check on paths
+                if ((string.Format(",{0},", parent.Path)).IndexOf(string.Format(",{0},", toMove.Id), StringComparison.Ordinal) > -1)
+                {
+                    throw new HttpResponseException(
+                        Request.CreateValidationErrorResponse(ui.Text("moveOrCopy", "notAllowedByPath", Security.CurrentUser)));
+                }
+            }
+
+            return toMove;
+        }
 
         /// <summary>
         /// Performs a permissions check for the user to check if it has access to the node based on 

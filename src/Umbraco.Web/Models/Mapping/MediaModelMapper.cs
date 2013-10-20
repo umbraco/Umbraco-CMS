@@ -35,7 +35,10 @@ namespace Umbraco.Web.Models.Mapping
                       expression => expression.MapFrom(content => content.ContentType.Name))
                   .ForMember(display => display.Properties, expression => expression.Ignore())
                   .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
+                  .AfterMap(MapGenericCustomProperties);
+            /*
                   .AfterMap((media, display) => TabsAndPropertiesResolver.MapGenericProperties(media, display));
+            */
 
             //FROM IMedia TO ContentItemBasic<ContentPropertyBasic, IMedia>
             config.CreateMap<IMedia, ContentItemBasic<ContentPropertyBasic, IMedia>>()
@@ -54,6 +57,18 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(
                       dto => dto.Owner,
                       expression => expression.ResolveUsing<OwnerResolver<IMedia>>());
+        }
+
+        private static void MapGenericCustomProperties(IMedia media, MediaItemDisplay display)
+        {
+            /*
+             * Should this be added? if so we need some changes in the UI tho.
+            if (media.ContentType.IsContainer)
+            {
+                TabsAndPropertiesResolver.AddContainerView(display);
+            }*/
+
+            TabsAndPropertiesResolver.MapGenericProperties(media, display);
         }
 
     }

@@ -46,7 +46,7 @@ namespace Umbraco.Web.Models.Mapping
             params ContentPropertyDisplay[] customProperties)
             where TPersisted : IContentBase
         {
-
+            
 
             var genericProps = display.Tabs.Single(x => x.Id == 0);
 
@@ -106,6 +106,33 @@ namespace Umbraco.Web.Models.Mapping
             //re-assign
             genericProps.Properties = contentProps;
 
+        }
+
+        internal static void AddContainerView<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display)
+             where TPersisted : IContentBase
+        {
+            var listViewTab = new Tab<ContentPropertyDisplay>();
+            listViewTab.Alias = "containerView";
+            listViewTab.Label = "Child items";
+            listViewTab.Id = 25;
+            listViewTab.IsActive = true;
+
+            var listViewProperties = new List<ContentPropertyDisplay>();
+            listViewProperties.Add(new ContentPropertyDisplay
+            {
+                Alias = string.Format("{0}containerView", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                Label = "",
+                Value = null,
+                View = "listview",
+                HideLabel = true
+            });
+            listViewTab.Properties = listViewProperties;
+
+            //Is there a better way?
+            var tabs = new List<Tab<ContentPropertyDisplay>>();
+            tabs.Add(listViewTab);
+            tabs.AddRange(display.Tabs);
+            display.Tabs = tabs;
         }
 
         protected override IEnumerable<Tab<ContentPropertyDisplay>> ResolveCore(IContentBase content)

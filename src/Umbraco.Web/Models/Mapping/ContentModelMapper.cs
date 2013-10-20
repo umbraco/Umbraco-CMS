@@ -96,7 +96,7 @@ namespace Umbraco.Web.Models.Mapping
             
             if (content.ContentType.IsContainer)
             {
-                AddContainerView(display);
+                TabsAndPropertiesResolver.AddContainerView(display);
             }
 
             TabsAndPropertiesResolver.MapGenericProperties(
@@ -135,32 +135,7 @@ namespace Umbraco.Web.Models.Mapping
                     });
         }
 
-        private static void AddContainerView<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display)
-             where TPersisted : IContentBase
-        {
-            var listViewTab = new Tab<ContentPropertyDisplay>();
-            listViewTab.Alias = "containerView";
-            listViewTab.Label = "Content";
-            listViewTab.Id = 25;
-            listViewTab.IsActive = true;
-
-            var listViewProperties = new List<ContentPropertyDisplay>();
-            listViewProperties.Add(new ContentPropertyDisplay
-            {
-                Alias = string.Format("{0}containerView", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                Label = ui.Text("content", "releaseDate"),
-                Value = null,
-                View = "listview",
-                HideLabel = true
-            });
-            listViewTab.Properties = listViewProperties;
-
-            //Is there a better way?
-            var tabs = new List<Tab<ContentPropertyDisplay>>();
-            tabs.Add(listViewTab);
-            tabs.AddRange(display.Tabs);
-            display.Tabs = tabs;
-        }
+        
 
         /// <summary>
         /// Gets the published date value for the IContent object
