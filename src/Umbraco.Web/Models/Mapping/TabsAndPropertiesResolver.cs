@@ -113,7 +113,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             var listViewTab = new Tab<ContentPropertyDisplay>();
             listViewTab.Alias = "containerView";
-            listViewTab.Label = "Child items";
+            listViewTab.Label = ui.Text("content", "childItems");
             listViewTab.Id = 25;
             listViewTab.IsActive = true;
 
