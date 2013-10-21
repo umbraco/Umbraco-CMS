@@ -2,6 +2,11 @@
 	
 	<div class="umb-pane">
 	<h5><localize key="create_createUnder">Create a page under</localize> {{currentNode.name}}</h5>
+
+	<p class="abstract" ng-hide="allowedTypes">
+		<localize key="create_noDocumentTypes" />
+	</p>
+
 	<ul class="umb-actions umb-actions-child">
 
 		<li ng-repeat="docType in allowedTypes">

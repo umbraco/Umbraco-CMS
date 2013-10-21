@@ -2,6 +2,11 @@
 	<div class="umb-pane">
 
 	<h5><localize key="create_createUnder">Create under</localize> {{currentNode.name}}</h5>
+
+	<p class="abstract" ng-hide="allowedTypes">
+		<localize key="create_noMediaTypes" />
+	</p>
+
 		<ul class="umb-actions">
 			<li class="action">
 				<ul class="umb-actions-child">
