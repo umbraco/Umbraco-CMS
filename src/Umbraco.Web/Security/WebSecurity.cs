@@ -104,8 +104,6 @@ namespace Umbraco.Web.Security
             return allowAction;
         }
 
-        private static readonly int UmbracoTimeOutInMinutes = GlobalSettings.TimeOutInMinutes;
-
         private IUser _currentUser;
 
         /// <summary>

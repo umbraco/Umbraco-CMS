@@ -15,6 +15,9 @@ namespace Umbraco.Web.WebApi.Filters
         {
             base.OnActionExecuted(actionExecutedContext);
 
+            //this can occur if an error has already occurred.
+            if (actionExecutedContext.Response == null) return;
+
             var httpContextAttempt = actionExecutedContext.Request.TryGetHttpContext();
             if (httpContextAttempt.Success)
             {

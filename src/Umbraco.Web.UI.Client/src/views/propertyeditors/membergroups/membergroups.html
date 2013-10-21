@@ -1,0 +1,18 @@
+﻿<div ng-controller="Umbraco.PropertyEditors.MemberGroupController">
+    <div class="umb-member-group-box">
+        <h5>Not a member of group(s)</h5>
+        <ul>
+            <li ng-repeat="item in getAvailable()">
+                <a href="" ng-click="addItem(item)">{{item}}</a>
+            </li>
+        </ul>
+    </div>
+    <div class="umb-member-group-box">
+        <h5>Member of group(s)</h5>
+        <ul>
+            <li ng-repeat="item in getSelected()">
+                <a href="" ng-click="removeItem(item)">{{item}}</a>
+            </li>
+        </ul>
+    </div>
+</div>

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core;
@@ -66,7 +67,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="member"></param>
         /// <param name="display"></param>
         private static void MapGenericCustomProperties(IMember member, MemberDisplay display)
-        {            
+        {
             TabsAndPropertiesResolver.MapGenericProperties(
                 member, display,
                 new ContentPropertyDisplay
@@ -75,6 +76,14 @@ namespace Umbraco.Web.Models.Mapping
                         Label = ui.Text("login"),
                         Value = display.Username,
                         View = "textbox",
+                        Config = new Dictionary<string, object> {{"IsRequired", true}}
+                    },
+                new ContentPropertyDisplay
+                    {
+                        Alias = string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Label = ui.Text("general", "email"),
+                        Value = display.Email,
+                        View = "email",
                         Config = new Dictionary<string, object> {{"IsRequired", true}}
                     },
                 new ContentPropertyDisplay
@@ -89,22 +98,40 @@ namespace Umbraco.Web.Models.Mapping
                         //TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
                         View = "changepassword",
                         Config = new Dictionary<string, object>(
-                            //initialize the dictionary with the configuration from the default membership provider
-                            Membership.Provider.GetConfiguration())
+                    //initialize the dictionary with the configuration from the default membership provider
+                    Membership.Provider.GetConfiguration())
                             {
                                 //the password change toggle will only be displayed if there is already a password assigned.
-                                {"hasPassword", member.Password.IsNullOrWhiteSpace() == false}                                
+                                {"hasPassword", member.Password.IsNullOrWhiteSpace() == false}
                             }
                     },
                 new ContentPropertyDisplay
                     {
-                        Alias = string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = ui.Text("general", "email"),
-                        Value = display.Email,
-                        View = "email",
+                        Alias = string.Format("{0}membergroup", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                        Label = ui.Text("content", "membergroup"),
+                        Value = GetMemberGroupValue(display.Username),
+                        View = "membergroups",
                         Config = new Dictionary<string, object> {{"IsRequired", true}}
                     });
 
+        }        
+
+        internal static IDictionary<string, bool> GetMemberGroupValue(string username)
+        {
+            var result = new Dictionary<string, bool>();
+            foreach (var role in Roles.GetAllRoles().Distinct())
+            {
+                result.Add(role, false);
+                // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
+                if (role.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
+                {
+                    if (Roles.IsUserInRole(username, role))
+                    {
+                        result[role] = true;
+                    }                        
+                }
+            }
+            return result;
         }
 
         /// <summary>

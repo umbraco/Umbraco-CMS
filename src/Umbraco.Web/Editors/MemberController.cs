@@ -157,6 +157,20 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
             }
 
+            //Now let's do the role provider stuff
+            var currGroups = Roles.GetRolesForUser(contentItem.PersistedContent.Username);
+            //find the ones to remove and remove them
+            var toRemove = currGroups.Except(contentItem.Groups).ToArray();
+            if (toRemove.Any())
+            {
+                Roles.RemoveUserFromRoles(contentItem.PersistedContent.Username, toRemove);    
+            }
+            if (contentItem.Groups.Any())
+            {
+                //add the ones submitted
+                Roles.AddUserToRoles(contentItem.PersistedContent.Username, contentItem.Groups.ToArray());    
+            }
+            
             //save the item
             //NOTE: We are setting the password to NULL - this indicates to the system to not actually save the password
             // so it will not get overwritten!

@@ -245,10 +245,21 @@ function umbDataFormatter() {
             var propPass = _.find(genericTab.properties, function (item) {
                 return item.alias === "_umb_password";
             });
+            var propGroups = _.find(genericTab.properties, function (item) {
+                return item.alias === "_umb_membergroup";
+            });
             saveModel.email = propEmail.value;
             saveModel.username = propLogin.value;
             saveModel.password = propPass.value;
-
+            
+            var selectedGroups = [];
+            for (var n in propGroups.value) {
+                if (propGroups.value[n] === true) {
+                    selectedGroups.push(n);
+                }
+            }
+            saveModel.memberGroups = selectedGroups;
+            
             return saveModel;
         },
 
