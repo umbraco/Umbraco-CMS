@@ -5,7 +5,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.TinyMCEv3Alias, "Rich Text Editor", "rte", HideLabel = false)]
+    [PropertyEditor(Constants.PropertyEditors.TinyMCEv3Alias, "Rich Text Editor", "rte", ValueType = "TEXT",  HideLabel = false)]
     public class RichTextPropertyEditor : PropertyEditor
     {
         /// <summary>
