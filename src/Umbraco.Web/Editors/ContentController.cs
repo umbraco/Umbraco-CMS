@@ -137,8 +137,13 @@ namespace Umbraco.Web.Editors
             //TODO: This will be horribly inefficient for paging! This is because our datasource/repository 
             // doesn't support paging at the SQL level... and it'll be pretty interesting to try to make that work.
 
+            //PP: could we in 7.0.1+ migrate this to the internal examine index instead of using the content service?
+
             var children = Services.ContentService.GetChildren(id).ToArray();
             var totalChildren = children.Length;
+
+            if (totalChildren == 0)
+                return new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(0, 0, 0);
 
             var result = children
                 .Select(Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>)
