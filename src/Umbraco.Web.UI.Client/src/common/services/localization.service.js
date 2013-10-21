@@ -80,6 +80,17 @@ angular.module('umbraco.services')
                 return deferred.promise;
             },
             _lookup: function(value,tokens){
+
+                //strip the key identifier if its there
+                if(value && value[0] === "@"){
+                    value = value.substring(1);
+                }
+
+                //if no area specified, add general_
+                if(value && value.indexOf("_") < 0){
+                    value = "general_" + value;
+                }
+
                 var entry = service.dictionary[value];
                 if(entry){
                     if(tokens){
