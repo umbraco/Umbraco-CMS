@@ -14,6 +14,7 @@ namespace umbraco.editorControls.Slider
     [ClientDependency.Core.ClientDependency(ClientDependency.Core.ClientDependencyType.Javascript, "ui/jquery.alphanumeric.js", "UmbracoClient")]
     [ClientDependency.Core.ClientDependency(ClientDependency.Core.ClientDependencyType.Css, "DateTimePicker/datetimepicker.css", "UmbracoClient")]
     [ValidationProperty("Text")]
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class SliderControl : PlaceHolder
     {
         /// <summary>

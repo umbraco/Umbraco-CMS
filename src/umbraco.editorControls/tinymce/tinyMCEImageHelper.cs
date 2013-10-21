@@ -10,6 +10,7 @@ using umbraco.cms.businesslogic.Files;
 
 namespace umbraco.editorControls.tinymce
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     internal class tinyMCEImageHelper
     {
         public static string cleanImages(string html)

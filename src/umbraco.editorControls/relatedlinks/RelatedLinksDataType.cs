@@ -5,6 +5,7 @@ using Umbraco.Core;
 
 namespace umbraco.editorControls.relatedlinks
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class RelatedLinksDataType : umbraco.cms.businesslogic.datatype.BaseDataType, umbraco.interfaces.IDataType
     {
         private umbraco.interfaces.IDataEditor _Editor;

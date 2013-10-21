@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System;
+using System.Xml;
 using umbraco;
 using umbraco.cms.businesslogic.datatype;
 
@@ -7,6 +8,7 @@ namespace umbraco.editorControls
     /// <summary>
     /// Overrides the <see cref="umbraco.cms.businesslogic.datatype.DefaultData"/> object to return the value as XML.
     /// </summary>
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class CsvToXmlData : umbraco.cms.businesslogic.datatype.DefaultData
     {
         /// <summary>

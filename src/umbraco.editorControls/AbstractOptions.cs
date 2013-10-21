@@ -1,11 +1,13 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 
 namespace umbraco.editorControls
 {
 	/// <summary>
 	/// Abstract class for the Prevalue Editor options.
 	/// </summary>
-	public abstract class AbstractOptions
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
+    public abstract class AbstractOptions
 	{
 		/// <summary>
 		/// Initializes a new instance of the <see cref="AbstractOptions"/> class.

@@ -8,6 +8,7 @@ namespace umbraco.editorControls.PickerRelations
     /// <summary>
     /// Data Class, used to store the configuration options for the PickerRelationsPreValueEditor
     /// </summary>
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     internal class PickerRelationsOptions
     {
         /// <summary>

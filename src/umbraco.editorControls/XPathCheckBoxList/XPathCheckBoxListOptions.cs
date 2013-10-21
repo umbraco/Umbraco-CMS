@@ -7,6 +7,7 @@ namespace umbraco.editorControls.XPathCheckBoxList
     /// <summary>
     /// DataType configuration options for the XPath CheckBoxList
     /// </summary>
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class XPathCheckBoxListOptions : AbstractOptions
     {
         /// <summary>

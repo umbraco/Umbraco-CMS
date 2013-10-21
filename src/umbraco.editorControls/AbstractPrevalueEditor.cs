@@ -12,6 +12,7 @@ namespace umbraco.editorControls
     /// <summary>
     /// Abstract class for the PreValue Editor.
     /// </summary>
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public abstract class AbstractPrevalueEditor : WebControl, IDataPrevalue
     {
         /// <summary>

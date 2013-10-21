@@ -7,6 +7,7 @@ namespace umbraco.editorControls
     /// <summary>
     /// Summary description for cms.businesslogic.datatype.DefaultDataKeyValue.
     /// </summary>
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class DefaultDataKeyValue : cms.businesslogic.datatype.DefaultData
     {
         public DefaultDataKeyValue(cms.businesslogic.datatype.BaseDataType DataType)

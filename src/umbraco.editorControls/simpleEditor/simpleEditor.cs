@@ -10,7 +10,8 @@ namespace umbraco.editorControls.simpleEditor
 	/// <summary>
 	/// Summary description for simpleEditor.
 	/// </summary>
-	public class SimpleEditor : System.Web.UI.WebControls.TextBox, interfaces.IDataEditor
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
+    public class SimpleEditor : System.Web.UI.WebControls.TextBox, interfaces.IDataEditor
 	{
 		private interfaces.IData _data;
 		

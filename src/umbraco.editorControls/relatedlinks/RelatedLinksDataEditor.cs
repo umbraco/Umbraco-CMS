@@ -15,6 +15,7 @@ using Umbraco.Core.IO;
 namespace umbraco.editorControls.relatedlinks
 {
     [ValidationProperty("IsValid")]
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class RelatedLinksDataEditor : UpdatePanel, IDataEditor
     {
         private umbraco.interfaces.IData _data;

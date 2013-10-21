@@ -7,7 +7,7 @@ using Umbraco.Core.IO;
 
 namespace umbraco.editorControls.tinymce
 {
-
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class tinyMCEConfiguration
     {
         private static bool _init = false;

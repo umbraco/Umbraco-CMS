@@ -5,6 +5,7 @@ using Umbraco.Core;
 
 namespace umbraco.editorControls.tinyMCE3
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class tinyMCE3dataType : umbraco.cms.businesslogic.datatype.BaseDataType, umbraco.interfaces.IDataType
     {
         private umbraco.interfaces.IDataEditor _Editor;

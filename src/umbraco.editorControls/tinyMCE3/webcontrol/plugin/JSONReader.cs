@@ -14,7 +14,9 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol.plugin
     /// <summary>
 	/// 
 	/// </summary>
-	public enum JSONToken {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
+    public enum JSONToken
+    {
 		/// <summary> </summary>
 		Boolean,
 
@@ -49,7 +51,9 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol.plugin
 	/// <summary>
 	///  Description of JSONReader.
 	/// </summary>
-	public class JSONReader {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
+    public class JSONReader
+    {
 		private TextReader reader;
 		private JSONToken token;
 		private object val;

@@ -6,7 +6,8 @@ using System.Collections;
 using System.Collections.Generic;
 namespace umbraco.editorControls
 {
-	public class radiobox : System.Web.UI.WebControls.RadioButtonList, interfaces.IDataEditor
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
+    public class radiobox : System.Web.UI.WebControls.RadioButtonList, interfaces.IDataEditor
 	{
 		private interfaces.IData _data;
 		private SortedList _prevalues;

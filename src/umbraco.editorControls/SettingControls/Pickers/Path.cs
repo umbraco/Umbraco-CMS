@@ -8,6 +8,7 @@ using System.Web.UI.WebControls;
 
 namespace umbraco.editorControls.SettingControls.Pickers
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class Path : DataEditorSettingType
     {
         private PathPicker pp = new PathPicker();
@@ -41,7 +42,7 @@ namespace umbraco.editorControls.SettingControls.Pickers
         }
     }
 
-
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class PathPicker : WebControl
     {
         private TextBox tb;

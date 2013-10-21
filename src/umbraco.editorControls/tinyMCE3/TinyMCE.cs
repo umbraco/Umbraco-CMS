@@ -18,6 +18,7 @@ using umbraco.uicontrols;
 
 namespace umbraco.editorControls.tinyMCE3
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class TinyMCE : TinyMCEWebControl, IDataEditor, IMenuElement
     {
         private readonly string _activateButtons = "";

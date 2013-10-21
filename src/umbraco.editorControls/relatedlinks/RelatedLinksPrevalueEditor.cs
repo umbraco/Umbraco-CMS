@@ -10,6 +10,7 @@ using umbraco.editorControls;
 
 namespace umbraco.editorControls.relatedlinks
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class RelatedLinksPrevalueEditor : System.Web.UI.WebControls.PlaceHolder, umbraco.interfaces.IDataPrevalue
     {
         #region IDataPrevalue Members
