@@ -134,8 +134,10 @@
     <key alias="alternativeUrls">Alternative Links</key>
     <key alias="clickToEdit">Click to edit this item</key>
     <key alias="createBy">Created by</key>
+    <key alias="createByDesc" version="7.0">Original autho</key>
     <key alias="updatedBy" version="7.0">Updated by</key>
     <key alias="createDate">Created</key>
+    <key alias="createDateDesc" version="7.0">Date/time this document was created</key>
     <key alias="documentType">Document Type</key>
     <key alias="editing">Editing</key>
     <key alias="expireDate">Remove at</key>
@@ -163,15 +165,22 @@
     <key alias="type">Type</key>
     <key alias="unPublish">Unpublish</key>
     <key alias="updateDate">Last edited</key>
+    <key alias="updateDateDesc" version="7.0">Date/time this document was created</key>
     <key alias="uploadClear">Remove file</key>
     <key alias="urls">Link to document</key>
     <key alias="memberof">Member of group(s)</key>
     <key alias="notmemberof">Not a member of group(s)</key>
+
+    <key alias="childItems" version="7.0">Child items</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Where do you want to create the new %0%</key>
     <key alias="createUnder">Create a page under</key>
     <key alias="updateData">Choose a type and a title</key>
+
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
+
+    <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Browse your website</key>
@@ -244,6 +253,7 @@
     <key alias="newtab">New tab</key>
     <key alias="tab">Tab</key>
     <key alias="thumbnail">Thumbnail</key>
+    <key alias="iscontainercontenttype">Use as container content type</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Add prevalue</key>
@@ -360,6 +370,7 @@
     <key alias="remaining">Remaining</key>
     <key alias="rename">Rename</key>
     <key alias="renew">Renew</key>
+    <key alias="required" version="7.0">Required</key>
     <key alias="retry">Retry</key>
     <key alias="rights">Permissions</key>
     <key alias="search">Search</key>
@@ -821,6 +832,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="alternativeField">Alternative field</key>
     <key alias="alternativeText">Alternative Text</key>
     <key alias="casing">Casing</key>
+    <key alias="encoding">Encoding</key>
     <key alias="chooseField">Choose field</key>
     <key alias="convertLineBreaks">Convert Linebreaks</key>
     <key alias="convertLineBreaksHelp">Replaces linebreaks with html-tag &amp;lt;br&amp;gt;</key>

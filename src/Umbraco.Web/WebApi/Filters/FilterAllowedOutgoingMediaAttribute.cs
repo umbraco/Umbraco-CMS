@@ -122,7 +122,7 @@ namespace Umbraco.Web.WebApi.Filters
                 if (property != null)
                 {
                     var result = property.GetValue(objectContent.Value);
-                    if (TypeHelper.IsTypeAssignableFrom(_outgoingType, result.GetType()))
+                    if (result != null && TypeHelper.IsTypeAssignableFrom(_outgoingType, result.GetType()))
                     {
                         return result;
                     }
