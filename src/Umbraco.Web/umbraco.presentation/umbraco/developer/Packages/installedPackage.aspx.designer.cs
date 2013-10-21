@@ -19,34 +19,7 @@ namespace umbraco.presentation.developer.packages {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.UmbracoPanel Panel1;
-        
-        /// <summary>
-        /// packageUninstalled control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel packageUninstalled;
-        
-        /// <summary>
-        /// pane_uninstalled control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_uninstalled;
-        
-        /// <summary>
-        /// installedPackagePanel control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Panel installedPackagePanel;
+        protected global::umbraco.uicontrols.TabView Panel1;
         
         /// <summary>
         /// pane_meta control.
@@ -202,60 +175,6 @@ namespace umbraco.presentation.developer.packages {
         protected global::System.Web.UI.WebControls.Repeater rptr_versions;
         
         /// <summary>
-        /// pane_options control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_options;
-        
-        /// <summary>
-        /// lt_noUpdate control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal lt_noUpdate;
-        
-        /// <summary>
-        /// bt_update control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button bt_update;
-        
-        /// <summary>
-        /// bt_uninstall control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button bt_uninstall;
-        
-        /// <summary>
-        /// pane_noItems control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::umbraco.uicontrols.Pane pane_noItems;
-        
-        /// <summary>
-        /// bt_deletePackage control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Button bt_deletePackage;
-        
-        /// <summary>
         /// pane_upgrade control.
         /// </summary>
         /// <remarks>
@@ -290,6 +209,24 @@ namespace umbraco.presentation.developer.packages {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Button bt_gotoUpgrade;
+        
+        /// <summary>
+        /// pane_noItems control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane pane_noItems;
+        
+        /// <summary>
+        /// bt_deletePackage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button bt_deletePackage;
         
         /// <summary>
         /// pane_uninstall control.
@@ -452,5 +389,14 @@ namespace umbraco.presentation.developer.packages {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::umbraco.uicontrols.ProgressBar progbar;
+        
+        /// <summary>
+        /// pane_uninstalled control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane pane_uninstalled;
     }
 }

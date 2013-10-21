@@ -1,6 +1,5 @@
 <div class="umb-panel" ng-controller="Umbraco.Dialogs.IconPickerController">
 	<div class="umb-panel-header">
-
 		<div class="umb-el-wrap umb-panel-buttons">
 			<div class="span6">
 	                <div class="form-search">
@@ -14,7 +13,7 @@
 		</div>
 	</div>
 
-	<div class="umb-panel-body umb-scrollable" auto-scale="0">
+	<div class="umb-panel-body with-footer">
         
         <div class="umb-control-group">
 	        <ul class="umb-thumbnails thumbnails">
@@ -28,4 +27,13 @@
 
 	</div>
 	
+	<div class="umb-panel-footer" >
+		<div class="umb-el-wrap umb-panel-buttons">
+	        <div class="btn-toolbar umb-btn-toolbar pull-right">
+	        	<a href ng-click="close()" class="btn btn-link">
+	        		<localize key="general_cancel">Cancel</localize>
+				</a>
+	        </div>
+		</div>
+	</div>
 </div>

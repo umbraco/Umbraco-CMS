@@ -6,7 +6,7 @@ angular.module('umbraco')
 	function($scope, dialogService, entityResource, $log, iconHelper){
 		$scope.ids = $scope.model.value.split(',');
 		$scope.renderModel = [];
-		$scope.multipicker = true;
+		$scope.multiPicker = true;
 
 		entityResource.getByIds($scope.ids, "Member").then(function(data){
 			$(data).each(function(i, item){
@@ -16,7 +16,7 @@ angular.module('umbraco')
 		});
 
 		$scope.openMemberPicker =function(){
-			var d = dialogService.memberPicker({scope: $scope, multipicker: $scope.multipicker, callback: populate});
+			var d = dialogService.memberPicker({scope: $scope, multiPicker: $scope.multiPicker, callback: populate});
 		};
 
 		$scope.remove =function(index){

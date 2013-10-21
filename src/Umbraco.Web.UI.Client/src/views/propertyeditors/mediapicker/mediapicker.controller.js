@@ -35,7 +35,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
         $scope.add = function() {
             dialogService.mediaPicker({
-                multipicker: true,
+                multiPicker: true,
                 callback: function(data) {
                     _.each(data.selection, function(media, i) {
                         //shortcuts

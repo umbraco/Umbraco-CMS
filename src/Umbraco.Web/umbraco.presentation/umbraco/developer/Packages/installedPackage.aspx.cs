@@ -257,18 +257,11 @@ namespace umbraco.presentation.developer.packages
                             {
                                 if (repoPackage.HasUpgrade && repoPackage.UpgradeVersion != _pack.Data.Version)
                                 {
-                                    bt_update.Visible = true;
-                                    bt_update.Text = "Update available: version: " + repoPackage.UpgradeVersion;
+                                    pane_upgrade.Visible = true;
                                     lt_upgradeReadme.Text = repoPackage.UpgradeReadMe;
                                     bt_gotoUpgrade.OnClientClick = "window.location.href = 'browseRepository.aspx?url=" + repoPackage.Url + "'; return true;";
-                                    lt_noUpdate.Visible = false;
                                 }
-                                else
-                                {
-                                    bt_update.Visible = false;
-                                    lt_noUpdate.Visible = true;
-                                }
-
+                                
                                 if (!string.IsNullOrEmpty(repoPackage.Demo))
                                 {
                                     lb_demoLink.OnClientClick = "openDemo(this, '" + _pack.Data.PackageGuid + "'); return false;";
@@ -285,8 +278,7 @@ namespace umbraco.presentation.developer.packages
                         }
                         catch
                         {
-                            bt_update.Visible = false;
-                            lt_noUpdate.Visible = true;
+                            pane_upgrade.Visible = false;
                         }
                     }
 
@@ -332,7 +324,6 @@ namespace umbraco.presentation.developer.packages
                     if (deletePackage)
                     {
                         pane_noItems.Visible = true;
-                        bt_uninstall.Visible = false;
                         pane_uninstall.Visible = false;
                     }
 
@@ -372,8 +363,8 @@ namespace umbraco.presentation.developer.packages
         protected void delPack(object sender, EventArgs e)
         {
             _pack.Delete();
-            packageUninstalled.Visible = true;
-            installedPackagePanel.Visible = false;
+            pane_uninstalled.Visible = true;
+            pane_uninstall.Visible = false;
         }
 
 
@@ -554,11 +545,11 @@ namespace umbraco.presentation.developer.packages
                     }
                 }
                 _pack.Save();
-
                 _pack.Delete();
 
-                packageUninstalled.Visible = true;
-                installedPackagePanel.Visible = false;
+                pane_uninstalled.Visible = true;
+                pane_uninstall.Visible = false;
+
             }
 
             // refresh cache
@@ -619,22 +610,24 @@ namespace umbraco.presentation.developer.packages
             hl_docLink.Text = ui.Text("packager", "packageDocumentation");
             lb_demoLink.Text = ui.Text("packager", "packageDemonstration");
 
-            pane_options.Text = ui.Text("packager", "packageOptions");
-            lt_noUpdate.Text = ui.Text("packager", "packageNoUpgrades");
-            bt_update.Text = ui.Text("packager", "packageUpgradeHeader");
-            pp_upgradeInstruction.Text = ui.Text("packager", "packageUpgradeInstructions");
-            bt_gotoUpgrade.Text = ui.Text("packager", "packageUpgradeDownload");
-
             pane_versions.Text = ui.Text("packager", "packageVersionHistory");
-
             pane_noItems.Text = ui.Text("packager", "packageNoItemsHeader");
 
             pane_uninstall.Text = ui.Text("packager", "packageUninstallHeader");
-            bt_uninstall.Text = ui.Text("packager", "packageUninstallHeader");
             bt_deletePackage.Text = ui.Text("packager", "packageUninstallHeader");
             bt_confirmUninstall.Text = ui.Text("packager", "packageUninstallConfirm");
 
             pane_uninstalled.Text = ui.Text("packager", "packageUninstalledHeader");
+
+            var general = Panel1.NewTabPage(ui.Text("packager", "packageName"));
+            general.Controls.Add(pane_meta);
+            general.Controls.Add(pane_versions);
+
+
+            var uninstall = Panel1.NewTabPage(ui.Text("packager", "packageUninstallHeader"));
+            uninstall.Controls.Add(pane_noItems);
+            uninstall.Controls.Add(pane_uninstall);
+            uninstall.Controls.Add(pane_uninstalled);
         }
     }
 }

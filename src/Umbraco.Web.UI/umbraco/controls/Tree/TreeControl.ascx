@@ -47,7 +47,7 @@ jQuery(document).ready(function() {
         dataUrl: "<%#global::Umbraco.Core.IO.IOHelper.ResolveUrl(global::Umbraco.Core.IO.SystemDirectories.Umbraco)%>/webservices/TreeDataService.ashx",
         serviceUrl: "<%#global::Umbraco.Core.IO.IOHelper.ResolveUrl(global::Umbraco.Core.IO.SystemDirectories.Umbraco)%>/webservices/TreeClientService.asmx/GetInitAppTreeData"});
         
-     //add event handler for ajax errors, this will refresh the whole application
+     /*add event handler for ajax errors, this will refresh the whole application
     var mainTree = UmbClientMgr.mainTree();
     if (mainTree != null) {
         mainTree.addEventHandler("ajaxError", function(e) {
@@ -55,7 +55,7 @@ jQuery(document).ready(function() {
 	            UmbClientMgr.mainWindow("umbraco.aspx");
             }
         });
-    }
+    }*/
 
     <%#GetLegacyIActionJavascript()%>
 	

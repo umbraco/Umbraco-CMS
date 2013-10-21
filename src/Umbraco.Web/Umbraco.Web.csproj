@@ -1834,7 +1834,9 @@
     <Content Include="umbraco.presentation\umbraco\developer\Packages\editPackage.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\developer\Packages\installedPackage.aspx" />
+    <Content Include="umbraco.presentation\umbraco\developer\Packages\installedPackage.aspx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\developer\Packages\LoadNitros.ascx" />
     <Content Include="umbraco.presentation\umbraco\developer\Packages\SubmitPackage.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\about.aspx">
@@ -1896,7 +1898,9 @@
     </None>
     <Content Include="umbraco.presentation\umbraco\Search\QuickSearchHandler.ashx" />
     <None Include="umbraco.presentation\umbraco\templateControls\InlineXslt.xsltTemplate" />
-    <Content Include="umbraco.presentation\umbraco\users\NodePermissions.ascx" />
+    <Content Include="umbraco.presentation\umbraco\users\NodePermissions.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\users\PermissionEditor.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1950,9 +1954,6 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\settings\editLanguage.aspx" />
     <Content Include="umbraco.presentation\umbraco\settings\EditMediaType.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\users\EditUser.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\users\EditUserType.aspx">

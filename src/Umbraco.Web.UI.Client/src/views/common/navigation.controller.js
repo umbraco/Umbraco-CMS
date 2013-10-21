@@ -32,8 +32,6 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
     $scope.treeEventHandler = $({});
     $scope.selectedId = navigationService.currentId;
     
-    
-    
 
     //This reacts to clicks passed to the body element which emits a global call to close all dialogs
     $rootScope.$on("closeDialogs", function (event) {
@@ -86,14 +84,10 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
     //this reacts to tree items themselves being clicked
     //the tree directive should not contain any handling, simply just bubble events
     $scope.treeEventHandler.bind("treeNodeSelect", function (ev, args) {
+        var n = args.node;
         ev.stopPropagation();
         ev.preventDefault();
         
-        var n = args.node;
-
-        /*if(n.metaData && n.metaData.application){
-            $location.path(n.metaData.application).search("");
-        }else*/
 
         if (n.metaData && n.metaData["jsClickCallback"] && angular.isString(n.metaData["jsClickCallback"]) && n.metaData["jsClickCallback"] !== "") {
             //this is a legacy tree node!                
@@ -121,8 +115,8 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
             historyService.add({ name: n.name, link: n.routePath, icon: n.icon });
             //not legacy, lets just set the route value and clear the query string if there is one.
             $location.path(n.routePath).search("");
-        }else if(n.metaData && n.metaData.application){
-            $location.path("#/" + n.metaData.application);
+        } else if(args.element.section){
+            $location.path(args.element.section).search("");
         }
 
         navigationService.hideNavigation();

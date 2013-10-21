@@ -53,6 +53,7 @@ namespace umbraco.cms.presentation.user
 
             var save = pnlUmbraco.Menu.NewButton();
             save.ID = "btnSave";
+            save.ButtonType = uicontrols.MenuButtonType.Primary;
             save.OnClientClick = "SavePermissions(); return false;";
             save.Text = ui.Text("save");
             save.ToolTip = ui.Text("save");

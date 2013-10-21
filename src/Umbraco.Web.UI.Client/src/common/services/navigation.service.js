@@ -551,7 +551,6 @@ angular.module('umbraco.services')
           * hides any open navigation panes and resets the tree, actions and the currently selected node
           */
         hideNavigation: function () {
-           this.ui.currentSection = "";
             this.ui.actions = [];
             this.ui.currentNode = undefined;
             setMode("default");

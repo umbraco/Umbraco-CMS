@@ -7,7 +7,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.ContentPickerController",
 
 	$scope.selectResult = function(result){
 		entityResource.getById(result.id, "Document").then(function(ent){
-			if(dialogOptions && dialogOptions.multipicker){
+			if(dialogOptions && dialogOptions.multiPicker){
 				
 				$scope.showSearch = false;
 				$scope.results = [];
@@ -42,13 +42,20 @@ angular.module("umbraco").controller("Umbraco.Dialogs.ContentPickerController",
 		args.event.stopPropagation();
 
 		eventsService.publish("Umbraco.Dialogs.ContentPickerController.Select", args).then(function(args){
-			if(dialogOptions && dialogOptions.multipicker){
+			if(dialogOptions && dialogOptions.multiPicker){
 				
 				var c = $(args.event.target.parentElement);
 				if(!args.node.selected){
 					args.node.selected = true;
-					c.find("i.umb-tree-icon").hide()
-					.after("<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>");
+					
+					var temp = "<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>";
+					var icon = c.find("i.umb-tree-icon");
+					if(icon.length > 0){
+						icon.hide().after(temp);
+					}else{
+						c.prepend(temp);
+					}
+						
 				}else{
 					args.node.selected = false;
 					c.find(".temporary").remove();
