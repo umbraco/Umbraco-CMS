@@ -106,10 +106,6 @@ namespace umbraco.controls
 
             pp_isContainer.Text = ui.Text("editcontenttype", "iscontainercontenttype", Security.CurrentUser);
             
-
-            //pp_thumbnail.Text = ui.Text("editcontenttype", "thumbnail", Security.CurrentUser);
-
-
             // we'll disable this...
             if (!Page.IsPostBack && _contentType.MasterContentType != 0)
             {
@@ -1296,11 +1292,6 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 BindDataGenericProperties(true);
             }
 
-            Page.ClientScript.RegisterStartupScript(this.GetType(), "dropDowns", @"
-Umbraco.Controls.TabView.onActiveTabChange(function(tabviewid, tabid, tabs) {
-    refreshDropDowns();
-});
-", true);
         }
 
         /// <summary>
