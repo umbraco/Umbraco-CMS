@@ -12,32 +12,48 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	$scope.entityType ="Document";
 	$scope.results = [];
 
-	if(dialogOptions.treeAlias === "member"){
+	if(dialogOptions.section === "member"){
 		$scope.searcher = searchService.searchMembers;
 		$scope.entityType = "Member";
-	}else if(dialogOptions.treeAlias === "media"){
+	}else if(dialogOptions.section === "media"){
 		$scope.searcher = searchService.searchMedia;
 		$scope.entityType = "Media";
 	}
 
-	function select(id){
-		entityResource.getById(id, $scope.entityType).then(function(ent){
-			if($scope.multiPicker){
-				
-				$scope.showSearch = false;
-				$scope.results = [];
-				$scope.term = "";
-				$scope.oldTerm = undefined;
+	function select(text, id){
+		
+		//if we get the root, we just return a constructed entity, no need for server data
+		if(id < 0){
+			var node = {
+				alias: null,
+				icon: "icon-folder",
+				id: id,
+				name: text};
 
-				$scope.select(ent);
+			if($scope.multiPicker){
+				$scope.select(node);
 			}else{
-				$scope.submit(ent);
+				$scope.submit(node);
 			}
-		});
+		}else{
+			entityResource.getById(id, $scope.entityType).then(function(ent){
+				if($scope.multiPicker){
+					
+					$scope.showSearch = false;
+					$scope.results = [];
+					$scope.term = "";
+					$scope.oldTerm = undefined;
+
+					$scope.select(ent);
+				}else{
+					$scope.submit(ent);
+				}
+			});
+		}
 	}
 
 	$scope.selectResult = function(result){
-		select(result.id);
+		select(result.title, result.id);
 	};
 
 	$scope.performSearch = function(){
@@ -63,14 +79,19 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 
 		eventsService.publish("Umbraco.Dialogs.TreePickerController.Select", args).then(function(args){
 			
-			select(args.node.id);
+			select(args.node.name, args.node.id);
 
 			if($scope.multiPicker){
 				var c = $(args.event.target.parentElement);
 				if(!args.node.selected){
 					args.node.selected = true;
-					c.find("i.umb-tree-icon").hide()
-					.after("<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>");
+					var temp = "<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>";
+					var icon = c.find("i.umb-tree-icon");
+					if(icon.length > 0){
+						icon.hide().after(temp);
+					}else{
+						c.prepend(temp);
+					}
 				}else{
 					args.node.selected = false;
 					c.find(".temporary").remove();

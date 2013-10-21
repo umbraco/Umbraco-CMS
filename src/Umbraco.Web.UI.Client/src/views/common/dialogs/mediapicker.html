@@ -61,14 +61,24 @@ data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupl
         />
 	</div>
 
-	<div class="umb-panel-footer">
-		<div class="umb-el-wrap umb-panel-buttons">
-	        <div class="pull-right umb-btn-toolbar"> 
-	         	<button ng-show="dialogData.selection.length > 0" type="button" 
-	         		ng-click="submit(dialogData)" class="btn btn-primary">Select ({{dialogData.selection.length}})</button>
-	        </div>
+	<div class="umb-panel-footer" >
+			<div class="umb-el-wrap umb-panel-buttons">
+		        <div class="btn-toolbar umb-btn-toolbar pull-right">
+
+		        	<a href ng-click="close()" class="btn btn-link">
+		        		<localize key="general_cancel">Cancel</localize>
+					</a>
+
+					<button
+						class="btn btn-primary"
+						ng-show="dialogOptions.multiPicker" 
+						ng-click="submit(dialogData)">
+						<localize key="buttons_select">Select</localize>({{dialogData.selection.length}})
+					</button>
+
+		        </div>
+			</div>
 		</div>
-	</div>
 
 </div>
 

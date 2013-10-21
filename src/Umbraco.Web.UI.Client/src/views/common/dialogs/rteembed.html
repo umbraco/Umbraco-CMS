@@ -22,7 +22,10 @@
 
         <div class="umb-panel-footer">
             <div class="btn-toolbar umb-btn-toolbar pull-right">
-                <a href class="btn btn-link" ng-click="close()">Cancel</a>
+                <a href class="btn btn-link" ng-click="close()">
+                    <localize key="cancel" />
+                </a>
+                
                 <input type="button" ng-click="insert()" class="btn btn-primary" value="Ok" ng-disabled="!form.success" />
             </div>
         </div>
