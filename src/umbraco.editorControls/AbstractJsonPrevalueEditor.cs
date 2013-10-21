@@ -10,6 +10,7 @@ namespace umbraco.editorControls
     /// Abstract class for the PreValue Editor.
     /// Specifically designed to serialize/deserialize the options as JSON.
     /// </summary>
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public abstract class AbstractJsonPrevalueEditor : AbstractPrevalueEditor
     {
         /// <summary>

@@ -14,6 +14,7 @@ namespace umbraco.editorControls.relatedlinks
     /// data (after the IDataEditor has performed a save()).
     /// This class was not designed for, but might work equally well for other datatypes.
     /// </summary>
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     class PagePickerDataExtractor : IData
     {
         private object _value;

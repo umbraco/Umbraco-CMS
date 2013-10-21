@@ -5,7 +5,8 @@ using umbraco.BusinessLogic;
 
 namespace umbraco.editorControls
 {
-	public abstract class BaseDataType
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
+    public abstract class BaseDataType
 	{
 		private int _datatypedefinitionid;
 		private string _datafield = "";
@@ -84,7 +85,8 @@ namespace umbraco.editorControls
 		}
 		#endregion
 	}
-	public enum DBTypes 
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
+    public enum DBTypes 
 	{
 		Integer,
 		Date,

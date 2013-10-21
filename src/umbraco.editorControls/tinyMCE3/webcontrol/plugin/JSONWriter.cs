@@ -14,7 +14,9 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol.plugin
     /// <summary>
 	/// 
 	/// </summary>
-	public enum JSONLocation {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
+    public enum JSONLocation
+    {
 		/// <summary> </summary>
 		InArray,
 
@@ -28,7 +30,9 @@ namespace umbraco.editorControls.tinyMCE3.webcontrol.plugin
 	/// <summary>
 	/// Description of JSONWriter.
 	/// </summary>
-	public class JSONWriter {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
+    public class JSONWriter
+    {
 		private TextWriter writer;
 		private JSONLocation location;
 		private Stack lastLocations;

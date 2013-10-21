@@ -125,6 +125,7 @@ namespace Umbraco.Web.Models.Mapping
                 // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
                 if (role.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false)
                 {
+                    if (username.IsNullOrWhiteSpace()) continue;
                     if (Roles.IsUserInRole(username, role))
                     {
                         result[role] = true;

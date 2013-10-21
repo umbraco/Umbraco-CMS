@@ -8,7 +8,8 @@ namespace umbraco.editorControls
 	/// <summary>
 	/// Generates a radiolist of yes and no for boolean fields
 	/// </summary>
-	public class yesNo : System.Web.UI.WebControls.CheckBox, interfaces.IDataEditor
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
+    public class yesNo : System.Web.UI.WebControls.CheckBox, interfaces.IDataEditor
 	{
 	
 		private interfaces.IData _data;

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 namespace umbraco.editorControls.userControlGrapper
 {
     [ValidationProperty("Value")]
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class usercontrolDataEditor : System.Web.UI.WebControls.PlaceHolder, umbraco.interfaces.IDataEditor
 	{
 		private umbraco.interfaces.IData _data;

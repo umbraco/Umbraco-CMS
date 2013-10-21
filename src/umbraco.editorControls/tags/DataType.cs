@@ -5,6 +5,7 @@ using datatype = umbraco.cms.businesslogic.datatype;
 
 namespace umbraco.editorControls.tags
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class DataType : datatype.BaseDataType, IDataType
     {
         #region IDataType Members

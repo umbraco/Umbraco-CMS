@@ -7,7 +7,8 @@ namespace umbraco.editorControls
 	/// <summary>
 	/// Summary description for propertyTypePicker.
 	/// </summary>
-	public class PropertyTypePicker : System.Web.UI.WebControls.ListBox, interfaces.IMacroGuiRendering
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
+    public class PropertyTypePicker : System.Web.UI.WebControls.ListBox, interfaces.IMacroGuiRendering
 	{
 		string _value = "";
 		bool _multiple = false;

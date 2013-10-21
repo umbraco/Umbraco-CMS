@@ -10,6 +10,7 @@ using ClientDependency.Core;
 namespace umbraco.editorControls.ultimatepicker
 {
     [ValidationProperty("IsValid")]
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class ultimatePickerDataEditor : UpdatePanel, IDataEditor
     {
         private IData _data;

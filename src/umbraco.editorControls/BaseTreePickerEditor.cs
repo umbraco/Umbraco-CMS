@@ -12,6 +12,7 @@ namespace umbraco.editorControls
     /// <summary>
     /// A base tree picker class that has all of the functionality built in for an IDataEditor
     /// </summary>
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public abstract class BaseTreePickerEditor : BaseTreePicker, IDataEditor
     {
 

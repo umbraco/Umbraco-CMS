@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Xml.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -246,6 +248,10 @@ namespace Umbraco.Core.Services
             {
                 repository.AddOrUpdate(member);
                 uow.Commit();
+
+                //insert the xml
+                var xml = member.ToXml();
+                CreateAndSaveContentXml(xml, member.Id, uow.Database);
             }
 
             return member;
@@ -343,6 +349,10 @@ namespace Umbraco.Core.Services
             {
                 repository.AddOrUpdate(member);
                 uow.Commit();
+
+                //insert the xml
+                var xml = member.ToXml();
+                CreateAndSaveContentXml(xml, member.Id, uow.Database);
             }
 
             if (raiseEvents)
@@ -350,6 +360,13 @@ namespace Umbraco.Core.Services
         }
 
         #endregion
+
+        private void CreateAndSaveContentXml(XElement xml, int id, UmbracoDatabase db)
+        {
+            var contentPoco = new ContentXmlDto { NodeId = id, Xml = xml.ToString(SaveOptions.None) };
+            var contentExists = db.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @Id", new { Id = id }) != 0;
+            int contentResult = contentExists ? db.Update(contentPoco) : Convert.ToInt32(db.Insert(contentPoco));
+        }
 
         #region Event Handlers
 

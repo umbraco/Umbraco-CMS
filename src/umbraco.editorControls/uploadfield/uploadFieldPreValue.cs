@@ -8,6 +8,7 @@ using umbraco.DataLayer;
 
 namespace umbraco.editorControls.uploadfield
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     class uploadFieldPreValue : System.Web.UI.WebControls.PlaceHolder, interfaces.IDataPrevalue
 	{
 	

@@ -7,6 +7,7 @@ using umbraco.cms.businesslogic.datatype;
 
 namespace umbraco.editorControls.SettingControls.Pickers
 {
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class DateWithTime : DataEditorSettingType
     {
         private DateTimePicker dp = new DateTimePicker();

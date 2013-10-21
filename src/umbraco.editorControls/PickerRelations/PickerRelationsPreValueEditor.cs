@@ -13,6 +13,7 @@ namespace umbraco.editorControls.PickerRelations
 	/// TODO: [HR] min / max selections ?
     /// Uses the shared JsonPreValueEditor as nice way of lightweight serializing a config data class object into a single DB field
     /// </summary>
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class PickerRelationsPreValueEditor : AbstractJsonPrevalueEditor
     {
         /// <summary>

@@ -11,6 +11,7 @@ namespace umbraco.editorControls.XPathCheckBoxList
     /// <summary>
     /// Renders a CheckBoxList using with option nodes obtained by an XPath expression
     /// </summary>
+    [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class XPathCheckBoxListDataEditor : CompositeControl, IDataEditor
     {
         /// <summary>
