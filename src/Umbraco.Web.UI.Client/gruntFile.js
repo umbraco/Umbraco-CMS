@@ -12,7 +12,7 @@ module.exports = function (grunt) {
   grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
   //triggered from grunt dev or grunt
-  grunt.registerTask('build', ['clean','concat','recess:build','copy']);
+  grunt.registerTask('build', ['clean','concat','uglify','recess:min','copy']);
   
   //utillity tasks
   grunt.registerTask('docs', ['ngdocs']);
@@ -190,9 +190,9 @@ module.exports = function (grunt) {
 
     uglify: {
       options: {
-        mangle: false
+        mangle: true
       },
-      my_target: {
+      combine: {
         files: {
           '<%= distdir %>/js/umbraco.min.js': ['<%= distdir %>/js/umbraco.*.js']
         }
@@ -213,6 +213,7 @@ module.exports = function (grunt) {
           '<%= distdir %>/assets/css/<%= pkg.name %>.css': ['<%= src.less %>']
         },
         options: {
+          compile: true,
           compress: true
         }
       }
