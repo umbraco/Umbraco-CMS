@@ -36,7 +36,7 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(display => display.Tabs,
                              expression => expression.ResolveUsing(
                                  new TabsAndPropertiesResolver(
-                                     //do no map this properties (currently anyways, they were never there in 6.x)
+                                 //do no map this properties (currently anyways, they were never there in 6.x)
                                      Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias))))
                   .AfterMap(MapGenericCustomProperties);
 
@@ -57,7 +57,7 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(
                       dto => dto.Owner,
                       expression => expression.ResolveUsing<OwnerResolver<IMember>>())
-                    //do no map the custom member properties (currently anyways, they were never there in 6.x)
+                //do no map the custom member properties (currently anyways, they were never there in 6.x)
                   .ForMember(dto => dto.Properties, expression => expression.ResolveUsing<MemberDtoPropertiesValueResolver>());
         }
 
@@ -76,7 +76,7 @@ namespace Umbraco.Web.Models.Mapping
                         Label = ui.Text("login"),
                         Value = display.Username,
                         View = "textbox",
-                        Config = new Dictionary<string, object> {{"IsRequired", true}}
+                        Config = new Dictionary<string, object> { { "IsRequired", true } }
                     },
                 new ContentPropertyDisplay
                     {
@@ -84,22 +84,23 @@ namespace Umbraco.Web.Models.Mapping
                         Label = ui.Text("general", "email"),
                         Value = display.Email,
                         View = "email",
-                        Config = new Dictionary<string, object> {{"IsRequired", true}}
+                        Config = new Dictionary<string, object> { { "IsRequired", true } }
                     },
                 new ContentPropertyDisplay
                     {
                         Alias = string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                         Label = ui.Text("password"),
-                        //NOTE: The value here is a json value - but the only property we care about is the generatedPassword one if it exists - this is the only value we'll ever supply to the front-end
+                        //NOTE: The value here is a json value - but the only property we care about is the generatedPassword one if it exists, the newPassword exists
+                        // only when creating a new member and we want to have a generated password pre-filled.
                         Value = new Dictionary<string, object>
                             {
-                                {"generatedPassword", member.AdditionalData.ContainsKey("GeneratedPassword") ? member.AdditionalData["GeneratedPassword"] : null}
+                                {"generatedPassword", member.AdditionalData.ContainsKey("GeneratedPassword") ? member.AdditionalData["GeneratedPassword"] : null},
+                                {"newPassword", member.AdditionalData.ContainsKey("NewPassword") ? member.AdditionalData["NewPassword"] : null},
                             },
                         //TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
                         View = "changepassword",
-                        Config = new Dictionary<string, object>(
-                    //initialize the dictionary with the configuration from the default membership provider
-                    Membership.Provider.GetConfiguration())
+                        //initialize the dictionary with the configuration from the default membership provider
+                        Config = new Dictionary<string, object>(Membership.Provider.GetConfiguration())
                             {
                                 //the password change toggle will only be displayed if there is already a password assigned.
                                 {"hasPassword", member.Password.IsNullOrWhiteSpace() == false}
@@ -111,10 +112,10 @@ namespace Umbraco.Web.Models.Mapping
                         Label = ui.Text("content", "membergroup"),
                         Value = GetMemberGroupValue(display.Username),
                         View = "membergroups",
-                        Config = new Dictionary<string, object> {{"IsRequired", true}}
+                        Config = new Dictionary<string, object> { { "IsRequired", true } }
                     });
 
-        }        
+        }
 
         internal static IDictionary<string, bool> GetMemberGroupValue(string username)
         {
@@ -129,7 +130,7 @@ namespace Umbraco.Web.Models.Mapping
                     if (Roles.IsUserInRole(username, role))
                     {
                         result[role] = true;
-                    }                        
+                    }
                 }
             }
             return result;

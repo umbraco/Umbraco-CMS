@@ -1,7 +1,7 @@
 angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordController",
-    function($scope) {
+    function ($scope, $routeParams) {
         
-        function resetModel() {
+        function resetModel(isNew) {
             //the model config will contain an object, if it does not we'll create defaults
             //NOTE: We will not support doing the password regex on the client side because the regex on the server side
             //based on the membership provider cannot always be ported to js from .net directly.        
@@ -46,18 +46,29 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
                 };
             }
             else {
-                //just reset the values we need to
-                $scope.model.value.newPassword = "";
-                $scope.model.value.oldPassword = null;
+                //just reset the values
+
+                if (!isNew) {
+                    //if it is new, then leave the generated pass displayed
+                    $scope.model.value.newPassword = "";
+                    $scope.model.value.oldPassword = null;
+                }
                 $scope.model.value.reset = null;
                 $scope.model.value.answer = null;
             }
 
             //the value to compare to match passwords
-            $scope.model.confirm = "";
+            if (!isNew) {
+                $scope.model.confirm = "";
+            }
+            else if ($scope.model.value.newPassword.length > 0) {
+                //if it is new and a new password has been set, then set the confirm password too
+                $scope.model.confirm = $scope.model.value.newPassword;
+            }
+            
         }
 
-        resetModel();
+        resetModel($routeParams.create);
 
         //if there is no password saved for this entity , it must be new so we do not allow toggling of the change password, it is always there
         //with validators turned on.

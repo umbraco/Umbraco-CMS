@@ -267,11 +267,6 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
-        /// </summary>
-        public IDictionary<string, object> AdditionalData { get; private set; }
-
-        /// <summary>
         /// List of PropertyGroups available on this Content object
         /// </summary>
         [IgnoreDataMember]

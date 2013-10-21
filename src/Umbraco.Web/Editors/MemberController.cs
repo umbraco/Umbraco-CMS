@@ -89,7 +89,8 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var emptyContent = new Core.Models.Member("", contentType);
+            IMember emptyContent = new Member("", contentType);
+            emptyContent.AdditionalData["NewPassword"] = Membership.GeneratePassword(Membership.MinRequiredPasswordLength, Membership.MinRequiredNonAlphanumericCharacters);
             return Mapper.Map<IMember, MemberDisplay>(emptyContent);
         }
 
