@@ -79,7 +79,7 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForContent("id")]
         public ContentItemDisplay GetById(int id)
         {
-            var foundContent = GetEntityFromRequest(() => Services.ContentService.GetById(id));            
+            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));            
             if (foundContent == null)
             {
                 HandleContentNotFound(id);
@@ -306,7 +306,8 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForContent("id", 'P')]
         public HttpResponseMessage PostPublishById(int id)
         {
-            var foundContent = Services.ContentService.GetById(id);
+            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
+
             if (foundContent == null)
             {
                 return HandleContentNotFound(id, false);
@@ -357,9 +358,8 @@ namespace Umbraco.Web.Editors
         [HttpDelete]
         public HttpResponseMessage DeleteById(int id)
         {
-            //TODO: We need to check if the user is allowed to do this!
+            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
 
-            var foundContent = Services.ContentService.GetById(id);
             if (foundContent == null)
             {
                 return HandleContentNotFound(id, false);
@@ -401,8 +401,6 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForContent("sorted.ParentId", 'S')]
         public HttpResponseMessage PostSort(ContentSortOrder sorted)
         {
-            //TODO: We need to check if the user is allowed to sort here!
-
             if (sorted == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
@@ -473,7 +471,8 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForContent("id", 'Z')]
         public ContentItemDisplay PostUnPublish(int id)
         {
-            var foundContent = Services.ContentService.GetById(id);
+            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
+
             if (foundContent == null)
                 HandleContentNotFound(id);
 

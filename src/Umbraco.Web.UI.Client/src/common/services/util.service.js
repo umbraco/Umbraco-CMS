@@ -232,6 +232,8 @@ function umbDataFormatter() {
             //this is basically the same as for media but we need to explicitly add the username,email, password to the save model
             var saveModel = this.formatMediaPostData(displayModel, action);
 
+            saveModel.key = displayModel.key;
+            
             var genericTab = _.find(displayModel.tabs, function (item) {
                 return item.id === 0;
             });

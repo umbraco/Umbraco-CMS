@@ -48,15 +48,16 @@ namespace Umbraco.Web.Editors
             if (membershipProvider == null) throw new ArgumentNullException("membershipProvider");
 
             int totalRecs;
-            var existingByEmail = membershipProvider.FindUsersByName(contentItem.Username.Trim(), 0, int.MaxValue, out totalRecs);
+            var existingByName = membershipProvider.FindUsersByName(contentItem.Username.Trim(), 0, int.MaxValue, out totalRecs);
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
 
-                    if (contentItem.PersistedContent.Email.InvariantEquals(contentItem.Email.Trim()) == false)
+                    //ok, we're updating the member, we need to check if they are changing their login and if so, does it exist already ?
+                    if (contentItem.PersistedContent.Username.InvariantEquals(contentItem.Username.Trim()) == false)
                     {
                         //they are changing their login name
-                        if (existingByEmail.Cast<MembershipUser>().Select(x => x.UserName)
+                        if (existingByName.Cast<MembershipUser>().Select(x => x.UserName)
                             .Any(x => x == contentItem.Username.Trim()))
                         {
                             //the user cannot use this login
@@ -66,7 +67,7 @@ namespace Umbraco.Web.Editors
                     break;
                 case ContentSaveAction.SaveNew:
                     //check if the user's login already exists
-                    if (existingByEmail.Cast<MembershipUser>().Select(x => x.UserName)
+                    if (existingByName.Cast<MembershipUser>().Select(x => x.UserName)
                         .Any(x => x == contentItem.Username.Trim()))
                     {
                         //the user cannot use this login

@@ -162,7 +162,8 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForMedia("id")]
         public MediaItemDisplay GetById(int id)
         {
-            var foundContent = Services.MediaService.GetById(id);
+            var foundContent = GetObjectFromRequest(() => Services.MediaService.GetById(id));
+
             if (foundContent == null)
             {
                 HandleContentNotFound(id);
@@ -251,7 +252,8 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForMedia("id")]
         public HttpResponseMessage DeleteById(int id)
         {
-            var foundMedia = Services.MediaService.GetById(id);
+            var foundMedia = GetObjectFromRequest(() => Services.MediaService.GetById(id));
+
             if (foundMedia == null)
             {
                 return HandleContentNotFound(id, false);

@@ -481,10 +481,20 @@ namespace umbraco.providers.members
         /// </returns>
         public override MembershipUser GetUser(object providerUserKey, bool userIsOnline)
         {
-            if (String.IsNullOrEmpty(providerUserKey.ToString()))
-                return null;
-            var m = new Member(Convert.ToInt32(providerUserKey));            
-            return ConvertToMembershipUser(m);
+            var asGuid = providerUserKey.TryConvertTo<Guid>();
+            if (asGuid.Success)
+            {
+                var m = new Member(asGuid.Result);
+                return ConvertToMembershipUser(m);    
+            }
+            var asInt = providerUserKey.TryConvertTo<int>();
+            if (asInt.Success)
+            {
+                var m = new Member(asInt.Result);
+                return ConvertToMembershipUser(m);    
+            }
+            throw new InvalidOperationException("The " + GetType() + " provider only supports GUID or Int as a providerUserKey");
+
         }
 
 

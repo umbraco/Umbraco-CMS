@@ -152,8 +152,7 @@ namespace Umbraco.Web.Editors
         /// This is useful for when filters have alraedy looked up a persisted entity and we don't want to have
         /// to look it up again.
         /// </remarks>
-        protected TPersisted GetEntityFromRequest<TPersisted>(Func<TPersisted> getFromService)
-            where TPersisted : IContentBase
+        protected TPersisted GetObjectFromRequest<TPersisted>(Func<TPersisted> getFromService)
         {
             return Request.Properties.ContainsKey(typeof (TPersisted).ToString()) == false
                        ? getFromService()

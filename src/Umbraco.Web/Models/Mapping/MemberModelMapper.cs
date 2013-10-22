@@ -70,14 +70,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             TabsAndPropertiesResolver.MapGenericProperties(
                 member, display,
-                new ContentPropertyDisplay
-                    {
-                        Alias = string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = ui.Text("login"),
-                        Value = display.Username,
-                        View = "textbox",
-                        Config = new Dictionary<string, object> { { "IsRequired", true } }
-                    },
+                GetLoginProperty(member, display),
                 new ContentPropertyDisplay
                     {
                         Alias = string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
@@ -115,6 +108,38 @@ namespace Umbraco.Web.Models.Mapping
                         Config = new Dictionary<string, object> { { "IsRequired", true } }
                     });
 
+        }
+
+        /// <summary>
+        /// Returns the login property display field
+        /// </summary>
+        /// <param name="member"></param>
+        /// <param name="display"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// If the membership provider installed is the umbraco membership provider, then we will allow changing the username, however if
+        /// the membership provider is a custom one, we cannot allow chaning the username because MembershipProvider's do not actually natively 
+        /// allow that.
+        /// </remarks>
+        internal static ContentPropertyDisplay GetLoginProperty(IMember member, MemberDisplay display)
+        {
+            var prop = new ContentPropertyDisplay
+                {
+                    Alias = string.Format("{0}login", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
+                    Label = ui.Text("login"),
+                    Value = display.Username            
+                };
+            //only allow editing if this is a new member, or if the membership provider is the umbraco one
+            if (member.HasIdentity == false || Membership.Provider.Name == Constants.Conventions.Member.UmbracoMemberProviderName)
+            {
+                prop.View = "textbox";
+                prop.Config = new Dictionary<string, object> {{"IsRequired", true}};
+            }
+            else
+            {
+                prop.View = "readonlyvalue";
+            }
+            return prop;
         }
 
         internal static IDictionary<string, bool> GetMemberGroupValue(string username)

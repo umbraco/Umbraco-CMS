@@ -104,6 +104,7 @@ namespace Umbraco.Web.Editors
             [ModelBinder(typeof(MemberBinder))]
                 MemberSave contentItem)
         {
+            //TODO : Support this!
             if (Membership.Provider.Name != Constants.Conventions.Member.UmbracoMemberProviderName)
             {
                 throw new NotSupportedException("Currently the member editor does not support providers that are not the default Umbraco membership provider ");
@@ -115,7 +116,7 @@ namespace Umbraco.Web.Editors
             // * any file attachments have been saved to their temporary location for us to use
             // * we have a reference to the DTO object and the persisted object
             // * Permissions are valid
-
+            
             //map the properties to the persisted entity
             MapPropertyValues(contentItem);
 
@@ -158,27 +159,30 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
             }
 
-            //Now let's do the role provider stuff
-            var currGroups = Roles.GetRolesForUser(contentItem.PersistedContent.Username);
-            //find the ones to remove and remove them
-            var toRemove = currGroups.Except(contentItem.Groups).ToArray();
-            if (toRemove.Any())
-            {
-                Roles.RemoveUserFromRoles(contentItem.PersistedContent.Username, toRemove);    
-            }
-            if (contentItem.Groups.Any())
-            {
-                //add the ones submitted
-                Roles.AddUserToRoles(contentItem.PersistedContent.Username, contentItem.Groups.ToArray());    
-            }
-            
             //save the item
             //NOTE: We are setting the password to NULL - this indicates to the system to not actually save the password
             // so it will not get overwritten!
             contentItem.PersistedContent.Password = null;
-
+            
             //create/save the IMember
             Services.MemberService.Save(contentItem.PersistedContent);
+
+            //Now let's do the role provider stuff - now that we've saved the content item (that is important since
+            // if we are changing the username, it must be persisted before looking up the member roles).
+            var currGroups = Roles.GetRolesForUser(contentItem.PersistedContent.Username);
+            //find the ones to remove and remove them
+            var toRemove = currGroups.Except(contentItem.Groups).ToArray();            
+            if (toRemove.Any())
+            {
+                Roles.RemoveUserFromRoles(contentItem.PersistedContent.Username, toRemove);
+            }
+            //find the ones to add and add them
+            var toAdd = contentItem.Groups.Except(currGroups).ToArray();
+            if (toAdd.Any())
+            {
+                //add the ones submitted
+                Roles.AddUserToRoles(contentItem.PersistedContent.Username, toAdd);
+            }
 
             //set the generated password (if there was one) - in order to do this we'll chuck the gen'd password into the
             // additional data of the IUmbracoEntity of the persisted item - then we can retreive this in the model mapper and set 
@@ -237,11 +241,12 @@ namespace Umbraco.Web.Editors
         private string UpdateWithMembershipProvider(MemberSave contentItem)
         {
             //Get the member from the provider
-            var membershipUser = Membership.Provider.GetUser(contentItem.PersistedContent.Username, false);
+
+            var membershipUser = Membership.Provider.GetUser(contentItem.PersistedContent.Key, false);
             if (membershipUser == null)
             {
                 //This should never happen! so we'll let it YSOD if it does.
-                throw new InvalidOperationException("Could not get member from membership provider " + Membership.Provider.Name + " with username " + contentItem.PersistedContent.Username);
+                throw new InvalidOperationException("Could not get member from membership provider " + Membership.Provider.Name + " with key " + contentItem.PersistedContent.Key);
             }
 
             //ok, first thing to do is check if they've changed their email 

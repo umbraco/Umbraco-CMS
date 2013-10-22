@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Web.Http.Controllers;
+using System.Web.Http.ModelBinding;
+using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -29,14 +32,19 @@ namespace Umbraco.Web.WebApi.Binders
             // pretty hard to support them in 7 when the member type editor is using the old APIs!
             var toRemove = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
 
-            var member =  ApplicationContext.Services.MemberService.GetByUsername(model.Username);
+            var member = ApplicationContext.Services.MemberService.GetByKey(model.Key);
+            if (member == null)
+            {
+                throw new InvalidOperationException("Could not find member with key " + model.Key);
+            }
+
             foreach (var remove in toRemove)
             {
                 member.Properties.Remove(remove);
             }
             return member;
         }
-        
+
         protected override IMember CreateNew(MemberSave model)
         {
             var contentType = ApplicationContext.Services.MemberTypeService.GetMemberType(model.ContentTypeAlias);
@@ -44,7 +52,7 @@ namespace Umbraco.Web.WebApi.Binders
             {
                 throw new InvalidOperationException("No member type found wth alias " + model.ContentTypeAlias);
             }
-
+            
             //TODO: We're going to remove the built-in member properties from this editor - We didn't support these in 6.x so 
             // pretty hard to support them in 7 when the member type editor is using the old APIs!
             var toRemove = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
