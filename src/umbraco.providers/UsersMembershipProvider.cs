@@ -18,6 +18,30 @@ namespace umbraco.providers
     /// </summary>
     public class UsersMembershipProvider : MembershipProviderBase
     {
+        /// <summary>
+        /// Override to maintain backwards compatibility with 0 required non-alphanumeric chars
+        /// </summary>
+        protected override int DefaultMinNonAlphanumericChars
+        {
+            get { return 0; }
+        }
+
+        /// <summary>
+        /// Override to maintain backwards compatibility with only 4 required length
+        /// </summary>
+        protected override int DefaultMinPasswordLength
+        {
+            get { return 4; }
+        }
+
+        /// <summary>
+        /// Override to maintain backwards compatibility
+        /// </summary>
+        protected override bool DefaultUseLegacyEncoding
+        {
+            get { return true; }
+        }
+        
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config) 
         {
             if (config == null) throw new ArgumentNullException("config");
@@ -41,8 +65,10 @@ namespace umbraco.providers
         /// During installation the application will not be configured, if this is the case and the 'default' password 
         /// is stored in the database then we will validate the user - this will allow for an admin password reset if required
         /// </remarks>
-        public override bool ChangePassword(string username, string oldPassword, string newPassword)
+        protected override bool PerformChangePassword(string username, string oldPassword, string newPassword)
         {
+
+
             if (ApplicationContext.Current.IsConfigured == false && oldPassword == "default"
                 || ValidateUser(username, oldPassword))
             {

@@ -232,78 +232,95 @@ namespace Umbraco.Web.Security
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not reset password, error: " + ex.Message + " (see log for full details)", new[] { "resetPassword" }) });
                 }
             }
-            if (passwordModel.NewPassword.IsNullOrWhiteSpace() == false)
+
+            //we're not resetting it so we need to try to change it.
+
+            if (passwordModel.NewPassword.IsNullOrWhiteSpace())
             {
-                //we're not resetting it so we need to try to change it.
+                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" }) });
+            }
 
-                if (passwordModel.OldPassword.IsNullOrWhiteSpace() && membershipProvider.EnablePasswordRetrieval == false)
+            //This is an edge case and is only necessary for backwards compatibility:
+            var umbracoBaseProvider = membershipProvider as MembershipProviderBase;
+            if (umbracoBaseProvider != null && umbracoBaseProvider.AllowManuallyChangingPassword)
+            {
+                //this provider allows manually changing the password without the old password, so we can just do it
+                try
                 {
-                    //if password retrieval is not enabled but there is no old password we cannot continue
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the old password", new[] { "value" }) });
+                    var result = umbracoBaseProvider.ChangePassword(username, "", passwordModel.NewPassword);
+                    return result == false
+                        ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "value" }) })
+                        : Attempt.Succeed(new PasswordChangedModel());
                 }
-                if (passwordModel.OldPassword.IsNullOrWhiteSpace() == false)
+                catch (Exception ex)
                 {
-                    //if an old password is suplied try to change it
-
-                    try
-                    {
-                        var result = membershipProvider.ChangePassword(username, passwordModel.OldPassword, passwordModel.NewPassword);
-                        if (result == false)
-                        {
-                            return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "value" }) });
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        LogHelper.WarnWithException<WebSecurity>("Could not change member password", ex);
-                        return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
-                    }
-                }
-                else if (membershipProvider.EnablePasswordRetrieval == false)
-                {
-                    //we cannot continue if we cannot get the current password
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the old password", new[] { "value" }) });
-                }
-                else if (membershipProvider.RequiresQuestionAndAnswer && passwordModel.Answer.IsNullOrWhiteSpace())
-                {
-                    //if the question answer is required but there isn't one, we cannot continue
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the password answer", new[] { "value" }) });
-                }
-                else
-                {
-                    //lets try to get the old one so we can change it
-
-                    try
-                    {
-                        var oldPassword = membershipProvider.GetPassword(
-                            username,
-                            membershipProvider.RequiresQuestionAndAnswer ? passwordModel.Answer : null);
-
-                        try
-                        {
-                            var result = membershipProvider.ChangePassword(username, oldPassword, passwordModel.NewPassword);
-                            if (result == false)
-                            {
-                                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password", new[] { "value" }) });
-                            }
-                        }
-                        catch (Exception ex1)
-                        {
-                            LogHelper.WarnWithException<WebSecurity>("Could not change member password", ex1);
-                            return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex1.Message + " (see log for full details)", new[] { "value" }) });                            
-                        }
-
-                    }
-                    catch (Exception ex2)
-                    {
-                        LogHelper.WarnWithException<WebSecurity>("Could not retrieve member password", ex2);
-                        return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex2.Message + " (see log for full details)", new[] { "value" }) });                        
-                    }
+                    LogHelper.WarnWithException<WebSecurity>("Could not change member password", ex);
+                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
                 }
             }
 
-            //woot!
-            return Attempt.Succeed(new PasswordChangedModel());
+            //The provider does not support manually chaning the password but no old password supplied - need to return an error
+            if (passwordModel.OldPassword.IsNullOrWhiteSpace() && membershipProvider.EnablePasswordRetrieval == false)
+            {
+                //if password retrieval is not enabled but there is no old password we cannot continue
+                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the old password", new[] { "value" }) });
+            }
+
+            if (passwordModel.OldPassword.IsNullOrWhiteSpace() == false)
+            {
+                //if an old password is suplied try to change it
+
+                try
+                {
+                    var result = membershipProvider.ChangePassword(username, passwordModel.OldPassword, passwordModel.NewPassword);
+                    return result == false
+                        ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "value" }) })
+                        : Attempt.Succeed(new PasswordChangedModel());
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.WarnWithException<WebSecurity>("Could not change member password", ex);
+                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
+                }
+            }
+
+            if (membershipProvider.EnablePasswordRetrieval == false)
+            {
+                //we cannot continue if we cannot get the current password
+                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the old password", new[] { "value" }) });
+            }
+            if (membershipProvider.RequiresQuestionAndAnswer && passwordModel.Answer.IsNullOrWhiteSpace())
+            {
+                //if the question answer is required but there isn't one, we cannot continue
+                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the password answer", new[] { "value" }) });
+            }
+
+            //lets try to get the old one so we can change it
+            try
+            {
+                var oldPassword = membershipProvider.GetPassword(
+                    username,
+                    membershipProvider.RequiresQuestionAndAnswer ? passwordModel.Answer : null);
+
+                try
+                {
+                    var result = membershipProvider.ChangePassword(username, oldPassword, passwordModel.NewPassword);
+                    return result == false
+                        ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password", new[] { "value" }) })
+                        : Attempt.Succeed(new PasswordChangedModel());
+                }
+                catch (Exception ex1)
+                {
+                    LogHelper.WarnWithException<WebSecurity>("Could not change member password", ex1);
+                            return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex1.Message + " (see log for full details)", new[] { "value" }) });                            
+                }
+
+            }
+            catch (Exception ex2)
+            {
+                LogHelper.WarnWithException<WebSecurity>("Could not retrieve member password", ex2);
+                        return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex2.Message + " (see log for full details)", new[] { "value" }) });                        
+            }
         }
 
         /// <summary>
