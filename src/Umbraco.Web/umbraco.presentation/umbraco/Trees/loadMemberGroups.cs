@@ -72,8 +72,7 @@ function openMemberGroup(id) {
                 xNode.NodeID = role;
                 xNode.Text = role;
                 xNode.Action = "javascript:openMemberGroup('" + HttpContext.Current.Server.UrlEncode(role.Replace("'", "\\'")) + "');";
-                xNode.Icon = "membergroup.gif";
-                xNode.OpenIcon = "membergroup.gif";
+                xNode.Icon = "icon-users";
                 if (!Member.IsUsingUmbracoRoles())
                 {
                     xNode.Menu = null;

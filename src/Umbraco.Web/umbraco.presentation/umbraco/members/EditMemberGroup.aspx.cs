@@ -12,6 +12,7 @@ using System.Web.UI.HtmlControls;
 using System.Web.Security;
 using umbraco.cms.businesslogic.member;
 using umbraco.cms.presentation.Trees;
+using umbraco.uicontrols;
 
 namespace umbraco.presentation.members
 {
@@ -27,7 +28,7 @@ namespace umbraco.presentation.members
 	    }
 
         private MemberGroup _memberGroup = null;
-        protected ImageButton save = null;
+        protected MenuButton save = null;
         string _memberGroupId = String.Empty;
 
 		protected void Page_Load(object sender, System.EventArgs e)
@@ -61,7 +62,7 @@ namespace umbraco.presentation.members
             }
 		}
 
-		private void save_click(object sender, System.Web.UI.ImageClickEventArgs e) 
+		private void save_click(object sender, EventArgs e) 
 		{
 			_memberGroup.Text = NameTxt.Text;
             memberGroupName.Value = NameTxt.Text;
@@ -82,11 +83,11 @@ namespace umbraco.presentation.members
 			InitializeComponent();
 			base.OnInit(e);
 			Panel1.hasMenu = true;
-			save = Panel1.Menu.NewImageButton();
-			save.ImageUrl =  UmbracoPath + "/images/editor/save.gif";
-			save.Click += new System.Web.UI.ImageClickEventHandler(save_click);
-			save.AlternateText = ui.Text("save");
-	
+			save = Panel1.Menu.NewButton();
+            save.Text = ui.Text("save");
+            save.Click += new EventHandler(save_click);
+            save.ButtonType = MenuButtonType.Primary;
+
 			Panel1.Text = ui.Text("membergroup");
 		}
 		
