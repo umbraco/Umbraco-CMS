@@ -57,9 +57,11 @@ namespace Umbraco.Core.Services
 
         public IUser GetUserByUserName(string username)
         {
-            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateUserRepository(uow))
             {
-                var query = Query<IUser>.Builder.Where(x => x.Username == username);
+                var escapedUser = uow.Database.EscapeAtSymbols(username);
+                var query = Query<IUser>.Builder.Where(x => x.Username == escapedUser);
                 return repository.GetByQuery(query).FirstOrDefault();
             }
         }

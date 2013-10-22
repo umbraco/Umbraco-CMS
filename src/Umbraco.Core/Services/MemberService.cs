@@ -287,9 +287,11 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IMember GetByEmail(string email)
         {
-            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                var query = Query<IMember>.Builder.Where(x => x.Email == email);
+                var escapedEmail = uow.Database.EscapeAtSymbols(email);
+                var query = Query<IMember>.Builder.Where(x => x.Email == escapedEmail);
                 var member = repository.GetByQuery(query).FirstOrDefault();
 
                 return member;
@@ -303,9 +305,11 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         public IMember GetByUsername(string userName)
         {
-            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                var query = Query<IMember>.Builder.Where(x => x.Username == userName);
+                var escapedUser = uow.Database.EscapeAtSymbols(userName);
+                var query = Query<IMember>.Builder.Where(x => x.Username == escapedUser);
                 var member = repository.GetByQuery(query).FirstOrDefault();
 
                 return member;
