@@ -190,7 +190,7 @@ namespace Umbraco.Web.WebApi.Binders
         /// <param name="dto"></param>
         private static void MapPropertyValuesFromSaved(TModelSave saveModel, ContentItemDto<TPersisted> dto)
         {
-            foreach (var p in saveModel.Properties)
+            foreach (var p in saveModel.Properties.Where(p => dto.Properties.Any(x => x.Alias == p.Alias)))
             {
                 dto.Properties.Single(x => x.Alias == p.Alias).Value = p.Value;
             }

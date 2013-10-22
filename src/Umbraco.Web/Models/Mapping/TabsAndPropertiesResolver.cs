@@ -15,17 +15,17 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class TabsAndPropertiesResolver : ValueResolver<IContentBase, IEnumerable<Tab<ContentPropertyDisplay>>>
     {
-        private readonly IEnumerable<string> _ignoreProperties;
+        protected IEnumerable<string> IgnoreProperties { get; set; }
 
         public TabsAndPropertiesResolver()
         {
-            _ignoreProperties = new List<string>();
+            IgnoreProperties = new List<string>();
         }
 
         public TabsAndPropertiesResolver(IEnumerable<string> ignoreProperties)
         {
             if (ignoreProperties == null) throw new ArgumentNullException("ignoreProperties");
-            _ignoreProperties = ignoreProperties;
+            IgnoreProperties = ignoreProperties;
         }
 
         /// <summary>
@@ -155,7 +155,7 @@ namespace Umbraco.Web.Models.Mapping
                     var current = propertyGroups.Single(x => x.ParentId == currentParentId);
 
                     var propsForGroup = content.GetPropertiesForGroup(current)
-                        .Where(x => _ignoreProperties.Contains(x.Alias) == false); //don't include ignored props
+                        .Where(x => IgnoreProperties.Contains(x.Alias) == false); //don't include ignored props
 
                     aggregateProperties.AddRange(
                         Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(
@@ -177,7 +177,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //now add the generic properties tab for any properties that don't belong to a tab
             var orphanProperties = content.GetNonGroupedProperties()
-                .Where(x => _ignoreProperties.Contains(x.Alias) == false); //don't include ignored props
+                .Where(x => IgnoreProperties.Contains(x.Alias) == false); //don't include ignored props
 
             //now add the generic properties tab
             aggregateTabs.Add(new Tab<ContentPropertyDisplay>

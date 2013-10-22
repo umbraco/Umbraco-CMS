@@ -230,6 +230,7 @@ function umbDataFormatter() {
         /** formats the display model used to display the member to the model used to save the member */
         formatMemberPostData: function(displayModel, action) {
             //this is basically the same as for media but we need to explicitly add the username,email, password to the save model
+
             var saveModel = this.formatMediaPostData(displayModel, action);
 
             saveModel.key = displayModel.key;
@@ -238,6 +239,7 @@ function umbDataFormatter() {
                 return item.id === 0;
             });
 
+            //map the member login, email, password and groups
             var propLogin = _.find(genericTab.properties, function (item) {
                 return item.alias === "_umb_login";
             });
@@ -262,6 +264,33 @@ function umbDataFormatter() {
             }
             saveModel.memberGroups = selectedGroups;
             
+            //turn the dictionary into an array of pairs
+            var memberProviderPropAliases = _.pairs(displayModel.fieldConfig);
+            _.each(displayModel.tabs, function (tab) {
+                _.each(tab.properties, function (prop) {
+                    var foundAlias = _.find(memberProviderPropAliases, function(item) {
+                        return prop.alias === item[1];
+                    });
+                    if (foundAlias) {
+                        //we know the current property matches an alias, now we need to determine which membership provider property it was for
+                        // by looking at the key
+                        switch (foundAlias[0]) {
+                            case "umbracoLockPropertyTypeAlias":
+                                saveModel.isLockedOut = prop.value.toString() === "1" ? true : false;
+                                break;
+                            case "umbracoApprovePropertyTypeAlias":
+                                saveModel.isApproved = prop.value.toString() === "1" ? true : false;
+                                break;
+                            case "umbracoCommentPropertyTypeAlias":
+                                saveModel.comments = prop.value;
+                                break;
+                        }
+                    }                
+                });
+            });
+
+
+
             return saveModel;
         },
 

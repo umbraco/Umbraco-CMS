@@ -30,5 +30,16 @@ namespace Umbraco.Web.Models.ContentEditing
         
         [DataMember(Name = "memberGroups")]
         public IEnumerable<string> Groups { get; set; }
+        
+        [DataMember(Name = "comments")]
+        public string Comments { get; set; }
+
+        [DataMember(Name = "isLockedOut")]
+        public bool IsLockedOut { get; set; }
+
+        [DataMember(Name = "isApproved")]
+        public bool IsApproved { get; set; }
+
+        //TODO: Need to add question / answer support 
     }
 }

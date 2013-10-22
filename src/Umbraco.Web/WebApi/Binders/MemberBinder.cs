@@ -28,17 +28,16 @@ namespace Umbraco.Web.WebApi.Binders
 
         protected override IMember GetExisting(MemberSave model)
         {
-            //TODO: We're going to remove the built-in member properties from this editor - We didn't support these in 6.x so 
-            // pretty hard to support them in 7 when the member type editor is using the old APIs!
-            var toRemove = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
-
             var member = ApplicationContext.Services.MemberService.GetByKey(model.Key);
             if (member == null)
             {
                 throw new InvalidOperationException("Could not find member with key " + model.Key);
             }
 
-            foreach (var remove in toRemove)
+            //remove all membership properties, these values are set with the membership provider.
+            var exclude = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
+
+            foreach (var remove in exclude)
             {
                 member.Properties.Remove(remove);
             }
@@ -52,11 +51,10 @@ namespace Umbraco.Web.WebApi.Binders
             {
                 throw new InvalidOperationException("No member type found wth alias " + model.ContentTypeAlias);
             }
-            
-            //TODO: We're going to remove the built-in member properties from this editor - We didn't support these in 6.x so 
-            // pretty hard to support them in 7 when the member type editor is using the old APIs!
-            var toRemove = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
-            foreach (var remove in toRemove)
+
+            //remove all membership properties, these values are set with the membership provider.
+            var exclude = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
+            foreach (var remove in exclude)
             {
                 contentType.RemovePropertyType(remove);
             }

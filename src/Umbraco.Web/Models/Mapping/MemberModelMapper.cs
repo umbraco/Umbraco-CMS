@@ -34,10 +34,9 @@ namespace Umbraco.Web.Models.Mapping
                       expression => expression.MapFrom(content => content.ContentType.Name))
                   .ForMember(display => display.Properties, expression => expression.Ignore())
                   .ForMember(display => display.Tabs,
-                             expression => expression.ResolveUsing(
-                                 new TabsAndPropertiesResolver(
-                                 //do no map this properties (currently anyways, they were never there in 6.x)
-                                     Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias))))
+                             expression => expression.ResolveUsing<MemberTabsAndPropertiesResolver>())
+                  .ForMember(display => display.MemberProviderFieldMapping,
+                             expression => expression.ResolveUsing<MemberProviderFieldMappingResolver>())
                   .AfterMap(MapGenericCustomProperties);
 
             //FROM IMember TO ContentItemBasic<ContentPropertyBasic, IMember>
@@ -162,7 +161,7 @@ namespace Umbraco.Web.Models.Mapping
         }
 
         /// <summary>
-        /// This ensures that the custom membership provider properties are not mapped (currently since they weren't there in v6)
+        /// This ensures that the custom membership provider properties are not mapped - these property values are controller by the membership provider
         /// </summary>
         /// <remarks>
         /// Because these properties don't exist on the form, if we don't remove them for this map we'll get validation errors when posting data
@@ -171,12 +170,76 @@ namespace Umbraco.Web.Models.Mapping
         {
             protected override IEnumerable<ContentPropertyDto> ResolveCore(IMember source)
             {
+                //remove all membership properties, these values are set with the membership provider.
                 var exclude = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
+                
                 return source.Properties
                              .Where(x => exclude.Contains(x.Alias) == false)
                              .Select(Mapper.Map<Property, ContentPropertyDto>);
             }
         }
+
+        /// <summary>
+        /// A custom tab/property resolver for members which will ensure that the built-in membership properties are or arent' displayed
+        /// depending on if the member type has these properties
+        /// </summary>
+        /// <remarks>
+        /// This also ensures that the IsLocked out property is readonly when the member is not locked out - this is because
+        /// an admin cannot actually set isLockedOut = true, they can only unlock. 
+        /// </remarks>
+        internal class MemberTabsAndPropertiesResolver : TabsAndPropertiesResolver
+        {
+            protected override IEnumerable<Tab<ContentPropertyDisplay>> ResolveCore(IContentBase content)
+            {
+                IgnoreProperties = content.PropertyTypes
+                    .Where(x => x.HasIdentity == false)
+                    .Select(x => x.Alias)
+                    .ToArray();
+
+                var result = base.ResolveCore(content).ToArray();
+
+                if (Membership.Provider.Name != Constants.Conventions.Member.UmbracoMemberProviderName)
+                {
+                    throw new NotSupportedException("Editing member with a non-umbraco membership provider is currently not supported");
+                }
+
+                var umbracoProvider = (global::umbraco.providers.members.UmbracoMembershipProvider) Membership.Provider;
+
+                //This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
+                // if we just had all of the membeship provider fields on the member table :(
+                var isLockedOutProperty = result.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == umbracoProvider.LockPropertyTypeAlias);
+                if (isLockedOutProperty != null && isLockedOutProperty.Value.ToString() != "1")
+                {
+                    isLockedOutProperty.View = "readonlyvalue";
+                    isLockedOutProperty.Value = ui.Text("general", "no");
+                }
+
+                return result;
+            }
+        }
+
+        /// <summary>
+        /// A resolver to map the provider field aliases
+        /// </summary>
+        internal class MemberProviderFieldMappingResolver : ValueResolver<IMember, IDictionary<string, string>>
+        {
+            protected override IDictionary<string, string> ResolveCore(IMember source)
+            {
+                if (Membership.Provider.Name != Constants.Conventions.Member.UmbracoMemberProviderName)
+                {
+                    throw new NotSupportedException("Editing member with a non-umbraco membership provider is currently not supported");
+                }
+
+                var umbracoProvider = (global::umbraco.providers.members.UmbracoMembershipProvider) Membership.Provider;
+
+                return new Dictionary<string, string>
+                    {
+                        {Constants.Conventions.Member.IsLockedOut, umbracoProvider.LockPropertyTypeAlias},
+                        {Constants.Conventions.Member.IsApproved, umbracoProvider.ApprovedPropertyTypeAlias},
+                        {Constants.Conventions.Member.Comments, umbracoProvider.CommentPropertyTypeAlias}
+                    };
+            }
+        } 
 
     }
 }

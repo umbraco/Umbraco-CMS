@@ -19,10 +19,10 @@ namespace Umbraco.Web.UI.Install.Steps
         {
             get
             {
-                var provider = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider];
+                var provider = Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider];
                 if (provider == null)
                 {
-                    throw new InvalidOperationException("No MembershipProvider found with name " + UmbracoSettings.DefaultBackofficeProvider);
+                    throw new InvalidOperationException("No MembershipProvider found with name " + UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider);
                 }
                 return provider;
             }

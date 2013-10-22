@@ -90,16 +90,16 @@ namespace Umbraco.Web.WebApi.Filters
 
             foreach (var p in postedItem.Properties)
             {
-                //if (propertyAliases.Contains(p.Alias) == false)
-                if (postedItem.PersistedContent.Properties[p.Alias] == null)
+                if (postedItem.PersistedContent.Properties.Contains(p.Alias))
                 {
                     //TODO: Do we return errors here ? If someone deletes a property whilst their editing then should we just
                     //save the property data that remains? Or inform them they need to reload... not sure. This problem exists currently too i think.
 
                     var message = string.Format("property with alias: {0} was not found", p.Alias);
                     actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, new InvalidOperationException(message));
-                    return false;
+                    return false;    
                 }
+                
             }
             return true;
         }

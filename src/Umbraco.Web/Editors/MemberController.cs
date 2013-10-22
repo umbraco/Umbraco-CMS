@@ -231,13 +231,6 @@ namespace Umbraco.Web.Editors
         /// <returns>
         /// If the password has been reset then this method will return the reset/generated password, otherwise will return null.
         /// </returns>
-        /// <remarks>
-        /// 
-        /// YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!        
-        /// 
-        /// TODO We should move this logic to a central helper class so we can re-use it when it comes to integrating with WebSecurity
-        /// 
-        /// </remarks>
         private string UpdateWithMembershipProvider(MemberSave contentItem)
         {
             //Get the member from the provider
@@ -249,14 +242,18 @@ namespace Umbraco.Web.Editors
                 throw new InvalidOperationException("Could not get member from membership provider " + Membership.Provider.Name + " with key " + contentItem.PersistedContent.Key);
             }
 
-            //ok, first thing to do is check if they've changed their email 
-            //TODO: When we support the other membership provider data then we'll check if any of that's changed too.
-            if (contentItem.Email.Trim().InvariantEquals(membershipUser.Email) == false)
+            var shouldReFetchMember = false;
+
+            //Update the membership user if it has changed
+            if (HasMembershipUserChanged(membershipUser, contentItem))
             {
                 membershipUser.Email = contentItem.Email.Trim();
+                membershipUser.IsApproved = contentItem.IsApproved;
+                membershipUser.Comment = contentItem.Comments;
                 try
                 {
                     Membership.Provider.UpdateUser(membershipUser);
+                    shouldReFetchMember = true;
                 }
                 catch (Exception ex)
                 {
@@ -267,12 +264,50 @@ namespace Umbraco.Web.Editors
                 }
             }
 
+            //if they were locked but now they are trying to be unlocked
+            if (membershipUser.IsLockedOut && contentItem.IsLockedOut == false)
+            {
+                try
+                {
+                    var result = Membership.Provider.UnlockUser(membershipUser.UserName);
+                    if (result == false)
+                    {
+                        //it wasn't successful - but it won't really tell us why.
+                        ModelState.AddModelError("custom", "Could not unlock the user");
+                    }
+                    else
+                    {
+                        shouldReFetchMember = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    ModelState.AddModelError("custom", ex);
+                }
+            }
+            else if (membershipUser.IsLockedOut == false && contentItem.IsLockedOut)
+            {
+                //NOTE: This should not ever happen unless someone is mucking around with the request data.
+                //An admin cannot simply lock a user, they get locked out by password attempts, but an admin can un-approve them
+                ModelState.AddModelError("custom", "An admin cannot lock a user");
+            }
+           
             //password changes ?           
             if (contentItem.Password == null) return null;
 
             var passwordChangeResult = Security.ChangePassword(membershipUser.UserName, contentItem.Password, Membership.Provider);
             if (passwordChangeResult.Success)
             {
+                //If the provider has changed some values, these values need to be reflected in the member object 
+                //that will get mapped to the display object
+                if (shouldReFetchMember)
+                {
+                    //Go and re-fetch the persisted item
+                    contentItem.PersistedContent = Services.MemberService.GetByUsername(contentItem.Username.Trim());
+                    //remap the values to save
+                    MapPropertyValues(contentItem);
+                }
+
                 //even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
                 return passwordChangeResult.Result.ResetPassword;
             }
@@ -282,7 +317,28 @@ namespace Umbraco.Web.Editors
                 passwordChangeResult.Result.ChangeError,
                 string.Format("{0}password", Constants.PropertyEditors.InternalGenericPropertiesPrefix));
 
+
             return null;
+        }
+
+        /// <summary>
+        /// Quick check to see if the 'normal' settable properties for the membership provider have changed
+        /// </summary>
+        /// <param name="membershipUser"></param>
+        /// <param name="contentItem"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// By 'normal' we mean that they can simply be set on the membership user and don't require method calls like ChangePassword or UnlockUser
+        /// </remarks>
+        private bool HasMembershipUserChanged(MembershipUser membershipUser, MemberSave contentItem)
+        {
+            if (contentItem.Email.Trim().InvariantEquals(membershipUser.Email) == false
+                || contentItem.IsApproved != membershipUser.IsApproved
+                || contentItem.Comments != membershipUser.Comment)
+            {
+                return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -316,6 +372,13 @@ namespace Umbraco.Web.Editors
             switch (status)
             {
                 case MembershipCreateStatus.Success:
+
+                    //if the comments are there then we need to save them
+                    if (contentItem.Comments.IsNullOrWhiteSpace() == false)
+                    {
+                        membershipUser.Comment = contentItem.Comments;
+                        umbracoMembershipProvider.UpdateUser(membershipUser);
+                    }
 
                     //Go and re-fetch the persisted item
                     contentItem.PersistedContent = Services.MemberService.GetByUsername(contentItem.Username.Trim());
