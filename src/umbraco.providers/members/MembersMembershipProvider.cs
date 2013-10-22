@@ -31,16 +31,21 @@ namespace umbraco.providers.members
     public class UmbracoMembershipProvider : MembershipProviderBase
     {
         #region Fields
+
+        //Set the defaults!
+        private string _defaultMemberTypeAlias = "Member";               
+        private string _lockPropertyTypeAlias = Constants.Conventions.Member.IsLockedOut;
+        private string _lastLockedOutPropertyTypeAlias = Constants.Conventions.Member.LastLockoutDate;
+        private string _failedPasswordAttemptsPropertyTypeAlias = Constants.Conventions.Member.FailedPasswordAttempts;
+        private string _approvedPropertyTypeAlias = Constants.Conventions.Member.IsApproved;
+        private string _commentPropertyTypeAlias = Constants.Conventions.Member.Comments;
+        private string _lastLoginPropertyTypeAlias = Constants.Conventions.Member.LastLoginDate;
+        private string _lastPasswordChangedPropertyTypeAlias = Constants.Conventions.Member.LastPasswordChangeDate;
+        private string _passwordRetrievalQuestionPropertyTypeAlias = Constants.Conventions.Member.PasswordQuestion;
+        private string _passwordRetrievalAnswerPropertyTypeAlias = Constants.Conventions.Member.PasswordAnswer;
         
-        private string _defaultMemberTypeAlias;
-        private string _lockPropertyTypeAlias;
-        private string _failedPasswordAttemptsPropertyTypeAlias;
-        private string _approvedPropertyTypeAlias;
-        private string _commentPropertyTypeAlias;
-        private string _lastLoginPropertyTypeAlias;
-        private string _passwordRetrievalQuestionPropertyTypeAlias;
-        private string _passwordRetrievalAnswerPropertyTypeAlias;
         private string _providerName = Member.UmbracoMemberProviderName;
+        
         #endregion
 
         #region Initialization Method
@@ -82,6 +87,14 @@ namespace umbraco.providers.members
             if (config["umbracoLockPropertyTypeAlias"] != null)
             {
                 _lockPropertyTypeAlias = config["umbracoLockPropertyTypeAlias"];
+            }
+            if (config["umbracoLastLockedPropertyTypeAlias"] != null)
+            {
+                _lastLockedOutPropertyTypeAlias = config["umbracoLastLockedPropertyTypeAlias"];
+            }
+            if (config["umbracoLastPasswordChangedPropertyTypeAlias"] != null)
+            {
+                _lastPasswordChangedPropertyTypeAlias = config["umbracoLastPasswordChangedPropertyTypeAlias"];
             }
             if (config["umbracoFailedPasswordAttemptsPropertyTypeAlias"] != null)
             {
@@ -141,6 +154,8 @@ namespace umbraco.providers.members
             var encodedPassword = EncryptOrHashNewPassword(newPassword, out salt);
             m.ChangePassword(
                 FormatPasswordForStorage(encodedPassword, salt));
+
+            UpdateMemberProperty(m, _lastPasswordChangedPropertyTypeAlias, DateTime.Now);
 
             return true;
         }
@@ -246,12 +261,17 @@ namespace umbraco.providers.members
                     UpdateMemberProperty(m, _passwordRetrievalAnswerPropertyTypeAlias, passwordAnswer);
 
                 if (string.IsNullOrEmpty(_approvedPropertyTypeAlias) == false)
-                    UpdateMemberProperty(m, _approvedPropertyTypeAlias, isApproved);
+                    UpdateMemberProperty(m, _approvedPropertyTypeAlias, isApproved ? 1 : 0);
 
                 if (string.IsNullOrEmpty(_lastLoginPropertyTypeAlias) == false)
                 {
                     mUser.LastActivityDate = DateTime.Now;
                     UpdateMemberProperty(m, _lastLoginPropertyTypeAlias, mUser.LastActivityDate);
+                }
+
+                if (string.IsNullOrEmpty(_lastPasswordChangedPropertyTypeAlias) == false)
+                {
+                    UpdateMemberProperty(m, _lastPasswordChangedPropertyTypeAlias, DateTime.Now);
                 }
 
                 // save
@@ -294,13 +314,10 @@ namespace umbraco.providers.members
         /// </returns>
         public override bool DeleteUser(string username, bool deleteAllRelatedData)
         {
-            Member m = Member.GetMemberFromLoginName(username);
+            var m = Member.GetMemberFromLoginName(username);
             if (m == null) return false;
-            else
-            {
-                m.delete();
-                return true;
-            }
+            m.delete();
+            return true;
         }
 
         /// <summary>
@@ -339,14 +356,14 @@ namespace umbraco.providers.members
         /// </returns>
         public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            int counter = 0;
-            int startIndex = pageSize * pageIndex;
-            int endIndex = startIndex + pageSize - 1;
-            MembershipUserCollection membersList = new MembershipUserCollection();
-            Member[] memberArray = Member.GetMemberByName(usernameToMatch, false);
+            var counter = 0;
+            var startIndex = pageSize * pageIndex;
+            var endIndex = startIndex + pageSize - 1;
+            var membersList = new MembershipUserCollection();
+            var memberArray = Member.GetMemberByName(usernameToMatch, false);
             totalRecords = memberArray.Length;
 
-            foreach (Member m in memberArray)
+            foreach (var m in memberArray)
             {
                 if (counter >= startIndex)
                     membersList.Add(ConvertToMembershipUser(m));
@@ -367,14 +384,14 @@ namespace umbraco.providers.members
         /// </returns>
         public override MembershipUserCollection GetAllUsers(int pageIndex, int pageSize, out int totalRecords)
         {
-            int counter = 0;
-            int startIndex = pageSize * pageIndex;
-            int endIndex = startIndex + pageSize - 1;
-            MembershipUserCollection membersList = new MembershipUserCollection();
-            Member[] memberArray = Member.GetAll;
+            var counter = 0;
+            var startIndex = pageSize * pageIndex;
+            var endIndex = startIndex + pageSize - 1;
+            var membersList = new MembershipUserCollection();
+            var memberArray = Member.GetAll;
             totalRecords = memberArray.Length;
 
-            foreach (Member m in memberArray)
+            foreach (var m in memberArray)
             {
                 if (counter >= startIndex)
                     membersList.Add(ConvertToMembershipUser(m));
@@ -406,24 +423,24 @@ namespace umbraco.providers.members
         /// </returns>
         public override string GetPassword(string username, string answer)
         {
-            if (!EnablePasswordRetrieval)
+            if (EnablePasswordRetrieval == false)
                 throw new ProviderException("Password Retrieval Not Enabled.");
 
             if (PasswordFormat == MembershipPasswordFormat.Hashed)
                 throw new ProviderException("Cannot retrieve Hashed passwords.");
 
-            Member m = Member.GetMemberFromLoginName(username);
+            var m = Member.GetMemberFromLoginName(username);
             if (m != null)
             {
                 if (RequiresQuestionAndAnswer)
                 {
                     // check if password answer property alias is set
-                    if (!String.IsNullOrEmpty(_passwordRetrievalAnswerPropertyTypeAlias))
+                    if (string.IsNullOrEmpty(_passwordRetrievalAnswerPropertyTypeAlias) == false)
                     {
                         // check if user is locked out
-                        if (!String.IsNullOrEmpty(_lockPropertyTypeAlias))
+                        if (string.IsNullOrEmpty(_lockPropertyTypeAlias) == false)
                         {
-                            bool isLockedOut = false;
+                            var isLockedOut = false;
                             bool.TryParse(GetMemberProperty(m, _lockPropertyTypeAlias, true), out isLockedOut);
                             if (isLockedOut)
                             {
@@ -447,10 +464,7 @@ namespace umbraco.providers.members
             {
                 throw new MembershipPasswordException("The supplied user is not found");
             }
-            else
-            {
-                return m.Password;
-            }
+            return m.GetPassword();
         }
 
         /// <summary>
@@ -570,6 +584,11 @@ namespace umbraco.providers.members
             m.ChangePassword(
                 FormatPasswordForStorage(encodedPassword, salt));
 
+            if (string.IsNullOrEmpty(_lastPasswordChangedPropertyTypeAlias) == false)
+            {
+                UpdateMemberProperty(m, _lastPasswordChangedPropertyTypeAlias, DateTime.Now);
+            }
+
             return newPassword;
         }
 
@@ -587,7 +606,7 @@ namespace umbraco.providers.members
                 var m = Member.GetMemberFromLoginName(userName);
                 if (m != null)
                 {
-                    UpdateMemberProperty(m, _lockPropertyTypeAlias, false);
+                    UpdateMemberProperty(m, _lockPropertyTypeAlias, 0);
                     return true;
                 }
                 throw new Exception(String.Format("No member with the username '{0}' found", userName));
@@ -597,8 +616,6 @@ namespace umbraco.providers.members
 
         /// <summary>
         /// Updates e-mail and potentially approved status, lock status and comment on a user.
-        /// Note: To automatically support lock, approve and comments you'll need to add references to the membertype properties in the 
-        /// 'Member' element in web.config by adding their aliases to the 'umbracoApprovePropertyTypeAlias', 'umbracoLockPropertyTypeAlias' and 'umbracoCommentPropertyTypeAlias' attributes
         /// </summary>
         /// <param name="user">A <see cref="T:System.Web.Security.MembershipUser"></see> object that represents the user to update and the updated information for the user.</param>
         public override void UpdateUser(MembershipUser user)
@@ -607,10 +624,14 @@ namespace umbraco.providers.members
             m.Email = user.Email;
 
             // if supported, update approve status
-            UpdateMemberProperty(m, _approvedPropertyTypeAlias, user.IsApproved);
+            UpdateMemberProperty(m, _approvedPropertyTypeAlias, user.IsApproved ? 1 : 0);
 
             // if supported, update lock status
-            UpdateMemberProperty(m, _lockPropertyTypeAlias, user.IsLockedOut);
+            UpdateMemberProperty(m, _lockPropertyTypeAlias, user.IsLockedOut ? 1 : 0);
+            if (user.IsLockedOut)
+            {
+                UpdateMemberProperty(m, _lastLockedOutPropertyTypeAlias, DateTime.Now);
+            }
 
             // if supported, update comment
             UpdateMemberProperty(m, _commentPropertyTypeAlias, user.Comment);
@@ -624,8 +645,7 @@ namespace umbraco.providers.members
             {
                 if (m.getProperty(propertyAlias) != null)
                 {
-                    m.getProperty(propertyAlias).Value =
-                        propertyValue;
+                    m.getProperty(propertyAlias).Value = propertyValue;
                 }
             }
         }
@@ -734,7 +754,8 @@ namespace umbraco.providers.members
                     // lock user?
                     if (failedAttempts >= MaxInvalidPasswordAttempts)
                     {
-                        UpdateMemberProperty(updateMemberDataObject, _lockPropertyTypeAlias, true);
+                        UpdateMemberProperty(updateMemberDataObject, _lockPropertyTypeAlias, 1);
+                        UpdateMemberProperty(updateMemberDataObject, _lastLockedOutPropertyTypeAlias, DateTime.Now);
                     }
                     updateMemberDataObject.Save();
                 }
@@ -825,6 +846,7 @@ namespace umbraco.providers.members
             if (m == null) return null;
 
             var lastLogin = DateTime.Now;
+            var lastLocked = DateTime.MinValue;
             var isApproved = true;
             var isLocked = false;
             var comment = "";
@@ -844,6 +866,11 @@ namespace umbraco.providers.members
             if (string.IsNullOrEmpty(_lockPropertyTypeAlias) == false)
             {
                 bool.TryParse(GetMemberProperty(m, _lockPropertyTypeAlias, true), out isLocked);
+            }
+            // last locked
+            if (string.IsNullOrEmpty(_lastLockedOutPropertyTypeAlias) == false)
+            {
+                DateTime.TryParse(GetMemberProperty(m, _lastLockedOutPropertyTypeAlias, false), out lastLocked);
             }
             // comment
             if (string.IsNullOrEmpty(_commentPropertyTypeAlias) == false)
@@ -857,7 +884,7 @@ namespace umbraco.providers.members
             }
 
             return new MembershipUser(_providerName, m.LoginName, m.Id, m.Email, passwordQuestion, comment, isApproved, isLocked, m.CreateDateTime, lastLogin,
-                                      DateTime.Now, DateTime.Now, DateTime.Now);
+                                      DateTime.Now, DateTime.Now, lastLocked);
         }
 
         /// <summary>
@@ -870,6 +897,7 @@ namespace umbraco.providers.members
             if (m == null) return null;
 
             var lastLogin = DateTime.Now;
+            var lastLocked = DateTime.MinValue;
             var isApproved = true;
             var isLocked = false;
             var comment = "";
@@ -890,6 +918,11 @@ namespace umbraco.providers.members
             {
                 bool.TryParse(GetMemberProperty(m, _lockPropertyTypeAlias, true), out isLocked);
             }
+            // last locked
+            if (string.IsNullOrEmpty(_lastLockedOutPropertyTypeAlias) == false)
+            {
+                DateTime.TryParse(GetMemberProperty(m, _lastLockedOutPropertyTypeAlias, false), out lastLocked);
+            }
             // comment
             if (string.IsNullOrEmpty(_commentPropertyTypeAlias) == false)
             {
@@ -902,7 +935,7 @@ namespace umbraco.providers.members
             }
 
             return new MembershipUser(_providerName, m.Username, m.Id, m.Email, passwordQuestion, comment, isApproved, isLocked, m.CreateDate, lastLogin,
-                                      DateTime.Now, DateTime.Now, DateTime.Now);
+                                      DateTime.Now, DateTime.Now, lastLocked);
         }
 
         #endregion
