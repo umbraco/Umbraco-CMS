@@ -17,10 +17,11 @@
  */
 
 angular.module('umbraco.services')
-.factory('navigationService', function ($rootScope, $routeParams, $log, $location, $q, $timeout, dialogService, treeService, notificationsService) {
+.factory('navigationService', function ($rootScope, $routeParams, $log, $location, $q, $timeout, dialogService, treeService, notificationsService, historyService) {
     
     //Define all sub-properties for the UI object here
     var ui = {
+        tablet: false,
         showNavigation: false,
         showContextMenu: false,
         showContextMenuDialog: false,
@@ -30,15 +31,22 @@ angular.module('umbraco.services')
         currentSection: undefined,
         currentPath: undefined,
         currentTree: undefined,
+        treeEventHandler: undefined,
         currentNode: undefined,
         actions: undefined,
         currentDialog: undefined,
         dialogTitle: undefined,
+       
         //a string/name reference for the currently set ui mode
         currentMode: "default"
     };
     
     $rootScope.$on("closeDialogs", function(){});
+
+    function setTreeMode() {
+        ui.tablet = ($(window).width() <= 1000);
+        ui.showNavigation = !ui.tablet;
+    }
 
     function setMode(mode) {
         switch (mode) {
@@ -82,12 +90,16 @@ angular.module('umbraco.services')
                 break;
             default:
                 ui.currentMode = "default";
-                ui.showNavigation = false;
                 ui.showContextMenu = false;
                 ui.showContextMenuDialog = false;
                 ui.showSearchResults = false;
                 ui.stickyNavigation = false;
                 ui.showTray = false;
+
+                if(ui.tablet){
+                    ui.showNavigation = false;
+                }
+
                 break;
         }
     }
@@ -97,6 +109,18 @@ angular.module('umbraco.services')
         touchDevice: false,
         userDialog: undefined,
         ui: ui,
+
+        init: function(){
+
+            //TODO: detect tablet mode, subscribe to window resizing
+            //for now we just hardcode it to non-tablet mode
+            setTreeMode();
+            this.ui.currentSection = $routeParams.section;
+
+            $(window).bind("resize", function () {
+                 setTreeMode();
+            });
+        },
 
         /**
          * @ngdoc method
@@ -144,7 +168,13 @@ angular.module('umbraco.services')
 		 */
         showTree: function (sectionAlias, treeAlias, path) {
             if (sectionAlias !== this.ui.currentSection) {
-                this.syncTree(sectionAlias, treeAlias, path);
+                this.ui.currentSection = sectionAlias;
+                if(treeAlias){
+                    this.setActiveTreeType(treeAlias);
+                }
+                if(path){
+                    this.syncpath(path, true);
+                }
             }
             setMode("tree");
         },
@@ -156,6 +186,80 @@ angular.module('umbraco.services')
         hideTray: function () {
             ui.showTray = false;
         },
+
+        //adding this to get clean global access to the main tree directive
+        //there will only ever be one main tree event handler
+        //we need to pass in the current scope for binding these actions
+        setupTreeEvents: function(treeEventHandler, scope){
+            this.ui.treeEventHandler = treeEventHandler;
+
+            //this reacts to the options item in the tree
+            this.ui.treeEventHandler.bind("treeOptionsClick", function (ev, args) {
+                ev.stopPropagation();
+                ev.preventDefault();
+                
+                scope.currentNode = args.node;
+                args.scope = scope;
+
+                if(args.event && args.event.altKey){
+                    args.skipDefault = true;
+                }
+
+                service.showMenu(ev, args);
+            });
+
+            this.ui.treeEventHandler.bind("treeNodeAltSelect", function (ev, args) {
+                ev.stopPropagation();
+                ev.preventDefault();
+                
+                scope.currentNode = args.node;
+                args.scope = scope;
+
+                args.skipDefault = true;
+                service.showMenu(ev, args);
+            });
+
+            //this reacts to tree items themselves being clicked
+            //the tree directive should not contain any handling, simply just bubble events
+            this.ui.treeEventHandler.bind("treeNodeSelect", function (ev, args) {
+                var n = args.node;
+                ev.stopPropagation();
+                ev.preventDefault();
+                
+
+                if (n.metaData && n.metaData["jsClickCallback"] && angular.isString(n.metaData["jsClickCallback"]) && n.metaData["jsClickCallback"] !== "") {
+                    //this is a legacy tree node!                
+                    var jsPrefix = "javascript:";
+                    var js;
+                    if (n.metaData["jsClickCallback"].startsWith(jsPrefix)) {
+                        js = n.metaData["jsClickCallback"].substr(jsPrefix.length);
+                    }
+                    else {
+                        js = n.metaData["jsClickCallback"];
+                    }
+                    try {
+                        var func = eval(js);
+                        //this is normally not necessary since the eval above should execute the method and will return nothing.
+                        if (func != null && (typeof func === "function")) {
+                            func.call();
+                        }
+                    }
+                    catch(ex) {
+                        $log.error("Error evaluating js callback from legacy tree node: " + ex);
+                    }
+                }
+                else if(n.routePath){
+                    //add action to the history service
+                    historyService.add({ name: n.name, link: n.routePath, icon: n.icon });
+                    //not legacy, lets just set the route value and clear the query string if there is one.
+                    $location.path(n.routePath).search("");
+                } else if(args.element.section){
+                    $location.path(args.element.section).search("");
+                }
+
+                service.hideNavigation();
+            });
+        },
         /**
          * @ngdoc method
          * @name umbraco.services.navigationService#syncTree
@@ -163,42 +267,24 @@ angular.module('umbraco.services')
          *
          * @description
          * Syncs the tree with a given section alias and a given path
-         * The path format is: ["treeAlias","itemId","itemId"], and so on
+         * The path format is: ["itemId","itemId"], and so on
          * so to sync to a specific document type node do:
          * <pre>
-         * navigationService.syncTree("content", "nodeTypes", [-1,1023,3453]);  
+         * navigationService.syncPath(["-1","123d"], true);  
          * </pre>
-         * @param {string} sectionAlias The alias of the section the tree should load data from
-         * @param {string} treeAlias The alias of tree to auto-expand
-         * @param {array} path array of ascendant ids, ex: [,1023,1243] (loads a specific document type into the settings tree)
+         * @param {array} path array of ascendant ids, ex: ["1023","1243"] (loads a specific document type into the settings tree)
+         * @param {bool} forceReload forces a reload of data from the server
          */
-        syncTree: function (sectionAlias, treeAlias, path) {
-                //TODO: investicate if we need to halt watch triggers
-                //and instead pause them and then manually tell the tree to digest path changes
-                //as this might be a bit heavy loading
-                if(sectionAlias){
-                    this.ui.currentSection = sectionAlias;
-                }
-                if(treeAlias){
-                    this.ui.currentTree = treeAlias;
-                }
-                if(path){
-                    this.ui.currentPath = path;
-                }
+        syncPath: function (path, forceReload) {
+            if(this.ui.treeEventHandler){
+                this.ui.treeEventHandler.syncPath(path,forceReload);
+            }
         },
 
-        /* this is to support the legacy ways to sync the tree, so you can do it in 2 steps 
-            For all new operations, its recommend to just use syncTree()
-        */
-        syncPath: function (path) {
-                //TODO: investicate if we need to halt watch triggers
-                //and instead pause them and then manually tell the tree to digest path changes
-                //as this might be a bit heavy loading
-                if(!angular.isArray(path)){
-                    path = path.split(",");
-                }
-
-                this.ui.currentPath = path;
+        setActiveTreeType: function (treeAlias) {
+            if(this.ui.treeEventHandler){
+                this.ui.treeEventHandler.setActiveTreeType(treeAlias);
+            }
         },
 
         /**
@@ -249,10 +335,13 @@ angular.module('umbraco.services')
          * Hides the tree by hiding the containing dom element
          */
         hideTree: function () {
-            if (!this.ui.stickyNavigation) {
-                this.ui.currentSection = "";
+
+            if (this.ui.tablet && !this.ui.stickyNavigation) {
+                //reset it to whatever is in the url
+                this.ui.currentSection = $routeParams.section;
                 setMode("default-hidesectiontree");
             }
+
         },
 
         /**
@@ -552,7 +641,7 @@ angular.module('umbraco.services')
           */
         hideNavigation: function () {
             this.ui.actions = [];
-            this.ui.currentNode = undefined;
+            //this.ui.currentNode = undefined;
             setMode("default");
         }
     };

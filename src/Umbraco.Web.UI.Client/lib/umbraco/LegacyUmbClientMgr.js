@@ -87,10 +87,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 //mimic the API of the legacy tree
                 var tree = {
                     setActiveTreeType : function(treeType){
-                         navService.syncTree(null, treeType, null);
+                         navService.setActiveTreeType(treeType);
                     },
                     syncTree : function(path,forceReload){
-                        navService.syncPath(path);
+                        navService.syncPath(path, forceReload);
                     },
                     getActionNode: function () {
                         //need to replicate the legacy tree node

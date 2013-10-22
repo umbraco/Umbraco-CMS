@@ -13,6 +13,14 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			scope.maxSections = 7;
 			scope.overflowingSections = 0;
             scope.sections = [];
+            scope.nav = navigationService;
+
+
+/*
+			scope.$watch("currentSection", function (newVal, oldVal) {
+				scope.currentSection = newVal;
+			});
+*/
 
 			function loadSections(){
 				sectionResource.getSections()

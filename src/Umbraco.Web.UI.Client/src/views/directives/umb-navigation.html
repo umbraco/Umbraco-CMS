@@ -1,7 +1,8 @@
 <div id="leftcolumn" ng-controller="Umbraco.NavigationController" 
     ng-mouseleave="nav.leaveTree($event)" ng-mouseenter="nav.enterTree($event)">
     
-    <umb-sections sections="sections" current-section="currentSection"></umb-sections>
+    <umb-sections sections="sections">
+    </umb-sections>
 
     <!-- navigation container -->
     <div id="navigation" ng-show="nav.ui.showNavigation" class="fill shadow umb-modalcolumn" ng-animate="'slide'">
@@ -11,6 +12,8 @@
             <!-- the search -->
             <div id="search-form">
                 <div class="umb-modalcolumn-header">
+
+                    {{nav.ui.currentSection}}
                     <form class="form-search" ng-controller="Umbraco.SearchController" novalidate>
                         <i class="icon-search"></i>
                         <input type="text"

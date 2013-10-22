@@ -1,7 +1,4 @@
 <div>
-    <div style="position:absolute; top: 1; background: red">
-        {{overflowingSections}} {{maxSections}} {{totalSections}}
-    </div>
     <div id="applications" ng-class="{faded:nav.ui.stickyNavigation}"> 
         <ul class="sections">
             <li class="avatar">
@@ -9,7 +6,7 @@
                     <img ng-src="{{avatar}}" />
                 </a>
             </li>
-            <li ng-repeat="section in sections | limitTo: maxSections" ng-class="{current: section.alias == currentSection}">
+            <li ng-repeat="section in sections | limitTo: maxSections" ng-class="{current: section.alias == nav.ui.currentSection}">
                 <a href="#/{{section.alias}}"
                    ng-dblclick="sectionDblClick(section)"
                    ng-click="sectionClick(section)"
