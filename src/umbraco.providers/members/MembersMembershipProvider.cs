@@ -157,6 +157,8 @@ namespace umbraco.providers.members
 
             UpdateMemberProperty(m, _lastPasswordChangedPropertyTypeAlias, DateTime.Now);
 
+            m.Save();
+
             return true;
         }
 
@@ -589,6 +591,8 @@ namespace umbraco.providers.members
                 UpdateMemberProperty(m, _lastPasswordChangedPropertyTypeAlias, DateTime.Now);
             }
 
+            m.Save();
+
             return newPassword;
         }
 
@@ -607,6 +611,7 @@ namespace umbraco.providers.members
                 if (m != null)
                 {
                     UpdateMemberProperty(m, _lockPropertyTypeAlias, 0);
+                    m.Save();
                     return true;
                 }
                 throw new Exception(String.Format("No member with the username '{0}' found", userName));
