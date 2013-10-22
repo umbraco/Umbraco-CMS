@@ -12,7 +12,7 @@ module.exports = function (grunt) {
   grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
   //triggered from grunt dev or grunt
-  grunt.registerTask('build', ['clean','concat','uglify','recess:min','copy']);
+  grunt.registerTask('build', ['clean','concat','recess:min','copy']);
   
   //utillity tasks
   grunt.registerTask('docs', ['ngdocs']);
@@ -90,7 +90,7 @@ module.exports = function (grunt) {
         files: [{ dest: '<%= distdir %>/lib', src : '**', expand: true, cwd: 'lib/' }]
       },
       views: {
-        files: [{ dest: '<%= distdir %>/views', src : '**/*.*', expand: true, cwd: 'src/views/' }]
+        files: [{ dest: '<%= distdir %>/views', src : ['**/*.*', '!**/*.controller.js'], expand: true, cwd: 'src/views/' }]
       },
       app: {
         files: [
