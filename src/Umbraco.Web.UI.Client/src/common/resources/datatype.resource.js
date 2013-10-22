@@ -53,10 +53,37 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "dataTypeApiBaseUrl",
                        "GetEmpty")),
-               'Failed to retreive data for empty media item type ' + alias);
-
+               'Failed to retreive data for empty datatype ' + alias);
         },
-
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.dataTypeResource#deleteById
+         * @methodOf umbraco.resources.dataTypeResource
+         *
+         * @description
+         * Deletes a content item with a given id
+         *
+         * ##usage
+         * <pre>
+         * dataTypeResource.deleteById(1234)
+         *    .then(function() {
+         *        alert('its gone!');
+         *    });
+         * </pre> 
+         * 
+         * @param {Int} id id of content item to delete        
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        deleteById: function(id) {
+            return umbRequestHelper.resourcePromise(
+                $http.delete(
+                    umbRequestHelper.getApiUrl(
+                        "dataTypeApiBaseUrl",
+                        "DeleteById",
+                        [{ id: id }])),
+                'Failed to delete item ' + id);
+        },
         /** saves or updates a data type object */
         save: function (dataType, preValues, isNew) {
             

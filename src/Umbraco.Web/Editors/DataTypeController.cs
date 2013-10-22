@@ -15,6 +15,7 @@ using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using Constants = Umbraco.Core.Constants;
+using System.Net.Http;
 
 namespace Umbraco.Web.Editors
 {
@@ -46,6 +47,26 @@ namespace Umbraco.Web.Editors
             // we should display a warning but let them select a different one!
 
             return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dataType);
+        }
+
+        /// <summary>
+        /// Deletes a data type wth a given ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpDelete]
+        public HttpResponseMessage DeleteById(int id)
+        {
+            var foundType = Services.DataTypeService.GetDataTypeDefinitionById(id);
+            if (foundType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+
+            Services.DataTypeService.Delete(foundType, UmbracoUser.Id);
+
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         public DataTypeDisplay GetEmpty()
