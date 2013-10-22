@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Web;
+using System.Globalization;
 using System.Web.Security;
 using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
@@ -63,15 +64,20 @@ namespace umbraco
             var loginName = nameAndMail.Length > 2 ? nameAndMail[3] : "";
             if (Member.InUmbracoMemberMode() && TypeID != -1)
             {
-                var dt = new MemberType(TypeID);
-                var m = Member.MakeNew(name, loginName, email, dt, User);
-                m.Password = password;                
-                m.LoginName = loginName.Replace(" ", "").ToLower();
+                var dt = new MemberType(TypeID);                
+                var provider = (providers.members.UmbracoMembershipProvider) Membership.Provider;
+                MembershipCreateStatus status;
+                //TODO: We are not supporting q/a - passing in empty here
+                var created = provider.CreateUser(dt.Alias, 
+                    loginName.Replace(" ", "").ToLower(), //dunno why we're doing this but that's how it has been so i'll leave it i guess
+                    password, email, "", "", true, Guid.NewGuid(), out status);
+
+                var member = Member.GetMemberFromLoginName(created.UserName);
 
                 var e = new NewMemberUIEventArgs();
-                OnNewMember(e, password, m);
+                this.OnNewMember(e, password, member);
 
-                _returnUrl = "members/editMember.aspx?id=" + m.Id.ToString();
+                _returnUrl = "members/editMember.aspx?id=" + member.Id.ToString(CultureInfo.InvariantCulture);
             }
             else
             {
@@ -79,7 +85,7 @@ namespace umbraco
                 Membership.CreateUser(name, password, email, "empty", "empty", true, out mc);
                 if (mc != MembershipCreateStatus.Success)
                 {
-                    throw new Exception("Error creating Member: " + mc.ToString());
+                    throw new Exception("Error creating Member: " + mc);
                 }
                 _returnUrl = "members/editMember.aspx?id=" + HttpUtility.UrlEncode(name);
             }
@@ -90,8 +96,11 @@ namespace umbraco
         public override bool PerformDelete()
         {            
             var u = Membership.GetUser(Alias);
+            if (u == null) return false;
             Membership.DeleteUser(u.UserName, true);
             return true;
+
+
         }
 
     }

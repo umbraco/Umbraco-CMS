@@ -254,7 +254,6 @@ namespace Umbraco.Web.Editors
             if (contentItem.Email.Trim().InvariantEquals(membershipUser.Email) == false)
             {
                 membershipUser.Email = contentItem.Email.Trim();
-
                 try
                 {
                     Membership.Provider.UpdateUser(membershipUser);
@@ -306,6 +305,8 @@ namespace Umbraco.Web.Editors
             //NOTE: We are casting directly to the umbraco membership provider so we can specify the member type that we want to use!
 
             var umbracoMembershipProvider = (global::umbraco.providers.members.UmbracoMembershipProvider)Membership.Provider;
+            
+            //TODO: We are not supporting q/a - passing in empty here
             var membershipUser = umbracoMembershipProvider.CreateUser(
                 contentItem.ContentTypeAlias, contentItem.Username,
                 contentItem.Password.NewPassword,

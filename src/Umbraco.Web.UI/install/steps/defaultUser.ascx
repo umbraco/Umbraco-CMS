@@ -47,6 +47,7 @@
 	                                            <asp:label AssociatedControlID="tb_password" runat="server">Password:</asp:label>
 												<span><asp:TextBox ID="tb_password" CssClass="text" TextMode="Password" type="text" Text="" runat="server"  /></span>
 												<asp:RequiredFieldValidator Display="Dynamic" CssClass="invalidaing" ControlToValidate="tb_password" runat="server" ErrorMessage="Password is a mandatory field" />
+                                                <asp:CustomValidator ID="PasswordValidator" Display="Dynamic" CssClass="invalidaing" runat="server" />
 											</div>
 
 											<div class="row">
@@ -79,7 +80,8 @@
                      badPass:       "invalidaing",
                      goodPass:      "validaing",
                      strongPass:    "validaing",
-                     baseStyle:     "basevalidaing",
+                     baseStyle: "basevalidaing",
+                     minLength: <%=CurrentProvider.MinRequiredPasswordLength %>,
 					userid:         jQuery("#<%= tb_login.ClientID %>").val(),
 					messageloc:		1
 				});
