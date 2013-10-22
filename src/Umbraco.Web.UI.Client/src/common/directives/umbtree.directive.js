@@ -76,7 +76,10 @@ angular.module("umbraco.directives")
                   if(!angular.isArray(path)){
                     path = path.split(',');
                   }
+                  //reset current node selection
+                  scope.currentNode = undefined;
 
+                  //filter the path for root node ids
                   path = _.filter(path, function(item){ return (item !== "init" && item !== "-1"); });
                    
                   //if we have a active tree, we sync based on that.
@@ -87,7 +90,7 @@ angular.module("umbraco.directives")
                 };
                 
                 scope.eventhandler.setActiveTreeType = function(treeAlias){
-                     activeTree = _.find(scope.tree.root.children, function(node){ return node.metaData.treeAlias === treeAlias; });
+                    activeTree = _.find(scope.tree.root.children, function(node){ return node.metaData.treeAlias === treeAlias; });
                 };
               }
             }

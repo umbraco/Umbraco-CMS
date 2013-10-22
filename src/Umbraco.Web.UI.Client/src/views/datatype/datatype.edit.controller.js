@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function DataTypeEditController($scope, $routeParams, $location, dataTypeResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, formHelper) {
+function DataTypeEditController($scope, $routeParams, $location, dataTypeResource, notificationsService, navigationService, angularHelper, serverValidationManager, contentEditingHelper, formHelper) {
 
     //method used to configure the pre-values when we retreive them from the server
     function createPreValueProps(preVals) {
@@ -55,6 +55,10 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
                 $scope.loaded = true;
                 $scope.preValuesLoaded = true;
                 $scope.content = data;
+
+                navigationService.setActiveTreeType("datatype");
+                navigationService.syncPath([String(data.id)]);
+
                 createPreValueProps($scope.content.preValues);
                 
                 //in one particular special case, after we've created a new item we redirect back to the edit
