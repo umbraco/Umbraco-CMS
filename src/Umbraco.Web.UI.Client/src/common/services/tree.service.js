@@ -154,7 +154,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                 }, function(reason) {
 
                     //in case of error, emit event
-                    $rootScope.$broadcast("treeNodeLoadError", { element: arrow, node: node, error: reason });
+                    $rootScope.$broadcast("treeNodeLoadError", {error: reason });
 
                     //stop show the loading indicator  
                     node.loading = false;

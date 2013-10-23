@@ -84,11 +84,11 @@ namespace Umbraco.Web
                 routeName = string.Format("umbraco-{0}-{1}", "api", controllerName);
                 if (id == null)
                 {
-                    return url.Link(routeName, new {controller = controllerName, action = actionName});
+                    return url.Route(routeName, new { controller = controllerName, action = actionName, httproute = "" });
                 }
                 else
                 {
-                    return url.Link(routeName, new {controller = controllerName, action = actionName, id = id});
+                    return url.Route(routeName, new { controller = controllerName, action = actionName, id = id, httproute = "" });
                 }
             }
             else
@@ -96,11 +96,11 @@ namespace Umbraco.Web
                 routeName = string.Format("umbraco-{0}-{1}-{2}", "api", area, controllerName);
                 if (id == null)
                 {
-                    return url.Link(routeName, new {controller = controllerName, action = actionName});
+                    return url.Route(routeName, new { controller = controllerName, action = actionName, httproute = "" });
                 }
                 else
                 {
-                    return url.Link(routeName, new { controller = controllerName, action = actionName, id = id });
+                    return url.Route(routeName, new { controller = controllerName, action = actionName, id = id, httproute = "" });
                 }
             }
         }
