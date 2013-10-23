@@ -325,7 +325,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "contentApiBaseUrl",
                        "GetByIds",
                        idQuery)),
-               'Failed to retreive data for content id ' + id);
+               'Failed to retreive data for content with multiple ids');
         },
 
         
