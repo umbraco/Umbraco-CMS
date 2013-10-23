@@ -19,6 +19,8 @@
 angular.module('umbraco.services')
 .factory('navigationService', function ($rootScope, $routeParams, $log, $location, $q, $timeout, dialogService, treeService, notificationsService, historyService) {
     
+    var minScreenSize = 1100;
+
     //Define all sub-properties for the UI object here
     var ui = {
         tablet: false,
@@ -44,7 +46,7 @@ angular.module('umbraco.services')
     $rootScope.$on("closeDialogs", function(){});
 
     function setTreeMode() {
-        ui.tablet = ($(window).width() <= 1000);
+        ui.tablet = ($(window).width() <= minScreenSize);
         ui.showNavigation = !ui.tablet;
     }
 
