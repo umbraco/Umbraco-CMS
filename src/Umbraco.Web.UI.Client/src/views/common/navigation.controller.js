@@ -37,6 +37,12 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
         $scope.nav.showSearch();
     });
 
+    //trigger dialogs closing with a hotkey:
+    keyboardService.bind("esc", function(){
+        $rootScope.$emit("closeDialogs");
+    });
+
+
     $scope.selectedId = navigationService.currentId;
     
     //This reacts to clicks passed to the body element which emits a global call to close all dialogs
