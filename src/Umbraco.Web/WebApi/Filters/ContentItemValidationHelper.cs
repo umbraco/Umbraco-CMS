@@ -90,7 +90,7 @@ namespace Umbraco.Web.WebApi.Filters
 
             foreach (var p in postedItem.Properties)
             {
-                if (postedItem.PersistedContent.Properties.Contains(p.Alias))
+                if (postedItem.PersistedContent.Properties.Contains(p.Alias) == false)
                 {
                     //TODO: Do we return errors here ? If someone deletes a property whilst their editing then should we just
                     //save the property data that remains? Or inform them they need to reload... not sure. This problem exists currently too i think.

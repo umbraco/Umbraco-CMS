@@ -29,6 +29,24 @@ angular.module('umbraco.security.interceptor', ['umbraco.security.retryQueue'])
                             return $injector.get('$http')(originalResponse.config);
                         });
                     }
+                    else if (originalResponse.status === 404) {
+
+                        //a 404 indicates that the request was not found - this could be due to a non existing url, or it could
+                        //be due to accessing a url with a parameter that doesn't exist, either way we should notifiy the user about it
+                        
+                        var errMsg = "The URL returned a 404 (not found): <br/><i>" + originalResponse.config.url.split('?')[0] + "</i>";
+                        if (originalResponse.data && originalResponse.data.ExceptionMessage) {
+                            errMsg += "<br/> with error: <br/><i>" + originalResponse.data.ExceptionMessage + "</i>";
+                        }
+                        if (originalResponse.config.data) {
+                            errMsg += "<br/> with data: <br/><i>" + angular.toJson(originalResponse.config.data) + "</i><br/>Contact your administrator for information.";
+                        }
+
+                        notifications.error(
+                            "Request error",
+                            errMsg);
+                        
+                    }
                     else if (originalResponse.status === 403) {
                         //if the status was a 403 it means the user didn't have permission to do what the request was trying to do.
                         //How do we deal with this now, need to tell the user somehow that they don't have permission to do the thing that was 
