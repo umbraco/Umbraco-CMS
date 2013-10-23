@@ -3,7 +3,8 @@
 		{
 			alias: "Sir.Trevor",
 			name: "Sir Trevor",
-			valueType: "TEXT",
+			hideLabel: true,
+			valueType: "JSON",
 			editor: {
 				view: "~/App_Plugins/SirTrevor/SirTrevor.html"
 			}
