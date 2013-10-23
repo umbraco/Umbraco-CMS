@@ -13,8 +13,8 @@ function MainController($scope, $location, $routeParams, $rootScope, $timeout, $
     var legacyTreeJsLoaded = false;
     
     //detect if the current device is touch-enabled
+    //todo, move this out of the 
     $scope.touchDevice = ("ontouchstart" in window || window.touch || window.navigator.msMaxTouchPoints===5 || window.DocumentTouch && document instanceof DocumentTouch);
-    //$scope.touchDevice = true; 
     navigationService.touchDevice = $scope.touchDevice;
 
     //the null is important because we do an explicit bool check on this in the view

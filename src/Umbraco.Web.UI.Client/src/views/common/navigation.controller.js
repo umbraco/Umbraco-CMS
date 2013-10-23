@@ -37,7 +37,7 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
         $scope.nav.showSearch();
     });
 
-    //trigger dialogs closing with a hotkey:
+    //trigger dialods with a hotkey:
     keyboardService.bind("esc", function(){
         $rootScope.$emit("closeDialogs");
     });

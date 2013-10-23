@@ -6,6 +6,12 @@ data-file-upload="options"
 data-file-upload-progress="" 
 data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
         
+		<span class="btn fileinput-button umb-upload-button-big" ng-class="{disabled: disabled}">
+		    <i class="icon icon-page-up"></i>
+		    <p>Click to upload</p>
+		    <input type="file" name="files[]" multiple ng-disabled="disabled">
+		</span>
+
         <umb-upload-dropzone dropping="dropping" files="filesUploading">
         </umb-upload-dropzone>
         
