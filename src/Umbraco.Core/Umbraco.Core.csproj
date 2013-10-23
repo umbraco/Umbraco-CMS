@@ -334,6 +334,7 @@
     <Compile Include="PropertyEditors\SupportTagsAttribute.cs" />
     <Compile Include="PropertyEditors\TagValueType.cs" />
     <Compile Include="PropertyEditors\ValueConverters\IntegerValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\JsonValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultipleTextStringValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\SimpleEditorValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\TextStringValueConverter.cs" />

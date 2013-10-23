@@ -188,19 +188,7 @@ namespace Umbraco.Core.Models.PublishedContent
             if (bool.TryParse(stringSource, out b))
                 return b;
 
-            //try json - expensive
-            if (stringSource.DetectIsJson())
-            {
-                try
-                {
-                    var obj = JsonConvert.DeserializeObject(stringSource);
-                    return obj;
-                }
-                catch
-                {
-                    //swallow, continue trying other things
-                }
-            }
+            //TODO: We can change this just like we do for the JSON converter - but to maintain compatibility might mean this still has to remain here
 
             // try xml - that is expensive, performance-wise
             XElement elt;

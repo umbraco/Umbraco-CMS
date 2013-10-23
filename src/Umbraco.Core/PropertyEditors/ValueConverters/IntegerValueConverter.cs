@@ -1,5 +1,4 @@
-﻿using System;
-using Umbraco.Core.Models.PublishedContent;
+﻿using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
