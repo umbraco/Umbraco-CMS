@@ -26,7 +26,14 @@ namespace Umbraco.Web.Trees
             var javascript = new StringBuilder();
             foreach (var bTree in legacyTrees)
             {
-                bTree.RenderJS(ref javascript);
+                try
+                {
+                    bTree.RenderJS(ref javascript);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error(typeof(LegacyTreeJavascript), "Could not load the JS from the legacy tree " + bTree.TreeAlias, ex);
+                }
             }
 
             return ReplaceLegacyJs(javascript.ToString());
