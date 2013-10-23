@@ -6,12 +6,14 @@
                     <input id="url" class="umb-editor input-block-level" type="text" ng-model="form.url" ng-change="showPreview()" required/>
                 </umb-control-group>
 
-                <umb-control-group label="Size" ng-show="form.supportsDimensions">
-                    <input type="text" ng-model="form.width" on-blur="changeSize('width')" style="width:50px"/> x <input type="text" ng-model="form.height" on-blur="changeSize('height')" style="width:50px"/>
+                <div ng-show="form.supportsDimensions">    
+                    <umb-control-group label="Size">
+                        <input type="text" ng-model="form.width" on-blur="changeSize('width')" style="width:50px"/> x <input type="text" ng-model="form.height" on-blur="changeSize('height')" style="width:50px"/>
 
-                    <label for="constrain" style="display:inline">Constrain:</label> 
-                    <input id="constrain" type="checkbox" ng-model="form.constrain" style="margin-bottom: 10px;"/>
-                </umb-control-group>
+                        <label for="constrain" style="display:inline">Constrain:</label> 
+                        <input id="constrain" type="checkbox" ng-model="form.constrain" style="margin-bottom: 10px;"/>
+                    </umb-control-group>
+                </div>
                 
                 <div>
                     <p ng-bind="form.info"></p>

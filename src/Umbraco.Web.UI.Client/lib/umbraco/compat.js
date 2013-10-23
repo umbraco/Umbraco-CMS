@@ -28,6 +28,11 @@
 
             UmbClientMgr.closeModalWindow(undefined);
         });
+
+        $.ctrl("S", function(){
+            $(".umb-panel-header .btn-primary").click();
+        });
+
     });     
 
     function scaleScrollables(selector) {
@@ -43,4 +48,26 @@
         });
     }
     
+    $.ctrl = function(key, callback, args) {
+        var isMac = navigator.platform.toUpperCase().indexOf('MAC')>=0;
+        var isCtrl = false;
+        $(document).keydown(function(e) {
+            if(!args) args=[]; // IE barks when args is null
+            var modKey = isMac ? e.metaKey : e.ctrlKey;
+            if(modKey){
+              isCtrl = true;  
+            } 
+
+            if(isCtrl && e.keyCode == key.charCodeAt(0)) {
+                callback.apply(this, args);
+                return false;
+            }
+
+        }).keyup(function(e) {
+            var modKey = isMac ? e.metaKey : e.ctrlKey;
+            if(modKey){
+                isCtrl = false;
+            }
+        });        
+    };
 })(jQuery);
