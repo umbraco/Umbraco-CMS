@@ -42,6 +42,65 @@ describe('tree service tests', function () {
         treeService = $injector.get('treeService');
     }));
 
+    describe('tree cache', function () {
+
+        it('tree with no args caches as content', function () {
+            treeService.getTree().then(function(data) {
+
+                var cache = treeService._getTreeCache();
+                expect(cache).toBeDefined();
+                expect(cache["_content"]).toBeDefined();
+
+            });
+        });
+        
+        it('tree caches by section', function () {
+            treeService.getTree({section: "media"}).then(function (data) {
+
+                var cache = treeService._getTreeCache();
+                expect(cache).toBeDefined();
+                expect(cache["_media"]).toBeDefined();
+
+            });
+        });
+        
+        it('removes cache by section', function () {
+            treeService.getTree({ section: "media" }).then(function (data) {
+
+                var cache = treeService._getTreeCache();
+                expect(cache["_media"]).toBeDefined();
+                expect(_.keys(cache).length).toBe(1);
+
+                treeService.clearCache("media");
+                
+                cache = treeService._getTreeCache();                
+                expect(cache["_media"]).not.toBeDefined();
+                expect(_.keys(cache).length).toBe(0);
+            });
+        });
+        
+        it('removes all cache', function () {
+            treeService.getTree({ section: "media" }).then(function (data) {
+
+                treeService.getTree({ section: "content" }).then(function (d) {
+
+                    var cache = treeService._getTreeCache();
+                    expect(cache["_content"]).toBeDefined();
+                    expect(cache["_media"]).toBeDefined();
+                    expect(_.keys(cache).length).toBe(2);
+
+                    treeService.clearCache();
+
+                    cache = treeService._getTreeCache();
+                    expect(cache["_content"]).toBeDefined();
+                    expect(cache["_media"]).toBeDefined();
+                    expect(_.keys(cache).length).toBe(0);
+                });
+            });
+        });
+
+    });
+
     describe('lookup plugin based trees', function() {
 
         it('can find a plugin based tree', function () {

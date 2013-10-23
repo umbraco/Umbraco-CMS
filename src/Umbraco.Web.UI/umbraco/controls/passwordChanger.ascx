@@ -77,7 +77,7 @@
     </asp:PlaceHolder>
 
     <div id="passwordInputArea">
-        <asp:PlaceHolder runat="server" ID="CurrentPasswordPlaceHolder" Visible="<%#Provider.EnablePasswordRetrieval == false %>">
+        <asp:PlaceHolder runat="server" ID="CurrentPasswordPlaceHolder" Visible="<%#ShowOldPassword %>">
             <div class="umb-el-wrap ">
                 <label class="control-label" for="<%=umbPasswordChanger_passwordCurrent.ClientID %>"><%=umbraco.ui.GetText("user", "passwordCurrent")%></label>
                 <div class="controls controls-row">

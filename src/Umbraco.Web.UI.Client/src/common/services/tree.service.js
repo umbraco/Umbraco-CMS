@@ -10,12 +10,30 @@
 function treeService($q, treeResource, iconHelper, notificationsService, $rootScope) {
 
     //TODO: implement this in local storage
-    var treeArray = [];
+    var treeCache = {};
     
     var standardCssClass = 'icon umb-tree-icon sprTree';
 
+    function getCacheKey(args) {
+        if (!args) {
+            args = {
+                section: 'content',
+                cacheKey: ''
+            };
+        }
+
+        var cacheKey = args.cachekey;
+        cacheKey += "_" + args.section;
+        return cacheKey;
+    }
+
     return {  
-        
+
+        /** Internal method to return the tree cache */
+        _getTreeCache: function() {
+            return treeCache;
+        },
+
         /** Internal method that ensures there's a routePath, parent and level property on each tree node and adds some icon specific properties so that the nodes display properly */
         _formatNodeDataForUseInUI: function (parentNode, treeNodes, section, level) {
             //if no level is set, then we make it 1   
@@ -85,13 +103,15 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             return undefined;
         },
 
-        /** clears the tree cache - with optional tree alias */
-        clearCache: function(treeAlias) {
-            if(!treeAlias){
-                treeArray.length = 0;  
-            }else{
-                if(treeArray && treeArray.indexOf(treeAlias) >= 0){
-                    treeArray.splice(treeArray.indexOf(treeAlias), 1);
+        /** clears the tree cache - with optional sectionAlias */
+        clearCache: function(sectionAlias) {
+            if (!sectionAlias) {
+                treeCache = {};
+            }
+            else {
+                var cacheKey = getCacheKey({ section: sectionAlias });
+                if (treeCache && treeCache[cacheKey] != null) {
+                    treeCache = _.omit(treeCache, cacheKey);
                 }
             }
         },
@@ -222,17 +242,19 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
 
         getTree: function (args) {
 
-            if (args === undefined) {
-                args = {};
+            //set defaults
+            if (!args) {
+                args = {
+                    section: 'content',
+                    cacheKey : ''
+                };
             }
 
-            var section = args.section || 'content';
-            var cacheKey = args.cachekey || '';
-            cacheKey += "_" + section;	
-
+            var cacheKey = getCacheKey(args);
+            
             //return the cache if it exists
-            if (treeArray[cacheKey] !== undefined){
-                return treeArray[cacheKey];
+            if (treeCache[cacheKey] !== undefined){
+                return treeCache[cacheKey];
             }
 
             var self = this;
@@ -241,17 +263,17 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     //this will be called once the tree app data has loaded
                     var result = {
                         name: data.name,
-                        alias: section,
+                        alias: args.section,
                         root: data
                     };
                     //we need to format/modify some of the node data to be used in our app.
-                    self._formatNodeDataForUseInUI(result.root, result.root.children, section);
+                    self._formatNodeDataForUseInUI(result.root, result.root.children, args.section);
                     //cache this result
                     //TODO: We'll need to un-cache this in many circumstances
-                    treeArray[cacheKey] = result;
+                    treeCache[cacheKey] = result;
                     //return the data result as promised
                     //deferred.resolve(treeArray[cacheKey]);
-                    return treeArray[cacheKey];
+                    return treeCache[cacheKey];
                 });
         },
 

@@ -15,6 +15,40 @@ namespace Umbraco.Core.Security
     /// </summary>
     public abstract class MembershipProviderBase : MembershipProvider
     {
+        /// <summary>
+        /// Providers can override this setting, default is 7
+        /// </summary>
+        protected virtual int DefaultMinPasswordLength
+        {
+            get { return 7; }
+        }
+
+        /// <summary>
+        /// Providers can override this setting, default is 1
+        /// </summary>
+        protected virtual int DefaultMinNonAlphanumericChars
+        {
+            get { return 1; }
+        }
+
+        /// <summary>
+        /// Providers can override this setting, default is false to use better security
+        /// </summary>
+        protected virtual bool DefaultUseLegacyEncoding
+        {
+            get { return false; }
+        }
+
+        /// <summary>
+        /// Providers can override this setting, by default this is false which means that the provider will 
+        /// authenticate the username + password when ChangePassword is called. This property exists purely for
+        /// backwards compatibility.
+        /// </summary>
+        internal virtual bool AllowManuallyChangingPassword
+        {
+            get { return false; }
+        }
+
         private string _applicationName;
         private bool _enablePasswordReset;
         private bool _enablePasswordRetrieval;
@@ -177,8 +211,8 @@ namespace Umbraco.Core.Security
             _requiresUniqueEmail = config.GetValue("requiresUniqueEmail", false);
             _maxInvalidPasswordAttempts = GetIntValue(config, "maxInvalidPasswordAttempts", 5, false, 0);
             _passwordAttemptWindow = GetIntValue(config, "passwordAttemptWindow", 10, false, 0);
-            _minRequiredPasswordLength = GetIntValue(config, "minRequiredPasswordLength", 7, true, 0x80);
-            _minRequiredNonAlphanumericCharacters = GetIntValue(config, "minRequiredNonalphanumericCharacters", 1, true, 0x80);
+            _minRequiredPasswordLength = GetIntValue(config, "minRequiredPasswordLength", DefaultMinPasswordLength, true, 0x80);
+            _minRequiredNonAlphanumericCharacters = GetIntValue(config, "minRequiredNonalphanumericCharacters", DefaultMinNonAlphanumericChars, true, 0x80);
             _passwordStrengthRegularExpression = config["passwordStrengthRegularExpression"];
 
             _applicationName = config["applicationName"];
@@ -186,7 +220,7 @@ namespace Umbraco.Core.Security
                 _applicationName = GetDefaultAppName();
 
             //by default we will continue using the legacy encoding.
-            _useLegacyEncoding = config.GetValue("useLegacyEncoding", true);
+            _useLegacyEncoding = config.GetValue("useLegacyEncoding", DefaultUseLegacyEncoding);
 
             // make sure password format is clear by default.
             string str = config["passwordFormat"] ?? "Clear";
@@ -237,6 +271,26 @@ namespace Umbraco.Core.Security
             AlphanumericChars,
             Strength
         }
+
+        /// <summary>
+        /// Checks to ensure the AllowManuallyChangingPassword rule is adhered to
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="oldPassword"></param>
+        /// <param name="newPassword"></param>
+        /// <returns></returns>
+        public sealed override bool ChangePassword(string username, string oldPassword, string newPassword)
+        {
+            if (oldPassword.IsNullOrWhiteSpace() && AllowManuallyChangingPassword == false)
+            {
+                //If the old password is empty and AllowManuallyChangingPassword is false, than this provider cannot just arbitrarily change the password
+                throw new NotSupportedException("This provider does not support manually changing the password");
+            }
+
+            return PerformChangePassword(username, oldPassword, newPassword);
+        }
+
+        protected abstract bool PerformChangePassword(string username, string oldPassword, string newPassword);
 
         protected internal static Attempt<PasswordValidityError> IsPasswordValid(string password, int minRequiredNonAlphanumericChars, string strengthRegex, int minLength)
         {

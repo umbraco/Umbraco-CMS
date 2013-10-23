@@ -102,7 +102,9 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
         };
 
         $scope.showOldPass = function() {
-            return $scope.model.config.hasPassword && !$scope.model.config.enablePasswordRetrieval && !$scope.model.value.reset;
+            return $scope.model.config.hasPassword &&
+                !$scope.model.config.allowManuallyChangingPassword &&
+                !$scope.model.config.enablePasswordRetrieval && !$scope.model.value.reset;
         };
 
         $scope.showNewPass = function () {
@@ -115,10 +117,6 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
         
         $scope.showCancelBtn = function() {
             return $scope.model.config.disableToggle !== true && $scope.model.config.hasPassword;
-        };
-
-        $scope.oldPassRequired = function() {
-            return !$scope.model.value.reset && $scope.model.config.hasPassword && !$scope.model.config.enablePasswordRetrieval;
         };
 
     });

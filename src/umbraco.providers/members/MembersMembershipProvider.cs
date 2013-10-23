@@ -66,6 +66,38 @@ namespace umbraco.providers.members
         }
 
         #endregion
+        
+        /// <summary>
+        /// Override to maintain backwards compatibility with 0 required non-alphanumeric chars
+        /// </summary>
+        protected override int DefaultMinNonAlphanumericChars
+        {
+            get { return 0; }
+        }
+
+        /// <summary>
+        /// Override to maintain backwards compatibility with only 4 required length
+        /// </summary>
+        protected override int DefaultMinPasswordLength
+        {
+            get { return 4; }
+        }
+
+        /// <summary>
+        /// Override to maintain backwards compatibility
+        /// </summary>
+        protected override bool DefaultUseLegacyEncoding
+        {
+            get { return true; }
+        }
+
+        /// <summary>
+        /// For backwards compatibility, this provider supports this option
+        /// </summary>
+        internal override bool AllowManuallyChangingPassword
+        {
+            get { return true; }
+        }
 
         #region Initialization Method
         /// <summary>
@@ -148,16 +180,19 @@ namespace umbraco.providers.members
         /// Processes a request to update the password for a membership user.
         /// </summary>
         /// <param name="username">The user to update the password for.</param>
-        /// <param name="oldPassword">The current password for the specified user.</param>
+        /// <param name="oldPassword">This property is ignore for this provider</param>
         /// <param name="newPassword">The new password for the specified user.</param>
         /// <returns>
         /// true if the password was updated successfully; otherwise, false.
         /// </returns>
-        public override bool ChangePassword(string username, string oldPassword, string newPassword)
+        protected override bool PerformChangePassword(string username, string oldPassword, string newPassword)
         {
-            
+            //NOTE: due to backwards compatibilty reasons, this provider doesn't care about the old password and 
+            // allows simply setting the password manually so we don't really care about the old password.
+            // This is allowed based on the overridden AllowManuallyChangingPassword option.
+
             // in order to support updating passwords from the umbraco core, we can't validate the old password
-            var m = Member.GetMemberFromLoginNameAndPassword(username, oldPassword);
+            var m = Member.GetMemberFromLoginName(username);            
             if (m == null) return false;
 
             var args = new ValidatePasswordEventArgs(username, newPassword, false);

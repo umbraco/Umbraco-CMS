@@ -10,6 +10,7 @@ using System.Web.UI.WebControls;
 using System.Web.UI.WebControls.WebParts;
 using System.Web.UI.HtmlControls;
 using Umbraco.Core;
+using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 
 namespace umbraco.controls
@@ -21,6 +22,23 @@ namespace umbraco.controls
         protected MembershipProvider Provider
         {
             get { return Membership.Providers[MembershipProviderName]; }
+        }
+
+        /// <summary>
+        /// Determines whether to show the old password field or not
+        /// </summary>
+        protected bool ShowOldPassword
+        {
+            get
+            {
+                var umbProvider = Provider as MembershipProviderBase;
+                if (umbProvider != null && umbProvider.AllowManuallyChangingPassword)
+                {
+                    return false;
+                }
+
+                return Provider.EnablePasswordRetrieval == false;                
+            }
         }
 
         public bool IsChangingPassword
