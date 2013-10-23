@@ -1,5 +1,5 @@
 <div ng-controller="Umbraco.PropertyEditors.TagsController" class="umb-editor umb-tags">
-		<span ng-repeat="tag in currentTags" class="label label-primary tag">{{tag}} <i class="icon icon-delete" ng-click="removeTag(tag)"></i></span>
+		<span ng-repeat="tag in currentTags" ng-click="removeTag(tag)" class="label label-primary tag">{{tag}} <i class="icon icon-delete"></i></span>
 		
 		<input type="text" 
 			ng-keyup="addTag($event)" 

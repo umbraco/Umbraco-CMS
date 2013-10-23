@@ -36,7 +36,7 @@
     'lib/jquery/jquery.upload/js/jquery.fileupload-image.js',
     'lib/jquery/jquery.upload/js/jquery.fileupload-angular.js',
 
-    'lib/bootstrap/js/bootstrap.js',
+    'lib/bootstrap/js/bootstrap.2.2.3.min.js',
 	'lib/umbraco/Extensions.js',
     
     'lib/umbraco/NamespaceManager.js',
