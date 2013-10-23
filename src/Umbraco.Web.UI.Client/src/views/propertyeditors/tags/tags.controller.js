@@ -2,24 +2,40 @@ angular.module("umbraco")
 .controller("Umbraco.PropertyEditors.TagsController",
     function ($rootScope, $scope, $log, assetsService) {
 		
-		assetsService.loadJs(
-			'views/propertyeditors/tags/bootstrap-tags.custom.js'
-			).then(function(){
+			//load current value
+			$scope.currentTags = [];
+			if($scope.model.value){
+				$scope.currentTags = $scope.model.value.split(",");
+			}
 
-			//// Get data from tagsFactory
-			//$scope.tags = tagsResource.getTags("group");
-			$scope.tags = [];
+			$scope.addTag = function(e){
+				var code = e.keyCode || e.which;
+				if(code == 13) { //Enter keycode   
+				   if($scope.currentTags.indexOf($scope.tagToAdd) < 0){
+				   		$scope.currentTags.push($scope.tagToAdd);
+				   }
+				   $scope.tagToAdd = "";
+				}
+			}
 
-			// Initialize bootstrap-tags.js script
-			var tags = $('#' + $scope.model.alias + "_tags").tags({
-				tagClass: 'label-inverse'
+			$scope.removeTag = function(tag){
+				var i = $scope.currentTags.indexOf(tag);
+				if(i >= 0){
+					$scope.currentTags.splice(i,1);
+				}
+			}
+			
+			//sync model on submit (needed since we convert an array to string)	
+			$scope.$on("formSubmitting", function (ev, args) {
+				$scope.model.value = $scope.currentTags.join();
 			});
 
-			$.each($scope.tags, function(index, tag) {
-				tags.addTag(tag.label);
-			});
-		});
+			//vice versa
+			$scope.model.onValueChanged = function (newVal, oldVal) {
+			    //update the display val again if it has changed from the server
+			    $scope.model.val = newVal;
+			    $scope.currentTags = $scope.model.value.split(",");
+			};
 
-		assetsService.loadCss('views/propertyeditors/tags/bootstrap-tags.custom.css');
-	}
+		}
 );
