@@ -105,6 +105,8 @@ namespace Umbraco.Core.PropertyEditors
                 case "STRING":
                     return DataTypeDatabaseType.Nvarchar;
                 case "TEXT":
+                case "JSON":
+                case "XML":
                     return DataTypeDatabaseType.Ntext;
                 case "DATETIME":
                 case "DATE":
