@@ -332,6 +332,8 @@
     <Compile Include="Models\Mapping\LogModelMapper.cs" />
     <Compile Include="Models\Mapping\MacroModelMapper.cs" />
     <Compile Include="Models\Mapping\MemberModelMapper.cs" />
+    <Compile Include="Models\Mapping\TabModelMapper.cs" />
+    <Compile Include="Models\TagModel.cs" />
     <Compile Include="Models\UpgradeCheckResponse.cs" />
     <Compile Include="Models\PasswordChangedModel.cs" />
     <Compile Include="PropertyEditors\ColorListPreValueEditor.cs" />
@@ -389,6 +391,7 @@
     <Compile Include="PropertyEditors\PropertyValueEditorWrapper.cs" />
     <Compile Include="PublishedQueryContext.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
+    <Compile Include="TagQueryContext.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
     <Compile Include="Trees\MemberTreeController.cs" />

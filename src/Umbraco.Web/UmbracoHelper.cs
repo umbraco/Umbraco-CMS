@@ -33,6 +33,15 @@ namespace Umbraco.Web
 		private readonly UmbracoContext _umbracoContext;
 		private readonly IPublishedContent _currentPage;
 	    private PublishedQueryContext _queryContext;
+        private TagQueryContext _tagContext;
+
+        /// <summary>
+        /// Lazy instantiates the tag context
+        /// </summary>
+        public TagQueryContext Tags
+        {
+            get { return _tagContext ?? (_tagContext = new TagQueryContext(UmbracoContext.Application.Services.TagService)); }
+        }
 
         /// <summary>
         /// Lazy instantiates the query context
