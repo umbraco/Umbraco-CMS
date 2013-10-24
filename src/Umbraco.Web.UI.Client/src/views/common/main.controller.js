@@ -13,7 +13,7 @@ function MainController($scope, $location, $routeParams, $rootScope, $timeout, $
     var legacyTreeJsLoaded = false;
     
     //detect if the current device is touch-enabled
-    //todo, move this out of the 
+    //todo, move this out of the controller
     $scope.touchDevice = ("ontouchstart" in window || window.touch || window.navigator.msMaxTouchPoints===5 || window.DocumentTouch && document instanceof DocumentTouch);
     navigationService.touchDevice = $scope.touchDevice;
 
@@ -98,19 +98,19 @@ function MainController($scope, $location, $routeParams, $rootScope, $timeout, $
             $location.path("/").search("");
         }
 
-        //var url = "http://www.gravatar.com/avatar/" + $scope.user.emailHash + ".json?404=404";
-        //$http.jsonp(url).then(function(response){
-        //    $log.log("found: " + response);
-        //}, function(data){
-        //    $log.log(data);
-        //});
-
-        //if($scope.user.avatar){
-        //    $http.get($scope.user.avatar).then(function(){
-        //        //alert($scope.user.avatar);
-        //        $scope.avatar = $scope.user.avatar;
-        //    });
-        //}
+        if($scope.user.emailHash){
+            $timeout(function(){
+                //yes this is wrong.. 
+                $("#avatar-img").fadeTo(1000, 0, function(){
+                      
+                      $timeout(function(){
+                        $scope.avatar = "http://www.gravatar.com/avatar/" + $scope.user.emailHash +".jpg?s=32&d=wavatar";
+                      });
+                      
+                      $("#avatar-img").fadeTo(1000, 1);
+                });
+              }, 3000);  
+        }
 
     });
 

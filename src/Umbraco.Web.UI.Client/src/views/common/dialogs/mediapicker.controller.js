@@ -13,6 +13,8 @@ angular.module("umbraco")
             };
 
             $scope.submitFolder = function(e){
+                e.ev.preventDefault();
+                
                 if(e.keyCode === 13){
                     $scope.showFolderInput = false;
 

@@ -3,7 +3,7 @@
         <ul class="sections">
             <li class="avatar">
                 <a href="#" ng-click="avatarClick()" title="{{user.name}}" prevent-default>
-                    <img ng-src="{{avatar}}" />
+                    <img id="avatar-img" ng-src="{{avatar}}" />
                 </a>
             </li>
             <li ng-repeat="section in sections | limitTo: maxSections" ng-class="{current: section.alias == nav.ui.currentSection}">
