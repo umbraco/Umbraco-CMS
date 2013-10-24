@@ -138,7 +138,7 @@ namespace Umbraco.Web.Editors
             var currVal = Services.DataTypeService.GetPreValuesCollectionByDataTypeId(dataType.PersistedDataType.Id);
 
             //we need to allow for the property editor to deserialize the prevalues
-            var formattedVal = dataType.PropertyEditor.PreValueEditor.FormatDataForPersistence(
+            var formattedVal = dataType.PropertyEditor.PreValueEditor.ConvertEditorToDb(
                 preValDictionary,
                 currVal);
 

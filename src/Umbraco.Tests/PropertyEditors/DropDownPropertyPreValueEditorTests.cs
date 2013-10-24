@@ -96,7 +96,7 @@ namespace Umbraco.Tests.PropertyEditors
 
             var editor = new ValueListPreValueEditor();
 
-            var result = editor.FormatDataForEditor(defaultVals, persisted);
+            var result = editor.ConvertDbToEditor(defaultVals, persisted);
 
             Assert.AreEqual(1, result.Count);
             Assert.IsTrue(result.ContainsKey("items"));

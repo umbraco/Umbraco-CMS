@@ -34,6 +34,24 @@ namespace Umbraco.Web.PropertyEditors
             }
 
             /// <summary>
+            /// override so that we can hide the label based on the pre-value
+            /// </summary>
+            /// <param name="preValues"></param>
+            public override void ConfigureForDisplay(Core.Models.PreValueCollection preValues)
+            {
+                base.ConfigureForDisplay(preValues);
+                var asDictionary = preValues.FormatAsDictionary();
+                if (asDictionary.ContainsKey("hideLabel"))
+                {
+                    var boolAttempt = asDictionary["hideLabel"].Value.TryConvertTo<bool>();
+                    if (boolAttempt.Success)
+                    {
+                        HideLabel = boolAttempt.Result;
+                    }
+                }
+            }
+
+            /// <summary>
             /// Format the data for the editor
             /// </summary>
             /// <param name="dbValue"></param>
@@ -41,7 +59,7 @@ namespace Umbraco.Web.PropertyEditors
             public override object ConvertDbToEditor(object dbValue)
             {
                 if (dbValue == null)
-                    return dbValue;
+                    return null;
 
                 var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(dbValue.ToString(), new Dictionary<string, string>());
                 return parsed;

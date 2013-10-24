@@ -52,9 +52,9 @@ namespace Umbraco.Web.PropertyEditors
             /// <param name="defaultPreVals"></param>
             /// <param name="persistedPreVals"></param>
             /// <returns></returns>
-            public override IDictionary<string, object> FormatDataForEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
+            public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
             {
-                var returnVal = base.FormatDataForEditor(defaultPreVals, persistedPreVals);
+                var returnVal = base.ConvertDbToEditor(defaultPreVals, persistedPreVals);
                 //always add the multiple param to true
                 returnVal["multiple"] = "1";
                 return returnVal;

@@ -138,7 +138,7 @@ namespace Umbraco.Web.PropertyEditors
             /// <param name="defaultPreVals"></param>
             /// <param name="persistedPreVals"></param>
             /// <returns></returns>
-            public override IDictionary<string, object> FormatDataForEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
+            public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
             {
                 var result = new Dictionary<string, object>();
 
@@ -164,9 +164,9 @@ namespace Umbraco.Web.PropertyEditors
             /// <param name="editorValue"></param>
             /// <param name="currentValue"></param>
             /// <returns></returns>
-            public override IDictionary<string, string> FormatDataForPersistence(IDictionary<string, object> editorValue, PreValueCollection currentValue)
+            public override IDictionary<string, string> ConvertEditorToDb(IDictionary<string, object> editorValue, PreValueCollection currentValue)
             {
-                var result = base.FormatDataForPersistence(editorValue, currentValue);
+                var result = base.ConvertEditorToDb(editorValue, currentValue);
 
                 //this should just be a dictionary of values, we want to re-format this so that it is just one value in the dictionary that is 
                 // semi-colon delimited

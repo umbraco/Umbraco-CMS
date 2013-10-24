@@ -24,16 +24,19 @@ namespace Umbraco.Web.Models.Mapping
         {
             var display = base.ConvertCore(originalProp);
 
+            var dataTypeService = _dataTypeService.Value;
+            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(originalProp.PropertyType.DataTypeDefinitionId);
+
+            //configure the editor for display with the pre-values
+            var valEditor = display.PropertyEditor.ValueEditor;
+            valEditor.ConfigureForDisplay(preVals);
+
             //set the display properties after mapping
             display.Alias = originalProp.Alias;
             display.Description = originalProp.PropertyType.Description;
             display.Label = originalProp.PropertyType.Name;
-            display.HideLabel = display.PropertyEditor.ValueEditor.HideLabel;
-
-            var dataTypeService = _dataTypeService.Value;
-
-            var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(originalProp.PropertyType.DataTypeDefinitionId);
-           
+            display.HideLabel = valEditor.HideLabel;
+            
             if (display.PropertyEditor == null)
             {
                 //display.Config = PreValueCollection.AsDictionary(preVals);
@@ -44,8 +47,8 @@ namespace Umbraco.Web.Models.Mapping
             else
             {
                 //let the property editor format the pre-values
-                display.Config = display.PropertyEditor.PreValueEditor.FormatDataForEditor(display.PropertyEditor.DefaultPreValues, preVals);
-                display.View = display.PropertyEditor.ValueEditor.View;
+                display.Config = display.PropertyEditor.PreValueEditor.ConvertDbToEditor(display.PropertyEditor.DefaultPreValues, preVals);
+                display.View = valEditor.View;
             }
 
             return display;

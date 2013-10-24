@@ -42,7 +42,7 @@ namespace Umbraco.Web.Models.Mapping
             if (propEd != null)
             {
                 result = propEd.PreValueEditor.Fields.Select(Mapper.Map<PreValueFieldDisplay>).ToArray();
-                dictionaryVals = propEd.PreValueEditor.FormatDataForEditor(propEd.DefaultPreValues, preVals);
+                dictionaryVals = propEd.PreValueEditor.ConvertDbToEditor(propEd.DefaultPreValues, preVals);
             }
 
             var currentIndex = 0; //used if the collection is non-dictionary based.
