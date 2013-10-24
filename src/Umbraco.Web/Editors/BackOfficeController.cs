@@ -16,6 +16,7 @@ using Umbraco.Web.Trees;
 using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Models;
+using Umbraco.Web.WebServices;
 
 namespace Umbraco.Web.Editors
 {
@@ -144,6 +145,10 @@ namespace Umbraco.Web.Editors
                                     "updateCheckApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<UpdateCheckController>(
                                         controller => controller.GetCheck())
                                 },
+                                {
+                                    "tagApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TagsController>(
+                                        controller => controller.GetAllTags(null))
+                                }
                             }
                     },
                     {
