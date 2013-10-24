@@ -16,16 +16,6 @@ namespace umbraco.cms
 	{
 
 		/// <summary>
-		/// Returns all available IActionHandler in application
-		/// </summary>
-		/// <param name="resolver"></param>
-		/// <returns></returns>
-		internal static IEnumerable<Type> ResolveActionHandlers(this PluginManager resolver)
-		{
-			return resolver.ResolveTypes<IActionHandler>();
-		}
-
-		/// <summary>
 		/// Returns all available IActions in application
 		/// </summary>
 		/// <param name="resolver"></param>

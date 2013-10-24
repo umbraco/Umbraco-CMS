@@ -523,8 +523,6 @@ namespace umbraco
                 var cachedFieldKeyStart = string.Format("{0}{1}_", CacheKeys.ContentItemCacheKey, d.Id);
                 ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(cachedFieldKeyStart);                    
 
-                Action.RunActionHandlers(d, ActionPublish.Instance);
-
                 FireAfterUpdateDocumentCache(d, e);
             }
         }
@@ -552,10 +550,6 @@ namespace umbraco
                 ClearContextCache();
             }
 
-            foreach (Document d in Documents)
-            {
-                Action.RunActionHandlers(d, ActionPublish.Instance);
-            }
         }
         
         /// <summary>
@@ -634,12 +628,6 @@ namespace umbraco
                         XmlContentInternal = xmlContentCopy;
                         ClearContextCache();
                     }
-                }
-
-                if (x != null)
-                {
-                    // Run Handler				
-                    Action.RunActionHandlers(doc, ActionUnPublish.Instance);
                 }
 
                 //SD: changed to fire event BEFORE running the sitemap!! argh.

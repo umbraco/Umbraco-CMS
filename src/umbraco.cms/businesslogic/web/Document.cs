@@ -323,9 +323,6 @@ namespace umbraco.cms.businesslogic.web
             // Log
             LogHelper.Info<Document>(string.Format("New document {0}", d.Id));
 
-            // Run Handler				
-            BusinessLogic.Actions.Action.RunActionHandlers(d, ActionNew.Instance);
-
             // Save doc
             d.Save();
 
@@ -761,9 +758,7 @@ namespace umbraco.cms.businesslogic.web
             FireBeforeSendToPublish(e);
             if (!e.Cancel)
             {
-                BusinessLogic.Log.Add(BusinessLogic.LogTypes.SendToPublish, u, this.Id, "");
-
-                BusinessLogic.Actions.Action.RunActionHandlers(this, ActionToPublish.Instance);
+                Log.Add(LogTypes.SendToPublish, u, this.Id, "");
 
                 FireAfterSendToPublish(e);
                 return true;
@@ -1161,8 +1156,6 @@ namespace umbraco.cms.businesslogic.web
                 var content = ApplicationContext.Current.Services.ContentService.Copy(Content, CopyTo, RelateToOrignal, u.Id);
                 newDoc = new Document(content);
                 
-                // Have to run the ActionNew handler to do umbEnsureUniqueName (for example)
-                BusinessLogic.Actions.Action.RunActionHandlers(newDoc, ActionNew.Instance);
                 // Then save to preserve any changes made by action handlers
                 newDoc.Save();
 
@@ -1578,7 +1571,6 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                umbraco.BusinessLogic.Actions.Action.RunActionHandlers(this, ActionDelete.Instance);
                 if (Content != null)
                 {
                     ApplicationContext.Current.Services.ContentService.Delete(Content);
@@ -1609,7 +1601,6 @@ namespace umbraco.cms.businesslogic.web
 
             if (!e.Cancel)
             {
-                umbraco.BusinessLogic.Actions.Action.RunActionHandlers(this, ActionDelete.Instance);
                 UnPublish();
                 if (Content != null)
                 {
