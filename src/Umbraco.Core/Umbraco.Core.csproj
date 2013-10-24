@@ -326,6 +326,7 @@
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
     <Compile Include="Models\TaggableObjectTypes.cs" />
+    <Compile Include="Packaging\PackageBinaryInspector.cs" />
     <Compile Include="PropertyEditors\IValueEditor.cs" />
     <Compile Include="PropertyEditors\PropertyCacheValue.cs" />
     <Compile Include="PropertyEditors\PropertyValueCacheAttribute.cs" />
@@ -1083,7 +1084,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Imaging\" />
-    <Folder Include="Packaging\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
