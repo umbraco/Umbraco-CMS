@@ -387,6 +387,7 @@
     <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
     <Compile Include="PropertyEditors\LabelPropertyValueEditor.cs" />
     <Compile Include="PropertyEditors\PropertyValueEditorWrapper.cs" />
+    <Compile Include="PublishedQueryContext.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />

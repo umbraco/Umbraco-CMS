@@ -14,8 +14,6 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
 using Umbraco.Core.Xml;
-using Umbraco.Web.Models;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Templates;
 using umbraco;
@@ -27,14 +25,53 @@ using Member = umbraco.cms.businesslogic.member.Member;
 
 namespace Umbraco.Web
 {
-
-	/// <summary>
+    /// <summary>
 	/// A helper class that provides many useful methods and functionality for using Umbraco in templates
 	/// </summary>
 	public class UmbracoHelper
 	{
 		private readonly UmbracoContext _umbracoContext;
 		private readonly IPublishedContent _currentPage;
+	    private PublishedQueryContext _queryContext;
+
+        /// <summary>
+        /// Lazy instantiates the query context
+        /// </summary>
+	    public PublishedQueryContext QueryContext
+	    {
+	        get { return _queryContext ?? (_queryContext = new PublishedQueryContext(UmbracoContext.ContentCache, UmbracoContext.MediaCache)); }
+	    }
+
+        /// <summary>
+        /// Helper method to ensure an umbraco context is set when it is needed
+        /// </summary>
+        private UmbracoContext UmbracoContext
+        {
+            get
+            {
+                if (_umbracoContext == null)
+                {
+                    throw new NullReferenceException("No " + typeof(UmbracoContext) + " reference has been set for this " + typeof(UmbracoHelper) + " instance");
+                }
+                return _umbracoContext;
+            }
+        }
+
+        /// <summary>
+        /// Empty constructor to create an umbraco helper for access to methods that don't have dependencies or used for testing
+        /// </summary>
+        public UmbracoHelper()
+        {            
+        }
+
+        public UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content, PublishedQueryContext queryContext)
+            : this(umbracoContext)
+        {
+            if (content == null) throw new ArgumentNullException("content");
+            if (queryContext == null) throw new ArgumentNullException("queryContext");
+            _currentPage = content;
+            _queryContext = queryContext;
+        }
 
 		/// <summary>
 		/// Custom constructor setting the current page to the parameter passed in
@@ -62,6 +99,13 @@ namespace Umbraco.Web
 				_currentPage = _umbracoContext.PublishedContentRequest.PublishedContent;
 			}
 		}
+
+        public UmbracoHelper(UmbracoContext umbracoContext, PublishedQueryContext queryContext)
+            : this(umbracoContext)
+        {
+            if (queryContext == null) throw new ArgumentNullException("queryContext");
+            _queryContext = queryContext;
+        }
 
         /// <summary>
         /// Returns the current IPublishedContent item assigned to the UmbracoHelper
@@ -93,7 +137,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public IHtmlString RenderTemplate(int pageId, int? altTemplateId = null)
 		{
-			var templateRenderer = new TemplateRenderer(_umbracoContext, pageId, altTemplateId);
+			var templateRenderer = new TemplateRenderer(UmbracoContext, pageId, altTemplateId);
 			using (var sw = new StringWriter())
 			{
 				try
@@ -140,12 +184,12 @@ namespace Umbraco.Web
 		public IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters)
 		{
 			
-			if (_umbracoContext.PublishedContentRequest == null)
+			if (UmbracoContext.PublishedContentRequest == null)
 			{
 				throw new InvalidOperationException("Cannot render a macro when there is no current PublishedContentRequest.");
 			}
 
-		    return RenderMacro(alias, parameters, _umbracoContext.PublishedContentRequest.UmbracoPage);
+		    return RenderMacro(alias, parameters, UmbracoContext.PublishedContentRequest.UmbracoPage);
 		}
 
         /// <summary>
@@ -181,7 +225,7 @@ namespace Umbraco.Web
             if (umbracoPage == null) throw new ArgumentNullException("umbracoPage");
             if (m == null) throw new ArgumentNullException("m");
 
-            if (_umbracoContext.PageId == null)
+            if (UmbracoContext.PageId == null)
             {
                 throw new InvalidOperationException("Cannot render a macro when UmbracoContext.PageId is null.");
             }
@@ -195,7 +239,7 @@ namespace Umbraco.Web
             }
             var macroControl = m.renderMacro(macroProps,
                 umbracoPage.Elements,
-                _umbracoContext.PageId.Value);
+                UmbracoContext.PageId.Value);
 
             string html;
             if (macroControl is LiteralControl)
@@ -225,13 +269,13 @@ namespace Umbraco.Web
                     // http://issues.umbraco.org/issue/U4-1599 if it is setup during the macro execution. So 
                     // here we'll save the content type response and reset it after execute is called.
 
-                    var contentType = _umbracoContext.HttpContext.Response.ContentType;
+                    var contentType = UmbracoContext.HttpContext.Response.ContentType;
                     var traceIsEnabled = containerPage.Trace.IsEnabled;
                     containerPage.Trace.IsEnabled = false;
-                    _umbracoContext.HttpContext.Server.Execute(containerPage, output, true);
+                    UmbracoContext.HttpContext.Server.Execute(containerPage, output, true);
                     containerPage.Trace.IsEnabled = traceIsEnabled;
                     //reset the content type
-                    _umbracoContext.HttpContext.Response.ContentType = contentType;
+                    UmbracoContext.HttpContext.Response.ContentType = contentType;
 
                     //Now, we need to ensure that local links are parsed
                     html = TemplateUtilities.ParseInternalLinks(output.ToString());
@@ -373,8 +417,8 @@ namespace Umbraco.Web
             //currently assigned node. The PublishedContentRequest will be null if:
             // * we are rendering a partial view or child action
             // * we are rendering a view from a custom route
-            if (_umbracoContext.PublishedContentRequest == null 
-                || _umbracoContext.PublishedContentRequest.PublishedContent.Id != currentPage.Id)
+            if (UmbracoContext.PublishedContentRequest == null 
+                || UmbracoContext.PublishedContentRequest.PublishedContent.Id != currentPage.Id)
             {
                 item.NodeId = currentPage.Id.ToString();
             }
@@ -522,137 +566,172 @@ namespace Umbraco.Web
 
 		public IPublishedContent TypedContent(object id)
 		{
-            return TypedDocumentById(id, _umbracoContext.ContentCache);
+		    int intId;
+            return ConvertIdObjectToInt(id, out intId) ? QueryContext.TypedContent(intId) : null;
 		}
 
 		public IPublishedContent TypedContent(int id)
 		{
-            return TypedDocumentById(id, _umbracoContext.ContentCache);
+            return QueryContext.TypedContent(id);
 		}
 
 		public IPublishedContent TypedContent(string id)
 		{
-            return TypedDocumentById(id, _umbracoContext.ContentCache);
+            int intId;
+            return ConvertIdObjectToInt(id, out intId) ? QueryContext.TypedContent(intId) : null;
 		}
 
         public IPublishedContent TypedContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return TypedDocumentByXPath(xpath, vars, _umbracoContext.ContentCache);
+            return QueryContext.TypedContentSingleAtXPath(xpath, vars);
         }
 
 		public IEnumerable<IPublishedContent> TypedContent(params object[] ids)
 		{
-            return TypedDocumentsbyIds(_umbracoContext.ContentCache, ids);
+            return QueryContext.TypedContent(ConvertIdsObjectToInts(ids));
 		}
 
 		public IEnumerable<IPublishedContent> TypedContent(params int[] ids)
 		{
-            return TypedDocumentsbyIds(_umbracoContext.ContentCache, ids);
+            return QueryContext.TypedContent(ids);
 		}
 
 		public IEnumerable<IPublishedContent> TypedContent(params string[] ids)
 		{
-            return TypedDocumentsbyIds(_umbracoContext.ContentCache, ids);
+            return QueryContext.TypedContent(ConvertIdsObjectToInts(ids));
 		}
 
 		public IEnumerable<IPublishedContent> TypedContent(IEnumerable<object> ids)
 		{
-			return TypedContent(ids.ToArray());
+            return QueryContext.TypedContent(ConvertIdsObjectToInts(ids));
 		}
 
 		public IEnumerable<IPublishedContent> TypedContent(IEnumerable<string> ids)
 		{
-			return TypedContent(ids.ToArray());
+            return QueryContext.TypedContent(ConvertIdsObjectToInts(ids));
 		}
 
 		public IEnumerable<IPublishedContent> TypedContent(IEnumerable<int> ids)
 		{
-			return TypedContent(ids.ToArray());
+            return QueryContext.TypedContent(ids);
 		}
 
         public IEnumerable<IPublishedContent> TypedContentAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return TypedDocumentsByXPath(xpath, vars, _umbracoContext.ContentCache);
+            return QueryContext.TypedContentAtXPath(xpath, vars);
         }
 
         public IEnumerable<IPublishedContent> TypedContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         {
-            return TypedDocumentsByXPath(xpath, vars, _umbracoContext.ContentCache);
+            return QueryContext.TypedContentAtXPath(xpath, vars);
         }
 
         public IEnumerable<IPublishedContent> TypedContentAtRoot()
         {
-            return TypedDocumentsAtRoot(_umbracoContext.ContentCache);
+            return QueryContext.TypedContentAtRoot();
         }
 
 		public dynamic Content(object id)
 		{
-            return DocumentById(id, _umbracoContext.ContentCache, DynamicNull.Null);
+            int intId;
+            return ConvertIdObjectToInt(id, out intId) ? QueryContext.Content(intId) : DynamicNull.Null;
 		}
 
 		public dynamic Content(int id)
 		{
-            return DocumentById(id, _umbracoContext.ContentCache, DynamicNull.Null);
+            return QueryContext.Content(id);
 		}
 
 		public dynamic Content(string id)
 		{
-            return DocumentById(id, _umbracoContext.ContentCache, DynamicNull.Null);
+            int intId;
+            return ConvertIdObjectToInt(id, out intId) ? QueryContext.Content(intId) : DynamicNull.Null;
 		}
 
         public dynamic ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return DocumentByXPath(xpath, vars, _umbracoContext.ContentCache, DynamicNull.Null);
+            return QueryContext.ContentSingleAtXPath(xpath, vars);
         }
 
         public dynamic ContentSingleAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         {
-            return DocumentByXPath(xpath, vars, _umbracoContext.ContentCache, DynamicNull.Null);
+            return QueryContext.ContentSingleAtXPath(xpath, vars);
         }
 
         public dynamic Content(params object[] ids)
 		{
-            return DocumentByIds(_umbracoContext.ContentCache, ids);
+            return QueryContext.Content(ConvertIdsObjectToInts(ids));
 		}
 
 		public dynamic Content(params int[] ids)
 		{
-            return DocumentByIds(_umbracoContext.ContentCache, ids);
+            return QueryContext.Content(ids);
 		}
 
 		public dynamic Content(params string[] ids)
 		{
-            return DocumentByIds(_umbracoContext.ContentCache, ids);
+            return QueryContext.Content(ConvertIdsObjectToInts(ids));
 		}
 
 		public dynamic Content(IEnumerable<object> ids)
 		{
-			return Content(ids.ToArray());
+            return QueryContext.Content(ConvertIdsObjectToInts(ids));
 		}
 
 		public dynamic Content(IEnumerable<int> ids)
 		{
-			return Content(ids.ToArray());
+            return QueryContext.Content(ids);
 		}
 
 		public dynamic Content(IEnumerable<string> ids)
 		{
-			return Content(ids.ToArray());
+            return QueryContext.Content(ConvertIdsObjectToInts(ids));
 		}
 
         public dynamic ContentAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return DocumentsByXPath(xpath, vars, _umbracoContext.ContentCache);
+            return QueryContext.ContentAtXPath(xpath, vars);
         }
 
         public dynamic ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         {
-            return DocumentsByXPath(xpath, vars, _umbracoContext.ContentCache);
+            return QueryContext.ContentAtXPath(xpath, vars);
         }
 
         public dynamic ContentAtRoot()
         {
-            return DocumentsAtRoot(_umbracoContext.ContentCache);
+            return QueryContext.ContentAtRoot();
+        }
+
+        private bool ConvertIdObjectToInt(object id, out int intId)
+        {
+            var s = id as string;
+            if (s != null)
+            {
+                return int.TryParse(s, out intId);
+            }
+                
+            if (id is int)
+            {
+                intId = (int) id;
+                return true;
+            }
+
+            throw new InvalidOperationException("The value of parameter 'id' must be either a string or an integer");
+        }
+
+        private IEnumerable<int> ConvertIdsObjectToInts(IEnumerable<object> ids)
+        {
+            var list = new List<int>();
+            foreach (var id in ids)
+            {
+                int intId;
+                if (ConvertIdObjectToInt(id, out intId))
+                {
+                    list.Add(intId);
+                }
+            }
+            return list;
         }
 
 		#endregion
@@ -671,314 +750,110 @@ namespace Umbraco.Web
 		/// </remarks>
 		public IPublishedContent TypedMedia(object id)
 		{
-			return TypedDocumentById(id, _umbracoContext.MediaCache);
+            int intId;
+            return ConvertIdObjectToInt(id, out intId) ? QueryContext.TypedMedia(intId) : null;
 		}
 
 		public IPublishedContent TypedMedia(int id)
 		{
-            return TypedDocumentById(id, _umbracoContext.MediaCache);
+            return QueryContext.TypedMedia(id);
 		}
 
 		public IPublishedContent TypedMedia(string id)
 		{
-            return TypedDocumentById(id, _umbracoContext.MediaCache);
+            int intId;
+            return ConvertIdObjectToInt(id, out intId) ? QueryContext.TypedMedia(intId) : null;
 		}
 
 		public IEnumerable<IPublishedContent> TypedMedia(params object[] ids)
 		{
-            return TypedDocumentsbyIds(_umbracoContext.MediaCache, ids);
+            return QueryContext.TypedMedia(ConvertIdsObjectToInts(ids));
 		}
 
 		public IEnumerable<IPublishedContent> TypedMedia(params int[] ids)
 		{
-            return TypedDocumentsbyIds(_umbracoContext.MediaCache, ids);
+            return QueryContext.TypedMedia(ids);
 		}
 
 		public IEnumerable<IPublishedContent> TypedMedia(params string[] ids)
 		{
-            return TypedDocumentsbyIds(_umbracoContext.MediaCache, ids);
+            return QueryContext.TypedMedia(ConvertIdsObjectToInts(ids));
 		}
 
 		public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<object> ids)
 		{
-			return TypedMedia(ids.ToArray());
+            return QueryContext.TypedMedia(ConvertIdsObjectToInts(ids));
 		}
 
 		public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<int> ids)
 		{
-			return TypedMedia(ids.ToArray());
+            return QueryContext.TypedMedia(ids);
 		}
 
 		public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<string> ids)
 		{
-			return TypedMedia(ids.ToArray());
+            return QueryContext.TypedMedia(ConvertIdsObjectToInts(ids));
 		}
 
         public IEnumerable<IPublishedContent> TypedMediaAtRoot()
         {
-            return TypedDocumentsAtRoot(_umbracoContext.MediaCache);
+            return QueryContext.TypedMediaAtRoot();
         }
 
 		public dynamic Media(object id)
 		{
-            return DocumentById(id, _umbracoContext.MediaCache, DynamicNull.Null);
+            int intId;
+            return ConvertIdObjectToInt(id, out intId) ? QueryContext.Media(intId) : DynamicNull.Null;
 		}
 
 		public dynamic Media(int id)
 		{
-            return DocumentById(id, _umbracoContext.MediaCache, DynamicNull.Null);
+            return QueryContext.Media(id);
 		}
 
 		public dynamic Media(string id)
 		{
-            return DocumentById(id, _umbracoContext.MediaCache, DynamicNull.Null);
+            int intId;
+            return ConvertIdObjectToInt(id, out intId) ? QueryContext.Media(intId) : DynamicNull.Null;
 		}
 
 		public dynamic Media(params object[] ids)
 		{
-            return DocumentByIds(_umbracoContext.MediaCache, ids);
+            return QueryContext.Media(ConvertIdsObjectToInts(ids));
 		}
 
 		public dynamic Media(params int[] ids)
 		{
-            return DocumentByIds(_umbracoContext.MediaCache, ids);
+            return QueryContext.Media(ids);
 		}
 
 		public dynamic Media(params string[] ids)
 		{
-            return DocumentByIds(_umbracoContext.MediaCache, ids);
+            return QueryContext.Media(ConvertIdsObjectToInts(ids));
 		}
 
 		public dynamic Media(IEnumerable<object> ids)
 		{
-			return Media(ids.ToArray());
+            return QueryContext.Media(ConvertIdsObjectToInts(ids));
 		}
 
 		public dynamic Media(IEnumerable<int> ids)
 		{
-			return Media(ids.ToArray());
+            return QueryContext.Media(ids);
 		}
 
 		public dynamic Media(IEnumerable<string> ids)
 		{
-			return Media(ids.ToArray());
+            return QueryContext.Media(ConvertIdsObjectToInts(ids));
 		}
 
         public dynamic MediaAtRoot()
         {
-            return DocumentsAtRoot(_umbracoContext.MediaCache);
+            return QueryContext.MediaAtRoot();
         }
 
 		#endregion
-
-		#region Used by Content/Media
-
-		/// <summary>
-		/// Overloaded method accepting an 'object' type
-		/// </summary>
-		/// <param name="id"></param>
-		/// <param name="cache"> </param>
-		/// <returns></returns>
-		/// <remarks>
-		/// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass 
-		/// this result in to this method.
-		/// This method will throw an exception if the value is not of type int or string.
-		/// </remarks>
-        private IPublishedContent TypedDocumentById(object id, ContextualPublishedCache cache)
-		{
-			if (id is string)
-				return TypedDocumentById((string)id, cache);
-			if (id is int)
-				return TypedDocumentById((int)id, cache);
-			throw new InvalidOperationException("The value of parameter 'id' must be either a string or an integer");
-		}
-
-		private IPublishedContent TypedDocumentById(int id, ContextualPublishedCache cache)
-		{
-            var doc = cache.GetById(id);
-			return doc;
-		}
-
-        private IPublishedContent TypedDocumentById(string id, ContextualPublishedCache cache)
-		{
-			int docId;
-			return int.TryParse(id, out docId)
-				       ? DocumentById(docId, cache, null)
-				       : null;
-		}
-
-        private IPublishedContent TypedDocumentByXPath(string xpath, XPathVariable[] vars, ContextualPublishedContentCache cache)
-        {
-            var doc = cache.GetSingleByXPath(xpath, vars);
-            return doc;
-        }
-
-        private IPublishedContent TypedDocumentByXPath(XPathExpression xpath, XPathVariable[] vars, ContextualPublishedContentCache cache)
-        {
-            var doc = cache.GetSingleByXPath(xpath, vars);
-            return doc;
-        }
-
-        /// <summary>
-		/// Overloaded method accepting an 'object' type
-		/// </summary>
-		/// <param name="ids"></param>
-		/// <param name="cache"> </param>
-		/// <returns></returns>
-		/// <remarks>
-		/// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass 
-		/// this result in to this method.
-		/// This method will throw an exception if the value is not of type int or string.
-		/// </remarks>
-        private IEnumerable<IPublishedContent> TypedDocumentsbyIds(ContextualPublishedCache cache, params object[] ids)
-		{
-			return ids.Select(eachId => TypedDocumentById(eachId, cache));
-		}
-
-        private IEnumerable<IPublishedContent> TypedDocumentsbyIds(ContextualPublishedCache cache, params int[] ids)
-		{
-			return ids.Select(eachId => TypedDocumentById(eachId, cache));
-		}
-
-        private IEnumerable<IPublishedContent> TypedDocumentsbyIds(ContextualPublishedCache cache, params string[] ids)
-		{
-			return ids.Select(eachId => TypedDocumentById(eachId, cache));
-		}
-
-        private IEnumerable<IPublishedContent> TypedDocumentsByXPath(string xpath, XPathVariable[] vars, ContextualPublishedContentCache cache)
-        {
-            var doc = cache.GetByXPath(xpath, vars);
-            return doc;
-        }
-
-        private IEnumerable<IPublishedContent> TypedDocumentsByXPath(XPathExpression xpath, XPathVariable[] vars, ContextualPublishedContentCache cache)
-        {
-            var doc = cache.GetByXPath(xpath, vars);
-            return doc;
-        }
-
-        private IEnumerable<IPublishedContent> TypedDocumentsAtRoot(ContextualPublishedCache cache)
-        {
-            return cache.GetAtRoot();
-        }
-
-		/// <summary>
-		/// Overloaded method accepting an 'object' type
-		/// </summary>
-		/// <param name="id"></param>
-		/// <param name="cache"> </param>
-		/// <param name="ifNotFound"> </param>
-		/// <returns></returns>
-		/// <remarks>
-		/// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass 
-		/// this result in to this method.
-		/// This method will throw an exception if the value is not of type int or string.
-		/// </remarks>
-        private dynamic DocumentById(object id, ContextualPublishedCache cache, object ifNotFound)
-		{
-			if (id is string)
-				return DocumentById((string)id, cache, ifNotFound);
-			if (id is int)
-				return DocumentById((int)id, cache, ifNotFound);
-			throw new InvalidOperationException("The value of parameter 'id' must be either a string or an integer");
-		}
-
-        private dynamic DocumentById(int id, ContextualPublishedCache cache, object ifNotFound)
-		{
-            var doc = cache.GetById(id);
-			return doc == null
-					? ifNotFound
-					: new DynamicPublishedContent(doc).AsDynamic();
-		}
-
-        private dynamic DocumentById(string id, ContextualPublishedCache cache, object ifNotFound)
-		{
-			int docId;
-			return int.TryParse(id, out docId)
-				? DocumentById(docId, cache, ifNotFound)
-				: ifNotFound;
-		}
-
-        private dynamic DocumentByXPath(string xpath, XPathVariable[] vars, ContextualPublishedCache cache, object ifNotFound)
-        {
-            var doc = cache.GetSingleByXPath(xpath, vars);
-            return doc == null
-                ? ifNotFound
-                : new DynamicPublishedContent(doc).AsDynamic();
-        }
-
-        private dynamic DocumentByXPath(XPathExpression xpath, XPathVariable[] vars, ContextualPublishedCache cache, object ifNotFound)
-        {
-            var doc = cache.GetSingleByXPath(xpath, vars);
-            return doc == null
-                ? ifNotFound
-                : new DynamicPublishedContent(doc).AsDynamic();
-        }
-
-        /// <summary>
-		/// Overloaded method accepting an 'object' type
-		/// </summary>
-		/// <param name="ids"></param>
-		/// <param name="cache"> </param>
-		/// <returns></returns>
-		/// <remarks>
-		/// We accept an object type because GetPropertyValue now returns an 'object', we still want to allow people to pass 
-		/// this result in to this method.
-		/// This method will throw an exception if the value is not of type int or string.
-		/// </remarks>
-        private dynamic DocumentByIds(ContextualPublishedCache cache, params object[] ids)
-		{
-            var dNull = DynamicNull.Null;
-			var nodes = ids.Select(eachId => DocumentById(eachId, cache, dNull))
-				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
-				.Cast<DynamicPublishedContent>();
-			return new DynamicPublishedContentList(nodes);
-		}
-
-        private dynamic DocumentByIds(ContextualPublishedCache cache, params int[] ids)
-		{
-            var dNull = DynamicNull.Null;
-			var nodes = ids.Select(eachId => DocumentById(eachId, cache, dNull))
-				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
-				.Cast<DynamicPublishedContent>();
-			return new DynamicPublishedContentList(nodes);
-		}
-
-        private dynamic DocumentByIds(ContextualPublishedCache cache, params string[] ids)
-		{
-            var dNull = DynamicNull.Null;
-			var nodes = ids.Select(eachId => DocumentById(eachId, cache, dNull))
-				.Where(x => !TypeHelper.IsTypeAssignableFrom<DynamicNull>(x))
-				.Cast<DynamicPublishedContent>();
-			return new DynamicPublishedContentList(nodes);
-		}
-
-        private dynamic DocumentsByXPath(string xpath, XPathVariable[] vars, ContextualPublishedCache cache)
-        {
-            return new DynamicPublishedContentList(
-                cache.GetByXPath(xpath, vars)
-                    .Select(publishedContent => new DynamicPublishedContent(publishedContent))
-            );
-        }
-
-        private dynamic DocumentsByXPath(XPathExpression xpath, XPathVariable[] vars, ContextualPublishedCache cache)
-        {
-            return new DynamicPublishedContentList(
-                cache.GetByXPath(xpath, vars)
-                    .Select(publishedContent => new DynamicPublishedContent(publishedContent))
-            );
-        }
-
-        private dynamic DocumentsAtRoot(ContextualPublishedCache cache)
-        {
-            return new DynamicPublishedContentList(
-                cache.GetAtRoot()
-                    .Select(publishedContent => new DynamicPublishedContent(publishedContent))
-            );
-        }
-
-        #endregion
-
+        
 		#region Search
 
 		/// <summary>
@@ -990,8 +865,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public dynamic Search(string term, bool useWildCards = true, string searchProvider = null)
 		{
-			return new DynamicPublishedContentList(
-				TypedSearch(term, useWildCards, searchProvider));
+		    return QueryContext.Search(term, useWildCards, searchProvider);
 		}
 
 		/// <summary>
@@ -1002,8 +876,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public dynamic Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
 		{
-			return new DynamicPublishedContentList(
-				TypedSearch(criteria, searchProvider));
+            return QueryContext.Search(criteria, searchProvider);
 		}
 
 		/// <summary>
@@ -1015,12 +888,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public IEnumerable<IPublishedContent> TypedSearch(string term, bool useWildCards = true, string searchProvider = null)
 		{
-			var searcher = Examine.ExamineManager.Instance.DefaultSearchProvider;
-			if (!string.IsNullOrEmpty(searchProvider))
-				searcher = Examine.ExamineManager.Instance.SearchProviderCollection[searchProvider];
-
-			var results = searcher.Search(term, useWildCards);
-			return results.ConvertSearchResultToPublishedContent(_umbracoContext.ContentCache);
+            return QueryContext.Search(term, useWildCards, searchProvider);
 		}
 
 		/// <summary>
@@ -1031,12 +899,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public IEnumerable<IPublishedContent> TypedSearch(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
 		{
-			var s = Examine.ExamineManager.Instance.DefaultSearchProvider;
-			if (searchProvider != null)
-				s = searchProvider;
-
-			var results = s.Search(criteria);
-			return results.ConvertSearchResultToPublishedContent(_umbracoContext.ContentCache);
+            return QueryContext.Search(criteria, searchProvider);
 		}
 
 		#endregion
