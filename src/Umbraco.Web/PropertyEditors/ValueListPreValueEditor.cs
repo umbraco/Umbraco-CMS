@@ -58,7 +58,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <param name="defaultPreVals"></param>
         /// <param name="persistedPreVals"></param>
         /// <returns></returns>
-        public override IDictionary<string, object> FormatDataForEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
+        public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
         {
             var dictionary = persistedPreVals.FormatAsDictionary();
             var arrayOfVals = dictionary.Select(item => item.Value).ToList();
@@ -78,7 +78,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <remarks>
         /// This is mostly because we want to maintain compatibility with v6 drop down property editors that store their prevalues in different db rows.
         /// </remarks>
-        public override IDictionary<string, string> FormatDataForPersistence(IDictionary<string, object> editorValue, PreValueCollection currentValue)
+        public override IDictionary<string, string> ConvertEditorToDb(IDictionary<string, object> editorValue, PreValueCollection currentValue)
         {
             var val = editorValue["items"] as JArray;
             var result = new Dictionary<string, string>();

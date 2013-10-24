@@ -112,7 +112,7 @@ namespace Umbraco.Core.PropertyEditors
         /// This can be overridden if perhaps you have a comma delimited string posted value but want to convert those to individual rows, or to convert
         /// a json structure to multiple rows.
         /// </remarks>
-        public virtual IDictionary<string, string> FormatDataForPersistence(IDictionary<string, object> editorValue, PreValueCollection currentValue)
+        public virtual IDictionary<string, string> ConvertEditorToDb(IDictionary<string, object> editorValue, PreValueCollection currentValue)
         {
             //convert to a string based value to be saved in the db
             return editorValue.ToDictionary(x => x.Key, x => x.Value == null ? null : x.Value.ToString());
@@ -133,7 +133,7 @@ namespace Umbraco.Core.PropertyEditors
         /// This is generally not going to be used by anything unless a property editor wants to change the merging
         /// functionality or needs to convert some legacy persisted data, or convert the string values to strongly typed values in json (i.e. booleans)
         /// </remarks>
-        public virtual IDictionary<string, object> FormatDataForEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
+        public virtual IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
         {
             if (defaultPreVals == null)
             {

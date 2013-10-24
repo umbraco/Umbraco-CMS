@@ -13,9 +13,8 @@ angular.module("umbraco")
             };
 
             $scope.submitFolder = function(e){
-                e.ev.preventDefault();
-                
                 if(e.keyCode === 13){
+                    e.preventDefault();
                     $scope.showFolderInput = false;
 
                     mediaResource

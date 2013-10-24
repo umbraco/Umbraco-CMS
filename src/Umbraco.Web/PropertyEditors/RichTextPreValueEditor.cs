@@ -22,6 +22,13 @@ namespace Umbraco.Web.PropertyEditors
                 HideLabel = true,
                 Key = "editor"
             });
+
+            Fields.Add(new PreValueField()
+            {
+                Name = "Hide Label",
+                View = "boolean",
+                Key = "hideLabel"
+            });
         }
 
         //SD: You can declare a field like this if you want to instead of in the ctor, there's some options here:

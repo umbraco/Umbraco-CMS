@@ -42,6 +42,34 @@ namespace Umbraco.Core.PropertyEditors
             }
         }
 
+        private PreValueCollection _preVals;
+        protected PreValueCollection PreValues
+        {
+            get
+            {
+                if (_preVals == null)
+                {
+                    throw new InvalidOperationException("Pre values cannot be accessed until the Configure method has been called");
+                }
+                return _preVals;
+            }
+        }
+
+        /// <summary>
+        /// This is called to configure the editor for display with it's prevalues, useful when properties need to change dynamically
+        /// depending on what is in the pre-values.
+        /// </summary>
+        /// <param name="preValues"></param>
+        /// <remarks>
+        /// This cannot be used to change the value being sent to the editor, ConfigureEditor will be called *after* ConvertDbToEditor, pre-values
+        /// should not be used to modify values.
+        /// </remarks>
+        public virtual void ConfigureForDisplay(PreValueCollection preValues)
+        {
+            if (preValues == null) throw new ArgumentNullException("preValues");
+            _preVals = preValues;
+        }
+
         /// <summary>
         /// Defines the view to use for the editor, this can be one of 3 things:
         /// * the full virtual path or 

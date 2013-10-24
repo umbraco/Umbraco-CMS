@@ -56,7 +56,7 @@ namespace Umbraco.Web.PropertyEditors
             /// <param name="editorValue"></param>
             /// <param name="currentValue"></param>
             /// <returns></returns>
-            public override IDictionary<string, string> FormatDataForPersistence(IDictionary<string, object> editorValue, PreValueCollection currentValue)
+            public override IDictionary<string, string> ConvertEditorToDb(IDictionary<string, object> editorValue, PreValueCollection currentValue)
             {
                 //the values from the editor will be min/max fieds and we need to format to json in one field
                 var min = (editorValue.ContainsKey("min") ? editorValue["min"].ToString() : "0").TryConvertTo<int>();
@@ -73,7 +73,7 @@ namespace Umbraco.Web.PropertyEditors
             /// <param name="defaultPreVals"></param>
             /// <param name="persistedPreVals"></param>
             /// <returns></returns>
-            public override IDictionary<string, object> FormatDataForEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
+            public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
             {
                 var preVals = persistedPreVals.FormatAsDictionary();
                 var stringVal = preVals.Any() ? preVals.First().Value.Value : "";
