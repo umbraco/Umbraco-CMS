@@ -10,7 +10,10 @@ angular.module("umbraco").controller("Umbraco.Editors.MultiValuesController",
             //make an array from the dictionary
             var items = [];
             for (var i in $scope.model.value) { 
-                items.push({value: $scope.model.value[i]});
+                items.push({
+                    value: $scope.model.value[i],
+                    id: i
+                });
             }
             //now make the editor model the array
             $scope.model.value = items;

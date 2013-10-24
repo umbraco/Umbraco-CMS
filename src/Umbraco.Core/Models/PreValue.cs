@@ -9,7 +9,11 @@
         {
             Value = value;
             Id = id;
+        }
 
+        public PreValue(string value)
+        {
+            Value = value;
         }
 
         /// <summary>

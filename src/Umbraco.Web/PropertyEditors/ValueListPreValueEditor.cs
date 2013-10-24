@@ -78,10 +78,10 @@ namespace Umbraco.Web.PropertyEditors
         /// <remarks>
         /// This is mostly because we want to maintain compatibility with v6 drop down property editors that store their prevalues in different db rows.
         /// </remarks>
-        public override IDictionary<string, string> ConvertEditorToDb(IDictionary<string, object> editorValue, PreValueCollection currentValue)
+        public override IDictionary<string, PreValue> ConvertEditorToDb(IDictionary<string, object> editorValue, PreValueCollection currentValue)
         {
             var val = editorValue["items"] as JArray;
-            var result = new Dictionary<string, string>();
+            var result = new Dictionary<string, PreValue>();
             
             if (val == null)
             {
@@ -93,12 +93,18 @@ namespace Umbraco.Web.PropertyEditors
                 var index = 0;
 
                 //get all values in the array that are not empty 
-                foreach (var asString in val.OfType<JObject>()
+                foreach (var item in val.OfType<JObject>()
                     .Where(jItem => jItem["value"] != null)
-                    .Select(jItem => jItem["value"].ToString())
-                    .Where(asString => asString.IsNullOrWhiteSpace() == false))
+                    .Select(jItem => new
+                        {
+                            idAsString = jItem["id"] == null ? "0" : jItem["id"].ToString(), 
+                            valAsString = jItem["value"].ToString()
+                        })
+                    .Where(x => x.valAsString.IsNullOrWhiteSpace() == false))
                 {
-                    result.Add(index.ToInvariantString(), asString);
+                    var id = 0;
+                    int.TryParse(item.idAsString, out id);
+                    result.Add(index.ToInvariantString(), new PreValue(id, item.valAsString));
                     index++;
                 }
             }

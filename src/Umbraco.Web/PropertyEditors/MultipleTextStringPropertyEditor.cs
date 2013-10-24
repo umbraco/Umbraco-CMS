@@ -56,7 +56,7 @@ namespace Umbraco.Web.PropertyEditors
             /// <param name="editorValue"></param>
             /// <param name="currentValue"></param>
             /// <returns></returns>
-            public override IDictionary<string, string> ConvertEditorToDb(IDictionary<string, object> editorValue, PreValueCollection currentValue)
+            public override IDictionary<string, PreValue> ConvertEditorToDb(IDictionary<string, object> editorValue, PreValueCollection currentValue)
             {
                 //the values from the editor will be min/max fieds and we need to format to json in one field
                 var min = (editorValue.ContainsKey("min") ? editorValue["min"].ToString() : "0").TryConvertTo<int>();
@@ -64,7 +64,7 @@ namespace Umbraco.Web.PropertyEditors
 
                 var json = JObject.FromObject(new {Minimum = min.Success ? min.Result : 0, Maximum = max.Success ? max.Result : 0});
 
-                return new Dictionary<string, string> {{"0", json.ToString(Formatting.None)}};
+                return new Dictionary<string, PreValue> { { "0", new PreValue(json.ToString(Formatting.None)) } };
             }
 
             /// <summary>
