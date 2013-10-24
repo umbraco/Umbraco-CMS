@@ -160,21 +160,50 @@ namespace Umbraco.Core.Persistence.Repositories
 
         //TODO: Consider caching implications.
 
-        public IEnumerable<ITag> GetPublishedTagsForContent(int contentId)
+        public IEnumerable<ITag> GetTagsForEntityType(TaggableObjectTypes objectType, string group = null)
         {
+            var nodeObjectType = GetNodeObjectType(objectType);
+
             var sql = new Sql()
                 .Select("DISTINCT cmsTags.*")
                 .From<TagDto>()
                 .InnerJoin<TagRelationshipDto>()
-                .On("cmsTagRelationship.tagId = cmsTags.id")
-                .Where<TagRelationshipDto>(dto => dto.NodeId == contentId);
+                .On<TagRelationshipDto, TagDto>(left => left.TagId, right => right.Id)
+                .InnerJoin<ContentDto>()
+                .On<ContentDto, TagRelationshipDto>(left => left.NodeId, right => right.NodeId)
+                .InnerJoin<NodeDto>()
+                .On<NodeDto, ContentDto>(left => left.NodeId, right => right.NodeId)
+                .Where<NodeDto>(dto => dto.NodeObjectType == nodeObjectType);
+
+            if (group.IsNullOrWhiteSpace() == false)
+            {
+                sql = sql.Where<TagDto>(dto => dto.Group == group);
+            }
 
             var factory = new TagFactory();
 
             return Database.Fetch<TagDto>(sql).Select(factory.BuildEntity);
         }
 
-        public IEnumerable<ITag> GetPublishedTagsForProperty(int contentId, string propertyAlias)
+        public IEnumerable<ITag> GetTagsForEntity(int contentId, string group = null)
+        {
+            var sql = new Sql()
+                .Select("DISTINCT cmsTags.*")
+                .From<TagDto>()
+                .InnerJoin<TagRelationshipDto>()
+                .On<TagRelationshipDto, TagDto>(left => left.TagId, right => right.Id);
+
+            if (group.IsNullOrWhiteSpace() == false)
+            {
+                sql = sql.Where<TagDto>(dto => dto.Group == group);
+            }
+
+            var factory = new TagFactory();
+
+            return Database.Fetch<TagDto>(sql).Select(factory.BuildEntity);
+        }
+
+        public IEnumerable<ITag> GetTagsForProperty(int contentId, string propertyTypeAlias, string group = null)
         {
             var sql = new Sql()
                 .Select("DISTINCT cmsTags.*")
@@ -184,7 +213,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 .InnerJoin<PropertyTypeDto>()
                 .On<PropertyTypeDto, TagRelationshipDto>(left => left.Id, right => right.PropertyTypeId)
                 .Where<TagRelationshipDto>(dto => dto.NodeId == contentId)
-                .Where<PropertyTypeDto>(dto => dto.Alias == propertyAlias);
+                .Where<PropertyTypeDto>(dto => dto.Alias == propertyTypeAlias);
+
+            if (group.IsNullOrWhiteSpace() == false)
+            {
+                sql = sql.Where<TagDto>(dto => dto.Group == group);
+            }  
 
             var factory = new TagFactory();
 
@@ -195,7 +229,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Assigns the given tags to a content item's property
         /// </summary>
         /// <param name="contentId"></param>
-        /// <param name="propertyAlias"></param>
+        /// <param name="propertyTypeAlias"></param>
         /// <param name="tags">The tags to assign</param>
         /// <param name="replaceTags">
         /// If set to true, this will replace all tags with the given tags, 
@@ -205,7 +239,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <remarks>
         /// This can also be used to remove all tags from a property by specifying replaceTags = true and an empty tag list.
         /// </remarks>
-        public void AssignPublishedTagsToProperty(int contentId, string propertyAlias, IEnumerable<ITag> tags, bool replaceTags)
+        public void AssignTagsToProperty(int contentId, string propertyTypeAlias, IEnumerable<ITag> tags, bool replaceTags)
         {
             //First we need to ensure there are no duplicates
             var asArray = tags.Distinct(new TagComparer()).ToArray();
@@ -216,7 +250,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 return;
             }
 
-            var propertyTypeId = EnsureContentProperty(contentId, propertyAlias);
+            var propertyTypeId = EnsureContentProperty(contentId, propertyTypeAlias);
 
             //next check if we're removing all of the tags
             if (asArray.Length == 0 && replaceTags)
@@ -292,11 +326,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Removes any of the given tags from the property association
         /// </summary>
         /// <param name="contentId"></param>
-        /// <param name="propertyAlias"></param>
+        /// <param name="propertyTypeAlias"></param>
         /// <param name="tags">The tags to remove from the property</param>
-        public void RemovePublishedTagsFromProperty(int contentId, string propertyAlias, IEnumerable<ITag> tags)
+        public void RemoveTagsFromProperty(int contentId, string propertyTypeAlias, IEnumerable<ITag> tags)
         {
-            var propertyTypeId = EnsureContentProperty(contentId, propertyAlias);
+            var propertyTypeId = EnsureContentProperty(contentId, propertyTypeAlias);
             
             var tagSetSql = GetTagSet(tags);
             
@@ -310,6 +344,21 @@ namespace Umbraco.Core.Persistence.Repositories
                                           " ON (TagSet.Tag = cmsTags.Tag and TagSet.[Group] = cmsTags.[Group]))");
 
             Database.Execute(deleteSql);
+        }
+
+        private Guid GetNodeObjectType(TaggableObjectTypes type)
+        {
+            switch (type)
+            {
+                case TaggableObjectTypes.Content:
+                    return new Guid(Constants.ObjectTypes.Document);
+                case TaggableObjectTypes.Media:
+                    return new Guid(Constants.ObjectTypes.Media);
+                case TaggableObjectTypes.Member:
+                    return new Guid(Constants.ObjectTypes.Member);
+                default:
+                    throw new ArgumentOutOfRangeException("type");
+            }
         }
 
         /// <summary>

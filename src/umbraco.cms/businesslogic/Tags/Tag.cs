@@ -13,6 +13,7 @@ using umbraco.cms.businesslogic.web;
 
 namespace umbraco.cms.businesslogic.Tags
 {
+    [Obsolete("Use the TagService to query tags or the UmbracoHelper on the front-end and use the SetTags, RemoveTags extension methods on IContentBase to manipulate tags")]
     public class Tag : ITag
     {
 

@@ -49,7 +49,8 @@ namespace Umbraco.Tests
                     new RepositoryFactory(true),
                     new Mock<IEntityService>().Object),
                 new Mock<ISectionService>().Object,
-                new Mock<IApplicationTreeService>().Object);
+                new Mock<IApplicationTreeService>().Object,
+                new Mock<ITagService>().Object);
             Assert.Pass();
         }
 
@@ -87,7 +88,8 @@ namespace Umbraco.Tests
                         new RepositoryFactory(true),
                         new Mock<IEntityService>().Object),
                     new Mock<ISectionService>().Object,
-                    new Mock<IApplicationTreeService>().Object),
+                    new Mock<IApplicationTreeService>().Object,
+                    new Mock<ITagService>().Object),
                 CacheHelper.CreateDisabledCacheHelper());
             Assert.Pass();
         }

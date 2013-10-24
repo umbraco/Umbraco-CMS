@@ -325,6 +325,7 @@
     <Compile Include="Models\PublishedContent\IPublishedContentModelFactory.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
+    <Compile Include="Models\TaggableObjectTypes.cs" />
     <Compile Include="PropertyEditors\IValueEditor.cs" />
     <Compile Include="PropertyEditors\PropertyCacheValue.cs" />
     <Compile Include="PropertyEditors\PropertyValueCacheAttribute.cs" />
@@ -961,6 +962,7 @@
     <Compile Include="Services\IRelationService.cs" />
     <Compile Include="Services\ISectionService.cs" />
     <Compile Include="Services\IService.cs" />
+    <Compile Include="Services\ITagService.cs" />
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\LocalizationService.cs" />
     <Compile Include="Services\MacroService.cs" />
@@ -972,6 +974,7 @@
     <Compile Include="Services\ServerRegistrationService.cs" />
     <Compile Include="Services\PackagingService.cs" />
     <Compile Include="Services\ServiceContext.cs" />
+    <Compile Include="Services\TagService.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Standalone\ServiceContextManager.cs" />
     <Compile Include="Standalone\StandaloneCoreApplication.cs" />

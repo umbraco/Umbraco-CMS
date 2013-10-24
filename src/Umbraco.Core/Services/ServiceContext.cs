@@ -12,6 +12,7 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class ServiceContext
     {
+        private Lazy<ITagService> _tagService;
         private Lazy<IContentService> _contentService;
         private Lazy<IUserService> _userService;
         private Lazy<IMemberService> _memberService;
@@ -43,6 +44,7 @@ namespace Umbraco.Core.Services
         /// <param name="relationService"></param>
         /// <param name="sectionService"></param>
         /// <param name="treeService"></param>
+        /// <param name="tagService"></param>
         public ServiceContext(
             IContentService contentService, 
             IMediaService mediaService, 
@@ -54,8 +56,10 @@ namespace Umbraco.Core.Services
             IEntityService entityService,
             IRelationService relationService,
             ISectionService sectionService,
-            IApplicationTreeService treeService)
+            IApplicationTreeService treeService,
+            ITagService tagService)
         {
+            _tagService = new Lazy<ITagService>(() => tagService);     
             _contentService = new Lazy<IContentService>(() => contentService);        
             _mediaService = new Lazy<IMediaService>(() => mediaService);
             _contentTypeService = new Lazy<IContentTypeService>(() => contentTypeService);
@@ -75,7 +79,8 @@ namespace Umbraco.Core.Services
         /// <param name="dbUnitOfWorkProvider"></param>
         /// <param name="fileUnitOfWorkProvider"></param>
         /// <param name="publishingStrategy"></param>
-		internal ServiceContext(IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, IUnitOfWorkProvider fileUnitOfWorkProvider, BasePublishingStrategy publishingStrategy, CacheHelper cache)
+        /// <param name="cache"></param>
+        internal ServiceContext(IDatabaseUnitOfWorkProvider dbUnitOfWorkProvider, IUnitOfWorkProvider fileUnitOfWorkProvider, BasePublishingStrategy publishingStrategy, CacheHelper cache)
         {
 			BuildServiceCache(dbUnitOfWorkProvider, fileUnitOfWorkProvider, publishingStrategy, cache,
                               //this needs to be lazy because when we create the service context it's generally before the
@@ -143,6 +148,9 @@ namespace Umbraco.Core.Services
 
             if (_memberTypeService == null)
                 _memberTypeService = new Lazy<IMemberTypeService>(() => new MemberTypeService(provider, repositoryFactory.Value));
+
+            if (_tagService == null)
+                _tagService = new Lazy<ITagService>(() => new TagService(provider, repositoryFactory.Value));
         }
 
         /// <summary>
@@ -154,7 +162,15 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets the <see cref="EntityService"/>
+        /// Gets the <see cref="ITagService"/>
+        /// </summary>
+        public ITagService TagService
+        {
+            get { return _tagService.Value; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IMacroService"/>
         /// </summary>
         public IMacroService MacroService
         {
@@ -162,7 +178,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets the <see cref="EntityService"/>
+        /// Gets the <see cref="IEntityService"/>
         /// </summary>
         public IEntityService EntityService
         {
@@ -170,7 +186,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Gets the <see cref="RelationService"/>
+        /// Gets the <see cref="IRelationService"/>
         /// </summary>
         public IRelationService RelationService
         {

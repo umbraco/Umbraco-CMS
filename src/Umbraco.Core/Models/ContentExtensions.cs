@@ -528,6 +528,21 @@ namespace Umbraco.Core.Models
         
         #region Tag methods
 
+        ///// <summary>
+        ///// Returns the tags for the given property
+        ///// </summary>
+        ///// <param name="content"></param>
+        ///// <param name="propertyTypeAlias"></param>
+        ///// <param name="tagGroup"></param>
+        ///// <returns></returns>
+        ///// <remarks>
+        ///// The tags returned are only relavent for published content & saved media or members 
+        ///// </remarks>
+        //public static IEnumerable<ITag> GetTags(this IContentBase content, string propertyTypeAlias, string tagGroup = "default")
+        //{
+
+        //}
+
         /// <summary>
         /// Sets tags for the property - will add tags to the tags table and set the property value to be the comma delimited value of the tags.
         /// </summary>
