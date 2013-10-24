@@ -9,10 +9,14 @@ namespace Umbraco.Core.Services
     /// Tag service to query for tags in the tags db table. The tags returned are only relavent for published content & saved media or members 
     /// </summary>
     /// <remarks>
-    /// If there is unpublished content with tags, those tags will not be contained
+    /// If there is unpublished content with tags, those tags will not be contained.
+    /// 
+    /// This service does not contain methods to query for content, media or members based on tags, those methods will be added
+    /// to the content, media and member services respectively.
     /// </remarks>
     public interface ITagService : IService
-    {
+    {   
+
         /// <summary>
         /// Get every tag stored in the database (with optional group)
         /// </summary>
