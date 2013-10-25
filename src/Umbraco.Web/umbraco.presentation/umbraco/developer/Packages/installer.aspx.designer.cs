@@ -301,6 +301,7 @@ namespace umbraco.presentation.developer.packages {
         protected global::umbraco.uicontrols.PropertyPanel pp_templateConflicts;
 
         protected global::umbraco.uicontrols.PropertyPanel BinaryFileErrorsPanel;
+        protected global::umbraco.uicontrols.PropertyPanel LegacyPropertyEditorPanel;        
         protected global::System.Web.UI.WebControls.Literal BinaryFileErrorReport;
         
         /// <summary>

@@ -63,15 +63,20 @@ namespace umbraco.cms.businesslogic.packager
         public IDictionary<string, string> ConflictingTemplateAliases { get { return _conflictingTemplateAliases; } }
 
         /// <summary>
-        /// Indicates that the package contains legacy property editors that are not compatible with this version (v7)
+        /// Indicates that the package contains assembly reference errors
         /// </summary>
         public bool ContainsBinaryFileErrors { get; private set; }
 
         /// <summary>
-        /// List each property editor that is not compatible
+        /// List each assembly reference error
         /// </summary>
         public List<string> BinaryFileErrors { get { return _binaryFileErrors; } }
 
+        /// <summary>
+        /// Indicates that the package contains legacy property editors
+        /// </summary>
+        public bool ContainsLegacyPropertyEditors { get; private set; }
+        
         public bool ContainsStyleSheeConflicts { get; private set; }
         public IDictionary<string, string> ConflictingStyleSheetNames { get { return _conflictingStyleSheetNames; } }
 
@@ -597,11 +602,16 @@ namespace umbraco.cms.businesslogic.packager
             if (ContainsUnsecureFiles)
             {
                 //Now we want to see if the DLLs contain any legacy data types since we want to warn people about that
-                var binaryFileErrors = PackageBinaryInspector.BinariesContainInstanceOf<IDataType>(tempDir).ToArray();
-                if (binaryFileErrors.Any())
+                string[] assemblyErrors;
+                var assembliesWithReferences = PackageBinaryInspector.ScanAssembliesForTypeReference<IDataType>(tempDir, out assemblyErrors).ToArray();
+                if (assemblyErrors.Any())
                 {
                     ContainsBinaryFileErrors = true;
-                    BinaryFileErrors.AddRange(binaryFileErrors);
+                    BinaryFileErrors.AddRange(assemblyErrors);
+                }
+                if (assembliesWithReferences.Any())
+                {
+                    ContainsLegacyPropertyEditors = true;
                 }
             }
 
@@ -741,8 +751,18 @@ namespace umbraco.cms.businesslogic.packager
         private static string UnPack(string zipName)
         {
             // Unzip
-            string tempDir = IOHelper.MapPath(SystemDirectories.Data) + Path.DirectorySeparatorChar + Guid.NewGuid().ToString();
-            Directory.CreateDirectory(tempDir);
+
+            //the temp directory will be the package GUID - this keeps it consistent!
+            //the zipName is always the package Guid.umb
+
+            var packageFileName = Path.GetFileNameWithoutExtension(zipName);
+            var packageId = Guid.NewGuid();
+            Guid.TryParse(packageFileName, out packageId);
+
+            string tempDir = IOHelper.MapPath(SystemDirectories.Data) + Path.DirectorySeparatorChar + packageId.ToString();
+            //clear the directory if it exists
+            if (Directory.Exists(tempDir)) Directory.Delete(tempDir, true);
+            Directory.CreateDirectory(tempDir);            
 
             var s = new ZipInputStream(File.OpenRead(zipName));
 
