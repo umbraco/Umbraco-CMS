@@ -651,7 +651,7 @@ Miłego dnia!]]></key>
     <key alias="DownloadXmlDTD">Pobierz XML DTD</key>
     <key alias="fields">Pola</key>
     <key alias="includeSubpages">Włączając podstrony</key>
-    <key alias="mailBody"><![CDATA[Witaj %0%<br/> to jest automatyczny mail informujący że dokument %1% został zgłoszony jako wymagający tłumaczenia na '%5%' przez %2%. Wejdź na http://%3%/translation/details.aspx?id=%4% aby edytować. Lub zaloguj się do umbraco aby zobaczyć wszystkie zadania do tłumaczenia  http://%3%/umbraco.aspx.<br/>Życzę miłego dnia! Umbraco robot]]></key>
+    <key alias="mailBody"><![CDATA[Witaj %0%<br/> to jest automatyczny mail informujący że dokument %1% został zgłoszony jako wymagający tłumaczenia na '%5%' przez %2%. Wejdź na http://%3%/translation/details.aspx?id=%4% aby edytować. Lub zaloguj się do umbraco aby zobaczyć wszystkie zadania do tłumaczenia  http://%3%.<br/>Życzę miłego dnia! Umbraco robot]]></key>
     <key alias="mailSubject">[%0%] Tłumaczeń dla %1%</key>
     <key alias="noTranslators">Nie znaleziono tłumaczy. Proszę utwórz tłumacza przed wysłaniem zawartości do tłumaczenia</key>
     <key alias="ownedTasks">Zadania stworzone przez Ciebie</key>

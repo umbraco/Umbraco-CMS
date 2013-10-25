@@ -85,7 +85,7 @@
                                     So get rid of this page by starting umbraco and publishing some content. You can do this by clicking the "set up your new website" button below.
                                 </p>
                                 <ul class="btn-web">
-                                    <li class="btn-set"><a href="<%= IOHelper.ResolveUrl(SystemDirectories.Umbraco) %>/umbraco.aspx"><span>Launch umbraco</span></a></li>
+                                    <li class="btn-set"><a href="<%= IOHelper.ResolveUrl(SystemDirectories.Umbraco) %>"><span>Launch umbraco</span></a></li>
                                 </ul>
                             </div>
                             <div class="threcol">
