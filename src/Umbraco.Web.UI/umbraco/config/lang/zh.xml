@@ -784,7 +784,7 @@
 
      转到 http://%3%/translation/details.aspx?id=%4% 进行编辑
 
-      或登录http://%3%/umbraco.aspx查看任务
+      或登录http://%3%查看任务
 
       祝好运!]]></key>
     <key alias="mailSubject">[%0%]翻译任务：%1%</key>
