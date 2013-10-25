@@ -11,7 +11,7 @@ using System.Web;
 
 namespace Umbraco.Core.Packaging
 {
-    public class PackageBinaryInspector : MarshalByRefObject
+    internal class PackageBinaryInspector : MarshalByRefObject
     {
         /// <summary>
         /// Entry point to call from your code
