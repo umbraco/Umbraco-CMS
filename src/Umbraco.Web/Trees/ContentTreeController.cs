@@ -80,6 +80,8 @@ namespace Umbraco.Web.Trees
                         e.ContentTypeIcon,
                         hasChildren);
 
+                    node.AdditionalData.Add("contentType", e.ContentTypeAlias);
+
                     if (e.IsPublished == false)
                         node.SetNotPublishedStyle();
 

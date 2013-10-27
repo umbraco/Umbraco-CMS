@@ -50,13 +50,16 @@ namespace Umbraco.Web.Trees
         protected override TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var entities = GetChildEntities(id);
+            var nodes = new TreeNodeCollection();
 
-            var nodes = new TreeNodeCollection();            
-
-            nodes.AddRange(
-                entities.Cast<UmbracoEntity>()
-                        .Select(e => CreateTreeNode(e.Id.ToInvariantString(), queryStrings, e.Name, e.ContentTypeIcon, e.HasChildren)));
-
+            foreach (var entity in entities)
+            {
+                var e = (UmbracoEntity)entity;
+                var node = CreateTreeNode(e.Id.ToInvariantString(), queryStrings, e.Name, e.ContentTypeIcon, e.HasChildren);
+                
+                node.AdditionalData.Add("contentType", e.ContentTypeAlias);
+                nodes.Add(node);
+            }
             return nodes;
 
         }

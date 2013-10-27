@@ -73,12 +73,33 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 		}
 	};
 
+	if(dialogOptions.filter){
+		var filterArray = dialogOptions.filter.split(',');
+
+		$scope.dialogTreeEventHandler.bind("treeNodeExpanded", function(ev, args){
+
+			if(angular.isArray(args.children)){
+				angular.forEach(args.children, function(value, key){
+					if(filterArray.indexOf(value.metaData.contentType) >= 0){
+						value.filtered = true;
+						value.icon = "icon-wrong red unpublished";
+					}
+				});
+			}
+
+		});
+	}
+
 	$scope.dialogTreeEventHandler.bind("treeNodeSelect", function(ev, args){
 		args.event.preventDefault();
 		args.event.stopPropagation();
 
 		eventsService.publish("Umbraco.Dialogs.TreePickerController.Select", args).then(function(args){
 			
+			if(args.node.filtered){
+				return;
+			}
+
 			select(args.node.name, args.node.id);
 
 			if($scope.multiPicker){
