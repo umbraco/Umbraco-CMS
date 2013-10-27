@@ -32,7 +32,7 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                     if (key === null || val === null) {
                         throw "The object in the array was not formatted as a key/value pair";
                     }
-                    return key + "=" + val;
+                    return encodeURIComponent(key) + "=" + encodeURIComponent(val);
                 }).join("&");
             }
 

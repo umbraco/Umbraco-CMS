@@ -18,6 +18,12 @@
             else
                 b.attr("disabled", true);
         }
+        
+        $(document).ready(function () {
+            $('.toggle-report').click(function () {
+                $(this).next().toggle();
+            });
+        });
     </script>
 
 </asp:Content>
@@ -112,10 +118,8 @@
                     <div class="error" style="width: 370px;">
                         <h3>
                             Binary files in the package!</h3>
-                        <p style="padding-bottom:1px">
-                            <span id="dll-readMore" style="cursor:pointer;">Read more...</span>    
-                        </p>
-                        <div id="dll-readMore-pane" style="display:none;">
+                        <a class="toggle-report" href="#">Read more...</a>
+                        <div style="display:none;">
                             <p>
                                 This package contains .NET code. This is <strong>not unusual</strong> as .NET code
                                 is used for any advanced functionality on an Umbraco powered website.</p>
@@ -132,14 +136,47 @@
                         </div>
                     </div>
                 </cc1:PropertyPanel>
+                <cc1:PropertyPanel ID="LegacyPropertyEditorPanel" runat="server" Visible="false" Text="&nbsp;">
+                    <div class="error" style="width: 370px;">
+                        <h3>
+                            Legacy Property editors detected</h3>
+                        <a class="toggle-report" href="#">Read more...</a>
+                        <div style="display:none;">
+                            <p>
+                                This package contains legacy property editors which are not compatible with Umbraco 7</p>
+                            <p>
+                                This package may not function correctly if the package developer has not indicated that 
+                                it is compatible with version 7. Any DataTypes this package creates that do not have
+                                a Version 7 compatible property editor will be converted to use a Label/NoEdit property editor.
+                            </p>                            
+                        </div>
+                    </div>
+                </cc1:PropertyPanel>
+                <cc1:PropertyPanel ID="BinaryFileErrorsPanel" runat="server" Visible="false" Text="&nbsp;">
+                    <div class="error" style="width: 370px;">
+                        <h3>
+                            Binary file errors detected</h3>                        
+                        <a class="toggle-report" href="#">Read more...</a>
+                        <div style="display:none;">
+                            <p>
+                                This package contains .NET binary files that might not be compatible with this version of Umbraco.
+                                If you aren't sure what these errors mean or why they are listed please contact the package creator.
+                            </p>                            
+                            <p>
+                                <strong>Error report</strong><br />
+                                <ul>
+                                    <asp:Literal ID="BinaryFileErrorReport" runat="server" />
+                                </ul>
+                            </p>
+                        </div>
+                    </div>
+                </cc1:PropertyPanel>
                 <cc1:PropertyPanel ID="pp_macroConflicts" runat="server" Visible="false" Text="&nbsp;">
                     <div class="error" style="width: 370px;">
                         <h3>
                             Macro Conflicts in the package!</h3>
-                        <p style="padding-bottom:1px;">
-                            <span id="macro-readMore" style="cursor:pointer;">Read more...</span>
-                        </p>
-                        <div id="macro-readMore-pane" style="display:none">
+                        <a class="toggle-report" href="#">Read more...</a>
+                        <div style="display:none">
                             <p>
                                 This package contains one or more macros which have the same alias as an existing one on your site, based on the Macro Alias.
                                 </p>
@@ -159,10 +196,8 @@
                     <div class="error" style="width: 370px;">
                         <h3>
                             Template Conflicts in the package!</h3>
-                        <p style="padding-bottom:1px;">
-                            <span id="template-readMore" style="cursor:pointer;">Read more...</span>
-                        </p>
-                        <div id="template-readMore-pane" style="display:none">
+                        <a class="toggle-report" href="#">Read more...</a>
+                        <div style="display:none">
                             <p>
                                 This package contains one or more templates which have the same alias as an existing one on your site, based on the Template Alias.
                                 </p>
@@ -182,10 +217,8 @@
                     <div class="error" style="width: 370px;">
                         <h3>
                             Stylesheet Conflicts in the package!</h3>
-                        <p style="padding-bottom:1px;">
-                            <span id="stylesheet-readMore" style="cursor:pointer;">Read more...</span>
-                        </p>
-                        <div id="stylesheet-readMore-pane" style="display:none">
+                        <a class="toggle-report" href="#">Read more...</a>
+                        <div style="display:none">
                             <p>
                                 This package contains one or more stylesheets which have the same alias as an existing one on your site, based on the Stylesheet Name.
                                 </p>
@@ -212,25 +245,6 @@
                         OnClick="startInstall"></asp:Button>
                 </cc1:PropertyPanel>
             </cc1:Pane>
-            <script type="text/javascript">
-                $(document).ready(function() {
-                    jQuery('#dll-readMore').click(function() {
-                        jQuery('#dll-readMore-pane').toggle();
-                    });
-
-                    jQuery('#macro-readMore').click(function() {
-                        jQuery('#macro-readMore-pane').toggle();
-                    });
-
-                    jQuery('#template-readMore').click(function() {
-                        jQuery('#template-readMore-pane').toggle();
-                    });
-
-                    jQuery('#stylesheet-readMore').click(function() {
-                        jQuery('#stylesheet-readMore-pane').toggle();
-                    });
-                });
-                    </script>
         </asp:Panel>
         <cc1:Pane ID="pane_installing" runat="server" Visible="false" Text="Installing package">
             <cc1:PropertyPanel runat="server">

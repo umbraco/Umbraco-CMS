@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Core.Security
 {
@@ -6,6 +7,7 @@ namespace Umbraco.Core.Security
     /// Data structure used to store information in the authentication cookie
     /// </summary>
     [DataContract(Name = "userData", Namespace = "")]
+    [Serializable]
     internal class UserData
     {
         public UserData()

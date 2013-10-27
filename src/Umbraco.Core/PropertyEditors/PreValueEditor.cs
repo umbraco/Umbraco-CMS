@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -112,10 +112,10 @@ namespace Umbraco.Core.PropertyEditors
         /// This can be overridden if perhaps you have a comma delimited string posted value but want to convert those to individual rows, or to convert
         /// a json structure to multiple rows.
         /// </remarks>
-        public virtual IDictionary<string, string> ConvertEditorToDb(IDictionary<string, object> editorValue, PreValueCollection currentValue)
+        public virtual IDictionary<string, PreValue> ConvertEditorToDb(IDictionary<string, object> editorValue, PreValueCollection currentValue)
         {
             //convert to a string based value to be saved in the db
-            return editorValue.ToDictionary(x => x.Key, x => x.Value == null ? null : x.Value.ToString());
+            return editorValue.ToDictionary(x => x.Key, x => new PreValue(x.Value == null ? null : x.Value.ToString()));
         }
 
         /// <summary>

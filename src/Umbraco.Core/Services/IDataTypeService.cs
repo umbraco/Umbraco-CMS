@@ -10,8 +10,6 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IDataTypeService : IService
     {
-        void SaveDataTypeAndPreValues(IDataTypeDefinition dataTypeDefinition, IDictionary<string, string> values, int userId = 0);
-
         /// <summary>
         /// Gets a <see cref="IDataTypeDefinition"/> by its Id
         /// </summary>
@@ -107,7 +105,23 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="id">Id of the DataTypeDefinition to save PreValues for</param>
         /// <param name="values">List of string values to save</param>
+        [Obsolete("This should no longer be used, use the alternative SavePreValues or SaveDataTypeAndPreValues methods instead. This will only insert pre-values without keys")]
         void SavePreValues(int id, IEnumerable<string> values);
+
+        /// <summary>
+        /// Saves a list of PreValues for a given DataTypeDefinition
+        /// </summary>
+        /// <param name="id">Id of the DataTypeDefinition to save PreValues for</param>
+        /// <param name="values">List of key/value pairs to save</param>
+        void SavePreValues(int id, IDictionary<string, PreValue> values);
+
+        /// <summary>
+        /// Saves the data type and it's prevalues
+        /// </summary>
+        /// <param name="dataTypeDefinition"></param>
+        /// <param name="values"></param>
+        /// <param name="userId"></param>
+        void SaveDataTypeAndPreValues(IDataTypeDefinition dataTypeDefinition, IDictionary<string, PreValue> values, int userId = 0);
 
         /// <summary>
         /// Gets a specific PreValue by its Id

@@ -307,13 +307,6 @@ namespace Umbraco.Tests
         }
 
         [Test]
-        public void Resolves_Action_Handlers()
-        {
-            var types = PluginManager.Current.ResolveActionHandlers();
-            Assert.AreEqual(1, types.Count());
-        }
-
-        [Test]
         public void Resolves_DataTypes()
         {
             var types = PluginManager.Current.ResolveDataTypes();

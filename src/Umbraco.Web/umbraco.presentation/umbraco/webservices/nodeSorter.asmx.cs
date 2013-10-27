@@ -160,8 +160,6 @@ namespace umbraco.presentation.webservices
                 if (parentNode != null)
                     content.SortNodes(ref parentNode);
 
-                // fire actionhandler, check for content
-                BusinessLogic.Actions.Action.RunActionHandlers(new Document(parentId), ActionSort.Instance);
             }
             catch (Exception ex)
             {

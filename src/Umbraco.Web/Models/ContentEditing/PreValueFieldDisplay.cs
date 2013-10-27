@@ -8,11 +8,6 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "preValue", Namespace = "")]
     public class PreValueFieldDisplay : PreValueFieldSave
     {
-        ///// <summary>
-        ///// The id of the pre-value field
-        ///// </summary>
-        //[DataMember(Name = "id", IsRequired = true)]
-        //public int Id { get; set; }
 
         /// <summary>
         /// The name to display for this pre-value field

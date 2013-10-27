@@ -148,12 +148,26 @@ namespace umbraco.presentation.developer.packages
             Panel1.Text = "Installing the package: " + _installer.Name;
 
 
-            if (_installer.ContainsUnsecureFiles && _repo == null)
+            if (_installer.ContainsUnsecureFiles)
             {
                 pp_unsecureFiles.Visible = true;
                 foreach (string str in _installer.UnsecureFiles)
                 {
                     lt_files.Text += "<li>" + str + "</li>";
+                }
+            }
+
+            if (_installer.ContainsLegacyPropertyEditors)
+            {
+                LegacyPropertyEditorPanel.Visible = true;
+            }
+
+            if (_installer.ContainsBinaryFileErrors)
+            {
+                BinaryFileErrorsPanel.Visible = true;
+                foreach (var str in _installer.BinaryFileErrors)
+                {
+                    BinaryFileErrorReport.Text += "<li>" + str + "</li>";
                 }
             }
 

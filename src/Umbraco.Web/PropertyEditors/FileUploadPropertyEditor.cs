@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -164,7 +164,7 @@ namespace Umbraco.Web.PropertyEditors
             /// <param name="editorValue"></param>
             /// <param name="currentValue"></param>
             /// <returns></returns>
-            public override IDictionary<string, string> ConvertEditorToDb(IDictionary<string, object> editorValue, PreValueCollection currentValue)
+            public override IDictionary<string, PreValue> ConvertEditorToDb(IDictionary<string, object> editorValue, PreValueCollection currentValue)
             {
                 var result = base.ConvertEditorToDb(editorValue, currentValue);
 
@@ -173,7 +173,7 @@ namespace Umbraco.Web.PropertyEditors
                 var values = result.Select(item => item.Value).ToList();
 
                 result.Clear();
-                result.Add("thumbs", string.Join(";", values));
+                result.Add("thumbs", new PreValue(string.Join(";", values)));
                 return result;
             }
         }

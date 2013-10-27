@@ -155,8 +155,17 @@ namespace Umbraco.Web.Trees
                 
             FilterUserAllowedMenuItems(nodeMenu, allowedMenuItems);
 
-            //set the default to create
-            nodeMenu.DefaultMenuAlias = ActionNew.Instance.Alias;
+            //if the media item is in the recycle bin, don't have a default menu, just show the regular menu
+            if (item.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
+            {
+                nodeMenu.DefaultMenuAlias = null;
+            }
+            else
+            {
+                //set the default to create
+                nodeMenu.DefaultMenuAlias = ActionNew.Instance.Alias;    
+            }
+            
 
             return nodeMenu;
         }

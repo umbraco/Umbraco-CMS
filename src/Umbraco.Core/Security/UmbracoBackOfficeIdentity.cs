@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.Serialization;
 using System.Web;
 using System.Web.Security;
 using Newtonsoft.Json;
@@ -11,6 +12,7 @@ namespace Umbraco.Core.Security
     /// <remarks>
     /// All values are lazy loaded for performance reasons as the constructor is called for every single request
     /// </remarks>
+    [Serializable]
     public class UmbracoBackOfficeIdentity : FormsIdentity
     {
         public UmbracoBackOfficeIdentity(FormsAuthenticationTicket ticket) 
@@ -104,5 +106,6 @@ namespace Umbraco.Core.Security
                 HttpContext.Current.Items[typeof (UmbracoBackOfficeIdentity)] = DeserializedData;
             }
         }
+
     }
 }

@@ -588,7 +588,6 @@
     <Compile Include="UI\JavaScript\ServerVariablesParser.cs" />
     <Compile Include="UI\CdfLogger.cs" />
     <Compile Include="umbraco.presentation\CompatibilityHelper.cs" />
-    <Compile Include="umbraco.presentation\umbraco\ActionHandlers\SimilarNodeNameComparer.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\PasswordChanger.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -936,9 +935,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\UmbracoServerUtility.cs" />
-    <Compile Include="umbraco.presentation\umbraco\ActionHandlers\umbEnsureUniqueName.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\actions\delete.aspx.cs">
       <DependentUpon>delete.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>

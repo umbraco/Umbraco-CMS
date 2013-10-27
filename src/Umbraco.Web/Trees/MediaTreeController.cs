@@ -34,7 +34,7 @@ namespace Umbraco.Web.Trees
 
         protected override int RecycleBinId
         {
-            get { return Constants.System.RecycleBinContent; }
+            get { return Constants.System.RecycleBinMedia; }
         }
 
         protected override bool RecycleBinSmells
@@ -102,6 +102,13 @@ namespace Umbraco.Web.Trees
             menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
             menu.Items.Add<ActionSort>(ui.Text("actions", ActionSort.Instance.Alias)).ConvertLegacyMenuItem(null, "media", "media");
             menu.Items.Add<ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+
+            //if the media item is in the recycle bin, don't have a default menu, just show the regular menu
+            if (item.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
+            {
+                menu.DefaultMenuAlias = null;
+            }
+
             return menu;
         }
 

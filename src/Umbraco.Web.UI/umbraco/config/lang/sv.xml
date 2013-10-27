@@ -684,7 +684,7 @@
     <key alias="DownloadXmlDTD">Ladda hem DTD för XML</key>
     <key alias="fields">Fält</key>
     <key alias="includeSubpages">Inkludera undersidor</key>
-    <key alias="mailBody">Hej %0%. Detta är ett automatisk mail skickat for att informera dig om att det finns en översättningsförfrågan på dokument '%1' till '{5}' skickad av {2}. För att redigere, besök http://{3}/translation/details.aspx?id={4}. För att få en översikt över dina översättningsuppgigter loggar du in i umbraco på: http://{3}/umbraco.aspx</key>
+    <key alias="mailBody">Hej %0%. Detta är ett automatisk mail skickat for att informera dig om att det finns en översättningsförfrågan på dokument '%1' till '{5}' skickad av {2}. För att redigere, besök http://{3}/translation/details.aspx?id={4}. För att få en översikt över dina översättningsuppgigter loggar du in i umbraco på: http://{3}</key>
     <key alias="mailSubject">[%0%] Översättningsuppgit för %1%</key>
     <key alias="noTranslators">Hittade inga användare som är översättare. Vänligen skapa en användare som är översättare innan du börjar skicka innehåll för översättning</key>
     <key alias="ownedTasks">Arbetsuppgifter som du har skapat</key>

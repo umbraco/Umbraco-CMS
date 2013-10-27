@@ -27,7 +27,7 @@ namespace umbraco.presentation.translation
     {
         public _default()
         {
-            CurrentApp = BusinessLogic.DefaultApps.translation.ToString();
+            CurrentApp = DefaultApps.translation.ToString();
 
         }
         protected void Page_Load(object sender, EventArgs e)
@@ -118,7 +118,7 @@ namespace umbraco.presentation.translation
                         {
                             try
                             {
-                                foreach (Task translation in importTranslatationFile(translationFileXml.FullName))
+                                foreach (Task translation in ImportTranslatationFile(translationFileXml.FullName))
                                 {
 
                                     sb.Append("<li>" + translation.Node.Text + " <a target=\"_blank\" href=\"preview.aspx?id=" + translation.Id + "\">" + ui.Text("preview") + "</a></li>");
@@ -142,7 +142,7 @@ namespace umbraco.presentation.translation
                 else
                 {
                     StringBuilder sb = new StringBuilder();
-                    List<Task> l = importTranslatationFile(tempFileName);
+                    List<Task> l = ImportTranslatationFile(tempFileName);
 
                     if (l.Count == 1)
                     {
@@ -167,12 +167,7 @@ namespace umbraco.presentation.translation
             }
         }
 
-        private void hideAll()
-        {
-            pane_uploadFile.Visible = false;
-            pane_tasks.Visible = false;
-        }
-        private List<Task> importTranslatationFile(string tempFileName)
+        private List<Task> ImportTranslatationFile(string tempFileName)
         {
             try
             {
@@ -200,9 +195,8 @@ namespace umbraco.presentation.translation
                         {
 
                             // update node contents
-                            Document d = new Document(t.Node.Id);
+                            var d = new Document(t.Node.Id);
                             Document.Import(d.ParentId, getUser(), (XmlElement)taskNode);
-                            BusinessLogic.Actions.Action.RunActionHandlers(d, ActionTranslate.Instance);
 
                             /*                            d.Text = taskNode.Attributes.GetNamedItem("nodeName").Value.Trim();
 

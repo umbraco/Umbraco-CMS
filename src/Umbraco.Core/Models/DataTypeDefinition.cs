@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models
 {
@@ -34,8 +36,15 @@ namespace Umbraco.Core.Models
         public DataTypeDefinition(int parentId, Guid controlId)
         {
             _parentId = parentId;
-            _propertyEditorAlias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(controlId, true);
-            
+
+            _propertyEditorAlias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(controlId, false);
+            if (_propertyEditorAlias == null)
+            {
+                //convert to Label!
+                LogHelper.Warn<DataTypeDefinition>("Could not find a GUID -> Alias mapping for the legacy property editor with id " + controlId + ". The DataType has been converted to a Label.");
+                _propertyEditorAlias = Constants.PropertyEditors.NoEditAlias;
+            }
+
             _additionalData = new Dictionary<string, object>();
         }
         public DataTypeDefinition(int parentId, string propertyEditorAlias)

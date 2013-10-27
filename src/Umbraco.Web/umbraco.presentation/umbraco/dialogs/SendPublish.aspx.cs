@@ -32,8 +32,8 @@ namespace umbraco.dialogs
                 int docId;
                 if (int.TryParse(Request.QueryString["id"], out docId))
                 {
-                    var document = new Document(docId);
-                    BusinessLogic.Actions.Action.RunActionHandlers(document, ActionToPublish.Instance);
+                    
+                    //TODO Send to publish!!
 
                 }
 

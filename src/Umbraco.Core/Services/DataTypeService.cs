@@ -217,6 +217,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="id">Id of the DataTypeDefinition to save PreValues for</param>
         /// <param name="values">List of string values to save</param>
+        [Obsolete("This should no longer be used, use the alternative SavePreValues or SaveDataTypeAndPreValues methods instead. This will only insert pre-values without keys")]
         public void SavePreValues(int id, IEnumerable<string> values)
         {
             //TODO: Should we raise an event here since we are really saving values for the data type?
@@ -255,9 +256,10 @@ namespace Umbraco.Core.Services
         /// <param name="id"></param>
         /// <param name="values"></param>
         /// <remarks>
-        /// We will actually just remove all pre-values and re-insert them in one transaction
+        /// We need to actually look up each pre-value and maintain it's id if possible - this is because of silly property editors
+        /// like 'dropdown list publishing keys'
         /// </remarks>
-        internal void SavePreValues(int id, IDictionary<string, string> values)
+        public void SavePreValues(int id, IDictionary<string, PreValue> values)
         {
             //TODO: Should we raise an event here since we are really saving values for the data type?
 
@@ -267,22 +269,7 @@ namespace Umbraco.Core.Services
                 {
                     using (var transaction = uow.Database.GetTransaction())
                     {
-                        uow.Database.Execute("DELETE FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = id });
-
-                        var sortOrder = 1;
-                        foreach (var value in values)
-                        {
-                            var dto = new DataTypePreValueDto
-                                {
-                                    DataTypeNodeId = id, 
-                                    Value = value.Value,
-                                    SortOrder = sortOrder,
-                                    Alias = value.Key
-                                };
-                            uow.Database.Insert(dto);
-                            sortOrder++;
-                        }
-
+                        AddOrUpdatePreValues(id, values, uow);
                         transaction.Complete();
                     }
                 }
@@ -295,7 +282,7 @@ namespace Umbraco.Core.Services
         /// <param name="dataTypeDefinition"></param>
         /// <param name="values"></param>
         /// <param name="userId"></param>
-        public void SaveDataTypeAndPreValues(IDataTypeDefinition dataTypeDefinition, IDictionary<string, string> values, int userId = 0)
+        public void SaveDataTypeAndPreValues(IDataTypeDefinition dataTypeDefinition, IDictionary<string, PreValue> values, int userId = 0)
         {
             if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this))
                 return;
@@ -309,31 +296,63 @@ namespace Umbraco.Core.Services
                     repository.AddOrUpdate(dataTypeDefinition);
 
                     //complete the transaction, but run the delegate before the db transaction is finalized
-                    uow.Commit(database =>
-                        {
-                            //Execute this before the transaction is completed!
-                            database.Execute("DELETE FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = dataTypeDefinition.Id });
-
-                            var sortOrder = 1;
-                            foreach (var value in values)
-                            {
-                                var dto = new DataTypePreValueDto
-                                {
-                                    DataTypeNodeId = dataTypeDefinition.Id,
-                                    Value = value.Value,
-                                    SortOrder = sortOrder,
-                                    Alias = value.Key
-                                };
-                                database.Insert(dto);
-                                sortOrder++;
-                            }
-                        });
+                    uow.Commit(database => AddOrUpdatePreValues(dataTypeDefinition.Id, values, uow));
 
                     Saved.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition, false), this);
                 }
             }
             
             Audit.Add(AuditTypes.Save, string.Format("Save DataTypeDefinition performed by user"), userId, dataTypeDefinition.Id);
+        }
+
+        private void AddOrUpdatePreValues(int id, IDictionary<string, PreValue> preValueCollection, IDatabaseUnitOfWork uow)
+        {
+            //first just get all pre-values for this data type so we can compare them to see if we need to insert or update or replace
+            var sql = new Sql().Select("*")
+                               .From<DataTypePreValueDto>()
+                               .Where<DataTypePreValueDto>(dto => dto.DataTypeNodeId == id)
+                               .OrderBy<DataTypePreValueDto>(dto => dto.SortOrder);
+            var currentVals = uow.Database.Fetch<DataTypePreValueDto>(sql).ToArray();
+
+            //already existing, need to be updated
+            var valueIds = preValueCollection.Where(x => x.Value.Id > 0).Select(x => x.Value.Id).ToArray();
+            var existingByIds = currentVals.Where(x => valueIds.Contains(x.Id)).ToArray();
+
+            //These ones need to be removed from the db, they no longer exist in the new values
+            var deleteById = currentVals.Where(x => valueIds.Contains(x.Id) == false);
+
+            foreach (var d in deleteById)
+            {
+                uow.Database.Execute(
+                    "DELETE FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId AND id=@Id",
+                    new { DataTypeId = id, Id = d.Id });
+            }
+
+            var sortOrder = 1;
+
+            foreach (var pre in preValueCollection)
+            {
+                var existing = existingByIds.FirstOrDefault(valueDto => valueDto.Id == pre.Value.Id);
+                if (existing != null)
+                {
+                    existing.Value = pre.Value.Value;
+                    existing.SortOrder = sortOrder;
+                    uow.Database.Update(existing);
+                }
+                else
+                {
+                    var dto = new DataTypePreValueDto
+                    {
+                        DataTypeNodeId = id,
+                        Value = pre.Value.Value,
+                        SortOrder = sortOrder,
+                        Alias = pre.Key
+                    };
+                    uow.Database.Insert(dto);
+                }
+
+                sortOrder++;
+            }
         }
 
         /// <summary>
