@@ -22,6 +22,7 @@ namespace umbraco
 		/// <returns>
 		/// 	<c>true</c> if the specified content item has property; otherwise, <c>false</c>.
 		/// </returns>
+		[Obsolete("Use the new Services APIs instead")]
 		public static bool HasProperty(this Content item, string propertyAlias)
 		{
 			var property = item.getProperty(propertyAlias);
@@ -35,6 +36,7 @@ namespace umbraco
 		/// <param name="item">The content item.</param>
 		/// <param name="propertyAlias">alias of property to get</param>
 		/// <returns>default(T) or property value cast to (T)</returns>
+        [Obsolete("Use the new Services APIs instead")]
 		public static T GetProperty<T>(this Content item, string propertyAlias)
         {
             // check to see if return object handles it's own object hydration
@@ -106,6 +108,7 @@ namespace umbraco
 		/// <returns>
 		/// empty string, or property value as string
 		/// </returns>
+        [Obsolete("Use the new Services APIs instead")]
 		private static string GetPropertyAsString(this Content item, string propertyAlias)
 		{
 			var propertyValue = string.Empty;
@@ -127,6 +130,7 @@ namespace umbraco
 		/// <returns>
 		/// true if can cast value, else false for all other circumstances
 		/// </returns>
+        [Obsolete("Use the new Services APIs instead")]
         private static bool GetPropertyAsBoolean(this Content item, string propertyAlias)
 		{
 			var propertyValue = false;
@@ -187,6 +191,7 @@ namespace umbraco
 		/// <param name="items">The items.</param>
 		/// <param name="propertyAlias">The property alias.</param>
 		/// <returns></returns>
+        [Obsolete("Use the new Services APIs instead")]
 		public static IEnumerable<Content> OrderByProperty<T>(this IEnumerable<Content> items, string propertyAlias)
 		{
 			return items.OrderBy(x => x.GetProperty<T>(propertyAlias));
@@ -213,6 +218,7 @@ namespace umbraco
 		/// <param name="items">The items.</param>
 		/// <param name="propertyAlias">The property alias.</param>
 		/// <returns></returns>
+        [Obsolete("Use the new Services APIs instead")]
 		public static IEnumerable<Content> OrderByPropertyDescending<T>(this IEnumerable<Content> items, string propertyAlias)
 		{
 			return items.OrderByDescending(x => x.GetProperty<T>(propertyAlias));
@@ -239,6 +245,7 @@ namespace umbraco
 		/// <returns>
 		/// The same content item on which this is an extension method.
 		/// </returns>
+        [Obsolete("Use the new Services APIs instead")]
 		public static Content SetProperty(this Content item, string propertyAlias, object value)
 		{
 			var property = item.getProperty(propertyAlias);

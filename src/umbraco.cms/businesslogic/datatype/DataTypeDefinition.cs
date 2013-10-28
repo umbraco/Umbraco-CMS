@@ -152,15 +152,18 @@ namespace umbraco.cms.businesslogic.datatype
 
         public XmlElement ToXml(XmlDocument xd)
         {
+            //here we need to get the property editor alias from it's id
+            var alias = LegacyPropertyEditorIdToAliasConverter.GetAliasFromLegacyId(DataType.Id, true);
+
             XmlElement dt = xd.CreateElement("DataType");
             dt.Attributes.Append(xmlHelper.addAttribute(xd, "Name", Text));
-            dt.Attributes.Append(xmlHelper.addAttribute(xd, "Id", this.DataType.Id.ToString()));
-            dt.Attributes.Append(xmlHelper.addAttribute(xd, "Definition", this.UniqueId.ToString()));
-            dt.Attributes.Append(xmlHelper.addAttribute(xd, "DatabaseType", this.DbType));
+            dt.Attributes.Append(xmlHelper.addAttribute(xd, "Id", alias));
+            dt.Attributes.Append(xmlHelper.addAttribute(xd, "Definition", UniqueId.ToString()));
+            dt.Attributes.Append(xmlHelper.addAttribute(xd, "DatabaseType", DbType));
 
             // templates
             XmlElement prevalues = xd.CreateElement("PreValues");
-            foreach (DictionaryEntry item in PreValues.GetPreValues(this.Id))
+            foreach (DictionaryEntry item in PreValues.GetPreValues(Id))
             {
                 XmlElement prevalue = xd.CreateElement("PreValue");
                 prevalue.Attributes.Append(xmlHelper.addAttribute(xd, "Id", ((PreValue)item.Value).Id.ToString()));
@@ -176,22 +179,24 @@ namespace umbraco.cms.businesslogic.datatype
         #endregion
 
         #region Static methods
+
+        [Obsolete("Do not use this method, it will not function correctly because legacy property editors are not supported in v7")]
         public static DataTypeDefinition Import(XmlNode xmlData)
         {
-            string _name = xmlData.Attributes["Name"].Value;
-            string _id = xmlData.Attributes["Id"].Value;
-            string _def = xmlData.Attributes["Definition"].Value;
+            var name = xmlData.Attributes["Name"].Value;
+            var id = xmlData.Attributes["Id"].Value;
+            var def = xmlData.Attributes["Definition"].Value;
 
 
             //Make sure that the dtd is not already present
-            if (IsNode(new Guid(_def)) == false)
+            if (IsNode(new Guid(def)) == false)
             {
                 var u = BusinessLogic.User.GetCurrent() ?? BusinessLogic.User.GetUser(0);
 
-                var dtd = MakeNew(u, _name, new Guid(_def));
-                var dataType = DataTypesResolver.Current.GetById(new Guid(_id));
+                var dtd = MakeNew(u, name, new Guid(def));
+                var dataType = DataTypesResolver.Current.GetById(new Guid(id));
                 if (dataType == null)
-                    throw new NullReferenceException("Could not resolve a data type with id " + _id);
+                    throw new NullReferenceException("Could not resolve a data type with id " + id);
 
                 dtd.DataType = dataType;
                 dtd.Save();
@@ -199,11 +204,11 @@ namespace umbraco.cms.businesslogic.datatype
                 //add prevalues
                 foreach (XmlNode xmlPv in xmlData.SelectNodes("PreValues/PreValue"))
                 {
-                    XmlAttribute val = xmlPv.Attributes["Value"];
+                    var val = xmlPv.Attributes["Value"];
 
                     if (val != null)
                     {
-                        PreValue p = new PreValue(0, 0, val.Value);
+                        var p = new PreValue(0, 0, val.Value);
                         p.DataTypeId = dtd.Id;
                         p.Save();
                     }

@@ -746,7 +746,8 @@ namespace Umbraco.Core.Services
 
             var xml = new XElement("DataType", prevalues);
             xml.Add(new XAttribute("Name", dataTypeDefinition.Name));
-            xml.Add(new XAttribute("Id", dataTypeDefinition.Id));
+            //The 'ID' when exporting is actually the property editor alias (in pre v7 it was the IDataType GUID id)
+            xml.Add(new XAttribute("Id", dataTypeDefinition.PropertyEditorAlias));
             xml.Add(new XAttribute("Definition", dataTypeDefinition.Key));
             xml.Add(new XAttribute("DatabaseType", dataTypeDefinition.DatabaseType.ToString()));
 

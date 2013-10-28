@@ -368,15 +368,6 @@ namespace umbraco.presentation.developer.packages
             packageFilesRepeater.DataBind();
         }
 
-        private static string JoinList(List<string> list, char seperator) {
-            string retVal = "";
-            foreach (string str in list) {
-                retVal += str + seperator.ToString();
-            }
-
-            return retVal.Trim(seperator);
-        }
-
         protected override void OnInit(EventArgs e)
         {
             // Tab setup
