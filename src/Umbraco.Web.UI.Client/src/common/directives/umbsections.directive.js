@@ -64,7 +64,8 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 				navigationService.showHelpDialog();
 			};
 
-			scope.sectionClick = function(section){
+			scope.sectionClick = function (section) {
+			    navigationService.hideSearch();
 				navigationService.showTree(section.alias);
 			};
 

@@ -1,77 +1,158 @@
 angular.module('umbraco.services')
-.factory('searchService', function ($q, $log, entityResource, contentResource) {
-	var m = {results: []};
-	var service = {
-		results: m,
+.factory('searchService', function ($q, $log, entityResource, contentResource, umbRequestHelper) {
 
-		searchMembers: function(args){
-			entityResource.search(args.term, "Member").then(function(data){
+    function configureMemberResult(el) {
+        el.menuUrl = umbRequestHelper.getApiUrl("memberTreeBaseUrl", "GetMenu", [{ id: el.Id }, { application: 'member' }]);
+        el.metaData = { treeAlias: "member" };
+        el.title = el.Fields.nodeName;
+        el.subTitle = el.Fields.email;
+        el.id = el.Id;
+    }
+    
+    function configureMediaResult(el)
+    {
+        el.menuUrl = umbRequestHelper.getApiUrl("mediaTreeBaseUrl", "GetMenu", [{ id: el.Id }, { application: 'media' }]);
+        el.metaData = { treeAlias: "media" };
+        el.title = el.Fields.nodeName;
+        el.id = el.Id;
+    }
+    
+    function configureContentResult(el) {
+        el.menuUrl = umbRequestHelper.getApiUrl("contentTreeBaseUrl", "GetMenu", [{ id: el.Id }, { application: 'content' }]);
+        el.metaData = { treeAlias: "content" };
+        el.title = el.Fields.nodeName;
+        el.id = el.Id;
 
-				_.each(data, function(el){
-					el.menuUrl = "UmbracoTrees/MemberTree/GetMenu?id=" + el.Id + "&application=member";
-					el.metaData = {treeAlias: "member"};
-					el.title = el.Fields.nodeName;
-					el.subTitle = el.Fields.email;
-					el.id = el.Id;
-				});
+        contentResource.getNiceUrl(el.Id).then(function (url) {
+            el.subTitle = angular.fromJson(url);
+        });
+    }
 
-				args.results.push({
-					icon: "icon-user",
-					editor: "member/member/edit/",
-					matches: data
-				});
-			});
-		},
-		searchContent: function(args){
-			entityResource.search(args.term, "Document").then(function(data){
+    return {
+        searchMembers: function(args) {
 
-				_.each(data, function(el){
-					el.menuUrl = "UmbracoTrees/ContentTree/GetMenu?id=" + el.Id + "&application=content";
-					el.metaData = {treeAlias: "content"};
-					el.title = el.Fields.nodeName;
-					el.id = el.Id;
+            if (!args.term) {
+                throw "args.term is required";
+            }
 
-					contentResource.getNiceUrl(el.Id).then(function(url){
-						el.subTitle = angular.fromJson(url);
-					});
-				});
+            return entityResource.search(args.term, "Member").then(function (data) {
 
-				args.results.push({
-					icon: "icon-document",
-					editor: "content/content/edit/",
-					matches: data
-				});
-			});
-		},
-		searchMedia: function(args){
-			entityResource.search(args.term, "Media").then(function(data){
+                _.each(data, function(el) {
+                    configureMemberResult(el);
+                });
 
-				_.each(data, function(el){
-					el.menuUrl = "UmbracoTrees/MediaTree/GetMenu?id=" + el.Id + "&application=media";
-					el.metaData = {treeAlias: "media"};
-					el.title = el.Fields.nodeName;
-					el.id = el.Id;
-				});
+                var results = (args.results && angular.isArray(args.results)) ? args.results : [];
+                
+                results.push({
+                    icon: "icon-user",
+                    editor: "member/member/edit/",
+                    matches: data
+                });
 
-				args.results.push({
-					icon: "icon-picture",
-					editor: "media/media/edit/",
-					matches: data
-				});
-			});
-		},
-		search: function(term){
-			m.results.length = 0;
+                return results;
+            });
+        },
+        searchContent: function(args) {
 
-			service.searchMedia({term:term, results:m.results});
-			service.searchContent({term:term, results:m.results});
-			service.searchMembers({term:term, results:m.results});
-		},
-		
-		setCurrent: function(sectionAlias){
-			currentSection = sectionAlias;	
-		}
-	};
+            if (!args.term) {
+                throw "args.term is required";
+            }
 
-	return service;
+            return entityResource.search(args.term, "Document").then(function (data) {
+
+                _.each(data, function(el) {
+                    configureContentResult(el);
+                });
+
+                var results = (args.results && angular.isArray(args.results)) ? args.results : [];
+                
+                args.results.push({
+                    icon: "icon-document",
+                    editor: "content/content/edit/",
+                    matches: data
+                });
+                
+                return results;
+            });
+        },
+        searchMedia: function(args) {
+
+            if (!args.term) {
+                throw "args.term is required";
+            }
+
+            return entityResource.search(args.term, "Media").then(function (data) {
+
+                _.each(data, function(el) {
+                    configureMediaResult(el);
+                });
+
+                var results = (args.results && angular.isArray(args.results)) ? args.results : [];
+
+                args.results.push({
+                    icon: "icon-picture",
+                    editor: "media/media/edit/",
+                    matches: data
+                });
+                
+                return results;
+            });
+        },
+        searchAll: function (args) {
+            
+            if (!args.term) {
+                throw "args.term is required";
+            }
+
+            return entityResource.searchAll(args.term).then(function (data) {
+
+                var results = (args.results && angular.isArray(args.results)) ? args.results : [];
+
+                _.each(data, function(resultByType) {
+                    switch(resultByType.type) {
+                        case "Document":
+                            _.each(resultByType.results, function (el) {
+                                configureContentResult(el);
+                            });
+                            results.push({
+                                type: resultByType.type,
+                                icon: "icon-document",
+                                editor: "content/content/edit/",
+                                matches: resultByType.results
+                            });
+                            break;
+                        case "Media":
+                            _.each(resultByType.results, function (el) {
+                                configureMediaResult(el);
+                            });
+                            results.push({
+                                type: resultByType.type,
+                                icon: "icon-picture",
+                                editor: "media/media/edit/",
+                                matches: resultByType.results
+                            });
+                            break;
+                        case "Member":
+                            _.each(resultByType.results, function (el) {
+                                configureMemberResult(el);
+                            });
+                            results.push({
+                                type: resultByType.type,
+                                icon: "icon-user",
+                                editor: "member/member/edit/",
+                                matches: resultByType.results
+                            });
+                            break;
+                    }
+                });
+
+                return results;
+            });
+            
+        },
+
+        setCurrent: function(sectionAlias) {
+            currentSection = sectionAlias;
+        }
+    };
 });

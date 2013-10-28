@@ -36,6 +36,8 @@
     'lib/jquery/jquery.upload/js/jquery.fileupload-image.js',
     'lib/jquery/jquery.upload/js/jquery.fileupload-angular.js',
 
+    'lib/throttle/jquery.ba-throttle-debounce.min.js',
+
     'lib/bootstrap/js/bootstrap.2.2.3.min.js',
 	'lib/umbraco/Extensions.js',
     

@@ -5,6 +5,7 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
+using Examine.LuceneEngine;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
@@ -34,12 +35,44 @@ namespace Umbraco.Web.Editors
     public class EntityController : UmbracoAuthorizedJsonController
     {   
         [HttpGet]
-        public ISearchResults Search([FromUri] string query, UmbracoEntityTypes type)
+        public ISearchResults Search(string query, UmbracoEntityTypes type)
         {
             if (string.IsNullOrEmpty(query))
-                return null;
+                return SearchResults.Empty();
 
             return ExamineSearch(query, type);
+        }
+
+        [HttpGet]
+        public IEnumerable<EntityTypeSearchResult> SearchAll(string query)
+        {
+            if (string.IsNullOrEmpty(query))
+                return Enumerable.Empty<EntityTypeSearchResult>();
+
+            var contentResult = ExamineSearch(query, UmbracoEntityTypes.Document);
+            var mediaResult = ExamineSearch(query, UmbracoEntityTypes.Media);
+            var memberResult = ExamineSearch(query, UmbracoEntityTypes.Member);
+
+            var result = new List<EntityTypeSearchResult>
+                {
+                    new EntityTypeSearchResult
+                        {
+                            EntityType = UmbracoEntityTypes.Document.ToString(),
+                            Results = contentResult
+                        },
+                    new EntityTypeSearchResult
+                        {
+                            EntityType = UmbracoEntityTypes.Media.ToString(),
+                            Results = mediaResult
+                        },
+                    new EntityTypeSearchResult
+                        {
+                            EntityType = UmbracoEntityTypes.Member.ToString(),
+                            Results = memberResult
+                        }
+                };
+
+            return result;
         }
 
         /// <summary>
@@ -116,14 +149,6 @@ namespace Umbraco.Web.Editors
 
             return internalSearcher.Search(operation);
 
-            /*
-            var results = internalSearcher.Search(operation)
-                .Select(x =>  int.Parse(x["id"]));
-
-            //TODO: Just create a basic entity from the results!! why double handling and going to the database... this will be ultra slow.
-
-            return GetResultForIds(results.ToArray(), entityType)
-                .WhereNotNull();*/
         }
 
         private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)

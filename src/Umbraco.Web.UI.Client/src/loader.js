@@ -40,6 +40,7 @@ yepnope({
     'lib/jquery/jquery.upload/js/jquery.fileupload-process.js',
     'lib/jquery/jquery.upload/js/jquery.fileupload-angular.js',
 
+    'lib/throttle/jquery.ba-throttle-debounce.min.js',
 
     'lib/bootstrap/js/bootstrap.js',
     'lib/underscore/underscore.js',
