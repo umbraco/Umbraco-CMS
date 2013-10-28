@@ -53,7 +53,8 @@ namespace Umbraco.Core.Persistence.Repositories
                                      Content = content,
                                      Key = path.EncodeAsGuid(),
                                      CreateDate = created,
-                                     UpdateDate = updated
+                                     UpdateDate = updated,
+                                     Id = GetStylesheetId(path)
                                  };
 
             //on initial construction we don't want to have dirty properties tracked
@@ -61,6 +62,17 @@ namespace Umbraco.Core.Persistence.Repositories
             stylesheet.ResetDirtyProperties(false);
 
             return stylesheet;
+            
+            
+        }
+
+        // Fix for missing Id's on FileService.GetStylesheets() call.  This is needed as sytlesheets can only bo loaded in the editor via 
+        //  their Id so listing stylesheets needs to list there Id as well for custom plugins to render the build in editor.
+        //  http://issues.umbraco.org/issue/U4-3258
+        private static int GetStylesheetId(string path)
+        {
+            var ss = ApplicationContext.Current.Services.EntityService.GetRootEntities(UmbracoObjectTypes.Stylesheet).SingleOrDefault(s => s.Name == path.TrimEnd(".css").Replace("\\", "/"));
+            return ss == null ? 0 : ss.Id;
         }
 
         public override IEnumerable<Stylesheet> GetAll(params string[] ids)
