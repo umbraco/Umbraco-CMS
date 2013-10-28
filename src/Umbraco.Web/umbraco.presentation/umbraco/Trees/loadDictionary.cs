@@ -38,7 +38,6 @@ namespace umbraco
         {   
             rootNode.NodeType = "init" + TreeAlias;			
             rootNode.NodeID = "init";
-            rootNode.Action = "javascript:openDictionary()";
         }
 
         protected override void CreateAllowedActions(ref List<IAction> actions)

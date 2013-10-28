@@ -307,6 +307,10 @@
     <Compile Include="Editors\DashboardSecurity.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
+    <Compile Include="Models\IRenderModel.cs" />
+    <Compile Include="Models\RenderModelOfTContent.cs" />
+    <Compile Include="Mvc\UmbracoTemplatePageOfTContent.cs" />
+    <Compile Include="Mvc\UmbracoViewPage.cs" />
     <Compile Include="Editors\LogController.cs" />
     <Compile Include="Editors\MacroController.cs" />
     <Compile Include="Editors\MembershipProviderValidationFilterAttribute.cs" />
@@ -641,7 +645,7 @@
     <Compile Include="Mvc\UmbracoController.cs" />
     <Compile Include="Mvc\UmbracoControllerFactory.cs" />
     <Compile Include="Mvc\UmbracoMvcHandler.cs" />
-    <Compile Include="Mvc\UmbracoViewPage.cs" />
+    <Compile Include="Mvc\UmbracoViewPageOfTModel.cs" />
     <Compile Include="PublishedCache\IPublishedCache.cs" />
     <Compile Include="PublishedCache\IPublishedContentCache.cs" />
     <Compile Include="PublishedCache\IPublishedMediaCache.cs" />

@@ -278,6 +278,11 @@ namespace Umbraco.Core
             return typeof (TBase).IsAssignableFrom(type);
         }
 
+	    public static bool Inherits(this Type type, Type tbase)
+	    {
+	        return tbase.IsAssignableFrom(type);
+	    }
+
         public static bool Implements<TInterface>(this Type type)
         {
             return typeof (TInterface).IsAssignableFrom(type);
