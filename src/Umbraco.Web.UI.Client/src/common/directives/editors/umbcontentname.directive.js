@@ -43,12 +43,11 @@ angular.module("umbraco.directives")
 				};
 
 				scope.exitEdit = function(){
-					scope.editMode = false;
 
-                    //SD: I've removed this since I don't agree with it - but please enable if that's what you want.
-					//if (!scope.model) {
-					//    scope.model = "Empty...";
-					//}
+					if(scope.model && scope.model !== ""){
+						scope.editMode = false;	
+					}
+					                    
 				};
 			}
 	    };

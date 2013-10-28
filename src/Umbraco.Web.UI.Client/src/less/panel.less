@@ -38,7 +38,10 @@
 }
 
 .umb-headline-editor-wrapper, 
-h1.headline{height: 20px; padding: 30px 0 0 20px;}
+h1.headline{
+  height: 20px; padding: 30px 0 0 20px;
+  position: relative;
+}
 
 .umb-headline-editor-wrapper h1, h1.headline {
   margin: 0;
@@ -46,11 +49,14 @@ h1.headline{height: 20px; padding: 30px 0 0 20px;}
   font-weight: 400;
   text-align: left;
   height: 25px;
+
 }
 
 .umb-headline-editor-wrapper 
   .help-inline{
-      float: right;
+      right: 0px;
+      top: 25px;
+      position: absolute;
       font-size: 10px;
       color: @red;
   }
