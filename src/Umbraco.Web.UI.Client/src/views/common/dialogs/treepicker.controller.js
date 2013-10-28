@@ -12,6 +12,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	$scope.entityType ="Document";
 	$scope.results = [];
 
+
 	if(dialogOptions.section === "member"){
 		$scope.searcher = searchService.searchMembers;
 		$scope.entityType = "Member";
@@ -21,36 +22,47 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	}
 
 	function select(text, id){
-		
+
 		//if we get the root, we just return a constructed entity, no need for server data
 		if(id < 0){
-			var node = {
-				alias: null,
-				icon: "icon-folder",
-				id: id,
-				name: text};
+			
 
 			if($scope.multiPicker){
-				$scope.select(node);
+				$scope.select(id);
 			}else{
+				
+				var node = {
+					alias: null,
+					icon: "icon-folder",
+					id: id,
+					name: text};
+
 				$scope.submit(node);
 			}
-		}else{
-			entityResource.getById(id, $scope.entityType).then(function(ent){
-				if($scope.multiPicker){
-					
-					$scope.showSearch = false;
-					$scope.results = [];
-					$scope.term = "";
-					$scope.oldTerm = undefined;
 
-					$scope.select(ent);
-				}else{
-					$scope.submit(ent);
-				}
-			});
+		}else{
+			$scope.showSearch = false;
+			$scope.results = [];
+			$scope.term = "";
+			$scope.oldTerm = undefined;
+
+
+			if($scope.multiPicker){
+				$scope.select(id);
+			}else{
+				entityResource.getById(id, $scope.entityType).then(function(ent){
+						$scope.submit(ent);
+				});
+			}
 		}
 	}
+
+	$scope.multiSubmit = function(result){
+		entityResource.getByIds(result, $scope.entityType).then(function(ents){
+				$scope.submit(ents);
+		});
+	};
+
 
 	$scope.selectResult = function(result){
 		select(result.title, result.id);
@@ -82,7 +94,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 				angular.forEach(args.children, function(value, key){
 					if(filterArray.indexOf(value.metaData.contentType) >= 0){
 						value.filtered = true;
-						value.icon = "icon-wrong red unpublished";
+						value.cssClasses.push("not-allowed");
 					}
 				});
 			}
@@ -102,6 +114,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 
 			select(args.node.name, args.node.id);
 
+			//ui...
 			if($scope.multiPicker){
 				var c = $(args.event.target.parentElement);
 				if(!args.node.selected){

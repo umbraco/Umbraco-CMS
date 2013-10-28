@@ -51,6 +51,8 @@
 	
 	<div class="umb-panel-footer" >
 		<div class="umb-el-wrap umb-panel-buttons">
+
+			{{dialogData.selection | json}}
 	        <div class="btn-toolbar umb-btn-toolbar pull-right">
 
 	        	<a href ng-click="close()" class="btn btn-link">
@@ -60,7 +62,7 @@
 				<button
 					class="btn btn-primary"
 					ng-show="dialogOptions.multiPicker" 
-					ng-click="submit(dialogData)">
+					ng-click="multiSubmit(dialogData.selection)">
 					<localize key="buttons_select">Select</localize>({{dialogData.selection.length}})
 				</button>
 
