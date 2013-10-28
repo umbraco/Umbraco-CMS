@@ -23,7 +23,8 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
                 $scope.loaded = true;
                 $scope.content = data;
 
-                navigationService.syncPath(data.path.split(","));
+                //just get the cached version, no need to force a reload
+                navigationService.syncPath(data.path.split(","), false);
                 
                 //in one particular special case, after we've created a new item we redirect back to the edit
                 // route but there might be server validation errors in the collection which we need to display
@@ -48,7 +49,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                     });
 
-                    navigationService.syncPath(data.path.split(","));
+                    navigationService.syncPath(data.path.split(","), true);
                 });
         }
         
@@ -69,7 +70,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                     });
 
-                    navigationService.syncPath(data.path.split(","));
+                    navigationService.syncPath(data.path.split(","), true);
 
                 }, function(err) {
 
@@ -110,7 +111,8 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                     });
 
-                    navigationService.syncPath(data.path.split(","));
+                    //fetch tree
+                    navigationService.syncPath(data.path.split(","), true);
 
                     deferred.resolve(data);
                 }, function(err) {
