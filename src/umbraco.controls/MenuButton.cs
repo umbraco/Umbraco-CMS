@@ -49,8 +49,8 @@ namespace umbraco.uicontrols
                 }
             }
 
-            cssClass += " btn-" + Enum.GetName(ButtonType.GetType(), ButtonType).ToLower();
-            this.CssClass = cssClass;
+            cssClass += " btn-" + Enum.GetName(ButtonType.GetType(), ButtonType).ToLower() + " " + CssClass;
+            this.CssClass = cssClass.Trim();
 
 
             base.Render(writer);

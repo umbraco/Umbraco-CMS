@@ -40,6 +40,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
             SaveButton.Text = ui.Text("save");
             SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";
+            SaveButton.CssClass = "client-side";
         }
 
         protected void Page_Load(object sender, EventArgs e)

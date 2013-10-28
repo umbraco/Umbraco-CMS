@@ -102,7 +102,8 @@ namespace umbraco.cms.presentation.settings
             SaveButton.Text = ui.Text("save");
             SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";
-           
+            SaveButton.CssClass = "client-side";
+
 			Panel1.Text = ui.Text("edittemplate");
 			pp_name.Text = ui.Text("name", UmbracoUser);
             pp_alias.Text = ui.Text("alias", UmbracoUser);

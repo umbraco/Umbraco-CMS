@@ -57,6 +57,7 @@ namespace umbraco.cms.presentation.settings.stylesheet
             bt.Click += SaveClick;
             bt.Text = ui.Text("save");
             bt.ToolTip = ui.Text("save");
+            bt.ButtonType = uicontrols.MenuButtonType.Primary;
             bt.ID = "save";
             SetupPreView();
         }

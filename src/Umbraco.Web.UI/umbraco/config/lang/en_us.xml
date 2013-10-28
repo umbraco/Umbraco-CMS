@@ -54,13 +54,6 @@
     <key alias="atViewingFor">Viewing for</key>
   </area>
 
-  <area alias="placeholders">
-    <key alias="username">Enter your username</key>
-    <key alias="password">Enter your password</key>
-    <key alias="search">Type to search</key>
-    <key alias="filter">Type to filter</key>
-  </area>
-
   <area alias="buttons">
     <key alias="bold">Bold</key>
     <key alias="deindent">Cancel Paragraph Indent</key>
@@ -971,6 +964,12 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="updateDownloadText">%0% is ready, click here for download</key>
     <key alias="updateNoServer">No connection to server</key>
     <key alias="updateNoServerError">Error checking for update. Please review trace-stack for further information</key>
+  </area>
+  <area alias="placeholders">
+    <key alias="username">Enter your username</key>
+    <key alias="password">Enter your password</key>
+    <key alias="search">Type to search</key>
+    <key alias="filter">Type to filter</key>
   </area>
   <area alias="user">
     <key alias="administrators">Administrator</key>

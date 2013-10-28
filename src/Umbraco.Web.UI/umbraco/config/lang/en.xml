@@ -68,15 +68,7 @@
     <key alias="atViewingFor">Viewing for</key>
   </area>
 
-  <area alias="placeholders">
-    <key alias="username">Enter your username</key>
-    <key alias="password">Enter your password</key>
-
-    <key alias="name">Enter a name...</key>
-    <key alias="search">Type to search...</key>
-    <key alias="filter">Type to filter...</key>
-  </area>
-
+  
   <area alias="buttons">
     <key alias="select">Select</key>
     <key alias="somethingElse">Do something else</key>
@@ -245,6 +237,15 @@
    ]]></key>
     <key alias="displayName">Culture Name</key>
   </area>
+  <area alias="placeholders">
+    <key alias="username">Enter your username</key>
+    <key alias="password">Enter your password</key>
+
+    <key alias="name">Enter a name...</key>
+    <key alias="search">Type to search...</key>
+    <key alias="filter">Type to filter...</key>
+  </area>
+
   <area alias="editcontenttype">
     <key alias="allowedchildnodetypes">Allowed child nodetypes</key>
     <key alias="create">Create</key>
