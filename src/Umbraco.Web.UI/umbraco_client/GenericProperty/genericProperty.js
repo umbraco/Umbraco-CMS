@@ -13,9 +13,9 @@ function expandCollapse(theId) {
     }
 }
 function duplicatePropertyNameAsSafeAlias(nameId, aliasId) {
-    var input = $('#' + aliasId);
+    var input = $(aliasId);
 
-    $('#' + nameId).keyup(function(event) {
+    $(nameId).keyup(function(event) {
         var value = $(this).val();
         getSafeAlias(aliasId, value, false, function (alias) {
             input.val(alias);
@@ -24,7 +24,7 @@ function duplicatePropertyNameAsSafeAlias(nameId, aliasId) {
 }
 
 function checkAlias(aliasId) {
-    var input = $('#' + aliasId);
+    var input = $(aliasId);
     
     input.keyup(function(event) {
         var value = $(this).val();

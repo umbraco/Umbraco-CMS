@@ -33,11 +33,11 @@
 
             <cc1:Pane runat="server">
                 <cc1:PropertyPanel runat="server" Text="Name">
-                    <asp:TextBox ID="tbName" runat="server" CssClass="propertyFormInput"></asp:TextBox>
+                    <asp:TextBox ID="tbName" runat="server" CssClass="propertyFormInput prop-name"></asp:TextBox>
                 </cc1:PropertyPanel>
 
                 <cc1:PropertyPanel ID="PropertyPanel1" runat="server" Text="Alias">
-                    <asp:TextBox ID="tbAlias" runat="server" CssClass="propertyFormInput"></asp:TextBox>
+                    <asp:TextBox ID="tbAlias" runat="server" CssClass="propertyFormInput prop-alias"></asp:TextBox>
                 </cc1:PropertyPanel>
 
                 <cc1:PropertyPanel ID="PropertyPanel2" runat="server" Text="Type">
@@ -65,13 +65,3 @@
         </div>
     </div>
 </li>
-<script type="text/javascript">
-    $(function () {
-        checkAlias('<%=tbAlias.ClientID%>');
-        var textbox = $('#<%=tbAlias.ClientID%>');
-        var ul = textbox.closest('ul');
-        if (ul.hasClass('addNewProperty')) {
-            duplicatePropertyNameAsSafeAlias('<%=tbName.ClientID%>', '<%=tbAlias.ClientID%>');
-        }
-    });
-</script>

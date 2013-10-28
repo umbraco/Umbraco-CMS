@@ -109,9 +109,12 @@
     });
 
 
-
     jQuery(document).ready(function () {
 
+        checkAlias('.prop-alias');
+   
+        duplicatePropertyNameAsSafeAlias('ul.addNewProperty .prop-name', 'ul.addNewProperty .prop-alias');
+   
         jQuery(".icon-picker").click(function(){
             var that = this;
             UmbClientMgr.openAngularModalWindow({
