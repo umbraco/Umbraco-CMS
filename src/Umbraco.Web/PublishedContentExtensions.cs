@@ -1064,6 +1064,35 @@ namespace Umbraco.Web
 
 		#region Axes: descendants, descendants-or-self
 
+        /// <summary>
+        /// Returns all DescendantsOrSelf of all content referenced
+        /// </summary>
+        /// <param name="parentNodes"></param>
+        /// <param name="docTypeAlias"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This can be useful in order to return all nodes in an entire site by a type when combined with TypedContentAtRoot
+        /// </remarks>
+        public static IEnumerable<IPublishedContent> DescendantsOrSelf(this IEnumerable<IPublishedContent> parentNodes, string docTypeAlias)
+        {
+            return parentNodes.SelectMany(x => x.DescendantsOrSelf(docTypeAlias));
+        }
+
+        /// <summary>
+        /// Returns all DescendantsOrSelf of all content referenced
+        /// </summary>
+        /// <param name="parentNodes"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This can be useful in order to return all nodes in an entire site by a type when combined with TypedContentAtRoot
+        /// </remarks>
+        public static IEnumerable<T> DescendantsOrSelf<T>(this IEnumerable<IPublishedContent> parentNodes)
+            where T : class, IPublishedContent
+        {
+            return parentNodes.SelectMany(x => x.DescendantsOrSelf<T>());
+        } 
+
+
         // as per XPath 1.0 specs §2.2,
         // - the descendant axis contains the descendants of the context node; a descendant is a child or a child of a child and so on; thus
         //   the descendant axis never contains attribute or namespace nodes.
