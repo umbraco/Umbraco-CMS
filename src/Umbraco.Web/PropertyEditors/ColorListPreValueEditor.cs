@@ -11,14 +11,19 @@ namespace Umbraco.Web.PropertyEditors
 {
     internal class ColorListPreValueEditor : ValueListPreValueEditor
     {
+      
         public ColorListPreValueEditor()
         {
+            var field = Fields.First();
+
             //use a custom editor too
-            Fields.First().View = "views/propertyeditors/colorpicker/colorpicker.prevalues.html";
+            field.View = "views/propertyeditors/colorpicker/colorpicker.prevalues.html";
             //change the description
-            Fields.First().Description = "Add and remove colors in HEX format without a prefixed '#'";
+            field.Description = "Add and remove colors in HEX format without a prefixed '#'";
+            //change the label
+            field.Name = "Add color";
             //need to have some custom validation happening here
-            Fields.First().Validators.Add(new ColorListValidator());
+            field.Validators.Add(new ColorListValidator());
         }
 
         internal class ColorListValidator : IPropertyValidator
