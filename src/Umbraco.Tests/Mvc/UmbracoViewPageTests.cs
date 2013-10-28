@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Xml;
 using NUnit.Framework;
+using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -402,12 +403,13 @@ namespace Umbraco.Tests.Mvc
             //PublishedContentCache.UnitTesting = true;
 
             // ApplicationContext.Current = new ApplicationContext(false) { IsReady = true };
-            var appCtx = new ApplicationContext(false) { IsReady = true };
-
+            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper()) { IsReady = true };
+            var http = GetHttpContextFactory(url, routeData).HttpContext;
             var ctx = new UmbracoContext(
                 GetHttpContextFactory(url, routeData).HttpContext,
                 appCtx,
-                new PublishedCaches(cache, new PublishedMediaCache()));
+                new PublishedCaches(cache, new PublishedMediaCache()),
+                new WebSecurity(http, appCtx));
 
             //if (setSingleton)
             //{

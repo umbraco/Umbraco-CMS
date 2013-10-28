@@ -133,6 +133,38 @@ namespace Umbraco.Web
             WebSecurity webSecurity,
             bool replaceContext)
         {
+            return EnsureContext(httpContext, applicationContext, new WebSecurity(httpContext, applicationContext), replaceContext, null);
+        }
+
+        /// <summary>
+        /// This is a helper method which is called to ensure that the singleton context is created and the nice url and routing
+        /// context is created and assigned.
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <param name="applicationContext"></param>
+        /// <param name="webSecurity"></param>
+        /// <param name="replaceContext">
+        /// if set to true will replace the current singleton with a new one, this is generally only ever used because
+        /// during application startup the base url domain will not be available so after app startup we'll replace the current
+        /// context with a new one in which we can access the httpcontext.Request object.
+        /// </param>
+        /// <param name="preview"></param>
+        /// <returns>
+        /// The Singleton context object
+        /// </returns>
+        /// <remarks>
+        /// This is created in order to standardize the creation of the singleton. Normally it is created during a request
+        /// in the UmbracoModule, however this module does not execute during application startup so we need to ensure it
+        /// during the startup process as well.
+        /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
+        /// </remarks>
+        public static UmbracoContext EnsureContext(
+            HttpContextBase httpContext,
+            ApplicationContext applicationContext,
+            WebSecurity webSecurity,
+            bool replaceContext,
+            bool? preview)
+        {
             if (UmbracoContext.Current != null)
             {
                 if (!replaceContext)
@@ -144,7 +176,8 @@ namespace Umbraco.Web
                 httpContext,
                 applicationContext,
                 PublishedCachesResolver.Current.Caches,
-                webSecurity);
+                webSecurity,
+                preview);
 
             // create the nice urls provider
             // there's one per request because there are some behavior parameters that can be changed

@@ -81,7 +81,7 @@ namespace Umbraco.Web.Standalone
             base.FreezeResolution();
 
             var httpContext = new StandaloneHttpContext();
-            UmbracoContext.EnsureContext(httpContext, ApplicationContext.Current, false, false);
+            UmbracoContext.EnsureContext(httpContext, ApplicationContext.Current, new WebSecurity(httpContext, ApplicationContext.Current), false, false);
         }
     }
 }
