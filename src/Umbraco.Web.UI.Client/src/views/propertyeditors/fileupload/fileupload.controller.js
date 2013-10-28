@@ -72,7 +72,7 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
     //listen for clear files changes to set our model to be sent up to the server
     $scope.$watch("clearFiles", function (isCleared) {
         if (isCleared == true) {
-            $scope.model.value = "{clearFiles: true}";
+            $scope.model.value = {clearFiles: true};
             clearFiles();
         }
         else {
@@ -98,8 +98,8 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
             $scope.clearFiles = false;
             //set the model value to be the concatenation of files selected. Please see the notes
             // in the description of this controller, it states that this value isn't actually used for persistence,
-            // but we need to set it to something so that the editor and the server can detect that it's been changed.
-            $scope.model.value = "{selectedFiles: '" + newVal.trimEnd(",") + "'}";
+            // but we need to set it so that the editor and the server can detect that it's been changed, and it is used for validation.
+            $scope.model.value = { selectedFiles: newVal.trimEnd(",") };
         });
     });
     
@@ -113,9 +113,13 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
             // has changed the value. There's only 2 scenarios where we change the value internall so 
             // we know what those values can be, if they are not either of them, then we'll re-initialize.
             
-            if (newVal !== "{clearFiles: true}" && newVal !== $scope.originalValue && !newVal.startsWith("{selectedFiles:")) {
+            if (newVal.clearFiles !== true && newVal !== $scope.originalValue && !newVal.selectedFiles) {
                 initialize($scope.rebuildInput.index + 1);
             }
+
+            //if (newVal !== "{clearFiles: true}" && newVal !== $scope.originalValue && !newVal.startsWith("{selectedFiles:")) {
+            //    initialize($scope.rebuildInput.index + 1);
+            //}
         }
     });
 

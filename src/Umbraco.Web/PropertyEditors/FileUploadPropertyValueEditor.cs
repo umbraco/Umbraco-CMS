@@ -22,8 +22,11 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// The editor for the file upload property editor
     /// </summary>
-    internal class FileUploadPropertyValueEditor : PropertyValueEditor
+    internal class FileUploadPropertyValueEditor : PropertyValueEditorWrapper
     {
+        public FileUploadPropertyValueEditor(PropertyValueEditor wrapped) : base(wrapped)
+        {
+        }
 
         /// <summary>
         /// Overrides the deserialize value so that we can save the file accordingly
@@ -68,9 +71,15 @@ namespace Umbraco.Web.PropertyEditors
 
             var newValue = new List<string>();
 
+            var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+
             if (clear)
             {
-                //TODO: Need to delete our old files!
+                //Remove any files that are saved for this item
+                foreach (var toRemove in currentPersistedValues)
+                {
+                    fs.DeleteFile(fs.GetRelativePath(toRemove), true);
+                }
                 return "";
             }
             
@@ -80,13 +89,19 @@ namespace Umbraco.Web.PropertyEditors
                 var files = editorValue.AdditionalData["files"] as IEnumerable<ContentItemFile>;
                 if (files != null)
                 {
-                    var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-
                     //now we just need to move the files to where they should be
                     var filesAsArray = files.ToArray();
+                    //a list of all of the newly saved files so we can compare with the current saved files and remove the old ones
+                    var savedFilePaths = new List<string>();
                     for (var i = 0; i < filesAsArray.Length; i++)
                     {
                         var file = filesAsArray[i];
+
+                        //don't continue if this is not allowed!
+                        if (UploadFileTypeValidator.ValidateFileExtension(file.FileName) == false)
+                        {
+                            continue;
+                        }
 
                         //TODO: ALl of this naming logic needs to be put into the ImageHelper and then we need to change ContentExtensions to do the same!
 
@@ -138,13 +153,19 @@ namespace Umbraco.Web.PropertyEditors
 
                             }
                             newValue.Add(umbracoFile.Url);
+                            //add to the saved paths
+                            savedFilePaths.Add(umbracoFile.Url);
                         }
                         //now remove the temp file
-                        File.Delete(file.TempFilePath);    
+                        File.Delete(file.TempFilePath);   
                     }
                     
-                    //TODO: We need to remove any files that were previously persisted but are no longer persisted. FOr example, if we
-                    // uploaded 5 files before and then only uploaded 3, then the last two should be deleted.
+                    //Remove any files that are no longer saved for this item
+                    foreach (var toRemove in currentPersistedValues.Except(savedFilePaths))
+                    {
+                        fs.DeleteFile(fs.GetRelativePath(toRemove), true);
+                    }
+                    
 
                     return string.Join(",", newValue);
                 }

@@ -45,11 +45,11 @@ namespace Umbraco.Core.IO
 
 		public IEnumerable<string> GetThumbnails(string path)
 		{
-			var parentDirectory = System.IO.Path.GetDirectoryName(path);
-			var extension = System.IO.Path.GetExtension(path);
+			var parentDirectory = Path.GetDirectoryName(path);
+			var extension = Path.GetExtension(path);
 
 			return GetFiles(parentDirectory)
-				.Where(x => x.StartsWith(path.TrimEnd(extension) + "_thumb"))
+				.Where(x => x.StartsWith(path.TrimEnd(extension) + "_thumb") || x.StartsWith(path.TrimEnd(extension) + "_big-thumb"))
 				.ToList();
 		}
 
@@ -57,7 +57,7 @@ namespace Umbraco.Core.IO
 		{
 			DeleteFile(path);
 
-			if (!deleteThumbnails)
+			if (deleteThumbnails == false)
 				return;
 
 			DeleteThumbnails(path);

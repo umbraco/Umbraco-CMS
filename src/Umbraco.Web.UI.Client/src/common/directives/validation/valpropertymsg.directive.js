@@ -100,6 +100,10 @@ function valPropertyMsg(serverValidationManager) {
                 // based on other errors. We'll also check if there's no other validation errors apart from valPropertyMsg, if valPropertyMsg
                 // is the only one, then we'll clear.
 
+                if (!newValue) {
+                    return;
+                }
+
                 var errCount = 0;
                 for (var e in formCtrl.$error) {
                     if (e) {
