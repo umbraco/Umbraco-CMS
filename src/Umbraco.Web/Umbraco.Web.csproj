@@ -344,7 +344,7 @@
     <Compile Include="PropertyEditors\EmailAddressPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ListViewPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MemberPickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MultiNodePreValueEditor.cs" />
+    <Compile Include="PropertyEditors\MultiNodePickerPreValueEditor.cs" />
     <Compile Include="PropertyEditors\MultiNodeTreePickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\TextAreaParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\TextParameterEditor.cs" />
@@ -385,6 +385,7 @@
     <Compile Include="PropertyEditors\RichTextPreValueEditor.cs" />
     <Compile Include="PropertyEditors\UltraSimplePropertyEditor.cs" />
     <Compile Include="PropertyEditors\TagsPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\UploadFileTypeValidator.cs" />
     <Compile Include="PropertyEditors\UserPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ValueListPreValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownPropertyEditor.cs" />
