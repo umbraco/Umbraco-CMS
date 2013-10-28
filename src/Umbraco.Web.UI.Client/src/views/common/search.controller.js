@@ -11,7 +11,6 @@ function SearchController($scope, searchService, $log, navigationService) {
 
     $scope.searchTerm = null;
     $scope.searchResults = [];
-    
     $scope.isSearching = false;
 
     //watch the value change but don't do the search on every change - that's far too many queries
@@ -23,6 +22,9 @@ function SearchController($scope, searchService, $log, navigationService) {
             searchService.searchAll({ term: $scope.searchTerm }).then(function (result) {
                 $scope.searchResults = result;
             });
+        }else{
+            $scope.isSearching = false;
+            navigationService.hideSearch();
         }
     }), true);
 
