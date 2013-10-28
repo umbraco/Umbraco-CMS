@@ -204,6 +204,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Delete<PropertyTypeDto>("WHERE id = @Id", new { Id = dto.Id });
             }
 
+            //Delete the pre-values
+            Database.Delete<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new {Id = entity.Id});
+
             //Delete Content specific data
             Database.Delete<DataTypeDto>("WHERE nodeId = @Id", new { Id = entity.Id });
 
