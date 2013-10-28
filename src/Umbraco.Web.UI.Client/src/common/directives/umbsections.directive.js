@@ -16,12 +16,6 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
             scope.nav = navigationService;
 
 
-/*
-			scope.$watch("currentSection", function (newVal, oldVal) {
-				scope.currentSection = newVal;
-			});
-*/
-
 			function loadSections(){
 				sectionResource.getSections()
 					.then(function (result) {
@@ -70,8 +64,7 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			};
 
 			scope.sectionDblClick = function(section){
-				treeService.clearCache(section.alias);
-				navigationService.changeSection(section.alias);
+				navigationService.reloadSection(section.alias);
 			};
 
 			scope.trayClick = function(){

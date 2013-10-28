@@ -68,10 +68,13 @@ angular.module("umbraco.directives")
             function setupExternalEvents() {
               if (scope.eventhandler) {
                 
-                //TODO: This will *never* do anything because we dont cache trees by tree alias!!
-                // Have changed this to clear all tree cache.
-                scope.eventhandler.clearCache = function(treeAlias){
-                  treeService.clearCache();
+                scope.eventhandler.clearCache = function(section){
+                  treeService.clearCache(section);
+                };
+
+                scope.eventhandler.load = function(section){
+                  scope.section = section;
+                  loadTree();
                 };
 
                 scope.eventhandler.syncPath = function(path, forceReload){
