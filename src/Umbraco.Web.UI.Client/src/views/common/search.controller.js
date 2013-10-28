@@ -15,7 +15,7 @@ function SearchController($scope, searchService, $log, navigationService) {
 
     //watch the value change but don't do the search on every change - that's far too many queries
     // we need to debounce
-    $scope.$watch("searchTerm", $.debounce(400, function () {
+    $scope.$watch("searchTerm", _.debounce(function () {
         if ($scope.searchTerm) {
             $scope.isSearching = true;
             navigationService.showSearch();
@@ -26,7 +26,7 @@ function SearchController($scope, searchService, $log, navigationService) {
             $scope.isSearching = false;
             navigationService.hideSearch();
         }
-    }), true);
+    }), 400);
 
 }
 //register it
