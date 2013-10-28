@@ -21,7 +21,7 @@ namespace Umbraco.Web.Editors
         {
             return StyleSheet.GetAll()
                 .Select(x => 
-                    new Stylesheet() { 
+                    new Stylesheet() {
                         Name = x.Text,
                         Id = x.Id,
                         Path = SystemDirectories.Css + "/" + x.Text + ".css" 
@@ -36,5 +36,16 @@ namespace Umbraco.Web.Editors
 
             return css.Properties.Select(x => new StylesheetRule() { Id = x.Id, Name = x.Text, Selector = x.Alias });
         }
+
+        public IEnumerable<StylesheetRule> GetRulesByName(string name)
+        {
+            var css = StyleSheet.GetByName(name);
+
+            if (css == null)
+                throw new HttpResponseException(System.Net.HttpStatusCode.NotFound);
+
+            return css.Properties.Select(x => new StylesheetRule() { Id = x.Id, Name = x.Text, Selector = x.Alias });
+        }
     }
+
 }
