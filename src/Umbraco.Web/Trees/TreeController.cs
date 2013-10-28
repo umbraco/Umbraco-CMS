@@ -14,12 +14,11 @@ using Constants = Umbraco.Core.Constants;
 namespace Umbraco.Web.Trees
 {
     /// <summary>
-    /// The base controller for all tree requests
+    /// A base controller reference for non-attributed trees (un-registered). Developers should inherit from
+    /// TreeController.
     /// </summary>
-    public abstract class TreeController : UmbracoAuthorizedApiController
+    public abstract class TreeControllerBase : UmbracoAuthorizedApiController
     {
-        private readonly TreeAttribute _attribute;
-
         /// <summary>
         /// Remove the xml formatter... only support JSON!
         /// </summary>
@@ -30,23 +29,6 @@ namespace Umbraco.Web.Trees
             controllerContext.Configuration.Formatters.Remove(controllerContext.Configuration.Formatters.XmlFormatter);
         }
 
-        protected TreeController()
-        {
-            //Locate the tree attribute
-            var treeAttributes = GetType()
-                .GetCustomAttributes(typeof(TreeAttribute), false)
-                .OfType<TreeAttribute>()
-                .ToArray();
-
-            if (treeAttributes.Any() == false)
-            {
-                throw new InvalidOperationException("The Tree controller is missing the " + typeof(TreeAttribute).FullName + " attribute");
-            }
-
-            //assign the properties of this object to those of the metadata attribute
-            _attribute = treeAttributes.First();
-        }
-        
         /// <summary>
         /// The method called to render the contents of the tree structure
         /// </summary>
@@ -71,18 +53,12 @@ namespace Umbraco.Web.Trees
         /// <summary>
         /// The name to display on the root node
         /// </summary>
-        public virtual string RootNodeDisplayName
-        {
-            get { return _attribute.Title; }
-        }
+        public abstract string RootNodeDisplayName { get; }
 
         /// <summary>
         /// Gets the current tree alias from the attribute assigned to it.
         /// </summary>
-        public string TreeAlias
-        {
-            get { return _attribute.Alias; }
-        }
+        public abstract string TreeAlias { get; }
 
         /// <summary>
         /// Returns the root node for the tree
@@ -96,7 +72,7 @@ namespace Umbraco.Web.Trees
             var node = CreateRootNode(queryStrings);
 
             //add the tree alias to the root
-            node.AdditionalData.Add("treeAlias", TreeAlias);
+            node.AdditionalData["treeAlias"] = TreeAlias;
 
             AddQueryStringsToAdditionalData(node, queryStrings);
 
@@ -207,6 +183,96 @@ namespace Umbraco.Web.Trees
             }
         }
 
+        /// <summary>
+        /// If the request is for a dialog mode tree
+        /// </summary>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        protected bool IsDialog(FormDataCollection queryStrings)
+        {
+            return queryStrings.GetValue<bool>(TreeQueryStringParameters.DialogMode);
+        }
+
+        /// <summary>
+        /// An event that allows developers to modify the tree node collection that is being rendered
+        /// </summary>
+        /// <remarks>
+        /// Developers can add/remove/replace/insert/update/etc... any of the tree items in the collection.
+        /// </remarks>
+        public static event TypedEventHandler<TreeControllerBase, TreeNodesRenderingEventArgs> TreeNodesRendering;
+
+        private static void OnTreeNodesRendering(TreeControllerBase instance, TreeNodesRenderingEventArgs e)
+        {
+            var handler = TreeNodesRendering;
+            if (handler != null) handler(instance, e);
+        }
+
+        /// <summary>
+        /// An event that allows developer to modify the root tree node that is being rendered
+        /// </summary>
+        public static event TypedEventHandler<TreeControllerBase, TreeNodeRenderingEventArgs> RootNodeRendering;
+
+        private static void OnRootNodeRendering(TreeControllerBase instance, TreeNodeRenderingEventArgs e)
+        {
+            var handler = RootNodeRendering;
+            if (handler != null) handler(instance, e);
+        }
+
+        /// <summary>
+        /// An event that allows developers to modify the meun that is being rendered
+        /// </summary>
+        /// <remarks>
+        /// Developers can add/remove/replace/insert/update/etc... any of the tree items in the collection.
+        /// </remarks>
+        public static event TypedEventHandler<TreeControllerBase, MenuRenderingEventArgs> MenuRendering;
+
+        private static void OnMenuRendering(TreeControllerBase instance, MenuRenderingEventArgs e)
+        {
+            var handler = MenuRendering;
+            if (handler != null) handler(instance, e);
+        }
+    }
+
+    /// <summary>
+    /// The base controller for all tree requests
+    /// </summary>
+    public abstract class TreeController : TreeControllerBase
+    {
+        private readonly TreeAttribute _attribute;
+
+        protected TreeController()
+        {
+            //Locate the tree attribute
+            var treeAttributes = GetType()
+                .GetCustomAttributes(typeof(TreeAttribute), false)
+                .OfType<TreeAttribute>()
+                .ToArray();
+
+            if (treeAttributes.Any() == false)
+            {
+                throw new InvalidOperationException("The Tree controller is missing the " + typeof(TreeAttribute).FullName + " attribute");
+            }
+
+            //assign the properties of this object to those of the metadata attribute
+            _attribute = treeAttributes.First();
+        }
+
+        /// <summary>
+        /// The name to display on the root node
+        /// </summary>
+        public override string RootNodeDisplayName
+        {
+            get { return _attribute.Title; }
+        }
+
+        /// <summary>
+        /// Gets the current tree alias from the attribute assigned to it.
+        /// </summary>
+        public override string TreeAlias
+        {
+            get { return _attribute.Alias; }
+        }
+
         #region Create TreeNode methods
 
         /// <summary>
@@ -294,59 +360,6 @@ namespace Umbraco.Web.Trees
         #endregion
 
         #region Query String parameter helpers
-
-        /// <summary>
-        /// If the request is for a dialog mode tree
-        /// </summary>
-        /// <param name="queryStrings"></param>
-        /// <returns></returns>
-        protected bool IsDialog(FormDataCollection queryStrings)
-        {
-            return queryStrings.GetValue<bool>(TreeQueryStringParameters.DialogMode);
-        }
-
-        #endregion
-
-        #region Events
-
-        /// <summary>
-        /// An event that allows developers to modify the tree node collection that is being rendered
-        /// </summary>
-        /// <remarks>
-        /// Developers can add/remove/replace/insert/update/etc... any of the tree items in the collection.
-        /// </remarks>
-        public static event TypedEventHandler<TreeController, TreeNodesRenderingEventArgs> TreeNodesRendering;
-
-        private static void OnTreeNodesRendering(TreeController instance, TreeNodesRenderingEventArgs e)
-        {
-            var handler = TreeNodesRendering;
-            if (handler != null) handler(instance, e);
-        }
-
-        /// <summary>
-        /// An event that allows developer to modify the root tree node that is being rendered
-        /// </summary>
-        public static event TypedEventHandler<TreeController, TreeNodeRenderingEventArgs> RootNodeRendering;
-
-        private static void OnRootNodeRendering(TreeController instance, TreeNodeRenderingEventArgs e)
-        {
-            var handler = RootNodeRendering;
-            if (handler != null) handler(instance, e);
-        }
-
-        /// <summary>
-        /// An event that allows developers to modify the meun that is being rendered
-        /// </summary>
-        /// <remarks>
-        /// Developers can add/remove/replace/insert/update/etc... any of the tree items in the collection.
-        /// </remarks>
-        public static event TypedEventHandler<TreeController, MenuRenderingEventArgs> MenuRendering;
-        
-        private static void OnMenuRendering(TreeController instance, MenuRenderingEventArgs e)
-        {
-            var handler = MenuRendering;
-            if (handler != null) handler(instance, e);
-        }
 
         #endregion
         

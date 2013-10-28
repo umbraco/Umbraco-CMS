@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
+using System.Web.Http.Routing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
@@ -9,6 +10,7 @@ using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using umbraco.cms.presentation.Trees;
 
 namespace Umbraco.Web.Trees
 {
@@ -17,16 +19,40 @@ namespace Umbraco.Web.Trees
     /// This is used to output JSON from legacy trees
     /// </summary>
     [PluginController("UmbracoTrees")]
-    public class LegacyTreeController : UmbracoAuthorizedApiController
+    //public class LegacyTreeController : UmbracoAuthorizedApiController
+    public class LegacyTreeController : TreeControllerBase
     {
-        /// <summary>
-        /// Convert a legacy tree to a new tree result
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="queryStrings"></param>
-        /// <returns></returns>
-        [HttpQueryStringFilter("queryStrings")]
-        public TreeNodeCollection GetNodes(string id, FormDataCollection queryStrings)
+        private readonly XmlTreeNode _xmlTreeNode;
+        private readonly string _treeAlias;
+        private readonly string _currentSection;
+        private readonly string _rootDisplay;
+
+        public LegacyTreeController()
+        {
+            
+        }
+
+        public LegacyTreeController(XmlTreeNode xmlTreeNode, string treeAlias, string currentSection, UrlHelper urlHelper)
+        {
+            _xmlTreeNode = xmlTreeNode;
+            _treeAlias = treeAlias;
+            _currentSection = currentSection;
+            _rootDisplay = xmlTreeNode.Text;
+            Url = urlHelper;
+        }
+
+        protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
+        {
+            return LegacyTreeDataConverter.ConvertFromLegacy(
+                _xmlTreeNode.NodeID,
+                _xmlTreeNode,
+                Url,
+                _currentSection, 
+                queryStrings, 
+                isRoot: true);
+        }
+
+        protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var tree = GetTree(queryStrings);
             var attempt = tree.TryLoadFromLegacyTree(id, queryStrings, Url, tree.ApplicationAlias);
@@ -40,19 +66,8 @@ namespace Umbraco.Web.Trees
             return attempt.Result;
         }
 
-        /// <summary>
-        /// This will return the menu item collection for the tree node with the specified Id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="queryStrings"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// Due to the nature of legacy trees this means that we need to lookup the parent node, render
-        /// the TreeNodeCollection and then find the node we're looking for and render it's menu.
-        /// </remarks>
-        [HttpQueryStringFilter("queryStrings")]
-        public MenuItemCollection GetMenu(string id, FormDataCollection queryStrings)
-        {            
+        protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)
+        {
             //get the parent id from the query strings
             var parentId = queryStrings.GetRequiredString("parentId");
             var tree = GetTree(queryStrings);
@@ -96,6 +111,16 @@ namespace Umbraco.Web.Trees
                 }
                 return attempt.Result;
             }                       
+        }
+
+        public override string RootNodeDisplayName
+        {
+            get { return _rootDisplay; }
+        }
+
+        public override string TreeAlias
+        {
+            get { return _treeAlias; }
         }
 
         private ApplicationTree GetTree(FormDataCollection queryStrings)

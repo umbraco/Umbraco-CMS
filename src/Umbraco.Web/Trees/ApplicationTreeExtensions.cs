@@ -81,8 +81,12 @@ namespace Umbraco.Web.Trees
             {
                 return Attempt<TreeNode>.Fail(xmlTreeNodeAttempt.Exception);
             }
-            return Attempt.Succeed(
-                LegacyTreeDataConverter.ConvertFromLegacy(xmlTreeNodeAttempt.Result.NodeID, xmlTreeNodeAttempt.Result, urlHelper, currentSection, formCollection, isRoot: true));
+
+            var legacyController = new LegacyTreeController(xmlTreeNodeAttempt.Result, appTree.Alias, currentSection, urlHelper);
+            var newRoot = legacyController.GetRootNode(formCollection);
+
+            return Attempt.Succeed(newRoot);
+            
         }
 
         internal static Attempt<XmlTreeNode> TryGetRootXmlNodeFromLegacyTree(this ApplicationTree appTree, FormDataCollection formCollection, UrlHelper urlHelper)
@@ -96,7 +100,10 @@ namespace Umbraco.Web.Trees
             var bTree = treeDef.CreateInstance();
             var treeParams = new LegacyTreeParams(formCollection);
             bTree.SetTreeParameters(treeParams);
-            return Attempt.Succeed(bTree.RootNode);
+
+            var xmlRoot = bTree.RootNode;
+            
+            return Attempt.Succeed(xmlRoot);
         }
 
         internal static Attempt<TreeDefinition> TryGetLegacyTreeDef(this ApplicationTree appTree)
