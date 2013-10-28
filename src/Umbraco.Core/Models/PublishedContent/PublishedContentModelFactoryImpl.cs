@@ -22,8 +22,6 @@ namespace Umbraco.Core.Models.PublishedContent
 
             foreach (var type in types)
             {
-                if (type.Inherits<PublishedContentModel>() == false)
-                    throw new InvalidOperationException(string.Format("Type {0} is marked with PublishedContentModel attribute but does not inherit from PublishedContentExtended.", type.FullName));
                 var constructor = type.GetConstructor(ctorArgTypes);
                 if (constructor == null)
                     throw new InvalidOperationException(string.Format("Type {0} is missing a public constructor with one argument of type IPublishedContent.", type.FullName));

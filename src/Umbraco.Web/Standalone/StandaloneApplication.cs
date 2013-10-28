@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Umbraco.Core;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Web.Standalone
 {
@@ -49,14 +50,37 @@ namespace Umbraco.Web.Standalone
         /// <summary>
         /// Starts the application.
         /// </summary>
-        public void Start()
+        public void Start(bool noerr = false)
         {
             lock (AppLock)
             {
                 if (_started)
+                {
+                    if (noerr) return;
                     throw new InvalidOperationException("Application has already started.");
+                }
                 Application_Start(this, EventArgs.Empty);
                 _started = true;
+            }
+        }
+
+        public void Terminate(bool noerr = false)
+        {
+            lock (AppLock)
+            {
+                if (_started == false)
+                {
+                    if (noerr) return;
+                    throw new InvalidOperationException("Application has already been terminated.");
+                }
+
+                ApplicationContext.Current.DisposeIfDisposable(); // should reset resolution, clear caches & resolvers...
+                ApplicationContext.Current = null;
+                UmbracoContext.Current.DisposeIfDisposable(); // dunno
+                UmbracoContext.Current = null;
+
+                _started = false;
+                _application = null;
             }
         }
 

@@ -65,6 +65,9 @@ namespace Umbraco.Web.Standalone
 
     internal class StandaloneHttpRequest : HttpRequestBase
     {
-
+        public override Uri Url
+        {
+            get { return new Uri("http://localhost"); }
+        }
     }
 }
