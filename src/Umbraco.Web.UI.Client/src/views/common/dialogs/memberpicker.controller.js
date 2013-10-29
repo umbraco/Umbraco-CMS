@@ -9,7 +9,9 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberPickerController",
 		if($scope.term){
 			if($scope.oldTerm !== $scope.term){
 				$scope.results = [];
-				searchService.searchMembers({term: $scope.term, results: $scope.results});
+			    searchService.searchMembers({ term: $scope.term }).then(function(data) {
+			        $scope.results = data;
+			    });
 				$scope.showSearch = true;
 				$scope.oldTerm = $scope.term;
 			}

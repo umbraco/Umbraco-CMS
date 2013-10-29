@@ -16,13 +16,13 @@
 		<div ng-show="showSearch">
 			<ul class="umb-tree">
 		        <li class="root">
-		            <ul class="umb-search-group" ng-repeat="resultGroup in results">
-		                <li ng-repeat="result in resultGroup.matches">
+		            <ul class="umb-search-group" >
+		                <li ng-repeat="result in results">
 		                    <div style="padding-left: 20px">
 		                    <a ng-class="{first:$first}" ng-click="selectResult(result)">
 		                           <i 
-		                            class="icon umb-tree-icon sprTree {{resultGroup.icon}}"></i>
-		                            {{result.title}}
+		                            class="icon umb-tree-icon sprTree {{result.icon}}"></i>
+		                            {{result.name}}
                                     <small class="search-subtitle" ng-show="result.subTitle">
                                         {{result.subTitle}}
                                     </small>
