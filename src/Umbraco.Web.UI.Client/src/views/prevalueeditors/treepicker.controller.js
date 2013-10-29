@@ -1,22 +1,20 @@
-//this controller simply tells the dialogs service to open a memberPicker window
+//this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco')
-.controller("Umbraco.PropertyEditors.MemberPickerController",
+.controller("Umbraco.PrevalueEditors.TreePickerController",
 	
 	function($scope, dialogService, entityResource, $log, iconHelper){
 		$scope.renderModel = [];
 		$scope.ids = $scope.model.value.split(',');
 
-		$scope.cfg = {multiPicker: false, entityType: "Document", type: "content", treeAlias: "content", filter: ""};
-		if($scope.model.config){
-			$scope.cfg = angular.extend($scope.cfg, $scope.model.config);
-		}
 
-		if($scope.cfg.type === "member"){
-			$scope.cfg.entityType = "Member";
-		}else if($scope.cfg.type === "media"){
-			$scope.cfg.entityType = "Media";
-		}
+		$scope.cfg = {
+						multiPicker: false, 
+						entityType: "Document", 
+						type: "content", 
+						treeAlias: "content"
+					};
+		
 
 		entityResource.getByIds($scope.ids, $scope.cfg.entityType).then(function(data){
 			$(data).each(function(i, item){
@@ -25,17 +23,15 @@ angular.module('umbraco')
 			});
 		});
 
-		$scope.openMemberPicker =function(){
-				var d = dialogService.memberPicker(
-							{
+
+		$scope.openContentPicker =function(){
+			var d = dialogService.treePicker({
+								section: $scope.cfg.type,
+								treeAlias: $scope.cfg.type,
 								scope: $scope, 
 								multiPicker: $scope.cfg.multiPicker,
-								filter: $scope.cfg.filter,
-								filterCssClass: "not-allowed", 
-								callback: populate}
-								);
+								callback: populate});
 		};
-
 
 		$scope.remove =function(index){
 			$scope.renderModel.splice(index, 1);
@@ -59,7 +55,6 @@ angular.module('umbraco')
 	        $scope.ids = [];
 	    };
 	   
-
 	    $scope.sortableOptions = {
 	        update: function(e, ui) {
 	        	var r = [];
@@ -72,18 +67,15 @@ angular.module('umbraco')
 	        }
 	    };
 
-
 	    $scope.$on("formSubmitting", function (ev, args) {
 			$scope.model.value = trim($scope.ids.join(), ",");
+	    	$log.log($scope.model);
 	    });
-
-
 
 		function trim(str, chr) {
 			var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^'+chr+'+|'+chr+'+$', 'g');
 			return str.replace(rgxtrim, '');
 		}
-
 
 		function populate(data){
 			if(angular.isArray(data)){
