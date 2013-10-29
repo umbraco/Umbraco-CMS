@@ -53,6 +53,11 @@ namespace Umbraco.Web.Editors
 
         public static void SetPropertyTags(IContentBase content, Property property, object convertedPropertyValue, string delimiter, bool replaceTags, string tagGroup, TagValueType valueType)
         {
+            if (convertedPropertyValue == null)
+            {
+                convertedPropertyValue = "";
+            }
+
             switch (valueType)
             {
                 case TagValueType.FromDelimitedValue:

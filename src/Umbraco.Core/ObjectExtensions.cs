@@ -82,8 +82,10 @@ namespace Umbraco.Core
                 return Attempt<object>.Succeed(null);
             }
 			
-            //if its not nullable then return false
-			if (input == null) return Attempt<object>.Fail();
+            //if its not nullable and it is a value type
+			if (input == null && destinationType.IsValueType) return Attempt<object>.Fail();
+            //if the type can be null, then no problem
+            if (input == null && destinationType.IsValueType == false) return Attempt<object>.Succeed(null);
 
 			if (destinationType == typeof(object)) return Attempt.Succeed(input);
 

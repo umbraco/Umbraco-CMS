@@ -164,18 +164,31 @@ namespace Umbraco.Web.Editors
             var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
 
             //build a lucene query:
-            // the __nodeName will be boosted 10x with wildcards
-            // the rest will be normal with wildcards
-            var sb = new StringBuilder("+(__nodeName:");
+            // the __nodeName will be boosted 10x without wildcards
+            // then __nodeName will be matched normally with wildcards
+            // the rest will be normal without wildcards
+            var sb = new StringBuilder();
+            
+            //node name exactly boost x 10
+            sb.Append("+(__nodeName:");
             sb.Append(query.ToLower());
-            sb.Append("*^10.0 ");
+            sb.Append("^10.0 ");
+
+            //node name normally with wildcards
+            sb.Append(" __nodeName:");            
+            sb.Append(query.ToLower());
+            sb.Append("* ");
+
             foreach (var f in fields)
             {
+                //additional fields normally
                 sb.Append(f);
                 sb.Append(":");
                 sb.Append(query);
-                sb.Append("* ");
+                sb.Append(" ");
             }
+
+            //must match index type
             sb.Append(") +__IndexType:");
             sb.Append(type);
 
