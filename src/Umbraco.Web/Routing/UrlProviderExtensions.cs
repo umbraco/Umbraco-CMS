@@ -17,9 +17,16 @@ namespace Umbraco.Web.Routing
         /// </remarks>
         public static IEnumerable<string> GetContentUrls(this IContent content)
         {
-            var urlProvider = UmbracoContext.Current.RoutingContext.UrlProvider;
-            var url = urlProvider.GetUrl(content.Id);
             var urls = new List<string>();
+
+            if (content.HasPublishedVersion() == false)
+            {
+                urls.Add(ui.Text("content", "itemNotPublished", UmbracoContext.Current.Security.CurrentUser));
+                return urls;
+            }
+
+            var urlProvider = UmbracoContext.Current.RoutingContext.UrlProvider;
+            var url = urlProvider.GetUrl(content.Id);            
             if (url == "#")
             {
                 // document as a published version yet it's url is "#" => a parent must be
