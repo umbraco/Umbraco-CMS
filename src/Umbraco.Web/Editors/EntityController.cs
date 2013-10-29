@@ -226,7 +226,7 @@ namespace Umbraco.Web.Editors
                 {
                     m.AdditionalData["Email"] = results.First(x => x.Id.ToInvariantString() == m.Id.ToString()).Fields["email"];    
                 }
-                if (searchResult.Fields["__key"] != null)
+                if (searchResult.Fields.ContainsKey("__key") && searchResult.Fields["__key"] != null)
                 {
                     Guid key;
                     if (Guid.TryParse(searchResult.Fields["__key"], out key))
