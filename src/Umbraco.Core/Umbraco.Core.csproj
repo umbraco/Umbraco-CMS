@@ -339,7 +339,7 @@
     <Compile Include="PropertyEditors\ValueConverters\IntegerValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\JsonValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MultipleTextStringValueConverter.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\SimpleEditorValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MarkdownEditorValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\TextStringValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\TinyMceValueConverter.cs" />
     <Compile Include="PropertyEditors\IPropertyValueConverter.cs" />

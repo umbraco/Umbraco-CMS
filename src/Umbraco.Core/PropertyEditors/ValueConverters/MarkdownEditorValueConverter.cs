@@ -6,11 +6,11 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
     [PropertyValueType(typeof(IHtmlString))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
-    public class SimpleEditorValueConverter : PropertyValueConverterBase
+    public class MarkdownEditorValueConverter : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return Constants.PropertyEditors.UltraSimpleEditorAlias.Equals(propertyType.PropertyEditorAlias);
+            return Constants.PropertyEditors.MarkdownEditorAlias.Equals(propertyType.PropertyEditorAlias);
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)

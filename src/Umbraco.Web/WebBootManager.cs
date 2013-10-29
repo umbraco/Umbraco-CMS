@@ -302,7 +302,7 @@ namespace Umbraco.Web
             PropertyValueConvertersResolver.Current.RemoveType<TinyMceValueConverter>();
             // same for other converters
             PropertyValueConvertersResolver.Current.RemoveType<Core.PropertyEditors.ValueConverters.TextStringValueConverter>();
-            PropertyValueConvertersResolver.Current.RemoveType<Core.PropertyEditors.ValueConverters.SimpleEditorValueConverter>();
+            PropertyValueConvertersResolver.Current.RemoveType<Core.PropertyEditors.ValueConverters.MarkdownEditorValueConverter>();
 
             PublishedCachesResolver.Current = new PublishedCachesResolver(new PublishedCaches(
                 new PublishedCache.XmlPublishedCache.PublishedContentCache(),
