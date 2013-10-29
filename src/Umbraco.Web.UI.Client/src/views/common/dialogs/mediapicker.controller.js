@@ -71,13 +71,13 @@ angular.module("umbraco")
                     $scope.gotoFolder(image.id);
                 }
                 else if (image.contentTypeAlias.toLowerCase() == 'image') {
-                    eventsService.publish("Umbraco.Dialogs.MediaPickerController.Select", image).then(function(image) {
+                    eventsService.publish("Umbraco.Dialogs.MediaPickerController.Select", image).then(function (img) {
                         if (dialogOptions && dialogOptions.multiPicker) {
-                            $scope.select(image);
-                            image.cssclass = ($scope.dialogData.selection.indexOf(image) > -1) ? "selected" : "";
+                            $scope.select(img);
+                            img.cssclass = ($scope.dialogData.selection.indexOf(img) > -1) ? "selected" : "";
                         }
                         else {
-                            $scope.submit(image);
+                            $scope.submit(img);
                         }
                     });
                 }
@@ -92,12 +92,12 @@ angular.module("umbraco")
                 }
                 else if (image.contentTypeAlias.toLowerCase() == 'image') {
 
-                    eventsService.publish("Umbraco.Dialogs.MediaPickerController.Select", image).then(function(image) {
+                    eventsService.publish("Umbraco.Dialogs.MediaPickerController.Select", image).then(function(img) {
                         if (dialogOptions && dialogOptions.multiPicker) {
-                            $scope.select(image);
+                            $scope.select(img);
                         }
                         else {
-                            $scope.submit(image);
+                            $scope.submit(img);
                         }
                     });
                 }

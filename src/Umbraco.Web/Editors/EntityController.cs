@@ -140,7 +140,7 @@ namespace Umbraco.Web.Editors
         {
             string type;
             var searcher = Constants.Examine.InternalSearcher;            
-            var fields = new[] { "id", "__nodeName", "bodyText" };
+            var fields = new[] { "id", "bodyText" };
             
             //TODO: WE should really just allow passing in a lucene raw query
             switch (entityType)
@@ -148,7 +148,7 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Member:
                     searcher = Constants.Examine.InternalMemberSearcher;
                     type = "member";
-                    fields = new[] { "id", "email", "loginName","nodeName"};
+                    fields = new[] { "id", "email", "loginName"};
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
@@ -162,11 +162,17 @@ namespace Umbraco.Web.Editors
 
             var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
             var criteria = internalSearcher.CreateSearchCriteria(type, BooleanOperation.Or);
-            
-            var term = new[] { query.ToLower().Escape() };
-            var operation = criteria.GroupedOr(fields, term).Compile();
 
-            var result = internalSearcher.Search(operation);
+            criteria
+                //search the special __nodeName specifically with lowercase since it is indexed lowercase
+                // - we are however by default using whitespace analyzer which doesn't care about casing anyways.
+                .Field("__nodeName", query.ToLower().MultipleCharacterWildcard())
+                .Or()
+                //then just search the result of the fields specified.
+                .GroupedOr(fields,  new[] { query.MultipleCharacterWildcard() })
+                .Compile();
+
+            var result = internalSearcher.Search(criteria);
 
             switch (entityType)
             {
