@@ -106,13 +106,12 @@ function valPropertyMsg(serverValidationManager) {
 
                 var errCount = 0;
                 for (var e in formCtrl.$error) {
-                    if (e) {
+                    if (angular.isArray(formCtrl.$error[e])) {
                         errCount++;
                     }
                 }
 
-                if ((errCount === 1 && formCtrl.$error.valPropertyMsg !== undefined) ||
-                    (formCtrl.$invalid && formCtrl.$error.valServer !== undefined)) {
+                if ((errCount === 1 && angular.isArray(formCtrl.$error.valPropertyMsg)) || (formCtrl.$invalid && angular.isArray(formCtrl.$error.valServer))) {
                     scope.errorMsg = "";
                     formCtrl.$setValidity('valPropertyMsg', true);
                 }

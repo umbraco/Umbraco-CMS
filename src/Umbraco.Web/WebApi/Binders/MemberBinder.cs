@@ -26,6 +26,11 @@ namespace Umbraco.Web.WebApi.Binders
         {
         }
 
+        protected override ContentItemValidationHelper<IMember, MemberSave> GetValidationHelper()
+        {
+            return new MemberValidationHelper();
+        }
+
         protected override IMember GetExisting(MemberSave model)
         {
             var member = ApplicationContext.Services.MemberService.GetByKey(model.Key);
@@ -56,7 +61,10 @@ namespace Umbraco.Web.WebApi.Binders
             var exclude = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
             foreach (var remove in exclude)
             {
-                contentType.RemovePropertyType(remove);
+                if (contentType.PropertyTypeExists(remove))
+                {
+                    contentType.RemovePropertyType(remove);    
+                }
             }
 
             //return the new member with the details filled in
@@ -66,6 +74,24 @@ namespace Umbraco.Web.WebApi.Binders
         protected override ContentItemDto<IMember> MapFromPersisted(MemberSave model)
         {
             return Mapper.Map<IMember, ContentItemDto<IMember>>(model.PersistedContent);
+        }
+
+        /// <summary>
+        /// Custom validation helper so that we can exclude the Member.StandardPropertyTypeStubs from being validating for existence
+        /// </summary>
+        internal class MemberValidationHelper : ContentItemValidationHelper<IMember, MemberSave>
+        {
+            protected override bool ValidateProperties(ContentItemBasic<ContentPropertyBasic, IMember> postedItem, HttpActionContext actionContext)
+            {
+                var propertiesToValidate = postedItem.Properties.ToList();
+                var exclude = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
+                foreach (var remove in exclude)
+                {
+                    propertiesToValidate.RemoveAll(property => property.Alias == remove);
+                }
+
+                return ValidateProperties(propertiesToValidate.ToArray(), postedItem.PersistedContent.Properties.ToArray(), actionContext);
+            }
         }
     }
 }

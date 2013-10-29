@@ -704,12 +704,18 @@ namespace umbraco.cms.businesslogic.member
         public override XmlNode ToXml(XmlDocument xd, bool Deep)
         {
             XmlNode x = base.ToXml(xd, Deep);
-            if (x.Attributes["loginName"] == null)
+            if (x.Attributes != null && x.Attributes["loginName"] == null)
             {
-                x.Attributes.Append(XmlHelper.AddAttribute(xd, "loginName", LoginName));
-                x.Attributes.Append(XmlHelper.AddAttribute(xd, "email", Email));
-                x.Attributes.Append(XmlHelper.AddAttribute(xd, "key", UniqueId.ToString()));
+                x.Attributes.Append(XmlHelper.AddAttribute(xd, "loginName", LoginName));                
             }
+            if (x.Attributes != null && x.Attributes["email"] == null)
+            {
+                x.Attributes.Append(XmlHelper.AddAttribute(xd, "email", Email));    
+            }
+            if (x.Attributes != null && x.Attributes["key"] == null)
+            {
+                x.Attributes.Append(XmlHelper.AddAttribute(xd, "key", UniqueId.ToString()));   
+            }                       
             return x;
         }
 

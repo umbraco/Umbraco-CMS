@@ -70,7 +70,7 @@ namespace Umbraco.Web.WebApi.Binders
                                    }
 
                                    //now that everything is binded, validate the properties
-                                   var contentItemValidator = new ContentItemValidationHelper<TPersisted, TModelSave>(ApplicationContext);
+                                   var contentItemValidator = GetValidationHelper();
                                    contentItemValidator.ValidateItem(actionContext, x.Result);
 
                                    bindingContext.Model = x.Result;
@@ -79,6 +79,11 @@ namespace Umbraco.Web.WebApi.Binders
             task.Wait();
 
             return bindingContext.Model != null;
+        }
+
+        protected virtual ContentItemValidationHelper<TPersisted, TModelSave> GetValidationHelper()
+        {
+            return new ContentItemValidationHelper<TPersisted, TModelSave>();
         }
 
         /// <summary>

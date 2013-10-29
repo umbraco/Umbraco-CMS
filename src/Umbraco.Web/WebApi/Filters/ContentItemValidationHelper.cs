@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Net;
@@ -25,19 +26,7 @@ namespace Umbraco.Web.WebApi.Filters
         where TPersisted : class, IContentBase
         where TModelSave : ContentBaseItemSave<TPersisted>
     {
-        private readonly ApplicationContext _applicationContext;
-
-        public ContentItemValidationHelper(ApplicationContext applicationContext)
-        {
-            _applicationContext = applicationContext;
-        }
-
-        public ContentItemValidationHelper()
-            : this(ApplicationContext.Current)
-        {
-            
-        }
-
+     
         public void ValidateItem(HttpActionContext actionContext, string argumentName)
         {
             var contentItem = actionContext.ActionArguments[argumentName] as TModelSave;
@@ -65,7 +54,7 @@ namespace Umbraco.Web.WebApi.Filters
         /// <param name="postedItem"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        private bool ValidateExistingContent(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, HttpActionContext actionContext)
+        protected virtual bool ValidateExistingContent(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, HttpActionContext actionContext)
         {
             if (postedItem.PersistedContent == null)
             {
@@ -83,26 +72,35 @@ namespace Umbraco.Web.WebApi.Filters
         /// <param name="postedItem"></param>
         /// <param name="actionContext"></param>
         /// <returns></returns>
-        private bool ValidateProperties(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, HttpActionContext actionContext)
+        protected virtual bool ValidateProperties(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, HttpActionContext actionContext)
         {
-            //ensure the property actually exists in our server side properties
-            //var propertyAliases = postedItem.ContentDto.Properties.Select(x => x.Alias).ToArray();
+            return ValidateProperties(postedItem.Properties.ToArray(), postedItem.PersistedContent.Properties.ToArray(), actionContext);
+        }
 
-            foreach (var p in postedItem.Properties)
+        /// <summary>
+        /// This validates that all of the posted properties exist on the persisted entity
+        /// </summary>
+        /// <param name="postedProperties"></param>
+        /// <param name="persistedProperties"></param>
+        /// <param name="actionContext"></param>
+        /// <returns></returns>
+        protected bool ValidateProperties(ContentPropertyBasic[] postedProperties , Property[] persistedProperties, HttpActionContext actionContext)
+        {
+            foreach (var p in postedProperties)
             {
-                if (postedItem.PersistedContent.Properties.Contains(p.Alias) == false)
+                if (persistedProperties.Any(property => property.Alias == p.Alias) == false)
                 {
                     //TODO: Do we return errors here ? If someone deletes a property whilst their editing then should we just
                     //save the property data that remains? Or inform them they need to reload... not sure. This problem exists currently too i think.
 
                     var message = string.Format("property with alias: {0} was not found", p.Alias);
                     actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, new InvalidOperationException(message));
-                    return false;    
+                    return false;
                 }
-                
+
             }
             return true;
-        }
+        } 
 
         /// <summary>
         /// Validates the data for each property
@@ -113,7 +111,7 @@ namespace Umbraco.Web.WebApi.Filters
         /// <remarks>
         /// All property data validation goes into the modelstate with a prefix of "Properties"
         /// </remarks>
-        private bool ValidatePropertyData(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, HttpActionContext actionContext)
+        protected virtual bool ValidatePropertyData(ContentItemBasic<ContentPropertyBasic, TPersisted> postedItem, HttpActionContext actionContext)
         {
             foreach (var p in postedItem.ContentDto.Properties)
             {
