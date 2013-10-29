@@ -14,14 +14,16 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class StylesheetRepository : FileRepository<string, Stylesheet>, IStylesheetRepository
     {
-		internal StylesheetRepository(IUnitOfWork work, IFileSystem fileSystem)
+        private readonly IDatabaseUnitOfWork _dbwork;
+
+        internal StylesheetRepository(IUnitOfWork work, IDatabaseUnitOfWork db, IFileSystem fileSystem)
 			: base(work, fileSystem)
 	    {
-		    
+            _dbwork = db;
 	    }
 
-        public StylesheetRepository(IUnitOfWork work)
-            : this(work, new PhysicalFileSystem(SystemDirectories.Css))
+        public StylesheetRepository(IUnitOfWork work, IDatabaseUnitOfWork db)
+            : this(work, db, new PhysicalFileSystem(SystemDirectories.Css))
         {
         }
 
@@ -63,16 +65,23 @@ namespace Umbraco.Core.Persistence.Repositories
 
             return stylesheet;
             
-            
         }
 
         // Fix for missing Id's on FileService.GetStylesheets() call.  This is needed as sytlesheets can only bo loaded in the editor via 
         //  their Id so listing stylesheets needs to list there Id as well for custom plugins to render the build in editor.
         //  http://issues.umbraco.org/issue/U4-3258
-        private static int GetStylesheetId(string path)
+        private int GetStylesheetId(string path)
         {
-            var ss = ApplicationContext.Current.Services.EntityService.GetRootEntities(UmbracoObjectTypes.Stylesheet).SingleOrDefault(s => s.Name == path.TrimEnd(".css").Replace("\\", "/"));
-            return ss == null ? 0 : ss.Id;
+            var sql = new Sql()
+                .Select("nodeId")
+                .From("umbracoNode")
+                .Where("umbracoNode.nodeObjectType = @NodeObjectType && umbracoNode.text = @Alias",
+                    new { NodeObjectType = UmbracoObjectTypes.Stylesheet, Alias = path.TrimEnd(".css").Replace("\\", "/") });
+            var nodeDto = _dbwork.Database.FirstOrDefault<Umbraco.Core.Models.Rdbms.NodeDto>(sql);
+            return nodeDto == null ? 0 : nodeDto.NodeId;
+
+            //var ss = ApplicationContext.Current.Services.EntityService.GetRootEntities(UmbracoObjectTypes.Stylesheet).SingleOrDefault(s => s.Name == path.TrimEnd(".css").Replace("\\", "/"));
+            //return ss == null ? 0 : ss.Id;
         }
 
         public override IEnumerable<Stylesheet> GetAll(params string[] ids)
