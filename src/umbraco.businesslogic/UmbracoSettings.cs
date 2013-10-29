@@ -491,7 +491,7 @@ namespace umbraco
         /// </summary>
         public static bool isXmlContentCacheDisabled
         {
-            get { return UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled; }
+            get { return UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled == false; }
         }
 
         /// <summary>
