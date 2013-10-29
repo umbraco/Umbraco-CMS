@@ -74,12 +74,7 @@ namespace Umbraco.Core
             /// </summary>
             [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
             public const string DictionaryPicker = "17B70066-F764-407D-AB05-3717F1E1C513";
-
-            /// <summary>
-            /// Alias for the Dictionary Picker datatype.
-            /// </summary>
-            public const string DictionaryPickerAlias = "Umbraco.DictionaryPicker";
-
+            
             /// <summary>
             /// Guid for the Dropdown list datatype.
             /// </summary>
@@ -141,10 +136,10 @@ namespace Umbraco.Core
             [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
             public const string ImageCropper = "7A2D436C-34C2-410F-898F-4A23B3D79F54";
 
-            /// <summary>
-            /// Alias for the Image Cropper datatype.
-            /// </summary>
-            public const string ImageCropperAlias = "Umbraco.ImageCropper";
+            ///// <summary>
+            ///// Alias for the Image Cropper datatype.
+            ///// </summary>
+            //public const string ImageCropperAlias = "Umbraco.ImageCropper";
 
             /// <summary>
             /// Guid for the Integer datatype.
@@ -174,12 +169,7 @@ namespace Umbraco.Core
             /// </summary>
             [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
             public const string MacroContainer = "474FCFF8-9D2D-11DE-ABC6-AD7A56D89593";
-
-            /// <summary>
-            /// Alias for the Macro Container datatype.
-            /// </summary>
-            public const string MacroContainerAlias = "Umbraco.MacroContainer";
-
+            
             /// <summary>
             /// Guid for the Media Picker datatype.
             /// </summary>
@@ -339,12 +329,7 @@ namespace Umbraco.Core
             /// </summary>
             [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
             public const string UltimatePicker = "CDBF0B5D-5CB2-445F-BC12-FCAAEC07CF2C";
-
-            /// <summary>
-            /// Alias for the Ultimate Picker datatype.
-            /// </summary>
-            public const string UltimatePickerAlias = "Umbraco.UltimatePicker";
-
+            
             /// <summary>
             /// Guid for the UltraSimpleEditor datatype.
             /// </summary>
@@ -352,21 +337,16 @@ namespace Umbraco.Core
             public const string UltraSimpleEditor = "60B7DABF-99CD-41EB-B8E9-4D2E669BBDE9";
 
             /// <summary>
-            /// Alias for the UltraSimpleEditor datatype.
+            /// Alias for the MarkdownEditor datatype.
             /// </summary>
-            public const string UltraSimpleEditorAlias = "Umbraco.UltraSimpleEditor";
+            public const string MarkdownEditorAlias = "Umbraco.MarkdownEditor";
 
             /// <summary>
             /// Guid for the Umbraco Usercontrol Wrapper datatype.
             /// </summary>
             [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
             public const string UmbracoUserControlWrapper = "D15E1281-E456-4B24-AA86-1DDA3E4299D5";
-
-            /// <summary>
-            /// Alias for the Umbraco Usercontrol Wrapper datatype.
-            /// </summary>
-            public const string UmbracoUserControlWrapperAlias = "Umbraco.UmbracoUserControlWrapper";
-
+            
             /// <summary>
             /// Guid for the Upload field datatype.
             /// </summary>
