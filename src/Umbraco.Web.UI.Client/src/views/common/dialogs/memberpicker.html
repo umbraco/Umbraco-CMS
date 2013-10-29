@@ -19,7 +19,7 @@
 		            <ul class="umb-search-group" >
 		                <li ng-repeat="result in results">
 		                    <div style="padding-left: 20px">
-		                    <a ng-class="{first:$first}" ng-href="#/{{result.editorPath}}">
+		                    <a ng-class="{first:$first}" ng-click="selectResult(result)">
 		                           <i 
 		                            class="icon umb-tree-icon sprTree {{result.icon}}"></i>
 		                            {{result.name}}

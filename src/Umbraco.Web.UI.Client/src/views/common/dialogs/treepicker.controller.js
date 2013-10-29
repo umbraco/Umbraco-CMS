@@ -12,21 +12,11 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	    $scope.entityType = "Document";
 	    $scope.results = [];
 
-
-	    if (dialogOptions.section === "member") {
-	        $scope.searcher = searchService.searchMembers;
-	        $scope.entityType = "Member";
-	    }
-	    else if (dialogOptions.section === "media") {
-	        $scope.searcher = searchService.searchMedia;
-	        $scope.entityType = "Media";
-	    }
-
-        /** Method used for selecting a node */
+	    /** Method used for selecting a node */
 	    function select(text, id, entity) {
 
 	        //if we get the root, we just return a constructed entity, no need for server data
-	        if (id < 0) {                
+	        if (id < 0) {
 	            if ($scope.multiPicker) {
 	                $scope.select(id);
 	            }
@@ -45,7 +35,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	            $scope.results = [];
 	            $scope.term = "";
 	            $scope.oldTerm = undefined;
-                
+
 	            if ($scope.multiPicker) {
 	                $scope.select(id);
 	            }
@@ -59,9 +49,18 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 	                    entityResource.getById(id, $scope.entityType).then(function (ent) {
 	                        $scope.submit(ent);
 	                    });
-	                }	                
+	                }
 	            }
 	        }
+	    }
+
+	    if (dialogOptions.section === "member") {
+	        $scope.searcher = searchService.searchMembers;
+	        $scope.entityType = "Member";
+	    }
+	    else if (dialogOptions.section === "media") {
+	        $scope.searcher = searchService.searchMedia;
+	        $scope.entityType = "Media";
 	    }
 
 	    $scope.multiSubmit = function (result) {
