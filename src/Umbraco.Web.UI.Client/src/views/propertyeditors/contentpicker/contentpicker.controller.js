@@ -7,7 +7,16 @@ angular.module('umbraco')
 		$scope.renderModel = [];
 		$scope.ids = $scope.model.value.split(',');
 
-		$scope.cfg = {multiPicker: false, entityType: "Document", type: "content", treeAlias: "content", filter: ""};
+
+		//configuration
+		$scope.cfg = {
+			multiPicker: false, 
+			entityType: "Document", 
+			type: "content", 
+			treeAlias: "content",
+			section: "content"
+		};
+
 		if($scope.model.config){
 			$scope.cfg = angular.extend($scope.cfg, $scope.model.config);
 		}
@@ -18,6 +27,13 @@ angular.module('umbraco')
 			$scope.cfg.entityType = "Media";
 		}
 
+		$scope.cfg.callback = populate;
+		$scope.cfg.section = $scope.cfg.type;
+		$scope.cfg.filterCssClass = "not-allowed not-published";
+		//$scope.cfg.scope = $scope;
+
+
+		//load current data
 		entityResource.getByIds($scope.ids, $scope.cfg.entityType).then(function(data){
 			$(data).each(function(i, item){
 				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
@@ -25,21 +41,19 @@ angular.module('umbraco')
 			});
 		});
 
+
+		//dialog
 		$scope.openContentPicker =function(){
-			var d = dialogService.treePicker({
-								section: $scope.cfg.type,
-								treeAlias: $scope.cfg.type,
-								scope: $scope, 
-								multiPicker: $scope.cfg.multiPicker,
-								filter: $scope.cfg.filter, 
-								callback: populate});
+			var d = dialogService.treePicker($scope.cfg);
 		};
+
 
 		$scope.remove =function(index){
 			$scope.renderModel.splice(index, 1);
 			$scope.ids.splice(index, 1);
 			$scope.model.value = trim($scope.ids.join(), ",");
 		};
+
 
 		$scope.add =function(item){
 			if($scope.ids.indexOf(item.id) < 0){
@@ -68,10 +82,10 @@ angular.module('umbraco')
 	        	$scope.model.value = trim($scope.ids.join(), ",");
 	        }
 	    };
-	   
+
+
 	    $scope.$on("formSubmitting", function (ev, args) {
 			$scope.model.value = trim($scope.ids.join(), ",");
-	    	$log.log($scope.model);
 	    });
 
 		function trim(str, chr) {
