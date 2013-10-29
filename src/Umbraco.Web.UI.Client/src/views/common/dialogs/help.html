@@ -5,20 +5,54 @@
 	
 	<div class="umb-panel-body umb-scrollable">
 		<div class="tab-content umb-control-group">
-
 			<div class="umb-pane">
 				<h5>Help topics for: {{section}}</h5>
-				<p>
-					This area will contain manuals, references and tutorials, downloaded from our.umbraco.org...
-				</p>
+				<ul class="unstyled list-icons" ng-show="topics">
+					<li ng-repeat="topic in topics">
+				    	<i class="icon icon-help-alt"></i>
+
+				    	<a target="_blank" href="{{topic.link}}" title="{{topic.title}}">
+				    		 {{topic.title}}
+				    	</a>
+				    	<small class="umb-detail">{{topic.description}}</small>
+			    	</li>
+			    </ul>
+
+			    <ul class="unstyled list-icons">	
+	    			<li>
+	    		    	<i class="icon icon-favorite"></i>
+	    		    	<a target="_blank" href="http://our.umbraco.org">
+	    		    		 go to our.umbraco.org
+	    		    	</a>
+	    		    	<small class="umb-detail">The friendliest community</small>
+	    	    	</li>
+				</ul>
 			</div>
 
 			<div class="umb-pane">
 				<h5>Video chapters for: {{section}}</h5>
-				<p>
-					This area will contain relevant videos from umbraco.tv
-				</p>
+
+				<ul class="thumbnails" ng-show="videos">
+					<li class="span2" ng-repeat="video in videos">
+				    	<div class="thumbnail" style="margin-right: 20px">
+					    	<a target="_blank" href="{{video.link}}" title="{{video.title}}">
+					    		<img ng-src="{{video.thumbnail}}"  alt="{{video.title}}">
+					    	</a>
+				    	</div>
+				    </li>
+				</ul>
+
+				<ul class="unstyled list-icons">    
+		    		<li>
+		    	    	<i class="icon icon-tv-old"></i>
+		    	    	<a target="_blank" href="http://our.umbraco.org">
+		    	    		 go to umbraco.tv
+		    	    	</a>
+		    	    	<small class="umb-detail">The best umbraco video tutorials</small>
+		        	</li>
+				</ul>
 			</div>
 		</div>
 	</div>
+
 </div>

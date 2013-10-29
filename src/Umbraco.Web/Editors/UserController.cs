@@ -56,6 +56,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
+            
 
             return Mapper.Map<UserDetail>(user);
         }
