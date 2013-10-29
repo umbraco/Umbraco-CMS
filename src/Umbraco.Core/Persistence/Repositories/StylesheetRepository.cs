@@ -73,15 +73,12 @@ namespace Umbraco.Core.Persistence.Repositories
         private int GetStylesheetId(string path)
         {
             var sql = new Sql()
-                .Select("nodeId")
+                .Select("id")
                 .From("umbracoNode")
-                .Where("umbracoNode.nodeObjectType = @NodeObjectType && umbracoNode.text = @Alias",
-                    new { NodeObjectType = UmbracoObjectTypes.Stylesheet, Alias = path.TrimEnd(".css").Replace("\\", "/") });
+                .Where("umbracoNode.nodeObjectType = @NodeObjectType AND umbracoNode.text = @Alias",
+                    new { NodeObjectType = UmbracoObjectTypes.Stylesheet.GetGuid(), Alias = path.TrimEnd(".css").Replace("\\", "/") });
             var nodeDto = _dbwork.Database.FirstOrDefault<Umbraco.Core.Models.Rdbms.NodeDto>(sql);
             return nodeDto == null ? 0 : nodeDto.NodeId;
-
-            //var ss = ApplicationContext.Current.Services.EntityService.GetRootEntities(UmbracoObjectTypes.Stylesheet).SingleOrDefault(s => s.Name == path.TrimEnd(".css").Replace("\\", "/"));
-            //return ss == null ? 0 : ss.Id;
         }
 
         public override IEnumerable<Stylesheet> GetAll(params string[] ids)
