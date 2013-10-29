@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Text;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
@@ -161,18 +162,26 @@ namespace Umbraco.Web.Editors
             }
 
             var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
-            var criteria = internalSearcher.CreateSearchCriteria(type, BooleanOperation.Or);
 
-            criteria
-                //search the special __nodeName specifically with lowercase since it is indexed lowercase
-                // - we are however by default using whitespace analyzer which doesn't care about casing anyways.
-                .Field("__nodeName", query.ToLower().MultipleCharacterWildcard())
-                .Or()
-                //then just search the result of the fields specified.
-                .GroupedOr(fields,  new[] { query.MultipleCharacterWildcard() })
-                .Compile();
+            //build a lucene query:
+            // the __nodeName will be boosted 10x with wildcards
+            // the rest will be normal with wildcards
+            var sb = new StringBuilder("+(__nodeName:");
+            sb.Append(query.ToLower());
+            sb.Append("*^10.0 ");
+            foreach (var f in fields)
+            {
+                sb.Append(f);
+                sb.Append(":");
+                sb.Append(query);
+                sb.Append("* ");
+            }
+            sb.Append(") +__IndexType:");
+            sb.Append(type);
 
-            var result = internalSearcher.Search(criteria);
+            var raw = internalSearcher.CreateSearchCriteria().RawQuery(sb.ToString());
+            
+            var result = internalSearcher.Search(raw);
 
             switch (entityType)
             {
