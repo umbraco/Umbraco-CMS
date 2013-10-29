@@ -29,7 +29,7 @@ namespace Umbraco.Web.PropertyEditors
                 Fields.Add(new PreValueField()
                 {
                     HideLabel = true,
-                    View = "readonly",
+                    View = "readonlykeyvalues",
                     Key = "values"
                 });
             }
