@@ -1,31 +1,25 @@
 angular.module('umbraco.services')
 .factory('searchService', function ($q, $log, entityResource, contentResource, umbRequestHelper) {
 
-    function configureMemberResult(el) {
-        el.menuUrl = umbRequestHelper.getApiUrl("memberTreeBaseUrl", "GetMenu", [{ id: el.Id }, { application: 'member' }]);
-        el.metaData = { treeAlias: "member" };
-        el.title = el.Fields.nodeName;
-        el.subTitle = el.Fields.email;
-        el.id = el.Id;
+    function configureMemberResult(member) {
+        member.menuUrl = umbRequestHelper.getApiUrl("memberTreeBaseUrl", "GetMenu", [{ id: member.id }, { application: 'member' }]);
+        member.editorPath = "member/member/edit/" + (member.key ? member.key : member.id);
+        member.metaData = { treeAlias: "member" };
+        member.subTitle = member.additionalData.Email;
     }
     
-    function configureMediaResult(el)
+    function configureMediaResult(media)
     {
-        el.menuUrl = umbRequestHelper.getApiUrl("mediaTreeBaseUrl", "GetMenu", [{ id: el.Id }, { application: 'media' }]);
-        el.metaData = { treeAlias: "media" };
-        el.title = el.Fields.nodeName;
-        el.id = el.Id;
+        media.menuUrl = umbRequestHelper.getApiUrl("mediaTreeBaseUrl", "GetMenu", [{ id: media.id }, { application: 'media' }]);
+        media.editorPath = "media/media/edit/" + media.id;
+        media.metaData = { treeAlias: "media" };
     }
     
-    function configureContentResult(el) {
-        el.menuUrl = umbRequestHelper.getApiUrl("contentTreeBaseUrl", "GetMenu", [{ id: el.Id }, { application: 'content' }]);
-        el.metaData = { treeAlias: "content" };
-        el.title = el.Fields.nodeName;
-        el.id = el.Id;
-
-        contentResource.getNiceUrl(el.Id).then(function (url) {
-            el.subTitle = angular.fromJson(url);
-        });
+    function configureContentResult(content) {
+        content.menuUrl = umbRequestHelper.getApiUrl("contentTreeBaseUrl", "GetMenu", [{ id: content.id }, { application: 'content' }]);
+        content.editorPath = "content/content/edit/" + content.id;
+        content.metaData = { treeAlias: "content" };
+        content.subTitle = content.additionalData.Url;        
     }
 
     return {
@@ -36,20 +30,10 @@ angular.module('umbraco.services')
             }
 
             return entityResource.search(args.term, "Member").then(function (data) {
-
-                _.each(data, function(el) {
-                    configureMemberResult(el);
-                });
-
-                var results = (args.results && angular.isArray(args.results)) ? args.results : [];
-                
-                results.push({
-                    icon: "icon-user",
-                    editor: "member/member/edit/",
-                    matches: data
-                });
-
-                return results;
+                _.each(data, function(item) {
+                    configureMemberResult(item);
+                });         
+                return data;
             });
         },
         searchContent: function(args) {
@@ -59,20 +43,10 @@ angular.module('umbraco.services')
             }
 
             return entityResource.search(args.term, "Document").then(function (data) {
-
-                _.each(data, function(el) {
-                    configureContentResult(el);
+                _.each(data, function (item) {
+                    configureContentResult(item);
                 });
-
-                var results = (args.results && angular.isArray(args.results)) ? args.results : [];
-                
-                args.results.push({
-                    icon: "icon-document",
-                    editor: "content/content/edit/",
-                    matches: data
-                });
-                
-                return results;
+                return data;
             });
         },
         searchMedia: function(args) {
@@ -82,20 +56,10 @@ angular.module('umbraco.services')
             }
 
             return entityResource.search(args.term, "Media").then(function (data) {
-
-                _.each(data, function(el) {
-                    configureMediaResult(el);
+                _.each(data, function (item) {
+                    configureMediaResult(item);
                 });
-
-                var results = (args.results && angular.isArray(args.results)) ? args.results : [];
-
-                args.results.push({
-                    icon: "icon-picture",
-                    editor: "media/media/edit/",
-                    matches: data
-                });
-                
-                return results;
+                return data;
             });
         },
         searchAll: function (args) {
@@ -106,47 +70,27 @@ angular.module('umbraco.services')
 
             return entityResource.searchAll(args.term).then(function (data) {
 
-                var results = (args.results && angular.isArray(args.results)) ? args.results : [];
-
                 _.each(data, function(resultByType) {
                     switch(resultByType.type) {
                         case "Document":
-                            _.each(resultByType.results, function (el) {
-                                configureContentResult(el);
-                            });
-                            results.push({
-                                type: resultByType.type,
-                                icon: "icon-document",
-                                editor: "content/content/edit/",
-                                matches: resultByType.results
+                            _.each(resultByType.results, function (item) {
+                                configureContentResult(item);
                             });
                             break;
                         case "Media":
-                            _.each(resultByType.results, function (el) {
-                                configureMediaResult(el);
-                            });
-                            results.push({
-                                type: resultByType.type,
-                                icon: "icon-picture",
-                                editor: "media/media/edit/",
-                                matches: resultByType.results
-                            });
+                            _.each(resultByType.results, function (item) {
+                                configureMediaResult(item);
+                            });                            
                             break;
                         case "Member":
-                            _.each(resultByType.results, function (el) {
-                                configureMemberResult(el);
-                            });
-                            results.push({
-                                type: resultByType.type,
-                                icon: "icon-user",
-                                editor: "member/member/edit/",
-                                matches: resultByType.results
-                            });
+                            _.each(resultByType.results, function (item) {
+                                configureMemberResult(item);
+                            });                            
                             break;
                     }
                 });
 
-                return results;
+                return data;
             });
             
         },

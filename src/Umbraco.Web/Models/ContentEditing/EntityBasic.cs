@@ -12,6 +12,11 @@ namespace Umbraco.Web.Models.ContentEditing
     [DataContract(Name = "entity", Namespace = "")]
     public class EntityBasic
     {
+        public EntityBasic()
+        {
+            AdditionalData = new Dictionary<string, object>();
+        }
+
         [DataMember(Name = "name", IsRequired = true)]
         [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
         public string Name { get; set; }
@@ -44,5 +49,11 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "path")]
         public string Path { get; set; }
+        
+        /// <summary>
+        /// A collection of extra data that is available for this specific entity/entity type
+        /// </summary>
+        [DataMember(Name = "additionalData")]
+        public IDictionary<string, object> AdditionalData { get; private set; } 
     }
 }

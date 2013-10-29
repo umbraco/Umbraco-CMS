@@ -226,6 +226,8 @@ namespace Umbraco.Web.Search
 		{
 			if (e.Fields.Keys.Contains("nodeName"))
 			{
+                //TODO: This logic should really be put into the content indexer instead of hidden here!!
+
 				//add the lower cased version
 				e.Document.Add(new Field("__nodeName",
 										e.Fields["nodeName"].ToLower(),

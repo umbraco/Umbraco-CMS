@@ -706,8 +706,9 @@ namespace umbraco.cms.businesslogic.member
             XmlNode x = base.ToXml(xd, Deep);
             if (x.Attributes["loginName"] == null)
             {
-                x.Attributes.Append(xmlHelper.addAttribute(xd, "loginName", LoginName));
-                x.Attributes.Append(xmlHelper.addAttribute(xd, "email", Email));
+                x.Attributes.Append(XmlHelper.AddAttribute(xd, "loginName", LoginName));
+                x.Attributes.Append(XmlHelper.AddAttribute(xd, "email", Email));
+                x.Attributes.Append(XmlHelper.AddAttribute(xd, "key", UniqueId.ToString()));
             }
             return x;
         }

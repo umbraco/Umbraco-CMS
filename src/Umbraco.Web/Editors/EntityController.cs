@@ -35,43 +35,62 @@ namespace Umbraco.Web.Editors
     public class EntityController : UmbracoAuthorizedJsonController
     {   
         [HttpGet]
-        public ISearchResults Search(string query, UmbracoEntityTypes type)
+        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type)
         {
             if (string.IsNullOrEmpty(query))
-                return SearchResults.Empty();
+                return Enumerable.Empty<EntityBasic>();
 
             return ExamineSearch(query, type);
         }
 
+        /// <summary>
+        /// Searches for all content that the user is allowed to see (based on their allowed sections)
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Even though a normal entity search will allow any user to search on a entity type that they may not have access to edit, we need
+        /// to filter these results to the sections they are allowed to edit since this search function is explicitly for the global search 
+        /// so if we showed entities that they weren't allowed to edit they would get errors when clicking on the result.
+        /// 
+        /// The reason a user is allowed to search individual entity types that they are not allowed to edit is because those search
+        /// methods might be used in things like pickers in the content editor.
+        /// </remarks>
         [HttpGet]
         public IEnumerable<EntityTypeSearchResult> SearchAll(string query)
         {
             if (string.IsNullOrEmpty(query))
                 return Enumerable.Empty<EntityTypeSearchResult>();
 
-            var contentResult = ExamineSearch(query, UmbracoEntityTypes.Document);
-            var mediaResult = ExamineSearch(query, UmbracoEntityTypes.Media);
-            var memberResult = ExamineSearch(query, UmbracoEntityTypes.Member);
+            var allowedSections = Security.CurrentUser.AllowedSections.ToArray();
 
-            var result = new List<EntityTypeSearchResult>
+            var result = new List<EntityTypeSearchResult>();
+
+            if (allowedSections.InvariantContains(Constants.Applications.Content))
+            {
+                result.Add(new EntityTypeSearchResult
+                    {
+                        Results = ExamineSearch(query, UmbracoEntityTypes.Document),
+                        EntityType = UmbracoEntityTypes.Document.ToString()
+                    });
+            }
+            if (allowedSections.InvariantContains(Constants.Applications.Media))
+            {
+                result.Add(new EntityTypeSearchResult
                 {
-                    new EntityTypeSearchResult
-                        {
-                            EntityType = UmbracoEntityTypes.Document.ToString(),
-                            Results = contentResult
-                        },
-                    new EntityTypeSearchResult
-                        {
-                            EntityType = UmbracoEntityTypes.Media.ToString(),
-                            Results = mediaResult
-                        },
-                    new EntityTypeSearchResult
-                        {
-                            EntityType = UmbracoEntityTypes.Member.ToString(),
-                            Results = memberResult
-                        }
-                };
+                    Results = ExamineSearch(query, UmbracoEntityTypes.Media),
+                    EntityType = UmbracoEntityTypes.Media.ToString()
+                });
+            }
+            if (allowedSections.InvariantContains(Constants.Applications.Members))
+            {
+                result.Add(new EntityTypeSearchResult
+                {
+                    Results = ExamineSearch(query, UmbracoEntityTypes.Member),
+                    EntityType = UmbracoEntityTypes.Member.ToString()
+                });
 
+            }
             return result;
         }
 
@@ -116,11 +135,11 @@ namespace Umbraco.Web.Editors
         {
             return GetResultForAll(type, postFilter, postFilterParams);
         }
-        
-        private ISearchResults ExamineSearch(string query, UmbracoEntityTypes entityType)
+
+        private IEnumerable<EntityBasic> ExamineSearch(string query, UmbracoEntityTypes entityType)
         {
-            var searcher = Constants.Examine.InternalSearcher;
-            var type = "content";
+            string type;
+            var searcher = Constants.Examine.InternalSearcher;            
             var fields = new[] { "id", "__nodeName", "bodyText" };
             
             //TODO: WE should really just allow passing in a lucene raw query
@@ -135,10 +154,10 @@ namespace Umbraco.Web.Editors
                     type = "media";
                     break;
                 case UmbracoEntityTypes.Document:
+                    type = "content";
                     break;
                 default:
-                    throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);
-                    
+                    throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);                    
             }
 
             var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
@@ -147,9 +166,85 @@ namespace Umbraco.Web.Editors
             var term = new[] { query.ToLower().Escape() };
             var operation = criteria.GroupedOr(fields, term).Compile();
 
-            return internalSearcher.Search(operation);
+            var result = internalSearcher.Search(operation);
 
+            switch (entityType)
+            {
+                case UmbracoEntityTypes.Member:
+                    return MemberFromSearchResults(result);
+                case UmbracoEntityTypes.Media:
+                    return MediaFromSearchResults(result);                    
+                case UmbracoEntityTypes.Document:
+                    return ContentFromSearchResults(result);
+                default:
+                    throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);
+            }
         }
+
+        /// <summary>
+        /// Returns a collection of entities for media based on search results
+        /// </summary>
+        /// <param name="results"></param>
+        /// <returns></returns>
+        private IEnumerable<EntityBasic> MemberFromSearchResults(ISearchResults results)
+        {
+            var mapped = Mapper.Map<IEnumerable<EntityBasic>>(results).ToArray();
+            //add additional data
+            foreach (var m in mapped)
+            {
+                m.Icon = "icon-user";
+                var searchResult = results.First(x => x.Id.ToInvariantString() == m.Id.ToString());
+                if (searchResult.Fields["email"] != null)
+                {
+                    m.AdditionalData["Email"] = results.First(x => x.Id.ToInvariantString() == m.Id.ToString()).Fields["email"];    
+                }
+                if (searchResult.Fields["__key"] != null)
+                {
+                    Guid key;
+                    if (Guid.TryParse(searchResult.Fields["__key"], out key))
+                    {
+                        m.Key = key;
+                    }
+                }
+            }
+            return mapped;
+        } 
+
+        /// <summary>
+        /// Returns a collection of entities for media based on search results
+        /// </summary>
+        /// <param name="results"></param>
+        /// <returns></returns>
+        private IEnumerable<EntityBasic> MediaFromSearchResults(ISearchResults results)
+        {
+            var mapped = Mapper.Map<IEnumerable<EntityBasic>>(results).ToArray();
+            //add additional data
+            foreach (var m in mapped)
+            {
+                m.Icon = "icon-picture";                 
+            }
+            return mapped;
+        } 
+
+        /// <summary>
+        /// Returns a collection of entities for content based on search results
+        /// </summary>
+        /// <param name="results"></param>
+        /// <returns></returns>
+        private IEnumerable<EntityBasic> ContentFromSearchResults(ISearchResults results)
+        {
+            var mapped = Mapper.Map<ISearchResults, IEnumerable<EntityBasic>>(results).ToArray();
+            //add additional data
+            foreach (var m in mapped)
+            {
+                var intId = m.Id.TryConvertTo<int>();
+                if (intId.Success)
+                {
+                    m.AdditionalData["Url"] = Umbraco.NiceUrl(intId.Result);
+                }
+            }
+            return mapped;
+        } 
 
         private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)
         {

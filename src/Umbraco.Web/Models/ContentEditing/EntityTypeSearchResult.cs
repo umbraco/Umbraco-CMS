@@ -1,8 +1,12 @@
-﻿using System.Runtime.Serialization;
+﻿using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Examine;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
+    /// <summary>
+    /// Represents a search result by entity type
+    /// </summary>
     [DataContract(Name = "searchResult", Namespace = "")]
     public class EntityTypeSearchResult
     {
@@ -10,6 +14,6 @@ namespace Umbraco.Web.Models.ContentEditing
         public string EntityType { get; set; }
 
         [DataMember(Name = "results")]
-        public ISearchResults Results { get; set; }
+        public IEnumerable<EntityBasic> Results { get; set; }
     }
 }
