@@ -8,9 +8,22 @@ namespace Umbraco.Core.PropertyEditors
     [AttributeUsage(AttributeTargets.Class)]
     public class SupportTagsAttribute : Attribute
     {
-        //TODO: We should be able to add an overload to this to provide a 'tag definition' so developers can dynamically change 
-        // things like TagGroup and ReplaceTags at runtime.
+        public Type TagPropertyDefinitionType { get; private set; }
 
+        /// <summary>
+        /// Defines a tag property definition type to invoke at runtime to get the tags configuration for a property
+        /// </summary>
+        /// <param name="tagPropertyDefinitionType"></param>
+        public SupportTagsAttribute(Type tagPropertyDefinitionType)
+            : this()
+        {
+            if (tagPropertyDefinitionType == null) throw new ArgumentNullException("tagPropertyDefinitionType");
+            TagPropertyDefinitionType = tagPropertyDefinitionType;
+        }
+
+        /// <summary>
+        /// Normal constructor specifying the default tags configuration for a property
+        /// </summary>
         public SupportTagsAttribute()
         {
             ValueType = TagValueType.FromDelimitedValue;

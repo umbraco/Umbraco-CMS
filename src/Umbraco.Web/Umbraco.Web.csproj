@@ -384,6 +384,7 @@
     <Compile Include="PropertyEditors\RadioButtonsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RichTextPreValueController.cs" />
     <Compile Include="PropertyEditors\RichTextPreValueEditor.cs" />
+    <Compile Include="PropertyEditors\TagPropertyEditorTagDefinition.cs" />
     <Compile Include="PropertyEditors\UltraSimplePropertyEditor.cs" />
     <Compile Include="PropertyEditors\TagsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\UploadFileTypeValidator.cs" />

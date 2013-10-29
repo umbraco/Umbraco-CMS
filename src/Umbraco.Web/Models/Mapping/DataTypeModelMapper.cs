@@ -39,8 +39,7 @@ namespace Umbraco.Web.Models.Mapping
                       {
                           var resolver = new PreValueDisplayResolver(lazyDataTypeService);
                           return resolver.Convert(definition);
-                      });
-                
+                      });               
 
             config.CreateMap<DataTypeSave, IDataTypeDefinition>()
                   .ConstructUsing(save => new DataTypeDefinition(-1, save.SelectedEditor) {CreateDate = DateTime.Now})
@@ -48,6 +47,20 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(definition => definition.PropertyEditorAlias, expression => expression.MapFrom(save => save.SelectedEditor))
                   .ForMember(definition => definition.ParentId, expression => expression.MapFrom(save => -1))
                   .ForMember(definition => definition.DatabaseType, expression => expression.ResolveUsing<DatabaseTypeResolver>());
+
+            //Converts a property editor to a new list of pre-value fields - used when creating a new data type or changing a data type with new pre-vals
+            config.CreateMap<PropertyEditor, IEnumerable<PreValueFieldDisplay>>()
+                .ConvertUsing(editor =>
+                    {
+                        //this is a new data type, so just return the field editors, there are no values yet
+                        var defaultVals = editor.DefaultPreValues;
+                        var fields = editor.PreValueEditor.Fields.Select(Mapper.Map<PreValueFieldDisplay>).ToArray();
+                        if (defaultVals != null)
+                        {
+                            PreValueDisplayResolver.MapPreValueValuesToPreValueFields(fields, defaultVals, true);
+                        }
+                        return fields;
+                    });
         }
     }
 }

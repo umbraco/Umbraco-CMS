@@ -116,8 +116,8 @@ namespace Umbraco.Web.Editors
                         var propVal = p.PropertyEditor.ValueEditor.ConvertEditorToDb(data, dboProperty.Value);
                         var supportTagsAttribute = TagExtractor.GetAttribute(p.PropertyEditor);
                         if (supportTagsAttribute != null)
-                        {                            
-                            TagExtractor.SetPropertyTags(contentItem.PersistedContent, dboProperty, propVal, supportTagsAttribute);                            
+                        {
+                            TagExtractor.SetPropertyTags(contentItem.PersistedContent, dboProperty, data, propVal, supportTagsAttribute);                            
                         }
                         else
                         {
