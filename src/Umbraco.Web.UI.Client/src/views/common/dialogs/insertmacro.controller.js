@@ -109,7 +109,7 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
                 });
                 if (found) {
                     //select the macro and go to next screen
-                    $scope.selectedMacro = found.id;
+                    $scope.selectedMacro = found;
                     editParams();
                     return;
                 }
