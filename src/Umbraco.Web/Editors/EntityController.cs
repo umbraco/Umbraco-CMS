@@ -315,6 +315,10 @@ namespace Umbraco.Web.Editors
             //now we need to convert the unknown ones
             switch (entityType)
             {
+                case UmbracoEntityTypes.PropertyType:
+
+                case UmbracoEntityTypes.PropertyGroup:
+
                 case UmbracoEntityTypes.Domain:
 
                 case UmbracoEntityTypes.Language:
@@ -364,6 +368,17 @@ namespace Umbraco.Web.Editors
                     var filteredPropertyTypes = ExecutePostFilter(propertyTypes, postFilter, postFilterParams);
                     return Mapper.Map<IEnumerable<PropertyType>, IEnumerable<EntityBasic>>(filteredPropertyTypes);
 
+                case UmbracoEntityTypes.PropertyGroup:
+
+                    //get all document types, then combine all property types into one list
+                    var propertyGroups = Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>()
+                                                .Concat(Services.ContentTypeService.GetAllMediaTypes())
+                                                .ToArray()
+                                                .SelectMany(x => x.PropertyGroups)
+                                                .DistinctBy(composition => composition.Name);
+                    var filteredpropertyGroups = ExecutePostFilter(propertyGroups, postFilter, postFilterParams);
+                    return Mapper.Map<IEnumerable<PropertyGroup>, IEnumerable<EntityBasic>>(filteredpropertyGroups);
+
                 case UmbracoEntityTypes.User:
 
                     var users = Services.UserService.GetAllUsers();
@@ -391,6 +406,8 @@ namespace Umbraco.Web.Editors
             switch (entityType)
             {
                 case UmbracoEntityTypes.PropertyType:
+                
+                case UmbracoEntityTypes.PropertyGroup:
 
                 case UmbracoEntityTypes.Domain:
 
@@ -421,6 +438,8 @@ namespace Umbraco.Web.Editors
             switch (entityType)
             {
                 case UmbracoEntityTypes.PropertyType:
+                    
+                case UmbracoEntityTypes.PropertyGroup:
 
                 case UmbracoEntityTypes.Domain:
                     

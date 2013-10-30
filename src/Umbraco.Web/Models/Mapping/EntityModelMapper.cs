@@ -23,6 +23,13 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(basic => basic.Path, expression => expression.UseValue(""))
                   .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1));
 
+            config.CreateMap<PropertyGroup, EntityBasic>()
+                  .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-tab"))
+                  .ForMember(basic => basic.Path, expression => expression.UseValue(""))
+                  .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
+                  //in v6 the 'alias' is it's lower cased name so we'll stick to that.
+                  .ForMember(basic => basic.Alias, expression => expression.MapFrom(group => group.Name.ToLowerInvariant()));
+
             config.CreateMap<IUser, EntityBasic>()
                   .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-user"))
                   .ForMember(basic => basic.Path, expression => expression.UseValue(""))

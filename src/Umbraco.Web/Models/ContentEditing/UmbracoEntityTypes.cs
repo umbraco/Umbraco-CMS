@@ -83,6 +83,11 @@
         /// <summary>
         /// Property Type
         /// </summary>
-        PropertyType
+        PropertyType,
+
+        /// <summary>
+        /// Property Group
+        /// </summary>
+        PropertyGroup
     }
 }
