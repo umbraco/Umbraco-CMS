@@ -7,23 +7,12 @@ angular.module('umbraco')
 		$scope.renderModel = [];
 		$scope.ids = $scope.model.value.split(',');
 
-		$scope.cfg = {multiPicker: false, entityType: "Document", type: "content", treeAlias: "content", filter: ""};
+		$scope.cfg = {multiPicker: false, entityType: "MemberGroup", type: "membergroup", treeAlias: "memberGroup", filter: ""};
 		if($scope.model.config){
 			$scope.cfg = angular.extend($scope.cfg, $scope.model.config);
 		}
 
-		if($scope.cfg.type === "member"){
-			$scope.cfg.entityType = "Member";
-		}else if($scope.cfg.type === "media"){
-			$scope.cfg.entityType = "Media";
-		}
-
-		entityResource.getByIds($scope.ids, $scope.cfg.entityType).then(function(data){
-			$(data).each(function(i, item){
-				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-				$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});
-			});
-		});
+		
 
 		$scope.openMemberGroupPicker =function(){
 				var d = dialogService.memberGroupPicker(
@@ -44,11 +33,11 @@ angular.module('umbraco')
 		};
 
 		$scope.add =function(item){
-			if($scope.ids.indexOf(item.id) < 0){
-				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
+			if($scope.ids.indexOf(item) < 0){
+				//item.icon = iconHelper.convertFromLegacyIcon(item.icon);
 
-				$scope.ids.push(item.id);
-				$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});
+				$scope.ids.push(item);
+				$scope.renderModel.push({ name: item, id: item, icon: 'icon-users' });
 				$scope.model.value = trim($scope.ids.join(), ",");
 			}	
 		};
@@ -91,8 +80,9 @@ angular.module('umbraco')
 					$scope.add(item);
 				});
 			}else{
-				$scope.clear();
+			    $scope.clear();
 				$scope.add(data);
+			   
 			}
 		}
 });
