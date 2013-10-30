@@ -27,27 +27,24 @@ angular.module("umbraco.directives")
 						});
 				}
 
-				ngModel.$render = function(){
-					$timeout(function(){
-						if(!scope.model){
-							scope.goEdit();
-						}
-					}, 100);
-				};
-
+				$timeout(function(){
+					if(!scope.model){
+						scope.goEdit();
+					}
+				}, 100, false);
+			
 				scope.goEdit = function(){
 					scope.editMode = true;
+
 					$timeout(function () {					    
 					    inputElement.focus();					    
-					}, 100);
+					}, 100, false);
 				};
 
 				scope.exitEdit = function(){
-
 					if(scope.model && scope.model !== ""){
 						scope.editMode = false;	
 					}
-					                    
 				};
 			}
 	    };
