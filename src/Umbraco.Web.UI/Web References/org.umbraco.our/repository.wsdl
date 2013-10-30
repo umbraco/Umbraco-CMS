@@ -1,0 +1,995 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wsdl:definitions xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" xmlns:tm="http://microsoft.com/wsdl/mime/textMatching/" xmlns:mime="http://schemas.xmlsoap.org/wsdl/mime/" xmlns:tns="http://packages.umbraco.org/webservices/" xmlns:s1="http://microsoft.com/wsdl/types/" xmlns:http="http://schemas.xmlsoap.org/wsdl/http/" xmlns:s="http://www.w3.org/2001/XMLSchema" xmlns:s2="http://packages.umbraco.org/webservices/AbstractTypes" xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" targetNamespace="http://packages.umbraco.org/webservices/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://packages.umbraco.org/webservices/">
+      <s:import namespace="http://microsoft.com/wsdl/types/" />
+      <s:element name="Categories">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="repositoryGuid" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="CategoriesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="CategoriesResult" type="tns:ArrayOfCategory" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:complexType name="ArrayOfCategory">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Category" nillable="true" type="tns:Category" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Category">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="1" name="Text" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Description" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Url" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="Id" type="s:int" />
+          <s:element minOccurs="0" maxOccurs="1" name="Packages" type="tns:ArrayOfPackage" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="ArrayOfPackage">
+        <s:sequence>
+          <s:element minOccurs="0" maxOccurs="unbounded" name="Package" nillable="true" type="tns:Package" />
+        </s:sequence>
+      </s:complexType>
+      <s:complexType name="Package">
+        <s:sequence>
+          <s:element minOccurs="1" maxOccurs="1" name="RepoGuid" type="s1:guid" />
+          <s:element minOccurs="0" maxOccurs="1" name="Text" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Description" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Icon" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Thumbnail" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Documentation" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Demo" type="s:string" />
+          <s:element minOccurs="1" maxOccurs="1" name="Accepted" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="IsModule" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="EditorsPick" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="Protected" type="s:boolean" />
+          <s:element minOccurs="1" maxOccurs="1" name="HasUpgrade" type="s:boolean" />
+          <s:element minOccurs="0" maxOccurs="1" name="UpgradeVersion" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="UpgradeReadMe" type="s:string" />
+          <s:element minOccurs="0" maxOccurs="1" name="Url" type="s:string" />
+        </s:sequence>
+      </s:complexType>
+      <s:element name="Modules">
+        <s:complexType />
+      </s:element>
+      <s:element name="ModulesResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ModulesResult" type="tns:ArrayOfPackage" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ModulesCategorized">
+        <s:complexType />
+      </s:element>
+      <s:element name="ModulesCategorizedResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="ModulesCategorizedResult" type="tns:ArrayOfCategory" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="Nitros">
+        <s:complexType />
+      </s:element>
+      <s:element name="NitrosResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="NitrosResult" type="tns:ArrayOfPackage" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="NitrosCategorized">
+        <s:complexType />
+      </s:element>
+      <s:element name="NitrosCategorizedResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="NitrosCategorizedResult" type="tns:ArrayOfCategory" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="authenticate">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="email" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="md5Password" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="authenticateResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="authenticateResult" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="fetchPackage">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="packageGuid" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="fetchPackageResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="fetchPackageResult" type="s:base64Binary" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="fetchPackageByVersion">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="packageGuid" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="repoVersion" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="fetchPackageByVersionResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="fetchPackageByVersionResult" type="s:base64Binary" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="fetchProtectedPackage">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="packageGuid" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="memberKey" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="fetchProtectedPackageResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="fetchProtectedPackageResult" type="s:base64Binary" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SubmitPackage">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="repositoryGuid" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="authorGuid" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="packageGuid" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="packageFile" type="s:base64Binary" />
+            <s:element minOccurs="0" maxOccurs="1" name="packageDoc" type="s:base64Binary" />
+            <s:element minOccurs="0" maxOccurs="1" name="packageThumbnail" type="s:base64Binary" />
+            <s:element minOccurs="0" maxOccurs="1" name="name" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="author" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="authorUrl" type="s:string" />
+            <s:element minOccurs="0" maxOccurs="1" name="description" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="SubmitPackageResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="1" maxOccurs="1" name="SubmitPackageResult" type="tns:SubmitStatus" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:simpleType name="SubmitStatus">
+        <s:restriction base="s:string">
+          <s:enumeration value="Complete" />
+          <s:enumeration value="Exists" />
+          <s:enumeration value="NoAccess" />
+          <s:enumeration value="Error" />
+        </s:restriction>
+      </s:simpleType>
+      <s:element name="PackageByGuid">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="packageGuid" type="s:string" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="PackageByGuidResponse">
+        <s:complexType>
+          <s:sequence>
+            <s:element minOccurs="0" maxOccurs="1" name="PackageByGuidResult" type="tns:Package" />
+          </s:sequence>
+        </s:complexType>
+      </s:element>
+      <s:element name="ArrayOfCategory" nillable="true" type="tns:ArrayOfCategory" />
+      <s:element name="ArrayOfPackage" nillable="true" type="tns:ArrayOfPackage" />
+      <s:element name="string" nillable="true" type="s:string" />
+      <s:element name="base64Binary" nillable="true" type="s:base64Binary" />
+      <s:element name="SubmitStatus" type="tns:SubmitStatus" />
+      <s:element name="Package" nillable="true" type="tns:Package" />
+    </s:schema>
+    <s:schema elementFormDefault="qualified" targetNamespace="http://microsoft.com/wsdl/types/">
+      <s:simpleType name="guid">
+        <s:restriction base="s:string">
+          <s:pattern value="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}" />
+        </s:restriction>
+      </s:simpleType>
+    </s:schema>
+    <s:schema targetNamespace="http://packages.umbraco.org/webservices/AbstractTypes">
+      <s:import namespace="http://schemas.xmlsoap.org/soap/encoding/" />
+      <s:complexType name="StringArray">
+        <s:complexContent mixed="false">
+          <s:restriction base="soapenc:Array">
+            <s:sequence>
+              <s:element minOccurs="0" maxOccurs="unbounded" name="String" type="s:string" />
+            </s:sequence>
+          </s:restriction>
+        </s:complexContent>
+      </s:complexType>
+    </s:schema>
+  </wsdl:types>
+  <wsdl:message name="CategoriesSoapIn">
+    <wsdl:part name="parameters" element="tns:Categories" />
+  </wsdl:message>
+  <wsdl:message name="CategoriesSoapOut">
+    <wsdl:part name="parameters" element="tns:CategoriesResponse" />
+  </wsdl:message>
+  <wsdl:message name="ModulesSoapIn">
+    <wsdl:part name="parameters" element="tns:Modules" />
+  </wsdl:message>
+  <wsdl:message name="ModulesSoapOut">
+    <wsdl:part name="parameters" element="tns:ModulesResponse" />
+  </wsdl:message>
+  <wsdl:message name="ModulesCategorizedSoapIn">
+    <wsdl:part name="parameters" element="tns:ModulesCategorized" />
+  </wsdl:message>
+  <wsdl:message name="ModulesCategorizedSoapOut">
+    <wsdl:part name="parameters" element="tns:ModulesCategorizedResponse" />
+  </wsdl:message>
+  <wsdl:message name="NitrosSoapIn">
+    <wsdl:part name="parameters" element="tns:Nitros" />
+  </wsdl:message>
+  <wsdl:message name="NitrosSoapOut">
+    <wsdl:part name="parameters" element="tns:NitrosResponse" />
+  </wsdl:message>
+  <wsdl:message name="NitrosCategorizedSoapIn">
+    <wsdl:part name="parameters" element="tns:NitrosCategorized" />
+  </wsdl:message>
+  <wsdl:message name="NitrosCategorizedSoapOut">
+    <wsdl:part name="parameters" element="tns:NitrosCategorizedResponse" />
+  </wsdl:message>
+  <wsdl:message name="authenticateSoapIn">
+    <wsdl:part name="parameters" element="tns:authenticate" />
+  </wsdl:message>
+  <wsdl:message name="authenticateSoapOut">
+    <wsdl:part name="parameters" element="tns:authenticateResponse" />
+  </wsdl:message>
+  <wsdl:message name="fetchPackageSoapIn">
+    <wsdl:part name="parameters" element="tns:fetchPackage" />
+  </wsdl:message>
+  <wsdl:message name="fetchPackageSoapOut">
+    <wsdl:part name="parameters" element="tns:fetchPackageResponse" />
+  </wsdl:message>
+  <wsdl:message name="fetchPackageByVersionSoapIn">
+    <wsdl:part name="parameters" element="tns:fetchPackageByVersion" />
+  </wsdl:message>
+  <wsdl:message name="fetchPackageByVersionSoapOut">
+    <wsdl:part name="parameters" element="tns:fetchPackageByVersionResponse" />
+  </wsdl:message>
+  <wsdl:message name="fetchProtectedPackageSoapIn">
+    <wsdl:part name="parameters" element="tns:fetchProtectedPackage" />
+  </wsdl:message>
+  <wsdl:message name="fetchProtectedPackageSoapOut">
+    <wsdl:part name="parameters" element="tns:fetchProtectedPackageResponse" />
+  </wsdl:message>
+  <wsdl:message name="SubmitPackageSoapIn">
+    <wsdl:part name="parameters" element="tns:SubmitPackage" />
+  </wsdl:message>
+  <wsdl:message name="SubmitPackageSoapOut">
+    <wsdl:part name="parameters" element="tns:SubmitPackageResponse" />
+  </wsdl:message>
+  <wsdl:message name="PackageByGuidSoapIn">
+    <wsdl:part name="parameters" element="tns:PackageByGuid" />
+  </wsdl:message>
+  <wsdl:message name="PackageByGuidSoapOut">
+    <wsdl:part name="parameters" element="tns:PackageByGuidResponse" />
+  </wsdl:message>
+  <wsdl:message name="CategoriesHttpGetIn">
+    <wsdl:part name="repositoryGuid" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="CategoriesHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfCategory" />
+  </wsdl:message>
+  <wsdl:message name="ModulesHttpGetIn" />
+  <wsdl:message name="ModulesHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfPackage" />
+  </wsdl:message>
+  <wsdl:message name="ModulesCategorizedHttpGetIn" />
+  <wsdl:message name="ModulesCategorizedHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfCategory" />
+  </wsdl:message>
+  <wsdl:message name="NitrosHttpGetIn" />
+  <wsdl:message name="NitrosHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfPackage" />
+  </wsdl:message>
+  <wsdl:message name="NitrosCategorizedHttpGetIn" />
+  <wsdl:message name="NitrosCategorizedHttpGetOut">
+    <wsdl:part name="Body" element="tns:ArrayOfCategory" />
+  </wsdl:message>
+  <wsdl:message name="authenticateHttpGetIn">
+    <wsdl:part name="email" type="s:string" />
+    <wsdl:part name="md5Password" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="authenticateHttpGetOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="fetchPackageHttpGetIn">
+    <wsdl:part name="packageGuid" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="fetchPackageHttpGetOut">
+    <wsdl:part name="Body" element="tns:base64Binary" />
+  </wsdl:message>
+  <wsdl:message name="fetchPackageByVersionHttpGetIn">
+    <wsdl:part name="packageGuid" type="s:string" />
+    <wsdl:part name="repoVersion" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="fetchPackageByVersionHttpGetOut">
+    <wsdl:part name="Body" element="tns:base64Binary" />
+  </wsdl:message>
+  <wsdl:message name="fetchProtectedPackageHttpGetIn">
+    <wsdl:part name="packageGuid" type="s:string" />
+    <wsdl:part name="memberKey" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="fetchProtectedPackageHttpGetOut">
+    <wsdl:part name="Body" element="tns:base64Binary" />
+  </wsdl:message>
+  <wsdl:message name="SubmitPackageHttpGetIn">
+    <wsdl:part name="repositoryGuid" type="s:string" />
+    <wsdl:part name="authorGuid" type="s:string" />
+    <wsdl:part name="packageGuid" type="s:string" />
+    <wsdl:part name="packageFile" type="s2:StringArray" />
+    <wsdl:part name="packageDoc" type="s2:StringArray" />
+    <wsdl:part name="packageThumbnail" type="s2:StringArray" />
+    <wsdl:part name="name" type="s:string" />
+    <wsdl:part name="author" type="s:string" />
+    <wsdl:part name="authorUrl" type="s:string" />
+    <wsdl:part name="description" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SubmitPackageHttpGetOut">
+    <wsdl:part name="Body" element="tns:SubmitStatus" />
+  </wsdl:message>
+  <wsdl:message name="PackageByGuidHttpGetIn">
+    <wsdl:part name="packageGuid" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="PackageByGuidHttpGetOut">
+    <wsdl:part name="Body" element="tns:Package" />
+  </wsdl:message>
+  <wsdl:message name="CategoriesHttpPostIn">
+    <wsdl:part name="repositoryGuid" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="CategoriesHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfCategory" />
+  </wsdl:message>
+  <wsdl:message name="ModulesHttpPostIn" />
+  <wsdl:message name="ModulesHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfPackage" />
+  </wsdl:message>
+  <wsdl:message name="ModulesCategorizedHttpPostIn" />
+  <wsdl:message name="ModulesCategorizedHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfCategory" />
+  </wsdl:message>
+  <wsdl:message name="NitrosHttpPostIn" />
+  <wsdl:message name="NitrosHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfPackage" />
+  </wsdl:message>
+  <wsdl:message name="NitrosCategorizedHttpPostIn" />
+  <wsdl:message name="NitrosCategorizedHttpPostOut">
+    <wsdl:part name="Body" element="tns:ArrayOfCategory" />
+  </wsdl:message>
+  <wsdl:message name="authenticateHttpPostIn">
+    <wsdl:part name="email" type="s:string" />
+    <wsdl:part name="md5Password" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="authenticateHttpPostOut">
+    <wsdl:part name="Body" element="tns:string" />
+  </wsdl:message>
+  <wsdl:message name="fetchPackageHttpPostIn">
+    <wsdl:part name="packageGuid" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="fetchPackageHttpPostOut">
+    <wsdl:part name="Body" element="tns:base64Binary" />
+  </wsdl:message>
+  <wsdl:message name="fetchPackageByVersionHttpPostIn">
+    <wsdl:part name="packageGuid" type="s:string" />
+    <wsdl:part name="repoVersion" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="fetchPackageByVersionHttpPostOut">
+    <wsdl:part name="Body" element="tns:base64Binary" />
+  </wsdl:message>
+  <wsdl:message name="fetchProtectedPackageHttpPostIn">
+    <wsdl:part name="packageGuid" type="s:string" />
+    <wsdl:part name="memberKey" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="fetchProtectedPackageHttpPostOut">
+    <wsdl:part name="Body" element="tns:base64Binary" />
+  </wsdl:message>
+  <wsdl:message name="SubmitPackageHttpPostIn">
+    <wsdl:part name="repositoryGuid" type="s:string" />
+    <wsdl:part name="authorGuid" type="s:string" />
+    <wsdl:part name="packageGuid" type="s:string" />
+    <wsdl:part name="packageFile" type="s2:StringArray" />
+    <wsdl:part name="packageDoc" type="s2:StringArray" />
+    <wsdl:part name="packageThumbnail" type="s2:StringArray" />
+    <wsdl:part name="name" type="s:string" />
+    <wsdl:part name="author" type="s:string" />
+    <wsdl:part name="authorUrl" type="s:string" />
+    <wsdl:part name="description" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="SubmitPackageHttpPostOut">
+    <wsdl:part name="Body" element="tns:SubmitStatus" />
+  </wsdl:message>
+  <wsdl:message name="PackageByGuidHttpPostIn">
+    <wsdl:part name="packageGuid" type="s:string" />
+  </wsdl:message>
+  <wsdl:message name="PackageByGuidHttpPostOut">
+    <wsdl:part name="Body" element="tns:Package" />
+  </wsdl:message>
+  <wsdl:portType name="RepositorySoap">
+    <wsdl:operation name="Categories">
+      <wsdl:input message="tns:CategoriesSoapIn" />
+      <wsdl:output message="tns:CategoriesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Modules">
+      <wsdl:input message="tns:ModulesSoapIn" />
+      <wsdl:output message="tns:ModulesSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ModulesCategorized">
+      <wsdl:input message="tns:ModulesCategorizedSoapIn" />
+      <wsdl:output message="tns:ModulesCategorizedSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Nitros">
+      <wsdl:input message="tns:NitrosSoapIn" />
+      <wsdl:output message="tns:NitrosSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NitrosCategorized">
+      <wsdl:input message="tns:NitrosCategorizedSoapIn" />
+      <wsdl:output message="tns:NitrosCategorizedSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="authenticate">
+      <wsdl:input message="tns:authenticateSoapIn" />
+      <wsdl:output message="tns:authenticateSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="fetchPackage">
+      <wsdl:input message="tns:fetchPackageSoapIn" />
+      <wsdl:output message="tns:fetchPackageSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="fetchPackageByVersion">
+      <wsdl:input message="tns:fetchPackageByVersionSoapIn" />
+      <wsdl:output message="tns:fetchPackageByVersionSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="fetchProtectedPackage">
+      <wsdl:input message="tns:fetchProtectedPackageSoapIn" />
+      <wsdl:output message="tns:fetchProtectedPackageSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SubmitPackage">
+      <wsdl:input message="tns:SubmitPackageSoapIn" />
+      <wsdl:output message="tns:SubmitPackageSoapOut" />
+    </wsdl:operation>
+    <wsdl:operation name="PackageByGuid">
+      <wsdl:input message="tns:PackageByGuidSoapIn" />
+      <wsdl:output message="tns:PackageByGuidSoapOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="RepositoryHttpGet">
+    <wsdl:operation name="Categories">
+      <wsdl:input message="tns:CategoriesHttpGetIn" />
+      <wsdl:output message="tns:CategoriesHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Modules">
+      <wsdl:input message="tns:ModulesHttpGetIn" />
+      <wsdl:output message="tns:ModulesHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ModulesCategorized">
+      <wsdl:input message="tns:ModulesCategorizedHttpGetIn" />
+      <wsdl:output message="tns:ModulesCategorizedHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Nitros">
+      <wsdl:input message="tns:NitrosHttpGetIn" />
+      <wsdl:output message="tns:NitrosHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NitrosCategorized">
+      <wsdl:input message="tns:NitrosCategorizedHttpGetIn" />
+      <wsdl:output message="tns:NitrosCategorizedHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="authenticate">
+      <wsdl:input message="tns:authenticateHttpGetIn" />
+      <wsdl:output message="tns:authenticateHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="fetchPackage">
+      <wsdl:input message="tns:fetchPackageHttpGetIn" />
+      <wsdl:output message="tns:fetchPackageHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="fetchPackageByVersion">
+      <wsdl:input message="tns:fetchPackageByVersionHttpGetIn" />
+      <wsdl:output message="tns:fetchPackageByVersionHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="fetchProtectedPackage">
+      <wsdl:input message="tns:fetchProtectedPackageHttpGetIn" />
+      <wsdl:output message="tns:fetchProtectedPackageHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SubmitPackage">
+      <wsdl:input message="tns:SubmitPackageHttpGetIn" />
+      <wsdl:output message="tns:SubmitPackageHttpGetOut" />
+    </wsdl:operation>
+    <wsdl:operation name="PackageByGuid">
+      <wsdl:input message="tns:PackageByGuidHttpGetIn" />
+      <wsdl:output message="tns:PackageByGuidHttpGetOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="RepositoryHttpPost">
+    <wsdl:operation name="Categories">
+      <wsdl:input message="tns:CategoriesHttpPostIn" />
+      <wsdl:output message="tns:CategoriesHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Modules">
+      <wsdl:input message="tns:ModulesHttpPostIn" />
+      <wsdl:output message="tns:ModulesHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="ModulesCategorized">
+      <wsdl:input message="tns:ModulesCategorizedHttpPostIn" />
+      <wsdl:output message="tns:ModulesCategorizedHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="Nitros">
+      <wsdl:input message="tns:NitrosHttpPostIn" />
+      <wsdl:output message="tns:NitrosHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="NitrosCategorized">
+      <wsdl:input message="tns:NitrosCategorizedHttpPostIn" />
+      <wsdl:output message="tns:NitrosCategorizedHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="authenticate">
+      <wsdl:input message="tns:authenticateHttpPostIn" />
+      <wsdl:output message="tns:authenticateHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="fetchPackage">
+      <wsdl:input message="tns:fetchPackageHttpPostIn" />
+      <wsdl:output message="tns:fetchPackageHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="fetchPackageByVersion">
+      <wsdl:input message="tns:fetchPackageByVersionHttpPostIn" />
+      <wsdl:output message="tns:fetchPackageByVersionHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="fetchProtectedPackage">
+      <wsdl:input message="tns:fetchProtectedPackageHttpPostIn" />
+      <wsdl:output message="tns:fetchProtectedPackageHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="SubmitPackage">
+      <wsdl:input message="tns:SubmitPackageHttpPostIn" />
+      <wsdl:output message="tns:SubmitPackageHttpPostOut" />
+    </wsdl:operation>
+    <wsdl:operation name="PackageByGuid">
+      <wsdl:input message="tns:PackageByGuidHttpPostIn" />
+      <wsdl:output message="tns:PackageByGuidHttpPostOut" />
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="RepositorySoap" type="tns:RepositorySoap">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="Categories">
+      <soap:operation soapAction="http://packages.umbraco.org/webservices/Categories" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Modules">
+      <soap:operation soapAction="http://packages.umbraco.org/webservices/Modules" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ModulesCategorized">
+      <soap:operation soapAction="http://packages.umbraco.org/webservices/ModulesCategorized" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Nitros">
+      <soap:operation soapAction="http://packages.umbraco.org/webservices/Nitros" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NitrosCategorized">
+      <soap:operation soapAction="http://packages.umbraco.org/webservices/NitrosCategorized" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="authenticate">
+      <soap:operation soapAction="http://packages.umbraco.org/webservices/authenticate" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchPackage">
+      <soap:operation soapAction="http://packages.umbraco.org/webservices/fetchPackage" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchPackageByVersion">
+      <soap:operation soapAction="http://packages.umbraco.org/webservices/fetchPackageByVersion" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchProtectedPackage">
+      <soap:operation soapAction="http://packages.umbraco.org/webservices/fetchProtectedPackage" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SubmitPackage">
+      <soap:operation soapAction="http://packages.umbraco.org/webservices/SubmitPackage" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PackageByGuid">
+      <soap:operation soapAction="http://packages.umbraco.org/webservices/PackageByGuid" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="RepositorySoap12" type="tns:RepositorySoap">
+    <soap12:binding transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="Categories">
+      <soap12:operation soapAction="http://packages.umbraco.org/webservices/Categories" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Modules">
+      <soap12:operation soapAction="http://packages.umbraco.org/webservices/Modules" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ModulesCategorized">
+      <soap12:operation soapAction="http://packages.umbraco.org/webservices/ModulesCategorized" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Nitros">
+      <soap12:operation soapAction="http://packages.umbraco.org/webservices/Nitros" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NitrosCategorized">
+      <soap12:operation soapAction="http://packages.umbraco.org/webservices/NitrosCategorized" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="authenticate">
+      <soap12:operation soapAction="http://packages.umbraco.org/webservices/authenticate" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchPackage">
+      <soap12:operation soapAction="http://packages.umbraco.org/webservices/fetchPackage" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchPackageByVersion">
+      <soap12:operation soapAction="http://packages.umbraco.org/webservices/fetchPackageByVersion" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchProtectedPackage">
+      <soap12:operation soapAction="http://packages.umbraco.org/webservices/fetchProtectedPackage" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SubmitPackage">
+      <soap12:operation soapAction="http://packages.umbraco.org/webservices/SubmitPackage" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PackageByGuid">
+      <soap12:operation soapAction="http://packages.umbraco.org/webservices/PackageByGuid" style="document" />
+      <wsdl:input>
+        <soap12:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap12:body use="literal" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="RepositoryHttpGet" type="tns:RepositoryHttpGet">
+    <http:binding verb="GET" />
+    <wsdl:operation name="Categories">
+      <http:operation location="/Categories" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Modules">
+      <http:operation location="/Modules" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ModulesCategorized">
+      <http:operation location="/ModulesCategorized" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Nitros">
+      <http:operation location="/Nitros" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NitrosCategorized">
+      <http:operation location="/NitrosCategorized" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="authenticate">
+      <http:operation location="/authenticate" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchPackage">
+      <http:operation location="/fetchPackage" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchPackageByVersion">
+      <http:operation location="/fetchPackageByVersion" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchProtectedPackage">
+      <http:operation location="/fetchProtectedPackage" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SubmitPackage">
+      <http:operation location="/SubmitPackage" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PackageByGuid">
+      <http:operation location="/PackageByGuid" />
+      <wsdl:input>
+        <http:urlEncoded />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="RepositoryHttpPost" type="tns:RepositoryHttpPost">
+    <http:binding verb="POST" />
+    <wsdl:operation name="Categories">
+      <http:operation location="/Categories" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Modules">
+      <http:operation location="/Modules" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="ModulesCategorized">
+      <http:operation location="/ModulesCategorized" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="Nitros">
+      <http:operation location="/Nitros" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="NitrosCategorized">
+      <http:operation location="/NitrosCategorized" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="authenticate">
+      <http:operation location="/authenticate" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchPackage">
+      <http:operation location="/fetchPackage" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchPackageByVersion">
+      <http:operation location="/fetchPackageByVersion" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="fetchProtectedPackage">
+      <http:operation location="/fetchProtectedPackage" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="SubmitPackage">
+      <http:operation location="/SubmitPackage" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="PackageByGuid">
+      <http:operation location="/PackageByGuid" />
+      <wsdl:input>
+        <mime:content type="application/x-www-form-urlencoded" />
+      </wsdl:input>
+      <wsdl:output>
+        <mime:mimeXml part="Body" />
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Repository">
+    <wsdl:port name="RepositorySoap" binding="tns:RepositorySoap">
+      <soap:address location="http://our.umbraco.org/umbraco/webservices/api/repository.asmx" />
+    </wsdl:port>
+    <wsdl:port name="RepositorySoap12" binding="tns:RepositorySoap12">
+      <soap12:address location="http://our.umbraco.org/umbraco/webservices/api/repository.asmx" />
+    </wsdl:port>
+    <wsdl:port name="RepositoryHttpGet" binding="tns:RepositoryHttpGet">
+      <http:address location="http://our.umbraco.org/umbraco/webservices/api/repository.asmx" />
+    </wsdl:port>
+    <wsdl:port name="RepositoryHttpPost" binding="tns:RepositoryHttpPost">
+      <http:address location="http://our.umbraco.org/umbraco/webservices/api/repository.asmx" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

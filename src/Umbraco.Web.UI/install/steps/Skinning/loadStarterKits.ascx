@@ -1,5 +1,6 @@
 <%@ Control Language="C#" AutoEventWireup="True" CodeBehind="LoadStarterKits.ascx.cs" Inherits="Umbraco.Web.UI.Install.Steps.Skinning.LoadStarterKits" %>
-<%@ Import Namespace="umbraco.cms.businesslogic.packager.repositories" %>
+<%@ Import Namespace="Umbraco.Web.UI.org.umbraco.our" %>
+
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 <asp:PlaceHolder ID="pl_loadStarterKits" runat="server">
