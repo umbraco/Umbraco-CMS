@@ -31,22 +31,24 @@ angular.module("umbraco")
             angular.forEach(editorConfig.stylesheets, function(val, key){
                 stylesheets.push("/css/" + val + ".css");
                 
-                stylesheetResource.getRulesByName(val).then(function(rules){
-                    angular.forEach(rules, function(rule){
+                stylesheetResource.getRulesByName(val).then(function(rules) {
+                    angular.forEach(rules, function(rule) {
                         var r = {};
                         r.title = rule.name;
-                        if(rule.selector[0] == "."){
+                        if (rule.selector[0] == ".") {
                             r.inline = "span";
                             r.classes = rule.selector.substring(1);
-                        }else if(rule.selector[0] == "#"){
+                        }
+                        else if (rule.selector[0] == "#") {
                             r.inline = "span";
-                            r.attributes = {id: rule.selector.substring(1)};
-                        }else{
+                            r.attributes = { id: rule.selector.substring(1) };
+                        }
+                        else {
                             r.block = rule.selector;
                         }
 
-                        styleFormats.push(r);   
-                    })
+                        styleFormats.push(r);
+                    });
                 });
             });
 
