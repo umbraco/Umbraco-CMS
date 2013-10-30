@@ -169,7 +169,12 @@ namespace Umbraco.Core
             /// </summary>
             [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
             public const string MacroContainer = "474FCFF8-9D2D-11DE-ABC6-AD7A56D89593";
-            
+
+            /// <summary>
+            /// Alias for the Macro Container datatype.
+            /// </summary>
+            public const string MacroContainerAlias = "Umbraco.MacroContainer";
+
             /// <summary>
             /// Guid for the Media Picker datatype.
             /// </summary>

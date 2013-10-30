@@ -672,6 +672,7 @@
     </None>
     <None Include="Config\tinyMceConfig.Release.config">
       <DependentUpon>tinyMceConfig.config</DependentUpon>
+      <SubType>Designer</SubType>
     </None>
     <None Include="Config\scripting.Release.config">
       <DependentUpon>scripting.config</DependentUpon>
