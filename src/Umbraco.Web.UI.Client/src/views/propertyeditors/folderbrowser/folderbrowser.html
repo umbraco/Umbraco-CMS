@@ -3,11 +3,13 @@ style="width: 100%"
 method="POST" enctype="multipart/form-data"
 class="umb-editor umb-folderbrowser" 
 data-file-upload="options" 
-data-file-upload-progress="" 
+data-file-upload-progress=""
+ng-hide="creating" 
 data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
         
 		<span class="btn fileinput-button umb-upload-button-big" 
             ng-show="touchDevice || images.length === 0"
+            ng-hide="dropping"
             ng-class="{disabled: disabled}">
 		    <i class="icon icon-page-up"></i>
 		    <p>Click to upload</p>

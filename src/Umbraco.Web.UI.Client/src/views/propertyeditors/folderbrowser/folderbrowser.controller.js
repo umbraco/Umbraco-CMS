@@ -14,56 +14,61 @@ angular.module("umbraco")
     function ($rootScope, $scope, assetsService, $routeParams, $timeout, $element, $location, umbRequestHelper, mediaResource, imageHelper) {
         var dialogOptions = $scope.$parent.dialogOptions;
 
-        $scope.filesUploading = [];
-        $scope.options = {
-            url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
-            autoUpload: true,
-            disableImageResize: /Android(?!.*Chrome)|Opera/
-            .test(window.navigator.userAgent),
-            previewMaxWidth: 200,
-            previewMaxHeight: 200,
-            previewCrop: true,
-            formData:{
-                currentFolder: $routeParams.id
-            }
-        };
+        $scope.creating = $routeParams.create;
 
+        if(!$scope.creating){
 
-        $scope.loadChildren = function(id){
-            mediaResource.getChildren(id)
-                .then(function(data) {
-                    $scope.images = data.items;
-                });    
-        };
-
-        $scope.$on('fileuploadstop', function(event, files){
-            $scope.loadChildren($scope.options.formData.currentFolder);
-            $scope.queue = [];
             $scope.filesUploading = [];
-        });
+            $scope.options = {
+                url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
+                autoUpload: true,
+                disableImageResize: /Android(?!.*Chrome)|Opera/
+                .test(window.navigator.userAgent),
+                previewMaxWidth: 200,
+                previewMaxHeight: 200,
+                previewCrop: true,
+                formData:{
+                    currentFolder: $routeParams.id
+                }
+            };
 
-        $scope.$on('fileuploadprocessalways', function(e,data) {
-            var i;
-            $scope.$apply(function() {
-                $scope.filesUploading.push(data.files[data.index]);
+
+            $scope.loadChildren = function(id){
+                mediaResource.getChildren(id)
+                    .then(function(data) {
+                        $scope.images = data.items;
+                    });    
+            };
+
+            $scope.$on('fileuploadstop', function(event, files){
+                $scope.loadChildren($scope.options.formData.currentFolder);
+                $scope.queue = [];
+                $scope.filesUploading = [];
             });
-        });
 
-        // All these sit-ups are to add dropzone area and make sure it gets removed if dragging is aborted! 
-        $scope.$on('fileuploaddragover', function(event, files) {
-            if (!$scope.dragClearTimeout) {
+            $scope.$on('fileuploadprocessalways', function(e,data) {
+                var i;
                 $scope.$apply(function() {
-                    $scope.dropping = true;
+                    $scope.filesUploading.push(data.files[data.index]);
                 });
-            } else {
-                $timeout.cancel($scope.dragClearTimeout);
-            }
-            $scope.dragClearTimeout = $timeout(function () {
-                $scope.dropping = null;
-                $scope.dragClearTimeout = null;
-            }, 300);
-        });
-        
-        //init load
-        $scope.loadChildren($routeParams.id);
+            });
+
+            // All these sit-ups are to add dropzone area and make sure it gets removed if dragging is aborted! 
+            $scope.$on('fileuploaddragover', function(event, files) {
+                if (!$scope.dragClearTimeout) {
+                    $scope.$apply(function() {
+                        $scope.dropping = true;
+                    });
+                } else {
+                    $timeout.cancel($scope.dragClearTimeout);
+                }
+                $scope.dragClearTimeout = $timeout(function () {
+                    $scope.dropping = null;
+                    $scope.dragClearTimeout = null;
+                }, 300);
+            });
+            
+            //init load
+            $scope.loadChildren($routeParams.id);
+        }
 });
