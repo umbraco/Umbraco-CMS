@@ -1,7 +1,7 @@
 //this controller simply tells the dialogs service to open a memberPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco')
-.controller("Umbraco.PropertyEditors.MemberPickerController",
+.controller("Umbraco.PropertyEditors.MemberGroupPickerController",
 	
 	function($scope, dialogService, entityResource, $log, iconHelper){
 		$scope.renderModel = [];
@@ -25,8 +25,8 @@ angular.module('umbraco')
 			});
 		});
 
-		$scope.openMemberPicker =function(){
-				var d = dialogService.memberPicker(
+		$scope.openMemberGroupPicker =function(){
+				var d = dialogService.memberGroupPicker(
 							{
 								scope: $scope, 
 								multiPicker: $scope.cfg.multiPicker,
