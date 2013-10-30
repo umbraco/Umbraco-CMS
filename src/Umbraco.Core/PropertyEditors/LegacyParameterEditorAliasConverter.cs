@@ -84,6 +84,16 @@ namespace Umbraco.Core.PropertyEditors
         /// </summary>
         internal static void CreateMappingsForCoreEditors()
         {
+            //All of these map to the content picker
+            CreateMap("contentSubs", Constants.PropertyEditors.ContentPickerAlias);
+            CreateMap("contentRandom", Constants.PropertyEditors.ContentPickerAlias);
+            CreateMap("contentPicker", Constants.PropertyEditors.ContentPickerAlias);
+            CreateMap("contentTree", Constants.PropertyEditors.ContentPickerAlias);
+            CreateMap("contentAll", Constants.PropertyEditors.ContentPickerAlias);
+
+            CreateMap("textMultiLine", Constants.PropertyEditors.TextboxMultipleAlias);
+            CreateMap("text", Constants.PropertyEditors.TextboxAlias);
+            CreateMap("bool", Constants.PropertyEditors.TrueFalseAlias);
             
         }
     }

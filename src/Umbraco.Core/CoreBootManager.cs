@@ -69,6 +69,7 @@ namespace Umbraco.Core
 
             //Create the legacy prop-eds mapping
             LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
+            LegacyParameterEditorAliasConverter.CreateMappingsForCoreEditors();
 
 			//create database and service contexts for the app context
 			var dbFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName);
