@@ -31,6 +31,7 @@ function valServer(serverValidationManager) {
             // resubmitted. So once a field is changed that has a server error assigned to it
             // we need to re-validate it for the server side validator so the user can resubmit
             // the form. Of course normal client-side validators will continue to execute.
+            //TODO: Should we be using $render here instead?
             ctrl.$viewChangeListeners.push(function () {
                 if (ctrl.$invalid) {
                     ctrl.$setValidity('valServer', true);
