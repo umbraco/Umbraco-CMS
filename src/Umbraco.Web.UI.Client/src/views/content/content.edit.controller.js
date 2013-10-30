@@ -8,12 +8,24 @@
  */
 function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, navigationService, localizationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper) {
     
+    contentResource.checkPermission("P", $routeParams.id).then(function(hasPermission){
+        var key = "buttons_sendToPublish"
+        if(hasPermission){
+            key = "buttons_saveAndPublish";
+        }
+        
+        localizationService.localize(key).then(function(label){
+            $scope.publishButtonLabel = label;
+        });
+    });
+    
+
     if ($routeParams.create) {
         //we are creating so get an empty content item
         contentResource.getScaffold($routeParams.id, $routeParams.doctype)
             .then(function(data) {
                 $scope.loaded = true;
-                $scope.content = data;
+                    $scope.content = data;
             });
     }
     else {
@@ -32,17 +44,6 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
 
-
-                contentResource.checkPermission("P", $routeParams.id).then(function(hasPermission){
-                    var key = "buttons_sendToPublish"
-                    if(hasPermission){
-                        key = "buttons_saveAndPublish";
-                    }
-                    
-                    localizationService.localize(key).then(function(label){
-                        $scope.publishButtonLabel = label;
-                    });
-                });
 
             });
     }
