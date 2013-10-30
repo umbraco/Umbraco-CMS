@@ -29,9 +29,11 @@
                 <ul class="unstyled">
                     <li ng-repeat="param in $parent.macroParams">
                         
-                        <umb-control-group label="{{param.name}}">
-                            <umb-editor model="param"></umb-editor>
-                        </umb-control-group>
+                        <ng-form name="parameterForm">
+                            <umb-control-group label="{{param.name}}">
+                                <umb-editor model="param"></umb-editor>
+                            </umb-control-group>
+                        </ng-form>                        
                         
                     </li>
                 </ul>

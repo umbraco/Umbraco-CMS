@@ -31,6 +31,13 @@ function fixNumber() {
                 }
             }
             
+            ngModel.$formatters.push(function (value) {
+                if (angular.isString(value)) {
+                    return parseFloat(value);
+                }
+                return value;
+            });
+            
             //This fixes this angular issue: 
             //https://github.com/angular/angular.js/issues/2144
             // which doesn't actually validate the number input properly since the model only changes when a real number is entered
