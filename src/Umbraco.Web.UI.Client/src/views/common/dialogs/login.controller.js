@@ -10,7 +10,7 @@
      * signs the user in
      */
     var d = new Date();
-    var weekday = new Array("Super Sunday", "Manic Monday", "Tremendous Tuesday", "Wonderfull Wednesday", "Thunder Thursday", "Friendly Friday", "Shiny Saturday");
+    var weekday = new Array("Super Sunday", "Manic Monday", "Tremendous Tuesday", "Wonderful Wednesday", "Thunder Thursday", "Friendly Friday", "Shiny Saturday");
     
     $scope.today = weekday[d.getDay()];
     $scope.errorMsg = "";
