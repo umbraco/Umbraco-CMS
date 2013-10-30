@@ -193,6 +193,11 @@ namespace Umbraco.Core
             public const string MemberPickerAlias = "Umbraco.MemberPicker";
 
             /// <summary>
+            /// Alias for the Member Group Picker datatype.
+            /// </summary>
+            public const string MemberGroupPickerAlias = "Umbraco.MemberGroupPicker";
+
+            /// <summary>
             /// Guid for the Multi-Node Tree Picker datatype
             /// </summary>
             [Obsolete("GUIDs are no longer used to reference Property Editors, use the Alias constant instead. This will be removed in future versions")]
