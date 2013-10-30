@@ -52,7 +52,7 @@
                     isNaN(i2) ? $scope.model.config.maxVal : (i2 > i1 ? (i2 <= $scope.model.config.maxVal ? i2 : $scope.model.config.maxVal) : $scope.model.config.maxVal)
                 ];
             }
-            else if (!angular.isArray($scope.model.value)) {
+            else {
                 //this will mean it's a delimited value stored in the db, convert it to an array
                 sliderVal = _.map($scope.model.value.split(','), function (item) {
                     return parseFloat(item);
@@ -61,8 +61,11 @@
         }
         else {
             //If no value saved yet - then use default value
-            if (!$scope.model.value) {
-                sliderVal = parseFloat($scope.model.config.initVal1);
+            if ($scope.model.value) {
+                sliderVal = parseFloat($scope.model.value);
+            }
+            else {
+                sliderVal = $scope.model.config.initVal1;
             }
         }
 
@@ -77,7 +80,7 @@
                     $scope.model.value = slider.getValue().join(",");
                 }
                 else {
-                    $scope.model.value = slider.getValue();
+                    $scope.model.value = slider.getValue().toString();
                 }
             });
         }).data('slider');
@@ -95,7 +98,9 @@
             //here we declare a special method which will be called whenever the value has changed from the server
             //this is instead of doing a watch on the model.value = faster
             $scope.model.onValueChanged = function (newVal, oldVal) {                
-                createSlider();
+                if (newVal != oldVal) {
+                    createSlider();
+                }
             };
 
         });
