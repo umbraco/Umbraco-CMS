@@ -1,0 +1,37 @@
+<div class="umb-panel" ng-controller="Umbraco.Dialogs.MemberGroupPickerController">
+	
+	<div class="umb-panel-body with-footer">
+
+
+		<div ng-hide="showSearch">
+				<umb-tree 
+				    section="member" 
+                    treealias="memberGroup"
+				    cachekey="membergrouppickerDialog" 
+					showheader="false" 
+				    showoptions="false"
+                    isdialog="true"
+					eventhandler="dialogTreeEventHandler">
+				</umb-tree>
+		</div>
+	</div>
+
+	<div class="umb-panel-footer" >
+			<div class="umb-el-wrap umb-panel-buttons">
+		        <div class="btn-toolbar umb-btn-toolbar pull-right">
+
+		        	<a href ng-click="close()" class="btn btn-link">
+		        		<localize key="general_cancel">Cancel</localize>
+					</a>
+
+					<button
+						class="btn btn-primary"
+						ng-show="multipicker" 
+						ng-click="submit(dialogData)">
+						<localize key="buttons_select">Select</localize>({{dialogData.selection.length}})
+					</button>
+
+		        </div>
+			</div>
+		</div>
+</div>
