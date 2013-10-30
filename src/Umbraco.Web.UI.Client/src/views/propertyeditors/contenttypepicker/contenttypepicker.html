@@ -1,0 +1,19 @@
+<div ng-controller="Umbraco.PropertyEditors.ContentTypeController" ng-switch="model.config.multiple">
+    
+    <select name="contentTypeList"
+        class="umb-editor umb-dropdown"
+        ng-switch-default
+        ng-model="model.value"
+        ng-options="contentType.id as contentType.name for contentType in contentTypes">
+    </select>
+    
+    <!--NOTE: This ng-switch is required because ng-multiple doesn't actually support dynamic bindings with multi-select lists -->
+    <select name="contentTypeList"
+        class="umb-editor umb-dropdown"
+        ng-switch-when="1"
+        multiple
+        ng-model="model.value"
+        ng-options="contentType.id as contentType.name for contentType in contentTypes">
+    </select>
+
+</div>
