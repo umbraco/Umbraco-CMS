@@ -8,18 +8,13 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors.ParameterEditors
 {
-    [ParameterEditor("contentType", "Content Type Picker", "contenttypepicker")]
+    [ParameterEditor("contentType", "Content Type Picker", "entitypicker")]
     public class ContentTypeParameterEditor : ParameterEditor
     {
-        
-    }
-
-    [ParameterEditor("contentTypeMultiple", "Multiple Content Type Picker", "contenttypepicker")]
-    public class MultipleContentTypeParameterEditor : ParameterEditor
-    {
-        public MultipleContentTypeParameterEditor()
+        public ContentTypeParameterEditor()
         {
-            Configuration.Add("multiple", "1");
+            Configuration.Add("multiple", "0");
+            Configuration.Add("entityType", "DocumentType");
         }
     }
 }

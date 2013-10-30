@@ -10,6 +10,7 @@ using Examine.LuceneEngine;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -341,40 +342,37 @@ namespace Umbraco.Web.Editors
             {
                 //TODO: Should we order this by something ?
                 var entities = Services.EntityService.GetAll(objectType.Value).WhereNotNull().Select(Mapper.Map<EntityBasic>);
-                
-                //if a post filter is assigned then try to execute it
-                if (postFilter.IsNullOrWhiteSpace() == false)
-                {
-                    return postFilterParams == null
-                               ? entities.AsQueryable().Where(postFilter).ToArray()
-                               : entities.AsQueryable().Where(postFilter, postFilterParams).ToArray();
-
-                }
-                return entities;
+                return ExecutePostFilter(entities, postFilter, postFilterParams);                
             }
             //now we need to convert the unknown ones
             switch (entityType)
             {
                 case UmbracoEntityTypes.Macro:                    
                     //Get all macros from the macro service
-                    var result = Services.MacroService.GetAll().WhereNotNull().OrderBy(x => x.Name).AsQueryable();
+                    var macros = Services.MacroService.GetAll().WhereNotNull().OrderBy(x => x.Name);
+                    var filteredMacros = ExecutePostFilter(macros, postFilter, postFilterParams);
+                    return filteredMacros.Select(Mapper.Map<EntityBasic>);
 
-                    //if a post filter is assigned then try to execute it
-                    if (postFilter.IsNullOrWhiteSpace() == false)
-                    {
-                        result = postFilterParams == null
-                            ? result.Where(postFilter)
-                            : result.Where(postFilter, postFilterParams);
+                case UmbracoEntityTypes.PropertyType:
 
-                    }
+                    //get all document types, then combine all property types into one list
+                    var propertyTypes = Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>()
+                                                .Concat(Services.ContentTypeService.GetAllMediaTypes())
+                                                .ToArray()
+                                                .SelectMany(x => x.PropertyTypes)
+                                                .DistinctBy(composition => composition.Alias);
+                    var filteredPropertyTypes = ExecutePostFilter(propertyTypes, postFilter, postFilterParams);
+                    return Mapper.Map<IEnumerable<PropertyType>, IEnumerable<EntityBasic>>(filteredPropertyTypes);
 
-                    return result.Select(Mapper.Map<EntityBasic>);
+                case UmbracoEntityTypes.User:
+
+                    var users = Services.UserService.GetAllUsers();
+                    var filteredUsers = ExecutePostFilter(users, postFilter, postFilterParams);
+                    return Mapper.Map<IEnumerable<IUser>, IEnumerable<EntityBasic>>(filteredUsers);
 
                 case UmbracoEntityTypes.Domain:
 
                 case UmbracoEntityTypes.Language:
-
-                case UmbracoEntityTypes.User:
 
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + entityType);
@@ -392,6 +390,8 @@ namespace Umbraco.Web.Editors
             //now we need to convert the unknown ones
             switch (entityType)
             {
+                case UmbracoEntityTypes.PropertyType:
+
                 case UmbracoEntityTypes.Domain:
 
                 case UmbracoEntityTypes.Language:
@@ -420,6 +420,8 @@ namespace Umbraco.Web.Editors
             //now we need to convert the unknown ones
             switch (entityType)
             {
+                case UmbracoEntityTypes.PropertyType:
+
                 case UmbracoEntityTypes.Domain:
                     
                 case UmbracoEntityTypes.Language:
@@ -464,6 +466,27 @@ namespace Umbraco.Web.Editors
                     return null;
             }
         }
+
+        /// <summary>
+        /// Executes the post filter against a collection of objects
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entities"></param>
+        /// <param name="postFilter"></param>
+        /// <param name="postFilterParams"></param>
+        /// <returns></returns>
+        private IEnumerable<T> ExecutePostFilter<T>(IEnumerable<T> entities, string postFilter, IDictionary<string, object> postFilterParams)
+        {
+            //if a post filter is assigned then try to execute it
+            if (postFilter.IsNullOrWhiteSpace() == false)
+            {
+                return postFilterParams == null
+                               ? entities.AsQueryable().Where(postFilter).ToArray()
+                               : entities.AsQueryable().Where(postFilter, postFilterParams).ToArray();
+
+            }
+            return entities;
+        } 
 
     }
 }

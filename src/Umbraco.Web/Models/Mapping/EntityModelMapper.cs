@@ -6,6 +6,7 @@ using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -16,6 +17,17 @@ namespace Umbraco.Web.Models.Mapping
         {
             config.CreateMap<UmbracoEntity, EntityBasic>()
                   .ForMember(basic => basic.Icon, expression => expression.MapFrom(entity => entity.ContentTypeIcon));
+
+            config.CreateMap<PropertyType, EntityBasic>()
+                  .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-box"))
+                  .ForMember(basic => basic.Path, expression => expression.UseValue(""))
+                  .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1));
+
+            config.CreateMap<IUser, EntityBasic>()
+                  .ForMember(basic => basic.Icon, expression => expression.UseValue("icon-user"))
+                  .ForMember(basic => basic.Path, expression => expression.UseValue(""))
+                  .ForMember(basic => basic.ParentId, expression => expression.UseValue(-1))
+                  .ForMember(basic => basic.Alias, expression => expression.MapFrom(user => user.Username));
 
             config.CreateMap<SearchResult, EntityBasic>()
                 //default to document icon

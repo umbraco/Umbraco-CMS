@@ -78,6 +78,11 @@
         /// <summary>
         /// Data Type
         /// </summary>
-        DataType
+        DataType,
+
+        /// <summary>
+        /// Property Type
+        /// </summary>
+        PropertyType
     }
 }

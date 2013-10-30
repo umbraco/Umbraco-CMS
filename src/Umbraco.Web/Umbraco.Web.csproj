@@ -347,6 +347,9 @@
     <Compile Include="PropertyEditors\MemberPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultiNodeTreePickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\ContentTypeParameterEditor.cs" />
+    <Compile Include="PropertyEditors\ParameterEditors\MultipleContentTypeParameterEditor.cs" />
+    <Compile Include="PropertyEditors\ParameterEditors\MultiplePropertyTypeParameterEditor.cs" />
+    <Compile Include="PropertyEditors\ParameterEditors\PropertyTypeParameterEditor.cs" />
     <Compile Include="PropertyEditors\RelatedLinksPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RteEmbedController.cs" />
     <Compile Include="Editors\EntityController.cs" />
