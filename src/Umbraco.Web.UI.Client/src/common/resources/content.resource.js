@@ -470,6 +470,38 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         /**
          * @ngdoc method
+         * @name umbraco.resources.contentResource#hasPermission
+         * @methodOf umbraco.resources.contentResource
+         *
+         * @description
+         * Returns true/false given a permission char to check against a nodeID
+         * for the current user
+         *
+         * ##usage
+         * <pre>
+         * contentResource.hasPermission('p',1234)
+         *    .then(function() {
+         *        alert('You are allowed to publish this item');
+         *    });
+         * </pre> 
+         *
+         * @param {String} permission char representing the permission to check
+         * @param {Int} id id of content item to delete        
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        checkPermission: function(permission, id) {
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "contentApiBaseUrl",
+                        "GetHasPermission",
+                        [{ permissionToCheck: permission },{ nodeId: id }])),
+                'Failed to check permission for item ' + id);
+        },
+
+        /**
+         * @ngdoc method
          * @name umbraco.resources.contentResource#save
          * @methodOf umbraco.resources.contentResource
          *

@@ -171,6 +171,18 @@ namespace Umbraco.Web.Editors
 
             return pagedResult;
         }
+
+        [HttpGet]
+        public bool GetHasPermission(string permissionToCheck, int nodeId)
+        {
+            var p = Services.UserService.GetPermissions(Security.CurrentUser, nodeId).FirstOrDefault();
+            if (p != null && p.AssignedPermissions.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))
+            {
+                return true;
+            }
+
+            return false;
+        }
         
         /// <summary>
         /// Saves content
@@ -575,6 +587,8 @@ namespace Umbraco.Web.Editors
                     throw new IndexOutOfRangeException();
             }
         }
+
+        
 
         /// <summary>
         /// Performs a permissions check for the user to check if it has access to the node based on 
