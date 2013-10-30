@@ -1,7 +1,7 @@
 <div ng-controller="Umbraco.PropertyEditors.MemberPickerController" class="umb-editor umb-memberpicker">
     
 
-    <ul class="unstyled" 
+    <ul class="unstyled list-icons" 
     		ui-sortable="sortableOptions"
     		ng-model="renderModel">	
     		<li ng-repeat="node in renderModel">
@@ -16,10 +16,11 @@
     		</li>
     	</ul>
 
-	<ul class="unstyled">	
+	<ul class="unstyled list-icons">	
 		<li>
+            <i class="icon icon-add blue"></i> 
 			<a href="#" ng-click="openMemberPicker()" prevent-default>
-				<i class="icon icon-add"></i> <localize key="general_add">Add</localize>
+				<localize key="general_add">Add</localize>
 			</a>
 		</li>
 	</ul>

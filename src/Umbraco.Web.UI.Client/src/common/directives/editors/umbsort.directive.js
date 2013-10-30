@@ -23,7 +23,6 @@ angular.module("umbraco.directives")
             link: function(scope, element, attrs, ngModel) {
                 var adjustment;
             
-                $log.log(element);
                 var cfg = scope.$eval(element.attr('umb-sort')) || {};
 
                 scope.model = ngModel;

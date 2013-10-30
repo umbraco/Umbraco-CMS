@@ -5,8 +5,8 @@ angular.module('umbraco')
 	
 	function($scope, dialogService, entityResource, $log, iconHelper){
 		$scope.renderModel = [];
-		$scope.ids = $scope.model.value.split(',');
-
+		$scope.ids = [];
+		
 
 		$scope.cfg = {
 						multiPicker: false, 
@@ -15,14 +15,16 @@ angular.module('umbraco')
 						treeAlias: "content"
 					};
 		
-
-		entityResource.getByIds($scope.ids, $scope.cfg.entityType).then(function(data){
-			$(data).each(function(i, item){
-				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-				$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});
+		if($scope.model.value){
+			$scope.ids = $scope.model.value.split(',');
+			entityResource.getByIds($scope.ids, $scope.cfg.entityType).then(function(data){
+				$(data).each(function(i, item){
+					item.icon = iconHelper.convertFromLegacyIcon(item.icon);
+					$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});
+				});
 			});
-		});
-
+		}
+		
 
 		$scope.openContentPicker =function(){
 			var d = dialogService.treePicker({
@@ -39,6 +41,12 @@ angular.module('umbraco')
 			$scope.model.value = trim($scope.ids.join(), ",");
 		};
 
+		$scope.clear = function() {
+		    $scope.model.value = "";
+		    $scope.renderModel = [];
+		    $scope.ids = [];
+		};
+		
 		$scope.add =function(item){
 			if($scope.ids.indexOf(item.id) < 0){
 				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
@@ -49,27 +57,9 @@ angular.module('umbraco')
 			}	
 		};
 
-	    $scope.clear = function() {
-	        $scope.model.value = "";
-	        $scope.renderModel = [];
-	        $scope.ids = [];
-	    };
-	   
-	    $scope.sortableOptions = {
-	        update: function(e, ui) {
-	        	var r = [];
-	        	angular.forEach($scope.renderModel, function(value, key){
-	        		r.push(value.id);
-	        	});
-
-	        	$scope.ids = r;
-	        	$scope.model.value = trim($scope.ids.join(), ",");
-	        }
-	    };
 
 	    $scope.$on("formSubmitting", function (ev, args) {
 			$scope.model.value = trim($scope.ids.join(), ",");
-	    	$log.log($scope.model);
 	    });
 
 		function trim(str, chr) {
