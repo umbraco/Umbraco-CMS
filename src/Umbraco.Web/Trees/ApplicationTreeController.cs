@@ -2,7 +2,9 @@
 using System.Globalization;
 using System.Linq;
 using System.Management.Instrumentation;
+using System.Net;
 using System.Net.Http.Formatting;
+using System.Web.Http;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Models;
@@ -35,28 +37,27 @@ namespace Umbraco.Web.Trees
         /// <summary>
         /// Returns the tree nodes for an application
         /// </summary>
-        /// <param name="application"></param>
+        /// <param name="application">The application to load tree for</param>
+        /// <param name="tree">An optional single tree alias, if specified will only load the single tree for the request app</param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
         [HttpQueryStringFilter("queryStrings")]
         public SectionRootNode GetApplicationTrees(string application, string tree, FormDataCollection queryStrings)
         {
-            if (application == null) throw new ArgumentNullException("application");
+            if (string.IsNullOrEmpty(application)) throw new HttpResponseException(HttpStatusCode.NotFound);
 
             var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
 
             //find all tree definitions that have the current application alias
             var appTrees = ApplicationContext.Current.Services.ApplicationTreeService.GetApplicationTrees(application, true).ToArray();
 
-            if (appTrees.Count() == 1 || !string.IsNullOrEmpty(tree) )
+            if (appTrees.Count() == 1 || string.IsNullOrEmpty(tree) == false )
             {
-                ApplicationTree apptree;
+                var apptree = string.IsNullOrEmpty(tree) == false 
+                    ? appTrees.SingleOrDefault(x => x.Alias == tree)
+                    : appTrees.SingleOrDefault();
 
-                if (!string.IsNullOrEmpty(tree))
-                    apptree = appTrees.Where(x => x.Alias == tree).Single();
-                else
-                    apptree = appTrees.Single();
-
+                if (apptree == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
                 var result = GetRootForSingleAppTree(
                     apptree,
@@ -64,8 +65,8 @@ namespace Umbraco.Web.Trees
                     queryStrings, 
                     application);
 
-                //PP: should this be further down in the logic?
-                result.Title = ui.Text("sections", application);
+                ////PP: should this be further down in the logic?
+                //result.Title = ui.Text("sections", application);
                 return result;
             }
 

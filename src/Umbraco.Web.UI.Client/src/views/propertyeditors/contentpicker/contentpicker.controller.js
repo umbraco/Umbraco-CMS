@@ -5,7 +5,7 @@ angular.module('umbraco')
 	
 	function($scope, dialogService, entityResource, $log, iconHelper){
 		$scope.renderModel = [];
-		$scope.ids = $scope.model.value.split(',');
+		$scope.ids = $scope.model.value ? $scope.model.value.split(',') : [];
 
 
 		//configuration

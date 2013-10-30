@@ -190,7 +190,7 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected bool IsDialog(FormDataCollection queryStrings)
         {
-            return queryStrings.GetValue<bool>(TreeQueryStringParameters.DialogMode);
+            return queryStrings.GetValue<bool>(TreeQueryStringParameters.IsDialog);
         }
 
         /// <summary>

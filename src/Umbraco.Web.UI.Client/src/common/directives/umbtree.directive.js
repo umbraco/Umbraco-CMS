@@ -17,6 +17,7 @@ angular.module("umbraco.directives")
         showoptions: '@',
         showheader: '@',
         cachekey: '@',
+        isdialog: '@',
         eventhandler: '='
       },
 
@@ -42,7 +43,7 @@ angular.module("umbraco.directives")
 
         element.replaceWith(template);
 
-        return function (scope, element, attrs, controller) {
+        return function (scope, elem, attr, controller) {
 
             //flag to track the last loaded section when the tree 'un-loads'. We use this to determine if we should
             // re-load the tree again. For example, if we hover over 'content' the content tree is shown. Then we hover
@@ -109,7 +110,7 @@ angular.module("umbraco.directives")
                     enableDeleteAnimations = false;
 
                     //use $q.when because a promise OR raw data might be returned.
-                    $q.when(treeService.getTree({ section: scope.section, tree: scope.treealias, cachekey: scope.cachekey }))
+                    $q.when(treeService.getTree({ section: scope.section, tree: scope.treealias, cachekey: scope.cachekey, isDialog: scope.isdialog ? scope.isdialog : false }))
                         .then(function (data) {
                             //set the data once we have it
                             scope.tree = data;
