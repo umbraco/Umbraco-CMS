@@ -30,23 +30,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberGroupPickerControlle
             }
         }
 
-        $scope.performSearch = function() {
-            if ($scope.term) {
-                if ($scope.oldTerm !== $scope.term) {
-                    $scope.results = [];
-                    searchService.searchMembers({ term: $scope.term }).then(function(data) {
-                        $scope.results = data;
-                    });
-                    $scope.showSearch = true;
-                    $scope.oldTerm = $scope.term;
-                }
-            }
-            else {
-                $scope.oldTerm = "";
-                $scope.showSearch = false;
-                $scope.results = [];
-            }
-        };
+
 
         /** method to select a search result */
         $scope.selectResult = function(result) {
@@ -58,11 +42,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberGroupPickerControlle
             args.event.preventDefault();
             args.event.stopPropagation();
 
-            if (args.node.nodeType === "member-folder") {
-                return;
-            }
 
-            eventsService.publish("Umbraco.Dialogs.MemberPickerController.Select", args).then(function(a) {
+            eventsService.publish("Umbraco.Dialogs.MemberGroupPickerController.Select", args).then(function(a) {
 
                 //This is a tree node, so we don't have an entity to pass in, it will need to be looked up
                 //from the server in this method.
