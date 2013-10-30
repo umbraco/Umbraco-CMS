@@ -20,7 +20,7 @@
     <umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient" Priority="5" />
 
 </head>
-<body>
+<body style="overflow: visible">
     <form id="form1" runat="server">
     <div>
             <asp:PlaceHolder ID="container" runat="server" />    

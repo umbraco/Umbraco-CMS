@@ -19,9 +19,8 @@
                         <div class="span12 umb-dashboard-control clearfix" 
                             ng-switch-when="true">
                             <h3 ng-show="property.caption">{{property.caption}}</h3>
-                            <iframe 
-                                style="min-height: 600px; max-height: 90%;" 
-                                resize-to-content ng-src="dashboard/usercontrolproxy.aspx?ctrl={{ property.path}}"></iframe>
+                            
+                            <iframe ng-src="dashboard/usercontrolproxy.aspx?ctrl={{ property.path}}"></iframe>
                         </div>
 
                    	</div>
