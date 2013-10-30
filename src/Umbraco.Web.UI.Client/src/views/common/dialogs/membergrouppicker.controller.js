@@ -8,6 +8,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberGroupPickerControlle
         /** Method used for selecting a node */
         function select(text, id, entity) {
 
+           
             $scope.showSearch = false;
             $scope.results = [];
             $scope.term = "";
@@ -17,26 +18,11 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberGroupPickerControlle
                 $scope.select(id);
             }
             else {
-                //if an entity has been passed in, use it
-                if (entity) {
-                    $scope.submit(entity);
-                }
-                else {
-                    //otherwise we have to get it from the server
-                    entityResource.getById(id, "Member").then(function (ent) {
-                        $scope.submit(ent);
-                    });
-                }
+                $scope.submit(id);
+               
             }
         }
 
-
-
-        /** method to select a search result */
-        $scope.selectResult = function(result) {
-            //since result = an entity, we'll pass it in so we don't have to go back to the server
-            select(result.name, result.id, result);
-        };
 
         $scope.dialogTreeEventHandler.bind("treeNodeSelect", function(ev, args) {
             args.event.preventDefault();
