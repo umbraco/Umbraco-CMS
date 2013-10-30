@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper) {
+function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, navigationService, localizationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper) {
     
     if ($routeParams.create) {
         //we are creating so get an empty content item
@@ -31,8 +31,22 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
+
+
+                contentResource.checkPermission("P", $routeParams.id).then(function(hasPermission){
+                    var key = "buttons_sendToPublish"
+                    if(hasPermission){
+                        key = "buttons_saveAndPublish";
+                    }
+                    
+                    localizationService.localize(key).then(function(label){
+                        $scope.publishButtonLabel = label;
+                    });
+                });
+
             });
     }
+
 
     $scope.unPublish = function () {
         
