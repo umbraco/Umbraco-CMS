@@ -474,13 +474,17 @@ function iconHelper($q) {
         /** If the icon is file based (i.e. it has a file path) */
         isFileBasedIcon: function (icon) {
             //if it doesn't start with a '.' but contains one then we'll assume it's file based
-            if (!icon.startsWith('.') && icon.indexOf('.') > 1) {
+            if (icon.startsWith('..') || (!icon.startsWith('.') && icon.indexOf('.') > 1)) {
                 return true;
             }
             return false;
         },
         /** If the icon is legacy */
         isLegacyIcon: function (icon) {
+            if(icon.startsWith('..')){
+                return false;
+            }
+
             if (icon.startsWith('.')) {
                 return true;
             }

@@ -104,6 +104,11 @@ namespace Umbraco.Web.Models.Trees
                 {
                     return true;
                 }
+
+                if (Icon.StartsWith(".."))
+                    return false;
+
+
                 //if it starts with a '.' or doesn't contain a '.' at all then it is a class
                 return Icon.StartsWith(".") || Icon.Contains(".") == false;
             }
