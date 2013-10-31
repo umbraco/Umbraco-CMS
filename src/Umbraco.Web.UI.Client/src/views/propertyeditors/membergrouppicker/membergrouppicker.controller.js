@@ -7,7 +7,7 @@ angular.module('umbraco')
 		$scope.renderModel = [];
 		$scope.ids = $scope.model.value.split(',');
 
-		$scope.cfg = {multiPicker: false, entityType: "MemberGroup", type: "membergroup", treeAlias: "memberGroup", filter: ""};
+		$scope.cfg = {multiPicker: true, entityType: "MemberGroup", type: "membergroup", treeAlias: "memberGroup", filter: ""};
 		if($scope.model.config){
 			$scope.cfg = angular.extend($scope.cfg, $scope.model.config);
 		}
