@@ -11,6 +11,7 @@ using System.Web.UI.WebControls;
 using System.Xml;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
+using Umbraco.Web.Models;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic.Exceptions;
@@ -162,6 +163,14 @@ namespace umbraco.cms.presentation.user
             var passwordChanger = (passwordChanger) LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx");
             passwordChanger.MembershipProviderName = UmbracoSettings.DefaultBackofficeProvider;
             
+            //This is a hack to allow the admin to change a user's password to whatever they want - this will only work if we are using the
+            // default umbraco membership provider. 
+            // See the notes below in the ChangePassword method.
+            if (BackOfficeProvider is UsersMembershipProvider)
+            {
+                passwordChanger.ShowOldPassword = false;
+            }
+
             //Add a custom validation message for the password changer
             var passwordValidation = new CustomValidator
                 {
@@ -407,6 +416,59 @@ namespace umbraco.cms.presentation.user
         }
 
         /// <summary>
+        /// This handles changing the password
+        /// </summary>
+        /// <param name="passwordChangerControl"></param>
+        /// <param name="membershipUser"></param>
+        /// <param name="passwordChangerValidator"></param>
+        private void ChangePassword(passwordChanger passwordChangerControl, MembershipUser membershipUser, CustomValidator passwordChangerValidator)
+        {
+            if (passwordChangerControl.IsChangingPassword)
+            {
+                //SD: not sure why this check is here but must have been for some reason at some point?
+                if (string.IsNullOrEmpty(passwordChangerControl.ChangingPasswordModel.NewPassword) == false)
+                {
+                    // make sure password is not empty
+                    if (string.IsNullOrEmpty(u.Password)) u.Password = "default";
+                }
+
+                var changePasswordModel = passwordChangerControl.ChangingPasswordModel;
+
+                // Is it using the default membership provider
+                if (BackOfficeProvider is UsersMembershipProvider)
+                {
+                    //This is a total hack so that an admin can change the password without knowing the previous one
+                    // we do this by simply passing in the already stored hashed/encrypted password in the database - 
+                    // this shouldn't be allowed but to maintain backwards compatibility we need to do this because
+                    // this logic was previously allowed.
+
+                    //For this editor, we set the passwordChanger.ShowOldPassword = false so that the old password
+                    // field doesn't appear because we know we are going to manually set it here.
+                    // We'll change the model to have the already encrypted password stored in the db and that will continue to validate.
+                    changePasswordModel.OldPassword = u.Password;
+                }
+
+                //now do the actual change
+                var changePassResult = UmbracoContext.Current.Security.ChangePassword(
+                    membershipUser.UserName, changePasswordModel, BackOfficeProvider);    
+
+                if (changePassResult.Success)
+                {
+                    //if it is successful, we need to show the generated password if there was one, so set
+                    //that back on the control
+                    passwordChangerControl.ChangingPasswordModel.GeneratedPassword = changePassResult.Result.ResetPassword;
+                }
+                else
+                {
+                    passwordChangerValidator.IsValid = false;
+                    passwordChangerValidator.ErrorMessage = changePassResult.Result.ChangeError.ErrorMessage;
+                    passw.Controls[1].Visible = true;
+                }
+
+            }
+        }
+
+        /// <summary>
         /// Handles the Click event of the saveUser control.
         /// </summary>
         /// <param name="sender">The source of the event.</param>
@@ -426,32 +488,8 @@ namespace umbraco.cms.presentation.user
                     var passwordChangerControl = (passwordChanger) passw.Controls[0];
                     var passwordChangerValidator = (CustomValidator) passw.Controls[1].Controls[0].Controls[0];
 
-                    if (passwordChangerControl.IsChangingPassword)
-                    {
-                        //SD: not sure why this check is here but must have been for some reason at some point?
-                        if (string.IsNullOrEmpty(passwordChangerControl.ChangingPasswordModel.NewPassword) == false)
-                        {
-                            // make sure password is not empty
-                            if (string.IsNullOrEmpty(u.Password)) u.Password = "default";                            
-                        }
-
-                        var changePassResult = UmbracoContext.Current.Security.ChangePassword(
-                            membershipUser.UserName, passwordChangerControl.ChangingPasswordModel, BackOfficeProvider);    
-
-                        if (changePassResult.Success)
-                        {
-                            //if it is successful, we need to show the generated password if there was one, so set
-                            //that back on the control
-                            passwordChangerControl.ChangingPasswordModel.GeneratedPassword = changePassResult.Result.ResetPassword;
-                        }
-                        else
-                        {
-                            passwordChangerValidator.IsValid = false;
-                            passwordChangerValidator.ErrorMessage = changePassResult.Result.ChangeError.ErrorMessage;
-                            passw.Controls[1].Visible = true;
-                        }
-
-                    }
+                    //perform the changing password logic
+                    ChangePassword(passwordChangerControl, membershipUser, passwordChangerValidator);
                     
                     // Is it using the default membership provider
                     if (BackOfficeProvider is UsersMembershipProvider)

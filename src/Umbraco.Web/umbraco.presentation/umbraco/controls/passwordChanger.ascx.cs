@@ -24,21 +24,27 @@ namespace umbraco.controls
             get { return Membership.Providers[MembershipProviderName]; }
         }
 
+        private bool? _showOldPassword;
+
         /// <summary>
         /// Determines whether to show the old password field or not
         /// </summary>
-        protected bool ShowOldPassword
+        internal protected bool ShowOldPassword
         {
             get
             {
-                var umbProvider = Provider as MembershipProviderBase;
-                if (umbProvider != null && umbProvider.AllowManuallyChangingPassword)
+                if (_showOldPassword.HasValue == false)
                 {
-                    return false;
+                    var umbProvider = Provider as MembershipProviderBase;
+                    if (umbProvider != null && umbProvider.AllowManuallyChangingPassword)
+                    {
+                        return false;
+                    }
+                    _showOldPassword = Provider.EnablePasswordRetrieval == false;    
                 }
-
-                return Provider.EnablePasswordRetrieval == false;                
+                return _showOldPassword.Value;
             }
+            internal set { _showOldPassword = value; }
         }
 
         public bool IsChangingPassword

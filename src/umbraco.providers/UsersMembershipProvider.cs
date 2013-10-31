@@ -18,6 +18,7 @@ namespace umbraco.providers
     /// </summary>
     public class UsersMembershipProvider : MembershipProviderBase
     {
+        
         /// <summary>
         /// Override to maintain backwards compatibility with 0 required non-alphanumeric chars
         /// </summary>
@@ -451,22 +452,34 @@ namespace umbraco.providers
         /// </returns>
         public override bool ValidateUser(string username, string password)
         {
-            // we need to wrap this in a try/catch as passing a non existing 
-            // user will throw an exception
-            try
+            var userId = User.getUserId(username);
+            if (userId != -1)
             {
-                var user = new User(username);
-                if (user.Id != -1)
+                var user = User.GetUser(userId);
+                if (user != null)
                 {
-                    return user.Disabled == false && user.ValidatePassword(EncryptOrHashExistingPassword(password));
+                    if (user.Disabled)
+                    {
+                        return false;
+                    }
+
+                    //Due to the way this legacy provider worked, when it 'validated' a password passed in, it would allow 
+                    // having the already hashed/encrypted password checked directly - this is bad but hey, we gotta support legacy
+                    // don't we.
+
+                    //So, first we'll check if the user object's db stored password (already hashed/encrypted in the db) matches the password that
+                    // has been passed in, if so then we will confirm that it is valid. If it doesn't we'll attempt to hash/encrypt the passed in 
+                    // password and then validate it - the way it is supposed to be done.
+                    
+                    if (user.Password == password)
+                    {
+                        return true;
+                    }
+
+                    return user.ValidatePassword(EncryptOrHashExistingPassword(password));    
                 }
-                return false;
             }
-            catch
-            {
-                //the user doesn't exist
-                return false;
-            }
+            return false;
         }
         #endregion
 
