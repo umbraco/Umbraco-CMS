@@ -145,6 +145,10 @@ namespace Umbraco.Core.Models.PublishedContent
                 ? (IContentTypeComposition) ApplicationContext.Current.Services.ContentTypeService.GetContentType(alias)
                 : (IContentTypeComposition) ApplicationContext.Current.Services.ContentTypeService.GetMediaType(alias);
 
+            if (contentType == null)
+                throw new Exception(string.Format("ContentTypeService failed to find a {0} type with alias \"{1}\".",
+                    itemType.ToString().ToLower(), alias));
+
             return new PublishedContentType(contentType);
         }
 
