@@ -3,11 +3,22 @@
 angular.module('umbraco')
 .controller("Umbraco.PropertyEditors.MemberGroupPickerController",
 	
-	function($scope, dialogService, entityResource, $log, iconHelper){
+	function($scope, dialogService){
 		$scope.renderModel = [];
-		$scope.ids = $scope.model.value.split(',');
+		$scope.ids = [];
 
-		$scope.cfg = {multiPicker: true, entityType: "MemberGroup", type: "membergroup", treeAlias: "memberGroup", filter: ""};
+		
+	    
+	    if ($scope.model.value) {
+	        $scope.ids = $scope.model.value.split(',');
+
+	        $($scope.ids).each(function (i, item) {
+	           
+	            $scope.renderModel.push({ name: item, id: item, icon: 'icon-users' });
+	        });
+	    }
+	    
+	    $scope.cfg = {multiPicker: true, entityType: "MemberGroup", type: "membergroup", treeAlias: "memberGroup", filter: ""};
 		if($scope.model.config){
 			$scope.cfg = angular.extend($scope.cfg, $scope.model.config);
 		}
@@ -48,18 +59,6 @@ angular.module('umbraco')
 	        $scope.ids = [];
 	    };
 	   
-
-	    $scope.sortableOptions = {
-	        update: function(e, ui) {
-	        	var r = [];
-	        	angular.forEach($scope.renderModel, function(value, key){
-	        		r.push(value.id);
-	        	});
-
-	        	$scope.ids = r;
-	        	$scope.model.value = trim($scope.ids.join(), ",");
-	        }
-	    };
 
 
 	    $scope.$on("formSubmitting", function (ev, args) {
