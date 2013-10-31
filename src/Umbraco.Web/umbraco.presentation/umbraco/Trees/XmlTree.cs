@@ -199,9 +199,12 @@ namespace umbraco.cms.presentation.Trees
 			xNode.Menu = bTree.RootNodeActions.FindAll(delegate(IAction a) { return true; }); //return a duplicate copy of the list
 			xNode.NodeType = bTree.TreeAlias;
 			xNode.Text = BaseTree.GetTreeHeader(bTree.TreeAlias);
-			//by default, all root nodes will open the dashboard to their application
-			xNode.Action = "javascript:" + ClientTools.Scripts.OpenDashboard(bTree.app);
-			xNode.IsRoot = true;
+			
+            // By default the action from the trees.config will be used, if none is specified then the apps dashboard will be used.
+            var appTreeItem = umbraco.BusinessLogic.ApplicationTree.getByAlias(bTree.TreeAlias);
+            xNode.Action = appTreeItem == null || String.IsNullOrEmpty(appTreeItem.Action) ? "javascript:" + ClientTools.Scripts.OpenDashboard(bTree.app) : "javascript:" + appTreeItem.Action;
+			
+            xNode.IsRoot = true;
 			//generally the tree type and node type are the same but in some cased they are not.
 			xNode.m_treeType = bTree.TreeAlias;
 			return xNode;

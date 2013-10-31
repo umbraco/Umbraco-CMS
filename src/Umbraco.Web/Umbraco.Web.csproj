@@ -295,6 +295,10 @@
     <Compile Include="Controllers\LoginStatusController.cs" />
     <Compile Include="Editors\MediaController.cs" />
     <Compile Include="Models\ChangingPasswordModel.cs" />
+    <Compile Include="Models\IRenderModel.cs" />
+    <Compile Include="Models\RenderModelOfTContent.cs" />
+    <Compile Include="Mvc\UmbracoTemplatePageOfTContent.cs" />
+    <Compile Include="Mvc\UmbracoViewPage.cs" />
     <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Models\PasswordChangedModel.cs" />
@@ -429,7 +433,7 @@
     <Compile Include="Mvc\UmbracoController.cs" />
     <Compile Include="Mvc\UmbracoControllerFactory.cs" />
     <Compile Include="Mvc\UmbracoMvcHandler.cs" />
-    <Compile Include="Mvc\UmbracoViewPage.cs" />
+    <Compile Include="Mvc\UmbracoViewPageOfTModel.cs" />
     <Compile Include="PublishedCache\IPublishedCache.cs" />
     <Compile Include="PublishedCache\IPublishedContentCache.cs" />
     <Compile Include="PublishedCache\IPublishedMediaCache.cs" />
