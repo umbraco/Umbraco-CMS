@@ -182,7 +182,7 @@ namespace Umbraco.Web.Editors
                     },
                     {"isDebuggingEnabled", HttpContext.IsDebuggingEnabled},
                     {
-                        "application", getApplicationState()
+                        "application", GetApplicationState()
                     }
                 };
 
@@ -191,16 +191,15 @@ namespace Umbraco.Web.Editors
         }
 
 
-        private Dictionary<string, object> getApplicationState()
+        private Dictionary<string, object> GetApplicationState()
         {
-            if (!ApplicationContext.IsConfigured)
+            if (ApplicationContext.IsConfigured == false)
                 return null;
 
-            var app = new Dictionary<string, object>();
-            app.Add("assemblyVersion", UmbracoVersion.AssemblyVersion);
-            app.Add("isReady", ApplicationContext.IsReady);
-            app.Add("isConfigured", ApplicationContext.IsConfigured);
-            app.Add("isDatabaseConfigured", ApplicationContext.DatabaseContext.IsDatabaseConfigured);
+            var app = new Dictionary<string, object>
+                {
+                    {"assemblyVersion", UmbracoVersion.AssemblyVersion}
+                };
 
             var version = string.IsNullOrEmpty(UmbracoVersion.CurrentComment)
                             ? UmbracoVersion.Current.ToString(3)
