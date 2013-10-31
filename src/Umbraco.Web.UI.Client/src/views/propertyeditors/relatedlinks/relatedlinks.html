@@ -16,8 +16,19 @@
                         <input type="text" ng-model="link.caption" ng-show="link.edit"/>
                     </td>
                     <td>
-                        <a href="{{link.link}}" target="_blank" ng-show="!link.edit">{{link.link}}</a>
-                         <input type="text" ng-model="link.link" ng-show="link.edit"/>
+                        <a href="{{link.link}}" target="_blank" ng-show="!link.edit && !link.isInternal">{{link.link}}</a>
+                        <a href="#/content/content/edit/{{link.internal}}" target="_blank" ng-show="!link.edit && link.isInternal">{{link.internalName}}</a>
+                        <div ng-show="link.edit">
+                            <div ng-show="!link.isInternal">
+                                <input type="text" ng-model="link.link"/><br />
+                                or <a href="#" ng-click="switchLinkType($event,link)">choose internal page</a>
+                            </div>
+                            
+                            <div ng-show="link.isInternal">
+                                <span ng-bind="link.internalName"></span> <a href="#" ng-click="selectInternal($event,link)">Choose</a><br/>
+                                or <a href="#" ng-click="switchLinkType($event,link)">enter external link</a>
+                            </div>
+                        </div>
                     </td>
                     <td>
                         <span ng-show="!link.edit">{{link.newWindow}}</span>
@@ -33,14 +44,15 @@
                             <button type="button" class="btn btn-default" ng-click="cancelEdit($index)">Cancel</button>
                             <button type="button" class="btn btn-default" ng-click="cancelEdit($index)">Save</button>
                         </div>
+                        
                     </td>
                 </tr>
                 <tr>
                     <form ng-submit="add()">
-                    <td><input type="text" ng-model="newCaption" placeholder="Enter a new caption" required/></td>
+                    <td><input type="text" ng-model="newCaption" placeholder="Enter a new caption" val-highlight="hasError"/></td>
                         <td>
                             <div ng-show="addExternal">
-                                <input type="text" ng-model="newLink" placeholder="Enter the link" required/>
+                                <input type="text" ng-model="newLink" placeholder="Enter the link"/>
                                 <br/> or
                                 <a href="#" ng-click="switch($event)">choose internal page</a>
                             </div>
