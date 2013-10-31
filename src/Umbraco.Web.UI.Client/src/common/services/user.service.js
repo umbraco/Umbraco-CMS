@@ -105,6 +105,8 @@ angular.module('umbraco.services')
     
     /** Called to update the current user's timeout */
     function setUserTimeoutInternal(newTimeout) {
+
+
         var asNumber = parseFloat(newTimeout);
         if (!isNaN(asNumber) && currentUser && angular.isNumber(asNumber)) {
             currentUser.remainingAuthSeconds = newTimeout;
@@ -118,7 +120,11 @@ angular.module('umbraco.services')
         if (currentUser && currentUser.id !== undefined) {
             lastUserId = currentUser.id;
         }
-        currentUser.remainingAuthSeconds = 0;
+
+        if(currentUser){
+            currentUser.remainingAuthSeconds = 0;
+        }
+        
         lastServerTimeoutSet = null;
         currentUser = null;
         

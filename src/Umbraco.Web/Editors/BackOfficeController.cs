@@ -180,12 +180,36 @@ namespace Umbraco.Web.Editors
                                 {"trees", GetTreePluginsMetaData()}
                             }
                     },
-                    {"isDebuggingEnabled", HttpContext.IsDebuggingEnabled}
+                    {"isDebuggingEnabled", HttpContext.IsDebuggingEnabled},
+                    {
+                        "application", getApplicationState()
+                    }
                 };
+
 
             return JavaScript(ServerVariablesParser.Parse(d));
         }
 
+
+        private Dictionary<string, object> getApplicationState()
+        {
+            if (!ApplicationContext.IsConfigured)
+                return null;
+
+            var app = new Dictionary<string, object>();
+            app.Add("assemblyVersion", UmbracoVersion.AssemblyVersion);
+            app.Add("isReady", ApplicationContext.IsReady);
+            app.Add("isConfigured", ApplicationContext.IsConfigured);
+            app.Add("isDatabaseConfigured", ApplicationContext.DatabaseContext.IsDatabaseConfigured);
+
+            var version = string.IsNullOrEmpty(UmbracoVersion.CurrentComment)
+                            ? UmbracoVersion.Current.ToString(3)
+                            : string.Format("{0}-{1}", UmbracoVersion.Current.ToString(3), UmbracoVersion.CurrentComment);
+
+            app.Add("version", version);
+
+            return app;
+        }
         
 
         private IEnumerable<Dictionary<string, string>> GetTreePluginsMetaData()

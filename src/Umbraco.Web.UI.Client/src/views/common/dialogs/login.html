@@ -1,6 +1,16 @@
 ﻿<form name="loginForm" ng-submit="loginSubmit(login, password)" ng-controller="Umbraco.Dialogs.LoginController">
     <div id="login" class="umb-modalcolumn" ng-class="{'show-validation': loginForm.$invalid}">
-        <div class="form">
+        
+        <div class="form" ng-show="missingConfiguration">
+            <h1>Umbraco has not yet been installed, 
+                or you need to perform an upgrade.
+                Please open the umbraco installer
+            </h1>
+
+            <a href="../install" class="btn">Open installer</a>
+        </div>
+
+        <div class="form" ng-hide="missingConfiguration">
             <h1>Happy {{today}}!</h1>
             <p><span ng-show="dialogData.isTimedOut">Session timed out. </span>Log in below</p>
 

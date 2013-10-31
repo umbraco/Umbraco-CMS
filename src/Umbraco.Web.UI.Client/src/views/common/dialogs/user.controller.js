@@ -3,6 +3,8 @@ angular.module("umbraco")
        
         $scope.user = userService.getCurrentUser();
         $scope.history = historyService.current;
+        $scope.version = Umbraco.Sys.ServerVariables.application.version + " assembly: " + Umbraco.Sys.ServerVariables.application.assemblyVersion;
+
 
         $scope.logout = function () {
             userService.logout().then(function () {
