@@ -52,7 +52,7 @@ angular.module('umbraco.mocks').
                     owner: { name: "Administrator", id: 0 },
                     updater: { name: "Per Ploug Krogslund", id: 1 },
                     path: "-1,1234,2455",
-                    
+                    allowedActions: ["U", "H", "A"],
                     tabs: [
                     {
                         label: "Child documents",
