@@ -1,5 +1,5 @@
 ﻿<?xml version='1.0' encoding='utf-8'?>
-<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="umbraco.presentation.Properties" GeneratedClassName="Settings">
+<SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="Umbraco.Web.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
     <Setting Name="umbraco_com_regexlib_Webservices" Type="System.String" Scope="Application">
@@ -10,6 +10,9 @@
     </Setting>
     <Setting Name="test" Type="System.String" Scope="Application">
       <Value Profile="(Default)">Somthing</Value>
+    </Setting>
+    <Setting Name="umbraco_org_umbraco_our_Repository" Type="(Web Service URL)" Scope="Application">
+      <Value Profile="(Default)">http://our.umbraco.org/umbraco/webservices/api/repository.asmx</Value>
     </Setting>
   </Settings>
 </SettingsFile>
