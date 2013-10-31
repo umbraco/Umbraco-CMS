@@ -315,7 +315,7 @@ namespace Umbraco.Web.Editors
         /// does not have Publish access to this node.
         /// </remarks>
         /// 
-        [EnsureUserPermissionForContent("id", 'P')]
+        [EnsureUserPermissionForContent("id", 'U')]
         public HttpResponseMessage PostPublishById(int id)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));

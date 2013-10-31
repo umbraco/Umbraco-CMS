@@ -95,6 +95,13 @@ function formHelper(angularHelper, serverValidationManager, $timeout, notificati
                 throw "args.scope cannot be null";
             }
             
+            //if no statusPropertyName is set we'll default to formStatus.
+            if (!args.statusPropertyName) {
+                args.statusPropertyName = "formStatus";
+            }
+            //clear the status
+            args.scope[args.statusPropertyName] = null;
+
             if (angular.isArray(args.notifications)) {
                 for (var i = 0; i < args.notifications.length; i++) {
                     notificationsService.showNotification(args.notifications[i]);
