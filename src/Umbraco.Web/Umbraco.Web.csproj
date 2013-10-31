@@ -419,6 +419,9 @@
     <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\dialogs\cruds.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackager.cs" />
     <Compile Include="WebApi\Binders\MemberBinder.cs" />
     <Compile Include="WebApi\ControllerContextExtensions.cs" />
@@ -1301,13 +1304,6 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\create.aspx.designer.cs">
       <DependentUpon>create.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\cruds.aspx.cs">
-      <DependentUpon>cruds.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\cruds.aspx.designer.cs">
-      <DependentUpon>cruds.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\emptyTrashcan.aspx.cs">
       <DependentUpon>emptyTrashcan.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1851,9 +1847,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\create.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\cruds.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\emptyTrashcan.aspx" />
