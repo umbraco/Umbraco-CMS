@@ -52,6 +52,11 @@ namespace Umbraco.Web.Editors
             get { return _userService ?? ApplicationContext.Current.Services.UserService; }
         }
 
+        public override bool AllowMultiple
+        {
+            get { return true; }
+        }
+
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             var contentItem = (ContentItemSave)actionContext.ActionArguments["contentItem"];
@@ -75,8 +80,31 @@ namespace Umbraco.Web.Editors
                     contentToCheck = contentItem.PersistedContent;
                     contentIdToCheck = contentToCheck.Id;
                     break;
+                case ContentSaveAction.SendPublish:
+                    permissionToCheck.Add(ActionToPublish.Instance.Letter);
+                    contentToCheck = contentItem.PersistedContent;
+                    contentIdToCheck = contentToCheck.Id;
+                    break;
                 case ContentSaveAction.SaveNew:
+                    //Save new requires both ActionNew AND ActionUpdate
+
                     permissionToCheck.Add(ActionNew.Instance.Letter);
+                    permissionToCheck.Add(ActionUpdate.Instance.Letter);
+                    if (contentItem.ParentId != Constants.System.Root)
+                    {
+                        contentToCheck = ContentService.GetById(contentItem.ParentId);
+                        contentIdToCheck = contentToCheck.Id;
+                    }
+                    else
+                    {
+                        contentIdToCheck = contentItem.ParentId;
+                    }
+                    break;
+                case ContentSaveAction.SendPublishNew:
+                    //Send new requires both ActionToPublish AND ActionUpdate
+
+                    permissionToCheck.Add(ActionNew.Instance.Letter);
+                    permissionToCheck.Add(ActionToPublish.Instance.Letter);
                     if (contentItem.ParentId != Constants.System.Root)
                     {
                         contentToCheck = ContentService.GetById(contentItem.ParentId);

@@ -209,10 +209,9 @@ namespace Umbraco.Web.Editors
             //      then we cannot continue saving, we can only display errors
             // * If there are validation errors and they were attempting to publish, we can only save, NOT publish and display 
             //      a message indicating this
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid == false)
             {
-                if (ValidationHelper.ModelHasRequiredForPersistenceErrors(contentItem)
-                    && (contentItem.Action == ContentSaveAction.SaveNew || contentItem.Action == ContentSaveAction.PublishNew))
+                if (ValidationHelper.ModelHasRequiredForPersistenceErrors(contentItem) && IsCreatingAction(contentItem.Action))
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the modelstate to the outgoing object and throw a validation message
@@ -242,6 +241,10 @@ namespace Umbraco.Web.Editors
                 //save the item
                 Services.ContentService.Save(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
             }
+            else if (contentItem.Action == ContentSaveAction.SendPublish || contentItem.Action == ContentSaveAction.SendPublishNew)
+            {
+                throw new NotSupportedException("Send to publish is currently not supported");   
+            }
             else
             {
                 //publish the item and check if it worked, if not we will show a diff msg below
@@ -262,9 +265,13 @@ namespace Umbraco.Web.Editors
                 case ContentSaveAction.SaveNew:
                     display.AddSuccessNotification(ui.Text("speechBubbles", "editContentSavedHeader"), ui.Text("speechBubbles", "editContentSavedText"));
                     break;
+                case ContentSaveAction.SendPublish:
+                case ContentSaveAction.SendPublishNew:
+                    display.AddSuccessNotification(ui.Text("speechBubbles", "editContentSendToPublish"), ui.Text("speechBubbles", "editContentSendToPublishText"));
+                    break;
                 case ContentSaveAction.Publish:
                 case ContentSaveAction.PublishNew:
-                    ShowMessageForStatus(publishStatus.Result, display);
+                    ShowMessageForPublishStatus(publishStatus.Result, display);
                     break;
             }
 
@@ -553,7 +560,7 @@ namespace Umbraco.Web.Editors
             return toMove;
         }
 
-        private void ShowMessageForStatus(PublishStatus status, ContentItemDisplay display)
+        private void ShowMessageForPublishStatus(PublishStatus status, ContentItemDisplay display)
         {
             switch (status.StatusType)
             {

@@ -159,5 +159,15 @@ namespace Umbraco.Web.Editors
                        : (TPersisted) Request.Properties[typeof (TPersisted).ToString()];
         } 
 
+        /// <summary>
+        /// Returns true if the action passed in means we need to create something new
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        internal static bool IsCreatingAction(ContentSaveAction action)
+        {
+            return (action.ToString().EndsWith("New"));
+        }
+
     }
 }

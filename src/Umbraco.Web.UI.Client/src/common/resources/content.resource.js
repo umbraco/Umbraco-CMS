@@ -564,6 +564,10 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
         publish: function (content, isNew, files) {
             return saveContentItem(content, "publish" + (isNew ? "New" : ""), files);
         },
+        
+        sendToPublish: function (content, isNew, files) {
+            return saveContentItem(content, "sendPublish" + (isNew ? "New" : ""), files);
+        },
 
         publishById: function(id){
 

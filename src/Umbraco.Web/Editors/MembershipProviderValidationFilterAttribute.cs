@@ -74,8 +74,6 @@ namespace Umbraco.Web.Editors
                         return false;
                     }
                     break;
-                case ContentSaveAction.Publish:
-                case ContentSaveAction.PublishNew:
                 default:
                     //we don't support this for members
                     throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -120,8 +118,6 @@ namespace Umbraco.Web.Editors
                         return false;
                     }
                     break;
-                case ContentSaveAction.Publish:
-                case ContentSaveAction.PublishNew:
                 default:
                     //we don't support this for members
                     throw new HttpResponseException(HttpStatusCode.NotFound);

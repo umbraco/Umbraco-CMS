@@ -73,7 +73,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
                 return {
                     letter: ch,
                     labelKey: "buttons_saveToPublish",
-                    handler: $scope.saveAndPublish,
+                    handler: $scope.sendToPublish,
                     hotKey: "ctrl+t"
                 };
             case "A":
@@ -96,6 +96,45 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
         }
     }
     
+    /** This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish */
+    function performSave(args) {
+        var deferred = $q.defer();
+
+        if (formHelper.submitForm({ scope: $scope, statusMessage: args.statusMessage })) {
+
+            args.saveMethod($scope.content, $routeParams.create, fileManager.getFiles())
+                .then(function (data) {
+
+                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
+
+                    contentEditingHelper.handleSuccessfulSave({
+                        scope: $scope,
+                        newContent: data,
+                        rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
+                    });
+
+                    configureButtons(data);
+
+                    navigationService.syncPath(data.path.split(","), true);
+
+                    deferred.resolve(data);
+                    
+                }, function (err) {
+                    contentEditingHelper.handleSaveError({
+                        err: err,
+                        allNewProps: contentEditingHelper.getAllProps(err.data),
+                        allOrigProps: contentEditingHelper.getAllProps($scope.content)
+                    });
+
+                    deferred.reject(err);
+                });
+        }
+        else {
+            deferred.reject();
+        }
+
+        return deferred.promise;
+    }
 
     if ($routeParams.create) {
         //we are creating so get an empty content item
@@ -151,36 +190,16 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
         
     };
 
+    $scope.sendToPublish = function() {
+        return performSave({ saveMethod: contentResource.sendToPublish, statusMessage: "Sending..." });
+    };
+
     $scope.saveAndPublish = function() {
+        return performSave({ saveMethod: contentResource.publish, statusMessage: "Publishing..." });        
+    };
 
-        if (formHelper.submitForm({ scope: $scope, statusMessage: "Publishing..." })) {
-            
-            contentResource.publish($scope.content, $routeParams.create, fileManager.getFiles())
-                .then(function(data) {
-
-                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
-
-                    contentEditingHelper.handleSuccessfulSave({
-                        scope: $scope,
-                        newContent: data,
-                        rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
-                    });
-
-                    configureButtons(data);
-
-                    navigationService.syncPath(data.path.split(","), true);
-
-                }, function(err) {
-
-                    contentEditingHelper.handleSaveError({
-                        err: err,
-                        redirectOnFailure: true,
-                        allNewProps: contentEditingHelper.getAllProps(err.data),
-                        rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
-                    });
-                });
-        }
-
+    $scope.save = function () {
+        return performSave({ saveMethod: contentResource.save, statusMessage: "Saving..." });
     };
 
     $scope.preview = function(content){
@@ -192,46 +211,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
                 $window.open('dialogs/preview.aspx?id='+content.id,'umbpreview');
             }    
     };
-
-    $scope.save = function() {
-        var deferred = $q.defer();
-
-        if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
-
-            contentResource.save($scope.content, $routeParams.create, fileManager.getFiles())
-                .then(function(data) {
-
-                    formHelper.resetForm({ scope: $scope, notifications: data.notifications });
-
-                    contentEditingHelper.handleSuccessfulSave({
-                        scope: $scope,
-                        newContent: data,
-                        rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
-                    });
-
-                    configureButtons(data);
-
-                    //fetch tree
-                    navigationService.syncPath(data.path.split(","), true);
-
-                    deferred.resolve(data);
-                }, function(err) {
-                    contentEditingHelper.handleSaveError({
-                        err: err,
-                        allNewProps: contentEditingHelper.getAllProps(err.data),
-                        allOrigProps: contentEditingHelper.getAllProps($scope.content)
-                    });
-
-                    deferred.reject(err);
-                });
-        }
-        else {
-            deferred.reject();
-        }
-
-        return deferred.promise;
-    };
-
+    
     /** this method is called for all action buttons and then we proxy based on the btn definition */
     $scope.performAction = function(btn) {
         if (!btn || !angular.isFunction(btn.handler)) {

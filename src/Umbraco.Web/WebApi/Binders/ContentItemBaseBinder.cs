@@ -18,6 +18,7 @@ using Newtonsoft.Json.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
@@ -163,15 +164,15 @@ namespace Umbraco.Web.WebApi.Binders
                     });
             }
 
-            if (model.Action == ContentSaveAction.Publish || model.Action == ContentSaveAction.Save)
-            {
-                //finally, let's lookup the real content item and create the DTO item
-                model.PersistedContent = GetExisting(model);
-            }
-            else
+            if (ContentControllerBase.IsCreatingAction(model.Action))
             {
                 //we are creating new content                          
                 model.PersistedContent = CreateNew(model);
+            }
+            else
+            {
+                //finally, let's lookup the real content item and create the DTO item
+                model.PersistedContent = GetExisting(model);                
             }
 
             //create the dto from the persisted model

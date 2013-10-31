@@ -71,8 +71,6 @@ namespace Umbraco.Web.Editors
                     }
 
                     break;
-                case ContentSaveAction.Publish:
-                case ContentSaveAction.PublishNew:
                 default:
                     //we don't support this for media
                     actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.NotFound);
