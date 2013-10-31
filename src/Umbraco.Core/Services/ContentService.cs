@@ -1228,18 +1228,20 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to send to publication</param>
         /// <param name="userId">Optional Id of the User issueing the send to publication</param>
         /// <returns>True if sending publication was succesfull otherwise false</returns>
-        internal bool SendToPublication(IContent content, int userId = 0)
+        public bool SendToPublication(IContent content, int userId = 0)
         {
 
             if (SendingToPublish.IsRaisedEventCancelled(new SendToPublishEventArgs<IContent>(content), this))
                 return false;
 
-            //TODO: Do some stuff here.. RunActionHandlers
+            //TODO: Do some stuff here.. ... what is it supposed to do ?
+            // pretty sure all that legacy stuff did was raise an event? and we no longer have IActionHandlers so no worries there.
 
             SentToPublish.RaiseEvent(new SendToPublishEventArgs<IContent>(content, false), this);
 
             Audit.Add(AuditTypes.SendToPublish, "Send to Publish performed by user", content.WriterId, content.Id);
 
+            //TODO: will this ever be false??
             return true;
         }
 

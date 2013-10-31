@@ -243,7 +243,7 @@ namespace Umbraco.Web.Editors
             }
             else if (contentItem.Action == ContentSaveAction.SendPublish || contentItem.Action == ContentSaveAction.SendPublishNew)
             {
-                throw new NotSupportedException("Send to publish is currently not supported");   
+                Services.ContentService.SendToPublication(contentItem.PersistedContent, UmbracoUser.Id);
             }
             else
             {

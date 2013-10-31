@@ -754,14 +754,16 @@ namespace umbraco.cms.businesslogic.web
         /// <param name="u">The User</param>
         public bool SendToPublication(User u)
         {
-            SendToPublishEventArgs e = new SendToPublishEventArgs();
+            var e = new SendToPublishEventArgs();
             FireBeforeSendToPublish(e);
-            if (!e.Cancel)
+            if (e.Cancel == false)
             {
-                Log.Add(LogTypes.SendToPublish, u, this.Id, "");
-
-                FireAfterSendToPublish(e);
-                return true;
+                var sent = ApplicationContext.Current.Services.ContentService.SendToPublication(Content, u.Id);
+                if (sent)
+                {
+                    FireAfterSendToPublish(e);
+                    return true;    
+                }
             }
 
             return false;

@@ -12,6 +12,8 @@ namespace Umbraco.Core.Services
     public interface IContentService : IService
     {
 
+        bool SendToPublication(IContent content, int userId = 0);
+
         IEnumerable<IContent> GetByIds(IEnumerable<int> ids);
 
         /// <summary>
