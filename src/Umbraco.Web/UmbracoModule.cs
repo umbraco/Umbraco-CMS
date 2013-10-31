@@ -103,7 +103,10 @@ namespace Umbraco.Web
             //re-write for the default back office path
             if (httpContext.Request.Url.IsDefaultBackOfficeRequest())
             {
-                RewriteToBackOfficeHandler(httpContext);
+                if (EnsureIsConfigured(httpContext, umbracoContext.OriginalRequestUrl))
+                {
+                    RewriteToBackOfficeHandler(httpContext);                    
+                }
                 return;
             }
 
