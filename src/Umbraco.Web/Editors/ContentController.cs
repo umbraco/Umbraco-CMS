@@ -480,7 +480,10 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [EnsureUserPermissionForContent("id", 'Z')]
+        //TODO: Unpublish is NOT an assignable permission therefore this won't work, I'd assume to unpublish you'd need to be able to publish??!
+        // still waiting on feedback from HQ.
+        //[EnsureUserPermissionForContent("id", 'Z')]
+        [EnsureUserPermissionForContent("id", 'U')]
         public ContentItemDisplay PostUnPublish(int id)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
@@ -490,6 +493,9 @@ namespace Umbraco.Web.Editors
 
             Services.ContentService.UnPublish(foundContent);
             var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+
+            content.AddSuccessNotification(ui.Text("content", "unPublish"), ui.Text("speechBubbles", "contentUnpublished"));
+
             return content;
         }
 
@@ -599,7 +605,7 @@ namespace Umbraco.Web.Editors
         /// <param name="userService"></param>
         /// <param name="contentService"></param>
         /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
-        /// <param name="permissionToCheck"></param>
+        /// <param name="permissionsToCheck"></param>
         /// <param name="contentItem">Specifies the already resolved content item to check against</param>
         /// <returns></returns>
         internal static bool CheckPermissions(
@@ -608,7 +614,7 @@ namespace Umbraco.Web.Editors
             IUserService userService,
             IContentService contentService,
             int nodeId,
-            char? permissionToCheck = null,
+            char[] permissionsToCheck = null,
             IContent contentItem = null)
         {
            
@@ -642,19 +648,22 @@ namespace Umbraco.Web.Editors
                 return false;
             }
 
-            if (permissionToCheck.HasValue == false)
+            if (permissionsToCheck == null || permissionsToCheck.Any() == false)
             {
                 return true;
             }
 
             var permission = userService.GetPermissions(user, nodeId).FirstOrDefault();
-            
-            if (permission != null && permission.AssignedPermissions.Contains(permissionToCheck.Value.ToString(CultureInfo.InvariantCulture)))
-            {
-                return true;
-            }
 
-            return false;
+            var allowed = true;
+            foreach (var p in permissionsToCheck)
+            {
+                if (permission == null || permission.AssignedPermissions.Contains(p.ToString(CultureInfo.InvariantCulture)) == false)
+                {
+                    allowed = false;
+                }
+            }
+            return allowed;
         }
 
     }

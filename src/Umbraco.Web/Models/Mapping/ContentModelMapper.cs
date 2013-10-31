@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
@@ -13,6 +14,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco;
 using Umbraco.Web.Routing;
+using umbraco.BusinessLogic.Actions;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -54,6 +56,8 @@ namespace Umbraco.Web.Models.Mapping
                                                            : content.GetContentUrls()))
                   .ForMember(display => display.Properties, expression => expression.Ignore())
                   .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
+                  .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
+                      new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService))))
                   .AfterMap(MapGenericCustomProperties);
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
@@ -156,6 +160,61 @@ namespace Umbraco.Web.Models.Mapping
             }
             return null;
         }
+
+        /// <summary>
+        /// Creates the list of action buttons allowed for this user - Publish, Send to publish, save, unpublish returned as the button's 'letter'
+        /// </summary>
+        private class ActionButtonsResolver : ValueResolver<IContent, IEnumerable<char>>
+        {
+            private readonly Lazy<IUserService> _userService;
+
+            public ActionButtonsResolver(Lazy<IUserService> userService)
+            {
+                _userService = userService;
+            }
+
+            protected override IEnumerable<char> ResolveCore(IContent source)
+            {
+                if (UmbracoContext.Current == null)
+                {
+                    //cannot check permissions without a context
+                    return Enumerable.Empty<char>();
+                }
+                var svc = _userService.Value;
+
+                var permissions = svc.GetPermissions(UmbracoContext.Current.Security.CurrentUser, source.Id)
+                                              .FirstOrDefault();
+                if (permissions == null)
+                {
+                    return Enumerable.Empty<char>();
+                }
+
+                var result = new List<char>();
+
+                //can they publish ?
+                if (permissions.AssignedPermissions.Contains(ActionPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
+                {
+                    result.Add(ActionPublish.Instance.Letter);
+                }
+                //can they send to publish ?
+                if (permissions.AssignedPermissions.Contains(ActionToPublish.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
+                {
+                    result.Add(ActionToPublish.Instance.Letter);
+                }
+                //can they save ?
+                if (permissions.AssignedPermissions.Contains(ActionUpdate.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
+                {
+                    result.Add(ActionUpdate.Instance.Letter);
+                }
+                //can they create ?
+                if (permissions.AssignedPermissions.Contains(ActionNew.Instance.Letter.ToString(CultureInfo.InvariantCulture)))
+                {
+                    result.Add(ActionNew.Instance.Letter);
+                }
+
+                return result;
+            }
+        } 
 
     }
 }

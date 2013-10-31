@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http.Controllers;
@@ -58,25 +59,24 @@ namespace Umbraco.Web.Editors
             //We now need to validate that the user is allowed to be doing what they are doing.
             //Based on the action we need to check different permissions.
             //Then if it is new, we need to lookup those permissions on the parent!
-            char permissionToCheck;
+
+            var permissionToCheck = new List<char>();
             IContent contentToCheck = null;
             int contentIdToCheck;
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
-                    permissionToCheck = ActionUpdate.Instance.Letter;
+                    permissionToCheck.Add(ActionUpdate.Instance.Letter);
                     contentToCheck = contentItem.PersistedContent;
                     contentIdToCheck = contentToCheck.Id;
                     break;
                 case ContentSaveAction.Publish:
-                    permissionToCheck = ActionPublish.Instance.Letter;
+                    permissionToCheck.Add(ActionPublish.Instance.Letter);
                     contentToCheck = contentItem.PersistedContent;
                     contentIdToCheck = contentToCheck.Id;
                     break;
-                case ContentSaveAction.PublishNew:
                 case ContentSaveAction.SaveNew:
-                default:
-                    permissionToCheck = ActionNew.Instance.Letter;
+                    permissionToCheck.Add(ActionNew.Instance.Letter);
                     if (contentItem.ParentId != Constants.System.Root)
                     {
                         contentToCheck = ContentService.GetById(contentItem.ParentId);
@@ -87,6 +87,24 @@ namespace Umbraco.Web.Editors
                         contentIdToCheck = contentItem.ParentId;
                     }
                     break;
+                case ContentSaveAction.PublishNew:
+                    //Publish new requires both ActionNew AND ActionPublish
+
+                    permissionToCheck.Add(ActionNew.Instance.Letter);
+                    permissionToCheck.Add(ActionPublish.Instance.Letter);
+
+                    if (contentItem.ParentId != Constants.System.Root)
+                    {
+                        contentToCheck = ContentService.GetById(contentItem.ParentId);
+                        contentIdToCheck = contentToCheck.Id;
+                    }
+                    else
+                    {
+                        contentIdToCheck = contentItem.ParentId;
+                    }
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             if (ContentController.CheckPermissions(
@@ -95,7 +113,7 @@ namespace Umbraco.Web.Editors
                 UserService,
                 ContentService,
                 contentIdToCheck,
-                permissionToCheck,
+                permissionToCheck.ToArray(),
                 contentToCheck) == false)
             {
                 actionContext.Response = actionContext.Request.CreateUserNoAccessResponse();
