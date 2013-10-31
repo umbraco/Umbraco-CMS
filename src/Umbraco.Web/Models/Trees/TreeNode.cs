@@ -122,9 +122,15 @@ namespace Umbraco.Web.Models.Trees
         {
             get
             {
-                return IconIsClass
-                           ? string.Empty
-                           : IOHelper.ResolveUrl("~/umbraco/images/umbraco/" + Icon);
+                if (IconIsClass)
+                    return string.Empty;
+
+                //absolute path with or without tilde
+                if (Icon.StartsWith("~") || Icon.StartsWith("/"))
+                    return IOHelper.ResolveUrl("~" + Icon.TrimStart('~'));
+
+                //legacy icon path
+                return IOHelper.ResolveUrl("~/umbraco/images/umbraco/" + Icon);
             }
         }
 
