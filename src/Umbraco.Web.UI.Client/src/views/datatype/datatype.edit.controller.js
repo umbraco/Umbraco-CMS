@@ -101,6 +101,8 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
                         }
                     });
 
+                    navigationService.syncPath([String(data.id)]);
+                    
                 }, function(err) {
 
                     //NOTE: in the case of data type values we are setting the orig/new props 

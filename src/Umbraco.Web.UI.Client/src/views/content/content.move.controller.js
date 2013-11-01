@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
-	function ($scope, eventsService, contentResource, $log) {	
+	function ($scope, eventsService, contentResource, navigationService, $log) {	
 	var dialogOptions = $scope.$parent.dialogOptions;
 	
 	$scope.dialogTreeEventHandler = $({});
@@ -27,9 +27,15 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
 
 	$scope.move = function(){
 		contentResource.move({parentId: $scope.target.id, id: node.id})
-			.then(function(){
+			.then(function(path){
 				$scope.error = false;
 				$scope.success = true;
+
+				//reloads the parent
+				navigationService.reloadNode(dialogOptions.currentNode.parent);
+
+				//reloads the target
+				navigationService.syncPath(path, true);
 			},function(err){
 				$scope.success = false;
 				$scope.error = err;

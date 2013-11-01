@@ -458,13 +458,12 @@ namespace Umbraco.Web.Editors
         /// <param name="move"></param>
         /// <returns></returns>
         [EnsureUserPermissionForContent("move.ParentId", 'M')]
-        public HttpResponseMessage PostMove(MoveOrCopy move)
+        public string PostMove(MoveOrCopy move)
         {
             var toMove = ValidateMoveOrCopy(move);
 
             Services.ContentService.Move(toMove, move.ParentId);
-
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return toMove.Path;
         }
 
         /// <summary>
@@ -473,13 +472,12 @@ namespace Umbraco.Web.Editors
         /// <param name="copy"></param>
         /// <returns></returns>
         [EnsureUserPermissionForContent("copy.ParentId", 'C')]
-        public HttpResponseMessage PostCopy(MoveOrCopy copy)
+        public string PostCopy(MoveOrCopy copy)
         {
             var toCopy = ValidateMoveOrCopy(copy);
 
-            Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal);
-
-            return Request.CreateResponse(HttpStatusCode.OK);
+            var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal);
+            return c.Path;
         }
 
         /// <summary>

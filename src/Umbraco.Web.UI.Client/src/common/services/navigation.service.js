@@ -286,6 +286,12 @@ angular.module('umbraco.services')
             }
         },
 
+        reloadNode: function (node) {
+            if(this.ui.treeEventHandler){
+                this.ui.treeEventHandler.reloadNode(node);
+            }
+        },
+
         reloadSection: function (sectionAlias) {
             if(this.ui.treeEventHandler){
                 this.ui.treeEventHandler.clearCache(sectionAlias);
