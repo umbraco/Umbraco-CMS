@@ -481,6 +481,11 @@ namespace Umbraco.Tests.Persistence
             using (Transaction transaction = Database.GetTransaction())
             {
                 Database.CreateTable<NodeDto>();
+                Database.CreateTable<ContentDto>();
+                Database.CreateTable<ContentTypeDto>();
+                Database.CreateTable<DataTypeDto>();
+                Database.CreateTable<PropertyTypeGroupDto>();
+                Database.CreateTable<PropertyTypeDto>();
                 Database.CreateTable<TagDto>();
                 Database.CreateTable<TagRelationshipDto>();
 

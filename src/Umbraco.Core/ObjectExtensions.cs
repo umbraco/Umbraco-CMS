@@ -207,7 +207,7 @@ namespace Umbraco.Core
 				if (destinationType == typeof(Boolean))
 					return Attempt<object>.Succeed(false);   // special case for booleans, null/empty == false
 				else if (destinationType == typeof(DateTime))
-					return Attempt<object>.Succeed(DateTime.MinValue);
+                    return Attempt<object>.Succeed(false);
 			}
 
 			// we have a non-empty string, look for type conversions in the expected order of frequency of use...
