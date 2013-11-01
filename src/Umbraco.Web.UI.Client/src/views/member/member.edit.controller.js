@@ -65,6 +65,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, memb
                 }, function (err) {
                     
                     contentEditingHelper.handleSaveError({
+                        redirectOnFailure: false,
                         err: err,
                         allNewProps: contentEditingHelper.getAllProps(err.data),
                         allOrigProps: contentEditingHelper.getAllProps($scope.content)
