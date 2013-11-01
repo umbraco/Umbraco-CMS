@@ -181,7 +181,7 @@ namespace umbraco.BasePages
         /// <returns></returns>
         public static int GetUserId()
         {
-            var identity = HttpContext.Current.GetCurrentIdentity();
+            var identity = HttpContext.Current.GetCurrentIdentity(true);
             if (identity == null)
                 return -1;
             return Convert.ToInt32(identity.Id);

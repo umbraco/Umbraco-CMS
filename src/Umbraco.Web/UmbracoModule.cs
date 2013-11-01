@@ -178,47 +178,8 @@ namespace Umbraco.Web
             if (ShouldAuthenticateRequest(req, UmbracoContext.Current.OriginalRequestUrl))
             {
                 var ticket = http.GetUmbracoAuthTicket();
-                //if there was a ticket, it's not expired, - it should not be renewed or its renewable
-                if (ticket != null && ticket.Expired == false
-                    && (ShouldIgnoreTicketRenew(UmbracoContext.Current.OriginalRequestUrl, http) || http.RenewUmbracoAuthTicket()))
-                {
-                    try
-                    {
-                        //create the Umbraco user identity 
-                        var identity = new UmbracoBackOfficeIdentity(ticket);
 
-                        //set the principal object
-                        var principal = new GenericPrincipal(identity, identity.Roles);
-
-                        //It is actually not good enough to set this on the current app Context and the thread, it also needs
-                        // to be set explicitly on the HttpContext.Current !! This is a strange web api thing that is actually 
-                        // an underlying fault of asp.net not propogating the User correctly.
-                        if (HttpContext.Current != null)
-                        {
-                            HttpContext.Current.User = principal;
-                        }
-                        app.Context.User = principal;
-                        Thread.CurrentPrincipal = principal;
-
-                        //This is a back office request, we will also set the culture/ui culture
-                        Thread.CurrentThread.CurrentCulture =
-                            Thread.CurrentThread.CurrentUICulture =
-                            new System.Globalization.CultureInfo(identity.Culture);
-                    }
-                    catch (Exception ex)
-                    {
-                        if (ex is FormatException || ex is JsonReaderException)
-                        {
-                            //this will occur if the cookie data is invalid
-                            http.UmbracoLogout();
-                        }
-                        else
-                        {
-                            throw;
-                        }
-                        
-                    }
-                }
+                http.AuthenticateCurrentRequest(ticket, ShouldIgnoreTicketRenew(UmbracoContext.Current.OriginalRequestUrl, http) == false);
             }
 
         }
