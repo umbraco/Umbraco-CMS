@@ -7,6 +7,8 @@ using umbraco.DataLayer;
 using umbraco.BasePages;
 using umbraco.IO;
 using umbraco.cms.businesslogic.member;
+using System.Configuration;
+using Umbraco.Core;
 
 namespace umbraco
 {
@@ -58,10 +60,15 @@ namespace umbraco
             // Create new dictionary item if name no already exist
             if (ParentID > 0)
             {
-                // Prepend parent keys to keep unique
                 var parentKey = new cms.businesslogic.Dictionary.DictionaryItem(ParentID).key;
+                string alias = "";
+                if(ConfigurationManager.AppSettings.ContainsKey("dictionaryIsHierarchy") && !String.IsNullOrEmpty(ConfigurationManager.AppSettings["dictionaryIsHierarchy"]))
+                    // Prepend parent keys to keep unique
+                    alias = parentKey + (string)ConfigurationManager.AppSettings["dictionaryIsHierarchy"] + Alias;
+                else
+                    alias = Alias;
 
-                int id = cms.businesslogic.Dictionary.DictionaryItem.addKey(parentKey + "." + Alias, "", parentKey);
+                int id = cms.businesslogic.Dictionary.DictionaryItem.addKey(alias, "", parentKey);
                 m_returnUrl = string.Format("settings/editDictionaryItem.aspx?id={0}", id);
             }
             else

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Linq;
 using System.Text;
+using Umbraco.Core;
 
 namespace Umbraco.Web
 {
@@ -26,6 +28,13 @@ namespace Umbraco.Web
             Umbraco = umbraco;
         }
 
+        private string GetHierarchyJoin
+        {
+            get {
+                return ConfigurationManager.AppSettings.ContainsKey("dictionaryIsHierarchy") ? ConfigurationManager.AppSettings["dictionaryIsHierarchy"] : "";
+            }
+        }
+
         /// <summary>
         /// Get a dictionary value by combining the section key and child key.
         /// </summary>
@@ -33,7 +42,7 @@ namespace Umbraco.Web
         /// <returns>string</returns>
         public string GetDictionaryValue(string key)
         {
-            return Umbraco.GetDictionaryValue(Section + "." + key);
+            return Umbraco.GetDictionaryValue(Section + GetHierarchyJoin + key);
         }
 
         /// <summary>
@@ -43,7 +52,7 @@ namespace Umbraco.Web
         /// <returns>DictionarySection</returns>
         public DictionarySection GetDictionarySection(string key)
         {
-            return new DictionarySection(Umbraco, Section + "." + key);
+            return new DictionarySection(Umbraco, Section + GetHierarchyJoin + key);
         }
 
         /// <summary>
@@ -66,7 +75,7 @@ namespace Umbraco.Web
         {
             get
             {
-                return Umbraco.GetDictionaryValue(Section + "." + key);
+                return Umbraco.GetDictionaryValue(Section + GetHierarchyJoin + key);
             }
         }
     }
