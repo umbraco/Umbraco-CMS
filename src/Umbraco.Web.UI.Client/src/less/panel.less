@@ -66,6 +66,7 @@ h1.headline{
   position: absolute;
   padding: 0px 0px 0px 20px;
 }
+
 .umb-panel-header h1 {
   margin: 0;
   font-size: @fontSizeMedium;
@@ -78,6 +79,7 @@ h1.headline{
 .umb-panel-header p {
     margin:0px 20px;
 }
+
 .umb-headline-editor-wrapper input  {
   background: none;
   border: none;
@@ -90,6 +92,10 @@ h1.headline{
 .umb-headline-editor-wrapper input.ng-invalid  {
   color: @red;
 }
+
+.umb-headline-editor-wrapper input.ng-invalid::-webkit-input-placeholder {color: @red;}
+.umb-headline-editor-wrapper input.ng-invalid::-moz-placeholder {color: @red;}
+.umb-headline-editor-wrapper input.ng-invalid:-ms-input-placeholder {color: @red;}
 
 .umb-panel-header i {
   font-size: 14px;
