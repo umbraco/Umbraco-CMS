@@ -624,9 +624,13 @@ namespace umbraco.cms.businesslogic.packager
                 {
                     try
                     {
-                        var m = new Macro(alias);
-                        this.ContainsMacroConflict = true;
-                        this._conflictingMacroAliases.Add(m.Name, alias);
+                        var m = Macro.GetByAlias(alias);
+
+                        if (m != null)
+                        {
+                            this.ContainsMacroConflict = true;
+                            this._conflictingMacroAliases.Add(m.Name, alias);
+                        }
                     }
                     catch (IndexOutOfRangeException) { } //thrown when the alias doesn't exist in the DB, ie - macro not there
                 }
