@@ -15,14 +15,12 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
     var standardCssClass = 'icon umb-tree-icon sprTree';
 
     function getCacheKey(args) {
-        if (!args) {
-            args = {
-                section: 'content',
-                cacheKey: ''
-            };
-        }
+        //if there is no cache key they return null - it won't be cached.
+        if (!args || !args.cacheKey) {
+            return null;
+        }        
 
-        var cacheKey = args.cachekey;
+        var cacheKey = args.cacheKey;
         cacheKey += "_" + args.section;
         return cacheKey;
     }
@@ -103,15 +101,35 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             return undefined;
         },
 
-        /** clears the tree cache - with optional sectionAlias */
-        clearCache: function(sectionAlias) {
-            if (!sectionAlias) {
+        /** clears the tree cache - with optional cacheKey and optional section */
+        clearCache: function (args) {
+            //clear all if not specified
+            if (!args) {
                 treeCache = {};
             }
             else {
-                var cacheKey = getCacheKey({ section: sectionAlias });
-                if (treeCache && treeCache[cacheKey] != null) {
-                    treeCache = _.omit(treeCache, cacheKey);
+                //if section and cache key specified just clear that cache
+                if (args.section && args.cacheKey) {
+                    var cacheKey = getCacheKey(args);
+                    if (cacheKey && treeCache && treeCache[cacheKey] != null) {
+                        treeCache = _.omit(treeCache, cacheKey);
+                    }
+                }
+                else if (args.cacheKey) {
+                    //if only the cache key is specified, then clear all cache starting with that key
+                    var allKeys1 = _.keys(treeCache);
+                    var toRemove1 = _.filter(allKeys1, function (k) {
+                        return k.startsWith(args.cacheKey + "_");
+                    });
+                    treeCache = _.omit(treeCache, toRemove1);
+                }
+                else if (args.section) {
+                    //if only the section is specified then clear all cache regardless of cache key by that section
+                    var allKeys2 = _.keys(treeCache);
+                    var toRemove2 = _.filter(allKeys2, function (k) {
+                        return k.endsWith("_" + args.section);
+                    });
+                    treeCache = _.omit(treeCache, toRemove2);
                 }
             }
         },
@@ -240,25 +258,28 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             return "";
         },
 
+        /** gets the tree, returns a promise */
         getTree: function (args) {
+
+            var deferred = $q.defer();
 
             //set defaults
             if (!args) {
-                args = {
-                    section: 'content',
-                    cacheKey : ''
-                };
+                args = { section: 'content', cacheKey: null };
+            }
+            else if (!args.section) {
+                args.section = 'content';
             }
 
             var cacheKey = getCacheKey(args);
             
             //return the cache if it exists
-            if (treeCache[cacheKey] !== undefined){
-                return treeCache[cacheKey];
+            if (cacheKey && treeCache[cacheKey] !== undefined) {
+                deferred.resolve(treeCache[cacheKey]);
             }
 
             var self = this;
-            return treeResource.loadApplication(args)
+            treeResource.loadApplication(args)
                 .then(function(data) {
                     //this will be called once the tree app data has loaded
                     var result = {
@@ -268,13 +289,19 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     };
                     //we need to format/modify some of the node data to be used in our app.
                     self._formatNodeDataForUseInUI(result.root, result.root.children, args.section);
-                    //cache this result
-                    //TODO: We'll need to un-cache this in many circumstances
-                    treeCache[cacheKey] = result;
-                    //return the data result as promised
-                    //deferred.resolve(treeArray[cacheKey]);
-                    return treeCache[cacheKey];
+
+                    //cache this result if a cache key is specified - generally a cache key should ONLY
+                    // be specified for application trees, dialog trees should not be cached.
+                    if (cacheKey) {                        
+                        treeCache[cacheKey] = result;
+                        deferred.resolve(treeCache[cacheKey]);
+                    }
+
+                    //return un-cached
+                    deferred.resolve(result);
                 });
+            
+            return deferred.promise;
         },
 
         getMenu: function (args) {

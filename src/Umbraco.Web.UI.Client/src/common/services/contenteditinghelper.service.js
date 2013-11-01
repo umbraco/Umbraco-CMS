@@ -112,7 +112,10 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
             if (!args.allNewProps && !angular.isArray(args.allNewProps)) {
                 throw "args.allNewProps must be a valid array";
             }
-            
+            if (args.redirectOnFailure === undefined || args.redirectOnFailure === null) {
+                throw "args.redirectOnFailure must be set to true or false";
+            }
+
             //When the status is a 400 status with a custom header: X-Status-Reason: Validation failed, we have validation errors.
             //Otherwise the error is probably due to invalid data (i.e. someone mucking around with the ids or something).
             //Or, some strange server error

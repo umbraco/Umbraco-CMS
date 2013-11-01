@@ -22,6 +22,10 @@ function serverValidationManager($timeout) {
     }
 
     function getFieldErrors(self, fieldName) {
+        if (!angular.isString(fieldName)) {
+            throw "fieldName must be a string";
+        }
+
         //find errors for this field name
         return _.filter(self.items, function (item) {
             return (item.propertyAlias === null && item.fieldName === fieldName);
@@ -29,6 +33,13 @@ function serverValidationManager($timeout) {
     }
     
     function getPropertyErrors(self, propertyAlias, fieldName) {
+        if (!angular.isString(propertyAlias)) {
+            throw "propertyAlias must be a string";
+        }
+        if (fieldName && !angular.isString(fieldName)) {
+            throw "fieldName must be a string";
+        }
+
         //find all errors for this property
         return _.filter(self.items, function (item) {            
             return (item.propertyAlias === propertyAlias && (item.fieldName === fieldName || (fieldName === undefined || fieldName === "")));
@@ -68,7 +79,7 @@ function serverValidationManager($timeout) {
                     }
                     else {
                         //its a property error
-                        var propErrors = getPropertyErrors(self, { alias: callbacks[cb].propertyAlias }, callbacks[cb].fieldName);
+                        var propErrors = getPropertyErrors(self, callbacks[cb].propertyAlias, callbacks[cb].fieldName);
                         if (propErrors.length > 0) {
                             executeCallback(self, propErrors, callbacks[cb].callback);
                         }

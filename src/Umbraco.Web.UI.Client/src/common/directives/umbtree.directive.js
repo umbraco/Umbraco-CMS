@@ -78,7 +78,7 @@ angular.module("umbraco.directives")
               if (scope.eventhandler) {
                 
                 scope.eventhandler.clearCache = function(section){
-                  treeService.clearCache(section);
+                    treeService.clearCache({ section: section });
                 };
 
                 scope.eventhandler.load = function(section){
@@ -160,7 +160,7 @@ angular.module("umbraco.directives")
                     enableDeleteAnimations = false;
 
                     //use $q.when because a promise OR raw data might be returned.
-                    $q.when(treeService.getTree({ section: scope.section, tree: scope.treealias, cachekey: scope.cachekey, isDialog: scope.isdialog ? scope.isdialog : false }))
+                    treeService.getTree({ section: scope.section, tree: scope.treealias, cacheKey: scope.cachekey, isDialog: scope.isdialog ? scope.isdialog : false })
                         .then(function (data) {
                             //set the data once we have it
                             scope.tree = data;

@@ -8,7 +8,7 @@ using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.PropertyEditors
 {
-    [PropertyEditor(Constants.PropertyEditors.MemberPickerAlias, "Member Picker", "memberpicker")]
+    [PropertyEditor(Constants.PropertyEditors.MemberPickerAlias, "Member Picker", "INT", "memberpicker")]
     public class MemberPickerPropertyEditor : PropertyEditor
     {
     }

@@ -51,9 +51,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         int UmbracoLibraryCacheDuration { get; }
 
         MacroErrorBehaviour MacroErrorBehaviour { get; }
-
-        IconPickerBehaviour IconPickerBehaviour { get; }
-
+        
         IEnumerable<string> DisallowedUploadFiles { get; }
 
         bool CloneXmlContent { get; }

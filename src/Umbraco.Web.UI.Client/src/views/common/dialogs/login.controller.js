@@ -15,11 +15,6 @@
     $scope.today = weekday[d.getDay()];
     $scope.errorMsg = "";
     
-    //this means the application is not configured and needs the installer
-    if(!Umbraco.Sys.ServerVariables.application){
-        $scope.missingConfiguration = true;
-    }
-
     $scope.loginSubmit = function (login, password) {
         
         //if the login and password are not empty we need to automatically 

@@ -120,7 +120,9 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
                     deferred.resolve(data);
                     
                 }, function (err) {
+                    
                     contentEditingHelper.handleSaveError({
+                        redirectOnFailure: true,
                         err: err,
                         allNewProps: contentEditingHelper.getAllProps(err.data),
                         allOrigProps: contentEditingHelper.getAllProps($scope.content)

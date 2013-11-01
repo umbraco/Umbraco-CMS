@@ -294,7 +294,7 @@ angular.module('umbraco.services')
 
         reloadSection: function (sectionAlias) {
             if(this.ui.treeEventHandler){
-                this.ui.treeEventHandler.clearCache(sectionAlias);
+                this.ui.treeEventHandler.clearCache({ section: sectionAlias });
                 this.ui.treeEventHandler.load(sectionAlias);
             }
         },

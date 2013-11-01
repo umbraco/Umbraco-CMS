@@ -614,11 +614,6 @@
     <Compile Include="Umbraco\TreeInit.aspx.designer.cs">
       <DependentUpon>treeInit.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Web References\org.umbraco.our\Reference.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Reference.map</DependentUpon>
-    </Compile>
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Logout.aspx" />
     <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
@@ -2182,25 +2177,10 @@
     <Content Include="Umbraco_client\CodeMirror\js\mode\sieve\LICENSE" />
     <None Include="Umbraco_client\CodeMirror\js\mode\xquery\LICENSE" />
     <Content Include="Views\Web.config" />
-    <Content Include="Web References\org.umbraco.our\Category.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
-    </Content>
-    <Content Include="Web References\org.umbraco.our\Package.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
-    </Content>
-    <Content Include="Web References\org.umbraco.our\Reference.map">
-      <Generator>MSDiscoCodeGenerator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </Content>
-    <Content Include="Web References\org.umbraco.our\repository.disco" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
     </Content>
     <Content Include="Views\Web.config.transform" />
-    <Content Include="Web References\org.umbraco.our\repository.wsdl" />
-    <Content Include="Web References\org.umbraco.our\SubmitStatus.datasource">
-      <DependentUpon>Reference.map</DependentUpon>
-    </Content>
     <None Include="Web.Debug.config.transformed" />
     <None Include="web.Template.Debug.config">
       <DependentUpon>Web.Template.config</DependentUpon>
@@ -2635,25 +2615,6 @@
     <Folder Include="UserControls\" />
     <Folder Include="Views\MacroPartials\" />
     <Folder Include="Views\Partials\" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <WebReferences Include="Web References\" />
-  </ItemGroup>
-  <ItemGroup>
-    <WebReferenceUrl Include="http://our.umbraco.org/umbraco/webservices/api/repository.asmx">
-      <UrlBehavior>Dynamic</UrlBehavior>
-      <RelPath>Web References\org.umbraco.our\</RelPath>
-      <UpdateFromURL>http://our.umbraco.org/umbraco/webservices/api/repository.asmx</UpdateFromURL>
-      <ServiceLocationURL>
-      </ServiceLocationURL>
-      <CachedDynamicPropName>
-      </CachedDynamicPropName>
-      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
-      <CachedSettingsPropName>Umbraco_Web_UI_org_umbraco_our_Repository</CachedSettingsPropName>
-    </WebReferenceUrl>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
