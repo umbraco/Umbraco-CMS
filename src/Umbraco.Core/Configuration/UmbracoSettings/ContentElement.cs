@@ -217,18 +217,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        [ConfigurationProperty("DocumentTypeIconList")]
-        internal InnerTextConfigurationElement<IconPickerBehaviour> DocumentTypeIconList
-        {
-            get
-            {
-                return new OptionalInnerTextConfigurationElement<IconPickerBehaviour>(
-                          (InnerTextConfigurationElement<IconPickerBehaviour>)this["DocumentTypeIconList"],
-                    //set the default
-                          IconPickerBehaviour.HideFileDuplicates);
-            }
-        }
-
         [ConfigurationProperty("disallowedUploadFiles")]
         internal CommaDelimitedConfigurationElement DisallowedUploadFiles
         {
@@ -392,12 +380,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return MacroErrors; }
         }
-
-        IconPickerBehaviour IContentSection.IconPickerBehaviour
-        {
-            get { return DocumentTypeIconList; }
-        }
-
+        
         IEnumerable<string> IContentSection.DisallowedUploadFiles
         {
             get { return DisallowedUploadFiles; }

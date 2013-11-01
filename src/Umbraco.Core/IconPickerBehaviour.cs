@@ -1,5 +1,8 @@
-﻿namespace Umbraco.Core
+﻿using System;
+
+namespace Umbraco.Core
 {
+    [Obsolete("This is no longer used and will be removed from the core in future versions")]
     public enum IconPickerBehaviour
     {
         /// <summary>
