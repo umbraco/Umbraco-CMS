@@ -40,7 +40,9 @@ namespace Umbraco.Web.UI
         /// <param name="op"></param>
         /// <param name="nodeType"></param>
         /// <param name="httpContext"></param>
-        /// <returns></returns>
+        /// <returns>
+        /// Returns the ITask if one is found and can be made, otherwise null
+        /// </returns>
         /// <remarks>
         /// This will first check if we've already created the ITask in the current Http request
         /// </remarks>
@@ -63,22 +65,22 @@ namespace Umbraco.Web.UI
             var def = createDef.SelectSingleNode("//nodeType [@alias = '" + nodeType + "']");
             if (def == null)
             {
-                throw new InvalidOperationException("Cannot find an item that matches node type " + nodeType);
+                return null;
             }
             var del = def.SelectSingleNode("./tasks/" + operationNode);
             if (del == null)
             {
-                throw new InvalidOperationException("No " + operationNode + " task found for node type " + nodeType);
+                return null;
             }
             if (!del.Attributes.HasAttribute("assembly"))
             {
-                throw new InvalidOperationException("No assembly attribute found for " + operationNode + " task for node type " + nodeType);
+                return null;
             }
             var taskAssembly = del.AttributeValue<string>("assembly");
             
             if (!del.Attributes.HasAttribute("type"))
             {
-                throw new InvalidOperationException("No type attribute found for " + operationNode + " task for node type " + nodeType);
+                return null;
             }
             var taskType = del.AttributeValue<string>("type");
 
@@ -87,7 +89,7 @@ namespace Umbraco.Web.UI
             var typeInstance = Activator.CreateInstance(type) as ITask;
             if (typeInstance == null)
             {
-                throw new InvalidOperationException("The type returned (" + type + ") is not an " + typeof(ITask));
+                return null;
             }
 
             //set the user/user id for the instance

@@ -8,6 +8,7 @@ using System.Security.Permissions;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Packaging
 {
@@ -89,9 +90,19 @@ namespace Umbraco.Core.Packaging
                         //if an exception occurs it means that a referenced assembly could not be found                        
                         errors.Add(
                             string.Concat("This package references the assembly '",
-                                assemblyName.Name,
-                                "' which was not found, this package may have problems running"));
+                                          assemblyName.Name,
+                                          "' which was not found"));
                         assembliesWithErrors.Add(f);
+                    }
+                    catch (Exception ex)
+                    {
+                        //if an exception occurs it means that a referenced assembly could not be found                        
+                        errors.Add(
+                            string.Concat("This package could not be verified for compatibility. An error occurred while loading a referenced assembly '",
+                                          assemblyName.Name,
+                                          "' see error log for full details."));
+                        assembliesWithErrors.Add(f);
+                        LogHelper.Error<PackageBinaryInspector>("An error occurred scanning package assemblies", ex);
                     }
                 }
             }
