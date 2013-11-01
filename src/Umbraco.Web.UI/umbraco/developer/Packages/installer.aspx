@@ -35,9 +35,9 @@
         <cc1:Feedback ID="fb" Style="margin-top: 7px;" runat="server" />
         <cc1:Pane ID="pane_upload" runat="server" Text="Install from local package file">
             <cc1:PropertyPanel runat="server" Text="">
-                <div class="notice">
-                    <h3>
-                        Only install packages from sources you know and trust!</h3>
+                <div class="alert alert-warning">
+                    <h4>
+                        Only install packages from sources you know and trust!</h4>
                     <p>
                         When installing an Umbraco package you should use the same caution as when you install
                         an application on your computer.</p>
@@ -56,11 +56,13 @@
                     </p>
                 </div>
             </cc1:PropertyPanel>
+
             <cc1:PropertyPanel ID="PropertyPanel9" Text="Choose a file" runat="server">
                 <p>
-                    <input id="file1" type="file" style="width: 300px;" name="file1" onchange="enableButton();"
+                    <input id="file1" type="file" class="btn" name="file1" onchange="enableButton();"
                         runat="server" />
                     <br />
+
                     <small>
                         <%= umbraco.ui.Text("packager", "chooseLocalPackageText") %>
                     </small>
@@ -76,7 +78,7 @@
         </cc1:Pane>
         <cc1:Pane ID="pane_authenticate" runat="server" Visible="false" Text="Repository authentication">
             <cc1:PropertyPanel runat="server">
-                <div class="notice">
+                <div class="alert alert-warning">
                     <p>
                         This repository requires authentication before you can download any packages from
                         it.<br />
@@ -93,7 +95,7 @@
         </cc1:Pane>
         <asp:Panel ID="pane_acceptLicense" runat="server" Visible="false">
             <br />
-            <div class="notice">
+            <div class="alert alert-warning">
                 <p>
                     <strong>Please note:</strong> Installing a package containing several items and
                     files can take some time. Do not refresh the page or navigate away before, the installer
@@ -114,10 +116,12 @@
                 <cc1:PropertyPanel ID="PropertyPanel8" runat="server" Text="Read me">
                     <asp:Literal ID="readme" runat="server"></asp:Literal>
                 </cc1:PropertyPanel>
+
                 <cc1:PropertyPanel ID="pp_unsecureFiles" runat="server" Visible="false" Text="&nbsp;">
-                    <div class="error" style="width: 370px;">
-                        <h3>
-                            Binary files in the package!</h3>
+                    
+                    <div class="alert alert-error" style="width: 370px;">
+                        <h4>
+                            Binary files in the package!</h4>
                         <a class="toggle-report" href="#">Read more...</a>
                         <div style="display:none;">
                             <p>
@@ -136,10 +140,11 @@
                         </div>
                     </div>
                 </cc1:PropertyPanel>
+
                 <cc1:PropertyPanel ID="LegacyPropertyEditorPanel" runat="server" Visible="false" Text="&nbsp;">
-                    <div class="error" style="width: 370px;">
-                        <h3>
-                            Legacy Property editors detected</h3>
+                    <div class="alert alert-error" style="width: 370px;">
+                        <h4>
+                            Legacy Property editors detected</h4>
                         <a class="toggle-report" href="#">Read more...</a>
                         <div style="display:none;">
                             <p>
@@ -153,9 +158,9 @@
                     </div>
                 </cc1:PropertyPanel>
                 <cc1:PropertyPanel ID="BinaryFileErrorsPanel" runat="server" Visible="false" Text="&nbsp;">
-                    <div class="error" style="width: 370px;">
-                        <h3>
-                            Binary file errors detected</h3>                        
+                    <div class="alert alert-error" style="width: 370px;">
+                        <h4>
+                            Binary file errors detected</h4>                        
                         <a class="toggle-report" href="#">Read more...</a>
                         <div style="display:none;">
                             <p>
@@ -172,9 +177,9 @@
                     </div>
                 </cc1:PropertyPanel>
                 <cc1:PropertyPanel ID="pp_macroConflicts" runat="server" Visible="false" Text="&nbsp;">
-                    <div class="error" style="width: 370px;">
-                        <h3>
-                            Macro Conflicts in the package!</h3>
+                    <div class="alert alert-error" style="width: 370px;">
+                        <h4>
+                            Macro Conflicts in the package!</h4>
                         <a class="toggle-report" href="#">Read more...</a>
                         <div style="display:none">
                             <p>
@@ -193,9 +198,9 @@
                     </div>
                 </cc1:PropertyPanel>
                 <cc1:PropertyPanel ID="pp_templateConflicts" runat="server" Visible="false" Text="&nbsp;">
-                    <div class="error" style="width: 370px;">
-                        <h3>
-                            Template Conflicts in the package!</h3>
+                    <div class="alert alert-error" style="width: 370px;">
+                        <h4>
+                            Template Conflicts in the package!</h4>
                         <a class="toggle-report" href="#">Read more...</a>
                         <div style="display:none">
                             <p>
@@ -214,9 +219,9 @@
                     </div>
                 </cc1:PropertyPanel>
                 <cc1:PropertyPanel ID="pp_stylesheetConflicts" runat="server" Visible="false" Text="&nbsp;">
-                    <div class="error" style="width: 370px;">
-                        <h3>
-                            Stylesheet Conflicts in the package!</h3>
+                    <div class="alert alert-error" style="width: 370px;">
+                        <h4>
+                            Stylesheet Conflicts in the package!</h4>
                         <a class="toggle-report" href="#">Read more...</a>
                         <div style="display:none">
                             <p>
@@ -241,7 +246,7 @@
                         <br />
                         <em>&nbsp; &nbsp;Installing package, please wait...</em><br />
                     </div>
-                    <asp:Button ID="ButtonInstall" runat="server" Text="Install Package" Enabled="False"
+                    <asp:Button ID="ButtonInstall" runat="server" Text="Install Package" CssClass="btn btn-primary" Enabled="False"
                         OnClick="startInstall"></asp:Button>
                 </cc1:PropertyPanel>
             </cc1:Pane>
