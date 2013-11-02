@@ -121,6 +121,7 @@ namespace umbraco.cms.presentation.settings.scripts
             SaveButton.Text = ui.Text("save");
             SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";
+            SaveButton.CssClass = "client-side";
 
             if (editorSource.CodeBase == uicontrols.CodeArea.EditorType.HTML)
             {

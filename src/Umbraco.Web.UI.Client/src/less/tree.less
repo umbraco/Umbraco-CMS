@@ -215,7 +215,7 @@ li.root > div > a.umb-options {
 // Tree item states
 // -------------------------
 div.not-published > i.icon,div.not-published > a{
-	color: @grayLight;
+	opacity: 0.6;
 }
 div.protected:before{
 	content:"\e256";
@@ -236,6 +236,11 @@ div.has-unpublished-version:before{
 	padding-left: 7px;
 	padding-top: 7px;
 }
+
+div.not-allowed > i.icon,div.not-allowed > a{
+	cursor: not-allowed;
+}
+
 
 // Tree context menu
 // -------------------------

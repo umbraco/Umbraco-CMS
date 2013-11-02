@@ -41,7 +41,10 @@ function treeResource($q, $http, umbRequestHelper) {
 
             if(!options.tree){
                 options.tree = "";
-            }                
+            }
+            if (!options.isDialog) {
+                options.isDialog = false;
+            }
 
             return umbRequestHelper.resourcePromise(
                 $http.get(
@@ -50,7 +53,8 @@ function treeResource($q, $http, umbRequestHelper) {
                         "GetApplicationTrees",
                             [
                                 {application: options.section}, 
-                                {tree: options.tree} 
+                                { tree: options.tree },
+                                { isDialog: options.isDialog }
                             ])),
                 'Failed to retreive data for application tree ' + options.section);
         },

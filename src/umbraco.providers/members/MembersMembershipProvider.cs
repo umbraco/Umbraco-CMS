@@ -308,28 +308,33 @@ namespace umbraco.providers.members
                 m.ChangePassword(
                     FormatPasswordForStorage(encodedPassword, salt));
                 
-                var mUser = ConvertToMembershipUser(m);
-
                 // custom fields
                 if (string.IsNullOrEmpty(_passwordRetrievalQuestionPropertyTypeAlias) == false)
+                {
                     UpdateMemberProperty(m, _passwordRetrievalQuestionPropertyTypeAlias, passwordQuestion);
+                }
 
                 if (string.IsNullOrEmpty(_passwordRetrievalAnswerPropertyTypeAlias) == false)
-                    UpdateMemberProperty(m, _passwordRetrievalAnswerPropertyTypeAlias, passwordAnswer);
+                {
+                    UpdateMemberProperty(m, _passwordRetrievalAnswerPropertyTypeAlias, passwordAnswer);                    
+                }   
 
                 if (string.IsNullOrEmpty(ApprovedPropertyTypeAlias) == false)
-                    UpdateMemberProperty(m, ApprovedPropertyTypeAlias, isApproved ? 1 : 0);
+                {
+                    UpdateMemberProperty(m, ApprovedPropertyTypeAlias, isApproved ? 1 : 0);                 
+                }
 
                 if (string.IsNullOrEmpty(_lastLoginPropertyTypeAlias) == false)
                 {
-                    mUser.LastActivityDate = DateTime.Now;
-                    UpdateMemberProperty(m, _lastLoginPropertyTypeAlias, mUser.LastActivityDate);
+                    UpdateMemberProperty(m, _lastLoginPropertyTypeAlias, DateTime.Now);
                 }
 
                 if (string.IsNullOrEmpty(_lastPasswordChangedPropertyTypeAlias) == false)
                 {
                     UpdateMemberProperty(m, _lastPasswordChangedPropertyTypeAlias, DateTime.Now);
                 }
+
+                var mUser = ConvertToMembershipUser(m);
 
                 // save
                 m.Save();

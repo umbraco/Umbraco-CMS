@@ -102,7 +102,6 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                                 $timeout(function () {
                                     var imgElm = editor.dom.get('__mcenew');
                                     var size = editor.dom.getSize(imgElm);
-                                    $log.log(size);
 
                                     var newSize = imageHelper.scaleToMaxSize(500, size.w, size.h);
                                     var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
@@ -469,7 +468,6 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         dialogData = {
                             macroData: parsed  
                         };
-
                     }
 
                     dialogService.macroPicker({

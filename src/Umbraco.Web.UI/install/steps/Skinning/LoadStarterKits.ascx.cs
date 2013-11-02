@@ -76,7 +76,9 @@ namespace Umbraco.Web.UI.Install.Steps.Skinning
 			{
 				try
 				{
-					rep_starterKits.DataSource = _repo.Webservice.StarterKits();
+                    var r = new org.umbraco.our.Repository();
+
+                    rep_starterKits.DataSource = r.Modules();
 					rep_starterKits.DataBind();
 				}
 				catch (Exception ex)

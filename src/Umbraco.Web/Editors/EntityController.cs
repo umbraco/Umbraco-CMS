@@ -1,13 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Text;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
+using Examine.LuceneEngine;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -34,12 +37,63 @@ namespace Umbraco.Web.Editors
     public class EntityController : UmbracoAuthorizedJsonController
     {   
         [HttpGet]
-        public ISearchResults Search([FromUri] string query, UmbracoEntityTypes type)
+        public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type)
         {
             if (string.IsNullOrEmpty(query))
-                return null;
+                return Enumerable.Empty<EntityBasic>();
 
             return ExamineSearch(query, type);
+        }
+
+        /// <summary>
+        /// Searches for all content that the user is allowed to see (based on their allowed sections)
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Even though a normal entity search will allow any user to search on a entity type that they may not have access to edit, we need
+        /// to filter these results to the sections they are allowed to edit since this search function is explicitly for the global search 
+        /// so if we showed entities that they weren't allowed to edit they would get errors when clicking on the result.
+        /// 
+        /// The reason a user is allowed to search individual entity types that they are not allowed to edit is because those search
+        /// methods might be used in things like pickers in the content editor.
+        /// </remarks>
+        [HttpGet]
+        public IEnumerable<EntityTypeSearchResult> SearchAll(string query)
+        {
+            if (string.IsNullOrEmpty(query))
+                return Enumerable.Empty<EntityTypeSearchResult>();
+
+            var allowedSections = Security.CurrentUser.AllowedSections.ToArray();
+
+            var result = new List<EntityTypeSearchResult>();
+
+            if (allowedSections.InvariantContains(Constants.Applications.Content))
+            {
+                result.Add(new EntityTypeSearchResult
+                    {
+                        Results = ExamineSearch(query, UmbracoEntityTypes.Document),
+                        EntityType = UmbracoEntityTypes.Document.ToString()
+                    });
+            }
+            if (allowedSections.InvariantContains(Constants.Applications.Media))
+            {
+                result.Add(new EntityTypeSearchResult
+                {
+                    Results = ExamineSearch(query, UmbracoEntityTypes.Media),
+                    EntityType = UmbracoEntityTypes.Media.ToString()
+                });
+            }
+            if (allowedSections.InvariantContains(Constants.Applications.Members))
+            {
+                result.Add(new EntityTypeSearchResult
+                {
+                    Results = ExamineSearch(query, UmbracoEntityTypes.Member),
+                    EntityType = UmbracoEntityTypes.Member.ToString()
+                });
+
+            }
+            return result;
         }
 
         /// <summary>
@@ -83,12 +137,12 @@ namespace Umbraco.Web.Editors
         {
             return GetResultForAll(type, postFilter, postFilterParams);
         }
-        
-        private ISearchResults ExamineSearch(string query, UmbracoEntityTypes entityType)
+
+        private IEnumerable<EntityBasic> ExamineSearch(string query, UmbracoEntityTypes entityType)
         {
-            var searcher = Constants.Examine.InternalSearcher;
-            var type = "content";
-            var fields = new[] { "id", "__nodeName", "bodyText" };
+            string type;
+            var searcher = Constants.Examine.InternalSearcher;            
+            var fields = new[] { "id", "bodyText" };
             
             //TODO: WE should really just allow passing in a lucene raw query
             switch (entityType)
@@ -96,35 +150,130 @@ namespace Umbraco.Web.Editors
                 case UmbracoEntityTypes.Member:
                     searcher = Constants.Examine.InternalMemberSearcher;
                     type = "member";
-                    fields = new[] { "id", "email", "loginName","nodeName"};
+                    fields = new[] { "id", "email", "loginName"};
                     break;
                 case UmbracoEntityTypes.Media:
                     type = "media";
                     break;
                 case UmbracoEntityTypes.Document:
+                    type = "content";
                     break;
                 default:
-                    throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);
-                    
+                    throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);                    
             }
 
             var internalSearcher = ExamineManager.Instance.SearchProviderCollection[searcher];
-            var criteria = internalSearcher.CreateSearchCriteria(type, BooleanOperation.Or);
+
+            //build a lucene query:
+            // the __nodeName will be boosted 10x without wildcards
+            // then __nodeName will be matched normally with wildcards
+            // the rest will be normal without wildcards
+            var sb = new StringBuilder();
             
-            var term = new[] { query.ToLower().Escape() };
-            var operation = criteria.GroupedOr(fields, term).Compile();
+            //node name exactly boost x 10
+            sb.Append("+(__nodeName:");
+            sb.Append(query.ToLower());
+            sb.Append("^10.0 ");
 
-            return internalSearcher.Search(operation);
+            //node name normally with wildcards
+            sb.Append(" __nodeName:");            
+            sb.Append(query.ToLower());
+            sb.Append("* ");
 
-            /*
-            var results = internalSearcher.Search(operation)
-                .Select(x =>  int.Parse(x["id"]));
+            foreach (var f in fields)
+            {
+                //additional fields normally
+                sb.Append(f);
+                sb.Append(":");
+                sb.Append(query);
+                sb.Append(" ");
+            }
 
-            //TODO: Just create a basic entity from the results!! why double handling and going to the database... this will be ultra slow.
+            //must match index type
+            sb.Append(") +__IndexType:");
+            sb.Append(type);
 
-            return GetResultForIds(results.ToArray(), entityType)
-                .WhereNotNull();*/
+            var raw = internalSearcher.CreateSearchCriteria().RawQuery(sb.ToString());
+            
+            var result = internalSearcher.Search(raw);
+
+            switch (entityType)
+            {
+                case UmbracoEntityTypes.Member:
+                    return MemberFromSearchResults(result);
+                case UmbracoEntityTypes.Media:
+                    return MediaFromSearchResults(result);                    
+                case UmbracoEntityTypes.Document:
+                    return ContentFromSearchResults(result);
+                default:
+                    throw new NotSupportedException("The " + typeof(EntityController) + " currently does not support searching against object type " + entityType);
+            }
         }
+
+        /// <summary>
+        /// Returns a collection of entities for media based on search results
+        /// </summary>
+        /// <param name="results"></param>
+        /// <returns></returns>
+        private IEnumerable<EntityBasic> MemberFromSearchResults(ISearchResults results)
+        {
+            var mapped = Mapper.Map<IEnumerable<EntityBasic>>(results).ToArray();
+            //add additional data
+            foreach (var m in mapped)
+            {
+                m.Icon = "icon-user";
+                var searchResult = results.First(x => x.Id.ToInvariantString() == m.Id.ToString());
+                if (searchResult.Fields["email"] != null)
+                {
+                    m.AdditionalData["Email"] = results.First(x => x.Id.ToInvariantString() == m.Id.ToString()).Fields["email"];    
+                }
+                if (searchResult.Fields.ContainsKey("__key") && searchResult.Fields["__key"] != null)
+                {
+                    Guid key;
+                    if (Guid.TryParse(searchResult.Fields["__key"], out key))
+                    {
+                        m.Key = key;
+                    }
+                }
+            }
+            return mapped;
+        } 
+
+        /// <summary>
+        /// Returns a collection of entities for media based on search results
+        /// </summary>
+        /// <param name="results"></param>
+        /// <returns></returns>
+        private IEnumerable<EntityBasic> MediaFromSearchResults(ISearchResults results)
+        {
+            var mapped = Mapper.Map<IEnumerable<EntityBasic>>(results).ToArray();
+            //add additional data
+            foreach (var m in mapped)
+            {
+                m.Icon = "icon-picture";                 
+            }
+            return mapped;
+        } 
+
+        /// <summary>
+        /// Returns a collection of entities for content based on search results
+        /// </summary>
+        /// <param name="results"></param>
+        /// <returns></returns>
+        private IEnumerable<EntityBasic> ContentFromSearchResults(ISearchResults results)
+        {
+            var mapped = Mapper.Map<ISearchResults, IEnumerable<EntityBasic>>(results).ToArray();
+            //add additional data
+            foreach (var m in mapped)
+            {
+                var intId = m.Id.TryConvertTo<int>();
+                if (intId.Success)
+                {
+                    m.AdditionalData["Url"] = Umbraco.NiceUrl(intId.Result);
+                }
+            }
+            return mapped;
+        } 
 
         private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)
         {
@@ -166,6 +315,10 @@ namespace Umbraco.Web.Editors
             //now we need to convert the unknown ones
             switch (entityType)
             {
+                case UmbracoEntityTypes.PropertyType:
+
+                case UmbracoEntityTypes.PropertyGroup:
+
                 case UmbracoEntityTypes.Domain:
 
                 case UmbracoEntityTypes.Language:
@@ -193,40 +346,48 @@ namespace Umbraco.Web.Editors
             {
                 //TODO: Should we order this by something ?
                 var entities = Services.EntityService.GetAll(objectType.Value).WhereNotNull().Select(Mapper.Map<EntityBasic>);
-                
-                //if a post filter is assigned then try to execute it
-                if (postFilter.IsNullOrWhiteSpace() == false)
-                {
-                    return postFilterParams == null
-                               ? entities.AsQueryable().Where(postFilter).ToArray()
-                               : entities.AsQueryable().Where(postFilter, postFilterParams).ToArray();
-
-                }
-                return entities;
+                return ExecutePostFilter(entities, postFilter, postFilterParams);                
             }
             //now we need to convert the unknown ones
             switch (entityType)
             {
                 case UmbracoEntityTypes.Macro:                    
                     //Get all macros from the macro service
-                    var result = Services.MacroService.GetAll().WhereNotNull().OrderBy(x => x.Name).AsQueryable();
+                    var macros = Services.MacroService.GetAll().WhereNotNull().OrderBy(x => x.Name);
+                    var filteredMacros = ExecutePostFilter(macros, postFilter, postFilterParams);
+                    return filteredMacros.Select(Mapper.Map<EntityBasic>);
 
-                    //if a post filter is assigned then try to execute it
-                    if (postFilter.IsNullOrWhiteSpace() == false)
-                    {
-                        result = postFilterParams == null
-                            ? result.Where(postFilter)
-                            : result.Where(postFilter, postFilterParams);
+                case UmbracoEntityTypes.PropertyType:
 
-                    }
+                    //get all document types, then combine all property types into one list
+                    var propertyTypes = Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>()
+                                                .Concat(Services.ContentTypeService.GetAllMediaTypes())
+                                                .ToArray()
+                                                .SelectMany(x => x.PropertyTypes)
+                                                .DistinctBy(composition => composition.Alias);
+                    var filteredPropertyTypes = ExecutePostFilter(propertyTypes, postFilter, postFilterParams);
+                    return Mapper.Map<IEnumerable<PropertyType>, IEnumerable<EntityBasic>>(filteredPropertyTypes);
 
-                    return result.Select(Mapper.Map<EntityBasic>);
+                case UmbracoEntityTypes.PropertyGroup:
+
+                    //get all document types, then combine all property types into one list
+                    var propertyGroups = Services.ContentTypeService.GetAllContentTypes().Cast<IContentTypeComposition>()
+                                                .Concat(Services.ContentTypeService.GetAllMediaTypes())
+                                                .ToArray()
+                                                .SelectMany(x => x.PropertyGroups)
+                                                .DistinctBy(composition => composition.Name);
+                    var filteredpropertyGroups = ExecutePostFilter(propertyGroups, postFilter, postFilterParams);
+                    return Mapper.Map<IEnumerable<PropertyGroup>, IEnumerable<EntityBasic>>(filteredpropertyGroups);
+
+                case UmbracoEntityTypes.User:
+
+                    var users = Services.UserService.GetAllUsers();
+                    var filteredUsers = ExecutePostFilter(users, postFilter, postFilterParams);
+                    return Mapper.Map<IEnumerable<IUser>, IEnumerable<EntityBasic>>(filteredUsers);
 
                 case UmbracoEntityTypes.Domain:
 
                 case UmbracoEntityTypes.Language:
-
-                case UmbracoEntityTypes.User:
 
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + entityType);
@@ -244,6 +405,10 @@ namespace Umbraco.Web.Editors
             //now we need to convert the unknown ones
             switch (entityType)
             {
+                case UmbracoEntityTypes.PropertyType:
+                
+                case UmbracoEntityTypes.PropertyGroup:
+
                 case UmbracoEntityTypes.Domain:
 
                 case UmbracoEntityTypes.Language:
@@ -272,6 +437,10 @@ namespace Umbraco.Web.Editors
             //now we need to convert the unknown ones
             switch (entityType)
             {
+                case UmbracoEntityTypes.PropertyType:
+                    
+                case UmbracoEntityTypes.PropertyGroup:
+
                 case UmbracoEntityTypes.Domain:
                     
                 case UmbracoEntityTypes.Language:
@@ -316,6 +485,27 @@ namespace Umbraco.Web.Editors
                     return null;
             }
         }
+
+        /// <summary>
+        /// Executes the post filter against a collection of objects
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="entities"></param>
+        /// <param name="postFilter"></param>
+        /// <param name="postFilterParams"></param>
+        /// <returns></returns>
+        private IEnumerable<T> ExecutePostFilter<T>(IEnumerable<T> entities, string postFilter, IDictionary<string, object> postFilterParams)
+        {
+            //if a post filter is assigned then try to execute it
+            if (postFilter.IsNullOrWhiteSpace() == false)
+            {
+                return postFilterParams == null
+                               ? entities.AsQueryable().Where(postFilter).ToArray()
+                               : entities.AsQueryable().Where(postFilter, postFilterParams).ToArray();
+
+            }
+            return entities;
+        } 
 
     }
 }

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Security.Principal;
+using System.Threading;
 using System.Web;
 using System.Web.Security;
 using Newtonsoft.Json;
@@ -11,14 +13,109 @@ namespace Umbraco.Core.Security
     /// </summary>
     internal static class AuthenticationExtensions
     {
-        public static UmbracoBackOfficeIdentity GetCurrentIdentity(this HttpContextBase http)
+        /// <summary>
+        /// This will check the ticket to see if it is valid, if it is it will set the current thread's user and culture
+        /// </summary>
+        /// <param name="http"></param>
+        /// <param name="ticket"></param>
+        /// <param name="renewTicket">If true will attempt to renew the ticket</param>
+        public static bool AuthenticateCurrentRequest(this HttpContextBase http, FormsAuthenticationTicket ticket, bool renewTicket)
         {
-            return http.User.Identity as UmbracoBackOfficeIdentity;             
+            if (http == null) throw new ArgumentNullException("http");
+
+            //if there was a ticket, it's not expired, - it should not be renewed or its renewable
+            if (ticket != null && ticket.Expired == false && (renewTicket == false || http.RenewUmbracoAuthTicket()))
+            {
+                try
+                {
+                    //create the Umbraco user identity 
+                    var identity = new UmbracoBackOfficeIdentity(ticket);
+
+                    //set the principal object
+                    var principal = new GenericPrincipal(identity, identity.Roles);
+
+                    //It is actually not good enough to set this on the current app Context and the thread, it also needs
+                    // to be set explicitly on the HttpContext.Current !! This is a strange web api thing that is actually 
+                    // an underlying fault of asp.net not propogating the User correctly.
+                    if (HttpContext.Current != null)
+                    {
+                        HttpContext.Current.User = principal;
+                    }
+                    http.User = principal;
+                    Thread.CurrentPrincipal = principal;
+
+                    //This is a back office request, we will also set the culture/ui culture
+                    Thread.CurrentThread.CurrentCulture =
+                        Thread.CurrentThread.CurrentUICulture =
+                        new System.Globalization.CultureInfo(identity.Culture);
+
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    if (ex is FormatException || ex is JsonReaderException)
+                    {
+                        //this will occur if the cookie data is invalid
+                        http.UmbracoLogout();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+
+                }
+            }
+
+            return false;
         }
 
-        internal static UmbracoBackOfficeIdentity GetCurrentIdentity(this HttpContext http)
+
+        /// <summary>
+        /// This will return the current back office identity. 
+        /// </summary>
+        /// <param name="http"></param>
+        /// <param name="authenticateRequestIfNotFound">
+        /// If set to true and a back office identity is not found and not authenticated, this will attempt to authenticate the 
+        /// request just as is done in the Umbraco module and then set the current identity if it is valid
+        /// </param>
+        /// <returns>
+        /// Returns the current back office identity if an admin is authenticated otherwise null
+        /// </returns>
+        public static UmbracoBackOfficeIdentity GetCurrentIdentity(this HttpContextBase http, bool authenticateRequestIfNotFound)
         {
-            return new HttpContextWrapper(http).GetCurrentIdentity();
+            if (http == null) throw new ArgumentNullException("http");
+            var identity = http.User.Identity as UmbracoBackOfficeIdentity;
+            if (identity != null) return identity;
+            if (authenticateRequestIfNotFound == false) return null;
+            //even if authenticateRequestIfNotFound is true we cannot continue if the request is actually authenticated 
+            // which would mean something strange is going on that it is not an umbraco identity.
+            if (http.User.Identity.IsAuthenticated) return null;
+            
+            //now we just need to try to authenticate the current request
+            var ticket = http.GetUmbracoAuthTicket();
+            if (http.AuthenticateCurrentRequest(ticket, true))
+            {
+                //now we 'should have an umbraco identity
+                return http.User.Identity as UmbracoBackOfficeIdentity;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// This will return the current back office identity. 
+        /// </summary>
+        /// <param name="http"></param>
+        /// <param name="authenticateRequestIfNotFound">
+        /// If set to true and a back office identity is not found and not authenticated, this will attempt to authenticate the 
+        /// request just as is done in the Umbraco module and then set the current identity if it is valid
+        /// </param>
+        /// <returns>
+        /// Returns the current back office identity if an admin is authenticated otherwise null
+        /// </returns>
+        internal static UmbracoBackOfficeIdentity GetCurrentIdentity(this HttpContext http, bool authenticateRequestIfNotFound)
+        {
+            if (http == null) throw new ArgumentNullException("http");
+            return new HttpContextWrapper(http).GetCurrentIdentity(authenticateRequestIfNotFound);
         }
 
         /// <summary>
@@ -26,11 +123,13 @@ namespace Umbraco.Core.Security
         /// </summary>
         public static void UmbracoLogout(this HttpContextBase http)
         {
+            if (http == null) throw new ArgumentNullException("http");
             Logout(http, UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName);
         }
 
         internal static void UmbracoLogout(this HttpContext http)
         {
+            if (http == null) throw new ArgumentNullException("http");
             new HttpContextWrapper(http).UmbracoLogout();
         }
 
@@ -41,6 +140,7 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         public static bool RenewUmbracoAuthTicket(this HttpContextBase http)
         {
+            if (http == null) throw new ArgumentNullException("http");
             return RenewAuthTicket(http,
                 UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName,
                 UmbracoConfig.For.UmbracoSettings().Security.AuthCookieDomain);
@@ -48,6 +148,7 @@ namespace Umbraco.Core.Security
 
         internal static bool RenewUmbracoAuthTicket(this HttpContext http)
         {
+            if (http == null) throw new ArgumentNullException("http");
             return new HttpContextWrapper(http).RenewUmbracoAuthTicket();
         }
 
@@ -58,6 +159,8 @@ namespace Umbraco.Core.Security
         /// <param name="userdata"></param>
         public static FormsAuthenticationTicket CreateUmbracoAuthTicket(this HttpContextBase http, UserData userdata)
         {
+            if (http == null) throw new ArgumentNullException("http");
+            if (userdata == null) throw new ArgumentNullException("userdata");
             var userDataString = JsonConvert.SerializeObject(userdata);
             return CreateAuthTicketAndCookie(
                 http, 
@@ -74,6 +177,8 @@ namespace Umbraco.Core.Security
 
         internal static FormsAuthenticationTicket CreateUmbracoAuthTicket(this HttpContext http, UserData userdata)
         {
+            if (http == null) throw new ArgumentNullException("http");
+            if (userdata == null) throw new ArgumentNullException("userdata");
             return new HttpContextWrapper(http).CreateUmbracoAuthTicket(userdata);
         }
 
@@ -84,6 +189,7 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         public static double GetRemainingAuthSeconds(this HttpContextBase http)
         {
+            if (http == null) throw new ArgumentNullException("http");
             var ticket = http.GetUmbracoAuthTicket();
             return ticket.GetRemainingAuthSeconds();
         }
@@ -111,11 +217,13 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         public static FormsAuthenticationTicket GetUmbracoAuthTicket(this HttpContextBase http)
         {
+            if (http == null) throw new ArgumentNullException("http");
             return GetAuthTicket(http, UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName);
         }
 
         internal static FormsAuthenticationTicket GetUmbracoAuthTicket(this HttpContext http)
         {
+            if (http == null) throw new ArgumentNullException("http");
             return new HttpContextWrapper(http).GetUmbracoAuthTicket();
         }
 
@@ -126,6 +234,7 @@ namespace Umbraco.Core.Security
         /// <param name="cookieName"></param>
         private static void Logout(this HttpContextBase http, string cookieName)
         {
+            if (http == null) throw new ArgumentNullException("http");
             //remove from the request
             http.Request.Cookies.Remove(cookieName);
 
@@ -145,6 +254,7 @@ namespace Umbraco.Core.Security
 
         private static FormsAuthenticationTicket GetAuthTicket(this HttpContextBase http, string cookieName)
         {
+            if (http == null) throw new ArgumentNullException("http");
             var formsCookie = http.Request.Cookies[cookieName];
             if (formsCookie == null)
             {
@@ -172,6 +282,7 @@ namespace Umbraco.Core.Security
         /// <returns>true if there was a ticket to renew otherwise false if there was no ticket</returns>
         private static bool RenewAuthTicket(this HttpContextBase http, string cookieName, string cookieDomain)
         {
+            if (http == null) throw new ArgumentNullException("http");
             //get the ticket
             var ticket = GetAuthTicket(http, cookieName);
             //renew the ticket
@@ -219,6 +330,7 @@ namespace Umbraco.Core.Security
                                             string cookieName,
                                             string cookieDomain)
         {
+            if (http == null) throw new ArgumentNullException("http");
             // Create a new ticket used for authentication
             var ticket = new FormsAuthenticationTicket(
                 4,

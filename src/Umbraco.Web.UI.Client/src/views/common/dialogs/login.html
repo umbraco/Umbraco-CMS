@@ -1,5 +1,6 @@
 ﻿<form name="loginForm" ng-submit="loginSubmit(login, password)" ng-controller="Umbraco.Dialogs.LoginController">
     <div id="login" class="umb-modalcolumn" ng-class="{'show-validation': loginForm.$invalid}">
+
         <div class="form">
             <h1>Happy {{today}}!</h1>
             <p><span ng-show="dialogData.isTimedOut">Session timed out. </span>Log in below</p>

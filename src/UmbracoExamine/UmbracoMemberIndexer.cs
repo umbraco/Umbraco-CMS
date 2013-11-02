@@ -3,6 +3,8 @@ using System.Linq;
 using System.Security;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Examine.LuceneEngine.Config;
+using UmbracoExamine.Config;
 using umbraco.cms.businesslogic.member;
 using Examine.LuceneEngine;
 using System.Collections.Generic;
@@ -37,6 +39,29 @@ namespace UmbracoExamine
             : base(indexerData, indexPath, dataService, analyzer, async) { }
 
         /// <summary>
+        /// Ensures that the'_searchEmail' is added to the user fields so that it is indexed - without having to modify the config
+        /// </summary>
+        /// <param name="indexSet"></param>
+        /// <returns></returns>
+        protected override IIndexCriteria GetIndexerData(IndexSet indexSet)
+        {
+            if (CanInitialize())
+            {           
+                var searchableEmail = indexSet.IndexUserFields["_searchEmail"];
+                if (searchableEmail == null)
+                {
+                    indexSet.IndexUserFields.Add(new IndexField
+                    {
+                        Name = "_searchEmail"
+                    });
+                }
+                return indexSet.ToIndexCriteria(DataService, IndexFieldPolicies);
+            }
+
+            return base.GetIndexerData(indexSet);
+        }
+
+	    /// <summary>
         /// The supported types for this indexer
         /// </summary>
         protected override IEnumerable<string> SupportedTypes
@@ -64,17 +89,38 @@ namespace UmbracoExamine
 
             return null;
         }
-
-        protected override Dictionary<string, string> GetDataToIndex(XElement node, string type)
+        
+        protected override Dictionary<string, string> GetSpecialFieldsToIndex(Dictionary<string, string> allValuesForIndexing)
         {
-            var data = base.GetDataToIndex(node, type);
+            var fields = base.GetSpecialFieldsToIndex(allValuesForIndexing);
 
-            if (data.ContainsKey("email"))
+            //adds the special path property to the index
+            fields.Add("__key", allValuesForIndexing["__key"]);
+            
+            return fields;
+
+        }
+
+        /// <summary>
+        /// Add the special __key and _searchEmail fields
+        /// </summary>
+        /// <param name="e"></param>
+        protected override void OnGatheringNodeData(IndexingNodeDataEventArgs e)
+        {
+            base.OnGatheringNodeData(e);
+
+            if (e.Node.Attribute("key") != null)
             {
-                data.Add("__email",data["email"].Replace("."," ").Replace("@"," "));
+                if (e.Fields.ContainsKey("__key") == false)
+                    e.Fields.Add("__key", e.Node.Attribute("key").Value);
             }
 
-            return data;
+            if (e.Node.Attribute("email") != null)
+            {
+                //NOTE: the single underscore = it's not a 'special' field which means it will be indexed normally
+                if (e.Fields.ContainsKey("_searchEmail") == false)
+                    e.Fields.Add("_searchEmail", e.Node.Attribute("email").Value.Replace(".", " ").Replace("@", " "));
+            }
         }
 
 		[SecuritySafeCritical]

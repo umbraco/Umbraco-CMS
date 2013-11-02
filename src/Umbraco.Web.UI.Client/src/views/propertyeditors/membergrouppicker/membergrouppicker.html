@@ -1,0 +1,25 @@
+<div ng-controller="Umbraco.PropertyEditors.MemberGroupPickerController" class="umb-editor umb-membergrouppicker">
+    
+
+    <ul class="unstyled" 
+    		ng-model="renderModel">	
+    		<li ng-repeat="node in renderModel">
+
+    			
+
+    			<a href="#" prevent-default ng-click="remove($index)">
+    				<i class="icon icon-delete red hover-show"></i>
+    				<i class="{{node.icon}} hover-hide"></i> 
+    					{{node.name}}
+    			</a>
+    		</li>
+    	</ul>
+
+	<ul class="unstyled">	
+		<li>
+			<a href="#" ng-click="openMemberGroupPicker()" prevent-default>
+				<i class="icon icon-add blue"></i> <localize key="general_add">Add</localize>
+			</a>
+		</li>
+	</ul>
+</div>

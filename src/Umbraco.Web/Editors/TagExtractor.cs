@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Web.Editors
@@ -22,22 +24,52 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="content"></param>
         /// <param name="property"></param>
-        /// <param name="propertyValue"></param>
+        /// <param name="propertyData"></param>
+        /// <param name="convertedPropertyValue"></param>
         /// <param name="attribute"></param>
-        public static void SetPropertyTags(IContentBase content, Property property, object propertyValue, SupportTagsAttribute attribute)
+        public static void SetPropertyTags(IContentBase content, Property property, ContentPropertyData propertyData, object convertedPropertyValue, SupportTagsAttribute attribute)
         {
-            switch (attribute.ValueType)
+            //check for a custom definition
+            if (attribute.TagPropertyDefinitionType != null)
+            {
+                //try to create it
+                TagPropertyDefinition def;
+                try
+                {
+                    def = (TagPropertyDefinition) Activator.CreateInstance(attribute.TagPropertyDefinitionType, propertyData, attribute);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<TagExtractor>("Could not create custom " + attribute.TagPropertyDefinitionType + " tag definition", ex);
+                    throw;
+                }
+                SetPropertyTags(content, property, convertedPropertyValue, def.Delimiter, def.ReplaceTags, def.TagGroup, attribute.ValueType);
+            }
+            else
+            {
+                SetPropertyTags(content, property, convertedPropertyValue, attribute.Delimiter, attribute.ReplaceTags, attribute.TagGroup, attribute.ValueType);
+            }
+        }
+
+        public static void SetPropertyTags(IContentBase content, Property property, object convertedPropertyValue, string delimiter, bool replaceTags, string tagGroup, TagValueType valueType)
+        {
+            if (convertedPropertyValue == null)
+            {
+                convertedPropertyValue = "";
+            }
+
+            switch (valueType)
             {
                 case TagValueType.FromDelimitedValue:
-                    var tags = propertyValue.ToString().Split(new[] { attribute.Delimiter }, StringSplitOptions.RemoveEmptyEntries);
-                    content.SetTags(property.Alias, tags, attribute.ReplaceTags, attribute.TagGroup);
+                    var tags = convertedPropertyValue.ToString().Split(new[] { delimiter }, StringSplitOptions.RemoveEmptyEntries);
+                    content.SetTags(property.Alias, tags, replaceTags, tagGroup);
                     break;
                 case TagValueType.CustomTagList:
                     //for this to work the object value must be IENumerable<string>
-                    var stringList = propertyValue as IEnumerable<string>;
+                    var stringList = convertedPropertyValue as IEnumerable<string>;
                     if (stringList != null)
                     {
-                        content.SetTags(property.Alias, stringList, attribute.ReplaceTags, attribute.TagGroup);
+                        content.SetTags(property.Alias, stringList, replaceTags, tagGroup);
                     }
                     break;
             }

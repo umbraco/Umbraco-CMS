@@ -10,6 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
@@ -42,10 +43,6 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-
-            //TODO: Here we need to do a legacy check... if we cannot find a property editor with the alias
-            // we should display a warning but let them select a different one!
-
             return Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dataType);
         }
 
@@ -62,8 +59,7 @@ namespace Umbraco.Web.Editors
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
-
-
+            
             Services.DataTypeService.Delete(foundType, UmbracoUser.Id);
 
             return Request.CreateResponse(HttpStatusCode.OK);
@@ -91,8 +87,8 @@ namespace Umbraco.Web.Editors
 
             if (dataTypeId == -1)
             {
-                //this is a new data type, so just return the field editors, there are no values yet
-                return propEd.PreValueEditor.Fields.Select(Mapper.Map<PreValueFieldDisplay>);                
+                //this is a new data type, so just return the field editors with default values
+                return Mapper.Map<PropertyEditor, IEnumerable<PreValueFieldDisplay>>(propEd);
             }
 
             //we have a data type associated
@@ -111,8 +107,8 @@ namespace Umbraco.Web.Editors
                 return Mapper.Map<IDataTypeDefinition, IEnumerable<PreValueFieldDisplay>>(dataType);
             }
 
-            //return the pre value display without values
-            return propEd.PreValueEditor.Fields.Select(Mapper.Map<PreValueFieldDisplay>);
+            //these are new pre-values, so just return the field editors with default values
+            return Mapper.Map<PropertyEditor, IEnumerable<PreValueFieldDisplay>>(propEd);            
         }
 
         //TODO: Generally there probably won't be file uploads for pre-values but we should allow them just like we do for the content editor

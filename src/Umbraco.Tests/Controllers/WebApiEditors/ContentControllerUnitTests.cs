@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             var userService = userServiceMock.Object;
             
             //act/assert
-            Assert.Throws<HttpResponseException>(() => ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F'));
+            Assert.Throws<HttpResponseException>(() => ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, new[] { 'F' }));
         }
 
         [Test]
@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             var userService = userServiceMock.Object;
 
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, new[] { 'F'});
 
             //assert
             Assert.IsFalse(result);
@@ -106,7 +106,7 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             var userService = userServiceMock.Object;
 
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, new[] { 'F'});
 
             //assert
             Assert.IsFalse(result);
@@ -135,7 +135,7 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             var userService = userServiceMock.Object;
 
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, 'F');
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, contentService, 1234, new[] { 'F'});
 
             //assert
             Assert.IsTrue(result);
@@ -223,7 +223,7 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             var userService = userServiceMock.Object;
 
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, null, -1, 'A');
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, null, -1, new[] { 'A'});
 
             //assert
             Assert.IsTrue(result);
@@ -247,7 +247,7 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             var userService = userServiceMock.Object;
 
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, null, -1, 'B');
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, null, -1, new[] { 'B'});
 
             //assert
             Assert.IsFalse(result);
@@ -271,7 +271,7 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             var userService = userServiceMock.Object;
 
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, null, -20, 'A');
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, null, -20, new[] { 'A'});
 
             //assert
             Assert.IsTrue(result);
@@ -295,7 +295,7 @@ namespace Umbraco.Tests.Controllers.WebApiEditors
             var userService = userServiceMock.Object;
 
             //act
-            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, null, -20, 'B');
+            var result = ContentController.CheckPermissions(new Dictionary<string, object>(), user, userService, null, -20, new[] { 'B'});
 
             //assert
             Assert.IsFalse(result);

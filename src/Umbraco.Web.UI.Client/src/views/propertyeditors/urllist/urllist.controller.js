@@ -10,6 +10,13 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.UrlListController"
             });
         }
 
+	    $scope.getUrl = function(valueUrl) {
+	        if (valueUrl.indexOf("/") >= 0) {
+	            return valueUrl;
+	        }
+	        return "#";
+	    };
+
 	    formatDisplayValue();
 	    
 	    //here we declare a special method which will be called whenever the value has changed from the server

@@ -3,7 +3,7 @@
 	<umb-control-group label="Toolbar" hide-label="false">
 		<div ng-repeat="cmd in tinyMceConfig.commands">
 			<input type="checkbox" 
-				ng-checked="selected(cmd.frontEndCommand, model.value.toolbar)" 
+				ng-checked="selected(cmd, cmd.frontEndCommand, model.value.toolbar)" 
 				ng-model="cmd.selected" 
 				ng-change="selectCommand(cmd)"
 				/> 
@@ -17,7 +17,7 @@
 	<umb-control-group label="Stylesheets" hide-label="0">
 		<div ng-repeat="css in stylesheets">
 			<input type="checkbox" 
-				ng-checked="selected(css.path, model.value.stylesheets)" 
+				ng-checked="selected(css, css.name, model.value.stylesheets)" 
 				ng-model="css.selected" 
 				ng-change="selectStylesheet(css)"
 				/> 
@@ -26,7 +26,7 @@
 	</umb-control-group>
 
 	<umb-control-group label="Dimensions" hide-label="asdasasdas">
-		<input type="number" ng-model="model.value.dimensions.height" class="umb-editor-tiny" placeholder="Height" /> x <input type="number" ng-model="model.value.dimensions.width" class="umb-editor umb-editor-tiny" placeholder="Width" /> Pixels   
+		<input type="number" ng-model="model.value.dimensions.height" 
+		class="umb-editor-tiny" placeholder="Height" /> x <input type="number" ng-model="model.value.dimensions.width" class="umb-editor-tiny" placeholder="Width" /> Pixels   
 	</umb-control-group>
-	
 </div>

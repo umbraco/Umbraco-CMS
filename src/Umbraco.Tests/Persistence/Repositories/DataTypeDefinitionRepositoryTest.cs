@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(dataTypeDefinitions, Is.Not.Null);
                 Assert.That(dataTypeDefinitions.Any(), Is.True);
                 Assert.That(dataTypeDefinitions.Any(x => x == null), Is.False);
-                Assert.That(dataTypeDefinitions.Count(), Is.EqualTo(24));
+                Assert.That(dataTypeDefinitions.Count(), Is.EqualTo(20));
             }
         }
 
@@ -242,7 +242,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var exists = repository.Exists(1042); //Macro Container
+                var exists = repository.Exists(1034); //Content picker
                 var doesntExist = repository.Exists(-80);
 
                 // Assert

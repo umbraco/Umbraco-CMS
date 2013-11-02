@@ -166,6 +166,17 @@ namespace Umbraco.Core.PropertyEditors
         /// <returns></returns>
         internal Attempt<object> TryConvertValueToCrlType(object value)
         {
+
+            //this is a custom check to avoid any errors, if it's a string and it's empty just make it null
+            var s = value as string;
+            if (s != null)
+            {
+                if (s.IsNullOrWhiteSpace())
+                {
+                    value = null;
+                }
+            }
+
             Type valueType;
             //convert the string to a known type
             switch (GetDatabaseType())
@@ -178,6 +189,7 @@ namespace Umbraco.Core.PropertyEditors
                     //ensure these are nullable so we can return a null if required
                     //NOTE: This is allowing type of 'long' because I think json.net will deserialize a numerical value as long
                     // instead of int. Even though our db will not support this (will get truncated), we'll at least parse to this.
+                    
                     valueType = typeof(long?);
                     break;
                 case DataTypeDatabaseType.Date:

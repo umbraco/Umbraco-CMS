@@ -30,7 +30,15 @@
         });
 
         $.ctrl("S", function(){
-            $(".umb-panel-header .btn-primary").click();
+            var link = $(".umb-panel-header .btn-primary");
+            var b = link.click();
+
+            //this is made of bad, to work around webforms horrible wiring
+            if(!link.hasClass("client-side") && link.attr("href").indexOf("javascript:") == 0){
+                eval(link.attr('href').replace('javascript:',''));
+            }else{
+                link.click();
+            }
         });
 
     });     

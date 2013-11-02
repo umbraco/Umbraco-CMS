@@ -148,6 +148,18 @@ namespace Umbraco.Web.Editors
                                 {
                                     "tagApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<TagsController>(
                                         controller => controller.GetAllTags(null))
+                                },
+                                {
+                                    "memberTreeBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MemberTreeController>(
+                                        controller => controller.GetNodes("-1", null))
+                                },
+                                {
+                                    "mediaTreeBaseUrl", Url.GetUmbracoApiServiceBaseUrl<MediaTreeController>(
+                                        controller => controller.GetNodes("-1", null))
+                                },
+                                {
+                                    "contentTreeBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentTreeController>(
+                                        controller => controller.GetNodes("-1", null))
                                 }
                             }
                     },
@@ -168,12 +180,35 @@ namespace Umbraco.Web.Editors
                                 {"trees", GetTreePluginsMetaData()}
                             }
                     },
-                    {"isDebuggingEnabled", HttpContext.IsDebuggingEnabled}
+                    {"isDebuggingEnabled", HttpContext.IsDebuggingEnabled},
+                    {
+                        "application", GetApplicationState()
+                    }
                 };
+
 
             return JavaScript(ServerVariablesParser.Parse(d));
         }
 
+
+        private Dictionary<string, object> GetApplicationState()
+        {
+            if (ApplicationContext.IsConfigured == false)
+                return null;
+
+            var app = new Dictionary<string, object>
+                {
+                    {"assemblyVersion", UmbracoVersion.AssemblyVersion}
+                };
+
+            var version = string.IsNullOrEmpty(UmbracoVersion.CurrentComment)
+                            ? UmbracoVersion.Current.ToString(3)
+                            : string.Format("{0}-{1}", UmbracoVersion.Current.ToString(3), UmbracoVersion.CurrentComment);
+
+            app.Add("version", version);
+
+            return app;
+        }
         
 
         private IEnumerable<Dictionary<string, string>> GetTreePluginsMetaData()

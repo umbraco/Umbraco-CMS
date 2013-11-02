@@ -162,7 +162,7 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
             SaveButton.Text = ui.Text("save");
             SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";
-
+            SaveButton.CssClass = "client-side";
 
 			Panel1.Text = ui.Text("edittemplate");
 			pp_name.Text = ui.Text("name", base.getUser());

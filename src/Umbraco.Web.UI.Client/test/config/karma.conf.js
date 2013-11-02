@@ -11,7 +11,8 @@ module.exports = function(karma) {
         'lib/angular/1.1.5/angular.js',
         'lib/angular/1.1.5/angular-cookies.min.js',
         'lib/angular/1.1.5/angular-mocks.js',
-
+        'lib/angular/angular-ui-sortable.js',
+        
         /*
         For angular 1.2:
          'lib/angular/1.2/angular.js',
@@ -25,6 +26,7 @@ module.exports = function(karma) {
          'lib/underscore/underscore.js',
          'lib/umbraco/Extensions.js', 
          'lib/yepnope/yepnope.min.js',
+
 
          'test/config/app.unit.js',
          'src/common/mocks/umbraco.servervariables.js',

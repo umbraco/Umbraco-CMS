@@ -12,11 +12,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// </summary>
     public class MemberSave : ContentBaseItemSave<IMember>
     {
-        public MemberSave()
-        {
-            Password = new ChangingPasswordModel();
-        }
-
+        
         [DataMember(Name = "username", IsRequired = true)]
         [RequiredForPersistence(AllowEmptyStrings = false, ErrorMessage = "Required")]
         public string Username { get; set; }

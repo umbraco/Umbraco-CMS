@@ -268,7 +268,7 @@ namespace Umbraco.Tests
         public void Resolves_Assigned_Mappers()
         {
             var foundTypes1 = PluginManager.Current.ResolveAssignedMapperTypes();
-            Assert.AreEqual(19, foundTypes1.Count());
+            Assert.AreEqual(20, foundTypes1.Count());
         }
 
         [Test]
@@ -282,21 +282,21 @@ namespace Umbraco.Tests
         public void Resolves_Attributed_Trees()
         {
             var trees = PluginManager.Current.ResolveAttributedTrees();
-            Assert.AreEqual(20, trees.Count());
+            Assert.AreEqual(19, trees.Count());
         }
 
         [Test]
         public void Resolves_Actions()
         {
             var actions = PluginManager.Current.ResolveActions();
-            Assert.AreEqual(38, actions.Count());
+            Assert.AreEqual(36, actions.Count());
         }
 
         [Test]
         public void Resolves_Trees()
         {
             var trees = PluginManager.Current.ResolveTrees();
-            Assert.AreEqual(40, trees.Count());
+            Assert.AreEqual(39, trees.Count());
         }
 
         [Test]
@@ -310,7 +310,7 @@ namespace Umbraco.Tests
         public void Resolves_DataTypes()
         {
             var types = PluginManager.Current.ResolveDataTypes();
-            Assert.AreEqual(38, types.Count());
+            Assert.AreEqual(35, types.Count());
         }
 
         [Test]
@@ -331,7 +331,7 @@ namespace Umbraco.Tests
         public void Resolves_XsltExtensions()
         {
             var types = PluginManager.Current.ResolveXsltExtensions();
-            Assert.AreEqual(1, types.Count());
+            Assert.AreEqual(3, types.Count());
         }
 
         [XsltExtension("Blah.Blah")]

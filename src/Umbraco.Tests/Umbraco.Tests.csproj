@@ -294,7 +294,6 @@
     <Compile Include="CoreStrings\DefaultShortStringHelperTests.cs" />
     <Compile Include="CoreStrings\LegacyStringExtensionsTests.cs" />
     <Compile Include="CoreStrings\MockShortStringHelper.cs" />
-    <Compile Include="LegacyApi\MediaTypeTests.cs" />
     <Compile Include="Macros\MacroTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
     <Compile Include="Migrations\Upgrades\BaseUpgradeTest.cs" />

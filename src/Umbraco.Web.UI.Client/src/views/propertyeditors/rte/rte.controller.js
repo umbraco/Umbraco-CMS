@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-    function ($rootScope, $element, $scope, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper) {
+    function ($rootScope, $element, $scope, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource) {
 
         tinyMceService.configuration().then(function(tinyMceConfig){
 
@@ -25,7 +25,34 @@ angular.module("umbraco")
 
             //config value on the data type
             var toolbar = editorConfig.toolbar.join(" | ");
-            
+            var stylesheets = [];
+            var styleFormats = [];
+
+            angular.forEach(editorConfig.stylesheets, function(val, key){
+                stylesheets.push("/css/" + val + ".css");
+                
+                stylesheetResource.getRulesByName(val).then(function(rules) {
+                    angular.forEach(rules, function(rule) {
+                        var r = {};
+                        r.title = rule.name;
+                        if (rule.selector[0] == ".") {
+                            r.inline = "span";
+                            r.classes = rule.selector.substring(1);
+                        }
+                        else if (rule.selector[0] == "#") {
+                            r.inline = "span";
+                            r.attributes = { id: rule.selector.substring(1) };
+                        }
+                        else {
+                            r.block = rule.selector;
+                        }
+
+                        styleFormats.push(r);
+                    });
+                });
+            });
+
+
             assetsService.loadJs("lib/tinymce/tinymce.min.js", $scope).then(function () {
                 
                 /** Loads in the editor */
@@ -47,7 +74,9 @@ angular.module("umbraco")
                             statusbar: false,
                             height: editorConfig.dimensions.height,
                             toolbar: toolbar,
+                            content_css: stylesheets.join(','),
                             relative_urls: false,
+                            style_formats: styleFormats,
                             setup: function (editor) {
 
                                 //We need to listen on multiple things here because of the nature of tinymce, it doesn't 

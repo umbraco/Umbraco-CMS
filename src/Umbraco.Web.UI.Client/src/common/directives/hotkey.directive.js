@@ -6,7 +6,13 @@ angular.module("umbraco.directives")
   .directive('hotkey', function ($window, keyboardService, $log) {
 
       return function (scope, el, attrs) {
-          var keyCombo = attrs["hotkey"];
+          
+          //support data binding
+    
+          var keyCombo = scope.$eval(attrs["hotkey"]);
+          if (!keyCombo) {
+              keyCombo = attrs["hotkey"];
+          }
 
           keyboardService.bind(keyCombo, function() {
               var element = $(el);

@@ -12,6 +12,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
+using umbraco;
 
 namespace Umbraco.Tests.Models.Mapping
 {
@@ -112,7 +113,7 @@ namespace Umbraco.Tests.Models.Mapping
                 AssertDisplayProperty(result, p, ApplicationContext);
             }            
             Assert.AreEqual(content.PropertyGroups.Count(), result.Tabs.Count() - 1);
-            Assert.IsTrue(result.Tabs.Any(x => x.Label == "Generic properties"));
+            Assert.IsTrue(result.Tabs.Any(x => x.Label == ui.Text("general", "properties")));
             Assert.IsTrue(result.Tabs.First().IsActive);
             Assert.IsTrue(result.Tabs.Except(new[] {result.Tabs.First()}).All(x => x.IsActive == false));
         }
@@ -158,8 +159,8 @@ namespace Umbraco.Tests.Models.Mapping
                 AssertDisplayProperty(result, p, ApplicationContext);
             }
             Assert.AreEqual(content.PropertyGroups.Count(), result.Tabs.Count() - 1);
-            Assert.IsTrue(result.Tabs.Any(x => x.Label == "Generic properties"));
-            Assert.AreEqual(2, result.Tabs.Where(x => x.Label == "Generic properties").SelectMany(x => x.Properties.Where(p => p.Alias.StartsWith("_umb_") == false)).Count());
+            Assert.IsTrue(result.Tabs.Any(x => x.Label == ui.Text("general", "properties")));
+            Assert.AreEqual(2, result.Tabs.Where(x => x.Label == ui.Text("general", "properties")).SelectMany(x => x.Properties.Where(p => p.Alias.StartsWith("_umb_") == false)).Count());
         }
 
         #region Assertions

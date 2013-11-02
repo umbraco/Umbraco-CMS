@@ -1,1 +1,11 @@
-<input name="numberField" class="umb-editor umb-number" type="number" ng-model="model.value" />
+<div>
+    <input name="numberField" class="umb-editor umb-number" 
+           type="number" 
+           ng-model="model.value"
+           val-server="value"
+            fix-number />
+
+    <span class="help-inline" val-msg-for="numberField" val-toggle-msg="number">Not a number</span>
+    <span class="help-inline" val-msg-for="numberField" val-toggle-msg="valServer">{{propertyForm.requiredField.errorMsg}}</span>
+    
+</div>

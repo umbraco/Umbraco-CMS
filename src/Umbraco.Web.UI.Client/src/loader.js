@@ -8,8 +8,10 @@ yepnope({
     'lib/jquery/jquery.ui.core.min.js',
     'lib/jquery/jquery.ui.widget.min.js',
 
-    /*'lib/jquery/jquery.ui.mouse.min.js',        
+    'lib/jquery/jquery.ui.mouse.min.js',       
     'lib/jquery/jquery.ui.sortable.min.js',
+
+    /*
     'lib/jquery/jquery.ui.effect.min.js',
     'lib/jquery/jquery.ui.effect-highlight.min.js',
     'lib/jquery/jquery.ui.draggable.js',*/
@@ -31,16 +33,14 @@ yepnope({
     'lib/angular/1.2/angular-sanitize.min.js',
     */
 
-    /* temporary sorter lib, should be updated */
-    /*'lib/angular/angular-ui-sortable.js',*/
-    'lib/jquery/jquery.sortable/jquery.sortable.js',
+    'lib/angular/angular-ui-sortable.js',
+
 
     /* App-wide file-upload helper */
     'lib/jquery/jquery.upload/js/jquery.fileupload.js',
     'lib/jquery/jquery.upload/js/jquery.fileupload-process.js',
     'lib/jquery/jquery.upload/js/jquery.fileupload-angular.js',
-
-
+    
     'lib/bootstrap/js/bootstrap.js',
     'lib/underscore/underscore.js',
     'lib/umbraco/Extensions.js',

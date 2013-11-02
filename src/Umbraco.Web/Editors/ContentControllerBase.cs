@@ -116,8 +116,8 @@ namespace Umbraco.Web.Editors
                         var propVal = p.PropertyEditor.ValueEditor.ConvertEditorToDb(data, dboProperty.Value);
                         var supportTagsAttribute = TagExtractor.GetAttribute(p.PropertyEditor);
                         if (supportTagsAttribute != null)
-                        {                            
-                            TagExtractor.SetPropertyTags(contentItem.PersistedContent, dboProperty, propVal, supportTagsAttribute);                            
+                        {
+                            TagExtractor.SetPropertyTags(contentItem.PersistedContent, dboProperty, data, propVal, supportTagsAttribute);                            
                         }
                         else
                         {
@@ -158,6 +158,16 @@ namespace Umbraco.Web.Editors
                        ? getFromService()
                        : (TPersisted) Request.Properties[typeof (TPersisted).ToString()];
         } 
+
+        /// <summary>
+        /// Returns true if the action passed in means we need to create something new
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        internal static bool IsCreatingAction(ContentSaveAction action)
+        {
+            return (action.ToString().EndsWith("New"));
+        }
 
     }
 }

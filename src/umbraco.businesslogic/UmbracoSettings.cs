@@ -491,7 +491,7 @@ namespace umbraco
         /// </summary>
         public static bool isXmlContentCacheDisabled
         {
-            get { return UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled; }
+            get { return UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled == false; }
         }
 
         /// <summary>
@@ -593,9 +593,10 @@ namespace umbraco
         /// - HideFileDuplicates   - Show files in the sprite and hide duplicates on disk
         /// </summary>
         /// <value>MacroErrorBehaviour enum defining how to show icons in the document type editor.</value>
+        [Obsolete("This is no longer used and will be removed from the core in future versions")]
         public static IconPickerBehaviour IconPickerBehaviour
         {
-            get { return UmbracoConfig.For.UmbracoSettings().Content.IconPickerBehaviour; }
+            get { return IconPickerBehaviour.ShowDuplicates; }
         }
 
         /// <summary>

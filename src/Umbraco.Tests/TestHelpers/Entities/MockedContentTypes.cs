@@ -212,13 +212,14 @@ namespace Umbraco.Tests.TestHelpers.Entities
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.CheckBoxListAlias, DataTypeDatabaseType.Nvarchar) { Alias = "chklist", Name = "Checkbox List", Mandatory = false, SortOrder = 15, DataTypeDefinitionId = -43 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.ContentPickerAlias, DataTypeDatabaseType.Integer) { Alias = "contentPicker", Name = "Content Picker", Mandatory = false, SortOrder = 16, DataTypeDefinitionId = 1034 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.MediaPickerAlias, DataTypeDatabaseType.Integer) { Alias = "mediaPicker", Name = "Media Picker", Mandatory = false, SortOrder = 17, DataTypeDefinitionId = 1035 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.MemberPickerAlias, DataTypeDatabaseType.Integer) { Alias = "memberPicker", Name = "Member Picker", Mandatory = false, SortOrder = 18, DataTypeDefinitionId = 1036 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.UltraSimpleEditorAlias, DataTypeDatabaseType.Ntext) { Alias = "simpleEditor", Name = "Ultra Simple Editor", Mandatory = false, SortOrder = 19, DataTypeDefinitionId = 1038 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.UltimatePickerAlias, DataTypeDatabaseType.Ntext) { Alias = "ultimatePicker", Name = "Ultimate Picker", Mandatory = false, SortOrder = 20, DataTypeDefinitionId = 1039 });
+            contentCollection.Add(new PropertyType(Constants.PropertyEditors.MemberPickerAlias, DataTypeDatabaseType.Integer) { Alias = "memberPicker", Name = "Member Picker", Mandatory = false, SortOrder = 18, DataTypeDefinitionId = 1036 });            
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.RelatedLinksAlias, DataTypeDatabaseType.Ntext) { Alias = "relatedLinks", Name = "Related Links", Mandatory = false, SortOrder = 21, DataTypeDefinitionId = 1040 });
             contentCollection.Add(new PropertyType(Constants.PropertyEditors.TagsAlias, DataTypeDatabaseType.Ntext) { Alias = "tags", Name = "Tags", Mandatory = false, SortOrder = 22, DataTypeDefinitionId = 1041 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.MacroContainerAlias, DataTypeDatabaseType.Ntext) { Alias = "macroContainer", Name = "Macro Container", Mandatory = false, SortOrder = 23, DataTypeDefinitionId = 1042 });
-            contentCollection.Add(new PropertyType(Constants.PropertyEditors.ImageCropperAlias, DataTypeDatabaseType.Ntext) { Alias = "imgCropper", Name = "Image Cropper", Mandatory = false, SortOrder = 24, DataTypeDefinitionId = 1043 });
+
+            //contentCollection.Add(new PropertyType(Constants.PropertyEditors.UltraSimpleEditorAlias, DataTypeDatabaseType.Ntext) { Alias = "simpleEditor", Name = "Ultra Simple Editor", Mandatory = false, SortOrder = 19, DataTypeDefinitionId = 1038 });
+            //contentCollection.Add(new PropertyType(Constants.PropertyEditors.UltimatePickerAlias, DataTypeDatabaseType.Ntext) { Alias = "ultimatePicker", Name = "Ultimate Picker", Mandatory = false, SortOrder = 20, DataTypeDefinitionId = 1039 });
+            //contentCollection.Add(new PropertyType(Constants.PropertyEditors.MacroContainerAlias, DataTypeDatabaseType.Ntext) { Alias = "macroContainer", Name = "Macro Container", Mandatory = false, SortOrder = 23, DataTypeDefinitionId = 1042 });
+            //contentCollection.Add(new PropertyType(Constants.PropertyEditors.ImageCropperAlias, DataTypeDatabaseType.Ntext) { Alias = "imgCropper", Name = "Image Cropper", Mandatory = false, SortOrder = 24, DataTypeDefinitionId = 1043 });
 
             contentType.PropertyGroups.Add(new PropertyGroup(contentCollection) { Name = "Content", SortOrder = 1 });
 

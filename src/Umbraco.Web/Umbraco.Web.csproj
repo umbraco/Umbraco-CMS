@@ -182,6 +182,7 @@
     </Reference>
     <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Web" />
     <Reference Include="System.Web.Abstractions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -307,6 +308,7 @@
     <Compile Include="Editors\DashboardSecurity.cs" />
     <Compile Include="Editors\DataTypeController.cs" />
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
+    <Compile Include="Models\ContentEditing\EntityTypeSearchResult.cs" />
     <Compile Include="Models\IRenderModel.cs" />
     <Compile Include="Models\RenderModelOfTContent.cs" />
     <Compile Include="Mvc\UmbracoTemplatePageOfTContent.cs" />
@@ -343,12 +345,16 @@
     <Compile Include="PropertyEditors\ColorListPreValueEditor.cs" />
     <Compile Include="PropertyEditors\EmailAddressPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ListViewPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MacroContainerPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MemberGroupPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MemberPickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\MultiNodePickerPreValueEditor.cs" />
     <Compile Include="PropertyEditors\MultiNodeTreePickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\TextAreaParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\TextParameterEditor.cs" />
-    <Compile Include="PropertyEditors\ParameterEditors\TrueFalseParameterEditor.cs" />
+    <Compile Include="PropertyEditors\ParameterEditors\ContentTypeParameterEditor.cs" />
+    <Compile Include="PropertyEditors\ParameterEditors\MultipleContentTypeParameterEditor.cs" />
+    <Compile Include="PropertyEditors\ParameterEditors\MultiplePropertyGroupParameterEditor.cs" />
+    <Compile Include="PropertyEditors\ParameterEditors\MultiplePropertyTypeParameterEditor.cs" />
+    <Compile Include="PropertyEditors\ParameterEditors\PropertyGroupParameterEditor.cs" />
+    <Compile Include="PropertyEditors\ParameterEditors\PropertyTypeParameterEditor.cs" />
     <Compile Include="PropertyEditors\RelatedLinksPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RteEmbedController.cs" />
     <Compile Include="Editors\EntityController.cs" />
@@ -383,7 +389,8 @@
     <Compile Include="PropertyEditors\RadioButtonsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RichTextPreValueController.cs" />
     <Compile Include="PropertyEditors\RichTextPreValueEditor.cs" />
-    <Compile Include="PropertyEditors\UltraSimplePropertyEditor.cs" />
+    <Compile Include="PropertyEditors\SliderPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\TagPropertyEditorTagDefinition.cs" />
     <Compile Include="PropertyEditors\TagsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\UploadFileTypeValidator.cs" />
     <Compile Include="PropertyEditors\UserPickerPropertyEditor.cs" />
@@ -394,11 +401,12 @@
     <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
     <Compile Include="PropertyEditors\LabelPropertyValueEditor.cs" />
     <Compile Include="PropertyEditors\PropertyValueEditorWrapper.cs" />
-    <Compile Include="PublishedQueryContext.cs" />
+    <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
-    <Compile Include="TagQueryContext.cs" />
+    <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
+    <Compile Include="Trees\LegacyBaseTreeAttribute.cs" />
     <Compile Include="Trees\MemberTreeController.cs" />
     <Compile Include="Trees\MenuRenderingEventArgs.cs" />
     <Compile Include="Models\Trees\CreateChildEntity.cs" />
@@ -413,7 +421,15 @@
     <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\dialogs\cruds.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\Trees\loadPackager.cs" />
+    <Compile Include="Web References\org.umbraco.our\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.map</DependentUpon>
+    </Compile>
     <Compile Include="WebApi\Binders\MemberBinder.cs" />
     <Compile Include="WebApi\ControllerContextExtensions.cs" />
     <Compile Include="WebApi\CustomDateTimeConvertor.cs" />
@@ -424,7 +440,7 @@
     <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Models\ProfileModel.cs" />
     <Compile Include="Models\LoginStatusModel.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\SimpleEditorValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MarkdownEditorValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\TextStringValueConverter.cs" />
     <Compile Include="PublishedContentPropertyExtension.cs" />
     <Compile Include="Models\UmbracoProperty.cs" />
@@ -1295,13 +1311,6 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\create.aspx.designer.cs">
       <DependentUpon>create.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\cruds.aspx.cs">
-      <DependentUpon>cruds.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\cruds.aspx.designer.cs">
-      <DependentUpon>cruds.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\emptyTrashcan.aspx.cs">
       <DependentUpon>emptyTrashcan.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1776,6 +1785,11 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="WebViewPageExtensions.cs" />
+    <None Include="Web References\org.umbraco.our\Reference.map">
+      <Generator>MSDiscoCodeGenerator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Web References\org.umbraco.our\repository.disco" />
     <EmbeddedResource Include="UI\JavaScript\Main.js" />
     <EmbeddedResource Include="UI\JavaScript\JsInitialize.js" />
     <EmbeddedResource Include="UI\JavaScript\ServerVariables.js" />
@@ -1847,9 +1861,6 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\create.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\cruds.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\emptyTrashcan.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\exportDocumenttype.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\imageViewer.aspx" />
@@ -1883,8 +1894,10 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx" />
+    <None Include="app.config" />
     <None Include="Mvc\web.config.template" />
     <None Include="packages.config" />
+    <None Include="Web References\org.umbraco.our\repository.wsdl" />
     <None Include="Web References\org.umbraco.update\UpgradeResult.datasource">
       <DependentUpon>Reference.map</DependentUpon>
     </None>
@@ -2030,6 +2043,17 @@
     <WebReferences Include="Web References\" />
   </ItemGroup>
   <ItemGroup>
+    <WebReferenceUrl Include="http://our.umbraco.org/umbraco/webservices/api/repository.asmx">
+      <UrlBehavior>Dynamic</UrlBehavior>
+      <RelPath>Web References\org.umbraco.our\</RelPath>
+      <UpdateFromURL>http://our.umbraco.org/umbraco/webservices/api/repository.asmx</UpdateFromURL>
+      <ServiceLocationURL>
+      </ServiceLocationURL>
+      <CachedDynamicPropName>
+      </CachedDynamicPropName>
+      <CachedAppSettingsObjectName>Settings</CachedAppSettingsObjectName>
+      <CachedSettingsPropName>umbraco_org_umbraco_our_Repository</CachedSettingsPropName>
+    </WebReferenceUrl>
     <WebReferenceUrl Include="http://update.umbraco.org/checkforupgrade.asmx">
       <UrlBehavior>Dynamic</UrlBehavior>
       <RelPath>Web References\org.umbraco.update\</RelPath>
@@ -2042,7 +2066,9 @@
       <CachedSettingsPropName>umbraco_org_umbraco_update_CheckForUpgrade</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

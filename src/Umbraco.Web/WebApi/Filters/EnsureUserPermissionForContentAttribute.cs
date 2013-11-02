@@ -100,7 +100,7 @@ namespace Umbraco.Web.WebApi.Filters
                 actionContext.Request.Properties,
                 UmbracoContext.Current.Security.CurrentUser,
                 ApplicationContext.Current.Services.UserService,
-                ApplicationContext.Current.Services.ContentService, nodeId, _permissionToCheck))
+                ApplicationContext.Current.Services.ContentService, nodeId, _permissionToCheck.HasValue ? new[]{_permissionToCheck.Value}: null))
             {
                 base.OnActionExecuting(actionContext);
             }

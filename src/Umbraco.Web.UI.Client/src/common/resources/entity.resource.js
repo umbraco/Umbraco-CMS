@@ -262,6 +262,17 @@ function entityResource($q, $http, umbRequestHelper) {
                        "Search",
                        [{ query: query }, {type: type}])),
                'Failed to retreive entity data for query ' + query);
+        },
+        
+        searchAll: function (query) {
+
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "entityApiBaseUrl",
+                       "SearchAll",
+                       [{ query: query }])),
+               'Failed to retreive entity data for query ' + query);
         }
             
     };

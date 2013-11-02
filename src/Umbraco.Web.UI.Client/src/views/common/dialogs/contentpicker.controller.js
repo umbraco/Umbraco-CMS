@@ -25,7 +25,9 @@ angular.module("umbraco").controller("Umbraco.Dialogs.ContentPickerController",
 		if($scope.term){
 			if($scope.oldTerm !== $scope.term){
 				$scope.results = [];
-				searchService.searchContent({term: $scope.term, results: $scope.results});
+			    searchService.searchContent({ term: $scope.term }).then(function(data) {
+			        $scope.results = data;
+			    });
 				$scope.showSearch = true;
 				$scope.oldTerm = $scope.term;
 			}

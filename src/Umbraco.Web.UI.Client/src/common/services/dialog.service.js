@@ -373,6 +373,25 @@ angular.module('umbraco.services')
                options.show = true;
               return openDialog(options);
            },
+           
+           /**
+            * @ngdoc method
+            * @name umbraco.services.dialogService#memberGroupPicker
+            * @methodOf umbraco.services.dialogService
+            *
+            * @description
+            * Opens a member group picker in a modal, the callback returns a object representing the selected member
+            * @param {Object} options member group picker dialog options object
+            * @param {$scope} options.scope dialog scope
+            * @param {$scope} options.multiPicker should the tree pick one or multiple members before returning
+            * @param {Function} options.callback callback function
+            * @returns {Object} modal object
+            */
+           memberGroupPicker: function (options) {
+               options.template = 'views/common/dialogs/memberGroupPicker.html';
+               options.show = true;
+               return openDialog(options);
+           },
 
            /**
             * @ngdoc method

@@ -27,28 +27,24 @@ angular.module("umbraco.directives")
 						});
 				}
 
-				ngModel.$render = function(){
-					$timeout(function(){
-						if(!scope.model){
-							scope.goEdit();
-						}
-					}, 100);
-				};
-
+				$timeout(function(){
+					if(!scope.model){
+						scope.goEdit();
+					}
+				}, 100, false);
+			
 				scope.goEdit = function(){
 					scope.editMode = true;
+
 					$timeout(function () {					    
 					    inputElement.focus();					    
-					}, 100);
+					}, 100, false);
 				};
 
 				scope.exitEdit = function(){
-					scope.editMode = false;
-
-                    //SD: I've removed this since I don't agree with it - but please enable if that's what you want.
-					//if (!scope.model) {
-					//    scope.model = "Empty...";
-					//}
+					if(scope.model && scope.model !== ""){
+						scope.editMode = false;	
+					}
 				};
 			}
 	    };

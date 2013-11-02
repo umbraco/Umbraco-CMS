@@ -21,21 +21,7 @@ function contentTypeResource($q, $http, umbRequestHelper) {
             deferred.resolve(data);
             return deferred.promise;
         },
-        //return all available types
-        all: function () {
-            return [];
-        },
-
-        //return children inheriting a given type
-        children: function (id) {
-            return [];
-        },
-
-        //return all content types a type inherits from
-        parents: function (id) {
-            return [];
-        },
-
+        
         //return all types allowed under given document
         getAllowedTypes: function (contentId) {
            

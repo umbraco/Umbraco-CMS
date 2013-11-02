@@ -49,9 +49,13 @@ namespace Umbraco.Web.Editors
         {
             if (contentId == Core.Constants.System.Root)
             {
-                return Services.ContentTypeService.GetAllContentTypes()
-                    .Where(x => x.AllowedAsRoot)
-                    .Select(Mapper.Map<IContentType, ContentTypeBasic>);
+                var types = Services.ContentTypeService.GetAllContentTypes();
+
+                //if no allowed root types are set, just return everythibg
+                if(types.Any(x => x.AllowedAsRoot))
+                    types = types.Where(x => x.AllowedAsRoot);
+
+                return types.Select(Mapper.Map<IContentType, ContentTypeBasic>);
             }
 
             var contentItem = Services.ContentService.GetById(contentId);

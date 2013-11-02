@@ -111,6 +111,8 @@ namespace Umbraco.Web.Cache
 
             Macro.AfterSave += MacroAfterSave;
             Macro.AfterDelete += MacroAfterDelete;
+            MacroService.Saved += MacroServiceSaved;
+            MacroService.Deleted += MacroServiceDeleted;
 
             //Bind to member events
 
@@ -498,6 +500,23 @@ namespace Umbraco.Web.Cache
         #endregion
 
         #region Macro event handlers
+
+        void MacroServiceDeleted(IMacroService sender, Core.Events.DeleteEventArgs<IMacro> e)
+        {
+            foreach (var entity in e.DeletedEntities)
+            {
+                DistributedCache.Instance.RemoveMacroCache(entity);
+            }
+        }
+
+        void MacroServiceSaved(IMacroService sender, Core.Events.SaveEventArgs<IMacro> e)
+        {
+            foreach (var entity in e.SavedEntities)
+            {
+                DistributedCache.Instance.RefreshMacroCache(entity);
+            }
+        }
+        
         /// <summary>
         /// Flush macro from cache
         /// </summary>

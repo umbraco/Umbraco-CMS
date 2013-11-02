@@ -440,8 +440,8 @@ namespace Umbraco.Core
         internal IEnumerable<Type> ResolveParameterEditors()
         {
             //return all paramter editor types found except for the base property editor type
-            return ResolveTypes<ParameterEditor>()
-                .Except(new[] { typeof(ParameterEditor) });
+            return ResolveTypes<IParameterEditor>()
+                .Except(new[] { typeof(ParameterEditor), typeof(PropertyEditor) });
         } 
 
         /// <summary>

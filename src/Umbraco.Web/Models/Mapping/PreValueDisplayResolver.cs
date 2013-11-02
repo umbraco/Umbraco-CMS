@@ -20,6 +20,47 @@ namespace Umbraco.Web.Models.Mapping
             _dataTypeService = dataTypeService;
         }
 
+        /// <summary>
+        /// Maps pre-values in the dictionary to the values for the fields
+        /// </summary>
+        /// <param name="fields"></param>
+        /// <param name="preValues"></param>
+        /// <param name="isDictionaryBased"></param>
+        internal static void MapPreValueValuesToPreValueFields(PreValueFieldDisplay[] fields, IDictionary<string, object> preValues, bool isDictionaryBased)
+        {
+            if (fields == null) throw new ArgumentNullException("fields");
+            if (preValues == null) throw new ArgumentNullException("preValues");
+            //now we need to wire up the pre-values values with the actual fields defined
+            var currentIndex = 0; //used if the collection is non-dictionary based.
+            foreach (var field in fields)
+            {
+                if (isDictionaryBased == false)
+                {
+                    //we'll just need to wire up the values based on the order that the pre-values are stored
+                    var found = preValues.Any(x => x.Key.InvariantEquals(currentIndex.ToInvariantString()));
+                    if (found == false)
+                    {
+                        LogHelper.Warn<PreValueDisplayResolver>("Could not find persisted pre-value for index " + currentIndex);
+                        continue;
+                    }
+                    field.Value = preValues.Single(x => x.Key.InvariantEquals(currentIndex.ToInvariantString())).Value.ToString();
+                    currentIndex++;
+                }
+                else
+                {
+                    var found = preValues.Any(x => x.Key.InvariantEquals(field.Key));
+                    if (found == false)
+                    {
+                        LogHelper.Warn<PreValueDisplayResolver>("Could not find persisted pre-value for field " + field.Key);
+                        continue;
+                    }
+                    field.Value = preValues.Single(x => x.Key.InvariantEquals(field.Key)).Value;
+                }
+
+
+            }
+        }
+
         internal IEnumerable<PreValueFieldDisplay> Convert(IDataTypeDefinition source)
         {
             PropertyEditor propEd = null;
@@ -45,36 +86,7 @@ namespace Umbraco.Web.Models.Mapping
                 dictionaryVals = propEd.PreValueEditor.ConvertDbToEditor(propEd.DefaultPreValues, preVals);
             }
 
-            var currentIndex = 0; //used if the collection is non-dictionary based.
-
-            //now we need to wire up the pre-values values with the actual fields defined
-            foreach (var field in result)
-            {
-                if (preVals.IsDictionaryBased == false)
-                {
-                    //we'll just need to wire up the values based on the order that the pre-values are stored
-                    var found = dictionaryVals.Any(x => x.Key.InvariantEquals(currentIndex.ToInvariantString()));
-                    if (found == false)
-                    {
-                        LogHelper.Warn<PreValueDisplayResolver>("Could not find persisted pre-value for index " + currentIndex);
-                        continue;
-                    }
-                    field.Value = dictionaryVals.Single(x => x.Key.InvariantEquals(currentIndex.ToInvariantString())).Value.ToString();
-                    currentIndex++;
-                }
-                else
-                {
-                    var found = dictionaryVals.Any(x => x.Key.InvariantEquals(field.Key));
-                    if (found == false)
-                    {
-                        LogHelper.Warn<PreValueDisplayResolver>("Could not find persisted pre-value for field " + field.Key);
-                        continue;
-                    }
-                    field.Value = dictionaryVals.Single(x => x.Key.InvariantEquals(field.Key)).Value;
-                }
-
-
-            }
+            MapPreValueValuesToPreValueFields(result, dictionaryVals, preVals.IsDictionaryBased);
 
             return result;
         }

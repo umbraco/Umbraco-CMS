@@ -11,7 +11,7 @@
         Save = 0,
 
         /// <summary>
-        /// Saves a new content item
+        /// Creates a new content item
         /// </summary>
         SaveNew = 1,
 
@@ -21,8 +21,18 @@
         Publish = 2,
 
         /// <summary>
-        /// Saves an publishes a new content item
+        /// Creates and publishes a new content item
         /// </summary>
-        PublishNew = 3
+        PublishNew = 3,
+
+        /// <summary>
+        /// Saves and sends publish notification
+        /// </summary>
+        SendPublish = 4,
+
+        /// <summary>
+        /// Creates and sends publish notification
+        /// </summary>
+        SendPublishNew = 5
     }
 }

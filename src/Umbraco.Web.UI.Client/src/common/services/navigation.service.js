@@ -148,13 +148,16 @@ angular.module('umbraco.services')
          * and load the dashboard related to the section
          * @param {string} sectionAlias The alias of the section
          */
-        changeSection: function (sectionAlias) {
-            if (this.ui.stickyNavigation) {
-                setMode("default-opensection");
-                this.ui.currentSection = sectionAlias;
-                this.showTree(sectionAlias);
+        changeSection: function (sectionAlias, force) {
+            setMode("default-opensection");
+            
+            if(force && this.ui.currentSection === sectionAlias){
+                this.ui.currentSection = "";
             }
 
+            this.ui.currentSection = sectionAlias;
+            this.showTree(sectionAlias);
+        
             $location.path(sectionAlias);
         },
 
@@ -280,6 +283,19 @@ angular.module('umbraco.services')
         syncPath: function (path, forceReload) {
             if(this.ui.treeEventHandler){
                 this.ui.treeEventHandler.syncPath(path,forceReload);
+            }
+        },
+
+        reloadNode: function (node) {
+            if(this.ui.treeEventHandler){
+                this.ui.treeEventHandler.reloadNode(node);
+            }
+        },
+
+        reloadSection: function (sectionAlias) {
+            if(this.ui.treeEventHandler){
+                this.ui.treeEventHandler.clearCache({ section: sectionAlias });
+                this.ui.treeEventHandler.load(sectionAlias);
             }
         },
 

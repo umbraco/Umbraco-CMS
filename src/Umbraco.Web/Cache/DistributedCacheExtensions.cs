@@ -310,7 +310,35 @@ namespace Umbraco.Web.Cache
             //NOTE: The 'false' ensure that it will only refresh on the current server, not post to all servers
             dc.RefreshAll(new Guid(DistributedCache.MacroCacheRefresherId), false);
         }
-        
+
+        /// <summary>
+        /// Refreshes the cache amongst servers for a macro item
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="macro"></param>
+        public static void RefreshMacroCache(this DistributedCache dc, IMacro macro)
+        {
+            if (macro != null)
+            {
+                dc.RefreshByJson(new Guid(DistributedCache.MacroCacheRefresherId),
+                    MacroCacheRefresher.SerializeToJsonPayload(macro));
+            }
+        }
+
+        /// <summary>
+        /// Removes the cache amongst servers for a macro item
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="macro"></param>
+        public static void RemoveMacroCache(this DistributedCache dc, IMacro macro)
+        {
+            if (macro != null)
+            {
+                dc.RefreshByJson(new Guid(DistributedCache.MacroCacheRefresherId),
+                    MacroCacheRefresher.SerializeToJsonPayload(macro));
+            }
+        }
+
         /// <summary>
         /// Refreshes the cache amongst servers for a macro item
         /// </summary>

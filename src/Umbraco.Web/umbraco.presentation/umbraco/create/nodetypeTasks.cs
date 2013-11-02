@@ -28,9 +28,7 @@ namespace umbraco
             contentType.CreatorId = User.Id;
             contentType.Alias = Alias.Replace("'", "''");
             contentType.Name = Alias.Replace("'", "''");
-            contentType.Icon = UmbracoConfig.For.UmbracoSettings().Content.IconPickerBehaviour == IconPickerBehaviour.HideFileDuplicates
-                                   ? ".sprTreeFolder"
-                                   : "folder.gif";
+            contentType.Icon = ".sprTreeFolder";
 
             // Create template?
             if (ParentID == 1)

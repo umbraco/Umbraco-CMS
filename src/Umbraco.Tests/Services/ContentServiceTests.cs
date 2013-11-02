@@ -113,11 +113,11 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(contentType);
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", 1046);
             content.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
-            contentService.Publish(content);
+            contentService.PublishWithStatus(content);
             
             // Act
             content.SetTags("tags", new[] { "another", "world" }, false);
-            contentService.Publish(content);
+            contentService.PublishWithStatus(content);
 
             // Assert
             Assert.AreEqual(5, content.Properties["tags"].Value.ToString().Split(',').Distinct().Count());
@@ -143,11 +143,11 @@ namespace Umbraco.Tests.Services
             contentTypeService.Save(contentType);
             var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", 1046);
             content.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
-            contentService.Publish(content);
+            contentService.PublishWithStatus(content);
 
             // Act
             content.RemoveTags("tags", new[] { "some", "world" });
-            contentService.Publish(content);
+            contentService.PublishWithStatus(content);
 
             // Assert
             Assert.AreEqual(2, content.Properties["tags"].Value.ToString().Split(',').Distinct().Count());

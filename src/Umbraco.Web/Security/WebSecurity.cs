@@ -386,7 +386,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public int GetUserId()
         {
-            var identity = _httpContext.GetCurrentIdentity();
+            var identity = _httpContext.GetCurrentIdentity(true);
             if (identity == null)
                 return -1;
             return Convert.ToInt32(identity.Id);

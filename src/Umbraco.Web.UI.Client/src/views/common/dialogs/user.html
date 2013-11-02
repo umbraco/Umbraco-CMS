@@ -12,7 +12,7 @@
 		
 	    <p class="muted">
 	        <small>
-	        	<localize key="user_sessionExpires" />: {{user.remainingAuthSeconds | timespan}}</small>	        
+	        	<localize key="user_sessionExpires" />: {{remainingAuthSeconds | timespan}}</small>	        
 	    </p>
 
 	</div>
@@ -44,5 +44,7 @@
 			</div>
 
 		</div>
+
+		<small style="color: #d9d9d9; position: absolute; bottom: 5px; right: 20px">{{version}}</small>
 	</div>
 </div>

@@ -1,0 +1,28 @@
+<div ng-controller="Umbraco.PropertyEditors.MacroContainerController" class="umb-editor umb-macrocontainer">
+
+    <ul class="unstyled list-icons" 
+		ui-sortable="sortableOptions"
+		ng-model="renderModel">	
+		<li ng-repeat="macro in renderModel" style="max-width: 300px">
+
+			<i class="icon icon-navigation handle"></i>
+
+            <div class="pull-right">
+                <a href ng-click="edit($index)"><i ng-show="macro.details" class="icon icon-edit"></i></a>
+                <i class="icon icon-delete red" ng-click="remove($index)" ></i>
+            </div>
+
+			<a href="#" prevent-default ng-click="edit($index)">{{macro.macroAlias}}</a>
+            <small class="umb-detail">{{macro.details}}</small> 
+        </li>
+	</ul>
+
+	<ul class="unstyled list-icons">	
+		<li>
+            <i class="icon icon-add blue"></i>
+			<a href="#" ng-click="add()" prevent-default>
+				 <localize key="general_add">Add</localize>
+			</a>
+		</li>
+	</ul>
+</div>

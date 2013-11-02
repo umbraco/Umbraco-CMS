@@ -54,6 +54,7 @@ namespace umbraco.cms.presentation.developer
             SaveButton.Text = ui.Text("save");
             SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";
+            SaveButton.CssClass = "client-side";
 
             var code = UmbracoPanel1.NewTabPage("xslt");
             code.Controls.Add(pane1);

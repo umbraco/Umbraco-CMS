@@ -31,6 +31,7 @@ describe('contentEditingHelper tests', function () {
 
             //act
             var handled = contentEditingHelper.handleSaveError({
+                redirectOnFailure: true,
                 err: err,
                 allNewProps: contentEditingHelper.getAllProps(content),
                 allOrigProps: contentEditingHelper.getAllProps(content)
@@ -49,6 +50,7 @@ describe('contentEditingHelper tests', function () {
             
             //act
             var handled = contentEditingHelper.handleSaveError({
+                redirectOnFailure: true,
                 err: err,
                 allNewProps: [],
                 allOrigProps: []
@@ -69,6 +71,7 @@ describe('contentEditingHelper tests', function () {
 
             //act
             var handled = contentEditingHelper.handleSaveError({
+                redirectOnFailure: true,
                 err: err,
                 allNewProps: contentEditingHelper.getAllProps(content),
                 allOrigProps: contentEditingHelper.getAllProps(content)

@@ -24,7 +24,7 @@ angular.module("umbraco.directives")
           $timeout(function(){
               var height = iframeWin.document.documentElement.scrollHeight || iframeWin.document.body.scrollHeight;
               el.height(height);
-          }, 2000);
+          }, 3000);
        }
     };
   });

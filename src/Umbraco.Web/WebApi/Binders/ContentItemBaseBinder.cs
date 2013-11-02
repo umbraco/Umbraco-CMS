@@ -18,6 +18,7 @@ using Newtonsoft.Json.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi.Filters;
@@ -70,7 +71,7 @@ namespace Umbraco.Web.WebApi.Binders
                                    }
 
                                    //now that everything is binded, validate the properties
-                                   var contentItemValidator = new ContentItemValidationHelper<TPersisted, TModelSave>(ApplicationContext);
+                                   var contentItemValidator = GetValidationHelper();
                                    contentItemValidator.ValidateItem(actionContext, x.Result);
 
                                    bindingContext.Model = x.Result;
@@ -79,6 +80,11 @@ namespace Umbraco.Web.WebApi.Binders
             task.Wait();
 
             return bindingContext.Model != null;
+        }
+
+        protected virtual ContentItemValidationHelper<TPersisted, TModelSave> GetValidationHelper()
+        {
+            return new ContentItemValidationHelper<TPersisted, TModelSave>();
         }
 
         /// <summary>
@@ -158,15 +164,15 @@ namespace Umbraco.Web.WebApi.Binders
                     });
             }
 
-            if (model.Action == ContentSaveAction.Publish || model.Action == ContentSaveAction.Save)
-            {
-                //finally, let's lookup the real content item and create the DTO item
-                model.PersistedContent = GetExisting(model);
-            }
-            else
+            if (ContentControllerBase.IsCreatingAction(model.Action))
             {
                 //we are creating new content                          
                 model.PersistedContent = CreateNew(model);
+            }
+            else
+            {
+                //finally, let's lookup the real content item and create the DTO item
+                model.PersistedContent = GetExisting(model);                
             }
 
             //create the dto from the persisted model

@@ -51,7 +51,14 @@ namespace Umbraco.Core.PropertyEditors
         /// <returns></returns>
         public IParameterEditor GetByAlias(string alias)
         {
-            return ParameterEditors.SingleOrDefault(x => x.Alias == alias);
+            var found = ParameterEditors.SingleOrDefault(x => x.Alias == alias);
+            if (found != null) return found;
+            
+            //couldn't find one, so try the map
+            var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(alias);
+            return mapped == null 
+                ? null 
+                : ParameterEditors.SingleOrDefault(x => x.Alias == mapped);
         }
     }
 }

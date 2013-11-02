@@ -21,6 +21,8 @@ namespace Umbraco.Core.Models
 
         internal static bool HasPathAccess(string path, int startNodeId, int recycleBinId)
         {
+            Mandate.ParameterNotNullOrEmpty(path, "path");
+
             var formattedPath = "," + path + ",";
             var formattedStartNodeId = "," + startNodeId.ToInvariantString() + ",";
             var formattedRecycleBinId = "," + recycleBinId.ToInvariantString() + ",";

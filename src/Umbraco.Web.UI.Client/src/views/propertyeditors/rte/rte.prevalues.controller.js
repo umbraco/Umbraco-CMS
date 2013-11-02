@@ -1,6 +1,7 @@
 angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
-    function ($scope, $timeout, tinyMceService, stylesheetResource) {
+    function ($scope, $timeout, $log, tinyMceService, stylesheetResource) {
         var cfg = tinyMceService.defaultPrevalues();
+
 
         if($scope.model.value){
             if(angular.isString($scope.model.value)){
@@ -12,14 +13,16 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
 
         tinyMceService.configuration().then(function(config){
             $scope.tinyMceConfig = config;
+
         });
             
         stylesheetResource.getAll().then(function(stylesheets){
             $scope.stylesheets = stylesheets;
         });
 
-        $scope.selected = function(alias, lookup){
-            return lookup.indexOf(alias) >= 0;
+        $scope.selected = function(cmd, alias, lookup){
+            cmd.selected = lookup.indexOf(alias) >= 0;
+            return cmd.selected;
         };
 
         $scope.selectCommand = function(command){
@@ -33,12 +36,21 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
         };
 
         $scope.selectStylesheet = function(css){
-            var index = $scope.model.value.stylesheets.indexOf(css.path);
+            var index = $scope.model.value.stylesheets.indexOf(css.name);
 
             if(css.selected && index === -1){
-                $scope.model.value.stylesheets.push(css.path);
+                $scope.model.value.stylesheets.push(css.name);
             }else if(index >= 0){
                 $scope.model.value.stylesheets.splice(index, 1);
             }
         };
+
+        $scope.$on("formSubmitting", function (ev, args) {
+
+            var commands = _.where($scope.tinyMceConfig.commands, {selected: true});
+            $scope.model.value.toolbar = _.pluck(commands, "frontEndCommand");
+
+            
+        });
+
     });

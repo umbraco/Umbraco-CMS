@@ -143,7 +143,7 @@ namespace umbraco
                 {                    
                     _xmlContent = value;
 
-                    if (!UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled && UmbracoConfig.For.UmbracoSettings().Content.ContinouslyUpdateXmlDiskCache)
+                    if (UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled && UmbracoConfig.For.UmbracoSettings().Content.ContinouslyUpdateXmlDiskCache)
                         QueueXmlForPersistence();
                     else
                         // Clear cache...
@@ -160,7 +160,7 @@ namespace umbraco
         /// </remarks>
         private void CheckDiskCacheForUpdate()
         {
-            if (UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled)
+            if (UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled == false)
                 return;
 
             lock (TimestampSyncLock)
@@ -208,7 +208,7 @@ namespace umbraco
 
                         // Only save new XML cache to disk if we just repopulated it
                         // TODO: Re-architect this so that a call to this method doesn't invoke a new thread for saving disk cache
-                        if (!UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled && !IsValidDiskCachePresent())
+                        if (UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled && !IsValidDiskCachePresent())
                         {
                             QueueXmlForPersistence();
                         }
@@ -310,7 +310,7 @@ namespace umbraco
                         // queues this up, because this delegate is executing on a different thread and may complete
                         // after the request which invoked it (which would normally persist the file on completion)
                         // So we are responsible for ensuring the content is persisted in this case.
-                        if (!UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled && UmbracoConfig.For.UmbracoSettings().Content.ContinouslyUpdateXmlDiskCache)
+                        if (UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled && UmbracoConfig.For.UmbracoSettings().Content.ContinouslyUpdateXmlDiskCache)
                             PersistXmlToFile(xmlDoc);
                     });
 
@@ -981,7 +981,7 @@ namespace umbraco
         /// <returns></returns>
         private XmlDocument LoadContent()
         {
-            if (!UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled && IsValidDiskCachePresent())
+            if (UmbracoConfig.For.UmbracoSettings().Content.XmlCacheEnabled && IsValidDiskCachePresent())
             {
                 try
                 {

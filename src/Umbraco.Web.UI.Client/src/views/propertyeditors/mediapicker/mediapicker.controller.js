@@ -14,8 +14,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 mediaResource.getByIds($scope.ids).then(function (medias) {
                     //img.media = media;
                     _.each(medias, function (media, i) {
-                        //shortcuts
-                        //TODO, do something better then this for searching
                         var img = {};
                         img.src = imageHelper.getImagePropertyValue({ imageModel: media });
                         img.thumbnail = imageHelper.getThumbnailFromPath(img.src);
@@ -37,14 +35,13 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             dialogService.mediaPicker({
                 multiPicker: true,
                 callback: function(data) {
-                    _.each(data.selection, function(media, i) {
-                        //shortcuts
-                        //TODO, do something better then this for searching
-
+                    
+                    _.each(data, function(media, i) {
                         var img = {};
                         img.id = media.id;
                         img.src = imageHelper.getImagePropertyValue({ imageModel: media });
                         img.thumbnail = imageHelper.getThumbnailFromPath(img.src);
+                        
                         $scope.images.push(img);
                         $scope.ids.push(img.id);
                     });
@@ -52,6 +49,18 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     $scope.sync();
                 }
             });
+        };
+
+       $scope.sortableOptions = {
+            update: function(e, ui) {
+                var r = [];
+                angular.forEach($scope.renderModel, function(value, key){
+                    r.push(value.id);
+                });
+
+                $scope.ids = r;
+                $scope.sync();
+            }
         };
 
         $scope.sync = function() {

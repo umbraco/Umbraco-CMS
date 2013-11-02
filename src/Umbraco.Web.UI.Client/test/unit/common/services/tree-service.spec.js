@@ -1,5 +1,5 @@
 describe('tree service tests', function () {
-    var treeService;
+    var treeService, $rootScope, $httpBackend, mocks;
 
     function getContentTree() {
 
@@ -37,66 +37,183 @@ describe('tree service tests', function () {
     }
 
     beforeEach(module('umbraco.services'));
+    beforeEach(module('umbraco.resources'));
+    beforeEach(module('umbraco.mocks'));
 
-    beforeEach(inject(function ($injector) {
+    beforeEach(inject(function ($injector, mocksUtils) {
+        
+        //for these tests we don't want any authorization to occur
+        mocksUtils.disableAuth();
+
+        $rootScope = $injector.get('$rootScope');
+        $httpBackend = $injector.get('$httpBackend');
+        mocks = $injector.get("treeMocks");
+        mocks.register();
         treeService = $injector.get('treeService');
     }));
 
     describe('tree cache', function () {
 
-        it('tree with no args caches as content', function () {
-            treeService.getTree().then(function(data) {
+        //it('tree with section but no cache key does not cache', function () {
+        //    treeService.getTree().then(function (data) {
 
-                var cache = treeService._getTreeCache();
-                expect(cache).toBeDefined();
-                expect(cache["_content"]).toBeDefined();
+        //        var cache = treeService._getTreeCache();
+        //        expect(cache).toBeDefined();
+        //        expect(cache["_content"]).toBeDefined();
 
-            });
-        });
-        
-        it('tree caches by section', function () {
-            treeService.getTree({section: "media"}).then(function (data) {
+        //    });
+        //});
 
-                var cache = treeService._getTreeCache();
-                expect(cache).toBeDefined();
-                expect(cache["_media"]).toBeDefined();
+        it('does not cache with no args', function () {
 
-            });
-        });
-        
-        it('removes cache by section', function () {
-            treeService.getTree({ section: "media" }).then(function (data) {
-
-                var cache = treeService._getTreeCache();
-                expect(cache["_media"]).toBeDefined();
-                expect(_.keys(cache).length).toBe(1);
-
-                treeService.clearCache("media");
-                
+            var cache;
+            treeService.getTree().then(function (data) {
                 cache = treeService._getTreeCache();                
-                expect(cache["_media"]).not.toBeDefined();
-                expect(_.keys(cache).length).toBe(0);
             });
+            
+            $rootScope.$digest();
+            $httpBackend.flush();
+
+            expect(_.keys(cache).length).toBe(0);
+        });
+        
+        it('does not cache with no cacheKey', function () {
+            var cache;
+            treeService.getTree({section: "content"}).then(function (data) {
+                cache = treeService._getTreeCache();
+                
+            });
+            
+            $rootScope.$digest();
+            $httpBackend.flush();
+
+            expect(_.keys(cache).length).toBe(0);
+        });
+        
+        it('caches by section with cache key', function () {
+            var cache;
+            treeService.getTree({ section: "media", cacheKey: "_" }).then(function (data) {
+                cache = treeService._getTreeCache();                
+            });
+            
+            $rootScope.$digest();
+            $httpBackend.flush();
+
+            expect(cache["__media"]).toBeDefined();
+        });
+        
+        it('caches by default content section with cache key', function () {
+            var cache;
+            treeService.getTree({ cacheKey: "_" }).then(function (data) {
+                cache = treeService._getTreeCache();                
+            });
+            
+            $rootScope.$digest();
+            $httpBackend.flush();
+            
+            expect(cache).toBeDefined();
+            expect(cache["__content"]).toBeDefined();
+        });
+        
+        it('removes by section with cache key', function () {
+            var cache;
+            treeService.getTree({ section: "media", cacheKey: "_" }).then(function (data) {
+                treeService.getTree({ section: "content", cacheKey: "_" }).then(function (d) {
+                    cache = treeService._getTreeCache();
+                });
+            });
+
+            $rootScope.$digest();
+            $httpBackend.flush();
+
+            expect(cache["__media"]).toBeDefined();
+            expect(_.keys(cache).length).toBe(2);
+
+            treeService.clearCache({ section: "media", cacheKey: "_" });
+            cache = treeService._getTreeCache();
+            
+            expect(cache["__media"]).not.toBeDefined();
+            expect(_.keys(cache).length).toBe(1);
+
+        });
+        
+        it('removes cache by key regardless of section', function () {
+            var cache;
+            
+            treeService.getTree({ section: "media", cacheKey: "_" }).then(function (data) {
+                treeService.getTree({ section: "content", cacheKey: "_" }).then(function (d) {
+                    treeService.getTree({ section: "content", cacheKey: "anotherkey" }).then(function (dd) {
+                        cache = treeService._getTreeCache();
+                    });
+                });
+            });
+            
+            $rootScope.$digest();
+            $httpBackend.flush();
+
+            expect(cache["__media"]).toBeDefined();
+            expect(cache["__content"]).toBeDefined();
+            expect(_.keys(cache).length).toBe(3);
+
+            treeService.clearCache({ cacheKey: "_" });
+
+            cache = treeService._getTreeCache();
+            expect(cache["__media"]).not.toBeDefined();
+            expect(cache["__content"]).not.toBeDefined();
+            expect(_.keys(cache).length).toBe(1);
+        });
+        
+        it('removes all section cache regardless of key', function () {
+            
+            var cache;
+            
+            treeService.getTree({ section: "media", cacheKey: "_" }).then(function (data) {
+                treeService.getTree({ section: "media", cacheKey: "anotherkey" }).then(function (d) {
+                    treeService.getTree({ section: "content", cacheKey: "anotherkey" }).then(function (dd) {
+                        cache = treeService._getTreeCache();
+                    });
+                });
+            });
+            
+            $rootScope.$digest();
+            $httpBackend.flush();
+
+            expect(cache["anotherkey_media"]).toBeDefined();
+            expect(cache["__media"]).toBeDefined();
+            expect(_.keys(cache).length).toBe(3);
+
+            treeService.clearCache({ section: "media" });
+
+            cache = treeService._getTreeCache();
+            expect(cache["anotherkey_media"]).not.toBeDefined();
+            expect(cache["__media"]).not.toBeDefined();
+            expect(_.keys(cache).length).toBe(1);
         });
         
         it('removes all cache', function () {
-            treeService.getTree({ section: "media" }).then(function (data) {
 
-                treeService.getTree({ section: "content" }).then(function (d) {
+            var cache;
 
-                    var cache = treeService._getTreeCache();
-                    expect(cache["_content"]).toBeDefined();
-                    expect(cache["_media"]).toBeDefined();
-                    expect(_.keys(cache).length).toBe(2);
-
-                    treeService.clearCache();
-
-                    cache = treeService._getTreeCache();
-                    expect(cache["_content"]).toBeDefined();
-                    expect(cache["_media"]).toBeDefined();
-                    expect(_.keys(cache).length).toBe(0);
+            treeService.getTree({ section: "media", cacheKey: "_" }).then(function (data) {
+                treeService.getTree({ section: "media", cacheKey: "anotherkey" }).then(function (d) {
+                    treeService.getTree({ section: "content", cacheKey: "anotherkey" }).then(function(dd) {
+                        cache = treeService._getTreeCache();
+                    });
                 });
             });
+
+            $rootScope.$digest();
+            $httpBackend.flush();
+
+            expect(cache["anotherkey_media"]).toBeDefined();
+            expect(cache["__media"]).toBeDefined();
+            expect(cache["anotherkey_content"]).toBeDefined();
+            expect(_.keys(cache).length).toBe(3);
+
+            treeService.clearCache();
+
+            cache = treeService._getTreeCache();
+            expect(_.keys(cache).length).toBe(0);
         });
 
     });

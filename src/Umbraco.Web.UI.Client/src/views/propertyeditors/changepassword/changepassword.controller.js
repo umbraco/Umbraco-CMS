@@ -39,7 +39,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
             if (!angular.isObject($scope.model.value)) {
                 //if it's not an object then just create a new one
                 $scope.model.value = {
-                    newPassword: "",
+                    newPassword: null,
                     oldPassword: null,
                     reset: null,
                     answer: null
@@ -50,7 +50,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
 
                 if (!isNew) {
                     //if it is new, then leave the generated pass displayed
-                    $scope.model.value.newPassword = "";
+                    $scope.model.value.newPassword = null;
                     $scope.model.value.oldPassword = null;
                 }
                 $scope.model.value.reset = null;
@@ -74,7 +74,13 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
         //with validators turned on.
         $scope.changing = $scope.model.config.disableToggle === true || !$scope.model.config.hasPassword;
 
+        //we're not currently changing so set the model to null
+        if (!$scope.changing) {
+            $scope.model.value = null;
+        }
+
         $scope.doChange = function() {
+            resetModel();
             $scope.changing = true;
             //if there was a previously generated password displaying, clear it
             $scope.model.value.generatedPassword = null;
@@ -82,6 +88,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
 
         $scope.cancelChange = function() {
             $scope.changing = false;
+            //set model to null
+            $scope.model.value = null;
         };
         
         //listen for the saved event, when that occurs we'll 
@@ -89,12 +97,17 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.ChangePasswordCont
         $scope.$on("formSubmitted", function () {
             if ($scope.model.config.disableToggle === false) {
                 $scope.changing = false;
-            }
-            resetModel();
+            }            
         });
         $scope.$on("formSubmitting", function() {
             //if there was a previously generated password displaying, clear it
-            $scope.model.value.generatedPassword = null;
+            if ($scope.changing && $scope.model.value) {
+                $scope.model.value.generatedPassword = null;
+            }
+            else if (!$scope.changing) {
+                //we are not changing, so the model needs to be null
+                $scope.model.value = null;
+            }
         });
 
         $scope.showReset = function() {

@@ -108,14 +108,12 @@ namespace Umbraco.Core.PropertyEditors
             CreateMap(Guid.Parse(Constants.PropertyEditors.ColorPicker), Constants.PropertyEditors.ColorPickerAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.ContentPicker), Constants.PropertyEditors.ContentPickerAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.Date), Constants.PropertyEditors.DateAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.DateTime), Constants.PropertyEditors.DateTimeAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.DictionaryPicker), Constants.PropertyEditors.DictionaryPickerAlias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.DateTime), Constants.PropertyEditors.DateTimeAlias);            
             CreateMap(Guid.Parse(Constants.PropertyEditors.DropDownList), Constants.PropertyEditors.DropDownListAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.DropDownListMultiple), Constants.PropertyEditors.DropDownListMultipleAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.DropdownlistMultiplePublishKeys), Constants.PropertyEditors.DropdownlistMultiplePublishKeysAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.DropdownlistPublishingKeys), Constants.PropertyEditors.DropdownlistPublishingKeysAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.FolderBrowser), Constants.PropertyEditors.FolderBrowserAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.ImageCropper), Constants.PropertyEditors.ImageCropperAlias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.FolderBrowser), Constants.PropertyEditors.FolderBrowserAlias);            
             CreateMap(Guid.Parse(Constants.PropertyEditors.Integer), Constants.PropertyEditors.IntegerAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.ListView), Constants.PropertyEditors.ListViewAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.MacroContainer), Constants.PropertyEditors.MacroContainerAlias);
@@ -123,8 +121,7 @@ namespace Umbraco.Core.PropertyEditors
             CreateMap(Guid.Parse(Constants.PropertyEditors.MemberPicker), Constants.PropertyEditors.MemberPickerAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.MultiNodeTreePicker), Constants.PropertyEditors.MultiNodeTreePickerAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.MultipleTextstring), Constants.PropertyEditors.MultipleTextstringAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.NoEdit), Constants.PropertyEditors.NoEditAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.PickerRelations), Constants.PropertyEditors.PickerRelationsAlias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.NoEdit), Constants.PropertyEditors.NoEditAlias);            
             CreateMap(Guid.Parse(Constants.PropertyEditors.RadioButtonList), Constants.PropertyEditors.RadioButtonListAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.RelatedLinks), Constants.PropertyEditors.RelatedLinksAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.Slider), Constants.PropertyEditors.SliderAlias);
@@ -132,14 +129,25 @@ namespace Umbraco.Core.PropertyEditors
             CreateMap(Guid.Parse(Constants.PropertyEditors.Textbox), Constants.PropertyEditors.TextboxAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.TextboxMultiple), Constants.PropertyEditors.TextboxMultipleAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.TinyMCEv3), Constants.PropertyEditors.TinyMCEv3Alias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.TrueFalse), Constants.PropertyEditors.TrueFalseAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.UltimatePicker), Constants.PropertyEditors.UltimatePickerAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.UserPicker), Constants.PropertyEditors.UserPickerAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.UltraSimpleEditor), Constants.PropertyEditors.UltraSimpleEditorAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.UmbracoUserControlWrapper), Constants.PropertyEditors.UmbracoUserControlWrapperAlias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.TrueFalse), Constants.PropertyEditors.TrueFalseAlias);            
+            CreateMap(Guid.Parse(Constants.PropertyEditors.UserPicker), Constants.PropertyEditors.UserPickerAlias);            
             CreateMap(Guid.Parse(Constants.PropertyEditors.UploadField), Constants.PropertyEditors.UploadFieldAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.XPathCheckBoxList), Constants.PropertyEditors.XPathCheckBoxListAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.XPathDropDownList), Constants.PropertyEditors.XPathDropDownListAlias);            
+            CreateMap(Guid.Parse(Constants.PropertyEditors.XPathDropDownList), Constants.PropertyEditors.XPathDropDownListAlias);
+
+            //Being mapped to different editors
+            //TODO: Map this somewhere!
+            CreateMap(Guid.Parse(Constants.PropertyEditors.PickerRelations), Constants.PropertyEditors.PickerRelationsAlias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.UltimatePicker), Constants.PropertyEditors.ContentPickerAlias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.UltraSimpleEditor), Constants.PropertyEditors.MarkdownEditorAlias);            
+
+            //Not being converted - convert to label
+            CreateMap(Guid.Parse(Constants.PropertyEditors.DictionaryPicker), Constants.PropertyEditors.NoEditAlias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.UmbracoUserControlWrapper), Constants.PropertyEditors.NoEditAlias);
+
+            //Not ready for v7.0! - will need to create for 7.1
+            CreateMap(Guid.Parse(Constants.PropertyEditors.MacroContainer), Constants.PropertyEditors.NoEditAlias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.ImageCropper), Constants.PropertyEditors.NoEditAlias);
         }
 
     }

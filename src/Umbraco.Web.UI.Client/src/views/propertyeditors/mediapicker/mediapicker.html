@@ -1,15 +1,17 @@
 <div class="umb-editor umb-mediapicker" ng-controller="Umbraco.PropertyEditors.MediaPickerController">
 
+	<ul ui-sortable="sortableOptions" ng-model="images" class="thumbnails umb-thumbnails">
+		<li class="umb-thumbnail thumbnail span3" style="width: 124px;" ng-repeat="image in images">
+			<a href class="picked-image" ng-click="remove($index)">
+				<img ng-src="{{image.src}}" alt="">
+			</a>
+		</li>
+	</ul>
+
 	<ul class="thumbnails umb-thumbnails">
 		<li class="umb-thumbnail thumbnail">
 			<a href="#" class="add-link" ng-click="add()" prevent-default>
 				<i class="icon icon-add large"></i> 
-			</a>
-		</li>
-
-		<li class="umb-thumbnail thumbnail span3" ng-repeat="image in images">
-			<a href class="picked-image" ng-click="remove($index)">
-				<img ng-src="{{image.src}}" alt="">
 			</a>
 		</li>
 	</ul>

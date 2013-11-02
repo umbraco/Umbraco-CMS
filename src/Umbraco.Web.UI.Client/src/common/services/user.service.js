@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-.factory('userService', function ($rootScope, $q, $location, $log, securityRetryQueue, authResource, dialogService, $timeout) {
+.factory('userService', function ($rootScope, $q, $location, $log, securityRetryQueue, authResource, dialogService, $timeout, angularHelper) {
 
     var currentUser = null;
     var lastUserId = null;
@@ -60,8 +60,8 @@ angular.module('umbraco.services')
     this will continually count down their current remaining seconds every 2 seconds until
     there are no more seconds remaining.
     */
-    function countdownUserTimeout() {        
-        $timeout(function () {
+    function countdownUserTimeout() {
+        $timeout(function() {
             if (currentUser) {
                 //countdown by 2 seconds since that is how long our timer is for.
                 currentUser.remainingAuthSeconds -= 2;
@@ -90,16 +90,23 @@ angular.module('umbraco.services')
                     countdownUserTimeout();
                 }
                 else {
-                    
+
                     //we are either timed out or very close to timing out so we need to show the login dialog.                    
-                    userAuthExpired();
+                    //NOTE: the safeApply because our timeout is set to not run digests (performance reasons)
+                    angularHelper.safeApply($rootScope, function() {
+                        userAuthExpired();
+                    });
+                    
                 }
-            }            
-        }, 2000);//every 2 seconds
+            }
+        }, 2000, //every 2 seconds
+            false); //false = do NOT execute a digest for every iteration
     }
     
     /** Called to update the current user's timeout */
     function setUserTimeoutInternal(newTimeout) {
+
+
         var asNumber = parseFloat(newTimeout);
         if (!isNaN(asNumber) && currentUser && angular.isNumber(asNumber)) {
             currentUser.remainingAuthSeconds = newTimeout;
@@ -113,7 +120,11 @@ angular.module('umbraco.services')
         if (currentUser && currentUser.id !== undefined) {
             lastUserId = currentUser.id;
         }
-        currentUser.remainingAuthSeconds = 0;
+
+        if(currentUser){
+            currentUser.remainingAuthSeconds = 0;
+        }
+        
         lastServerTimeoutSet = null;
         currentUser = null;
         

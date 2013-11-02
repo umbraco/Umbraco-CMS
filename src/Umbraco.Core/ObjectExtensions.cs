@@ -82,8 +82,10 @@ namespace Umbraco.Core
                 return Attempt<object>.Succeed(null);
             }
 			
-            //if its not nullable then return false
-			if (input == null) return Attempt<object>.Fail();
+            //if its not nullable and it is a value type
+			if (input == null && destinationType.IsValueType) return Attempt<object>.Fail();
+            //if the type can be null, then no problem
+            if (input == null && destinationType.IsValueType == false) return Attempt<object>.Succeed(null);
 
 			if (destinationType == typeof(object)) return Attempt.Succeed(input);
 
@@ -205,7 +207,7 @@ namespace Umbraco.Core
 				if (destinationType == typeof(Boolean))
 					return Attempt<object>.Succeed(false);   // special case for booleans, null/empty == false
 				else if (destinationType == typeof(DateTime))
-					return Attempt<object>.Succeed(DateTime.MinValue);
+                    return Attempt<object>.Succeed(false);
 			}
 
 			// we have a non-empty string, look for type conversions in the expected order of frequency of use...

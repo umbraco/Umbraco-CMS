@@ -171,6 +171,18 @@ namespace Umbraco.Web.Editors
 
             return pagedResult;
         }
+
+        [HttpGet]
+        public bool GetHasPermission(string permissionToCheck, int nodeId)
+        {
+            var p = Services.UserService.GetPermissions(Security.CurrentUser, nodeId).FirstOrDefault();
+            if (p != null && p.AssignedPermissions.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))
+            {
+                return true;
+            }
+
+            return false;
+        }
         
         /// <summary>
         /// Saves content
@@ -197,10 +209,9 @@ namespace Umbraco.Web.Editors
             //      then we cannot continue saving, we can only display errors
             // * If there are validation errors and they were attempting to publish, we can only save, NOT publish and display 
             //      a message indicating this
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid == false)
             {
-                if (ValidationHelper.ModelHasRequiredForPersistenceErrors(contentItem)
-                    && (contentItem.Action == ContentSaveAction.SaveNew || contentItem.Action == ContentSaveAction.PublishNew))
+                if (ValidationHelper.ModelHasRequiredForPersistenceErrors(contentItem) && IsCreatingAction(contentItem.Action))
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the modelstate to the outgoing object and throw a validation message
@@ -230,6 +241,10 @@ namespace Umbraco.Web.Editors
                 //save the item
                 Services.ContentService.Save(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
             }
+            else if (contentItem.Action == ContentSaveAction.SendPublish || contentItem.Action == ContentSaveAction.SendPublishNew)
+            {
+                Services.ContentService.SendToPublication(contentItem.PersistedContent, UmbracoUser.Id);
+            }
             else
             {
                 //publish the item and check if it worked, if not we will show a diff msg below
@@ -250,9 +265,13 @@ namespace Umbraco.Web.Editors
                 case ContentSaveAction.SaveNew:
                     display.AddSuccessNotification(ui.Text("speechBubbles", "editContentSavedHeader"), ui.Text("speechBubbles", "editContentSavedText"));
                     break;
+                case ContentSaveAction.SendPublish:
+                case ContentSaveAction.SendPublishNew:
+                    display.AddSuccessNotification(ui.Text("speechBubbles", "editContentSendToPublish"), ui.Text("speechBubbles", "editContentSendToPublishText"));
+                    break;
                 case ContentSaveAction.Publish:
                 case ContentSaveAction.PublishNew:
-                    ShowMessageForStatus(publishStatus.Result, display);
+                    ShowMessageForPublishStatus(publishStatus.Result, display);
                     break;
             }
 
@@ -303,7 +322,7 @@ namespace Umbraco.Web.Editors
         /// does not have Publish access to this node.
         /// </remarks>
         /// 
-        [EnsureUserPermissionForContent("id", 'P')]
+        [EnsureUserPermissionForContent("id", 'U')]
         public HttpResponseMessage PostPublishById(int id)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
@@ -439,13 +458,12 @@ namespace Umbraco.Web.Editors
         /// <param name="move"></param>
         /// <returns></returns>
         [EnsureUserPermissionForContent("move.ParentId", 'M')]
-        public HttpResponseMessage PostMove(MoveOrCopy move)
+        public string PostMove(MoveOrCopy move)
         {
             var toMove = ValidateMoveOrCopy(move);
 
             Services.ContentService.Move(toMove, move.ParentId);
-
-            return Request.CreateResponse(HttpStatusCode.OK);
+            return toMove.Path;
         }
 
         /// <summary>
@@ -454,13 +472,12 @@ namespace Umbraco.Web.Editors
         /// <param name="copy"></param>
         /// <returns></returns>
         [EnsureUserPermissionForContent("copy.ParentId", 'C')]
-        public HttpResponseMessage PostCopy(MoveOrCopy copy)
+        public string PostCopy(MoveOrCopy copy)
         {
             var toCopy = ValidateMoveOrCopy(copy);
 
-            Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal);
-
-            return Request.CreateResponse(HttpStatusCode.OK);
+            var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal);
+            return c.Path;
         }
 
         /// <summary>
@@ -468,7 +485,10 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [EnsureUserPermissionForContent("id", 'Z')]
+        //TODO: Unpublish is NOT an assignable permission therefore this won't work, I'd assume to unpublish you'd need to be able to publish??!
+        // still waiting on feedback from HQ.
+        //[EnsureUserPermissionForContent("id", 'Z')]
+        [EnsureUserPermissionForContent("id", 'U')]
         public ContentItemDisplay PostUnPublish(int id)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
@@ -478,6 +498,9 @@ namespace Umbraco.Web.Editors
 
             Services.ContentService.UnPublish(foundContent);
             var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+
+            content.AddSuccessNotification(ui.Text("content", "unPublish"), ui.Text("speechBubbles", "contentUnpublished"));
+
             return content;
         }
 
@@ -535,7 +558,7 @@ namespace Umbraco.Web.Editors
             return toMove;
         }
 
-        private void ShowMessageForStatus(PublishStatus status, ContentItemDisplay display)
+        private void ShowMessageForPublishStatus(PublishStatus status, ContentItemDisplay display)
         {
             switch (status.StatusType)
             {
@@ -576,6 +599,8 @@ namespace Umbraco.Web.Editors
             }
         }
 
+        
+
         /// <summary>
         /// Performs a permissions check for the user to check if it has access to the node based on 
         /// start node and/or permissions for the node
@@ -585,7 +610,7 @@ namespace Umbraco.Web.Editors
         /// <param name="userService"></param>
         /// <param name="contentService"></param>
         /// <param name="nodeId">The content to lookup, if the contentItem is not specified</param>
-        /// <param name="permissionToCheck"></param>
+        /// <param name="permissionsToCheck"></param>
         /// <param name="contentItem">Specifies the already resolved content item to check against</param>
         /// <returns></returns>
         internal static bool CheckPermissions(
@@ -594,7 +619,7 @@ namespace Umbraco.Web.Editors
             IUserService userService,
             IContentService contentService,
             int nodeId,
-            char? permissionToCheck = null,
+            char[] permissionsToCheck = null,
             IContent contentItem = null)
         {
            
@@ -628,19 +653,22 @@ namespace Umbraco.Web.Editors
                 return false;
             }
 
-            if (permissionToCheck.HasValue == false)
+            if (permissionsToCheck == null || permissionsToCheck.Any() == false)
             {
                 return true;
             }
 
             var permission = userService.GetPermissions(user, nodeId).FirstOrDefault();
-            
-            if (permission != null && permission.AssignedPermissions.Contains(permissionToCheck.Value.ToString(CultureInfo.InvariantCulture)))
-            {
-                return true;
-            }
 
-            return false;
+            var allowed = true;
+            foreach (var p in permissionsToCheck)
+            {
+                if (permission == null || permission.AssignedPermissions.Contains(p.ToString(CultureInfo.InvariantCulture)) == false)
+                {
+                    allowed = false;
+                }
+            }
+            return allowed;
         }
 
     }

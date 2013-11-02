@@ -191,7 +191,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Select("DISTINCT cmsTags.*")
                 .From<TagDto>()
                 .InnerJoin<TagRelationshipDto>()
-                .On<TagRelationshipDto, TagDto>(left => left.TagId, right => right.Id);
+                .On<TagRelationshipDto, TagDto>(left => left.TagId, right => right.Id)
+                .Where<TagRelationshipDto>(dto => dto.NodeId == contentId);
 
             if (group.IsNullOrWhiteSpace() == false)
             {
