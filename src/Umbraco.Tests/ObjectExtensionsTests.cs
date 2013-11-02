@@ -116,6 +116,22 @@ namespace Umbraco.Tests
 			}
 		}
 
+        [Test]
+        public virtual void CanConvertBlankStringToNullDateTime()
+        {
+            var result = "".TryConvertTo<DateTime?>();
+            Assert.IsTrue(result.Success);
+            Assert.IsNull(result.Result);
+        }
+
+        [Test]
+        public virtual void CanConvertBlankStringToNullBool()
+        {
+            var result = "".TryConvertTo<bool?>();
+            Assert.IsTrue(result.Success);
+            Assert.IsNull(result.Result);
+        }
+
 		[Test]
 		public virtual void CanConvertBlankStringToDateTime()
 		{
