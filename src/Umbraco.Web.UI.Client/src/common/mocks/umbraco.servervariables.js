@@ -30,5 +30,9 @@ Umbraco.Sys.ServerVariables = {
             { alias: "myTree", packageFolder: "MyPackage" }
         ]
     },
-    isDebuggingEnabled: true
+    isDebuggingEnabled: true,
+    application: {
+        assemblyVersion: "1",
+        version: "7"
+    }
 };
