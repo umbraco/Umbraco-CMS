@@ -32,23 +32,23 @@ namespace Umbraco.Web
 	{
 		private readonly UmbracoContext _umbracoContext;
 		private readonly IPublishedContent _currentPage;
-	    private PublishedQueryContext _queryContext;
-        private TagQueryContext _tagContext;
+	    private PublishedContentQuery _query;
+        private TagQuery _tag;
 
         /// <summary>
         /// Lazy instantiates the tag context
         /// </summary>
-        public TagQueryContext Tags
+        public TagQuery TagQuery
         {
-            get { return _tagContext ?? (_tagContext = new TagQueryContext(UmbracoContext.Application.Services.TagService)); }
+            get { return _tag ?? (_tag = new TagQuery(UmbracoContext.Application.Services.TagService)); }
         }
 
         /// <summary>
         /// Lazy instantiates the query context
         /// </summary>
-	    public PublishedQueryContext QueryContext
+	    public PublishedContentQuery ContentQuery
 	    {
-	        get { return _queryContext ?? (_queryContext = new PublishedQueryContext(UmbracoContext.ContentCache, UmbracoContext.MediaCache)); }
+	        get { return _query ?? (_query = new PublishedContentQuery(UmbracoContext.ContentCache, UmbracoContext.MediaCache)); }
 	    }
 
         /// <summary>
@@ -73,13 +73,13 @@ namespace Umbraco.Web
         {            
         }
 
-        public UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content, PublishedQueryContext queryContext)
+        public UmbracoHelper(UmbracoContext umbracoContext, IPublishedContent content, PublishedContentQuery query)
             : this(umbracoContext)
         {
             if (content == null) throw new ArgumentNullException("content");
-            if (queryContext == null) throw new ArgumentNullException("queryContext");
+            if (query == null) throw new ArgumentNullException("query");
             _currentPage = content;
-            _queryContext = queryContext;
+            _query = query;
         }
 
 		/// <summary>
@@ -109,11 +109,11 @@ namespace Umbraco.Web
 			}
 		}
 
-        public UmbracoHelper(UmbracoContext umbracoContext, PublishedQueryContext queryContext)
+        public UmbracoHelper(UmbracoContext umbracoContext, PublishedContentQuery query)
             : this(umbracoContext)
         {
-            if (queryContext == null) throw new ArgumentNullException("queryContext");
-            _queryContext = queryContext;
+            if (query == null) throw new ArgumentNullException("query");
+            _query = query;
         }
 
         /// <summary>
@@ -576,140 +576,140 @@ namespace Umbraco.Web
 		public IPublishedContent TypedContent(object id)
 		{
 		    int intId;
-            return ConvertIdObjectToInt(id, out intId) ? QueryContext.TypedContent(intId) : null;
+            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.TypedContent(intId) : null;
 		}
 
 		public IPublishedContent TypedContent(int id)
 		{
-            return QueryContext.TypedContent(id);
+            return ContentQuery.TypedContent(id);
 		}
 
 		public IPublishedContent TypedContent(string id)
 		{
             int intId;
-            return ConvertIdObjectToInt(id, out intId) ? QueryContext.TypedContent(intId) : null;
+            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.TypedContent(intId) : null;
 		}
 
         public IPublishedContent TypedContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return QueryContext.TypedContentSingleAtXPath(xpath, vars);
+            return ContentQuery.TypedContentSingleAtXPath(xpath, vars);
         }
 
 		public IEnumerable<IPublishedContent> TypedContent(params object[] ids)
 		{
-            return QueryContext.TypedContent(ConvertIdsObjectToInts(ids));
+            return ContentQuery.TypedContent(ConvertIdsObjectToInts(ids));
 		}
 
 		public IEnumerable<IPublishedContent> TypedContent(params int[] ids)
 		{
-            return QueryContext.TypedContent(ids);
+            return ContentQuery.TypedContent(ids);
 		}
 
 		public IEnumerable<IPublishedContent> TypedContent(params string[] ids)
 		{
-            return QueryContext.TypedContent(ConvertIdsObjectToInts(ids));
+            return ContentQuery.TypedContent(ConvertIdsObjectToInts(ids));
 		}
 
 		public IEnumerable<IPublishedContent> TypedContent(IEnumerable<object> ids)
 		{
-            return QueryContext.TypedContent(ConvertIdsObjectToInts(ids));
+            return ContentQuery.TypedContent(ConvertIdsObjectToInts(ids));
 		}
 
 		public IEnumerable<IPublishedContent> TypedContent(IEnumerable<string> ids)
 		{
-            return QueryContext.TypedContent(ConvertIdsObjectToInts(ids));
+            return ContentQuery.TypedContent(ConvertIdsObjectToInts(ids));
 		}
 
 		public IEnumerable<IPublishedContent> TypedContent(IEnumerable<int> ids)
 		{
-            return QueryContext.TypedContent(ids);
+            return ContentQuery.TypedContent(ids);
 		}
 
         public IEnumerable<IPublishedContent> TypedContentAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return QueryContext.TypedContentAtXPath(xpath, vars);
+            return ContentQuery.TypedContentAtXPath(xpath, vars);
         }
 
         public IEnumerable<IPublishedContent> TypedContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         {
-            return QueryContext.TypedContentAtXPath(xpath, vars);
+            return ContentQuery.TypedContentAtXPath(xpath, vars);
         }
 
         public IEnumerable<IPublishedContent> TypedContentAtRoot()
         {
-            return QueryContext.TypedContentAtRoot();
+            return ContentQuery.TypedContentAtRoot();
         }
 
 		public dynamic Content(object id)
 		{
             int intId;
-            return ConvertIdObjectToInt(id, out intId) ? QueryContext.Content(intId) : DynamicNull.Null;
+            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.Content(intId) : DynamicNull.Null;
 		}
 
 		public dynamic Content(int id)
 		{
-            return QueryContext.Content(id);
+            return ContentQuery.Content(id);
 		}
 
 		public dynamic Content(string id)
 		{
             int intId;
-            return ConvertIdObjectToInt(id, out intId) ? QueryContext.Content(intId) : DynamicNull.Null;
+            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.Content(intId) : DynamicNull.Null;
 		}
 
         public dynamic ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return QueryContext.ContentSingleAtXPath(xpath, vars);
+            return ContentQuery.ContentSingleAtXPath(xpath, vars);
         }
 
         public dynamic ContentSingleAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         {
-            return QueryContext.ContentSingleAtXPath(xpath, vars);
+            return ContentQuery.ContentSingleAtXPath(xpath, vars);
         }
 
         public dynamic Content(params object[] ids)
 		{
-            return QueryContext.Content(ConvertIdsObjectToInts(ids));
+            return ContentQuery.Content(ConvertIdsObjectToInts(ids));
 		}
 
 		public dynamic Content(params int[] ids)
 		{
-            return QueryContext.Content(ids);
+            return ContentQuery.Content(ids);
 		}
 
 		public dynamic Content(params string[] ids)
 		{
-            return QueryContext.Content(ConvertIdsObjectToInts(ids));
+            return ContentQuery.Content(ConvertIdsObjectToInts(ids));
 		}
 
 		public dynamic Content(IEnumerable<object> ids)
 		{
-            return QueryContext.Content(ConvertIdsObjectToInts(ids));
+            return ContentQuery.Content(ConvertIdsObjectToInts(ids));
 		}
 
 		public dynamic Content(IEnumerable<int> ids)
 		{
-            return QueryContext.Content(ids);
+            return ContentQuery.Content(ids);
 		}
 
 		public dynamic Content(IEnumerable<string> ids)
 		{
-            return QueryContext.Content(ConvertIdsObjectToInts(ids));
+            return ContentQuery.Content(ConvertIdsObjectToInts(ids));
 		}
 
         public dynamic ContentAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return QueryContext.ContentAtXPath(xpath, vars);
+            return ContentQuery.ContentAtXPath(xpath, vars);
         }
 
         public dynamic ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         {
-            return QueryContext.ContentAtXPath(xpath, vars);
+            return ContentQuery.ContentAtXPath(xpath, vars);
         }
 
         public dynamic ContentAtRoot()
         {
-            return QueryContext.ContentAtRoot();
+            return ContentQuery.ContentAtRoot();
         }
 
         private bool ConvertIdObjectToInt(object id, out int intId)
@@ -760,105 +760,105 @@ namespace Umbraco.Web
 		public IPublishedContent TypedMedia(object id)
 		{
             int intId;
-            return ConvertIdObjectToInt(id, out intId) ? QueryContext.TypedMedia(intId) : null;
+            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.TypedMedia(intId) : null;
 		}
 
 		public IPublishedContent TypedMedia(int id)
 		{
-            return QueryContext.TypedMedia(id);
+            return ContentQuery.TypedMedia(id);
 		}
 
 		public IPublishedContent TypedMedia(string id)
 		{
             int intId;
-            return ConvertIdObjectToInt(id, out intId) ? QueryContext.TypedMedia(intId) : null;
+            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.TypedMedia(intId) : null;
 		}
 
 		public IEnumerable<IPublishedContent> TypedMedia(params object[] ids)
 		{
-            return QueryContext.TypedMedia(ConvertIdsObjectToInts(ids));
+            return ContentQuery.TypedMedia(ConvertIdsObjectToInts(ids));
 		}
 
 		public IEnumerable<IPublishedContent> TypedMedia(params int[] ids)
 		{
-            return QueryContext.TypedMedia(ids);
+            return ContentQuery.TypedMedia(ids);
 		}
 
 		public IEnumerable<IPublishedContent> TypedMedia(params string[] ids)
 		{
-            return QueryContext.TypedMedia(ConvertIdsObjectToInts(ids));
+            return ContentQuery.TypedMedia(ConvertIdsObjectToInts(ids));
 		}
 
 		public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<object> ids)
 		{
-            return QueryContext.TypedMedia(ConvertIdsObjectToInts(ids));
+            return ContentQuery.TypedMedia(ConvertIdsObjectToInts(ids));
 		}
 
 		public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<int> ids)
 		{
-            return QueryContext.TypedMedia(ids);
+            return ContentQuery.TypedMedia(ids);
 		}
 
 		public IEnumerable<IPublishedContent> TypedMedia(IEnumerable<string> ids)
 		{
-            return QueryContext.TypedMedia(ConvertIdsObjectToInts(ids));
+            return ContentQuery.TypedMedia(ConvertIdsObjectToInts(ids));
 		}
 
         public IEnumerable<IPublishedContent> TypedMediaAtRoot()
         {
-            return QueryContext.TypedMediaAtRoot();
+            return ContentQuery.TypedMediaAtRoot();
         }
 
 		public dynamic Media(object id)
 		{
             int intId;
-            return ConvertIdObjectToInt(id, out intId) ? QueryContext.Media(intId) : DynamicNull.Null;
+            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.Media(intId) : DynamicNull.Null;
 		}
 
 		public dynamic Media(int id)
 		{
-            return QueryContext.Media(id);
+            return ContentQuery.Media(id);
 		}
 
 		public dynamic Media(string id)
 		{
             int intId;
-            return ConvertIdObjectToInt(id, out intId) ? QueryContext.Media(intId) : DynamicNull.Null;
+            return ConvertIdObjectToInt(id, out intId) ? ContentQuery.Media(intId) : DynamicNull.Null;
 		}
 
 		public dynamic Media(params object[] ids)
 		{
-            return QueryContext.Media(ConvertIdsObjectToInts(ids));
+            return ContentQuery.Media(ConvertIdsObjectToInts(ids));
 		}
 
 		public dynamic Media(params int[] ids)
 		{
-            return QueryContext.Media(ids);
+            return ContentQuery.Media(ids);
 		}
 
 		public dynamic Media(params string[] ids)
 		{
-            return QueryContext.Media(ConvertIdsObjectToInts(ids));
+            return ContentQuery.Media(ConvertIdsObjectToInts(ids));
 		}
 
 		public dynamic Media(IEnumerable<object> ids)
 		{
-            return QueryContext.Media(ConvertIdsObjectToInts(ids));
+            return ContentQuery.Media(ConvertIdsObjectToInts(ids));
 		}
 
 		public dynamic Media(IEnumerable<int> ids)
 		{
-            return QueryContext.Media(ids);
+            return ContentQuery.Media(ids);
 		}
 
 		public dynamic Media(IEnumerable<string> ids)
 		{
-            return QueryContext.Media(ConvertIdsObjectToInts(ids));
+            return ContentQuery.Media(ConvertIdsObjectToInts(ids));
 		}
 
         public dynamic MediaAtRoot()
         {
-            return QueryContext.MediaAtRoot();
+            return ContentQuery.MediaAtRoot();
         }
 
 		#endregion
@@ -874,7 +874,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public dynamic Search(string term, bool useWildCards = true, string searchProvider = null)
 		{
-		    return QueryContext.Search(term, useWildCards, searchProvider);
+		    return ContentQuery.Search(term, useWildCards, searchProvider);
 		}
 
 		/// <summary>
@@ -885,7 +885,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public dynamic Search(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
 		{
-            return QueryContext.Search(criteria, searchProvider);
+            return ContentQuery.Search(criteria, searchProvider);
 		}
 
 		/// <summary>
@@ -897,7 +897,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public IEnumerable<IPublishedContent> TypedSearch(string term, bool useWildCards = true, string searchProvider = null)
 		{
-            return QueryContext.Search(term, useWildCards, searchProvider);
+            return ContentQuery.Search(term, useWildCards, searchProvider);
 		}
 
 		/// <summary>
@@ -908,7 +908,7 @@ namespace Umbraco.Web
 		/// <returns></returns>
 		public IEnumerable<IPublishedContent> TypedSearch(Examine.SearchCriteria.ISearchCriteria criteria, Examine.Providers.BaseSearchProvider searchProvider = null)
 		{
-            return QueryContext.Search(criteria, searchProvider);
+            return ContentQuery.Search(criteria, searchProvider);
 		}
 
 		#endregion
