@@ -96,8 +96,8 @@ function openMemberType(id) {
                 treeElement.SetAttribute("text", MemberTypes[i].Text);
                 treeElement.SetAttribute("action", "javascript:openMemberType(" + MemberTypes[i].Id + ");");
                 treeElement.SetAttribute("src", "");
-                treeElement.SetAttribute("icon", "membertype.gif");
-                treeElement.SetAttribute("openIcon", "membertype.gif");
+                treeElement.SetAttribute("icon", "icon-users");
+                treeElement.SetAttribute("openIcon", "icon-users");
                 treeElement.SetAttribute("nodeType", "memberType");
                 root.AppendChild(treeElement);
             }

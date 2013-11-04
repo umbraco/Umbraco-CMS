@@ -104,7 +104,7 @@
 
 .umb-tree ins {
 	vertical-align: middle;
-	margin-left: -16px;
+	margin: -4px 0 0 -16px;
 	width: 16px;
 	height: 16px;
 	display: inline-block;
@@ -149,24 +149,26 @@ a.umb-options {
 	cursor: pointer;
 	display: inline-block;
 	text-align: center;
-	width: 45px;
 	position: absolute;
-	right: 0px;
-	top: 0px;
-	background: @grayLighter;
+	right: 10px;
+	top: 3px;
+	padding: 0 3px 3px 5px;
+	border: 1px solid @grayLight;
+	.border-radius(@baseBorderRadius);
+	background: @btnBackground;
 }
 
 a.umb-options i {
-	height: 6px !important;
-	width: 6px !important;
+	height: 5px !important;
+	width: 5px !important;
 	border-radius: 20px;
-	background: #333;
+	background: @black;
 	display: inline-block;
-	margin: 10px 2px 0 0;
+	margin: 0 2px 0 0;
 }
 
 li.root > div > a.umb-options {
-    top: 10px;
+    top: 13px;
 }
 
 .hide-options a.umb-options{display: none !important}
