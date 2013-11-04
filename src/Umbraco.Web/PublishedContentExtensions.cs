@@ -611,7 +611,7 @@ namespace Umbraco.Web
 		{
 			var contentTypeService = UmbracoContext.Current.Application.Services.ContentTypeService;
 			var type = contentTypeService.GetContentType(content.DocumentTypeAlias);
-			while (type.ParentId > 0)
+			while (type != null && type.ParentId > 0)
 			{
 				type = contentTypeService.GetContentType(type.ParentId);
 				if (type.Alias.InvariantEquals(docTypeAlias))

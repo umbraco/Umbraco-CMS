@@ -163,7 +163,7 @@ module.exports = function (grunt) {
           }
         },
         testing: {
-          src:['src/common/mocks/resources/*.js'],
+          src:['src/common/mocks/*/*.js'],
           dest: '<%= distdir %>/js/umbraco.testing.js',
           options: {
               banner: "<%= banner %>\n(function() { \n\n",
