@@ -97,8 +97,17 @@ namespace Umbraco.Core
 			// if we've got a nullable of something, we try to convert directly to that thing.
 			if (destinationType.IsGenericType && destinationType.GetGenericTypeDefinition() == typeof(Nullable<>))
 			{
+			    var underlyingType = Nullable.GetUnderlyingType(destinationType);
+
+                //special case for empty strings for bools/dates which should return null if an empty string
+			    var asString = input as string;
+			    if (asString != null && string.IsNullOrEmpty(asString) && (underlyingType == typeof(DateTime) || underlyingType == typeof(bool)))
+                {
+                    return Attempt<object>.Succeed(null);
+                }
+
 				// recursively call into myself with the inner (not-nullable) type and handle the outcome
-				var nonNullable = input.TryConvertTo(Nullable.GetUnderlyingType(destinationType));
+                var nonNullable = input.TryConvertTo(underlyingType);
 
 				// and if sucessful, fall on through to rewrap in a nullable; if failed, pass on the exception
 				if (nonNullable.Success)
@@ -202,78 +211,78 @@ namespace Umbraco.Core
 			if (destinationType == typeof(string))
 				return Attempt<object>.Succeed(input);
 
-			if (input == null || input.Length == 0)
+			if (string.IsNullOrEmpty(input))
 			{
 				if (destinationType == typeof(Boolean))
 					return Attempt<object>.Succeed(false);   // special case for booleans, null/empty == false
-				else if (destinationType == typeof(DateTime))
-                    return Attempt<object>.Succeed(false);
+				if (destinationType == typeof(DateTime))
+                    return Attempt<object>.Succeed(DateTime.MinValue);
 			}
 
 			// we have a non-empty string, look for type conversions in the expected order of frequency of use...
 			if (destinationType.IsPrimitive)
 			{
-				if (destinationType == typeof(Int32))
+			    if (destinationType == typeof(Int32))
 				{
 					Int32 value;
 					return Int32.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
 				}
-				else if (destinationType == typeof(Int64))
-				{
-					Int64 value;
-					return Int64.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
-				}
-				else if (destinationType == typeof(Boolean))
-				{
-					Boolean value;
-					if (Boolean.TryParse(input, out value))
-						return Attempt<object>.Succeed(value);  // don't declare failure so the CustomBooleanTypeConverter can try
-				}
-				else if (destinationType == typeof(Int16))
-				{
-					Int16 value;
-					return Int16.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
-				}
-				else if (destinationType == typeof(Double))
-				{
-					Double value;
-					return Double.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
-				}
-				else if (destinationType == typeof(Single))
-				{
-					Single value;
-					return Single.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
-				}
-				else if (destinationType == typeof(Char))
-				{
-					Char value;
-					return Char.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
-				}
-				else if (destinationType == typeof(Byte))
-				{
-					Byte value;
-					return Byte.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
-				}
-				else if (destinationType == typeof(SByte))
-				{
-					SByte value;
-					return SByte.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
-				}
-				else if (destinationType == typeof(UInt32))
-				{
-					UInt32 value;
-					return UInt32.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
-				}
-				else if (destinationType == typeof(UInt16))
-				{
-					UInt16 value;
-					return UInt16.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
-				}
-				else if (destinationType == typeof(UInt64))
-				{
-					UInt64 value;
-					return UInt64.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
-				}
+			    if (destinationType == typeof(Int64))
+			    {
+			        Int64 value;
+			        return Int64.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			    }
+			    if (destinationType == typeof(Boolean))
+			    {
+			        Boolean value;
+			        if (Boolean.TryParse(input, out value))
+			            return Attempt<object>.Succeed(value);  // don't declare failure so the CustomBooleanTypeConverter can try
+			    }
+			    else if (destinationType == typeof(Int16))
+			    {
+			        Int16 value;
+			        return Int16.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			    }
+			    else if (destinationType == typeof(Double))
+			    {
+			        Double value;
+			        return Double.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			    }
+			    else if (destinationType == typeof(Single))
+			    {
+			        Single value;
+			        return Single.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			    }
+			    else if (destinationType == typeof(Char))
+			    {
+			        Char value;
+			        return Char.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			    }
+			    else if (destinationType == typeof(Byte))
+			    {
+			        Byte value;
+			        return Byte.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			    }
+			    else if (destinationType == typeof(SByte))
+			    {
+			        SByte value;
+			        return SByte.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			    }
+			    else if (destinationType == typeof(UInt32))
+			    {
+			        UInt32 value;
+			        return UInt32.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			    }
+			    else if (destinationType == typeof(UInt16))
+			    {
+			        UInt16 value;
+			        return UInt16.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			    }
+			    else if (destinationType == typeof(UInt64))
+			    {
+			        UInt64 value;
+			        return UInt64.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			    }
 			}
 			else if (destinationType == typeof(Guid))
 			{
