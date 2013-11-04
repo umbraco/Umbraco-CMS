@@ -6,8 +6,9 @@
  * @description
  * The controller for the content editor
  */
-function DataTypeEditController($scope, $routeParams, $location, dataTypeResource, notificationsService, navigationService, angularHelper, serverValidationManager, contentEditingHelper, formHelper) {
+function DataTypeEditController($scope, $routeParams, $location, navigationService, treeService, dataTypeResource, notificationsService, navigationService, angularHelper, serverValidationManager, contentEditingHelper, formHelper) {
 
+    $scope.nav = navigationService;
     //method used to configure the pre-values when we retreive them from the server
     function createPreValueProps(preVals) {
         $scope.preValues = [];
@@ -83,6 +84,19 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
                 });
         }
     });
+
+    $scope.options = function(content){
+        if(!content.id){
+            return;
+        }
+
+        if(!$scope.actions){
+            treeService.getMenu({ treeNode: $scope.nav.ui.currentTreeNode })
+                .then(function(data) {
+                        $scope.actions = data.menuItems;
+                });    
+        }
+    };
 
     $scope.save = function() {
 

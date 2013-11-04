@@ -216,18 +216,17 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
     };
     
     $scope.options = function(content){
-        if(!content.id){
-            return;
-        }
+            if(!content.id){
+                return;
+            }
 
-        if(!$scope.actions){
-            var node = {menuUrl: "/umbraco/UmbracoTrees/ContentTree/GetMenu?id=" + content.id + "&application=content"};
-            treeService.getMenu({ treeNode: node })
-                .then(function(data) {
-                        $scope.actions = data.menuItems;
-                });    
-        }
-    };
+            if(!$scope.actions){
+                treeService.getMenu({ treeNode: $scope.nav.ui.currentTreeNode })
+                    .then(function(data) {
+                            $scope.actions = data.menuItems;
+                    });    
+            }
+        };
 
     /** this method is called for all action buttons and then we proxy based on the btn definition */
     $scope.performAction = function(btn) {
