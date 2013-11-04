@@ -13,39 +13,35 @@
             </div>
 
             <div class="span8">
-                
+              
                 <div class="btn-toolbar pull-right umb-btn-toolbar">
+                    {{nav.ui.currentNode | json}}    
                     <div class="btn-group" ng-animate="'fade'" ng-show="formStatus">
                         <p class="btn btn-link umb-status-label">{{formStatus}}</p>
                     </div>
 
                     <div class="btn-group">
-                        <a class="btn" ng-click="preview(content)">
-                            <localize key="buttons_showPage">Preview page</localize>
-                        </a>
-                    </div>
-
-                    <div class="btn-group" ng-if="defaultButton">
-                        
-                        <!-- primary button -->
-                        <a class="btn btn-success" href="#" ng-click="performAction(defaultButton)" prevent-default data-hotkey="{{defaultButton.hotKey}}">
-                            <localize key="{{defaultButton.labelKey}}">{{defaultButton.labelKey}}</localize>                            
+                        <!-- options button -->
+                        <a class="btn" href="#" ng-click="options(content)" prevent-default data-toggle="dropdown">
+                           <i class="icon-settings" style="line-height: 14px"></i> Options
                         </a>
                         
-                        <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" ng-if="subButtons.length > 0">
+                        <a class="btn dropdown-toggle" ng-click="options(content)" data-toggle="dropdown">
                             <span class="caret"></span>
                         </a>
                         
-                        <!-- sub buttons -->
-                        <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel" ng-if="subButtons.length > 0">
-                            <li ng-repeat="btn in subButtons">
-                                <a href="#" ng-click="performAction(btn)" prevent-default data-hotkey="{{btn.hotKey}}">
-                                    <localize key="{{btn.labelKey}}">{{btn.labelKey}}</localize>
+                        <!-- actions -->
+                        <ul class="dropdown-menu  umb-actions" role="menu" aria-labelledby="dLabel">
+                            <li class="action" ng-class="{sep:action.seperator}" ng-repeat="action in actions">
+                                <a prevent-default
+                                    ng-click="executeMenuItem(content,action,nav.ui.currentSection)">
+                                    <i class="icon icon-{{action.cssclass}}"></i>
+                                    <span class="menu-label">{{action.name}}</span>
                                 </a>
-                            </li>                            
+                            </li>                             
                         </ul>
-
                      </div>
+                    
                  </div>
              </div>
         </umb-header>
@@ -56,9 +52,39 @@
                     <umb-property 
                         property="property"
                         ng-repeat="property in tab.properties">
-                        
                         <umb-editor model="property"></umb-editor>
                     </umb-property>
+
+
+
+                    <div class="umb-tab-buttons">
+                        <div class="btn-group">
+                            <a class="btn" ng-click="preview(content)">
+                                <localize key="buttons_showPage">Preview page</localize>
+                            </a>
+                        </div>
+
+                        <div class="btn-group dropup" ng-if="defaultButton">
+                            <!-- primary button -->
+                            <a class="btn btn-success" href="#" ng-click="performAction(defaultButton)" prevent-default data-hotkey="{{defaultButton.hotKey}}">
+                                <localize key="{{defaultButton.labelKey}}">{{defaultButton.labelKey}}</localize>                            
+                            </a>
+                            
+                            <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" ng-if="subButtons.length > 0">
+                                <span class="caret"></span>
+                            </a>
+                            
+                            <!-- sub buttons -->
+                            <ul class="dropdown-menu bottom-up" role="menu" aria-labelledby="dLabel" ng-if="subButtons.length > 0">
+                                <li ng-repeat="btn in subButtons">
+                                    <a href="#" ng-click="performAction(btn)" prevent-default data-hotkey="{{btn.hotKey}}">
+                                        <localize key="{{btn.labelKey}}">{{btn.labelKey}}</localize>
+                                    </a>
+                                </li>                            
+                            </ul>
+                         </div>
+                    </div>
+
                 </div>
             </umb-tab>
         </umb-tab-view>

@@ -254,7 +254,10 @@ namespace umbraco.cms.businesslogic.macro
             var alias = XmlHelper.GetNodeValue(n.SelectSingleNode("alias"));
             //check to see if the macro alreay exists in the system
             //it's better if it does and we keep using it, alias *should* be unique remember
+            
             var m = Macro.GetByAlias(alias);
+
+
             if (m == null)
             {
                 m = MakeNew(XmlHelper.GetNodeValue(n.SelectSingleNode("name")));
@@ -432,7 +435,7 @@ namespace umbraco.cms.businesslogic.macro
 		        TimeSpan.FromMinutes(30),
 		        () =>
 		            {
-		                var macro = ApplicationContext.Current.Services.MacroService.GetByAlias(alias);
+                        var macro = ApplicationContext.Current.Services.MacroService.GetByAlias(alias);
 		                if (macro == null) return null;
 		                return new Macro(macro);
 		            });

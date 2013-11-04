@@ -2,7 +2,7 @@
   "author": "Umbraco HQ",
   "name": "umbraco",
   "homepage": "https://github.com/umbraco/umbraco-cms/tree/7.0.0",
-  "version": "0.0.1-TechnicalPReview",
+  "version": "7.0.0-Beta",
   "repository": {
     "type": "git",
     "url": "git@github.com:umbraco/umbraco-cms.git"

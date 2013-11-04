@@ -87,7 +87,14 @@ angular.module("umbraco.directives")
                 };
 
                 scope.eventhandler.reloadNode = function(node){
-                    scope.loadChildren(node, true);
+
+                    if(!node){
+                      node = scope.currentNode;
+                    }
+                      
+                    if(node){
+                      scope.loadChildren(node, true); 
+                    }
                 };
 
                 scope.eventhandler.syncPath = function(path, forceReload){

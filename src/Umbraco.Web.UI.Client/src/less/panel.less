@@ -66,6 +66,7 @@ h1.headline{
   position: absolute;
   padding: 0px 0px 0px 20px;
 }
+
 .umb-panel-header h1 {
   margin: 0;
   font-size: @fontSizeMedium;
@@ -78,6 +79,7 @@ h1.headline{
 .umb-panel-header p {
     margin:0px 20px;
 }
+
 .umb-headline-editor-wrapper input  {
   background: none;
   border: none;
@@ -90,6 +92,10 @@ h1.headline{
 .umb-headline-editor-wrapper input.ng-invalid  {
   color: @red;
 }
+
+.umb-headline-editor-wrapper input.ng-invalid::-webkit-input-placeholder {color: @red;}
+.umb-headline-editor-wrapper input.ng-invalid::-moz-placeholder {color: @red;}
+.umb-headline-editor-wrapper input.ng-invalid:-ms-input-placeholder {color: @red;}
 
 .umb-panel-header i {
   font-size: 14px;
@@ -137,6 +143,28 @@ h1.headline{
     margin: 20px 29px;
     width: 80px
  }
+
+/* tab buttons */
+.umb-bottom-bar{
+    background: white;
+
+    -webkit-box-shadow: 0px -18px 20px rgba(255, 255, 255, 1);
+    -moz-box-shadow:    0px -18px 20px rgba(255, 255, 255, 1);
+    box-shadow:         0px -18px 20px rgba(255, 255, 255, 1);
+
+    padding: 10px 0 10px 0;
+
+    position: fixed;
+    bottom: 0px;
+    left: 460px;
+    right: 0px;
+  };
+
+
+.umb-tab-buttons{padding-left: 240px;}
+.umb-tab-pane.with-buttons{padding-bottom: 80px}
+
+
 
 
  // Utility classes
