@@ -26,13 +26,17 @@ angular.module("umbraco.directives")
 					return;
 				}
 
-				var bottom = bar.offset().top + bar.height();
-	            if(bottom > $(window).height()){
-					bar.addClass("umb-bottom-bar");
-					$(".tab-content .active").addClass("with-buttons");
-				}else{
-					bar.removeClass("umb-bottom-bar");
-					$(".tab-content .active").removeClass("with-buttons");
+				var offset = bar.offset();
+
+				if(offset){
+					var bottom = bar.offset().top + bar.height();
+		            if(bottom > $(window).height()){
+						bar.addClass("umb-bottom-bar");
+						$(".tab-content .active").addClass("with-buttons");
+					}else{
+						bar.removeClass("umb-bottom-bar");
+						$(".tab-content .active").removeClass("with-buttons");
+					}	
 				}
 			}
 
