@@ -19,13 +19,13 @@ angular.module('umbraco.mocks').
       return {
           register: function() {
               $httpBackend
-                  .whenGET(mocksUtils.urlRegex('/umbraco/Api/'))
+                  .whenGET(mocksUtils.urlRegex('/umbraco/Api/ContentType/GetAllowedChildren'))
                   .respond(returnAllowedChildren);
                 
           },
           expectAllowedChildren: function(){
             console.log("expecting get");
-            $httpBackend.expectGET(mocksUtils.urlRegex('/umbraco/Api/'));
+            $httpBackend.expectGET(mocksUtils.urlRegex('/umbraco/Api/ContentType/GetAllowedChildren'));
           }
       };
   }]);

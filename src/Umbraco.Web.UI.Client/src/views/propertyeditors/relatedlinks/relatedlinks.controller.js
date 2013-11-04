@@ -14,28 +14,17 @@
             $scope.addExternal = true;
             $scope.currentEditLink = null;
             $scope.hasError = false;
-            
-            //$scope.relatedLinks = [
-            //    { caption: 'Google', link: "http://google.com", newWindow: false, edit:false },
-            //    { caption: 'Umbraco', link: "http://umbraco.com", newWindow: false, edit: false },
-            //    { caption: 'Nibble', link: "http://nibble.be", newWindow: false, edit: false }
-            //];
 
             $scope.internal = function ($event) {
-
                 $scope.currentEditLink = null;
-                
                 var d = dialogService.contentPicker({ scope: $scope, multipicker: false, callback: select });
-
                 $event.preventDefault();
             };
             
             $scope.selectInternal = function ($event, link) {
 
                 $scope.currentEditLink = link;
-                
                 var d = dialogService.contentPicker({ scope: $scope, multipicker: false, callback: select });
-
                 $event.preventDefault();
             };
 
@@ -51,8 +40,8 @@
             };
             
             $scope.delete = function (idx) {
-                
-                $scope.model.value.splice($scope.model.value[idx], 1);
+               
+                $scope.model.value.splice(idx, 1);
                 
             };
 

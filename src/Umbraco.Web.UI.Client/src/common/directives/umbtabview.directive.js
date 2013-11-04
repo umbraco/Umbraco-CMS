@@ -13,14 +13,18 @@ angular.module("umbraco.directives")
 
 		link: function (scope, el, attrs) {
 			
-			function _setClass(reset){
+			function _setClass(resize){
 				var bar = $(".tab-content .active .umb-tab-buttons");
 
 				//no need to process
-				if(!reset && bar.hasClass("umb-bottom-bar")){
+				if(resize){
+					bar.removeClass("umb-bottom-bar");
+				}	
+
+				//already positioned
+				if(bar.hasClass("umb-bottom-bar")){
 					return;
 				}
-					
 
 				var bottom = bar.offset().top + bar.height();
 	            if(bottom > $(window).height()){
@@ -33,6 +37,7 @@ angular.module("umbraco.directives")
 			}
 
 
+			//initial loading
 			$timeout(function(){
 				$('a[data-toggle="tab"]').on('shown', function (e) {
 					_setClass();	
