@@ -156,7 +156,7 @@ angular.module("umbraco.directives")
         //if the current path contains the node id, we will auto-expand the tree item children
         
         scope.expandActivePath(scope.node, scope.activetree, scope.path);
-        scope.node.stateCssClass = scope.node.cssClasses.join(" ");
+        scope.node.stateCssClass = (scope.node.cssClasses || []).join(" ");
 
         var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item  ng-repeat="child in node.children" eventhandler="eventhandler" activetree="{{activetree}}"  tree="tree" current-node="currentNode" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
         var newElement = angular.element(template);
