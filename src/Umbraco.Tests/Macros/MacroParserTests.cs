@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Core.Macros;
 
@@ -21,7 +22,7 @@ namespace Umbraco.Tests.Macros
 <div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" /> -->
 <ins>Macro alias: <strong>Map</strong></ins></div>
-<p>asdfasdf</p>", result);
+<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
         }
 
         [Test]
@@ -38,7 +39,7 @@ namespace Umbraco.Tests.Macros
 <div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" /> -->
 <ins>Macro alias: <strong>Map</strong></ins></div>
-<p>asdfasdf</p>", result);
+<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
         }
 
         [Test]
@@ -55,7 +56,7 @@ namespace Umbraco.Tests.Macros
 <div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
 <ins>Macro alias: <strong>Map</strong></ins></div>
-<p>asdfasdf</p>", result);
+<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
         }
 
         [Test]
@@ -72,7 +73,7 @@ namespace Umbraco.Tests.Macros
 <div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
 <ins>Macro alias: <strong>Map</strong></ins></div>
-<p>asdfasdf</p>", result);
+<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
         }
 
         [Test]
@@ -89,7 +90,7 @@ namespace Umbraco.Tests.Macros
 <div class=""umb-macro-holder Map mceNonEditable"" test1=""value1"" test2=""value2"">
 <!-- <?UMBRACO_MACRO macroAlias=""Map"" test1=""value1"" test2=""value2"" /> -->
 <ins>Macro alias: <strong>Map</strong></ins></div>
-<p>asdfasdf</p>", result);
+<p>asdfasdf</p>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
         }
 
         [Test]
@@ -122,7 +123,7 @@ asdfsdf
 asdfsdf
 </div>
 </body>
-</html>", result);
+</html>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
         }
 
         [Test]
@@ -155,7 +156,7 @@ asdfsdf
 asdfsdf
 </div>
 </body>
-</html>", result);
+</html>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
         }
     }
 }
