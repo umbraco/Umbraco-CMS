@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper) {
+function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper) {
 
     $scope.defaultButton = null;
     $scope.subButtons = [];
