@@ -583,6 +583,10 @@ angular.module('umbraco.services')
                 var treeAlias = treeService.getTreeAlias(args.node);
                 var packageTreeFolder = treeService.getTreePackageFolder(treeAlias);
 
+                if (!treeAlias) {
+                    throw "Could not get tree alias for node " + args.node.id;
+                }
+
                 if (packageTreeFolder) {
                     templateUrl = Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath + 
                         "/" + packageTreeFolder +

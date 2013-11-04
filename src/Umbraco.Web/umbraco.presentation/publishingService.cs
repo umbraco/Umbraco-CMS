@@ -81,7 +81,7 @@ namespace umbraco.presentation
 
                         if (runTask)
                         {
-                            bool taskResult = getTaskByHttp(t.Url);
+                            bool taskResult = GetTaskByHttp(t.Url);
                             if (t.Log)
                                 LogHelper.Info<publishingService>(string.Format("{0} has been called with response: {1}", t.Alias, taskResult));
                         }
@@ -94,7 +94,7 @@ namespace umbraco.presentation
 			}
 			catch(Exception x)
 			{
-				Debug.WriteLine(x);
+                LogHelper.Error<publishingService>("Error executing scheduled publishing", x);
 			}
 			finally
 			{
@@ -102,35 +102,23 @@ namespace umbraco.presentation
 			}
 		}
 
-		private static bool getTaskByHttp(string url)
+		private static bool GetTaskByHttp(string url)
 		{
 			var myHttpWebRequest = (HttpWebRequest)WebRequest.Create(url);
-			HttpWebResponse myHttpWebResponse = null;
-			try
-			{
-				myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse();
-				if(myHttpWebResponse.StatusCode == HttpStatusCode.OK)
-				{
-					myHttpWebResponse.Close();
-					return true;
-				}
-				else
-				{
-					myHttpWebResponse.Close();
-					return false;
-				}
-			}
-			catch
-			{
-			}
-			finally
-			{
-				// Release the HttpWebResponse Resource.
-				if(myHttpWebResponse != null)
-					myHttpWebResponse.Close();
-			}
 
-			return false;
+            try
+            {
+                using (var myHttpWebResponse = (HttpWebResponse)myHttpWebRequest.GetResponse())
+                {
+                    return myHttpWebResponse.StatusCode == HttpStatusCode.OK;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<publishingService>("Error sending url request for scheduled task", ex);
+            }
+
+		    return false;
 		}
 	}
 }

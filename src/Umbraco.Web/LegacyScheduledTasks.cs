@@ -12,11 +12,7 @@ using global::umbraco.BusinessLogic;
 
 namespace Umbraco.Web
 {
-	// note: has to be public to be detected by the resolver
-	//   if it's made internal, which would make more sense, then it's not detected
-	//   and it needs to be manually registered - which we want to avoid, in order
-	//   to be as unobtrusive as possible
-
+	
 	internal sealed class LegacyScheduledTasks : ApplicationEventHandler
 	{
 		Timer _pingTimer;
