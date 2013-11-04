@@ -167,6 +167,10 @@ a.umb-options i {
 	margin: 0 2px 0 0;
 }
 
+a.umb-options:hover {
+	background: @btnBackgroundHighlight
+}
+
 li.root > div > a.umb-options {
     top: 13px;
 }
@@ -266,19 +270,15 @@ div.not-allowed > i.icon,div.not-allowed > a{
 	white-space: nowrap;
 	display: block;
 	font-size: 14px;
-	color: #414141;
+	color: @black;
 	padding: 4px 25px 4px 20px;
 	text-decoration: none;
 	cursor: pointer;
 }
 .umb-actions a:hover, .umb-actions a:focus,
 .umb-actions li.selected {
-	color: #fff !important;
-	background: #2e8aea !important;
-}
-
-.umb-actions a:hover i {
-	color: #fff;
+	color: @black !important;
+	background: @grayLighter !important;
 }
 
 .umb-actions .menu-label {
@@ -317,14 +317,6 @@ div.not-allowed > i.icon,div.not-allowed > a{
 	margin-bottom: 10px;
 	color: #000;
 	margin-left: 20px;
-}
-
-.umb-actions-child li a:hover {
-	color: #fff;
-	background-color: #2E8AEA
-}
-.umb-actions-child li a:hover * {
-	color: #fff !important
 }
 
 .umb-actions-child li .menu-label small {

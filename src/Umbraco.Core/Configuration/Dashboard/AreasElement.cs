@@ -2,17 +2,14 @@
 
 namespace Umbraco.Core.Configuration.Dashboard
 {
-    internal class AreasElement : ConfigurationElement, IArea
+    internal class AreasElement : ConfigurationElement
     {
-        [ConfigurationProperty("area", IsRequired = true)]
-        public InnerTextConfigurationElement<string> AreaName
+        [ConfigurationCollection(typeof(SectionCollection), AddItemName = "area")]
+        [ConfigurationProperty("", IsDefaultCollection = true)]
+        public AreaCollection AreaCollection
         {
-            get { return (InnerTextConfigurationElement<string>)this["area"]; }
-        }
-        
-        string IArea.AreaName
-        {
-            get { return AreaName; }
+            get { return (AreaCollection)base[""]; }
+            set { base[""] = value; }
         }
     }
 }

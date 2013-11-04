@@ -159,6 +159,8 @@
     <Compile Include="Configuration\Dashboard\AccessElement.cs" />
     <Compile Include="Configuration\Dashboard\AccessItem.cs" />
     <Compile Include="Configuration\Dashboard\AccessType.cs" />
+    <Compile Include="Configuration\Dashboard\AreaCollection.cs" />
+    <Compile Include="Configuration\Dashboard\AreaElement.cs" />
     <Compile Include="Configuration\Dashboard\AreasElement.cs" />
     <Compile Include="Configuration\Dashboard\ControlCollection.cs" />
     <Compile Include="Configuration\Dashboard\ControlElement.cs" />
