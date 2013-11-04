@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper) {
+function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper) {
 
     $scope.defaultButton = null;
     $scope.subButtons = [];
@@ -215,17 +215,23 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
             }    
     };
     
-    $scope.options = function(content){
-        if(!content.id){
+    $scope.options = function (content) {
+        if (!content.id) {
             return;
         }
 
-        if(!$scope.actions){
-            var node = {menuUrl: "/umbraco/UmbracoTrees/ContentTree/GetMenu?id=" + content.id + "&application=content"};
+        if (!$scope.actions) {
+            var menuUrl = umbRequestHelper.getApiUrl(
+                "contentTreeBaseUrl",
+                "GetMenu",
+                [{ id: content.id }, { application: "content" }]);
+
+            var node = { menuUrl: menuUrl };
+
             treeService.getMenu({ treeNode: node })
-                .then(function(data) {
-                        $scope.actions = data.menuItems;
-                });    
+                .then(function (data) {
+                    $scope.actions = data.menuItems;
+                });
         }
     };
 
