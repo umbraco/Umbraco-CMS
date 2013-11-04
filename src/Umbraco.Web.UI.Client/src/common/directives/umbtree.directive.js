@@ -4,7 +4,7 @@
 * @restrict E
 **/
 angular.module("umbraco.directives")
-  .directive('umbTree', function ($compile, $log, $q, $rootScope, treeService, notificationsService, $timeout) {
+  .directive('umbTree', function ($compile, $log, $q, $rootScope, navigationService, treeService, notificationsService, $timeout) {
     
     return {
       restrict: 'E',
@@ -105,6 +105,7 @@ angular.module("umbraco.directives")
 
                   //reset current node selection
                   scope.currentNode = undefined;
+                  navigationService.ui.currentTreeNode = undefined;
 
                   //filter the path for root node ids
                   path = _.filter(path, function(item){ return (item !== "init" && item !== "-1"); });
@@ -226,6 +227,7 @@ angular.module("umbraco.directives")
                           path.splice(0,1);
                           syncTree(child, path, forceReload);
                         }else{
+                              navigationService.ui.currentTreeNode = child;
                               scope.currentNode = child;
                         }
                     });

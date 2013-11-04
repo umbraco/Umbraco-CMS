@@ -10,7 +10,8 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
 
     $scope.defaultButton = null;
     $scope.subButtons = [];
-
+    $scope.nav = navigationService;
+    
     //This sets up the action buttons based on what permissions the user has.
     //The allowedActions parameter contains a list of chars, each represents a button by permission so 
     //here we'll build the buttons according to the chars of the user.

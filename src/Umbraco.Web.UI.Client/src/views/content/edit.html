@@ -13,7 +13,7 @@
             </div>
 
             <div class="span8">
-              
+                
                 <div class="btn-toolbar pull-right umb-btn-toolbar">
                     <div class="btn-group" ng-animate="'fade'" ng-show="formStatus">
                         <p class="btn btn-link umb-status-label">{{formStatus}}</p>
@@ -33,7 +33,7 @@
                         <ul class="dropdown-menu  umb-actions" role="menu" aria-labelledby="dLabel">
                             <li class="action" ng-class="{sep:action.seperator}" ng-repeat="action in actions">
                                 <a prevent-default
-                                    ng-click="executeMenuItem(content,action,nav.ui.currentSection)">
+                                    ng-click="executeMenuItem(nav.ui.currentTreeNode,action,nav.ui.currentSection)">
                                     <i class="icon icon-{{action.cssclass}}"></i>
                                     <span class="menu-label">{{action.name}}</span>
                                 </a>
