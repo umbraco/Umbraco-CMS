@@ -7,7 +7,7 @@
 // --------------------------------------------------
 
 // Core
-.btn {
+.btn, input[type=submit] {
   display: inline-block;
   .ie7-inline-block();
   padding: 4px 12px;
@@ -30,6 +30,7 @@
   // Hover/focus state
   &:hover,
   &:focus {
+    background: @btnBackgroundHighlight;
     color: @grayDark;
     text-decoration: none;
     background-position: 0 -15px;
