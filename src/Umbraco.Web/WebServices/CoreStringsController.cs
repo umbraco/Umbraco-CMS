@@ -18,11 +18,11 @@ namespace Umbraco.Web.WebServices
     public class CoreStringsController : UmbracoAuthorizedController
     {
         [HttpGet]
-        public JsonResult ToSafeAlias(string value)
+        public JsonResult ToSafeAlias(string value, bool camelCase = true)
         {
             return value == null 
-                ? Json(new {error = "no value."}, JsonRequestBehavior.AllowGet) 
-                : Json(new { alias = value.ToSafeAlias() }, JsonRequestBehavior.AllowGet);
+                ? Json(new {error = "no value."}, JsonRequestBehavior.AllowGet)
+                : Json(new { alias = camelCase ? value.ToSafeCamelAlias() : value.ToSafeAlias() }, JsonRequestBehavior.AllowGet);
         }
 
         [HttpGet]

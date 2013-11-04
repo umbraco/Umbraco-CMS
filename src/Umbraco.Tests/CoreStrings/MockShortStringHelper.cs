@@ -19,7 +19,17 @@ namespace Umbraco.Tests.CoreStrings
             return "SAFE-ALIAS::" + text;
         }
 
+        public string CleanStringForSafeCamelAlias(string text)
+        {
+            return "SAFE-ALIAS::" + text;
+        }
+
         public string CleanStringForSafeAlias(string text, System.Globalization.CultureInfo culture)
+        {
+            return "SAFE-ALIAS-CULTURE::" + text;
+        }
+
+        public string CleanStringForSafeCamelAlias(string text, System.Globalization.CultureInfo culture)
         {
             return "SAFE-ALIAS-CULTURE::" + text;
         }

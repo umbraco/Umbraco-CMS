@@ -139,6 +139,18 @@ function isValidAlias(alias) {{
         }
 
         /// <summary>
+        /// Cleans a string to produce a string that can safely be used in an alias.
+        /// </summary>
+        /// <param name="text">The text to filter.</param>
+        /// <returns>The safe alias.</returns>
+        /// <remarks>The string will be cleaned in the context of invariant culture.</remarks>
+        public string CleanStringForSafeCamelAlias(string text)
+        {
+            var t = CleanStringForSafeAlias(text);
+            return Char.ToLowerInvariant(t[0]) + t.Substring(1);
+        }
+
+        /// <summary>
         /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used in an alias.
         /// </summary>
         /// <param name="text">The text to filter.</param>
@@ -148,6 +160,18 @@ function isValidAlias(alias) {{
         public string CleanStringForSafeAlias(string text, CultureInfo culture)
         {
             return CleanStringForSafeAlias(text);
+        }
+
+        /// <summary>
+        /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used in an alias.
+        /// </summary>
+        /// <param name="text">The text to filter.</param>
+        /// <param name="culture">The culture.</param>
+        /// <returns>The safe alias.</returns>
+        /// <remarks>Legacy does not support culture contexts.</remarks>
+        public string CleanStringForSafeCamelAlias(string text, CultureInfo culture)
+        {
+            return CleanStringForSafeCamelAlias(text);
         }
 
         /// <summary>
