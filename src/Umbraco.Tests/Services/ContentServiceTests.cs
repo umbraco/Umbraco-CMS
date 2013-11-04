@@ -977,12 +977,8 @@ namespace Umbraco.Tests.Services
             Assert.That(sut.GetValue<int>("contentPicker"), Is.EqualTo(1090));
             Assert.That(sut.GetValue<int>("mediaPicker"), Is.EqualTo(1091));
             Assert.That(sut.GetValue<int>("memberPicker"), Is.EqualTo(1092));
-            Assert.That(sut.GetValue<string>("simpleEditor"), Is.EqualTo("This is simply edited"));
-            Assert.That(sut.GetValue<string>("ultimatePicker"), Is.EqualTo("1234,1235"));
             Assert.That(sut.GetValue<string>("relatedLinks"), Is.EqualTo("<links><link title=\"google\" link=\"http://google.com\" type=\"external\" newwindow=\"0\" /></links>"));
             Assert.That(sut.GetValue<string>("tags"), Is.EqualTo("this,is,tags"));
-            Assert.That(sut.GetValue<string>("macroContainer"), Is.Empty);
-            Assert.That(sut.GetValue<string>("imgCropper"), Is.Empty);
 	    }
 
 	    [Test]

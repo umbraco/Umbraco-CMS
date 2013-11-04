@@ -101,12 +101,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
             content.SetValue("contentPicker", 1090);
             content.SetValue("mediaPicker", 1091);
             content.SetValue("memberPicker", 1092);
-            content.SetValue("simpleEditor", "This is simply edited");
-            content.SetValue("ultimatePicker", "1234,1235");
             content.SetValue("relatedLinks", "<links><link title=\"google\" link=\"http://google.com\" type=\"external\" newwindow=\"0\" /></links>");
             content.SetValue("tags", "this,is,tags");
-            content.SetValue("macroContainer", "");
-            content.SetValue("imgCropper", "");
 
             return content;
         }
