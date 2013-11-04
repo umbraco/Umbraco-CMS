@@ -711,6 +711,20 @@ figure{display: block;}
 	color:#3e0e03;
 	background:url(../images/bul2.gif) no-repeat 0 7px;
 }
+
+/* basic starterkit grid*/
+ul.kits {
+    list-style: none;        
+}
+
+
+.kits:after {
+	clear: both;
+	content:"";
+	display: block;
+}
+
+
 /* gallery */
 .gallery:after {
 	clear: both;

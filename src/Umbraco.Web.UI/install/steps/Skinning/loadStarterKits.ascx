@@ -27,61 +27,26 @@
 
     <asp:Repeater ID="rep_starterKits" runat="server">
         <HeaderTemplate>
-            <nav class="zoom-list add-nav">
-                <ul>
+             <ul class="thumbnails">
         </HeaderTemplate>
         <ItemTemplate>
-
-            <li class="add-<%# ((Package)Container.DataItem).Text.Replace(" ","").ToLower() %>">
-                
-                <a href="#" class="single-tab selectStarterKit" title="<%# ((Package)Container.DataItem).Text %>" data-repoId="<%# ((Package)Container.DataItem).RepoGuid %>">
-                    <img class="zoom-img" src="<%# ((Package)Container.DataItem).Thumbnail %>" alt="<%# ((Package)Container.DataItem).Text %>" width="150" height="204">
-                </a>
-
-                <%--<asp:LinkButton CssClass="single-tab selectStarterKit" ID="bt_selectKit" runat="server" OnClick="SelectStarterKit" ToolTip="<%# ((Package)Container.DataItem).Text %>" CommandArgument="<%# ((Package)Container.DataItem).RepoGuid %>">
-                    <img class="zoom-img" src="<%# ((Package)Container.DataItem).Thumbnail %>" alt="<%# ((Package)Container.DataItem).Text %>" width="150" height="204">
-                </asp:LinkButton>--%>
-                
-                <em>&nbsp;</em>
-                <!-- drop down -->
-                <div class="drop-hold">
-                    <div class="t">&nbsp;</div>
-                    <div class="c">
-                        <div class="title">
-                            <span><strong><%# ((Package)Container.DataItem).Text %></strong> contains the following functionality</span>
-                        </div>
-                        <div class="hold">
-                            <%# ((Package)Container.DataItem).Description %>
-                        </div>
+             <li class="add-<%# ((Package)Container.DataItem).Text.Replace(" ","").ToLower() %>">
+                    <div class="image">
+                        <a href="#" class="single-tab selectStarterKit" title="<%# ((Package)Container.DataItem).Text %>" data-repoId="<%# ((Package)Container.DataItem).RepoGuid %>">
+                            <img src="http://our.umbraco.org<%# ((Package)Container.DataItem).Thumbnail %>" alt="<%# ((Package)Container.DataItem).Text %>">
+                        </a>
                     </div>
-                    <div class="b">&nbsp;</div>
-                </div>
             </li>
         </ItemTemplate>
         <FooterTemplate>
-
-            <li class="add-thanks">
-                <asp:LinkButton runat="server" class="single-tab declineStarterKits" ID="declineStarterKits" OnClientClick="return confirm('Are you sure you do not want to install a starter kit?');" OnClick="NextStep">
-            <img class="zoom-img" src="<%# umbraco.GlobalSettings.ClientPath + "/installer/images/btn-no-thanks.png" %>" alt="image description" width="150" height="204">
+                </ul>
+                
+                 <asp:LinkButton runat="server" ID="declineStarterKits" CssClass="declineKit" OnClientClick="return confirm('Are you sure you do not want to install a starter kit?');" OnClick="NextStep">
+                    No thanks, do not install a starterkit
                 </asp:LinkButton>
-
-                <em>&nbsp;</em>
-                <!-- drop down -->
-                <div class="drop-hold">
-                    <div class="t">&nbsp;</div>
-                    <div class="c">
-                        <div class="title">
-                            <span><strong>Choose not to install a starter kit</strong></span>
-                        </div>
-                    </div>
-                    <div class="b">&nbsp;</div>
-                </div>
-            </li>
-
-            </ul>
-	</nav>    
         </FooterTemplate>
     </asp:Repeater>
+
 </asp:PlaceHolder>
 
 <div id="connectionError" style="<%= CannotConnect ? "" : "display:none;" %>">
