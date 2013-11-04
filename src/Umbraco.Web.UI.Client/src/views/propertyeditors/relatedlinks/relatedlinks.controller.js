@@ -40,8 +40,8 @@
             };
             
             $scope.delete = function (idx) {
-                
-                $scope.model.value.splice($scope.model.value[idx], 1);
+               
+                $scope.model.value.splice(idx, 1);
                 
             };
 
