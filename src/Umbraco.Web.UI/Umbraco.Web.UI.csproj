@@ -620,7 +620,15 @@
     </Compile>
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Logout.aspx" />
+    <Content Include="Umbraco\umbraco.aspx" />
     <Content Include="Umbraco_Client\IconPicker\iconpicker.js" />
+    <Compile Include="Umbraco\umbraco.aspx.cs">
+      <DependentUpon>umbraco.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\umbraco.aspx.designer.cs">
+      <DependentUpon>umbraco.aspx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Users\EditUser.aspx.cs">
       <DependentUpon>EditUser.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
