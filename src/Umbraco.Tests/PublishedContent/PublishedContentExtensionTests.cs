@@ -18,7 +18,7 @@ namespace Umbraco.Tests.PublishedContent
 
 		protected override DatabaseBehavior DatabaseTestBehavior
 		{
-			get { return DatabaseBehavior.NewDbFileAndSchemaPerFixture; }
+			get { return DatabaseBehavior.NewSchemaPerFixture; }
 		}
 
 		[SetUp]

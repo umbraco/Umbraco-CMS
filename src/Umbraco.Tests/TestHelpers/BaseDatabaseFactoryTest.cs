@@ -214,7 +214,9 @@ namespace Umbraco.Tests.TestHelpers
 
             if (_isFirstRunInTestSession
                 || DatabaseTestBehavior == DatabaseBehavior.NewSchemaPerTest
-                || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewSchemaPerFixture))
+                || DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest
+                || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewSchemaPerFixture)
+                || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture))
             {
                 //Create the umbraco database and its base data
                 DatabaseContext.Database.CreateDatabaseSchema(false);
