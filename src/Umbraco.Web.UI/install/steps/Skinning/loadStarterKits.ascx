@@ -32,17 +32,22 @@
         <ItemTemplate>
              <li class="add-<%# ((Package)Container.DataItem).Text.Replace(" ","").ToLower() %>">
                     <div class="image">
-                        <a href="#" class="single-tab selectStarterKit" title="<%# ((Package)Container.DataItem).Text %>" data-repoId="<%# ((Package)Container.DataItem).RepoGuid %>">
+						
+                        <a href="#" class="single-tab selectStarterKit" title="Install <%# ((Package)Container.DataItem).Text %>" data-repoId="<%# ((Package)Container.DataItem).RepoGuid %>">
+							<div class="overlay">Install <%# ((Package)Container.DataItem).Text %></div>
                             <img src="http://our.umbraco.org<%# ((Package)Container.DataItem).Thumbnail %>" alt="<%# ((Package)Container.DataItem).Text %>">
                         </a>
+						<a class="zoom-in" title="Enlarge <%# ((Package)Container.DataItem).Text %>" href="#<%# ((Package)Container.DataItem).Text %>">Open</a>
                     </div>
             </li>
+			<div id="<%# ((Package)Container.DataItem).Text %>" class="lb"><a href="#top"><img src="http://our.umbraco.org<%# ((Package)Container.DataItem).Thumbnail %>" alt="oh man" /></a></div>
+
         </ItemTemplate>
         <FooterTemplate>
                 </ul>
                 
                  <asp:LinkButton runat="server" ID="declineStarterKits" CssClass="declineKit" OnClientClick="return confirm('Are you sure you do not want to install a starter kit?');" OnClick="NextStep">
-                    No thanks, do not install a starterkit
+                    No thanks, do not install a starterkit!
                 </asp:LinkButton>
         </FooterTemplate>
     </asp:Repeater>

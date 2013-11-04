@@ -95,7 +95,7 @@
 
 
 
-        <!-- bg page -->
+        <!-- bg page 
         <div class="bg-main">
             <div class="color2">
 
@@ -123,7 +123,7 @@
             </div>
 
         </div>
-
+-->
 
         <!-- lightbox -->
         <div class="lightbox" id="lightbox">

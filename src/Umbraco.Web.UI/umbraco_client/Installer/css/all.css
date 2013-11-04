@@ -1,8 +1,8 @@
 body{
 	margin:0;
-	color:#ffffff;
+	color:#fff;
 	font:13px/16px Tahoma, Geneva, sans-serif;
-	background:#3b0d03;
+	background:#191919;
 	min-width:1000px;
 	position:relative;
 }
@@ -174,9 +174,8 @@ figure{display: block;}
 	letter-spacing:-1px;
 	color:#f27021;
 	position:relative;
-    text-shadow: 0 0 3px #000000;
 }
-.tabset ul li.disable{color:#c57f73;}
+.tabset ul li.disable{color:#666;}
 .tabset ul li em{
 	position:absolute;
 	left:13px;
@@ -209,8 +208,7 @@ figure{display: block;}
 	font-size:36px;
 	line-height:40px;
 	font-weight:normal;
-	color:#FFF3BB;
-    text-shadow: 0 0 10px #000000;
+	color:#fff;
 }
 .content .container{
 	overflow:hidden;
@@ -221,7 +219,7 @@ figure{display: block;}
 	margin:0 0 11px;
 	font-size:20px;
 	line-height:24px;
-	color:#FFF3BB;
+	color:#fff;
 	font-weight:normal;
 }
 .content p{margin:0 0 13px;}
@@ -308,7 +306,7 @@ figure{display: block;}
 	margin:0 0 18px;
 	font-size:15px;
 	line-height:20px;
-	color:#FFF3BB;
+	color:#fff;
 	font-weight: normal;
 }
 .btn-accept,
@@ -465,7 +463,7 @@ figure{display: block;}
 	font-size:17px;
 	line-height:20px;
 	text-decoration:underline;
-	color:#fff3bb;
+	color:#fff;
 }
 .btn-link a:hover{text-decoration:none;}
 /* loader */
@@ -717,12 +715,120 @@ ul.kits {
     list-style: none;        
 }
 
+.thumbnails li {
+	float: left;
+	width: 256px;
+	margin: 0 30px 0 0;
+	background: #1f1f1f;
+	padding: 18px 22px;
+	border-radius: 10px;
+	position: relative;
+}
+
+.thumbnails li .overlay {
+	position: absolute;
+	bottom: 30px;
+	right: 32px;
+	background: #3388cc;
+	height: 16px;
+	color: #fff;
+	border-radius: 3px;
+	padding: 7px 15px;
+	cursor: pointer;
+	outline: 0;
+	box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.05);
+	display: inline;
+	-moz-transition: background-color .25s ease-in-out;
+	-webkit-transition: background-color .25s ease-in-out;
+	-o-transition: background-color .25s ease-in-out;
+	-ms-transition: background-color .25s ease-in-out;
+	transition: background-color .25s ease-in-out;
+}
+
+.thumbnails li .overlay:hover {
+	background: #4398dc;
+}
+
+
+.thumbnails li.add-cwsstart {
+	margin: 0
+}
+
+.thumbnails li img {
+	width: 100%;
+	height: 143px;
+	background-color: #fff
+}
+
+
 
 .kits:after {
 	clear: both;
 	content:"";
 	display: block;
 }
+
+.declineKit {
+	color: #fff;
+	text-decoration: underline;
+	font-size: 14px;
+	margin-top: 20px;
+	display: block;
+	float: left;
+}
+
+/* Light box */
+
+.zoom-in {
+	background: #1f1f1f url(../Images/zoom-in.png) no-repeat 7px 7px;
+	width: 16px;
+	height: 16px;
+	position: absolute;
+	bottom: 30px;
+	left: 32px;
+	text-indent: -9999px;
+	border-radius: 3px;
+	padding: 7px;
+	-moz-transition: background-color .25s ease-in-out;
+	-webkit-transition: background-color .25s ease-in-out;
+	-o-transition: background-color .25s ease-in-out;
+	-ms-transition: background-color .25s ease-in-out;
+	transition: background-color .25s ease-in-out;
+}
+
+.zoom-in:hover {
+	background-color: #333
+}
+
+div.lb {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  z-index: 100
+}
+
+div.lb img {
+	position: absolute;
+   top: 10px;
+   left: 50%;
+   width: 960px;
+   height: auto;
+   margin-left: -480px; /* Half the width */
+}
+
+div.lb:target {
+  display: block;
+}
+
+/** IE doesn't support :target, so we use CSS expressions **/
+div.lb {
+  display: expression((document.location.toString().split('#').slice(1) == this.id)?'block':'none');
+}
+
 
 
 /* gallery */
@@ -1057,7 +1163,7 @@ ul.kits {
 	font-size:20px;
 	line-height:24px;
 	font-weight:bold;
-	color:#FFF3BB;
+	color:#fff;
 }
 .col1{
 	float:left;
@@ -1169,7 +1275,6 @@ ul.kits {
 
 .summary li{margin-bottom: 20px; display: block;}
 .summary a{color: White;display:block;font-weight:bold;}
-.summary a:hover{text-shadow: #000000 0px 0px 0px;}
 
 .error {padding:0 100px 13px 5px}
 .error p{margin:0 0 13px;padding-right:100px;}
