@@ -80,6 +80,10 @@ h1.headline{
     margin:0px 20px;
 }
 
+.umb-btn-toolbar .dimmed{
+  opacity: 0.6;
+}
+
 .umb-headline-editor-wrapper input  {
   background: none;
   border: none;
@@ -156,10 +160,13 @@ h1.headline{
 
     position: fixed;
     bottom: 0px;
-    left: 460px;
-    right: 0px;
+    left: 100px;
+    right: 20px;
   };
 
+@media (min-width: 1101px) {
+    .umb-bottom-bar {left: 460px;}
+}
 
 .umb-tab-buttons{padding-left: 240px;}
 .umb-tab-pane.with-buttons{padding-bottom: 80px}

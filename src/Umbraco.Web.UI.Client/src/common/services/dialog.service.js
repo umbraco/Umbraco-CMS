@@ -104,7 +104,7 @@ angular.module('umbraco.services')
 
            //if iframe is enabled, inject that instead of a template
            if (dialog.iframe) {
-               var html = $("<iframe auto-scale='0' src='" + dialog.template + "' style='border: none; width: 100%; height: 100%;'></iframe>");
+               var html = $("<iframe src='" + dialog.template + "' style='border: none; width: 100%; height: 100%;'></iframe>");
                dialog.element.html(html);
   
                //append to body or whatever element is passed in as options.containerElement
