@@ -215,6 +215,10 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
     };
     
     $scope.options = function(content){
+        if(!content.id){
+            return;
+        }
+
         if(!$scope.actions){
             var node = {menuUrl: "/umbraco/UmbracoTrees/ContentTree/GetMenu?id=" + content.id + "&application=content"};
             treeService.getMenu({ treeNode: node })
