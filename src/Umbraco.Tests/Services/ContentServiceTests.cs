@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Services
                     DataTypeDefinitionId = 1041
                 });
             contentTypeService.Save(contentType);
-            var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", 1046);
+            var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
             content.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
             contentService.Publish(content);
 
@@ -82,7 +82,7 @@ namespace Umbraco.Tests.Services
                     });            
             contentTypeService.Save(contentType);
 
-            var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", 1046);
+            var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
 	        
             
             // Act
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Services
                     DataTypeDefinitionId = 1041
                 });
             contentTypeService.Save(contentType);
-            var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", 1046);
+            var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
             content.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
             contentService.PublishWithStatus(content);
             
@@ -141,7 +141,7 @@ namespace Umbraco.Tests.Services
                     DataTypeDefinitionId = 1041
                 });
             contentTypeService.Save(contentType);
-            var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", 1046);
+            var content = MockedContent.CreateSimpleContent(contentType, "Tagged content", -1);
             content.SetTags("tags", new[] { "hello", "world", "some", "tags" }, true);
             contentService.PublishWithStatus(content);
 
