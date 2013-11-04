@@ -179,7 +179,10 @@ namespace Umbraco.Core.Configuration
                 {
                     throw new InvalidOperationException("Cannot create an MVC Area path without the umbracoPath specified");
                 }
-			    return Path.TrimStart(SystemDirectories.Root).TrimStart('~').TrimStart('/').Replace('/', '-').Trim().ToLower();
+                var path = Path;
+                if (path.StartsWith(SystemDirectories.Root)) // beware of TrimStart, see U4-2518
+                    path = path.Substring(SystemDirectories.Root.Length);
+			    return path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim().ToLower();
             }
         }
 

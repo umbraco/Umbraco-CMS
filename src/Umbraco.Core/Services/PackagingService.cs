@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -32,15 +33,15 @@ namespace Umbraco.Core.Services
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private Dictionary<string, IContentType> _importedContentTypes;
-        
-        
-        public PackagingService(IContentService contentService, 
-            IContentTypeService contentTypeService, 
-            IMediaService mediaService, 
-            IDataTypeService dataTypeService, 
-            IFileService fileService, 
+
+
+        public PackagingService(IContentService contentService,
+            IContentTypeService contentTypeService,
+            IMediaService mediaService,
+            IDataTypeService dataTypeService,
+            IFileService fileService,
             ILocalizationService localizationService,
-            RepositoryFactory repositoryFactory, 
+            RepositoryFactory repositoryFactory,
             IDatabaseUnitOfWorkProvider uowProvider)
         {
             _contentService = contentService;
@@ -56,7 +57,7 @@ namespace Umbraco.Core.Services
         }
 
         #region Generic export methods
-        
+
         internal void ExportToFile(string absoluteFilePath, string nodeType, int id)
         {
             XElement xml = null;
@@ -91,7 +92,7 @@ namespace Umbraco.Core.Services
                 xml = Export(dataType);
             }
 
-            if(xml != null)
+            if (xml != null)
                 xml.Save(absoluteFilePath);
         }
 
@@ -293,7 +294,7 @@ namespace Umbraco.Core.Services
             var properties = from property in element.Elements()
                              where property.Attribute("isDoc") == null
                              select property;
-            
+
             IContent content = parent == null
                                    ? new Content(nodeName, parentId, contentType)
                                    {
@@ -324,7 +325,7 @@ namespace Umbraco.Core.Services
                         {
                             propertyValueList.Add(dtos.Single(x => x.Value == preValue).Id.ToString(CultureInfo.InvariantCulture));
                         }
-                        
+
                         propertyValue = string.Join(",", propertyValueList.ToArray());
                     }
 
@@ -355,7 +356,7 @@ namespace Umbraco.Core.Services
                                     new XElement("AllowAtRoot", contentType.AllowedAsRoot.ToString()));
 
             var masterContentType = contentType.CompositionAliases().FirstOrDefault();
-            if(masterContentType != null)
+            if (masterContentType != null)
                 info.Add(new XElement("Master", masterContentType));
 
             var allowedTemplates = new XElement("AllowedTemplates");
@@ -364,7 +365,7 @@ namespace Umbraco.Core.Services
                 allowedTemplates.Add(new XElement("Template", template.Alias));
             }
             info.Add(allowedTemplates);
-            if(contentType.DefaultTemplate != null && contentType.DefaultTemplate.Id != 0)
+            if (contentType.DefaultTemplate != null && contentType.DefaultTemplate.Id != 0)
                 info.Add(new XElement("DefaultTemplate", contentType.DefaultTemplate.Alias));
             else
                 info.Add(new XElement("DefaultTemplate", ""));
@@ -391,7 +392,7 @@ namespace Umbraco.Core.Services
                                                    new XElement("Description", new XCData(propertyType.Description)));
                 genericProperties.Add(genericProperty);
             }
-            
+
             var tabs = new XElement("Tabs");
             foreach (var propertyGroup in contentType.PropertyGroups)
             {
@@ -541,7 +542,7 @@ namespace Umbraco.Core.Services
                     var template = _fileService.GetTemplate(alias.ToSafeAlias());
                     if (template != null)
                     {
-                        if(allowedTemplates.Any(x => x.Id == template.Id)) continue;
+                        if (allowedTemplates.Any(x => x.Id == template.Id)) continue;
                         allowedTemplates.Add(template);
                     }
                     else
@@ -598,40 +599,46 @@ namespace Umbraco.Core.Services
                 var dataTypeDefinitionId = new Guid(property.Element("Definition").Value);//Unique Id for a DataTypeDefinition
 
                 var dataTypeDefinition = _dataTypeService.GetDataTypeDefinitionById(dataTypeDefinitionId);
-                
+
                 //If no DataTypeDefinition with the guid from the xml wasn't found OR the ControlId on the DataTypeDefinition didn't match the DataType Id
                 //We look up a DataTypeDefinition that matches
+
+                //we'll check if it is a GUID (legacy id for a property editor)
+                var legacyPropertyEditorId = Guid.Empty;
+                Guid.TryParse(property.Element("Type").Value, out legacyPropertyEditorId);
+                //get the alias as a string for use below
+                var propertyEditorAlias = property.Element("Type").Value.Trim();
+
+                //If no DataTypeDefinition with the guid from the xml wasn't found OR the ControlId on the DataTypeDefinition didn't match the DataType Id
+                //We look up a DataTypeDefinition that matches
+
                 if (dataTypeDefinition == null)
                 {
-                    //we'll check if it is a GUID (legacy id for a property editor)
-                    Guid legacyPropertyEditorId;
-                    if (Guid.TryParse(property.Element("Type").Value, out legacyPropertyEditorId))
+                    var dataTypeDefinitions = legacyPropertyEditorId != Guid.Empty
+                                                  ? _dataTypeService.GetDataTypeDefinitionByControlId(legacyPropertyEditorId)
+                                                  : _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(propertyEditorAlias);
+                    if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
                     {
-                        if (dataTypeDefinition.ControlId != legacyPropertyEditorId)
-                        {
-                            var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByControlId(legacyPropertyEditorId);
-                            if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
-                            {
-                                dataTypeDefinition = dataTypeDefinitions.First();
-                            }
-                        }
+                        dataTypeDefinition = dataTypeDefinitions.First();
                     }
-                    else
+                }
+                else if (legacyPropertyEditorId != Guid.Empty && dataTypeDefinition.ControlId != legacyPropertyEditorId)
+                {
+                    var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByControlId(legacyPropertyEditorId);
+                    if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
                     {
-                        //check against the property editor string alias
-                        var propertyEditorAlias = property.Element("Type").Value.Trim();
-                        if (dataTypeDefinition.PropertyEditorAlias != propertyEditorAlias)
-                        {
-                            var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(propertyEditorAlias);
-                            if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
-                            {
-                                dataTypeDefinition = dataTypeDefinitions.First();
-                            }
-                        }
+                        dataTypeDefinition = dataTypeDefinitions.First();
+                    }
+                }
+                else if (dataTypeDefinition.PropertyEditorAlias != propertyEditorAlias)
+                {
+                    var dataTypeDefinitions = _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(propertyEditorAlias);
+                    if (dataTypeDefinitions != null && dataTypeDefinitions.Any())
+                    {
+                        dataTypeDefinition = dataTypeDefinitions.First();
                     }
                 }
                 
-
                 // For backwards compatibility, if no datatype with that ID can be found, we're letting this fail silently.
                 // This means that the property will not be created.
                 if (dataTypeDefinition == null)
@@ -790,7 +797,7 @@ namespace Umbraco.Core.Services
                     var databaseType = databaseTypeAttribute != null
                                            ? databaseTypeAttribute.Value.EnumParse<DataTypeDatabaseType>(true)
                                            : DataTypeDatabaseType.Ntext;
-                
+
                     //check if the Id was a GUID, that means it is referenced using the legacy property editor GUID id
                     if (legacyPropertyEditorId != Guid.Empty)
                     {
@@ -813,7 +820,7 @@ namespace Umbraco.Core.Services
                         };
                         dataTypes.Add(dataTypeDefinitionName, dataTypeDefinition);
                     }
-                    
+
                 }
             }
 

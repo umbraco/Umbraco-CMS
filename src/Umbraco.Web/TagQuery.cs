@@ -9,11 +9,11 @@ namespace Umbraco.Web
     /// <summary>
     /// A class that exposes methods used to query tag data in views
     /// </summary>
-    public class TagQueryContext
+    public class TagQuery
     {
         private readonly ITagService _tagService;
 
-        public TagQueryContext(ITagService tagService)
+        public TagQuery(ITagService tagService)
         {
             if (tagService == null) throw new ArgumentNullException("tagService");
             _tagService = tagService;

@@ -13,12 +13,12 @@ namespace Umbraco.Web
     /// <summary>
     /// A class used to query for published content, media items
     /// </summary>
-    public class PublishedQueryContext
+    public class PublishedContentQuery
     {
         private readonly ContextualPublishedContentCache _contentCache;
         private readonly ContextualPublishedMediaCache _mediaCache;
 
-        public PublishedQueryContext(ContextualPublishedContentCache contentCache, ContextualPublishedMediaCache mediaCache)
+        public PublishedContentQuery(ContextualPublishedContentCache contentCache, ContextualPublishedMediaCache mediaCache)
         {
             _contentCache = contentCache;
             _mediaCache = mediaCache;

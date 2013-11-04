@@ -622,17 +622,12 @@ namespace umbraco.cms.businesslogic.packager
                 var alias = n.SelectSingleNode("alias").InnerText;
                 if (!string.IsNullOrEmpty(alias))
                 {
-                    try
+                    var m = ApplicationContext.Current.Services.MacroService.GetByAlias(alias);
+                    if (m != null)
                     {
-                        var m = Macro.GetByAlias(alias);
-
-                        if (m != null)
-                        {
-                            this.ContainsMacroConflict = true;
-                            this._conflictingMacroAliases.Add(m.Name, alias);
-                        }
-                    }
-                    catch (IndexOutOfRangeException) { } //thrown when the alias doesn't exist in the DB, ie - macro not there
+                        ContainsMacroConflict = true;
+                        _conflictingMacroAliases.Add(m.Name, alias);
+                    }                    
                 }
             }
 

@@ -23,7 +23,7 @@ namespace Umbraco.Web.WebServices
         /// </summary>
         public IEnumerable<TagModel> GetAllTags(string group = null)
         {
-            return Umbraco.Tags.GetAllTags(group);
+            return Umbraco.TagQuery.GetAllTags(group);
         }
 
         /// <summary>
@@ -33,7 +33,7 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         public IEnumerable<TagModel> GetAllContentTags(string group = null)
         {
-            return Umbraco.Tags.GetAllContentTags(group);
+            return Umbraco.TagQuery.GetAllContentTags(group);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         public IEnumerable<TagModel> GetAllMediaTags(string group = null)
         {
-            return Umbraco.Tags.GetAllMediaTags(group);
+            return Umbraco.TagQuery.GetAllMediaTags(group);
         }
 
         /// <summary>
@@ -53,7 +53,7 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         public IEnumerable<TagModel> GetAllMemberTags(string group = null)
         {
-            return Umbraco.Tags.GetAllMemberTags(group);
+            return Umbraco.TagQuery.GetAllMemberTags(group);
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         public IEnumerable<TagModel> GetTagsForProperty(int contentId, string propertyTypeAlias, string tagGroup = null)
         {
-            return Umbraco.Tags.GetTagsForProperty(contentId, propertyTypeAlias, tagGroup);
+            return Umbraco.TagQuery.GetTagsForProperty(contentId, propertyTypeAlias, tagGroup);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace Umbraco.Web.WebServices
         /// <returns></returns>
         public IEnumerable<TagModel> GetTagsForEntity(int contentId, string tagGroup = null)
         {
-            return Umbraco.Tags.GetTagsForEntity(contentId, tagGroup);
+            return Umbraco.TagQuery.GetTagsForEntity(contentId, tagGroup);
         }
 
     }

@@ -22,6 +22,7 @@ namespace Umbraco.Web.UI
     /// specific app, they'd still be able to execute code to create/delete for any ITask regardless of what app 
     /// they have access to.
     /// </remarks>
+    [Obsolete("ITask is used for legacy webforms back office editors, change to using the v7 angular approach")]
     public abstract class LegacyDialogTask : ITaskReturnUrl, IAssignedApp
     {
         public virtual int ParentID { get; set; }

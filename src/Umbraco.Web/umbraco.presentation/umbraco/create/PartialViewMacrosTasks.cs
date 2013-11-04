@@ -4,8 +4,10 @@ using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.UI;
 using umbraco.BasePages;
 using Umbraco.Core;
+using umbraco.BusinessLogic;
 
 namespace umbraco
 {
@@ -13,13 +15,10 @@ namespace umbraco
     /// The UI 'tasks' for the create dialog and delete processes
     /// </summary>
     [UmbracoWillObsolete("http://issues.umbraco.org/issue/U4-1373", "This will one day be removed when we overhaul the create process")]
-    public class PartialViewMacroTasks : interfaces.ITaskReturnUrl
+    public class PartialViewMacroTasks : LegacyDialogTask
     {
-        private string _alias;
-        private int _parentId;
-        private int _typeId;
-        private int _userId;
-
+        private string _returnUrl = "";
+        
         protected virtual string EditViewFile
         {
             get { return "Settings/Views/EditView.aspx"; }
@@ -35,34 +34,11 @@ namespace umbraco
             get { return "MacroPartials"; }
         }
 
-        public int UserId
+        public override bool PerformSave()
         {
-            set { _userId = value; }
-        }
-        public int TypeID
-        {
-            set { _typeId = value; }
-            get { return _typeId; }
-        }
-
-
-        public string Alias
-        {
-            set { _alias = value; }
-            get { return _alias; }
-        }
-
-        public int ParentID
-        {
-            set { _parentId = value; }
-            get { return _parentId; }
-        }
-
-        public bool Save()
-        {
-            var pipesIndex = _alias.IndexOf("|||", System.StringComparison.Ordinal);
-            var template = _alias.Substring(0, pipesIndex).Trim();
-            var fileName = _alias.Substring(pipesIndex + 3, _alias.Length - pipesIndex - 3) + ".cshtml";
+            var pipesIndex = Alias.IndexOf("|||", System.StringComparison.Ordinal);
+            var template = Alias.Substring(0, pipesIndex).Trim();
+            var fileName = Alias.Substring(pipesIndex + 3, Alias.Length - pipesIndex - 3) + ".cshtml";
 
             var fullFilePath = IOHelper.MapPath(BasePath + fileName);
 
@@ -97,27 +73,29 @@ namespace umbraco
             return true;
         }
 
-        public bool Delete()
+        public override string ReturnUrl
         {
-            var path = IOHelper.MapPath(BasePath + _alias.TrimStart('/'));
+            get { return _returnUrl; }
+        }
+
+        public override string AssignedApp
+        {
+            get { return DefaultApps.developer.ToString(); }
+        }
+
+        public override bool PerformDelete()
+        {
+            var path = IOHelper.MapPath(BasePath + Alias.TrimStart('/'));
 
             if (File.Exists(path))
                 File.Delete(path);
             else if (Directory.Exists(path))
                 Directory.Delete(path, true);
 
-            LogHelper.Info<PartialViewTasks>(string.Format("{0} Deleted by user {1}", _alias, UmbracoEnsuredPage.CurrentUser.Id));
+            LogHelper.Info<PartialViewTasks>(string.Format("{0} Deleted by user {1}", Alias, User.Id));
 
             return true;
         }
 
-        #region ITaskReturnUrl Members
-        private string _returnUrl = "";
-        public string ReturnUrl
-        {
-            get { return _returnUrl; }
-        }
-
-        #endregion
     }
 }
