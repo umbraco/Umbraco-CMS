@@ -1,15 +1,18 @@
 angular.module('umbraco.mocks').
   factory('userMocks', ['$httpBackend', 'mocksUtils', function ($httpBackend, mocksUtils) {
       'use strict';
-      
-      var mocked = {
-          name: "Per Ploug",
-          email: "test@test.com",
-          emailHash: "f9879d71855b5ff21e4963273a886bfc",
-          id: 0,
-          locale: 'da-DK',
-          remainingAuthSeconds: 600
-      };
+
+      function generateMockedUser() {
+          // Ensure a new user object each call
+          return {
+              name: "Per Ploug",
+              email: "test@test.com",
+              emailHash: "f9879d71855b5ff21e4963273a886bfc",
+              id: 0,
+              locale: 'da-DK',
+              remainingAuthSeconds: 600
+          };
+      }
 
       function isAuthenticated() {
           //check for existence of a cookie so we can do login/logout in the belle app (ignore for tests).
@@ -26,7 +29,7 @@ angular.module('umbraco.mocks').
               return [401, null, null];
           }
           else {
-              return [200, mocked, null];
+              return [200, generateMockedUser(), null];
           }
       }
 
@@ -44,7 +47,7 @@ angular.module('umbraco.mocks').
           //set the cookie for loging
           mocksUtils.setAuth();
 
-          return [200, mocked, null];
+          return [200, generateMockedUser(), null];
       }
       
       function logout() {
