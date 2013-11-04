@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
 
 namespace Umbraco.Core.Configuration.Dashboard
 {
@@ -12,7 +13,7 @@ namespace Umbraco.Core.Configuration.Dashboard
         }
 
         [ConfigurationProperty("areas", IsRequired = true)]
-        public AreasElement Area
+        public AreasElement Areas
         {
             get { return (AreasElement)this["areas"]; }
         }
@@ -35,10 +36,10 @@ namespace Umbraco.Core.Configuration.Dashboard
         {
             get { return TabCollection; }            
         }
-        
-        string ISection.Area
+
+        IEnumerable<string> ISection.Areas
         {
-            get { return Area.AreaName; }
+            get { return Areas.AreaCollection.Cast<AreaElement>().Select(x => x.Value); }
         }
 
         IAccess ISection.AccessRights

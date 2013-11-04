@@ -6,7 +6,7 @@ namespace Umbraco.Core.Configuration.Dashboard
     {
         string Alias { get; }
 
-        string Area { get; }
+        IEnumerable<string> Areas { get; }
 
         IEnumerable<IDashboardTab> Tabs { get; }
 

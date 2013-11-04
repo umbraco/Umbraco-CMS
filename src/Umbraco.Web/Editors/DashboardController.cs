@@ -21,7 +21,7 @@ namespace Umbraco.Web.Editors
             var tabs = new List<Tab<DashboardControl>>();
 
             var dashboardSection = UmbracoConfig.For.DashboardSettings()
-                                                .Sections.FirstOrDefault(x => x.Area.InvariantEquals(section));
+                                                .Sections.FirstOrDefault(x => x.Areas.Contains(section));
             
             //if we cannot find it for whatever reason just return an empty one.
             if (dashboardSection == null)

@@ -41,11 +41,12 @@ namespace Umbraco.Tests.Configurations.DashboardSettings
         [Test]
         public void Test_Section_Area()
         {
-            Assert.AreEqual("settings", SettingsSection.Sections.ElementAt(0).Area);
-            Assert.AreEqual("developer", SettingsSection.Sections.ElementAt(1).Area);
-            Assert.AreEqual("media", SettingsSection.Sections.ElementAt(2).Area);
-            Assert.AreEqual("content", SettingsSection.Sections.ElementAt(3).Area);
-            Assert.AreEqual("member", SettingsSection.Sections.ElementAt(4).Area);
+            Assert.AreEqual("settings", SettingsSection.Sections.ElementAt(0).Areas.First());
+            Assert.AreEqual("developer", SettingsSection.Sections.ElementAt(1).Areas.First());
+            Assert.AreEqual("media", SettingsSection.Sections.ElementAt(2).Areas.First());
+            Assert.AreEqual("content", SettingsSection.Sections.ElementAt(3).Areas.First());
+            Assert.AreEqual("default", SettingsSection.Sections.ElementAt(4).Areas.First());
+            Assert.AreEqual("member", SettingsSection.Sections.ElementAt(4).Areas.Last());
         }
 
         [Test]
