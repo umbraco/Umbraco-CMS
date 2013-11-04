@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper) {
+function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper) {
 
     $scope.defaultButton = null;
     $scope.subButtons = [];
@@ -214,6 +214,16 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
             }    
     };
     
+    $scope.options = function(content){
+        if(!$scope.actions){
+            var node = {menuUrl: "/umbraco/UmbracoTrees/ContentTree/GetMenu?id=" + content.id + "&application=content"};
+            treeService.getMenu({ treeNode: node })
+                .then(function(data) {
+                        $scope.actions = data.menuItems;
+                });    
+        }
+    };
+
     /** this method is called for all action buttons and then we proxy based on the btn definition */
     $scope.performAction = function(btn) {
         if (!btn || !angular.isFunction(btn.handler)) {
