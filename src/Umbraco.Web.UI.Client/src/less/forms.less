@@ -776,3 +776,8 @@ legend + .control-group {
     padding-left: @horizontalComponentOffset;
   }
 }
+//make sure buttons are always on top
+.umb-panel-buttons .umb-btn-toolbar .btn {
+    position: relative;
+    z-index: 1000;
+}
