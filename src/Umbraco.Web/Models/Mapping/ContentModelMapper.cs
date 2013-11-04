@@ -115,7 +115,7 @@ namespace Umbraco.Web.Models.Mapping
                 new ContentPropertyDisplay
                     {
                         Alias = string.Format("{0}expiredate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
-                        Label = ui.Text("content", "removeDate"),
+                        Label = ui.Text("content", "unpublishDate"),
                         Value = display.ExpireDate.HasValue ? display.ExpireDate.Value.ToIsoString() : null,
                         View = "datepicker" //TODO: Hard coding this because the templatepicker doesn't necessarily need to be a resolvable (real) property editor
                     },
