@@ -211,7 +211,7 @@ angular.module('umbraco.mocks').
                   "dictionaryItem_displayName": "Culture Name",
                   "placeholders_username": "Enter your username",
                   "placeholders_password": "Enter your password",
-                  "placeholders_name": "Enter a name...",
+                  "placeholders_entername": "Enter a name...",
                   "placeholders_search": "Type to search...",
                   "placeholders_filter": "Type to filter...",
                   "editcontenttype_allowedchildnodetypes": "Allowed child nodetypes",
