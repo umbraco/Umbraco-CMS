@@ -242,7 +242,7 @@
     <key alias="username">Enter your username</key>
     <key alias="password">Enter your password</key>
 
-    <key alias="name">Enter a name...</key>
+    <key alias="entername">Enter a name...</key>
     <key alias="search">Type to search...</key>
     <key alias="filter">Type to filter...</key>
   </area>

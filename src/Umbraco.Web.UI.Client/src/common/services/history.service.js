@@ -33,8 +33,13 @@ angular.module('umbraco.services')
 	var nArray = [];
 
 	function add(item) {
-		nArray.splice(0,0,item);
-		return nArray[0];
+
+		var any = _.where(nArray, {link: item.link});
+
+		if(any.length === 0){
+			nArray.splice(0,0,item);
+			return nArray[0];
+		}
 	}
 
 	return {
