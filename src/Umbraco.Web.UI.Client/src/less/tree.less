@@ -153,9 +153,7 @@ a.umb-options {
 	right: 10px;
 	top: 3px;
 	padding: 0 3px 3px 5px;
-	border: 1px solid @grayLight;
-	.border-radius(@baseBorderRadius);
-	background: @btnBackground;
+	border: 1px solid transparent;
 }
 
 a.umb-options i {
@@ -168,7 +166,9 @@ a.umb-options i {
 }
 
 a.umb-options:hover {
-	background: @btnBackgroundHighlight
+	background: @btnBackgroundHighlight;
+	border: 1px solid @grayLight;
+	.border-radius(@baseBorderRadius);
 }
 
 li.root > div > a.umb-options {

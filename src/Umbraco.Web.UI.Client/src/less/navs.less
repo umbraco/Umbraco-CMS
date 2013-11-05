@@ -162,14 +162,21 @@
 .show-validation .tab-error a,
 .show-validation .tab-error a:hover,
 .show-validation .tab-error a:focus {
-  color: @red !important;
-  border-bottom: 1px solid @red !important;
+  color: @white !important;
+  background-color: @red !important;
+  border-color: @errorBorder;
+}
+
+.show-validation .tab-error a:before {
+  content: "\e25d";
+  font-family: 'icomoon';
+  margin-right: 5px;
+  vertical-align: top;
 }
 
 .show-validation .nav-tabs > li.active.error > a,
 .show-validation .nav-tabs > li.active.error > a:hover,
 .show-validation .nav-tabs > li.active.error > a:focus {
-  border-bottom-color: white !important;
 }
 
 .umb-nav-tabs {
