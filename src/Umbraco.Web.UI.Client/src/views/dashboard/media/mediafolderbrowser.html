@@ -7,9 +7,8 @@ data-file-upload-progress=""
 data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
         
 
-        <span class="btn fileinput-button umb-upload-button-big" 
-        ng-class="{disabled: disabled}" ng-show="touchDevice || images.length === 0">
-
+        <span class="fileinput-button umb-upload-button-big" 
+            ng-class="{disabled: disabled}">
             <i class="icon icon-page-up"></i>
             <p>Click to upload</p>
             <input type="file" name="files[]" multiple ng-disabled="disabled">

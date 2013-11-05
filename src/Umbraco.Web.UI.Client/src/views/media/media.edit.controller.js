@@ -29,7 +29,7 @@ function mediaEditController($scope, $routeParams, mediaResource, navigationServ
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
-
+                navigationService.syncPath(data.path, true);
             });
     }
     
@@ -61,6 +61,7 @@ function mediaEditController($scope, $routeParams, mediaResource, navigationServ
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                     });
 
+                    navigationService.syncPath(data.path, true);
                 }, function(err) {
 
                     contentEditingHelper.handleSaveError({
