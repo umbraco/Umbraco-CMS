@@ -45,11 +45,18 @@ h1.headline{
 
 .umb-headline-editor-wrapper h1, h1.headline {
   margin: 0;
-  font-size: @fontSizeLarge;
+  font-size: 14px;
   font-weight: 400;
   text-align: left;
   height: 25px;
+  border: 1px solid transparent;
+}
 
+.umb-headline-editor-wrapper h1:hover {
+  border: 1px dashed @inputBorder;
+  background-color: rgba(255,255,255,0.8);
+  margin: -10px 0 0 -7px;
+  padding: 10px 0 0 7px
 }
 
 .umb-headline-editor-wrapper 
@@ -69,12 +76,11 @@ h1.headline{
 
 .umb-panel-header h1 {
   margin: 0;
-  font-size: @fontSizeMedium;
+  font-size: 14px;
   font-weight: 400;
   color: @gray;
   line-height: 1em;
   width: 100%;
-  margin: -2px 0 0 0;
 }
 .umb-panel-header p {
     margin:0px 20px;
@@ -87,11 +93,13 @@ h1.headline{
 .umb-headline-editor-wrapper input  {
   background: none;
   border: none;
-  margin: -9px 0 0 0;
+  margin: -6px 0 0 0;
   padding: 0 0 2px 0;
   border-radius: 0;
   line-height: 1em;
-  color: @black
+  border: 1px solid transparent;
+  color: @black;
+  letter-spacing: -0.01em
 }
 .umb-headline-editor-wrapper input.ng-invalid  {
   color: @red;
@@ -102,7 +110,8 @@ h1.headline{
 .umb-headline-editor-wrapper input.ng-invalid:-ms-input-placeholder {color: @red;}
 
 .umb-panel-header i {
-  font-size: 14px;
+  font-size: 13px;
+  vertical-align: middle;
 }
 
 .umb-panel-header-meta {
