@@ -6,8 +6,9 @@
  * @description
  * The controller for the media editor
  */
-function mediaEditController($scope, $routeParams, mediaResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper) {
+function mediaEditController($scope, $routeParams, mediaResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService,  formHelper) {
 
+    $scope.nav = navigationService;
     if ($routeParams.create) {
 
         mediaResource.getScaffold($routeParams.id, $routeParams.doctype)
@@ -32,6 +33,19 @@ function mediaEditController($scope, $routeParams, mediaResource, notificationsS
             });
     }
     
+    $scope.options = function(content){
+            if(!content.id){
+                return;
+            }
+
+            if(!$scope.actions){
+                treeService.getMenu({ treeNode: $scope.nav.ui.currentTreeNode })
+                    .then(function(data) {
+                            $scope.actions = data.menuItems;
+                    });    
+            }
+        };
+
     $scope.save = function () {
 
         if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {

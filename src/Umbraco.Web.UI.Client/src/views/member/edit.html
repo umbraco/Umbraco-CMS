@@ -18,9 +18,27 @@
                         <p class="btn btn-link umb-status-label">{{formStatus}}</p>
                     </div>
 
-                    <div class="btn-group">
-                        <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">Save</button>
-                    </div>
+                    <div class="btn-group" ng-class="{dimmed: content.id === 0}">
+                        <!-- options button -->
+                        <a class="btn" href="#" ng-click="options(content)" prevent-default data-toggle="dropdown">
+                           <i class="icon-settings" style="line-height: 14px"></i> Options
+                        </a>
+                        
+                        <a class="btn dropdown-toggle" ng-click="options(content)" data-toggle="dropdown">
+                            <span class="caret"></span>
+                        </a>
+                        
+                        <!-- actions -->
+                        <ul class="dropdown-menu  umb-actions" role="menu" aria-labelledby="dLabel">
+                            <li class="action" ng-class="{sep:action.seperator}" ng-repeat="action in actions">
+                                <a prevent-default
+                                    ng-click="executeMenuItem(nav.ui.currentTreeNode,action,nav.ui.currentSection)">
+                                    <i class="icon icon-{{action.cssclass}}"></i>
+                                    <span class="menu-label">{{action.name}}</span>
+                                </a>
+                            </li>                             
+                        </ul>
+                     </div>
                 </div>
             </div>
         </umb-header>
@@ -34,6 +52,14 @@
                         
                         <umb-editor model="property"></umb-editor>
                     </umb-property>
+
+                    <div class="umb-tab-buttons">
+                        <div class="btn-group">
+                            <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
+                                <localize key="buttons_save">Save</localize>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </umb-tab>
             

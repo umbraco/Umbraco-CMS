@@ -6,8 +6,10 @@
  * @description
  * The controller for the member editor
  */
-function MemberEditController($scope, $routeParams, $location, $q, $window, memberResource, entityResource, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper) {
+function MemberEditController($scope, $routeParams, $location, $q, $window, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, treeService) {
     
+    $scope.nav = navigationService;
+
     if ($routeParams.create) {
         //we are creating so get an empty member item
         memberResource.getScaffold($routeParams.doctype)
@@ -44,6 +46,19 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, memb
         }
 
     }
+
+    $scope.options = function(content){
+            if(!content.id){
+                return;
+            }
+
+            if(!$scope.actions){
+                treeService.getMenu({ treeNode: $scope.nav.ui.currentTreeNode })
+                    .then(function(data) {
+                            $scope.actions = data.menuItems;
+                    });    
+            }
+        };
 
     $scope.save = function() {
 

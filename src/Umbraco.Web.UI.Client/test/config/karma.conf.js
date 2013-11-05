@@ -36,7 +36,7 @@ module.exports = function(karma) {
          'src/common/services/*.js',
          'src/common/security/*.js',
          'src/common/resources/*.js',
-         'src/common/mocks/resources/*.js',
+         'src/common/mocks/**/*.js',
          'src/views/**/*.controller.js',
          'test/unit/**/*.spec.js',
         {pattern: 'lib/umbraco/namespacemanager.js', watched: true, served: true}       
