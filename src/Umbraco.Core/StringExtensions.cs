@@ -956,10 +956,13 @@ namespace Umbraco.Core
         /// Cleans a string to produce a string that can safely be used in an alias.
         /// </summary>
         /// <param name="alias">The text to filter.</param>
+        /// <param name="camel">A value indicating that we want to camel-case the alias.</param>
         /// <returns>The safe alias.</returns>
-        public static string ToSafeCamelAlias(this string alias)
+        public static string ToSafeAlias(this string alias, bool camel)
         {
-            return ShortStringHelper.CleanStringForSafeCamelAlias(alias);
+            var a = ShortStringHelper.CleanStringForSafeAlias(alias);
+            if (string.IsNullOrWhiteSpace(a) || camel == false) return a;
+            return char.ToLowerInvariant(a[0]) + a.Substring(1);
         }
 
         /// <summary>

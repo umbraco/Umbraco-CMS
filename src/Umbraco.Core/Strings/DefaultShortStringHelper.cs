@@ -249,34 +249,6 @@ function validateSafeAlias(id, value, immediate, callback) {{
         }
 
         /// <summary>
-        /// Cleans a string to produce a string that can safely be used in an alias.
-        /// </summary>
-        /// <param name="text">The text to filter.</param>
-        /// <returns>The safe alias.</returns>
-        /// <remarks>
-        /// <para>The string will be cleaned in the context of the default culture.</para>
-        /// <para>Safe aliases are Ascii only.</para>
-        /// </remarks>
-        public virtual string CleanStringForSafeCamelAlias(string text)
-        {
-            return CleanString(text, CleanStringType.Ascii | CleanStringType.CamelCase | CleanStringType.Alias);
-        }
-
-        /// <summary>
-        /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an alias.
-        /// </summary>
-        /// <param name="text">The text to filter.</param>
-        /// <param name="culture">The culture.</param>
-        /// <returns>The safe alias.</returns>
-        /// <remarks>
-        /// <para>Safe aliases are Ascii only.</para>
-        /// </remarks>
-        public virtual string CleanStringForSafeCamelAlias(string text, CultureInfo culture)
-        {
-            return CleanString(text, CleanStringType.Ascii | CleanStringType.CamelCase | CleanStringType.Alias, culture);
-        }
-
-        /// <summary>
         /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an alias.
         /// </summary>
         /// <param name="text">The text to filter.</param>
