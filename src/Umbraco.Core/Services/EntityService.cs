@@ -39,6 +39,27 @@ namespace Umbraco.Core.Services
                                                                               };
         }
 
+        public IUmbracoEntity GetByKey(Guid key, bool loadBaseType = true)
+        {
+            if (loadBaseType)
+            {
+                using (var repository = _repositoryFactory.CreateEntityRepository(_uowProvider.GetUnitOfWork()))
+                {
+                    return repository.GetByKey(key);
+                }
+            }
+
+            //SD: TODO: Need to enable this at some stage ... just need to ask Morten what the deal is with what this does.
+            throw new NotSupportedException();
+
+            //var objectType = GetObjectType(key);
+            //var entityType = GetEntityType(objectType);
+            //var typeFullName = entityType.FullName;
+            //var entity = _supportedObjectTypes[typeFullName].Item2(id);
+
+            //return entity;
+        }
+
         /// <summary>
         /// Gets an UmbracoEntity by its Id, and optionally loads the complete object graph.
         /// </summary>
@@ -64,6 +85,27 @@ namespace Umbraco.Core.Services
             var entity = _supportedObjectTypes[typeFullName].Item2(id);
 
             return entity;
+        }
+
+        public IUmbracoEntity GetByKey(Guid key, UmbracoObjectTypes umbracoObjectType, bool loadBaseType = true)
+        {
+            if (loadBaseType)
+            {
+                var objectTypeId = umbracoObjectType.GetGuid();
+                using (var repository = _repositoryFactory.CreateEntityRepository(_uowProvider.GetUnitOfWork()))
+                {
+                    return repository.GetByKey(key, objectTypeId);
+                }
+            }
+
+            //SD: TODO: Need to enable this at some stage ... just need to ask Morten what the deal is with what this does.
+            throw new NotSupportedException();
+
+            //var entityType = GetEntityType(umbracoObjectType);
+            //var typeFullName = entityType.FullName;
+            //var entity = _supportedObjectTypes[typeFullName].Item2(id);
+
+            //return entity;
         }
 
         /// <summary>
@@ -92,6 +134,11 @@ namespace Umbraco.Core.Services
             var entity = _supportedObjectTypes[typeFullName].Item2(id);
 
             return entity;
+        }
+
+        public IUmbracoEntity GetByKey<T>(Guid key, bool loadBaseType = true) where T : IUmbracoEntity
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -320,6 +367,22 @@ namespace Umbraco.Core.Services
             using (var uow = _uowProvider.GetUnitOfWork())
             {
                 var sql = new Sql().Select("nodeObjectType").From<NodeDto>().Where<NodeDto>(x => x.NodeId == id);
+                var nodeObjectTypeId = uow.Database.ExecuteScalar<string>(sql);
+                var objectTypeId = new Guid(nodeObjectTypeId);
+                return UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);
+            }
+        }
+
+        /// <summary>
+        /// Gets the UmbracoObjectType from the integer id of an IUmbracoEntity.
+        /// </summary>
+        /// <param name="key">Unique Id of the entity</param>
+        /// <returns><see cref="UmbracoObjectTypes"/></returns>
+        public virtual UmbracoObjectTypes GetObjectType(Guid key)
+        {
+            using (var uow = _uowProvider.GetUnitOfWork())
+            {
+                var sql = new Sql().Select("nodeObjectType").From<NodeDto>().Where<NodeDto>(x => x.UniqueId == key);
                 var nodeObjectTypeId = uow.Database.ExecuteScalar<string>(sql);
                 var objectTypeId = new Guid(nodeObjectTypeId);
                 return UmbracoObjectTypesExtensions.GetUmbracoObjectType(objectTypeId);

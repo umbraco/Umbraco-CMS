@@ -6,7 +6,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberPickerController",
         $scope.results = [];
 
         /** Method used for selecting a node */
-        function select(text, id, entity) {
+        function select(text, key, entity) {
 
             $scope.showSearch = false;
             $scope.results = [];
@@ -14,7 +14,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberPickerController",
             $scope.oldTerm = undefined;
 
             if (dialogOptions.multiPicker) {
-                $scope.select(id);
+                $scope.select(key);
             }
             else {
                 //if an entity has been passed in, use it
@@ -23,7 +23,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberPickerController",
                 }
                 else {
                     //otherwise we have to get it from the server
-                    entityResource.getById(id, "Member").then(function (ent) {
+                    entityResource.getByKey(key, "Member").then(function (ent) {
                         $scope.submit(ent);
                     });
                 }

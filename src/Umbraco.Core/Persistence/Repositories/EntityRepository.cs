@@ -49,6 +49,34 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Query Methods
 
+        public IUmbracoEntity GetByKey(Guid key)
+        {
+            var sql = GetBaseWhere(GetBase, false, false, key);
+            var nodeDto = _work.Database.FirstOrDefault<UmbracoEntityDto>(sql);
+            if (nodeDto == null)
+                return null;
+
+            var factory = new UmbracoEntityFactory();
+            var entity = factory.BuildEntity(nodeDto);
+
+            return entity;
+        }
+
+        public IUmbracoEntity GetByKey(Guid key, Guid objectTypeId)
+        {
+            bool isContent = objectTypeId == new Guid(Constants.ObjectTypes.Document);
+            bool isMedia = objectTypeId == new Guid(Constants.ObjectTypes.Media);
+            var sql = GetBaseWhere(GetBase, isContent, isMedia, objectTypeId, key).Append(GetGroupBy(isContent, isMedia));
+            var nodeDto = _work.Database.FirstOrDefault<UmbracoEntityDto>(sql);
+            if (nodeDto == null)
+                return null;
+
+            var factory = new UmbracoEntityFactory();
+            var entity = factory.BuildEntity(nodeDto);
+
+            return entity;
+        }
+
         public virtual IUmbracoEntity Get(int id)
         {
             var sql = GetBaseWhere(GetBase, false, false, id);
@@ -239,10 +267,10 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected virtual Sql GetBaseWhere(Func<bool, bool, string, Sql> baseQuery, bool isContent, bool isMedia, string additionWhereStatement, Guid id)
+        protected virtual Sql GetBaseWhere(Func<bool, bool, string, Sql> baseQuery, bool isContent, bool isMedia, string additionWhereStatement, Guid nodeObjectType)
         {
             var sql = baseQuery(isContent, isMedia, additionWhereStatement)
-                .Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = id });
+                .Where("umbracoNode.nodeObjectType = @NodeObjectType", new { NodeObjectType = nodeObjectType });
             return sql;
         }
 
@@ -254,11 +282,27 @@ namespace Umbraco.Core.Persistence.Repositories
             return sql;
         }
 
-        protected virtual Sql GetBaseWhere(Func<bool, bool, string, Sql> baseQuery, bool isContent, bool isMedia, Guid objectId, int id)
+        protected virtual Sql GetBaseWhere(Func<bool, bool, string, Sql> baseQuery, bool isContent, bool isMedia, Guid key)
+        {
+            var sql = baseQuery(isContent, isMedia, " AND umbracoNode.uniqueID = '" + key + "'")
+                .Where("umbracoNode.uniqueID = @UniqueID", new { UniqueID = key })
+                .Append(GetGroupBy(isContent, isMedia));
+            return sql;
+        }
+
+        protected virtual Sql GetBaseWhere(Func<bool, bool, string, Sql> baseQuery, bool isContent, bool isMedia, Guid nodeObjectType, int id)
         {
             var sql = baseQuery(isContent, isMedia, " AND umbracoNode.id = '"+ id +"'")
                 .Where("umbracoNode.id = @Id AND umbracoNode.nodeObjectType = @NodeObjectType",
-                       new {Id = id, NodeObjectType = objectId});
+                       new {Id = id, NodeObjectType = nodeObjectType});
+            return sql;
+        }
+
+        protected virtual Sql GetBaseWhere(Func<bool, bool, string, Sql> baseQuery, bool isContent, bool isMedia, Guid nodeObjectType, Guid key)
+        {
+            var sql = baseQuery(isContent, isMedia, " AND umbracoNode.uniqueID = '" + key + "'")
+                .Where("umbracoNode.uniqueID = @UniqueID AND umbracoNode.nodeObjectType = @NodeObjectType",
+                       new { UniqueID = key, NodeObjectType = nodeObjectType });
             return sql;
         }
 

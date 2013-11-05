@@ -109,6 +109,17 @@ namespace Umbraco.Web.Editors
             return foundContent.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
         }
 
+        /// <summary>
+        /// Gets an entity by it's unique id if the entity supports that
+        /// </summary>
+        /// <param name="key"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public EntityBasic GetByKey(Guid key, UmbracoEntityTypes type)
+        {
+            return GetResultForKey(key, type);
+        }
+
         public EntityBasic GetById(int id, UmbracoEntityTypes type)
         {
             return GetResultForId(id, type);
@@ -407,6 +418,38 @@ namespace Umbraco.Web.Editors
             {
                 case UmbracoEntityTypes.PropertyType:
                 
+                case UmbracoEntityTypes.PropertyGroup:
+
+                case UmbracoEntityTypes.Domain:
+
+                case UmbracoEntityTypes.Language:
+
+                case UmbracoEntityTypes.User:
+
+                case UmbracoEntityTypes.Macro:
+
+                default:
+                    throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + entityType);
+            }
+        }
+
+        private EntityBasic GetResultForKey(Guid key, UmbracoEntityTypes entityType)
+        {
+            var objectType = ConvertToObjectType(entityType);
+            if (objectType.HasValue)
+            {
+                var found = Services.EntityService.GetByKey(key, objectType.Value);
+                if (found == null)
+                {
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                }
+                return Mapper.Map<EntityBasic>(found);
+            }
+            //now we need to convert the unknown ones
+            switch (entityType)
+            {
+                case UmbracoEntityTypes.PropertyType:
+
                 case UmbracoEntityTypes.PropertyGroup:
 
                 case UmbracoEntityTypes.Domain:
