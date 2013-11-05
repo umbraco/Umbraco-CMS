@@ -346,6 +346,7 @@
     <Compile Include="PropertyEditors\EmailAddressPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ListViewPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MacroContainerPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MarkdownPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MemberGroupPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MemberPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultiNodeTreePickerPropertyEditor.cs" />
