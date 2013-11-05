@@ -72,6 +72,14 @@
 
             //bind to the click handler for each of the install starter kit buttons
             this._opts.starterKits.click(function () {
+                // show status screen
+                $(".thumbnails").fadeOut();
+                $(".declineKit").fadeOut();
+                $("#starter-kit-progress").fadeIn();
+
+                // set progress
+                self._setProgress("5", "Downloading " + $(this).attr("data-name"));
+
                 //set the package id to install
                 self._packageId = $(this).attr("data-repoId");
                 self.downloadPackageFiles();
