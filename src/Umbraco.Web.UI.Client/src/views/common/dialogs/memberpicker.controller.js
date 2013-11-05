@@ -23,7 +23,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberPickerController",
                 }
                 else {
                     //otherwise we have to get it from the server
-                    entityResource.getByKey(key, "Member").then(function (ent) {
+                    entityResource.getById(key, "Member").then(function (ent) {
                         $scope.submit(ent);
                     });
                 }

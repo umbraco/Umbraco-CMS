@@ -19,6 +19,7 @@ using System.Linq;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
 using Umbraco.Web.WebApi.Filters;
+using umbraco.cms.businesslogic.packager;
 using Constants = Umbraco.Core.Constants;
 using Examine;
 using Examine.LuceneEngine.SearchCriteria;
@@ -35,7 +36,14 @@ namespace Umbraco.Web.Editors
     /// </remarks>
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
-    {   
+    {
+        protected override void Initialize(HttpControllerContext controllerContext)
+        {
+            base.Initialize(controllerContext);
+
+            controllerContext.Configuration.Services.Replace(typeof(IHttpActionSelector), new EntityControllerActionSelector());
+        }
+
         [HttpGet]
         public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type)
         {
@@ -112,12 +120,12 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Gets an entity by it's unique id if the entity supports that
         /// </summary>
-        /// <param name="key"></param>
+        /// <param name="id"></param>
         /// <param name="type"></param>
         /// <returns></returns>
-        public EntityBasic GetByKey(Guid key, UmbracoEntityTypes type)
+        public EntityBasic GetByKey(Guid id, UmbracoEntityTypes type)
         {
-            return GetResultForKey(key, type);
+            return GetResultForKey(id, type);
         }
 
         public EntityBasic GetById(int id, UmbracoEntityTypes type)
