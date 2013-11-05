@@ -183,11 +183,11 @@
                         <tr>
                             <td>
                                 <asp:RequiredFieldValidator ID="RequiredFieldValidator1" CssClass="add-validator" runat="server" ControlToValidate="macroPropertyAliasNew" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
-                                <asp:TextBox runat="server" ID="macroPropertyAliasNew" Text='New Alias' OnTextChanged="macroPropertyCreate" />
+                                <asp:TextBox runat="server" ID="macroPropertyAliasNew" PlaceHolder='New Alias' OnTextChanged="macroPropertyCreate" />
                             </td>
                             <td>
                                 <asp:RequiredFieldValidator ID="RequiredFieldValidator4" CssClass="add-validator" runat="server" ControlToValidate="macroPropertyNameNew" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>
-                                <asp:TextBox runat="server" ID="macroPropertyNameNew" Text='New Name' />
+                                <asp:TextBox runat="server" ID="macroPropertyNameNew" PlaceHolder='New Name' />
                             </td>
                             <td>
                                 <asp:RequiredFieldValidator ID="RequiredFieldValidator5" CssClass="add-validator" runat="server" ControlToValidate="macroPropertyTypeNew" Display="Dynamic" ForeColor="#b94a48">Required<br/></asp:RequiredFieldValidator>

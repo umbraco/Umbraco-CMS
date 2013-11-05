@@ -344,6 +344,34 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         parentId: parentId
                     }),
                 'Failed to add folder');
+        },
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaResource#emptyRecycleBin
+         * @methodOf umbraco.resources.mediaResource
+         *
+         * @description
+         * Empties the media recycle bin
+         *
+         * ##usage
+         * <pre>
+         * mediaResource.emptyRecycleBin()
+         *    .then(function() {
+         *        alert('its empty!');
+         *    });
+         * </pre> 
+         *         
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        emptyRecycleBin: function() {
+            return umbRequestHelper.resourcePromise(
+                $http.delete(
+                    umbRequestHelper.getApiUrl(
+                        "mediaApiBaseUrl",
+                        "EmptyRecycleBin")),
+                'Failed to empty the recycle bin');
         }
     };
 }

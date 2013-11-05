@@ -31,19 +31,6 @@ namespace Umbraco.Core.Strings
         /// </remarks>
         string CleanStringForSafeAlias(string text);
 
-
-        /// <summary>
-        /// Cleans a string to produce a string that can safely be used in an alias.
-        /// </summary>
-        /// <param name="text">The text to filter.</param>
-        /// <returns>The safe alias.</returns>
-        /// <remarks>
-        /// <para>The string will be cleaned in the context of the IShortStringHelper default culture.</para>
-        /// <para>A safe alias is [a-z][a-zA-Z0-9_]* although legacy will also accept '-', and '_' at the beginning.</para>
-        /// </remarks>
-        string CleanStringForSafeCamelAlias(string text);
-
-
         /// <summary>
         /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an alias.
         /// </summary>
@@ -51,14 +38,6 @@ namespace Umbraco.Core.Strings
         /// <param name="culture">The culture.</param>
         /// <returns>The safe alias.</returns>
         string CleanStringForSafeAlias(string text, CultureInfo culture);
-
-        /// <summary>
-        /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an alias.
-        /// </summary>
-        /// <param name="text">The text to filter.</param>
-        /// <param name="culture">The culture.</param>
-        /// <returns>The safe alias.</returns>
-        string CleanStringForSafeCamelAlias(string text, CultureInfo culture);
 
         /// <summary>
         /// Cleans a string to produce a string that can safely be used in an url segment.

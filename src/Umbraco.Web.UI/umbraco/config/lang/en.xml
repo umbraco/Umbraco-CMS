@@ -158,7 +158,7 @@
     <key alias="type">Type</key>
     <key alias="unPublish">Unpublish</key>
     <key alias="updateDate">Last edited</key>
-    <key alias="updateDateDesc" version="7.0">Date/time this document was created</key>
+    <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
     <key alias="uploadClear">Remove file</key>
     <key alias="urls">Link to document</key>
     <key alias="memberof">Member of group(s)</key>
