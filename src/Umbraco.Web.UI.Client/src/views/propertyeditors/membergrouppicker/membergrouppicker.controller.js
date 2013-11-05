@@ -75,7 +75,7 @@ angular.module('umbraco')
 
 		function populate(data){
 			if(angular.isArray(data)){
-				$(data).each(function(i, item){
+			    _.each(data, function (item, i) {
 					$scope.add(item);
 				});
 			}else{

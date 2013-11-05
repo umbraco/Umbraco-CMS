@@ -6,8 +6,7 @@ angular.module('umbraco')
 	function($scope, dialogService, entityResource, $log, iconHelper){
 		$scope.renderModel = [];
 		$scope.ids = $scope.model.value ? $scope.model.value.split(',') : [];
-
-
+        
 		//configuration
 		$scope.cfg = {
 			multiPicker: false, 
@@ -20,22 +19,25 @@ angular.module('umbraco')
 		if($scope.model.config){
 			$scope.cfg = angular.extend($scope.cfg, $scope.model.config);
 		}
+	    
+	    //Umbraco persists boolean for prevalues as "0" or "1" so we need to convert that!
+		$scope.cfg.multiPicker = ($scope.cfg.multiPicker.toString() == "1" ? true : ($scope.cfg.multiPicker === true));
 
 		if($scope.cfg.type === "member"){
-			$scope.cfg.entityType = "Member";
-		}else if($scope.cfg.type === "media"){
+		    $scope.cfg.entityType = "Member";		    
+		}
+		else if ($scope.cfg.type === "media") {
 			$scope.cfg.entityType = "Media";
 		}
 
 		$scope.cfg.callback = populate;
+		$scope.cfg.treeAlias = $scope.cfg.type;
 		$scope.cfg.section = $scope.cfg.type;
 		$scope.cfg.filterCssClass = "not-allowed not-published";
-		//$scope.cfg.scope = $scope;
-
-
+		
 		//load current data
 		entityResource.getByIds($scope.ids, $scope.cfg.entityType).then(function(data){
-			$(data).each(function(i, item){
+		    _.each(data, function (item, i) {
 				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
 				$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});
 			});
@@ -95,7 +97,7 @@ angular.module('umbraco')
 
 		function populate(data){
 			if(angular.isArray(data)){
-				$(data).each(function(i, item){
+			    _.each(data, function (item, i) {
 					$scope.add(item);
 				});
 			}else{

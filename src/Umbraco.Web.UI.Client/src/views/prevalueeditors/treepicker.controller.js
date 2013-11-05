@@ -6,19 +6,19 @@ angular.module('umbraco')
 	function($scope, dialogService, entityResource, $log, iconHelper){
 		$scope.renderModel = [];
 		$scope.ids = [];
-		
 
-		$scope.cfg = {
-						multiPicker: false, 
-						entityType: "Document", 
-						type: "content", 
-						treeAlias: "content"
-					};
+
+	    $scope.cfg = {
+	        multiPicker: false,
+	        entityType: "Document",
+	        type: "content",
+	        treeAlias: "content"
+	    };
 		
 		if($scope.model.value){
 			$scope.ids = $scope.model.value.split(',');
 			entityResource.getByIds($scope.ids, $scope.cfg.entityType).then(function(data){
-				$(data).each(function(i, item){
+			    _.each(data, function (item, i) {
 					item.icon = iconHelper.convertFromLegacyIcon(item.icon);
 					$scope.renderModel.push({name: item.name, id: item.id, icon: item.icon});
 				});
@@ -69,7 +69,7 @@ angular.module('umbraco')
 
 		function populate(data){
 			if(angular.isArray(data)){
-				$(data).each(function(i, item){
+			    _.each(data, function (item, i) {
 					$scope.add(item);
 				});
 			}else{
