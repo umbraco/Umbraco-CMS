@@ -793,10 +793,12 @@ namespace umbraco.providers.members
                     }
                 }
 
+                // TODO: Make approving optional for all member types, forcing it on is not good
+
                 // check for approve status. If not approved, then set the member property to null
-                if (!CheckApproveStatus(m)) {
-                    m = null;
-                }
+                //if (!CheckApproveStatus(m)) {
+                //    m = null;
+                //}
 
                 // maybe update login date
                 if (m != null && string.IsNullOrEmpty(_lastLoginPropertyTypeAlias) == false)
