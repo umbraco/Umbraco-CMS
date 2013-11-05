@@ -301,8 +301,8 @@
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
     <Compile Include="Editors\ContentController.cs" />
-    <Compile Include="Controllers\ProfileController.cs" />
-    <Compile Include="Controllers\LoginStatusController.cs" />
+    <Compile Include="Controllers\UmbProfileController.cs" />
+    <Compile Include="Controllers\UmbLoginStatusController.cs" />
     <Compile Include="Editors\ContentPostValidateAttribute.cs" />
     <Compile Include="Editors\DashboardController.cs" />
     <Compile Include="Editors\DashboardSecurity.cs" />
@@ -439,7 +439,7 @@
     <Compile Include="Editors\ContentControllerBase.cs" />
     <Compile Include="Editors\ContentTypeController.cs" />
     <Compile Include="Editors\LegacyController.cs" />
-    <Compile Include="Controllers\RegisterController.cs" />
+    <Compile Include="Controllers\UmbRegisterController.cs" />
     <Compile Include="Models\ProfileModel.cs" />
     <Compile Include="Models\LoginStatusModel.cs" />
     <Compile Include="PropertyEditors\ValueConverters\MarkdownEditorValueConverter.cs" />
@@ -637,7 +637,7 @@
     <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="Controllers\UmbLoginController.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TranslateTreeNames.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="Editors\MediaController.cs" />
