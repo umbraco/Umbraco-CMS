@@ -20,7 +20,7 @@ namespace umbraco.cms.presentation.create.controls
 		protected void Page_Load(object sender, System.EventArgs e)
 		{
 			sbmt.Text = ui.Text("create");
-            rename.Text = ui.Text("name");
+            rename.Attributes["placeholder"] = ui.Text("name");
 
 			// Put user code to initialize the page here
 		}
