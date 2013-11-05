@@ -158,7 +158,7 @@
     <key alias="type">Type</key>
     <key alias="unPublish">Unpublish</key>
     <key alias="updateDate">Last edited</key>
-    <key alias="updateDateDesc" version="7.0">Date/time this document was created</key>
+    <key alias="updateDateDesc" version="7.0">Date/time this document was edited</key>
     <key alias="uploadClear">Remove file</key>
     <key alias="urls">Link to document</key>
     <key alias="memberof">Member of group(s)</key>
@@ -692,6 +692,9 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="publishHelp"><![CDATA[Click <em>ok</em> to publish <strong>%0%</strong> and thereby making it's content publicly available.<br/><br />
       You can publish this page and all it's sub-pages by checking <em>publish all children</em> below.
       ]]></key>
+  </area>
+  <area alias="colorpicker">
+    <key alias="noColors">You have not configured any approved colors</key>
   </area>
   <area alias="relatedlinks">
     <key alias="addExternal">Add external link</key>

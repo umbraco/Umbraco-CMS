@@ -9,6 +9,7 @@
 function MemberEditController($scope, $routeParams, $location, $q, $window, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, treeService) {
     
     $scope.nav = navigationService;
+    
 
     if ($routeParams.create) {
         //we are creating so get an empty member item
@@ -37,6 +38,13 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, memb
                     $scope.loaded = true;
                     $scope.content = data;
 
+                    //build a path to sync the tree with
+                    var path = data.name[0]+"," + data.key;
+                    path = path.replace(/-/g,'');
+
+                    navigationService.setActiveTreeType("member");
+                    navigationService.syncPath(path.split(","), true);
+
                     //in one particular special case, after we've created a new item we redirect back to the edit
                     // route but there might be server validation errors in the collection which we need to display
                     // after the redirect, so we will bind all subscriptions which will show the server validation errors
@@ -46,6 +54,8 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, memb
         }
 
     }
+
+
 
     $scope.options = function(content){
             if(!content.id){

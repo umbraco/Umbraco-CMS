@@ -358,6 +358,20 @@ namespace Umbraco.Web.Editors
             //use the base method to map the rest of the properties
             base.MapPropertyValues(contentItem);
         }
+
+        /// <summary>
+        /// Empties the recycle bin
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete]
+        public HttpResponseMessage EmptyRecycleBin()
+        {
+            Services.MediaService.EmptyRecycleBin();
+            return Request.CreateResponse(HttpStatusCode.OK);
+        }
+
+
+
         
         /// <summary>
         /// Change the sort order for media

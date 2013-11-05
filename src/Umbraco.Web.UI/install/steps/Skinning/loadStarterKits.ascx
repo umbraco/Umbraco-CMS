@@ -24,32 +24,41 @@
         })(jQuery);
     </script>
     <% } %>
-
+        <div id="starter-kit-progress" style="display: none;">
+        <h2>Installation in progress...</h2>
+        <div class="loader">
+            <div class="hold">
+                <div class="progress-bar">
+                </div>
+                <span class="progress-bar-value">0%</span>
+            </div>
+            <strong></strong>
+        </div>
+    </div>
     <asp:Repeater ID="rep_starterKits" runat="server">
-        <HeaderTemplate>
-             <ul class="thumbnails">
-        </HeaderTemplate>
-        <ItemTemplate>
-             <li class="add-<%# ((Package)Container.DataItem).Text.Replace(" ","").ToLower() %>">
-                    <div class="image">
-						
-                        <a href="#" class="single-tab selectStarterKit" title="Install <%# ((Package)Container.DataItem).Text %>" data-repoId="<%# ((Package)Container.DataItem).RepoGuid %>">
-							<div class="overlay">Install <%# ((Package)Container.DataItem).Text %></div>
-                            <img src="http://our.umbraco.org<%# ((Package)Container.DataItem).Thumbnail %>" alt="<%# ((Package)Container.DataItem).Text %>">
-                        </a>
-						<a class="zoom-in" title="Enlarge <%# ((Package)Container.DataItem).Text %>" href="#<%# ((Package)Container.DataItem).Text %>">Open</a>
-                    </div>
-            </li>
-			<div id="<%# ((Package)Container.DataItem).Text %>" class="lb"><a href="#top"><img src="http://our.umbraco.org<%# ((Package)Container.DataItem).Thumbnail %>" alt="oh man" /></a></div>
+        <headertemplate>
+            <ul class="thumbnails">
+        </headertemplate>
+        <itemtemplate>
+            <li class="add-<%# ((Package)Container.DataItem).Text.Replace(" ","").ToLower() %>">
+                <div class="image">
 
-        </ItemTemplate>
-        <FooterTemplate>
+
+                    <div class="overlay"><a href="#" class="single-tab selectStarterKit" data-name="<%# ((Package)Container.DataItem).Text %>" title="Install <%# ((Package)Container.DataItem).Text %>" data-repoid="<%# ((Package)Container.DataItem).RepoGuid %>">Install <%# ((Package)Container.DataItem).Text %></a></div>
+                    <img src="http://our.umbraco.org<%# ((Package)Container.DataItem).Thumbnail %>" alt="<%# ((Package)Container.DataItem).Text %>">
+
+                    <a class="zoom-in" title="Enlarge <%# ((Package)Container.DataItem).Text %>" href="#<%# ((Package)Container.DataItem).Text %>">Open</a>
+                </div>
+            </li>
+            <div id="<%# ((Package)Container.DataItem).Text %>" class="lb"><a href="#top"><img src="http://our.umbraco.org<%# ((Package)Container.DataItem).Thumbnail %>" alt="oh man" /></a></div>
+
+        </itemtemplate>
+        <footertemplate>
                 </ul>
-                
-                 <asp:LinkButton runat="server" ID="declineStarterKits" CssClass="declineKit" OnClientClick="return confirm('Are you sure you do not want to install a starter kit?');" OnClick="NextStep">
+            <asp:LinkButton runat="server" ID="declineStarterKits" CssClass="declineKit" OnClientClick="return confirm('Are you sure you do not want to install a starter kit?');" OnClick="NextStep">
                     No thanks, do not install a starterkit!
-                </asp:LinkButton>
-        </FooterTemplate>
+            </asp:LinkButton>
+        </footertemplate>
     </asp:Repeater>
 
 </asp:PlaceHolder>
