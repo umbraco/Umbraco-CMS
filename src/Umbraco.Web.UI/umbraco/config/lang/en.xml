@@ -693,6 +693,9 @@ To manage your website, simply open the umbraco back office and start adding con
       You can publish this page and all it's sub-pages by checking <em>publish all children</em> below.
       ]]></key>
   </area>
+  <area alias="colorpicker">
+    <key alias="noColors">You have not configured any approved colors</key>
+  </area>
   <area alias="relatedlinks">
     <key alias="addExternal">Add external link</key>
     <key alias="addInternal">Add internal link</key>
