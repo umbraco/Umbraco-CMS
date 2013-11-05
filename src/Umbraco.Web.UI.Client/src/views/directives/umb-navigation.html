@@ -40,7 +40,7 @@
                             <ul class="umb-search-group" ng-repeat="resultGroup in searchResults">
                                 <li ng-repeat="result in resultGroup.results">
                                     <div>
-                                        <a ng-class="{'first':$first}" ng-href="#/{{result.editorPath}}">
+                                        <a ng-class="{'first':$first}" ng-click="searchHide()" ng-href="#/{{result.editorPath}}">
 
                                             <i class="icon umb-tree-icon sprTree {{result.icon}}"></i>
                                             {{result.name}}

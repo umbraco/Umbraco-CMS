@@ -65,6 +65,12 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
         navigationService.showMenu(ev, args);
     };
 
+    //todo, migrate to nav service
+    $scope.searchHide = function () {   
+        navigationService.hideSearch();
+    };
+
+
     /** Opens a dialog but passes in this scope instance to be used for the dialog */
     $scope.openDialog = function (currentNode, action, currentSection) {        
         navigationService.showDialog({
