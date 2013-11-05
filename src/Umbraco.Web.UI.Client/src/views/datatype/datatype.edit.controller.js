@@ -72,7 +72,7 @@ function DataTypeEditController($scope, $routeParams, $location, dataTypeResourc
     $scope.$watch("content.selectedEditor", function (newVal, oldVal) {
 
         //when the value changes, we need to dynamically load in the new editor
-        if (oldVal !== null && newVal !== null && newVal !== undefined && newVal != oldVal) {
+        if (newVal && (newVal != oldVal && (oldVal || $routeParams.create))) {
             //we are editing so get the content item from the server
             var currDataTypeId = $routeParams.create ? undefined : $routeParams.id;
             dataTypeResource.getPreValues(newVal, currDataTypeId)
