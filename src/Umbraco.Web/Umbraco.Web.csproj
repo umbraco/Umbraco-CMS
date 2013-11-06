@@ -321,6 +321,7 @@
     <Compile Include="Security\Providers\MembersRoleProvider.cs" />
     <Compile Include="Security\Providers\UmbracoMembershipProvider.cs" />
     <Compile Include="Security\Providers\UsersMembershipProvider.cs" />
+    <Compile Include="Standalone\PowershellAssemblyResolver.cs" />
     <Compile Include="Standalone\ServiceContextManager.cs" />
     <Compile Include="Standalone\StandaloneApplication.cs" />
     <Compile Include="Standalone\StandaloneBootManager.cs" />
@@ -396,6 +397,7 @@
     <Compile Include="Search\LuceneIndexerExtensions.cs" />
     <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
+    <Compile Include="Standalone\WriteableConfigSystem.cs" />
     <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\RebuildMediaXmlCacheAfterUpgrade.cs" />
     <Compile Include="Strategies\PublicAccessEventHandler.cs" />
