@@ -276,6 +276,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             //return the cache if it exists
             if (cacheKey && treeCache[cacheKey] !== undefined) {
                 deferred.resolve(treeCache[cacheKey]);
+                return deferred.promise;
             }
 
             var self = this;
