@@ -91,6 +91,13 @@ namespace Umbraco.Core.Services
         void SavePreValues(int id, IEnumerable<string> values);
 
         /// <summary>
+        /// Saves a list of PreValues for a given DataTypeDefinition
+        /// </summary>
+        /// <param name="id">Id of the DataTypeDefinition to save PreValues for</param>
+        /// <param name="values">List of prevalues to save</param>
+        void SavePreValues(int id, IEnumerable<Tuple<string,string>> prevalues);
+
+        /// <summary>
         /// Gets a specific PreValue by its Id
         /// </summary>
         /// <param name="id">Id of the PreValue to retrieve the value from</param>

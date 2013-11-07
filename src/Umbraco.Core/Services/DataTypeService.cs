@@ -208,6 +208,16 @@ namespace Umbraco.Core.Services
         /// <param name="values">List of string values to save</param>
         public void SavePreValues(int id, IEnumerable<string> values)
         {
+            SavePreValues(id, values.Select(x => new Tuple<string, string>(string.Empty, x)));
+        }
+
+        /// <summary>
+        /// Saves a list of PreValues for a given DataTypeDefinition
+        /// </summary>
+        /// <param name="id">Id of the DataTypeDefinition to save PreValues for</param>
+        /// <param name="prevalues">List of prevalues to save</param>
+        public void SavePreValues(int id, IEnumerable<Tuple<string, string>> prevalues)
+        {
             using (new WriteLock(Locker))
             {
                 using (var uow = _uowProvider.GetUnitOfWork())
@@ -223,9 +233,9 @@ namespace Umbraco.Core.Services
 
                     using (var transaction = uow.Database.GetTransaction())
                     {
-                        foreach (var value in values)
+                        foreach (var prevalue in prevalues)
                         {
-                            var dto = new DataTypePreValueDto { DataTypeNodeId = id, Value = value, SortOrder = sortOrder };
+                            var dto = new DataTypePreValueDto { DataTypeNodeId = id, Value = prevalue.Item2, SortOrder = sortOrder, Alias = prevalue.Item1 };
                             uow.Database.Insert(dto);
                             sortOrder++;
                         }

@@ -180,7 +180,9 @@ namespace umbraco.cms.businesslogic.datatype
 
                     if (val != null)
                     {
-                        PreValue p = new PreValue(0, 0, val.Value);
+                        var alias = xmlPv.Attributes["Alias"] != null ? xmlPv.Attributes["Alias"].Value : string.Empty;
+
+                        PreValue p = new PreValue(0, 0, val.Value, alias);
                         p.DataTypeId = dtd.Id;
                         p.Save();
                     }
