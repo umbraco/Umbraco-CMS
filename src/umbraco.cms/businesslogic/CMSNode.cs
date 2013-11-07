@@ -708,17 +708,18 @@ order by level,sortOrder";
             {
                 if (!_isTrashed.HasValue)
                 {
-                    _isTrashed = Convert.ToBoolean(SqlHelper.ExecuteScalar<object>("SELECT trashed FROM umbracoNode where id=@id",
-                        SqlHelper.CreateParameter("@id", this.Id)));
+                    _isTrashed = Database.ExecuteScalar<bool>(
+                        "SELECT trashed FROM umbracoNode where id=@id",
+                        new{id=_id});
                 }
                 return _isTrashed.Value;
             }
             set
             {
                 _isTrashed = value;
-                SqlHelper.ExecuteNonQuery("update umbracoNode set trashed = @trashed where id = @id",
-                    SqlHelper.CreateParameter("@trashed", value),
-                    SqlHelper.CreateParameter("@id", this.Id));
+                Database.Execute(
+                    "update umbracoNode set trashed = @trashed where id = @id",
+                    new{trashed=value,id=_id});
             }
         }
 
