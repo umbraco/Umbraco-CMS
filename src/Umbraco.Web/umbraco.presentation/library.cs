@@ -9,34 +9,26 @@ using System.Web;
 using System.Web.UI;
 using System.Xml;
 using System.Xml.XPath;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
-using Umbraco.Web;
-using Umbraco.Web.Cache;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Templates;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
+using umbraco.cms.businesslogic.language;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.cms.businesslogic.relation;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.helpers;
-using umbraco.presentation.cache;
-using umbraco.scripting;
 using umbraco.DataLayer;
-using System.Web.Security;
-using umbraco.cms.businesslogic.language;
+using umbraco.scripting;
+using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
-using System.Collections;
-using System.Collections.Generic;
-using umbraco.cms.businesslogic.cache;
-using umbraco.NodeFactory;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Web;
+using Umbraco.Web.Cache;
+using Umbraco.Web.Templates;
 using UmbracoContext = umbraco.presentation.UmbracoContext;
-using System.Linq;
 
 namespace umbraco
 {
@@ -1244,16 +1236,15 @@ namespace umbraco
             XmlDocument xd = new XmlDocument();
             xd.LoadXml("<preValues/>");
 
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("Select id, [value] from cmsDataTypeprevalues where DataTypeNodeId = @dataTypeId order by sortorder",
-                SqlHelper.CreateParameter("@dataTypeId", DataTypeId)))
+            var dtos = ApplicationContext.Current.DatabaseContext.Database.Fetch<DataTypePreValueDto>(
+                "Select id, [value] from cmsDataTypeprevalues where DataTypeNodeId = @dataTypeId order by sortorder", new { dataTypeId = DataTypeId });
+            foreach (var dto in dtos)
             {
-                while (dr.Read())
-                {
-                    XmlNode n = xmlHelper.addTextNode(xd, "preValue", dr.GetString("value"));
-                    n.Attributes.Append(xmlHelper.addAttribute(xd, "id", dr.GetInt("id").ToString()));
-                    xd.DocumentElement.AppendChild(n);
-                }
+                XmlNode n = xmlHelper.addTextNode(xd, "preValue", dto.Value);
+                n.Attributes.Append(xmlHelper.addAttribute(xd, "id", dto.Id.ToString()));
+                xd.DocumentElement.AppendChild(n);                
             }
+            
             XPathNavigator xp = xd.CreateNavigator();
             return xp.Select("/preValues");
         }
@@ -1267,8 +1258,8 @@ namespace umbraco
         {
             try
             {
-                return SqlHelper.ExecuteScalar<string>("select [value] from cmsDataTypePreValues where id = @id",
-                                                       SqlHelper.CreateParameter("@id", Id));
+                return ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
+                    "select [value] from cmsDataTypePreValues where id = @id", new { id = Id });
             }
             catch
             {
