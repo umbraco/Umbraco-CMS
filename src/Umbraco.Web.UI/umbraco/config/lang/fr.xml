@@ -222,7 +222,6 @@ Exemple: 'email', 'url']]></key>
     <key alias="errorExistsWithoutTab">%0% existe déjà</key>
     <key alias="errorHeader">Des erreurs se sont produites :</key>
     <key alias="errorHeaderWithoutTab">Des erreurs se sont produites :</key>
-    <key alias="errorInPasswordFormat">Le mot de passe doit contenir un minimum de %0% caractères et en contenir au moins %1% qui soit non alphanumérique(s)'</key>
     <key alias="errorIntegerWithoutTab">%0% doit être un entier</key>
     <key alias="errorMandatory">%0% à %1% est un champ obligatoire</key>
     <key alias="errorMandatoryWithoutTab">%0% est un champ obligatoire</key>

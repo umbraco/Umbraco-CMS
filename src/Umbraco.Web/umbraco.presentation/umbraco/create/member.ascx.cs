@@ -39,10 +39,6 @@ namespace umbraco.cms.presentation.create.controls
                 memberChooser.Visible = false;
             }
 
-            string[] pwRules = { Membership.MinRequiredPasswordLength.ToString(), Membership.MinRequiredNonAlphanumericCharacters.ToString() };
-            PasswordRules.Text = PasswordRules.Text = ui.Text(
-                "errorHandling", "errorInPasswordFormat", pwRules, BasePages.UmbracoEnsuredPage.CurrentUser);
-
             if (!IsPostBack)
             {
                 passwordRequired.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", ui.Text("password"), BasePages.UmbracoEnsuredPage.CurrentUser);

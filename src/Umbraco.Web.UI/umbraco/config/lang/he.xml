@@ -207,7 +207,6 @@
     <key alias="errorExistsWithoutTab">השדה %0% כבר קיים</key>
     <key alias="errorHeader">התרחשו שגיאות:</key>
     <key alias="errorHeaderWithoutTab">התרחשו שגיאות:</key>
-    <key alias="errorInPasswordFormat">הסיסמה חייבת להיות במינימום של %0% תווים characters long and contain at least %1% non-alpha numeric character(s)</key>
     <key alias="errorIntegerWithoutTab">%0% חייב להיות מספר שלם</key>
     <key alias="errorMandatory">השדה %0% בלשונית %1% הינו זה חובה</key>
     <key alias="errorMandatoryWithoutTab">השדה %0% הינו זה חובה</key>

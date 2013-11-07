@@ -203,7 +203,6 @@
     <key alias="errorExistsWithoutTab">%0% já existe</key>
     <key alias="errorHeader">Houve erros:</key>
     <key alias="errorHeaderWithoutTab">Houve erros:</key>
-    <key alias="errorInPasswordFormat">A senha deve ter no mínimo %0% caracteres e conter pelo menos %1% caractere(s) não alfa-númérico</key>
     <key alias="errorIntegerWithoutTab">%0% tem que ser um inteiro</key>
     <key alias="errorMandatory">O campo %0% na guia %1% é mandatório</key>
     <key alias="errorMandatoryWithoutTab">%0% é um campo mandatório</key>

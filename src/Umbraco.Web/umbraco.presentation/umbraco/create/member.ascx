@@ -28,8 +28,7 @@
     <asp:TextBox ID="Email" runat="server" Width="350px" CssClass="bigInput"></asp:TextBox><br />
 </p>
 <p>
-    Password: <em>
-        <asp:Literal runat="server" ID="PasswordRules"></asp:Literal></em><asp:RequiredFieldValidator
+    Password: <asp:RequiredFieldValidator
             ID="passwordRequired" ControlToValidate="Password" runat="server">*</asp:RequiredFieldValidator><br />
     <asp:TextBox ID="Password" runat="server" Width="350px" CssClass="bigInput"></asp:TextBox><br />
 </p>
