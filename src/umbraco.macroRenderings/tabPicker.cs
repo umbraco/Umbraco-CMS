@@ -7,6 +7,7 @@ using System.Web;
 using umbraco.DataLayer;
 using umbraco.interfaces;
 using umbraco.BusinessLogic;
+using Umbraco.Core;
 
 
 namespace umbraco.macroRenderings
@@ -83,37 +84,19 @@ namespace umbraco.macroRenderings
 				this.SelectionMode = System.Web.UI.WebControls.ListSelectionMode.Single;
 			}
 
-			//SqlDataReader dr = SqlHelper.ExecuteReader(GlobalSettings.DbDSN, CommandType.Text, "select distinct text from cmsPropertyTypeGroup order by text");
+            var propertyTypeGroups = ApplicationContext.Current.DatabaseContext.Database.Fetch<string>(
+                "select distinct text from cmsPropertyTypeGroup order by text");
+            foreach (var propertyTypeGroup in propertyTypeGroups)
+            {
+                System.Web.UI.WebControls.ListItem li = new System.Web.UI.WebControls.ListItem(propertyTypeGroup, propertyTypeGroup.ToLower());
 
-
-
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select distinct text from cmsPropertyTypeGroup order by text")) {
-                while (dr.Read()) {
-
-                    System.Web.UI.WebControls.ListItem li = new System.Web.UI.WebControls.ListItem(dr.GetString("text"), dr.GetString("text").ToLower());
-
-                    if (((string)(", " + _value + ",")).IndexOf(", " + dr.GetString("text").ToLower() + ",") > -1)
-                        li.Selected = true;
-
-                    this.Items.Add(li);
-
+                if (((string)(", " + _value + ",")).IndexOf(", " + propertyTypeGroup.ToLower() + ",") > -1)
+                {
+                    li.Selected = true;
                 }
+
+                this.Items.Add(li);                
             }
-
-/*
-			while (dr.Read())
-			{
-				System.Web.UI.WebControls.ListItem li = new System.Web.UI.WebControls.ListItem(dr["text"].ToString(), dr["text"].ToString().ToLower());
-				if (((string) (", "+_value+",")).IndexOf(", "+dr["text"].ToString().ToLower()+",") > -1)
-					li.Selected = true;
-
-				this.Items.Add(li);
-			}
-			dr.Close();*/
-
 		}
-
-	}
-
-    
+	}    
 }

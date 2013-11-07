@@ -143,6 +143,10 @@
       <Project>{6edd2061-82f2-461b-bb6e-879245a832de}</Project>
       <Name>umbraco.controls</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
+      <Project>{31785bc3-256c-4613-b2f5-a1b0bdded8c1}</Project>
+      <Name>Umbraco.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\umbraco.datalayer\umbraco.datalayer.csproj">
       <Project>{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}</Project>
       <Name>umbraco.datalayer</Name>
