@@ -4,10 +4,12 @@ using System.Net.Mail;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Web;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.property;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Models.Rdbms;
 using umbraco.DataLayer;
 using umbraco.interfaces;
 using Umbraco.Core.IO;
@@ -210,22 +212,19 @@ namespace umbraco.cms.businesslogic.workflow
         public static IEnumerable<Notification> GetUserNotifications(User user)
         {
             var items = new List<Notification>();
-            using (
-                IRecordsReader dr =
-                    SqlHelper.ExecuteReader(
-                        "select * from umbracoUser2NodeNotify where userId = @userId order by nodeId",
-                        SqlHelper.CreateParameter("@userId", user.Id)))
+            var dtos = ApplicationContext.Current.DatabaseContext.Database.Fetch<User2NodeNotifyDto>(
+                "WHERE userId = @UserId ORDER BY nodeId", new { UserId = user.Id });
+
+            foreach (var dto in dtos)
             {
-                while (dr.Read())
-                {
-                    items.Add(new Notification
-                                  {
-                                      NodeId = dr.GetInt("nodeId"),
-                                      ActionId = Convert.ToChar(dr.GetString("action")),
-                                      UserId = dr.GetInt("userId")
-                                  });
-                }
+                items.Add(new Notification
+                          {
+                              NodeId = dto.NodeId,
+                              ActionId = Convert.ToChar(dto.Action),
+                              UserId = dto.UserId
+                          });
             }
+
             return items;
         }
 
