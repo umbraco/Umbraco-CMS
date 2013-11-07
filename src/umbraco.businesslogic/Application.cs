@@ -10,6 +10,8 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Rdbms;
+
 using umbraco.DataLayer;
 using System.Runtime.CompilerServices;
 using umbraco.businesslogic;
@@ -101,6 +103,7 @@ namespace umbraco.BusinessLogic
         /// Gets the SQL helper.
         /// </summary>
         /// <value>The SQL helper.</value>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         public static ISqlHelper SqlHelper
         {
             get
@@ -247,8 +250,8 @@ namespace umbraco.BusinessLogic
         public void Delete()
         {
             //delete the assigned applications
-            SqlHelper.ExecuteNonQuery("delete from umbracoUser2App where app = @appAlias", SqlHelper.CreateParameter("@appAlias", this.alias));
-
+            ApplicationContext.Current.DatabaseContext.Database.Delete<User2AppDto>("where app = @appAlias",
+                                                                                    new {appAlias = this.alias});
             //delete the assigned trees
             var trees = ApplicationTree.getApplicationTree(this.alias);
             foreach (var t in trees)
