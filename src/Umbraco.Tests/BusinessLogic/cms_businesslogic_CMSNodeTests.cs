@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using umbraco.cms.businesslogic;
+using Umbraco.Core.Persistence;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using ContentType = Umbraco.Core.Models.ContentType;
@@ -27,7 +28,10 @@ namespace Umbraco.Tests.BusinessLogic
         private ContentType testContentType1;
         private ContentType testContentType2;
         private ContentType testContentType3;
+        private ContentType testContentType4;
+        private ContentType[] contentTypes;
         private UmbracoContext context;
+        private UmbracoDatabase database;
 
         protected override DatabaseBehavior DatabaseTestBehavior
         {
@@ -81,7 +85,7 @@ namespace Umbraco.Tests.BusinessLogic
         [TestCase(MemberObjectTypeId, 1, "Member")]
         [TestCase(RecycleBin1ObjectTypeId, 1, "Recycle bin 1")]
         [TestCase(MediaTypeObjectTypeId, 3, "MediaType")]
-        [TestCase(DocumentTypeObjectTypeId, 3, "DocumentType")]
+        [TestCase(DocumentTypeObjectTypeId, 4, "DocumentType")]
         [TestCase(RecycleBin2ObjectTypeId, 1, "Recycle Bin 2")]
         [TestCase(DataTypeObjectTypeId, 24, "DataType")]
         public void CountByObjectType_ReturnsCount(string objectTypeId, int expected, string description)
@@ -106,59 +110,91 @@ namespace Umbraco.Tests.BusinessLogic
         {
             EnsureTestDocumentTypes();
             var actual = CMSNode.CountLeafNodes(testContentType1.Id, new Guid(DocumentTypeObjectTypeId));
-            Assert.AreEqual(1, actual);
+            Assert.AreEqual(2, actual);
         }
 
         [Test]
         public void CountSubs_ReturnsCountOfAncestorsOrSomething()
         {
-            const int expectedRootCount = 34;
-            const int expectedGrandChildCount = 2;
-            const int expectedChildCount = 1;
+            const int expectedRootCount = 35;
+            const int expectedParentOfTwoCount = 3;
+            const int expectedLeafCount = 1;
 
             EnsureTestDocumentTypes();
             Assert.AreEqual(expectedRootCount, CMSNode.CountSubs(-1));
-            Assert.AreEqual(expectedGrandChildCount, CMSNode.CountSubs(testContentType1.Id));
-            Assert.AreEqual(expectedChildCount, CMSNode.CountSubs(testContentType2.Id));
+            Assert.AreEqual(expectedParentOfTwoCount, CMSNode.CountSubs(testContentType1.Id));
+            Assert.AreEqual(expectedLeafCount, CMSNode.CountSubs(testContentType2.Id));
         }
 
         [Test]
         public void Delete_DeletesRowFromUmbracoNode()
         {
             EnsureTestDocumentTypes();
-            var database = context.Application.DatabaseContext.Database;
             var originalCount = database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode");
             try
             {
                 var node = new CMSNode(testContentType2.Id);
                 database.Execute("DELETE cmsContentType WHERE nodeId = @NodeId", new { NodeId = node.Id });
                 node.delete();
-                Assert.AreEqual(0, database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE id = @id", new{id = node.Id}));;
+                Assert.AreEqual(0, database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE id = @id", new { id = node.Id })); ;
                 var newCount = database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode");
                 Assert.AreEqual(originalCount - 1, newCount);
             }
             finally
             {
-                foreach(var node in new[] { testContentType1, testContentType2, testContentType3 })
-                    database.Execute("DELETE cmsContentType WHERE nodeId = @NodeId", new {NodeId = node.Id});
-                foreach (var node in new[] { testContentType3, testContentType1, testContentType2 })
-                    database.Execute("DELETE umbracoNode WHERE id = @Id", new {node.Id });
+                foreach (var node in contentTypes)
+                    database.Execute("DELETE cmsContentType WHERE nodeId = @NodeId", new { NodeId = node.Id });
+                foreach (var node in contentTypes)
+                    database.Execute("DELETE umbracoNode WHERE id = @Id", new { node.Id });
                 initialized = false;
             }
         }
 
+        [Test]
+        public void ChildCount_ReturnsCountOfChildren()
+        {
+            EnsureTestDocumentTypes();
+            var contentTypeNode = new CMSNode(testContentType1.Id);
+            var rootNode = new CMSNode(-1);
+            Assert.AreEqual(2, contentTypeNode.ChildCount);
+            Assert.AreEqual(33, rootNode.ChildCount);
+        }
+
+        [Test]
+        public void Children_ReturnsAllChildren()
+        {
+            EnsureTestDocumentTypes();
+            Assert.AreEqual(2, database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE ParentId = @id", new { id = testContentType1.Id }));
+            var parentNode = new CMSNode(testContentType1.Id);
+            var children = parentNode.Children;
+            Assert.AreEqual(2, children.Count());
+            Assert.AreEqual(testContentType3.Id, children[0].Id);
+            Assert.AreEqual(testContentType4.Id, children[1].Id);
+            AssertNonEmptyNode((CMSNode)children[0]);
+            AssertNonEmptyNode((CMSNode)children[1]);
+        }
+
         private void EnsureTestDocumentTypes()
         {
+            CreateContext();
             if (initialized) return;
-            testContentType1 = new ContentType(-1) {Alias="Test1"};
-            testContentType2 = new ContentType(-1) {Alias="Test2"};
-            context = GetUmbracoContext("http://localhost", 0);
+            testContentType1 = new ContentType(-1) { Alias = "Test1", Name = "Test 1" };
+            testContentType2 = new ContentType(-1) { Alias = "Test2", Name = "Test 2" };
             var contentTypeService = context.Application.Services.ContentTypeService;
             contentTypeService.Save(testContentType1);
             contentTypeService.Save(testContentType2);
-            testContentType3 = new ContentType(testContentType1.Id) {Alias="Test1.1"};
+            testContentType3 = new ContentType(testContentType1.Id) { Alias = "Test1.1", Name = "Test 1.1" };
+            testContentType4 = new ContentType(testContentType1.Id) { Alias = "Test1.2", Name = "Test 1.2" };
             contentTypeService.Save(testContentType3);
+            contentTypeService.Save(testContentType4);
+            contentTypes = new[] { testContentType4, testContentType3, testContentType2, testContentType1 };
             initialized = true;
+        }
+
+        private void CreateContext()
+        {
+            context = GetUmbracoContext("http://localhost", 0);
+            database = context.Application.DatabaseContext.Database;
         }
 
         private void AssertTextStringDataTypeNode(CMSNode node)
@@ -176,6 +212,19 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.IsFalse(node.IsTrashed);
         }
 
+        private void AssertNonEmptyNode(CMSNode node)
+        {
+            Assert.AreNotEqual(0, node.Id);
+            Assert.AreNotEqual(Guid.Empty, node.UniqueId);
+            Assert.AreNotEqual(Guid.Empty, node.nodeObjectType);
+            Assert.Greater(node.Level, 0);
+            Assert.IsNotNullOrEmpty(node.Path);
+            Assert.AreNotEqual(0, node.ParentId);
+            Assert.IsNotNullOrEmpty(node.Text);
+            Assert.AreEqual(DateTime.Today, node.CreateDateTime.Date);
+            Assert.IsFalse(node.IsTrashed);
+        }
+
         private static void AssertTextStringDataTypeIdOnly(CMSNode node)
         {
             Assert.AreEqual(TextStringDataTypeId, node.Id);
@@ -189,7 +238,7 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.AreEqual(0, node.User.Id);
             Assert.AreEqual(DateTime.MinValue, node.CreateDateTime);
             Assert.IsFalse(node.IsTrashed);
-            
+
         }
     }
 }
