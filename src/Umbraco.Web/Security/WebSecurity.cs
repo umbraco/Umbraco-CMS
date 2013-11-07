@@ -6,6 +6,7 @@ using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Security;
 using umbraco;
 using umbraco.BusinessLogic;
@@ -86,15 +87,6 @@ namespace Umbraco.Web.Security
             return allowAction;
         }
 
-        /// <summary>
-        /// Gets the SQL helper.
-        /// </summary>
-        /// <value>The SQL helper.</value>
-        private ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
-
         private const long TicksPrMinute = 600000000;
         private static readonly int UmbracoTimeOutInMinutes = GlobalSettings.TimeOutInMinutes;
 
@@ -124,15 +116,15 @@ namespace Umbraco.Web.Security
         public void PerformLogin(int userId)
         {
             var retVal = Guid.NewGuid();
-            SqlHelper.ExecuteNonQuery(
-                                      "insert into umbracoUserLogins (contextID, userID, timeout) values (@contextId,'" + userId + "','" +
-                                      (DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)) +
-                                      "') ",
-                                      SqlHelper.CreateParameter("@contextId", retVal));
+            ApplicationContext.Current.DatabaseContext.Database.Insert(new UserLoginDto
+                {
+                    ContextId = retVal,
+                    UserId = userId,
+                    Timeout = DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)
+                });
             UmbracoUserContextId = retVal.ToString();
 
             LogHelper.Info<WebSecurity>("User Id: {0} logged in", () => userId);
-
         }
 
         /// <summary>
@@ -144,9 +136,10 @@ namespace Umbraco.Web.Security
             // Either due to old cookie or running multiple sessions on localhost with different port number
             try
             {
-                SqlHelper.ExecuteNonQuery(
-                "DELETE FROM umbracoUserLogins WHERE contextId = @contextId",
-                SqlHelper.CreateParameter("@contextId", UmbracoUserContextId));
+                ApplicationContext.Current.DatabaseContext.Database.Delete(new UserLoginDto
+                    {
+                        ContextId = new Guid(UmbracoUserContextId)
+                    });
             }
             catch (Exception ex)
             {
@@ -160,10 +153,11 @@ namespace Umbraco.Web.Security
         public void RenewLoginTimeout()
         {
             // only call update if more than 1/10 of the timeout has passed
-            SqlHelper.ExecuteNonQuery(
-                "UPDATE umbracoUserLogins SET timeout = @timeout WHERE contextId = @contextId",
-                SqlHelper.CreateParameter("@timeout", DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)),
-                SqlHelper.CreateParameter("@contextId", UmbracoUserContextId));
+            ApplicationContext.Current.DatabaseContext.Database.Update(new UserLoginDto
+                {
+                    ContextId = new Guid(UmbracoUserContextId),
+                    Timeout = DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)
+                });
         }
 
         /// <summary>
@@ -215,10 +209,11 @@ namespace Umbraco.Web.Security
         {
             // only call update if more than 1/10 of the timeout has passed
             if (timeout - (((TicksPrMinute * UmbracoTimeOutInMinutes) * 0.8)) < DateTime.Now.Ticks)
-                SqlHelper.ExecuteNonQuery(
-                    "UPDATE umbracoUserLogins SET timeout = @timeout WHERE contextId = @contextId",
-                    SqlHelper.CreateParameter("@timeout", DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)),
-                    SqlHelper.CreateParameter("@contextId", UmbracoUserContextId));
+                ApplicationContext.Current.DatabaseContext.Database.Update(new UserLoginDto
+                    {
+                        ContextId = new Guid(UmbracoUserContextId),
+                        Timeout = DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)
+                    });
         }
 
         internal long GetTimeout(string umbracoUserContextId)
@@ -236,9 +231,10 @@ namespace Umbraco.Web.Security
 
             if (byPassCache)
             {
-                return SqlHelper.ExecuteScalar<long>("select timeout from umbracoUserLogins where contextId=@contextId",
-                                                          SqlHelper.CreateParameter("@contextId", new Guid(UmbracoUserContextId))
-                                        );
+                return
+                    ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<long>(
+                        "select timeout from umbracoUserLogins where contextId = @ContextId",
+                        new { ContextId = new Guid(UmbracoUserContextId) });
             }
 
             return GetTimeout(UmbracoUserContextId);
@@ -258,12 +254,12 @@ namespace Umbraco.Web.Security
                 return -1;
             }
 
-            var id = ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                CacheKeys.UserContextCacheKey + umbracoUserContextId,
-                new TimeSpan(0, UmbracoTimeOutInMinutes / 10, 0),
-                () => SqlHelper.ExecuteScalar<int?>(
-                    "select userID from umbracoUserLogins where contextID = @contextId",
-                    SqlHelper.CreateParameter("@contextId", guid)));
+            var id =
+                ApplicationContext.Current.ApplicationCache.GetCacheItem(
+                    CacheKeys.UserContextCacheKey + umbracoUserContextId, new TimeSpan(0, UmbracoTimeOutInMinutes / 10, 0),
+                    () =>
+                    ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int?>(
+                        "select userID from umbracoUserLogins where contextID = @ContextId", new { ContextId = guid }));
             if (id == null)
                 return -1;
             return id.Value;
