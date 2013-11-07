@@ -134,8 +134,8 @@ namespace umbraco.cms.businesslogic.language
         {
             if (!hasText(key, languageId)) throw new ArgumentException("Key does not exist");
             
-            ApplicationContext.Current.DatabaseContext.Database.Update(
-                "Update cmsLanguageText set [value] = @value where LanguageId = @languageId And UniqueId = @key", 
+            ApplicationContext.Current.DatabaseContext.Database.Update<LanguageTextDto>(
+                "set [value] = @value where LanguageId = @languageId And UniqueId = @key", 
                 new { value = value, languageId = languageId, key = key });
         }
 
@@ -165,7 +165,7 @@ namespace umbraco.cms.businesslogic.language
         public static void removeText(Guid key)
         {
             // remove from database
-            ApplicationContext.Current.DatabaseContext.Database.Delete<LanguageTextDto>(key);
+            ApplicationContext.Current.DatabaseContext.Database.Delete<LanguageTextDto>("where UniqueId =  @UniqueId", new { UniqueId = key });
         }
 
         /// <summary>
