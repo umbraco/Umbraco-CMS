@@ -4,7 +4,11 @@ using System.Collections.Specialized;
 using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
+
+using Umbraco.Core;
 using Umbraco.Core.Events;
+using Umbraco.Core.Models.Rdbms;
+
 using umbraco.DataLayer;
 using umbraco.cms.businesslogic;
 using System.Collections.Generic;
@@ -26,7 +30,8 @@ namespace umbraco.BusinessLogic
         /// Private constructor, this class cannot be directly instantiated
         /// </summary>
         private Permission() { }
-
+             
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         private static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -44,20 +49,29 @@ namespace umbraco.BusinessLogic
             var asArray = nodes.ToArray();
             foreach (var node in asArray)
             {
-                var parameters = new[] { SqlHelper.CreateParameter("@userId", user.Id),
-                                                         SqlHelper.CreateParameter("@nodeId", node.Id),
-                                                         SqlHelper.CreateParameter("@permission", permissionKey.ToString()) };
-
                 // Method is synchronized so exists remains consistent (avoiding race condition)
-                var exists = SqlHelper.ExecuteScalar<int>(
-                    "SELECT COUNT(userId) FROM umbracoUser2nodePermission WHERE userId = @userId AND nodeId = @nodeId AND permission = @permission",
-                    parameters) > 0;
+                var exists =
+                    ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(
+                        "SELECT COUNT(userId) FROM umbracoUser2nodePermission WHERE userId = @userId AND nodeId = @nodeId AND permission = @permission",
+                        new
+                        {
+                            userId = user.Id,
+                            nodeId = node.Id,
+                            permission = permissionKey.ToString()
+                            
+                        }) > 0;
+
 
                 if (exists) return;
 
-                SqlHelper.ExecuteNonQuery(
-                    "INSERT INTO umbracoUser2nodePermission (userId, nodeId, permission) VALUES (@userId, @nodeId, @permission)",
-                    parameters);
+                ApplicationContext.Current.DatabaseContext.Database.Insert(new User2NodePermissionDto
+                                                                           {
+                                                                               UserId = user.Id,
+                                                                               NodeId = node.Id,
+                                                                               Permission =
+                                                                                   permissionKey
+                                                                                   .ToString()
+                                                                           });
             }
 
             if (raiseEvents)
@@ -79,18 +93,20 @@ namespace umbraco.BusinessLogic
         public static IEnumerable<Permission> GetUserPermissions(User user)
         {
             var items = new List<Permission>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select * from umbracoUser2NodePermission where userId = @userId order by nodeId", SqlHelper.CreateParameter("@userId", user.Id)))
+            var dtos =
+                ApplicationContext.Current.DatabaseContext.Database.Fetch<User2NodePermissionDto>(
+                    "where userId = @userId order by nodeId",
+                    new {userId = user.Id});
+            foreach (var dto in dtos)
             {
-                while (dr.Read())
-                {
-                    items.Add(new Permission()
-                    {
-                        NodeId = dr.GetInt("nodeId"),
-                        PermissionId = Convert.ToChar(dr.GetString("permission")),
-                        UserId = dr.GetInt("userId")
-                    });
-                }
+                items.Add(new Permission()
+                          {
+                              NodeId = dto.NodeId,
+                              PermissionId = Convert.ToChar(dto.Permission),
+                              UserId = dto.UserId
+                          });
             }
+
             return items;
         }
 
@@ -102,19 +118,22 @@ namespace umbraco.BusinessLogic
         public static IEnumerable<Permission> GetNodePermissions(CMSNode node)
         {
             var items = new List<Permission>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select * from umbracoUser2NodePermission where nodeId = @nodeId order by nodeId", SqlHelper.CreateParameter("@nodeId", node.Id)))
+            var dtos =
+                ApplicationContext.Current.DatabaseContext.Database.Fetch<User2NodePermissionDto>(
+                    "where nodeId = @nodeId order by nodeId",
+                    new {nodeId = node.Id});
+            foreach (var dto in dtos)
             {
-                while (dr.Read())
-                {
-                    items.Add(new Permission()
-                    {
-                        NodeId = dr.GetInt("nodeId"),
-                        PermissionId = Convert.ToChar(dr.GetString("permission")),
-                        UserId = dr.GetInt("userId")
-                    });
-                }
+                items.Add(new Permission()
+                          {
+                              NodeId = dto.NodeId,
+                              PermissionId = Convert.ToChar(dto.Permission),
+                              UserId = dto.UserId
+                          });
             }
+
             return items;
+
         }
 
         /// <summary>
@@ -130,8 +149,7 @@ namespace umbraco.BusinessLogic
         internal static void DeletePermissions(User user, CMSNode node, bool raiseEvents)
         {
             // delete all settings on the node for this user
-            SqlHelper.ExecuteNonQuery("delete from umbracoUser2NodePermission where userId = @userId and nodeId = @nodeId",
-                SqlHelper.CreateParameter("@userId", user.Id), SqlHelper.CreateParameter("@nodeId", node.Id));
+            ApplicationContext.Current.DatabaseContext.Database.Delete<User2NodePermissionDto>("where userId = @userId and nodeId = @nodeId", new { userId = user.Id, nodeId = node.Id });
 
             if (raiseEvents)
             {
@@ -146,19 +164,25 @@ namespace umbraco.BusinessLogic
         public static void DeletePermissions(User user)
         {
             // delete all settings on the node for this user
-            SqlHelper.ExecuteNonQuery("delete from umbracoUser2NodePermission where userId = @userId",
-                SqlHelper.CreateParameter("@userId", user.Id));
+            ApplicationContext.Current.DatabaseContext.Database.Delete<User2NodePermissionDto>("where userId = @userId", new { userId = user.Id });
 
             OnDeleted(new UserPermission(user, Enumerable.Empty<CMSNode>(), null), new DeleteEventArgs());
         }
 
         public static void DeletePermissions(int iUserID, int[] iNodeIDs)
         {
-            var sql = "DELETE FROM umbracoUser2NodePermission WHERE nodeID IN ({0}) AND userID=@userID";
-            var nodeIDs = string.Join(",", Array.ConvertAll(iNodeIDs, Converter));
-            sql = string.Format(sql, nodeIDs);
-            SqlHelper.ExecuteNonQuery(sql, new[] { SqlHelper.CreateParameter("@userID", iUserID) });
-
+            foreach (var NodeID in iNodeIDs)
+            {
+                ApplicationContext.Current.DatabaseContext.Database.Delete<User2NodePermissionDto>(
+                    "WHERE nodeID = @nodeID AND userID = @userID",
+                    new
+                    {
+                        nodeID = NodeID,
+                        userID = iUserID
+                        
+                    });
+            }
+ 
             OnDeleted(new UserPermission(iUserID, iNodeIDs), new DeleteEventArgs());
         }
         public static void DeletePermissions(int iUserID, int iNodeID)
@@ -176,9 +200,7 @@ namespace umbraco.BusinessLogic
         /// <param name="node"></param>
         public static void DeletePermissions(CMSNode node)
         {
-            SqlHelper.ExecuteNonQuery(
-                "delete from umbracoUser2NodePermission where nodeId = @nodeId",
-                SqlHelper.CreateParameter("@nodeId", node.Id));
+            ApplicationContext.Current.DatabaseContext.Database.Delete<User2NodePermissionDto>("where nodeId = @nodeId", new { nodeId = node.Id });
 
             OnDeleted(new UserPermission(null, node, null), new DeleteEventArgs());
         }
