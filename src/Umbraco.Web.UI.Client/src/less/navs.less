@@ -112,8 +112,8 @@
 }
 .nav-tabs > li > a,
 .nav-pills > li > a {
-  padding-right: 12px;
-  padding-left: 12px;
+  padding-right: 8px;
+  padding-left: 8px;
   margin-right: 2px;
   line-height: 14px; // keeps the overall height an even number
 }
@@ -133,14 +133,14 @@
 .nav-tabs > li > a {
   -webkit-border-radius: @tabsBorderRadius;
   border-radius: @tabsBorderRadius;
-  color: @black;
-  padding-top: 8px;
-  padding-bottom: 8px;
+  color: @gray;
+  padding-top: 5px;
+  padding-bottom: 4px;
   line-height: @baseLineHeight;
   border: 1px solid transparent;
   .border-radius(4px 4px 0 0);
   &:hover {
-      color: @blue;
+      color: @black;
   }
   &:hover,
   &:focus {
@@ -151,7 +151,7 @@
 .nav-tabs > .active > a,
 .nav-tabs > .active > a:hover,
 .nav-tabs > .active > a:focus {
-  color: @gray;
+  color: @black;
   background-color: @bodyBackground;
   border: 1px solid #ddd;
   border-bottom-color: transparent;
