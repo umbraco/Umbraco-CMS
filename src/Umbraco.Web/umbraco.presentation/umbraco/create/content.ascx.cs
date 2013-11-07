@@ -64,7 +64,7 @@ namespace umbraco.cms.presentation.create.controls
                         {
                             nodeType.Items.Add(li);
                             js.Append("typeInfo[" + counter + "] = '<img src=\"" + docImage + "\"><p>" +
-                                      docDescription + "</p>\n");
+                                      docDescription + "</p>'\n");
 
                             if (typeInited == false)
                             {

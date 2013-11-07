@@ -168,7 +168,9 @@ namespace umbraco.cms.businesslogic.packager
                         }
                         catch (Exception unpackE)
                         {
-                            throw new Exception("Error unpacking extension...", unpackE);
+                           var e=new Exception("Error unpacking extension...", unpackE);
+                           e.Data["code"] = 1;
+                           throw e;
                         }
                     }
                     else
