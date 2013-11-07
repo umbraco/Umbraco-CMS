@@ -586,9 +586,18 @@ namespace Umbraco.Core.Services
             {
                 var id = tab.Element("Id").Value;//Do we need to use this for tracking?
                 var caption = tab.Element("Caption").Value;
+
                 if (contentType.PropertyGroups.Contains(caption) == false)
                 {
                     contentType.AddPropertyGroup(caption);
+
+                    int sortOrder;
+                    if(tab.Element("SortOrder") != null && 
+                        int.TryParse(tab.Element("SortOrder").Value, out sortOrder))
+                    {
+                        // Override the sort order with the imported value
+                        contentType.PropertyGroups[caption].SortOrder = sortOrder;
+                    }
                 }
             }
         }
