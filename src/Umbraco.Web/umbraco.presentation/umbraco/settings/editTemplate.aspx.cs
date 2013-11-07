@@ -13,6 +13,7 @@ using umbraco.DataLayer;
 using Umbraco.Core.IO;
 using umbraco.uicontrols;
 using System.Linq;
+using Umbraco.Core.Models.Rdbms;
 
 namespace umbraco.cms.presentation.settings
 {
@@ -207,21 +208,20 @@ namespace umbraco.cms.presentation.settings
 			rpt_codeTemplates.DataBind();
 		}
 
-		private void LoadMacros()
-		{
-			IRecordsReader macroRenderings =
-				SqlHelper.ExecuteReader("select id, macroAlias, macroName from cmsMacro order by macroName");
+        private void LoadMacros()
+        {
+            var macroRenderings =
+                    ApplicationContext.Current.DatabaseContext.Database.Fetch<MacroDto>("select id, macroAlias, macroName from cmsMacro order by macroName"); 
 
-			rpt_macros.DataSource = macroRenderings;
-			rpt_macros.DataBind();
-
-			macroRenderings.Close();
-		}
+	        rpt_macros.DataSource = macroRenderings;
+	        rpt_macros.DataBind();
+        }
 
 		public string DoesMacroHaveSettings(string macroId)
 		{
 			if (
-				SqlHelper.ExecuteScalar<int>(string.Format("select 1 from cmsMacroProperty where macro = {0}", macroId)) ==
+                ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(
+                            string.Format("select 1 from cmsMacroProperty where macro = {0}", macroId)) == 
 				1)
 				return "1";
 			else
