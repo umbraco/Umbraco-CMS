@@ -9,7 +9,6 @@ using System.Linq;
 using System.IO;
 using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.property;
-using Umbraco.Core;
 
 namespace umbraco.cms.presentation
 {
@@ -43,8 +42,8 @@ namespace umbraco.cms.presentation
             _media = new cms.businesslogic.media.Media(media);
 
             // Save media on first load
-            bool exists = SqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @nodeId",
-                                       SqlHelper.CreateParameter("@nodeId", _media.Id)) > 0;
+            bool exists = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(
+                "SELECT COUNT(nodeId) FROM cmsContentXml WHERE nodeId = @nodeId", new { nodeId = _media.Id }) > 0; 
             if (!exists)
             {
                 _media.XmlGenerate(new XmlDocument());
