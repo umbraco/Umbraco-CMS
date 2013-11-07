@@ -255,7 +255,7 @@
     <key alias="errorExistsWithoutTab">%0% already exists</key>
     <key alias="errorHeader">There were errors:</key>
     <key alias="errorHeaderWithoutTab">There were errors:</key>
-    <key alias="errorInPasswordFormat">The password should be a minimum of %0% characters long and contain at least %1% non-alpha numeric character(s)</key>
+    <key alias="errorInPasswordFormat">The password should be a minimum of %0% characters long.</key>
     <key alias="errorIntegerWithoutTab">%0% must be an integer</key>
     <key alias="errorMandatory">The %0% field in the %1% tab is mandatory</key>
     <key alias="errorMandatoryWithoutTab">%0% is a mandatory field</key>
