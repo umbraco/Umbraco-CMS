@@ -411,7 +411,7 @@ namespace umbraco.cms.businesslogic
             PopulateCMSNodeFromDto(dto);
         }
 
-        [Obsolete("When user is refactored to use Database, call CmsNode(NodeDto)")]
+        [Obsolete("When inheritors are refactored to use Database, call CmsNode(NodeDto)")]
         protected internal CMSNode(IRecordsReader reader)
         {
             _id = reader.GetInt("id");
