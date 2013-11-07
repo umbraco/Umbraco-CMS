@@ -1,4 +1,6 @@
 ﻿using System.Web.Services;
+using Umbraco.Core;
+using Umbraco.Core.Models.Rdbms;
 
 namespace umbraco.cms.presentation.developer.RelationTypes
 {
@@ -23,11 +25,13 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 			if (user.UserType.Name == "Administrators")
 			{
 				// Delete all relations for this relation type!
-				uQuery.SqlHelper.ExecuteNonQuery(string.Format("DELETE FROM umbracoRelation WHERE relType = {0}", relationTypeId.ToString()));
+                var relation = new RelationDto() { RelationType = relationTypeId };
+                ApplicationContext.Current.DatabaseContext.Database.Delete("umbracoRelation", "relType", relation);
 
 				// Delete relation type
-				uQuery.SqlHelper.ExecuteNonQuery(string.Format("DELETE FROM umbracoRelationType WHERE id = {0}", relationTypeId.ToString()));
-			}
+                var relationType = new RelationTypeDto() { Id = relationTypeId };
+                ApplicationContext.Current.DatabaseContext.Database.Delete(relationType);
+            }
 		}
 	}
 }
