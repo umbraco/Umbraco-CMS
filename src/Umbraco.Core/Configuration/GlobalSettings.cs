@@ -704,6 +704,8 @@ namespace Umbraco.Core.Configuration
                         StartsWithContainer _newReservedList = new StartsWithContainer();
                         foreach (string reservedUrl in _reservedUrlsCache.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
                         {
+                            if (string.IsNullOrWhiteSpace(reservedUrl))
+                               continue;
                             //resolves the url to support tilde chars
                             string reservedUrlTrimmed = IOHelper.ResolveUrl(reservedUrl).Trim().ToLower();
                             if (reservedUrlTrimmed.Length > 0)
@@ -713,6 +715,8 @@ namespace Umbraco.Core.Configuration
                         foreach (string reservedPath in _reservedPathsCache.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries))
                         {
                             bool trimEnd = !reservedPath.EndsWith("/");
+                            if (string.IsNullOrWhiteSpace(reservedPath))
+                                continue;
                             //resolves the url to support tilde chars
                             string reservedPathTrimmed = IOHelper.ResolveUrl(reservedPath).Trim().ToLower();
 
