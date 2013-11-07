@@ -78,6 +78,7 @@ namespace umbraco.cms.businesslogic.macro
         public Macro Macro { get; set; }
 
         private MacroPropertyType _type;
+        private string _parameterEditorAlias;
 
         /// <summary>
         /// The basetype which defines which component is used in the UI for editing content
@@ -113,7 +114,24 @@ namespace umbraco.cms.businesslogic.macro
         /// <summary>
         /// The macro parameter editor alias used to render the editor
         /// </summary>
-        public string ParameterEditorAlias { get; set; }
+        public string ParameterEditorAlias
+        {
+            get { return _parameterEditorAlias; }
+            set
+            {
+                //try to get the new mapped parameter editor
+                var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(value, false);
+                if (mapped.IsNullOrWhiteSpace() == false)
+                {
+                    _parameterEditorAlias = value;
+                }
+                else
+                {
+                    _parameterEditorAlias = value;    
+                }
+                
+            }
+        }
 
         private void Setup()
         {
@@ -219,6 +237,14 @@ namespace umbraco.cms.businesslogic.macro
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static MacroProperty MakeNew(Macro macro, string alias, string name, string editorAlias)
         {
+
+            //try to get the new mapped parameter editor
+            var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(editorAlias, false);
+            if (mapped.IsNullOrWhiteSpace() == false)
+            {
+                editorAlias = mapped;
+            }
+
             int macroPropertyId = 0;
             // The method is synchronized
             SqlHelper.ExecuteNonQuery("INSERT INTO cmsMacroProperty (macro, macropropertyAlias, macroPropertyName, editorAlias) VALUES (@macro, @alias, @name, @editorAlias)",
