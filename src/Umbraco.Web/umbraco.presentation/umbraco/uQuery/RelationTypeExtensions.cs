@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using umbraco.cms.businesslogic.relation;
+using Umbraco.Core;
 
 namespace umbraco
 {
@@ -16,9 +17,9 @@ namespace umbraco
 		/// <returns>an UmbracoObjectType value</returns>
 		public static uQuery.UmbracoObjectType GetParentUmbracoObjectType(this RelationType relationType)
 		{
-			return uQuery.GetUmbracoObjectType(
-				uQuery.SqlHelper.ExecuteScalar<Guid>(
-					string.Concat("SELECT parentObjectType FROM umbracoRelationType WHERE id = ", relationType.Id)));
+            var parentObjectType = ApplicationContext.Current.DatabaseContext.Database.SingleOrDefault<Guid>(
+                "SELECT parentObjectType FROM umbracoRelationType WHERE id = @id", new { id = relationType.Id });
+            return uQuery.GetUmbracoObjectType(parentObjectType);
 		}
 
 		/// <summary>
@@ -28,9 +29,9 @@ namespace umbraco
 		/// <returns>an UmbracoObjectType value</returns>
 		public static uQuery.UmbracoObjectType GetChildUmbracoObjectType(this RelationType relationType)
 		{
-			return uQuery.GetUmbracoObjectType(
-				uQuery.SqlHelper.ExecuteScalar<Guid>(
-					string.Concat("SELECT childObjectType FROM umbracoRelationType WHERE id = ", relationType.Id)));
+            var childObjectType = ApplicationContext.Current.DatabaseContext.Database.SingleOrDefault<Guid>(
+                "SELECT childObjectType FROM umbracoRelationType WHERE id = @id", new { id = relationType.Id });
+            return uQuery.GetUmbracoObjectType(childObjectType);
 		}
 
 		/// <summary>
