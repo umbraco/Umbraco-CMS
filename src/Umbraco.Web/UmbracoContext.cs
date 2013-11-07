@@ -54,7 +54,12 @@ namespace Umbraco.Web
         /// </remarks>
         public static UmbracoContext EnsureContext(HttpContextBase httpContext, ApplicationContext applicationContext)
         {
-            return EnsureContext(httpContext, applicationContext, false);
+            return EnsureContext(httpContext, applicationContext, false, null);
+        }
+
+        public static UmbracoContext EnsureContext(HttpContextBase httpContext, ApplicationContext applicationContext, bool replaceContext)
+        {
+            return EnsureContext(httpContext, applicationContext, replaceContext, null);
         }
 
         /// <summary>
@@ -77,7 +82,7 @@ namespace Umbraco.Web
         /// during the startup process as well.
         /// See: http://issues.umbraco.org/issue/U4-1890, http://issues.umbraco.org/issue/U4-1717
         /// </remarks>
-        public static UmbracoContext EnsureContext(HttpContextBase httpContext, ApplicationContext applicationContext, bool replaceContext)
+        public static UmbracoContext EnsureContext(HttpContextBase httpContext, ApplicationContext applicationContext, bool replaceContext, bool? preview)
         {
             if (UmbracoContext.Current != null)
             {
@@ -89,7 +94,8 @@ namespace Umbraco.Web
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 applicationContext,
-                PublishedCachesResolver.Current.Caches);
+                PublishedCachesResolver.Current.Caches,
+                preview);
 
             // create the nice urls provider
             // there's one per request because there are some behavior parameters that can be changed

@@ -82,6 +82,8 @@ namespace Umbraco.Core.Models.PublishedContent
         private PropertyCacheLevel _objectCacheLevel;
         private PropertyCacheLevel _xpathCacheLevel;
 
+        private Type _clrType = typeof (object);
+
         private void InitializeConverters()
         {
             var converters = PropertyValueConvertersResolver.Current.Converters.ToArray();
@@ -107,6 +109,13 @@ namespace Umbraco.Core.Models.PublishedContent
             _objectCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.XPath);
             if (_objectCacheLevel < _sourceCacheLevel) _objectCacheLevel = _sourceCacheLevel;
             if (_xpathCacheLevel < _sourceCacheLevel) _xpathCacheLevel = _sourceCacheLevel;
+
+            if (_converter != null)
+            {
+                var attr = _converter.GetType().GetCustomAttribute<PropertyValueTypeAttribute>(false);
+                if (attr != null)
+                    _clrType = attr.Type;
+            }
         }
 
         static PropertyCacheLevel GetCacheLevel(IPropertyValueConverter converter, PropertyCacheValue value)
@@ -201,6 +210,9 @@ namespace Umbraco.Core.Models.PublishedContent
 
             return source;
         }
+
+        // gets the property CLR type
+        public Type ClrType { get { return _clrType; } }
 
         #endregion
 

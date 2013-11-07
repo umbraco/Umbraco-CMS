@@ -294,6 +294,10 @@
     <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\LoginStatusController.cs" />
     <Compile Include="Editors\MediaController.cs" />
+    <Compile Include="Models\IRenderModel.cs" />
+    <Compile Include="Models\RenderModelOfTContent.cs" />
+    <Compile Include="Mvc\UmbracoTemplatePageOfTContent.cs" />
+    <Compile Include="Mvc\UmbracoViewPage.cs" />
     <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
     <Compile Include="Models\ProfileModel.cs" />
@@ -401,6 +405,9 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.designer.cs">
       <DependentUpon>AssignDomain2.aspx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\members\EditMember.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="UmbracoContextExtensions.cs" />
     <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -421,7 +428,7 @@
     <Compile Include="Mvc\UmbracoController.cs" />
     <Compile Include="Mvc\UmbracoControllerFactory.cs" />
     <Compile Include="Mvc\UmbracoMvcHandler.cs" />
-    <Compile Include="Mvc\UmbracoViewPage.cs" />
+    <Compile Include="Mvc\UmbracoViewPageOfTModel.cs" />
     <Compile Include="PublishedCache\IPublishedCache.cs" />
     <Compile Include="PublishedCache\IPublishedContentCache.cs" />
     <Compile Include="PublishedCache\IPublishedMediaCache.cs" />
@@ -1395,13 +1402,6 @@
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Updates\IUpdateList.cs" />
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\MacroModule\TemplateUpdate.cs" />
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Utility.cs" />
-    <Compile Include="umbraco.presentation\umbraco\members\EditMember.aspx.cs">
-      <DependentUpon>EditMember.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\EditMember.aspx.designer.cs">
-      <DependentUpon>EditMember.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx.cs">
       <DependentUpon>EditMemberGroup.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1962,9 +1962,6 @@
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltInsertValueOf.aspx" />
     <Content Include="umbraco.presentation\umbraco\js\language.aspx" />
-    <Content Include="umbraco.presentation\umbraco\members\EditMember.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx">
       <SubType>Form</SubType>
     </Content>

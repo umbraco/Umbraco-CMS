@@ -145,6 +145,7 @@
   <ItemGroup>
     <Compile Include="AttemptTests.cs" />
     <Compile Include="MockTests.cs" />
+    <Compile Include="Mvc\UmbracoViewPageTests.cs" />
     <Compile Include="Persistence\Auditing\AuditTests.cs" />
     <Compile Include="BootManagers\CoreBootManagerTests.cs" />
     <Compile Include="BusinessLogic\DictionaryTest.cs" />

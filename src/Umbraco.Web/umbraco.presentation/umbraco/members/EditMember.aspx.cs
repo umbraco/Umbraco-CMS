@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Web.UI;
 using System.Web.UI.Design.WebControls;
 using System.Web.UI.WebControls;
@@ -8,33 +8,33 @@ using System.Web.Security;
 
 namespace umbraco.cms.presentation.members
 {
-	/// <summary>
-	/// Summary description for EditMember.
-	/// </summary>
-	public partial class EditMember : BasePages.UmbracoEnsuredPage
-	{
-	    public EditMember()
-	    {
+    /// <summary>
+    /// Summary description for EditMember.
+    /// </summary>
+    public partial class EditMember : BasePages.UmbracoEnsuredPage
+    {
+        public EditMember()
+        {
             CurrentApp = BusinessLogic.DefaultApps.member.ToString();
         }
-		protected uicontrols.TabView TabView1;
-		protected TextBox documentName;
-		private Member _document;
+        protected uicontrols.TabView TabView1;
+        protected TextBox documentName;
+        private Member _document;
         private MembershipUser _member;
-		controls.ContentControl _contentControl;
-        protected uicontrols.UmbracoPanel m_MemberShipPanel = new uicontrols.UmbracoPanel(); 
+        controls.ContentControl _contentControl;
+        protected uicontrols.UmbracoPanel m_MemberShipPanel = new uicontrols.UmbracoPanel();
 
-		protected TextBox MemberLoginNameTxt = new TextBox();
-	    protected RequiredFieldValidator MemberLoginNameVal = new RequiredFieldValidator();
+        protected TextBox MemberLoginNameTxt = new TextBox();
+        protected RequiredFieldValidator MemberLoginNameVal = new RequiredFieldValidator();
 
-		protected PlaceHolder MemberPasswordTxt = new PlaceHolder();
-		protected TextBox MemberEmail = new TextBox();
+        protected PlaceHolder MemberPasswordTxt = new PlaceHolder();
+        protected TextBox MemberEmail = new TextBox();
         protected CustomValidator MemberEmailExistCheck = new CustomValidator();
-		protected controls.DualSelectbox _memberGroups = new controls.DualSelectbox();
+        protected controls.DualSelectbox _memberGroups = new controls.DualSelectbox();
 
-
-		protected void Page_Load(object sender, EventArgs e)
-		{
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
 
             // Add password changer
             MemberPasswordTxt.Controls.Add(new UserControl().LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx"));
@@ -80,9 +80,16 @@ namespace umbraco.cms.presentation.members
             }
             else
             {
+                m_MemberShipPanel.hasMenu = true;
+                var menuSave = m_MemberShipPanel.Menu.NewImageButton();
+                menuSave.ID = m_MemberShipPanel.ID + "_save";
+                menuSave.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
+                menuSave.Click += new ImageClickEventHandler(MenuSaveClick);
+                menuSave.AltText = ui.Text("buttons", "save", null);
+
                 _member = Membership.GetUser(Request.QueryString["id"]);
                 MemberLoginNameTxt.Text = _member.UserName;
-                if (!IsPostBack)
+                if (IsPostBack == false)
                 {
                     MemberEmail.Text = _member.Email;
                 }
@@ -93,7 +100,7 @@ namespace umbraco.cms.presentation.members
                 MemberLoginNameTxt.Enabled = false;
 
                 // check for pw support
-                if (!Membership.Provider.EnablePasswordRetrieval)
+                if (Membership.Provider.EnablePasswordRetrieval == false)
                 {
                     MemberPasswordTxt.Controls.Clear();
                     MemberPasswordTxt.Controls.Add(
@@ -107,27 +114,29 @@ namespace umbraco.cms.presentation.members
                 plc.Controls.Add(m_MemberShipPanel);
             }
 
-			// Groups
-			var p = new uicontrols.Pane();
-			_memberGroups.ID = "Membergroups";
-			_memberGroups.Width = 175;
-			var selectedMembers = "";
-			foreach(var role in Roles.GetAllRoles()) 
-			{
+            // Groups
+            var p = new uicontrols.Pane();
+            _memberGroups.ID = "Membergroups";
+            _memberGroups.Width = 175;
+            var selectedMembers = "";
+            foreach (var role in Roles.GetAllRoles())
+            {
                 // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
-                if (!role.StartsWith("__umbracoRole"))
+                if (role.StartsWith("__umbracoRole") == false)
                 {
                     var li = new ListItem(role);
-                    if (!IsPostBack)
+                    if (IsPostBack == false)
                     {
 
                         if (Roles.IsUserInRole(_member.UserName, role))
+                        {
                             selectedMembers += role + ",";
+                        }
                     }
                     _memberGroups.Items.Add(li);
                 }
-			}
-			_memberGroups.Value = selectedMembers;
+            }
+            _memberGroups.Value = selectedMembers;
 
             p.addProperty(ui.Text("membergroup"), _memberGroups);
 
@@ -137,9 +146,11 @@ namespace umbraco.cms.presentation.members
                 _contentControl.Save += new System.EventHandler(tmp_save);
             }
             else
+            {
                 m_MemberShipPanel.Controls.Add(p);
+            }
 
-		}
+        }
 
         void MemberEmailExistCheck_ServerValidate(object source, ServerValidateEventArgs args)
         {
@@ -165,25 +176,25 @@ namespace umbraco.cms.presentation.members
 
         void MenuSaveClick(object sender, ImageClickEventArgs e)
         {
-           
+
             tmp_save(sender, e);
-            
+
         }
 
-	    protected void tmp_save(object sender, EventArgs e)
-	    {
-	        Page.Validate();
-	        if (!Page.IsValid)
-	        {
+        protected void tmp_save(object sender, EventArgs e)
+        {
+            Page.Validate();
+            if (!Page.IsValid)
+            {
                 foreach (uicontrols.TabPage tp in _contentControl.GetPanels())
                 {
                     tp.ErrorControl.Visible = true;
                     tp.ErrorHeader = ui.Text("errorHandling", "errorHeader");
                     tp.CloseCaption = ui.Text("close");
                 }
-	        }
-	        else
-	        {
+            }
+            else
+            {
 
                 if (Page.IsPostBack)
                 {
@@ -192,30 +203,30 @@ namespace umbraco.cms.presentation.members
                     {
                         tp.ErrorControl.Visible = false;
                     }
-                }    
+                }
 
-	            if (Member.InUmbracoMemberMode())
-	            {
-	                _document.LoginName = MemberLoginNameTxt.Text;
-	                _document.Email = MemberEmail.Text;
+                if (Member.InUmbracoMemberMode())
+                {
+                    _document.LoginName = MemberLoginNameTxt.Text;
+                    _document.Email = MemberEmail.Text;
 
-	                // Check if password should be changed
-	                string tempPassword = ((controls.passwordChanger) MemberPasswordTxt.Controls[0]).Password;
-	                if (tempPassword.Trim() != "")
-	                    _document.Password = tempPassword;
+                    // Check if password should be changed
+                    string tempPassword = ((controls.passwordChanger)MemberPasswordTxt.Controls[0]).Password;
+                    if (tempPassword.Trim() != "")
+                        _document.Password = tempPassword;
 
-	                // Groups
-	                foreach (ListItem li in _memberGroups.Items)
+                    // Groups
+                    foreach (ListItem li in _memberGroups.Items)
                     {
-	                    if (("," + _memberGroups.Value + ",").IndexOf("," + li.Value + ",") > -1)
-	                    {
-	                        if (!Roles.IsUserInRole(_document.LoginName, li.Value))
-	                            Roles.AddUserToRole(_document.LoginName, li.Value);
-	                    }
-	                    else if (Roles.IsUserInRole(_document.LoginName, li.Value))
-	                    {
-	                        Roles.RemoveUserFromRole(_document.LoginName, li.Value);
-	                    }
+                        if (("," + _memberGroups.Value + ",").IndexOf("," + li.Value + ",") > -1)
+                        {
+                            if (!Roles.IsUserInRole(_document.LoginName, li.Value))
+                                Roles.AddUserToRole(_document.LoginName, li.Value);
+                        }
+                        else if (Roles.IsUserInRole(_document.LoginName, li.Value))
+                        {
+                            Roles.RemoveUserFromRole(_document.LoginName, li.Value);
+                        }
                     }
 
                     //The value of the properties has been set on IData through IDataEditor in the ContentControl
@@ -227,59 +238,72 @@ namespace umbraco.cms.presentation.members
                         _document.getProperty(item.Key).Value = item.Value.Data.Value;
                     }
 
-	                // refresh cache
-	                _document.XmlGenerate(new System.Xml.XmlDocument());
-	                _document.Save();
-	            }
-	            else
-	            {
-	                _member.Email = MemberEmail.Text;
-	                if (Membership.Provider.EnablePasswordRetrieval)
-	                {
-	                    string tempPassword = ((controls.passwordChanger) MemberPasswordTxt.Controls[0]).Password;
-	                    if (tempPassword.Trim() != "")
-	                        _member.ChangePassword(_member.GetPassword(), tempPassword);
-	                }
-	                Membership.UpdateUser(_member);
-	                // Groups
-	                foreach (ListItem li in _memberGroups.Items)
-	                    if (("," + _memberGroups.Value + ",").IndexOf("," + li.Value + ",") > -1)
-	                    {
-	                        if (!Roles.IsUserInRole(_member.UserName, li.Value))
-	                            Roles.AddUserToRole(_member.UserName, li.Value);
-	                    }
-	                    else if (Roles.IsUserInRole(_member.UserName, li.Value))
-	                    {
-	                        Roles.RemoveUserFromRole(_member.UserName, li.Value);
-	                    }
+                    // refresh cache
+                    _document.XmlGenerate(new System.Xml.XmlDocument());
+                    _document.Save();
+                }
+                else
+                {
+                    _member.Email = MemberEmail.Text;
+                    if (Membership.Provider.EnablePasswordRetrieval)
+                    {
+                        string tempPassword = ((controls.passwordChanger)MemberPasswordTxt.Controls[0]).Password;
+                        if (tempPassword.Trim() != "")
+                            _member.ChangePassword(_member.GetPassword(), tempPassword);
+                    }
+                    Membership.UpdateUser(_member);
+                    // Groups
+                    foreach (ListItem li in _memberGroups.Items)
+                        if (("," + _memberGroups.Value + ",").IndexOf("," + li.Value + ",") > -1)
+                        {
+                            if (!Roles.IsUserInRole(_member.UserName, li.Value))
+                                Roles.AddUserToRole(_member.UserName, li.Value);
+                        }
+                        else if (Roles.IsUserInRole(_member.UserName, li.Value))
+                        {
+                            Roles.RemoveUserFromRole(_member.UserName, li.Value);
+                        }
 
-	            }
+                }
 
                 ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editMemberSaved", base.getUser()), "");
             }
-		}
-
-	    private uicontrols.PropertyPanel AddProperty(string caption, Control c)
-	    {
-	        var pp = new uicontrols.PropertyPanel();
-	        pp.Controls.Add(c);
-	        pp.Text = caption;
-	        return pp;
-	    }
-
-	    override protected void OnInit(EventArgs e)
-		{
-		    if (!Member.InUmbracoMemberMode())
-		    {
-		        m_MemberShipPanel.hasMenu = true;
-		        umbraco.uicontrols.MenuImageButton menuSave = m_MemberShipPanel.Menu.NewImageButton();
-		        menuSave.ID = m_MemberShipPanel.ID + "_save";
-		        menuSave.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
-		        menuSave.Click += new ImageClickEventHandler(MenuSaveClick);
-		        menuSave.AltText = ui.Text("buttons", "save", null);
-		    }
-		    base.OnInit(e);
         }
-		
-	}
+
+        private uicontrols.PropertyPanel AddProperty(string caption, Control c)
+        {
+            var pp = new uicontrols.PropertyPanel();
+            pp.Controls.Add(c);
+            pp.Text = caption;
+            return pp;
+        }
+
+        /// <summary>
+        /// doSave control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden doSave;
+
+        /// <summary>
+        /// doPublish control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden doPublish;
+
+        /// <summary>
+        /// plc control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder plc;
+
+    }
 }

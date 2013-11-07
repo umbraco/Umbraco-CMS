@@ -1,9 +1,10 @@
-<%@ Page language="c#" Codebehind="EditMember.aspx.cs" MasterPageFile="../masterpages/umbracoPage.Master" ValidateRequest="false" AutoEventWireup="True" Inherits="umbraco.cms.presentation.members.EditMember" %>
+<%@ Page language="c#" MasterPageFile="../masterpages/umbracoPage.Master" 
+    ValidateRequest="false" AutoEventWireup="True" Inherits="umbraco.cms.presentation.members.EditMember" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
 		<script type="text/javascript">
 		  // Save handlers for IDataFields		
-		  var saveHandlers = new Array()
+		    var saveHandlers = new Array();
 
 		  function addSaveHandler(handler) {
 		    saveHandlers[saveHandlers.length] = handler;
@@ -18,6 +19,6 @@
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
-			<INPUT id="doSave" type="hidden" name="doSave" runat="server"> <INPUT id="doPublish" type="hidden" name="doPublish" runat="server">
+			<input id="doSave" type="hidden" name="doSave" runat="server" /> <input id="doPublish" type="hidden" name="doPublish" runat="server" />
 			<asp:PlaceHolder id="plc" Runat="server"></asp:PlaceHolder>
 </asp:Content>
