@@ -6,6 +6,17 @@
 <asp:Content ContentPlaceHolderID="head" runat="server">
 
 	<script type="text/javascript">
+	    $(function () {
+	        // disable ok button on click
+	        var clickCount = 0; // this is a work-around for webforms js clicks.
+	        $("#<%= ok.ClientID %>").click(function() {
+	            if (clickCount > 0) {
+	                $(this).attr('disabled', 'disabled');
+	                return false;
+	            }
+	            clickCount++;
+	        });
+	    });
 
 			function dialogHandler(id) {
 				document.getElementById("copyTo").value = id;
