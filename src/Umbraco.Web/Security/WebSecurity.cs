@@ -136,10 +136,9 @@ namespace Umbraco.Web.Security
             // Either due to old cookie or running multiple sessions on localhost with different port number
             try
             {
-                ApplicationContext.Current.DatabaseContext.Database.Delete(new UserLoginDto
-                    {
-                        ContextId = new Guid(UmbracoUserContextId)
-                    });
+                ApplicationContext.Current.DatabaseContext.Database.Execute(
+                    "DELETE FROM umbracoUserLogins WHERE contextId = @ContextId",
+                    new { ContextId = new Guid(UmbracoUserContextId) });
             }
             catch (Exception ex)
             {
@@ -153,11 +152,13 @@ namespace Umbraco.Web.Security
         public void RenewLoginTimeout()
         {
             // only call update if more than 1/10 of the timeout has passed
-            ApplicationContext.Current.DatabaseContext.Database.Update(new UserLoginDto
-                {
-                    ContextId = new Guid(UmbracoUserContextId),
-                    Timeout = DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)
-                });
+            ApplicationContext.Current.DatabaseContext.Database.Execute(
+                "UPDATE umbracoUserLogins SET timeout = @Timeout WHERE contextId = @ContextId",
+                new
+                    {
+                        ContextId = UmbracoUserContextId,
+                        Timeout = DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)
+                    });
         }
 
         /// <summary>
@@ -209,11 +210,12 @@ namespace Umbraco.Web.Security
         {
             // only call update if more than 1/10 of the timeout has passed
             if (timeout - (((TicksPrMinute * UmbracoTimeOutInMinutes) * 0.8)) < DateTime.Now.Ticks)
-                ApplicationContext.Current.DatabaseContext.Database.Update(new UserLoginDto
-                    {
-                        ContextId = new Guid(UmbracoUserContextId),
-                        Timeout = DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)
-                    });
+                ApplicationContext.Current.DatabaseContext.Database.Execute(
+                    "UPDATE umbracoUserLogins SET timeout = @Timeout WHERE contextId = @ContextId", new
+                        {
+                            ContextId = UmbracoUserContextId,
+                            Timeout = DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)
+                        });
         }
 
         internal long GetTimeout(string umbracoUserContextId)
