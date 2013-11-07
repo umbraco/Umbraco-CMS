@@ -45,9 +45,11 @@ namespace umbraco.editorControls.mediapicker
 
             _checkboxShowPreview = new CheckBox();
             _checkboxShowPreview.ID = "showpreview";
+            _checkboxShowPreview.Checked = true;
 
             _checkboxShowAdvancedDialog = new CheckBox();
             _checkboxShowAdvancedDialog.ID = "showadvanceddialog";
+            _checkboxShowAdvancedDialog.Checked = true;
 
             //Controls.Add(_dropdownlist);
 
