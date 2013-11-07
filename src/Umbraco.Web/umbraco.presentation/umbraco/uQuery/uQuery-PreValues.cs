@@ -4,6 +4,8 @@ using System.Linq;
 using umbraco.cms.businesslogic.datatype;
 using umbraco.cms.businesslogic.propertytype;
 using umbraco.NodeFactory;
+using Umbraco.Core;
+using Umbraco.Core.Models.Rdbms;
 
 namespace umbraco
 {
@@ -24,15 +26,17 @@ namespace umbraco
 		/// </returns>
 		public static PreValue MakeNewPreValue(int dataTypeDefinitionId, string value, string alias = "", int sortOrder = 0)
 		{
-			var result =
-				SqlHelper.ExecuteNonQuery(
-					"INSERT INTO cmsDataTypePreValues (datatypeNodeId, value, alias, sortorder) VALUES (@dtdefid, @value, @alias, @sortorder)",
-					SqlHelper.CreateParameter("@dtdefid", dataTypeDefinitionId),
-					SqlHelper.CreateParameter("@value", value),
-					SqlHelper.CreateParameter("@alias", alias),
-					SqlHelper.CreateParameter("@sortorder", sortOrder));
+            var dto = new DataTypePreValueDto
+            {
+                Alias = alias,
+                DataTypeNodeId = dataTypeDefinitionId,
+                SortOrder = sortOrder,
+                Value = value,
+            };
 
-			if (result > -1)
+            var result = ApplicationContext.Current.DatabaseContext.Database.Insert(dto);
+
+			if ((int)result > -1)
 			{
 				return uQuery.GetPreValues(dataTypeDefinitionId).Single(x => x.Value.Equals(value) && x.GetAlias().Equals(alias) && x.SortOrder == sortOrder);
 			}
@@ -94,11 +98,9 @@ namespace umbraco
 		/// <returns></returns>
 		public static bool ReorderPreValue(int preValueId, int sortOrder)
 		{
-			var result =
-				SqlHelper.ExecuteNonQuery(
-					"UPDATE cmsDataTypePreValues SET sortorder = @sortorder WHERE id = @prevalueid",
-					SqlHelper.CreateParameter("@prevalueid", preValueId),
-					SqlHelper.CreateParameter("@sortorder", sortOrder));
+            var result = ApplicationContext.Current.DatabaseContext.Database.Execute(
+                "UPDATE cmsDataTypePreValues SET sortorder = @sortorder WHERE id = @prevalueid",
+                new { prevalueid = preValueId, sortOrder = sortOrder });
 
 			if (result > 0)
 			{

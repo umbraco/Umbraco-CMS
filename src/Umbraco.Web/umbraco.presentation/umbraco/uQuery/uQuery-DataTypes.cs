@@ -5,6 +5,8 @@ using Umbraco.Core.Logging;
 using Umbraco.Web;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.datatype;
+using Umbraco.Core;
+using Umbraco.Core.Models.Rdbms;
 
 namespace umbraco
 {
@@ -35,17 +37,16 @@ namespace umbraco
 		{
 			var datatypes = new Dictionary<int, string>();
 
-			using (var reader = uQuery.SqlHelper.ExecuteReader("SELECT d.nodeId, n.text FROM cmsDataType d, umbracoNode n WHERE d.nodeId = n.id"))
-			{
-				// Go through the values from the database and store them in the array.
-				while (reader.Read())
-				{
-					if (!reader.GetInt("nodeId").Equals(new Guid()) && !string.IsNullOrEmpty(reader.GetString("text")))
-					{
-						datatypes.Add(reader.GetInt("nodeId"), reader.GetString("text"));
-					}
-				}
-			}
+            // Go through the values from the database and store them in the array.
+            var dtos = ApplicationContext.Current.DatabaseContext.Database.Fetch<NodeDto>(
+                "SELECT d.nodeId id, n.text FROM cmsDataType d, umbracoNode n WHERE d.nodeId = n.id");
+            foreach (var dto in dtos)
+            {
+                if (!dto.NodeId.Equals(new Guid()) && !string.IsNullOrEmpty(dto.Text))
+                {
+                    datatypes.Add(dto.NodeId, dto.Text);
+                }                
+            }
 
 			if (sortByName)
 			{

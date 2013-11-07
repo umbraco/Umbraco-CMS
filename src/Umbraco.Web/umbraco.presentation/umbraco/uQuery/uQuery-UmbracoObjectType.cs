@@ -152,8 +152,9 @@ namespace umbraco
 		public static UmbracoObjectType GetUmbracoObjectType(int id)
 		{
 			return uQuery.GetUmbracoObjectType(
-						uQuery.SqlHelper.ExecuteScalar<Guid>(
-							string.Concat("SELECT nodeObjectType FROM umbracoNode WHERE id = ", id)));
+                ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<Guid>(
+                    "SELECT nodeObjectType FROM umbracoNode WHERE id = @id",
+                    new { id = id}));
 		}
 
 		/// <summary>
