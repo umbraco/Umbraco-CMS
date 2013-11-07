@@ -123,7 +123,7 @@ namespace umbraco.cms.businesslogic.macro
                 var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(value, false);
                 if (mapped.IsNullOrWhiteSpace() == false)
                 {
-                    _parameterEditorAlias = value;
+                    _parameterEditorAlias = mapped;
                 }
                 else
                 {
