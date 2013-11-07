@@ -102,7 +102,7 @@ namespace umbraco.cms.businesslogic.datatype
                .Where<PropertyDataDto>(x => x.Id == _propertyId);
             var dto = Database.Fetch<PropertyDataDto, PropertyTypeDto, DataTypeDto>(sql).FirstOrDefault();
 
-            if (dto != null)
+            if (dto != null && _dataType != null)
             {
                 //the type stored in the cmsDataType table
                 var strDbType = dto.PropertyTypeDto.DataTypeDto.DbType;
