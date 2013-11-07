@@ -12,6 +12,7 @@ using umbraco.businesslogic.Exceptions;
 using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
 using umbraco.DataLayer;
+using Umbraco.Core.Models.Rdbms;
 
 namespace umbraco.presentation.tinymce3
 {
@@ -163,20 +164,16 @@ namespace umbraco.presentation.tinymce3
             }
             else
             {
-                IRecordsReader macroRenderings;
-                if (Request["editor"] != "")
-                    macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro where macroUseInEditor = 1 order by macroName");
-                else
-                    macroRenderings = SqlHelper.ExecuteReader("select macroAlias, macroName from cmsMacro order by macroName");
-
-                umb_macroAlias.DataSource = macroRenderings;
-                umb_macroAlias.DataValueField = "macroAlias";
-                umb_macroAlias.DataTextField = "macroName";
+                var sql = string.Format("select macroAlias, macroName from cmsMacro {0}order by macroName",
+                    Request["editor"] != string.Empty ? "where macroUseInEditor = 1 " : "");
+                var dtos = ApplicationContext.DatabaseContext.Database.Fetch<MacroDto>(sql);
+                
+                umb_macroAlias.DataSource = dtos;
+                umb_macroAlias.DataValueField = "Alias";
+                umb_macroAlias.DataTextField = "Name";
                 umb_macroAlias.DataBind();
-                macroRenderings.Close();
             }
         }
-
 
         protected void renderMacro_Click(object sender, EventArgs e)
         {
