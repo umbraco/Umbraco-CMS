@@ -184,16 +184,10 @@ namespace umbraco.cms.businesslogic
         /// </returns>
         public static Guid[] getAllUniquesFromObjectType(Guid objectType)
         {
-            IRecordsReader dr = SqlHelper.ExecuteReader("Select uniqueID from umbracoNode where nodeObjectType = @type",
-                SqlHelper.CreateParameter("@type", objectType));
-            System.Collections.ArrayList tmp = new System.Collections.ArrayList();
-
-            while (dr.Read()) tmp.Add(dr.GetGuid("uniqueID"));
-            dr.Close();
-
-            Guid[] retval = new Guid[tmp.Count];
-            for (int i = 0; i < tmp.Count; i++) retval[i] = (Guid)tmp[i];
-            return retval;
+            return Database.Fetch<Guid>(
+                "SELECT uniqueID FROM umbracoNode WHERE nodeObjectType = @ObjectTypeId",
+                new{ObjectTypeId = objectType})
+                .ToArray();
         }
 
         /// <summary>
@@ -205,14 +199,10 @@ namespace umbraco.cms.businesslogic
         /// </returns>
         public static int[] getAllUniqueNodeIdsFromObjectType(Guid objectType)
         {
-            IRecordsReader dr = SqlHelper.ExecuteReader("Select id from umbracoNode where nodeObjectType = @type",
-                SqlHelper.CreateParameter("@type", objectType));
-            System.Collections.ArrayList tmp = new System.Collections.ArrayList();
-
-            while (dr.Read()) tmp.Add(dr.GetInt("id"));
-            dr.Close();
-
-            return (int[])tmp.ToArray(typeof(int));
+            return Database.Fetch<int>(
+                "SELECT ID FROM umbracoNode WHERE nodeObjectType = @ObjectTypeId",
+                new { ObjectTypeId = objectType })
+                .ToArray();
         }
 
 
