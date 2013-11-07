@@ -8,10 +8,11 @@
         <umb-header>
 
             <div class="span4">
-                <umb-content-name 
-                    ng-model="content.name" 
-                    placeholder="Enter a title">
-                </umb-content-name>
+                <input type="text" 
+                                    class="umb-headline" 
+                                    localize="placeholder" 
+                                    placeholder="@placeholders_entername" 
+                                    ng-model="content.name" />
             </div>
 
             <div class="span8">
