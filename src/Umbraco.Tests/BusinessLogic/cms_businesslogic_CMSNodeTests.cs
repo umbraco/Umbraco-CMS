@@ -174,6 +174,15 @@ namespace Umbraco.Tests.BusinessLogic
             AssertNonEmptyNode((CMSNode)children[1]);
         }
 
+        [Test]
+        public void Children_OfRoot_ReturnsItselfOnlySinceNoSimilarObjectTypes()
+        {
+            CreateContext();
+            var root = new CMSNode(-1);
+            Assert.AreEqual(1, root.Children.Count());
+            Assert.AreEqual(-1, root.Children[0].Id);
+        }
+
         private void EnsureTestDocumentTypes()
         {
             CreateContext();

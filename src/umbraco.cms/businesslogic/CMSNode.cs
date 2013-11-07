@@ -872,8 +872,8 @@ order by level,sortOrder";
         {
             get
             {
-                return SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode where ParentID = @parentId",
-                                                    SqlHelper.CreateParameter("@parentId", this.Id));
+                return Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode where ParentID = @parentId",
+                                                    new{parentId = _id});
             }
         }
 
@@ -885,6 +885,8 @@ order by level,sortOrder";
         {
             get
             {
+                //var children = 
+
                 System.Collections.ArrayList tmp = new System.Collections.ArrayList();
                 using (IRecordsReader dr = SqlHelper.ExecuteReader("SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE ParentID = @ParentID AND nodeObjectType = @type order by sortOrder",
                     SqlHelper.CreateParameter("@type", this.nodeObjectType),
