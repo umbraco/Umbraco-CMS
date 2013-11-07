@@ -226,7 +226,6 @@
     <key alias="errorExistsWithoutTab">%0% уже существует</key>
     <key alias="errorHeader">Обнаружены следующие ошибки:</key>
     <key alias="errorHeaderWithoutTab">Обнаружены следующие ошибки:</key>
-    <key alias="errorInPasswordFormat">Пароль должен состоять как минимум из %0% символов, хотя бы %1% из которых не являются буквами</key>
     <key alias="errorIntegerWithoutTab">%0% должно быть целочисленным значением</key>
     <key alias="errorMandatory">%0% в %1% является обязательным полем</key>
     <key alias="errorMandatoryWithoutTab">%0% является обязательным полем</key>

@@ -209,7 +209,6 @@
     <key alias="errorExistsWithoutTab">%0% は既にあります</key>
     <key alias="errorHeader">次の様なエラーが発生しています:</key>
     <key alias="errorHeaderWithoutTab">次の様なエラーが発生しています:</key>
-    <key alias="errorInPasswordFormat">パスワードは最低でも %0% 文字の長さかつ %1% 文字以上の数以外の文字を含める必要があります</key>
     <key alias="errorIntegerWithoutTab">%0% は整数でなければなりません</key>
     <key alias="errorMandatory">%1% タブの %0% フィールドは必須です</key>
     <key alias="errorMandatoryWithoutTab">%0% は必須です</key>

@@ -130,15 +130,6 @@ namespace umbraco.cms.presentation.create.controls {
         protected global::System.Web.UI.WebControls.TextBox Email;
         
         /// <summary>
-        /// PasswordRules control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal PasswordRules;
-        
-        /// <summary>
         /// passwordRequired control.
         /// </summary>
         /// <remarks>

@@ -217,7 +217,6 @@
     <key alias="errorExistsWithoutTab">'%0%' ist bereits vorhanden</key>
     <key alias="errorHeader">Bitte prüfen und korrigieren:</key>
     <key alias="errorHeaderWithoutTab">Bitte prüfen und korrigieren:</key>
-    <key alias="errorInPasswordFormat">Für das Kennwort ist eine Mindestlänge von %0% Zeichen vorgesehen, wovon mindestens %1% Sonderzeichen (nicht alphanumerisch) sein müssen</key>
     <key alias="errorIntegerWithoutTab">'%0%' muss eine Zahl sein</key>
     <key alias="errorMandatory">'%0%' (in Registerkarte '%1%') ist ein Pflichtfeld</key>
     <key alias="errorMandatoryWithoutTab">'%0%' ist ein Pflichtfeld</key>

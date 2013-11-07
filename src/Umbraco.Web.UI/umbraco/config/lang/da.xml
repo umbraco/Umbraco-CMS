@@ -203,7 +203,6 @@
     <key alias="errorExistsWithoutTab">%0% der findes allerede</key>
     <key alias="errorHeader">Der var fejl i dokumentet:</key>
     <key alias="errorHeaderWithoutTab">Der var fejl i formularen:</key>
-    <key alias="errorInPasswordFormat">Kodeordet skal være på minimum %0% tegn og indeholde mindst %1% alfanumeriske karakterer</key>
     <key alias="errorIntegerWithoutTab">%0% skal være et heltal</key>
     <key alias="errorMandatory">%0% under %1% er et obligatorisk felt og skal udfyldes</key>
     <key alias="errorMandatoryWithoutTab">%0% er et obligatorisk felt og skal udfyldes</key>

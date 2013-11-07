@@ -206,7 +206,6 @@
     <key alias="errorExistsWithoutTab">%0% 은 이미 존재합니다.</key>
     <key alias="errorHeader">에러:</key>
     <key alias="errorHeaderWithoutTab">에러:</key>
-    <key alias="errorInPasswordFormat">암호는 최소 %0% 자 이상이며 적어도 %1% 개의 알파벳이 아닌 문자를 포함해야 합니다.</key>
     <key alias="errorIntegerWithoutTab">%0% must be an integer</key>
     <key alias="errorMandatory">The %0% field in the %1% tab is mandatory</key>
     <key alias="errorMandatoryWithoutTab">%0% 은 필수선택 항목입니다.</key>

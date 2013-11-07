@@ -207,7 +207,6 @@
     <key alias="errorExistsWithoutTab">%0% ya existe</key>
     <key alias="errorHeader">Se han encontrado los siguientes errores:</key>
     <key alias="errorHeaderWithoutTab">Se han encontrado los siguientes errores:</key>
-    <key alias="errorInPasswordFormat">La clave debe tener como mínimo %0% caracteres y %1% caracter(es) no alfanuméricos</key>
     <key alias="errorIntegerWithoutTab">%0% debe ser un número entero</key>
     <key alias="errorMandatory">Debe llenar los campos del %0% al %1%</key>
     <key alias="errorMandatoryWithoutTab">Debe llenar el campo %0%</key>
