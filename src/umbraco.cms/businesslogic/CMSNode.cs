@@ -906,20 +906,14 @@ order by level,sortOrder";
         {
             get
             {
-                System.Collections.ArrayList tmp = new System.Collections.ArrayList();
-                IRecordsReader dr = SqlHelper.ExecuteReader("select id from umbracoNode where ParentID = " + this.Id + " order by sortOrder");
-
-                while (dr.Read())
-                    tmp.Add(dr.GetInt("Id"));
-
-                dr.Close();
-
-                CMSNode[] retval = new CMSNode[tmp.Count];
-
-                for (int i = 0; i < tmp.Count; i++)
-                    retval[i] = new CMSNode((int)tmp[i]);
-
-                return retval;
+                var children = Database.Fetch<NodeDto>(
+                    "WHERE ParentId = @ParentId ORDER BY SortOrder",
+                    new { ParentId = _id }
+                );
+                return children
+                    .Select(c => new CMSNode(c))
+                    .Cast<BusinessLogic.console.IconI>()
+                    .ToArray();
             }
         }
 
