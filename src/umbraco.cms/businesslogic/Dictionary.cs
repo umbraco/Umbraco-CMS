@@ -7,6 +7,9 @@ using System.Xml;
 using System.Linq;
 using Umbraco.Core;
 using umbraco.cms.businesslogic.language;
+
+using Umbraco.Core.Models.Rdbms;
+
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Runtime.CompilerServices;
@@ -25,6 +28,7 @@ namespace umbraco.cms.businesslogic
         private static readonly ConcurrentDictionary<string, DictionaryItem> DictionaryItems = new ConcurrentDictionary<string, DictionaryItem>();
         private static readonly Guid TopLevelParent = new Guid("41c7638d-f529-4bff-853e-59a0c2fb1bde");
 
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -41,20 +45,15 @@ namespace umbraco.cms.businesslogic
                 
                 lck.UpgradeToWriteLock();
 
-                using (var dr = SqlHelper.ExecuteReader("Select pk, id, [key], parent from cmsDictionary"))
+                var dtos = ApplicationContext.Current.DatabaseContext.Database.Fetch<Umbraco.Core.Models.Rdbms.DictionaryDto>("");
+                foreach (var dto in dtos)
                 {
-                    while (dr.Read())
-                    {
-                        //create new dictionaryitem object and put in cache
-                        var item = new DictionaryItem(dr.GetInt("pk"),
-                                                      dr.GetString("key"),
-                                                      dr.GetGuid("id"),
-                                                      dr.GetGuid("parent"));
-
-                        DictionaryItems.TryAdd(item.key, item);
-                    }
+                    var item = new DictionaryItem(dto.PrimaryKey, 
+                                                  dto.Key, 
+                                                  dto.UniqueId, 
+                                                  dto.Parent);
+                    DictionaryItems.TryAdd(item.key, item);
                 }
-
                 _cacheIsEnsured = true;
             }            
         }
@@ -252,25 +251,22 @@ namespace umbraco.cms.businesslogic
                     {
                         lock (Locker)
                         {
-                            SqlHelper.ExecuteNonQuery("Update cmsDictionary set [key] = @key WHERE pk = @Id", SqlHelper.CreateParameter("@key", value),
-                                SqlHelper.CreateParameter("@Id", id));
-                            
-                            using (IRecordsReader dr =
-                                SqlHelper.ExecuteReader("Select pk, id, [key], parent from cmsDictionary where id=@id",
-                            SqlHelper.CreateParameter("@id", this.UniqueId)))
+                            ApplicationContext.Current.DatabaseContext.Database.Update<DictionaryDto>("SET [key] = @key WHERE pk = @Id", new { key = value,Id = id});
+
+                            var newDto = ApplicationContext.Current.DatabaseContext.Database.Fetch<DictionaryDto>("where id=@id", new {id = this.UniqueId}).FirstOrDefault();
+                            if (newDto != null)
+                            {  
+                                
+                                // Copied from previous version of code - not sure why this is here - can we remove it?
+                                //create new dictionaryitem object and put in cache
+                                var item = new DictionaryItem(newDto.PrimaryKey,
+                                                              newDto.Key,
+                                                              newDto.UniqueId,
+                                                              newDto.Parent);
+                            }
+                            else
                             {
-                                if (dr.Read())
-                                {
-                                    //create new dictionaryitem object and put in cache
-                                    var item = new DictionaryItem(dr.GetInt("pk"),
-                                        dr.GetString("key"),
-                                        dr.GetGuid("id"),
-                                        dr.GetGuid("parent"));
-                                }
-                                else
-                                {
-                                    throw new DataException("Could not load updated created dictionary item with id " + id);
-                                }
+                                throw new DataException("Could not load updated created dictionary item with id " + id);
                             }
 
                             //finally update this objects value
@@ -361,8 +357,8 @@ namespace umbraco.cms.businesslogic
                 Item.removeText(UniqueId);
 
                 // remove key from database
-                SqlHelper.ExecuteNonQuery("delete from cmsDictionary where [key] = @key", SqlHelper.CreateParameter("@key", key));
-
+                ApplicationContext.Current.DatabaseContext.Database.Delete<DictionaryDto>("where [key] = @key",new { key=key});
+                
                 OnDeleted(EventArgs.Empty);
             }
 
@@ -462,35 +458,19 @@ namespace umbraco.cms.businesslogic
                 if (!hasKey(key))
                 {
                     Guid newId = Guid.NewGuid();
-                    SqlHelper.ExecuteNonQuery("Insert into cmsDictionary (id,parent,[key]) values (@id, @parentId, @dictionaryKey)",
-                                              SqlHelper.CreateParameter("@id", newId),
-                                              SqlHelper.CreateParameter("@parentId", parentId),
-                                              SqlHelper.CreateParameter("@dictionaryKey", key));
 
-                    using (IRecordsReader dr =
-                        SqlHelper.ExecuteReader("Select pk, id, [key], parent from cmsDictionary where id=@id",
-                            SqlHelper.CreateParameter("@id", newId)))
-                    {
-                        if (dr.Read())
-                        {
-                            //create new dictionaryitem object and put in cache
-                            var item = new DictionaryItem(dr.GetInt("pk"),
-                                dr.GetString("key"),
-                                dr.GetGuid("id"),
-                                dr.GetGuid("parent"));
-                            
-                            item.setValue(defaultValue);
+                    var newID = ApplicationContext.Current.DatabaseContext.Database.Insert(new DictionaryDto {Key = key, Parent = parentId, UniqueId = newId});
 
-                            item.OnNew(EventArgs.Empty);
+                    var item = new DictionaryItem(Convert.ToInt32(newID),
+                               key,
+                               newId,
+                               parentId);
 
-                            return item.id;
-                        }
-                        else
-                        {
-                            throw new DataException("Could not load newly created dictionary item with id " + newId.ToString());
-                        }
-                    }
+                    item.setValue(defaultValue);
 
+                    item.OnNew(EventArgs.Empty);
+                    _cacheIsEnsured = false;
+                    return item.id;
                 }
                 else
                 {
