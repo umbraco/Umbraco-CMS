@@ -202,7 +202,10 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
         },
 
         /** Gets a child node by id */
-        getChildNode: function(treeNode, id) {
+        getChildNode: function (treeNode, id) {
+            if (!treeNode.children) {
+                throw "The current tree node has no assigned children, ensure it's children are loaded before calling this method";
+            }
             var found = _.find(treeNode.children, function (child) {
                 return String(child.id) === String(id);
             });
