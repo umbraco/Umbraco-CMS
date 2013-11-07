@@ -172,6 +172,8 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.AreEqual(testContentType4.Id, children[1].Id);
             AssertNonEmptyNode((CMSNode)children[0]);
             AssertNonEmptyNode((CMSNode)children[1]);
+            for (var i = 0; i < children.Count() - 1; i++)
+                Assert.LessOrEqual(((CMSNode)children[i]).sortOrder, ((CMSNode)children[i + 1]).sortOrder);
         }
 
         [Test]
@@ -179,8 +181,23 @@ namespace Umbraco.Tests.BusinessLogic
         {
             CreateContext();
             var root = new CMSNode(-1);
-            Assert.AreEqual(1, root.Children.Count());
-            Assert.AreEqual(-1, root.Children[0].Id);
+            var actual = root.Children;
+            Assert.AreEqual(1, actual.Count());
+            Assert.AreEqual(-1, actual[0].Id);
+        }
+
+        [Test]
+        public void ChildrenOfAllObjectTypes_OfRoot_ReturnsAllDirectChildren()
+        {
+            EnsureTestDocumentTypes();
+            var root = new CMSNode(-1);
+            var actual = root.ChildrenOfAllObjectTypes;
+            Assert.AreEqual(33, actual.Count());
+            Assert.AreEqual(-1, actual[0].Id);
+            for (var i = 0; i < actual.Count() - 1; i++)
+                Assert.LessOrEqual(((CMSNode)actual[i]).sortOrder, ((CMSNode)actual[i+1]).sortOrder);
+            foreach(var node in actual)
+                AssertNonEmptyNode((CMSNode)node);
         }
 
         private void EnsureTestDocumentTypes()
@@ -226,7 +243,6 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.AreNotEqual(0, node.Id);
             Assert.AreNotEqual(Guid.Empty, node.UniqueId);
             Assert.AreNotEqual(Guid.Empty, node.nodeObjectType);
-            Assert.Greater(node.Level, 0);
             Assert.IsNotNullOrEmpty(node.Path);
             Assert.AreNotEqual(0, node.ParentId);
             Assert.IsNotNullOrEmpty(node.Text);
