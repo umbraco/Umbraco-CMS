@@ -200,6 +200,31 @@ namespace Umbraco.Tests.BusinessLogic
                 AssertNonEmptyNode((CMSNode)node);
         }
 
+        [Test]
+        public void HasChildren_WhenParent_ReturnsTrue()
+        {
+            EnsureTestDocumentTypes();
+            var parent = new CMSNode(testContentType1);
+            Assert.IsTrue(parent.HasChildren);
+        }
+
+        [Test]
+        public void HasChildren_WhenLeaf_ReturnsFalse()
+        {
+            EnsureTestDocumentTypes();
+            var leaf = new CMSNode(testContentType3);
+            Assert.IsFalse(leaf.HasChildren);
+        }
+
+        [Test]
+        public void HasChildren_WhenSet_ReturnsValue()
+        {
+            EnsureTestDocumentTypes();
+            var leaf = new CMSNode(testContentType3);
+            leaf.HasChildren = true;
+            Assert.IsTrue(leaf.HasChildren);
+        }
+
         private void EnsureTestDocumentTypes()
         {
             CreateContext();
