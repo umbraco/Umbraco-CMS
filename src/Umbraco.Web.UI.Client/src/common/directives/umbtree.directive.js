@@ -105,7 +105,7 @@ angular.module("umbraco.directives")
 
                   //reset current node selection
                   scope.currentNode = undefined;
-                  navigationService.ui.currentTreeNode = undefined;
+                  navigationService.ui.currentNode = undefined;
 
                   //filter the path for root node ids
                   path = _.filter(path, function(item){ return (item !== "init" && item !== "-1"); });
@@ -226,8 +226,9 @@ angular.module("umbraco.directives")
                         if(!onParent){
                           path.splice(0,1);
                           syncTree(child, path, forceReload);
-                        }else{
-                              navigationService.ui.currentTreeNode = child;
+                        }
+                        else {
+                            navigationService.ui.currentNode = child;
                               scope.currentNode = child;
                         }
                     });
