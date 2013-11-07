@@ -200,7 +200,7 @@ namespace umbraco.cms.businesslogic
         public static int[] getAllUniqueNodeIdsFromObjectType(Guid objectType)
         {
             return Database.Fetch<int>(
-                "SELECT ID FROM umbracoNode WHERE nodeObjectType = @ObjectTypeId",
+                "SELECT id FROM umbracoNode WHERE nodeObjectType = @ObjectTypeId",
                 new { ObjectTypeId = objectType })
                 .ToArray();
         }
@@ -671,17 +671,9 @@ order by level,sortOrder";
         /// </remarks>
         public virtual IEnumerable GetDescendants()
         {
-            var descendants = new List<CMSNode>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(SqlDescendants, Id)))
-            {
-                while (dr.Read())
-                {
-                    var node = new CMSNode(dr.GetInt("id"), true);
-                    node.PopulateCMSNodeFromReader(dr);
-                    descendants.Add(node);
-                }
-            }
-            return descendants;
+            return Database
+                .Fetch<NodeDto>(String.Format("WHERE path LIKE '%,{0},%'", _id))
+                .Select(node => new CMSNode(node));
         }
 
         #endregion

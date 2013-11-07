@@ -291,6 +291,7 @@ namespace Umbraco.Tests.BusinessLogic
         [Test]
         public void GetDescendants_ReturnsAllDescendants()
         {
+            EnsureTestDocumentTypes();
             var parent = new CMSNode(testContentType1);
             var parentDescs = parent.GetDescendants().Cast<CMSNode>();
             Assert.AreEqual(3, parentDescs.Count());
