@@ -22,7 +22,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             get
             {
-                return sqlHelper ?? (sqlHelper = sqlHelper = umbraco.BusinessLogic.Application.SqlHelper);
+                return sqlHelper ?? (sqlHelper = Application.SqlHelper);
             }
         }
 

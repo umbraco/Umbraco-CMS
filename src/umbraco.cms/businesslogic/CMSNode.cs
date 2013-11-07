@@ -6,6 +6,7 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
 using umbraco.cms.businesslogic.web;
@@ -371,9 +372,8 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         /// <param name="Id">The id.</param>
         public CMSNode(int Id)
+            : this(Id, false)
         {
-            _id = Id;
-            setupNode();
         }
 
         /// <summary>
@@ -386,7 +386,7 @@ namespace umbraco.cms.businesslogic
             _id = id;
 
             if (!noSetup)
-                setupNode();
+                SetupNodeFromDto("WHERE id = @id", new{id});
         }
 
         /// <summary>
@@ -394,19 +394,24 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         /// <param name="uniqueID">The unique ID.</param>
         public CMSNode(Guid uniqueID)
+            : this(uniqueID, false)
         {
-            _id = SqlHelper.ExecuteScalar<int>("SELECT id FROM umbracoNode WHERE uniqueID = @uniqueId", SqlHelper.CreateParameter("@uniqueId", uniqueID));
-            setupNode();
         }
 
         public CMSNode(Guid uniqueID, bool noSetup)
         {
-            _id = SqlHelper.ExecuteScalar<int>("SELECT id FROM umbracoNode WHERE uniqueID = @uniqueId", SqlHelper.CreateParameter("@uniqueId", uniqueID));
-
             if (!noSetup)
-                setupNode();
+                SetupNodeFromDto("WHERE uniqueID = @uniqueID", new {uniqueID});
+            else
+                _id = Database.ExecuteScalar<int>("SELECT id FROM umbracoNode WHERE uniqueId = @uniqueID", new {uniqueID});
         }
 
+        internal CMSNode(NodeDto dto)
+        {
+            PopulateCMSNodeFromDto(dto);
+        }
+
+        [Obsolete("When user is refactored to use Database, call CmsNode(NodeDto)")]
         protected internal CMSNode(IRecordsReader reader)
         {
             _id = reader.GetInt("id");
@@ -1029,6 +1034,12 @@ order by level,sortOrder";
             }
         }
 
+        protected void SetupNodeFromDto(string whereStatement, params object[] args)
+        {
+            var node = Database.Single<NodeDto>(whereStatement, args);
+            PopulateCMSNodeFromDto(node);
+        }
+
         /// <summary>
         /// Sets up the node for the content tree, this makes no database calls, just sets the underlying properties
         /// </summary>
@@ -1101,6 +1112,24 @@ order by level,sortOrder";
                                       SqlHelper.CreateParameter("@versionId", versionId),
                                       SqlHelper.CreateParameter("@timestamp", DateTime.Now),
                                       SqlHelper.CreateParameter("@xml", x.OuterXml));
+        }
+
+        private void PopulateCMSNodeFromDto(NodeDto dto)
+        {
+            // testing purposes only > original umbraco data hasn't any unique values ;)
+            // And we need to have a newParent in order to create a new node ..
+            // Should automatically add an unique value if no exists (or throw a decent exception)
+            _id = dto.NodeId;
+            _uniqueID = dto.UniqueId ?? Guid.NewGuid();
+            _nodeObjectType = dto.NodeObjectType.Value;
+            _level = dto.Level;
+            _path = dto.Path;
+            _parentid = dto.ParentId;
+            _text = dto.Text;
+            _sortOrder = dto.SortOrder;
+            _userId = dto.UserId.Value;
+            _createDate = dto.CreateDate;
+            _isTrashed = dto.Trashed;
         }
 
         protected void PopulateCMSNodeFromReader(IRecordsReader dr)
