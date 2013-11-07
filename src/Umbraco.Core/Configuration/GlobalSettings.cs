@@ -706,8 +706,10 @@ namespace Umbraco.Core.Configuration
                         {
                             if (string.IsNullOrWhiteSpace(reservedUrl))
                                continue;
+                            
+
                             //resolves the url to support tilde chars
-                            string reservedUrlTrimmed = IOHelper.ResolveUrl(reservedUrl).Trim().ToLower();
+                            string reservedUrlTrimmed = IOHelper.ResolveUrl(reservedUrl.Trim()).Trim().ToLower();
                             if (reservedUrlTrimmed.Length > 0)
                                 _newReservedList.Add(reservedUrlTrimmed);
                         }
@@ -717,8 +719,9 @@ namespace Umbraco.Core.Configuration
                             bool trimEnd = !reservedPath.EndsWith("/");
                             if (string.IsNullOrWhiteSpace(reservedPath))
                                 continue;
+                           
                             //resolves the url to support tilde chars
-                            string reservedPathTrimmed = IOHelper.ResolveUrl(reservedPath).Trim().ToLower();
+                            string reservedPathTrimmed = IOHelper.ResolveUrl(reservedPath.Trim()).Trim().ToLower();
 
                             if (reservedPathTrimmed.Length > 0)
                                 _newReservedList.Add(reservedPathTrimmed + (reservedPathTrimmed.EndsWith("/") ? "" : "/"));
