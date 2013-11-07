@@ -4,6 +4,7 @@ using System.Web.Caching;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Rdbms;
 using umbraco.DataLayer;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,6 +33,7 @@ namespace umbraco.BusinessLogic
         private Hashtable _notifications = new Hashtable();
         private bool _notificationsInitialized = false;
 
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         private static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -79,28 +81,24 @@ namespace umbraco.BusinessLogic
         {
             _id = ID;
 
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                "Select userNoConsole, userDisabled, userType,startStructureID, startMediaId, userName,userLogin,userEmail,userDefaultPermissions, userLanguage, defaultToLiveEditing from umbracoUser where id = @id",
-                SqlHelper.CreateParameter("@id", ID)))
+            var dto = ApplicationContext.Current.DatabaseContext.Database.FirstOrDefault<UserDto>("WHERE id = @id", new { id = ID});
+            if (dto != null)
             {
-                if (dr.Read())
-                {
-                    _userNoConsole = dr.GetBoolean("usernoconsole");
-                    _userDisabled = dr.GetBoolean("userDisabled");
-                    _name = dr.GetString("userName");
-                    _loginname = dr.GetString("userLogin");
-                    _email = dr.GetString("userEmail");
-                    _language = dr.GetString("userLanguage");
-                    _startnodeid = dr.GetInt("startStructureID");
-                    if (!dr.IsNull("startMediaId"))
-                        _startmediaid = dr.GetInt("startMediaID");
-                    _usertype = UserType.GetUserType(dr.GetShort("UserType"));
-                    _defaultToLiveEditing = dr.GetBoolean("defaultToLiveEditing");
-                }
-                else
-                {
-                    throw new ArgumentException("No User exists with ID " + ID.ToString());
-                }
+                _userNoConsole = dto.NoConsole;
+                _userDisabled = dto.Disabled;
+                _name = dto.UserName;
+                _loginname = dto.Login;
+                _email = dto.Email;
+                _language = dto.UserLanguage;
+                _startnodeid = dto.ContentStartId;
+                if (dto.MediaStartId.HasValue)
+                    _startmediaid = dto.MediaStartId.Value;
+                _usertype = UserType.GetUserType(dto.Type);
+                _defaultToLiveEditing = dto.DefaultToLiveEditing;
+            }
+            else
+            {
+                throw new ArgumentException("No User exists with ID " + ID);
             }
             _isInitialized = true;
         }
@@ -121,14 +119,17 @@ namespace umbraco.BusinessLogic
         {
             get
             {
-                if (!_isInitialized)
+                if (_isInitialized == false)
                     setupUser(_id);
                 return _name;
             }
             set
             {
                 _name = value;
-                SqlHelper.ExecuteNonQuery("Update umbracoUser set UserName = @userName where id = @id", SqlHelper.CreateParameter("@userName", value), SqlHelper.CreateParameter("@id", Id));
+
+                ApplicationContext.Current.DatabaseContext.Database.Update<UserDto>(
+                    "SET UserName = @userName WHERE id = @id", new { userName = value, id = Id});
+
                 FlushFromCache();
             }
         }
@@ -141,14 +142,17 @@ namespace umbraco.BusinessLogic
         {
             get
             {
-                if (!_isInitialized)
+                if (_isInitialized == false)
                     setupUser(_id);
                 return _email;
             }
             set
             {
                 _email = value;
-                SqlHelper.ExecuteNonQuery("Update umbracoUser set UserEmail = @email where id = @id", SqlHelper.CreateParameter("@id", this.Id), SqlHelper.CreateParameter("@email", value));
+
+                ApplicationContext.Current.DatabaseContext.Database.Update<UserDto>(
+                    "SET UserEmail = @email WHERE id = @id", new { email = value, id = Id });
+
                 FlushFromCache();
             }
         }
@@ -161,14 +165,17 @@ namespace umbraco.BusinessLogic
         {
             get
             {
-                if (!_isInitialized)
+                if (_isInitialized == false)
                     setupUser(_id);
                 return _language;
             }
             set
             {
                 _language = value;
-                SqlHelper.ExecuteNonQuery("Update umbracoUser set userLanguage = @language where id = @id", SqlHelper.CreateParameter("@language", value), SqlHelper.CreateParameter("@id", Id));
+
+                ApplicationContext.Current.DatabaseContext.Database.Update<UserDto>(
+                    "SET userLanguage = @language WHERE id = @id", new { language = value, id = Id });
+
                 FlushFromCache();
             }
         }
@@ -185,7 +192,9 @@ namespace umbraco.BusinessLogic
             }
             set
             {
-                SqlHelper.ExecuteNonQuery("Update umbracoUser set UserPassword = @pw where id = @id", SqlHelper.CreateParameter("@pw", value), SqlHelper.CreateParameter("@id", Id));
+                ApplicationContext.Current.DatabaseContext.Database.Update<UserDto>(
+                    "SET UserPassword = @pw WHERE id = @id", new { pw = value, id = Id });
+
                 FlushFromCache();
             }
         }
@@ -196,9 +205,8 @@ namespace umbraco.BusinessLogic
         /// <returns></returns>
         public string GetPassword()
         {
-            return
-                SqlHelper.ExecuteScalar<string>("select UserPassword from umbracoUser where id = @id",
-                SqlHelper.CreateParameter("@id", this.Id));
+            return ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
+                "SELECT UserPassword FROM umbracoUser WHERE id = @id", new {id = Id});
         }
 
         /// <summary>
@@ -214,11 +222,10 @@ namespace umbraco.BusinessLogic
 
         public bool ValidatePassword(string password)
         {
-            string userLogin =
-                SqlHelper.ExecuteScalar<string>("select userLogin from umbracoUser where userLogin = @login and UserPassword = @pw",
-                SqlHelper.CreateParameter("@pw", password),
-                SqlHelper.CreateParameter("@login", LoginName)
-                );
+            var userLogin = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
+                "SELECT userLogin FROM umbracoUser WHERE userLogin = @login AND UserPasword = @password",
+                new {login = LoginName, password = password});
+
             return userLogin == this.LoginName;
         }
 
@@ -251,20 +258,19 @@ namespace umbraco.BusinessLogic
         /// <returns></returns>
         public List<Application> GetApplications()
         {
-            if (!_isInitialized)
+            if (_isInitialized == false)
                 setupUser(_id);
 
             var allApps = Application.getAll();
             var apps = new List<Application>();
 
-            using (IRecordsReader appIcons = SqlHelper.ExecuteReader("select app from umbracoUser2app where [user] = @userID", SqlHelper.CreateParameter("@userID", this.Id)))
+            var dtos = ApplicationContext.Current.DatabaseContext.Database.Fetch<User2AppDto>(
+                "SELECT * FROM umbracoUser2app WHERE [user] = @userID", new {userID = Id});
+            foreach (var dto in dtos)
             {
-                while (appIcons.Read())
-                {
-                    var app = allApps.SingleOrDefault(x => x.alias == appIcons.GetString("app"));
-                    if(app != null)
-                        apps.Add(app);
-                }
+                var app = allApps.SingleOrDefault(x => x.alias == dto.AppAlias);
+                if (app != null)
+                    apps.Add(app);
             }
 
             return apps;
@@ -278,21 +284,25 @@ namespace umbraco.BusinessLogic
         {
             get
             {
-                if (!_isInitialized)
+                if (_isInitialized == false)
                     setupUser(_id);
                 return _loginname;
             }
             set
             {
-                if (!ensureUniqueLoginName(value, this))
+                if (EnsureUniqueLoginName(value, this) == false)
                     throw new Exception(String.Format("A user with the login '{0}' already exists", value));
+
                 _loginname = value;
-                SqlHelper.ExecuteNonQuery("Update umbracoUser set UserLogin = @login where id = @id", SqlHelper.CreateParameter("@login", value), SqlHelper.CreateParameter("@id", Id));
+
+                ApplicationContext.Current.DatabaseContext.Database.Update<UserDto>(
+                    "SET UserLogin = @login WHERE id = @id", new { login = value, id = Id });
+
                 FlushFromCache();
             }
         }
 
-        private static bool ensureUniqueLoginName(string loginName, User currentUser)
+        private static bool EnsureUniqueLoginName(string loginName, User currentUser)
         {
             User[] u = User.getAllByLoginName(loginName);
             if (u.Length != 0)
@@ -329,7 +339,9 @@ namespace umbraco.BusinessLogic
                 consoleCheckSql = "and userNoConsole = 0 ";
 
             object tmp = SqlHelper.ExecuteScalar<object>(
-                "select id from umbracoUser where userDisabled = 0 " + consoleCheckSql + " and userLogin = @login and userPassword = @pw", SqlHelper.CreateParameter("@login", lname), SqlHelper.CreateParameter("@pw", passw)
+                "select id from umbracoUser where userDisabled = 0 " + consoleCheckSql + " and userLogin = @login and userPassword = @pw", 
+                SqlHelper.CreateParameter("@login", lname), 
+                SqlHelper.CreateParameter("@pw", passw)
                 );
 
             // Logging
@@ -349,17 +361,17 @@ namespace umbraco.BusinessLogic
         {
             get
             {
-                if (!_isInitialized)
+                if (_isInitialized == false)
                     setupUser(_id);
                 return _usertype;
             }
             set
             {
                 _usertype = value;
-                SqlHelper.ExecuteNonQuery(
-                    @"Update umbracoUser set userType = @type where id = @id",
-                    SqlHelper.CreateParameter("@type", value.Id),
-                    SqlHelper.CreateParameter("@id", Id));
+
+                ApplicationContext.Current.DatabaseContext.Database.Update<UserDto>(
+                    "SET userType = @type WHERE id = @id", new { type = value.Id, id = Id });
+
                 FlushFromCache();
             }
         }
@@ -371,11 +383,9 @@ namespace umbraco.BusinessLogic
         /// <returns></returns>
         public static User[] getAll()
         {
+            IRecordsReader dr = SqlHelper.ExecuteReader("Select id from umbracoUser");
 
-            IRecordsReader dr;
-            dr = SqlHelper.ExecuteReader("Select id from umbracoUser");
-
-            List<User> users = new List<User>();
+            var users = new List<User>();
 
             while (dr.Read())
             {
@@ -424,23 +434,18 @@ namespace umbraco.BusinessLogic
         /// <returns></returns>
         public static User[] getAllByEmail(string email, bool useExactMatch)
         {
-            List<User> retVal = new List<User>();
-            System.Collections.ArrayList tmpContainer = new System.Collections.ArrayList();
-			
-			IRecordsReader dr;
+            var retVal = new List<User>();
+            var tmpContainer = new ArrayList();
 
-			if (useExactMatch == true)
-			{
-				dr = SqlHelper.ExecuteReader("Select id from umbracoUser where userEmail = @email", SqlHelper.CreateParameter("@email", email));
-			}
-			else
-			{
-				dr = SqlHelper.ExecuteReader("Select id from umbracoUser where userEmail LIKE {0} @email", SqlHelper.CreateParameter("@email", String.Format("%{0}%", email)));
-			}
+            IRecordsReader dr = useExactMatch
+                ? SqlHelper.ExecuteReader("Select id from umbracoUser where userEmail = @email",
+                    SqlHelper.CreateParameter("@email", email))
+                : SqlHelper.ExecuteReader("Select id from umbracoUser where userEmail LIKE {0} @email",
+                    SqlHelper.CreateParameter("@email", String.Format("%{0}%", email)));
             
             while (dr.Read())
             {
-                retVal.Add(BusinessLogic.User.GetUser(dr.GetInt("id")));
+                retVal.Add(GetUser(dr.GetInt("id")));
             }
             dr.Close();
 
@@ -569,7 +574,7 @@ namespace umbraco.BusinessLogic
         /// <param name="ut">The ut.</param>
         public static void Update(int id, string name, string lname, string email, UserType ut)
         {
-            if (!ensureUniqueLoginName(lname, User.GetUser(id)))
+            if (!EnsureUniqueLoginName(lname, User.GetUser(id)))
                 throw new Exception(String.Format("A user with the login '{0}' already exists", lname));
 
 
