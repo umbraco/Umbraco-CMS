@@ -46,6 +46,21 @@ namespace umbraco.cms.businesslogic.datatype
         /// <summary>
         /// Initializes a new instance of the <see cref="PreValue"/> class.
         /// </summary>
+        /// <param name="Id">The unique identifier.</param>
+        /// <param name="SortOrder">The sort order.</param>
+        /// <param name="Value">The value.</param>
+        /// <param name="Alias">The alias.</param>
+        public PreValue(int Id, int SortOrder, string Value, string Alias)
+        {
+            _id = Id;
+            _sortOrder = SortOrder;
+            _value = Value;
+            _alias = Alias;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PreValue"/> class.
+        /// </summary>
         /// <param name="Id">The id.</param>
         public PreValue(int Id)
         {
@@ -92,7 +107,8 @@ namespace umbraco.cms.businesslogic.datatype
         private int _dataTypeId;
         private int? _id;
         private string _value;
-        private int _sortOrder; 
+        private int _sortOrder;
+        private string _alias;
         #endregion
 
         #region Public properties
@@ -134,7 +150,23 @@ namespace umbraco.cms.businesslogic.datatype
         {
             get { return _sortOrder; }
             set { _sortOrder = value; }
-        } 
+        }
+
+        /// <summary>
+        /// Gets or sets the alias.
+        /// </summary>
+        /// <value>The alias.</value>
+        public string Alias
+        {
+            get
+            {
+                if (_alias == null)
+                    _alias = string.Empty;
+
+                return _alias;
+            }
+            set { _alias = value; }
+        }
         #endregion
 
         #region Public methods
@@ -195,12 +227,13 @@ namespace umbraco.cms.businesslogic.datatype
         private void initialize()
         {
             IRecordsReader dr = SqlHelper.ExecuteReader(
-                 "Select id, sortorder, [value] from cmsDataTypePreValues where id = @id order by sortorder",
+                 "SELECT id, sortorder, [value], alias FROM cmsDataTypePreValues WHERE id = @id ORDER BY sortorder",
                  SqlHelper.CreateParameter("@id", Id));
             if (dr.Read())
             {
                 _sortOrder = dr.GetInt("sortorder");
                 _value = dr.GetString("value");
+                _alias = dr.GetString("alias");
             }
             dr.Close();
         } 

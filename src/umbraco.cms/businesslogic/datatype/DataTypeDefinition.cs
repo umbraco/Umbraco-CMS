@@ -135,11 +135,16 @@ namespace umbraco.cms.businesslogic.datatype
             XmlElement prevalues = xd.CreateElement("PreValues");
             foreach (DictionaryEntry item in PreValues.GetPreValues(this.Id))
             {
-                XmlElement prevalue = xd.CreateElement("PreValue");
-                prevalue.Attributes.Append(xmlHelper.addAttribute(xd, "Id", ((PreValue)item.Value).Id.ToString()));
-                prevalue.Attributes.Append(xmlHelper.addAttribute(xd, "Value", ((PreValue)item.Value).Value));
+                var prevalue = (PreValue)item.Value;
+                var element = xd.CreateElement("PreValue");
+                element.Attributes.Append(xmlHelper.addAttribute(xd, "Id", prevalue.Id.ToString()));
 
-                prevalues.AppendChild(prevalue);
+                if (!string.IsNullOrWhiteSpace(prevalue.Alias))
+                    element.Attributes.Append(xmlHelper.addAttribute(xd, "Alias", prevalue.Alias));
+
+                element.Attributes.Append(xmlHelper.addAttribute(xd, "Value", prevalue.Value));
+
+                prevalues.AppendChild(element);
             }
 
             dt.AppendChild(prevalues);
