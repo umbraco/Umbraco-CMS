@@ -4,6 +4,7 @@ using umbraco.DataLayer;
 using System.Collections;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core;
+using Umbraco.Core.Models.Rdbms;
 
 namespace umbraco.cms.businesslogic.member
 {
@@ -61,8 +62,8 @@ namespace umbraco.cms.businesslogic.member
             FireBeforeDelete(e);
             if (!e.Cancel) {
                 // delete member specific data!
-                SqlHelper.ExecuteNonQuery("Delete from cmsMember2MemberGroup where memberGroup = @id",
-                    SqlHelper.CreateParameter("@id", Id));
+                ApplicationContext.Current.DatabaseContext.Database.Delete<Member2MemberGroupDto>(
+                    "WHERE memberGroup = @id", new { id = Id, });
 
                 // Delete all content and cmsnode specific data!
                 base.delete();
@@ -112,46 +113,53 @@ namespace umbraco.cms.businesslogic.member
 		}
 
         public int[] GetMembersAsIds() {
-            ArrayList retval = new ArrayList();
-            IRecordsReader dr = SqlHelper.ExecuteReader("select member from cmsMember2MemberGroup where memberGroup = @memberGroup",
-                SqlHelper.CreateParameter("@memberGroup", Id));
-            while (dr.Read()) {
-                retval.Add(dr.GetInt("member"));
-            }
-            dr.Close();
-
-            return (int[])retval.ToArray(typeof(int));
+            return ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(
+                "select member from cmsMember2MemberGroup where memberGroup = @memberGroup",
+                new
+                {
+                    memberGroup = Id,
+                }).ToArray();
         }
 
         [Obsolete("Use System.Web.Security.Roles.FindUsersInRole")]
         public Member[] GetMembers() {
-            ArrayList retval = new ArrayList();
-            IRecordsReader dr = SqlHelper.ExecuteReader("select member from cmsMember2MemberGroup where memberGroup = @memberGroup",
-                SqlHelper.CreateParameter("@memberGroup", Id));
-            while (dr.Read()) {
-                retval.Add(new Member(dr.GetInt("member")));
+            var retval = new ArrayList();
+
+            var memberIds = GetMembersAsIds();
+            foreach (var memberId in memberIds)
+            {
+                retval.Add(new Member(memberId));
             }
-            dr.Close();
 
             return (Member[])retval.ToArray(typeof(Member));
         }
 
         public Member[] GetMembers(string usernameToMatch) {
-            ArrayList retval = new ArrayList();
-            IRecordsReader dr = SqlHelper.ExecuteReader("select member from cmsMember2MemberGroup inner join cmsMember on cmsMember.nodeId = cmsMember2MemberGroup.member where loginName like @username and memberGroup = @memberGroup",
-                SqlHelper.CreateParameter("@memberGroup", Id), SqlHelper.CreateParameter("@username", usernameToMatch + "%"));
-            while (dr.Read()) {
-                retval.Add(new Member(dr.GetInt("member")));
-            }
-            dr.Close();
+            var retval = new ArrayList();
+
+            var memberIds = ApplicationContext.Current.DatabaseContext.Database.Fetch<int>(
+                "select member from cmsMember2MemberGroup inner join cmsMember on cmsMember.nodeId = cmsMember2MemberGroup.member where loginName like @username and memberGroup = @memberGroup",
+                new
+                {
+                    memberGroup = Id,
+                    username = usernameToMatch + "%",
+                });
+            foreach (var memberId in memberIds)
+            {
+                retval.Add(new Member(memberId));
+            }            
 
             return (Member[])retval.ToArray(typeof(Member));
         }
 
         public bool HasMember(int memberId) {
-            return SqlHelper.ExecuteScalar<int>("select count(member) from cmsMember2MemberGroup where member = @member and memberGroup = @memberGroup",
-                SqlHelper.CreateParameter("@member", memberId),
-                SqlHelper.CreateParameter("@memberGroup", Id)) > 0; 
+            return ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(
+                "select count(member) from cmsMember2MemberGroup where member = @member and memberGroup = @memberGroup",
+                new
+                {
+                    member = memberId,
+                    memberGroup = Id,
+                }) > 0;
         }
 
 		/// <summary>
@@ -163,11 +171,13 @@ namespace umbraco.cms.businesslogic.member
 		{
 			try 
 			{
-				return
-					new MemberGroup(SqlHelper.ExecuteScalar<int>(
-								    "select id from umbracoNode where Text = @text and nodeObjectType = @objectType",
-								    SqlHelper.CreateParameter("@text", name),
-								    SqlHelper.CreateParameter("@objectType", _objectType)));
+				return new MemberGroup(ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(
+                    "select id from umbracoNode where Text = @text and nodeObjectType = @objectType",
+                    new 
+                    {
+                        text = name,
+                        objectType = _objectType,
+                    }));
 			} 
 			catch 
 			{
