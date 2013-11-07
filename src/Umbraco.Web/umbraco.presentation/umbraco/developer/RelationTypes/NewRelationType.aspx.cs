@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Web.UI.WebControls;
+using Umbraco.Core;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.relation;
+using Umbraco.Core.Models.Rdbms;
+using umbraco.businesslogic.Exceptions;
 
 namespace umbraco.cms.presentation.developer.RelationTypes
 {
@@ -54,19 +57,23 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 			{
                 var newRelationTypeAlias = this.aliasTextBox.Text.Trim();
 
-                uQuery.SqlHelper.ExecuteNonQuery(
-                    string.Format("INSERT INTO umbracoRelationType ([dual], parentObjectType, childObjectType, name, alias) VALUES ({0}, '{1}', '{2}', '{3}', '{4}')",
-                        this.dualRadioButtonList.SelectedValue,
-                        uQuery.GetUmbracoObjectType(this.parentDropDownList.SelectedValue).GetGuid().ToString(),
-                        uQuery.GetUmbracoObjectType(this.childDropDownList.SelectedValue).GetGuid().ToString(),
-                        this.descriptionTextBox.Text,
-                        newRelationTypeAlias));
+                var newRelationType = new RelationTypeDto()
+                {
+                    Dual = this.dualRadioButtonList.SelectedValue == "1",
+                    ParentObjectType = uQuery.GetUmbracoObjectType(this.parentDropDownList.SelectedValue).GetGuid(),
+                    ChildObjectType = uQuery.GetUmbracoObjectType(this.childDropDownList.SelectedValue).GetGuid(),
+                    Name = this.descriptionTextBox.Text,
+                    Alias = newRelationTypeAlias
+                };
+                ApplicationContext.Current.DatabaseContext.Database.Insert(newRelationType);
 
-                var newRelationTypeId = uQuery.SqlHelper.ExecuteScalar<int>("SELECT id FROM umbracoRelationType WHERE alias = '" + newRelationTypeAlias + "'");
+                newRelationType = ApplicationContext.Current.DatabaseContext.Database.FirstOrDefault<RelationTypeDto>("SELECT id FROM umbracoRelationType WHERE alias = '" + newRelationTypeAlias + "'");
+                if (newRelationType == null)
+                    throw new ApplicationException(String.Format("Can't insert new Relation Type: Name = '{0}', Alias = '{1}'", this.descriptionTextBox.Text, newRelationTypeAlias));
 
 				// base.speechBubble(BasePage.speechBubbleIcon.success, "New Relation Type", "relation type created");
 
-				ClientTools.ChangeContentFrameUrl("/umbraco/developer/RelationTypes/EditRelationType.aspx?id=" + newRelationTypeId.ToString()).CloseModalWindow().ChildNodeCreated();
+				ClientTools.ChangeContentFrameUrl("/umbraco/developer/RelationTypes/EditRelationType.aspx?id=" + newRelationType.Id.ToString()).CloseModalWindow().ChildNodeCreated();
 			}
 		}
 
