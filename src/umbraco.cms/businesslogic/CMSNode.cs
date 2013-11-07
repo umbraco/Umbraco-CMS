@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Xml;
@@ -885,26 +886,14 @@ order by level,sortOrder";
         {
             get
             {
-                //var children = 
-
-                System.Collections.ArrayList tmp = new System.Collections.ArrayList();
-                using (IRecordsReader dr = SqlHelper.ExecuteReader("SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode WHERE ParentID = @ParentID AND nodeObjectType = @type order by sortOrder",
-                    SqlHelper.CreateParameter("@type", this.nodeObjectType),
-                    SqlHelper.CreateParameter("ParentID", this.Id)))
-                {
-                    while (dr.Read())
-                    {
-                        tmp.Add(new CMSNode(dr));
-                    }
-                }
-
-                CMSNode[] retval = new CMSNode[tmp.Count];
-
-                for (int i = 0; i < tmp.Count; i++)
-                {
-                    retval[i] = (CMSNode)tmp[i];
-                }
-                return retval;
+                var children = Database.Fetch<NodeDto>(
+                    "WHERE ParentId = @ParentId AND nodeObjectType = @ObjectType ORDER BY SortOrder", 
+                    new {ParentId = _id, ObjectType = _nodeObjectType}
+                );
+                return children
+                    .Select(c => new CMSNode(c))
+                    .Cast<BusinessLogic.console.IconI>()
+                    .ToArray();
             }
         }
 
