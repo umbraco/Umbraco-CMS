@@ -210,8 +210,17 @@ body
     color: #fff;
     font-size: 1px;
     width: 49px;
-    height: 36px;
+    height: 26px;
     display: block;
+}
+
+#tray li a.name {
+	background: none;
+	color: #2F2F2F;
+	font-size: 9px;
+	text-align: center;
+	font-family: "Trebuchet MS",verdana,arial;
+	height: auto;
 }
 
 .trayHolder, .trayIcon
