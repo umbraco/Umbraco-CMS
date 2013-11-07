@@ -82,7 +82,7 @@
 	</cc1:Pane>
 	<asp:Panel ID="panel_buttons" runat="server">
 		<p>
-			<asp:Button ID="ok" runat="server" CssClass="guiInputButton" OnClick="HandleMoveOrCopy"></asp:Button>
+			<asp:Button ID="ok" runat="server" CssClass="guiInputButton" OnClick="HandleMoveOrCopy" UseSubmitBehavior="false" OnClientClick="this.disabled = 'disabled';"></asp:Button>
 			&nbsp; <em>
 				<%=umbraco.ui.Text("general", "or", this.getUser())%></em> &nbsp; <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()">
 					<%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
