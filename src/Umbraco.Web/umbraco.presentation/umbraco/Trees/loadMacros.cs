@@ -1,30 +1,10 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.IO;
 using System.Text;
-using System.Web;
-using System.Xml;
-using System.Configuration;
-using umbraco.BasePages;
-using umbraco.BusinessLogic;
 using umbraco.businesslogic;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.cache;
-using umbraco.cms.businesslogic.contentitem;
-using umbraco.cms.businesslogic.datatype;
-using umbraco.cms.businesslogic.language;
-using umbraco.cms.businesslogic.media;
-using umbraco.cms.businesslogic.member;
-using umbraco.cms.businesslogic.property;
-using umbraco.cms.businesslogic.web;
-using umbraco.interfaces;
-using umbraco.DataLayer;
-using umbraco.BusinessLogic.Actions;
-using umbraco.BusinessLogic.Utils;
 using umbraco.cms.presentation.Trees;
+using umbraco.DataLayer;
 using Umbraco.Core;
+using Umbraco.Core.Models.Rdbms;
 
 
 namespace umbraco
@@ -70,26 +50,23 @@ function openMacro(id) {
         /// <param name="tree"></param>
         public override void Render(ref XmlTree tree)
         {
-            using (IRecordsReader macros = SqlHelper.ExecuteReader("select id, macroName from cmsMacro order by macroName"))
+            var dtos = ApplicationContext.Current.DatabaseContext.Database.Fetch<MacroDto>(
+                "select id, macroName from cmsMacro order by macroName");
+            foreach (var dto in dtos)
             {
-                
-                while (macros.Read())
+                XmlTreeNode xNode = XmlTreeNode.Create(this);
+                xNode.NodeID = dto.Id.ToString();
+                xNode.Text = dto.Name;
+                xNode.Action = "javascript:openMacro(" + dto.Id + ");";
+                xNode.Icon = "developerMacro.gif";
+                xNode.OpenIcon = "developerMacro.gif";
+                OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                if (xNode != null)
                 {
-                    XmlTreeNode xNode = XmlTreeNode.Create(this);
-                    xNode.NodeID = macros.GetInt("id").ToString();
-                    xNode.Text = macros.GetString("macroName");
-                    xNode.Action = "javascript:openMacro(" + macros.GetInt("id") + ");";
-                    xNode.Icon = "developerMacro.gif";
-                    xNode.OpenIcon = "developerMacro.gif";
-                    OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
-                    if (xNode != null)
-                    {
-                        tree.Add(xNode);
-                    }
-                    OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);
+                    tree.Add(xNode);
                 }
-            }
+                OnAfterNodeRender(ref tree, ref xNode, EventArgs.Empty);                
+            }            
         }
-
 	}
 }
