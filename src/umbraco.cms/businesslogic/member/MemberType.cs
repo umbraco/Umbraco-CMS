@@ -5,6 +5,7 @@ using umbraco.cms.businesslogic.propertytype;
 using System.Linq;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
+using Umbraco.Core.Models.Rdbms;
 
 namespace umbraco.cms.businesslogic.member
 {
@@ -69,12 +70,7 @@ namespace umbraco.cms.businesslogic.member
 		/// <returns>True if the Member can edit the data</returns>
         public bool MemberCanEdit(PropertyType pt)
         {
-            if (propertyTypeRegistered(pt))
-            {
-                var memberCanEdit = SqlHelper.ExecuteScalar<object>("Select memberCanEdit from cmsMemberType where NodeId = " + this.Id + " And propertytypeId = " + pt.Id);
-                return (Convert.ToBoolean(memberCanEdit));
-            }
-            return false;
+            return GetOptionForPropertyType(pt, "memberCanEdit");
         }
         
 		/// <summary>
@@ -84,12 +80,30 @@ namespace umbraco.cms.businesslogic.member
 		/// <returns>True if the data should be displayed on the profilepage</returns>
 		public bool ViewOnProfile(PropertyType pt) 
 		{
-			if(propertyTypeRegistered(pt)) 
-			{
-                return Convert.ToBoolean(SqlHelper.ExecuteScalar<object>("Select viewOnProfile from cmsMemberType where NodeId = " + this.Id + " And propertytypeId = " + pt.Id));
-			}
-			return false;
+            return GetOptionForPropertyType(pt, "viewOnProfile");
 		}
+
+        /// <summary>
+        /// Helper to get the boolean property flags on the member type
+        /// </summary>
+        /// <param name="pt">PropertyType</param>
+        /// <param name="field">Field to set or update</param>
+        /// <returns>Value for option</returns>
+        private bool GetOptionForPropertyType(PropertyType pt, string field)
+        {
+            if (propertyTypeRegistered(pt))
+            {
+                return ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<bool>(
+                    string.Format("Select {0} from cmsMemberType where NodeId = @nodeId And propertytypeId = @propertyTypeId", field),
+                    new
+                    {
+                        nodeId = this.Id,
+                        propertyTypeId = pt.Id,
+                    });
+            }
+
+            return false;
+        }
 		
 		/// <summary>
 		/// Set if the member should be able to edit the data defined by its propertytype
@@ -98,13 +112,7 @@ namespace umbraco.cms.businesslogic.member
 		/// <param name="value">True/False if Members of the type shoúld be able to edit the data</param>
         public void setMemberCanEdit(PropertyType pt, bool value)
         {
-            int tmpval = 0;
-            if (value) tmpval = 1;
-            if (propertyTypeRegistered(pt))
-                SqlHelper.ExecuteNonQuery("Update cmsMemberType set memberCanEdit = " + tmpval + " where NodeId = " + this.Id + " And propertytypeId = " + pt.Id);
-            else
-                SqlHelper.ExecuteNonQuery("insert into cmsMemberType (NodeId, propertytypeid, memberCanEdit,viewOnProfile) values (" + this.Id + "," + pt.Id + ", " + tmpval + ",0)");
-
+            SetOptionForPropertyType(pt, "memberCanEdit", value);
         }
         
 		/// <summary>
@@ -114,13 +122,40 @@ namespace umbraco.cms.businesslogic.member
 		/// <param name="value">True/False if the data should be displayed</param>
         public void setMemberViewOnProfile(PropertyType pt, bool value) 
 		{
-			int tmpval = 0;
-			if (value) tmpval = 1;
-			if (propertyTypeRegistered(pt))
-				SqlHelper.ExecuteNonQuery("Update cmsMemberType set viewOnProfile = " + tmpval + " where NodeId = " + this.Id +" And propertytypeId = "+pt.Id);
-			else
-				SqlHelper.ExecuteNonQuery("insert into cmsMemberType (NodeId, propertytypeid, viewOnProfile) values ("+this.Id+","+pt.Id+", "+tmpval+")");
+            SetOptionForPropertyType(pt, "viewOnProfile", value);
 		}
+
+        /// <summary>
+        /// Helper to set the boolean property flags on the member type
+        /// </summary>
+        /// <param name="pt">PropertyType</param>
+        /// <param name="field">Field to set or update</param>
+        /// <param name="value">True/False if the data should be displayed</param>
+        private void SetOptionForPropertyType(PropertyType pt, string field, bool value)
+        {
+            if (propertyTypeRegistered(pt))
+            {
+                ApplicationContext.Current.DatabaseContext.Database.Execute(
+                    string.Format("Update cmsMemberType set {0} = @val where NodeId = @nodeId And propertytypeId = @propertyTypeId", field),
+                    new
+                    {
+                        val = value ? 1 : 0,
+                        nodeId = this.Id,
+                        propertyTypeId = pt.Id,
+                    });
+            }
+            else
+            {
+                var dto = new MemberTypeDto
+                {
+                    CanEdit = field == "memberCanEdit" ? value : false,
+                    NodeId = this.Id,
+                    PropertyTypeId = pt.Id,
+                    ViewOnProfile = field == "viewOnProfile" ? value : false,
+                };
+                ApplicationContext.Current.DatabaseContext.Database.Insert(dto);
+            }
+        }
 
 		/// <summary>
 		/// Delete the current MemberType.
@@ -141,7 +176,8 @@ namespace umbraco.cms.businesslogic.member
                 Member.DeleteFromType(this);
 
                 // delete membertype specific data
-                SqlHelper.ExecuteNonQuery("Delete from cmsMemberType where nodeId = " + this.Id);
+                ApplicationContext.Current.DatabaseContext.Database.Delete<MemberTypeDto>(
+                    "WHERE nodeId = @Id", new { Id = this.Id, });
 
                 // Delete contentType
                 base.delete();
@@ -219,11 +255,16 @@ namespace umbraco.cms.businesslogic.member
         {
             try
             {
-                return
-                    new MemberType(
-                            SqlHelper.ExecuteScalar<int>(@"SELECT nodeid from cmsContentType INNER JOIN umbracoNode on cmsContentType.nodeId = umbracoNode.id WHERE nodeObjectType=@nodeObjectType AND alias=@alias",
-                                SqlHelper.CreateParameter("@nodeObjectType", MemberType._objectType),
-                                SqlHelper.CreateParameter("@alias", Alias)));
+                var nodeId = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(
+                    @"SELECT nodeid from cmsContentType
+                      INNER JOIN umbracoNode on cmsContentType.nodeId = umbracoNode.id
+                      WHERE nodeObjectType = @nodeObjectType AND alias = @alias",
+                    new 
+                    {
+                        nodeObjectType = MemberType._objectType,
+                        alias = Alias
+                    });
+                return new MemberType(nodeId);
             }
             catch
             {
@@ -272,7 +313,13 @@ namespace umbraco.cms.businesslogic.member
 
         private bool propertyTypeRegistered(PropertyType pt)
         {
-            return (SqlHelper.ExecuteScalar<int>("Select count(pk) as tmp from cmsMemberType where NodeId = " + this.Id + " And propertytypeId = " + pt.Id) > 0);
+            return ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(
+                "Select count(pk) as tmp from cmsMemberType where NodeId = @nodeId And propertytypeId = @propertyTypeId",
+                new
+                {
+                    nodeId = this.Id,
+                    propertyTypeId = pt.Id,
+                }) > 0;
         }
 
         #endregion
