@@ -84,8 +84,56 @@ angular.module('umbraco.mocks').
                         ]
                     },
                     {
-                        label: "Grid",
+                        label: "This",
                         id: 4,
+                        properties: [
+                            { alias: "valTest4", label: "Validation test", view: "validationtest", value: "asdfasdf" },
+                            { alias: "bodyText4", label: "Body Text", description: "Here you enter the primary article contents", view: "rte", value: "<p>askjdkasj lasjd</p>", config: {} },
+                            { alias: "textarea4", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
+                            { alias: "map4", label: "Map", view: "googlemaps", value: "37.4419,-122.1419", config: { mapType: "ROADMAP", zoom: 4 } },
+                            
+                            { alias: "content4", label: "Content picker", view: "contentpicker", value: "1234,23242,23232,23231" }
+                        ]
+                    },
+                    {
+                        label: "Is",
+                        id: 5,
+                        properties: [
+                            { alias: "valTest5", label: "Validation test", view: "validationtest", value: "asdfasdf" },
+                            { alias: "bodyText5", label: "Body Text", description: "Here you enter the primary article contents", view: "rte", value: "<p>askjdkasj lasjd</p>", config: {} },
+                            { alias: "textarea5", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
+                            { alias: "map5", label: "Map", view: "googlemaps", value: "37.4419,-122.1419", config: { mapType: "ROADMAP", zoom: 4 } },
+                            
+                            { alias: "content5", label: "Content picker", view: "contentpicker", value: "1234,23242,23232,23231" }
+                        ]
+                    },
+                    {
+                        label: "Overflown",
+                        id: 6,
+                        properties: [
+                            { alias: "valTest6", label: "Validation test", view: "validationtest", value: "asdfasdf" },
+                            { alias: "bodyText6", label: "Body Text", description: "Here you enter the primary article contents", view: "rte", value: "<p>askjdkasj lasjd</p>", config: {} },
+                            { alias: "textarea6", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
+                            { alias: "map6", label: "Map", view: "googlemaps", value: "37.4419,-122.1419", config: { mapType: "ROADMAP", zoom: 4 } },
+                            
+                            { alias: "content6", label: "Content picker", view: "contentpicker", value: "1234,23242,23232,23231" }
+                        ]
+                    },
+                    {
+                        label: "Tab # 7",
+                        id: 7,
+                        properties: [
+                            { alias: "valTest7", label: "Validation test", view: "validationtest", value: "asdfasdf" },
+                            { alias: "bodyText7", label: "Body Text", description: "Here you enter the primary article contents", view: "rte", value: "<p>askjdkasj lasjd</p>", config: {} },
+                            { alias: "textarea7", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
+                            { alias: "map7", label: "Map", view: "googlemaps", value: "37.4419,-122.1419", config: { mapType: "ROADMAP", zoom: 4 } },
+                            
+                            { alias: "content7", label: "Content picker", view: "contentpicker", value: "1234,23242,23232,23231" }
+                        ]
+                    },
+                    {
+                        label: "Grid",
+                        id: 8,
                         properties: [
                         { alias: "grid", label: "Grid", view: "grid", value: "test", hideLabel: true }
                         ]

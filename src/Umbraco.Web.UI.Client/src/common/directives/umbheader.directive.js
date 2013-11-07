@@ -12,8 +12,11 @@ angular.module("umbraco.directives")
         },
         link: function (scope, iElement, iAttrs) {
 
+            var maxTabs = 5;
+
             function collectFromDom(activeTab){
                 var $panes = $('div.tab-content');
+                
                 $panes.find('.tab-pane').each(function (index) {
                     var $this = angular.element(this);
                     var id = $this.attr("rel");
@@ -31,43 +34,43 @@ angular.module("umbraco.directives")
                         $this.removeClass('active');
                     }
 
-                    //this is sorta hacky since we add a tab object to the tabs collection
-                    //based on a dom element, there is most likely a better way...    
-                    if (label) {
-                        scope.collectedTabs.push(tab);
+
+                    //scope.visibleTabs.push(tab);
+
+                    
+                    if(label && (scope.visibleTabs.length < maxTabs || tab.id === 0)){
+                        scope.visibleTabs.push(tab);
+                    }else{
+                        scope.overflownTabs.push(tab);
                     }
+
                 });
+
             }
 
             scope.showTabs = iAttrs.tabs ? true : false;
-            scope.collectedTabs = [];
+            scope.visibleTabs = [];
+            scope.overflownTabs = [];
 
             $timeout(function () {
-                                collectFromDom(undefined);
-                            }, 500);
+                collectFromDom(undefined);
+            }, 500);
 
             //when the tabs change, we need to hack the planet a bit and force the first tab content to be active,
             //unfortunately twitter bootstrap tabs is not playing perfectly with angular.
             scope.$watch("tabs", function (newValue, oldValue) {
 
                 $(newValue).each(function(i, val){
-                        scope.collectedTabs.push({id: val.id, label: val.label});
+                        scope.visibleTabs.push({id: val.id, label: val.label});
                 });
-                //scope.collectedTabs = newValue;
-
+                
                 //don't process if we cannot or have already done so
                 if (!newValue) {return;}
-                //if (hasProcessed || !newValue.length || newValue.length == 0) return;
                 if (!newValue.length || newValue.length === 0){return;}
-                
-                //set the flag
-                //hasProcessed = true;
-
                 
                 var activeTab = _.find(newValue, function (item) {
                     return item.active;
                 });
-
 
                 //we need to do a timeout here so that the current sync operation can complete
                 // and update the UI, then this will fire and the UI elements will be available.

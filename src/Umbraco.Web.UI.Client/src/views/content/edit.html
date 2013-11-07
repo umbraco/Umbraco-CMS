@@ -6,15 +6,18 @@
     <umb-panel>
         <umb-header tabs="content.tabs">
 
-            <div class="span4">
-                <input type="text" 
+            <div class="span8">
+                <input type="text"
+                    select-on-focus 
                     class="umb-headline" 
                     localize="placeholder" 
-                    placeholder="@placeholders_entername" 
+                    placeholder="@placeholders_nameentity:content.contentTypeName'" 
                     ng-model="content.name" />
+            
+                    {{content.contentTypeName}}
             </div>
 
-            <div class="span8">
+            <div class="span4">
                 
                 <div class="btn-toolbar pull-right umb-btn-toolbar">
                     <div class="btn-group" ng-animate="'fade'" ng-show="formStatus">

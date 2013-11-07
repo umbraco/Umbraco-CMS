@@ -47,7 +47,7 @@ describe('edit content controller tests', function () {
         });
 
         it('it should have a tabs collection', function () {
-          expect(scope.content.tabs.length).toBe(5);
+          expect(scope.content.tabs.length).toBe(9);
         });
 
         it('it should have a properties collection on each tab', function () {
