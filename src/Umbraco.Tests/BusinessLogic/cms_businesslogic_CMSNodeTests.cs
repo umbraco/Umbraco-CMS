@@ -29,6 +29,7 @@ namespace Umbraco.Tests.BusinessLogic
         private ContentType testContentType2;
         private ContentType testContentType3;
         private ContentType testContentType4;
+        private ContentType testContentType5;
         private ContentType[] contentTypes;
         private UmbracoContext context;
         private UmbracoDatabase database;
@@ -85,7 +86,7 @@ namespace Umbraco.Tests.BusinessLogic
         [TestCase(MemberObjectTypeId, 1, "Member")]
         [TestCase(RecycleBin1ObjectTypeId, 1, "Recycle bin 1")]
         [TestCase(MediaTypeObjectTypeId, 3, "MediaType")]
-        [TestCase(DocumentTypeObjectTypeId, 4, "DocumentType")]
+        [TestCase(DocumentTypeObjectTypeId, 5, "DocumentType")]
         [TestCase(RecycleBin2ObjectTypeId, 1, "Recycle Bin 2")]
         [TestCase(DataTypeObjectTypeId, 24, "DataType")]
         public void CountByObjectType_ReturnsCount(string objectTypeId, int expected, string description)
@@ -116,13 +117,13 @@ namespace Umbraco.Tests.BusinessLogic
         [Test]
         public void CountSubs_ReturnsCountOfAncestorsOrSomething()
         {
-            const int expectedRootCount = 35;
-            const int expectedParentOfTwoCount = 3;
+            const int expectedRootCount = 36;
+            const int expectedAncestorOfThreeCount = 4;
             const int expectedLeafCount = 1;
 
             EnsureTestDocumentTypes();
             Assert.AreEqual(expectedRootCount, CMSNode.CountSubs(-1));
-            Assert.AreEqual(expectedParentOfTwoCount, CMSNode.CountSubs(testContentType1.Id));
+            Assert.AreEqual(expectedAncestorOfThreeCount, CMSNode.CountSubs(testContentType1.Id));
             Assert.AreEqual(expectedLeafCount, CMSNode.CountSubs(testContentType2.Id));
         }
 
@@ -279,6 +280,24 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.IsTrue(expectedIds.SequenceEqual(actualIds));
         }
 
+        [Test]
+        public void GetDescendants_Root_ReturnsNone()
+        {
+            var root = new CMSNode(-1);
+            var rootDescs = root.GetDescendants().Cast<CMSNode>();
+            Assert.AreEqual(0, rootDescs.Count());
+        }
+        
+        [Test]
+        public void GetDescendants_ReturnsAllDescendants()
+        {
+            var parent = new CMSNode(testContentType1);
+            var parentDescs = parent.GetDescendants().Cast<CMSNode>();
+            Assert.AreEqual(3, parentDescs.Count());
+            foreach (var desc in parentDescs)
+                AssertNonEmptyNode(desc);
+        }
+
         private void EnsureTestDocumentTypes()
         {
             CreateContext();
@@ -292,7 +311,9 @@ namespace Umbraco.Tests.BusinessLogic
             testContentType4 = new ContentType(testContentType1.Id) { Alias = "Test1.2", Name = "Test 1.2" };
             contentTypeService.Save(testContentType3);
             contentTypeService.Save(testContentType4);
-            contentTypes = new[] { testContentType4, testContentType3, testContentType2, testContentType1 };
+            testContentType5 = new ContentType(testContentType4.Id) { Alias = "Test1.2.1", Name = "Test 1.2.1" };
+            contentTypeService.Save(testContentType5);
+            contentTypes = new[] { testContentType5, testContentType4, testContentType3, testContentType2, testContentType1 };
             initialized = true;
         }
 
