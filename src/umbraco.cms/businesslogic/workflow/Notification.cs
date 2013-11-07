@@ -38,6 +38,7 @@ namespace umbraco.cms.businesslogic.workflow
         /// Gets the SQL helper.
         /// </summary>
         /// <value>The SQL helper.</value>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -236,21 +237,17 @@ namespace umbraco.cms.businesslogic.workflow
         public static IEnumerable<Notification> GetNodeNotifications(CMSNode node)
         {
             var items = new List<Notification>();
-            using (
-                IRecordsReader dr =
-                    SqlHelper.ExecuteReader(
-                        "select * from umbracoUser2NodeNotify where nodeId = @nodeId order by nodeId",
-                        SqlHelper.CreateParameter("@nodeId", node.Id)))
+            var dtos = ApplicationContext.Current.DatabaseContext.Database.Fetch<User2NodeNotifyDto>(
+                "WHERE userId = @UserId ORDER BY nodeId", new { nodeId = node.Id });
+
+            foreach (var dto in dtos)
             {
-                while (dr.Read())
+                items.Add(new Notification
                 {
-                    items.Add(new Notification
-                                  {
-                                      NodeId = dr.GetInt("nodeId"),
-                                      ActionId = Convert.ToChar(dr.GetString("action")),
-                                      UserId = dr.GetInt("userId")
-                                  });
-                }
+                    NodeId = dto.NodeId,
+                    ActionId = Convert.ToChar(dto.Action),
+                    UserId = dto.UserId
+                });
             }
             return items;
         }
@@ -258,12 +255,12 @@ namespace umbraco.cms.businesslogic.workflow
         /// <summary>
         /// Deletes notifications by node
         /// </summary>
-        /// <param name="nodeId"></param>
+        /// <param name="node"></param>
         public static void DeleteNotifications(CMSNode node)
         {
             // delete all settings on the node for this node id
-            SqlHelper.ExecuteNonQuery("delete from umbracoUser2NodeNotify where nodeId = @nodeId",
-                                      SqlHelper.CreateParameter("@nodeId", node.Id));
+            ApplicationContext.Current.DatabaseContext.Database.Delete<User2NodeNotifyDto>("WHERE nodeId = @nodeId",
+                new {nodeId = node.Id});
         }
 
         /// <summary>
@@ -273,8 +270,8 @@ namespace umbraco.cms.businesslogic.workflow
         public static void DeleteNotifications(User user)
         {
             // delete all settings on the node for this node id
-            SqlHelper.ExecuteNonQuery("delete from umbracoUser2NodeNotify where userId = @userId",
-                                      SqlHelper.CreateParameter("@userId", user.Id));
+            ApplicationContext.Current.DatabaseContext.Database.Delete<User2NodeNotifyDto>("WHERE userId = @userId",
+                new { userId = user.Id });
         }
 
         /// <summary>
@@ -285,9 +282,8 @@ namespace umbraco.cms.businesslogic.workflow
         public static void DeleteNotifications(User user, CMSNode node)
         {
             // delete all settings on the node for this user
-            SqlHelper.ExecuteNonQuery("delete from umbracoUser2NodeNotify where userId = @userId and nodeId = @nodeId",
-                                      SqlHelper.CreateParameter("@userId", user.Id),
-                                      SqlHelper.CreateParameter("@nodeId", node.Id));
+            ApplicationContext.Current.DatabaseContext.Database.Delete<User2NodeNotifyDto>(
+                "WHERE userId = @userId AND nodeId = @nodeId", new {userId = user.Id, nodeId = node.Id});
         }
 
         /// <summary>
@@ -299,21 +295,19 @@ namespace umbraco.cms.businesslogic.workflow
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static void MakeNew(User User, CMSNode Node, char ActionLetter)
         {
-            var parameters = new[]
-                                 {
-                                     SqlHelper.CreateParameter("@userId", User.Id),
-                                     SqlHelper.CreateParameter("@nodeId", Node.Id),
-                                     SqlHelper.CreateParameter("@action", ActionLetter.ToString())
-                                 };
+            bool exists = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(
+                "SELECT COUNT(userId) FROM umbracoUser2nodeNotify WHERE userId = @userId AND nodeId = @nodeId AND action = @action", 
+                new { userId = User.Id, nodeId = Node.Id, action = ActionLetter.ToString()}) > 0;
 
-            // Method is synchronized so exists remains consistent (avoiding race condition)
-            bool exists = SqlHelper.ExecuteScalar<int>(
-                "SELECT COUNT(userId) FROM umbracoUser2nodeNotify WHERE userId = @userId AND nodeId = @nodeId AND action = @action",
-                parameters) > 0;
-            if (!exists)
-                SqlHelper.ExecuteNonQuery(
-                    "INSERT INTO umbracoUser2nodeNotify (userId, nodeId, action) VALUES (@userId, @nodeId, @action)",
-                    parameters);
+            if (exists == false)
+            {
+                ApplicationContext.Current.DatabaseContext.Database.Insert(new User2NodeNotifyDto
+                                                                           {
+                                                                               Action = ActionLetter.ToString(),
+                                                                               NodeId = Node.Id,
+                                                                               UserId = User.Id
+                                                                           });
+            }
         }
 
         /// <summary>
