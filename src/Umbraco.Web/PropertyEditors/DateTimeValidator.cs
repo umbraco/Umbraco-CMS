@@ -14,8 +14,14 @@ namespace Umbraco.Web.PropertyEditors
     {
         public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)
         {
+            //don't validate if empty
+            if (value == null || value.ToString().IsNullOrWhiteSpace())
+            {
+                yield break;
+            }
+
             DateTime dt;
-            if (value != null &&  DateTime.TryParse(value.ToString(), out dt) == false)
+            if (DateTime.TryParse(value.ToString(), out dt) == false)
             {
                 yield return new ValidationResult(string.Format("The string value {0} cannot be parsed into a DateTime", value),
                                                   new[]

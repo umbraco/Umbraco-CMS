@@ -26,17 +26,20 @@ function valServer(serverValidationManager) {
                 }
             }            
 
-            //subscribe to the changed event of the view model. This is required because when we
+            //Need to watch the value model for it to change, previously we had  subscribed to 
+            //ctrl.$viewChangeListeners but this is not good enough if you have an editor that
+            // doesn't specifically have a 2 way ng binding. This is required because when we
             // have a server error we actually invalidate the form which means it cannot be 
             // resubmitted. So once a field is changed that has a server error assigned to it
             // we need to re-validate it for the server side validator so the user can resubmit
             // the form. Of course normal client-side validators will continue to execute.
-            //TODO: Should we be using $render here instead?
-            ctrl.$viewChangeListeners.push(function () {
+            scope.$watch(function() {
+                return ctrl.$modelValue;
+            }, function (newValue) {
                 if (ctrl.$invalid) {
                     ctrl.$setValidity('valServer', true);
                 }
-            });
+            });            
             
             //subscribe to the server validation changes
             serverValidationManager.subscribe(currentProperty.alias, fieldName, function (isValid, propertyErrors, allErrors) {

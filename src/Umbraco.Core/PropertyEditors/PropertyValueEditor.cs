@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using Newtonsoft.Json;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
@@ -223,7 +224,8 @@ namespace Umbraco.Core.PropertyEditors
             var result = TryConvertValueToCrlType(editorValue.Value);
             if (result.Success == false)
             {
-                throw new InvalidOperationException("The value " + editorValue + " cannot be converted to the type " + GetDatabaseType());
+                LogHelper.Warn<PropertyValueEditor>("The value " + editorValue.Value + " cannot be converted to the type " + GetDatabaseType());
+                return null;
             }
             return result.Result;
         }
