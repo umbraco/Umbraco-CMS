@@ -102,6 +102,19 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     refreshTree: function(treeAlias){
                         navService.setActiveTreeType(treeAlias);
                     },
+                    moveNode: function (id, path) {
+                        if (navService.ui.currentNode) {
+                            var treeService = injector.get("treeService");
+                            var treeRoot = treeService.getTreeRoot(navService.ui.currentNode);
+                            if (treeRoot) {
+                                var found = treeService.getDescendantNode(treeRoot, id);
+                                if (found) {
+                                    treeService.removeNode(found);
+                                }
+                            }
+                        }
+                        navService.syncPath(path, true);
+                    },
                     getActionNode: function () {
                         //need to replicate the legacy tree node
                         var legacyNode = {
