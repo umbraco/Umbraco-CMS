@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Persistence
 		[TestCase(typeof(IRelationRepository))]
 		[TestCase(typeof(IRelationTypeRepository))]
 		[TestCase(typeof(IScriptRepository))]
-		[TestCase(typeof(IStylesheetRepository))]
+		//[TestCase(typeof(IStylesheetRepository))]
 		[TestCase(typeof(ITemplateRepository))]
 		public void ResolveRepository(Type repoType)
 		{
