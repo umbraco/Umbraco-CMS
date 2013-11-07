@@ -4,6 +4,7 @@ using Umbraco.Core;
 using umbraco.DataLayer;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.media;
+using Umbraco.Core.Models.Rdbms;
 
 namespace umbraco.cms.businesslogic
 {
@@ -103,10 +104,8 @@ namespace umbraco.cms.businesslogic
                     break;
             }
 
-            string sql = String.Format(RecycleBin.m_ChildCountSQL,
-                        (int) type);
-
-            return SqlHelper.ExecuteScalar<int>(sql, SqlHelper.CreateParameter("@nodeObjectType", objectType));
+            string sql = String.Format(RecycleBin.m_ChildCountSQL, (int) type);
+            return ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(sql, new { nodeObjectType = objectType });  
         }
         #endregion
 
@@ -157,15 +156,12 @@ namespace umbraco.cms.businesslogic
             {
                 System.Collections.ArrayList tmp = new System.Collections.ArrayList();
 
-                using (IRecordsReader dr = SqlHelper.ExecuteReader(m_ChildSQL,
-                            SqlHelper.CreateParameter("@parentId", this.Id),
-                            SqlHelper.CreateParameter("@type", _nodeObjectType)))
-                {
-                    while (dr.Read())
-                    {
-                        tmp.Add(new CMSNode(dr));
-                    }
-                }
+               foreach (var node in ApplicationContext.Current.DatabaseContext.Database.Query<NodeDto> (
+                                    m_ChildSQL, new { ParentID = this.Id, nodeObjectType = _nodeObjectType })) 
+               {
+                   var cmsNode = new CMSNode(node.NodeId); // .ctor internally calls PopulateCMSNodeFromReader(...) of CMSNode instance to setup cmsNode properties
+                   tmp.Add(cmsNode);  
+               }
 
                 CMSNode[] retval = new CMSNode[tmp.Count];
 
@@ -179,4 +175,5 @@ namespace umbraco.cms.businesslogic
         #endregion
 
     }
+
 }
