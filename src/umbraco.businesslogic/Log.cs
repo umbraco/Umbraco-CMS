@@ -1,10 +1,12 @@
 using System;
 using System.Diagnostics;
 using System.Globalization;
+using System.Linq;
 using System.Threading;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using umbraco.DataLayer;
 using System.Collections.Generic;
@@ -38,7 +40,7 @@ namespace umbraco.BusinessLogic
                         }
                         catch (Exception ee)
                         {
-							LogHelper.Error<Log>("Error loading external logger", ee);
+                            LogHelper.Error<Log>("Error loading external logger", ee);
                         }
                     }
                 }
@@ -102,7 +104,7 @@ namespace umbraco.BusinessLogic
             }
         }
 
-		[Obsolete("Use LogHelper to log exceptions/errors")]
+        [Obsolete("Use LogHelper to log exceptions/errors")]
         public void AddException(Exception ee)
         {
             if (ExternalLogger != null)
@@ -116,7 +118,7 @@ namespace umbraco.BusinessLogic
                 {
                     ex2 = ex2.InnerException;
                 }
-				LogHelper.Error<Log>("An error occurred", ee);
+                LogHelper.Error<Log>("An error occurred", ee);
             }
         }
 
@@ -168,84 +170,95 @@ namespace umbraco.BusinessLogic
             {
                 try
                 {
-                    SqlHelper.ExecuteNonQuery(
-                        "insert into umbracoLog (userId, nodeId, logHeader, logComment) values (@userId, @nodeId, @logHeader, @comment)",
-                        SqlHelper.CreateParameter("@userId", userId),
-                        SqlHelper.CreateParameter("@nodeId", nodeId),
-                        SqlHelper.CreateParameter("@logHeader", type.ToString()),
-                        SqlHelper.CreateParameter("@comment", comment));
+                    ApplicationContext.Current.DatabaseContext.Database.Insert(new LogDto
+                        {
+                            UserId = userId,
+                            NodeId = nodeId,
+                            Header = type.ToString(),
+                            Comment = comment
+                        });
                 }
                 catch (Exception e)
                 {
-					LogHelper.Error<Log>("An error occurred adding an audit trail log to the umbracoLog table", e);
+                    LogHelper.Error<Log>("An error occurred adding an audit trail log to the umbracoLog table", e);
                 }
 
-				//Because 'Custom' log types are also Audit trail (for some wacky reason) but we also want these logged normally so we have to check for this:
-				if (type != LogTypes.Custom)
-				{
-					return;
-				}
+                //Because 'Custom' log types are also Audit trail (for some wacky reason) but we also want these logged normally so we have to check for this:
+                if (type != LogTypes.Custom)
+                {
+                    return;
+                }
 
             }
 
-			//if we've made it this far it means that the log type is not an audit trail log or is a custom log.
-			LogHelper.Info<Log>(
-				"Redirected log call (please use Umbraco.Core.Logging.LogHelper instead of umbraco.BusinessLogic.Log) | Type: {0} | User: {1} | NodeId: {2} | Comment: {3}",
-				() => type.ToString(), () => userId, () => nodeId.ToString(CultureInfo.InvariantCulture), () => comment);            
+            //if we've made it this far it means that the log type is not an audit trail log or is a custom log.
+            LogHelper.Info<Log>(
+                "Redirected log call (please use Umbraco.Core.Logging.LogHelper instead of umbraco.BusinessLogic.Log) | Type: {0} | User: {1} | NodeId: {2} | Comment: {3}",
+                type.ToString, () => userId, () => nodeId.ToString(CultureInfo.InvariantCulture), () => comment);
         }
 
-        public List<LogItem> GetAuditLogItems(int NodeId)
+        public List<LogItem> GetAuditLogItems(int nodeId)
         {
             if (UmbracoSettings.ExternalLoggerLogAuditTrail && ExternalLogger != null)
-                return ExternalLogger.GetAuditLogReader(NodeId);
-            
-            return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
-                "select userId, nodeId, logHeader, DateStamp, logComment from umbracoLog where nodeId = @id and logHeader not in ('open','system') order by DateStamp desc",
-                SqlHelper.CreateParameter("@id", NodeId)));
+                return ExternalLogger.GetAuditLogReader(nodeId);
+
+            return
+                LogItem.ConvertLogDtos(
+                    ApplicationContext.Current.DatabaseContext.Database.Fetch<LogDto>(
+                        "select userId, nodeId, logHeader, DateStamp, logComment from umbracoLog where nodeId = @Id and logHeader not in ('open','system') order by DateStamp desc",
+                        new { Id = nodeId }));
         }
 
         public List<LogItem> GetLogItems(LogTypes type, DateTime sinceDate)
         {
             if (ExternalLogger != null)
                 return ExternalLogger.GetLogItems(type, sinceDate);
-            
-            return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
-                "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
-                SqlHelper.CreateParameter("@logHeader", type.ToString()),
-                SqlHelper.CreateParameter("@dateStamp", sinceDate)));
+
+            return
+                LogItem.ConvertLogDtos(
+                    ApplicationContext.Current.DatabaseContext.Database.Fetch<LogDto>(
+                        "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where logHeader = @LogHeader and DateStamp >= @DateStamp order by dateStamp desc",
+                        new
+                            {
+                                LogHeader = type.ToString(),
+                                DateStamp = sinceDate
+                            }));
         }
 
         public List<LogItem> GetLogItems(int nodeId)
         {
             if (ExternalLogger != null)
                 return ExternalLogger.GetLogItems(nodeId);
-            
-            return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
-                "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where id = @id order by dateStamp desc",
-                SqlHelper.CreateParameter("@id", nodeId)));
+
+            return
+                LogItem.ConvertLogDtos(
+                    ApplicationContext.Current.DatabaseContext.Database.Fetch<LogDto>(
+                        "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where id = @Id order by dateStamp desc",
+                        new { Id = nodeId }));
         }
 
         public List<LogItem> GetLogItems(User user, DateTime sinceDate)
         {
             if (ExternalLogger != null)
                 return ExternalLogger.GetLogItems(user, sinceDate);
-            
-            return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
-                "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and DateStamp >= @dateStamp order by dateStamp desc",
-                SqlHelper.CreateParameter("@user", user.Id),
-                SqlHelper.CreateParameter("@dateStamp", sinceDate)));
+
+            return
+                LogItem.ConvertLogDtos(
+                    ApplicationContext.Current.DatabaseContext.Database.Fetch<LogDto>(
+                        "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @UserId and DateStamp >= @DateStamp order by dateStamp desc",
+                        new { UserId = user.Id, DateStamp = sinceDate }));
         }
 
         public List<LogItem> GetLogItems(User user, LogTypes type, DateTime sinceDate)
         {
             if (ExternalLogger != null)
                 return ExternalLogger.GetLogItems(user, type, sinceDate);
-            
-            return LogItem.ConvertIRecordsReader(SqlHelper.ExecuteReader(
-                "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc",
-                SqlHelper.CreateParameter("@logHeader", type.ToString()),
-                SqlHelper.CreateParameter("@user", user.Id),
-                SqlHelper.CreateParameter("@dateStamp", sinceDate)));
+
+            return
+                LogItem.ConvertLogDtos(
+                    ApplicationContext.Current.DatabaseContext.Database.Fetch<LogDto>(
+                        "select userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @UserId and logHeader = @LogHeader and DateStamp >= @DateStamp order by dateStamp desc",
+                        new { UserId = user.Id, LogHeader = type.ToString(), DateStamp = sinceDate }));
         }
 
         public static void CleanLogs(int maximumAgeOfLogsInMinutes)
@@ -256,11 +269,12 @@ namespace umbraco.BusinessLogic
             {
                 try
                 {
-                    DateTime oldestPermittedLogEntry = DateTime.Now.Subtract(new TimeSpan(0, maximumAgeOfLogsInMinutes, 0));
+                    var oldestPermittedLogEntry = DateTime.Now.Subtract(new TimeSpan(0, maximumAgeOfLogsInMinutes, 0));
                     var formattedDate = oldestPermittedLogEntry.ToString("yyyy-MM-dd HH:mm:ss");
 
-                    SqlHelper.ExecuteNonQuery("delete from umbracoLog where datestamp < @oldestPermittedLogEntry and logHeader in ('open','system')",
-                        SqlHelper.CreateParameter("@oldestPermittedLogEntry", formattedDate));
+                    ApplicationContext.Current.DatabaseContext.Database.Execute(
+                        "delete from umbracoLog where datestamp < @OldestPermittedLogEntry and logHeader in ('open','system')",
+                        new { OldestPermittedLogEntry = formattedDate });
 
                     LogHelper.Info<Log>(string.Format("Log scrubbed.  Removed all items older than {0}", formattedDate));
                 }
@@ -360,13 +374,13 @@ namespace umbraco.BusinessLogic
         {
             var query = "select {0} userId, NodeId, DateStamp, logHeader, logComment from umbracoLog where UserId = @user and logHeader = @logHeader and DateStamp >= @dateStamp order by dateStamp desc {1}";
 
-            query = ApplicationContext.Current.DatabaseContext.DatabaseProvider == DatabaseProviders.MySql 
-                ? string.Format(query, string.Empty, "limit 0," + numberOfResults) 
+            query = ApplicationContext.Current.DatabaseContext.DatabaseProvider == DatabaseProviders.MySql
+                ? string.Format(query, string.Empty, "limit 0," + numberOfResults)
                 : string.Format(query, "top " + numberOfResults, string.Empty);
 
-            return SqlHelper.ExecuteReader(query, 
-                                           SqlHelper.CreateParameter("@logHeader", type.ToString()), 
-                                           SqlHelper.CreateParameter("@user", user.Id), 
+            return SqlHelper.ExecuteReader(query,
+                                           SqlHelper.CreateParameter("@logHeader", type.ToString()),
+                                           SqlHelper.CreateParameter("@user", user.Id),
                                            SqlHelper.CreateParameter("@dateStamp", sinceDate));
         }
 
@@ -375,7 +389,7 @@ namespace umbraco.BusinessLogic
         #endregion
     }
 
-	public class LogItem
+    public class LogItem
     {
         public int UserId { get; set; }
         public int NodeId { get; set; }
@@ -397,6 +411,7 @@ namespace umbraco.BusinessLogic
             Comment = comment;
         }
 
+        [Obsolete("Use the Instance.GetLogItems method which return a list of LogItems instead")]
         public static List<LogItem> ConvertIRecordsReader(IRecordsReader reader)
         {
             var items = new List<LogItem>();
@@ -411,7 +426,11 @@ namespace umbraco.BusinessLogic
             }
 
             return items;
+        }
 
+        internal static List<LogItem> ConvertLogDtos(IList<LogDto> logs)
+        {
+            return logs.Select(log => new LogItem(log.UserId, log.NodeId, log.Datestamp, ConvertLogHeader(log.Header), log.Comment)).ToList();
         }
 
         private static LogTypes ConvertLogHeader(string logHeader)
