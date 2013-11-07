@@ -85,3 +85,6 @@ NDependOut/*
 *.ndproj
 QueryResult.htm
 *.ndproj
+
+src/umbraco.sln
+src/umbraco.sln
