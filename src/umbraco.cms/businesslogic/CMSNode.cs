@@ -106,7 +106,7 @@ namespace umbraco.cms.businesslogic
         /// </returns>
         public static int CountByObjectType(Guid objectType)
         {
-            return SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) from umbracoNode WHERE nodeObjectType = @type", SqlHelper.CreateParameter("@type", objectType));
+            return Database.ExecuteScalar<int>("SELECT COUNT(*) from umbracoNode WHERE nodeObjectType = @objectType", new{objectType});
         }
 
         /// <summary>
@@ -118,7 +118,7 @@ namespace umbraco.cms.businesslogic
         /// </returns>
         public static int CountSubs(int Id)
         {
-            return SqlHelper.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE ','+path+',' LIKE '%," + Id.ToString() + ",%'");
+            return Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE ','+path+',' LIKE '%," + Id + ",%'");
         }
 
         /// <summary>
@@ -129,9 +129,8 @@ namespace umbraco.cms.businesslogic
         /// <returns></returns>
         public static int CountLeafNodes(int parentId, Guid objectType)
         {
-            return SqlHelper.ExecuteScalar<int>("Select count(uniqueID) from umbracoNode where nodeObjectType = @type And parentId = @parentId",
-                SqlHelper.CreateParameter("@type", objectType),
-                SqlHelper.CreateParameter("@parentId", parentId));
+            return Database.ExecuteScalar<int>("Select count(uniqueID) from umbracoNode where nodeObjectType = @objectType And parentId = @parentId",
+                new { parentId, objectType });
         }
 
         /// <summary>
