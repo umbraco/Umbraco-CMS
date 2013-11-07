@@ -890,7 +890,7 @@ namespace umbraco.cms.businesslogic
         {
             var contentTypes = new List<ContentType>();
 
-            using (var dr =
+            using (var dr = 
                 SqlHelper.ExecuteReader(m_SQLOptimizedGetAll.Trim(), SqlHelper.CreateParameter("@nodeObjectType", nodeObjectType)))
             {
                 while (dr.Read())
