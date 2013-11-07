@@ -138,7 +138,7 @@ namespace Umbraco.Web.Security
             {
                 ApplicationContext.Current.DatabaseContext.Database.Execute(
                     "DELETE FROM umbracoUserLogins WHERE contextId = @ContextId",
-                    new { ContextId = new Guid(UmbracoUserContextId) });
+                    new { ContextId = UmbracoUserContextId });
             }
             catch (Exception ex)
             {
