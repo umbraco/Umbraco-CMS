@@ -22,7 +22,7 @@ namespace umbraco.BusinessLogic
     /// <summary>
     /// Class for handling all registered applications in Umbraco.
     /// </summary>
-    [Obsolete("Use Umbraco.Core.Sections.SectionCollection instead")]
+    [Obsolete("Use ApplicationContext.Current.Services.SectionService and/or Umbraco.Core.Sections.SectionCollection instead")]
     public class Application
     {
         private static ISqlHelper _sqlHelper;

@@ -63,7 +63,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, memb
             }
 
             if(!$scope.actions){
-                treeService.getMenu({ treeNode: $scope.nav.ui.currentTreeNode })
+                treeService.getMenu({ treeNode: $scope.nav.ui.currentNode })
                     .then(function(data) {
                             $scope.actions = data.menuItems;
                     });    

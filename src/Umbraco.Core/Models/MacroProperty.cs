@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Core.Models
 {
@@ -29,6 +30,14 @@ namespace Umbraco.Core.Models
             _alias = alias;
             _name = name;
             _sortOrder = sortOrder;
+
+            //try to get the new mapped parameter editor
+            var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(editorAlias, false);
+            if (mapped.IsNullOrWhiteSpace() == false)
+            {
+                editorAlias = mapped;
+            }
+
             _editorAlias = editorAlias;
         }
 
@@ -46,6 +55,14 @@ namespace Umbraco.Core.Models
             _alias = alias;
             _name = name;
             _sortOrder = sortOrder;
+
+            //try to get the new mapped parameter editor
+            var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(editorAlias, false);
+            if (mapped.IsNullOrWhiteSpace() == false)
+            {
+                editorAlias = mapped;
+            }
+
             _editorAlias = editorAlias;
         }
 
@@ -145,7 +162,17 @@ namespace Umbraco.Core.Models
             {
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _editorAlias = value;
+                    //try to get the new mapped parameter editor
+                    var mapped = LegacyParameterEditorAliasConverter.GetNewAliasFromLegacyAlias(value, false);
+                    if (mapped.IsNullOrWhiteSpace() == false)
+                    {
+                        _editorAlias = mapped;
+                    }
+                    else
+                    {
+                        _editorAlias = value;
+                    }
+
                     return _editorAlias;
                 }, _editorAlias, PropertyTypeSelector);
             }

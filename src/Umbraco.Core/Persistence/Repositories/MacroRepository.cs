@@ -124,7 +124,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                 {
-                    "DELETE FROM cmsMacro WHERE id = @Id"                               
+                    "DELETE FROM cmsMacroProperty WHERE macro = @Id",
+                    "DELETE FROM cmsMacro WHERE id = @Id"                           
                 };
             return list;
         }

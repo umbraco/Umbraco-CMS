@@ -1,5 +1,5 @@
 angular.module("umbraco").controller("Umbraco.PropertyEditors.DatepickerController",
-    function ($scope, notificationsService, assetsService) {
+    function ($scope, notificationsService, assetsService, angularHelper) {
 
         //setup the default config
         var config = {
@@ -12,17 +12,19 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DatepickerControll
         //map back to the model
         $scope.model.config = config;
 
-        function applyDate(e){
+        function applyDate(e) {
+
+            angularHelper.safeApply($scope, function() {
                 // when a date is changed, update the model
                 if (e.localDate) {
                     if ($scope.model.config.format == "yyyy-MM-dd HH:mm:ss") {
-                        $scope.$apply(function(){
-                            $scope.model.value = e.localDate.toIsoDateTimeString();
-                        });
-                    }else{
+                        $scope.model.value = e.localDate.toIsoDateTimeString();
+                    }
+                    else {
                         $scope.model.value = e.localDate.toIsoDateString();
                     }
                 }
+            });
         }
 
         assetsService.loadJs(

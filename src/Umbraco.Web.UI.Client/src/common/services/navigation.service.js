@@ -258,7 +258,7 @@ angular.module('umbraco.services')
                     historyService.add({ name: n.name, link: n.routePath, icon: n.icon });
                     //not legacy, lets just set the route value and clear the query string if there is one.
                     
-                    ui.currentTreeNode = n;
+                    ui.currentNode = n;
                     $location.path(n.routePath).search("");
                 } else if(args.element.section){
                     $location.path(args.element.section).search("");

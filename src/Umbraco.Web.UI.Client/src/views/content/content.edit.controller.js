@@ -221,7 +221,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
             }
 
             if(!$scope.actions){
-                treeService.getMenu({ treeNode: $scope.nav.ui.currentTreeNode })
+                treeService.getMenu({ treeNode: $scope.nav.ui.currentNode })
                     .then(function(data) {
                             $scope.actions = data.menuItems;
                     });    

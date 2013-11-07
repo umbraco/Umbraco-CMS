@@ -31,7 +31,7 @@
                         <ul class="dropdown-menu  umb-actions" role="menu" aria-labelledby="dLabel">
                             <li class="action" ng-class="{sep:action.seperator}" ng-repeat="action in actions">
                                 <a prevent-default
-                                    ng-click="executeMenuItem(nav.ui.currentTreeNode,action,nav.ui.currentSection)">
+                                    ng-click="executeMenuItem(nav.ui.currentNode,action,nav.ui.currentSection)">
                                     <i class="icon icon-{{action.cssclass}}"></i>
                                     <span class="menu-label">{{action.name}}</span>
                                 </a>
