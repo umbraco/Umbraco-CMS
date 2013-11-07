@@ -12,7 +12,7 @@ angular.module("umbraco.directives")
         },
         link: function (scope, iElement, iAttrs) {
 
-            var maxTabs = 5;
+            var maxTabs = 4;
 
             function collectFromDom(activeTab){
                 var $panes = $('div.tab-content');
@@ -33,15 +33,13 @@ angular.module("umbraco.directives")
                     else {
                         $this.removeClass('active');
                     }
-
-
-                    //scope.visibleTabs.push(tab);
-
                     
-                    if(label && (scope.visibleTabs.length < maxTabs || tab.id === 0)){
-                        scope.visibleTabs.push(tab);
-                    }else{
-                        scope.overflownTabs.push(tab);
+                    if(label){
+                        if(scope.visibleTabs.length < maxTabs || tab.id === 0){
+                            scope.visibleTabs.push(tab);
+                        }else{
+                            scope.overflownTabs.push(tab);
+                        }
                     }
 
                 });
@@ -61,7 +59,14 @@ angular.module("umbraco.directives")
             scope.$watch("tabs", function (newValue, oldValue) {
 
                 $(newValue).each(function(i, val){
-                        scope.visibleTabs.push({id: val.id, label: val.label});
+                        var tab = {id: val.id, label: val.label};
+                        if(scope.visibleTabs.length < maxTabs || tab.id === 0){
+                            scope.visibleTabs.push(tab);
+                        }else{
+                            scope.overflownTabs.push(tab);
+                        }
+
+                        //scope.visibleTabs.push({id: val.id, label: val.label});
                 });
                 
                 //don't process if we cannot or have already done so

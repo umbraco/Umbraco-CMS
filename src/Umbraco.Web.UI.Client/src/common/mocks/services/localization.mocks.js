@@ -207,7 +207,7 @@ angular.module('umbraco.mocks').
                   "defaultdialogs_thumbnailimageclickfororiginal": "Click on the image to see full size",
                   "defaultdialogs_treepicker": "Pick item",
                   "defaultdialogs_viewCacheItem": "View Cache Item",
-                  "dictionaryItem_description": "      Edit the different language versions for the dictionary item '<em>%0%</em>' below<br/>You can add additional languages under the 'languages' in the menu on the left   ",
+                  "dictionaryItem_description": "Edit the different language versions for the dictionary item '<em>%0%</em>' below<br/>You can add additional languages under the 'languages' in the menu on the left   ",
                   "dictionaryItem_displayName": "Culture Name",
                   "placeholders_username": "Enter your username",
                   "placeholders_password": "Enter your password",
