@@ -39,7 +39,7 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="Stylesheet"/> objects</returns>
         public IEnumerable<Stylesheet> GetStylesheets(params string[] names)
         {
-            using (var repository = _repositoryFactory.CreateStylesheetRepository(_fileUowProvider.GetUnitOfWork()))
+            using (var repository = _repositoryFactory.CreateStylesheetRepository(_fileUowProvider.GetUnitOfWork(), _dataUowProvider.GetUnitOfWork()))
             {
                 return repository.GetAll(names);
             }
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Services
         /// <returns>A <see cref="Stylesheet"/> object</returns>
         public Stylesheet GetStylesheetByName(string name)
         {
-            using (var repository = _repositoryFactory.CreateStylesheetRepository(_fileUowProvider.GetUnitOfWork()))
+            using (var repository = _repositoryFactory.CreateStylesheetRepository(_fileUowProvider.GetUnitOfWork(), _dataUowProvider.GetUnitOfWork()))
             {
                 return repository.Get(name);
             }
@@ -69,7 +69,7 @@ namespace Umbraco.Core.Services
 				return;
 	        
 			var uow = _fileUowProvider.GetUnitOfWork();
-	        using (var repository = _repositoryFactory.CreateStylesheetRepository(uow))
+            using (var repository = _repositoryFactory.CreateStylesheetRepository(uow, _dataUowProvider.GetUnitOfWork()))
 	        {
 		        repository.AddOrUpdate(stylesheet);
 		        uow.Commit();
@@ -88,7 +88,7 @@ namespace Umbraco.Core.Services
         public void DeleteStylesheet(string name, int userId = 0)
         {
             var uow = _fileUowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateStylesheetRepository(uow))
+            using (var repository = _repositoryFactory.CreateStylesheetRepository(uow, _dataUowProvider.GetUnitOfWork()))
             {
                 var stylesheet = repository.Get(name);
 

@@ -59,7 +59,7 @@ namespace umbraco.cms.presentation.create.controls
                     new User(Security.CurrentUser),
                     Request.GetItemAsString("nodeType"),
 					nodeId,
-					rename.Text);
+					rename.Text.Trim());
 
 				BasePage.Current.ClientTools
 					.ChangeContentFrameUrl(returnUrl)

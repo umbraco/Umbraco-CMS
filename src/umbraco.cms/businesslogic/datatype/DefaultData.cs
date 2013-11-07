@@ -33,7 +33,7 @@ namespace umbraco.cms.businesslogic.datatype
 
         //TODO Refactor this class to use the Database object instead of the SqlHelper
         //NOTE DatabaseContext.Current.Database should eventually be replaced with that from the Repository-Resolver refactor branch. 
-        internal static Database Database
+        internal static UmbracoDatabase Database
         {
             get { return ApplicationContext.Current.DatabaseContext.Database; }
         }

@@ -71,21 +71,19 @@ namespace Umbraco.Web.UI.Controls
 			var divMacroItemContainer = new TagBuilder("div");
 			divMacroItemContainer.Attributes.Add("style", "width: 285px;display:none;");
 			divMacroItemContainer.Attributes.Add("class", "sbMenu");
-			using (var macroReader = SqlHelper.ExecuteReader("select id, macroAlias, macroName from cmsMacro order by macroName"))
+			var macros = ApplicationContext.DatabaseContext.Database.Query<MacroDto>("select id, macroAlias, macroName from cmsMacro order by macroName");
+			foreach (var macro in macros)
 			{
-				while (macroReader.Read())
-				{
-					var divMacro = new TagBuilder("div");
-					divMacro.AddCssClass("macro-item");
-					divMacro.Attributes.Add("rel", macroReader.GetString("macroAlias"));
-					divMacro.Attributes.Add("data-has-params", DoesMacroHaveParameters(macroReader.GetInt("id")).ToString().ToLower());
-					divMacro.SetInnerText(macroReader.GetString("macroName"));
-					divMacroItemContainer.InnerHtml += divMacro.ToString();	
-				}
+				var divMacro = new TagBuilder("div");
+				divMacro.AddCssClass("macro-item");
+				divMacro.Attributes.Add("rel", macro.Alias);
+				divMacro.Attributes.Add("data-has-params", DoesMacroHaveParameters(macro.Id).ToString().ToLower());
+				divMacro.SetInnerText(macro.Name);
+				divMacroItemContainer.InnerHtml += divMacro.ToString();
 			}
 			
 			/*create the button itself, similar to this:
-			 			
+			
 			<div id="splitButtonMacro" style="display: inline; height: 23px; vertical-align: top;">
 				<a href="javascript:openMacroModal();" class="sbLink">
 					<img alt="Insert Macro" src="../images/editor/insMacroSB.png" title="Insert Macro"
@@ -139,7 +137,7 @@ namespace Umbraco.Web.UI.Controls
 
 		private bool DoesMacroHaveParameters(int macroId)
 		{
-			return SqlHelper.ExecuteScalar<int>(string.Format("select 1 from cmsMacroProperty where macro = {0}", macroId)) == 1;
+			return ApplicationContext.DatabaseContext.Database.ExecuteScalar<int>(string.Format("select 1 from cmsMacroProperty where macro = {0}", macroId)) == 1;
 		}
 	}
 }

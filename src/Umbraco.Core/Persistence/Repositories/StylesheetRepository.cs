@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -14,14 +15,16 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class StylesheetRepository : FileRepository<string, Stylesheet>, IStylesheetRepository
     {
-		internal StylesheetRepository(IUnitOfWork work, IFileSystem fileSystem)
+        private readonly IDatabaseUnitOfWork _dbwork;
+
+        internal StylesheetRepository(IUnitOfWork work, IDatabaseUnitOfWork db, IFileSystem fileSystem)
 			: base(work, fileSystem)
 	    {
-		    
+            _dbwork = db;
 	    }
 
-        public StylesheetRepository(IUnitOfWork work)
-            : this(work, new PhysicalFileSystem(SystemDirectories.Css))
+        public StylesheetRepository(IUnitOfWork work, IDatabaseUnitOfWork db)
+            : this(work, db, new PhysicalFileSystem(SystemDirectories.Css))
         {
         }
 
@@ -29,7 +32,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public override Stylesheet Get(string id)
         {
-            if (!FileSystem.FileExists(id))
+            if (FileSystem.FileExists(id) == false)
             {
                 throw new Exception(string.Format("The file {0} was not found", id));
             }
@@ -53,7 +56,8 @@ namespace Umbraco.Core.Persistence.Repositories
                                      Content = content,
                                      Key = path.EncodeAsGuid(),
                                      CreateDate = created,
-                                     UpdateDate = updated
+                                     UpdateDate = updated,
+                                     Id = GetStylesheetId(path)
                                  };
 
             //on initial construction we don't want to have dirty properties tracked
@@ -61,6 +65,22 @@ namespace Umbraco.Core.Persistence.Repositories
             stylesheet.ResetDirtyProperties(false);
 
             return stylesheet;
+            
+        }
+
+        // Fix for missing Id's on FileService.GetStylesheets() call.  This is needed as sytlesheets can only bo loaded in the editor via 
+        //  their Id so listing stylesheets needs to list there Id as well for custom plugins to render the build in editor.
+        //  http://issues.umbraco.org/issue/U4-3258
+        private int GetStylesheetId(string path)
+        {
+            var sql = new Sql()
+                .Select("*")
+                .From<NodeDto>()
+                .Where("nodeObjectType = @NodeObjectType AND umbracoNode.text = @Alias",
+                    new { NodeObjectType = UmbracoObjectTypes.Stylesheet.GetGuid(), 
+                        Alias = path.TrimEnd(".css").Replace("\\", "/") });
+            var nodeDto = _dbwork.Database.FirstOrDefault<NodeDto>(sql);
+            return nodeDto == null ? 0 : nodeDto.NodeId;
         }
 
         public override IEnumerable<Stylesheet> GetAll(params string[] ids)

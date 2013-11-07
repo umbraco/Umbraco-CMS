@@ -6,6 +6,7 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
 using umbraco.cms.businesslogic.web;
 using umbraco.DataLayer;
@@ -343,9 +344,15 @@ namespace umbraco.cms.businesslogic
         /// Gets the SQL helper.
         /// </summary>
         /// <value>The SQL helper.</value>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
+        }
+
+        internal static UmbracoDatabase Database
+        {
+            get { return ApplicationContext.Current.DatabaseContext.Database; }
         }
         #endregion
 

@@ -3,9 +3,13 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Data;
 using System.Linq;
+
+using Umbraco.Core;
+
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
+using Umbraco.Core.Models.Rdbms;
 
 namespace umbraco.cms.businesslogic.language
 {
@@ -27,6 +31,7 @@ namespace umbraco.cms.businesslogic.language
         /// Gets the SQL helper.
         /// </summary>
         /// <value>The SQL helper.</value>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -44,27 +49,26 @@ namespace umbraco.cms.businesslogic.language
                     //double check
                     if (!_isInitialize)
                     {
-                        // load all data
-                        using (IRecordsReader dr = SqlHelper.ExecuteReader("Select LanguageId, UniqueId,[value] from cmsLanguageText order by UniqueId"))
-                        {
-                            while (dr.Read())
-                            {
-                                var languageId = dr.GetInt("LanguageId");
-                                var uniqueId = dr.GetGuid("UniqueId");
-                                var text = dr.GetString("value");
 
-                                Items.AddOrUpdate(uniqueId, guid =>
-                                    {
-                                        var languagevalues = new Dictionary<int, string> { { languageId, text } };
-                                        return languagevalues;
-                                    }, (guid, dictionary) =>
-                                        {
-                                            // add/update the text for the id
-                                            dictionary[languageId] = text;
-                                            return dictionary;
-                                        });
-                            }
-                        }                        
+                        var dtos = ApplicationContext.Current.DatabaseContext.Database.Fetch<LanguageTextDto>("ORDER BY UniqueId");
+                        foreach (var dto in dtos)
+                        {
+                            var languageId = dto.LanguageId;
+                            var uniqueId = dto.UniqueId;
+                            var text = dto.Value;
+
+                            Items.AddOrUpdate(uniqueId, guid =>
+                            {
+                                var languagevalues = new Dictionary<int, string> { { languageId, text } };
+                                return languagevalues;
+                            }, (guid, dictionary) =>
+                            {
+                                // add/update the text for the id
+                                dictionary[languageId] = text;
+                                return dictionary;
+                            });
+                        }
+
                         _isInitialize = true;
                     }                    
                 }
@@ -130,10 +134,9 @@ namespace umbraco.cms.businesslogic.language
         {
             if (!hasText(key, languageId)) throw new ArgumentException("Key does not exist");
             
-            SqlHelper.ExecuteNonQuery("Update cmsLanguageText set [value] = @value where LanguageId = @languageId And UniqueId = @key",
-                SqlHelper.CreateParameter("@value", value),
-                SqlHelper.CreateParameter("@languageId", languageId),
-                SqlHelper.CreateParameter("@key", key));
+            ApplicationContext.Current.DatabaseContext.Database.Update<LanguageTextDto>(
+                "set [value] = @value where LanguageId = @languageId And UniqueId = @key", 
+                new { value = value, languageId = languageId, key = key });
         }
 
         /// <summary>
@@ -146,11 +149,13 @@ namespace umbraco.cms.businesslogic.language
         public static void addText(int languageId, Guid key, string value)
         {
             if (hasText(key, languageId)) throw new ArgumentException("Key being add'ed already exists");
-            
-            SqlHelper.ExecuteNonQuery("Insert Into cmsLanguageText (languageId,UniqueId,[value]) values (@languageId, @key, @value)",
-                SqlHelper.CreateParameter("@languageId", languageId),
-                SqlHelper.CreateParameter("@key", key),
-                SqlHelper.CreateParameter("@value", value));
+
+            ApplicationContext.Current.DatabaseContext.Database.Insert(new LanguageTextDto
+                                                                       {
+                                                                           LanguageId = languageId,
+                                                                           Value = value,
+                                                                           UniqueId = key
+                                                                       });
         }
         
         /// <summary>
@@ -160,8 +165,7 @@ namespace umbraco.cms.businesslogic.language
         public static void removeText(Guid key)
         {
             // remove from database
-            SqlHelper.ExecuteNonQuery("Delete from cmsLanguageText where UniqueId =  @key",
-                SqlHelper.CreateParameter("@key", key));
+            ApplicationContext.Current.DatabaseContext.Database.Delete<LanguageTextDto>("where UniqueId =  @UniqueId", new { UniqueId = key });
         }
 
         /// <summary>
@@ -172,9 +176,7 @@ namespace umbraco.cms.businesslogic.language
         public static void RemoveByLanguage(int languageId)
         {
             // remove from database
-            SqlHelper.ExecuteNonQuery("Delete from cmsLanguageText where languageId =  @languageId",
-                SqlHelper.CreateParameter("@languageId", languageId));
-
+            ApplicationContext.Current.DatabaseContext.Database.Delete<LanguageTextDto>("where languageId =  @languageId", new { languageId = languageId });
         }
     }
 }
