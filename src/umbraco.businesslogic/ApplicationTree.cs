@@ -20,7 +20,7 @@ namespace umbraco.BusinessLogic
     /// An application tree is a collection of nodes belonging to one or more application(s).
     /// Through this class new application trees can be created, modified and deleted. 
     /// </summary>
-    [Obsolete("This has been superceded by Umbraco.Core.Trees.ApplicationTree and Umbraco.Core.Trees.ApplicationTreeCollection")]
+    [Obsolete("This has been superceded by ApplicationContext.Current.ApplicationTreeService")]
     public class ApplicationTree
     {
 
