@@ -5,6 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using umbraco.cms.businesslogic;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Web;
 using ContentType = Umbraco.Core.Models.ContentType;
 
 namespace Umbraco.Tests.BusinessLogic
@@ -26,6 +27,7 @@ namespace Umbraco.Tests.BusinessLogic
         private ContentType testContentType1;
         private ContentType testContentType2;
         private ContentType testContentType3;
+        private UmbracoContext context;
 
         protected override DatabaseBehavior DatabaseTestBehavior
         {
@@ -120,12 +122,35 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.AreEqual(expectedChildCount, CMSNode.CountSubs(testContentType2.Id));
         }
 
+        [Test]
+        public void Delete_DeletesRowFromUmbracoNode()
+        {
+            EnsureTestDocumentTypes();
+            var database = context.Application.DatabaseContext.Database;
+            try
+            {
+                var node = new CMSNode(testContentType2.Id);
+                database.Execute("DELETE cmsContentType WHERE nodeId = @NodeId", new { NodeId = node.Id });
+                node.delete();
+                Assert.AreEqual(0, database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE id = @id", new{id = node.Id}));;
+            }
+            finally
+            {
+                foreach(var node in new[] { testContentType1, testContentType2, testContentType3 })
+                    database.Execute("DELETE cmsContentType WHERE nodeId = @NodeId", new {NodeId = node.Id});
+                foreach (var node in new[] { testContentType3, testContentType1, testContentType2 })
+                    database.Execute("DELETE umbracoNode WHERE id = @Id", new {node.Id });
+                initialized = false;
+            }
+        }
+
         private void EnsureTestDocumentTypes()
         {
             if (initialized) return;
             testContentType1 = new ContentType(-1) {Alias="Test1"};
             testContentType2 = new ContentType(-1) {Alias="Test2"};
-            var contentTypeService = GetUmbracoContext("http://localhost", 0).Application.Services.ContentTypeService;
+            context = GetUmbracoContext("http://localhost", 0);
+            var contentTypeService = context.Application.Services.ContentTypeService;
             contentTypeService.Save(testContentType1);
             contentTypeService.Save(testContentType2);
             testContentType3 = new ContentType(testContentType1.Id) {Alias="Test1.1"};
