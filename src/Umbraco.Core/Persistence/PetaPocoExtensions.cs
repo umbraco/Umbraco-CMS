@@ -304,9 +304,30 @@ namespace Umbraco.Core.Persistence
             return SqlSyntaxContext.SqlSyntaxProvider.DoesTableExist(db, tableName);
         }
 
+        /// <summary>
+        /// Creates the Umbraco db schema in the Database of the current Database.
+        /// Safe method that is only able to create the schema in non-configured
+        /// umbraco instances.
+        /// </summary>
+        /// <param name="db">Current PetaPoco <see cref="Database"/> object</param>
         public static void CreateDatabaseSchema(this Database db)
         {
             CreateDatabaseSchema(db, true);
+        }
+
+        /// <summary>
+        /// Creates the Umbraco db schema in the Database of the current Database
+        /// with the option to guard the db from having the schema created
+        /// multiple times.
+        /// </summary>
+        /// <param name="db"></param>
+        /// <param name="guardConfiguration"></param>
+        public static void CreateDatabaseSchema(this Database db, bool guardConfiguration)
+        {
+            if (guardConfiguration && ApplicationContext.Current.IsConfigured)
+                throw new Exception("Umbraco is already configured!");
+
+            CreateDatabaseSchemaDo(db);
         }
 
         internal static void UninstallDatabaseSchema(this Database db)
@@ -315,11 +336,8 @@ namespace Umbraco.Core.Persistence
             creation.UninstallDatabaseSchema();
         }
 
-        internal static void CreateDatabaseSchema(this Database db, bool guardConfiguration)
+        internal static void CreateDatabaseSchemaDo(this Database db)
         {
-            if (guardConfiguration && ApplicationContext.Current.IsConfigured)
-                throw new Exception("Umbraco is already configured!");
-
             NewTable += PetaPocoExtensions_NewTable;
 
             LogHelper.Info<Database>("Initializing database schema creation");
