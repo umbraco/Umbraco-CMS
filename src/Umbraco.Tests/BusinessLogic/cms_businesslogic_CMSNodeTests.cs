@@ -127,12 +127,15 @@ namespace Umbraco.Tests.BusinessLogic
         {
             EnsureTestDocumentTypes();
             var database = context.Application.DatabaseContext.Database;
+            var originalCount = database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode");
             try
             {
                 var node = new CMSNode(testContentType2.Id);
                 database.Execute("DELETE cmsContentType WHERE nodeId = @NodeId", new { NodeId = node.Id });
                 node.delete();
                 Assert.AreEqual(0, database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode WHERE id = @id", new{id = node.Id}));;
+                var newCount = database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode");
+                Assert.AreEqual(originalCount - 1, newCount);
             }
             finally
             {

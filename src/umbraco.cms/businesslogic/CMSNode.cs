@@ -129,7 +129,7 @@ namespace umbraco.cms.businesslogic
         /// <returns></returns>
         public static int CountLeafNodes(int parentId, Guid objectType)
         {
-            return Database.ExecuteScalar<int>("Select count(uniqueID) from umbracoNode where nodeObjectType = @objectType And parentId = @parentId",
+            return Database.ExecuteScalar<int>("SELECT COUNT(uniqueID) FROM umbracoNode where nodeObjectType = @objectType AND parentId = @parentId",
                 new { parentId, objectType });
         }
 
@@ -641,7 +641,7 @@ order by level,sortOrder";
                 //removes tag associations (i know the key is set to cascade but do it anyways)
                 Tag.RemoveTagsFromNode(this.Id);
 
-                SqlHelper.ExecuteNonQuery("DELETE FROM umbracoNode WHERE uniqueID= @uniqueId", SqlHelper.CreateParameter("@uniqueId", _uniqueID));
+                Database.Delete<NodeDto>("WHERE uniqueID=@uniqueId", new { uniqueId = _uniqueID });
                 FireAfterDelete(e);
             }
         }
