@@ -204,7 +204,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
         /** Gets a child node by id */
         getChildNode: function (treeNode, id) {
             if (!treeNode.children) {
-                throw "The current tree node has no assigned children, ensure it's children are loaded before calling this method";
+                return null;
             }
             var found = _.find(treeNode.children, function (child) {
                 return String(child.id) === String(id);
@@ -221,6 +221,10 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             }
            
             //check each child of this node
+            if (!treeNode.children) {
+                return null;
+            }
+
             for (var i = 0; i < treeNode.children.length; i++) {
                 if (treeNode.children[i].children && angular.isArray(treeNode.children[i].children) && treeNode.children[i].children.length > 0) {
                     //recurse
@@ -236,11 +240,15 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
         },
 
         /** Gets the root node of the current tree type for a given tree node */
-        getTreeRoot: function(treeNode) {
+        getTreeRoot: function (treeNode) {
+            if (!treeNode) {
+                throw "treeNode cannot be null";
+            }
+
             //all root nodes have metadata key 'treeAlias'
             var root = null;
             var current = treeNode;            
-            while (root === null && current !== undefined) {
+            while (root === null && current) {
                 
                 if (current.metaData && current.metaData["treeAlias"]) {
                     root = current;

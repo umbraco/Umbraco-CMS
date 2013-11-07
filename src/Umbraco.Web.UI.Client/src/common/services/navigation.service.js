@@ -15,10 +15,8 @@
  * Section navigation and search, and maintain their state for the entire application lifetime
  *
  */
+function navigationService($rootScope, $routeParams, $log, $location, $q, $timeout, dialogService, treeService, notificationsService, historyService) {
 
-angular.module('umbraco.services')
-.factory('navigationService', function ($rootScope, $routeParams, $log, $location, $q, $timeout, dialogService, treeService, notificationsService, historyService) {
-    
     var minScreenSize = 1100;
 
     //Define all sub-properties for the UI object here
@@ -38,12 +36,13 @@ angular.module('umbraco.services')
         actions: undefined,
         currentDialog: undefined,
         dialogTitle: undefined,
-       
+
         //a string/name reference for the currently set ui mode
         currentMode: "default"
     };
-    
-    $rootScope.$on("closeDialogs", function(){});
+
+    $rootScope.$on("closeDialogs", function() {
+    });
 
     function setTreeMode() {
         ui.tablet = ($(window).width() <= minScreenSize);
@@ -52,57 +51,57 @@ angular.module('umbraco.services')
 
     function setMode(mode) {
         switch (mode) {
-            case 'tree':
-                ui.currentMode = "tree";
-                ui.showNavigation = true;
-                ui.showContextMenu = false;
-                ui.showContextMenuDialog = false;
-                ui.stickyNavigation = false;
-                ui.showTray = false;
-                service.hideUserDialog();
-                service.hideHelpDialog();
-                //$("#search-form input").focus();    
-                break;
-            case 'menu':
-                ui.currentMode = "menu";
-                ui.showNavigation = true;
-                ui.showContextMenu = true;
-                ui.showContextMenuDialog = false;
-                ui.stickyNavigation = true;
-                break;
-            case 'dialog':
-                ui.currentMode = "dialog";
-                ui.stickyNavigation = true;
-                ui.showNavigation = true;
-                ui.showContextMenu = false;
-                ui.showContextMenuDialog = true;
-                break;
-            case 'search':
-                ui.currentMode = "search";
-                ui.stickyNavigation = false;
-                ui.showNavigation = true;
-                ui.showContextMenu = false;
-                ui.showSearchResults = true;
-                ui.showContextMenuDialog = false;
+        case 'tree':
+            ui.currentMode = "tree";
+            ui.showNavigation = true;
+            ui.showContextMenu = false;
+            ui.showContextMenuDialog = false;
+            ui.stickyNavigation = false;
+            ui.showTray = false;
+            service.hideUserDialog();
+            service.hideHelpDialog();
+            //$("#search-form input").focus();    
+            break;
+        case 'menu':
+            ui.currentMode = "menu";
+            ui.showNavigation = true;
+            ui.showContextMenu = true;
+            ui.showContextMenuDialog = false;
+            ui.stickyNavigation = true;
+            break;
+        case 'dialog':
+            ui.currentMode = "dialog";
+            ui.stickyNavigation = true;
+            ui.showNavigation = true;
+            ui.showContextMenu = false;
+            ui.showContextMenuDialog = true;
+            break;
+        case 'search':
+            ui.currentMode = "search";
+            ui.stickyNavigation = false;
+            ui.showNavigation = true;
+            ui.showContextMenu = false;
+            ui.showSearchResults = true;
+            ui.showContextMenuDialog = false;
 
-                $timeout(function(){
-                    $("#search-field").focus();
-                });
-                
-                break;
-            default:
-                ui.currentMode = "default";
-                ui.showContextMenu = false;
-                ui.showContextMenuDialog = false;
-                ui.showSearchResults = false;
-                ui.stickyNavigation = false;
-                ui.showTray = false;
+            $timeout(function() {
+                $("#search-field").focus();
+            });
 
-                if(ui.tablet){
-                    ui.showNavigation = false;
-                }
+            break;
+        default:
+            ui.currentMode = "default";
+            ui.showContextMenu = false;
+            ui.showContextMenuDialog = false;
+            ui.showSearchResults = false;
+            ui.stickyNavigation = false;
+            ui.showTray = false;
 
-                break;
+            if (ui.tablet) {
+                ui.showNavigation = false;
+            }
+
+            break;
         }
     }
 
@@ -112,15 +111,15 @@ angular.module('umbraco.services')
         userDialog: undefined,
         ui: ui,
 
-        init: function(){
+        init: function() {
 
             //TODO: detect tablet mode, subscribe to window resizing
             //for now we just hardcode it to non-tablet mode
             setTreeMode();
             this.ui.currentSection = $routeParams.section;
 
-            $(window).bind("resize", function () {
-                 setTreeMode();
+            $(window).bind("resize", function() {
+                setTreeMode();
             });
         },
 
@@ -133,7 +132,7 @@ angular.module('umbraco.services')
          * Shows the legacy iframe and loads in the content based on the source url
          * @param {String} source The URL to load into the iframe
          */
-        loadLegacyIFrame: function (source) {
+        loadLegacyIFrame: function(source) {
             $location.path("/" + this.ui.currentSection + "/framed/" + encodeURIComponent(source));
         },
 
@@ -148,16 +147,16 @@ angular.module('umbraco.services')
          * and load the dashboard related to the section
          * @param {string} sectionAlias The alias of the section
          */
-        changeSection: function (sectionAlias, force) {
+        changeSection: function(sectionAlias, force) {
             setMode("default-opensection");
-            
-            if(force && this.ui.currentSection === sectionAlias){
+
+            if (force && this.ui.currentSection === sectionAlias) {
                 this.ui.currentSection = "";
             }
 
             this.ui.currentSection = sectionAlias;
             this.showTree(sectionAlias);
-        
+
             $location.path(sectionAlias);
         },
 
@@ -171,52 +170,52 @@ angular.module('umbraco.services')
          * only changes if the section is different from the current one
 		 * @param {string} sectionAlias The alias of the section the tree should load data from
 		 */
-        showTree: function (sectionAlias, treeAlias, path) {
+        showTree: function(sectionAlias, treeAlias, path) {
             if (sectionAlias !== this.ui.currentSection) {
                 this.ui.currentSection = sectionAlias;
-                if(treeAlias){
+                if (treeAlias) {
                     this.setActiveTreeType(treeAlias);
                 }
-                if(path){
+                if (path) {
                     this.syncpath(path, true);
                 }
             }
             setMode("tree");
         },
 
-        showTray: function () {
+        showTray: function() {
             ui.showTray = true;
         },
 
-        hideTray: function () {
+        hideTray: function() {
             ui.showTray = false;
         },
 
         //adding this to get clean global access to the main tree directive
         //there will only ever be one main tree event handler
         //we need to pass in the current scope for binding these actions
-        setupTreeEvents: function(treeEventHandler, scope){
+        setupTreeEvents: function(treeEventHandler, scope) {
             this.ui.treeEventHandler = treeEventHandler;
 
             //this reacts to the options item in the tree
-            this.ui.treeEventHandler.bind("treeOptionsClick", function (ev, args) {
+            this.ui.treeEventHandler.bind("treeOptionsClick", function(ev, args) {
                 ev.stopPropagation();
                 ev.preventDefault();
-                
+
                 scope.currentNode = args.node;
                 args.scope = scope;
 
-                if(args.event && args.event.altKey){
+                if (args.event && args.event.altKey) {
                     args.skipDefault = true;
                 }
 
                 service.showMenu(ev, args);
             });
 
-            this.ui.treeEventHandler.bind("treeNodeAltSelect", function (ev, args) {
+            this.ui.treeEventHandler.bind("treeNodeAltSelect", function(ev, args) {
                 ev.stopPropagation();
                 ev.preventDefault();
-                
+
                 scope.currentNode = args.node;
                 args.scope = scope;
 
@@ -226,11 +225,11 @@ angular.module('umbraco.services')
 
             //this reacts to tree items themselves being clicked
             //the tree directive should not contain any handling, simply just bubble events
-            this.ui.treeEventHandler.bind("treeNodeSelect", function (ev, args) {
+            this.ui.treeEventHandler.bind("treeNodeSelect", function(ev, args) {
                 var n = args.node;
                 ev.stopPropagation();
                 ev.preventDefault();
-                
+
 
                 if (n.metaData && n.metaData["jsClickCallback"] && angular.isString(n.metaData["jsClickCallback"]) && n.metaData["jsClickCallback"] !== "") {
                     //this is a legacy tree node!                
@@ -253,14 +252,15 @@ angular.module('umbraco.services')
                         $log.error("Error evaluating js callback from legacy tree node: " + ex);
                     }
                 }
-                else if(n.routePath){
+                else if (n.routePath) {
                     //add action to the history service
                     historyService.add({ name: n.name, link: n.routePath, icon: n.icon });
                     //not legacy, lets just set the route value and clear the query string if there is one.
-                    
+
                     ui.currentNode = n;
                     $location.path(n.routePath).search("");
-                } else if(args.element.section){
+                }
+                else if (args.element.section) {
                     $location.path(args.element.section).search("");
                 }
 
@@ -269,11 +269,11 @@ angular.module('umbraco.services')
         },
         /**
          * @ngdoc method
-         * @name umbraco.services.navigationService#syncTree
+         * @name umbraco.services.navigationService#syncPath
          * @methodOf umbraco.services.navigationService
          *
          * @description
-         * Syncs the tree with a given section alias and a given path
+         * Syncs the tree with a given path
          * The path format is: ["itemId","itemId"], and so on
          * so to sync to a specific document type node do:
          * <pre>
@@ -282,27 +282,27 @@ angular.module('umbraco.services')
          * @param {array} path array of ascendant ids, ex: ["1023","1243"] (loads a specific document type into the settings tree)
          * @param {bool} forceReload forces a reload of data from the server
          */
-        syncPath: function (path, forceReload) {
-            if(this.ui.treeEventHandler){
-                this.ui.treeEventHandler.syncPath(path,forceReload);
+        syncPath: function(path, forceReload) {
+            if (this.ui.treeEventHandler) {
+                this.ui.treeEventHandler.syncPath(path, forceReload);
             }
         },
 
-        reloadNode: function (node) {
-            if(this.ui.treeEventHandler){
+        reloadNode: function(node) {
+            if (this.ui.treeEventHandler) {
                 this.ui.treeEventHandler.reloadNode(node);
             }
         },
 
-        reloadSection: function (sectionAlias) {
-            if(this.ui.treeEventHandler){
+        reloadSection: function(sectionAlias) {
+            if (this.ui.treeEventHandler) {
                 this.ui.treeEventHandler.clearCache({ section: sectionAlias });
                 this.ui.treeEventHandler.load(sectionAlias);
             }
         },
 
-        setActiveTreeType: function (treeAlias) {
-            if(this.ui.treeEventHandler){
+        setActiveTreeType: function(treeAlias) {
+            if (this.ui.treeEventHandler) {
                 this.ui.treeEventHandler.setActiveTreeType(treeAlias);
             }
         },
@@ -316,7 +316,7 @@ angular.module('umbraco.services')
          * Sets a service variable as soon as the user hovers the navigation with the mouse
          * used by the leaveTree method to delay hiding
          */
-        enterTree: function (event) {
+        enterTree: function(event) {
             service.active = true;
         },
 
@@ -328,18 +328,18 @@ angular.module('umbraco.services')
          * @description
          * Hides navigation tree, with a short delay, is cancelled if the user moves the mouse over the tree again
          */
-        leaveTree: function (event) {
+        leaveTree: function(event) {
             //this is a hack to handle IE touch events
             //which freaks out due to no mouse events
             //so the tree instantly shuts down
-            if(!event){
+            if (!event) {
                 return;
             }
 
-            if(!service.touchDevice){
+            if (!service.touchDevice) {
                 service.active = false;
-                $timeout(function(){
-                    if(!service.active){
+                $timeout(function() {
+                    if (!service.active) {
                         service.hideTree();
                     }
                 }, 300);
@@ -354,7 +354,7 @@ angular.module('umbraco.services')
          * @description
          * Hides the tree by hiding the containing dom element
          */
-        hideTree: function () {
+        hideTree: function() {
 
             if (this.ui.tablet && !this.ui.stickyNavigation) {
                 //reset it to whatever is in the url
@@ -375,14 +375,14 @@ angular.module('umbraco.services')
          *
          * @param {Event} event the click event triggering the method, passed from the DOM element
          */
-        showMenu: function (event, args) {
+        showMenu: function(event, args) {
 
             var deferred = $q.defer();
             var self = this;
 
             treeService.getMenu({ treeNode: args.node })
                 .then(function(data) {
-                    
+
                     //check for a default
                     //NOTE: event will be undefined when a call to hideDialog is made so it won't re-load the default again.
                     // but perhaps there's a better way to deal with with an additional parameter in the args ? it works though.
@@ -393,7 +393,7 @@ angular.module('umbraco.services')
                         });
 
                         if (found) {
-                            
+
                             self.ui.currentNode = args.node;
                             //ensure the current dialog is cleared before creating another!
                             if (self.ui.currentDialog) {
@@ -414,18 +414,18 @@ angular.module('umbraco.services')
                     }
 
                     //there is no default or we couldn't find one so just continue showing the menu                    
-                    
+
                     setMode("menu");
-                    
+
                     ui.actions = data.menuItems;
-                    
+
                     ui.currentNode = args.node;
                     ui.dialogTitle = args.node.name;
 
                     //we're not opening a dialog, return null.
                     deferred.resolve(null);
                 });
-            
+
             return deferred.promise;
         },
 
@@ -437,7 +437,7 @@ angular.module('umbraco.services')
          * @description
          * Hides the menu by hiding the containing dom element
          */
-        hideMenu: function () {
+        hideMenu: function() {
             var selectedId = $routeParams.id;
             this.ui.currentNode = undefined;
             this.ui.actions = [];
@@ -454,7 +454,7 @@ angular.module('umbraco.services')
          * Opens the user dialog, next to the sections navigation
          * template is located in views/common/dialogs/user.html
          */
-        showUserDialog: function () {
+        showUserDialog: function() {
             service.userDialog = dialogService.open(
                 {
                     template: "views/common/dialogs/user.html",
@@ -474,7 +474,7 @@ angular.module('umbraco.services')
          * Opens the user dialog, next to the sections navigation
          * template is located in views/common/dialogs/user.html
          */
-        showHelpDialog: function () {
+        showHelpDialog: function() {
             service.helpDialog = dialogService.open(
                 {
                     template: "views/common/dialogs/help.html",
@@ -494,18 +494,18 @@ angular.module('umbraco.services')
          * Hides the user dialog, next to the sections navigation
          * template is located in views/common/dialogs/user.html
          */
-        hideUserDialog: function () {
-            if(service.userDialog){
+        hideUserDialog: function() {
+            if (service.userDialog) {
                 service.userDialog.close();
                 service.userDialog = undefined;
-            } 
+            }
         },
 
-        hideHelpDialog: function () {
-            if(service.helpDialog){
+        hideHelpDialog: function() {
+            if (service.helpDialog) {
                 service.helpDialog.close();
                 service.helpDialog = undefined;
-            } 
+            }
         },
 
         /**
@@ -529,7 +529,7 @@ angular.module('umbraco.services')
          * @param {Scope} args.scope current scope passed to the dialog
          * @param {Object} args.action the clicked action containing `name` and `alias`
          */
-        showDialog: function (args) {
+        showDialog: function(args) {
 
             if (!args) {
                 throw "showDialog is missing the args parameter";
@@ -573,7 +573,7 @@ angular.module('umbraco.services')
                 iframe = false;
             }
             else {
-                
+
                 //by convention we will look into the /views/{treetype}/{action}.html
                 // for example: /views/content/create.html
 
@@ -588,7 +588,7 @@ angular.module('umbraco.services')
                 }
 
                 if (packageTreeFolder) {
-                    templateUrl = Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath + 
+                    templateUrl = Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
                         "/" + packageTreeFolder +
                         "/umbraco/" + treeAlias + "/" + args.action.alias + ".html";
                 }
@@ -630,8 +630,8 @@ angular.module('umbraco.services')
 	     * @description
 	     * hides the currently open dialog
 	     */
-        hideDialog: function () {
-            this.showMenu(undefined, {skipDefault: true, node: this.ui.currentNode });
+        hideDialog: function() {
+            this.showMenu(undefined, { skipDefault: true, node: this.ui.currentNode });
         },
         /**
           * @ngdoc method
@@ -641,7 +641,7 @@ angular.module('umbraco.services')
           * @description
           * shows the search pane
           */
-        showSearch: function () {
+        showSearch: function() {
             setMode("search");
         },
         /**
@@ -652,7 +652,7 @@ angular.module('umbraco.services')
           * @description
           * hides the search pane
         */
-        hideSearch: function () {
+        hideSearch: function() {
             setMode("default-hidesearch");
         },
         /**
@@ -663,7 +663,7 @@ angular.module('umbraco.services')
           * @description
           * hides any open navigation panes and resets the tree, actions and the currently selected node
           */
-        hideNavigation: function () {
+        hideNavigation: function() {
             this.ui.actions = [];
             //this.ui.currentNode = undefined;
             setMode("default");
@@ -671,4 +671,6 @@ angular.module('umbraco.services')
     };
 
     return service;
-});
+}
+
+angular.module('umbraco.services').factory('navigationService', navigationService);
