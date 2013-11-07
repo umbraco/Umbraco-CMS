@@ -7,6 +7,8 @@ using System.Web.Caching;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Events;
+using Umbraco.Core.Models.Rdbms;
+
 using umbraco.DataLayer;
 
 namespace umbraco.BusinessLogic
@@ -80,22 +82,17 @@ namespace umbraco.BusinessLogic
                     () =>
                         {
                             var tmp = new List<UserType>();
-                            using (var dr = SqlHelper.ExecuteReader("select id, userTypeName, userTypeAlias, userTypeDefaultPermissions from umbracoUserType"))
+                            var dtos = ApplicationContext.Current.DatabaseContext.Database.Fetch<UserTypeDto>("");
+                            foreach (var dto in dtos)
                             {
-                                while (dr.Read())
-                                {
-                                    tmp.Add(new UserType(
-                                                dr.GetShort("id"),
-                                                dr.GetString("userTypeName"),
-                                                dr.GetString("userTypeDefaultPermissions"),
-                                                dr.GetString("userTypeAlias")));
-                                }
+                                tmp.Add(new UserType(dto.Id, dto.Name, dto.DefaultPermissions, dto.Alias));
                             }
                             return tmp;
                         });
             }
         }
-
+        
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         private static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -156,16 +153,10 @@ namespace umbraco.BusinessLogic
             if (_id <= 0)
                 throw new Exception("The current UserType object does not exist in the database. New UserTypes should be created with the MakeNew method");
 
-            SqlHelper.ExecuteNonQuery(@"
-				update umbracoUserType set
-				userTypeAlias=@alias,userTypeName=@name,userTypeDefaultPermissions=@permissions
-                where id=@id",
-                                      SqlHelper.CreateParameter("@alias", _alias),
-                                      SqlHelper.CreateParameter("@name", _name),
-                                      SqlHelper.CreateParameter("@permissions", _defaultPermissions),
-                                      SqlHelper.CreateParameter("@id", _id)
-                );
-
+            ApplicationContext.Current.DatabaseContext.Database.Update<UserTypeDto>(
+                "set userTypeAlias=@alias,userTypeName=@name,userTypeDefaultPermissions=@permissions where id=@id",
+                new {alias = _alias, name = _name, permissions = _defaultPermissions, id = _id});
+ 
             //raise event
             OnUpdated(this, new EventArgs());
         }
@@ -179,8 +170,8 @@ namespace umbraco.BusinessLogic
             if (_id <= 0)
                 throw new Exception("The current UserType object does not exist in the database. New UserTypes should be created with the MakeNew method");
 
-            SqlHelper.ExecuteNonQuery(@"delete from umbracoUserType where id=@id", SqlHelper.CreateParameter("@id", _id));
-
+            ApplicationContext.Current.DatabaseContext.Database.Delete<UserTypeDto>("where id=@id", new {id = _id});
+           
             //raise event
             OnDeleted(this, new EventArgs());
         }
@@ -221,37 +212,25 @@ namespace umbraco.BusinessLogic
             if (existing != null)
                 throw new Exception("The UserType alias specified already exists");
 
-            SqlHelper.ExecuteNonQuery(@"
-				insert into umbracoUserType 
-				(userTypeAlias,userTypeName,userTypeDefaultPermissions) 
-				values (@alias,@name,@permissions)",
-                SqlHelper.CreateParameter("@alias", alias),
-                SqlHelper.CreateParameter("@name", name),
-                SqlHelper.CreateParameter("@permissions", defaultPermissions));
-            
-            //get it's id
-            var newId = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoUserType WHERE userTypeAlias=@alias", SqlHelper.CreateParameter("@alias", alias));
+            var newId = ApplicationContext.Current.DatabaseContext.Database.Insert(new UserTypeDto
+                                                                       {
+                                                                           Alias = alias,
+                                                                           Name = name,
+                                                                           DefaultPermissions = defaultPermissions
+                                                                       });
 
-            //load the instance and return it
-            using (var dr = SqlHelper.ExecuteReader(
-                "select id, userTypeName, userTypeAlias, userTypeDefaultPermissions from umbracoUserType where id=@id", 
-                SqlHelper.CreateParameter("@id", newId)))
+            var newItem = ApplicationContext.Current.DatabaseContext.Database.SingleOrDefault<UserTypeDto>("where id=@id",new {id=newId});
+            if (newItem != null)
             {
-                if (dr.Read())
-                {
-                    var ut = new UserType(
-                        dr.GetShort("id"),
-                        dr.GetString("userTypeName"),
-                        dr.GetString("userTypeDefaultPermissions"),
-                        dr.GetString("userTypeAlias"));
+                var ut = new UserType(newItem.Id, newItem.Name, newItem.DefaultPermissions, newItem.Alias);
 
-                    //raise event
-                    OnNew(ut, new EventArgs());
+                //raise event
+                OnNew(ut, new EventArgs());
 
-                    return ut;
-                }
-                throw new InvalidOperationException("Could not read the new User Type with id of " + newId);
+                return ut;
             }
+            throw new InvalidOperationException("Could not read the new User Type with id of " + newId);
+        
         }
 
         /// <summary>
