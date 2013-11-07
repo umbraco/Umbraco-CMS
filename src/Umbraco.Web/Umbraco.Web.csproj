@@ -405,6 +405,9 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.designer.cs">
       <DependentUpon>AssignDomain2.aspx</DependentUpon>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\members\EditMember.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="UmbracoContextExtensions.cs" />
     <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\editstylesheet.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
@@ -1399,13 +1402,6 @@
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Updates\IUpdateList.cs" />
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Modules\MacroModule\TemplateUpdate.cs" />
     <Compile Include="umbraco.presentation\umbraco\LiveEditing\Utility.cs" />
-    <Compile Include="umbraco.presentation\umbraco\members\EditMember.aspx.cs">
-      <DependentUpon>EditMember.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\EditMember.aspx.designer.cs">
-      <DependentUpon>EditMember.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx.cs">
       <DependentUpon>EditMemberGroup.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1966,9 +1962,6 @@
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltInsertValueOf.aspx" />
     <Content Include="umbraco.presentation\umbraco\js\language.aspx" />
-    <Content Include="umbraco.presentation\umbraco\members\EditMember.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx">
       <SubType>Form</SubType>
     </Content>
