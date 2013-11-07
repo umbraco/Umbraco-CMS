@@ -6,6 +6,8 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Rdbms;
+
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Linq;
@@ -37,13 +39,13 @@ namespace umbraco.cms.businesslogic.language
         /// Gets the SQL helper.
         /// </summary>
         /// <value>The SQL helper.</value>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
         }
 
-        protected internal const string m_SQLOptimizedGetAll = @"select * from umbracoLanguage";
-
+ 
         #endregion
         
         #region Constructors
@@ -86,24 +88,11 @@ namespace umbraco.cms.businesslogic.language
                 if (culture != null)
                 {
                     //insert it
-                    SqlHelper.ExecuteNonQuery(
-                        "insert into umbracoLanguage (languageISOCode) values (@CultureCode)",
-                        SqlHelper.CreateParameter("@CultureCode", cultureCode));
-
-                    //get it's id
-                    var newId = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoLanguage WHERE languageISOCode=@cultureCode", SqlHelper.CreateParameter("@cultureCode", cultureCode));
-
-                    //load it and raise events
-                    using (var dr = SqlHelper.ExecuteReader(string.Format("{0} where id = {1}", m_SQLOptimizedGetAll, newId)))
-                    {
-                        while (dr.Read())
-                        {
-
-                            var ct = new Language();
-                            ct.PopulateFromReader(dr);
-                            ct.OnNew(new NewEventArgs());
-                        }
-                    }
+                    var newId = ApplicationContext.Current.DatabaseContext.Database.Insert(new LanguageDto { IsoCode = cultureCode });
+                    var ct = new Language { _id = Convert.ToInt32(newId), _cultureAlias = cultureCode };
+                    ct.UpdateNames();
+                    ct.OnNew(new NewEventArgs());
+                     
                 }
             }
         }
@@ -135,19 +124,18 @@ namespace umbraco.cms.businesslogic.language
                 () =>
                     {
                         var languages = new List<Language>();
-                        using (var dr = SqlHelper.ExecuteReader(m_SQLOptimizedGetAll))
+                        var dtos = ApplicationContext.Current.DatabaseContext.Database.Fetch<LanguageDto>("");
+                        foreach (var dto in dtos)
                         {
-                            while (dr.Read())
-                            {
-                                //create the ContentType object without setting up
-                                var ct = new Language();
-                                ct.PopulateFromReader(dr);
-                                languages.Add(ct);
-                            }
+                            var ct = new Language {_id = dto.Id, _cultureAlias = dto.IsoCode};
+                            ct.UpdateNames();
+                            languages.Add(ct);
                         }
                         return languages;
                     });
         }
+
+      
 
         /// <summary>
         /// Gets the language by its culture code, if no language is found, null is returned
@@ -209,9 +197,11 @@ namespace umbraco.cms.businesslogic.language
             set
             {
                 _cultureAlias = value;
-                SqlHelper.ExecuteNonQuery(
-                    "update umbracoLanguage set languageISOCode = @cultureAlias where id = @id", SqlHelper.CreateParameter("@id", id),
-                    SqlHelper.CreateParameter("@cultureAlias", _cultureAlias));
+                ApplicationContext.Current.DatabaseContext.Database.Update<LanguageDto>(
+                    "set languageISOCode = @cultureAlias where id = @id",
+                    new { cultureAlias = _cultureAlias,id=id}
+                    );
+ 
                 UpdateNames();
             }
         }
@@ -277,10 +267,9 @@ namespace umbraco.cms.businesslogic.language
         {            
             lock (Locker)
             {
-                if (SqlHelper.ExecuteScalar<int>("SELECT count(id) FROM umbracoDomains where domainDefaultLanguage = @id",
-                   SqlHelper.CreateParameter("@id", id)) == 0)
-                {
 
+                if (ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>("SELECT count(id) FROM umbracoDomains where domainDefaultLanguage = @id", new { id = id }) == 0)
+                {
                     var e = new DeleteEventArgs();
                     FireBeforeDelete(e);
 
@@ -289,9 +278,8 @@ namespace umbraco.cms.businesslogic.language
                         //remove the dictionary entries first
                         Item.RemoveByLanguage(id);
 
-                        SqlHelper.ExecuteNonQuery("delete from umbracoLanguage where id = @id",
-                            SqlHelper.CreateParameter("@id", id));
-
+                        ApplicationContext.Current.DatabaseContext.Database.Delete<LanguageDto>("where id = @id",
+                                                                                                new {id = id});
                         FireAfterDelete(e);
                     }
                 }
@@ -328,7 +316,8 @@ namespace umbraco.cms.businesslogic.language
             _cultureAlias = dr.GetString("languageISOCode");
             
             UpdateNames();
-        } 
+        }
+
         #endregion
 
         #region Private methods
