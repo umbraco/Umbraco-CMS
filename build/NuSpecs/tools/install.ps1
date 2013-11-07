@@ -26,7 +26,7 @@ if ($project) {
 	# If we don't do this, the correct version never gets copied in
 	$projectDestinationPath = Split-Path $project.FullName -Parent
 	$jsonDllFile = Join-Path $projectDestinationPath "bin\Newtonsoft.Json.dll"
-	Remove-Item $jsonDllFile -Confirm:$false
+	if (Test-Path $jsonDllFile) { Remove-Item $jsonDllFile -Confirm:$false }
 	
 	# Open readme.txt file
 	$DTE.ItemOperations.OpenFile($toolsPath + '\Readme.txt')
