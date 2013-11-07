@@ -43,7 +43,10 @@ namespace Umbraco.Core.IO
         //Replaces tildes with the root dir
         public static string ResolveUrl(string virtualPath)
         {
-            if (virtualPath.StartsWith("~"))
+            if (string.IsNullOrWhiteSpace(virtualPath))
+                return string.Empty;
+
+             if (virtualPath.StartsWith("~"))
                 return virtualPath.Replace("~", SystemDirectories.Root).Replace("//", "/");
             else if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
                 return virtualPath;
