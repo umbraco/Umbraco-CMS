@@ -146,8 +146,9 @@ namespace umbraco.dialogs
             var contentType = contentTypeService.GetContentType(
                 int.Parse(Request.GetItemAsString("id")));
 
-            var alias = rename.Text.Replace("'", "''");
+            var alias = rename.Text.Trim().Replace("'", "''");
             var clone = ((Umbraco.Core.Models.ContentType) contentType).Clone(alias);
+			clone.Name = rename.Text.Trim();
             contentTypeService.Save(clone);
 
             var returnUrl = string.Format("{0}/settings/editNodeTypeNew.aspx?id={1}", SystemDirectories.Umbraco, clone.Id);
