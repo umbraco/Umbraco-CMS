@@ -8,6 +8,8 @@ namespace Umbraco.Core
 	/// </summary>
 	public static class SystemUtilities
 	{
+	    private static bool _knowTrustLevel;
+	    private static AspNetHostingPermissionLevel _trustLevel;
 
 		/// <summary>
 		/// Get the current trust level of the hosted application
@@ -15,6 +17,8 @@ namespace Umbraco.Core
 		/// <returns></returns>
 		public static AspNetHostingPermissionLevel GetCurrentTrustLevel()
 		{
+		    if (_knowTrustLevel) return _trustLevel;
+
 			foreach (var trustLevel in new[] {
 			                                 	AspNetHostingPermissionLevel.Unrestricted,
 			                                 	AspNetHostingPermissionLevel.High,
@@ -31,10 +35,14 @@ namespace Umbraco.Core
 					continue;
 				}
 
-				return trustLevel;
+                _trustLevel = trustLevel;
+			    _knowTrustLevel = true;
+			    return _trustLevel;
 			}
 
-			return AspNetHostingPermissionLevel.None;
-		}
+			_trustLevel = AspNetHostingPermissionLevel.None;
+            _knowTrustLevel = true;
+            return _trustLevel;
+        }
 	}
 }

@@ -1949,8 +1949,6 @@
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltChooseExtension.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\Xslt\xsltInsertValueOf.aspx" />
     <Content Include="umbraco.presentation\umbraco\js\language.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\members\EditMemberGroup.aspx">
       <SubType>Form</SubType>
     </Content>
