@@ -37,35 +37,33 @@
   cursor: text;
 }
 
-.umb-headline-editor-wrapper, 
-h1.headline{
+.umb-headline-editor-wrapper h1.headline{
   height: 20px; padding: 30px 0 0 20px;
   position: relative;
 }
 
-.umb-headline-editor-wrapper h1, h1.headline {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 400;
-  text-align: left;
-  height: 25px;
-  border: 1px solid transparent;
+.umb-panel-header .umb-headline {
+  font-size: 18px;
+  border: none;
+  background: none;
+  margin: 25px 0 0 20px;
+  padding: 0;
+  height: auto;
+  width: 100%;
+  border-bottom: 1px dotted #f8f8f8;
 }
 
-.umb-headline-editor-wrapper h1:hover {
-  border: 1px dashed @inputBorder;
-  background-color: rgba(255,255,255,0.8);
-  margin: -10px 0 0 -7px;
-  padding: 10px 0 0 7px
+.umb-panel-header .umb-headline:hover,.umb-panel-header .umb-headline:active  {
+  border-bottom: 1px dotted @grayLight;
+  color: @black
 }
 
-.umb-headline-editor-wrapper 
-  .help-inline{
-      right: 0px;
-      top: 25px;
-      position: absolute;
-      font-size: 10px;
-      color: @red;
+.umb-headline-editor-wrapper .help-inline{
+  right: 0px;
+  top: 25px;
+  position: absolute;
+  font-size: 10px;
+  color: @red;
   }
 
 .umb-panel-header .umb-nav-tabs{
@@ -83,7 +81,7 @@ h1.headline{
   width: 100%;
 }
 .umb-panel-header p {
-    margin:0px 20px;
+  margin:0px 20px;
 }
 
 .umb-btn-toolbar .dimmed{
@@ -122,8 +120,6 @@ h1.headline{
     float: right;
     padding: 20px 20px 0 0;
 }
-
-
 
 .umb-panel-footer {
   margin: 0;

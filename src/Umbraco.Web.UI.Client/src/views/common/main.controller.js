@@ -104,7 +104,7 @@ function MainController($scope, $location, $routeParams, $rootScope, $timeout, $
                 $("#avatar-img").fadeTo(1000, 0, function(){
                       
                       $timeout(function(){
-                        $scope.avatar = "http://www.gravatar.com/avatar/" + $scope.user.emailHash +".jpg?s=32&d=wavatar";
+                        $scope.avatar = "http://www.gravatar.com/avatar/" + $scope.user.emailHash +".jpg?s=64&d=mm";
                       });
                       
                       $("#avatar-img").fadeTo(1000, 1);

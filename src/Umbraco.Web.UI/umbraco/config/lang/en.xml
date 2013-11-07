@@ -241,7 +241,7 @@
   <area alias="placeholders">
     <key alias="username">Enter your username</key>
     <key alias="password">Enter your password</key>
-
+    <key alias="nameentity">Name the %0%...</key>
     <key alias="entername">Enter a name...</key>
     <key alias="search">Type to search...</key>
     <key alias="filter">Type to filter...</key>
@@ -353,6 +353,7 @@
     <key alias="logout">Logout</key>
     <key alias="macro">Macro</key>
     <key alias="move">Move</key>
+    <key alias="more">More</key>
     <key alias="name">Name</key>
     <key alias="new">New</key>
     <key alias="next">Next</key>
