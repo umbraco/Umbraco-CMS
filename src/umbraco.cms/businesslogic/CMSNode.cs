@@ -258,24 +258,24 @@ namespace umbraco.cms.businesslogic
             else
                 path = "-1";
 
-            // Ruben 8/1/2007: I replace this with a parameterized version.
-            // But does anyone know what the 'level++' is supposed to be doing there?
-            // Nothing obviously, since it's a postfix.
-
-            SqlHelper.ExecuteNonQuery("INSERT INTO umbracoNode(trashed, parentID, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text, createDate) VALUES(@trashed, @parentID, @nodeObjectType, @nodeUser, @level, @path, @sortOrder, @uniqueID, @text, @createDate)",
-                                      SqlHelper.CreateParameter("@trashed", 0),
-                                      SqlHelper.CreateParameter("@parentID", parentId),
-                                      SqlHelper.CreateParameter("@nodeObjectType", objectType),
-                                      SqlHelper.CreateParameter("@nodeUser", userId),
-                                      SqlHelper.CreateParameter("@level", level++),
-                                      SqlHelper.CreateParameter("@path", path),
-                                      SqlHelper.CreateParameter("@sortOrder", sortOrder),
-                                      SqlHelper.CreateParameter("@uniqueID", uniqueID),
-                                      SqlHelper.CreateParameter("@text", text),
-                                      SqlHelper.CreateParameter("@createDate", DateTime.Now));
+            Database.Execute(
+                "INSERT INTO umbracoNode(trashed, parentID, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text, createDate) VALUES(@trashed, @parentID, @nodeObjectType, @nodeUser, @level, @path, @sortOrder, @uniqueID, @text, @createDate)",
+                new
+                {
+                    trashed = false,
+                    parentID = parentId,
+                    nodeObjectType = objectType,
+                    nodeUser = userId,
+                    level,
+                    path,
+                    sortOrder,
+                    uniqueID,
+                    text,
+                    createDate = DateTime.Now
+                });
 
             CMSNode retVal = new CMSNode(uniqueID);
-            retVal.Path = path + "," + retVal.Id.ToString();
+            retVal.Path = path + "," + retVal.Id;
 
             // NH 4.7.1 duplicate permissions because of refactor
             if (parent != null)
@@ -285,7 +285,6 @@ namespace umbraco.cms.businesslogic
                 {
                     Permission.MakeNew(User.GetUser(p.UserId), retVal, p.PermissionId);
                 }
-
             }
 
             //event
@@ -297,18 +296,13 @@ namespace umbraco.cms.businesslogic
 
         private static int GetNewDocumentSortOrder(int parentId)
         {
-            var sortOrder = 0;
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                        "SELECT MAX(sortOrder) AS sortOrder FROM umbracoNode WHERE parentID = @parentID AND nodeObjectType = @GuidForNodesOfTypeDocument",
-                        SqlHelper.CreateParameter("@parentID", parentId),
-                        SqlHelper.CreateParameter("@GuidForNodesOfTypeDocument", Document._objectType)
-                  ))
-            {
-                while (dr.Read())
-                    sortOrder = dr.GetInt("sortOrder") + 1;
-            }
-
-            return sortOrder;
+            // I'd let other node types than document get a sort order too, but that'll be a bugfix
+            // I'd also let it start on 1, but then again, it didn't.
+            var max = Database.SingleOrDefault<int?>(
+                "SELECT MAX(sortOrder) FROM umbracoNode WHERE parentId = @parentId AND nodeObjectType = @ObjectTypeId",
+                new {parentId, ObjectTypeId = Document._objectType}
+                );
+            return (max ?? -1) + 1;
         }
 
         /// <summary>
