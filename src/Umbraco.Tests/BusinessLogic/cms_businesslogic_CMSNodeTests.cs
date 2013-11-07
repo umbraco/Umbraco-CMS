@@ -239,7 +239,8 @@ namespace Umbraco.Tests.BusinessLogic
             EnsureTestDocumentTypes();
             var node = new CMSNode(testContentType3);
             node.IsTrashed = true;
-            var actual = database.ExecuteScalar<bool>("SELECT trashed FROM umbracoNode WHERE id = @id",
+            var actual = database.ExecuteScalar<bool>(
+                "SELECT trashed FROM umbracoNode WHERE id = @id",
                 new {id = testContentType3.Id});
             Assert.IsTrue(actual);
         }
@@ -248,10 +249,34 @@ namespace Umbraco.Tests.BusinessLogic
         public void IsTrashed_WhenTrashed_ReturnsTrue()
         {
             EnsureTestDocumentTypes();
-            database.Execute("UPDATE umbracoNode SET trashed = 1 WHERE id = @id",
+            database.Execute(
+                "UPDATE umbracoNode SET trashed = 1 WHERE id = @id",
                 new { id = testContentType3.Id });
             var node = new CMSNode(testContentType3);
             Assert.IsTrue(node.IsTrashed);
+        }
+
+        [Test]
+        public void getAllUniqueNodeIdsFromObjectType_ReturnsIds()
+        {
+            EnsureTestDocumentTypes();
+            var ids = CMSNode.getAllUniqueNodeIdsFromObjectType(new Guid(DocumentTypeObjectTypeId));
+            var expectedIds = contentTypes.Select(c => c.Id).OrderBy(id => id);
+            var actualIds = ids.OrderBy(id => id);
+            Assert.IsTrue(expectedIds.SequenceEqual(actualIds));
+        }
+
+        [Test]
+        public void getAllUniquesFromObjectType_ReturnsGuids()
+        {
+            EnsureTestDocumentTypes();
+            var guids = CMSNode.getAllUniquesFromObjectType(new Guid(DocumentTypeObjectTypeId));
+            var expectedIds = database.Fetch<Guid>(
+                "SELECT uniqueId FROM umbracoNode WHERE nodeObjectType = @ObjectTypeId",
+                new {ObjectTypeId = DocumentTypeObjectTypeId})
+                .OrderBy(id => id);
+            var actualIds = guids.OrderBy(id => id);
+            Assert.IsTrue(expectedIds.SequenceEqual(actualIds));
         }
 
         private void EnsureTestDocumentTypes()
