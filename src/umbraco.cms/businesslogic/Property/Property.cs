@@ -59,6 +59,10 @@ namespace umbraco.cms.businesslogic.property
 
             //Just to ensure that there is a PropertyType available
             _pt = PropertyType.GetPropertyType(property.PropertyTypeId);
+
+            if (_pt.DataTypeDefinition.DataType== null)
+                throw new Exception(string.Format("The datatype '{0}' for property '{1} couldn't be loaded", _pt.DataTypeDefinition.Text, _pt.Name));
+
             _data = _pt.DataTypeDefinition.DataType.Data;
             _data.PropertyId = Id;
         }
