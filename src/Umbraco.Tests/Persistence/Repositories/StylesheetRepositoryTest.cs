@@ -4,7 +4,6 @@ using System.Text;
 using NUnit.Framework;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
@@ -29,9 +28,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
+            var dbProvider = new PetaPocoUnitOfWorkProvider();
+            var dbUnitOfWork = dbProvider.GetUnitOfWork();
 
             // Act
-            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
+            var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
 
 
             // Assert
@@ -44,7 +45,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
+            var dbProvider = new PetaPocoUnitOfWorkProvider();
+            var dbUnitOfWork = dbProvider.GetUnitOfWork();
+
+            var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
 
             // Act
             var stylesheet = new Stylesheet("test-add.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
@@ -61,7 +65,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
+            var dbProvider = new PetaPocoUnitOfWorkProvider();
+            var dbUnitOfWork = dbProvider.GetUnitOfWork();
+            var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
 
             // Act
             var stylesheet = new Stylesheet("test-update.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
@@ -87,7 +93,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
+            var dbProvider = new PetaPocoUnitOfWorkProvider();
+            var dbUnitOfWork = dbProvider.GetUnitOfWork();
+            var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
 
             // Act
             var stylesheet = new Stylesheet("test-delete.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
@@ -107,7 +115,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
+            var dbProvider = new PetaPocoUnitOfWorkProvider();
+            var dbUnitOfWork = dbProvider.GetUnitOfWork();
+            var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
 
             // Act
             var stylesheet = repository.Get("styles.css");
@@ -125,7 +135,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
+            var dbProvider = new PetaPocoUnitOfWorkProvider();
+            var dbUnitOfWork = dbProvider.GetUnitOfWork();
+            var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
 
             var stylesheet = new Stylesheet("styles-v2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.AddOrUpdate(stylesheet);
@@ -147,7 +159,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
+            var dbProvider = new PetaPocoUnitOfWorkProvider();
+            var dbUnitOfWork = dbProvider.GetUnitOfWork();
+            var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
 
             var stylesheet = new Stylesheet("styles-v2.css") { Content = "body { color:#000; } .bold {font-weight:bold;}" };
             repository.AddOrUpdate(stylesheet);
@@ -169,7 +183,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             // Arrange
             var provider = new FileUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
-            var repository = new StylesheetRepository(unitOfWork, _fileSystem);
+            var dbProvider = new PetaPocoUnitOfWorkProvider();
+            var dbUnitOfWork = dbProvider.GetUnitOfWork();
+            var repository = new StylesheetRepository(unitOfWork, dbUnitOfWork, _fileSystem);
 
             // Act
             var exists = repository.Exists("styles.css");
