@@ -84,8 +84,6 @@ namespace umbraco.cms.presentation.create.controls
                         }
                         counter++;
                     }
-
-
                 }
                 if (nodeType.Items.Count == 0) {
                     sbmt.Enabled = false;
