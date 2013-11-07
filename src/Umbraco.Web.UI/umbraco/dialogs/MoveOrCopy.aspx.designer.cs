@@ -11,5 +11,23 @@ namespace Umbraco.Web.UI.Umbraco.Dialogs {
     
     
     public partial class MoveOrCopy {
+        
+        /// <summary>
+        /// CustomValidation1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CustomValidator CustomValidation1;
+        
+        /// <summary>
+        /// CustomValidation2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CustomValidator CustomValidation2;
     }
 }
