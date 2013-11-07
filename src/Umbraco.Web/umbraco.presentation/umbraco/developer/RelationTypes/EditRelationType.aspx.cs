@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.relation;
@@ -82,10 +83,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
 			get
 			{
 				if (this._relations == null)
-				{
-					this._relations = new List<ReadOnlyRelation>();
-
-				    using (var reader = uQuery.SqlHelper.ExecuteReader(@"
+                    this._relations = ApplicationContext.Current.DatabaseContext.Database.Fetch<ReadOnlyRelation>(@"
                         SELECT  A.id, 
                                 A.parentId,
 		                        B.[text] AS parentText,
@@ -97,25 +95,7 @@ namespace umbraco.cms.presentation.developer.RelationTypes
                         FROM umbracoRelation A 
 	                        LEFT OUTER JOIN umbracoNode B ON A.parentId = B.id
 	                        LEFT OUTER JOIN umbracoNode C ON A.childId = C.id					
-                        WHERE A.relType = " + this._relationType.Id.ToString()))
-					{
-						while (reader.Read())
-						{
-							var readOnlyRelation = new ReadOnlyRelation();
-
-							readOnlyRelation.Id = reader.GetInt("id");
-							readOnlyRelation.ParentId = reader.GetInt("parentId");
-							readOnlyRelation.ParentText = reader.GetString("parentText");
-							readOnlyRelation.ChildId = reader.GetInt("childId");
-							readOnlyRelation.ChildText = reader.GetString("childText");
-							readOnlyRelation.RelType = reader.GetInt("relType");
-							readOnlyRelation.DateTime = reader.GetDateTime("datetime");
-							readOnlyRelation.Comment = reader.GetString("comment");
-
-							this._relations.Add(readOnlyRelation);
-						}
-					}
-				}
+                        WHERE A.relType = " + this._relationType.Id.ToString());
 
 				return this._relations;
 			}
