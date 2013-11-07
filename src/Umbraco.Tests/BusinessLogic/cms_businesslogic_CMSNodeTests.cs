@@ -225,6 +225,35 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.IsTrue(leaf.HasChildren);
         }
 
+        [Test]
+        public void IsTrashed_New_ReturnsFalse()
+        {
+            EnsureTestDocumentTypes();
+            var node = new CMSNode(testContentType3);
+            Assert.IsFalse(node.IsTrashed);
+        }
+
+        [Test]
+        public void IsTrashed_WhenSet_Persists()
+        {
+            EnsureTestDocumentTypes();
+            var node = new CMSNode(testContentType3);
+            node.IsTrashed = true;
+            var actual = database.ExecuteScalar<bool>("SELECT trashed FROM umbracoNode WHERE id = @id",
+                new {id = testContentType3.Id});
+            Assert.IsTrue(actual);
+        }
+
+        [Test]
+        public void IsTrashed_WhenTrashed_ReturnsTrue()
+        {
+            EnsureTestDocumentTypes();
+            database.Execute("UPDATE umbracoNode SET trashed = 1 WHERE id = @id",
+                new { id = testContentType3.Id });
+            var node = new CMSNode(testContentType3);
+            Assert.IsTrue(node.IsTrashed);
+        }
+
         private void EnsureTestDocumentTypes()
         {
             CreateContext();
