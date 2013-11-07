@@ -80,6 +80,9 @@ namespace umbraco.presentation.umbraco.dialogs
 		    if (contentType != null)
 		        dtNameConfirm.Text = contentType.Name;
 
+            // Clean up the temporary file from App_Data
+            System.IO.File.Delete(tempFile.Value);
+
 		    Wizard.Visible = false;
 			Confirm.Visible = false;
 			done.Visible = true;
