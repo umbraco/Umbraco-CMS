@@ -659,9 +659,8 @@ order by level,sortOrder";
             {
                 if (!_hasChildrenInitialized)
                 {
-                    int tmpChildrenCount = SqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where ParentId = @id",
-                        SqlHelper.CreateParameter("@id", Id));
-                    HasChildren = (tmpChildrenCount > 0);
+                    _hasChildren = ChildCount > 0;
+                    _hasChildrenInitialized = true;
                 }
                 return _hasChildren;
             }
