@@ -177,7 +177,7 @@ namespace umbraco.cms.businesslogic.web
 
         public static Domain GetDomain(string DomainName)
         {
-        	return GetDomains().FirstOrDefault(d => d.Name == DomainName);
+            return GetDomains().FirstOrDefault(d => d.Name.InvariantEquals(DomainName));
         }
 
         public static int GetRootFromDomain(string DomainName)
