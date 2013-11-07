@@ -6,9 +6,8 @@
     <umb-panel>
         <umb-header tabs="content.tabs">
 
-            <div class="span8">
-                <input type="text"
-                    select-on-focus 
+            <div class="span7">
+                <input type="text" 
                     class="umb-headline" 
                     localize="placeholder" 
                     placeholder="@placeholders_nameentity:content.contentTypeName'" 
@@ -17,7 +16,7 @@
                     {{content.contentTypeName}}
             </div>
 
-            <div class="span4">
+            <div class="span5">
                 
                 <div class="btn-toolbar pull-right umb-btn-toolbar">
                     <div class="btn-group" ng-animate="'fade'" ng-show="formStatus">
@@ -27,11 +26,7 @@
                     <div class="btn-group" ng-class="{dimmed: content.id === 0}">
                         <!-- options button -->
                         <a class="btn" href="#" ng-click="options(content)" prevent-default data-toggle="dropdown">
-                           <i class="icon-settings" style="line-height: 14px"></i> Options
-                        </a>
-                        
-                        <a class="btn dropdown-toggle" ng-click="options(content)" data-toggle="dropdown">
-                            <span class="caret"></span>
+                            Options <span class="caret"></span>
                         </a>
                         
                         <!-- actions -->
