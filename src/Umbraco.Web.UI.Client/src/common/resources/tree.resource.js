@@ -62,8 +62,8 @@ function treeResource($q, $http, umbRequestHelper) {
         /** Loads in the data to display the child nodes for a given node */
         loadNodes: function (options) {
 
-            if (!options || !options.node || !options.section) {
-                throw "The options parameter object does not contain the required properties: 'node' and 'section'";
+            if (!options || !options.node) {
+                throw "The options parameter object does not contain the required properties: 'node'";
             }
 
             return umbRequestHelper.resourcePromise(

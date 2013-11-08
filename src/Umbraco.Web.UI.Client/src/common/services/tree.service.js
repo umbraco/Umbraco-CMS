@@ -44,9 +44,12 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                 //if there is not route path specified, then set it automatically,
                 //if this is a tree root node then we want to route to the section's dashboard
                 if (!treeNodes[i].routePath) {
+                    //set the section for each tree node - this allows us to reference this easily when accessing tree nodes
+                    treeNodes[i].section = section;
+                    
                     if (treeNodes[i].metaData && treeNodes[i].metaData["treeAlias"]) {
                         //this is a root node
-                        treeNodes[i].routePath = section;
+                        treeNodes[i].routePath = section;                        
                     }
                     else {
                         var treeAlias = this.getTreeAlias(treeNodes[i]);
@@ -149,10 +152,10 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
          */
         loadNodeChildren: function(args) {
             if (!args) {
-                throw "No args object defined for getChildren";
+                throw "No args object defined for loadNodeChildren";
             }
             if (!args.node) {
-                throw "No node defined on args object for getChildren";
+                throw "No node defined on args object for loadNodeChildren";
             }
             
             this.removeChildNodes(args.node);
@@ -350,12 +353,192 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
 
             var self = this;
 
-            return treeResource.loadNodes({ section: section, node: treeItem })
+            return treeResource.loadNodes({ node: treeItem })
                 .then(function (data) {
                     //now that we have the data, we need to add the level property to each item and the view
                     self._formatNodeDataForUseInUI(treeItem, data, section, treeItem.level + 1);
                     return data;
                 });
+        },
+        
+        /** This re-loads the single node from the server */
+        reloadNode: function(node) {
+            if (!node) {
+                throw "node cannot be null";
+            }
+            if (!node.parent) {
+                throw "cannot reload a single node without a parent";
+            }
+            if (!node.section) {
+                throw "cannot reload a single node without an assigned node.section";
+            }
+            
+            var deferred = $q.defer();
+            
+            //set the node to loading
+            node.loading = true;
+
+            this.getChildren({ node: node.parent, section: node.section }).then(function(data) {
+
+                //ok, now that we have the children, find the node we're reloading
+                var found = _.find(data, function(item) {
+                    return item.id === node.id;
+                });
+                if (found) {
+                    //now we need to find the node in the parent.children collection to replace
+                    var index = _.indexOf(node.parent.children, node);
+                    //the trick here is to not actually replace the node - this would cause the delete animations
+                    //to fire, instead we're just going to replace all the properties of this node.
+                    _.extend(node.parent.children[index], found);                    
+                    //set the node to loading
+                    node.parent.children[index].loading = false;
+                    //return
+                    deferred.resolve(node.parent.children[index]);
+                }
+                else {
+                    deferred.reject();
+                }
+            }, function() {
+                deferred.reject();
+            });
+            
+            return deferred.promise;
+        },
+
+        syncTree: function(args) {
+            
+            if (!args) {
+                throw "No args object defined for syncTree";
+            }
+            if (!args.node) {
+                throw "No node defined on args object for syncTree";
+            }
+            if (!args.path) {
+                throw "No path defined on args object for syncTree";
+            }
+            //if (!current.metaData["treeAlias"] && !args.node.section) {
+            //    throw "No section defined on args.node object for syncTree";
+            //}
+            if (!angular.isArray(args.path)) {
+                throw "Path must be an array";
+            }
+            if (args.path.length < 1) {
+                throw "args.path must contain at least one id";
+            }
+
+            var deferred = $q.defer();
+
+            //get the rootNode for the current node, we'll sync based on that
+            var root = this.getTreeRoot(args.node);
+            if (!root) {
+                throw "Could not get the root tree node based on the node passed in";
+            }
+            
+            //now we want to loop through the ids in the path, first we'll check if the first part
+            //of the path is the root node, otherwise we'll search it's children.
+            var currPathIndex = 0;
+            //if the first id is the root node and there's only one... then consider it synced
+            if (String(args.path[currPathIndex]) === String(args.node.id)) {
+
+                if (args.path.length === 1) {
+                    //return the root
+                    deferred.resolve(root);
+                }
+                else {
+                    currPathIndex = 1;
+                }
+            }
+            else {
+                
+                //now that we have the first id to lookup, we can start the process
+
+                var self = this;
+                var node = args.node;
+                
+                var doSync = function() {
+                    if (node.children) {
+                        //children are loaded, check for the existence
+                        var child = self.getChildNode(node, args.path[currPathIndex]);
+                        if (child) {
+                            if (args.path.length === (currPathIndex + 1)) {
+                                //woot! synced the node
+                                if (!args.forceReload) {
+                                    deferred.resolve(child);
+                                }
+                                else {
+                                    //even though we've found the node if forceReload is specified
+                                    //we want to go update this single node from the server
+                                    self.reloadNode(child).then(function (reloaded) {
+                                        deferred.resolve(reloaded);
+                                    }, function() {
+                                        deferred.reject();
+                                    });
+                                }
+                            }
+                            else {
+                                //now we need to recurse with the updated node/currPathIndex
+                                currPathIndex++;
+                                node = child;
+                                //recurse
+                                doSync();
+                            }
+                        }
+                        else {
+                            //we couldn't find the child, if forceReload is true, we can go re-fetch the child collection and try again
+                            if (args.forceReload) {
+                                self.loadNodeChildren({ node: node.parent }).then(function () {
+                                    //now we'll check again
+                                    child = self.getChildNode(node, args.path[currPathIndex]);
+                                    if (child) {
+                                        deferred.resolve(child);
+                                    }
+                                    else {
+                                        //fail!
+                                        deferred.reject();
+                                    }
+                                });
+                            }
+                            else {
+                                //fail!
+                                deferred.reject();
+                            }
+                        }
+                    }
+                    else {
+                        //the current node doesn't have it's children loaded, so go get them
+                        self.loadNodeChildren({ node: node }).then(function () {
+                            //ok, got the children, let's find it
+                            var found = self.getChildNode(node, args.path[currPathIndex]);
+                            if (found) {
+                                if (args.path.length === (currPathIndex + 1)) {
+                                    //woot! synced the node
+                                    deferred.resolve(found);
+                                }
+                                else {
+                                    //now we need to recurse with the updated node/currPathIndex
+                                    currPathIndex++;
+                                    node = found;
+                                    //recurse
+                                    doSync();
+                                }
+                            }
+                            else {
+                                //fail!
+                                deferred.reject();
+                            }
+                        }, function() {
+                            //fail!
+                            deferred.reject();
+                        });
+                    }
+                };
+
+                //start
+                doSync();
+            }
+            
+            return deferred.promise;
+
         }
         
     };

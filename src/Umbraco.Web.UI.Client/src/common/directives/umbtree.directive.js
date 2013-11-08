@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbTree
 * @restrict E
 **/
-function umbTreeDirective($compile, $log, $q, $rootScope, navigationService, treeService, notificationsService, $timeout) {
+function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificationsService, $timeout) {
 
     return {
         restrict: 'E',
@@ -106,7 +106,6 @@ function umbTreeDirective($compile, $log, $q, $rootScope, navigationService, tre
 
                             //reset current node selection
                             scope.currentNode = undefined;
-                            navigationService.ui.currentNode = undefined;
 
                             //filter the path for root node ids
                             path = _.filter(path, function(item) { return (item !== "init" && item !== "-1"); });
@@ -199,46 +198,21 @@ function umbTreeDirective($compile, $log, $q, $rootScope, navigationService, tre
                 }
 
                 function syncTree(node, path, forceReload) {
-                    if (!node || !path || path.length === 0) {
-                        return;
-                    }
 
-                    //we are directly above the changed node
-                    var onParent = (path.length === 1);
-                    var needsReload = true;
+                    enableDeleteAnimations = false;
 
-                    node.expanded = true;
+                    treeService.syncTree({
+                        node: node,
+                        path: path,
+                        forceReload: forceReload
+                    }).then(function (data) {
+                        scope.currentNode = data;
+                        emitEvent("treeSynced", { node: data });
+                        //enable delete animations
+                        enableDeleteAnimations = true;
+                    });
 
-                    //if we are not directly above, we will just try to locate
-                    //the node and continue down the path
-                    if (!onParent) {
-                        //if we can find the next node in the path 
-                        var child = treeService.getChildNode(node, path[0]);
-                        if (child) {
-                            needsReload = false;
-                            path.splice(0, 1);
-                            syncTree(child, path, forceReload);
-                        }
-                    }
-
-                    //if a reload is needed, all children will be loaded from server
-                    if (needsReload) {
-                        scope.loadChildren(node, forceReload)
-                            .then(function(children) {
-                                var child = treeService.getChildNode(node, path[0]);
-
-                                if (!onParent) {
-                                    path.splice(0, 1);
-                                    syncTree(child, path, forceReload);
-                                }
-                                else {
-                                    navigationService.ui.currentNode = child;
-                                    scope.currentNode = child;
-                                }
-                            });
-                    }
                 }
-
 
                 /** method to set the current animation for the node. 
                  *  This changes dynamically based on if we are changing sections or just loading normal tree data. 

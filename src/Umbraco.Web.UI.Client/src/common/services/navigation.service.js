@@ -194,8 +194,27 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         //adding this to get clean global access to the main tree directive
         //there will only ever be one main tree event handler
         //we need to pass in the current scope for binding these actions
+
+        //TODO: How many places are we assigning a currentNode?? Now we're assigning a currentNode arbitrarily to this
+        // scope - which looks to be the scope of the navigation controller - but then we are assigning a global current
+        // node on the ui object?? This is a mess.
+        
         setupTreeEvents: function(treeEventHandler, scope) {
             this.ui.treeEventHandler = treeEventHandler;
+
+            //when a tree node is synced this event will fire, this allows us to set the currentNode
+            this.ui.treeEventHandler.bind("treeSynced", function (ev, args) {
+                
+                //set the global current node
+                ui.currentNode = args.node;
+                //not sure what this is doing
+                scope.currentNode = args.node;
+                //what the heck is going on here? - this seems really zany, allowing us to modify the 
+                // navigationController.scope from within the navigationService to assign back to the args
+                // so that we can change the navigationController.scope from within the umbTree directive. Hrm.
+                args.scope = scope;
+                
+            });
 
             //this reacts to the options item in the tree
             this.ui.treeEventHandler.bind("treeOptionsClick", function(ev, args) {
