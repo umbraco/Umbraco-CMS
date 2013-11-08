@@ -1052,9 +1052,10 @@ order by level,sortOrder";
 
         protected internal virtual bool PreviewExists(Guid versionId)
         {
-            return (SqlHelper.ExecuteScalar<int>("SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId=@nodeId and versionId = @versionId",
-                        SqlHelper.CreateParameter("@nodeId", Id), SqlHelper.CreateParameter("@versionId", versionId)) != 0);
-
+            var count = Database.ExecuteScalar<int>(
+                "SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId=@nodeId and versionId = @versionId",
+                new {nodeId = Id, versionId});
+            return count > 0;
         }
 
         /// <summary>
@@ -1065,13 +1066,18 @@ order by level,sortOrder";
         [MethodImpl(MethodImplOptions.Synchronized)]
         protected void SavePreviewXml(XmlNode x, Guid versionId)
         {
-            string sql = PreviewExists(versionId) ? "UPDATE cmsPreviewXml SET xml = @xml, timestamp = @timestamp WHERE nodeId=@nodeId AND versionId = @versionId"
-                                : "INSERT INTO cmsPreviewXml(nodeId, versionId, timestamp, xml) VALUES (@nodeId, @versionId, @timestamp, @xml)";
-            SqlHelper.ExecuteNonQuery(sql,
-                                      SqlHelper.CreateParameter("@nodeId", Id),
-                                      SqlHelper.CreateParameter("@versionId", versionId),
-                                      SqlHelper.CreateParameter("@timestamp", DateTime.Now),
-                                      SqlHelper.CreateParameter("@xml", x.OuterXml));
+            string sql = PreviewExists(versionId) ? 
+                "UPDATE cmsPreviewXml SET xml = @xml, timestamp = @timestamp WHERE nodeId=@nodeId AND versionId = @versionId" :
+                "INSERT INTO cmsPreviewXml(nodeId, versionId, timestamp, xml) VALUES (@nodeId, @versionId, @timestamp, @xml)";
+            Database.Execute(sql, 
+                new
+                {
+                    nodeId = Id,
+                    versionId,
+                    timestamp = DateTime.Now,
+                    xml = x.OuterXml
+                }
+            );
         }
 
         private void PopulateCMSNodeFromDto(NodeDto dto)
