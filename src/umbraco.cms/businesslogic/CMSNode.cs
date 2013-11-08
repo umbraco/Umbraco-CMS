@@ -525,8 +525,10 @@ order by level,sortOrder";
                 //level and path might change even if it's the same newParent because the newParent could be moving somewhere.
                 if (ParentId != newParent.Id)
                 {
-                    int maxSortOrder = SqlHelper.ExecuteScalar<int>("select coalesce(max(sortOrder),0) from umbracoNode where parentid = @parentId",
-                        SqlHelper.CreateParameter("@parentId", newParent.Id));
+                    int maxSortOrder = Database.ExecuteScalar<int>(
+                        "select coalesce(max(sortOrder),0) from umbracoNode where parentid = @parentId",
+                        new { parentId = newParent.Id } 
+                    );
 
                     this.Parent = newParent;
                     this.sortOrder = maxSortOrder + 1;
