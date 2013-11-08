@@ -622,6 +622,8 @@ namespace Umbraco.Tests.BusinessLogic
 
         public void TopMostNodeIds_ReturnsUniqueIdsOfRootNodes()
         {
+            // Lacks testing of sorting
+
             // Root
             Assert.IsTrue(
                 new[] { new Guid("916724A5-173D-4619-B97E-B9DE133DD6F5") }

@@ -221,16 +221,11 @@ namespace umbraco.cms.businesslogic
         /// </returns>
         public static Guid[] TopMostNodeIds(Guid ObjectType)
         {
-            IRecordsReader dr = SqlHelper.ExecuteReader("Select uniqueID from umbracoNode where nodeObjectType = @type And parentId = -1 order by sortOrder",
-                SqlHelper.CreateParameter("@type", ObjectType));
-            System.Collections.ArrayList tmp = new System.Collections.ArrayList();
-
-            while (dr.Read()) tmp.Add(dr.GetGuid("uniqueID"));
-            dr.Close();
-
-            Guid[] retval = new Guid[tmp.Count];
-            for (int i = 0; i < tmp.Count; i++) retval[i] = (Guid)tmp[i];
-            return retval;
+            return Database.Fetch<Guid>(
+                "Select uniqueID from umbracoNode where nodeObjectType = @type And parentId = -1 order by sortOrder",
+                new {type = ObjectType}
+                )
+                .ToArray();
         }
 
         #endregion
@@ -1006,17 +1001,13 @@ order by level,sortOrder";
         /// </summary>
         protected virtual void setupNode()
         {
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(SqlSingle,
-                    SqlHelper.CreateParameter("@id", this.Id)))
+            try
             {
-                if (dr.Read())
-                {
-                    PopulateCMSNodeFromReader(dr);
-                }
-                else
-                {
-                    throw new ArgumentException(string.Format("No node exists with id '{0}'", Id));
-                }
+                SetupNodeFromDto("WHERE id = @id", new { id=_id });
+            }
+            catch (InvalidOperationException)
+            {
+                throw new ArgumentException(string.Format("No node exists with id '{0}'", Id));
             }
         }
 
