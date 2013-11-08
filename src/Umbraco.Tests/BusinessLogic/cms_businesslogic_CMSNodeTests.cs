@@ -407,14 +407,6 @@ namespace Umbraco.Tests.BusinessLogic
             // and if I can set EnableTableMapping or whatever it's named
         }
 
-        [Test]
-        public void GetPreviewXml_ReturnsXmlForPreview()
-        {
-            Assert.Inconclusive();
-            // Dunno how to create non-tableish dtos
-            // and if I can set EnableTableMapping or whatever it's named
-        }
-
         private void EnsureTestDocumentTypes()
         {
             CreateContext();

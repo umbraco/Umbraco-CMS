@@ -1037,16 +1037,12 @@ order by level,sortOrder";
 
         protected virtual XmlNode GetPreviewXml(XmlDocument xd, Guid version)
         {
-
-            XmlDocument xmlDoc = new XmlDocument();
-            using (XmlReader xmlRdr = SqlHelper.ExecuteXmlReader(
-                                                       "select xml from cmsPreviewXml where nodeID = @nodeId and versionId = @versionId",
-                                      SqlHelper.CreateParameter("@nodeId", Id),
-                                      SqlHelper.CreateParameter("@versionId", version)))
-            {
-                xmlDoc.Load(xmlRdr);
-            }
-
+            var xmlDoc = new XmlDocument();
+            var xml = Database.ExecuteScalar<string>(
+                "select xml from cmsPreviewXml where nodeID = @nodeId and versionId = @versionId",
+                new {nodeId = _id, versionId = version}
+                );
+            xmlDoc.LoadXml(xml);
             return xd.ImportNode(xmlDoc.FirstChild, true);
         }
 
