@@ -6,6 +6,8 @@ using System.Runtime.CompilerServices;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core;
 
 
 namespace umbraco.cms.businesslogic.macro
@@ -29,6 +31,7 @@ namespace umbraco.cms.businesslogic.macro
         cms.businesslogic.macro.Macro m_macro;
         cms.businesslogic.macro.MacroPropertyType _type;
 
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -123,22 +126,10 @@ namespace umbraco.cms.businesslogic.macro
 
         private void setup()
         {
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select macro, macroPropertyHidden, macroPropertyType, macroPropertySortOrder, macroPropertyAlias, macroPropertyName from cmsMacroProperty where id = @id", SqlHelper.CreateParameter("@id", _id)))
-            {
-                if (dr.Read())
-                {
-                    m_macro = new Macro(dr.GetInt("macro"));
-                    _public = dr.GetBoolean("macroPropertyHidden");
-                    _sortOrder = (int)dr.GetByte("macroPropertySortOrder");
-                    _alias = dr.GetString("macroPropertyAlias");
-                    _name = dr.GetString("macroPropertyName");
-                    _type = new MacroPropertyType(dr.GetShort("macroPropertyType"));
-                }
-                else
-                {
-                    throw new ArgumentException("No macro property found for the id specified");
-                }
-            }
+            ApplicationContext.Current.DatabaseContext.Database.FirstOrDefault<MacroPropertyDto>(
+                "select macro, macroPropertyHidden, macroPropertyType, macroPropertySortOrder, macroPropertyAlias, macroPropertyName from cmsMacroProperty where id = @0", _id)
+                .IfNull(x => { throw new ArgumentException(string.Format("No macro property found with the specified id = '{0}'", Id)); })
+                .IfNotNull<MacroPropertyDto>(x => PopulateMacroPropertyFromDto(x));
         }
 
         /// <summary>
@@ -146,28 +137,19 @@ namespace umbraco.cms.businesslogic.macro
         /// </summary>
         public void Delete()
         {
-            SqlHelper.ExecuteNonQuery("delete from cmsMacroProperty where id = @id", SqlHelper.CreateParameter("@id", this._id));
+            ApplicationContext.Current.DatabaseContext.Database.Execute("delete from cmsMacroProperty where id = @0", this._id);  
         }
 
         public void Save()
         {
             if (_id == 0)
             {
-                MacroProperty mp =
-                    MakeNew(m_macro, Public, Alias, Name, Type);
+                MacroProperty mp = MakeNew(m_macro, Public, Alias, Name, Type);
                 _id = mp.Id;
-
             }
             else
             {
-                SqlHelper.ExecuteNonQuery("UPDATE cmsMacroProperty set macro = @macro, macroPropertyHidden = @show, macropropertyAlias = @alias, macroPropertyName = @name, macroPropertyType = @type, macroPropertySortOrder = @so WHERE id = @id",
-    SqlHelper.CreateParameter("@id", Id),
-    SqlHelper.CreateParameter("@macro", Macro.Id),
-    SqlHelper.CreateParameter("@show", Public),
-    SqlHelper.CreateParameter("@alias", Alias),
-    SqlHelper.CreateParameter("@name", Name),
-    SqlHelper.CreateParameter("@type", Type.Id),
-    SqlHelper.CreateParameter("@so", SortOrder));
+                ApplicationContext.Current.DatabaseContext.Database.Update(PopulateDtoFromMacroProperty(this));
             }
         }
 
@@ -198,14 +180,9 @@ namespace umbraco.cms.businesslogic.macro
         public static MacroProperty[] GetProperties(int MacroId)
         {
             var props = new List<MacroProperty>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select id from cmsMacroProperty where macro = @macroId order by macroPropertySortOrder, id ASC", SqlHelper.CreateParameter("@macroId", MacroId)))
-            {                
-                while (dr.Read())
-                {
-                    props.Add(new MacroProperty(dr.GetInt("id")));
-                }
-                return props.ToArray();
-            }
+            ApplicationContext.Current.DatabaseContext.Database.Fetch<int>("select id from cmsMacroProperty where macro = @0 order by macroPropertySortOrder, id ASC", MacroId)
+                 .ForEach<int>(x => props.Add(new MacroProperty(x)));
+            return props.ToArray();
         }
 
         /// <summary>
@@ -221,17 +198,45 @@ namespace umbraco.cms.businesslogic.macro
         {
             int macroPropertyId = 0;
             // The method is synchronized
-            SqlHelper.ExecuteNonQuery("INSERT INTO cmsMacroProperty (macro, macroPropertyHidden, macropropertyAlias, macroPropertyName, macroPropertyType) VALUES (@macro, @show, @alias, @name, @type)",
-                SqlHelper.CreateParameter("@macro", M.Id),
-                SqlHelper.CreateParameter("@show", show),
-                SqlHelper.CreateParameter("@alias", alias),
-                SqlHelper.CreateParameter("@name", name),
-                SqlHelper.CreateParameter("@type", propertyType.Id));
-            macroPropertyId = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsMacroProperty");
+            var macroPropertyDto = new MacroPropertyDto()
+            {
+                Id = 0,
+                Hidden = show,
+                Type = (short)propertyType.Id,  
+                Macro = M.Id,
+                //SortOrder => default => 0,  
+                Alias = alias, 
+                Name = name    
+            };
+            ApplicationContext.Current.DatabaseContext.Database.Insert(macroPropertyDto);  
+
+            macroPropertyId = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>("SELECT MAX(id) FROM cmsMacroProperty");
             return new MacroProperty(macroPropertyId);
         }
 
         #endregion
 
+        private void PopulateMacroPropertyFromDto(MacroPropertyDto dto)
+        {
+            m_macro = new Macro(dto.Macro);
+            _public = dto.Hidden; // should it be !dto.Hidden? But original was dr.GetBoolean("macroPropertyHidden");
+            _sortOrder = dto.SortOrder;
+            _alias = dto.Alias;
+            _name = dto.Name;
+            _type = new MacroPropertyType(dto.Type);
+        }
+        private MacroPropertyDto PopulateDtoFromMacroProperty(MacroProperty p)
+        {
+            return new MacroPropertyDto()
+            {
+                 Macro = p.Macro.Id,
+                 Id = p.Id,
+                 Hidden = p.Public,
+                 Alias = p.Alias,
+                 Name = p.Name,
+                 Type = (short)p.Type.Id,
+                 SortOrder = (byte)p.SortOrder
+            };
+        }
     }
 }

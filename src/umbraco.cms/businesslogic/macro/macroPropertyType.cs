@@ -3,6 +3,9 @@ using System.Data;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
+using Umbraco.Core.Persistence;
+using Umbraco.Core;
+using Umbraco.Core.Models.Rdbms;
 
 namespace umbraco.cms.businesslogic.macro
 {
@@ -19,6 +22,7 @@ namespace umbraco.cms.businesslogic.macro
         string _baseType;
         private static List<MacroPropertyType> m_allPropertyTypes = new List<MacroPropertyType>();
 
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -29,20 +33,12 @@ namespace umbraco.cms.businesslogic.macro
             get
             {
                 if (m_allPropertyTypes.Count == 0)
-                {
-                    using (IRecordsReader dr = SqlHelper.ExecuteReader("select id from cmsMacroPropertyType order by macroPropertyTypeAlias"))
-                    {
-                        while (dr.Read())
-                        {
-                            m_allPropertyTypes.Add(new MacroPropertyType(dr.GetShort("id")));
-                        }
-                    }
-                }
+                    ApplicationContext.Current.DatabaseContext.Database.Fetch<int>("select id from cmsMacroPropertyType order by macroPropertyTypeAlias")
+                         .ForEach<int>(x => m_allPropertyTypes.Add(new MacroPropertyType(x)) );
 
-                return m_allPropertyTypes;
+                return m_allPropertyTypes; 
             }
         }
-
 
         /// <summary>
         /// Identifier
@@ -89,28 +85,25 @@ namespace umbraco.cms.businesslogic.macro
         /// <param name="Alias">The alias of the MacroPropertyType</param>
         public MacroPropertyType(string Alias)
         {
-            _id = SqlHelper.ExecuteScalar<int>("select id from cmsMacroPropertyType where macroPropertyTypeAlias = @alias", SqlHelper.CreateParameter("@alias", Alias));
+            var dto = ApplicationContext.Current.DatabaseContext.Database.FirstOrDefault<MacroPropertyTypeDto>("select id from cmsMacroPropertyType where macroPropertyTypeAlias = @0", Alias);
+            if (dto == null) throw new ArgumentException(string.Format("No macro property type found with the specified Alias  = '{0}'", Alias));
+            _id = dto.Id; 
             setup();
         }
 
         private void setup()
         {
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select macroPropertyTypeAlias, macroPropertyTypeRenderAssembly, macroPropertyTypeRenderType, macroPropertyTypeBaseType from cmsMacroPropertyType where id = @id", SqlHelper.CreateParameter("@id", _id)))
-            {
-                if (dr.Read())
+            ApplicationContext.Current.DatabaseContext.Database.FirstOrDefault<MacroPropertyTypeDto>(
+                "select macroPropertyTypeAlias, macroPropertyTypeRenderAssembly, macroPropertyTypeRenderType, macroPropertyTypeBaseType from cmsMacroPropertyType where id = @0", _id)
+                .IfNull(x => { throw new ArgumentException("No macro property type found with the id specified"); })
+                .IfNotNull<MacroPropertyTypeDto>(x =>
                 {
-                    _alias = dr.GetString("macroPropertyTypeAlias");
-                    _assembly = dr.GetString("macroPropertyTypeRenderAssembly");
-                    _type = dr.GetString("macroPropertyTypeRenderType");
-                    _baseType = dr.GetString("macroPropertyTypeBaseType");
-                }
-                else
-                {
-                    throw new ArgumentException("No macro property type found with the id specified");
-                }
-            }
+                    _alias = x.Alias;
+                    _assembly = x.RenderAssembly;
+                    _type = x.RenderType;
+                    _baseType = x.BaseType;
+                });               
         }
-
 
     }
 }
