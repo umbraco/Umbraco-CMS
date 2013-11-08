@@ -107,7 +107,7 @@ namespace umbraco.cms.businesslogic
         /// </returns>
         public static int CountByObjectType(Guid objectType)
         {
-            return Database.ExecuteScalar<int>("SELECT COUNT(*) from umbracoNode WHERE nodeObjectType = @objectType", new{objectType});
+            return Database.ExecuteScalar<int>("SELECT COUNT(*) from umbracoNode WHERE nodeObjectType = @objectType", new { objectType });
         }
 
         /// <summary>
@@ -162,7 +162,10 @@ namespace umbraco.cms.businesslogic
         /// <returns>True if there is a CMSNode with the given Guid</returns>
         public static bool IsNode(Guid uniqueID)
         {
-            return (SqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where uniqueID = @uniqueID", SqlHelper.CreateParameter("@uniqueId", uniqueID)) > 0);
+            return (Database.ExecuteScalar<int>(
+                "select count(id) from umbracoNode where uniqueID = @uniqueID",
+                new { uniqueID })
+                > 0);
         }
 
         /// <summary>
@@ -172,7 +175,10 @@ namespace umbraco.cms.businesslogic
         /// <returns>True if there is a CMSNode with the given id</returns>
         public static bool IsNode(int Id)
         {
-            return (SqlHelper.ExecuteScalar<int>("select count(id) from umbracoNode where id = @id", SqlHelper.CreateParameter("@id", Id)) > 0);
+            return (Database.ExecuteScalar<int>(
+                "select count(id) from umbracoNode where id = @id",
+                new { id = Id })
+                > 0);
         }
 
         /// <summary>
@@ -186,7 +192,7 @@ namespace umbraco.cms.businesslogic
         {
             return Database.Fetch<Guid>(
                 "SELECT uniqueID FROM umbracoNode WHERE nodeObjectType = @ObjectTypeId",
-                new{ObjectTypeId = objectType})
+                new { ObjectTypeId = objectType })
                 .ToArray();
         }
 
@@ -300,7 +306,7 @@ namespace umbraco.cms.businesslogic
             // I'd also let it start on 1, but then again, it didn't.
             var max = Database.SingleOrDefault<int?>(
                 "SELECT MAX(sortOrder) FROM umbracoNode WHERE parentId = @parentId AND nodeObjectType = @ObjectTypeId",
-                new {parentId, ObjectTypeId = Document._objectType}
+                new { parentId, ObjectTypeId = Document._objectType }
                 );
             return (max ?? -1) + 1;
         }
@@ -318,7 +324,7 @@ namespace umbraco.cms.businesslogic
             // This method can be deleted. It's not in use.
             return Database.Fetch<int>(
                 "Select id from umbracoNode where nodeObjectType = @objectType AND text like @letter",
-                new {objectType, letter = letter + "%"})
+                new { objectType, letter = letter + "%" })
                 .ToArray();
         }
 
@@ -369,7 +375,7 @@ namespace umbraco.cms.businesslogic
             _id = id;
 
             if (!noSetup)
-                SetupNodeFromDto("WHERE id = @id", new{id});
+                SetupNodeFromDto("WHERE id = @id", new { id });
         }
 
         /// <summary>
@@ -384,9 +390,9 @@ namespace umbraco.cms.businesslogic
         public CMSNode(Guid uniqueID, bool noSetup)
         {
             if (!noSetup)
-                SetupNodeFromDto("WHERE uniqueID = @uniqueID", new {uniqueID});
+                SetupNodeFromDto("WHERE uniqueID = @uniqueID", new { uniqueID });
             else
-                _id = Database.ExecuteScalar<int>("SELECT id FROM umbracoNode WHERE uniqueId = @uniqueID", new {uniqueID});
+                _id = Database.ExecuteScalar<int>("SELECT id FROM umbracoNode WHERE uniqueId = @uniqueID", new { uniqueID });
         }
 
         internal CMSNode(NodeDto dto)
@@ -472,7 +478,7 @@ order by level,sortOrder";
             string pathExp = childrenOnly ? Path + ",%" : Path;
 
             return Database.Fetch<NodeDto, PreviewXmlDto, CMSPreviewNode>(
-                (node, preview) => new CMSPreviewNode(node.NodeId, node.UniqueId.Value, node.ParentId, node.Level, node.SortOrder, preview.Xml, false), 
+                (node, preview) => new CMSPreviewNode(node.NodeId, node.UniqueId.Value, node.ParentId, node.Level, node.SortOrder, preview.Xml, false),
                 String.Format(sql, pathExp)
                 );
         }
@@ -684,7 +690,7 @@ order by level,sortOrder";
                 {
                     _isTrashed = Database.ExecuteScalar<bool>(
                         "SELECT trashed FROM umbracoNode where id=@id",
-                        new{id=_id});
+                        new { id = _id });
                 }
                 return _isTrashed.Value;
             }
@@ -693,7 +699,8 @@ order by level,sortOrder";
                 _isTrashed = value;
                 Database.Execute(
                     "update umbracoNode set trashed = @trashed where id = @id",
-                    new{trashed=value,id=_id});
+                    new { trashed = value, id = _id }
+                );
             }
         }
 
@@ -707,7 +714,10 @@ order by level,sortOrder";
             set
             {
                 _sortOrder = value;
-                SqlHelper.ExecuteNonQuery("update umbracoNode set sortOrder = '" + value + "' where id = " + this.Id.ToString());
+                Database.Execute(
+                    "update umbracoNode set sortOrder = @sortOrder where id = @id",
+                    new { sortOrder = _sortOrder, id = _id }
+                );
 
                 if (_entity != null)
                     _entity.SortOrder = value;
@@ -724,7 +734,10 @@ order by level,sortOrder";
             set
             {
                 _createDate = value;
-                SqlHelper.ExecuteNonQuery("update umbracoNode set createDate = @createDate where id = " + this.Id.ToString(), SqlHelper.CreateParameter("@createDate", _createDate));
+                Database.Execute(
+                    "update umbracoNode set createDate = @createDate where id = @id",
+                    new { createDate = _createDate, id = _id }
+                );
             }
         }
 
@@ -772,7 +785,10 @@ order by level,sortOrder";
             set
             {
                 _parentid = value.Id;
-                SqlHelper.ExecuteNonQuery("update umbracoNode set parentId = " + value.Id.ToString() + " where id = " + this.Id.ToString());
+                Database.Execute(
+                    "update umbracoNode set parentId = @parentId where id = @id",
+                    new { parentId = _parentid, id = _id }
+                );
 
                 if (_entity != null)
                     _entity.ParentId = value.Id;
@@ -790,7 +806,10 @@ order by level,sortOrder";
             set
             {
                 _path = value;
-                SqlHelper.ExecuteNonQuery("update umbracoNode set path = '" + _path + "' where id = " + this.Id.ToString());
+                Database.Execute(
+                    "update umbracoNode set path = @path where id = @id",
+                    new { path = _path, id = _id }
+                );
 
                 if (_entity != null)
                     _entity.Path = value;
@@ -808,7 +827,10 @@ order by level,sortOrder";
             set
             {
                 _level = value;
-                SqlHelper.ExecuteNonQuery("update umbracoNode set level = " + _level.ToString() + " where id = " + this.Id.ToString());
+                Database.Execute(
+                    "update umbracoNode set level = @level where id = @id",
+                    new { level = _level, id = _id }
+                );
 
                 if (_entity != null)
                     _entity.Level = value;
@@ -848,7 +870,7 @@ order by level,sortOrder";
             get
             {
                 return Database.ExecuteScalar<int>("SELECT COUNT(*) FROM umbracoNode where ParentID = @parentId",
-                                                    new{parentId = _id});
+                                                    new { parentId = _id });
             }
         }
 
@@ -861,8 +883,8 @@ order by level,sortOrder";
             get
             {
                 var children = Database.Fetch<NodeDto>(
-                    "WHERE ParentId = @ParentId AND nodeObjectType = @ObjectType ORDER BY SortOrder", 
-                    new {ParentId = _id, ObjectType = _nodeObjectType}
+                    "WHERE ParentId = @ParentId AND nodeObjectType = @ObjectType ORDER BY SortOrder",
+                    new { ParentId = _id, ObjectType = _nodeObjectType }
                 );
                 return children
                     .Select(c => new CMSNode(c))
@@ -910,13 +932,17 @@ order by level,sortOrder";
             get { return _text; }
             set
             {
-                _text = value;
-                SqlHelper.ExecuteNonQuery("UPDATE umbracoNode SET text = @text WHERE id = @id",
-                                          SqlHelper.CreateParameter("@text", value.Trim()),
-                                          SqlHelper.CreateParameter("@id", this.Id));
+                // Would've thrown nullreferenceexception since SQL update did value.Trim
+                // Can't be breaking to fix :)
+                // Also trimming text since it would be when loaded again
+                _text = (value ?? "").Trim();
+                Database.Execute(
+                    "UPDATE umbracoNode SET text = @text WHERE id = @id",
+                    new { text = _text, id = _id }
+                );
 
                 if (_entity != null)
-                    _entity.Name = value;
+                    _entity.Name = _text;
             }
         }
 
@@ -1038,7 +1064,7 @@ order by level,sortOrder";
             var xmlDoc = new XmlDocument();
             var xml = Database.ExecuteScalar<string>(
                 "select xml from cmsPreviewXml where nodeID = @nodeId and versionId = @versionId",
-                new {nodeId = _id, versionId = version}
+                new { nodeId = _id, versionId = version }
                 );
             xmlDoc.LoadXml(xml);
             return xd.ImportNode(xmlDoc.FirstChild, true);
@@ -1048,7 +1074,7 @@ order by level,sortOrder";
         {
             var count = Database.ExecuteScalar<int>(
                 "SELECT COUNT(nodeId) FROM cmsPreviewXml WHERE nodeId=@nodeId and versionId = @versionId",
-                new {nodeId = Id, versionId});
+                new { nodeId = Id, versionId });
             return count > 0;
         }
 
@@ -1060,10 +1086,10 @@ order by level,sortOrder";
         [MethodImpl(MethodImplOptions.Synchronized)]
         protected void SavePreviewXml(XmlNode x, Guid versionId)
         {
-            string sql = PreviewExists(versionId) ? 
+            string sql = PreviewExists(versionId) ?
                 "UPDATE cmsPreviewXml SET xml = @xml, timestamp = @timestamp WHERE nodeId=@nodeId AND versionId = @versionId" :
                 "INSERT INTO cmsPreviewXml(nodeId, versionId, timestamp, xml) VALUES (@nodeId, @versionId, @timestamp, @xml)";
-            Database.Execute(sql, 
+            Database.Execute(sql,
                 new
                 {
                     nodeId = Id,

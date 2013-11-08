@@ -561,12 +561,13 @@ namespace Umbraco.Tests.BusinessLogic
         public void Text_Set_Persists()
         {
             EnsureTestDocumentTypes();
-            var newText = "A new text";
+            var newText = "\tA new text  ";
+            var expectedText = "A new text";
             Setter_Persists(
                 testContentType1.Id,
                 n => n.Text = newText,
                 n => n.Text,
-                newText,
+                expectedText,
                 "text");
         }
 
