@@ -1,6 +1,7 @@
 using System;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Models.Rdbms;
 using umbraco.cms.businesslogic.cache;
 using umbraco.DataLayer;
 
@@ -12,87 +13,96 @@ namespace umbraco.cms.businesslogic.web
         private string _value;
 
         private static readonly Guid ModuleObjectType = new Guid("5555da4f-a123-42b2-4488-dcdfb25e4111");
-        
-        public StylesheetProperty(int id) : base(id)
+
+        public StylesheetProperty(int id)
+            : base(id)
         {
             InitProperty();
         }
 
-        public StylesheetProperty(Guid id) : base(id)
+        public StylesheetProperty(Guid id)
+            : base(id)
         {
             InitProperty();
         }
 
-        private  void InitProperty() 
+        private void InitProperty()
         {
-            var dr = SqlHelper.ExecuteReader("Select stylesheetPropertyAlias,stylesheetPropertyValue from cmsStylesheetProperty where nodeId = " + this.Id);
-            if (dr.Read())
-            {
-                _alias = dr.GetString("stylesheetPropertyAlias");
-                _value = dr.GetString("stylesheetPropertyValue");
-            } 
-            else
-                throw new ArgumentException("NO DATA EXSISTS");
-            dr.Close();
+            var prop =
+                ApplicationContext.Current.DatabaseContext.Database.SingleOrDefault<StylesheetPropertyDto>(
+                    "Select stylesheetPropertyAlias,stylesheetPropertyValue from cmsStylesheetProperty where nodeId = @NodeId",
+                    new { NodeId = Id });
+
+            if (prop == null) throw new ArgumentException("NO DATA EXSISTS");
+
+            _alias = prop.Alias;
+            _value = prop.Value;
         }
 
-        public StyleSheet StyleSheet() 
+        public StyleSheet StyleSheet()
         {
             return new StyleSheet(this.Parent.Id, true, false);
         }
 
-        public void RefreshFromFile() 
+        public void RefreshFromFile()
         {
             // ping the stylesheet
             var ss = new StyleSheet(this.Parent.Id);
             InitProperty();
         }
 
-        public string Alias 
+        public string Alias
         {
             get { return _alias; }
-            set 
+            set
             {
-                SqlHelper.ExecuteNonQuery(String.Format("update cmsStylesheetProperty set stylesheetPropertyAlias = '{0}' where nodeId = {1}", value.Replace("'", "''"), this.Id));
-                _alias=value;
+                ApplicationContext.Current.DatabaseContext.Database.Execute(
+                    "update cmsStylesheetProperty set stylesheetPropertyAlias = @Alias where nodeId = @NodeId",
+                    new { NodeId = Id, Alias = value.Replace("'", "''") });
+                _alias = value;
 
                 InvalidateCache();
             }
         }
 
-        public string value 
+        public string value
         {
             get { return _value; }
             set
             {
-                SqlHelper.ExecuteNonQuery(String.Format("update cmsStylesheetProperty set stylesheetPropertyValue = '{0}' where nodeId = {1}", value.Replace("'", "''"), this.Id));
+                ApplicationContext.Current.DatabaseContext.Database.Execute(
+                    "update cmsStylesheetProperty set stylesheetPropertyValue = @Alias where nodeId = @NodeId",
+                    new { NodeId = Id, Alias = value.Replace("'", "''") });
                 _value = value;
 
                 InvalidateCache();
             }
         }
 
-        public static StylesheetProperty MakeNew(string Text, StyleSheet sheet, BusinessLogic.User user)
+        public static StylesheetProperty MakeNew(string text, StyleSheet sheet, BusinessLogic.User user)
         {
-            var newNode = CMSNode.MakeNew(sheet.Id, ModuleObjectType, user.Id, 2, Text, Guid.NewGuid());
-            SqlHelper.ExecuteNonQuery(String.Format("Insert into cmsStylesheetProperty (nodeId,stylesheetPropertyAlias,stylesheetPropertyValue) values ('{0}','{1}','')", newNode.Id, Text));
+            var newNode = MakeNew(sheet.Id, ModuleObjectType, user.Id, 2, text, Guid.NewGuid());
+            ApplicationContext.Current.DatabaseContext.Database.Insert(new StylesheetPropertyDto
+                {
+                    NodeId = newNode.Id,
+                    Alias = text,
+                    Value = string.Empty
+                });
             var ssp = new StylesheetProperty(newNode.Id);
             var e = new NewEventArgs();
             ssp.OnNew(e);
             return ssp;
         }
 
-        public override void delete() 
+        public override void delete()
         {
             var e = new DeleteEventArgs();
             FireBeforeDelete(e);
+            if (e.Cancel) return;
 
-            if (!e.Cancel) 
-            {
-                SqlHelper.ExecuteNonQuery("delete from cmsStylesheetProperty where nodeId = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
-                base.delete();
-                FireAfterDelete(e);
-            }
+            ApplicationContext.Current.DatabaseContext.Database.Delete(new StylesheetPropertyDto { NodeId = Id });
+            base.delete();
+            FireAfterDelete(e);
         }
 
         public override void Save()
@@ -134,7 +144,7 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("Umbraco automatically refreshes the cache when stylesheets and stylesheet properties are saved or deleted")]
         private void InvalidateCache()
         {
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(GetCacheKey(Id));            
+            ApplicationContext.Current.ApplicationCache.ClearCacheItem(GetCacheKey(Id));
         }
 
         private static string GetCacheKey(int id)
@@ -165,7 +175,8 @@ namespace umbraco.cms.businesslogic.web
         /// Raises the <see cref="E:BeforeSave"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        new protected virtual void FireBeforeSave(SaveEventArgs e) {
+        new protected virtual void FireBeforeSave(SaveEventArgs e)
+        {
             if (BeforeSave != null)
                 BeforeSave(this, e);
         }
@@ -178,7 +189,8 @@ namespace umbraco.cms.businesslogic.web
         /// Raises the <see cref="E:AfterSave"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        new protected virtual void FireAfterSave(SaveEventArgs e) {
+        new protected virtual void FireAfterSave(SaveEventArgs e)
+        {
             if (AfterSave != null)
                 AfterSave(this, e);
         }
@@ -191,7 +203,8 @@ namespace umbraco.cms.businesslogic.web
         /// Raises the <see cref="E:New"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        protected virtual void OnNew(NewEventArgs e) {
+        protected virtual void OnNew(NewEventArgs e)
+        {
             if (New != null)
                 New(this, e);
         }
@@ -204,7 +217,8 @@ namespace umbraco.cms.businesslogic.web
         /// Raises the <see cref="E:BeforeDelete"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        new protected virtual void FireBeforeDelete(DeleteEventArgs e) {
+        new protected virtual void FireBeforeDelete(DeleteEventArgs e)
+        {
             if (BeforeDelete != null)
                 BeforeDelete(this, e);
         }
@@ -217,7 +231,8 @@ namespace umbraco.cms.businesslogic.web
         /// Raises the <see cref="E:AfterDelete"/> event.
         /// </summary>
         /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        new protected virtual void FireAfterDelete(DeleteEventArgs e) {
+        new protected virtual void FireAfterDelete(DeleteEventArgs e)
+        {
             if (AfterDelete != null)
                 AfterDelete(this, e);
         }
