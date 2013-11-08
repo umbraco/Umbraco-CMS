@@ -12,6 +12,9 @@ using Umbraco.Core.Logging;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Linq;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Models.Rdbms;
+using System.Collections.Generic;
 
 namespace umbraco.cms.businesslogic.macro
 {
@@ -47,9 +50,15 @@ namespace umbraco.cms.businesslogic.macro
 
         bool m_propertiesLoaded = false;
 
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
+        }
+
+        internal static UmbracoDatabase Database
+        {
+            get { return ApplicationContext.Current.DatabaseContext.Database; }
         }
 
 		/// <summary>
@@ -69,7 +78,7 @@ namespace umbraco.cms.businesslogic.macro
 			set 
 			{
 				_useInEditor = value;
-				SqlHelper.ExecuteNonQuery("update cmsMacro set macroUseInEditor = @macroAlias where id = @id", SqlHelper.CreateParameter("@macroAlias", value), SqlHelper.CreateParameter("@id", this.Id));
+               Database.Execute("update cmsMacro set macroUseInEditor = @0 where id = @1", value, this.Id);   
 			}
 		}
 
@@ -85,7 +94,7 @@ namespace umbraco.cms.businesslogic.macro
 			set 
 			{
 				_refreshRate = value;
-				SqlHelper.ExecuteNonQuery("update cmsMacro set macroRefreshRate = @macroAlias where id = @id", SqlHelper.CreateParameter("@macroAlias", value), SqlHelper.CreateParameter("@id", this.Id));
+                Database.Execute("update cmsMacro set macroRefreshRate = @0 where id = @1", value, this.Id);
 			}
 		}
 
@@ -100,7 +109,7 @@ namespace umbraco.cms.businesslogic.macro
 			set 
 			{
 				_alias = value;
-				SqlHelper.ExecuteNonQuery("update cmsMacro set macroAlias = @macroAlias where id = @id", SqlHelper.CreateParameter("@macroAlias", value), SqlHelper.CreateParameter("@id", this.Id));
+                Database.Execute("update cmsMacro set macroAlias = @0 where id = @1", value, this.Id);
 			}
 		}
 		
@@ -113,7 +122,7 @@ namespace umbraco.cms.businesslogic.macro
 			set 
 			{
 				_name = value;
-				SqlHelper.ExecuteNonQuery("update cmsMacro set macroName = @macroAlias where id = @id", SqlHelper.CreateParameter("@macroAlias", value), SqlHelper.CreateParameter("@id", this.Id));
+                Database.Execute("update cmsMacro set macroName = @0 where id = @1", value, this.Id);
 			}
 		}
 
@@ -128,7 +137,7 @@ namespace umbraco.cms.businesslogic.macro
 			set 
 			{
 				_assembly = value;
-				SqlHelper.ExecuteNonQuery("update cmsMacro set macroScriptAssembly = @macroAlias where id = @id", SqlHelper.CreateParameter("@macroAlias", value), SqlHelper.CreateParameter("@id", this.Id));
+                Database.Execute("update cmsMacro set macroScriptAssembly = @0 where id = @1", value, this.Id);
 			}
 		}
 
@@ -144,7 +153,7 @@ namespace umbraco.cms.businesslogic.macro
 			set 
 			{
 				_type = value;
-				SqlHelper.ExecuteNonQuery("update cmsMacro set macroScriptType = @macroAlias where id = @id", SqlHelper.CreateParameter("@macroAlias", value), SqlHelper.CreateParameter("@id", this.Id));
+                Database.Execute("update cmsMacro set macroScriptType = @0 where id = @1", value, this.Id);
 			}
 		}
 
@@ -159,7 +168,7 @@ namespace umbraco.cms.businesslogic.macro
 			set 
 			{
 				_xslt = value;
-				SqlHelper.ExecuteNonQuery("update cmsMacro set macroXSLT = @macroXslt where id = @id", SqlHelper.CreateParameter("@macroXslt", value), SqlHelper.CreateParameter("@id", this.Id));
+                Database.Execute( "update cmsMacro set macroXSLT = @0 where id = @1", value, this.Id);
 			}
 		}
 
@@ -175,7 +184,7 @@ namespace umbraco.cms.businesslogic.macro
             get { return _scriptingFile; }
             set {
                 _scriptingFile = value;
-                SqlHelper.ExecuteNonQuery("update cmsMacro set macroPython = @macroPython where id = @id", SqlHelper.CreateParameter("@macroPython", value), SqlHelper.CreateParameter("@id", this.Id));
+                Database.Execute("update cmsMacro set macroPython = @0 where id = @1", value, this.Id);
             }
         }
 
@@ -188,7 +197,7 @@ namespace umbraco.cms.businesslogic.macro
             get { return _renderContent; }
             set {
                 _renderContent = value;
-                SqlHelper.ExecuteNonQuery("update cmsMacro set macroDontRender = @macroDontRender where id = @id", SqlHelper.CreateParameter("@macroDontRender", !value), SqlHelper.CreateParameter("@id", this.Id));
+                Database.Execute("update cmsMacro set macroDontRender = @0 where id = @1", value, this.Id);
             }
         }
 
@@ -200,7 +209,7 @@ namespace umbraco.cms.businesslogic.macro
             get { return _cachePersonalized; }
             set {
                 _cachePersonalized = value;
-                SqlHelper.ExecuteNonQuery("update cmsMacro set macroCachePersonalized = @macroCachePersonalized where id = @id", SqlHelper.CreateParameter("@macroCachePersonalized", value), SqlHelper.CreateParameter("@id", this.Id));
+                Database.Execute("update cmsMacro set macroCachePersonalized = @0 where id = @1", value, this.Id);
             }
         }
 
@@ -212,7 +221,7 @@ namespace umbraco.cms.businesslogic.macro
             get { return _cacheByPage; }
             set {
                 _cacheByPage = value;
-                SqlHelper.ExecuteNonQuery("update cmsMacro set macroCacheByPage = @macroCacheByPage where id = @id", SqlHelper.CreateParameter("@macroCacheByPage", value), SqlHelper.CreateParameter("@id", this.Id));
+                Database.Execute("update cmsMacro set macroCacheByPage = @macroCacheByPage where id = @1", value, this.Id);
             }
         }
 
@@ -258,18 +267,10 @@ namespace umbraco.cms.businesslogic.macro
         /// <param name="alias">The alias.</param>
         public Macro(string alias)
         {
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select id from cmsMacro where macroAlias = @alias", SqlHelper.CreateParameter("@alias", alias)))
-            {
-                if (dr.Read())
-                {
-                    _id = dr.GetInt("id");
-                    setup();
-                }
-                else
-                {
-                    throw new IndexOutOfRangeException(string.Format("Alias '{0}' does not match an existing macro", alias));
-                }
-            }
+            var macro = Database.FirstOrDefault<MacroDto>("select id from cmsMacro where macroAlias = @0", alias);
+            if (macro == null) throw new IndexOutOfRangeException(string.Format("Alias '{0}' does not match an existing macro", alias));
+            _id = macro.Id;
+            setup();
         }
 
         /// <summary>
@@ -297,9 +298,8 @@ namespace umbraco.cms.businesslogic.macro
             FireBeforeDelete(e);
 
             if (!e.Cancel) {
-                foreach (MacroProperty p in this.Properties)
-                    p.Delete();
-                SqlHelper.ExecuteNonQuery("delete from cmsMacro where id = @id", SqlHelper.CreateParameter("@id", this._id));
+                foreach (MacroProperty p in this.Properties) p.Delete();
+                Database.Execute("delete from cmsMacro where id = @0", this._id);
 
                 FireAfterDelete(e);
             }
@@ -387,34 +387,29 @@ namespace umbraco.cms.businesslogic.macro
 
 		private void setup() 
 		{
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select id, macroUseInEditor, macroRefreshRate, macroAlias, macroName, macroScriptType, macroScriptAssembly, macroXSLT, macroPython, macroDontRender, macroCacheByPage, macroCachePersonalized  from cmsMacro where id = @id", SqlHelper.CreateParameter("@id", _id)))
-			{
-                if (dr.Read())
-                {
-                    PopulateMacroInfo(dr);
-                }
-                else
-                {
-                    throw new ArgumentException("No macro found for the id specified");
-                }
-			}
+            Database.FirstOrDefault<MacroDto>
+                ("select id, macroUseInEditor, macroRefreshRate, macroAlias, macroName, macroScriptType, " +
+                 "macroScriptAssembly, macroXSLT, macroPython, macroDontRender, macroCacheByPage, macroCachePersonalized  " +
+                 " from cmsMacro where id = @0", _id)
+            .IfNull<MacroDto>(x => { throw new ArgumentException("No macro found for the id specified"); })
+            .IfNotNull<MacroDto>(x => PopulateMacroFromDto(x));             
 		}
 
-        private void PopulateMacroInfo(IRecordsReader dr)
+        private void PopulateMacroFromDto(MacroDto dto)
         {
-            _useInEditor = dr.GetBoolean("macroUseInEditor");
-            _refreshRate = dr.GetInt("macroRefreshRate");
-            _alias = dr.GetString("macroAlias");
-            _id = dr.GetInt("id");
-            _name = dr.GetString("macroName");
-            _assembly = dr.GetString("macroScriptAssembly");
-            _type = dr.GetString("macroScriptType");
-            _xslt = dr.GetString("macroXSLT");
-            _scriptingFile = dr.GetString("macroPython");
+            _useInEditor = dto.UseInEditor;
+            _refreshRate = dto.RefreshRate;
+            _alias = dto.Alias;
+            _id = dto.Id;
+            _name = dto.Name;
+            _assembly = dto.ScriptAssembly;
+            _type = dto.ScriptType;
+            _xslt = dto.Xslt;
+            _scriptingFile = dto.Python;
 
-            _cacheByPage = dr.GetBoolean("macroCacheByPage");
-            _cachePersonalized = dr.GetBoolean("macroCachePersonalized");
-            _renderContent = !dr.GetBoolean("macroDontRender");
+            _cacheByPage = dto.CacheByPage;
+            _cachePersonalized = dto.CachePersonalized;
+            _renderContent = !dto.DontRender;
         }
 
 		/// <summary>
@@ -463,10 +458,8 @@ namespace umbraco.cms.businesslogic.macro
 		{
             int macroId = 0;
             // The method is synchronized
-            SqlHelper.ExecuteNonQuery("INSERT INTO cmsMacro (macroAlias, macroName) values (@macroAlias, @macroName)",
-                SqlHelper.CreateParameter("@macroAlias", Name.Replace(" ", String.Empty)),
-                SqlHelper.CreateParameter("@macroName", Name));
-            macroId = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsMacro");
+            Database.Execute("INSERT INTO cmsMacro (macroAlias, macroName) values (@0, @1)", Name.Replace(" ", String.Empty), Name);
+            macroId = Database.ExecuteScalar<int>("SELECT MAX(id) FROM cmsMacro"); 
 
             Macro newMacro = new Macro(macroId);
            
@@ -483,12 +476,13 @@ namespace umbraco.cms.businesslogic.macro
 		/// <returns>A list of all macroes</returns>
 		public static Macro[] GetAll() 
 		{
-			// zb-00001 #29927 : refactor
-			IRecordsReader dr = SqlHelper.ExecuteReader("select id from cmsMacro order by macroName");
-			var list = new System.Collections.Generic.List<Macro>();
-			while (dr.Read()) list.Add(new Macro(dr.GetInt("id")));
-			return list.ToArray();
+            return getObjects(Database.Fetch<int>("select id from cmsMacro order by macroName")).ToArray<Macro>();    
 		}
+
+        private static IEnumerable<Macro> getObjects(IEnumerable<int> ids)
+        {
+            foreach (var id in ids) yield return new Macro(id);
+        }
 
 		/// <summary>
 		/// Static contructor for retrieving a macro given an alias
@@ -625,5 +619,6 @@ namespace umbraco.cms.businesslogic.macro
                 AfterDelete(this, e);
         }
 		#endregion
-	}
+
+    }
 }
