@@ -13,6 +13,8 @@ using System.Collections.Generic;
 using umbraco.cms.businesslogic.cache;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Models.Rdbms;
 
 namespace umbraco.cms.businesslogic.template
 {
@@ -143,16 +145,15 @@ namespace umbraco.cms.businesslogic.template
         {
             base.setupNode();
 
-            IRecordsReader dr = SqlHelper.ExecuteReader("Select alias,design,master from cmsTemplate where nodeId = " + this.Id);
-            bool hasRows = dr.Read();
-            if (hasRows)
-            {
-                _alias = dr.GetString("alias");
-                _design = dr.GetString("design");
-                //set the master template to zero if it's null
-                _mastertemplate = dr.IsNull("master") ? 0 : dr.GetInt("master");
-            }
-            dr.Close();
+            Database.FirstOrDefault<TemplateDto>("Select alias,design,master from cmsTemplate where nodeId = @0", this.Id)
+                .IfNull<TemplateDto>(x => { throw new ArgumentException(string.Format("No Template found for the specified Id = '{0}'", this.Id)); })
+                .IfNotNull<TemplateDto>(x =>
+                    {
+                        _alias = x.Alias;
+                        _design = x.Design;
+                        //set the master template to zero if it's null
+                        _mastertemplate = x.Master == null? 0 : (int)x.Master;
+                    });
 
 			if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(this))
                 _design = ViewHelper.GetFileContents(this);
@@ -206,7 +207,7 @@ namespace umbraco.cms.businesslogic.template
                 _oldAlias = _alias;
                 _alias = value;
 
-                SqlHelper.ExecuteNonQuery("Update cmsTemplate set alias = @alias where NodeId = " + this.Id, SqlHelper.CreateParameter("@alias", _alias));
+                Database.Execute("Update cmsTemplate set alias = @alias where NodeId = @nodeId", new { alias = _alias, nodeId = this.Id });
                 _templateAliasesInitialized = false;
 
                 InitTemplateAliases();
@@ -226,7 +227,7 @@ namespace umbraco.cms.businesslogic.template
             {
                 if (!_hasChildrenInitialized)
                 {
-                    _hasChildren = SqlHelper.ExecuteScalar<int>("select count(NodeId) as tmp from cmsTemplate where master = " + Id) > 0;
+                    _hasChildren = Database.ExecuteScalar<int>("select count(NodeId) as tmp from cmsTemplate where master = " + Id) > 0;
                 }
                 return _hasChildren;
             }
@@ -249,9 +250,7 @@ namespace umbraco.cms.businesslogic.template
                 object masterVal = value;
                 if (value == 0) masterVal = DBNull.Value;
 
-                SqlHelper.ExecuteNonQuery("Update cmsTemplate set master = @master where NodeId = @nodeId",
-                    SqlHelper.CreateParameter("@master", masterVal),
-                    SqlHelper.CreateParameter("@nodeId", this.Id));
+                Database.Execute("Update cmsTemplate set master = @master where NodeId = @nodeId", new { master = masterVal, nodeId = this.Id});
             }
         }
 
@@ -278,10 +277,7 @@ namespace umbraco.cms.businesslogic.template
 					_design = MasterPageHelper.UpdateMasterPageFile(this, _oldAlias);
 				}
                 
-
-                SqlHelper.ExecuteNonQuery("Update cmsTemplate set design = @design where NodeId = @id",
-                        SqlHelper.CreateParameter("@design", _design),
-                        SqlHelper.CreateParameter("@id", Id));
+                Database.Execute("Update cmsTemplate set design = @design where NodeId = @id", new { design = _design, id = Id});
             }
         }
 
@@ -410,13 +406,9 @@ namespace umbraco.cms.businesslogic.template
 
             if (name.Length > 100)
                 name = name.Substring(0, 95) + "...";
-
           
-            SqlHelper.ExecuteNonQuery("INSERT INTO cmsTemplate (NodeId, Alias, design, master) VALUES (@nodeId, @alias, @design, @master)",
-                                      SqlHelper.CreateParameter("@nodeId", n.Id),
-                                      SqlHelper.CreateParameter("@alias", name),
-                                      SqlHelper.CreateParameter("@design", ' '),
-                                      SqlHelper.CreateParameter("@master", DBNull.Value));
+            Database.Execute("INSERT INTO cmsTemplate (NodeId, Alias, design, master) VALUES (@nodeId, @alias, @design, @master)",
+                               new { nodeId = n.Id, alias = name, design = " ", master = DBNull.Value });  
 
             Template t = new Template(n.Id);
             NewEventArgs e = new NewEventArgs();
@@ -466,7 +458,7 @@ namespace umbraco.cms.businesslogic.template
 			{
 				try
 				{
-					return new Template(SqlHelper.ExecuteScalar<int>("select nodeId from cmsTemplate where alias = @alias", SqlHelper.CreateParameter("@alias", Alias)));
+					return new Template(Database.ExecuteScalar<int>("select nodeId from cmsTemplate where alias = @0", Alias));
 				}
 				catch
 				{
@@ -553,7 +545,7 @@ namespace umbraco.cms.businesslogic.template
                 InitTemplateAliases();
 
                 //delete the template
-                SqlHelper.ExecuteNonQuery("delete from cmsTemplate where NodeId =" + this.Id);
+                Database.Execute("delete from cmsTemplate where NodeId =" + this.Id);
 
                 base.delete();
 
@@ -785,7 +777,6 @@ namespace umbraco.cms.businesslogic.template
 
             return t;
         }
-        
 
         #region Events
         //EVENTS
