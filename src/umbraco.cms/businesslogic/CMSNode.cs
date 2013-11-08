@@ -315,12 +315,11 @@ namespace umbraco.cms.businesslogic
         /// </returns>
         protected static int[] getUniquesFromObjectTypeAndFirstLetter(Guid objectType, char letter)
         {
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("Select id from umbracoNode where nodeObjectType = @objectType AND text like @letter", SqlHelper.CreateParameter("@objectType", objectType), SqlHelper.CreateParameter("@letter", letter.ToString() + "%")))
-            {
-                List<int> tmp = new List<int>();
-                while (dr.Read()) tmp.Add(dr.GetInt("id"));
-                return tmp.ToArray();
-            }
+            // This method can be deleted. It's not in use.
+            return Database.Fetch<int>(
+                "Select id from umbracoNode where nodeObjectType = @objectType AND text like @letter",
+                new {objectType, letter = letter + "%"})
+                .ToArray();
         }
 
 
