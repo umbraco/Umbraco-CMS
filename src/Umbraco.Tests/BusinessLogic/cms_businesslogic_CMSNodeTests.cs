@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using NUnit.Framework;
+using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
+using umbraco.cms.presentation;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Tests.TestHelpers;
@@ -305,7 +308,7 @@ namespace Umbraco.Tests.BusinessLogic
             int id = 0;
             try
             {
-                EnsureTestDocumentTypes();
+                CreateContext();
                 TestCMSNode.MakeNew(-1, 1, "TestContent 1", Document._objectType);
                 TestCMSNode.MakeNew(-1, 1, "TestContent 2", Document._objectType);
                 var node3 = TestCMSNode.MakeNew(-1, 1, "TestContent 3", Document._objectType);
@@ -320,8 +323,62 @@ namespace Umbraco.Tests.BusinessLogic
             }
             finally
             {
-                database.Delete<NodeDto>("WHERE nodeObjectType = @ObjectTypeId", new{ObjectTypeId=Document._objectType});
+                DeleteContent();
             }
+        }
+
+        [Test]
+        public void SavePreviewXml_WhenNew_PersistsXml()
+        {
+            EnsureTestDocumentTypes();
+            try
+            {
+                var node = Document.MakeNew("Test content", new DocumentType(testContentType1), new User(0), -1);
+                var asTestNode = new TestCMSNode(node.Id);
+                //var xmlNode = node.ToPreviewXml(new XmlDocument());
+                asTestNode.ExecuteSavePreviewXml(new XmlDocument(), node.Version);
+                var persistedXml = database.ExecuteScalar<string>("SELECT xml FROM cmsPreviewXml WHERE nodeId = @id",
+                    new {id = node.Id});
+
+                Console.WriteLine(persistedXml);
+                
+                Assert.IsNotNullOrEmpty(persistedXml);
+            }
+            finally
+            {
+                DeleteContent();
+            }
+        }
+
+        [Test]
+        public void SavePreviewXml_WhenExists_UpdatesXml()
+        {
+            EnsureTestDocumentTypes();
+            try
+            {
+                var node = Document.MakeNew("Test content", new DocumentType(testContentType1), new User(0), -1);
+                node.ToPreviewXml(new XmlDocument());
+                var asTestNode = new TestCMSNode(node.Id);
+                asTestNode.Text = "Updated test content";
+                asTestNode.ExecuteSavePreviewXml(new XmlDocument(), node.Version);
+                var persistedXml = database.ExecuteScalar<string>("SELECT xml FROM cmsPreviewXml WHERE nodeId = @id",
+                    new { id = node.Id });
+
+                Console.WriteLine(persistedXml);
+
+                Assert.IsNotNullOrEmpty(persistedXml);
+                Assert.IsTrue(persistedXml.Contains(asTestNode.Text));
+            }
+            finally
+            {
+                DeleteContent();
+            }
+        }
+
+        [Test]
+        public void ToPreviewXml_ReturnsPersistedXml()
+        {
+            
         }
 
         [Test]
@@ -364,6 +421,15 @@ namespace Umbraco.Tests.BusinessLogic
             foreach (var node in contentTypes)
                 DeleteContentType(node.Id);
             initialized = false;
+        }
+
+        private void DeleteContent()
+        {
+            database.Execute("DELETE cmsPreviewXml");
+            database.Execute("DELETE cmsContentVersion");
+            database.Execute("DELETE cmsDocument");
+            database.Execute("DELETE cmsContent");
+            database.Delete<NodeDto>("WHERE nodeObjectType = @ObjectTypeId", new {ObjectTypeId = Document._objectType});
         }
 
         private void DeleteContentType(int id)
@@ -423,6 +489,11 @@ namespace Umbraco.Tests.BusinessLogic
 
         private class TestCMSNode : CMSNode
         {
+            public TestCMSNode(int id)
+                : base(id)
+            {
+            }
+
             public static CMSNode MakeNew(
                 int parentId, 
                 int level,
@@ -430,6 +501,11 @@ namespace Umbraco.Tests.BusinessLogic
                 Guid objectType)
             {
                 return CMSNode.MakeNew(parentId, objectType, 0, level, text, Guid.NewGuid());
+            }
+
+            public void ExecuteSavePreviewXml(XmlDocument xd, Guid versionId)
+            {
+                SavePreviewXml(ToXml(xd, false), versionId);
             }
         }
     }
