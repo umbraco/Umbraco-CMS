@@ -7,6 +7,7 @@ using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using System.Collections.Generic;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Models.Rdbms;
 
 namespace umbraco.cms.businesslogic.relation
 {
@@ -40,18 +41,10 @@ namespace umbraco.cms.businesslogic.relation
 
 		public RelationType(int id)
 		{
-			using (IRecordsReader dr = SqlHelper.ExecuteReader(
-				"SELECT id, [dual], name, alias FROM umbracoRelationType WHERE id = @id", SqlHelper.CreateParameter("@id", id)))
-			{
-                if (dr.Read())
-                {
-                    PopulateFromReader(dr);
-                }
-                else
-                {
-                    throw new ArgumentException("Not RelationType found for id " + id.ToString());
-                }
-			}
+            var relationType = ApplicationContext.Current.DatabaseContext.Database.FirstOrDefault<RelationTypeDto>(
+                             "SELECT id, [dual], name, alias FROM umbracoRelationType WHERE id = @id", new { id = id });
+            if (relationType != null) PopulateFromDTO(relationType); 
+            else throw new ArgumentException("No RelationType found for id " + id.ToString());
 		}
 
 		#endregion
@@ -68,9 +61,7 @@ namespace umbraco.cms.businesslogic.relation
 			get { return _name; }
 			set
 			{
-				_name = value;
-				SqlHelper.ExecuteNonQuery(
-					"UPDATE umbracoRelationType SET name = @name WHERE id = " + this.Id.ToString(), SqlHelper.CreateParameter("@name", value));
+                ApplicationContext.Current.DatabaseContext.Database.Update<RelationTypeDto>("SET name = @0 WHERE id = @1", value, this.Id);  
 			}
 		}
 
@@ -79,9 +70,7 @@ namespace umbraco.cms.businesslogic.relation
 			get { return _alias; }
 			set
 			{
-				_alias = value;
-				SqlHelper.ExecuteNonQuery(
-					"UPDATE umbracoRelationType SET alias = @alias WHERE id = " + this.Id.ToString(), SqlHelper.CreateParameter("@alias", value));
+                ApplicationContext.Current.DatabaseContext.Database.Update<RelationTypeDto>("SET alias = @0 WHERE id = @1", value, this.Id);
 			}
 		}
 
@@ -90,23 +79,21 @@ namespace umbraco.cms.businesslogic.relation
 			get { return _dual; }
 			set
 			{
-				_dual = value;
-				SqlHelper.ExecuteNonQuery(
-					"UPDATE umbracoRelationType SET [dual] = @dual WHERE id = " + this.Id.ToString(), SqlHelper.CreateParameter("@dual", value));
+                ApplicationContext.Current.DatabaseContext.Database.Update<RelationTypeDto>("SET dual = @0 WHERE id = @1", value, this.Id);
 			}
 		}
 
 		#endregion
 
-        private void PopulateFromReader(IRecordsReader dr)
+        private void PopulateFromDTO(RelationTypeDto dto)
         {
-            this._id = dr.GetInt("id");
-            this._dual = dr.GetBoolean("dual");
-            //this._parentObjectType = dr.GetGuid("parentObjectType");
-            //this._childObjectType = dr.GetGuid("childObjectType");
-            this._name = dr.GetString("name");
-            this._alias = dr.GetString("alias");
-        }
+            this._id = dto.Id;
+            this._dual = dto.Dual;
+            //this._parentObjectType = dto.ParentObjectType; // it was commented out in original method PopulateFromReader(...)
+            //this._childObjectType = dto.ChildObjectType;  // it was commented out in original method PopulateFromReader(...)
+            this._name = dto.Name;
+            this._alias = dto.Alias; 
+        }        
 
 		#region Methods
 
@@ -123,19 +110,13 @@ namespace umbraco.cms.businesslogic.relation
         /// <returns></returns>
         public static IEnumerable<RelationType> GetAll()
         {
-            var relationTypes = new List<RelationType>();
-
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("SELECT id, [dual], name, alias FROM umbracoRelationType"))
+            foreach (var relationTypeDto in ApplicationContext.Current.DatabaseContext.Database.Query<RelationTypeDto>(
+                      "SELECT id, [dual], name, alias FROM umbracoRelationType"))
             {
-                while (dr.Read())
-                {
-                    var rt = new RelationType();
-                    rt.PopulateFromReader(dr);
-                    relationTypes.Add(rt);
-                }
+                var relationType = (new RelationType());
+                relationType.PopulateFromDTO(relationTypeDto);
+                yield return relationType; 
             }
-
-            return relationTypes;
         }
 
 		public static RelationType GetById(int id)
@@ -154,9 +135,12 @@ namespace umbraco.cms.businesslogic.relation
 		{
 			try
 			{
-				return GetById(SqlHelper.ExecuteScalar<int>(
-					"select id from umbracoRelationType where alias = @alias",
-					SqlHelper.CreateParameter("@alias", Alias)));
+                var  relationTypeDto =  ApplicationContext.Current.DatabaseContext.Database.FirstOrDefault<RelationTypeDto>(
+                                 "SELECT id, [dual], name, alias FROM umbracoRelationType WHERE alias = @alias", new { alias = Alias });
+                if (relationTypeDto == null) return null;
+                var  relationType = (new RelationType());
+                relationType.PopulateFromDTO(relationTypeDto);
+                return relationType; 
 			}
 			catch
 			{
