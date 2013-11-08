@@ -7,6 +7,7 @@ using System.Xml;
 using NUnit.Framework;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic;
+using umbraco.cms.businesslogic.packager;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.presentation;
 using Umbraco.Core.Models.Rdbms;
@@ -460,6 +461,125 @@ namespace Umbraco.Tests.BusinessLogic
                     nodes[i].delete();
                 DeleteContent();
             }
+        }
+
+        [Test]
+        [TestCase(-1, true)]
+        [TestCase(1044, true)]
+        [TestCase(-21, true)]
+        [TestCase(1031, true)]
+        [TestCase(0, false)]
+        [TestCase(999, false)]
+        public void IsNode_Int_ReturnsBoolIndicatingExistence(int id, bool expected)
+        {
+            Assert.AreEqual(expected, CMSNode.IsNode(id));
+        }
+
+        [Test]
+        [TestCase("916724A5-173D-4619-B97E-B9DE133DD6F5", true)]
+        [TestCase("D59BE02F-1DF9-4228-AA1E-01917D806CDA", true)]
+        [TestCase("BF7C7CBC-952F-4518-97A2-69E9C7B33842", true)]
+        [TestCase("F38BD2D7-65D0-48E6-95DC-87CE06EC2D3D", true)]
+        [TestCase("B4172458-572A-4757-9810-17D204C96F61", false)]
+        [TestCase("CF096FFC-794F-49A7-A8DC-FAA5CC7E334F", false)]
+        public void IsNode_Guid_ReturnsBoolIndicatingExistence(string id, bool expected)
+        {
+            Assert.AreEqual(expected, CMSNode.IsNode(new Guid(id)));
+        }
+
+        [Test]
+        public void CreateDateTime_Set_Persists()
+        {
+            var newDate = new DateTime(2013, 1, 1);
+            EnsureTestDocumentTypes();
+            Setter_Persists(
+                testContentType1.Id, 
+                n => n.CreateDateTime = newDate, 
+                n => n.CreateDateTime, 
+                newDate, 
+                "createDate"
+            );
+        }
+
+        [Test]
+        public void Level_Set_Persists()
+        {
+            // this is silly :)
+            var newLevel = 5;
+            EnsureTestDocumentTypes();
+            Setter_Persists(
+                testContentType1.Id,
+                n => n.Level = newLevel,
+                n => n.Level,
+                newLevel,
+                "level"
+            );
+        }
+
+        [Test]
+        public void Parent_Set_Persists()
+        {
+            EnsureTestDocumentTypes();
+            var newParentNode = new CMSNode(testContentType2.Id);
+            Setter_Persists(
+                testContentType4.Id,
+                n => n.Parent = newParentNode,
+                n => n.Parent.Id,
+                newParentNode.Id,
+                "ParentId"
+                );
+        }
+
+        [Test]
+        public void Path_Set_Persists()
+        {
+            // this is sillier :)
+            EnsureTestDocumentTypes();
+            var newPath = "abc";
+            Setter_Persists(
+                testContentType1.Id,
+                n => n.Path = newPath,
+                n => n.Path,
+                newPath,
+                "Path");
+        }
+
+        [Test]
+        public void SortOrder_Set_Persists()
+        {
+            EnsureTestDocumentTypes();
+            var newSortOrder = 99;
+            Setter_Persists(
+                testContentType1.Id,
+                n => n.sortOrder = newSortOrder,
+                n => n.sortOrder,
+                newSortOrder,
+                "sortOrder");
+        }
+
+        [Test]
+        public void Text_Set_Persists()
+        {
+            EnsureTestDocumentTypes();
+            var newText = "A new text";
+            Setter_Persists(
+                testContentType1.Id,
+                n => n.Text = newText,
+                n => n.Text,
+                newText,
+                "text");
+        }
+
+        private void Setter_Persists<T>(int nodeId, Action<CMSNode> setter, Func<CMSNode, T> getter, T expected, string field)
+        {
+            var node = new CMSNode(nodeId);
+            setter(node);
+            var persisted = database.ExecuteScalar<T>(
+                String.Format("SELECT {0} FROM umbracoNode WHERE id = @id", field)
+                , new{id=nodeId});
+            Assert.AreEqual(expected, persisted);
+            Assert.AreEqual(expected, getter(node));
+            ResetTestDocumentTypes();
         }
 
         private static void AssertXmlPreviewNode(Document[] expectedNodes, List<CMSPreviewNode> result, int index)
