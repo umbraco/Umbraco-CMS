@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Remoting.Messaging;
 using System.Text;
 using System.Xml;
 using NUnit.Framework;
@@ -400,11 +401,48 @@ namespace Umbraco.Tests.BusinessLogic
         }
 
         [Test]
-        public void GetNodesForPreview_ReturnsPreviewNodes()
+        public void GetNodesForPreview_NotChildrenOnly_ReturnsItself()
         {
-            Assert.Inconclusive();
-            // Dunno how to create non-tableish dtos
-            // and if I can set EnableTableMapping or whatever it's named
+            EnsureTestDocumentTypes();
+            var nodes = CreateContentForPreviewXml();
+            try
+            {
+                nodes[1].IsTrashed = true;
+                var expectedNodes = new[] {nodes[0]};
+                var result = new CMSNode(nodes[0].Id).GetNodesForPreview(false);
+                Assert.AreEqual(1, result.Count);
+                for(var i = 0; i<expectedNodes.Length; i++)
+                {
+                    Assert.AreEqual(expectedNodes[i].Id, result[i].NodeId);
+                    Assert.IsFalse(result[i].IsDraft);
+                    Assert.AreEqual(expectedNodes[i].Level, result[i].Level);
+                    Assert.AreEqual(expectedNodes[i].ParentId, result[i].ParentId);
+                    Assert.AreEqual(expectedNodes[i].sortOrder, result[i].SortOrder);
+                    Assert.AreEqual(expectedNodes[i].UniqueId, result[i].Version);
+                    Assert.AreEqual(expectedNodes[i].ToXml(new XmlDocument(), false).OuterXml, result[i].Xml);
+                }
+            }
+            finally
+            {
+                for(var i = nodes.Count - 1; i>=0; i--)
+                    nodes[i].delete();
+                DeleteContent();
+            }
+        }
+
+        private List<Document> CreateContentForPreviewXml()
+        {
+            var documentType = new DocumentType(testContentType1);
+            var user = new User(0);
+            var nodes = new List<Document>
+            {
+                Document.MakeNew("Test content 1", documentType, user, -1),
+                Document.MakeNew("Test content 2", documentType, user, -1),
+                Document.MakeNew("Test content 3", documentType, user, -1)
+            };
+            nodes.Insert(2, Document.MakeNew("Test content 1.1", documentType, user, nodes[0].Id));
+            nodes.ForEach(n => n.ToPreviewXml(new XmlDocument()));
+            return nodes;
         }
 
         private void EnsureTestDocumentTypes()
