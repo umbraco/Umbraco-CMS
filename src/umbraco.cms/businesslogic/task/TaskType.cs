@@ -6,6 +6,9 @@ using System.Runtime.CompilerServices;
 
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
+using Umbraco.Core.Persistence;
+using Umbraco.Core;
+using Umbraco.Core.Models.Rdbms;
 
 
 namespace umbraco.cms.businesslogic.task
@@ -50,10 +53,17 @@ namespace umbraco.cms.businesslogic.task
 
         #region Private/protected members
 
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
         }
+
+        internal static UmbracoDatabase Database
+        {
+            get { return ApplicationContext.Current.DatabaseContext.Database; }
+        }
+
         private int _id;
         private Tasks m_Tasks;
 
@@ -66,9 +76,10 @@ namespace umbraco.cms.businesslogic.task
 
         public TaskType(string TypeAlias)
         {
-            Id = SqlHelper.ExecuteScalar<int>(
-                "select id from cmsTaskType where alias = @alias",
-                SqlHelper.CreateParameter("@alias", TypeAlias));
+            var ids = Database.Fetch<int>(
+                "select id from cmsTaskType where alias = @0", TypeAlias);
+            if (ids.Count == 0) throw new ArgumentException(string.Format("No Task type found for the specified Alias type = '{0}'", TypeAlias));
+            _id = ids[0];
             setup();
         }
 
@@ -82,20 +93,9 @@ namespace umbraco.cms.businesslogic.task
         #region Private methods
         private void setup()         
         {
-			using (IRecordsReader dr =
-				SqlHelper.ExecuteReader("select alias from cmsTaskType where id = @id",
-				                        SqlHelper.CreateParameter("@id", Id)))
-			{
-                if (dr.Read())
-                {
-                    _id = Id;
-                    Alias = dr.GetString("alias");
-                }
-                else
-                {
-                    throw new ArgumentException("No Task type found for the id specified");
-                }
-			}
+            Database.FirstOrDefault<string>("select alias from cmsTaskType where id = @id", Id)
+                .IfNull<string>(x => { throw new ArgumentException(string.Format("No Task type found for the specified id =  {0}", Id)); })
+                .IfNotNull(x => { _id = Id; Alias = x; }); 
         }
         #endregion
 
@@ -107,16 +107,12 @@ namespace umbraco.cms.businesslogic.task
             if (Id == 0)
             {
                 // The method is synchronized
-                SqlHelper.ExecuteNonQuery("INSERT INTO cmsTaskType (alias) values (@alias)",
-                    SqlHelper.CreateParameter("@alias", Alias));
-                Id = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsTaskType");
+                Database.Execute("INSERT INTO cmsTaskType (alias) values (@0)", Alias); 
+                Id = Database.ExecuteScalar<int>("SELECT MAX(id) FROM cmsTaskType");
             }
             else
             {
-                SqlHelper.ExecuteNonQuery(
-                    "update cmsTaskType set alias = @alias where id = @id",
-                    SqlHelper.CreateParameter("@alias", Alias),
-                    SqlHelper.CreateParameter("@id", Id));
+                Database.Execute("update cmsTaskType set alias = @0 where id = @1", Alias, Id); 
             }
         }
 
@@ -131,7 +127,7 @@ namespace umbraco.cms.businesslogic.task
                 t.Delete();
             }
             m_Tasks.Clear(); //remove the internal collection
-            SqlHelper.ExecuteNonQuery("DELETE FROM cmsTaskType WHERE id = @id", SqlHelper.CreateParameter("@id", this._id));
+            Database.Execute("DELETE FROM cmsTaskType WHERE id = @0",this._id);
         } 
 
         #endregion
@@ -144,16 +140,9 @@ namespace umbraco.cms.businesslogic.task
         public static IEnumerable<TaskType> GetAll()
         {
             var sql = "SELECT id, alias FROM cmsTaskType";
-            var types = new List<TaskType>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(sql))
-            {
-                while (dr.Read())
-                {
-                    types.Add(new TaskType() { _alias = dr.GetString("alias"), _id = Convert.ToInt32(dr.Get<object>("id")) });
-                }
-            }
-            return types;
-        } 
+            foreach (var taskTypeDto in Database.Query<TaskTypeDto>(sql))
+                yield return  new TaskType() { Alias = taskTypeDto.Alias, Id = taskTypeDto.Id };
+        }
         #endregion
 	
     }
