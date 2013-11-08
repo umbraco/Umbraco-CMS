@@ -6,8 +6,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using Umbraco.Core.Cache;
 using Umbraco.Core.IO;
-using umbraco.cms.businesslogic.cache;
-using umbraco.DataLayer;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.web
@@ -31,7 +30,8 @@ namespace umbraco.cms.businesslogic.web
 
                 //move old file
                 _filename = value;
-                SqlHelper.ExecuteNonQuery(string.Format("update cmsStylesheet set filename = '{0}' where nodeId = {1}", _filename, Id));
+                ApplicationContext.Current.DatabaseContext.Database.Execute(
+                    "update cmsStylesheet set filename = @Filename where nodeId = @NodeId", new { NodeId = Id, Filename = _filename });
                 InvalidateCache();
             }
         }
@@ -42,7 +42,8 @@ namespace umbraco.cms.businesslogic.web
             set
             {
                 _content = value;
-                SqlHelper.ExecuteNonQuery("update cmsStylesheet set content = @content where nodeId = @id", SqlHelper.CreateParameter("@content", this.Content), SqlHelper.CreateParameter("@id", this.Id));
+                ApplicationContext.Current.DatabaseContext.Database.Execute(
+                    "update cmsStylesheet set content = @Content where nodeId = @Id", new { Id, Content });
                 InvalidateCache();
             }
         }
@@ -103,56 +104,53 @@ namespace umbraco.cms.businesslogic.web
         private void SetupStyleSheet(bool loadFileData, bool updateStyleProperties)
         {
             // Get stylesheet data
-            using (var dr = SqlHelper.ExecuteReader("select filename, content from cmsStylesheet where nodeid = " + Id))
+            var sheet = ApplicationContext.Current.DatabaseContext.Database.SingleOrDefault<StylesheetDto>(
+                "select filename, content from cmsStylesheet where nodeid = @Id", new { Id });
+
+            if (sheet == null) return;
+
+            _filename = sheet.Filename;
+
+            // Get Content from db or file 
+            if (loadFileData == false)
             {
-                if (dr.Read())
+                _content = sheet.Content;
+            }
+            else if (File.Exists(IOHelper.MapPath(String.Format("{0}/{1}.css", SystemDirectories.Css, Text))))
+            {
+                var propertiesContent = String.Empty;
+
+                using (var re = File.OpenText(IOHelper.MapPath(String.Format("{0}/{1}.css", SystemDirectories.Css, Text))))
                 {
-                    if (!dr.IsNull("filename"))
-                        _filename = dr.GetString("filename");
-                    // Get Content from db or file 
-                    if (!loadFileData)
-                    {
-                        if (!dr.IsNull("content"))
-                            _content = dr.GetString("content");
-                    }
-                    else if (File.Exists(IOHelper.MapPath(String.Format("{0}/{1}.css", SystemDirectories.Css, this.Text))))
-                    {
-                        var propertiesContent = String.Empty;
+                    string input;
+                    _content = string.Empty;
+                    // NH: Updates the reader to support properties
+                    var readingProperties = false;
 
-                        using (var re = File.OpenText(IOHelper.MapPath(String.Format("{0}/{1}.css", SystemDirectories.Css, this.Text))))
+                    while ((input = re.ReadLine()) != null)
+                    {
+                        if (input.Contains("EDITOR PROPERTIES"))
                         {
-                            string input = null;
-                            _content = string.Empty;
-                            // NH: Updates the reader to support properties
-                            var readingProperties = false;
-
-                            while ((input = re.ReadLine()) != null && true)
-                            {
-                                if (input.Contains("EDITOR PROPERTIES"))
-                                {
-                                    readingProperties = true;
-                                }
-                                else
-                                    if (readingProperties)
-                                    {
-                                        propertiesContent += input.Replace("\n", "") + "\n";
-                                    }
-                                    else
-                                    {
-                                        _content += input.Replace("\n", "") + "\n";
-                                    }
-                            }
+                            readingProperties = true;
                         }
-
-                        // update properties
-                        if (updateStyleProperties)
+                        else
                         {
-                            if (propertiesContent != String.Empty)
+                            if (readingProperties)
                             {
-                                ParseProperties(propertiesContent);
+                                propertiesContent += input.Replace("\n", "") + "\n";
+                            }
+                            else
+                            {
+                                _content += input.Replace("\n", "") + "\n";
                             }
                         }
                     }
+                }
+
+                // update properties
+                if (updateStyleProperties && propertiesContent != String.Empty)
+                {
+                    ParseProperties(propertiesContent);
                 }
             }
         }
@@ -172,14 +170,18 @@ namespace umbraco.cms.businesslogic.web
             }
         }
 
-        public static StyleSheet MakeNew(BusinessLogic.User user, string Text, string FileName, string Content)
+        public static StyleSheet MakeNew(BusinessLogic.User user, string text, string fileName, string content)
         {
-
             // Create the umbraco node
-            var newNode = CMSNode.MakeNew(-1, ModuleObjectType, user.Id, 1, Text, Guid.NewGuid());
+            var newNode = MakeNew(-1, ModuleObjectType, user.Id, 1, text, Guid.NewGuid());
 
             // Create the stylesheet data
-            SqlHelper.ExecuteNonQuery(string.Format("insert into cmsStylesheet (nodeId, filename, content) values ('{0}','{1}',@content)", newNode.Id, FileName), SqlHelper.CreateParameter("@content", Content));
+            ApplicationContext.Current.DatabaseContext.Database.Insert(new StylesheetDto
+                {
+                    NodeId = newNode.Id,
+                    Filename = fileName,
+                    Content = content
+                });
 
             // save to file to avoid file coherency issues
             var newCss = new StyleSheet(newNode.Id, false, false);
@@ -238,7 +240,7 @@ namespace umbraco.cms.businesslogic.web
 
             return retval;
         }
-        
+
         public StylesheetProperty AddProperty(string Alias, BusinessLogic.User u)
         {
             return StylesheetProperty.MakeNew(Alias, this, u);
@@ -248,27 +250,24 @@ namespace umbraco.cms.businesslogic.web
         {
             var e = new DeleteEventArgs();
             FireBeforeDelete(e);
+            if (e.Cancel) return;
 
-            if (!e.Cancel)
+            File.Delete(IOHelper.MapPath(String.Format("{0}/{1}.css", SystemDirectories.Css, Text)));
+            foreach (var p in Properties.Where(p => p != null))
             {
-                File.Delete(IOHelper.MapPath(String.Format("{0}/{1}.css", SystemDirectories.Css, this.Text)));
-                foreach (var p in Properties.Where(p => p != null))
-                {
-                    p.delete();
-                }
-                SqlHelper.ExecuteNonQuery("delete from cmsStylesheet where nodeId = @nodeId", SqlHelper.CreateParameter("@nodeId", this.Id));
-                base.delete();
-
-                FireAfterDelete(e);
+                p.delete();
             }
+            ApplicationContext.Current.DatabaseContext.Database.Delete(new StylesheetDto { NodeId = Id });
+            base.delete();
 
+            FireAfterDelete(e);
         }
 
         public void saveCssToFile()
         {
             using (StreamWriter SW = File.CreateText(IOHelper.MapPath(string.Format("{0}/{1}.css", SystemDirectories.Css, this.Text))))
             {
-                string tmpCss = this.Content ;
+                string tmpCss = this.Content;
                 tmpCss += "/* EDITOR PROPERTIES - PLEASE DON'T DELETE THIS LINE TO AVOID DUPLICATE PROPERTIES */\n";
                 foreach (StylesheetProperty p in this.Properties)
                 {
@@ -419,7 +418,9 @@ namespace umbraco.cms.businesslogic.web
         {
             try
             {
-                int id = SqlHelper.ExecuteScalar<int>("SELECT id FROM umbracoNode WHERE text = @text AND nodeObjectType = @objType ", SqlHelper.CreateParameter("@text", name), SqlHelper.CreateParameter("@objType", StyleSheet.ModuleObjectType));
+                var id = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(
+                    "SELECT id FROM umbracoNode WHERE text = @Text AND nodeObjectType = @ObjType", 
+                    new { Text = name, ObjType = ModuleObjectType });
                 return new StyleSheet(id);
             }
             catch
