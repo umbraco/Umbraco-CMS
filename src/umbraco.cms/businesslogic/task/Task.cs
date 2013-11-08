@@ -7,6 +7,9 @@ using System.Runtime.CompilerServices;
 
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
+using Umbraco.Core.Persistence;
+using Umbraco.Core;
+using Umbraco.Core.Models.Rdbms;
 
 namespace umbraco.cms.businesslogic.task
 {
@@ -124,9 +127,15 @@ namespace umbraco.cms.businesslogic.task
         /// Gets the SQL helper.
         /// </summary>
         /// <value>The SQL helper.</value>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
+        }
+
+        internal static UmbracoDatabase Database
+        {
+            get { return ApplicationContext.Current.DatabaseContext.Database; }
         }
 
         #endregion
@@ -146,20 +155,9 @@ namespace umbraco.cms.businesslogic.task
         /// <param name="TaskId">The task id.</param>
         public Task(int TaskId)
         {
-			using (IRecordsReader dr =
-				SqlHelper.ExecuteReader(
-				"select id, taskTypeId, nodeId, parentUserId, userId, DateTime, comment, closed from cmsTask where id = @id",
-				SqlHelper.CreateParameter("@id", TaskId)))
-			{
-                if (dr.Read())
-                {
-                    PopulateTaskFromReader(dr);
-                }
-                else
-                {
-                    throw new ArgumentException("Task with id: '" + TaskId + "' not found");
-                }
-			}
+            Database.FirstOrDefault<TaskDto>("select id, taskTypeId, nodeId, parentUserId, userId, DateTime, comment, closed from cmsTask where id = @0", TaskId)
+                .IfNull<TaskDto>(x => { throw new ArgumentException("Task with id: '" + TaskId + "' not found"); })
+                .IfNotNull<TaskDto>(x => PopulateTaskFromDto(x));   
         }
 
         #endregion
@@ -172,7 +170,7 @@ namespace umbraco.cms.businesslogic.task
         /// </summary>
         public void Delete()
         {
-            SqlHelper.ExecuteNonQuery("DELETE FROM cmsTask WHERE id = @id", SqlHelper.CreateParameter("@id", this._id));
+           Database.Execute("DELETE FROM cmsTask WHERE id = @0", this._id);
         }
 
         /// <summary>
@@ -189,43 +187,32 @@ namespace umbraco.cms.businesslogic.task
             if (Id == 0)
             {
                 // The method is synchronized
-                SqlHelper.ExecuteNonQuery(
+                Database.Execute(
                     "insert into cmsTask (closed, taskTypeId, nodeId, parentUserId, userId, comment) values (@closed, @taskTypeId, @nodeId, @parentUserId, @userId, @comment)",
-                    SqlHelper.CreateParameter("@closed", Closed),
-                    SqlHelper.CreateParameter("@taskTypeId", Type.Id),
-                    SqlHelper.CreateParameter("@nodeId", Node.Id),
-                    SqlHelper.CreateParameter("@parentUserId", ParentUser.Id),
-                    SqlHelper.CreateParameter("@userId", User.Id),
-                    SqlHelper.CreateParameter("@comment", Comment));
-                Id = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsTask");
+                        new { closed = this.Closed, taskTypeId = this.Type.Id,  nodeId = this.Node.Id, parentUserId = this.ParentUser.Id, userId = this.User.Id, comment = this.Comment });  
+                Id = Database.ExecuteScalar<int>("SELECT MAX(id) FROM cmsTask");
             }
             else
             {
-                SqlHelper.ExecuteNonQuery(
+                Database.Execute(
                     "update cmsTask set closed = @closed, taskTypeId = @taskTypeId, nodeId = @nodeId, parentUserId = @parentUserId, userId = @userId, comment = @comment where id = @id",
-                    SqlHelper.CreateParameter("@closed", Closed),
-                    SqlHelper.CreateParameter("@taskTypeId", Type.Id),
-                    SqlHelper.CreateParameter("@nodeId", Node.Id),
-                    SqlHelper.CreateParameter("@parentUserId", ParentUser.Id),
-                    SqlHelper.CreateParameter("@userId", User.Id),
-                    SqlHelper.CreateParameter("@comment", Comment),
-                    SqlHelper.CreateParameter("@id", Id));
+                        new { id = this.Id, closed = this.Closed, taskTypeId = this.Type.Id,  nodeId = this.Node.Id, parentUserId = this.ParentUser.Id, userId = this.User.Id, comment = this.Comment }); 
             }
         }
 
         #endregion
 
         #region Private methods
-        private void PopulateTaskFromReader(IRecordsReader dr)
+        private void PopulateTaskFromDto(TaskDto dto)
         {
-            _id = dr.GetInt("id");
-            Type = new TaskType((int)dr.GetByte("taskTypeId"));
-            Node = new CMSNode(dr.GetInt("nodeId"));
-            ParentUser = User.GetUser(dr.GetInt("parentUserId"));
-            User = User.GetUser(dr.GetInt("userId"));
-            Date = dr.GetDateTime("DateTime");
-            Comment = dr.GetString("comment");
-            Closed = dr.GetBoolean("closed");
+            _id = dto.Id;
+            Type = new TaskType(dto.TaskTypeId);
+            Node = new CMSNode(dto.NodeId);
+            ParentUser = User.GetUser(dto.ParentUserId);
+            User = User.GetUser(dto.UserId);
+            Date = dto.DateTime;
+            Comment = dto.Comment;
+            Closed = dto.Closed;
         } 
         #endregion
 
@@ -238,19 +225,9 @@ namespace umbraco.cms.businesslogic.task
         /// <returns></returns>
         public static Tasks GetTasksByType(int taskType)
         {
-            var sql = "select id, taskTypeId, nodeId, parentUserId, userId, DateTime, comment, closed from cmsTask where taskTypeId = @taskTypeId";
-            Tasks tasks = new Tasks();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(sql, SqlHelper.CreateParameter("@taskTypeId", taskType)))
-            {
-                while (dr.Read())
-                {
-                    var t = new Task();
-                    t.PopulateTaskFromReader(dr);
-                    tasks.Add(t);
-                }
-            }
+            var sql = "select id, taskTypeId, nodeId, parentUserId, userId, DateTime, comment, closed from cmsTask where taskTypeId = @0";
 
-            return tasks;
+            return getTasks(sql, taskType);
         }
 
         /// <summary>
@@ -260,19 +237,9 @@ namespace umbraco.cms.businesslogic.task
         /// <returns></returns>
         public static Tasks GetTasks(int nodeId)
         {
-            var sql = "select id, taskTypeId, nodeId, parentUserId, userId, DateTime, comment, closed from cmsTask where nodeId = @nodeId";
-            Tasks tasks = new Tasks();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(sql, SqlHelper.CreateParameter("@nodeId", nodeId)))
-            {
-                while (dr.Read())
-                {
-                    var t = new Task();
-                    t.PopulateTaskFromReader(dr);
-                    tasks.Add(t);
-                }                    
-            }
-
-            return tasks;
+            var sql = "select id, taskTypeId, nodeId, parentUserId, userId, DateTime, comment, closed from cmsTask where nodeId = @0";
+            
+            return getTasks(sql, nodeId); 
         }
 
         /// <summary>
@@ -282,25 +249,12 @@ namespace umbraco.cms.businesslogic.task
         /// <param name="IncludeClosed">If true both open and closed tasks will be returned</param>
         /// <returns>A collections of tasks</returns>
         public static Tasks GetTasks(User User, bool IncludeClosed) {
-            string sql = "select id, taskTypeId, nodeId, parentUserId, userId, DateTime, comment, closed from cmsTask where userId = @userId";
+            string sql = "select id, taskTypeId, nodeId, parentUserId, userId, DateTime, comment, closed from cmsTask where userId = @0";
             if (!IncludeClosed)
                 sql += " and closed = 0";
             sql += " order by DateTime desc";
 
-            Tasks tasks = new Tasks();
-			using (IRecordsReader dr = SqlHelper.ExecuteReader(
-				sql,
-				SqlHelper.CreateParameter("@userId", User.Id)))
-			{
-                while (dr.Read())
-                {
-                    var t = new Task();
-                    t.PopulateTaskFromReader(dr);
-                    tasks.Add(t);
-                }   				
-			}
-
-            return tasks;
+            return getTasks(sql, User.Id);
         }
 
         /// <summary>
@@ -310,21 +264,22 @@ namespace umbraco.cms.businesslogic.task
         /// <param name="IncludeClosed">If true both open and closed tasks will be returned</param>
         /// <returns>A collections of tasks</returns>
         public static Tasks GetOwnedTasks(User User, bool IncludeClosed) {
-            string sql = "select id, taskTypeId, nodeId, parentUserId, userId, DateTime, comment, closed from cmsTask where parentUserId = @userId";
+            string sql = "select id, taskTypeId, nodeId, parentUserId, userId, DateTime, comment, closed from cmsTask where parentUserId = @0";
             if (!IncludeClosed)
                 sql += " and closed = 0";
             sql += " order by DateTime desc";
 
+            return getTasks(sql, User.Id); 
+        }
+
+        private static Tasks getTasks(string sql, params object[] args)
+        {
             Tasks tasks = new Tasks();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                sql,
-                SqlHelper.CreateParameter("@userId", User.Id))) {
-                    while (dr.Read())
-                    {
-                        var t = new Task();
-                        t.PopulateTaskFromReader(dr);
-                        tasks.Add(t);
-                    }   
+            foreach (var taskDto in Database.Fetch<TaskDto>(sql, args))
+            {
+                var t = new Task();
+                t.PopulateTaskFromDto(taskDto);
+                tasks.Add(t);
             }
 
             return tasks;
