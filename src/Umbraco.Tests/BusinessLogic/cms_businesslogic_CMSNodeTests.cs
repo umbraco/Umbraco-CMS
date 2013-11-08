@@ -376,9 +376,27 @@ namespace Umbraco.Tests.BusinessLogic
         }
 
         [Test]
-        public void ToPreviewXml_ReturnsPersistedXml()
+        public void GetPreviewXml_ReturnsPersistedXml()
         {
-            
+            EnsureTestDocumentTypes();
+            try
+            {
+                var node = Document.MakeNew("Test content", new DocumentType(testContentType1), new User(0), -1);
+                node.ToPreviewXml(new XmlDocument());
+                var asTestNode = new TestCMSNode(node.Id);
+
+                var expected = database.ExecuteScalar<string>("SELECT xml FROM cmsPreviewXml WHERE nodeId = @id",
+                    new { id = node.Id });
+
+                var result = asTestNode.ExecuteGetPreviewXml(new XmlDocument(), node.Version);
+                var actual = result.OuterXml;
+
+                Assert.AreEqual(expected, actual);
+            }
+            finally
+            {
+                DeleteContent();
+            }
         }
 
         [Test]
@@ -506,6 +524,11 @@ namespace Umbraco.Tests.BusinessLogic
             public void ExecuteSavePreviewXml(XmlDocument xd, Guid versionId)
             {
                 SavePreviewXml(ToXml(xd, false), versionId);
+            }
+
+            public XmlNode ExecuteGetPreviewXml(XmlDocument xd, Guid versionId)
+            {
+                return GetPreviewXml(xd, versionId);
             }
         }
     }
