@@ -12,6 +12,7 @@ using umbraco.cms.businesslogic.web;
 using umbraco.cms.presentation;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
+using umbraco.NodeFactory;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using ContentType = Umbraco.Core.Models.ContentType;
@@ -86,6 +87,20 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var node = new CMSNode(textStringDataTypeUniqueId, false);
             AssertTextStringDataTypeNode(node);
+        }
+
+        [Test]
+        public void SetUpNode_PopulatesNode()
+        {
+            var node = TestCMSNode.CreateUsingSetupNode(TextStringDataTypeId);
+            AssertTextStringDataTypeNode(node);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentException), ExpectedMessage = "No node exists with id '999'")]
+        public void SetUpNode_InvalidNode_Throws()
+        {
+            TestCMSNode.CreateUsingSetupNode(999);
         }
 
         [Test]
@@ -605,6 +620,32 @@ namespace Umbraco.Tests.BusinessLogic
             //}
         }
 
+        public void TopMostNodeIds_ReturnsUniqueIdsOfRootNodes()
+        {
+            // Root
+            Assert.IsTrue(
+                new[] { new Guid("916724A5-173D-4619-B97E-B9DE133DD6F5") }
+                .SequenceEqual(CMSNode.TopMostNodeIds(new Guid(RootObjectTypeId)))
+                );
+
+            // Content
+            EnsureTestDocumentTypes();
+            var nodes = CreateContent();
+            try
+            {
+                Assert.IsTrue(
+                    new[] { nodes[0].UniqueId }
+                    .SequenceEqual(CMSNode.TopMostNodeIds(Document._objectType))
+                    );
+            }
+            finally
+            {
+                for (var i = nodes.Count - 1; i >= 0; i--)
+                    nodes[i].delete();
+                DeleteContent();
+            }
+        }
+
         private static void AssertXmlPreviewNode(Document[] expectedNodes, List<CMSPreviewNode> result, int index)
         {
             Assert.AreEqual(expectedNodes[index].Id, result[index].NodeId);
@@ -619,7 +660,7 @@ namespace Umbraco.Tests.BusinessLogic
 
         private List<Document> CreateContent()
         {
-            var documentType = new DocumentType(testContentType1.Id);
+            var documentType = new DocumentType(testContentType1);
             var user = new User(0);
             var nodes = new List<Document>
             {
@@ -733,6 +774,11 @@ namespace Umbraco.Tests.BusinessLogic
             {
             }
 
+            private TestCMSNode(int id, bool nosetup)
+                : base(id, nosetup)
+            {
+            }
+
             public static CMSNode MakeNew(
                 int parentId, 
                 int level,
@@ -755,6 +801,13 @@ namespace Umbraco.Tests.BusinessLogic
             public static int[] ExecuteGetUniquesFromObjectTypeAndFirstLetter(Guid objectType, char letter)
             {
                 return getUniquesFromObjectTypeAndFirstLetter(objectType, letter);
+            }
+
+            public static CMSNode CreateUsingSetupNode(int id)
+            {
+                var node = new TestCMSNode(id, true);
+                node.setupNode();
+                return node;
             }
         }
     }
