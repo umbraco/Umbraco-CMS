@@ -404,7 +404,7 @@ namespace Umbraco.Tests.BusinessLogic
         public void GetNodesForPreview_NotChildrenOnly_ReturnsItself()
         {
             EnsureTestDocumentTypes();
-            var nodes = CreateContentForPreviewXml();
+            var nodes = CreateContent();
             try
             {
                 // oh yes, GetNodesForPreview in base returns both draft and not draft as draft
@@ -426,7 +426,7 @@ namespace Umbraco.Tests.BusinessLogic
         public void GetNodesForPreview_ChildrenOnly_ReturnsChildren()
         {
             EnsureTestDocumentTypes();
-            var nodes = CreateContentForPreviewXml();
+            var nodes = CreateContent();
             try
             {
                 var expectedNodes = new[] { nodes[2], nodes[2], nodes[1], nodes[1], nodes[3], nodes[3] }; 
@@ -437,7 +437,26 @@ namespace Umbraco.Tests.BusinessLogic
             }
             finally
             {
-                for(var i = nodes.Count - 1; i>=0; i--)
+                for (var i = nodes.Count - 1; i >= 0; i--)
+                    nodes[i].delete();
+                DeleteContent();
+            }
+        }
+
+        [Test]
+        public void getUniquesFromObjectTypeAndFirstLetter_ReturnsUniqueIdsWhereTextStartsWith()
+        {
+            EnsureTestDocumentTypes();
+            var nodes = CreateContent();
+            try
+            {
+                var expected = new[] {nodes[1].Id, nodes[2].Id};
+                var result = TestCMSNode.ExecuteGetUniquesFromObjectTypeAndFirstLetter(Document._objectType, 'B');
+                Assert.IsTrue(expected.SequenceEqual(result));
+            }
+            finally
+            {
+                for (var i = nodes.Count - 1; i >= 0; i--)
                     nodes[i].delete();
                 DeleteContent();
             }
@@ -455,7 +474,7 @@ namespace Umbraco.Tests.BusinessLogic
             // can't compare with ToXml 'cause of date variance
         }
 
-        private List<Document> CreateContentForPreviewXml()
+        private List<Document> CreateContent()
         {
             var documentType = new DocumentType(testContentType1);
             var user = new User(0);
@@ -463,8 +482,8 @@ namespace Umbraco.Tests.BusinessLogic
             {
                 Document.MakeNew("Test content 1", documentType, user, -1),
             };
-            nodes.Add(Document.MakeNew("Test content 1.1", documentType, user, nodes[0].Id));
-            nodes.Add(Document.MakeNew("Test content 1.2", documentType, user, nodes[0].Id));
+            nodes.Add(Document.MakeNew("B Test content 1.1", documentType, user, nodes[0].Id));
+            nodes.Add(Document.MakeNew("B Test content 1.2", documentType, user, nodes[0].Id));
             nodes.Add(Document.MakeNew("Test content 1.2.1", documentType, user, nodes[2].Id));
             nodes[1].sortOrder = 3;
             nodes.ForEach(n =>
@@ -588,6 +607,11 @@ namespace Umbraco.Tests.BusinessLogic
             public XmlNode ExecuteGetPreviewXml(XmlDocument xd, Guid versionId)
             {
                 return GetPreviewXml(xd, versionId);
+            }
+
+            public static int[] ExecuteGetUniquesFromObjectTypeAndFirstLetter(Guid objectType, char letter)
+            {
+                return getUniquesFromObjectTypeAndFirstLetter(objectType, letter);
             }
         }
     }
