@@ -461,7 +461,8 @@ namespace umbraco.cms.businesslogic
 
         public virtual List<CMSPreviewNode> GetNodesForPreview(bool childrenOnly)
         {
-            List<CMSPreviewNode> nodes = new List<CMSPreviewNode>();
+            // This code can probably be deleted or replaced with throw NotImplementedException
+            // It lacked uniqueId, but reader read it, so would've thrown an exception anyways.
             string sql = @"
 select umbracoNode.id, umbracoNode.uniqueId, umbracoNode.parentId, umbracoNode.level, umbracoNode.sortOrder, cmsPreviewXml.xml
 from umbracoNode 
@@ -471,12 +472,10 @@ order by level,sortOrder";
 
             string pathExp = childrenOnly ? Path + ",%" : Path;
 
-            IRecordsReader dr = SqlHelper.ExecuteReader(String.Format(sql, pathExp));
-            while (dr.Read())
-                nodes.Add(new CMSPreviewNode(dr.GetInt("id"), dr.GetGuid("uniqueID"), dr.GetInt("parentId"), dr.GetShort("level"), dr.GetInt("sortOrder"), dr.GetString("xml"), false));
-            dr.Close();
-
-            return nodes;
+            return Database.Fetch<NodeDto, PreviewXmlDto, CMSPreviewNode>(
+                (node, preview) => new CMSPreviewNode(node.NodeId, node.UniqueId.Value, node.ParentId, node.Level, node.SortOrder, preview.Xml, false), 
+                String.Format(sql, pathExp)
+                );
         }
 
         /// <summary>
