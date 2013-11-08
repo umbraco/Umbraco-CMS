@@ -22,6 +22,7 @@ namespace umbraco.cms.businesslogic.property
         private interfaces.IData _data;
         private int _id;
 
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
@@ -44,9 +45,9 @@ namespace umbraco.cms.businesslogic.property
         public Property(int Id)
         {
             _id = Id;
+
             _pt = PropertyType.GetPropertyType(
-                SqlHelper.ExecuteScalar<int>("select propertytypeid from cmsPropertyData where id = @id",
-                                             SqlHelper.CreateParameter("@id", Id)));
+                Database.ExecuteScalar<int>("select propertytypeid from cmsPropertyData where id = @0", Id));
             _data = _pt.DataTypeDefinition.DataType.Data;
             _data.PropertyId = Id;
         }
@@ -67,11 +68,7 @@ namespace umbraco.cms.businesslogic.property
         {
             get
             {
-                using (IRecordsReader dr = SqlHelper.ExecuteReader("SELECT versionId FROM cmsPropertyData WHERE id = " + _id.ToString()))
-                {
-                    dr.Read();
-                    return dr.GetGuid("versionId");
-                }
+                return Database.ExecuteScalar<Guid>("SELECT versionId FROM cmsPropertyData WHERE id = @0", _id);  
             }
         }
         public int Id
@@ -103,8 +100,8 @@ namespace umbraco.cms.businesslogic.property
 
         public void delete()
         {
-            int contentId = SqlHelper.ExecuteScalar<int>("Select contentNodeId from cmsPropertyData where Id = " + _id);
-            SqlHelper.ExecuteNonQuery("Delete from cmsPropertyData where PropertyTypeId =" + _pt.Id + " And contentNodeId = " + contentId);
+            int contentId = Database.ExecuteScalar<int>("Select contentNodeId from cmsPropertyData where Id = @0", _id);
+            Database.Execute("Delete from cmsPropertyData where PropertyTypeId =@0 And contentNodeId = @1", _pt.Id, contentId);
             _data.Delete();
         }
         public XmlNode ToXml(XmlDocument xd)
@@ -131,11 +128,9 @@ namespace umbraco.cms.businesslogic.property
         {
             int newPropertyId = 0;
             // The method is synchronized
-            SqlHelper.ExecuteNonQuery("INSERT INTO cmsPropertyData (contentNodeId, versionId, propertyTypeId) VALUES(@contentNodeId, @versionId, @propertyTypeId)",
-                                      SqlHelper.CreateParameter("@contentNodeId", c.Id),
-                                      SqlHelper.CreateParameter("@versionId", versionId),
-                                      SqlHelper.CreateParameter("@propertyTypeId", pt.Id));
-            newPropertyId = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsPropertyData");
+            // UmbracoPropertyDto is used for another entity type - use plain sql for now
+            Database.Execute("INSERT INTO cmsPropertyData (contentNodeId, versionId, propertyTypeId) VALUES(@0, @1, @2)", c.Id, versionId, pt.Id); 
+            newPropertyId = Database.ExecuteScalar<int>("SELECT MAX(id) FROM cmsPropertyData");
             interfaces.IData d = pt.DataTypeDefinition.DataType.Data;
             d.MakeNew(newPropertyId);
             return new Property(newPropertyId, pt);
