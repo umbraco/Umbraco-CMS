@@ -407,20 +407,12 @@ namespace Umbraco.Tests.BusinessLogic
             var nodes = CreateContentForPreviewXml();
             try
             {
-                nodes[1].IsTrashed = true;
-                var expectedNodes = new[] {nodes[0]};
+                // oh yes, GetNodesForPreview in base returns both draft and not draft as draft
+                var expectedNodes = new[] { nodes[0], nodes[0] }; 
                 var result = new CMSNode(nodes[0].Id).GetNodesForPreview(false);
-                Assert.AreEqual(1, result.Count);
+                Assert.AreEqual(expectedNodes.Length, result.Count);
                 for(var i = 0; i<expectedNodes.Length; i++)
-                {
-                    Assert.AreEqual(expectedNodes[i].Id, result[i].NodeId);
-                    Assert.IsFalse(result[i].IsDraft);
-                    Assert.AreEqual(expectedNodes[i].Level, result[i].Level);
-                    Assert.AreEqual(expectedNodes[i].ParentId, result[i].ParentId);
-                    Assert.AreEqual(expectedNodes[i].sortOrder, result[i].SortOrder);
-                    Assert.AreEqual(expectedNodes[i].UniqueId, result[i].Version);
-                    Assert.AreEqual(expectedNodes[i].ToXml(new XmlDocument(), false).OuterXml, result[i].Xml);
-                }
+                    AssertXmlPreviewNode(expectedNodes, result, i);
             }
             finally
             {
@@ -430,6 +422,39 @@ namespace Umbraco.Tests.BusinessLogic
             }
         }
 
+        [Test]
+        public void GetNodesForPreview_ChildrenOnly_ReturnsChildren()
+        {
+            EnsureTestDocumentTypes();
+            var nodes = CreateContentForPreviewXml();
+            try
+            {
+                var expectedNodes = new[] { nodes[2], nodes[2], nodes[1], nodes[1], nodes[3], nodes[3] }; 
+                var result = new CMSNode(nodes[0].Id).GetNodesForPreview(true);
+                Assert.AreEqual(expectedNodes.Length, result.Count);
+                for(var i = 0; i<expectedNodes.Length; i++)
+                    AssertXmlPreviewNode(expectedNodes, result, i);
+            }
+            finally
+            {
+                for(var i = nodes.Count - 1; i>=0; i--)
+                    nodes[i].delete();
+                DeleteContent();
+            }
+        }
+
+        private static void AssertXmlPreviewNode(Document[] expectedNodes, List<CMSPreviewNode> result, int index)
+        {
+            Assert.AreEqual(expectedNodes[index].Id, result[index].NodeId);
+            Assert.IsFalse(result[index].IsDraft);
+            Assert.AreEqual(expectedNodes[index].Level, result[index].Level);
+            Assert.AreEqual(expectedNodes[index].ParentId, result[index].ParentId);
+            Assert.AreEqual(expectedNodes[index].sortOrder, result[index].SortOrder);
+            Assert.AreEqual(expectedNodes[index].UniqueId, result[index].Version);
+            Assert.IsNotNullOrEmpty(result[index].Xml);
+            // can't compare with ToXml 'cause of date variance
+        }
+
         private List<Document> CreateContentForPreviewXml()
         {
             var documentType = new DocumentType(testContentType1);
@@ -437,11 +462,15 @@ namespace Umbraco.Tests.BusinessLogic
             var nodes = new List<Document>
             {
                 Document.MakeNew("Test content 1", documentType, user, -1),
-                Document.MakeNew("Test content 2", documentType, user, -1),
-                Document.MakeNew("Test content 3", documentType, user, -1)
             };
-            nodes.Insert(2, Document.MakeNew("Test content 1.1", documentType, user, nodes[0].Id));
-            nodes.ForEach(n => n.ToPreviewXml(new XmlDocument()));
+            nodes.Add(Document.MakeNew("Test content 1.1", documentType, user, nodes[0].Id));
+            nodes.Add(Document.MakeNew("Test content 1.2", documentType, user, nodes[0].Id));
+            nodes.Add(Document.MakeNew("Test content 1.2.1", documentType, user, nodes[2].Id));
+            nodes[1].sortOrder = 3;
+            nodes.ForEach(n =>
+            {
+                n.Publish(user);
+            });
             return nodes;
         }
 

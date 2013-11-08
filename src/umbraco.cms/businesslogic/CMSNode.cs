@@ -463,7 +463,7 @@ namespace umbraco.cms.businesslogic
         {
             List<CMSPreviewNode> nodes = new List<CMSPreviewNode>();
             string sql = @"
-select umbracoNode.id, umbracoNode.parentId, umbracoNode.level, umbracoNode.sortOrder, cmsPreviewXml.xml
+select umbracoNode.id, umbracoNode.uniqueId, umbracoNode.parentId, umbracoNode.level, umbracoNode.sortOrder, cmsPreviewXml.xml
 from umbracoNode 
 inner join cmsPreviewXml on cmsPreviewXml.nodeId = umbracoNode.id 
 where trashed = 0 and path like '{0}' 
