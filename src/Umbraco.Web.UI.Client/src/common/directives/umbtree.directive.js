@@ -286,6 +286,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
 
 
                 //watch for section changes
+                //TODO: Surely this shouldn't be here!??
                 scope.$watch("section", function(newVal, oldVal) {
 
                     if (!scope.tree) {

@@ -36,6 +36,9 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
         _formatNodeDataForUseInUI: function (parentNode, treeNodes, section, level) {
             //if no level is set, then we make it 1   
             var childLevel = (level ? level : 1);
+            if (!parentNode.section) {
+                parentNode.section = section;
+            }
             for (var i = 0; i < treeNodes.length; i++) {
 
                 treeNodes[i].level = childLevel;
@@ -486,7 +489,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                         else {
                             //we couldn't find the child, if forceReload is true, we can go re-fetch the child collection and try again
                             if (args.forceReload) {
-                                self.loadNodeChildren({ node: node.parent }).then(function () {
+                                self.loadNodeChildren({ node: node, section: node.section }).then(function () {
                                     //now we'll check again
                                     child = self.getChildNode(node, args.path[currPathIndex]);
                                     if (child) {
@@ -506,7 +509,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     }
                     else {
                         //the current node doesn't have it's children loaded, so go get them
-                        self.loadNodeChildren({ node: node }).then(function () {
+                        self.loadNodeChildren({ node: node, section: node.section }).then(function () {
                             //ok, got the children, let's find it
                             var found = self.getChildNode(node, args.path[currPathIndex]);
                             if (found) {
