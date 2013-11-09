@@ -68,7 +68,7 @@ namespace umbraco.cms.businesslogic.template
 
         internal static string CreateDefaultMasterPageContent(Template template, string currentAlias)
         {
-            string design = GetMasterPageHeader(template) + "\n";
+            string design = GetMasterPageHeader(template) + Environment.NewLine;
 
             if (template.HasMasterTemplate)
             {
@@ -77,14 +77,15 @@ namespace umbraco.cms.businesslogic.template
                 foreach (string cpId in master.contentPlaceholderIds())
                 {
                     design += "<asp:content ContentPlaceHolderId=\"" + cpId +
-                              "\" runat=\"server\">\n\t\n</asp:content>\n\n";
+                              "\" runat=\"server\">\n\t\n</asp:content>" + Environment.NewLine
+                                                                         + Environment.NewLine;
                 }
             }
             else
             {
-                design += GetMasterContentElement(template) + "\n";
-                design += template.Design;
-                design += "\n</asp:Content>" + Environment.NewLine;
+                design += GetMasterContentElement(template) + Environment.NewLine;
+                design += template.Design + Environment.NewLine;
+                design += "</asp:Content>" + Environment.NewLine;
             }
 
             return design;
