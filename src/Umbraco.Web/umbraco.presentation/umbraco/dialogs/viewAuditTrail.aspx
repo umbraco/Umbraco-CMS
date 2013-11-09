@@ -22,7 +22,7 @@
                 <asp:TemplateColumn>
                   <HeaderTemplate>
                     <b>
-                      <%=umbraco.ui.Text("action")%>&nbsp;&nbsp;
+                      <%=umbraco.ui.Text("action")%>
                     </b>
                   </HeaderTemplate>
                   <ItemTemplate>

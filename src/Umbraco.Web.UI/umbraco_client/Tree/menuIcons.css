@@ -1,12 +1,14 @@
 ﻿.menuSpr
 {
 	float: left;
+    min-width:17px;
+    background-repeat:no-repeat;
+    padding-top:3px;
 	background-image: url(sprites.png);
 	background-position: -7px -8px;	
 	margin-top: 1px;
-	width: 17px;
 	height: 16px;
-	margin: 1px 13px 1px 0px;
+	margin: 1px 1px 1px 0px;
 }
 
 .sprNew
