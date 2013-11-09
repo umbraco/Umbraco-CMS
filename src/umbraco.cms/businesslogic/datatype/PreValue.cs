@@ -70,10 +70,10 @@ namespace umbraco.cms.businesslogic.datatype
         public PreValue(int DataTypeId, string Value)
         {
             object id = Database.ExecuteScalar<object>("Select id from cmsDataTypePreValues where [Value] = @value and DataTypeNodeId = @dataTypeId",
-                                   new { value = Value, dataTypeId = DataTypeId });    
-            if (id != null)
-                _id = int.Parse(id.ToString());
-
+                                   new { value = Value, dataTypeId = DataTypeId });
+            if (id == null) throw new ArgumentException(string.Format("Can't fetch a PreValue instance from database for DataTypeId = {0} and Value = '{1}'", DataTypeId, Value ));   
+                
+            _id = (int)id;
             initialize();
         } 
         #endregion
@@ -118,7 +118,11 @@ namespace umbraco.cms.businesslogic.datatype
         /// <value>The id.</value>
         public int Id
         {
-            get { return _id.Value; }
+            get 
+            {
+                if (_id == null) throw new InvalidOperationException("ID is null"); 
+                return _id.Value; 
+            }
             set { _id = value; }
         }
 
@@ -152,7 +156,7 @@ namespace umbraco.cms.businesslogic.datatype
         {
             if (_id == null) 
             {
-                throw new ArgumentNullException("Id");
+                throw new ArgumentNullException("Id is null");
             }
 
             Database.Execute("delete from cmsDataTypePreValues where id = @0", this.Id); 
@@ -194,6 +198,7 @@ namespace umbraco.cms.businesslogic.datatype
             public int id { get; set; }
             public int sortorder { get; set; }
             public string value { get; set; }
+            public int dataTypeNodeId { get; set; }
         }
 
         /// <summary>
@@ -201,14 +206,19 @@ namespace umbraco.cms.businesslogic.datatype
         /// </summary>
         private void initialize()
         {
+            if (_id == null) throw new ArgumentNullException("Id is null");
+
             Database.FirstOrDefault<preValueDto>(
-                 "Select id, sortorder, [value] from cmsDataTypePreValues where id = @id order by sortorder",
-                 new { id = Id })
-                 .IfNotNull<preValueDto>(x =>
+                 "Select id, sortorder, [value], dataTypeNodeId from cmsDataTypePreValues where id = @id order by sortorder",
+                 new { id = _id })
+            .IfNull<preValueDto>(x => { throw new ArgumentException(string.Format("Can't fetch a PreValue instance for ID = {0}", _id)); })
+            .IfNotNull<preValueDto>(x =>
             {
                 _sortOrder = x.sortorder;
                 _value = x.value;
+                _dataTypeId = x.dataTypeNodeId;
             });
+            
 
         } 
         #endregion
