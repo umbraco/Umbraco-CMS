@@ -1,15 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.web;
-using umbraco.DataLayer;
 using Umbraco.Tests.TestHelpers;
 using umbraco.cms.businesslogic.datatype;
-using Umbraco.Core.Persistence;
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
 using System.Reflection;
@@ -30,17 +23,25 @@ namespace Umbraco.Tests.BusinessLogic
             System.Console.WriteLine(format, args);
         }
 
+        private bool _traceTestCompletion = false;
         private int _testNumber;
-        private void traceCompletion(string done = "Done")
+        private void traceCompletion(string finished = "Finished")
         {
+            if (!_traceTestCompletion) return; 
             StackTrace stackTrace = new StackTrace();
             MethodBase methodBase = stackTrace.GetFrame(1).GetMethod();
-            string message = string.Format("***** {0:000}. {1} - {2} *****\n", ++_testNumber, methodBase.Name, done);
+            string message = string.Format("***** {0:000}. {1} - {2} *****\n", ++_testNumber, methodBase.Name, finished);
             System.Console.Write(message);
         }
         #endregion
 
         #region EnsureData()
+        public override void Initialize()
+        {
+            base.Initialize();
+            EnsureData(); 
+        }
+
         private bool initialized;
 
         private UserType _userType;
@@ -101,7 +102,6 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Verify if EnsureData() executes well")]
         public void Test_EnsureData()
         {
-            EnsureData();
             Assert.IsTrue(initialized);
             Assert.That(_userType, !Is.Null);
             Assert.That(_dataTypeDefinition1, !Is.Null);
@@ -114,7 +114,6 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test static CountOfPreValues(int dataTypeDefId) method")]
         public void Test_CountOfPreValues()
         {
-            EnsureData();
             Assert.That(PreValues.CountOfPreValues(_dataTypeDefinition1.Id), Is.EqualTo(_dataTypeDefinition1_PrevaluesTestCount));
             Assert.That(PreValues.CountOfPreValues(_dataTypeDefinition2.Id), Is.EqualTo(_dataTypeDefinition2_PrevaluesTestCount));
             traceCompletion();
@@ -123,7 +122,6 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test static DeleteByDataTypeDefinition(int dataTypeDefId) method")]
         public void Test_DeleteByDataTypeDefinition()
         {
-            EnsureData();
             PreValues.DeleteByDataTypeDefinition(_dataTypeDefinition1.Id);
             Assert.That(PreValues.GetPreValues(_dataTypeDefinition1.Id).Count, Is.EqualTo(0));
             Assert.That(PreValues.GetPreValues(_dataTypeDefinition2.Id).Count, Is.EqualTo(_dataTypeDefinition2_PrevaluesTestCount));
@@ -137,7 +135,6 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test static GetPreValues(int DataTypeId) method")]
         public void Test_GetPreValues()
         {
-            EnsureData();
             Assert.That(PreValues.GetPreValues(_dataTypeDefinition1.Id).Count, Is.EqualTo(_dataTypeDefinition1_PrevaluesTestCount));
             Assert.That(PreValues.GetPreValues(_dataTypeDefinition2.Id).Count, Is.EqualTo(_dataTypeDefinition2_PrevaluesTestCount));
             traceCompletion();

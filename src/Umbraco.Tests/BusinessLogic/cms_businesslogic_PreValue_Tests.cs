@@ -1,15 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic;
-using umbraco.cms.businesslogic.web;
-using umbraco.DataLayer;
 using Umbraco.Tests.TestHelpers;
 using umbraco.cms.businesslogic.datatype;
-using Umbraco.Core.Persistence;
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
 using System.Reflection;
@@ -19,6 +12,7 @@ namespace Umbraco.Tests.BusinessLogic
     [TestFixture]
     public class cms_cms_businesslogic_PreValue_Tests : BaseDatabaseFactoryTest
     {
+
         #region Helper methods
         protected override DatabaseBehavior DatabaseTestBehavior
         {
@@ -30,17 +24,25 @@ namespace Umbraco.Tests.BusinessLogic
             System.Console.WriteLine(format, args);
         }
 
+        private bool _traceTestCompletion = false;
         private int _testNumber;
-        private void traceCompletion(string done = "Done")
+        private void traceCompletion(string finished = "Finished")
         {
+            if (!_traceTestCompletion) return;
             StackTrace stackTrace = new StackTrace();
             MethodBase methodBase = stackTrace.GetFrame(1).GetMethod();
-            string message = string.Format("***** {0:000}. {1} - {2} *****\n", ++_testNumber, methodBase.Name, done);
+            string message = string.Format("***** {0:000}. {1} - {2} *****\n", ++_testNumber, methodBase.Name, finished);
             System.Console.Write(message);
         }
         #endregion
 
         #region EnsureData()
+        public override void Initialize()
+        {
+            base.Initialize();
+            EnsureData();
+        }
+        
         private bool initialized;
 
         private UserType _userType;
@@ -86,7 +88,6 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Verify if EnsureData() executes well")]
         public void Test_EnsureData()
         {
-            EnsureData(); 
             Assert.IsTrue(initialized);
             Assert.That(_userType, !Is.Null);
             Assert.That(_dataTypeDefinition, !Is.Null);
@@ -99,8 +100,6 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Fetch PreValue object instance created by Database.Execute(...) in EnsureData() method")]
         public void Test_Get()
         {
-            EnsureData(); 
-
             // PreValue class doesn't have any explicit GetById(...) methods - a PreValue object instance is created from a saved in the database record
             // by using a set of constructors, with the most simple one being PreValue(int id). 
             // This PreValue(int id) constructor's functionality is tested here.
@@ -117,8 +116,6 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test constructors and initialize() method for the new non-database PreValue object instances")]
         public void Test_initialize()
         {
-            EnsureData(); 
-
             Assert.IsNotNull(_preValue);
 
             // test parametersless constructor public PreValue()
@@ -148,8 +145,6 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test PreValue(int Id) and PreValue(int DataTypeId, string Value) constructors and initialize() method for saved in the database PreValue object instances")]
         public void Test_get_Values()
         {
-            EnsureData(); 
-
             Assert.IsNotNull(_preValue);
            
             // test public PreValue(int Id) constructor - fetch existing instance by Id
@@ -170,8 +165,6 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description="Test MakeNew(...) static method" )]
         public void Test_MakeNew()
         {
-            EnsureData(); 
-
             var newPreValue = PreValue.MakeNew(_dataTypeDefinition.Id, TEST_VALUE_VALUE);
             var savedPrevalue = new PreValue(_dataTypeDefinition.Id, TEST_VALUE_VALUE);
 
@@ -185,8 +178,6 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test Delete() method")]
         public void Test_Delete()
         {
-            EnsureData(); 
-
             var newPreValue1 = new PreValue();
 
             // new non-saved Prevalue instance can't be deleted
@@ -206,8 +197,6 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test Save() method")]
         public void Test_Save()
         {
-            EnsureData(); 
-
             const int ZERO_ID = 0; // for the .Save(...) method to create a new PreValue record the Id value should be equal to Zero
 
             var newPreValue = new PreValue(ZERO_ID, 1, TEST_VALUE_VALUE);

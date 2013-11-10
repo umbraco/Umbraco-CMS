@@ -24,7 +24,7 @@ namespace umbraco.cms.businesslogic
         }
 
         private const string m_ChildCountSQL = @"select count(id) from umbracoNode where nodeObjectType = @nodeObjectType and path like '%,{0},%'";
-        private const string m_ChildSQL = @"SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode where ParentID = @parentId And nodeObjectType = @type order by sortOrder";
+        private const string m_ChildSQL = @"SELECT id, createDate, trashed, parentId, nodeObjectType, nodeUser, level, path, sortOrder, uniqueID, text FROM umbracoNode where ParentID = @parentId And nodeObjectType = @nodeObjectType order by sortOrder";
         private static object m_Locker = new object();
 
         #region Private variables
@@ -157,7 +157,7 @@ namespace umbraco.cms.businesslogic
                 System.Collections.ArrayList tmp = new System.Collections.ArrayList();
 
                foreach (var node in ApplicationContext.Current.DatabaseContext.Database.Query<NodeDto> (
-                                    m_ChildSQL, new { ParentID = this.Id, nodeObjectType = _nodeObjectType })) 
+                                    m_ChildSQL, new { parentId = this.Id, nodeObjectType = _nodeObjectType })) 
                {
                    var cmsNode = new CMSNode(node.NodeId); // .ctor internally calls PopulateCMSNodeFromReader(...) of CMSNode instance to setup cmsNode properties
                    tmp.Add(cmsNode);  
