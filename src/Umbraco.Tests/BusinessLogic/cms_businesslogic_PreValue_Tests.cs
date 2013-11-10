@@ -101,10 +101,11 @@ namespace Umbraco.Tests.BusinessLogic
         {
             EnsureData(); 
 
-            // PreValue class doesn't have any explicit GetById(...) methods - a PreValue object instance is created fro a saved in the database
-            //  by using a set of constructors, with the most simple one being PreValue(int id).
+            // PreValue class doesn't have any explicit GetById(...) methods - a PreValue object instance is created from a saved in the database record
+            // by using a set of constructors, with the most simple one being PreValue(int id). 
+            // This PreValue(int id) constructor's functionality is tested here.
             
-            // Assert.That fetched by Id Prevalue object instance has the same properties as an in-memory just saved PreValue object instance
+            // Assert.That fetched from a database record by Id PreValue object instance has the same properties as an in-memory test PreValue object instance
             var savedPrevalue = new PreValue(_preValue.Id);
             Assert.That(_preValue.Id, Is.EqualTo(savedPrevalue.Id));
             Assert.That(_preValue.SortOrder, Is.EqualTo(savedPrevalue.SortOrder));
