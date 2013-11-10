@@ -120,18 +120,6 @@ namespace Umbraco.Tests.BusinessLogic
 
             Assert.IsNotNull(_preValue);
 
-            // Subject test methods =>
-            //  Direct:
-            //    public PreValue()
-            //    public PreValue(int Id)
-            //    public PreValue(int DataTypeId, string Value)
-            //    public PreValue(int Id, int SortOrder, string Value)
-            //    public int Id  [get;set;] 
-            //    public int SortOrder  [get;set;] 
-            //    public string Value  [get;set;] 
-            //  Indirect:
-            //   private void initialize()
-
             // test parametersless constructor public PreValue()
             var newPreValue1 = new PreValue();
 
@@ -156,7 +144,6 @@ namespace Umbraco.Tests.BusinessLogic
             traceCompletion();
         }
 
-        //get_Prevalue()	umbraco.cms.businesslogic.datatype.DefaultPreValueEditor.get_Prevalue( )																		
         [Test(Description = "Test PreValue(int Id) and PreValue(int DataTypeId, string Value) constructors and initialize() method for saved in the database PreValue object instances")]
         public void Test_get_Values()
         {
