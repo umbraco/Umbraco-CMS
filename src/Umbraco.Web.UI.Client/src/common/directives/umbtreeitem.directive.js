@@ -18,7 +18,7 @@
    </example>
  */
 angular.module("umbraco.directives")
-.directive('umbTreeItem', function ($compile, $http, $templateCache, $interpolate, $log, $location, $rootScope, $window, treeService, notificationsService) {
+.directive('umbTreeItem', function ($compile, $http, $templateCache, $interpolate, $log, $location, $rootScope, $window, treeService, $timeout) {
   return {
     restrict: 'E',
     replace: true,
@@ -45,13 +45,22 @@ angular.module("umbraco.directives")
     link: function (scope, element, attrs) {
         
         //flag to enable/disable delete animations, default for an item is tru
-        var enableDeleteAnimations = true;
+        var deleteAnimations = true;
 
         /** Helper function to emit tree events */
         function emitEvent(eventName, args) {
           if(scope.eventhandler){
             $(scope.eventhandler).trigger(eventName,args);
           }
+        }
+
+        /** This will deleteAnimations to true after the current digest */
+        function enableDeleteAnimations() {
+            //do timeout so that it re-enables them after this digest
+            $timeout(function () {
+                //enable delete animations
+                deleteAnimations = true;
+            }, 0, false);
         }
 
         /**
@@ -89,7 +98,7 @@ angular.module("umbraco.directives")
         *  When changing sections we don't want all of the tree-ndoes to do their 'leave' animations.
         */
         scope.animation = function () {
-            if (enableDeleteAnimations && scope.node.expanded) {
+            if (deleteAnimations && scope.node.expanded) {
                 return { leave: 'tree-node-delete-leave' };
             }
             else {
@@ -104,7 +113,7 @@ angular.module("umbraco.directives")
         */
         scope.load = function(node) {
             if (node.expanded) {
-                enableDeleteAnimations = false;
+                deleteAnimations = false;
                 emitEvent("treeNodeCollapsing", {tree: scope.tree, node: node });
                 node.expanded = false;
             }
@@ -124,13 +133,13 @@ angular.module("umbraco.directives")
                     .then(function(data) {
                         //emit expanded event
                         emitEvent("treeNodeExpanded", {tree: scope.tree, node: node, children: data });
-                        enableDeleteAnimations = true;
+                        enableDeleteAnimations();
                     });
             }
             else {
                 emitEvent("treeNodeExpanded", { tree: scope.tree, node: node, children: node.children });
                 node.expanded = true;
-                enableDeleteAnimations = true;
+                enableDeleteAnimations();
             }
         };
 

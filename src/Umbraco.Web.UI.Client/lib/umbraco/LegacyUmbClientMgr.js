@@ -83,37 +83,51 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
             mainTree: function() {
                 var injector = getRootInjector();
                 var navService = injector.get("navigationService");
+                var angularHelper = injector.get("angularHelper");
+                var $rootScope = injector.get("$rootScope");
 
                 //mimic the API of the legacy tree
                 var tree = {
-                    setActiveTreeType : function(treeType){
-                         navService.setActiveTreeType(treeType);
+                    setActiveTreeType: function (treeType) {
+                        angularHelper.safeApply($rootScope, function() {
+                            navService.setActiveTreeType(treeType);
+                        });
                     },
-                    syncTree : function(path,forceReload){
-                        navService.syncPath(path, forceReload);
+                    syncTree: function (path, forceReload) {
+                        angularHelper.safeApply($rootScope, function() {
+                            navService.syncPath(path, forceReload);
+                        });
                     },
                     clearTreeCache: function(){
                         var treeService = injector.get("treeService");
-                        treeService.clearCache();
+                        angularHelper.safeApply($rootScope, function() {
+                            treeService.clearCache();
+                        });
                     },
-                    reloadActionNode: function(){
-                        navService.reloadNode();
+                    reloadActionNode: function () {
+                        angularHelper.safeApply($rootScope, function() {
+                            navService.reloadNode();
+                        });
                     },
-                    refreshTree: function(treeAlias){
-                        navService.setActiveTreeType(treeAlias);
+                    refreshTree: function (treeAlias) {
+                        angularHelper.safeApply($rootScope, function() {
+                            navService.setActiveTreeType(treeAlias);
+                        });                        
                     },
                     moveNode: function (id, path) {
-                        if (navService.ui.currentNode) {
-                            var treeService = injector.get("treeService");
-                            var treeRoot = treeService.getTreeRoot(navService.ui.currentNode);
-                            if (treeRoot) {
-                                var found = treeService.getDescendantNode(treeRoot, id);
-                                if (found) {
-                                    treeService.removeNode(found);
+                        angularHelper.safeApply($rootScope, function() {
+                            if (navService.ui.currentNode) {
+                                var treeService = injector.get("treeService");
+                                var treeRoot = treeService.getTreeRoot(navService.ui.currentNode);
+                                if (treeRoot) {
+                                    var found = treeService.getDescendantNode(treeRoot, id);
+                                    if (found) {
+                                        treeService.removeNode(found);
+                                    }
                                 }
                             }
-                        }
-                        navService.syncPath(path, true);
+                            navService.syncPath(path, true);
+                        });                        
                     },
                     getActionNode: function () {
                         //need to replicate the legacy tree node

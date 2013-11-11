@@ -61,20 +61,27 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 }
 
                 //flag to enable/disable delete animations
-                var enableDeleteAnimations = false;
+                var deleteAnimations = false;
 
 
                 /** Helper function to emit tree events */
-
                 function emitEvent(eventName, args) {
                     if (scope.eventhandler) {
                         $(scope.eventhandler).trigger(eventName, args);
                     }
                 }
+                
+                /** This will deleteAnimations to true after the current digest */
+                function enableDeleteAnimations() {
+                    //do timeout so that it re-enables them after this digest
+                    $timeout(function () {
+                        //enable delete animations
+                        deleteAnimations = true;
+                    }, 0, false);
+                }
 
 
                 /*this is the only external interface a tree has */
-
                 function setupExternalEvents() {
                     if (scope.eventhandler) {
 
@@ -169,20 +176,15 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         scope.loading = true;
 
                         //anytime we want to load the tree we need to disable the delete animations
-                        enableDeleteAnimations = false;
+                        deleteAnimations = false;
 
                         //use $q.when because a promise OR raw data might be returned.
                         treeService.getTree({ section: scope.section, tree: scope.treealias, cacheKey: scope.cachekey, isDialog: scope.isdialog ? scope.isdialog : false })
                             .then(function(data) {
                                 //set the data once we have it
                                 scope.tree = data;
-
-
-                                //do timeout so that it re-enables them after this digest
-                                $timeout(function() {
-                                    //enable delete animations
-                                    enableDeleteAnimations = true;
-                                }, 0, false);
+                                
+                                enableDeleteAnimations();
 
                                 scope.loading = false;
 
@@ -199,7 +201,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
 
                 function syncTree(node, path, forceReload) {
 
-                    enableDeleteAnimations = false;
+                    deleteAnimations = false;
 
                     treeService.syncTree({
                         node: node,
@@ -208,8 +210,8 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     }).then(function (data) {
                         scope.currentNode = data;
                         emitEvent("treeSynced", { node: data });
-                        //enable delete animations
-                        enableDeleteAnimations = true;
+                        
+                        enableDeleteAnimations();
                     });
 
                 }
@@ -219,7 +221,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                  *  When changing sections we don't want all of the tree-ndoes to do their 'leave' animations.
                  */
                 scope.animation = function() {
-                    if (enableDeleteAnimations && scope.tree && scope.tree.root && scope.tree.root.expanded) {
+                    if (deleteAnimations && scope.tree && scope.tree.root && scope.tree.root.expanded) {
                         return { leave: 'tree-node-delete-leave' };
                     }
                     else {
@@ -245,7 +247,8 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                             .then(function(data) {
                                 //emit expanded event
                                 emitEvent("treeNodeExpanded", { tree: scope.tree, node: node, children: data });
-                                enableDeleteAnimations = true;
+                                
+                                enableDeleteAnimations();
 
                                 deferred.resolve(data);
                             });
@@ -253,7 +256,8 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     else {
                         emitEvent("treeNodeExpanded", { tree: scope.tree, node: node, children: node.children });
                         node.expanded = true;
-                        enableDeleteAnimations = true;
+                        
+                        enableDeleteAnimations();
 
                         deferred.resolve(node.children);
                     }
