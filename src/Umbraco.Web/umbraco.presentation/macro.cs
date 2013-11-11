@@ -1595,156 +1595,55 @@ namespace umbraco
                 return new LiteralControl(string.Format("Unable to create control {0} from assembly {1}",
                                                         controlName, asm.FullName));
 
-            AddCurrentNodeToControl(control, type);
+            AddCurrentNodeToControl(control);
 
             // Properties
-            UpdateControlProperties(type, control, model);
+            UpdateControlProperties(control, model);
             return control;
         }
 
-        private static void UpdateControlProperties(Type type, Control control, MacroModel model)
+        //TODO: SD : We *really* need to get macro's rendering properly with a real macro engine
+        // and move logic like this (after it is completely overhauled) to a UserControlMacroEngine.
+        internal static void UpdateControlProperties(Control control, MacroModel model)
         {
-            foreach (MacroPropertyModel mp in model.Properties)
+            var type = control.GetType();
+
+            foreach (var mp in model.Properties)
             {
-                PropertyInfo prop = type.GetProperty(mp.Key);
+                var prop = type.GetProperty(mp.Key);
                 if (prop == null)
                 {					
 					TraceWarn("macro", string.Format("control property '{0}' doesn't exist or aren't accessible (public)", mp.Key));
                     continue;
                 }
 
-                object propValue = mp.Value;
-                bool propValueSet = false;
-                // Special case for types of webControls.unit
-                if (prop.PropertyType == typeof(Unit))
-                {
-                    propValue = Unit.Parse(propValue.ToString());
-                    propValueSet = true;
-                }
-                else
+                var tryConvert = mp.Value.TryConvertTo(prop.PropertyType);
+                if (tryConvert.Success)
                 {
                     try
                     {
-                        if (mp.CLRType == null)
-                            continue;
-                        var st = (TypeCode)Enum.Parse(typeof(TypeCode), mp.CLRType, true);
-
-                        // Special case for booleans
-                        if (prop.PropertyType == typeof(bool))
-                        {
-                            bool parseResult;
-                            if (
-                                Boolean.TryParse(
-                                    propValue.ToString().Replace("1", "true").Replace("0", "false"),
-                                    out parseResult))
-                                propValue = parseResult;
-                            else
-                                propValue = false;
-                            propValueSet = true;
-
-                        }
-                        else
-                        {
-                            string sPropValue = string.Format("{0}", propValue);
-                            Type propType = prop.PropertyType;
-                            if (!string.IsNullOrWhiteSpace(sPropValue))
-                            {
-                                try
-                                {
-                                    propValue = Convert.ChangeType(propValue, st);
-                                    propValueSet = true;
-                                }
-                                catch (FormatException)
-                                {
-                                    propValue = Convert.ChangeType(propValue, propType);
-                                    propValueSet = true;
-                                }
-                            }
-                            /* NH 06-01-2012: Remove the lines below as they would only get activated if the values are empty
-                        else
-                        {
-                            if (propType != null)
-                            {
-                                if (propType.IsValueType)
-                                {
-                                    propValue = Activator.CreateInstance(propType);
-                                }
-                                else
-                                {
-                                    propValue = null;
-                                }
-                            }
-                        }*/
-                        }
-
-						if (GlobalSettings.DebugMode)
-							TraceInfo("macro.loadControlProperties",
-							          string.Format("Property added '{0}' with value '{1}'",
-							                        mp.Key,
-							                        propValue));
+                        prop.SetValue(control, tryConvert.Result, null);
                     }
-                    catch (Exception PropException)
+                    catch (Exception ex)
                     {
-						LogHelper.WarnWithException<macro>(string.Format(
-										  "Error adding property '{0}' with value '{1}'",
-										  mp.Key, propValue), PropException);
+                        LogHelper.WarnWithException<macro>(string.Format("Error adding property '{0}' with value '{1}'", mp.Key, mp.Value), ex);
+                        if (GlobalSettings.DebugMode)
+                        {
+                            TraceWarn("macro.loadControlProperties", string.Format("Error adding property '{0}' with value '{1}'", mp.Key, mp.Value), ex);
+                        }
+                    }
 
-						if (GlobalSettings.DebugMode)
-						{
-							TraceWarn("macro.loadControlProperties",
-							          string.Format(
-								          "Error adding property '{0}' with value '{1}'",
-								          mp.Key, propValue), PropException);
-						}
+                    if (GlobalSettings.DebugMode)
+                    {
+                        TraceInfo("macro.UpdateControlProperties", string.Format("Property added '{0}' with value '{1}'", mp.Key, mp.Value));
                     }
                 }
-
-                // NH 06-01-2012: Only set value if it has content
-                if (propValueSet)
+                else
                 {
-                    //GE 06-05-2012: Handle Nullable<T> properties
-                    if (prop.PropertyType.IsGenericType && prop.PropertyType.Name == "Nullable`1")
+                    LogHelper.Warn<macro>(string.Format("Error adding property '{0}' with value '{1}'", mp.Key, mp.Value));
+                    if (GlobalSettings.DebugMode)
                     {
-                        Type underlyingType = Nullable.GetUnderlyingType(prop.PropertyType);
-                        if (underlyingType != null)
-                        {
-                            object safeValue = null;
-                            if (propValue != null)
-                            {
-                                if (!(underlyingType == typeof(Guid)))
-                                {
-                                    prop.SetValue(control, Convert.ChangeType(propValue, underlyingType), null);
-                                }
-                                else
-                                {
-                                    Guid g = Guid.Empty;
-                                    if (Guid.TryParse(string.Format("{0}", propValue), out g))
-                                    {
-                                        prop.SetValue(control, g, null);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                prop.SetValue(control, safeValue, null);
-                            }
-                        }
-                    }
-                    else
-                    {
-                        //GE 06-05-2012: Handle Guid properties as Convert.ChangeType throws on string->Guid
-                        if (!(prop.PropertyType == typeof(Guid)))
-                        {
-                            prop.SetValue(control, Convert.ChangeType(propValue, prop.PropertyType), null);
-                        }
-                        else
-                        {
-                            Guid g = Guid.Empty;
-                            if (Guid.TryParse(string.Format("{0}", propValue), out g))
-                            {
-                                prop.SetValue(control, g, null);
-                            }
-                        }
+                        TraceWarn("macro.loadControlProperties", string.Format("Error adding property '{0}' with value '{1}'", mp.Key, mp.Value));
                     }
                 }
             }
@@ -1784,10 +1683,8 @@ namespace umbraco
 
                 TraceInfo(LoadUserControlKey, string.Format("Usercontrol added with id '{0}'", oControl.ID));
 
-                Type type = oControl.GetType();
-
-	            AddCurrentNodeToControl(oControl, type);
-                UpdateControlProperties(type, oControl, model);
+	            AddCurrentNodeToControl(oControl);
+                UpdateControlProperties(oControl, model);
                 return oControl;
             }
             catch (Exception e)
@@ -1797,8 +1694,10 @@ namespace umbraco
             }
         }
 
-        private static void AddCurrentNodeToControl(Control control, Type type)
+        private static void AddCurrentNodeToControl(Control control)
         {
+            var type = control.GetType();
+
             PropertyInfo currentNodeProperty = type.GetProperty("CurrentNode");
             if (currentNodeProperty != null && currentNodeProperty.CanWrite &&
                 currentNodeProperty.PropertyType.IsAssignableFrom(typeof(Node)))

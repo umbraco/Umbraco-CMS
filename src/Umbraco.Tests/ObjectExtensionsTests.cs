@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using System.Web.UI.WebControls;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Tests.PartialTrust;
@@ -18,6 +19,20 @@ namespace Umbraco.Tests
 			base.FixtureSetup();
 			TestHelper.SetupLog4NetForTests();
 		}
+
+        [Test]
+        public void CanParseStringToUnit()
+        {
+            var stringUnit = "1234px";
+            object objUnit = "1234px";
+            var result = stringUnit.TryConvertTo<Unit>();
+            var result2 = objUnit.TryConvertTo<Unit>();
+            var unit = new Unit("1234px");
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(result2.Success);
+            Assert.AreEqual(unit, result.Result);
+            Assert.AreEqual(unit, result2.Result);
+        }
 
 	    [Test]
 	    public void Can_Convert_List_To_Enumerable()
