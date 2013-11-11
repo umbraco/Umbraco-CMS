@@ -168,6 +168,27 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Unit of Work Implementation
 
+        /// <summary>
+        /// Deletes a content type
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <remarks>
+        /// First checks for children and removes those first
+        /// </remarks>
+        protected override void PersistDeletedItem(IContentType entity)
+        {
+            var query = Query<IContentType>.Builder.Where(x => x.ParentId == entity.Id);
+            var children = GetByQuery(query);
+            foreach (var child in children)
+            {
+                //NOTE: We must cast here so that it goes to the outter method to
+                // ensure the cache is updated.
+                PersistDeletedItem((IEntity)child);
+            }
+
+            base.PersistDeletedItem(entity);
+        }
+
         protected override void PersistNewItem(IContentType entity)
         {
             Mandate.That<Exception>(string.IsNullOrEmpty(entity.Alias) == false,

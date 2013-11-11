@@ -147,6 +147,36 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Can_Perform_Delete_With_Heirarchy_On_ContentTypeRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {                
+                var ctMain = MockedContentTypes.CreateSimpleContentType();
+                var ctChild1 = MockedContentTypes.CreateSimpleContentType("child1", "Child 1", ctMain);
+                var ctChild2 = MockedContentTypes.CreateSimpleContentType("child2", "Child 2", ctChild1);
+                
+                repository.AddOrUpdate(ctMain);
+                repository.AddOrUpdate(ctChild1);
+                repository.AddOrUpdate(ctChild2);                
+                unitOfWork.Commit();
+                
+                // Act
+
+                var resolvedParent = repository.Get(ctMain.Id);
+                repository.Delete(resolvedParent);
+                unitOfWork.Commit();
+
+                // Assert
+                Assert.That(repository.Exists(ctMain.Id), Is.False);
+                Assert.That(repository.Exists(ctChild1.Id), Is.False);
+                Assert.That(repository.Exists(ctChild2.Id), Is.False);
+            }
+        }
+
+        [Test]
         public void Can_Perform_Get_On_ContentTypeRepository()
         {
             // Arrange
