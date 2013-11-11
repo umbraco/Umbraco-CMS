@@ -94,8 +94,9 @@ namespace umbraco.cms.businesslogic.relation
 
 		public void Delete() 
 		{
-            ApplicationContext.Current.DatabaseContext.Database.Delete<RelationDto>("DELETE FROM umbracoRelation WHERE id = @0", this.Id);   
-		}
+            //ApplicationContext.Current.DatabaseContext.Database.Delete<RelationDto>("DELETE FROM umbracoRelation WHERE id = @0", this.Id);
+            ApplicationContext.Current.DatabaseContext.Database.Delete<RelationDto>("WHERE id = @0", this.Id);
+        }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
 		public static Relation MakeNew(int parentId, int childId, RelationType relType, string comment) 
@@ -106,7 +107,8 @@ namespace umbraco.cms.businesslogic.relation
                  ParentId = parentId,
                  ChildId = childId,
                  RelationType = relType.Id,
-                 Comment = comment
+                 Comment = comment,
+                 Datetime = DateTime.Now 
             };
             ApplicationContext.Current.DatabaseContext.Database.Insert(seedRelationDto);
             return new Relation(ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoRelation"));

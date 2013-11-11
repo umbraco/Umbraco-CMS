@@ -61,7 +61,8 @@ namespace umbraco.cms.businesslogic.relation
 			get { return _name; }
 			set
 			{
-                ApplicationContext.Current.DatabaseContext.Database.Update<RelationTypeDto>("SET name = @0 WHERE id = @1", value, this.Id);  
+                ApplicationContext.Current.DatabaseContext.Database.Update<RelationTypeDto>("SET name = @0 WHERE id = @1", value, this.Id);
+                _name = value;
 			}
 		}
 
@@ -71,6 +72,7 @@ namespace umbraco.cms.businesslogic.relation
 			set
 			{
                 ApplicationContext.Current.DatabaseContext.Database.Update<RelationTypeDto>("SET alias = @0 WHERE id = @1", value, this.Id);
+                _alias = value;
 			}
 		}
 
@@ -80,6 +82,7 @@ namespace umbraco.cms.businesslogic.relation
 			set
 			{
                 ApplicationContext.Current.DatabaseContext.Database.Update<RelationTypeDto>("SET dual = @0 WHERE id = @1", value, this.Id);
+                _dual = value;
 			}
 		}
 
