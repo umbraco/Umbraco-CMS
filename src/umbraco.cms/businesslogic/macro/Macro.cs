@@ -221,7 +221,7 @@ namespace umbraco.cms.businesslogic.macro
             get { return _cacheByPage; }
             set {
                 _cacheByPage = value;
-                Database.Execute("update cmsMacro set macroCacheByPage = @macroCacheByPage where id = @1", value, this.Id);
+                Database.Execute("update cmsMacro set macroCacheByPage = @0 where id = @1", value, this.Id);
             }
         }
 
@@ -409,7 +409,7 @@ namespace umbraco.cms.businesslogic.macro
 
             _cacheByPage = dto.CacheByPage;
             _cachePersonalized = dto.CachePersonalized;
-            _renderContent = !dto.DontRender;
+            _renderContent = dto.DontRender;
         }
 
 		/// <summary>
@@ -465,7 +465,7 @@ namespace umbraco.cms.businesslogic.macro
            
             //fire new event
             NewEventArgs e = new NewEventArgs();
-            newMacro.OnNew(e);
+            newMacro.OnNew(e); //ss: that will never be fired as newMacro is instantiated in this method
             
             return newMacro;
 		}

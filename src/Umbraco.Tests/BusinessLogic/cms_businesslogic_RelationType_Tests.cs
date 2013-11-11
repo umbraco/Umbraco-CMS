@@ -123,70 +123,42 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public string Name' property ")]
         public void Test_RelationType_SetName()
         {
-            string oldName = _relationType1.Name;
+            var relationType1 = new RelationType(_relationType1.Id);
+            Assert.That(relationType1.Name, Is.EqualTo(_relationType1.Name));
 
-            try
-            {
-                var relationType1 = new RelationType(_relationType1.Id);
-                Assert.That(relationType1.Name, Is.EqualTo(_relationType1.Name));
+            relationType1.Name = "New Name";
 
-                relationType1.Name = "New Name";
-
-                var relationType2 = getTestRelationTypeDto(_relationType1.Id);
-                Assert.That(relationType2.Name, Is.EqualTo(relationType1.Name));
-                Assert.That(relationType2.Name, Is.EqualTo("New Name"));
-            }
-            finally
-            {
-                _relationType1.Name = oldName; 
-            }
+            var relationType2 = getTestRelationTypeDto(_relationType1.Id);
+            Assert.That(relationType2.Name, Is.EqualTo(relationType1.Name));
+            Assert.That(relationType2.Name, Is.EqualTo("New Name"));
         }
 
         [Test(Description = "Test 'public string Alias' property set")]
         public void Test_RelationType_SetAlias()
         {
-            string oldAlias = _relationType1.Alias;
+            var relationType1 = new RelationType(_relationType1.Id);
+            Assert.That(relationType1.Alias, Is.EqualTo(_relationType1.Alias));
 
-            try
-            {
-                var relationType1 = new RelationType(_relationType1.Id);
-                Assert.That(relationType1.Alias, Is.EqualTo(_relationType1.Alias));
+            relationType1.Alias = "newAlias";
 
-                relationType1.Alias = "newAlias";
-
-                var relationType2 = getTestRelationTypeDto(_relationType1.Id);
-                Assert.That(relationType2.Alias, Is.EqualTo(relationType1.Alias));
-                Assert.That(relationType2.Alias, Is.EqualTo("newAlias"));
-            }
-            finally
-            {
-                _relationType1.Alias = oldAlias;
-            }
+            var relationType2 = getTestRelationTypeDto(_relationType1.Id);
+            Assert.That(relationType2.Alias, Is.EqualTo(relationType1.Alias));
+            Assert.That(relationType2.Alias, Is.EqualTo("newAlias"));
         }
 
         [Test(Description = "Test 'public bool Dual' property set")]
         public void Test_RelationType_SetDual()
         {
-            var oldDual = _relationType1.Dual;
+            var relationType1 = new RelationType(_relationType1.Id);
+            Assert.That(relationType1.Dual, Is.EqualTo(_relationType1.Dual));
 
-            try
-            {
-                var relationType1 = new RelationType(_relationType1.Id);
-                Assert.That(relationType1.Dual, Is.EqualTo(_relationType1.Dual));
+            bool dual = !relationType1.Dual;
+            relationType1.Dual = dual;
 
-                bool dual = !relationType1.Dual;
-                relationType1.Dual = dual;
-
-                var relationType2 = getTestRelationTypeDto(_relationType1.Id);
-                Assert.That(relationType2.Dual, Is.EqualTo(relationType1.Dual));
-                Assert.That(relationType2.Dual, Is.EqualTo(dual));
-            }
-            finally
-            {
-                _relationType1.Dual = oldDual;
-            }
+            var relationType2 = getTestRelationTypeDto(_relationType1.Id);
+            Assert.That(relationType2.Dual, Is.EqualTo(relationType1.Dual));
+            Assert.That(relationType2.Dual, Is.EqualTo(dual));
         }
-
         #endregion
     }
 }
