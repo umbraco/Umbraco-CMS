@@ -119,8 +119,6 @@ namespace Umbraco.Tests.BusinessLogic
             var relationTypes = RelationType.GetAll().ToArray<RelationType>();
 
             Assert.That(relationTypes.Length, Is.EqualTo(3));  // 1 default + 2 created in this test suite
-
-            traceCompletion();
         }
 
 
@@ -144,8 +142,6 @@ namespace Umbraco.Tests.BusinessLogic
             {
                 _relationType1.Name = oldName; 
             }
-
-            traceCompletion();
         }
 
         [Test(Description = "Test 'public string Alias' property set")]
@@ -168,8 +164,6 @@ namespace Umbraco.Tests.BusinessLogic
             {
                 _relationType1.Alias = oldAlias;
             }
-
-            traceCompletion();
         }
 
         [Test(Description = "Test 'public bool Dual' property set")]
