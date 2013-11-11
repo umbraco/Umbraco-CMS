@@ -104,23 +104,46 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                                 scope.loadChildren(node, true);
                             }
                         };
+                        
+                        /** 
+                            Used to do the tree syncing. If the args.tree is not specified we are assuming it has been 
+                            specified previously using the _setActiveTreeType
+                        */
+                        scope.eventhandler.syncTree = function(args) {
+                            if (!args) {
+                                throw "args cannot be null";
+                            }
+                            if (!args.path) {
+                                throw "args.path cannot be null";
+                            }
+                            
+                            //this should normally be set unless it is being called from legacy 
+                            // code, so set the active tree type before proceeding.
+                            if (args.tree) {
+                                loadActiveTree(args.tree);
+                            }
 
-                        scope.eventhandler.syncPath = function(path, forceReload) {
-
-                            if (angular.isString(path)) {
-                                path = path.replace('"', '').split(',');
+                            if (angular.isString(args.path)) {
+                                args.path = args.path.replace('"', '').split(',');
                             }
 
                             //reset current node selection
                             scope.currentNode = undefined;
 
                             //filter the path for root node ids
-                            path = _.filter(path, function(item) { return (item !== "init" && item !== "-1"); });
-                            loadPath(path, forceReload);
+                            args.path = _.filter(args.path, function (item) { return (item !== "init" && item !== "-1"); });
+                            loadPath(args.path, args.forceReload);
                         };
 
-                        scope.eventhandler.setActiveTreeType = function(treeAlias) {
-                            loadActiveTree(treeAlias);
+                        /** 
+                            Internal method that should ONLY be used by the legacy API wrapper, the legacy API used to 
+                            have to set an active tree and then sync, the new API does this in one method by using syncTree.
+                            loadChildren is optional but if it is set, it will set the current active tree and load the root
+                            node's children - this is synonymous with the legacy refreshTree method - again should not be used
+                            and should only be used for the legacy code to work.
+                        */
+                        scope.eventhandler._setActiveTreeType = function(treeAlias, loadChildren) {
+                            loadActiveTree(treeAlias, loadChildren);
                         };
                     }
                 }
@@ -146,12 +169,32 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 
                 //given a tree alias, this will search the current section tree for the specified tree alias and
                 //set that to the activeTree
-                function loadActiveTree(treeAlias) {
+                //NOTE: loadChildren is ONLY used for legacy purposes, do not use this when syncing the tree as it will cause problems
+                // since there will be double request and event handling operations.
+                function loadActiveTree(treeAlias, loadChildren) {
                     scope.activeTree = undefined;
 
                     function _load(tree) {
-                        scope.activeTree = _.find(tree.children, function(node) { return node.metaData.treeAlias === treeAlias; });
-                        emitEvent("activeTreeLoaded", { tree: scope.activeTree });
+
+                        var childrenAndSelf = [tree].concat(tree.children);
+                        scope.activeTree = _.find(childrenAndSelf, function (node) {
+                             return node.metaData.treeAlias === treeAlias;
+                        });
+                        
+                        if (!scope.activeTree) {
+                            throw "Could not find the tree " + treeAlias + ", activeTree has not been set";
+                        }
+
+                        //This is only used for the legacy tree method refreshTree!
+                        if (loadChildren) {
+                            scope.activeTree.expanded = true;
+                            scope.loadChildren(scope.activeTree, false).then(function() {
+                                emitEvent("activeTreeLoaded", { tree: scope.activeTree });
+                            });
+                        }
+                        else {
+                            emitEvent("activeTreeLoaded", { tree: scope.activeTree });
+                        }
                     }
 
                     if (scope.tree) {
