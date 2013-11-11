@@ -1,65 +1,22 @@
-﻿using System.Collections.Generic;
-using NUnit.Framework;
-using umbraco.BusinessLogic;
-using Umbraco.Tests.TestHelpers;
-using umbraco.cms.businesslogic.datatype;
-using System.Runtime.CompilerServices;
-using System.Diagnostics;
-using System.Reflection;
-using umbraco.cms.businesslogic;
-using System;
-using System.Xml;
+﻿using System;
 using System.Linq;
-using Umbraco.Web;
-using Umbraco.Core.Persistence;
+using System.Runtime.CompilerServices;
+using NUnit.Framework;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Models.Rdbms;
-using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.relation;
 
 namespace Umbraco.Tests.BusinessLogic
 {
     [TestFixture]
-    public class cms_businesslogic_RelationType_Tests : BaseDatabaseFactoryTest
+    public class cms_businesslogic_RelationType_Tests : BaseDatabaseFactoryTestWithContext
     {
-        #region Helper methods
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NewSchemaPerFixture; }
-        }
-
-        private void l(string format, params object[] args)
-        {
-            System.Console.WriteLine(format, args);
-        }
-
-        private bool _traceTestCompletion = false;
-        private int _testNumber;
-        private void traceCompletion(string finished = "Finished")
-        {
-            if (!_traceTestCompletion) return; 
-            StackTrace stackTrace = new StackTrace();
-            MethodBase methodBase = stackTrace.GetFrame(1).GetMethod();
-            string message = string.Format("***** {0:000}. {1} - {2} *****\n", ++_testNumber, methodBase.Name, finished);
-            System.Console.Write(message);
-        }
-        #endregion
-
-        #region EnsureData()
-        public override void Initialize()
-        {
-            base.Initialize();
-            EnsureData(); 
-        }
-
-        private bool initialized;
-        private UmbracoContext context;
-        private UmbracoDatabase database;
-
-        private RelationType _relationType1;
-        private RelationType _relationType2;
+        #region EnsureData
+        private RelationTypeDto _relationType1;
+        private RelationTypeDto _relationType2;
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        private void EnsureData()
+        protected override void EnsureData()
         {
             if (!initialized)
             {
@@ -72,34 +29,33 @@ namespace Umbraco.Tests.BusinessLogic
             initialized = true;
         }
 
+        private RelationTypeDto getTestRelationTypeDto(int relationTypeId)
+        {
+            return getPersistedTestDto<RelationTypeDto>(relationTypeId);  
+        }
+
         private const string TEST_RELATION_TYPE_NAME = "Test Relation Type";
         private const string TEST_RELATION_TYPE_ALIAS = "testRelationTypeAlias";
-        private RelationType insertTestRelationType(int testRelationTypeNumber)
+        private RelationTypeDto insertTestRelationType(int testRelationTypeNumber)
         {
-            database.Execute("insert into [umbracoRelationType] ([dual], [parentObjectType], [childObjectType], [name], [alias]) values " +
+            independentDatabase.Execute("insert into [umbracoRelationType] ([dual], [parentObjectType], [childObjectType], [name], [alias]) values " +
                             "(@dual, @parentObjectType, @childObjectType, @name, @alias)",
                             new { dual = 1, parentObjectType = Guid.NewGuid(), childObjectType = Guid.NewGuid(),
                                   name = string.Format("{0}_{1}", TEST_RELATION_TYPE_NAME, testRelationTypeNumber),
                                   alias = string.Format("{0}_{1}", TEST_RELATION_TYPE_ALIAS, testRelationTypeNumber),
                             });
-            int relationTypeId = database.ExecuteScalar<int>("select max(id) from [umbracoRelationType]");
-            return new RelationType(relationTypeId);
+            int relationTypeId = independentDatabase.ExecuteScalar<int>("select max(id) from [umbracoRelationType]");
+            return getTestRelationTypeDto(relationTypeId);   
         }
 
         private void EnsureAllTestRecordsAreDeleted()
         {
-           if (_relationType1 != null) database.Execute("delete from [umbracoRelationType] where (Id = @0)", _relationType1.Id);
-           if (_relationType2 != null) database.Execute("delete from [umbracoRelationType] where (Id = @0)", _relationType2.Id);
+            if (_relationType1 != null) independentDatabase.Execute("delete from [umbracoRelationType] where (Id = @0)", _relationType1.Id);
+            if (_relationType2 != null) independentDatabase.Execute("delete from [umbracoRelationType] where (Id = @0)", _relationType2.Id);
 
            initialized = false; 
         }
 
-        private void CreateContext()
-        {
-            context = GetUmbracoContext("http://localhost", 0);
-            database = context.Application.DatabaseContext.Database;
-        }
- 
         #endregion
 
         #region Tests
@@ -120,10 +76,8 @@ namespace Umbraco.Tests.BusinessLogic
             //l("Count = {0}", count21); // = 1 + 0
 
             // see the next test code line: Assert.Throws(typeof(ArgumentException), delegate { RelationType.GetById(_relationType.Id); });
-            Assert.That(RelationType.GetById(_relationType1.Id), Is.Null);
-            Assert.That(RelationType.GetById(_relationType2.Id), Is.Null);
-
-            traceCompletion();
+            Assert.That(getTestRelationTypeDto(_relationType1.Id), Is.Null);
+            Assert.That(getTestRelationTypeDto(_relationType2.Id), Is.Null);
         }
 
         [Test(Description = "Test 'public RelationType(int id)' and 'private void PopulateFromDTO(RelationTypeDto dto)' methods")]
@@ -134,9 +88,7 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(testRelationType.Id, Is.EqualTo(_relationType1.Id));
             Assert.That(testRelationType.Dual, Is.EqualTo(_relationType1.Dual));
             Assert.That(testRelationType.Name, Is.EqualTo(_relationType1.Name));
-            Assert.That(testRelationType.Alias, Is.EqualTo(_relationType1.Alias));    
-
-            traceCompletion();
+            Assert.That(testRelationType.Alias, Is.EqualTo(_relationType1.Alias));
         }
 
         [Test(Description = "Test 'public static RelationType GetById(int id)' method")]
@@ -148,8 +100,6 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(testRelationType.Dual, Is.EqualTo(_relationType1.Dual));
             Assert.That(testRelationType.Name, Is.EqualTo(_relationType1.Name));
             Assert.That(testRelationType.Alias, Is.EqualTo(_relationType1.Alias));
-
-            traceCompletion();
         }
      
         [Test(Description = "Test 'public static RelationType GetByAlias(string Alias)' method")]
@@ -161,8 +111,6 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(testRelationType.Dual, Is.EqualTo(_relationType1.Dual));
             Assert.That(testRelationType.Name, Is.EqualTo(_relationType1.Name));
             Assert.That(testRelationType.Alias, Is.EqualTo(_relationType1.Alias));
-
-            traceCompletion();
         }
 
         [Test(Description = "Test 'public static IEnumerable<RelationType> GetAll()' method")]
@@ -176,7 +124,7 @@ namespace Umbraco.Tests.BusinessLogic
         }
 
 
-        [Test(Description = "Test 'public string Name' property set")]
+        [Test(Description = "Test 'public string Name' property ")]
         public void Test_RelationType_SetName()
         {
             string oldName = _relationType1.Name;
@@ -188,8 +136,9 @@ namespace Umbraco.Tests.BusinessLogic
 
                 relationType1.Name = "New Name";
 
-                var relationType2 = new RelationType(_relationType1.Id);
+                var relationType2 = getTestRelationTypeDto(_relationType1.Id);
                 Assert.That(relationType2.Name, Is.EqualTo(relationType1.Name));
+                Assert.That(relationType2.Name, Is.EqualTo("New Name"));
             }
             finally
             {
@@ -211,8 +160,9 @@ namespace Umbraco.Tests.BusinessLogic
 
                 relationType1.Alias = "newAlias";
 
-                var relationType2 = new RelationType(_relationType1.Id);
+                var relationType2 = getTestRelationTypeDto(_relationType1.Id);
                 Assert.That(relationType2.Alias, Is.EqualTo(relationType1.Alias));
+                Assert.That(relationType2.Alias, Is.EqualTo("newAlias"));
             }
             finally
             {
@@ -232,23 +182,19 @@ namespace Umbraco.Tests.BusinessLogic
                 var relationType1 = new RelationType(_relationType1.Id);
                 Assert.That(relationType1.Dual, Is.EqualTo(_relationType1.Dual));
 
-                relationType1.Dual = !relationType1.Dual;
+                bool dual = !relationType1.Dual;
+                relationType1.Dual = dual;
 
-                var relationType2 = new RelationType(_relationType1.Id);
+                var relationType2 = getTestRelationTypeDto(_relationType1.Id);
                 Assert.That(relationType2.Dual, Is.EqualTo(relationType1.Dual));
+                Assert.That(relationType2.Dual, Is.EqualTo(dual));
             }
             finally
             {
                 _relationType1.Dual = oldDual;
             }
-
-            traceCompletion();
         }
 
-        #endregion
-
-        #region Private Helper classes and methods
-        // NONE
         #endregion
     }
 }
