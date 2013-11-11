@@ -644,11 +644,15 @@ namespace Umbraco.Core.Services
                 if (dataTypeDefinition == null)
                 {
                     LogHelper.Warn<PackagingService>(
-                        string.Format("Packager: Error handling creation of PropertyType '{0}'. Could not find DataTypeDefintion with unique id '{1}' nor one referencing the DataType with a property editor alias (or legacy control id) '{2}'. Did the package creator forget to package up custom datatypes?",
+                        string.Format("Packager: Error handling creation of PropertyType '{0}'. Could not find DataTypeDefintion with unique id '{1}' nor one referencing the DataType with a property editor alias (or legacy control id) '{2}'. Did the package creator forget to package up custom datatypes? This property will be converted to a label/readonly editor if one exists.",
                                       property.Element("Name").Value,
                                       dataTypeDefinitionId,
                                       property.Element("Type").Value.Trim()));
-                    continue;
+
+                    //convert to a label!
+                    dataTypeDefinition = _dataTypeService.GetDataTypeDefinitionByPropertyEditorAlias(Constants.PropertyEditors.NoEditAlias).FirstOrDefault();
+                    //if for some odd reason this isn't there then ignore
+                    if (dataTypeDefinition == null) continue;
                 }
 
                 var propertyType = new PropertyType(dataTypeDefinition)
