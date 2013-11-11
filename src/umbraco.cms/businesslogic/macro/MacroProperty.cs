@@ -101,8 +101,15 @@ namespace umbraco.cms.businesslogic.macro
                             Alias = ParameterEditorAlias,
                             Id = 0,
                             Assembly = found.GetType().Namespace,
-                            BaseType = found.GetType().Name,
-                            Type = "String"
+                            //NOTE: In v6 macro parameter's stored in the database used to 
+                            // expose a CLR type but we no longer support that, instead we'll just attempt
+                            // to convert the value to the CLR type - It's also important to note that the
+                            // ONLY place this BaseType is ever used is to assign to the umbraco.cms.businesslogic.macro.MacroPropertyModel.CLRType
+                            // property, which is then used when attempting to render a UserControl macro. So basically
+                            // it is completely pointless since we already know the CLR property type of the UserControl
+                            // property and we're just going to do the conversion anyways since it is always essentially a string.
+                            BaseType = "String",
+                            Type = found.GetType().Name
                         };
                     _type = type;
                 }
