@@ -10,48 +10,17 @@ using System.Reflection;
 namespace Umbraco.Tests.BusinessLogic
 {
     [TestFixture]
-    public class cms_cms_businesslogic_PreValue_Tests : BaseDatabaseFactoryTest
+    public class cms_cms_businesslogic_PreValue_Tests : BaseDatabaseFactoryTestWithContext
     {
-
-        #region Helper methods
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NewSchemaPerFixture; }
-        }
-
-        private void l(string format, params object[] args)
-        {
-            System.Console.WriteLine(format, args);
-        }
-
-        private bool _traceTestCompletion = false;
-        private int _testNumber;
-        private void traceCompletion(string finished = "Finished")
-        {
-            if (!_traceTestCompletion) return;
-            StackTrace stackTrace = new StackTrace();
-            MethodBase methodBase = stackTrace.GetFrame(1).GetMethod();
-            string message = string.Format("***** {0:000}. {1} - {2} *****\n", ++_testNumber, methodBase.Name, finished);
-            System.Console.Write(message);
-        }
-        #endregion
-
         #region EnsureData()
-        public override void Initialize()
-        {
-            base.Initialize();
-            EnsureData();
-        }
-        
-        private bool initialized;
 
         private UserType _userType;
         private User _user;
         private DataTypeDefinition _dataTypeDefinition;
-        private PreValue _preValue;
+        private umbraco.cms.businesslogic.datatype.PreValue.PreValueDto _preValue;
         
         [MethodImpl(MethodImplOptions.Synchronized)]
-        private void EnsureData()
+        protected override void EnsureData()
         {
             if (!initialized)
             {
@@ -60,25 +29,28 @@ namespace Umbraco.Tests.BusinessLogic
                 _dataTypeDefinition = DataTypeDefinition.MakeNew(_user, "Nvarchar");
             }
 
-            if ((int)PreValues.Database.ExecuteScalar<int>("select count(*) from cmsDataTypePreValues where datatypenodeid = @0", _dataTypeDefinition.Id) == 0)
+            if ((int)independentDatabase.ExecuteScalar<int>("select count(*) from cmsDataTypePreValues where datatypenodeid = @0", _dataTypeDefinition.Id) == 0)
             {
                 initialized = false;
 
                 string value = ",code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,|1|1,2,3,|0|500,400|1049,|true|";
 
-                PreValue.Database.Execute(
+                independentDatabase.Execute(
                     "insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')",
                     new { dtdefid = _dataTypeDefinition.Id, value = value });
                 var id = PreValue.Database.ExecuteScalar<int>("SELECT MAX(id) FROM cmsDataTypePreValues");
 
-                _preValue = new PreValue();
-                _preValue.Id = id;
-                _preValue.DataTypeId = _dataTypeDefinition.Id;
-                _preValue.Value = value;
+                _preValue = getTestPrevalueDto(id);
             }
 
             initialized = true;
         }
+
+        private umbraco.cms.businesslogic.datatype.PreValue.PreValueDto getTestPrevalueDto(int id)
+        {
+            return getPersistedTestDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(id);
+        }
+
         #endregion
 
         #region Tests
@@ -94,7 +66,6 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(_preValue, !Is.Null);
             Assert.That(_dataTypeDefinition.Id, !Is.EqualTo(0));
             Assert.That(_preValue.Id, !Is.EqualTo(0));
-            traceCompletion();
         }
 
         [Test(Description = "Fetch PreValue object instance created by Database.Execute(...) in EnsureData() method")]
@@ -110,7 +81,6 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(_preValue.SortOrder, Is.EqualTo(savedPrevalue.SortOrder));
             Assert.That(_preValue.Value, Is.EqualTo(savedPrevalue.Value));
             Assert.That(_preValue.DataTypeId, Is.EqualTo(savedPrevalue.DataTypeId));
-            traceCompletion();
         }
 
         [Test(Description = "Test constructors and initialize() method for the new non-database PreValue object instances")]
@@ -139,7 +109,6 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(newPreValue4.SortOrder, Is.EqualTo(1));
             Assert.That(newPreValue4.Value, Is.EqualTo(TEST_VALUE_VALUE));
 
-            traceCompletion();
         }
 
         [Test(Description = "Test PreValue(int Id) and PreValue(int DataTypeId, string Value) constructors and initialize() method for saved in the database PreValue object instances")]
@@ -159,20 +128,17 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(newPreValue2.SortOrder, Is.EqualTo(_preValue.SortOrder));
             Assert.That(newPreValue2.Value, Is.EqualTo(_preValue.Value));
 
-            traceCompletion();
         }
 
         [Test(Description="Test MakeNew(...) static method" )]
         public void Test_MakeNew()
         {
             var newPreValue = PreValue.MakeNew(_dataTypeDefinition.Id, TEST_VALUE_VALUE);
-            var savedPrevalue = new PreValue(_dataTypeDefinition.Id, TEST_VALUE_VALUE);
+            var savedPrevalue = getTestPrevalueDto(newPreValue.Id);
 
             Assert.That(newPreValue.Id, Is.EqualTo(savedPrevalue.Id));
             Assert.That(newPreValue.SortOrder, Is.EqualTo(savedPrevalue.SortOrder));
             Assert.That(newPreValue.Value, Is.EqualTo(savedPrevalue.Value));
-            
-            traceCompletion();
         }
 
         [Test(Description = "Test Delete() method")]
@@ -191,7 +157,6 @@ namespace Umbraco.Tests.BusinessLogic
             PreValue savedPrevalue = null;
             Assert.Throws(typeof(ArgumentException), delegate { savedPrevalue = new PreValue(id); });
 
-            traceCompletion();
         }
 
         [Test(Description = "Test Save() method")]
@@ -207,13 +172,12 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(newPreValue.Id, !Is.Null);    
 
             //  fetched by Id Prevalue object instance has the same properties as an in-memory just saved PreValue object instance
-            var savedPrevalue = new PreValue(newPreValue.Id);
+            var savedPrevalue = getTestPrevalueDto(newPreValue.Id);
             Assert.That(newPreValue.Id, Is.EqualTo(savedPrevalue.Id));
             Assert.That(newPreValue.SortOrder, Is.EqualTo(savedPrevalue.SortOrder));
             Assert.That(newPreValue.Value, Is.EqualTo(savedPrevalue.Value));
             Assert.That(newPreValue.DataTypeId, Is.EqualTo(savedPrevalue.DataTypeId));
 
-            traceCompletion();
         }
         #endregion
 

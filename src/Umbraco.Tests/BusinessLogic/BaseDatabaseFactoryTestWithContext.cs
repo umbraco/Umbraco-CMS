@@ -13,6 +13,7 @@ namespace Umbraco.Tests.TestHelpers
         public override void Initialize()
         {
             base.Initialize();
+            if (!initialized) CreateContext(); 
             EnsureData();
         }
 

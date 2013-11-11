@@ -10,6 +10,7 @@ using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using Umbraco.Core.Persistence;
 using Umbraco.Core;
+using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 
 namespace umbraco.cms.businesslogic.datatype
@@ -193,12 +194,20 @@ namespace umbraco.cms.businesslogic.datatype
         #endregion
 
         #region Private methods
-        private class preValueDto
+        [TableName("cmsDataTypePreValues")]
+        [PrimaryKey("id")]
+        [ExplicitColumns]
+        internal class PreValueDto
         {
-            public int id { get; set; }
-            public int sortorder { get; set; }
-            public string value { get; set; }
-            public int dataTypeNodeId { get; set; }
+            [Column("Id")]
+            [PrimaryKeyColumn(IdentitySeed = 1)]
+            public int Id { get; set; }
+            [Column("SortOrder")]
+            public int SortOrder { get; set; }
+            [Column("Value")]
+            public string Value { get; set; }
+            [Column("dataTypeNodeId")]
+            public int DataTypeId { get; set; }  // source DataTypeNodeId
         }
 
         /// <summary>
@@ -208,15 +217,15 @@ namespace umbraco.cms.businesslogic.datatype
         {
             if (_id == null) throw new ArgumentNullException("Id is null");
 
-            Database.FirstOrDefault<preValueDto>(
+            Database.FirstOrDefault<PreValueDto>(
                  "Select id, sortorder, [value], dataTypeNodeId from cmsDataTypePreValues where id = @id order by sortorder",
                  new { id = _id })
-            .IfNull<preValueDto>(x => { throw new ArgumentException(string.Format("Can't fetch a PreValue instance for ID = {0}", _id)); })
-            .IfNotNull<preValueDto>(x =>
+            .IfNull<PreValueDto>(x => { throw new ArgumentException(string.Format("Can't fetch a PreValue instance for ID = {0}", _id)); })
+            .IfNotNull<PreValueDto>(x =>
             {
-                _sortOrder = x.sortorder;
-                _value = x.value;
-                _dataTypeId = x.dataTypeNodeId;
+                _sortOrder = x.SortOrder;
+                _value = x.Value;
+                _dataTypeId = x.DataTypeId;
             });
             
 

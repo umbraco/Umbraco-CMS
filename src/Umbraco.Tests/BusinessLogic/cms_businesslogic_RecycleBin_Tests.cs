@@ -15,31 +15,8 @@ namespace Umbraco.Tests.BusinessLogic
     /// TODO: Populate test database with RecycleBin related test data. Implement additional tests.
     /// </remarks> 
     [TestFixture]
-    public class cms_businesslogic_RecycleBin_Tests : BaseDatabaseFactoryTest
+    public class cms_businesslogic_RecycleBin_Tests : BaseDatabaseFactoryTestWithContext
     {
-
-        #region Helper methods
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NewSchemaPerFixture; }
-        }
-
-        private void l(string format, params object[] args)
-        {
-            System.Console.WriteLine(format, args);
-        }
-
-        private bool _traceTestCompletion = false;
-        private int _testNumber;
-        private void traceCompletion(string finished = "Finished")
-        {
-            if (!_traceTestCompletion) return; 
-            StackTrace stackTrace = new StackTrace();
-            MethodBase methodBase = stackTrace.GetFrame(1).GetMethod();
-            string message = string.Format("***** {0:000}. {1} - {2} *****\n", ++_testNumber, methodBase.Name, finished);
-            System.Console.Write(message);
-        }
-        #endregion
 
         #region EnsureData()
         public override void Initialize()
@@ -48,10 +25,8 @@ namespace Umbraco.Tests.BusinessLogic
             EnsureData(); 
         }
 
-        private bool initialized;
-
         [MethodImpl(MethodImplOptions.Synchronized)]
-        private void EnsureData()
+        protected override void EnsureData()
         {
             //TODO: implement population of Recycle Bin and related test data into the test database
             initialized = true;
@@ -68,7 +43,6 @@ namespace Umbraco.Tests.BusinessLogic
         //public void Test_EnsureData()
         //{
         //    Assert.IsTrue(initialized);
-        //    traceCompletion();
         //}
 
         [Test(Description = "Test 'static int Count(RecycleBinType type)' method")]
@@ -77,7 +51,6 @@ namespace Umbraco.Tests.BusinessLogic
             EnsureAllRecycleBinRecordsAreDeleted();
             Assert.That(RecycleBin.Count(umbraco.cms.businesslogic.RecycleBin.RecycleBinType.Content), Is.EqualTo(0));
             Assert.That(RecycleBin.Count(umbraco.cms.businesslogic.RecycleBin.RecycleBinType.Media), Is.EqualTo(0));
-            traceCompletion();
         }
 
         [Test(Description = "Test 'umbraco.BusinessLogic.console.IconI[] Children' property")]
@@ -86,7 +59,6 @@ namespace Umbraco.Tests.BusinessLogic
             EnsureAllRecycleBinRecordsAreDeleted();
             var recycleBin = new RecycleBin(RecycleBin.RecycleBinType.Content); 
             Assert.That(recycleBin.Children.Length, Is.EqualTo(0));
-            traceCompletion();
         }
 
         #endregion

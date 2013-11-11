@@ -10,40 +10,9 @@ using System.Reflection;
 namespace Umbraco.Tests.BusinessLogic
 {
     [TestFixture]
-    public class cms_businesslogic_PreValues_Tests : BaseDatabaseFactoryTest
+    public class cms_businesslogic_PreValues_Tests : BaseDatabaseFactoryTestWithContext
     {
-        #region Helper methods
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NewSchemaPerFixture; }
-        }
-
-        private void l(string format, params object[] args)
-        {
-            System.Console.WriteLine(format, args);
-        }
-
-        private bool _traceTestCompletion = false;
-        private int _testNumber;
-        private void traceCompletion(string finished = "Finished")
-        {
-            if (!_traceTestCompletion) return; 
-            StackTrace stackTrace = new StackTrace();
-            MethodBase methodBase = stackTrace.GetFrame(1).GetMethod();
-            string message = string.Format("***** {0:000}. {1} - {2} *****\n", ++_testNumber, methodBase.Name, finished);
-            System.Console.Write(message);
-        }
-        #endregion
-
         #region EnsureData()
-        public override void Initialize()
-        {
-            base.Initialize();
-            EnsureData(); 
-        }
-
-        private bool initialized;
-
         private UserType _userType;
         private User _user;
         private DataTypeDefinition _dataTypeDefinition1;
@@ -52,7 +21,7 @@ namespace Umbraco.Tests.BusinessLogic
         private int _dataTypeDefinition2_PrevaluesTestCount;
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        private void EnsureData()
+        protected override void EnsureData()
         {
             if (!initialized)
             {
@@ -96,6 +65,11 @@ namespace Umbraco.Tests.BusinessLogic
 
             initialized = true;
         }
+
+        private umbraco.cms.businesslogic.datatype.PreValue.PreValueDto getTestPrevalueDto(int id)
+        {
+            return getPersistedTestDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(id);
+        }
         #endregion
 
         #region Tests
@@ -108,7 +82,6 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(_dataTypeDefinition1.Id, !Is.EqualTo(0));
             Assert.That(_dataTypeDefinition2, !Is.Null);
             Assert.That(_dataTypeDefinition2.Id, !Is.EqualTo(0));
-            traceCompletion();
         }
 
         [Test(Description = "Test static CountOfPreValues(int dataTypeDefId) method")]
@@ -116,7 +89,6 @@ namespace Umbraco.Tests.BusinessLogic
         {
             Assert.That(PreValues.CountOfPreValues(_dataTypeDefinition1.Id), Is.EqualTo(_dataTypeDefinition1_PrevaluesTestCount));
             Assert.That(PreValues.CountOfPreValues(_dataTypeDefinition2.Id), Is.EqualTo(_dataTypeDefinition2_PrevaluesTestCount));
-            traceCompletion();
         }
 
         [Test(Description = "Test static DeleteByDataTypeDefinition(int dataTypeDefId) method")]
@@ -129,7 +101,6 @@ namespace Umbraco.Tests.BusinessLogic
             PreValues.DeleteByDataTypeDefinition(_dataTypeDefinition2.Id);
             Assert.That(PreValues.GetPreValues(_dataTypeDefinition2.Id).Count, Is.EqualTo(0));
 
-            traceCompletion();
         }
 
         [Test(Description = "Test static GetPreValues(int DataTypeId) method")]
@@ -137,7 +108,6 @@ namespace Umbraco.Tests.BusinessLogic
         {
             Assert.That(PreValues.GetPreValues(_dataTypeDefinition1.Id).Count, Is.EqualTo(_dataTypeDefinition1_PrevaluesTestCount));
             Assert.That(PreValues.GetPreValues(_dataTypeDefinition2.Id).Count, Is.EqualTo(_dataTypeDefinition2_PrevaluesTestCount));
-            traceCompletion();
         }
 
         #endregion

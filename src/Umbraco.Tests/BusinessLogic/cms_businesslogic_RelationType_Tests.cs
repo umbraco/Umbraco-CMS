@@ -20,8 +20,6 @@ namespace Umbraco.Tests.BusinessLogic
         {
             if (!initialized)
             {
-                CreateContext();
-
                 _relationType1 = insertTestRelationType(1);                
                 _relationType2 = insertTestRelationType(2); 
             }

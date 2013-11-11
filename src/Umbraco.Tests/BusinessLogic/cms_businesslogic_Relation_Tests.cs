@@ -18,39 +18,10 @@ using umbraco.cms.businesslogic.relation;
 namespace Umbraco.Tests.BusinessLogic
 {
     [TestFixture]
-    public class cms_businesslogic_Relation_Tests : BaseDatabaseFactoryTest
+    public class cms_businesslogic_Relation_Tests : BaseDatabaseFactoryTestWithContext
     {
-        #region Helper methods
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NewSchemaPerFixture; }
-        }
-
-        private void l(string format, params object[] args)
-        {
-            System.Console.WriteLine(format, args);
-        }
-
-        private bool _traceTestCompletion = false;
-        private int _testNumber;
-        private void traceCompletion(string finished = "Finished")
-        {
-            if (!_traceTestCompletion) return; 
-            StackTrace stackTrace = new StackTrace();
-            MethodBase methodBase = stackTrace.GetFrame(1).GetMethod();
-            string message = string.Format("***** {0:000}. {1} - {2} *****\n", ++_testNumber, methodBase.Name, finished);
-            System.Console.Write(message);
-        }
-        #endregion
-
         #region EnsureData()
-        public override void Initialize()
-        {
-            base.Initialize();
-            EnsureData(); 
-        }
 
-        private bool initialized;
         private UmbracoContext context;
         private UmbracoDatabase database;
 
@@ -62,19 +33,22 @@ namespace Umbraco.Tests.BusinessLogic
 
         private RelationType _relationType1;
         private RelationType _relationType2;
-        private Relation _relation1;
-        private Relation _relation2;
-        private Relation _relation3;
+
+        private RelationDto _relation1;
+        private RelationDto _relation2;
+        private RelationDto _relation3;
 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        private void EnsureData()
+        protected override void EnsureData()
         {
             if (!initialized)
             {               
                 MakeNew_PersistsNewUmbracoNodeRow();
 
-                _relationType1 = insertTestRelationType(1);
-                _relationType2 = insertTestRelationType(2); 
+                var relationType1 = insertTestRelationType(1);
+                _relationType1 = new RelationType(relationType1.Id);  
+                var relationType2 = insertTestRelationType(2);
+                _relationType2 = new RelationType(relationType2.Id);  
 
                 _relation1 = insertTestRelation(_relationType1,  _node1.Id, _node2.Id, "node1(parent) <-> node2(child)");
                 _relation2 = insertTestRelation(_relationType1,  _node2.Id, _node3.Id, "node2(parent) <-> node3(child)");
@@ -85,26 +59,35 @@ namespace Umbraco.Tests.BusinessLogic
             initialized = true;
         }
 
+        private RelationDto getTestRelationDto(int relationId)
+        {
+            return getPersistedTestDto<RelationDto>(relationId);
+        }
+        private RelationTypeDto getTestRelationTypeDto(int relationTypeId)
+        {
+            return getPersistedTestDto<RelationTypeDto>(relationTypeId);
+        }
+
         private const string TEST_RELATION_TYPE_NAME = "Test Relation Type";
         private const string TEST_RELATION_TYPE_ALIAS = "testRelationTypeAlias";
-        private RelationType insertTestRelationType(int testRelationTypeNumber)
+        private RelationTypeDto insertTestRelationType(int testRelationTypeNumber)
         {
-            database.Execute("insert into [umbracoRelationType] ([dual], [parentObjectType], [childObjectType], [name], [alias]) values " +
+            independentDatabase.Execute("insert into [umbracoRelationType] ([dual], [parentObjectType], [childObjectType], [name], [alias]) values " +
                             "(@dual, @parentObjectType, @childObjectType, @name, @alias)",
                             new { dual = 1, parentObjectType = Guid.NewGuid(), childObjectType = Guid.NewGuid(),
                                   name = string.Format("{0}_{1}", TEST_RELATION_TYPE_NAME, testRelationTypeNumber),
                                   alias = string.Format("{0}_{1}", TEST_RELATION_TYPE_ALIAS, testRelationTypeNumber),
                             });
-            int relationTypeId = database.ExecuteScalar<int>("select max(id) from [umbracoRelationType]");
-            return new RelationType(relationTypeId);
+            int relationTypeId = independentDatabase.ExecuteScalar<int>("select max(id) from [umbracoRelationType]");
+            return getTestRelationTypeDto(relationTypeId);
         }
 
-        private Relation insertTestRelation(RelationType relationType, int parentNodeId, int childNodeId, string comment)
+        private RelationDto insertTestRelation(RelationType relationType, int parentNodeId, int childNodeId, string comment)
         {
-            database.Execute("insert into [umbracoRelation] (parentId, childId, relType, datetime, comment) values (@parentId, @childId, @relType, @datetime, @comment)",
+            independentDatabase.Execute("insert into [umbracoRelation] (parentId, childId, relType, datetime, comment) values (@parentId, @childId, @relType, @datetime, @comment)",
                              new { parentId = parentNodeId, childId = childNodeId, relType = relationType.Id, datetime = DateTime.Now, comment = comment });
-            int relationId = database.ExecuteScalar<int>("select max(id) from [umbracoRelation]");
-            return new Relation(relationId);
+            int relationId = independentDatabase.ExecuteScalar<int>("select max(id) from [umbracoRelation]");
+            return getTestRelationDto(relationId);
         }
 
         private void EnsureAllTestRecordsAreDeleted()
@@ -117,18 +100,11 @@ namespace Umbraco.Tests.BusinessLogic
            if (_node5 != null) _node5.delete();
 
            //... bit not relation types
-           if (_relationType1 != null) database.Execute("delete from [umbracoRelationType] where (Id = @0)", _relationType1.Id);
-           if (_relationType2 != null) database.Execute("delete from [umbracoRelationType] where (Id = @0)", _relationType2.Id);
+           if (_relationType1 != null) independentDatabase.Execute("delete from [umbracoRelationType] where (Id = @0)", _relationType1.Id);
+           if (_relationType2 != null) independentDatabase.Execute("delete from [umbracoRelationType] where (Id = @0)", _relationType2.Id);
 
            initialized = false; 
         }
-
-        private void CreateContext()
-        {
-            context = GetUmbracoContext("http://localhost", 0);
-            database = context.Application.DatabaseContext.Database;
-        }
- 
         #endregion
 
         #region Tests
@@ -179,8 +155,6 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(Relation.GetRelations(_relation2.Id).Length, Is.EqualTo(0));
             Assert.That(Relation.GetRelations(_relation3.Id).Length, Is.EqualTo(0));
 
-
-            traceCompletion();
         }
 
         [Test(Description = "Test 'public Relation(int Id)' constructor")]
@@ -193,111 +167,63 @@ namespace Umbraco.Tests.BusinessLogic
             // not persisted Relation
             Assert.Throws(typeof(ArgumentException), delegate { new Relation(12345); });
 
-            traceCompletion();
         }
 
         [Test(Description = "Test 'public CMSNode Parent' property.set")]
         public void Test_Parent_set()
         {
-            var oldParent = _relation1.Parent;
+            // before new parent node is set
+            var testRelation1 = new Relation(_relation1.Id);
+            Assert.That(testRelation1.Parent.Id, Is.EqualTo(_node1.Id));
 
-            try
-            {
-                // before new parent node is set
-                var testRelation1 = new Relation(_relation1.Id);
-                Assert.That(testRelation1.Parent.Id, Is.EqualTo(_node1.Id));
+            testRelation1.Parent = _node4;
 
-                _relation1.Parent = _node4;
-
-                // after new parent node is set
-                var testRelation2 = new Relation(_relation1.Id);
-                Assert.That(testRelation2.Parent.Id, Is.EqualTo(_node4.Id));
-            }
-            finally
-            {
-                // reset
-                _relation1.Parent = oldParent;
-            }
-            traceCompletion();
+            // after new parent node is set
+            var testRelation2 = getTestRelationDto(_relation1.Id);
+            Assert.That(testRelation2.ParentId, Is.EqualTo(_node4.Id));
         }
 
         [Test(Description = "Test 'public CMSNode Child' property.set")]
         public void Test_Child_set()
         {
-            var oldChild = _relation1.Child;
+            var testRelation1 = new Relation(_relation1.Id);
+            Assert.That(testRelation1.Child.Id, Is.EqualTo(_node2.Id));
 
-            try
-            {
-                // before new child node is set
-                var testRelation1 = new Relation(_relation1.Id);
-                Assert.That(testRelation1.Child.Id, Is.EqualTo(_node2.Id));
+            testRelation1.Child = _node4;
 
-                _relation1.Child = _node4;
-
-                // after new child node is set
-                var testRelation2 = new Relation(_relation1.Id);
-                Assert.That(testRelation2.Child.Id, Is.EqualTo(_node4.Id));
-            }
-            finally 
-            {
-                // reset
-                _relation1.Child = oldChild;
-            }
-
-            traceCompletion();
+            // after new child node is set
+            var testRelation2 = getTestRelationDto(_relation1.Id);
+            Assert.That(testRelation2.ChildId, Is.EqualTo(_node4.Id));
         }
 
         [Test(Description = "Test 'public string Comment' property.set")]
         public void Test_Comment_set()
         {
-            string oldComment = _relation1.Comment;
             string newComment = "my new comment";
 
-            try
-            {
-                // before new comment value is set
-                var testRelation1 = new Relation(_relation1.Id);
-                Assert.That(testRelation1.Comment, !Is.EqualTo(newComment));
+            // before new comment value is set
+            var testRelation1 = new Relation(_relation1.Id);
+            Assert.That(testRelation1.Comment, !Is.EqualTo(newComment));
 
-                _relation1.Comment = newComment;
+            testRelation1.Comment = newComment;
 
-                // after new comment value is set
-                var testRelation2 = new Relation(_relation1.Id);
-                Assert.That(testRelation2.Comment, Is.EqualTo(newComment));
-            }
-            finally
-            {
-                // reset
-                _relation1.Comment = oldComment;  
-            }
-
-            traceCompletion();
+            // after new comment value is set
+            var testRelation2 = getTestRelationDto(_relation1.Id);
+            Assert.That(testRelation2.Comment, Is.EqualTo(newComment));
         }
 
         [Test(Description = "Test 'public RelationType RelType' property.set")]
         public void Test_RelationType_set()
         {
-            var oldRelationType = _relation1.RelType; 
+            // before new relation type value is set
+            var testRelation1 = new Relation(_relation1.Id);
+            Assert.That(testRelation1.RelType.Id, Is.EqualTo(_relation1.RelationType));
 
-            try
-            {
-                // before new comment value is set
-                var testRelation1 = new Relation(_relation1.Id);
-                Assert.That(testRelation1.RelType.Id, Is.EqualTo(oldRelationType.Id));
+            testRelation1.RelType = _relationType2;
 
-                _relation1.RelType = _relationType2;
-
-                // after new comment value is set
-                var testRelation2 = new Relation(_relation1.Id);
-                Assert.That(testRelation2.RelType.Id, Is.EqualTo(_relationType2.Id));
-            }
-            finally
-            {
-                // reset
-                _relation1.RelType = _relationType1; 
-            }
-
-            traceCompletion();
+            // after new relation type value is set
+            var testRelation2 = getTestRelationDto(_relation1.Id);
+            Assert.That(testRelation2.RelationType, Is.EqualTo(_relationType2.Id));
         }
 
         [Test(Description = "Test 'public Delete' method")]
@@ -306,42 +232,41 @@ namespace Umbraco.Tests.BusinessLogic
             var relationId = _relation1.Id;
 
             try
-            {
-  
+            {  
                 // before relation is deleted
                 var testRelation1 = new Relation(relationId);
                 Assert.That(testRelation1.Id, Is.EqualTo(_relation1.Id));
 
-                _relation1.Delete();
+                testRelation1.Delete();
 
                 // after relation is deleted
-                Assert.Throws<ArgumentException>( () => { new Relation(relationId); });  
+                Assert.Throws<ArgumentException>( () => { new Relation(relationId); });
+                Assert.That(getTestRelationDto(relationId), Is.Null);   
             }
             finally
             {
                 // reset
                 EnsureAllTestRecordsAreDeleted(); 
             }
-
-            traceCompletion();
         }
         
         [Test(Description = "Test 'public static Relation MakeNew(int parentId, int childId, RelationType relType, string comment)' method")]
         public void Test_Relation_MakeNew()
         {
             Relation testRelation1 = null;
-            Relation testRelation2 = null;
+            RelationDto testRelation2 = null;
 
             try
             {
                 testRelation1 = Relation.MakeNew(_node4.Id, _node5.Id, _relationType2, "Test Relation MakeNew");
                 int testRelationId = testRelation1.Id;
-                testRelation2 = new Relation(testRelationId);
+
+                testRelation2 = getTestRelationDto(testRelationId);
 
                 Assert.That(testRelationId, Is.EqualTo(testRelation2.Id));
 
-                testRelation2.Delete();
-                testRelation2 = null;
+                testRelation1.Delete();
+                testRelation1 = null;
 
                 // after relation is deleted
                 Assert.Throws<ArgumentException>(() => { new Relation(testRelationId); });
@@ -349,10 +274,8 @@ namespace Umbraco.Tests.BusinessLogic
             finally
             {
                 // reset
-                if (testRelation2 != null) testRelation2.Delete();   
+                if (testRelation1 != null) testRelation1.Delete();   
             }
-
-            traceCompletion();
         }
 
         [Test(Description = "Test 'public static Relation[] GetRelations(int NodeId)' method")]
@@ -361,8 +284,6 @@ namespace Umbraco.Tests.BusinessLogic
             var relations = Relation.GetRelations(_node1.Id);
             // there are two test relations for _node1 created in EnsureData()
             Assert.That(relations.Length, Is.EqualTo(2));
-
-            traceCompletion();
         }
 
         [Test(Description = "public static List<Relation> GetRelationsAsList(int NodeId)' method")]
@@ -371,8 +292,6 @@ namespace Umbraco.Tests.BusinessLogic
             var relations = Relation.GetRelationsAsList(_node1.Id);
             // there are two test relations for _node1 created in EnsureData()
             Assert.That(relations.Count, Is.EqualTo(2));
-
-            traceCompletion();
         }
 
         [Test(Description = "Test 'public static Relation[] GetRelations(int NodeId, RelationType Filter)' method")]
@@ -385,8 +304,6 @@ namespace Umbraco.Tests.BusinessLogic
             var relations2 = Relation.GetRelations(_node1.Id, _relationType2);
             // there is one test relation of type _ralationType2 for _node1 created in EnsureData()
             Assert.That(relations1.Length, Is.EqualTo(1));
-
-            traceCompletion();
         }
 
         [Test(Description = "Test 'public static bool IsRelated(int ParentID, int ChildId)' method")]
@@ -396,8 +313,6 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.IsTrue(result1);
             var result2 = Relation.IsRelated(_node1.Id, _node4.Id);
             Assert.IsFalse(result2);
-
-            traceCompletion();
         }
 
         [Test(Description = "Test 'public static bool IsRelated(int ParentID, int ChildId, RelationType Filter)' method")]
@@ -407,8 +322,6 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.IsTrue(result1);
             var result2 = Relation.IsRelated(_node1.Id, _node2.Id, _relationType2);
             Assert.IsFalse(result2);
-
-            traceCompletion();
         }
 
         [Test(Description = "Test 'internal PopulateFromDto(RelationDto relationDto)' method")]
@@ -416,13 +329,11 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var testRelation = new Relation(_relation1.Id);
             Assert.That(testRelation.Id, Is.EqualTo(_relation1.Id));    
-            Assert.That(testRelation.Parent.Id, Is.EqualTo(_relation1.Parent.Id));    
-            Assert.That(testRelation.Child.Id, Is.EqualTo(_relation1.Child.Id));    
-            Assert.That(testRelation.RelType.Id, Is.EqualTo(_relation1.RelType.Id));    
+            Assert.That(testRelation.Parent.Id, Is.EqualTo(_relation1.ParentId));    
+            Assert.That(testRelation.Child.Id, Is.EqualTo(_relation1.ChildId));    
+            Assert.That(testRelation.RelType.Id, Is.EqualTo(_relation1.RelationType));    
             Assert.That(testRelation.Comment, Is.EqualTo(_relation1.Comment));    
-            Assert.That(testRelation.CreateDate, Is.EqualTo(_relation1.CreateDate));    
-
-            traceCompletion();
+            Assert.That(testRelation.CreateDate, Is.EqualTo(_relation1.Datetime));    
         }
 
         #endregion
@@ -479,13 +390,12 @@ namespace Umbraco.Tests.BusinessLogic
             int id = 0;
             try
             {
-                CreateContext();
                 _node1 = TestCMSNode.MakeNew(-1, 1, "TestContent 1", Document._objectType);
                 _node2 = TestCMSNode.MakeNew(-1, 1, "TestContent 2", Document._objectType);
                 _node3 = TestCMSNode.MakeNew(-1, 1, "TestContent 3", Document._objectType);
                 _node4 = TestCMSNode.MakeNew(-1, 1, "TestContent 4", Document._objectType);
                 _node5 = TestCMSNode.MakeNew(-1, 1, "TestContent 5", Document._objectType);
-                var totalDocuments = database.ExecuteScalar<int>(
+                var totalDocuments = independentDatabase.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @ObjectTypeId",
                     new { ObjectTypeId = Document._objectType });
                 Assert.AreEqual(5, totalDocuments);
