@@ -65,7 +65,7 @@ function DataTypeEditController($scope, $routeParams, $location, navigationServi
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
                 
-                navigationService.syncTree({ tree: "datatype", path: [String(data.id)], forceReload: true });
+                navigationService.syncTree({ tree: "datatype", path: [String(data.id)] });
             });
     }
     

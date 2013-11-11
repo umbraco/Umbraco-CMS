@@ -162,7 +162,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
 
-                navigationService.syncTree({ tree: "content", path: data.path.split(","), forceReload: true });
+                navigationService.syncTree({ tree: "content", path: data.path.split(",") });
             });
     }
 

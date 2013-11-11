@@ -42,7 +42,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, memb
                     var path = data.name[0]+"," + data.key;
                     path = path.replace(/-/g,'');
 
-                    navigationService.syncTree({ tree: "member", path: path.split(","), forceReload: true });
+                    navigationService.syncTree({ tree: "member", path: path.split(",") });
 
                     //in one particular special case, after we've created a new item we redirect back to the edit
                     // route but there might be server validation errors in the collection which we need to display

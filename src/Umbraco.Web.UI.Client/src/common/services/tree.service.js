@@ -43,12 +43,13 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
 
                 treeNodes[i].level = childLevel;
                 treeNodes[i].parent = parentNode;
-                
+
+                //set the section for each tree node - this allows us to reference this easily when accessing tree nodes
+                treeNodes[i].section = section;
+
                 //if there is not route path specified, then set it automatically,
                 //if this is a tree root node then we want to route to the section's dashboard
                 if (!treeNodes[i].routePath) {
-                    //set the section for each tree node - this allows us to reference this easily when accessing tree nodes
-                    treeNodes[i].section = section;
                     
                     if (treeNodes[i].metaData && treeNodes[i].metaData["treeAlias"]) {
                         //this is a root node
