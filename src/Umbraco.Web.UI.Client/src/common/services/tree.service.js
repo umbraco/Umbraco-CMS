@@ -419,9 +419,6 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             if (!args.path) {
                 throw "No path defined on args object for syncTree";
             }
-            //if (!current.metaData["treeAlias"] && !args.node.section) {
-            //    throw "No section defined on args.node object for syncTree";
-            //}
             if (!angular.isArray(args.path)) {
                 throw "Path must be an array";
             }
@@ -458,53 +455,31 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                 var self = this;
                 var node = args.node;
                 
-                var doSync = function() {
-                    if (node.children) {
-                        //children are loaded, check for the existence
-                        var child = self.getChildNode(node, args.path[currPathIndex]);
-                        if (child) {
-                            if (args.path.length === (currPathIndex + 1)) {
-                                //woot! synced the node
-                                if (!args.forceReload) {
-                                    deferred.resolve(child);
-                                }
-                                else {
-                                    //even though we've found the node if forceReload is specified
-                                    //we want to go update this single node from the server
-                                    self.reloadNode(child).then(function (reloaded) {
-                                        deferred.resolve(reloaded);
-                                    }, function() {
-                                        deferred.reject();
-                                    });
-                                }
+                var doSync = function() {                    
+                    //check if it exists in the already loaded children
+                    var child = self.getChildNode(node, args.path[currPathIndex]);
+                    if (child) {
+                        if (args.path.length === (currPathIndex + 1)) {
+                            //woot! synced the node
+                            if (!args.forceReload) {
+                                deferred.resolve(child);
                             }
                             else {
-                                //now we need to recurse with the updated node/currPathIndex
-                                currPathIndex++;
-                                node = child;
-                                //recurse
-                                doSync();
+                                //even though we've found the node if forceReload is specified
+                                //we want to go update this single node from the server
+                                self.reloadNode(child).then(function(reloaded) {
+                                    deferred.resolve(reloaded);
+                                }, function() {
+                                    deferred.reject();
+                                });
                             }
                         }
                         else {
-                            //we couldn't find the child, if forceReload is true, we can go re-fetch the child collection and try again
-                            if (args.forceReload) {
-                                self.loadNodeChildren({ node: node, section: node.section }).then(function () {
-                                    //now we'll check again
-                                    child = self.getChildNode(node, args.path[currPathIndex]);
-                                    if (child) {
-                                        deferred.resolve(child);
-                                    }
-                                    else {
-                                        //fail!
-                                        deferred.reject();
-                                    }
-                                });
-                            }
-                            else {
-                                //fail!
-                                deferred.reject();
-                            }
+                            //now we need to recurse with the updated node/currPathIndex
+                            currPathIndex++;
+                            node = child;
+                            //recurse
+                            doSync();
                         }
                     }
                     else {
@@ -529,11 +504,11 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                                 //fail!
                                 deferred.reject();
                             }
-                        }, function() {
+                        }, function () {
                             //fail!
                             deferred.reject();
                         });
-                    }
+                    }                   
                 };
 
                 //start

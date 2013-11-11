@@ -127,7 +127,6 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
 
 
                 //helper to load a specific path on the active tree as soon as its ready
-
                 function loadPath(path, forceReload) {
 
                     function _load(tree, path, forceReload) {
@@ -144,26 +143,23 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     }
                 }
 
-                //expands the first child with a tree alias as soon as the tree has loaded
-
+                
+                //given a tree alias, this will search the current section tree for the specified tree alias and
+                //set that to the activeTree
                 function loadActiveTree(treeAlias) {
                     scope.activeTree = undefined;
 
-                    function _load(tree, alias) {
+                    function _load(tree) {
                         scope.activeTree = _.find(tree.children, function(node) { return node.metaData.treeAlias === treeAlias; });
-                        scope.activeTree.expanded = true;
-
-                        scope.loadChildren(scope.activeTree, false).then(function() {
-                            emitEvent("activeTreeLoaded", { tree: scope.activeTree });
-                        });
+                        emitEvent("activeTreeLoaded", { tree: scope.activeTree });
                     }
 
                     if (scope.tree) {
-                        _load(scope.tree.root, treeAlias);
+                        _load(scope.tree.root);
                     }
                     else {
                         scope.eventhandler.one("treeLoaded", function(e, args) {
-                            _load(args.tree, treeAlias);
+                            _load(args.tree);
                         });
                     }
                 }
@@ -199,12 +195,13 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     }
                 }
 
-                function syncTree(node, path, forceReload) {
+                /** syncs the tree, the treeNode can be ANY tree node in the tree that requires syncing */
+                function syncTree(treeNode, path, forceReload) {
 
                     deleteAnimations = false;
 
                     treeService.syncTree({
-                        node: node,
+                        node: treeNode,
                         path: path,
                         forceReload: forceReload
                     }).then(function (data) {

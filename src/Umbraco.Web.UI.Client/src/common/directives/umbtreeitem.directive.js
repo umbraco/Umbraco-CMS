@@ -103,7 +103,7 @@ angular.module("umbraco.directives")
             }
             else {
                 return {};
-            }
+            }            
         };
 
         /**
