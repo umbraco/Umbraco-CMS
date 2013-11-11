@@ -166,18 +166,17 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * @methodOf umbraco.services.navigationService
          *
          * @description
-         * Shows the tree for a given tree alias but turning on the containing dom element
+         * Displays the tree for a given section alias but turning on the containing dom element
          * only changes if the section is different from the current one
-		 * @param {string} sectionAlias The alias of the section the tree should load data from
+		 * @param {string} sectionAlias The alias of the section to load
+         * @param {Object} syncArgs Optional object of arguments for syncing the tree for the section being shown
 		 */
-        showTree: function(sectionAlias, treeAlias, path) {
+        showTree: function (sectionAlias, syncArgs) {
             if (sectionAlias !== this.ui.currentSection) {
                 this.ui.currentSection = sectionAlias;
-                if (treeAlias) {
-                    this.setActiveTreeType(treeAlias);
-                }
-                if (path) {
-                    this.syncpath(path, true);
+                
+                if (syncArgs) {
+                    this.syncTree(syncArgs);
                 }
             }
             setMode("tree");
@@ -288,22 +287,44 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         },
         /**
          * @ngdoc method
-         * @name umbraco.services.navigationService#syncPath
+         * @name umbraco.services.navigationService#syncTreePath
          * @methodOf umbraco.services.navigationService
          *
          * @description
-         * Syncs the tree with a given path
+         * Syncs a tree with a given path
          * The path format is: ["itemId","itemId"], and so on
          * so to sync to a specific document type node do:
          * <pre>
-         * navigationService.syncPath(["-1","123d"], true);  
+         * navigationService.syncTreePath({tree: 'content', path: ["-1","123d"], forceReload: true});  
          * </pre>
-         * @param {array} path array of ascendant ids, ex: ["1023","1243"] (loads a specific document type into the settings tree)
-         * @param {bool} forceReload forces a reload of data from the server
+         * @param {Object} args arguments passed to the function
+         * @param {String} args.tree the tree alias to sync to
+         * @param {Array} args.path the path to sync the tree to
+         * @param {Boolean} args.forceReload optional, specifies whether to force reload the node data from the server even if it already exists in the tree currently
          */
-        syncPath: function(path, forceReload) {
+        syncTree: function (args) {
+            if (!args) {
+                throw "args cannot be null";
+            }
+            if (!args.path) {
+                throw "args.path cannot be null";
+            }
+            if (!args.tree) {
+                throw "args.tree cannot be null";
+            }
+            
             if (this.ui.treeEventHandler) {
-                this.ui.treeEventHandler.syncPath(path, forceReload);
+                this.ui.treeEventHandler.syncTree(args);
+            }
+        },
+
+        /** 
+            Internal method that should ONLY be used by the legacy API wrapper, the legacy API used to 
+            have to set an active tree and then sync, the new API does this in one method by using syncTree
+        */
+        _syncPath: function(path, forceReload) {
+            if (this.ui.treeEventHandler) {
+                this.ui.treeEventHandler.syncTree({ path: path, forceReload: forceReload });
             }
         },
 
@@ -320,9 +341,13 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             }
         },
 
-        setActiveTreeType: function(treeAlias) {
+        /** 
+            Internal method that should ONLY be used by the legacy API wrapper, the legacy API used to 
+            have to set an active tree and then sync, the new API does this in one method by using syncTreePath
+        */
+        _setActiveTreeType: function (treeAlias, loadChildren) {
             if (this.ui.treeEventHandler) {
-                this.ui.treeEventHandler.setActiveTreeType(treeAlias);
+                this.ui.treeEventHandler._setActiveTreeType(treeAlias, loadChildren);
             }
         },
 

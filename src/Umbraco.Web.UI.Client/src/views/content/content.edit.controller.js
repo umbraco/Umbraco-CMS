@@ -116,7 +116,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
 
                     configureButtons(data);
 
-                    navigationService.syncPath(data.path.split(","), true);
+                    navigationService.syncTree({ tree: "content", path: data.path.split(","), forceReload: true });
 
                     deferred.resolve(data);
                     
@@ -155,9 +155,6 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
                 $scope.loaded = true;
                 $scope.content = data;
                 configureButtons($scope.content);
-
-                //just get the cached version, no need to force a reload
-                navigationService.syncPath(data.path.split(","), false);
                 
                 //in one particular special case, after we've created a new item we redirect back to the edit
                 // route but there might be server validation errors in the collection which we need to display
@@ -165,7 +162,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
 
-
+                navigationService.syncTree({ tree: "content", path: data.path.split(","), forceReload: true });
             });
     }
 
@@ -187,7 +184,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
 
                     configureButtons(data);
 
-                    navigationService.syncPath(data.path.split(","), true);
+                    navigationService.syncTree({ tree: "content", path: data.path.split(","), forceReload: true });
                 });
         }
         

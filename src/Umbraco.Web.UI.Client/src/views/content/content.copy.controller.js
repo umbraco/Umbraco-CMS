@@ -36,7 +36,7 @@ angular.module("umbraco")
 				$scope.error = false;
 				$scope.success = true;
 
-				navigationService.syncPath(path, true);
+				navigationService.syncTree({ tree: "content", path: path, forceReload: true });
 
 			},function(err){
 				$scope.success = false;

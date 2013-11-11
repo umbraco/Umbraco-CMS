@@ -90,12 +90,12 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 var tree = {
                     setActiveTreeType: function (treeType) {
                         angularHelper.safeApply($rootScope, function() {
-                            navService.setActiveTreeType(treeType);
+                            navService._setActiveTreeType(treeType);
                         });
                     },
                     syncTree: function (path, forceReload) {
                         angularHelper.safeApply($rootScope, function() {
-                            navService.syncPath(path, forceReload);
+                            navService._syncPath(path, forceReload);
                         });
                     },
                     clearTreeCache: function(){
@@ -111,7 +111,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     },
                     refreshTree: function (treeAlias) {
                         angularHelper.safeApply($rootScope, function() {
-                            navService.setActiveTreeType(treeAlias);
+                            navService._setActiveTreeType(treeAlias, true);
                         });                        
                     },
                     moveNode: function (id, path) {
@@ -126,7 +126,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                                     }
                                 }
                             }
-                            navService.syncPath(path, true);
+                            navService._syncPath(path, true);
                         });                        
                     },
                     getActionNode: function () {

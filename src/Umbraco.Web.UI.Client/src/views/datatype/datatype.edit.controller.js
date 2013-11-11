@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function DataTypeEditController($scope, $routeParams, $location, navigationService, treeService, dataTypeResource, notificationsService, navigationService, angularHelper, serverValidationManager, contentEditingHelper, formHelper) {
+function DataTypeEditController($scope, $routeParams, $location, navigationService, treeService, dataTypeResource, notificationsService,  angularHelper, serverValidationManager, contentEditingHelper, formHelper) {
 
     $scope.nav = navigationService;
     //method used to configure the pre-values when we retreive them from the server
@@ -57,9 +57,6 @@ function DataTypeEditController($scope, $routeParams, $location, navigationServi
                 $scope.preValuesLoaded = true;
                 $scope.content = data;
 
-                navigationService.setActiveTreeType("datatype");
-                navigationService.syncPath([String(data.id)]);
-
                 createPreValueProps($scope.content.preValues);
                 
                 //in one particular special case, after we've created a new item we redirect back to the edit
@@ -67,6 +64,8 @@ function DataTypeEditController($scope, $routeParams, $location, navigationServi
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
+                
+                navigationService.syncTree({ tree: "datatype", path: [String(data.id)], forceReload: true });
             });
     }
     
@@ -115,7 +114,7 @@ function DataTypeEditController($scope, $routeParams, $location, navigationServi
                         }
                     });
 
-                    navigationService.syncPath([String(data.id)]);
+                    navigationService.syncTree({ tree: "datatype", path: [String(data.id)], forceReload: true });
                     
                 }, function(err) {
 
