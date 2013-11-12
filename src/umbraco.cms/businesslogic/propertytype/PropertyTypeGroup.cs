@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
+using Umbraco.Core;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence;
 
 namespace umbraco.cms.businesslogic.propertytype
 {
@@ -48,14 +51,10 @@ namespace umbraco.cms.businesslogic.propertytype
         public IEnumerable<PropertyTypeGroup> GetPropertyTypeGroups()
         {
             var ptgs = new List<PropertyTypeGroup>();
-            using (var dr = SqlHelper.ExecuteReader(@"SELECT id FROM cmsPropertyTypeGroup WHERE parentGroupId = @id", SqlHelper.CreateParameter("@id", Id)))
+            foreach (var item in Database.Query<PropertyTypeGroupDto>(@"SELECT id FROM cmsPropertyTypeGroup WHERE parentGroupId = @0", Id))
             {
-                while (dr.Read())
-                {
-                    ptgs.Add(GetPropertyTypeGroup(dr.GetInt("id")));
-                }
+                ptgs.Add(GetPropertyTypeGroup(item.Id));
             }
-
             return ptgs;
         }
 
@@ -63,7 +62,7 @@ namespace umbraco.cms.businesslogic.propertytype
         {
             if (Id != 0)
             {
-                SqlHelper.ExecuteNonQuery(
+                Database.Execute(
                     @"UPDATE 
                         cmsPropertyTypeGroup 
                     SET 
@@ -73,21 +72,16 @@ namespace umbraco.cms.businesslogic.propertytype
                         text = @name
                     WHERE
                         id = @id
-                ",
-                    SqlHelper.CreateParameter("@id", Id),
-                    SqlHelper.CreateParameter("@parentGroupId", ConvertParentId(ParentId)),
-                    SqlHelper.CreateParameter("@contentTypeId", ContentTypeId),
-                    SqlHelper.CreateParameter("@sortOrder", SortOrder),
-                    SqlHelper.CreateParameter("@name", Name)
+                ", new {id = Id,  parentGroupId = ConvertParentId(ParentId), @contentTypeId = ContentTypeId, sortOrder = SortOrder, name = Name }
                     );
             }
             else
             {
                 if (SortOrder == -1)
-                    SortOrder = SqlHelper.ExecuteScalar<int>("select count(*) from cmsPropertyTypeGroup where COALESCE(parentGroupId, 0) = 0 and contenttypeNodeId = @nodeId",
-                        SqlHelper.CreateParameter("@nodeId", ContentTypeId)) + 1;
+                    SortOrder = Database.ExecuteScalar<int>("select count(*) from cmsPropertyTypeGroup where COALESCE(parentGroupId, 0) = 0 and contenttypeNodeId = @nodeId",
+                                     new {nodeId = ContentTypeId}) + 1;
 
-                SqlHelper.ExecuteNonQuery(
+                Database.Execute(
                     @"
                     INSERT INTO 
                         cmsPropertyTypeGroup
@@ -95,12 +89,9 @@ namespace umbraco.cms.businesslogic.propertytype
                     VALUES 
                         (@parentGroupId, @contentTypeId, @sortOrder, @name)
                 ",
-                    SqlHelper.CreateParameter("@parentGroupId", ConvertParentId(ParentId)),
-                    SqlHelper.CreateParameter("@contentTypeId", ContentTypeId),
-                    SqlHelper.CreateParameter("@sortOrder", SortOrder),
-                    SqlHelper.CreateParameter("@name", Name)
-                    );
-                Id = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM [cmsPropertyTypeGroup]");
+                  new { parentGroupId = ConvertParentId(ParentId), contentTypeId = ContentTypeId, sortOrder = SortOrder, name = Name });
+
+                Id = Database.ExecuteScalar<int>("SELECT MAX(id) FROM [cmsPropertyTypeGroup]");
 
             }
         }
@@ -117,21 +108,19 @@ namespace umbraco.cms.businesslogic.propertytype
             foreach (var ptg in GetPropertyTypeGroups())
                 ptg.Delete();
 
-            SqlHelper.ExecuteNonQuery("DELETE FROM cmsPropertyTypeGroup WHERE id = @id", SqlHelper.CreateParameter("@id", Id));
+            Database.Execute("DELETE FROM cmsPropertyTypeGroup WHERE id = @id", new { id = Id} );
         }
 
         internal void Load()
         {
-            using (var dr = SqlHelper.ExecuteReader(@" SELECT parentGroupId, contenttypeNodeId, sortOrder, text FROM cmsPropertyTypeGroup WHERE id = @id", SqlHelper.CreateParameter("@id", Id)))
+            var dto = Database.FirstOrDefault<PropertyTypeGroupDto>(@" SELECT parentGroupId, contenttypeNodeId, sortOrder, text FROM cmsPropertyTypeGroup WHERE id = @id",
+                   new { id = Id });
+            if (dto != null)
             {
-                if (dr.Read())
-                {
-                    // if no parent, the value should just be null. The GetInt helper method returns -1 if value is null so we need to check
-                    ParentId = dr.GetInt("parentGroupId") != -1 ? dr.GetInt("parentGroupId") : 0;
-                    SortOrder = dr.GetInt("sortOrder");
-                    ContentTypeId = dr.GetInt("contenttypeNodeId");
-                    Name = dr.GetString("text");
-                }
+                ParentId = dto.ParentGroupId != null && dto.ParentGroupId != -1 ? (int)dto.ParentGroupId : 0;
+                SortOrder = dto.SortOrder;
+                ContentTypeId = dto.ContentTypeNodeId;
+                Name = dto.Text;
             }
         }
 
@@ -145,12 +134,12 @@ namespace umbraco.cms.businesslogic.propertytype
         public static IEnumerable<PropertyTypeGroup> GetPropertyTypeGroupsFromContentType(int contentTypeId)
         {
             var ptgs = new List<PropertyTypeGroup>();
-            using (var dr = SqlHelper.ExecuteReader(@" SELECT id FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @contentTypeId", SqlHelper.CreateParameter("@contentTypeId", contentTypeId)))
+
+            var dto = Database.Query<PropertyTypeGroupDto>(@" SELECT id FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @contentTypeId",
+                   new { contentTypeId = contentTypeId });
+            foreach (var item in dto)
             {
-                while (dr.Read())
-                {
-                    ptgs.Add(GetPropertyTypeGroup(dr.GetInt("id")));
-                }
+                ptgs.Add(GetPropertyTypeGroup(item.Id));
             }
 
             return ptgs;
@@ -168,9 +157,16 @@ namespace umbraco.cms.businesslogic.propertytype
         /// Gets the SQL helper.
         /// </summary>
         /// <value>The SQL helper.</value>
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
         }
+
+        internal static UmbracoDatabase Database
+        {
+            get { return ApplicationContext.Current.DatabaseContext.Database; }
+        }
+
     }
 }

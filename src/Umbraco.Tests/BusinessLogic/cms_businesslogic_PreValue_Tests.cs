@@ -91,7 +91,8 @@ namespace Umbraco.Tests.BusinessLogic
             // test parametersless constructor public PreValue()
             var newPreValue1 = new PreValue();
 
-            Assert.Throws(typeof(InvalidOperationException), delegate { l("ID = {0}", newPreValue1.Id); });
+            //Assert.Throws(typeof(InvalidOperationException), delegate { l("ID = {0}", newPreValue1.Id); });
+            Assert.Throws(typeof(InvalidOperationException), delegate { int test = newPreValue1.Id; });
             Assert.That(newPreValue1.SortOrder, Is.EqualTo(0));
             Assert.That(newPreValue1.Value, Is.Null);
 
