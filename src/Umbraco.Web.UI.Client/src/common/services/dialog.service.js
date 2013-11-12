@@ -66,7 +66,7 @@ angular.module('umbraco.services')
            var scope = options.scope || $rootScope.$new();
            
            //Modal dom obj and unique id
-           dialog.element = $('<div ng-swipe-right="hide()"  data-backdrop="false"></div>');
+           dialog.element = $('<div ng-swipe-right="swipeHide($event)"  data-backdrop="false"></div>');
            var id = dialog.template.replace('.html', '').replace('.aspx', '').replace(/[\/|\.|:\&\?\=]/g, "-") + '-' + scope.$id;
 
            if (options.inline) {
@@ -156,6 +156,15 @@ angular.module('umbraco.services')
                      //this passes the modal to the current scope
                      scope.$modal = function(name) {
                          dialog.element.modal(name);
+                     };
+
+                     scope.swipeHide = function(e){
+                       if($rootScope.touchDevice){
+                            var selection = window.getSelection();
+                            if(selection.type !== "Range"){
+                              scope.hide();  
+                            }
+                        }
                      };
 
                      scope.hide = function() {
