@@ -58,8 +58,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             ui.showContextMenuDialog = false;
             ui.stickyNavigation = false;
             ui.showTray = false;
-            service.hideUserDialog();
-            service.hideHelpDialog();
+            
             //$("#search-form input").focus();    
             break;
         case 'menu':
@@ -499,12 +498,20 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * template is located in views/common/dialogs/user.html
          */
         showUserDialog: function() {
+
+            if(service.userDialog){
+                service.userDialog.close();
+                service.userDialog = undefined;
+            }
+
             service.userDialog = dialogService.open(
                 {
                     template: "views/common/dialogs/user.html",
                     modalClass: "umb-modal-left",
                     show: true
                 });
+        
+            
 
             return service.userDialog;
         },
@@ -519,37 +526,19 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * template is located in views/common/dialogs/user.html
          */
         showHelpDialog: function() {
-            service.helpDialog = dialogService.open(
-                {
-                    template: "views/common/dialogs/help.html",
-                    modalClass: "umb-modal-left",
-                    show: true
-                });
-
-            return service.helpDialog;
-        },
-
-        /**
-         * @ngdoc method
-         * @name umbraco.services.navigationService#hideUserDialog
-         * @methodOf umbraco.services.navigationService
-         *
-         * @description
-         * Hides the user dialog, next to the sections navigation
-         * template is located in views/common/dialogs/user.html
-         */
-        hideUserDialog: function() {
-            if (service.userDialog) {
-                service.userDialog.close();
-                service.userDialog = undefined;
-            }
-        },
-
-        hideHelpDialog: function() {
-            if (service.helpDialog) {
+            if(service.helpDialog){
                 service.helpDialog.close();
                 service.helpDialog = undefined;
             }
+
+            service.helpDialog = dialogService.open(
+            {
+                template: "views/common/dialogs/help.html",
+                modalClass: "umb-modal-left",
+                show: true
+            });
+            
+            return service.helpDialog;
         },
 
         /**
