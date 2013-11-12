@@ -8,14 +8,14 @@
  * The main application controller
  * 
  */
-function MainController($scope, $location, $routeParams, $rootScope, $timeout, $http, $log, notificationsService, userService, navigationService, legacyJsLoader, updateChecker) {
+function MainController($scope, $rootScope, $location, $routeParams, $rootScope, $timeout, $http, $log, notificationsService, userService, navigationService, legacyJsLoader, updateChecker) {
 
     var legacyTreeJsLoaded = false;
     
     //detect if the current device is touch-enabled
     //todo, move this out of the controller
-    $scope.touchDevice = ("ontouchstart" in window || window.touch || window.navigator.msMaxTouchPoints===5 || window.DocumentTouch && document instanceof DocumentTouch);
-    navigationService.touchDevice = $scope.touchDevice;
+    $rootScope.touchDevice = ("ontouchstart" in window || window.touch || window.navigator.msMaxTouchPoints===5 || window.DocumentTouch && document instanceof DocumentTouch);
+    navigationService.touchDevice = $rootScope.touchDevice;
 
     //the null is important because we do an explicit bool check on this in the view
     //the avatar is by default the umbraco logo    
