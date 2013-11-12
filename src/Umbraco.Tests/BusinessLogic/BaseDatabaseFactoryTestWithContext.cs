@@ -43,13 +43,60 @@ namespace Umbraco.Tests.TestHelpers
             return independentDatabase.SingleOrDefault<T>(string.Format("where {0} = @0", idKeyName), id);
         }
 
+        protected void Setter_Persists_Ext<T, S, U>(
+              Func<T, S> getter,
+              Action<T> setter,
+              string tableName,
+              string fieldName,
+              U expected,
+              string idFieldName,
+              int id,
+              bool useSecondGetter = false,
+              Func<T, U> getter2 = null,
+              U oldValue2 = default(U)
+         )
+        {
+            UmbracoDatabase independentDatabase = (new DefaultDatabaseFactory()).CreateDatabase();
+            T testORMClass = (T)Activator.CreateInstance(typeof(T), id);
+            S oldValue = getter(testORMClass);
+            try
+            {
+                setter(testORMClass);  // set new value and get it persisted via ORM
+                // extract saved value via independent database
+                var persisted = independentDatabase.ExecuteScalar<U>(
+                    String.Format("SELECT [{0}] FROM [{1}] WHERE [{2}] = @0", fieldName, tableName, idFieldName), id);
+                Assert.AreEqual(expected, persisted);
+                if (!useSecondGetter)
+                  Assert.AreEqual(expected, getter(testORMClass));
+                else
+                    Assert.AreEqual(expected, getter2(testORMClass));
+            }
+            finally
+            {
+                // reset to oldValue
+                string sql = String.Format("Update [{0}] set [{1}] = @0 WHERE [{2}] = @1", tableName, fieldName, idFieldName);
+                if (!useSecondGetter)
+                    independentDatabase.Execute(sql, oldValue, id);
+                else
+                    independentDatabase.Execute(sql, oldValue2, id);
+
+                // double check
+                var persisted2 = independentDatabase.ExecuteScalar<U>(
+                    String.Format("SELECT [{0}] FROM [{1}] WHERE [{2}] = @0", fieldName, tableName, idFieldName), id);
+                if (!useSecondGetter)
+                    Assert.AreEqual(oldValue, persisted2);
+                else
+                    Assert.AreEqual(oldValue2, persisted2);
+            }
+        }
+
 
         protected void l(string format, params object[] args)
         {
             System.Console.WriteLine(format, args);
         }
 
-        #region Private Helper classes and methods
+        #region Private Helper classes and methods from cms_businesslogic_CMSNodeTests
         protected CMSNode _node1;
         protected CMSNode _node2;
         protected CMSNode _node3;
@@ -137,6 +184,18 @@ namespace Umbraco.Tests.TestHelpers
             Assert.IsNotNullOrEmpty(node.Text);
             Assert.AreEqual(DateTime.Today, node.CreateDateTime.Date);
             Assert.IsFalse(node.IsTrashed);
+        }
+
+        private void Setter_Persists<T>(int nodeId, Action<CMSNode> setter, Func<CMSNode, T> getter, T expected, string field)
+        {
+            var node = new CMSNode(nodeId);
+            setter(node);
+            var persisted = database.ExecuteScalar<T>(
+                String.Format("SELECT {0} FROM cmsPropertyType WHERE id = @id", field)
+                , new { id = nodeId });
+            Assert.AreEqual(expected, persisted);
+            Assert.AreEqual(expected, getter(node));
+            //SS:ResetTestDocumentTypes();
         }
 
         #endregion

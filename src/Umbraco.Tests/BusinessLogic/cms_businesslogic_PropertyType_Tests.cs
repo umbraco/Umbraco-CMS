@@ -318,218 +318,153 @@ namespace Umbraco.Tests.BusinessLogic
 
         [Test(Description = "Test 'DataTypeDefinition DataTypeDefinition .set' property")]
         public void Test_PropertyType_DataTypeDefinition_Set()
-        {
-            //public DataTypeDefinition DataTypeDefinition .set
-            var propertyType = new PropertyType(_propertyType1.Id);
-            var oldValue = propertyType.DataTypeDefinition;
-            try
-            {
-                var newValue = new DataTypeDefinition(TEST_DATA_TYPE_ID3);
- 
-                propertyType.DataTypeDefinition = newValue;
-
-                var dtoWithNewValue = getTestPropertyTypeDto(propertyType.Id);
-                Assert.That(dtoWithNewValue.DataTypeId, Is.EqualTo(newValue.Id), "DataTypeDefinition .set test(1) failed");
-
-                var PropertyTypeWithNewValue = new PropertyType(_propertyType1.Id);
-                Assert.That(PropertyTypeWithNewValue.DataTypeDefinition.Id, Is.EqualTo(propertyType.DataTypeDefinition.Id), "DataTypeDefinition .set test(2) failed");
-            }
-            finally
-            {
-                propertyType.DataTypeDefinition = oldValue; 
-            }
+        { 
+            var newValue = new DataTypeDefinition(TEST_DATA_TYPE_ID3);
+            var expectedValue = newValue.Id;
+            Setter_Persists_Ext<PropertyType, DataTypeDefinition, int>(
+                    n => n.DataTypeDefinition,
+                    n => n.DataTypeDefinition = newValue,
+                    "cmsPropertyType",
+                    "dataTypeId",
+                    expectedValue,
+                    "id",
+                    _propertyType1.Id,
+                    useSecondGetter: true,
+                    getter2: n => n.DataTypeDefinition.Id,
+                    oldValue2: _propertyType1.DataTypeId
+                );
         }
 
+        [Obsolete("TabId is marked as obsolete - this test to be deleted when .TabId will be deleted")] 
         [Test(Description = "Test 'public int TabId .set => PropertyTypeGroup' property")]
         public void Test_PropertyType_TabId_Set()
         {
-            //public int TabId .set => PropertyTypeGroup
-            var propertyType = new PropertyType(_propertyType1.Id);
-            var oldValue = propertyType.TabId;
-            try
-            {
-                var newValue = PropertyTypeGroup.GetPropertyTypeGroup(_propertyTypeGroup3.Id);
-
-                propertyType.TabId = newValue.Id;
-
-                var dtoWithNewValue = getTestPropertyTypeDto(propertyType.Id);
-                Assert.That(dtoWithNewValue.PropertyTypeGroupId, Is.EqualTo(newValue.Id), "TabId .set test(1) failed");
-
-                var PropertyTypeWithNewValue = new PropertyType(_propertyType1.Id);
-                Assert.That(PropertyTypeWithNewValue.TabId, Is.EqualTo(propertyType.TabId), "TabId .set test(2) failed");
-            }
-            finally
-            {
-                propertyType.TabId = oldValue;
-            }
+            var newValue = PropertyTypeGroup.GetPropertyTypeGroup(_propertyTypeGroup3.Id);
+            var expectedValue = newValue.Id;
+            Setter_Persists_Ext<PropertyType, int, int>(
+                    n => n.TabId,
+                    n => n.TabId = newValue.Id,
+                    "cmsPropertyType",
+                    "propertyTypeGroupId",
+                    expectedValue,
+                    "id",
+                    _propertyType1.Id
+                );
         }
 
         [Test(Description = "Test 'public int PropertyTypeGroup .set' property")]
         public void Test_PropertyType_PropertyTypeGroup_Set()
         {
-            //public int PropertyTypeGroup .set
-            var propertyType = new PropertyType(_propertyType1.Id);
-            var oldValue = propertyType.PropertyTypeGroup;
-            try
-            {
-                var newValue = PropertyTypeGroup.GetPropertyTypeGroup(_propertyTypeGroup3.Id);
-
-                propertyType.PropertyTypeGroup = newValue.Id;
-
-                var dtoWithNewValue = getTestPropertyTypeDto(propertyType.Id);
-                Assert.That(dtoWithNewValue.PropertyTypeGroupId, Is.EqualTo(newValue.Id), "PropertyTypeGroup .set test(1) failed");
-
-                var PropertyTypeWithNewValue = new PropertyType(_propertyType1.Id);
-                Assert.That(PropertyTypeWithNewValue.PropertyTypeGroup, Is.EqualTo(propertyType.PropertyTypeGroup), "PropertyTypeGroup .set test(2) failed");
-            }
-            finally
-            {
-                propertyType.PropertyTypeGroup = oldValue;
-            }
+            var newValue = PropertyTypeGroup.GetPropertyTypeGroup(_propertyTypeGroup3.Id);
+            var expectedValue = newValue.Id;
+            Setter_Persists_Ext<PropertyType, int, int>(
+                    n => n.PropertyTypeGroup,
+                    n => n.PropertyTypeGroup = newValue.Id,
+                    "cmsPropertyType",
+                    "propertyTypeGroupId",
+                    expectedValue,
+                    "id",
+                    _propertyType1.Id
+                );
         }
         
         [Test(Description = "Test 'public bool Mandatory .set' property")]
         public void Test_PropertyType_Mandatory_Set()
         {
-            //public bool Mandatory .set
             var propertyType = new PropertyType(_propertyType1.Id);
             var oldValue = propertyType.Mandatory;
-            try
-            {
-                var newValue = !oldValue; 
 
-                propertyType.Mandatory = newValue;
-
-                var dtoWithNewValue = getTestPropertyTypeDto(propertyType.Id);
-                Assert.That(dtoWithNewValue.Mandatory, Is.EqualTo(newValue), "Mandatory .set test(1) failed");
-
-                var PropertyTypeWithNewValue = new PropertyType(_propertyType1.Id);
-                Assert.That(PropertyTypeWithNewValue.Mandatory, Is.EqualTo(propertyType.Mandatory), "Mandatory .set test(2) failed");
-            }
-            finally
-            {
-                propertyType.Mandatory = oldValue;
-            }
+            var newValue = !oldValue;
+            var expectedValue = !oldValue;
+            Setter_Persists_Ext<PropertyType, bool, bool>(
+                    n => n.Mandatory,
+                    n => n.Mandatory = newValue,
+                    "cmsPropertyType",
+                    "Mandatory",
+                    expectedValue,
+                    "id",
+                    _propertyType1.Id
+                );
         }
 
         [Test(Description = "Test 'public string ValidationRegExp .set' property")]
         public void Test_PropertyType_ValidationRegExp_Set()
         {
-            // public string ValidationRegExp .set
-            var propertyType = new PropertyType(_propertyType1.Id);
-            var oldValue = propertyType.ValidationRegExp;
-            try
-            {
-                var newValue = @"[a-b]\w[1-9]";
-
-                propertyType.ValidationRegExp = newValue;
-
-                var dtoWithNewValue = getTestPropertyTypeDto(propertyType.Id);
-                Assert.That(dtoWithNewValue.ValidationRegExp, Is.EqualTo(newValue), "ValidationRegExp .set test(1) failed");
-
-                var PropertyTypeWithNewValue = new PropertyType(_propertyType1.Id);
-                Assert.That(PropertyTypeWithNewValue.ValidationRegExp, Is.EqualTo(propertyType.ValidationRegExp), "ValidationRegExp .set test(2) failed");
-            }
-            finally
-            {
-                propertyType.ValidationRegExp = oldValue;
-            }
+            var newValue = @"[a-b]\w[1-9]";
+            var expectedValue = @"[a-b]\w[1-9]";
+            Setter_Persists_Ext<PropertyType, string, string>(
+                    n => n.ValidationRegExp,
+                    n => n.ValidationRegExp = newValue,
+                    "cmsPropertyType",
+                    "ValidationRegExp",
+                    expectedValue,
+                    "id",
+                    _propertyType1.Id
+                );
         }
 
         [Test(Description = "Test 'public string Description .set' property")]
         public void Test_PropertyType_Description_Set()
         {
-            // public string Description .set
-            var propertyType = new PropertyType(_propertyType1.Id);
-            var oldValue = propertyType.Description;
-            try
-            {
-                var newValue = @"New description";
-
-                propertyType.Description = newValue;
-
-                var dtoWithNewValue = getTestPropertyTypeDto(propertyType.Id);
-                Assert.That(dtoWithNewValue.Description, Is.EqualTo(newValue), "Description .set test(1) failed");
-
-                var PropertyTypeWithNewValue = new PropertyType(_propertyType1.Id);
-                Assert.That(PropertyTypeWithNewValue.Description, Is.EqualTo(propertyType.Description), "Description .set test(2) failed");
-            }
-            finally
-            {
-                propertyType.Description = oldValue;
-            }
+            var newValue = "New Description";
+            var expectedValue = "New Description";
+            Setter_Persists_Ext<PropertyType, string, string>(
+                    n => n.Description,
+                    n => n.Description = newValue,
+                    "cmsPropertyType",
+                    "Description",
+                    expectedValue,
+                    "id",
+                    _propertyType1.Id
+                );
         }
 
         [Test(Description = "Test 'public string SortOrder .set' property")]
         public void Test_PropertyType_SortOrder_Set()
         {
-            // public string SortOrder .set
-            var propertyType = new PropertyType(_propertyType1.Id);
-            var oldValue = propertyType.SortOrder;
-            try
-            {
-                var newValue = 7;
-
-                propertyType.SortOrder = newValue;
-
-                var dtoWithNewValue = getTestPropertyTypeDto(propertyType.Id);
-                Assert.That(dtoWithNewValue.SortOrder, Is.EqualTo(newValue), "SortOrder .set test(1) failed");
-
-                var PropertyTypeWithNewValue = new PropertyType(_propertyType1.Id);
-                Assert.That(PropertyTypeWithNewValue.SortOrder, Is.EqualTo(propertyType.SortOrder), "SortOrder .set test(2) failed");
-            }
-            finally
-            {
-                propertyType.SortOrder = oldValue;
-            }
+            var newValue = 7;
+            var expectedValue = 7;
+            Setter_Persists_Ext<PropertyType, int, int>(
+                    n => n.SortOrder,
+                    n => n.SortOrder = newValue,
+                    "cmsPropertyType",
+                    "SortOrder",
+                    expectedValue,
+                    "id",
+                    _propertyType1.Id
+                );
         }
 
         [Test(Description = "Test 'public string Alias .set' property")]
         public void Test_PropertyType_Alias_Set()
         {
-            // public string Alias .set
-            var propertyType = new PropertyType(_propertyType1.Id);
-            var oldValue = propertyType.Alias;
-            try
-            {
-                var newValue = "theNewAliasValue";
-
-                propertyType.Alias = newValue;
-
-                var dtoWithNewValue = getTestPropertyTypeDto(propertyType.Id);
-                Assert.That(dtoWithNewValue.Alias, Is.EqualTo(newValue), "Alias .set test(1) failed");
-
-                var PropertyTypeWithNewValue = new PropertyType(_propertyType1.Id);
-                Assert.That(PropertyTypeWithNewValue.Alias, Is.EqualTo(propertyType.Alias), "Alias .set test(2) failed");
-            }
-            finally
-            {
-                propertyType.Alias = oldValue;
-            }
+            var newValue      = "theNewAliasValue";
+            var expectedValue = "theNewAliasValue";
+            Setter_Persists_Ext<PropertyType, string, string>(
+                    n => n.Alias,
+                    n => n.Alias = newValue,
+                    "cmsPropertyType",
+                    "Alias",
+                    expectedValue,
+                    "id",
+                    _propertyType1.Id
+                );
         }
 
         [Test(Description = "Test 'public string Name .set' property")]
         public void Test_PropertyType_Name_Set()
         {
-            // public string Name .set
-            var propertyType = new PropertyType(_propertyType1.Id);
-            var oldValue = propertyType.Name;
-            try
-            {
-                var newValue = "The New Name Value";
-
-                propertyType.Name = newValue;
-
-                var dtoWithNewValue = getTestPropertyTypeDto(propertyType.Id);
-                Assert.That(dtoWithNewValue.Name, Is.EqualTo(newValue), "Name .set test(1) failed");
-
-                var PropertyTypeWithNewValue = new PropertyType(_propertyType1.Id);
-                Assert.That(PropertyTypeWithNewValue.Name, Is.EqualTo(propertyType.Name), "Name .set test(2) failed");
-            }
-            finally
-            {
-                propertyType.Name = oldValue;
-            }
+            var newValue = "The New Name Value";
+            var expectedValue = "The New Name Value";
+            Setter_Persists_Ext<PropertyType, string, string>(
+                    n => n.Name,
+                    n => n.Name = newValue,
+                    "cmsPropertyType",
+                    "Name",
+                    expectedValue,
+                    "id",
+                    _propertyType1.Id
+                );
         }
 
         [Test(Description = "Test 'public static PropertyType[] GetAll()' method")]
