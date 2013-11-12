@@ -207,7 +207,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <param name="xElement"></param>
         /// <returns></returns>
-        public static XmlNode ToXmlElement(this XElement xElement)
+        public static XmlNode ToXmlElement(this XContainer xElement)
         {
             var xmlDocument = new XmlDocument();
             using (var xmlReader = xElement.CreateReader())
@@ -270,7 +270,7 @@ namespace Umbraco.Core
             return xDoc.Root;
         }
 
-        public static XmlNode GetXmlNode(this XElement element)
+        public static XmlNode GetXmlNode(this XContainer element)
         {
             using (XmlReader xmlReader = element.CreateReader())
             {
@@ -280,7 +280,7 @@ namespace Umbraco.Core
             }
         }
 
-        public static XmlNode GetXmlNode(this XElement element, XmlDocument xmlDoc)
+        public static XmlNode GetXmlNode(this XContainer element, XmlDocument xmlDoc)
         {
             using (XmlReader xmlReader = element.CreateReader())
             {
@@ -289,13 +289,5 @@ namespace Umbraco.Core
             }
         }
 
-        public static XmlNode GetXmlNode(this XNode element, XmlDocument xmlDoc)
-        {
-            using (XmlReader xmlReader = element.CreateReader())
-            {
-                xmlDoc.Load(xmlReader);
-                return xmlDoc.DocumentElement;
-            }
-        }
 	}
 }

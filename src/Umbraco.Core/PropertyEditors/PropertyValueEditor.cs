@@ -289,6 +289,8 @@ namespace Umbraco.Core.PropertyEditors
         /// <remarks>
         /// By default this will just return the value of ConvertDbToString but ensure that if the db value type is nvarchar or text
         /// it is a CDATA fragment, otherwise it is just a text fragment.
+        /// 
+        /// This method by default will only return XText or XCData which must be wrapped in an element!
         /// </remarks>
         public virtual XNode ConvertDbToXml(Property property)
         {

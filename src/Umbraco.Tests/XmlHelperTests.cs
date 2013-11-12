@@ -4,7 +4,6 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Xml;
-using System.Xml.Linq;
 using System.Xml.XPath;
 using NUnit.Framework;
 using Umbraco.Core;
