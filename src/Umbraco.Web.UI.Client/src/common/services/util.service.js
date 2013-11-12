@@ -454,10 +454,10 @@ function iconHelper($q) {
         /** Used by the create dialogs for content/media types to format the data so that the thumbnails are styled properly */
         formatContentTypeThumbnails: function (contentTypes) {
             for (var i = 0; i < contentTypes.length; i++) {
+
                 if (contentTypes[i].thumbnailIsClass === undefined || contentTypes[i].thumbnailIsClass) {
                     contentTypes[i].cssClass = this.convertFromLegacyIcon(contentTypes[i].thumbnail);
-                }
-                else {
+                }else {
                     contentTypes[i].style = "background-image: url('" + contentTypes[i].thumbnailFilePath + "');height:36px; background-position:4px 0px; background-repeat: no-repeat;background-size: 35px 35px;";
                     //we need an 'icon-' class in there for certain styles to work so if it is image based we'll add this
                     contentTypes[i].cssClass = "custom-file";
@@ -468,6 +468,11 @@ function iconHelper($q) {
         formatContentTypeIcons: function (contentTypes) {
             for (var i = 0; i < contentTypes.length; i++) {
                 contentTypes[i].icon = this.convertFromLegacyIcon(contentTypes[i].icon);
+
+                //couldnt find replacement
+                if(contentTypes[i].icon.indexOf(".") > 0){
+                     contentTypes[i].icon = "icon-document-dashed-line";   
+                }
             }
             return contentTypes;
         },
