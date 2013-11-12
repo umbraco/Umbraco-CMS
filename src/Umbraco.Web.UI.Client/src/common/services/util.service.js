@@ -17,7 +17,9 @@ function umbSessionStorage($window) {
 
     return {
 
-        get: function (key) {            
+        get: function (key) {
+            console.log(storage);
+            console.log(storage["umb_" + key]);
             return angular.fromJson(storage["umb_" + key]);
         },
         
