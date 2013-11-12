@@ -271,8 +271,62 @@ namespace Umbraco.Core.Persistence.Repositories
             ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
+        private void PersistDeletedTemplate(TemplateDto dto)
+        {
+            //we need to get the real template for this item unfortunately to remove it
+            var template = Get(dto.NodeId);
+            if (template != null)
+            {
+                //NOTE: We must cast here so that it goes to the outter method to
+                // ensure the cache is updated.
+                PersistDeletedItem((IEntity)template);
+            }
+        }
+
+        /// <summary>
+        /// Returns a list of templates in order of descendants from the parent
+        /// </summary>
+        /// <param name="template"></param>
+        /// <param name="allChildTemplates"></param>
+        /// <returns></returns>
+        private static List<TemplateDto> GenerateTemplateHierarchy(TemplateDto template, IEnumerable<TemplateDto> allChildTemplates)
+        {
+            var hierarchy = new List<TemplateDto> {template};
+            foreach (var t in allChildTemplates.Where(x => x.Master == template.NodeId))
+            {
+                hierarchy.AddRange(GenerateTemplateHierarchy(t, allChildTemplates));
+            }
+            return hierarchy;
+        }
+
         protected override void PersistDeletedItem(ITemplate entity)
         {
+
+            //TODO: This isn't the most ideal way to delete a template tree, because below it will actually end up 
+            // recursing back to this method for each descendant and re-looking up the template list causing an extrac
+            // SQL call - not ideal but there shouldn't ever be a heaping list of descendant templates.
+            //The easiest way to overcome this is to expose the underlying cache upwards so that the repository has access
+            // to it, then in the PersistDeletedTemplate we wouldn't recurse the underlying function, we'd just call 
+            // PersistDeletedItem with a Template object and clear it's cache.
+
+            var sql = new Sql();
+            sql.Select("*").From<TemplateDto>().Where<TemplateDto>(dto => dto.Master != null || dto.NodeId == entity.Id);
+            var dtos = Database.Fetch<TemplateDto>(sql);
+            var self = dtos.Single(x => x.NodeId == entity.Id);
+            var allChildren = dtos.Except(new[] {self});
+            var hierarchy = GenerateTemplateHierarchy(self, allChildren);
+            //remove ourselves
+            hierarchy.Remove(self);
+            //change the order so it goes bottom up!
+            hierarchy.Reverse();
+
+            //delete the hierarchy
+            foreach (var descendant in hierarchy)
+            {
+                PersistDeletedTemplate(descendant);
+            }
+
+            //now we can delete this one
             base.PersistDeletedItem(entity);
 
             //Check for file under the Masterpages filesystem

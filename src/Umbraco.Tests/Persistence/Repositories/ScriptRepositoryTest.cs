@@ -7,20 +7,25 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
     [TestFixture]
-    public class ScriptRepositoryTest
+    public class ScriptRepositoryTest : BaseUmbracoApplicationTest
     {
         private IFileSystem _fileSystem;
 
         [SetUp]
-        public void Initialize()
+        public override void Initialize()
         {
+            base.Initialize();
+
             _fileSystem = new PhysicalFileSystem(SystemDirectories.Scripts);
-            var stream = CreateStream("Umbraco.Sys.registerNamespace(\"Umbraco.Utils\");");
-            _fileSystem.AddFile("test-script.js", stream);
+            using (var stream = CreateStream("Umbraco.Sys.registerNamespace(\"Umbraco.Utils\");"))
+            {
+                _fileSystem.AddFile("test-script.js", stream);    
+            }
         }
 
         [Test]
@@ -92,6 +97,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             unitOfWork.Commit();
 
             // Assert
+
+            Assert.IsFalse(repository.Exists("test-script.js"));
 
         }
 
@@ -180,8 +187,10 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [TearDown]
-        public void TearDown()
+        public override void TearDown()
         {
+            base.TearDown();
+
             _fileSystem = null;
             //Delete all files
 	        var fs = new PhysicalFileSystem(SystemDirectories.Scripts);

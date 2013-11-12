@@ -30,14 +30,6 @@ namespace Umbraco.Core.Models
         //private static readonly PropertyInfo MasterTemplateIdSelector = ExpressionHelper.GetPropertyInfo<Template, int>(x => x.MasterTemplateId);
         private static readonly PropertyInfo MasterTemplateAliasSelector = ExpressionHelper.GetPropertyInfo<Template, string>(x => x.MasterTemplateAlias);
         
-
-        internal Template(string path)
-            : base(path)
-        {
-            base.Path = path;
-            ParentId = -1;
-        }
-
         public Template(string path, string name, string alias)
             : base(path)
         {
