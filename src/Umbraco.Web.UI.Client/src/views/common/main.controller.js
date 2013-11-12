@@ -8,7 +8,7 @@
  * The main application controller
  * 
  */
-function MainController($scope, $rootScope, $location, $routeParams, $rootScope, $timeout, $http, $log, notificationsService, userService, navigationService, legacyJsLoader, updateChecker) {
+function MainController($scope, $rootScope, $location, $routeParams, $rootScope, $timeout, $http, $log, notificationsService, userService, navigationService, historyService, legacyJsLoader, updateChecker) {
 
     var legacyTreeJsLoaded = false;
     
@@ -96,13 +96,13 @@ function MainController($scope, $rootScope, $location, $routeParams, $rootScope,
         //last item in the URL
         if (data.lastUserId && data.lastUserId !== data.user.id) {
             $location.path("/").search("");
+            historyService.removeAll();
         }
 
         if($scope.user.emailHash){
             $timeout(function(){
                 //yes this is wrong.. 
                 $("#avatar-img").fadeTo(1000, 0, function(){
-                      
                       $timeout(function(){
                         $scope.avatar = "http://www.gravatar.com/avatar/" + $scope.user.emailHash +".jpg?s=64&d=mm";
                       });
