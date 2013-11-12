@@ -271,34 +271,6 @@ namespace Umbraco.Core.Persistence.Repositories
             ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
-        private void PersistDeletedTemplate(TemplateDto dto)
-        {
-            //we need to get the real template for this item unfortunately to remove it
-            var template = Get(dto.NodeId);
-            if (template != null)
-            {
-                //NOTE: We must cast here so that it goes to the outter method to
-                // ensure the cache is updated.
-                PersistDeletedItem((IEntity)template);
-            }
-        }
-
-        /// <summary>
-        /// Returns a list of templates in order of descendants from the parent
-        /// </summary>
-        /// <param name="template"></param>
-        /// <param name="allChildTemplates"></param>
-        /// <returns></returns>
-        private static List<TemplateDto> GenerateTemplateHierarchy(TemplateDto template, IEnumerable<TemplateDto> allChildTemplates)
-        {
-            var hierarchy = new List<TemplateDto> {template};
-            foreach (var t in allChildTemplates.Where(x => x.Master == template.NodeId))
-            {
-                hierarchy.AddRange(GenerateTemplateHierarchy(t, allChildTemplates));
-            }
-            return hierarchy;
-        }
-
         protected override void PersistDeletedItem(ITemplate entity)
         {
 
@@ -351,6 +323,34 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         #endregion
+
+        private void PersistDeletedTemplate(TemplateDto dto)
+        {
+            //we need to get the real template for this item unfortunately to remove it
+            var template = Get(dto.NodeId);
+            if (template != null)
+            {
+                //NOTE: We must cast here so that it goes to the outter method to
+                // ensure the cache is updated.
+                PersistDeletedItem((IEntity)template);
+            }
+        }
+
+        /// <summary>
+        /// Returns a list of templates in order of descendants from the parent
+        /// </summary>
+        /// <param name="template"></param>
+        /// <param name="allChildTemplates"></param>
+        /// <returns></returns>
+        private static List<TemplateDto> GenerateTemplateHierarchy(TemplateDto template, IEnumerable<TemplateDto> allChildTemplates)
+        {
+            var hierarchy = new List<TemplateDto> { template };
+            foreach (var t in allChildTemplates.Where(x => x.Master == template.NodeId))
+            {
+                hierarchy.AddRange(GenerateTemplateHierarchy(t, allChildTemplates));
+            }
+            return hierarchy;
+        }
 
         private void PopulateViewTemplate(ITemplate template, string fileName)
         {
@@ -432,6 +432,103 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
         }
+
+        /// <summary>
+        /// Returns a template as a template node which can be traversed (parent, children)
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        public TemplateNode GetTemplateNode(string alias)
+        {
+            //in order to do this we need to get all of the templates and then organize, unfortunately 
+            // our db structure does not use the path correctly for templates so we cannot just look
+            // up a template tree easily.
+
+            //first get all template objects
+            var allTemplates = GetAll().ToArray();
+           
+            var selfTemplate = allTemplates.SingleOrDefault(x => x.Alias == alias);
+            if (selfTemplate == null)
+            {
+                return null;
+            }
+
+            //then we need to get all template Dto's because those contain the master property
+            var sql = new Sql();
+            sql.Select("*").From<TemplateDto>();
+            var allDtos = Database.Fetch<TemplateDto>(sql).ToArray();
+            var selfDto = allDtos.Single(x => x.NodeId == selfTemplate.Id);
+            
+            //need to get the top-most node of the current tree
+            var top = selfDto;
+            while (top.Master.HasValue)
+            {
+                top = allDtos.Single(x => x.NodeId == top.Master.Value);
+            }
+
+            var topNode = new TemplateNode(allTemplates.Single(x => x.Id == top.NodeId));
+            var childIds = allDtos.Where(x => x.Master == top.NodeId).Select(x => x.NodeId);
+            //This now creates the hierarchy recursively
+            topNode.Children = CreateChildren(topNode, childIds, allTemplates, allDtos);
+
+            //now we'll return the TemplateNode requested
+            return FindTemplateInTree(topNode, alias);
+        }
+
+        private static TemplateNode WalkTree(TemplateNode current, string alias)
+        {           
+            //now walk the tree to find the node
+            if (current.Template.Alias == alias)
+            {
+                return current;
+            }
+            foreach (var c in current.Children)
+            {
+                var found = WalkTree(c, alias);
+                if (found != null) return found;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Given a template node in a tree, this will find the template node with the given alias if it is found in the hierarchy, otherwise null
+        /// </summary>
+        /// <param name="anyNode"></param>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        public TemplateNode FindTemplateInTree(TemplateNode anyNode, string alias)
+        {
+            //first get the root
+            var top = anyNode;
+            while (top.Parent != null)
+            {
+                top = top.Parent;
+            }
+            return WalkTree(top, alias);
+        }
+
+        private static IEnumerable<TemplateNode> CreateChildren(TemplateNode parent, IEnumerable<int> childIds, ITemplate[] allTemplates, TemplateDto[] allDtos)
+        {
+            var children = new List<TemplateNode>();
+            foreach (var i in childIds)
+            {
+                var template = allTemplates.Single(x => x.Id == i);
+                var child = new TemplateNode(template)
+                    {
+                        Parent = parent
+                    };
+                
+                //add to our list
+                children.Add(child);
+
+                //get this node's children
+                var kids = allDtos.Where(x => x.Master == i).Select(x => x.NodeId).ToArray();
+                
+                //recurse
+                child.Children = CreateChildren(child, kids, allTemplates, allDtos);
+            }
+            return children;
+        } 
 
         #endregion
     }

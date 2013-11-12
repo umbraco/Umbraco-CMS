@@ -148,6 +148,74 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.IsNull(repository.Get("test"));
         }
 
+        [Test]
+        public void Can_Get_Template_Tree()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = new TemplateRepository(unitOfWork, NullCacheProvider.Current, _masterPageFileSystem, _viewsFileSystem);
+
+            var parent = new Template("test-parent-masterpage.master", "parent", "parent") { Content = @"<%@ Master Language=""C#"" %>" };
+            
+            var child1 = new Template("test-child1-masterpage.master", "child1", "child1") { Content = @"<%@ Master Language=""C#"" %>" };
+            var toddler1 = new Template("test-toddler1-masterpage.master", "toddler1", "toddler1") { Content = @"<%@ Master Language=""C#"" %>" };
+            var toddler2 = new Template("test-toddler2-masterpage.master", "toddler2", "toddler2") { Content = @"<%@ Master Language=""C#"" %>" };
+            var baby1 = new Template("test-baby1-masterpage.master", "baby1", "baby1") { Content = @"<%@ Master Language=""C#"" %>" };
+
+            var child2 = new Template("test-child2-masterpage.master", "child2", "child2") { Content = @"<%@ Master Language=""C#"" %>" };
+            var toddler3 = new Template("test-toddler3-masterpage.master", "toddler3", "toddler3") { Content = @"<%@ Master Language=""C#"" %>" };
+            var toddler4 = new Template("test-toddler4-masterpage.master", "toddler4", "toddler4") { Content = @"<%@ Master Language=""C#"" %>" };
+            var baby2 = new Template("test-baby2-masterpage.master", "baby2", "baby2") { Content = @"<%@ Master Language=""C#"" %>" };
+            
+            
+            child1.MasterTemplateAlias = parent.Alias;
+            child1.MasterTemplateId = new Lazy<int>(() => parent.Id);
+            child2.MasterTemplateAlias = parent.Alias;
+            child2.MasterTemplateId = new Lazy<int>(() => parent.Id);
+
+            toddler1.MasterTemplateAlias = child1.Alias;
+            toddler1.MasterTemplateId = new Lazy<int>(() => child1.Id);
+            toddler2.MasterTemplateAlias = child1.Alias;
+            toddler2.MasterTemplateId = new Lazy<int>(() => child1.Id);
+
+            toddler3.MasterTemplateAlias = child2.Alias;
+            toddler3.MasterTemplateId = new Lazy<int>(() => child2.Id);
+            toddler4.MasterTemplateAlias = child2.Alias;
+            toddler4.MasterTemplateId = new Lazy<int>(() => child2.Id);
+
+            baby1.MasterTemplateAlias = toddler2.Alias;
+            baby1.MasterTemplateId = new Lazy<int>(() => toddler2.Id);
+
+            baby2.MasterTemplateAlias = toddler4.Alias;
+            baby2.MasterTemplateId = new Lazy<int>(() => toddler4.Id);
+
+            repository.AddOrUpdate(parent);
+            repository.AddOrUpdate(child1);
+            repository.AddOrUpdate(child2);
+            repository.AddOrUpdate(toddler1);
+            repository.AddOrUpdate(toddler2);
+            repository.AddOrUpdate(toddler3);
+            repository.AddOrUpdate(toddler4);
+            repository.AddOrUpdate(baby1);
+            repository.AddOrUpdate(baby2);
+            unitOfWork.Commit();
+
+            // Act
+            var rootNode = repository.GetTemplateNode("parent");
+            
+            // Assert
+            Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "parent"));
+            Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "child1"));
+            Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "child2"));
+            Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "toddler1"));
+            Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "toddler2"));
+            Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "toddler3"));
+            Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "toddler4"));
+            Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "baby1"));
+            Assert.IsNotNull(repository.FindTemplateInTree(rootNode, "baby2"));
+        }
+
         //[Test]
         //public void Can_Perform_Get_On_ScriptRepository()
         //{
