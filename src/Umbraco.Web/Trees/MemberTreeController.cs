@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Security;
@@ -89,8 +90,16 @@ namespace Umbraco.Web.Trees
                 return menu;
             }
 
-            menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
-            menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+            Guid guid;
+            if (Guid.TryParse(id, out guid))
+            {
+                menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+            }
+            else
+            {
+                menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);    
+            }
             return menu;
         }
     }
