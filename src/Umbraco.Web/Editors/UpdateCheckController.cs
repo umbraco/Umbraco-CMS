@@ -20,13 +20,21 @@ namespace Umbraco.Web.Editors
             var updateCheckCookie = updChkCookie != null ? updChkCookie["UMB_UPDCHK"].Value : "";            
             if (GlobalSettings.VersionCheckPeriod > 0 && string.IsNullOrEmpty(updateCheckCookie) && Security.CurrentUser.UserType.Alias == "admin")
             {
-                var check = new global::umbraco.presentation.org.umbraco.update.CheckForUpgrade();
-                var result = check.CheckUpgrade(UmbracoVersion.Current.Major,
-                                                UmbracoVersion.Current.Minor,
-                                                UmbracoVersion.Current.Build,
-                                                UmbracoVersion.CurrentComment);     
-         
-                return new UpgradeCheckResponse(result.UpgradeType.ToString(), result.Comment, result.UpgradeUrl);
+                try
+                {
+                    var check = new global::umbraco.presentation.org.umbraco.update.CheckForUpgrade();
+                    var result = check.CheckUpgrade(UmbracoVersion.Current.Major,
+                                                    UmbracoVersion.Current.Minor,
+                                                    UmbracoVersion.Current.Build,
+                                                    UmbracoVersion.CurrentComment);
+
+                    return new UpgradeCheckResponse(result.UpgradeType.ToString(), result.Comment, result.UpgradeUrl);
+                }
+                catch (System.Net.WebException)
+                {
+                    //this occurs if the server is down or cannot be reached
+                    return null;
+                }
             }
             return null;
         }
@@ -41,6 +49,8 @@ namespace Umbraco.Web.Editors
         {
             public override void OnActionExecuted(HttpActionExecutedContext context)
             {
+                if (context.Response == null) return;
+
                 var objectContent = context.Response.Content as ObjectContent;
                 if (objectContent == null || objectContent.Value == null) return;
 
