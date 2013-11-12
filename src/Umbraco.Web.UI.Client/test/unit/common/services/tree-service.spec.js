@@ -253,7 +253,7 @@ describe('tree service tests', function () {
                 cacheKey: "__content",
                 filter: function (currentCache) {                    
                     var toRemove = treeService.getDescendantNode(currentCache.root, 1235);
-                    toRemove.parent.children = _.without(toRemove.parent.children, toRemove);
+                    toRemove.parent().children = _.without(toRemove.parent().children, toRemove);
                     return currentCache;
                 }
             });
@@ -285,8 +285,6 @@ describe('tree service tests', function () {
             });
 
             cache = treeService._getTreeCache();
-
-            console.log(" blah: " + cache.__content.root.children.length);
 
             expect(cache.__content.root.children.length).toBe(4);
             expect(cache.__content.root.children[0].children).toBeNull();

@@ -39,7 +39,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
 				$scope.success = true;
 
 				//reloads the parent
-				navigationService.reloadNode(dialogOptions.currentNode.parent);
+				navigationService.reloadNode(dialogOptions.currentNode.parent());
 
 			    //reloads the target
 				navigationService.syncTree({ tree: "content", path: path, forceReload: true });

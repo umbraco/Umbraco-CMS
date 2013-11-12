@@ -19,11 +19,15 @@ namespace Umbraco.Web.Models.Trees
         /// Internal constructor, to create a tree node use the CreateTreeNode methods of the TreeApiController.
         /// </summary>
         /// <param name="nodeId"></param>
+        /// <param name="parentId">The parent id for the current node</param>
         /// <param name="getChildNodesUrl"></param>
         /// <param name="menuUrl"></param>
-        internal TreeNode(string nodeId, string getChildNodesUrl, string menuUrl)
+        internal TreeNode(string nodeId, string parentId, string getChildNodesUrl, string menuUrl)
         {
+            Mandate.ParameterNotNullOrEmpty(nodeId, "nodeId");            
+
             Id = nodeId;
+            ParentId = parentId;
             ChildNodesUrl = getChildNodesUrl;
             MenuUrl = menuUrl;
             CssClasses = new List<string>();
@@ -31,6 +35,9 @@ namespace Umbraco.Web.Models.Trees
             Icon = "icon-folder-close";
         }
         
+        [DataMember(Name = "parentId", IsRequired = true)]        
+        public new object ParentId { get; set; }
+
         /// <summary>
         /// A flag to set whether or not this node has children
         /// </summary>
@@ -63,13 +70,6 @@ namespace Umbraco.Web.Models.Trees
         /// </summary>
         [DataMember(Name = "menuUrl")]
         public string MenuUrl { get; set; }
-        
-        /// <summary>
-        /// The icon to use for the node, this can be either a path to an image or a Css class. 
-        /// If a '/' is found in the string then it will be considered a path to an image.
-        /// </summary>
-        [DataMember(Name = "icon")]
-        public string Icon { get; set; }
 
         /// <summary>
         /// Returns true if the icon represents a CSS class instead of a file path

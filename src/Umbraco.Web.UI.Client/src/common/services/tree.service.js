@@ -40,13 +40,22 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
         _formatNodeDataForUseInUI: function (parentNode, treeNodes, section, level) {
             //if no level is set, then we make it 1   
             var childLevel = (level ? level : 1);
+            //set the section if it's not already set
             if (!parentNode.section) {
                 parentNode.section = section;
             }
+            //create a method outside of the loop to return the parent - otherwise jshint blows up
+            var funcParent = function() {
+                return parentNode;
+            };
             for (var i = 0; i < treeNodes.length; i++) {
 
                 treeNodes[i].level = childLevel;
-                treeNodes[i].parent = parentNode;
+
+                //create a function to get the parent node, we could assign the parent node but 
+                // then we cannot serialize this entity because we have a cyclical reference.
+                // Instead we just make a function to return the parentNode.
+                treeNodes[i].parent = funcParent;
 
                 //set the section for each tree node - this allows us to reference this easily when accessing tree nodes
                 treeNodes[i].section = section;
@@ -242,11 +251,11 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
 
         /** Removes a given tree node from the tree */
         removeNode: function(treeNode) {
-            if (treeNode.parent == null) {
+            if (treeNode.parent() == null) {
                 throw "Cannot remove a node that doesn't have a parent";
             }
             //remove the current item from it's siblings
-            treeNode.parent.children.splice(treeNode.parent.children.indexOf(treeNode), 1);            
+            treeNode.parent().children.splice(treeNode.parent().children.indexOf(treeNode), 1);            
         },
         
         /** Removes all child nodes from a given tree node */
@@ -309,7 +318,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     root = current;
                 }
                 else { 
-                    current = current.parent;
+                    current = current.parent();
                 }
             }
             return root;
@@ -418,7 +427,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             if (!node) {
                 throw "node cannot be null";
             }
-            if (!node.parent) {
+            if (!node.parent()) {
                 throw "cannot reload a single node without a parent";
             }
             if (!node.section) {
@@ -430,7 +439,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             //set the node to loading
             node.loading = true;
 
-            this.getChildren({ node: node.parent, section: node.section }).then(function(data) {
+            this.getChildren({ node: node.parent(), section: node.section }).then(function(data) {
 
                 //ok, now that we have the children, find the node we're reloading
                 var found = _.find(data, function(item) {
@@ -438,14 +447,14 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                 });
                 if (found) {
                     //now we need to find the node in the parent.children collection to replace
-                    var index = _.indexOf(node.parent.children, node);
+                    var index = _.indexOf(node.parent().children, node);
                     //the trick here is to not actually replace the node - this would cause the delete animations
                     //to fire, instead we're just going to replace all the properties of this node.
-                    _.extend(node.parent.children[index], found);                    
+                    _.extend(node.parent().children[index], found);
                     //set the node to loading
-                    node.parent.children[index].loading = false;
+                    node.parent().children[index].loading = false;
                     //return
-                    deferred.resolve(node.parent.children[index]);
+                    deferred.resolve(node.parent().children[index]);
                 }
                 else {
                     deferred.reject();

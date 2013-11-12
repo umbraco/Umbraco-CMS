@@ -75,6 +75,7 @@ namespace Umbraco.Web.Trees
 
                     var node = CreateTreeNode(
                         e.Id.ToInvariantString(),
+                        id,
                         queryStrings,
                         e.Name,
                         e.ContentTypeIcon,

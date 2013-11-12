@@ -55,7 +55,7 @@ namespace Umbraco.Web.Trees
             foreach (var entity in entities)
             {
                 var e = (UmbracoEntity)entity;
-                var node = CreateTreeNode(e.Id.ToInvariantString(), queryStrings, e.Name, e.ContentTypeIcon, e.HasChildren);
+                var node = CreateTreeNode(e.Id.ToInvariantString(), id, queryStrings, e.Name, e.ContentTypeIcon, e.HasChildren);
                 
                 node.AdditionalData.Add("contentType", e.ContentTypeAlias);
                 nodes.Add(node);
