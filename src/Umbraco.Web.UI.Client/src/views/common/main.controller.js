@@ -99,16 +99,18 @@ function MainController($scope, $location, $routeParams, $rootScope, $timeout, $
         }
 
         if($scope.user.emailHash){
-            $timeout(function(){
+            $timeout(function () {                
                 //yes this is wrong.. 
-                $("#avatar-img").fadeTo(1000, 0, function(){
-                      
-                      $timeout(function(){
-                        $scope.avatar = "http://www.gravatar.com/avatar/" + $scope.user.emailHash +".jpg?s=64&d=mm";
-                      });
-                      
-                      $("#avatar-img").fadeTo(1000, 1);
+                $("#avatar-img").fadeTo(1000, 0, function () {
+                    $timeout(function () {
+                        //this can be null if they time out
+                        if ($scope.user && $scope.user.emailHash) {
+                            $scope.avatar = "http://www.gravatar.com/avatar/" + $scope.user.emailHash + ".jpg?s=64&d=mm";
+                        }
+                    });
+                    $("#avatar-img").fadeTo(1000, 1);
                 });
+                
               }, 3000);  
         }
 
