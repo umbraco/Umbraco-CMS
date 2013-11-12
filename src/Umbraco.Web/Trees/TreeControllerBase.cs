@@ -155,12 +155,13 @@ namespace Umbraco.Web.Trees
 
             var node = new TreeNode(
                 rootNodeAsString,
+                null, //this is a root node, there is no parent
                 Url.GetTreeUrl(GetType(), rootNodeAsString, queryStrings),
                 Url.GetMenuUrl(GetType(), rootNodeAsString, queryStrings))
                 {
                     HasChildren = true,
                     RoutePath = currApp,
-                    Title = RootNodeDisplayName
+                    Name = RootNodeDisplayName
                 };
 
             return node;
@@ -172,14 +173,15 @@ namespace Umbraco.Web.Trees
         /// Helper method to create tree nodes
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="parentId"></param>
         /// <param name="queryStrings"></param>
         /// <param name="title"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title)
+        public TreeNode CreateTreeNode(string id, string parentId, FormDataCollection queryStrings, string title)
         {
             var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
             var menuUrl = Url.GetMenuUrl(GetType(), id, queryStrings);
-            var node = new TreeNode(id, jsonUrl, menuUrl) { Title = title };
+            var node = new TreeNode(id, parentId, jsonUrl, menuUrl) { Name = title };
             return node;
         }
 
@@ -187,15 +189,16 @@ namespace Umbraco.Web.Trees
         /// Helper method to create tree nodes
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="parentId"></param>
         /// <param name="queryStrings"></param>
         /// <param name="title"></param>
         /// <param name="icon"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string icon)
+        public TreeNode CreateTreeNode(string id, string parentId, FormDataCollection queryStrings, string title, string icon)
         {
             var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
             var menuUrl = Url.GetMenuUrl(GetType(), id, queryStrings);
-            var node = new TreeNode(id, jsonUrl, menuUrl) { Title = title, Icon = icon };
+            var node = new TreeNode(id, parentId, jsonUrl, menuUrl) { Name = title, Icon = icon };
             return node;
         }
 
@@ -203,16 +206,17 @@ namespace Umbraco.Web.Trees
         /// Helper method to create tree nodes
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="parentId"></param>
         /// <param name="queryStrings"></param>
         /// <param name="title"></param>
         /// <param name="routePath"></param>
         /// <param name="icon"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string icon, string routePath)
+        public TreeNode CreateTreeNode(string id, string parentId, FormDataCollection queryStrings, string title, string icon, string routePath)
         {
             var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
             var menuUrl = Url.GetMenuUrl(GetType(), id, queryStrings);
-            var node = new TreeNode(id, jsonUrl, menuUrl) { Title = title, RoutePath = routePath, Icon = icon };
+            var node = new TreeNode(id, parentId, jsonUrl, menuUrl) { Name = title, RoutePath = routePath, Icon = icon };
             return node;
         }
 
@@ -220,14 +224,15 @@ namespace Umbraco.Web.Trees
         /// Helper method to create tree nodes and automatically generate the json url
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="parentId"></param>
         /// <param name="queryStrings"></param>
         /// <param name="title"></param>
         /// <param name="icon"></param>
         /// <param name="hasChildren"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string icon, bool hasChildren)
+        public TreeNode CreateTreeNode(string id, string parentId, FormDataCollection queryStrings, string title, string icon, bool hasChildren)
         {
-            var treeNode = CreateTreeNode(id, queryStrings, title, icon);
+            var treeNode = CreateTreeNode(id, parentId, queryStrings, title, icon);
             treeNode.HasChildren = hasChildren;
             return treeNode;
         }
@@ -236,15 +241,16 @@ namespace Umbraco.Web.Trees
         /// Helper method to create tree nodes and automatically generate the json url
         /// </summary>
         /// <param name="id"></param>
+        /// <param name="parentId"></param>
         /// <param name="queryStrings"></param>
         /// <param name="title"></param>
         /// <param name="routePath"></param>
         /// <param name="hasChildren"></param>
         /// <param name="icon"></param>
         /// <returns></returns>
-        public TreeNode CreateTreeNode(string id, FormDataCollection queryStrings, string title, string icon, bool hasChildren, string routePath)
+        public TreeNode CreateTreeNode(string id, string parentId, FormDataCollection queryStrings, string title, string icon, bool hasChildren, string routePath)
         {
-            var treeNode = CreateTreeNode(id, queryStrings, title, icon);
+            var treeNode = CreateTreeNode(id, parentId, queryStrings, title, icon);
             treeNode.HasChildren = hasChildren;
             treeNode.RoutePath = routePath;
             return treeNode;

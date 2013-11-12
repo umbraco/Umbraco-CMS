@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Dialogs.MediaPickerController",
-        function($scope, mediaResource, umbRequestHelper, entityResource, $log, imageHelper, eventsService) {
+        function($scope, mediaResource, umbRequestHelper, entityResource, $log, imageHelper, eventsService, treeService) {
 
             var dialogOptions = $scope.$parent.dialogOptions;
             $scope.options = {
@@ -20,6 +20,12 @@ angular.module("umbraco")
                     mediaResource
                         .addFolder($scope.newFolderName, $scope.options.formData.currentFolder)
                         .then(function(data) {
+
+                            //we've added a new folder so lets clear the tree cache for that specific item
+                            treeService.clearCache({
+                                cacheKey: "__media", //this is the main media tree cache key
+                                childrenOf: data.parentId //clear the children of the parent
+                            });
 
                             $scope.gotoFolder(data.id);
                         });

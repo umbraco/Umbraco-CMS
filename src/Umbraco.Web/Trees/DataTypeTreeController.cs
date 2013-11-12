@@ -33,6 +33,7 @@ namespace Umbraco.Web.Trees
                         .Select(dt =>
                                 CreateTreeNode(
                                     dt.Id.ToInvariantString(),
+                                    id,
                                     queryStrings,
                                     dt.Name,
                                     "icon-autofill",

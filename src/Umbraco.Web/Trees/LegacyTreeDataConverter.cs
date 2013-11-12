@@ -348,11 +348,11 @@ namespace Umbraco.Web.Trees
 
             //TODO: Might need to add stuff to additional attributes
 
-            var node = new TreeNode(xmlTreeNode.NodeID, childNodesSource, menuSource)
+            var node = new TreeNode(xmlTreeNode.NodeID, isRoot ? null : parentId, childNodesSource, menuSource)
             {
                 HasChildren = xmlTreeNode.HasChildren,
                 Icon = xmlTreeNode.Icon,
-                Title = xmlTreeNode.Text,
+                Name = xmlTreeNode.Text,
                 NodeType = xmlTreeNode.NodeType
             };
             if (isRoot)

@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Security;
@@ -30,14 +31,14 @@ namespace Umbraco.Web.Trees
                 for (var i = 97; i < 123; i++)
                 {
                     var charString = ((char) i).ToString(CultureInfo.InvariantCulture);
-                    var folder = CreateTreeNode(charString, queryStrings, charString, "icon-folder-close", true);
+                    var folder = CreateTreeNode(charString, id, queryStrings, charString, "icon-folder-close", true);
                     folder.NodeType = "member-folder";
                     nodes.Add(folder);
                 }
                 //list out 'Others' if the membership provider is umbraco
                 if (Member.InUmbracoMemberMode())
                 {
-                    var folder = CreateTreeNode("others", queryStrings, "Others", "icon-folder-close", true);
+                    var folder = CreateTreeNode("others", id, queryStrings, "Others", "icon-folder-close", true);
                     folder.NodeType = "member-folder";
                     nodes.Add(folder);
                 }
@@ -52,7 +53,7 @@ namespace Umbraco.Web.Trees
                         //get the members from our member data layer
                         nodes.AddRange(
                             Member.getMemberFromFirstLetter(id.ToCharArray()[0])
-                                        .Select(m => CreateTreeNode(m.UniqueId.ToString("N"), queryStrings, m.Text, "icon-user")));
+                                        .Select(m => CreateTreeNode(m.UniqueId.ToString("N"), id, queryStrings, m.Text, "icon-user")));
                     }
                     else
                     {
@@ -60,7 +61,7 @@ namespace Umbraco.Web.Trees
                         int total;
                         nodes.AddRange(
                             Membership.Provider.FindUsersByName(id + "%", 0, 9999, out total).Cast<MembershipUser>()
-                                      .Select(m => CreateTreeNode(m.ProviderUserKey.ToString(), queryStrings, m.UserName, "icon-user")));
+                                      .Select(m => CreateTreeNode(m.ProviderUserKey.ToString(), id, queryStrings, m.UserName, "icon-user")));
                     }
                 }
                 else if (id == "others")
@@ -68,7 +69,7 @@ namespace Umbraco.Web.Trees
                     //others will only show up when in umbraco membership mode
                     nodes.AddRange(
                         Member.getAllOtherMembers()
-                                    .Select(m => CreateTreeNode(m.Id.ToInvariantString(), queryStrings, m.Text, "icon-user")));
+                                    .Select(m => CreateTreeNode(m.Id.ToInvariantString(), id, queryStrings, m.Text, "icon-user")));
                 }
             }
             return nodes;
@@ -89,8 +90,16 @@ namespace Umbraco.Web.Trees
                 return menu;
             }
 
-            menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
-            menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
+            Guid guid;
+            if (Guid.TryParse(id, out guid))
+            {
+                menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+            }
+            else
+            {
+                menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
+                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);    
+            }
             return menu;
         }
     }

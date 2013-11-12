@@ -2,6 +2,37 @@
 
 /**
  * @ngdoc function
+ * @name umbraco.services.umbSessionStorage
+ * @function
+ *
+ * @description
+ * Used to get/set things in browser sessionStorage but always prefixes keys with "umb_" and converts json vals so there is no overlap 
+ * with any sessionStorage created by a developer.
+ */
+function umbSessionStorage($window) {
+
+    //gets the sessionStorage object if available, otherwise just uses a normal object
+    // - required for unit tests.
+    var storage = $window['sessionStorage'] ? $window['sessionStorage'] : {};
+
+    return {
+
+        get: function (key) {
+            console.log(storage);
+            console.log(storage["umb_" + key]);
+            return angular.fromJson(storage["umb_" + key]);
+        },
+        
+        set : function(key, value) {
+            storage["umb_" + key] = angular.toJson(value);
+        }
+        
+    };
+}
+angular.module('umbraco.services').factory('umbSessionStorage', umbSessionStorage);
+
+/**
+ * @ngdoc function
  * @name umbraco.services.legacyJsLoader
  * @function
  *

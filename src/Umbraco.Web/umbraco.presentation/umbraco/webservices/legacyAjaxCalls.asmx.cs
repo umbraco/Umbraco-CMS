@@ -185,6 +185,7 @@ namespace umbraco.presentation.webservices
             return Application[helper.Request("key")].ToString();
         }
 
+        [Obsolete("This is no longer used and will be removed in future versions")]
         [WebMethod]
         [ScriptMethod]
         public void RenewUmbracoSession()
@@ -195,6 +196,7 @@ namespace umbraco.presentation.webservices
 
         }
 
+        [Obsolete("This is no longer used and will be removed in future versions")]
         [WebMethod]
         [ScriptMethod]
         public int GetSecondsBeforeUserLogout()

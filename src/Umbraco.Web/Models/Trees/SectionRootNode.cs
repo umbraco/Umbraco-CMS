@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Models.Trees
 {
@@ -28,12 +29,12 @@ namespace Umbraco.Web.Models.Trees
             return new SectionRootNode(nodeId, getChildNodesUrl, menuUrl)
             {
                 Children = children,
-                Title = title
+                Name = title
             };
         }
 
         private SectionRootNode(string nodeId, string getChildNodesUrl, string menuUrl)
-            : base(nodeId, getChildNodesUrl, menuUrl)
+            : base(nodeId, null, getChildNodesUrl, menuUrl)
         {
             //default to false
             IsContainer = false;

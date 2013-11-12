@@ -72,6 +72,7 @@ namespace Umbraco.Web.Trees
                 {
                     nodes.Add(CreateTreeNode(
                         RecycleBinId.ToInvariantString(),
+                        id,
                         queryStrings,
                         ui.GetText("general", "recycleBin"),
                         "icon-trash",

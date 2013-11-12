@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Xml;
+using System.Xml.Linq;
 using Umbraco.Core.Models;
 using umbraco.interfaces;
 
@@ -40,17 +41,29 @@ namespace Umbraco.Core.PropertyEditors
                         Value = Value
                     };
                 var xd = new XmlDocument();
-                var xml = propertyEditor.ValueEditor.ConvertDbToXml(property);
-                xml.GetXmlNode(xd);
+                var xNode = propertyEditor.ValueEditor.ConvertDbToXml(property);
+                
+                //check if this xml fragment can be converted to an XmlNode
+                var xContainer = xNode as XContainer;
+                if (xContainer != null)
+                {
+                    //imports to the document
+                    xContainer.GetXmlNode(xd);
+                    // return the XML node.
+                    return data.ImportNode(xd.DocumentElement, true);
+                }
 
-                // return the XML node.
-                return data.ImportNode(xd.DocumentElement, true);
+                return ReturnCDataElement(data);
             }
 
             //if for some reason the prop editor wasn't found we'll default to returning the string value in a CDATA block.
-            var sValue = Value != null ? Value.ToString() : String.Empty;
-            return data.CreateCDataSection(sValue);
+            return ReturnCDataElement(data);
+        }
 
+        private XmlNode ReturnCDataElement(XmlDocument doc)
+        {
+            var sValue = Value != null ? Value.ToString() : string.Empty;
+            return doc.CreateCDataSection(sValue);
         }
         
         public void MakeNew(int PropertyId)

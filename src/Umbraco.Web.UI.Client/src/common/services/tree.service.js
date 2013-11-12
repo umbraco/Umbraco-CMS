@@ -9,7 +9,11 @@
  */
 function treeService($q, treeResource, iconHelper, notificationsService, $rootScope) {
 
-    //TODO: implement this in local storage
+    //SD: Have looked at putting this in sessionStorage (not localStorage since that means you wouldn't be able to work
+    // in multiple tabs) - however our tree structure is cyclical, meaning a node has a reference to it's parent and it's children
+    // which you cannot serialize to sessionStorage. There's really no benefit of session storage except that you could refresh
+    // a tab and have the trees where they used to be - supposed that is kind of nice but would mean we'd have to store the parent
+    // as a nodeid reference instead of a variable with a getParent() method.
     var treeCache = {};
     
     var standardCssClass = 'icon umb-tree-icon sprTree';
@@ -36,13 +40,22 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
         _formatNodeDataForUseInUI: function (parentNode, treeNodes, section, level) {
             //if no level is set, then we make it 1   
             var childLevel = (level ? level : 1);
+            //set the section if it's not already set
             if (!parentNode.section) {
                 parentNode.section = section;
             }
+            //create a method outside of the loop to return the parent - otherwise jshint blows up
+            var funcParent = function() {
+                return parentNode;
+            };
             for (var i = 0; i < treeNodes.length; i++) {
 
                 treeNodes[i].level = childLevel;
-                treeNodes[i].parent = parentNode;
+
+                //create a function to get the parent node, we could assign the parent node but 
+                // then we cannot serialize this entity because we have a cyclical reference.
+                // Instead we just make a function to return the parentNode.
+                treeNodes[i].parent = funcParent;
 
                 //set the section for each tree node - this allows us to reference this easily when accessing tree nodes
                 treeNodes[i].section = section;
@@ -108,7 +121,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             return undefined;
         },
 
-        /** clears the tree cache - with optional cacheKey and optional section */
+        /** clears the tree cache - with optional cacheKey, optional section or optional filter */
         clearCache: function (args) {
             //clear all if not specified
             if (!args) {
@@ -121,6 +134,50 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     if (cacheKey && treeCache && treeCache[cacheKey] != null) {
                         treeCache = _.omit(treeCache, cacheKey);
                     }
+                }
+                else if (args.childrenOf) {
+                    //if childrenOf is supplied a cacheKey must be supplied as well
+                    if (!args.cacheKey) {
+                        throw "args.cacheKey is required if args.childrenOf is supplied";
+                    }
+                    //this will clear out all children for the parentId passed in to this parameter, we'll 
+                    // do this by recursing and specifying a filter
+                    var self = this;
+                    this.clearCache({
+                        cacheKey: args.cacheKey,
+                        filter: function(cc) {
+                            //get the new parent node from the tree cache
+                            var parent = self.getDescendantNode(cc.root, args.childrenOf);                            
+                            //clear it's children and set to not expanded
+                            parent.children = null;
+                            parent.expanded = false;
+                            //return the cache to be saved
+                            return cc;
+                        }
+                    });
+                }
+                else if (args.filter && angular.isFunction(args.filter)) {
+                    //if a filter is supplied a cacheKey must be supplied as well
+                    if (!args.cacheKey) {
+                        throw "args.cacheKey is required if args.filter is supplied";
+                    }
+
+                    //if a filter is supplied the function needs to return the data to keep
+                    var byKey = treeCache[args.cacheKey];
+                    if (byKey) {
+                        var result = args.filter(byKey);
+
+                        if (result) {
+                            //set the result to the filtered data
+                            treeCache[args.cacheKey] = result;
+                        }
+                        else {                            
+                            //remove the cache
+                            treeCache = _.omit(treeCache, args.cacheKey);
+                        }
+
+                    }
+
                 }
                 else if (args.cacheKey) {
                     //if only the cache key is specified, then clear all cache starting with that key
@@ -137,7 +194,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                         return k.endsWith("_" + args.section);
                     });
                     treeCache = _.omit(treeCache, toRemove2);
-                }
+                }               
             }
         },
 
@@ -194,11 +251,11 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
 
         /** Removes a given tree node from the tree */
         removeNode: function(treeNode) {
-            if (treeNode.parent == null) {
+            if (treeNode.parent() == null) {
                 throw "Cannot remove a node that doesn't have a parent";
             }
             //remove the current item from it's siblings
-            treeNode.parent.children.splice(treeNode.parent.children.indexOf(treeNode), 1);            
+            treeNode.parent().children.splice(treeNode.parent().children.indexOf(treeNode), 1);            
         },
         
         /** Removes all child nodes from a given tree node */
@@ -261,7 +318,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     root = current;
                 }
                 else { 
-                    current = current.parent;
+                    current = current.parent();
                 }
             }
             return root;
@@ -370,7 +427,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             if (!node) {
                 throw "node cannot be null";
             }
-            if (!node.parent) {
+            if (!node.parent()) {
                 throw "cannot reload a single node without a parent";
             }
             if (!node.section) {
@@ -382,7 +439,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             //set the node to loading
             node.loading = true;
 
-            this.getChildren({ node: node.parent, section: node.section }).then(function(data) {
+            this.getChildren({ node: node.parent(), section: node.section }).then(function(data) {
 
                 //ok, now that we have the children, find the node we're reloading
                 var found = _.find(data, function(item) {
@@ -390,14 +447,14 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                 });
                 if (found) {
                     //now we need to find the node in the parent.children collection to replace
-                    var index = _.indexOf(node.parent.children, node);
+                    var index = _.indexOf(node.parent().children, node);
                     //the trick here is to not actually replace the node - this would cause the delete animations
                     //to fire, instead we're just going to replace all the properties of this node.
-                    _.extend(node.parent.children[index], found);                    
+                    _.extend(node.parent().children[index], found);
                     //set the node to loading
-                    node.parent.children[index].loading = false;
+                    node.parent().children[index].loading = false;
                     //return
-                    deferred.resolve(node.parent.children[index]);
+                    deferred.resolve(node.parent().children[index]);
                 }
                 else {
                     deferred.reject();

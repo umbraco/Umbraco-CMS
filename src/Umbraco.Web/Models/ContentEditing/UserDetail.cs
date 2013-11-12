@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Models.ContentEditing
@@ -29,5 +30,11 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "remainingAuthSeconds")]
         public double SecondsUntilTimeout { get; set; }
+
+        /// <summary>
+        /// A list of sections the user is allowed to view.
+        /// </summary>
+        [DataMember(Name = "allowedSections")]
+        public IEnumerable<string> AllowedSections { get; set; }
     }
 }

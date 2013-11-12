@@ -36,6 +36,7 @@ angular.module("umbraco")
 	        $scope.user = user;
 	        if ($scope.user) {
 	            $scope.remainingAuthSeconds = $scope.user.remainingAuthSeconds;
+	            $scope.canEditProfile = _.indexOf($scope.user.allowedSections, "users") > -1;
 	            //set the timer
 	            updateTimeout();
 	        }

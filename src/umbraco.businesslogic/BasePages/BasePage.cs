@@ -7,6 +7,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -30,9 +31,7 @@ namespace umbraco.BasePages
         private User _user;
         private bool _userisValidated = false;
         private ClientTools _clientTools;
-
-        private static readonly int UmbracoTimeOutInMinutes = GlobalSettings.TimeOutInMinutes;
-
+        
         /// <summary>
         /// The path to the umbraco root folder
         /// </summary>
@@ -135,6 +134,7 @@ namespace umbraco.BasePages
             ClientTools.RefreshAdmin(Seconds);
         }
 
+        //NOTE: This is basically replicated in WebSecurity because this class exists in a poorly placed assembly. - also why it is obsolete.
         private void ValidateUser()
         {
             var ticket = Context.GetUmbracoAuthTicket();
@@ -160,7 +160,7 @@ namespace umbraco.BasePages
             }
             else
             {
-                throw new InvalidOperationException("The user has no umbraco contextid - try logging in");    
+                throw new InvalidOperationException("The user has no umbraco contextid - try logging in");
             }
         }
 
@@ -205,13 +205,10 @@ namespace umbraco.BasePages
         /// <returns></returns>
         public static bool ValidateCurrentUser()
         {
-            var ticket = HttpContext.Current.GetUmbracoAuthTicket();
-            if (ticket != null)
+            var identity = HttpContext.Current.GetCurrentIdentity(true);
+            if (identity != null)
             {
-                if (ticket.Expired == false)
-                {
-                    return true;
-                }
+                return true;
             }
             return false;
         }
@@ -220,7 +217,8 @@ namespace umbraco.BasePages
         public static long GetTimeout(bool bypassCache)
         {
             var ticket = HttpContext.Current.GetUmbracoAuthTicket();
-            var ticks = ticket.Expiration.Ticks - DateTime.Now.Ticks;
+            if (ticket.Expired) return 0;
+            var ticks = ticket.Expiration.Ticks - DateTime.Now.Ticks;         
             return ticks;
         }
 

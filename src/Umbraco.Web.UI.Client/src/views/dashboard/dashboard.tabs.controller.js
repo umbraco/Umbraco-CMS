@@ -80,7 +80,7 @@ function MediaFolderBrowserDashboardController($rootScope, $scope, assetsService
 angular.module("umbraco").controller("Umbraco.Dashboard.MediaFolderBrowserDashboardController", MediaFolderBrowserDashboardController);
 
 
-function ChangePasswordDashboardController($scope, xmlhelper, $log, userResource, formHelper) {
+function ChangePasswordDashboardController($scope, xmlhelper, $log, currentUserResource, formHelper) {
 
     //create the initial model for change password property editor
     $scope.changePasswordModel = {
@@ -91,7 +91,7 @@ function ChangePasswordDashboardController($scope, xmlhelper, $log, userResource
     };
 
     //go get the config for the membership provider and add it to the model
-    userResource.getMembershipProviderConfig().then(function(data) {
+    currentUserResource.getMembershipProviderConfig().then(function(data) {
         $scope.changePasswordModel.config = data;
         //ensure the hasPassword config option is set to true (the user of course has a password already assigned)
         //this will ensure the oldPassword is shown so they can change it
@@ -105,7 +105,7 @@ function ChangePasswordDashboardController($scope, xmlhelper, $log, userResource
     $scope.changePassword = function() {
 
         if (formHelper.submitForm({ scope: $scope })) {
-            userResource.changePassword($scope.changePasswordModel.value).then(function(data) {
+            currentUserResource.changePassword($scope.changePasswordModel.value).then(function(data) {
 
                 //if the password has been reset, then update our model
                 if (data.value) {

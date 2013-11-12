@@ -80,7 +80,7 @@ namespace Umbraco.Web.Trees
             }
 
             var multiTree = SectionRootNode.CreateMultiTreeSectionRoot(rootId, collection);
-            multiTree.Title = ui.Text("sections", application);
+            multiTree.Name = ui.Text("sections", application);
             return multiTree;
         }
 
@@ -133,7 +133,7 @@ namespace Umbraco.Web.Trees
                     rootId, 
                     rootNode.Result.ChildNodesUrl, 
                     rootNode.Result.MenuUrl, 
-                    rootNode.Result.Title,
+                    rootNode.Result.Name,
                     byControllerAttempt.Result);
 
                 foreach (var d in rootNode.Result.AdditionalData)

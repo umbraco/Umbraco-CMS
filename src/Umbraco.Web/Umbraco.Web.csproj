@@ -362,7 +362,7 @@
     <Compile Include="Editors\EntityController.cs" />
     <Compile Include="Editors\MediaPostValidateAttribute.cs" />
     <Compile Include="Editors\MemberController.cs" />
-    <Compile Include="Editors\UserController.cs" />
+    <Compile Include="Editors\CurrentUserController.cs" />
     <Compile Include="Install\Steps\MajorUpgradeReport.cs" />
     <Compile Include="Models\ContentEditing\DashboardControl.cs" />
     <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />

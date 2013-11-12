@@ -23,7 +23,8 @@ Umbraco.Sys.ServerVariables = {
     umbracoSettings: {
         "umbracoPath": "/umbraco",
         "appPluginsPath" : "/App_Plugins",
-        "imageFileTypes": "jpeg,jpg,gif,bmp,png,tiff,tif"
+        "imageFileTypes": "jpeg,jpg,gif,bmp,png,tiff,tif",
+        "keepUserLoggedIn": true
     },
     umbracoPlugins: {
         trees: [
