@@ -217,7 +217,11 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         //anytime we want to load the tree we need to disable the delete animations
                         deleteAnimations = false;
 
-                        //use $q.when because a promise OR raw data might be returned.
+                        //Here's where we cache the data before loading other data (changing sections)
+                        if (lastSection && scope.section !== lastSection) {
+                            treeService.cacheTree(scope.cachekey, lastSection, scope.tree);
+                        }
+
                         treeService.getTree({ section: scope.section, tree: scope.treealias, cacheKey: scope.cachekey, isDialog: scope.isdialog ? scope.isdialog : false })
                             .then(function(data) {
                                 //set the data once we have it
@@ -356,7 +360,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 //When the user logs in
                 scope.$on("authenticated", function(evt, data) {
                     //populate the tree if the user has changed
-                    if (data.lastUserId !== data.user.id) {
+                    if (data.lastUserId && data.lastUserId !== data.user.id) {
                         treeService.clearCache();
                         scope.tree = null;
 

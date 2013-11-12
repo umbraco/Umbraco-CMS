@@ -7,14 +7,13 @@
  * @description
  * The tree service factory, used internally by the umbTree and umbTreeItem directives
  */
-function treeService($q, treeResource, iconHelper, notificationsService, $rootScope) {
+function treeService($q, treeResource, iconHelper, notificationsService, $rootScope, umbSessionStorage) {
 
-    //SD: Have looked at putting this in sessionStorage (not localStorage since that means you wouldn't be able to work
-    // in multiple tabs) - however our tree structure is cyclical, meaning a node has a reference to it's parent and it's children
-    // which you cannot serialize to sessionStorage. There's really no benefit of session storage except that you could refresh
-    // a tab and have the trees where they used to be - supposed that is kind of nice but would mean we'd have to store the parent
-    // as a nodeid reference instead of a variable with a getParent() method.
-    var treeCache = {};
+    //initialize the tree cache if nothing is there, we store the cache in sessionStorage which 
+    // is applicable to the current open tab
+    if (!umbSessionStorage.get("treeCache")) {
+        umbSessionStorage.set("treeCache", {});
+    }
     
     var standardCssClass = 'icon umb-tree-icon sprTree';
 
@@ -31,9 +30,44 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
 
     return {  
 
-        /** Internal method to return the tree cache */
-        _getTreeCache: function() {
-            return treeCache;
+        /** Internal method to return the tree cache - this also wires up the parent() function for each node since when we serialize to cache, functions are obviously lost */
+        _getTreeCache: function(key) {
+            var cache = umbSessionStorage.get("treeCache");
+            
+            //method to set the parent() delegate for each node
+            var setParent = function (currParent, currChildren) {
+                _.each(currChildren, function (child, index) {
+                    //create the method, return it's parent
+                    child.parent = function () {
+                        return currParent;
+                    };
+                    if (angular.isArray(child.children) && child.children.length > 0) {
+                        //recurse
+                        setParent(child, child.children);
+                    }
+
+                });
+            };
+
+            //return the raw cache if a key is specified but there is nothing to process with that key
+            if (key && (!cache[key] || !cache[key].root || !angular.isArray(cache[key].root.children))) {
+                return cache;
+            }
+            else if (key && cache[key]) {
+                //if a key is specified only process that portion of the cache
+                setParent(cache[key].root, cache[key].root.children);
+                return cache;
+            }
+            else {
+                //no key is specified, process all of the cache
+                _.each(cache, function (val) {
+                    if (val.root && angular.isArray(val.root.children)) {                        
+                        setParent(val.root, val.root.children);
+                    }
+                });
+                return cache;
+            }
+            
         },
 
         /** Internal method that ensures there's a routePath, parent and level property on each tree node and adds some icon specific properties so that the nodes display properly */
@@ -121,18 +155,35 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             return undefined;
         },
 
+        /** This puts the tree into cache */
+        cacheTree: function (cacheKey, section, tree) {
+            if (!cacheKey || !section || !tree) {
+                return;
+            }
+
+            var key = getCacheKey({ cacheKey: cacheKey, section: section });
+            //NOTE: we're not using the _getTreeCache method here because we don't want to process the parent() method, 
+            // simply to get the raw values so we can update it.
+            var rawCache = umbSessionStorage.get("treeCache");
+            rawCache[key] = tree;
+            umbSessionStorage.set("treeCache", rawCache);
+        },
+
         /** clears the tree cache - with optional cacheKey, optional section or optional filter */
         clearCache: function (args) {
             //clear all if not specified
             if (!args) {
-                treeCache = {};
+                umbSessionStorage.set("treeCache", {});
             }
             else {
+
+                var treeCache = this._getTreeCache();
+
                 //if section and cache key specified just clear that cache
                 if (args.section && args.cacheKey) {
-                    var cacheKey = getCacheKey(args);
+                    var cacheKey = getCacheKey(args);                    
                     if (cacheKey && treeCache && treeCache[cacheKey] != null) {
-                        treeCache = _.omit(treeCache, cacheKey);
+                        umbSessionStorage.set("treeCache", _.omit(treeCache, cacheKey));
                     }
                 }
                 else if (args.childrenOf) {
@@ -170,12 +221,12 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                         if (result) {
                             //set the result to the filtered data
                             treeCache[args.cacheKey] = result;
+                            umbSessionStorage.set("treeCache", treeCache);
                         }
                         else {                            
                             //remove the cache
-                            treeCache = _.omit(treeCache, args.cacheKey);
+                            umbSessionStorage.set("treeCache", _.omit(treeCache, args.cacheKey));
                         }
-
                     }
 
                 }
@@ -185,7 +236,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     var toRemove1 = _.filter(allKeys1, function (k) {
                         return k.startsWith(args.cacheKey + "_");
                     });
-                    treeCache = _.omit(treeCache, toRemove1);
+                    umbSessionStorage.set("treeCache", _.omit(treeCache, toRemove1));
                 }
                 else if (args.section) {
                     //if only the section is specified then clear all cache regardless of cache key by that section
@@ -193,7 +244,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     var toRemove2 = _.filter(allKeys2, function (k) {
                         return k.endsWith("_" + args.section);
                     });
-                    treeCache = _.omit(treeCache, toRemove2);
+                    umbSessionStorage.set("treeCache", _.omit(treeCache, toRemove2));
                 }               
             }
         },
@@ -347,7 +398,8 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             }
 
             var cacheKey = getCacheKey(args);
-            
+            var treeCache = this._getTreeCache(cacheKey);
+
             //return the cache if it exists
             if (cacheKey && treeCache[cacheKey] !== undefined) {
                 deferred.resolve(treeCache[cacheKey]);
@@ -366,12 +418,13 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     //we need to format/modify some of the node data to be used in our app.
                     self._formatNodeDataForUseInUI(result.root, result.root.children, args.section);
 
-                    //cache this result if a cache key is specified - generally a cache key should ONLY
-                    // be specified for application trees, dialog trees should not be cached.
-                    if (cacheKey) {                        
-                        treeCache[cacheKey] = result;
-                        deferred.resolve(treeCache[cacheKey]);
-                    }
+                    ////cache this result if a cache key is specified - generally a cache key should ONLY
+                    //// be specified for application trees, dialog trees should not be cached.
+                    //if (cacheKey) {                        
+                    //    treeCache[cacheKey] = result;
+                    //    umbSessionStorage.set("treeCache", treeCache);
+                    //    deferred.resolve(treeCache[cacheKey]);
+                    //}
 
                     //return un-cached
                     deferred.resolve(result);
