@@ -28,7 +28,7 @@ namespace Umbraco.Web.Models.Trees
             return new SectionRootNode(nodeId, getChildNodesUrl, menuUrl)
             {
                 Children = children,
-                Title = title
+                Name = title
             };
         }
 

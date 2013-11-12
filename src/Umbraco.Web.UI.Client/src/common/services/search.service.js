@@ -5,7 +5,7 @@ angular.module('umbraco.services')
         member.menuUrl = umbRequestHelper.getApiUrl("memberTreeBaseUrl", "GetMenu", [{ id: member.id }, { application: 'member' }]);
         member.editorPath = "member/member/edit/" + (member.key ? member.key : member.id);
         member.metaData = { treeAlias: "member" };
-        member.subTitle = member.additionalData.Email;
+        member.subTitle = member.metaData.Email;
     }
     
     function configureMediaResult(media)
@@ -19,7 +19,7 @@ angular.module('umbraco.services')
         content.menuUrl = umbRequestHelper.getApiUrl("contentTreeBaseUrl", "GetMenu", [{ id: content.id }, { application: 'content' }]);
         content.editorPath = "content/content/edit/" + content.id;
         content.metaData = { treeAlias: "content" };
-        content.subTitle = content.additionalData.Url;        
+        content.subTitle = content.metaData.Url;        
     }
 
     return {

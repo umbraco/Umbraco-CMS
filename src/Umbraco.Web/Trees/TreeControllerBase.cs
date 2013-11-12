@@ -160,7 +160,7 @@ namespace Umbraco.Web.Trees
                 {
                     HasChildren = true,
                     RoutePath = currApp,
-                    Title = RootNodeDisplayName
+                    Name = RootNodeDisplayName
                 };
 
             return node;
@@ -179,7 +179,7 @@ namespace Umbraco.Web.Trees
         {
             var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
             var menuUrl = Url.GetMenuUrl(GetType(), id, queryStrings);
-            var node = new TreeNode(id, jsonUrl, menuUrl) { Title = title };
+            var node = new TreeNode(id, jsonUrl, menuUrl) { Name = title };
             return node;
         }
 
@@ -195,7 +195,7 @@ namespace Umbraco.Web.Trees
         {
             var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
             var menuUrl = Url.GetMenuUrl(GetType(), id, queryStrings);
-            var node = new TreeNode(id, jsonUrl, menuUrl) { Title = title, Icon = icon };
+            var node = new TreeNode(id, jsonUrl, menuUrl) { Name = title, Icon = icon };
             return node;
         }
 
@@ -212,7 +212,7 @@ namespace Umbraco.Web.Trees
         {
             var jsonUrl = Url.GetTreeUrl(GetType(), id, queryStrings);
             var menuUrl = Url.GetMenuUrl(GetType(), id, queryStrings);
-            var node = new TreeNode(id, jsonUrl, menuUrl) { Title = title, RoutePath = routePath, Icon = icon };
+            var node = new TreeNode(id, jsonUrl, menuUrl) { Name = title, RoutePath = routePath, Icon = icon };
             return node;
         }
 

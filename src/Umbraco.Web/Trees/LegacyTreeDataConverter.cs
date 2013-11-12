@@ -352,7 +352,7 @@ namespace Umbraco.Web.Trees
             {
                 HasChildren = xmlTreeNode.HasChildren,
                 Icon = xmlTreeNode.Icon,
-                Title = xmlTreeNode.Text,
+                Name = xmlTreeNode.Text,
                 NodeType = xmlTreeNode.NodeType
             };
             if (isRoot)

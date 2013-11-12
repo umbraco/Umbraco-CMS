@@ -53,7 +53,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// <summary>
         /// A collection of extra data that is available for this specific entity/entity type
         /// </summary>
-        [DataMember(Name = "additionalData")]
+        [DataMember(Name = "metaData")]
         public IDictionary<string, object> AdditionalData { get; private set; } 
     }
 }
