@@ -102,8 +102,8 @@ namespace Umbraco.Web.Editors
                                         controller => controller.PostLogin(null, null))
                                 },
                                 {
-                                    "userApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<UserController>(
-                                        controller => controller.GetAll())
+                                    "currentUserApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<CurrentUserController>(
+                                        controller => controller.GetMembershipProviderConfig())
                                 },
                                 {
                                     "legacyApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<LegacyController>(
