@@ -9,7 +9,11 @@
  */
 function treeService($q, treeResource, iconHelper, notificationsService, $rootScope) {
 
-    //TODO: implement this in local storage
+    //SD: Have looked at putting this in sessionStorage (not localStorage since that means you wouldn't be able to work
+    // in multiple tabs) - however our tree structure is cyclical, meaning a node has a reference to it's parent and it's children
+    // which you cannot serialize to sessionStorage. There's really no benefit of session storage except that you could refresh
+    // a tab and have the trees where they used to be - supposed that is kind of nice but would mean we'd have to store the parent
+    // as a nodeid reference instead of a variable with a getParent() method.
     var treeCache = {};
     
     var standardCssClass = 'icon umb-tree-icon sprTree';
@@ -108,7 +112,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             return undefined;
         },
 
-        /** clears the tree cache - with optional cacheKey and optional section */
+        /** clears the tree cache - with optional cacheKey, optional section or optional filter */
         clearCache: function (args) {
             //clear all if not specified
             if (!args) {
@@ -121,6 +125,29 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     if (cacheKey && treeCache && treeCache[cacheKey] != null) {
                         treeCache = _.omit(treeCache, cacheKey);
                     }
+                }
+                else if (args.filter && angular.isFunction(args.filter)) {
+                    //if a filter is supplied a cacheKey must be supplied as well
+                    if (!args.cacheKey) {
+                        throw "args.cacheKey is required if args.filter is supplied";
+                    }
+
+                    //if a filter is supplied the function needs to return the data to keep
+                    var byKey = treeCache[args.cacheKey];
+                    if (byKey) {
+                        var result = args.filter(byKey);
+
+                        if (result) {
+                            //set the result to the filtered data
+                            treeCache[args.cacheKey] = result;
+                        }
+                        else {                            
+                            //remove the cache
+                            treeCache = _.omit(treeCache, args.cacheKey);
+                        }
+
+                    }
+
                 }
                 else if (args.cacheKey) {
                     //if only the cache key is specified, then clear all cache starting with that key
@@ -137,7 +164,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                         return k.endsWith("_" + args.section);
                     });
                     treeCache = _.omit(treeCache, toRemove2);
-                }
+                }               
             }
         },
 
