@@ -1,11 +1,18 @@
-<div class="umb-editor umb-datepicker" ng-controller="Umbraco.PropertyEditors.DatepickerController">
-    <div class="input-append date datepicker" id="{{model.alias}}">        
-        <input  name="datepicker" data-format="{{model.config.format}}" type="text" 
-                ng-model="model.value"   
-                val-server="value" />
-        <span class="add-on">
-            <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
-        </span>        
-    </div>
-    <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="valServer">{{propertyForm.datepicker.errorMsg}}</span>
+<div class="umb-datepicker" ng-controller="Umbraco.PropertyEditors.DatepickerController">
+	<div class="dropdown">
+	  <a class="dropdown-toggle" id="{{model.alias}}-dropdown" 
+	  	role="button" 
+	  	data-toggle="dropdown" 
+	  	data-target="#" href="#">
+	    <div class="input-append">
+	    	<input type="text" class="umb-editor input-large" 
+	    		value="{{model.datetime | date:'medium'}}"><span class="add-on"><i class="icon-calendar"></i></span>
+	    </div>
+	  </a>
+	  <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+	    <datetimepicker 
+	    	ng-model="model.datetime" 
+	    	datetimepicker-config="{ dropdownSelector:  '#' + model.alias + '-dropdown'}"/>
+	  </ul>
+	</div>
 </div>

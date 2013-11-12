@@ -7,44 +7,27 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DatepickerControll
             pickTime: true,
             format: "yyyy-MM-dd HH:mm:ss"
         };
+
         //map the user config
         angular.extend(config, $scope.model.config);
         //map back to the model
         $scope.model.config = config;
 
-        function applyDate(e) {
-
-            angularHelper.safeApply($scope, function() {
-                // when a date is changed, update the model
-                if (e.localDate) {
-                    if ($scope.model.config.format == "yyyy-MM-dd HH:mm:ss") {
-                        $scope.model.value = e.localDate.toIsoDateTimeString();
-                    }
-                    else {
-                        $scope.model.value = e.localDate.toIsoDateString();
-                    }
-                }
-            });
+        if($scope.model.value){
+            $scope.model.datetime = moment($scope.model.value).toDate();
         }
-
-        assetsService.loadJs(
-                'views/propertyeditors/datepicker/bootstrap-datetimepicker.min.js'
-            ).then(
-            function () {
-                //The Datepicker js and css files are available and all components are ready to use.
-
-                // Get the id of the datepicker button that was clicked
-                var pickerId = $scope.model.alias;
-                // Open the datepicker and add a changeDate eventlistener
-                $("#" + pickerId)
-                    .datetimepicker($scope.model.config)
-                    .on("changeDate", applyDate)
-                    .on("hide", applyDate);
-
-            });
-
-
+        
         assetsService.loadCss(
-                'views/propertyeditors/datepicker/bootstrap-datetimepicker.min.css'
-            );
+            'views/propertyeditors/datepicker/bootstrap-datetimepicker.min.css'
+        );
+
+        $scope.$on("formSubmitting", function (ev, args) {
+
+            //hack to set the hours right
+            //since an hour is subtracted on the server? 
+            var t = angular.copy($scope.model.datetime);
+            t.setHours(t.getHours()+1);
+            $scope.model.value = t;
+        });
+
     });
