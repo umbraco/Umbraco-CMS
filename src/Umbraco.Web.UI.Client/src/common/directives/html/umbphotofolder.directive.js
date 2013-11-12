@@ -103,18 +103,19 @@ angular.module("umbraco.directives.html")
             // if total width is slightly smaller than 
             // actual div width then add 1 to each 
             // photo width till they match
-            i = 0;
-            while (tw < w) {
+            
+            /*i = 0;
+            while (tw < w-1) {
                 row.photos[i].style.width++;
                 i = (i + 1) % c;
                 tw++;
-            }
+            }*/
 
             // if total width is slightly bigger than 
             // actual div width then subtract 1 from each 
             // photo width till they match
             i = 0;
-            while (tw > w) {
+            while (tw > w-1) {
                 row.photos[i].style.width--;
                 i = (i + 1) % c;
                 tw--;
