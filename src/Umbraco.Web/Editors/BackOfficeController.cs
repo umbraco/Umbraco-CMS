@@ -172,6 +172,7 @@ namespace Umbraco.Web.Editors
                                     "imageFileTypes",
                                     string.Join(",", UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes)
                                 },
+                                {"keepUserLoggedIn", UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn},
                             }
                     },
                     {

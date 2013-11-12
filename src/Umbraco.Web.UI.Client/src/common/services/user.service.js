@@ -93,10 +93,28 @@ angular.module('umbraco.services')
 
                     //we are either timed out or very close to timing out so we need to show the login dialog.                    
                     //NOTE: the safeApply because our timeout is set to not run digests (performance reasons)
-                    angularHelper.safeApply($rootScope, function() {
-                        userAuthExpired();
-                    });
-                    
+                    if (Umbraco.Sys.ServerVariables.umbracoSettings.keepUserLoggedIn !== true) {
+                        angularHelper.safeApply($rootScope, function() {
+                            userAuthExpired();
+                        });
+                    }
+                    else {
+                        //we've got less than 30 seconds remaining so let's check the server
+
+                        if (lastServerTimeoutSet != null) {
+                            //first we'll set the lastServerTimeoutSet to null - this is so we don't get back in to this loop while we 
+                            // wait for a response from the server otherwise we'll be making double/triple/etc... calls while we wait.
+                            lastServerTimeoutSet = null;
+                            //now go get it from the server
+                            authResource.getRemainingTimeoutSeconds().then(function (result) {
+                                setUserTimeoutInternal(result);
+                            });
+                        }
+                        
+                        //recurse the countdown!
+                        countdownUserTimeout();
+
+                    }
                 }
             }
         }, 2000, //every 2 seconds

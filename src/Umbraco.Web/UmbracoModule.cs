@@ -225,10 +225,17 @@ namespace Umbraco.Web
         /// <param name="httpContext"></param>
         /// <returns></returns>
         /// <remarks>
-        /// We do not want to renew the ticket when we are checking for the user's remaining timeout.
+        /// We do not want to renew the ticket when we are checking for the user's remaining timeout unless -
+        /// UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn == true
         /// </remarks>
         internal static bool ShouldIgnoreTicketRenew(Uri url, HttpContextBase httpContext)
         {
+            //this setting will renew the ticket for all requests.
+            if (UmbracoConfig.For.UmbracoSettings().Security.KeepUserLoggedIn)
+            {
+                return false;
+            }
+
             //initialize the ignore ticket urls - we don't need to lock this, it's concurrent and a hashset
             // we don't want to have to gen the url each request so this will speed things up a teeny bit.
             if (IgnoreTicketRenewUrls.Any() == false)

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
@@ -217,6 +218,19 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
+        [Obsolete("This is here so that if this config element exists we won't get a YSOD, it is not used whatsoever and will be removed in future versions")]
+        [ConfigurationProperty("DocumentTypeIconList")]
+        internal InnerTextConfigurationElement<IconPickerBehaviour> DocumentTypeIconList
+        {
+            get
+            {
+                return new OptionalInnerTextConfigurationElement<IconPickerBehaviour>(
+                          (InnerTextConfigurationElement<IconPickerBehaviour>)this["DocumentTypeIconList"],
+                    //set the default
+                          IconPickerBehaviour.HideFileDuplicates);
+            }
+        }
+
         [ConfigurationProperty("disallowedUploadFiles")]
         internal CommaDelimitedConfigurationElement DisallowedUploadFiles
         {
@@ -380,7 +394,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
         {
             get { return MacroErrors; }
         }
-        
+
         IEnumerable<string> IContentSection.DisallowedUploadFiles
         {
             get { return DisallowedUploadFiles; }

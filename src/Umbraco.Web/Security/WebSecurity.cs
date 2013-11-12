@@ -173,6 +173,9 @@ namespace Umbraco.Web.Security
             _httpContext.UmbracoLogout();
         }
 
+        /// <summary>
+        /// Renews the user's login ticket
+        /// </summary>
         public void RenewLoginTimeout()
         {
             _httpContext.RenewUmbracoAuthTicket();
@@ -357,18 +360,6 @@ namespace Umbraco.Web.Security
             return userApps.Any(uApp => uApp.InvariantEquals(app));
         }
 
-        internal void UpdateLogin()
-        {
-            _httpContext.RenewUmbracoAuthTicket();
-        }
-
-        internal long GetTimeout()
-        {
-            var ticket = _httpContext.GetUmbracoAuthTicket();
-            var ticks = ticket.Expiration.Ticks - DateTime.Now.Ticks;
-            return ticks;
-        }
-        
         /// <summary>
         /// Gets the user id.
         /// </summary>
@@ -409,15 +400,8 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public bool ValidateCurrentUser()
         {
-            var ticket = _httpContext.GetUmbracoAuthTicket();
-            if (ticket != null)
-            {
-                if (ticket.Expired == false)
-                {
-                    return true;
-                }
-            }
-            return false;
+            var result = ValidateCurrentUser(false);
+            return result == ValidateRequestAttempt.Success;
         }
 
         /// <summary>
@@ -440,8 +424,7 @@ namespace Umbraco.Web.Security
                     {
                         if (throwExceptions) throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
                         return ValidateRequestAttempt.FailedNoPrivileges;
-                    }
-                    UpdateLogin();
+                    }                    
                     return ValidateRequestAttempt.Success;
                 }
                 if (throwExceptions) throw new ArgumentException("User has timed out!!");
