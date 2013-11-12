@@ -9,10 +9,10 @@
 
             <div class="span4">
                 <input type="text" 
-                                    class="umb-headline" 
-                                    localize="placeholder" 
-                                    placeholder="@placeholders_entername" 
-                                    ng-model="content.name" />
+                    class="umb-headline" 
+                    localize="placeholder" 
+                    placeholder="@placeholders_entername" 
+                    ng-model="content.name" />
             </div>
 
             <div class="span8">
@@ -20,7 +20,8 @@
                     <div class="btn-group" ng-class="{dimmed: content.id === 0}">
                         <!-- options button -->
                         <a class="btn" href="#" ng-click="options(content)" prevent-default data-toggle="dropdown">
-                           <i class="icon-settings" style="line-height: 14px"></i> Options
+                           <i class="icon-settings" style="line-height: 14px"></i> 
+                           <localize key="general_actions">Actions</localize>
                         </a>
                         
                         <a class="btn dropdown-toggle" ng-click="options(content)" data-toggle="dropdown">
