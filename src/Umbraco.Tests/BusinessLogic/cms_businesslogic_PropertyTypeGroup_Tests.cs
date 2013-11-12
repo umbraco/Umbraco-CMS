@@ -12,7 +12,7 @@ using System.Collections.Generic;
 namespace Umbraco.Tests.BusinessLogic
 {
     [TestFixture]
-    public class cms_businesslogic_PropertyGroup_Tests : BaseDatabaseFactoryTestWithContext
+    public class cms_businesslogic_PropertyTypeGroup_Tests : BaseDatabaseFactoryTestWithContext
     {
         #region EnsureData
 

@@ -329,7 +329,7 @@ namespace umbraco.cms.businesslogic.propertytype
         /// <returns></returns>
         public static IEnumerable<PropertyType> GetByDataTypeDefinition(int dataTypeDefId)
         {
-            return getobjects(Database.Query<int>("select id, Name from cmsPropertyType where dataTypeId=@d0 order by Name", dataTypeDefId));
+            return getobjects(Database.Query<int>("select id, Name from cmsPropertyType where dataTypeId=@0 order by Name", dataTypeDefId));
         }
 
         public void delete()
@@ -338,7 +338,8 @@ namespace umbraco.cms.businesslogic.propertytype
             FlushCache();
 
             // Delete all properties of propertytype
-            CleanPropertiesOnDeletion(_contenttypeid);
+            //ss:temp comment and used the following code line  // CleanPropertiesOnDeletion(_contenttypeid);
+            CleanAllPropertiesOnDeletion();
 
             // Delete PropertyType ..
             Database.Execute("Delete from cmsPropertyType where id = @0", Id);
@@ -361,6 +362,14 @@ namespace umbraco.cms.businesslogic.propertytype
             }
         }
 
+        // (!new) temp
+        private void CleanAllPropertiesOnDeletion()
+        {
+            Database.Execute("DELETE FROM cmsPropertyData WHERE PropertyTypeId = @0", this.Id);
+        }
+
+        //SS: 11-NOV-2013 - not tested - see https://groups.google.com/d/msg/umbraco-dev/9qLYrQrTQ8o/Uljx446Bv1YJ
+        // temp CleanAllPropertiesOnDeletion() used instead
         private void CleanPropertiesOnDeletion(int contentTypeId)
         {
             // first delete from all master document types
@@ -372,6 +381,8 @@ namespace umbraco.cms.businesslogic.propertytype
             foreach (var contentId in
                 Database.Query<int>("SELECT nodeId FROM cmsContent INNER JOIN umbracoNode ON cmsContent.nodeId = umbracoNode.id WHERE ContentType = @0 ORDER BY umbracoNode.text ", contentTypeId))
             {
+                System.Console.WriteLine("**** DELETED {0} {1} ****", this.Id, contentId); 
+
                 Database.Execute("DELETE FROM cmsPropertyData WHERE PropertyTypeId = @0 AND contentNodeId = @1", this.Id, contentId);
             }
 
