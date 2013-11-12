@@ -262,6 +262,36 @@ describe('tree service tests', function () {
 
             expect(cache.__content.root.children.length).toBe(3);
         });
+        
+        it('removes cache children for a parent id specified', function () {
+
+            var cache;
+
+            treeService.getTree({ section: "content", cacheKey: "_" }).then(function (dd) {
+                treeService.loadNodeChildren({ node: dd.root.children[0] }).then(function () {
+                    cache = treeService._getTreeCache();    
+                });                
+            });
+
+            $rootScope.$digest();
+            $httpBackend.flush();
+
+            expect(cache.__content.root.children.length).toBe(4);
+            expect(cache.__content.root.children[0].children.length).toBe(4);
+            
+            treeService.clearCache({
+                cacheKey: "__content",
+                childrenOf: "1234"
+            });
+
+            cache = treeService._getTreeCache();
+
+            console.log(" blah: " + cache.__content.root.children.length);
+
+            expect(cache.__content.root.children.length).toBe(4);
+            expect(cache.__content.root.children[0].children).toBeNull();
+            expect(cache.__content.root.children[0].expanded).toBe(false);
+        });
 
     });
 

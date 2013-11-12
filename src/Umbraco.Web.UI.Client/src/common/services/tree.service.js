@@ -126,6 +126,27 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                         treeCache = _.omit(treeCache, cacheKey);
                     }
                 }
+                else if (args.childrenOf) {
+                    //if childrenOf is supplied a cacheKey must be supplied as well
+                    if (!args.cacheKey) {
+                        throw "args.cacheKey is required if args.childrenOf is supplied";
+                    }
+                    //this will clear out all children for the parentId passed in to this parameter, we'll 
+                    // do this by recursing and specifying a filter
+                    var self = this;
+                    this.clearCache({
+                        cacheKey: args.cacheKey,
+                        filter: function(cc) {
+                            //get the new parent node from the tree cache
+                            var parent = self.getDescendantNode(cc.root, args.childrenOf);                            
+                            //clear it's children and set to not expanded
+                            parent.children = null;
+                            parent.expanded = false;
+                            //return the cache to be saved
+                            return cc;
+                        }
+                    });
+                }
                 else if (args.filter && angular.isFunction(args.filter)) {
                     //if a filter is supplied a cacheKey must be supplied as well
                     if (!args.cacheKey) {
