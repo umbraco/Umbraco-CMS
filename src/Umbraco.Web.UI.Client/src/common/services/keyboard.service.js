@@ -25,6 +25,9 @@ angular.module('umbraco.services')
 		  label = label.replace("ctrl","meta");
 		}
 
+		//always try to unbind first, so we dont have multiple actions on the same key
+		keyboardManagerService.unbind(label);
+
 		var fct, elt, code, k;
 		// Initialize opt object
 		opt   = angular.extend({}, defaultOpt, opt);
