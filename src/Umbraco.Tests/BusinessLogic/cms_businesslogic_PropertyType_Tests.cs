@@ -67,9 +67,12 @@ namespace Umbraco.Tests.BusinessLogic
                 _propertyType2 = insertPropertyType(TEST_DATA_TYPE_ID2, _contentType2.NodeId, _propertyTypeGroup2.Id, "Test Property Type 2");
                 _propertyType3 = insertPropertyType(TEST_DATA_TYPE_ID3, _contentType2.NodeId, _propertyTypeGroup1.Id, "Test Property Type 3");
 
+                //_propertyData1 = insertPropertyTypeData(_propertyType1.Id, _contentType1.NodeId);
+                //_propertyData2 = insertPropertyTypeData(_propertyType1.Id, _contentType2.NodeId);
+                //_propertyData3 = insertPropertyTypeData(_propertyType2.Id, _contentType1.NodeId);
                 _propertyData1 = insertPropertyTypeData(_propertyType1.Id, _contentType1.NodeId);
-                _propertyData2 = insertPropertyTypeData(_propertyType1.Id, _contentType2.NodeId);
-                _propertyData3 = insertPropertyTypeData(_propertyType2.Id, _contentType1.NodeId);
+                _propertyData2 = insertPropertyTypeData(_propertyType2.Id, _contentType1.NodeId);
+                _propertyData3 = insertPropertyTypeData(_propertyType1.Id, _contentType2.NodeId);
             }
 
             initialized = true;
@@ -556,6 +559,7 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(all1.Length, Is.EqualTo(all2.Length + 1)); // this test suite adds just one PropertyType for TEST_DATA_TYPE_ID1
 
         }
+
 
         //
         // not tested

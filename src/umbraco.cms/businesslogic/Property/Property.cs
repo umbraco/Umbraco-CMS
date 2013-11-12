@@ -38,18 +38,33 @@ namespace umbraco.cms.businesslogic.property
 
             _pt = pt;
             _id = Id;
-            _data = _pt.DataTypeDefinition.DataType.Data;
-            _data.PropertyId = Id;
+
+            // 12-nov-2013 - it fails here -> _pt.DataTypeDefinition.DataType == null
+            // suppress by try/catch - till it will be clear how to fix it
+            try
+            {
+                _data = _pt.DataTypeDefinition.DataType.Data;
+                _data.PropertyId = Id;
+            }
+            catch { }
         }
 
         public Property(int Id)
         {
             _id = Id;
 
-            _pt = PropertyType.GetPropertyType(
-                Database.ExecuteScalar<int>("select propertytypeid from cmsPropertyData where id = @0", Id));
-            _data = _pt.DataTypeDefinition.DataType.Data;
-            _data.PropertyId = Id;
+            int propertyTypeId = Database.ExecuteScalar<int>("select propertytypeid from cmsPropertyData where id = @0", Id);
+
+            _pt = PropertyType.GetPropertyType(propertyTypeId);
+
+            // 12-nov-2013 - it fails here -> _pt.DataTypeDefinition.DataType == null
+            // suppress by try/catch - till it will be clear how to fix it
+            try
+            {
+                _data = _pt.DataTypeDefinition.DataType.Data;
+                _data.PropertyId = Id;
+            }
+            catch { }
         }
 
         internal Property(Umbraco.Core.Models.Property property)
@@ -102,7 +117,9 @@ namespace umbraco.cms.businesslogic.property
         {
             int contentId = Database.ExecuteScalar<int>("Select contentNodeId from cmsPropertyData where Id = @0", _id);
             Database.Execute("Delete from cmsPropertyData where PropertyTypeId =@0 And contentNodeId = @1", _pt.Id, contentId);
-            _data.Delete();
+
+            if (_data != null)
+                _data.Delete();
         }
         public XmlNode ToXml(XmlDocument xd)
         {
@@ -131,8 +148,15 @@ namespace umbraco.cms.businesslogic.property
             // UmbracoPropertyDto is used for another entity type - use plain sql for now
             Database.Execute("INSERT INTO cmsPropertyData (contentNodeId, versionId, propertyTypeId) VALUES(@0, @1, @2)", c.Id, versionId, pt.Id); 
             newPropertyId = Database.ExecuteScalar<int>("SELECT MAX(id) FROM cmsPropertyData");
-            interfaces.IData d = pt.DataTypeDefinition.DataType.Data;
-            d.MakeNew(newPropertyId);
+
+            // 12-nov-2013 - it fails here -> _pt.DataTypeDefinition.DataType == null
+            // suppress by try/catch - till it will be clear how to fix it
+            try
+            {
+                interfaces.IData d = pt.DataTypeDefinition.DataType.Data;
+                d.MakeNew(newPropertyId);
+            }
+            catch { }
             return new Property(newPropertyId, pt);
         }
     }
