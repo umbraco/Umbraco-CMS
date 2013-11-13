@@ -11,9 +11,7 @@
  */
 function NavigationController($scope, $rootScope, $location, $log, $routeParams, appState, navigationService, keyboardService, dialogService, historyService, sectionResource, angularHelper) {
 
-    //TODO: Put all of this nav service init in the main controller ! - or on the appStart not here!
-    //initialize nav service
-    navigationService.init();
+    //TODO: Put all of this nav service init in the main controller ! - or on the appStart not here!    
     //the tree event handler i used to subscribe to the main tree click events
     $scope.treeEventHandler = $({});
     navigationService.setupTreeEvents($scope.treeEventHandler, $scope);
@@ -51,7 +49,7 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
 
     //Listen for menu state changes
     $scope.$on("appState.menuState.changed", function(e, args) {
-        if (args.key === "showMenu") {
+        if (args.key === "showMenuDialog") {
             $scope.showContextMenuDialog = args.value;
         }
     });

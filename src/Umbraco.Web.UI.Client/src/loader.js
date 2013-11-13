@@ -57,7 +57,8 @@ yepnope({
     'js/umbraco.services.js',
     'js/umbraco.security.js',
     'js/umbraco.controllers.js',
-    'js/routes.js'
+    'js/routes.js',
+    'js/init.js'
   ],
 
   complete: function () {

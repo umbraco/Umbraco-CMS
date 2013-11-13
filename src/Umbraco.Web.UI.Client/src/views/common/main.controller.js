@@ -8,7 +8,7 @@
  * The main application controller
  * 
  */
-function MainController($scope, $rootScope, $location, $routeParams, $rootScope, $timeout, $http, $log, notificationsService, userService, navigationService, historyService, legacyJsLoader, updateChecker) {
+function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, notificationsService, userService, navigationService, historyService, legacyJsLoader, updateChecker) {
 
     var legacyTreeJsLoaded = false;
     

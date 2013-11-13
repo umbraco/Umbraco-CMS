@@ -8,11 +8,19 @@ angular.module("umbraco.directives")
 
             //setup scope vars
             scope.currentSection = appState.getSectionState("currentSection");
+            scope.showMenu = appState.getMenuState("showMenu");
 
             //listen for section change
             scope.$on("appState.sectionState.changed", function(e, args) {
                 if (args.key === "currentSection") {
                     scope.currentSection = args.value;
+                }
+            });
+            
+            //listen for menu change
+            scope.$on("appState.menuState.changed", function (e, args) {
+                if (args.key === "showMenu") {
+                    scope.showMenu = args.value;
                 }
             });
 

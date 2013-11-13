@@ -22,7 +22,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
     //Define all sub-properties for the UI object here
     var ui = {
         tablet: false,
-        showContextMenu: false,
         stickyNavigation: false,
         showTray: false,
         currentPath: undefined,
@@ -51,8 +50,8 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         case 'tree':
             ui.currentMode = "tree";
             appState.setGlobalState("showNavigation", true);
-            ui.showContextMenu = false;
             appState.setMenuState("showMenu", false);
+            appState.setMenuState("showMenuDialog", false);
             ui.stickyNavigation = false;
             ui.showTray = false;
             
@@ -61,25 +60,26 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         case 'menu':
             ui.currentMode = "menu";
             appState.setGlobalState("showNavigation", true);
-            ui.showContextMenu = true;
-            appState.setMenuState("showMenu", false);
+            appState.setMenuState("showMenu", true);
+            appState.setMenuState("showMenuDialog", false);
             ui.stickyNavigation = true;
             break;
         case 'dialog':
             ui.currentMode = "dialog";
             ui.stickyNavigation = true;
             appState.setGlobalState("showNavigation", true);
-            ui.showContextMenu = false;
-            appState.setMenuState("showMenu", true);
+            appState.setMenuState("showMenu", false);
+            appState.setMenuState("showMenuDialog", true);
             break;
         case 'search':
             ui.currentMode = "search";
             ui.stickyNavigation = false;
             appState.setGlobalState("showNavigation", true);
-            ui.showContextMenu = false;
-            appState.setSectionState("showSearchResults", true);
             appState.setMenuState("showMenu", false);
+            appState.setSectionState("showSearchResults", true);
+            appState.setMenuState("showMenuDialog", false);
 
+            //TODO: This would be much better off in the search field controller listening to appState changes
             $timeout(function() {
                 $("#search-field").focus();
             });
@@ -87,8 +87,8 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             break;
         default:
             ui.currentMode = "default";
-            ui.showContextMenu = false;
             appState.setMenuState("showMenu", false);
+            appState.setMenuState("showMenuDialog", false);
             appState.setSectionState("showSearchResults", false);
             ui.stickyNavigation = false;
             ui.showTray = false;
@@ -122,6 +122,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 appState.setSectionState("currentSection", newVal);
             });
 
+            //TODO: This does not belong here - would be much better off in a directive
             $(window).bind("resize", function() {
                 setTreeMode();
             });

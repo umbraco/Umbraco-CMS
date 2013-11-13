@@ -29,7 +29,9 @@ function appState($rootScope) {
     var menuState = {
         //The basic entity that is having an action performed on it
         currentEntity: null,
-        //Whether the menu is being shown or not
+        //Whether the menu's dialog is being shown or not
+        showMenuDialog: null,
+        //Whether the context menu is being shown or not
         showMenu: null
     };
 
