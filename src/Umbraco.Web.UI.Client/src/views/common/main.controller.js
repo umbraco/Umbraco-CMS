@@ -8,7 +8,7 @@
  * The main application controller
  * 
  */
-function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, notificationsService, userService, navigationService, historyService, legacyJsLoader, updateChecker) {
+function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, notificationsService, userService, navigationService, historyService, legacyJsLoader, updateChecker) {
 
     var legacyTreeJsLoaded = false;
     
@@ -16,7 +16,7 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
     //the avatar is by default the umbraco logo    
     $scope.authenticated = null;
     $scope.avatar = "assets/img/application/logo.png";
-
+    $scope.touchDevice = appState.getGlobalState("touchDevice");
     //subscribes to notifications in the notification service
     $scope.notifications = notificationsService.current;
     $scope.$watch('notificationsService.current', function (newVal, oldVal, scope) {
