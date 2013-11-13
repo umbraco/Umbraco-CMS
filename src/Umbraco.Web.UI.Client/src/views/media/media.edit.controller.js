@@ -6,9 +6,12 @@
  * @description
  * The controller for the media editor
  */
-function mediaEditController($scope, $routeParams, mediaResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService,  formHelper) {
+function mediaEditController($scope, $routeParams, appState, mediaResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService,  formHelper) {
 
+    //setup scope vars
     $scope.nav = navigationService;
+    $scope.currentSection = appState.getSectionState("currentSection");
+
     if ($routeParams.create) {
 
         mediaResource.getScaffold($routeParams.id, $routeParams.doctype)

@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting content
  */
-function ContentSortController($scope, contentResource, treeService) {
+function ContentSortController($scope, contentResource, treeService, appState) {
     contentResource.getChildren($scope.currentNode.id).then(function (data) {
         $scope.pagesToSort = [];
         for (var i = 0; i < data.items.length; i++) {
@@ -44,7 +44,7 @@ function ContentSortController($scope, contentResource, treeService) {
         contentResource.sort({ parentId: $scope.currentNode.id, sortedIds: sortedIds })
             .then(function () {
                 $scope.sortableModel.complete = true;
-                treeService.loadNodeChildren({ node: $scope.nav.ui.currentNode, section: $scope.nav.ui.currentSection });
+                treeService.loadNodeChildren({ node: $scope.nav.ui.currentNode, section: appState.getSectionState("currentSection") });
             });
     });*/
 

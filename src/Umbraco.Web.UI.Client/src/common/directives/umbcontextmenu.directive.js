@@ -1,10 +1,20 @@
 angular.module("umbraco.directives")
-.directive('umbContextMenu', function ($injector) {
+.directive('umbContextMenu', function ($injector, appState) {
     return {
         restrict: 'E',
         replace: true,
         templateUrl: 'views/directives/umb-contextmenu.html',
         link: function (scope, element, attrs, ctrl) {
+
+            //setup scope vars
+            scope.currentSection = appState.getSectionState("currentSection");
+
+            //listen for section change
+            scope.$on("appState.sectionState.changed", function(e, args) {
+                if (args.key === "currentSection") {
+                    scope.currentSection = args.value;
+                }
+            });
 
             //adds a handler to the context menu item click, we need to handle this differently
             //depending on what the menu item is supposed to do.

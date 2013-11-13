@@ -3,18 +3,19 @@
 * @name umbraco.directives.directive:umbSections
 * @restrict E
 **/
-function sectionsDirective($timeout, $window, navigationService, treeService, sectionResource) {
+function sectionsDirective($timeout, $window, navigationService, treeService, sectionResource, appState) {
     return {
         restrict: "E",    // restrict to an element
         replace: true,   // replace the html element with the template
         templateUrl: 'views/directives/umb-sections.html',
         link: function (scope, element, attr, ctrl) {
 			
+            //setup scope vars
 			scope.maxSections = 7;
 			scope.overflowingSections = 0;
             scope.sections = [];
             scope.nav = navigationService;
-
+            scope.currentSection = appState.getSectionState("currentSection");
 
 			function loadSections(){
 				sectionResource.getSections()

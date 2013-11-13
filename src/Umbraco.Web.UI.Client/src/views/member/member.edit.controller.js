@@ -6,10 +6,11 @@
  * @description
  * The controller for the member editor
  */
-function MemberEditController($scope, $routeParams, $location, $q, $window, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, treeService) {
+function MemberEditController($scope, $routeParams, $location, $q, $window, appState, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, treeService) {
     
+    //setup scope vars
     $scope.nav = navigationService;
-    
+    $scope.currentSection = appState.getSectionState("currentSection");
 
     if ($routeParams.create) {
         //we are creating so get an empty member item

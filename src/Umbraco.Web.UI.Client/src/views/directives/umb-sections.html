@@ -6,7 +6,7 @@
                     <img id="avatar-img" ng-src="{{avatar}}" />
                 </a>
             </li>
-            <li ng-repeat="section in sections | limitTo: maxSections" ng-class="{current: section.alias == nav.ui.currentSection}">
+            <li ng-repeat="section in sections | limitTo: maxSections" ng-class="{current: section.alias == currentSection}">
                 <a href="#/{{section.alias}}"
                    ng-dblclick="sectionDblClick(section)"
                    ng-click="sectionClick(section)"

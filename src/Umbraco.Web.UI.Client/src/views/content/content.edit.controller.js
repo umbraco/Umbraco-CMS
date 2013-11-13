@@ -6,11 +6,13 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService) {
+function ContentEditController($scope, $routeParams, $q, $timeout, $window, appState, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService) {
 
+    //setup scope vars
     $scope.defaultButton = null;
     $scope.subButtons = [];
     $scope.nav = navigationService;
+    $scope.currentSection = appState.getSectionState("currentSection");
     
     //This sets up the action buttons based on what permissions the user has.
     //The allowedActions parameter contains a list of chars, each represents a button by permission so 

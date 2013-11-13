@@ -6,9 +6,12 @@
  * @description
  * The controller for the content editor
  */
-function DataTypeEditController($scope, $routeParams, $location, navigationService, treeService, dataTypeResource, notificationsService,  angularHelper, serverValidationManager, contentEditingHelper, formHelper) {
+function DataTypeEditController($scope, $routeParams, $location, appState, navigationService, treeService, dataTypeResource, notificationsService,  angularHelper, serverValidationManager, contentEditingHelper, formHelper) {
 
+    //setup scope vars
     $scope.nav = navigationService;
+    $scope.currentSection = appState.getSectionState("currentSection");
+
     //method used to configure the pre-values when we retreive them from the server
     function createPreValueProps(preVals) {
         $scope.preValues = [];

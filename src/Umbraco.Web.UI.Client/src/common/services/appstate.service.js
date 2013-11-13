@@ -50,7 +50,7 @@ function appState($rootScope) {
          *
          */
         getSectionState: function (key) {
-            if (sectionState[key] === undefined) {
+            if (!_.has(sectionState, key)) {
                 throw "The variable " + key + " does not exist in section state";
             }
             return sectionState[key];
@@ -67,7 +67,7 @@ function appState($rootScope) {
          *
          */
         setSectionState: function(key, value) {
-            if (sectionState[key] === undefined) {
+            if (!_.has(sectionState, key)) {
                 throw "The variable " + key + " does not exist in section state";
             }
             var changed = sectionState[key] !== value;
@@ -89,7 +89,7 @@ function appState($rootScope) {
          *
          */
         getTreeState: function (key) {
-            if (treeState[key] === undefined) {
+            if (!_.has(treeState, key)) {
                 throw "The variable " + key + " does not exist in tree state";
             }
             return treeState[key];
@@ -106,7 +106,7 @@ function appState($rootScope) {
          *
          */
         setTreeState: function (key, value) {
-            if (treeState[key] === undefined) {
+            if (!_.has(treeState, key)) {
                 throw "The variable " + key + " does not exist in tree state";
             }
             var changed = treeState[key] !== value;
@@ -128,7 +128,7 @@ function appState($rootScope) {
          *
          */
         getMenuState: function (key) {
-            if (menuState[key] === undefined) {
+            if (!_.has(menuState, key)) {
                 throw "The variable " + key + " does not exist in menu state";
             }
             return menuState[key];
@@ -145,7 +145,7 @@ function appState($rootScope) {
          *
          */
         setMenuState: function (key, value) {
-            if (menuState[key] === undefined) {
+            if (!_.has(menuState, key)) {
                 throw "The variable " + key + " does not exist in menu state";
             }
             var changed = treeState[key] !== value;

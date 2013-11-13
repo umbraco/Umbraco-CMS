@@ -34,8 +34,10 @@
                         <!-- actions -->
                         <ul class="dropdown-menu  umb-actions" role="menu" aria-labelledby="dLabel">
                             <li class="action" ng-class="{sep:action.seperator}" ng-repeat="action in actions">
+                                
+                                <!-- How does this reference executeMenuItem() i really don't think that this is very clear -->
                                 <a prevent-default
-                                    ng-click="executeMenuItem(nav.ui.currentNode,action,nav.ui.currentSection)">
+                                    ng-click="executeMenuItem(nav.ui.currentNode,action,currentSection)">
                                     <i class="icon icon-{{action.cssclass}}"></i>
                                     <span class="menu-label">{{action.name}}</span>
                                 </a>

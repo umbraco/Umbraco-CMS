@@ -19,21 +19,14 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
     //set up our scope vars
     $scope.showContextMenuDialog = false;
     $scope.showSearchResults = false;
-
-    //wire up the screensize and tree mode detection
+    $scope.currentSection = null;
+    
+    //TODO: Put all of this in the main controller ! - or on the appStart not here!
+    //initialize nav service
     navigationService.init();
-
     //the tree event handler i used to subscribe to the main tree click events
     $scope.treeEventHandler = $({});
     navigationService.setupTreeEvents($scope.treeEventHandler, $scope);
-
-    //keep track of the current section
-    $scope.$watch(function () {
-        //watch the route parameters section
-        return $routeParams.section;
-    }, function(newVal, oldVal) {
-        navigationService.ui.currentSection = newVal;
-    });
     
     //trigger search with a hotkey:
     keyboardService.bind("ctrl+shift+s", function(){
@@ -57,6 +50,11 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
     
     //Listen for section state changes
     $scope.$on("appState.sectionState.changed", function (e, args) {
+        //section changed
+        if (args.key === "currentSection") {
+            $scope.currentSection = args.value;
+        }
+        //show/hide search results
         if (args.key === "showSearchResults") {
             $scope.showSearchResults = args.value;
         }

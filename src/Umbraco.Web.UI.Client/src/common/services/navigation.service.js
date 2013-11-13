@@ -26,7 +26,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         showContextMenu: false,
         stickyNavigation: false,
         showTray: false,
-        currentSection: undefined,
         currentPath: undefined,
         currentTree: undefined,
         treeEventHandler: undefined,
@@ -108,12 +107,20 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         userDialog: undefined,
         ui: ui,
 
+        /** initializes the navigation service */
         init: function() {
 
             //TODO: detect tablet mode, subscribe to window resizing
             //for now we just hardcode it to non-tablet mode
             setTreeMode();
-            this.ui.currentSection = $routeParams.section;
+            
+            //keep track of the current section - initially this will always be undefined so 
+            // no point in setting it now until it changes.
+            $rootScope.$watch(function () {
+                return $routeParams.section;
+            }, function (newVal, oldVal) {
+                appState.setSectionState("currentSection", newVal);
+            });
 
             $(window).bind("resize", function() {
                 setTreeMode();
@@ -129,8 +136,8 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * Shows the legacy iframe and loads in the content based on the source url
          * @param {String} source The URL to load into the iframe
          */
-        loadLegacyIFrame: function(source) {
-            $location.path("/" + this.ui.currentSection + "/framed/" + encodeURIComponent(source));
+        loadLegacyIFrame: function (source) {            
+            $location.path("/" + appState.getSectionState("currentSection") + "/framed/" + encodeURIComponent(source));
         },
 
         /**
@@ -147,11 +154,11 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         changeSection: function(sectionAlias, force) {
             setMode("default-opensection");
 
-            if (force && this.ui.currentSection === sectionAlias) {
-                this.ui.currentSection = "";
+            if (force && appState.getSectionState("currentSection") === sectionAlias) {
+                appState.setSectionState("currentSection", "");
             }
 
-            this.ui.currentSection = sectionAlias;
+            appState.setSectionState("currentSection", sectionAlias);
             this.showTree(sectionAlias);
 
             $location.path(sectionAlias);
@@ -169,8 +176,8 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * @param {Object} syncArgs Optional object of arguments for syncing the tree for the section being shown
 		 */
         showTree: function (sectionAlias, syncArgs) {
-            if (sectionAlias !== this.ui.currentSection) {
-                this.ui.currentSection = sectionAlias;
+            if (sectionAlias !== appState.getSectionState("currentSection")) {
+                appState.setSectionState("currentSection", sectionAlias);
                 
                 if (syncArgs) {
                     this.syncTree(syncArgs);
@@ -399,7 +406,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
             if (this.ui.tablet && !this.ui.stickyNavigation) {
                 //reset it to whatever is in the url
-                this.ui.currentSection = $routeParams.section;
+                appState.setSectionState("currentSection", $routeParams.section);
                 setMode("default-hidesectiontree");
             }
 
@@ -445,7 +452,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                                 scope: args.scope,
                                 node: args.node,
                                 action: found,
-                                section: self.ui.currentSection
+                                section: appState.getSectionState("currentSection")
                             });
 
                             //return the dialog this is opening.

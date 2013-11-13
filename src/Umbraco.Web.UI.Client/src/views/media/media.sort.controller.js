@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting content
  */
-function MediaSortController($scope, mediaResource, treeService) {
+function MediaSortController($scope, mediaResource, treeService, appState) {
 
     $scope.sortableModel = {
         itemsToSort: [],
@@ -41,7 +41,7 @@ function MediaSortController($scope, mediaResource, treeService) {
         mediaResource.sort({ parentId: $scope.currentNode.id, sortedIds: sortedIds })
             .then(function () {
                 $scope.sortableModel.complete = true;
-                treeService.loadNodeChildren({ node: $scope.nav.ui.currentNode, section: $scope.nav.ui.currentSection });
+                treeService.loadNodeChildren({ node: $scope.nav.ui.currentNode, section: appState.getSectionState("currentSection") });
             });
 
     });
