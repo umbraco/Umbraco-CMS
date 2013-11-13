@@ -15,7 +15,7 @@
  * Section navigation and search, and maintain their state for the entire application lifetime
  *
  */
-function navigationService($rootScope, $routeParams, $log, $location, $q, $timeout, dialogService, treeService, notificationsService, historyService) {
+function navigationService($rootScope, $routeParams, $log, $location, $q, $timeout, dialogService, treeService, notificationsService, historyService, appState) {
 
     var minScreenSize = 1100;
 
@@ -24,7 +24,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         tablet: false,
         showNavigation: false,
         showContextMenu: false,
-        showContextMenuDialog: false,
         stickyNavigation: false,
         showTray: false,
         showSearchResults: false,
@@ -55,7 +54,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             ui.currentMode = "tree";
             ui.showNavigation = true;
             ui.showContextMenu = false;
-            ui.showContextMenuDialog = false;
+            appState.setMenuState("showMenu", false);
             ui.stickyNavigation = false;
             ui.showTray = false;
             
@@ -65,7 +64,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             ui.currentMode = "menu";
             ui.showNavigation = true;
             ui.showContextMenu = true;
-            ui.showContextMenuDialog = false;
+            appState.setMenuState("showMenu", false);
             ui.stickyNavigation = true;
             break;
         case 'dialog':
@@ -73,7 +72,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             ui.stickyNavigation = true;
             ui.showNavigation = true;
             ui.showContextMenu = false;
-            ui.showContextMenuDialog = true;
+            appState.setMenuState("showMenu", true);
             break;
         case 'search':
             ui.currentMode = "search";
@@ -81,7 +80,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             ui.showNavigation = true;
             ui.showContextMenu = false;
             ui.showSearchResults = true;
-            ui.showContextMenuDialog = false;
+            appState.setMenuState("showMenu", false);
 
             $timeout(function() {
                 $("#search-field").focus();
@@ -91,7 +90,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         default:
             ui.currentMode = "default";
             ui.showContextMenu = false;
-            ui.showContextMenuDialog = false;
+            appState.setMenuState("showMenu", false);
             ui.showSearchResults = false;
             ui.stickyNavigation = false;
             ui.showTray = false;
