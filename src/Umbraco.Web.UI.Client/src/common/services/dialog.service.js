@@ -29,7 +29,7 @@
  */
 
 angular.module('umbraco.services')
-.factory('dialogService', function ($rootScope, $compile, $http, $timeout, $q, $templateCache, $log) {
+.factory('dialogService', function ($rootScope, $compile, $http, $timeout, $q, $templateCache, appState) {
 
        var dialogs = [];
        
@@ -159,7 +159,7 @@ angular.module('umbraco.services')
                      };
 
                      scope.swipeHide = function(e){
-                       if($rootScope.touchDevice){
+                       if(appState.getGlobalState("touchDevice")){
                             var selection = window.getSelection();
                             if(selection.type !== "Range"){
                               scope.hide();  

@@ -12,7 +12,8 @@ function appState($rootScope) {
     // changed, we only expose methods to interact with the values.
 
     var globalState = {
-        showNavigation: null  
+        showNavigation: null,
+        touchDevice: null
     };
     
     var sectionState = {

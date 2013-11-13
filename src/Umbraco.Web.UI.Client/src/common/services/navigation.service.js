@@ -103,7 +103,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
     var service = {
         active: false,
-        touchDevice: false,
         userDialog: undefined,
         ui: ui,
 
@@ -385,7 +384,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 return;
             }
 
-            if (!service.touchDevice) {
+            if (!appState.getGlobalState("touchDevice")) {
                 service.active = false;
                 $timeout(function() {
                     if (!service.active) {
