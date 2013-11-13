@@ -35,7 +35,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     '</div>';
             }
             template += '<ul>' +
-                '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" activetree="{{activetree}}" node="child" current-node="currentNode" tree="child" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
+                '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" node="child" current-node="currentNode" tree="child" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
                 '</ul>' +
                 '</li>' +
                 '</ul>';
@@ -51,10 +51,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 // reload it. This saves a lot on processing if someone is navigating in and out of the same section many times
                 // since it saves on data retreival and DOM processing.
                 var lastSection = "";
-
-                //keeps track of the currently active tree being called by editors syncing
-                var activeTree;
-
+                
                 //setup a default internal handler
                 if (!scope.eventhandler) {
                     scope.eventhandler = $({});
@@ -346,7 +343,6 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         //store the new section to be loaded as the last section
                         //clear any active trees to reset lookups
                         lastSection = newVal;
-                        activeTree = undefined;
                     }
                 });
                 

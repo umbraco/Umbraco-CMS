@@ -22,13 +22,13 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
     var currentDialog = null;
     //tracks the screen size as a tablet
     var isTablet = false;
+    //the main tree event handler, which gets assigned via the setupTreeEvents method
+    var mainTreeEventHandler = null;
 
     //TODO: Once most of the state vars have been refactored out to use appState, this UI object will be internal ONLY and will not be
     // exposed from this service.
     var ui = {     
-        currentPath: undefined,
         currentTree: undefined,
-        treeEventHandler: undefined,
         currentNode: undefined,   
 
         //a string/name reference for the currently set ui mode
@@ -197,10 +197,10 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         // node on the ui object?? This is a mess.
         
         setupTreeEvents: function(treeEventHandler, scope) {
-            this.ui.treeEventHandler = treeEventHandler;
+            mainTreeEventHandler = treeEventHandler;
 
             //when a tree node is synced this event will fire, this allows us to set the currentNode
-            this.ui.treeEventHandler.bind("treeSynced", function (ev, args) {
+            mainTreeEventHandler.bind("treeSynced", function (ev, args) {
                 
                 //set the global current node
                 ui.currentNode = args.node;
@@ -214,7 +214,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             });
 
             //this reacts to the options item in the tree
-            this.ui.treeEventHandler.bind("treeOptionsClick", function(ev, args) {
+            mainTreeEventHandler.bind("treeOptionsClick", function(ev, args) {
                 ev.stopPropagation();
                 ev.preventDefault();
 
@@ -231,7 +231,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 service.showMenu(ev, args);
             });
 
-            this.ui.treeEventHandler.bind("treeNodeAltSelect", function(ev, args) {
+            mainTreeEventHandler.bind("treeNodeAltSelect", function(ev, args) {
                 ev.stopPropagation();
                 ev.preventDefault();
 
@@ -244,7 +244,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
             //this reacts to tree items themselves being clicked
             //the tree directive should not contain any handling, simply just bubble events
-            this.ui.treeEventHandler.bind("treeNodeSelect", function(ev, args) {
+            mainTreeEventHandler.bind("treeNodeSelect", function(ev, args) {
                 var n = args.node;
                 ev.stopPropagation();
                 ev.preventDefault();
@@ -314,8 +314,8 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 throw "args.tree cannot be null";
             }
             
-            if (this.ui.treeEventHandler) {
-                this.ui.treeEventHandler.syncTree(args);
+            if (mainTreeEventHandler) {
+                mainTreeEventHandler.syncTree(args);
             }
         },
 
@@ -324,21 +324,21 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             have to set an active tree and then sync, the new API does this in one method by using syncTree
         */
         _syncPath: function(path, forceReload) {
-            if (this.ui.treeEventHandler) {
-                this.ui.treeEventHandler.syncTree({ path: path, forceReload: forceReload });
+            if (mainTreeEventHandler) {
+                mainTreeEventHandler.syncTree({ path: path, forceReload: forceReload });
             }
         },
 
         reloadNode: function(node) {
-            if (this.ui.treeEventHandler) {
-                this.ui.treeEventHandler.reloadNode(node);
+            if (mainTreeEventHandler) {
+                mainTreeEventHandler.reloadNode(node);
             }
         },
 
         reloadSection: function(sectionAlias) {
-            if (this.ui.treeEventHandler) {
-                this.ui.treeEventHandler.clearCache({ section: sectionAlias });
-                this.ui.treeEventHandler.load(sectionAlias);
+            if (mainTreeEventHandler) {
+                mainTreeEventHandler.clearCache({ section: sectionAlias });
+                mainTreeEventHandler.load(sectionAlias);
             }
         },
 
@@ -347,8 +347,8 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             have to set an active tree and then sync, the new API does this in one method by using syncTreePath
         */
         _setActiveTreeType: function (treeAlias, loadChildren) {
-            if (this.ui.treeEventHandler) {
-                this.ui.treeEventHandler._setActiveTreeType(treeAlias, loadChildren);
+            if (mainTreeEventHandler) {
+                mainTreeEventHandler._setActiveTreeType(treeAlias, loadChildren);
             }
         },
 
