@@ -93,7 +93,7 @@ namespace umbraco.cms.businesslogic.task
         #region Private methods
         private void setup()         
         {
-            Database.FirstOrDefault<string>("select alias from cmsTaskType where id = @id", Id)
+            Database.FirstOrDefault<string>("select alias from cmsTaskType where id = @0", Id)
                 .IfNull<string>(x => { throw new ArgumentException(string.Format("No Task type found for the specified id =  {0}", Id)); })
                 .IfNotNull(x => { _id = Id; Alias = x; }); 
         }

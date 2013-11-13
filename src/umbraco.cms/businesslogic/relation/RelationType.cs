@@ -100,12 +100,12 @@ namespace umbraco.cms.businesslogic.relation
 
 		#region Methods
 
-		/// <summary>
-		/// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
-		/// </summary>
-		public virtual void Save()
-		{
-		}
+        /// <summary>
+        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
+        /// </summary>
+        public virtual void Save()
+        {
+        }
 
         /// <summary>
         /// Return all relation types

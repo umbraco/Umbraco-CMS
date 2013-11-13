@@ -38,7 +38,10 @@ namespace Umbraco.Tests.BusinessLogic
         {
             independentDatabase.Execute("insert into [umbracoRelationType] ([dual], [parentObjectType], [childObjectType], [name], [alias]) values " +
                             "(@dual, @parentObjectType, @childObjectType, @name, @alias)",
-                            new { dual = 1, parentObjectType = Guid.NewGuid(), childObjectType = Guid.NewGuid(),
+                            new { 
+                                  dual = 1, 
+                                  parentObjectType = Guid.NewGuid(), 
+                                  childObjectType = Guid.NewGuid(),
                                   name = string.Format("{0}_{1}", TEST_RELATION_TYPE_NAME, testRelationTypeNumber),
                                   alias = string.Format("{0}_{1}", TEST_RELATION_TYPE_ALIAS, testRelationTypeNumber),
                             });
