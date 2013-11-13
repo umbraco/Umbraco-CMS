@@ -213,6 +213,8 @@ namespace umbraco
                 {
                     xNode.Icon = "icon-newspaper";
                     xNode.OpenIcon = "icon-newspaper";
+                    //do not show the delete option if it has children
+                    xNode.Menu.Remove(ActionDelete.Instance);
                 }
 
                 OnBeforeNodeRender(ref tree, ref xNode, EventArgs.Empty);
