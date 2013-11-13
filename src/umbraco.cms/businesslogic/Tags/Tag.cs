@@ -79,7 +79,9 @@ namespace umbraco.cms.businesslogic.Tags
                 //if not found we'll get zero and handle that onsave instead...
                 int id = GetTagId(allTags[i], group);
                 if (id == 0)
+                {
                     id = AddTag(allTags[i], group);
+                }
 
                 //Perform a subselect insert into cmsTagRelationship using a left outer join to perform the if not exists check
                 string sql = "insert into cmsTagRelationship (nodeId,tagId) select " + string.Format("{0}", nodeId) + ", " + string.Format("{0}", id) + " from cmsTags ";
@@ -89,7 +91,6 @@ namespace umbraco.cms.businesslogic.Tags
 
                 ApplicationContext.Current.DatabaseContext.Database.Execute(sql); 
             }
-
         }
 
         public static void MergeTagsToNode(int nodeId, string tags, string group)
@@ -170,7 +171,7 @@ namespace umbraco.cms.businesslogic.Tags
         public static void RemoveTagsFromNode(int nodeId, string group)
         {
             ApplicationContext.Current.DatabaseContext.Database.Execute(
-                "DELETE FROM cmsTagRelationship WHERE (nodeId = @0) AND EXISTS (SELECT id FROM cmsTags WHERE (cmsTagRelationship.tagId = id) AND ([group] = @1)",
+                "DELETE FROM cmsTagRelationship WHERE (nodeId = @0) AND EXISTS (SELECT id FROM cmsTags WHERE (cmsTagRelationship.tagId = id) AND ([group] = @1))",
                    nodeId, group); 
         }
 
@@ -206,9 +207,9 @@ namespace umbraco.cms.businesslogic.Tags
 
         public static int GetTagId(string tag, string group)
         {
-            var tagDto = Database.Fetch<TagDto>("where tag=@0 AND [group]=@1", tag, group);
+            var tagDto = Database.FirstOrDefault<TagDto>("where tag=@0 AND [group]=@1", tag, group);
             if (tagDto == null) return 0;
-            return tagDto[0].Id;  
+            return tagDto.Id;  
         }
 
         public static IEnumerable<Tag> GetTags(int nodeId, string group)
@@ -272,21 +273,35 @@ namespace umbraco.cms.businesslogic.Tags
 
         }
 
+        /// <summary>
+        /// Gets *published only* documents
+        /// </summary>
+        /// <param name="tags">Tags list separated by comma</param>
+        /// <returns>IEnumerable<Document></returns>
+        /// <remarks>
+        /// This one was the only function to get documents for the specified list of tags.
+        /// During PetaPOCO refactoring <see cref="public static IEnumerable<Document> GetAllDocumentsWithTags(string tags, bool publishedOnly = false)"/> 
+        /// method was added to get all documents or published only depending on 'publishedOnly' flag argument value.
+        /// </remarks> 
         public static IEnumerable<Document> GetDocumentsWithTags(string tags)
         {
+            
+            return GetAllDocumentsWithTags(tags, publishedOnly: true); 
+        }
 
+        public static IEnumerable<Document> GetAllDocumentsWithTags(string tags, bool publishedOnly = false)
+        {
             var docs = new List<Document>();
-            string sql = @"SELECT DISTINCT cmsTagRelationShip.nodeid from cmsTagRelationShip
+            string sql = string.Format(
+                          @"SELECT DISTINCT cmsTagRelationShip.nodeid from cmsTagRelationShip 
                             INNER JOIN cmsTags ON cmsTagRelationShip.tagid = cmsTags.id 
-                            INNER JOIN umbracoNode ON cmsTagRelationShip.nodeId = umbracoNode.id
-                            WHERE (cmsTags.tag IN ({0})) AND nodeObjectType=@nodeType";
-            foreach (var id in ApplicationContext.Current.DatabaseContext.Database.Query<int>(string.Format(sql, GetSqlStringArray(tags),
-                                                   new { nodeType = Document._objectType})))
+                            INNER JOIN umbracoNode ON cmsTagRelationShip.nodeId = umbracoNode.id 
+                            WHERE (cmsTags.tag IN ({0})) AND nodeObjectType=@0", //nodeType",
+                           GetSqlStringArray(tags));
+            foreach (var id in Database.Query<int>(sql, Document._objectType))
             {
                 Document cnode = new Document(id);
-
-                if (cnode != null && cnode.Published)
-                     yield return cnode; 
+                if (cnode != null && (!publishedOnly || cnode.Published)) yield return cnode;
             }
         }
 

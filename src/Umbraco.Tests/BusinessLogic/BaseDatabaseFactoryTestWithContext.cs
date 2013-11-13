@@ -8,6 +8,7 @@ using System.Xml;
 using umbraco.cms.businesslogic.web;
 using NUnit.Framework;
 using System.Text;
+using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -15,9 +16,14 @@ namespace Umbraco.Tests.TestHelpers
     {
         protected abstract void EnsureData();
 
+        const bool NO_BASE_CLASS_ASSERTS = true;
         protected override DatabaseBehavior DatabaseTestBehavior
         {
-            get { return DatabaseBehavior.NewSchemaPerFixture; }
+            get 
+            {
+                return DatabaseBehavior.NoDatabasePerFixture;    
+               //return DatabaseBehavior.NewSchemaPerFixture; 
+            }
         }
 
         public override void Initialize()
@@ -42,6 +48,14 @@ namespace Umbraco.Tests.TestHelpers
         protected T getPersistedTestDto<T>(int id, string idKeyName = "id")
         {
             return independentDatabase.SingleOrDefault<T>(string.Format("where {0} = @0", idKeyName), id);
+        }
+
+        protected string uniqueLabel
+        {
+            get
+            {
+                return string.Format("* {0} *", Guid.NewGuid().ToString());
+            }
         }
 
         protected void Setter_Persists_Ext<T, S, U>(
@@ -193,11 +207,15 @@ namespace Umbraco.Tests.TestHelpers
                 var totalDocuments = independentDatabase.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @ObjectTypeId",
                     new { ObjectTypeId = Document._objectType });
-                Assert.AreEqual(5, totalDocuments);
+                if (!NO_BASE_CLASS_ASSERTS)  Assert.AreEqual(5, totalDocuments);
                 id = _node3.Id;
                 var loadedNode = new CMSNode(id);
-                AssertNonEmptyNode(loadedNode);
-                Assert.AreEqual(2, loadedNode.sortOrder);
+
+                if (!NO_BASE_CLASS_ASSERTS)
+                {
+                    AssertNonEmptyNode(loadedNode);
+                    Assert.AreEqual(2, loadedNode.sortOrder);
+                }
             }
             finally
             {
@@ -224,10 +242,33 @@ namespace Umbraco.Tests.TestHelpers
             var persisted = database.ExecuteScalar<T>(
                 String.Format("SELECT {0} FROM cmsPropertyType WHERE id = @id", field)
                 , new { id = nodeId });
+
             Assert.AreEqual(expected, persisted);
             Assert.AreEqual(expected, getter(node));
             //SS:ResetTestDocumentTypes();
         }
+
+        //private void ResetTestDocumentTypes()
+        //{
+        //    foreach (var node in contentTypes)
+        //        DeleteContentType(node.Id);
+        //    initialized = false;
+        //}
+
+        //protected void deleteContent()
+        //{
+        //    database.Execute("DELETE cmsPreviewXml");
+        //    database.Execute("DELETE cmsContentVersion");
+        //    database.Execute("DELETE cmsDocument");
+        //    database.Execute("DELETE cmsContent");
+        //    database.Delete<NodeDto>("WHERE nodeObjectType = @ObjectTypeId", new { ObjectTypeId = Document._objectType });
+        //}
+
+        //protected void deleteContentType(int id)
+        //{
+        //    database.Execute("DELETE cmsContentType WHERE nodeId = @NodeId", new { NodeId = id });
+        //    database.Execute("DELETE umbracoNode WHERE id = @Id", new { Id = id });
+        //}
 
         #endregion
 

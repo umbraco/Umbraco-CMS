@@ -1,19 +1,13 @@
-﻿using System;
+﻿//#define ENABLE_TRACE
+
+using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Models.Rdbms;
-using umbraco.cms.businesslogic.relation;
-//using Umbraco.Core.Models;
-using umbraco.cms.businesslogic;
 using System.Collections.Generic;
-using umbraco.cms.businesslogic.propertytype;
-using umbraco.cms.businesslogic.datatype;
-using umbraco.cms.businesslogic.property;
-using umbraco.interfaces;
 using umbraco.cms.businesslogic.Tags;
-using System.Text;
 using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Tests.BusinessLogic
@@ -25,10 +19,9 @@ namespace Umbraco.Tests.BusinessLogic
     [TestFixture]
     public class cms_businesslogic_Tag_Tests : BaseDatabaseFactoryTestWithContext
     {
-
         #region Tests
         [Test(Description = "Test EnsureData()")]
-        public void Test_EnsureData()
+        public void _1st_Test_EnsureTestData()
         {
             var dto = new Tag();
 
@@ -73,46 +66,41 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(getTestNodeDto(_node5.Id), Is.Null);
         }
 
-
         [Test(Description = "Constructors")]
-        [Ignore] 
-        public void Test_Property_Constructors()
+        public void _2nd_Test_Tag_Constructors()
         {
-            // Tag class has two constructors but no one of them is communicating with back-end
+            // Tag class has two constructors but no one of them is communicating with back-end database
             //public Tag() { }
             //public Tag(int id, string tag, string group, int nodeCount)
             Assert.True(true);  
         }
 
         [Test(Description = "Test 'public static int AddTag(string tag, string group)' method")]
-        public void Test_Tag_AddTag()
+        public void Test_Tag_AddTag_Using_TagName_GroupName()
         {
-            int id = Tag.AddTag("Tag 21", "2");  
+            string tagName = string.Format("Tag {0}", uniqueLabel);
+            int id = addTag(tagName, TEST_GROUP_NAME);
             var tagDto = getTestTagDto(id);
 
             Assert.That(tagDto, !Is.Null, "Failed to add Tag");
             Assert.That(id, Is.EqualTo(tagDto.Id), "Double-check - AddTag - failed");
-
-            EnsureAllTestRecordsAreDeleted();
         }
 
         [Test(Description = "Test 'public static int GetTagId(string tag, string group)' method")]
-        public void Test_Tag_GetTagId()
+        public void Test_Tag_GetTagId_By_TagName_GroupName()
         {
-            int id1 = addTag("Tag 21", "2");
-            int id2 = Tag.GetTagId("Tag 21", "2");
+            string tagName = string.Format("Tag {0}", uniqueLabel); 
+            int id1 = addTag(tagName, TEST_GROUP_NAME);
+            int id2 = Tag.GetTagId(tagName, TEST_GROUP_NAME);
             var tagDto = getTestTagDto(id2);
 
             Assert.That(tagDto, !Is.Null, "Failed to get Tag Id");
             Assert.That(id2, Is.EqualTo(id1), "Double-check - GetTagId - 1 failed");
-            Assert.That(tagDto.Id , Is.EqualTo(id1), "Double-check - GetTagId - 2 - failed");
-
-            EnsureAllTestRecordsAreDeleted();
-
+            Assert.That(tagDto.Id, Is.EqualTo(id1), "Double-check - GetTagId - 2 - failed");
         }
 
         [Test(Description = "Test 'public static IEnumerable<Tag> GetTags(string group)' method")]
-        public void Test_Tag_GetTags()
+        public void Test_Tag_GetTags_By_GroupName()
         {
             int tagsAddedCount = addTestTags(groupName: TEST_GROUP_NAME);
             int testCount = countTags(groupName: TEST_GROUP_NAME);
@@ -120,12 +108,10 @@ namespace Umbraco.Tests.BusinessLogic
             var testGroup = Tag.GetTags(TEST_GROUP_NAME).ToArray();
 
             Assert.That(testGroup.Length, Is.EqualTo(testCount), "GetTags(string group) test failed");
-
-            EnsureAllTestRecordsAreDeleted();
         }
 
         [Test(Description = "Test 'public static IEnumerable<Tag> GetTags()' method")]
-        public void Test_Tag_GetTags2()
+        public void Test_Tag_GetTags_All()
         {
             int tagsAddedCount = addTestTags();
             int testCount = countTags();
@@ -133,30 +119,26 @@ namespace Umbraco.Tests.BusinessLogic
             var testGroup = Tag.GetTags().ToArray();
 
             Assert.That(testGroup.Length, Is.EqualTo(testCount), "IEnumerable<Tag> GetTags() test failed");
-            
-            EnsureAllTestRecordsAreDeleted();
         }
 
         [Test(Description = "Test 'public static void AddTagsToNode(int nodeId, string tags, string group)' method")]
-        public void Test_Tag_AddTagsToNodes()
+        public void Test_Tag_AddTagsToNode_Using_NodeId_TagsListString_GroupName()
         {
             int testCount1 = countTags(_node1.Id, TEST_GROUP_NAME);
 
             var list = new List<string>();
-            (new int[] { 1, 2, 3, 4, 5 }).ToList().ForEach(x => list.Add(string.Format("Tag #{0}", x)));
+            for (int i = 1; i <= TEST_ITEMS_MAX_COUNT; i++) list.Add(string.Format("Tag #{0}", uniqueLabel));
             string tagsSeparatedByComma = string.Join(",", list);
 
             Tag.AddTagsToNode(_node1.Id,  tagsSeparatedByComma, TEST_GROUP_NAME);
 
             int testCount2 = countTags(_node1.Id, TEST_GROUP_NAME);
 
-            Assert.That(testCount2, Is.EqualTo(testCount1 + 5), "AddTagsToNode(int nodeId, string tags, string group) test failed");
-
-            EnsureAllTestRecordsAreDeleted();
+            Assert.That(testCount2, Is.EqualTo(testCount1 + list.Count), "AddTagsToNode(int nodeId, string tags, string group) test failed");
         }
 
         [Test(Description = "Test 'public static IEnumerable<Tag> GetTags(int nodeId, string group)' method")]
-        public void Test_Tag_GetTags3()
+        public void Test_Tag_GetTags_By_NodeId_GroupName()
         {
             int tagsAddedCount = addTestTags (nodeId: _node1.Id,  groupName: TEST_GROUP_NAME);
             int testCount1 = countTags       (nodeId: _node1.Id, groupName: TEST_GROUP_NAME);
@@ -164,13 +146,10 @@ namespace Umbraco.Tests.BusinessLogic
             int testCount2  = Tag.GetTags(_node1.Id, TEST_GROUP_NAME).ToArray().Length;
 
             Assert.That(testCount2, Is.EqualTo(testCount1), "GetTags(int nodeId, string group) test failed");
-
-            EnsureAllTestRecordsAreDeleted();
         }
 
-
         [Test(Description = "Test 'public static IEnumerable<Tag> GetTags(int nodeId)' method")]
-        public void Test_Tag_GetTags4()
+        public void Test_Tag_GetTags_By_NodeId()
         {
             int tagsAddedCount = addTestTags(nodeId: _node1.Id, groupName: TEST_GROUP_NAME);
             int testCount1 = countTags(nodeId: _node1.Id);
@@ -178,14 +157,12 @@ namespace Umbraco.Tests.BusinessLogic
             int testCount2 = Tag.GetTags(_node1.Id).ToArray().Length;
 
             Assert.That(testCount2, Is.EqualTo(testCount1), "GetTags(int nodeId) test failed");
-
-            EnsureAllTestRecordsAreDeleted();
         }
 
         [Test(Description = "Test 'public static void AssociateTagToNode(int nodeId, int tagId)' method")]
-        public void Test_Tag_AssociateTagToNode()
+        public void Test_Tag_AssociateTagToNode_Using_NodeId_TagId()
         {
-            int tagId = addTag("My Test Tag", TEST_GROUP_NAME);  
+            int tagId = addTag(uniqueLabel, TEST_GROUP_NAME);  
             int testCount1 = countTags(nodeId: _node1.Id);
 
             Tag.AssociateTagToNode(_node1.Id, tagId);
@@ -193,14 +170,12 @@ namespace Umbraco.Tests.BusinessLogic
             int testCount2 = countTags(nodeId: _node1.Id);
 
             Assert.That(testCount2, Is.EqualTo(testCount1+1), "AssociateTagToNode test failed");
-
-            EnsureAllTestRecordsAreDeleted();
         }
 
         [Test(Description = "Test 'public static void RemoveTag(int tagId)' method")]
-        public void Test_Tag_RemoveTag()
+        public void Test_Tag_RemoveTag_By_NodeId()
         {
-            int tagId = addTag("My Test Tag", TEST_GROUP_NAME);
+            int tagId = addTag(uniqueLabel, TEST_GROUP_NAME);
             int testCount1 = countTags();
 
             Tag.RemoveTag(tagId);
@@ -208,44 +183,38 @@ namespace Umbraco.Tests.BusinessLogic
             int testCount2 = countTags();
 
             Assert.That(testCount2, Is.EqualTo(testCount1 - 1), "RemoveTag test failed");
-
-            EnsureAllTestRecordsAreDeleted();
         }
 
         [Test(Description = "Test 'public static void RemoveTagsFromNode(int nodeId)' method")]
-        public void Test_Tag_RemoveTagsFromNode()
+        public void Test_Tag_RemoveTagsFromNode_Using_NodeId()
         {
-            int addedCount = addTestTags(nodeId: _node1.Id);   
-
             int testCount1 = countTags(nodeId: _node1.Id);
+            int addedCount = addTestTags(nodeId: _node1.Id);   
+            int testCount2 = countTags(nodeId: _node1.Id);
 
             Tag.RemoveTagsFromNode(_node1.Id);
 
-            int testCount2 = countTags(nodeId: _node1.Id);
+            int testCount3 = countTags(nodeId: _node1.Id);
 
-            Assert.That(testCount2, Is.EqualTo(testCount1 - addedCount), "RemoveTagsFromNode(int nodeId) test failed");
-
-            EnsureAllTestRecordsAreDeleted();
+            Assert.That(testCount3, Is.EqualTo(testCount2 - addedCount - testCount1), "RemoveTagsFromNode(int nodeId) test failed");
         }
 
         [Test(Description = "Test 'public static void RemoveTagsFromNode(int nodeId, string group)' method")]
-        public void Test_Tag_RemoveTagsFromNode2()
+        public void Test_Tag_RemoveTagsFromNode_Using_NodeId_GroupName()
         {
-            int addedCount =  addTestTags(nodeId: _node1.Id);
-
-            int testCount1 = countTags(nodeId: _node1.Id, groupName:TEST_GROUP_NAME );
+            int testCount1 = countTags(nodeId: _node1.Id, groupName: TEST_GROUP_NAME);
+            int addedCount = addTestTags(nodeId: _node1.Id, groupName: TEST_GROUP_NAME);
+            int testCount2 = countTags(nodeId: _node1.Id, groupName:TEST_GROUP_NAME );
 
             Tag.RemoveTagsFromNode(_node1.Id, TEST_GROUP_NAME);
 
-            int testCount2 = countTags(nodeId: _node1.Id, groupName: TEST_GROUP_NAME);
+            int testCount3 = countTags(nodeId: _node1.Id, groupName: TEST_GROUP_NAME);
 
-            Assert.That(testCount2, Is.EqualTo(testCount1 - addedCount), "RemoveTagsFromNode(int nodeId, string group) test failed");
-
-            EnsureAllTestRecordsAreDeleted();
+            Assert.That(testCount3, Is.EqualTo(testCount2 - addedCount - testCount1), "RemoveTagsFromNode(int nodeId, string group) test failed");
         }
         
         [Test(Description = "Test 'public static void RemoveTagFromNode(int nodeId, string tag, string group)' method")]
-        public void Test_Tag_RemoveTagFromNode()
+        public void Test_Tag_RemoveTagFromNode_Using_NodeId_TagName_GroupName()
         {
             string tagName = "My Test Tag";
             int tagId = addTagToNode(_node1.Id, tagName, TEST_GROUP_NAME);
@@ -256,33 +225,45 @@ namespace Umbraco.Tests.BusinessLogic
             int testCount2 = countTags(nodeId: _node1.Id);
 
             Assert.That(testCount2, Is.EqualTo(testCount1 - 1), "RemoveTagFromNode test failed");
-
-            EnsureAllTestRecordsAreDeleted();
         }
 
         [Test(Description = "Test 'public static void MergeTagsToNode(int nodeId, string tags, string group)' method")]
-        public void Test_Tag_MergeTagsToNode()
+        public void Test_Tag_MergeTagsToNode_Using_NodeId_TagsListString_GroupName()
         {
-            int testCount1 = countTags(_node1.Id, TEST_GROUP_NAME);
+#if ENABLE_TRACE
+            DateTime st = DateTime.Now;
+            int initialTagsCount = Tag.GetTags(_node1.Id).ToArray().Length;
+#endif
 
             var list = new List<string>();
-            (new int[] { 1, 2, 3, 4, 5 }).ToList().ForEach(x => list.Add(string.Format("Tag #{0}", x)));
+            for (int i = 1; i <= TEST_ITEMS_MAX_COUNT; i++) list.Add(string.Format("Tag #{0}", uniqueLabel));
             string tagsSeparatedByComma = string.Join(",", list);
 
+            //GE 2011-11-01
+            //When you have a new CSV list of tags (e.g. from control) and want to push those to the DB, the only way to do this
+            //is delete all the existing tags and add the new ones. 
+            //On a lot of tags, or a very full cmsTagRelationship table, this will perform too slowly
             Tag.MergeTagsToNode(_node1.Id, tagsSeparatedByComma, TEST_GROUP_NAME);
 
-            int testCount2 = countTags(_node1.Id, TEST_GROUP_NAME);
+            int testCount = countTags(_node1.Id, TEST_GROUP_NAME);
+            Assert.That(testCount, Is.EqualTo(list.Count), "MergeTagsToNode(int nodeId, string tags, string group) test failed");
 
-            Assert.That(testCount2, Is.EqualTo(testCount1 + 5), "MergeTagsToNode(int nodeId, string tags, string group) test failed");
+#if ENABLE_TRACE
+            int mergedTasgCount = list.Count;
+            DateTime et = DateTime.Now;
 
-            EnsureAllTestRecordsAreDeleted();
+            System.Console.WriteLine("Elapsed Time: {0}, testCount = {1}, initialTagsCount = {2}, mergedTasgCount = {3}", 
+                    (et - st).TotalSeconds, testCount, initialTagsCount, mergedTasgCount);    
+#endif
+
         }
 
         [Test(Description = "Test 'public static IEnumerable<CMSNode> GetNodesWithTags(string tags)' method")]
         public void Test_Tag_GetNodesWithTags()
         {
-
-            string tags = "Tag #1, Tag #2, Tag #3, Tag #4, Tag #5";
+            var tagsList = new List<string>();
+            for (int i = 1; i <= TEST_ITEMS_MAX_COUNT; i++) tagsList.Add(uniqueLabel);
+            string tags = string.Join(",", tagsList);
             addTagsToNode(_node1.Id, tags, TEST_GROUP_NAME);
             addTagsToNode(_node2.Id, tags, TEST_GROUP_NAME);
             addTagsToNode(_node3.Id, tags, TEST_GROUP_NAME);
@@ -292,30 +273,46 @@ namespace Umbraco.Tests.BusinessLogic
             int testCount2 = Tag.GetNodesWithTags(tags).ToArray().Length;
 
             Assert.That(testCount2, Is.EqualTo(testCount1), "GetNodesWithTags(string tags) test failed");
-
-            EnsureAllTestRecordsAreDeleted();
         }
 
         [Test(Description = "Test 'public static IEnumerable<Document> GetDocumentsWithTags(string tags)' method")]
-        public void Test_Tag_GetDocumentsWithTags()
+        [Obsolete("As it follows from the Tag.cs code GetDocumentsWithTags(...) method selecting only published Documents is depreciated/obsolete.")]
+        public void Test_Tag_GetDocumentsWithTags_PublishedOnly()
         {
+            var tagsList = new List<string>();
+            for (int i = 1; i <= TEST_ITEMS_MAX_COUNT; i++) tagsList.Add(uniqueLabel);
+            string tags = string.Join(",", tagsList);
 
-            string tags = "Tag #1, Tag #2, Tag #3, Tag #4, Tag #5";
             addTagsToNode(_node1.Id, tags, TEST_GROUP_NAME);
             addTagsToNode(_node2.Id, tags, TEST_GROUP_NAME);
             addTagsToNode(_node3.Id, tags, TEST_GROUP_NAME);
 
-            int testCount1 = countDocumentsWithTags(tags);
-
+            int testCount1 = countDocumentsWithTags(tags, publishedOnly: true);
             int testCount2 = Tag.GetDocumentsWithTags(tags).ToArray().Length;
 
             Assert.That(testCount2, Is.EqualTo(testCount1), "GetDocumentsWithTags test failed");
+        }
 
-            EnsureAllTestRecordsAreDeleted();
+        [Test(Description = "Test 'public static IEnumerable<Document> GetAllDocumentsWithTags(string tags)' method")]
+        public void Test_Tag_GetDocumentsWithTags_All()
+        {
+            var tagsList = new List<string>();
+            for (int i = 1; i <= TEST_ITEMS_MAX_COUNT; i++) tagsList.Add(uniqueLabel);
+            string tags = string.Join(",", tagsList);
+            addTagsToNode(_node1.Id, tags, TEST_GROUP_NAME);
+            addTagsToNode(_node2.Id, tags, TEST_GROUP_NAME);
+            addTagsToNode(_node3.Id, tags, TEST_GROUP_NAME);
+
+            int testCount1 = countDocumentsWithTags(tags, publishedOnly: false);
+            int testCount2 = Tag.GetAllDocumentsWithTags(tags).ToArray().Length;
+
+            Assert.That(testCount2, Is.EqualTo(testCount1), "GetAllDocumentsWithTags test failed");
         }
         #endregion
 
         #region EnsureData
+        const int TEST_ITEMS_MAX_COUNT = 7;
+
         private TagDto _tag1;
         private TagDto _tag2;
         private TagDto _tag3;
@@ -393,7 +390,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             for (int i = 1; i <= qty; i++)
             {
-                string tagName = string.Format("Tag #{0}", i);
+                string tagName = string.Format("Tag #{0}", uniqueLabel);
                 if (nodeId == null)
                     addTag(tagName, groupName);
                 else
@@ -424,18 +421,46 @@ namespace Umbraco.Tests.BusinessLogic
             return (int)(decimal)independentDatabase.Insert(new TagDto() { Tag = tag, Group = group });
         }
 
+        internal class TagDtoExt : TagDto
+        {
+            public int NodeCount { get; set; }
+        }
+
+        private IEnumerable<TagDto> convertSqlToTags(string sql, params object[] param)
+        {
+            //string testSql = sql;
+            //int index = 0;
+            //foreach (var p in param)
+            //{
+            //    testSql = testSql.Replace(string.Format("@{0}", index++), p.ToString());  
+            //}
+
+            //l("TEST SQL = '{0}'", testSql);
+
+            foreach (var tagDto in independentDatabase.Query<TagDtoExt>(sql, param))
+            {
+                yield return tagDto;
+                //new Tag(tagDto.Id, tagDto.Tag, tagDto.Group, tagDto.NodeCount);
+            }
+        }
+        private int convertSqlToTagsCount(string sql, params object[] param)
+        {
+            return convertSqlToTags(sql, param).ToArray().Length;
+        }
+
         private int countTags(int? nodeId = null, string groupName = "")
         {
-            var sql = @"SELECT count(cmsTagRelationShip.tagid) AS nodeCount FROM cmsTags
-                  INNER JOIN cmsTagRelationship ON cmsTagRelationShip.tagId = cmsTags.id";
+            var groupBy = " GROUP BY cmsTags.id, cmsTags.tag, cmsTags.[group]";
+            var sql = @"SELECT cmsTags.id, cmsTags.tag, cmsTags.[group], count(cmsTagRelationShip.tagid) AS nodeCount FROM cmsTags " +
+                        "INNER JOIN cmsTagRelationship ON cmsTagRelationShip.tagId = cmsTags.id";
             if (nodeId != null && !string.IsNullOrWhiteSpace(groupName))
-                return independentDatabase.ExecuteScalar<int>(sql + "WHERE cmsTags.[group] = @0 AND cmsTagRelationship.nodeid = @1", nodeId, groupName);
+                return convertSqlToTagsCount(sql + " WHERE cmsTags.[group] = @0 AND cmsTagRelationship.nodeid = @1" + groupBy, groupName, nodeId);
             else if (nodeId != null)
-                return independentDatabase.ExecuteScalar<int>(sql + "WHERE cmsTagRelationship.nodeid = @0", nodeId);
+                return convertSqlToTagsCount(sql +  " WHERE cmsTagRelationship.nodeid = @0" + groupBy, nodeId);
             else if (!string.IsNullOrWhiteSpace(groupName))
-                return independentDatabase.ExecuteScalar<int>(sql + "WHERE cmsTags.[group] = @0", groupName);
+                return convertSqlToTagsCount(sql + " WHERE cmsTags.[group] = @0" + groupBy, groupName);
             else
-                return independentDatabase.ExecuteScalar<int>(sql);
+                return convertSqlToTagsCount(sql.Replace("INNER JOIN", "LEFT JOIN") + groupBy);
         }
 
 
@@ -466,7 +491,7 @@ namespace Umbraco.Tests.BusinessLogic
             }
         }
 
-        private int countDocumentsWithTags(string tags)
+        private int countDocumentsWithTags(string tags, bool publishedOnly = false)
         {
             int count = 0;
             var docs = new List<DocumentDto>();
@@ -474,12 +499,12 @@ namespace Umbraco.Tests.BusinessLogic
                             INNER JOIN cmsTags ON cmsTagRelationShip.tagid = cmsTags.id 
                             INNER JOIN umbracoNode ON cmsTagRelationShip.nodeId = umbracoNode.id
                             WHERE (cmsTags.tag IN ({0})) AND nodeObjectType=@nodeType";
-            foreach (var id in independentDatabase.Query<int>(string.Format(sql, getSqlStringArray(tags),
-                                                   new { nodeType = Document._objectType })))
+            foreach (var id in independentDatabase.Query<int>(string.Format(sql, getSqlStringArray(tags)),
+                                                   new { nodeType = Document._objectType }))
             {
                 Document cnode = new Document(id);
 
-                if (cnode != null && cnode.Published) count++;
+                if (cnode != null && (!publishedOnly || cnode.Published)) count++;
             }
 
             return count;
@@ -517,6 +542,8 @@ namespace Umbraco.Tests.BusinessLogic
             if (_node4 != null) _node4.delete();
             if (_node5 != null) _node5.delete();
 
+            //deleteContent();
+
             initialized = false;
         }
 
@@ -525,282 +552,6 @@ namespace Umbraco.Tests.BusinessLogic
     }
 }
 
-//
-// first run
-//
-//1 passed, 15 failed, 1 skipped (see 'Task List'), took 14.66 seconds (NUnit 2.6.1).
-//
-// second run
-//
-// 3 passed, 13 failed, 1 skipped (see 'Task List'), took 14.37 seconds (NUnit 2.6.1).
-//------ Test started: Assembly: Umbraco.Tests.dll ------
-//Test 'Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_AddTagsToNodes' failed: System.Data.SqlServerCe.SqlCeException : There was an error parsing the query. [ Token line number = 2,Token line offset = 95,Token in error = cmsTags ]
-//    at System.Data.SqlServerCe.SqlCeCommand.ProcessResults(Int32 hr)
-//    at System.Data.SqlServerCe.SqlCeCommand.CompileQueryPlan()
-//    at System.Data.SqlServerCe.SqlCeCommand.ExecuteCommand(CommandBehavior behavior, String method, ResultSetOptions options)
-//    at System.Data.SqlServerCe.SqlCeCommand.ExecuteScalar()
-//    at StackExchange.Profiling.Data.ProfiledDbCommand.ExecuteScalar()
-//    Persistence\PetaPocoCommandExtensions.cs(237,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.<>c__DisplayClassa.<ExecuteScalarWithRetry>b__9()
-//    Persistence\FaultHandling\RetryPolicy.cs(172,0): at Umbraco.Core.Persistence.FaultHandling.RetryPolicy.ExecuteAction[TResult](Func`1 func)
-//    Persistence\PetaPocoCommandExtensions.cs(231,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy)
-//    Persistence\PetaPocoCommandExtensions.cs(215,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy retryPolicy)
-//    Persistence\PetaPocoCommandExtensions.cs(202,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command)
-//    Persistence\PetaPoco.cs(575,0): at Umbraco.Core.Persistence.Database.ExecuteScalar[T](String sql, Object[] args)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(432,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.countTags(Nullable`1 nodeId, String groupName)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(143,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_AddTagsToNodes()
-
-//Test 'Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_AssociateTagToNode' failed: System.Data.SqlServerCe.SqlCeException : There was an error parsing the query. [ Token line number = 2,Token line offset = 95,Token in error = cmsTagRelationship ]
-//    at System.Data.SqlServerCe.SqlCeCommand.ProcessResults(Int32 hr)
-//    at System.Data.SqlServerCe.SqlCeCommand.CompileQueryPlan()
-//    at System.Data.SqlServerCe.SqlCeCommand.ExecuteCommand(CommandBehavior behavior, String method, ResultSetOptions options)
-//    at System.Data.SqlServerCe.SqlCeCommand.ExecuteScalar()
-//    at StackExchange.Profiling.Data.ProfiledDbCommand.ExecuteScalar()
-//    Persistence\PetaPocoCommandExtensions.cs(237,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.<>c__DisplayClassa.<ExecuteScalarWithRetry>b__9()
-//    Persistence\FaultHandling\RetryPolicy.cs(172,0): at Umbraco.Core.Persistence.FaultHandling.RetryPolicy.ExecuteAction[TResult](Func`1 func)
-//    Persistence\PetaPocoCommandExtensions.cs(231,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy)
-//    Persistence\PetaPocoCommandExtensions.cs(215,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy retryPolicy)
-//    Persistence\PetaPocoCommandExtensions.cs(202,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command)
-//    Persistence\PetaPoco.cs(575,0): at Umbraco.Core.Persistence.Database.ExecuteScalar[T](String sql, Object[] args)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(434,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.countTags(Nullable`1 nodeId, String groupName)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(189,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_AssociateTagToNode()
-
-//Test 'Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_GetDocumentsWithTags' failed: System.ArgumentException : Parameter '@nodeType' specified but none of the passed arguments have a property with this name (in 'SELECT DISTINCT cmsTagRelationShip.nodeid from cmsTagRelationShip
-//                            INNER JOIN cmsTags ON cmsTagRelationShip.tagid = cmsTags.id 
-//                            INNER JOIN umbracoNode ON cmsTagRelationShip.nodeId = umbracoNode.id
-//                            WHERE (cmsTags.tag IN ('Tag #1','Tag #2','Tag #3','Tag #4','Tag #5')) AND nodeObjectType=@nodeType')
-//    Persistence\PetaPoco.cs(361,0): at Umbraco.Core.Persistence.Database.<>c__DisplayClass1.<ProcessParams>b__0(Match m)
-//    at System.Text.RegularExpressions.RegexReplacement.Replace(MatchEvaluator evaluator, Regex regex, String input, Int32 count, Int32 startat)
-//    at System.Text.RegularExpressions.Regex.Replace(String input, MatchEvaluator evaluator, Int32 count, Int32 startat)
-//    at System.Text.RegularExpressions.Regex.Replace(String input, MatchEvaluator evaluator)
-//    Persistence\PetaPoco.cs(330,0): at Umbraco.Core.Persistence.Database.ProcessParams(String _sql, Object[] args_src, List`1 args_dest)
-//    Persistence\PetaPoco.cs(476,0): at Umbraco.Core.Persistence.Database.CreateCommand(IDbConnection connection, String sql, Object[] args)
-//    Persistence\PetaPoco.cs(761,0): at Umbraco.Core.Persistence.Database.<Query>d__7`1.MoveNext()
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(477,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.countDocumentsWithTags(String tags)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(308,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_GetDocumentsWithTags()
-
-//Test 'Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_GetTagId' failed: 
-//  Double-check - GetTagId - 1 failed
-//  Expected: 28
-//  But was:  11
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(107,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_GetTagId()
-
-//Test 'Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_GetTags' failed: System.Data.SqlServerCe.SqlCeException : There was an error parsing the query. [ Token line number = 2,Token line offset = 95,Token in error = cmsTags ]
-//    at System.Data.SqlServerCe.SqlCeCommand.ProcessResults(Int32 hr)
-//    at System.Data.SqlServerCe.SqlCeCommand.CompileQueryPlan()
-//    at System.Data.SqlServerCe.SqlCeCommand.ExecuteCommand(CommandBehavior behavior, String method, ResultSetOptions options)
-//    at System.Data.SqlServerCe.SqlCeCommand.ExecuteScalar()
-//    at StackExchange.Profiling.Data.ProfiledDbCommand.ExecuteScalar()
-//    Persistence\PetaPocoCommandExtensions.cs(237,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.<>c__DisplayClassa.<ExecuteScalarWithRetry>b__9()
-//    Persistence\FaultHandling\RetryPolicy.cs(172,0): at Umbraco.Core.Persistence.FaultHandling.RetryPolicy.ExecuteAction[TResult](Func`1 func)
-//    Persistence\PetaPocoCommandExtensions.cs(231,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy)
-//    Persistence\PetaPocoCommandExtensions.cs(215,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy retryPolicy)
-//    Persistence\PetaPocoCommandExtensions.cs(202,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command)
-//    Persistence\PetaPoco.cs(575,0): at Umbraco.Core.Persistence.Database.ExecuteScalar[T](String sql, Object[] args)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(436,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.countTags(Nullable`1 nodeId, String groupName)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(118,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_GetTags()
-
-//Test 'Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_GetTags2' failed: 
-//  IEnumerable<Tag> GetTags() test failed
-//  Expected: 5
-//  But was:  23
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(135,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_GetTags2()
-
-//Test 'Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_GetTags3' failed: System.Data.SqlServerCe.SqlCeException : There was an error parsing the query. [ Token line number = 2,Token line offset = 95,Token in error = cmsTags ]
-//    at System.Data.SqlServerCe.SqlCeCommand.ProcessResults(Int32 hr)
-//    at System.Data.SqlServerCe.SqlCeCommand.CompileQueryPlan()
-//    at System.Data.SqlServerCe.SqlCeCommand.ExecuteCommand(CommandBehavior behavior, String method, ResultSetOptions options)
-//    at System.Data.SqlServerCe.SqlCeCommand.ExecuteScalar()
-//    at StackExchange.Profiling.Data.ProfiledDbCommand.ExecuteScalar()
-//    Persistence\PetaPocoCommandExtensions.cs(237,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.<>c__DisplayClassa.<ExecuteScalarWithRetry>b__9()
-//    Persistence\FaultHandling\RetryPolicy.cs(172,0): at Umbraco.Core.Persistence.FaultHandling.RetryPolicy.ExecuteAction[TResult](Func`1 func)
-//    Persistence\PetaPocoCommandExtensions.cs(231,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy)
-//    Persistence\PetaPocoCommandExtensions.cs(215,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy retryPolicy)
-//    Persistence\PetaPocoCommandExtensions.cs(202,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command)
-//    Persistence\PetaPoco.cs(575,0): at Umbraco.Core.Persistence.Database.ExecuteScalar[T](String sql, Object[] args)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(432,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.countTags(Nullable`1 nodeId, String groupName)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(162,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_GetTags3()
-
-//Test 'Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_GetTags4' failed: System.Data.SqlServerCe.SqlCeException : There was an error parsing the query. [ Token line number = 2,Token line offset = 95,Token in error = cmsTagRelationship ]
-//    at System.Data.SqlServerCe.SqlCeCommand.ProcessResults(Int32 hr)
-//    at System.Data.SqlServerCe.SqlCeCommand.CompileQueryPlan()
-//    at System.Data.SqlServerCe.SqlCeCommand.ExecuteCommand(CommandBehavior behavior, String method, ResultSetOptions options)
-//    at System.Data.SqlServerCe.SqlCeCommand.ExecuteScalar()
-//    at StackExchange.Profiling.Data.ProfiledDbCommand.ExecuteScalar()
-//    Persistence\PetaPocoCommandExtensions.cs(237,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.<>c__DisplayClassa.<ExecuteScalarWithRetry>b__9()
-//    Persistence\FaultHandling\RetryPolicy.cs(172,0): at Umbraco.Core.Persistence.FaultHandling.RetryPolicy.ExecuteAction[TResult](Func`1 func)
-//    Persistence\PetaPocoCommandExtensions.cs(231,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy)
-//    Persistence\PetaPocoCommandExtensions.cs(215,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy retryPolicy)
-//    Persistence\PetaPocoCommandExtensions.cs(202,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command)
-//    Persistence\PetaPoco.cs(575,0): at Umbraco.Core.Persistence.Database.ExecuteScalar[T](String sql, Object[] args)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(434,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.countTags(Nullable`1 nodeId, String groupName)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(176,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_GetTags4()
-
-//Test 'Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_MergeTagsToNode' failed: System.Data.SqlServerCe.SqlCeException : There was an error parsing the query. [ Token line number = 2,Token line offset = 95,Token in error = cmsTags ]
-//    at System.Data.SqlServerCe.SqlCeCommand.ProcessResults(Int32 hr)
-//    at System.Data.SqlServerCe.SqlCeCommand.CompileQueryPlan()
-//    at System.Data.SqlServerCe.SqlCeCommand.ExecuteCommand(CommandBehavior behavior, String method, ResultSetOptions options)
-//    at System.Data.SqlServerCe.SqlCeCommand.ExecuteScalar()
-//    at StackExchange.Profiling.Data.ProfiledDbCommand.ExecuteScalar()
-//    Persistence\PetaPocoCommandExtensions.cs(237,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.<>c__DisplayClassa.<ExecuteScalarWithRetry>b__9()
-//    Persistence\FaultHandling\RetryPolicy.cs(172,0): at Umbraco.Core.Persistence.FaultHandling.RetryPolicy.ExecuteAction[TResult](Func`1 func)
-//    Persistence\PetaPocoCommandExtensions.cs(231,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy)
-//    Persistence\PetaPocoCommandExtensions.cs(215,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy retryPolicy)
-//    Persistence\PetaPocoCommandExtensions.cs(202,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command)
-//    Persistence\PetaPoco.cs(575,0): at Umbraco.Core.Persistence.Database.ExecuteScalar[T](String sql, Object[] args)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(432,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.countTags(Nullable`1 nodeId, String groupName)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(266,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_MergeTagsToNode()
-
-//Test 'Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_RemoveTag' failed: 
-//  RemoveTag test failed
-//  Expected: 9
-//  But was:  10
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(210,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_RemoveTag()
-
-//Test 'Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_RemoveTagFromNode' failed: System.Data.SqlServerCe.SqlCeException : There was an error parsing the query. [ Token line number = 2,Token line offset = 95,Token in error = cmsTagRelationship ]
-//    at System.Data.SqlServerCe.SqlCeCommand.ProcessResults(Int32 hr)
-//    at System.Data.SqlServerCe.SqlCeCommand.CompileQueryPlan()
-//    at System.Data.SqlServerCe.SqlCeCommand.ExecuteCommand(CommandBehavior behavior, String method, ResultSetOptions options)
-//    at System.Data.SqlServerCe.SqlCeCommand.ExecuteScalar()
-//    at StackExchange.Profiling.Data.ProfiledDbCommand.ExecuteScalar()
-//    Persistence\PetaPocoCommandExtensions.cs(237,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.<>c__DisplayClassa.<ExecuteScalarWithRetry>b__9()
-//    Persistence\FaultHandling\RetryPolicy.cs(172,0): at Umbraco.Core.Persistence.FaultHandling.RetryPolicy.ExecuteAction[TResult](Func`1 func)
-//    Persistence\PetaPocoCommandExtensions.cs(231,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy)
-//    Persistence\PetaPocoCommandExtensions.cs(215,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy retryPolicy)
-//    Persistence\PetaPocoCommandExtensions.cs(202,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command)
-//    Persistence\PetaPoco.cs(575,0): at Umbraco.Core.Persistence.Database.ExecuteScalar[T](String sql, Object[] args)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(434,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.countTags(Nullable`1 nodeId, String groupName)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(252,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_RemoveTagFromNode()
-
-//Test 'Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_RemoveTagsFromNode' failed: System.Data.SqlServerCe.SqlCeException : There was an error parsing the query. [ Token line number = 2,Token line offset = 95,Token in error = cmsTagRelationship ]
-//    at System.Data.SqlServerCe.SqlCeCommand.ProcessResults(Int32 hr)
-//    at System.Data.SqlServerCe.SqlCeCommand.CompileQueryPlan()
-//    at System.Data.SqlServerCe.SqlCeCommand.ExecuteCommand(CommandBehavior behavior, String method, ResultSetOptions options)
-//    at System.Data.SqlServerCe.SqlCeCommand.ExecuteScalar()
-//    at StackExchange.Profiling.Data.ProfiledDbCommand.ExecuteScalar()
-//    Persistence\PetaPocoCommandExtensions.cs(237,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.<>c__DisplayClassa.<ExecuteScalarWithRetry>b__9()
-//    Persistence\FaultHandling\RetryPolicy.cs(172,0): at Umbraco.Core.Persistence.FaultHandling.RetryPolicy.ExecuteAction[TResult](Func`1 func)
-//    Persistence\PetaPocoCommandExtensions.cs(231,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy)
-//    Persistence\PetaPocoCommandExtensions.cs(215,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy retryPolicy)
-//    Persistence\PetaPocoCommandExtensions.cs(202,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command)
-//    Persistence\PetaPoco.cs(575,0): at Umbraco.Core.Persistence.Database.ExecuteScalar[T](String sql, Object[] args)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(434,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.countTags(Nullable`1 nodeId, String groupName)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(220,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_RemoveTagsFromNode()
-
-//Test 'Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_RemoveTagsFromNode2' failed: System.Data.SqlServerCe.SqlCeException : There was an error parsing the query. [ Token line number = 2,Token line offset = 95,Token in error = cmsTags ]
-//    at System.Data.SqlServerCe.SqlCeCommand.ProcessResults(Int32 hr)
-//    at System.Data.SqlServerCe.SqlCeCommand.CompileQueryPlan()
-//    at System.Data.SqlServerCe.SqlCeCommand.ExecuteCommand(CommandBehavior behavior, String method, ResultSetOptions options)
-//    at System.Data.SqlServerCe.SqlCeCommand.ExecuteScalar()
-//    at StackExchange.Profiling.Data.ProfiledDbCommand.ExecuteScalar()
-//    Persistence\PetaPocoCommandExtensions.cs(237,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.<>c__DisplayClassa.<ExecuteScalarWithRetry>b__9()
-//    Persistence\FaultHandling\RetryPolicy.cs(172,0): at Umbraco.Core.Persistence.FaultHandling.RetryPolicy.ExecuteAction[TResult](Func`1 func)
-//    Persistence\PetaPocoCommandExtensions.cs(231,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy)
-//    Persistence\PetaPocoCommandExtensions.cs(215,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy retryPolicy)
-//    Persistence\PetaPocoCommandExtensions.cs(202,0): at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command)
-//    Persistence\PetaPoco.cs(575,0): at Umbraco.Core.Persistence.Database.ExecuteScalar[T](String sql, Object[] args)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(432,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.countTags(Nullable`1 nodeId, String groupName)
-//    BusinessLogic\cms_businesslogic_Tag_Tests.cs(236,0): at Umbraco.Tests.BusinessLogic.cms_businesslogic_Tag_Tests.Test_Tag_RemoveTagsFromNode2()
-
-//2013-11-13 17:29:39,882 Umbraco.Core.Persistence.UmbracoDatabase: [Thread 20]    at System.Data.SqlServerCe.SqlCeCommand.ProcessResults(Int32 hr)
-//   at System.Data.SqlServerCe.SqlCeCommand.CompileQueryPlan()
-//   at System.Data.SqlServerCe.SqlCeCommand.ExecuteCommand(CommandBehavior behavior, String method, ResultSetOptions options)
-//   at System.Data.SqlServerCe.SqlCeCommand.ExecuteScalar()
-//   at StackExchange.Profiling.Data.ProfiledDbCommand.ExecuteScalar() in c:\Code\github\SamSaffron\MiniProfiler\StackExchange.Profiling\Data\ProfiledDbCommand.cs:line 299
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.<>c__DisplayClassa.<ExecuteScalarWithRetry>b__9() in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 237
-//   at Umbraco.Core.Persistence.FaultHandling.RetryPolicy.ExecuteAction[TResult](Func`1 func) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\FaultHandling\RetryPolicy.cs:line 172
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 231
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy retryPolicy) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 215
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 202
-//   at Umbraco.Core.Persistence.Database.ExecuteScalar[T](String sql, Object[] args) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPoco.cs:line 560
-//2013-11-13 17:29:39,907 Umbraco.Core.Persistence.UmbracoDatabase: [Thread 20]    at System.Data.SqlServerCe.SqlCeCommand.ProcessResults(Int32 hr)
-//   at System.Data.SqlServerCe.SqlCeCommand.CompileQueryPlan()
-//   at System.Data.SqlServerCe.SqlCeCommand.ExecuteCommand(CommandBehavior behavior, String method, ResultSetOptions options)
-//   at System.Data.SqlServerCe.SqlCeCommand.ExecuteScalar()
-//   at StackExchange.Profiling.Data.ProfiledDbCommand.ExecuteScalar() in c:\Code\github\SamSaffron\MiniProfiler\StackExchange.Profiling\Data\ProfiledDbCommand.cs:line 299
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.<>c__DisplayClassa.<ExecuteScalarWithRetry>b__9() in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 237
-//   at Umbraco.Core.Persistence.FaultHandling.RetryPolicy.ExecuteAction[TResult](Func`1 func) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\FaultHandling\RetryPolicy.cs:line 172
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 231
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy retryPolicy) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 215
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 202
-//   at Umbraco.Core.Persistence.Database.ExecuteScalar[T](String sql, Object[] args) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPoco.cs:line 560
-//2013-11-13 17:29:40,201 Umbraco.Core.Persistence.UmbracoDatabase: [Thread 20]    at System.Data.SqlServerCe.SqlCeCommand.ProcessResults(Int32 hr)
-//   at System.Data.SqlServerCe.SqlCeCommand.CompileQueryPlan()
-//   at System.Data.SqlServerCe.SqlCeCommand.ExecuteCommand(CommandBehavior behavior, String method, ResultSetOptions options)
-//   at System.Data.SqlServerCe.SqlCeCommand.ExecuteScalar()
-//   at StackExchange.Profiling.Data.ProfiledDbCommand.ExecuteScalar() in c:\Code\github\SamSaffron\MiniProfiler\StackExchange.Profiling\Data\ProfiledDbCommand.cs:line 299
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.<>c__DisplayClassa.<ExecuteScalarWithRetry>b__9() in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 237
-//   at Umbraco.Core.Persistence.FaultHandling.RetryPolicy.ExecuteAction[TResult](Func`1 func) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\FaultHandling\RetryPolicy.cs:line 172
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 231
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy retryPolicy) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 215
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 202
-//   at Umbraco.Core.Persistence.Database.ExecuteScalar[T](String sql, Object[] args) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPoco.cs:line 560
-//2013-11-13 17:29:40,238 Umbraco.Core.Persistence.UmbracoDatabase: [Thread 20]    at System.Data.SqlServerCe.SqlCeCommand.ProcessResults(Int32 hr)
-//   at System.Data.SqlServerCe.SqlCeCommand.CompileQueryPlan()
-//   at System.Data.SqlServerCe.SqlCeCommand.ExecuteCommand(CommandBehavior behavior, String method, ResultSetOptions options)
-//   at System.Data.SqlServerCe.SqlCeCommand.ExecuteScalar()
-//   at StackExchange.Profiling.Data.ProfiledDbCommand.ExecuteScalar() in c:\Code\github\SamSaffron\MiniProfiler\StackExchange.Profiling\Data\ProfiledDbCommand.cs:line 299
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.<>c__DisplayClassa.<ExecuteScalarWithRetry>b__9() in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 237
-//   at Umbraco.Core.Persistence.FaultHandling.RetryPolicy.ExecuteAction[TResult](Func`1 func) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\FaultHandling\RetryPolicy.cs:line 172
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 231
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy retryPolicy) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 215
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 202
-//   at Umbraco.Core.Persistence.Database.ExecuteScalar[T](String sql, Object[] args) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPoco.cs:line 560
-//2013-11-13 17:29:40,272 Umbraco.Core.Persistence.UmbracoDatabase: [Thread 20]    at System.Data.SqlServerCe.SqlCeCommand.ProcessResults(Int32 hr)
-//   at System.Data.SqlServerCe.SqlCeCommand.CompileQueryPlan()
-//   at System.Data.SqlServerCe.SqlCeCommand.ExecuteCommand(CommandBehavior behavior, String method, ResultSetOptions options)
-//   at System.Data.SqlServerCe.SqlCeCommand.ExecuteScalar()
-//   at StackExchange.Profiling.Data.ProfiledDbCommand.ExecuteScalar() in c:\Code\github\SamSaffron\MiniProfiler\StackExchange.Profiling\Data\ProfiledDbCommand.cs:line 299
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.<>c__DisplayClassa.<ExecuteScalarWithRetry>b__9() in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 237
-//   at Umbraco.Core.Persistence.FaultHandling.RetryPolicy.ExecuteAction[TResult](Func`1 func) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\FaultHandling\RetryPolicy.cs:line 172
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 231
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy retryPolicy) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 215
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 202
-//   at Umbraco.Core.Persistence.Database.ExecuteScalar[T](String sql, Object[] args) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPoco.cs:line 560
-//2013-11-13 17:29:40,281 Umbraco.Core.Persistence.UmbracoDatabase: [Thread 20]    at System.Data.SqlServerCe.SqlCeCommand.ProcessResults(Int32 hr)
-//   at System.Data.SqlServerCe.SqlCeCommand.CompileQueryPlan()
-//   at System.Data.SqlServerCe.SqlCeCommand.ExecuteCommand(CommandBehavior behavior, String method, ResultSetOptions options)
-//   at System.Data.SqlServerCe.SqlCeCommand.ExecuteScalar()
-//   at StackExchange.Profiling.Data.ProfiledDbCommand.ExecuteScalar() in c:\Code\github\SamSaffron\MiniProfiler\StackExchange.Profiling\Data\ProfiledDbCommand.cs:line 299
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.<>c__DisplayClassa.<ExecuteScalarWithRetry>b__9() in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 237
-//   at Umbraco.Core.Persistence.FaultHandling.RetryPolicy.ExecuteAction[TResult](Func`1 func) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\FaultHandling\RetryPolicy.cs:line 172
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 231
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy retryPolicy) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 215
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 202
-//   at Umbraco.Core.Persistence.Database.ExecuteScalar[T](String sql, Object[] args) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPoco.cs:line 560
-//2013-11-13 17:29:40,303 Umbraco.Core.Persistence.UmbracoDatabase: [Thread 20]    at System.Data.SqlServerCe.SqlCeCommand.ProcessResults(Int32 hr)
-//   at System.Data.SqlServerCe.SqlCeCommand.CompileQueryPlan()
-//   at System.Data.SqlServerCe.SqlCeCommand.ExecuteCommand(CommandBehavior behavior, String method, ResultSetOptions options)
-//   at System.Data.SqlServerCe.SqlCeCommand.ExecuteScalar()
-//   at StackExchange.Profiling.Data.ProfiledDbCommand.ExecuteScalar() in c:\Code\github\SamSaffron\MiniProfiler\StackExchange.Profiling\Data\ProfiledDbCommand.cs:line 299
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.<>c__DisplayClassa.<ExecuteScalarWithRetry>b__9() in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 237
-//   at Umbraco.Core.Persistence.FaultHandling.RetryPolicy.ExecuteAction[TResult](Func`1 func) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\FaultHandling\RetryPolicy.cs:line 172
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 231
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy retryPolicy) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 215
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 202
-//   at Umbraco.Core.Persistence.Database.ExecuteScalar[T](String sql, Object[] args) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPoco.cs:line 560
-//2013-11-13 17:29:40,322 Umbraco.Core.Persistence.UmbracoDatabase: [Thread 20]    at System.Data.SqlServerCe.SqlCeCommand.ProcessResults(Int32 hr)
-//   at System.Data.SqlServerCe.SqlCeCommand.CompileQueryPlan()
-//   at System.Data.SqlServerCe.SqlCeCommand.ExecuteCommand(CommandBehavior behavior, String method, ResultSetOptions options)
-//   at System.Data.SqlServerCe.SqlCeCommand.ExecuteScalar()
-//   at StackExchange.Profiling.Data.ProfiledDbCommand.ExecuteScalar() in c:\Code\github\SamSaffron\MiniProfiler\StackExchange.Profiling\Data\ProfiledDbCommand.cs:line 299
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.<>c__DisplayClassa.<ExecuteScalarWithRetry>b__9() in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 237
-//   at Umbraco.Core.Persistence.FaultHandling.RetryPolicy.ExecuteAction[TResult](Func`1 func) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\FaultHandling\RetryPolicy.cs:line 172
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 231
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy retryPolicy) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 215
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 202
-//   at Umbraco.Core.Persistence.Database.ExecuteScalar[T](String sql, Object[] args) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPoco.cs:line 560
-//2013-11-13 17:29:40,341 Umbraco.Core.Persistence.UmbracoDatabase: [Thread 20]    at System.Data.SqlServerCe.SqlCeCommand.ProcessResults(Int32 hr)
-//   at System.Data.SqlServerCe.SqlCeCommand.CompileQueryPlan()
-//   at System.Data.SqlServerCe.SqlCeCommand.ExecuteCommand(CommandBehavior behavior, String method, ResultSetOptions options)
-//   at System.Data.SqlServerCe.SqlCeCommand.ExecuteScalar()
-//   at StackExchange.Profiling.Data.ProfiledDbCommand.ExecuteScalar() in c:\Code\github\SamSaffron\MiniProfiler\StackExchange.Profiling\Data\ProfiledDbCommand.cs:line 299
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.<>c__DisplayClassa.<ExecuteScalarWithRetry>b__9() in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 237
-//   at Umbraco.Core.Persistence.FaultHandling.RetryPolicy.ExecuteAction[TResult](Func`1 func) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\FaultHandling\RetryPolicy.cs:line 172
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy cmdRetryPolicy, RetryPolicy conRetryPolicy) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 231
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command, RetryPolicy retryPolicy) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 215
-//   at Umbraco.Core.Persistence.PetaPocoCommandExtensions.ExecuteScalarWithRetry(IDbCommand command) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPocoCommandExtensions.cs:line 202
-//   at Umbraco.Core.Persistence.Database.ExecuteScalar[T](String sql, Object[] args) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\Persistence\PetaPoco.cs:line 560
-
-//3 passed, 13 failed, 1 skipped (see 'Task List'), took 14.37 seconds (NUnit 2.6.1).
-
-
+// first run: 1 passed, 15 failed, 1 skipped (see 'Task List'), took 14.66 seconds (NUnit 2.6.1).
+// second run: 3 passed, 13 failed, 1 skipped (see 'Task List'), took 14.37 seconds (NUnit 2.6.1).
+// N-th run: 18 passed, 0 failed, 0 skipped, took 26.64 seconds (NUnit 2.6.1).
