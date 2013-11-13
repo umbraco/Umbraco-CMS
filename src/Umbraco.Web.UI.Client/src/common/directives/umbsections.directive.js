@@ -14,9 +14,9 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			scope.maxSections = 7;
 			scope.overflowingSections = 0;
             scope.sections = [];
-            scope.nav = navigationService;
             scope.currentSection = appState.getSectionState("currentSection");
             scope.showTray = appState.getGlobalState("showTray");
+            scope.stickyNavigation = appState.getGlobalState("stickyNavigation");
             scope.needTray = false;
 
 			function loadSections(){
@@ -42,10 +42,13 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 				});
 			}
 
-            //Listen for showTray changes
+            //Listen for global state changes
 			scope.$on("appState.globalState.changed", function (e, args) {
 			    if (args.key === "showTray") {
 			        scope.showTray = args.value;
+			    }
+			    if (args.key === "stickyNavigation") {
+			        scope.stickyNavigation = args.value;
 			    }
 			});
 

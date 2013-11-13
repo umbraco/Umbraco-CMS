@@ -19,10 +19,10 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
     var minScreenSize = 1100;
 
-    //Define all sub-properties for the UI object here
+    //TODO: Once most of the state vars have been refactored out to use appState, this UI object will be internal ONLY and will not be
+    // exposed from this service.
     var ui = {
-        tablet: false,
-        stickyNavigation: false,
+        tablet: false,        
         currentPath: undefined,
         currentTree: undefined,
         treeEventHandler: undefined,
@@ -34,10 +34,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         //a string/name reference for the currently set ui mode
         currentMode: "default"
     };
-
-    $rootScope.$on("closeDialogs", function() {
-    });
-
+    
     function setTreeMode() {
         ui.tablet = ($(window).width() <= minScreenSize);
 
@@ -51,7 +48,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             appState.setGlobalState("showNavigation", true);
             appState.setMenuState("showMenu", false);
             appState.setMenuState("showMenuDialog", false);
-            ui.stickyNavigation = false;
+            appState.setGlobalState("stickyNavigation", false);
             appState.setGlobalState("showTray", false);
             
             //$("#search-form input").focus();    
@@ -65,14 +62,14 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             break;
         case 'dialog':
             ui.currentMode = "dialog";
-            ui.stickyNavigation = true;
+            appState.setGlobalState("stickyNavigation", true);
             appState.setGlobalState("showNavigation", true);
             appState.setMenuState("showMenu", false);
             appState.setMenuState("showMenuDialog", true);
             break;
         case 'search':
             ui.currentMode = "search";
-            ui.stickyNavigation = false;
+            appState.setGlobalState("stickyNavigation", false);
             appState.setGlobalState("showNavigation", true);
             appState.setMenuState("showMenu", false);
             appState.setSectionState("showSearchResults", true);
@@ -89,7 +86,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             appState.setMenuState("showMenu", false);
             appState.setMenuState("showMenuDialog", false);
             appState.setSectionState("showSearchResults", false);
-            ui.stickyNavigation = false;
+            appState.setGlobalState("stickyNavigation", false);
             appState.setGlobalState("showTray", false);
 
             if (ui.tablet) {
@@ -403,7 +400,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          */
         hideTree: function() {
 
-            if (this.ui.tablet && !this.ui.stickyNavigation) {
+            if (this.ui.tablet && !appState.getGlobalState("stickyNavigation")) {
                 //reset it to whatever is in the url
                 appState.setSectionState("currentSection", $routeParams.section);
                 setMode("default-hidesectiontree");
