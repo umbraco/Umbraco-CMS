@@ -28,7 +28,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
     //TODO: Once most of the state vars have been refactored out to use appState, this UI object will be internal ONLY and will not be
     // exposed from this service.
     var ui = {     
-        currentTree: undefined,
         currentNode: undefined,   
 
         //a string/name reference for the currently set ui mode

@@ -88,7 +88,7 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         });
 
         //if the user has changed we need to redirect to the root so they don't try to continue editing the
-        //last item in the URL
+        //last item in the URL (NOTE: the user id can equal zero, so we cannot just do !data.lastUserId since that will resolve to true)
         if (data.lastUserId !== undefined && data.lastUserId !== null && data.lastUserId !== data.user.id) {
             $location.path("/").search("");
             historyService.removeAll();
