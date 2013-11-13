@@ -2,14 +2,12 @@
 	<div class="umb-panel-header">
 		<div class="umb-el-wrap umb-panel-buttons">
 	        <div class="btn-toolbar umb-btn-toolbar">
-	        	<button ng-click="logout()" class="btn btn-warning">
+	        	<button ng-click="logout()" hotkey="ctrl+shift+l" class="btn btn-warning">
 	        		<localize key="general_logout">Log out</localize>
 	        	</button>
 	        </div>
 		</div>
-
 		<h1 class="headline">{{user.name}}</h1>
-		
 	    <p class="muted">
 	        <small>
 	        	<localize key="user_sessionExpires" />: {{remainingAuthSeconds | timespan}}</small>	        

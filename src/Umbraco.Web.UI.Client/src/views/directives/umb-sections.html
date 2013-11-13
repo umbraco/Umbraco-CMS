@@ -2,7 +2,7 @@
     <div id="applications" ng-class="{faded:nav.ui.stickyNavigation}"> 
         <ul class="sections">
             <li class="avatar">
-                <a href="#" ng-click="avatarClick()" title="{{user.name}}" prevent-default>
+                <a href="#" ng-click="avatarClick()" hotkey="ctrl+shift+u" title="{{user.name}}" prevent-default>
                     <img id="avatar-img" ng-src="{{avatar}}" />
                 </a>
             </li>
@@ -23,7 +23,7 @@
             </li>
 
             <li class="help">
-                <a class="help" ng-click="helpClick()" prevent-default>
+                <a class="help" hotkey="ctrl+shift+h" ng-click="helpClick()" prevent-default>
                     <i class="icon-help-alt"></i>
                     <span><localize key="sections_help">Help</localize></span>
                 </a>
