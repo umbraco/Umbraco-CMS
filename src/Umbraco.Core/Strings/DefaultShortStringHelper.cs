@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Globalization;
+using System.Text;
+using System.Text.RegularExpressions;
 using Umbraco.Core.Configuration;
 
 namespace Umbraco.Core.Strings
@@ -299,19 +301,90 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// <remarks>Legacy says this was used to "overcome an issue when Umbraco is used in IE in an intranet environment" but that issue is not documented.</remarks>
         public virtual string CleanStringForSafeFileName(string text)
         {
-            if (string.IsNullOrWhiteSpace(text))
-                return string.Empty;
+            // - Original version
 
-            text = text.ReplaceMany(Path.GetInvalidFileNameChars(), '-');
+            if (String.IsNullOrEmpty(text))
+                return String.Empty;
 
-            var pos = text.LastIndexOf('.');
-            var name = pos < 0 ? text : text.Substring(0, pos);
-            var ext = pos < 0 ? string.Empty : text.Substring(pos + 1);
+            text = string.IsNullOrWhiteSpace(text) == false 
+                ? text.ReplaceMany(Path.GetInvalidFileNameChars(), '-') 
+                : string.Empty;
 
-            name = CleanString(name, CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.LowerCase, '-');
-            ext = CleanString(ext, CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.LowerCase, '-');
+            //Break up the file in name and extension before applying the UrlReplaceCharacters
+            var fileNamePart = text.Substring(0, text.LastIndexOf('.'));
+            var ext = text.Substring(text.LastIndexOf('.'));
 
-            return pos < 0 ? name : (name + "." + ext);
+            fileNamePart = ApplyUrlReplaceCharacters(fileNamePart);
+
+            text = string.Concat(fileNamePart, ext);
+
+            // Adapted from: http://stackoverflow.com/a/4827510/5018
+            // Combined both Reserved Characters and Character Data 
+            // from http://en.wikipedia.org/wiki/Percent-encoding
+            var stringBuilder = new StringBuilder();
+
+            const string reservedCharacters = "!*'();:@&=+$,/?%#[]-~{}\"<>\\^`| ";
+
+            foreach (var character in text)
+            {
+                if (reservedCharacters.IndexOf(character) == -1)
+                    stringBuilder.Append(character);
+                else
+                    stringBuilder.Append("-");
+            }
+
+            // Remove repeating dashes
+            // From: http://stackoverflow.com/questions/5111967/regex-to-remove-a-specific-repeated-character
+            var reducedString = Regex.Replace(stringBuilder.ToString(), "-+", "-");
+
+            return reducedString;
+
+
+            // - Version 2 (Legacy Short string)
+
+            //const string UmbracoValidAliasCharacters = "_-abcdefghijklmnopqrstuvwxyz1234567890";
+            //const string UmbracoInvalidFirstCharacters = "0123456789";
+            //const string validAliasCharacters = UmbracoValidAliasCharacters;
+            //const string invalidFirstCharacters = UmbracoInvalidFirstCharacters;
+            //var safeString = new StringBuilder();
+            //int aliasLength = text.Length;
+            //for (var i = 0; i < aliasLength; i++)
+            //{
+            //    var currentChar = text.Substring(i, 1);
+            //    if (validAliasCharacters.Contains(currentChar.ToLowerInvariant()))
+            //    {
+            //        // check for camel (if previous character is a space, we'll upper case the current one
+            //        if (safeString.Length == 0 && invalidFirstCharacters.Contains(currentChar.ToLowerInvariant()))
+            //        {
+            //            //currentChar = "";
+            //        }
+            //        else
+            //        {
+            //            if (i < aliasLength - 1 && i > 0 && text.Substring(i - 1, 1) == " ")
+            //                currentChar = currentChar.ToUpperInvariant();
+
+            //            safeString.Append(currentChar);
+            //        }
+            //    }
+            //}
+            //return safeString.ToString();
+
+
+            // - Version 3 (Default short string)
+
+            //if (string.IsNullOrWhiteSpace(text))
+            //    return string.Empty;
+
+            //text = text.ReplaceMany(Path.GetInvalidFileNameChars(), '-');
+
+            //var pos = text.LastIndexOf('.');
+            //var name = pos < 0 ? text : text.Substring(0, pos);
+            //var ext = pos < 0 ? string.Empty : text.Substring(pos + 1);
+
+            //name = CleanString(name, CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.LowerCase, '-');
+            //ext = CleanString(ext, CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.LowerCase, '-');
+
+            //return pos < 0 ? name : (name + "." + ext);
         }
 
         /// <summary>
