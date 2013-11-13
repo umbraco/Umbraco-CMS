@@ -92,6 +92,15 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
         }
     });
         
+    //when a user logs out or timesout
+    $scope.$on("notAuthenticated", function() {
+        $scope.authenticated = false;        
+    });
+    
+    //when a user is authorized setup the data
+    $scope.$on("authenticated", function(evt, data) {
+        $scope.authenticated = true;
+    });
 
     //this reacts to the options item in the tree
     //todo, migrate to nav service
@@ -108,8 +117,7 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     $scope.searchHide = function () {   
         navigationService.hideSearch();
     };
-
-
+    
     /** Opens a dialog but passes in this scope instance to be used for the dialog */
     $scope.openDialog = function (currentNode, action, currentSection) {        
         navigationService.showDialog({

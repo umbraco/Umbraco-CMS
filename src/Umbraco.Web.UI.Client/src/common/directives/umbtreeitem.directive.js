@@ -151,20 +151,9 @@ angular.module("umbraco.directives")
         scope.setTreePadding = function(node) {
           return { 'padding-left': (node.level * 20) + "px" };
         };
-        
-        scope.expandActivePath = function(node, activeTree, activePath) {
-            if(activePath || activeTree){
-              if(node.metaData.treeAlias && activeTree === node.metaData.treeAlias){
-                  scope.loadChildren(null, scope.node, true);
-              }else if( !node.metaData.treeAlias && activePath.indexOf(node.id) >= 0){
-                  scope.loadChildren(null, scope.node, true);
-              }
-            }
-        };
 
         //if the current path contains the node id, we will auto-expand the tree item children
         
-        scope.expandActivePath(scope.node, scope.activetree, scope.path);
         scope.node.stateCssClass = (scope.node.cssClasses || []).join(" ");
 
         if(scope.node.style){

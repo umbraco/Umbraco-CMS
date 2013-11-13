@@ -1,7 +1,7 @@
 <div id="leftcolumn" ng-controller="Umbraco.NavigationController" 
     ng-mouseleave="nav.leaveTree($event)" ng-mouseenter="nav.enterTree($event)">
     
-    <umb-sections sections="sections">
+    <umb-sections sections="sections" ng-if="authenticated">
     </umb-sections>
 
     <!-- navigation container -->
@@ -61,11 +61,10 @@
             </div>
 
             <!-- the tree -->
-            <div id="tree" class="umb-modalcolumn-body">
+            <div id="tree" class="umb-modalcolumn-body" ng-if="authenticated">
                 <umb-tree 
                     cachekey="_"
                     eventhandler="treeEventHandler" 
-                    path="{{nav.ui.currentPath}}" 
                     section="{{currentSection}}"
                     activetree="{{nav.ui.currentTree}}" >
                 </umb-tree>

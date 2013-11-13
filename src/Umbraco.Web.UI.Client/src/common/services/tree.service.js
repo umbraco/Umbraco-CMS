@@ -497,81 +497,80 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             var currPathIndex = 0;
             //if the first id is the root node and there's only one... then consider it synced
             if (String(args.path[currPathIndex]) === String(args.node.id)) {
-
                 if (args.path.length === 1) {
                     //return the root
                     deferred.resolve(root);
+                    return deferred.promise;
                 }
                 else {
+                    //move to the next path part and continue
                     currPathIndex = 1;
                 }
             }
-            else {
-                
-                //now that we have the first id to lookup, we can start the process
+           
+            //now that we have the first id to lookup, we can start the process
 
-                var self = this;
-                var node = args.node;
-                
-                var doSync = function() {                    
-                    //check if it exists in the already loaded children
-                    var child = self.getChildNode(node, args.path[currPathIndex]);
-                    if (child) {
-                        if (args.path.length === (currPathIndex + 1)) {
-                            //woot! synced the node
-                            if (!args.forceReload) {
-                                deferred.resolve(child);
-                            }
-                            else {
-                                //even though we've found the node if forceReload is specified
-                                //we want to go update this single node from the server
-                                self.reloadNode(child).then(function(reloaded) {
-                                    deferred.resolve(reloaded);
-                                }, function() {
-                                    deferred.reject();
-                                });
-                            }
+            var self = this;
+            var node = args.node;
+
+            var doSync = function () {
+                //check if it exists in the already loaded children
+                var child = self.getChildNode(node, args.path[currPathIndex]);
+                if (child) {
+                    if (args.path.length === (currPathIndex + 1)) {
+                        //woot! synced the node
+                        if (!args.forceReload) {
+                            deferred.resolve(child);
                         }
                         else {
-                            //now we need to recurse with the updated node/currPathIndex
-                            currPathIndex++;
-                            node = child;
-                            //recurse
-                            doSync();
+                            //even though we've found the node if forceReload is specified
+                            //we want to go update this single node from the server
+                            self.reloadNode(child).then(function (reloaded) {
+                                deferred.resolve(reloaded);
+                            }, function () {
+                                deferred.reject();
+                            });
                         }
                     }
                     else {
-                        //the current node doesn't have it's children loaded, so go get them
-                        self.loadNodeChildren({ node: node, section: node.section }).then(function () {
-                            //ok, got the children, let's find it
-                            var found = self.getChildNode(node, args.path[currPathIndex]);
-                            if (found) {
-                                if (args.path.length === (currPathIndex + 1)) {
-                                    //woot! synced the node
-                                    deferred.resolve(found);
-                                }
-                                else {
-                                    //now we need to recurse with the updated node/currPathIndex
-                                    currPathIndex++;
-                                    node = found;
-                                    //recurse
-                                    doSync();
-                                }
+                        //now we need to recurse with the updated node/currPathIndex
+                        currPathIndex++;
+                        node = child;
+                        //recurse
+                        doSync();
+                    }
+                }
+                else {
+                    //the current node doesn't have it's children loaded, so go get them
+                    self.loadNodeChildren({ node: node, section: node.section }).then(function () {
+                        //ok, got the children, let's find it
+                        var found = self.getChildNode(node, args.path[currPathIndex]);
+                        if (found) {
+                            if (args.path.length === (currPathIndex + 1)) {
+                                //woot! synced the node
+                                deferred.resolve(found);
                             }
                             else {
-                                //fail!
-                                deferred.reject();
+                                //now we need to recurse with the updated node/currPathIndex
+                                currPathIndex++;
+                                node = found;
+                                //recurse
+                                doSync();
                             }
-                        }, function () {
+                        }
+                        else {
                             //fail!
                             deferred.reject();
-                        });
-                    }                   
-                };
+                        }
+                    }, function () {
+                        //fail!
+                        deferred.reject();
+                    });
+                }
+            };
 
-                //start
-                doSync();
-            }
+            //start
+            doSync();
             
             return deferred.promise;
 

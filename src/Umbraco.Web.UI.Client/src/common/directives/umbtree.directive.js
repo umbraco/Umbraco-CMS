@@ -35,7 +35,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     '</div>';
             }
             template += '<ul>' +
-                '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" path="{{path}}" activetree="{{activetree}}" node="child" current-node="currentNode" tree="child" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
+                '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" activetree="{{activetree}}" node="child" current-node="currentNode" tree="child" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
                 '</ul>' +
                 '</li>' +
                 '</ul>';
@@ -217,7 +217,6 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         //anytime we want to load the tree we need to disable the delete animations
                         deleteAnimations = false;
 
-                        //use $q.when because a promise OR raw data might be returned.
                         treeService.getTree({ section: scope.section, tree: scope.treealias, cacheKey: scope.cachekey, isDialog: scope.isdialog ? scope.isdialog : false })
                             .then(function(data) {
                                 //set the data once we have it
@@ -327,10 +326,8 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 scope.altSelect = function(e, n, ev) {
                     emitEvent("treeNodeAltSelect", { element: e, tree: scope.tree, node: n, event: ev });
                 };
-
-
+                
                 //watch for section changes
-                //TODO: Surely this shouldn't be here!??
                 scope.$watch("section", function(newVal, oldVal) {
 
                     if (!scope.tree) {
@@ -352,19 +349,9 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         activeTree = undefined;
                     }
                 });
-
-                //When the user logs in
-                scope.$on("authenticated", function(evt, data) {
-                    //populate the tree if the user has changed
-                    if (data.lastUserId !== data.user.id) {
-                        treeService.clearCache();
-                        scope.tree = null;
-
-                        setupExternalEvents();
-                        loadTree();
-                    }
-                });
-
+                
+                setupExternalEvents();
+                loadTree();
             };
         }
     };

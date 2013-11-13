@@ -52,14 +52,6 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			    }
 			});
 
-			//When the user logs in
-			scope.$on("authenticated", function (evt, data) {
-				//populate their sections if the user has changed
-				if (data.lastUserId !== data.user.id) {
-					loadSections();
-				}        
-			});	
-            
 			//on page resize
 			window.onresize = calculateHeight;
 			
@@ -83,6 +75,8 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			scope.trayClick = function(){
 				navigationService.showTray();
 			};
+            
+			loadSections();
 
         }
     };

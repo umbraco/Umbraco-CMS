@@ -62,7 +62,7 @@ function entityResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "entityApiBaseUrl",
                        "GetPath",
-                       [{ id: id, type: type }])),
+                       [{ id: id }, {type: type }])),
                'Failed to retrieve path for id:' + id);
         },
 

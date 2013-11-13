@@ -15,6 +15,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 			if(!$scope.target.path) {
 			    entityResource.getPath($scope.target.id, "Document").then(function (path) {
 			        $scope.target.path = path;
+			        //now sync the tree to this path
+			        $scope.dialogTreeEventHandler.syncTree({ path: $scope.target.path, tree: "content" });
 			    });
 			}
 
@@ -23,7 +25,6 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 			});
 		}
 	}
-
 
 	$scope.dialogTreeEventHandler.bind("treeNodeSelect", function(ev, args){
 		args.event.preventDefault();
