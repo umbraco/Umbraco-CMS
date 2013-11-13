@@ -3,6 +3,7 @@
     ng-show="loaded"
     ng-submit="save()"
     val-form-manager>
+    
     <umb-panel>
         <umb-header tabs="content.tabs">
 
@@ -15,8 +16,7 @@
                     ng-model="content.name" />
             </div>
 
-            <div class="span5">
-                
+            <div class="span5">     
                 <div class="btn-toolbar pull-right umb-btn-toolbar">
                     <div class="btn-group" ng-animate="'fade'" ng-show="formStatus">
                         <p class="btn btn-link umb-status-label">{{formStatus}}</p>
@@ -25,7 +25,7 @@
                     <div class="btn-group" ng-class="{dimmed: content.id === 0}">
                         <!-- options button -->
                         <a class="btn" href="#" ng-click="options(content)" prevent-default data-toggle="dropdown">
-                            Options <span class="caret"></span>
+                            <localize key="general_actions">Actions</localize> <span class="caret"></span>
                         </a>
                         
                         <!-- actions -->
@@ -64,7 +64,7 @@
 
                         <div class="btn-group dropup" ng-if="defaultButton">
                             <!-- primary button -->
-                            <a class="btn btn-success" href="#" ng-click="performAction(defaultButton)" prevent-default data-hotkey="{{defaultButton.hotKey}}">
+                            <a class="btn btn-success" href="#" ng-click="performAction(defaultButton)" prevent-default>
                                 <localize key="{{defaultButton.labelKey}}">{{defaultButton.labelKey}}</localize>                            
                             </a>
                             
@@ -75,14 +75,13 @@
                             <!-- sub buttons -->
                             <ul class="dropdown-menu bottom-up" role="menu" aria-labelledby="dLabel" ng-if="subButtons.length > 0">
                                 <li ng-repeat="btn in subButtons">
-                                    <a href="#" ng-click="performAction(btn)" prevent-default data-hotkey="{{btn.hotKey}}">
+                                    <a href="#" ng-click="performAction(btn)" prevent-default>
                                         <localize key="{{btn.labelKey}}">{{btn.labelKey}}</localize>
                                     </a>
                                 </li>                            
                             </ul>
                          </div>
                     </div>
-
                 </div>
             </umb-tab>
         </umb-tab-view>

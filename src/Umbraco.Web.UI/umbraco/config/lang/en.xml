@@ -168,7 +168,7 @@
   </area>
   <area alias="create">
     <key alias="chooseNode">Where do you want to create the new %0%</key>
-    <key alias="createUnder">Create a page under</key>
+    <key alias="createUnder">Create an item under</key>
     <key alias="updateData">Choose a type and a title</key>
 
     <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
@@ -304,6 +304,7 @@
   <area alias="general">
     <key alias="about">About</key>
     <key alias="action">Action</key>
+    <key alias="actions">Actions</key>
     <key alias="add">Add</key>
     <key alias="alias">Alias</key>
     <key alias="areyousure">Are you sure?</key>

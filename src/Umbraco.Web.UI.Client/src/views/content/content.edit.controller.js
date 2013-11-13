@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper) {
+function ContentEditController($scope, $routeParams, $q, $timeout, $window, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService) {
 
     $scope.defaultButton = null;
     $scope.subButtons = [];
@@ -63,6 +63,8 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
         switch (ch) {
             case "U":
                 //publish action
+                keyboardService.bind("ctrl+p", $scope.saveAndPublish);
+
                 return {
                     letter: ch,
                     labelKey: "buttons_saveAndPublish",
@@ -71,14 +73,17 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
                 };
             case "H":
                 //send to publish
+                keyboardService.bind("ctrl+p", $scope.sendToPublish);
+
                 return {
                     letter: ch,
                     labelKey: "buttons_saveToPublish",
                     handler: $scope.sendToPublish,
-                    hotKey: "ctrl+t"
+                    hotKey: "ctrl+p"
                 };
             case "A":
                 //save
+                keyboardService.bind("ctrl+s", $scope.save);
                 return {
                     letter: ch,
                     labelKey: "buttons_save",
@@ -87,6 +92,8 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, cont
                 };
             case "Z":
                 //unpublish
+                keyboardService.bind("ctrl+u", $scope.unPublish);
+
                 return {
                     letter: ch,
                     labelKey: "content_unPublish",

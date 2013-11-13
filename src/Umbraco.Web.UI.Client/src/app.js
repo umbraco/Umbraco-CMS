@@ -7,7 +7,9 @@ var app = angular.module('umbraco', [
     'ngCookies',
     'ngMobile',
     'ngSanitize',
-    'blueimp.fileupload'
+    
+    'blueimp.fileupload',
+    'ui.bootstrap.datetimepicker'
 ]);
 
 //seperate core and packages? 

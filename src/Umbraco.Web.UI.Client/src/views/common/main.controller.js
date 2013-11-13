@@ -8,7 +8,7 @@
  * The main application controller
  * 
  */
-function MainController($scope, $rootScope, $location, $routeParams, $rootScope, $timeout, $http, $log, notificationsService, userService, navigationService, legacyJsLoader, updateChecker) {
+function MainController($scope, $rootScope, $location, $routeParams, $rootScope, $timeout, $http, $log, notificationsService, userService, navigationService, historyService, legacyJsLoader, updateChecker) {
 
     var legacyTreeJsLoaded = false;
     
@@ -96,6 +96,7 @@ function MainController($scope, $rootScope, $location, $routeParams, $rootScope,
         //last item in the URL
         if (data.lastUserId && data.lastUserId !== data.user.id) {
             $location.path("/").search("");
+            historyService.removeAll();
         }
 
         if($scope.user.emailHash){
