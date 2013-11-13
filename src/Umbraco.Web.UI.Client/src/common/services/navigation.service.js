@@ -22,7 +22,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
     //Define all sub-properties for the UI object here
     var ui = {
         tablet: false,
-        showNavigation: false,
         showContextMenu: false,
         stickyNavigation: false,
         showTray: false,
@@ -43,14 +42,15 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
     function setTreeMode() {
         ui.tablet = ($(window).width() <= minScreenSize);
-        ui.showNavigation = !ui.tablet;
+
+        appState.setGlobalState("showNavigation", !ui.tablet);
     }
 
     function setMode(mode) {
         switch (mode) {
         case 'tree':
             ui.currentMode = "tree";
-            ui.showNavigation = true;
+            appState.setGlobalState("showNavigation", true);
             ui.showContextMenu = false;
             appState.setMenuState("showMenu", false);
             ui.stickyNavigation = false;
@@ -60,7 +60,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             break;
         case 'menu':
             ui.currentMode = "menu";
-            ui.showNavigation = true;
+            appState.setGlobalState("showNavigation", true);
             ui.showContextMenu = true;
             appState.setMenuState("showMenu", false);
             ui.stickyNavigation = true;
@@ -68,14 +68,14 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         case 'dialog':
             ui.currentMode = "dialog";
             ui.stickyNavigation = true;
-            ui.showNavigation = true;
+            appState.setGlobalState("showNavigation", true);
             ui.showContextMenu = false;
             appState.setMenuState("showMenu", true);
             break;
         case 'search':
             ui.currentMode = "search";
             ui.stickyNavigation = false;
-            ui.showNavigation = true;
+            appState.setGlobalState("showNavigation", true);
             ui.showContextMenu = false;
             appState.setSectionState("showSearchResults", true);
             appState.setMenuState("showMenu", false);
@@ -94,7 +94,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             ui.showTray = false;
 
             if (ui.tablet) {
-                ui.showNavigation = false;
+                appState.setGlobalState("showNavigation", false);
             }
 
             break;

@@ -9,7 +9,14 @@
  * 
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope,$rootScope, $location, $log, $routeParams, navigationService, keyboardService, dialogService, historyService, sectionResource, angularHelper) {
+function NavigationController($scope, $rootScope, $location, $log, $routeParams, appState, navigationService, keyboardService, dialogService, historyService, sectionResource, angularHelper) {
+
+    //TODO: Put all of this nav service init in the main controller ! - or on the appStart not here!
+    //initialize nav service
+    navigationService.init();
+    //the tree event handler i used to subscribe to the main tree click events
+    $scope.treeEventHandler = $({});
+    navigationService.setupTreeEvents($scope.treeEventHandler, $scope);
 
     //Put the navigation service on this scope so we can use it's methods/properties in the view.
     // IMPORTANT: all properties assigned to this scope are generally available on the scope object on dialogs since
@@ -19,14 +26,8 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
     //set up our scope vars
     $scope.showContextMenuDialog = false;
     $scope.showSearchResults = false;
-    $scope.currentSection = null;
-    
-    //TODO: Put all of this in the main controller ! - or on the appStart not here!
-    //initialize nav service
-    navigationService.init();
-    //the tree event handler i used to subscribe to the main tree click events
-    $scope.treeEventHandler = $({});
-    navigationService.setupTreeEvents($scope.treeEventHandler, $scope);
+    $scope.currentSection = appState.getSectionState("currentSection");
+    $scope.showNavigation = appState.getGlobalState("showNavigation");
     
     //trigger search with a hotkey:
     keyboardService.bind("ctrl+shift+s", function(){
@@ -41,6 +42,13 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
     
     $scope.selectedId = navigationService.currentId;
     
+    //Listen for global state changes
+    $scope.$on("appState.globalState.changed", function (e, args) {
+        if (args.key === "showNavigation") {
+            $scope.showNavigation = args.value;
+        }
+    });
+
     //Listen for menu state changes
     $scope.$on("appState.menuState.changed", function(e, args) {
         if (args.key === "showMenu") {

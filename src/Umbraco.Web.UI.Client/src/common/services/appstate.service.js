@@ -10,14 +10,11 @@ function appState($rootScope) {
     
     //Define all variables here - we are never returning this objects so they cannot be publicly mutable
     // changed, we only expose methods to interact with the values.
-    
-    //var dialogState = {
-    //    //The current dialog
-    //    currentDialog: null,
-    //    //The dialog title
-    //    dialogTitle: null
-    //};
 
+    var globalState = {
+        showNavigation: null  
+    };
+    
     var sectionState = {
         //The currently active section
         currentSection: null,
@@ -36,7 +33,56 @@ function appState($rootScope) {
         showMenu: null
     };
 
+    /** function to validate and set the state on a state object */
+    function setState(stateObj, key, value, stateObjName) {
+        if (!_.has(stateObj, key)) {
+            throw "The variable " + key + " does not exist in " + stateObjName;
+        }
+        var changed = stateObj[key] !== value;
+        stateObj[key] = value;
+        if (changed) {
+            $rootScope.$broadcast("appState." + stateObjName + ".changed", { key: key, value: value });
+        }
+    }
+    
+    /** function to validate and set the state on a state object */
+    function getState(stateObj, key, stateObjName) {
+        if (!_.has(stateObj, key)) {
+            throw "The variable " + key + " does not exist in " + stateObjName;
+        }
+        return stateObj[key];
+    }
+
     return {
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.angularHelper#getGlobalState
+         * @methodOf umbraco.services.appState
+         * @function
+         *
+         * @description
+         * Returns the current global state value by key - we do not return an object here - we do NOT want this
+         * to be publicly mutable and allow setting arbitrary values
+         *
+         */
+        getGlobalState: function (key) {
+            return getState(globalState, key, "globalState");
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.angularHelper#setGlobalState
+         * @methodOf umbraco.services.appState
+         * @function
+         *
+         * @description
+         * Sets a global state value by key
+         *
+         */
+        setGlobalState: function (key, value) {
+            setState(globalState, key, value, "globalState");
+        },
 
         /**
          * @ngdoc function
@@ -45,15 +91,12 @@ function appState($rootScope) {
          * @function
          *
          * @description
-         * Returns the current section state value by key - we do not return a variable here - we do NOT want this
+         * Returns the current section state value by key - we do not return an object here - we do NOT want this
          * to be publicly mutable and allow setting arbitrary values
          *
          */
         getSectionState: function (key) {
-            if (!_.has(sectionState, key)) {
-                throw "The variable " + key + " does not exist in section state";
-            }
-            return sectionState[key];
+            return getState(sectionState, key, "sectionState");            
         },
         
         /**
@@ -67,14 +110,7 @@ function appState($rootScope) {
          *
          */
         setSectionState: function(key, value) {
-            if (!_.has(sectionState, key)) {
-                throw "The variable " + key + " does not exist in section state";
-            }
-            var changed = sectionState[key] !== value;
-            sectionState[key] = value;
-            if (changed) {
-                $rootScope.$broadcast("appState.sectionState.changed", { key: key, value: value });
-            }
+            setState(sectionState, key, value, "sectionState");
         },
 
         /**
@@ -84,15 +120,12 @@ function appState($rootScope) {
          * @function
          *
          * @description
-         * Returns the current tree state value by key - we do not return a variable here - we do NOT want this
+         * Returns the current tree state value by key - we do not return an object here - we do NOT want this
          * to be publicly mutable and allow setting arbitrary values
          *
          */
         getTreeState: function (key) {
-            if (!_.has(treeState, key)) {
-                throw "The variable " + key + " does not exist in tree state";
-            }
-            return treeState[key];
+            return getState(treeState, key, "treeState");
         },
         
         /**
@@ -106,14 +139,7 @@ function appState($rootScope) {
          *
          */
         setTreeState: function (key, value) {
-            if (!_.has(treeState, key)) {
-                throw "The variable " + key + " does not exist in tree state";
-            }
-            var changed = treeState[key] !== value;
-            treeState[key] = value;
-            if (changed) {
-                $rootScope.$broadcast("appState.treeState.changed", { key: key, value: value });
-            }
+            setState(treeState, key, value, "treeState");
         },
 
         /**
@@ -123,15 +149,12 @@ function appState($rootScope) {
          * @function
          *
          * @description
-         * Returns the current menu state value by key - we do not return a variable here - we do NOT want this
+         * Returns the current menu state value by key - we do not return an object here - we do NOT want this
          * to be publicly mutable and allow setting arbitrary values
          *
          */
         getMenuState: function (key) {
-            if (!_.has(menuState, key)) {
-                throw "The variable " + key + " does not exist in menu state";
-            }
-            return menuState[key];
+            return getState(menuState, key, "menuState");
         },
         
         /**
@@ -145,14 +168,7 @@ function appState($rootScope) {
          *
          */
         setMenuState: function (key, value) {
-            if (!_.has(menuState, key)) {
-                throw "The variable " + key + " does not exist in menu state";
-            }
-            var changed = treeState[key] !== value;
-            menuState[key] = value;
-            if (changed) {
-                $rootScope.$broadcast("appState.menuState.changed", { key: key, value: value });
-            }
+            setState(menuState, key, value, "menuState");
         },
 
     };
