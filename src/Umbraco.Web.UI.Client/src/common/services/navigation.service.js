@@ -20,11 +20,12 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
     var minScreenSize = 1100;
     //used to track the current dialog object
     var currentDialog = null;
+    //tracks the screen size as a tablet
+    var isTablet = false;
 
     //TODO: Once most of the state vars have been refactored out to use appState, this UI object will be internal ONLY and will not be
     // exposed from this service.
-    var ui = {
-        tablet: false,        
+    var ui = {     
         currentPath: undefined,
         currentTree: undefined,
         treeEventHandler: undefined,
@@ -35,9 +36,9 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
     };
     
     function setTreeMode() {
-        ui.tablet = ($(window).width() <= minScreenSize);
+        isTablet = ($(window).width() <= minScreenSize);
 
-        appState.setGlobalState("showNavigation", !ui.tablet);
+        appState.setGlobalState("showNavigation", !isTablet);
     }
 
     function setMode(mode) {
@@ -88,7 +89,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             appState.setGlobalState("stickyNavigation", false);
             appState.setGlobalState("showTray", false);
 
-            if (ui.tablet) {
+            if (isTablet) {
                 appState.setGlobalState("showNavigation", false);
             }
 
@@ -104,8 +105,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         /** initializes the navigation service */
         init: function() {
 
-            //TODO: detect tablet mode, subscribe to window resizing
-            //for now we just hardcode it to non-tablet mode
             setTreeMode();
             
             //keep track of the current section - initially this will always be undefined so 
@@ -402,7 +401,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          */
         hideTree: function() {
 
-            if (this.ui.tablet && !appState.getGlobalState("stickyNavigation")) {
+            if (isTablet && !appState.getGlobalState("stickyNavigation")) {
                 //reset it to whatever is in the url
                 appState.setSectionState("currentSection", $routeParams.section);
                 setMode("default-hidesectiontree");
