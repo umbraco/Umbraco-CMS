@@ -239,6 +239,10 @@ namespace Umbraco.Tests.BusinessLogic
             // public Guid VersionId . get
 
             // ! constuctor fails
+            // !!!!!!!!!!!!!
+            //  Property class constructor is failing because of unclear reasons. 
+            //  Could be that last part of its code is obsolete. 
+            //  Suppressed by try {} catch {}. Should be carefully investigated and solved later.
             var property = new Property(_propertyData1.Id);
             var savedPropertyDto = getTestPropertyDataDto(_propertyData1.Id);
 

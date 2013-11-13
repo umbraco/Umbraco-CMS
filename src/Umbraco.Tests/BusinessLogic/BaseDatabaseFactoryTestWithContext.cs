@@ -7,6 +7,7 @@ using umbraco.cms.businesslogic;
 using System.Xml;
 using umbraco.cms.businesslogic.web;
 using NUnit.Framework;
+using System.Text;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -95,6 +96,36 @@ namespace Umbraco.Tests.TestHelpers
         {
             System.Console.WriteLine(format, args);
         }
+
+        #region Helper methods borroed from umbraco
+        protected string getSqlStringArray(string commaSeparatedArray)
+        {
+            // create array
+            string[] array = commaSeparatedArray.Trim().Split(',');
+
+            // build SQL array
+            StringBuilder sqlArray = new StringBuilder();
+            foreach (string item in array)
+            {
+                string trimmedItem = item.Trim();
+                if (trimmedItem.Length > 0)
+                {
+                    sqlArray.Append("'").Append(escapeString(trimmedItem)).Append("',");
+                }
+            }
+
+            // remove last comma
+            if (sqlArray.Length > 0)
+                sqlArray.Remove(sqlArray.Length - 1, 1);
+            return sqlArray.ToString();
+        }
+
+        protected static string escapeString(string value)
+        {
+            return string.IsNullOrEmpty(value) ? string.Empty : value.Replace("'", "''");
+        }
+
+        #endregion
 
         #region Private Helper classes and methods from cms_businesslogic_CMSNodeTests
         protected CMSNode _node1;

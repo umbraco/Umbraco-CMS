@@ -9,12 +9,24 @@ using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core;
+using Umbraco.Core.Persistence;
+using System.Runtime.CompilerServices;
 
 namespace umbraco.cms.businesslogic.Tags
 {
     public class Tag : ITag
     {
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
+        protected static ISqlHelper SqlHelper
+        {
+            get { return Application.SqlHelper; }
+        }
 
+        internal static UmbracoDatabase Database
+        {
+            get { return ApplicationContext.Current.DatabaseContext.Database; }
+        }
+        
         #region Constructors
         public Tag() { }
         public Tag(int id, string tag, string group, int nodeCount)
@@ -177,17 +189,26 @@ namespace umbraco.cms.businesslogic.Tags
             }
         }
 
+        /// <summary>
+        /// Adds new Tag
+        /// </summary>
+        /// <param name="tag">tag name</param>
+        /// <param name="group">group name</param>
+        /// <returns>Tag.Id</returns>
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public static int AddTag(string tag, string group)
         {
-            return (int)ApplicationContext.Current.DatabaseContext.Database.Insert( 
-                   new TagDto() { Tag = tag, Group = group });
+            Database.Execute("insert into [cmsTags] ([Tag], [Group]) values (@0, @1)", tag, group);
+            object id = Database.ExecuteScalar<object>("select Max(id) from cmsTags");
+            if (id == null) throw new ArgumentNullException(string.Format("Tag addition failed, Tag = '{0}', GroupName = '{1}'", tag, group));
+            return (int)id;
         }
 
         public static int GetTagId(string tag, string group)
         {
-            var tagDto = ApplicationContext.Current.DatabaseContext.Database.FirstOrDefault<TagDto>("where tag=@0 AND [group]=@1", tag, group);
+            var tagDto = Database.Fetch<TagDto>("where tag=@0 AND [group]=@1", tag, group);
             if (tagDto == null) return 0;
-            return tagDto.Id;  
+            return tagDto[0].Id;  
         }
 
         public static IEnumerable<Tag> GetTags(int nodeId, string group)
