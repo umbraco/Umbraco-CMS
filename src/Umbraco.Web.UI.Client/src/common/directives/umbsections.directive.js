@@ -16,6 +16,8 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
             scope.sections = [];
             scope.nav = navigationService;
             scope.currentSection = appState.getSectionState("currentSection");
+            scope.showTray = appState.getGlobalState("showTray");
+            scope.needTray = false;
 
 			function loadSections(){
 				sectionResource.getSections()
@@ -39,6 +41,13 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 					}
 				});
 			}
+
+            //Listen for showTray changes
+			scope.$on("appState.globalState.changed", function (e, args) {
+			    if (args.key === "showTray") {
+			        scope.showTray = args.value;
+			    }
+			});
 
 			//When the user logs in
 			scope.$on("authenticated", function (evt, data) {

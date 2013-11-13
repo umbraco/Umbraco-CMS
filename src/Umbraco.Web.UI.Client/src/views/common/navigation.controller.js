@@ -11,7 +11,7 @@
  */
 function NavigationController($scope, $rootScope, $location, $log, $routeParams, appState, navigationService, keyboardService, dialogService, historyService, sectionResource, angularHelper) {
 
-    //TODO: Put all of this nav service init in the main controller ! - or on the appStart not here!    
+    //TODO: Need to think about this and an nicer way to acheive what this is doing.
     //the tree event handler i used to subscribe to the main tree click events
     $scope.treeEventHandler = $({});
     navigationService.setupTreeEvents($scope.treeEventHandler, $scope);

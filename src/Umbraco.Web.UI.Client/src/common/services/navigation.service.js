@@ -23,7 +23,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
     var ui = {
         tablet: false,
         stickyNavigation: false,
-        showTray: false,
         currentPath: undefined,
         currentTree: undefined,
         treeEventHandler: undefined,
@@ -53,7 +52,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             appState.setMenuState("showMenu", false);
             appState.setMenuState("showMenuDialog", false);
             ui.stickyNavigation = false;
-            ui.showTray = false;
+            appState.setGlobalState("showTray", false);
             
             //$("#search-form input").focus();    
             break;
@@ -91,7 +90,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             appState.setMenuState("showMenuDialog", false);
             appState.setSectionState("showSearchResults", false);
             ui.stickyNavigation = false;
-            ui.showTray = false;
+            appState.setGlobalState("showTray", false);
 
             if (ui.tablet) {
                 appState.setGlobalState("showNavigation", false);
@@ -186,12 +185,12 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             setMode("tree");
         },
 
-        showTray: function() {
-            ui.showTray = true;
+        showTray: function () {
+            appState.setGlobalState("showTray", true);
         },
 
-        hideTray: function() {
-            ui.showTray = false;
+        hideTray: function () {
+            appState.setGlobalState("showTray", false);
         },
 
         //adding this to get clean global access to the main tree directive
