@@ -1,17 +1,5 @@
 angular.module("umbraco").controller("Umbraco.Editors.DatepickerController",
-    function ($scope, notificationsService, assetsService) {
-
-        //setup the default config
-        var config = {
-            pickDate: true,
-            pickTime: true,
-            format: "yyyy-MM-dd HH:mm:ss"
-        };
-        //map the user config
-        angular.extend(config, $scope.model.config);
-        //map back to the model
-        $scope.model.config = config;
-        $scope.model.viewvalue = $scope.model.value;
+    function ($scope, notificationsService, assetsService, userService) {
 
         function applyDate(e){
                 // when a date is changed, update the model
@@ -26,24 +14,40 @@ angular.module("umbraco").controller("Umbraco.Editors.DatepickerController",
                 }
         }
 
-        assetsService.loadJs(
-                'views/propertyeditors/datepicker/bootstrap-datetimepicker.min.js'
-            ).then(
-            function () {
-                //The Datepicker js and css files are available and all components are ready to use.
+        function initEditor(){
+            // Get the id of the datepicker button that was clicked
+            var pickerId = $scope.model.alias;
+            // Open the datepicker and add a changeDate eventlistener
+            
+            $("#" + pickerId)
+                .datetimepicker($scope.model.config)
+                .on("changeDate", applyDate)
+                .on("hide", applyDate);
+        }
+        
+        userService.getCurrentUser().then(function(user){
 
-                // Get the id of the datepicker button that was clicked
-                var pickerId = $scope.model.alias;
-                // Open the datepicker and add a changeDate eventlistener
-                
-                $("#" + pickerId)
-                    .datetimepicker($scope.model.config)
-                    .on("changeDate", applyDate)
-                    .on("hide", applyDate);
+            //setup the default config
+            var config = {
+                pickDate: true,
+                pickTime: true,
+                language: user.locale,
+                format: "yyyy-MM-dd HH:mm:ss"
+            };
 
-            });
+            //format:"yyyy-MM-dd HH:mm:ss"
 
+            //map the user config
+            angular.extend(config, $scope.model.config);
+            //map back to the model
+            $scope.model.config = config;
+            $scope.model.viewvalue = $scope.model.value;
 
+            assetsService.loadJs(
+                    'views/propertyeditors/datepicker/bootstrap-datetimepicker.js'
+                ).then(initEditor);
+        });
+ 
         assetsService.loadCss(
                 'views/propertyeditors/datepicker/bootstrap-datetimepicker.min.css'
         );
