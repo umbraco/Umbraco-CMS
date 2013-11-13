@@ -289,7 +289,7 @@ namespace umbraco.cms.businesslogic.template
         public XmlNode ToXml(XmlDocument doc)
         {
             XmlNode template = doc.CreateElement("Template");
-            template.AppendChild(xmlHelper.addTextNode(doc, "Name", this.Text));
+            template.AppendChild(xmlHelper.addTextNode(doc, "Name", base.Text));
             template.AppendChild(xmlHelper.addTextNode(doc, "Alias", this.Alias));
 
             if (this.MasterTemplate != 0)
@@ -770,21 +770,9 @@ namespace umbraco.cms.businesslogic.template
 		
         public static Template Import(XmlNode n, User u)
         {
-            string alias = xmlHelper.GetNodeValue(n.SelectSingleNode("Alias"));
-
-            Template t = Template.GetByAlias(alias);
-	        var design = xmlHelper.GetNodeValue(n.SelectSingleNode("Design"));
-
-            if (t == null)
-            {
-				//create the template with the design if one is specified
-				t = MakeNew(xmlHelper.GetNodeValue(n.SelectSingleNode("Name")), u, 
-					design.IsNullOrWhiteSpace() ? null : design);
-            }
-
-            t.Alias = alias;
-
-            return t;
+            var element = System.Xml.Linq.XElement.Parse(n.OuterXml);
+            var templates = ApplicationContext.Current.Services.PackagingService.ImportTemplates(element, u.Id);
+            return new Template(templates.First().Id);
         }
         
 

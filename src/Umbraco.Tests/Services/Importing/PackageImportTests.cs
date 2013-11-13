@@ -131,6 +131,24 @@ namespace Umbraco.Tests.Services.Importing
         }
 
         [Test]
+        public void PackagingService_Can_Import_Single_Template()
+        {
+            // Arrange
+            string strXml = ImportResources.StandardMvc_Package;
+            var xml = XElement.Parse(strXml);
+            var element = xml.Descendants("Templates").First().Element("Template");
+            var packagingService = ServiceContext.PackagingService;
+
+            // Act
+            var templates = packagingService.ImportTemplates(element);
+
+            // Assert
+            Assert.That(templates, Is.Not.Null);
+            Assert.That(templates.Any(), Is.True);
+            Assert.That(templates.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
         public void PackagingService_Can_Import_StandardMvc_ContentTypes_Package_Xml()
         {
             // Arrange
