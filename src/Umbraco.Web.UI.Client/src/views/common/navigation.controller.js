@@ -18,6 +18,7 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
 
     //set up our scope vars
     $scope.showContextMenuDialog = false;
+    $scope.showSearchResults = false;
 
     //wire up the screensize and tree mode detection
     navigationService.init();
@@ -51,6 +52,13 @@ function NavigationController($scope,$rootScope, $location, $log, $routeParams, 
     $scope.$on("appState.menuState.changed", function(e, args) {
         if (args.key === "showMenu") {
             $scope.showContextMenuDialog = args.value;
+        }
+    });
+    
+    //Listen for section state changes
+    $scope.$on("appState.sectionState.changed", function (e, args) {
+        if (args.key === "showSearchResults") {
+            $scope.showSearchResults = args.value;
         }
     });
 

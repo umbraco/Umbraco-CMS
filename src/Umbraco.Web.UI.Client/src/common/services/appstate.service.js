@@ -20,7 +20,8 @@ function appState($rootScope) {
 
     var sectionState = {
         //The currently active section
-        currentSection: null  
+        currentSection: null,
+        showSearchResults: null
     };
 
     var treeState = {

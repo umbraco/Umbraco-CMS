@@ -26,7 +26,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         showContextMenu: false,
         stickyNavigation: false,
         showTray: false,
-        showSearchResults: false,
         currentSection: undefined,
         currentPath: undefined,
         currentTree: undefined,
@@ -79,7 +78,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             ui.stickyNavigation = false;
             ui.showNavigation = true;
             ui.showContextMenu = false;
-            ui.showSearchResults = true;
+            appState.setSectionState("showSearchResults", true);
             appState.setMenuState("showMenu", false);
 
             $timeout(function() {
@@ -91,7 +90,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             ui.currentMode = "default";
             ui.showContextMenu = false;
             appState.setMenuState("showMenu", false);
-            ui.showSearchResults = false;
+            appState.setSectionState("showSearchResults", false);
             ui.stickyNavigation = false;
             ui.showTray = false;
 
