@@ -950,7 +950,7 @@ namespace Umbraco.Core.Services
             var templates = new List<ITemplate>();
             var templateElements = name.Equals("Templates")
                                        ? (from doc in element.Elements("Template") select doc).ToList()
-                                       : new List<XElement> { element.Element("Template") };
+                                       : new List<XElement> { element };
 
             var fields = new List<TopologicalSorter.DependencyField<XElement>>();
             foreach (XElement tempElement in templateElements)
