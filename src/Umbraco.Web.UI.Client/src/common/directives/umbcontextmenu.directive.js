@@ -1,29 +1,17 @@
 angular.module("umbraco.directives")
-.directive('umbContextMenu', function ($injector, appState) {
+.directive('umbContextMenu', function ($injector, navigationService) {
     return {
+        scope: {
+            menuDialogTitle: "@",
+            currentSection: "@",
+            currentEntity: "=",
+            menuActions: "="
+        },
         restrict: 'E',
         replace: true,
         templateUrl: 'views/directives/umb-contextmenu.html',
         link: function (scope, element, attrs, ctrl) {
-
-            //setup scope vars
-            scope.currentSection = appState.getSectionState("currentSection");
-            scope.showMenu = appState.getMenuState("showMenu");
-
-            //listen for section change
-            scope.$on("appState.sectionState.changed", function(e, args) {
-                if (args.key === "currentSection") {
-                    scope.currentSection = args.value;
-                }
-            });
             
-            //listen for menu change
-            scope.$on("appState.menuState.changed", function (e, args) {
-                if (args.key === "showMenu") {
-                    scope.showMenu = args.value;
-                }
-            });
-
             //adds a handler to the context menu item click, we need to handle this differently
             //depending on what the menu item is supposed to do.
             scope.executeMenuItem = function (currentNode, action, currentSection) {
@@ -61,7 +49,12 @@ angular.module("umbraco.directives")
                 }
                 else {
                     //by default we launch the dialog
-                    scope.openDialog(currentNode, action, currentSection);
+                    
+                    //TODO: This is temporary using $parent, now that this is an isolated scope
+                    // the problem with all these dialogs is were passing other object's scopes around which isn't nice at all.
+                    // Each of these passed scopes expects a .nav property assigned to it which is a reference to the navigationService,
+                    // which should not be happenning... should simply be using the navigation service, no ?!
+                    scope.$parent.openDialog(currentNode, action, currentSection);
                 }
             };
 

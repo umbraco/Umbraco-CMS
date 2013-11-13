@@ -18,6 +18,8 @@
 function navigationService($rootScope, $routeParams, $log, $location, $q, $timeout, dialogService, treeService, notificationsService, historyService, appState) {
 
     var minScreenSize = 1100;
+    //used to track the current dialog object
+    var currentDialog = null;
 
     //TODO: Once most of the state vars have been refactored out to use appState, this UI object will be internal ONLY and will not be
     // exposed from this service.
@@ -26,10 +28,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         currentPath: undefined,
         currentTree: undefined,
         treeEventHandler: undefined,
-        currentNode: undefined,
-        actions: undefined,
-        currentDialog: undefined,
-        dialogTitle: undefined,
+        currentNode: undefined,   
 
         //a string/name reference for the currently set ui mode
         currentMode: "default"
@@ -58,7 +57,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             appState.setGlobalState("showNavigation", true);
             appState.setMenuState("showMenu", true);
             appState.setMenuState("showMenuDialog", false);
-            ui.stickyNavigation = true;
+            appState.setGlobalState("stickyNavigation", true);
             break;
         case 'dialog':
             ui.currentMode = "dialog";
@@ -220,7 +219,10 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 ev.stopPropagation();
                 ev.preventDefault();
 
-                scope.currentNode = args.node;
+                //Set the current action node (this is not the same as the current selected node!)
+                //TODO: Convert this to basic entity , not tree node
+                appState.setMenuState("currentEntity", args.node);
+                
                 args.scope = scope;
 
                 if (args.event && args.event.altKey) {
@@ -438,10 +440,13 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
                         if (found) {
 
-                            self.ui.currentNode = args.node;
+                            //NOTE: This is assigning the current action node - this is not the same as the currently selected node!
+                            //TODO: Change this to an entity instead of a node!
+                            appState.setMenuState("currentEntity", args.node);
+                            
                             //ensure the current dialog is cleared before creating another!
-                            if (self.ui.currentDialog) {
-                                dialogService.close(self.ui.currentDialog);
+                            if (currentDialog) {
+                                dialogService.close(currentDialog);
                             }
 
                             var dialog = self.showDialog({
@@ -461,10 +466,10 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
                     setMode("menu");
 
-                    ui.actions = data.menuItems;
-
-                    ui.currentNode = args.node;
-                    ui.dialogTitle = args.node.name;
+                    //TODO: Change this to an entity instead of a node!
+                    appState.setMenuState("currentEntity", args.node);
+                    appState.setMenuState("menuActions", data.menuItems);
+                    appState.setMenuState("dialogTitle", args.node.name);                    
 
                     //we're not opening a dialog, return null.
                     deferred.resolve(null);
@@ -482,10 +487,9 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * Hides the menu by hiding the containing dom element
          */
         hideMenu: function() {
-            var selectedId = $routeParams.id;
-            this.ui.currentNode = undefined;
-            this.ui.actions = [];
-
+            //SD: Would we ever want to access the last action'd node instead of clearing it here?
+            appState.setMenuState("currentEntity", null);
+            appState.setMenuState("menuActions", []);
             setMode("tree");
         },
 
@@ -576,8 +580,8 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             }
 
             //ensure the current dialog is cleared before creating another!
-            if (this.ui.currentDialog) {
-                dialogService.close(this.ui.currentDialog);
+            if (currentDialog) {
+                dialogService.close(currentDialog);
             }
 
             setMode("dialog");
@@ -589,10 +593,10 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
             //the title might be in the meta data, check there first
             if (args.action.metaData["dialogTitle"]) {
-                this.ui.dialogTitle = args.action.metaData["dialogTitle"];
+                appState.setMenuState("dialogTitle", args.action.metaData["dialogTitle"]);
             }
             else {
-                this.ui.dialogTitle = args.action.name;
+                appState.setMenuState("dialogTitle", args.action.name);
             }
 
             var templateUrl;
@@ -652,7 +656,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 });
 
             //save the currently assigned dialog so it can be removed before a new one is created
-            this.ui.currentDialog = dialog;
+            currentDialog = dialog;
             return dialog;
         },
 
@@ -665,7 +669,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 	     * hides the currently open dialog
 	     */
         hideDialog: function() {
-            this.showMenu(undefined, { skipDefault: true, node: this.ui.currentNode });
+            this.showMenu(undefined, { skipDefault: true, node: appState.getMenuState("currentEntity") });
         },
         /**
           * @ngdoc method
@@ -698,8 +702,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
           * hides any open navigation panes and resets the tree, actions and the currently selected node
           */
         hideNavigation: function() {
-            this.ui.actions = [];
-            //this.ui.currentNode = undefined;
+            appState.setMenuState("menuActions", []);
             setMode("default");
         }
     };

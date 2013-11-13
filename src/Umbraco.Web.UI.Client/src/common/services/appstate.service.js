@@ -30,6 +30,10 @@ function appState($rootScope) {
     };
     
     var menuState = {
+        //this list of menu items to display
+        menuActions: null,
+        //the title to display in the context menu dialog
+        dialogTitle: null,
         //The basic entity that is having an action performed on it
         currentEntity: null,
         //Whether the menu's dialog is being shown or not

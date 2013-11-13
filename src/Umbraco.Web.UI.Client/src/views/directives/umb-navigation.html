@@ -73,15 +73,24 @@
         </div>
 
         <div class="offset6" style="z-index: 10">
+            
             <!-- The context menu -->
-            <umb-context-menu></umb-context-menu>
+            <div id='contextMenu' class="umb-modalcolumn fill shadow" ng-swipe-left="nav.hideMenu()" ng-show="showContextMenu" ng-animate="'slide'">
+                <umb-context-menu                     
+                    menu-dialog-title="{{menuDialogTitle}}"
+                    current-section="{{currentSection}}"
+                    current-entity="menuEntity"
+                    menu-actions="menuActions">
+                </umb-context-menu>    
+            </div>
+            
             
             <!-- Tree dialogs -->
             <div id="dialog" class='umb-modalcolumn fill shadow'
                 ng-swipe-left="nav.hideDialog()"
                 ng-show="showContextMenuDialog" ng-animate="'slide'">
                 <div class='umb-modalcolumn-header'>
-                    <h1>{{nav.ui.dialogTitle}}</h1>
+                    <h1>{{menuDialogTitle}}</h1>
                 </div>
                 <div class='umb-modalcolumn-body'>
                 </div>
