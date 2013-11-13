@@ -9,11 +9,9 @@
     'lib/angular/1.1.5/angular-cookies.min.js',
     'lib/angular/1.1.5/angular-mobile.min.js',
     'lib/angular/1.1.5/angular-sanitize.min.js',
-   
 
     'lib/angular/angular-ui-sortable.js',
-    'lib/angular/angular-datetimepicker.min.js',
-
+    
     'lib/jquery/jquery.upload/js/jquery.fileupload.js',
     'lib/jquery/jquery.upload/js/load-image.min.js',
     'lib/jquery/jquery.upload/js/jquery.fileupload-process.js',
