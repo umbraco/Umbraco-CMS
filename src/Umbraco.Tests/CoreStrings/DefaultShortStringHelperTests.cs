@@ -6,17 +6,20 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Strings;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.CoreStrings
 {
     [TestFixture]
-    public class DefaultShortStringHelperTests
+    public class DefaultShortStringHelperTests : BaseUmbracoConfigurationTest
     {
         private DefaultShortStringHelper _helper;
 
         [SetUp]
-        public void Setup()
+        public override void Initialize()
         {
+            base.Initialize();
+
             // NOTE: it is not possible to configure the helper once it has been assigned
             // to the resolver and resolution has frozen. but, obviously, it is possible
             // to configure filters and then to alter these filters after resolution has
@@ -37,8 +40,9 @@ namespace Umbraco.Tests.CoreStrings
         }
 
         [TearDown]
-        public void TearDown()
+        public override void TearDown()
         {
+            base.TearDown();
             ShortStringHelperResolver.Reset();
         }
 

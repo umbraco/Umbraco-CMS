@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Core.Persistence;
@@ -19,21 +18,15 @@ namespace Umbraco.Tests.TestHelpers
     /// ensures everything is torn down properly.
     /// </summary>
     [TestFixture]
-    public abstract class BaseUmbracoApplicationTest
+    public abstract class BaseUmbracoApplicationTest : BaseUmbracoConfigurationTest
     {
         [SetUp]
-        public virtual void Initialize()
+        public override void Initialize()
         {
-            TestHelper.SetupLog4NetForTests();
+            base.Initialize();
+
             TestHelper.InitializeContentDirectories();
             TestHelper.EnsureUmbracoSettingsConfig();
-            
-            //mock the Umbraco settings that we need
-            var settings = SettingsForTests.GetMockSettings();
-            //sets the global singleton to use the mocked format
-            SettingsForTests.ConfigureSettings(settings);
-            //set our local variable for tests to use (preferably)
-            UmbracoSettings = settings;
             
             //Create the legacy prop-eds mapping
             LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
@@ -46,8 +39,10 @@ namespace Umbraco.Tests.TestHelpers
         }
 
         [TearDown]
-        public virtual void TearDown()
+        public override void TearDown()
         {
+            base.TearDown();
+
             //reset settings
             SettingsForTests.Reset();
             UmbracoContext.Current = null;
@@ -72,7 +67,7 @@ namespace Umbraco.Tests.TestHelpers
             });
         }
 
-        protected virtual IUmbracoSettingsSection UmbracoSettings { get; private set; }
+        
 
         /// <summary>
         /// By default this returns false which means the plugin manager will not be reset so it doesn't need to re-scan 
