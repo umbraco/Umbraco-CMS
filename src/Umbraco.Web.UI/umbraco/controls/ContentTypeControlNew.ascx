@@ -59,7 +59,7 @@
   <cc2:Pane runat="server">  
     <cc2:PropertyPanel ID="pp_icon" runat="server" Text="Icon">
         <div class="umbIconDropdownList">
-          <a href="#" class="icon-picker"> <i class="<asp:Literal runat="server" ID="lt_icon" />"></i> Choose...</a>
+          <a href="#" class="btn btn-link picker-icons"> <i class="<asp:Literal runat="server" ID="lt_icon" />"></i> Choose...</a>
           <asp:HiddenField ID="tb_icon" runat="server" />
         </div>
     </cc2:PropertyPanel>
@@ -115,7 +115,7 @@
    
         duplicatePropertyNameAsSafeAlias('ul.addNewProperty .prop-name', 'ul.addNewProperty .prop-alias');
    
-        jQuery(".icon-picker").click(function(){
+        jQuery(".picker-icons").click(function(){
             var that = this;
             UmbClientMgr.openAngularModalWindow({
                 template: 'views/common/dialogs/iconpicker.html', 
