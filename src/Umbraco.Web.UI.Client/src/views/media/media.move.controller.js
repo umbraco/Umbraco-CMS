@@ -13,18 +13,25 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
 		eventsService.publish("Umbraco.Editors.Media.MoveController.Select", args);
 	    
 		var c = $(args.event.target.parentElement);
+
 		if ($scope.selectedEl) {
 		    $scope.selectedEl.find(".temporary").remove();
 		    $scope.selectedEl.find("i.umb-tree-icon").show();
 		}
 
-		c.find("i.umb-tree-icon").hide()
-        .after("<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>");
+		var temp = "<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>";
+		var icon = c.find("i.umb-tree-icon");
+		if (icon.length > 0) {
+		    icon.hide().after(temp);
+		} else {
+		    c.prepend(temp);
+		}
+
 
 		$scope.target = args.node;
 		$scope.selectedEl = c;
-	    
 	});
+
 
 	$scope.move = function(){
 		mediaResource.move({parentId: $scope.target.id, id: node.id})
