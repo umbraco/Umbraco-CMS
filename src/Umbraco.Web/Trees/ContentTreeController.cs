@@ -68,7 +68,7 @@ namespace Umbraco.Web.Trees
                     var hasChildren = e.HasChildren;
 
                     //Special check to see if it ia a container, if so then we'll hide children.
-                    if (entity.AdditionalData["IsContainer"] is bool && (bool) entity.AdditionalData["IsContainer"])
+                    if (entity.AdditionalData.ContainsKey("IsContainer") && entity.AdditionalData["IsContainer"] is bool && (bool) entity.AdditionalData["IsContainer"])
                     {
                         hasChildren = false;
                     }
