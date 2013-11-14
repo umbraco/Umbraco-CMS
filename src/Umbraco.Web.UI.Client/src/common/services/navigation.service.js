@@ -344,12 +344,14 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             }
         },
 
+        //TODO: This should return a promise
         reloadNode: function(node) {
             if (mainTreeEventHandler) {
                 mainTreeEventHandler.reloadNode(node);
             }
         },
 
+        //TODO: This should return a promise
         reloadSection: function(sectionAlias) {
             if (mainTreeEventHandler) {
                 mainTreeEventHandler.clearCache({ section: sectionAlias });
