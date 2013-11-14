@@ -481,6 +481,8 @@ namespace umbraco.cms.businesslogic
                             
                             item.setValue(defaultValue);
 
+                            DictionaryItems.TryAdd(dr.GetString("key"), item);
+
                             item.OnNew(EventArgs.Empty);
 
                             return item.id;
