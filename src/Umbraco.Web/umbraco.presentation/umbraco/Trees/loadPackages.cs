@@ -112,22 +112,18 @@ namespace umbraco
                 case "repository":
 
                     _repoGuid = HttpContext.Current.Request.QueryString["repoGuid"];
-                    var currentRepo = cms.businesslogic.packager.repositories.Repository.getByGuid(_repoGuid);
-                    if (currentRepo != null)
+                    Umbraco.Web.org.umbraco.our.Repository r = new Umbraco.Web.org.umbraco.our.Repository();
+                    foreach (var cat in r.Categories(_repoGuid))
                     {
-
-                        foreach (cms.businesslogic.packager.repositories.Category cat in currentRepo.Webservice.Categories(currentRepo.Guid))
-                        {
-
-                            XmlTreeNode xNode = XmlTreeNode.Create(this);
-                            xNode.Text = cat.Text;
-                            xNode.Action = "javascript:openPackageCategory('BrowseRepository.aspx?category=" + cat.Id + "&repoGuid=" + currentRepo.Guid + "');";
-                            xNode.Icon = "icon-folder";
-                            xNode.OpenIcon = "icon-folder";
-                            xNode.NodeType = "packagesCategory" + cat.Id;                        
-                            tree.Add(xNode);
-                        }
+                        XmlTreeNode xNode = XmlTreeNode.Create(this);
+                        xNode.Text = cat.Text;
+                        xNode.Action = "javascript:openPackageCategory('BrowseRepository.aspx?category=" + cat.Id + "&repoGuid=" + _repoGuid + "');";
+                        xNode.Icon = "icon-folder";
+                        xNode.OpenIcon = "icon-folder";
+                        xNode.NodeType = "packagesCategory" + cat.Id;                        
+                        tree.Add(xNode);
                     }
+                    
                     break;
             }
 
