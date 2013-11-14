@@ -206,11 +206,12 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             //when a tree node is synced this event will fire, this allows us to set the currentNode
             mainTreeEventHandler.bind("treeSynced", function (ev, args) {
                 
-                //set the global current node
-                ui.currentNode = args.node;
-                //not sure what this is doing
-                scope.currentNode = args.node;
-                //what the heck is going on here? - this seems really zany, allowing us to modify the 
+                if (args.activate === undefined || args.activate === true) {
+                    //set the current selected node
+                    appState.setTreeState("selectedNode", args.node);
+                }
+                
+                //TODO: what the heck is going on here? - this seems really zany, allowing us to modify the 
                 // navigationController.scope from within the navigationService to assign back to the args
                 // so that we can change the navigationController.scope from within the umbTree directive. Hrm.
                 args.scope = scope;
@@ -225,6 +226,9 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 //Set the current action node (this is not the same as the current selected node!)
                 appState.setMenuState("currentNode", args.node);
                 
+                //TODO: what the heck is going on here? - this seems really zany, allowing us to modify the 
+                // navigationController.scope from within the navigationService to assign back to the args
+                // so that we can change the navigationController.scope from within the umbTree directive. Hrm.
                 args.scope = scope;
 
                 if (args.event && args.event.altKey) {
@@ -238,7 +242,9 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 ev.stopPropagation();
                 ev.preventDefault();
 
-                scope.currentNode = args.node;
+                //TODO: what the heck is going on here? - this seems really zany, allowing us to modify the 
+                // navigationController.scope from within the navigationService to assign back to the args
+                // so that we can change the navigationController.scope from within the umbTree directive. Hrm.
                 args.scope = scope;
 
                 args.skipDefault = true;
@@ -251,9 +257,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 var n = args.node;
                 ev.stopPropagation();
                 ev.preventDefault();
-
-                //put this into the app state
-                appState.setTreeState("selectedNode", args.node);
 
                 if (n.metaData && n.metaData["jsClickCallback"] && angular.isString(n.metaData["jsClickCallback"]) && n.metaData["jsClickCallback"] !== "") {
                     //this is a legacy tree node!                
@@ -279,9 +282,11 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 else if (n.routePath) {
                     //add action to the history service
                     historyService.add({ name: n.name, link: n.routePath, icon: n.icon });
-                    //not legacy, lets just set the route value and clear the query string if there is one.
+                    
+                    //put this node into the tree state
+                    appState.setTreeState("selectedNode", args.node);
 
-                    ui.currentNode = n;
+                    //not legacy, lets just set the route value and clear the query string if there is one.
                     $location.path(n.routePath).search("");
                 }
                 else if (args.element.section) {
@@ -307,6 +312,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * @param {String} args.tree the tree alias to sync to
          * @param {Array} args.path the path to sync the tree to
          * @param {Boolean} args.forceReload optional, specifies whether to force reload the node data from the server even if it already exists in the tree currently
+         * @param {Boolean} args.activate optional, specifies whether to set the synced node to be the active node, this will default to true if not specified
          */
         syncTree: function (args) {
             if (!args) {

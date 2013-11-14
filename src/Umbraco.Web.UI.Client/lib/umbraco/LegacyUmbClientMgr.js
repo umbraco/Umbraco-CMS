@@ -83,6 +83,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
             mainTree: function() {
                 var injector = getRootInjector();
                 var navService = injector.get("navigationService");
+                var appState = injector.get("appState");
                 var angularHelper = injector.get("angularHelper");
                 var $rootScope = injector.get("$rootScope");
 
@@ -116,9 +117,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     },
                     moveNode: function (id, path) {
                         angularHelper.safeApply($rootScope, function() {
-                            if (navService.ui.currentNode) {
+                            var currentMenuNode = appState.getMenuState("currentNode");
+                            if (currentMenuNode) {
                                 var treeService = injector.get("treeService");
-                                var treeRoot = treeService.getTreeRoot(navService.ui.currentNode);
+                                var treeRoot = treeService.getTreeRoot(currentMenuNode);
                                 if (treeRoot) {
                                     var found = treeService.getDescendantNode(treeRoot, id);
                                     if (found) {
@@ -131,12 +133,17 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     },
                     getActionNode: function () {
                         //need to replicate the legacy tree node
+                        var currentMenuNode = appState.getMenuState("currentNode");
+                        if (!currentMenuNode) {
+                            return null;
+                        }
+                        
                         var legacyNode = {
-                            nodeId: navService.ui.currentNode.id,
-                            nodeName: navService.ui.currentNode.name,
-                            nodeType: navService.ui.currentNode.nodeType,
-                            treeType: navService.ui.currentNode.nodeType,
-                            sourceUrl: navService.ui.currentNode.childNodesUrl,
+                            nodeId: currentMenuNode.id,
+                            nodeName: currentMenuNode.name,
+                            nodeType: currentMenuNode.nodeType,
+                            treeType: currentMenuNode.nodeType,
+                            sourceUrl: currentMenuNode.childNodesUrl,
                             updateDefinition: function() {
                                 throw "'updateDefinition' method is not supported in Umbraco 7, consider upgrading to the new v7 APIs";
                             }

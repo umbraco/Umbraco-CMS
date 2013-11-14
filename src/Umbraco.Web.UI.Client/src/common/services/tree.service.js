@@ -494,6 +494,29 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             return deferred.promise;
         },
 
+        /** This will return the current node's path by walking up the tree */
+        getPath: function(node) {
+            if (!node) {
+                throw "node cannot be null";                
+            }
+            if (!angular.isFunction(node.parent)) {
+                throw "node.parent is not a function, the path cannot be resolved";
+            }
+            //all root nodes have metadata key 'treeAlias'
+            var reversePath = [];
+            var current = node;
+            while (current != null) {
+                reversePath.push(current.id);                
+                if (current.metaData && current.metaData["treeAlias"]) {
+                    current = null;
+                }
+                else {
+                    current = current.parent();
+                }
+            }
+            return reversePath.reverse();
+        },
+
         syncTree: function(args) {
             
             if (!args) {
@@ -569,7 +592,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     }
                 }
                 else {
-                    //the current node doesn't have it's children loaded, so go get them
+                    //couldn't find it in the 
                     self.loadNodeChildren({ node: node, section: node.section }).then(function () {
                         //ok, got the children, let's find it
                         var found = self.getChildNode(node, args.path[currPathIndex]);

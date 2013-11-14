@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Net.Http.Headers;
 using System.Security.AccessControl;
+using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
@@ -280,12 +281,15 @@ namespace Umbraco.Web.Editors
         [EnsureUserPermissionForMedia("move.Id")]
         public HttpResponseMessage PostMove(MoveOrCopy move)
         {
-            
             var toMove = ValidateMoveOrCopy(move);
 
             Services.MediaService.Move(toMove, move.ParentId);
 
-            return Request.CreateResponse(HttpStatusCode.OK);
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json")
+            };
+            return response; 
         }
 
         /// <summary>

@@ -133,11 +133,11 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                             }
 
                             //reset current node selection
-                            scope.currentNode = undefined;
+                            //scope.currentNode = null;
 
                             //filter the path for root node ids
                             args.path = _.filter(args.path, function (item) { return (item !== "init" && item !== "-1"); });
-                            loadPath(args.path, args.forceReload);
+                            loadPath(args.path, args.forceReload, args.activate);
 
                             return deferred.promise;
                         };
@@ -157,18 +157,14 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
 
 
                 //helper to load a specific path on the active tree as soon as its ready
-                function loadPath(path, forceReload) {
-
-                    function _load(tree, path, forceReload) {
-                        syncTree(tree, path, forceReload);
-                    }
+                function loadPath(path, forceReload, activate) {
 
                     if (scope.activeTree) {
-                        _load(scope.activeTree, path, forceReload);
+                        syncTree(scope.activeTree, path, forceReload, activate);
                     }
                     else {
-                        scope.eventhandler.one("activeTreeLoaded", function(e, args) {
-                            _load(args.tree, path, forceReload);
+                        scope.eventhandler.one("activeTreeLoaded", function (e, args) {
+                            syncTree(args.tree, path, forceReload, activate);
                         });
                     }
                 }
@@ -181,8 +177,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 function loadActiveTree(treeAlias, loadChildren) {
                     scope.activeTree = undefined;
 
-                    function _load(tree) {
-
+                    function doLoad(tree) {
                         var childrenAndSelf = [tree].concat(tree.children);
                         scope.activeTree = _.find(childrenAndSelf, function (node) {
                              return node.metaData.treeAlias === treeAlias;
@@ -205,11 +200,11 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     }
 
                     if (scope.tree) {
-                        _load(scope.tree.root);
+                        doLoad(scope.tree.root);
                     }
                     else {
                         scope.eventhandler.one("treeLoaded", function(e, args) {
-                            _load(args.tree);
+                            doLoad(args.tree);
                         });
                     }
                 }
@@ -245,7 +240,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                 }
 
                 /** syncs the tree, the treeNode can be ANY tree node in the tree that requires syncing */
-                function syncTree(treeNode, path, forceReload) {
+                function syncTree(treeNode, path, forceReload, activate) {
 
                     deleteAnimations = false;
 
@@ -254,8 +249,12 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         path: path,
                         forceReload: forceReload
                     }).then(function (data) {
-                        scope.currentNode = data;
-                        emitEvent("treeSynced", { node: data });
+
+                        if (activate === undefined || activate === true) {
+                            scope.currentNode = data;
+                        }
+                        
+                        emitEvent("treeSynced", { node: data, activate: activate });
                         
                         enableDeleteAnimations();
                     });
@@ -326,7 +325,12 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                   and emits it as a treeNodeSelect element if there is a callback object
                   defined on the tree
                 */
-                scope.select = function(e, n, ev) {
+                scope.select = function (e, n, ev) {
+                    //on tree select we need to remove the current node - 
+                    // whoever handles this will need to make sure the correct node is selected
+                    //reset current node selection
+                    scope.currentNode = null;
+
                     emitEvent("treeNodeSelect", { element: e, node: n, event: ev });
                 };
 
