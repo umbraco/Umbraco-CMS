@@ -15,7 +15,7 @@
  * Section navigation and search, and maintain their state for the entire application lifetime
  *
  */
-function navigationService($rootScope, $routeParams, $log, $location, $q, $timeout, $injector, dialogService, treeService, notificationsService, historyService, appState, angularHelper) {
+function navigationService($rootScope, $routeParams, $log, $location, $q, $timeout, $injector, dialogService, umbModelMapper, treeService, notificationsService, historyService, appState, angularHelper) {
 
     var minScreenSize = 1100;
     //used to track the current dialog object
@@ -457,7 +457,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             setMode("tree");
         },
 
-        executeMenuAction: function (currentNode, action, currentSection) {
+        executeMenuAction: function (action, node, section) {
 
             if (action.metaData && action.metaData["jsAction"] && angular.isString(action.metaData["jsAction"])) {
 
@@ -467,41 +467,37 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
                     //if it is not two parts long then this most likely means that it's a legacy action                         
                     var js = action.metaData["jsAction"].replace("javascript:", "");
-                    
                     //there's not really a different way to acheive this except for eval 
                     eval(js);
                 }
                 else {
-                    var _s = $injector.get(menuAction[0]);
-                    if (!_s) {
+                    var _service = $injector.get(menuAction[0]);
+                    if (!_service) {
                         throw "The angular service " + menuAction[0] + " could not be found";
                     }
 
-                    var method = _s[menuAction[1]];
+                    var method = _service[menuAction[1]];
+
                     if (!method) {
                         throw "The method " + menuAction[1] + " on the angular service " + menuAction[0] + " could not be found";
                     }
 
                     method.apply(this, [{
-                        treeNode: currentNode,
+                        //map our content object to a basic entity to pass in to the menu handlers,
+                        //this is required for consistency since a menu item needs to be decoupled from a tree node since the menu can
+                        //exist standalone in the editor for which it can only pass in an entity (not tree node).
+                        entity: umbModelMapper.convertToEntityBasic(node),
                         action: action,
-                        section: currentSection
+                        section: section,
+                        treeAlias: treeService.getTreeAlias(node)
                     }]);
                 }
             }
             else {
-                //by default we launch the dialog
-                
-                //TODO: This is temporary using $parent, now that this is an isolated scope
-                // the problem with all these dialogs is were passing other object's scopes around which isn't nice at all.
-                // Each of these passed scopes expects a .nav property assigned to it which is a reference to the navigationService,
-                // which should not be happenning... should simply be using the navigation service, no ?!
-                //scope.$parent.openDialog(currentNode, action, currentSection);
-
                 service.showDialog({
-                    node: currentNode,
+                    node: node,
                     action: action,
-                    section: currentSection
+                    section: section
                 });
             }
         },

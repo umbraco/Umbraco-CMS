@@ -9,7 +9,7 @@
  * 
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope, $rootScope, $location, $log, $routeParams, appState, navigationService, keyboardService, dialogService, historyService, sectionResource, angularHelper) {
+function NavigationController($scope, $rootScope, $location, $log, $routeParams, $timeout, appState, navigationService, keyboardService, dialogService, historyService, sectionResource, angularHelper) {
 
     //TODO: Need to think about this and an nicer way to acheive what this is doing.
     //the tree event handler i used to subscribe to the main tree click events
