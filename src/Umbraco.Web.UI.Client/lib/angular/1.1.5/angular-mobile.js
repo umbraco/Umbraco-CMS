@@ -271,6 +271,7 @@ ngMobile.directive('ngClick', ['$parse', '$timeout', '$rootElement',
       });
     });
 
+/*
     element.bind('mousedown', function(event) {
       element.addClass(ACTIVE_CLASS_NAME);
     });
@@ -278,6 +279,7 @@ ngMobile.directive('ngClick', ['$parse', '$timeout', '$rootElement',
     element.bind('mousemove mouseup', function(event) {
       element.removeClass(ACTIVE_CLASS_NAME);
     });
+*/
 
   };
 }]);
