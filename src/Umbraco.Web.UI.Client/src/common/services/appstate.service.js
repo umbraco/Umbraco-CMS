@@ -15,7 +15,8 @@ function appState($rootScope) {
         showNavigation: null,
         touchDevice: null,
         showTray: null,
-        stickyNavigation: null
+        stickyNavigation: null,
+        navMode: null
     };
     
     var sectionState = {

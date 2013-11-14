@@ -19,6 +19,8 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     //Put the navigation service on this scope so we can use it's methods/properties in the view.
     // IMPORTANT: all properties assigned to this scope are generally available on the scope object on dialogs since
     //   when we create a dialog we pass in this scope to be used for the dialog's scope instead of creating a new one.
+    // TODO: Lets fix this, it is less than ideal to be passing in the navigationController scope to something else to be used as it's scope,
+    // this is going to lead to problems/confusion. I really don't think passing scope's around is very good practice.
     $scope.nav = navigationService;
 
     //set up our scope vars
@@ -30,21 +32,20 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     $scope.menuNode = null;
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.showNavigation = appState.getGlobalState("showNavigation");
-    
-    
+
     //trigger search with a hotkey:
-    keyboardService.bind("ctrl+shift+s", function(){
+    keyboardService.bind("ctrl+shift+s", function () {
         navigationService.showSearch();
     });
 
     //trigger dialods with a hotkey:
     //TODO: Unfortunately this will also close the login dialog.
-    keyboardService.bind("esc", function(){
+    keyboardService.bind("esc", function () {
         $rootScope.$emit("closeDialogs");
     });
-    
+
     $scope.selectedId = navigationService.currentId;
-    
+
     //Listen for global state changes
     $scope.$on("appState.globalState.changed", function (e, args) {
         if (args.key === "showNavigation") {
@@ -53,7 +54,7 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     });
 
     //Listen for menu state changes
-    $scope.$on("appState.menuState.changed", function(e, args) {
+    $scope.$on("appState.menuState.changed", function (e, args) {
         if (args.key === "showMenuDialog") {
             $scope.showContextMenuDialog = args.value;
         }
@@ -70,7 +71,7 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
             $scope.menuNode = args.value;
         }
     });
-    
+
     //Listen for section state changes
     $scope.$on("appState.sectionState.changed", function (e, args) {
         //section changed
@@ -91,20 +92,20 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
             angularHelper.safeApply($scope);
         }
     });
-        
+
     //when a user logs out or timesout
-    $scope.$on("notAuthenticated", function() {
-        $scope.authenticated = false;        
+    $scope.$on("notAuthenticated", function () {
+        $scope.authenticated = false;
     });
-    
+
     //when a user is authorized setup the data
-    $scope.$on("authenticated", function(evt, data) {
+    $scope.$on("authenticated", function (evt, data) {
         $scope.authenticated = true;
     });
 
     //this reacts to the options item in the tree
     //todo, migrate to nav service
-    $scope.searchShowMenu = function (ev, args) {   
+    $scope.searchShowMenu = function (ev, args) {
         $scope.currentNode = args.node;
         args.scope = $scope;
 
@@ -114,18 +115,43 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     };
 
     //todo, migrate to nav service
-    $scope.searchHide = function () {   
+    $scope.searchHide = function () {
         navigationService.hideSearch();
     };
-    
+
     /** Opens a dialog but passes in this scope instance to be used for the dialog */
-    $scope.openDialog = function (currentNode, action, currentSection) {        
+    $scope.openDialog = function (currentNode, action, currentSection) {
         navigationService.showDialog({
             scope: $scope,
             node: currentNode,
             action: action,
             section: currentSection
         });
+    };
+
+    //the below assists with hiding/showing the tree
+    var treeActive = false;
+
+    //Sets a service variable as soon as the user hovers the navigation with the mouse
+    //used by the leaveTree method to delay hiding
+    $scope.enterTree = function (event) {
+        treeActive = true;
+    };
+    
+    // Hides navigation tree, with a short delay, is cancelled if the user moves the mouse over the tree again    
+    $scope.leaveTree = function(event) {
+        //this is a hack to handle IE touch events which freaks out due to no mouse events so the tree instantly shuts down
+        if (!event) {
+            return;
+        }
+        if (!appState.getGlobalState("touchDevice")) {
+            treeActive = false;
+            $timeout(function() {
+                if (!treeActive) {
+                    navigationService.hideTree();
+                }
+            }, 300);
+        }
     };
 }
 

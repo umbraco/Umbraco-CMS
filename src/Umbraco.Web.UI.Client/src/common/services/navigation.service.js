@@ -24,26 +24,18 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
     var isTablet = false;
     //the main tree event handler, which gets assigned via the setupTreeEvents method
     var mainTreeEventHandler = null;
+    //tracks the user profile dialog
+    var userDialog = null;
 
-    //TODO: Once most of the state vars have been refactored out to use appState, this UI object will be internal ONLY and will not be
-    // exposed from this service.
-    var ui = {     
-        currentNode: undefined,   
-
-        //a string/name reference for the currently set ui mode
-        currentMode: "default"
-    };
-    
     function setTreeMode() {
         isTablet = ($(window).width() <= minScreenSize);
-
         appState.setGlobalState("showNavigation", !isTablet);
     }
 
     function setMode(mode) {
         switch (mode) {
         case 'tree':
-            ui.currentMode = "tree";
+            appState.setGlobalState("navMode", "tree");
             appState.setGlobalState("showNavigation", true);
             appState.setMenuState("showMenu", false);
             appState.setMenuState("showMenuDialog", false);
@@ -53,21 +45,21 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             //$("#search-form input").focus();    
             break;
         case 'menu':
-            ui.currentMode = "menu";
+            appState.setGlobalState("navMode", "menu");
             appState.setGlobalState("showNavigation", true);
             appState.setMenuState("showMenu", true);
             appState.setMenuState("showMenuDialog", false);
             appState.setGlobalState("stickyNavigation", true);
             break;
         case 'dialog':
-            ui.currentMode = "dialog";
+            appState.setGlobalState("navMode", "dialog");
             appState.setGlobalState("stickyNavigation", true);
             appState.setGlobalState("showNavigation", true);
             appState.setMenuState("showMenu", false);
             appState.setMenuState("showMenuDialog", true);
             break;
         case 'search':
-            ui.currentMode = "search";
+            appState.setGlobalState("navMode", "search");
             appState.setGlobalState("stickyNavigation", false);
             appState.setGlobalState("showNavigation", true);
             appState.setMenuState("showMenu", false);
@@ -81,7 +73,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
             break;
         default:
-            ui.currentMode = "default";
+            appState.setGlobalState("navMode", "default");
             appState.setMenuState("showMenu", false);
             appState.setMenuState("showMenuDialog", false);
             appState.setSectionState("showSearchResults", false);
@@ -97,9 +89,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
     }
 
     var service = {
-        active: false,
-        userDialog: undefined,
-        ui: ui,
 
         /** initializes the navigation service */
         init: function() {
@@ -368,46 +357,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 mainTreeEventHandler._setActiveTreeType(treeAlias, loadChildren);
             }
         },
-
-        /**
-         * @ngdoc method
-         * @name umbraco.services.navigationService#enterTree
-         * @methodOf umbraco.services.navigationService
-         *
-         * @description
-         * Sets a service variable as soon as the user hovers the navigation with the mouse
-         * used by the leaveTree method to delay hiding
-         */
-        enterTree: function(event) {
-            service.active = true;
-        },
-
-        /**
-         * @ngdoc method
-         * @name umbraco.services.navigationService#leaveTree
-         * @methodOf umbraco.services.navigationService
-         *
-         * @description
-         * Hides navigation tree, with a short delay, is cancelled if the user moves the mouse over the tree again
-         */
-        leaveTree: function(event) {
-            //this is a hack to handle IE touch events
-            //which freaks out due to no mouse events
-            //so the tree instantly shuts down
-            if (!event) {
-                return;
-            }
-
-            if (!appState.getGlobalState("touchDevice")) {
-                service.active = false;
-                $timeout(function() {
-                    if (!service.active) {
-                        service.hideTree();
-                    }
-                }, 300);
-            }
-        },
-
+        
         /**
          * @ngdoc method
          * @name umbraco.services.navigationService#hideTree
@@ -518,12 +468,12 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          */
         showUserDialog: function() {
 
-            if(service.userDialog){
-                service.userDialog.close();
-                service.userDialog = undefined;
+            if(userDialog){
+                userDialog.close();
+                userDialog = null;
             }
 
-            service.userDialog = dialogService.open(
+            userDialog = dialogService.open(
                 {
                     template: "views/common/dialogs/user.html",
                     modalClass: "umb-modal-left",
@@ -532,7 +482,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         
             
 
-            return service.userDialog;
+            return userDialog;
         },
 
         /**
@@ -601,9 +551,9 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             setMode("dialog");
 
             //set up the scope object and assign properties
-            var scope = args.scope || $rootScope.$new();
-            scope.currentNode = args.node;
-            scope.currentAction = args.action;
+            var dialogScope = args.scope || $rootScope.$new();
+            dialogScope.currentNode = args.node;
+            dialogScope.currentAction = args.action;
 
             //the title might be in the meta data, check there first
             if (args.action.metaData["dialogTitle"]) {
@@ -659,7 +609,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             var dialog = dialogService.open(
                 {
                     container: $("#dialog div.umb-modalcolumn-body"),
-                    scope: scope,
+                    scope: dialogScope,
                     currentNode: args.node,
                     currentAction: args.action,
                     inline: true,

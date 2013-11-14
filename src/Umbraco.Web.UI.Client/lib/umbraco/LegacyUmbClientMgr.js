@@ -292,8 +292,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 // will show up on the right hand side and a dialog will show up as if it is in the menu.
                 // with the legacy API we cannot know what is expected so we can only check if the menu is active, if it is
                 // we'll launch a dialog, otherwise a modal.
+                var appState = injector.get("appState");
+                var navMode = appState.getGlobalState("navMode");
                 var dialog;
-                if (navService.ui.currentMode === "menu") {
+                if (navMode === "menu") {
                     dialog = navService.showDialog({
                         //create a 'fake' action to passin with the specified actionUrl since it needs to load into an iframe
                         action: {
