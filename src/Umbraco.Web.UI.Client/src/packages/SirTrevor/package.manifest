@@ -3,10 +3,10 @@
 		{
 			alias: "Sir.Trevor",
 			name: "Sir Trevor",
-			hideLabel: true,
-			valueType: "JSON",
 			editor: {
-				view: "~/App_Plugins/SirTrevor/SirTrevor.html"
+				view: "~/App_Plugins/SirTrevor/SirTrevor.html",
+				hideLabel: true,
+				valueType: "JSON"	
 			}
 		}
 	],
