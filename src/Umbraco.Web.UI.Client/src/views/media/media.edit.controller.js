@@ -11,6 +11,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
     //setup scope vars
     $scope.nav = navigationService;
     $scope.currentSection = appState.getSectionState("currentSection");
+    $scope.currentNode = null; //the editors affiliated node
 
     if ($routeParams.create) {
 
@@ -33,7 +34,9 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
 
-                navigationService.syncTree({ tree: "media", path: data.path });
+                navigationService.syncTree({ tree: "media", path: data.path }).then(function (syncArgs) {
+                    $scope.currentNode = syncArgs.node;
+                });
                 
             });
     }
@@ -53,7 +56,9 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                     });
 
-                    navigationService.syncTree({ tree: "media", path: data.path, forceReload: true });
+                    navigationService.syncTree({ tree: "media", path: data.path, forceReload: true }).then(function (syncArgs) {
+                        $scope.currentNode = syncArgs.node;
+                    });
 
                 }, function(err) {
 

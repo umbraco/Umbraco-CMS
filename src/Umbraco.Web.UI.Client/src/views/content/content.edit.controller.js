@@ -13,6 +13,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
     $scope.subButtons = [];
     $scope.nav = navigationService;
     $scope.currentSection = appState.getSectionState("currentSection");
+    $scope.currentNode = null; //the editors affiliated node
     
     //This sets up the action buttons based on what permissions the user has.
     //The allowedActions parameter contains a list of chars, each represents a button by permission so 
@@ -125,7 +126,9 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
 
                     configureButtons(data);
 
-                    navigationService.syncTree({ tree: "content", path: data.path.split(","), forceReload: true });
+                    navigationService.syncTree({ tree: "content", path: data.path.split(","), forceReload: true }).then(function (syncArgs) {
+                        $scope.currentNode = syncArgs.node;
+                    });
 
                     deferred.resolve(data);
                     
@@ -171,7 +174,9 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
 
-                navigationService.syncTree({ tree: "content", path: data.path.split(",") });
+                navigationService.syncTree({ tree: "content", path: data.path.split(",") }).then(function(syncArgs) {
+                    $scope.currentNode = syncArgs.node;
+                });
             });
     }
 
@@ -193,7 +198,9 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
 
                     configureButtons(data);
 
-                    navigationService.syncTree({ tree: "content", path: data.path.split(","), forceReload: true });
+                    navigationService.syncTree({ tree: "content", path: data.path.split(","), forceReload: true }).then(function (syncArgs) {
+                        $scope.currentNode = syncArgs.node;
+                    });
                 });
         }
         

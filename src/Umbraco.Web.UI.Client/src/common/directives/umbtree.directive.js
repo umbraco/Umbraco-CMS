@@ -114,6 +114,14 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                                 throw "args.path cannot be null";
                             }
                             
+                            var deferred = $q.defer();
+
+                            //this is super complex but seems to be working in other places, here we're listening for our
+                            // own events, once the tree is sycned we'll resolve our promise.
+                            scope.eventhandler.one("treeSynced", function (e, syncArgs) {
+                                deferred.resolve(syncArgs);
+                            });
+
                             //this should normally be set unless it is being called from legacy 
                             // code, so set the active tree type before proceeding.
                             if (args.tree) {
@@ -130,6 +138,8 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                             //filter the path for root node ids
                             args.path = _.filter(args.path, function (item) { return (item !== "init" && item !== "-1"); });
                             loadPath(args.path, args.forceReload);
+
+                            return deferred.promise;
                         };
 
                         /** 

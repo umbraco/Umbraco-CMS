@@ -22,7 +22,10 @@
                         <p class="btn btn-link umb-status-label">{{formStatus}}</p>
                     </div>
                     
-                    <umb-options-menu content="content" current-section="{{currentSection}}"></umb-options-menu>
+                    <umb-options-menu ng-show="currentNode"
+                        current-node="currentNode" 
+                        current-section="{{currentSection}}">                        
+                    </umb-options-menu>
 
                  </div>
              </div>

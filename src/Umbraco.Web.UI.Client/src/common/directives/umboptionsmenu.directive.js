@@ -1,10 +1,9 @@
 angular.module("umbraco.directives")
-.directive('umbOptionsMenu', function ($injector, treeService, navigationService, umbModelMapper) {
+.directive('umbOptionsMenu', function ($injector, treeService, navigationService, umbModelMapper, appState) {
     return {
         scope: {
-            content: "=",
             currentSection: "@",
-            treeAlias: "@"
+            currentNode: "="
         },
         restrict: 'E',
         replace: true,
@@ -14,9 +13,6 @@ angular.module("umbraco.directives")
             //adds a handler to the context menu item click, we need to handle this differently
             //depending on what the menu item is supposed to do.
             scope.executeMenuItem = function (action) {
-
-                //map our content object to a basic entity to pass in to the handlers
-                var currentEntity = umbModelMapper.convertToEntityBasic(scope.content);
 
                 if (action.metaData && action.metaData["jsAction"] && angular.isString(action.metaData["jsAction"])) {
 
@@ -43,10 +39,10 @@ angular.module("umbraco.directives")
                         }
 
                         method.apply(this, [{
-                            entity: currentEntity,
+                            entity: umbModelMapper.convertToEntityBasic(scope.currentNode),
                             action: action,
                             section: scope.currentSection,
-                            treeAlias: scope.treeAlias
+                            treeAlias: treeService.getTreeAlias(scope.currentNode)
                         }]);
                     }
                 }
@@ -57,18 +53,19 @@ angular.module("umbraco.directives")
                     // the problem with all these dialogs is were passing other object's scopes around which isn't nice at all.
                     // Each of these passed scopes expects a .nav property assigned to it which is a reference to the navigationService,
                     // which should not be happenning... should simply be using the navigation service, no ?!
-                    scope.$parent.openDialog(currentEntity, action, scope.currentSection);
+                    scope.$parent.openDialog(scope.currentNode, action, scope.currentSection);
                 }
             };
 
             //callback method to go and get the options async
             scope.getOptions = function () {
-                if (!scope.content.id) {
+
+                if (!scope.currentNode) {
                     return;
                 }
-
+                
                 if (!scope.actions) {
-                    treeService.getMenu({ treeNode: navigationService.ui.currentNode })
+                    treeService.getMenu({ treeNode: scope.currentNode })
                         .then(function (data) {
                             scope.actions = data.menuItems;
                         });

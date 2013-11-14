@@ -18,7 +18,10 @@
             <div class="span8">
                 <div class="btn-toolbar pull-right umb-btn-toolbar">
                     
-                    <umb-options-menu content="content" current-section="{{currentSection}}"></umb-options-menu>
+                    <umb-options-menu ng-show="currentNode"
+                        current-node="currentNode" 
+                        current-section="{{currentSection}}">                        
+                    </umb-options-menu>
 
                 </div>
             </div>

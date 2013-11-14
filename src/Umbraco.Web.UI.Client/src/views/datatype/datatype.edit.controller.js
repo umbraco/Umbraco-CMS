@@ -11,6 +11,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
     //setup scope vars
     $scope.nav = navigationService;
     $scope.currentSection = appState.getSectionState("currentSection");
+    $scope.currentNode = null; //the editors affiliated node
 
     //method used to configure the pre-values when we retreive them from the server
     function createPreValueProps(preVals) {
@@ -68,7 +69,9 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
                 
-                navigationService.syncTree({ tree: "datatype", path: [String(data.id)] });
+                navigationService.syncTree({ tree: "datatype", path: [String(data.id)] }).then(function (syncArgs) {
+                    $scope.currentNode = syncArgs.node;
+                });
             });
     }
     
@@ -104,7 +107,9 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                         }
                     });
 
-                    navigationService.syncTree({ tree: "datatype", path: [String(data.id)], forceReload: true });
+                    navigationService.syncTree({ tree: "datatype", path: [String(data.id)], forceReload: true }).then(function (syncArgs) {
+                        $scope.currentNode = syncArgs.node;
+                    });
                     
                 }, function(err) {
 

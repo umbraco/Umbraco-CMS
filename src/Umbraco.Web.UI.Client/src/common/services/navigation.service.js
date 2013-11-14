@@ -15,7 +15,7 @@
  * Section navigation and search, and maintain their state for the entire application lifetime
  *
  */
-function navigationService($rootScope, $routeParams, $log, $location, $q, $timeout, dialogService, treeService, notificationsService, historyService, appState) {
+function navigationService($rootScope, $routeParams, $log, $location, $q, $timeout, dialogService, treeService, notificationsService, historyService, appState, angularHelper) {
 
     var minScreenSize = 1100;
     //used to track the current dialog object
@@ -297,7 +297,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * @methodOf umbraco.services.navigationService
          *
          * @description
-         * Syncs a tree with a given path
+         * Syncs a tree with a given path, returns a promise
          * The path format is: ["itemId","itemId"], and so on
          * so to sync to a specific document type node do:
          * <pre>
@@ -320,8 +320,12 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             }
             
             if (mainTreeEventHandler) {
-                mainTreeEventHandler.syncTree(args);
+                //returns a promise
+                return mainTreeEventHandler.syncTree(args);
             }
+
+            //couldn't sync
+            return angularHelper.rejectedPromise();
         },
 
         /** 

@@ -27,11 +27,11 @@ function umbracoMenuActions($q, treeService, $location, navigationService, appSt
          */
         "RefreshNode": function (args) {
             
-            //just in case clear any tree cache for this node/section
-            treeService.clearCache({
-                cacheKey: "__" + args.section, //each item in the tree cache is cached by the section name
-                childrenOf: args.entity.parentId //clear the children of the parent
-            });
+            ////just in case clear any tree cache for this node/section
+            //treeService.clearCache({
+            //    cacheKey: "__" + args.section, //each item in the tree cache is cached by the section name
+            //    childrenOf: args.entity.parentId //clear the children of the parent
+            //});
 
             //since we're dealing with an entity, we need to attempt to find it's tree node, in the main tree
             // this action is purely a UI thing so if for whatever reason there is no loaded tree node in the UI
