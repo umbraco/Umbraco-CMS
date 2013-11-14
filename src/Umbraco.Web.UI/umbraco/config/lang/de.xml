@@ -89,8 +89,8 @@
   </area>
   <area alias="content">
     <key alias="about">Über dieses Dokument</key>
-    <key alias="alias">Alternative URLs</key>
-    <key alias="alternativeTextHelp">(Wie würden Sie das Bild über dem Telefon beschreiben?)</key>
+    <key alias="alias">Alias</key>
+    <key alias="alternativeTextHelp">(Wie würden Sie das Bild über das Telefon beschreiben?)</key>
     <key alias="alternativeUrls">Alternative Links</key>
     <key alias="clickToEdit">Klicken, um das Dokument zu bearbeiten</key>
     <key alias="createBy">Erstellt von</key>
