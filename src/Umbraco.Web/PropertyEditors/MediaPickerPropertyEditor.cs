@@ -14,13 +14,13 @@ namespace Umbraco.Web.PropertyEditors
     {
         public MediaPickerPropertyEditor()
         {
-            _defaultPreValues = new Dictionary<string, object>
+            InternalPreValues = new Dictionary<string, object>
                 {
                     {"multiPicker", false}
                 };
         }
 
-        private IDictionary<string, object> _defaultPreValues;
+        protected IDictionary<string, object> InternalPreValues;
 
         protected override PropertyValueEditor CreateValueEditor()
         {
@@ -32,8 +32,8 @@ namespace Umbraco.Web.PropertyEditors
 
         public override IDictionary<string, object> DefaultPreValues
         {
-            get { return _defaultPreValues; }
-            set { _defaultPreValues = value; }
+            get { return InternalPreValues; }
+            set { InternalPreValues = value; }
         }
     }
 }

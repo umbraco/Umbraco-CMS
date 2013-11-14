@@ -351,6 +351,7 @@
     <Compile Include="PropertyEditors\MemberGroupPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MemberPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MultiNodeTreePickerPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\MultipleMediaPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\ContentTypeParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleContentTypeParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultiplePropertyGroupParameterEditor.cs" />
