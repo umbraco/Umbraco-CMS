@@ -62,8 +62,8 @@ namespace Umbraco.Tests.BusinessLogic
             var taskType1 = new TaskType(_taskType1.Id);
             Assert.That(taskType1.Id, Is.EqualTo(_taskType1.Id));
             Assert.That(taskType1.Alias, Is.EqualTo(_taskType1.Alias));
- 
-            Assert.True(true);  
+
+            Assert.Throws<ArgumentException>(() => { new TaskType(12345); }, "Non-existent TaskType Id constuction failed");  
         }
 
         [Test(Description = "Constructor - public TaskType(string TypeAlias)")]
@@ -72,6 +72,8 @@ namespace Umbraco.Tests.BusinessLogic
             var taskType1 = new TaskType(_taskType1.Alias);
             Assert.That(taskType1.Id, Is.EqualTo(_taskType1.Id));
             Assert.That(taskType1.Alias, Is.EqualTo(_taskType1.Alias));
+
+            Assert.Throws<ArgumentException>(() => { new TaskType("*** Ghost Alais ***"); }, "Non-existent TaskType Alias constuction failed");  
 
             Assert.True(true);
         }

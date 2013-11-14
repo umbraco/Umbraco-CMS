@@ -21,7 +21,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             get 
             {
-                return DatabaseBehavior.NoDatabasePerFixture;    
+               return DatabaseBehavior.NoDatabasePerFixture;    
                //return DatabaseBehavior.NewSchemaPerFixture; 
             }
         }
@@ -48,6 +48,11 @@ namespace Umbraco.Tests.TestHelpers
         protected T getPersistedTestDto<T>(int id, string idKeyName = "id")
         {
             return independentDatabase.SingleOrDefault<T>(string.Format("where {0} = @0", idKeyName), id);
+        }
+        protected T getDto<T>(int id, string idKeyName = "id")
+        {
+            // short-cut for getPersistedTestDto<T>
+            return getPersistedTestDto<T>(id, idKeyName);  
         }
 
         protected string uniqueLabel
