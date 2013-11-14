@@ -17,7 +17,7 @@ function angularHelper($log, $q) {
          *
          * @description
          * In some situations we need to return a promise as a rejection, normally based on invalid data. This
-         * is a wrapper to do that so we can save one writing a bit of code.
+         * is a wrapper to do that so we can save on writing a bit of code.
          *
          * @param {object} objReject The object to send back with the promise rejection
          */

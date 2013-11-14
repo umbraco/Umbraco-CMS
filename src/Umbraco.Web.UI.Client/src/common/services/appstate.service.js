@@ -15,7 +15,8 @@ function appState($rootScope) {
         showNavigation: null,
         touchDevice: null,
         showTray: null,
-        stickyNavigation: null
+        stickyNavigation: null,
+        navMode: null
     };
     
     var sectionState = {
@@ -25,8 +26,11 @@ function appState($rootScope) {
     };
 
     var treeState = {
-        //The currently selected/edited entity
-        currentEntity:  null
+        //The currently selected node
+        selectedNode: null,
+        //The currently loaded root node reference - depending on the section loaded this could be a section root or a normal root.
+        //We keep this reference so we can lookup nodes to interact with in the UI via the tree service
+        currentRootNode: null
     };
     
     var menuState = {
@@ -34,8 +38,8 @@ function appState($rootScope) {
         menuActions: null,
         //the title to display in the context menu dialog
         dialogTitle: null,
-        //The basic entity that is having an action performed on it
-        currentEntity: null,
+        //The tree node that the ctx menu is launched for
+        currentNode: null,
         //Whether the menu's dialog is being shown or not
         showMenuDialog: null,
         //Whether the context menu is being shown or not

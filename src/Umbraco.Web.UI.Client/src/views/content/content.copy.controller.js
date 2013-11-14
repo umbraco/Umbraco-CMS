@@ -1,6 +1,6 @@
 angular.module("umbraco")
 	.controller("Umbraco.Editors.Content.CopyController",
-	function ($scope, eventsService, contentResource, navigationService, $log) {	
+	function ($scope, eventsService, contentResource, navigationService, appState, treeService) {
 	var dialogOptions = $scope.$parent.dialogOptions;
 	
 	$scope.dialogTreeEventHandler = $({});
@@ -37,7 +37,19 @@ angular.module("umbraco")
 				$scope.error = false;
 				$scope.success = true;
 
-				navigationService.syncTree({ tree: "content", path: path, forceReload: true });
+                //get the currently edited node (if any)
+			    var activeNode = appState.getTreeState("selectedNode");
+			    
+			    //we need to do a double sync here: first sync to the copied content - but don't activate the node,
+			    //then sync to the currenlty edited content (note: this might not be the content that was copied!!)
+
+			    navigationService.syncTree({ tree: "content", path: path, forceReload: true, activate: false }).then(function(args) {
+			        if (activeNode) {
+			            var activeNodePath = treeService.getPath(activeNode).join();
+			            //sync to this node now - depending on what was copied this might already be synced but might not be
+			            navigationService.syncTree({ tree: "content", path: activeNodePath, forceReload: false, activate: true });
+			        }
+			    });
 
 			},function(err){
 				$scope.success = false;

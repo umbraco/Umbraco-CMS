@@ -13,6 +13,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
     $scope.subButtons = [];
     $scope.nav = navigationService;
     $scope.currentSection = appState.getSectionState("currentSection");
+    $scope.currentNode = null; //the editors affiliated node
     
     //we need this to share our content object with property editors
     editorContext = $scope.content;
@@ -127,7 +128,10 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
                     });
 
                     configureButtons(data);
-                    navigationService.syncTree({ tree: "content", path: data.path.split(","), forceReload: true });
+                    navigationService.syncTree({ tree: "content", path: data.path.split(","), forceReload: true }).then(function (syncArgs) {
+                        $scope.currentNode = syncArgs.node;
+                    });
+
                     deferred.resolve(data);
                     
                 }, function (err) {
@@ -172,7 +176,9 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
 
-                navigationService.syncTree({ tree: "content", path: data.path.split(",") });
+                navigationService.syncTree({ tree: "content", path: data.path.split(",") }).then(function(syncArgs) {
+                    $scope.currentNode = syncArgs.node;
+                });
             });
     }
 
@@ -194,7 +200,9 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
 
                     configureButtons(data);
 
-                    navigationService.syncTree({ tree: "content", path: data.path.split(","), forceReload: true });
+                    navigationService.syncTree({ tree: "content", path: data.path.split(","), forceReload: true }).then(function (syncArgs) {
+                        $scope.currentNode = syncArgs.node;
+                    });
                 });
         }
         
@@ -222,24 +230,6 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
             }    
     };
     
-    $scope.options = function(content){
-        if(!content.id){
-            return;
-        }
-
-        if(!$scope.actions){
-            treeService.getMenu({ treeNode: $scope.nav.ui.currentNode })
-                .then(function(data) {
-                        $scope.actions = data.menuItems;
-                });    
-        }
-    };
-
-    $scope.executeOption = function(action){
-         navigationService.executeMenuAction($scope.nav.ui.currentNode, action, $scope.currentSection);   
-    };
-            
-
     /** this method is called for all action buttons and then we proxy based on the btn definition */
     $scope.performAction = function(btn) {
         if (!btn || !angular.isFunction(btn.handler)) {

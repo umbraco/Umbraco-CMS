@@ -20,30 +20,11 @@
                         <p class="btn btn-link umb-status-label">{{formStatus}}</p>
                     </div>
 
-                    <div class="btn-group" ng-class="{dimmed: content.id === 0}">
-                        <!-- options button -->
-                        <a class="btn" href="#" ng-click="options(content)" prevent-default data-toggle="dropdown">
-                           <i class="icon-settings" style="line-height: 14px"></i> 
-                           <localize key="general_actions">Actions</localize>
-                        </a>
-                        
-                        <a class="btn dropdown-toggle" ng-click="options(content)" data-toggle="dropdown">
-                            <span class="caret"></span>
-                        </a>
-                        
-                        <!-- actions -->
-                        <ul class="dropdown-menu  umb-actions" role="menu" aria-labelledby="dLabel">
-                            <li class="action" ng-class="{sep:action.seperator}" ng-repeat="action in actions">
-                                
-                                <!-- How does this reference executeMenuItem() i really don't think that this is very clear -->
-                                <a prevent-default
-                                    ng-click="executeMenuItem(nav.ui.currentNode,action,currentSection)">
-                                    <i class="icon icon-{{action.cssclass}}"></i>
-                                    <span class="menu-label">{{action.name}}</span>
-                                </a>
-                            </li>                             
-                        </ul>
-                     </div>
+                    <umb-options-menu ng-show="currentNode"
+                        current-node="currentNode" 
+                        current-section="{{currentSection}}">                        
+                    </umb-options-menu>
+
                 </div>
             </div>
         </umb-header>

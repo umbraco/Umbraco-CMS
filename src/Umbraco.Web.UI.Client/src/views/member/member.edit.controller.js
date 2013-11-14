@@ -11,6 +11,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
     //setup scope vars
     $scope.nav = navigationService;
     $scope.currentSection = appState.getSectionState("currentSection");
+    $scope.currentNode = null; //the editors affiliated node
 
     if ($routeParams.create) {
         //we are creating so get an empty member item
@@ -43,7 +44,9 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     var path = data.name[0]+"," + data.key;
                     path = path.replace(/-/g,'');
 
-                    navigationService.syncTree({ tree: "member", path: path.split(",") });
+                    navigationService.syncTree({ tree: "member", path: path.split(",") }).then(function (syncArgs) {
+                        $scope.currentNode = syncArgs.node;
+                    });
 
                     //in one particular special case, after we've created a new item we redirect back to the edit
                     // route but there might be server validation errors in the collection which we need to display
@@ -54,22 +57,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
         }
 
     }
-
-
-
-    $scope.options = function(content){
-            if(!content.id){
-                return;
-            }
-
-            if(!$scope.actions){
-                treeService.getMenu({ treeNode: $scope.nav.ui.currentNode })
-                    .then(function(data) {
-                            $scope.actions = data.menuItems;
-                    });    
-            }
-        };
-
+    
     $scope.save = function() {
 
         if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
@@ -85,6 +73,10 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                         //specify a custom id to redirect to since we want to use the GUID
                         redirectId: data.key,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
+                    });
+                    
+                    navigationService.syncTree({ tree: "member", path: path.split(",") }).then(function (syncArgs) {
+                        $scope.currentNode = syncArgs.node;
                     });
 
                 }, function (err) {

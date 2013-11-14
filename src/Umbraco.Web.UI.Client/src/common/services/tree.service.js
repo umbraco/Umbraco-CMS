@@ -147,10 +147,12 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                         cacheKey: args.cacheKey,
                         filter: function(cc) {
                             //get the new parent node from the tree cache
-                            var parent = self.getDescendantNode(cc.root, args.childrenOf);                            
-                            //clear it's children and set to not expanded
-                            parent.children = null;
-                            parent.expanded = false;
+                            var parent = self.getDescendantNode(cc.root, args.childrenOf);
+                            if (parent) {
+                                //clear it's children and set to not expanded
+                                parent.children = null;
+                                parent.expanded = false;
+                            }
                             //return the cache to be saved
                             return cc;
                         }
@@ -277,7 +279,33 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
         },
 
         /** Gets a descendant node by id */
-        getDescendantNode: function(treeNode, id) {
+        getDescendantNode: function(treeNode, id, treeAlias) {
+
+            //validate if it is a section container since we'll need a treeAlias if it is one
+            if (treeNode.isContainer === true && !treeAlias) {
+                throw "Cannot get a descendant node from a section container node without a treeAlias specified";
+            }
+
+            //if it is a section container, we need to find the tree to be searched
+            if (treeNode.isContainer) {
+                var foundRoot = null;
+                for (var c = 0; c < treeNode.children.length; c++) {
+                    if (this.getTreeAlias(treeNode.children[c]) === treeAlias) {
+                        foundRoot = treeNode.children[c];
+                        break;
+                    }
+                }
+                if (!foundRoot) {
+                    throw "Could not find a tree in the current section with alias " + treeAlias;
+                }
+                treeNode = foundRoot;
+            }
+
+            //check this node
+            if (treeNode.id === id) {
+                return treeNode;
+            }
+
             //check the first level
             var found = this.getChildNode(treeNode, id);
             if (found) {
@@ -466,6 +494,29 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             return deferred.promise;
         },
 
+        /** This will return the current node's path by walking up the tree */
+        getPath: function(node) {
+            if (!node) {
+                throw "node cannot be null";                
+            }
+            if (!angular.isFunction(node.parent)) {
+                throw "node.parent is not a function, the path cannot be resolved";
+            }
+            //all root nodes have metadata key 'treeAlias'
+            var reversePath = [];
+            var current = node;
+            while (current != null) {
+                reversePath.push(current.id);                
+                if (current.metaData && current.metaData["treeAlias"]) {
+                    current = null;
+                }
+                else {
+                    current = current.parent();
+                }
+            }
+            return reversePath.reverse();
+        },
+
         syncTree: function(args) {
             
             if (!args) {
@@ -541,7 +592,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     }
                 }
                 else {
-                    //the current node doesn't have it's children loaded, so go get them
+                    //couldn't find it in the 
                     self.loadNodeChildren({ node: node, section: node.section }).then(function () {
                         //ok, got the children, let's find it
                         var found = self.getChildNode(node, args.path[currPathIndex]);

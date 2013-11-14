@@ -2,6 +2,36 @@
 
 /**
  * @ngdoc function
+ * @name umbraco.services.umbModelMapper
+ * @function
+ *
+ * @description
+ * Utility class to map/convert models
+ */
+function umbModelMapper() {
+
+    return {
+
+        /** This converts the source model to a basic entity model, it will throw an exception if there isn't enough data to create the model */
+        convertToEntityBasic: function (source) {
+            var required = ["id", "name", "icon", "parentId", "path"];            
+            _.each(required, function (k) {
+                if (!_.has(source, k)) {
+                    throw "The source object does not contain the property " + k;
+                }
+            });
+            var optional = ["metaData", "key", "alias"];
+            //now get the basic object
+            var result = _.pick(source, required.concat(optional));
+            return result;
+        }
+
+    };
+}
+angular.module('umbraco.services').factory('umbModelMapper', umbModelMapper);
+
+/**
+ * @ngdoc function
  * @name umbraco.services.umbSessionStorage
  * @function
  *

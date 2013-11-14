@@ -3,6 +3,8 @@
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerController",
     function($rootScope, $scope, dialogService, mediaResource, imageHelper, $log) {
 
+        //check the pre-values for multi-picker
+        var multiPicker = $scope.model.config.multiPicker !== undefined ? $scope.model.config.multiPicker : true;
 
         function setupViewModel() {
             $scope.images = [];
@@ -33,8 +35,13 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
         $scope.add = function() {
             dialogService.mediaPicker({
-                multiPicker: true,
+                multiPicker: multiPicker,
                 callback: function(data) {
+                    
+                    //it's only a single selector, so make it into an array
+                    if (!multiPicker) {
+                        data = [data];
+                    }
                     
                     _.each(data, function(media, i) {
                         var img = {};
@@ -65,6 +72,15 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
         $scope.sync = function() {
             $scope.model.value = $scope.ids.join();
+        };
+
+        $scope.showAdd = function () {
+            if (!multiPicker) {
+                if ($scope.model.value && $scope.model.value !== "") {
+                    return false;
+                }
+            }
+            return true;
         };
 
         //here we declare a special method which will be called whenever the value has changed from the server

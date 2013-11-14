@@ -1,5 +1,5 @@
 <div id="leftcolumn" ng-controller="Umbraco.NavigationController" 
-    ng-mouseleave="nav.leaveTree($event)" ng-mouseenter="nav.enterTree($event)">
+    ng-mouseleave="leaveTree($event)" ng-mouseenter="enterTree($event)">
     
     <umb-sections sections="sections" ng-if="authenticated">
     </umb-sections>
@@ -78,7 +78,7 @@
                 <umb-context-menu                     
                     menu-dialog-title="{{menuDialogTitle}}"
                     current-section="{{currentSection}}"
-                    current-entity="menuEntity"
+                    current-node="menuNode"
                     menu-actions="menuActions">
                 </umb-context-menu>    
             </div>

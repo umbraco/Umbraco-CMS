@@ -15,7 +15,7 @@
  * Section navigation and search, and maintain their state for the entire application lifetime
  *
  */
-function navigationService($rootScope, $routeParams, $log, $location, $q, $timeout, $injector, dialogService, treeService, notificationsService, historyService, appState) {
+function navigationService($rootScope, $routeParams, $log, $location, $q, $timeout, $injector, dialogService, treeService, notificationsService, historyService, appState, angularHelper) {
 
     var minScreenSize = 1100;
     //used to track the current dialog object
@@ -24,26 +24,18 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
     var isTablet = false;
     //the main tree event handler, which gets assigned via the setupTreeEvents method
     var mainTreeEventHandler = null;
+    //tracks the user profile dialog
+    var userDialog = null;
 
-    //TODO: Once most of the state vars have been refactored out to use appState, this UI object will be internal ONLY and will not be
-    // exposed from this service.
-    var ui = {     
-        currentNode: undefined,   
-
-        //a string/name reference for the currently set ui mode
-        currentMode: "default"
-    };
-    
     function setTreeMode() {
         isTablet = ($(window).width() <= minScreenSize);
-
         appState.setGlobalState("showNavigation", !isTablet);
     }
 
     function setMode(mode) {
         switch (mode) {
         case 'tree':
-            ui.currentMode = "tree";
+            appState.setGlobalState("navMode", "tree");
             appState.setGlobalState("showNavigation", true);
             appState.setMenuState("showMenu", false);
             appState.setMenuState("showMenuDialog", false);
@@ -53,21 +45,21 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             //$("#search-form input").focus();    
             break;
         case 'menu':
-            ui.currentMode = "menu";
+            appState.setGlobalState("navMode", "menu");
             appState.setGlobalState("showNavigation", true);
             appState.setMenuState("showMenu", true);
             appState.setMenuState("showMenuDialog", false);
             appState.setGlobalState("stickyNavigation", true);
             break;
         case 'dialog':
-            ui.currentMode = "dialog";
+            appState.setGlobalState("navMode", "dialog");
             appState.setGlobalState("stickyNavigation", true);
             appState.setGlobalState("showNavigation", true);
             appState.setMenuState("showMenu", false);
             appState.setMenuState("showMenuDialog", true);
             break;
         case 'search':
-            ui.currentMode = "search";
+            appState.setGlobalState("navMode", "search");
             appState.setGlobalState("stickyNavigation", false);
             appState.setGlobalState("showNavigation", true);
             appState.setMenuState("showMenu", false);
@@ -81,7 +73,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
             break;
         default:
-            ui.currentMode = "default";
+            appState.setGlobalState("navMode", "default");
             appState.setMenuState("showMenu", false);
             appState.setMenuState("showMenuDialog", false);
             appState.setSectionState("showSearchResults", false);
@@ -97,9 +89,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
     }
 
     var service = {
-        active: false,
-        userDialog: undefined,
-        ui: ui,
 
         /** initializes the navigation service */
         init: function() {
@@ -198,14 +187,20 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         setupTreeEvents: function(treeEventHandler, scope) {
             mainTreeEventHandler = treeEventHandler;
 
+            //when a tree is loaded into a section, we need to put it into appState
+            mainTreeEventHandler.bind("treeLoaded", function(ev, args) {
+                appState.setTreeState("currentRootNode", args.tree);
+            });
+
             //when a tree node is synced this event will fire, this allows us to set the currentNode
             mainTreeEventHandler.bind("treeSynced", function (ev, args) {
                 
-                //set the global current node
-                ui.currentNode = args.node;
-                //not sure what this is doing
-                scope.currentNode = args.node;
-                //what the heck is going on here? - this seems really zany, allowing us to modify the 
+                if (args.activate === undefined || args.activate === true) {
+                    //set the current selected node
+                    appState.setTreeState("selectedNode", args.node);
+                }
+                
+                //TODO: what the heck is going on here? - this seems really zany, allowing us to modify the 
                 // navigationController.scope from within the navigationService to assign back to the args
                 // so that we can change the navigationController.scope from within the umbTree directive. Hrm.
                 args.scope = scope;
@@ -218,9 +213,11 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 ev.preventDefault();
 
                 //Set the current action node (this is not the same as the current selected node!)
-                //TODO: Convert this to basic entity , not tree node
-                appState.setMenuState("currentEntity", args.node);
+                appState.setMenuState("currentNode", args.node);
                 
+                //TODO: what the heck is going on here? - this seems really zany, allowing us to modify the 
+                // navigationController.scope from within the navigationService to assign back to the args
+                // so that we can change the navigationController.scope from within the umbTree directive. Hrm.
                 args.scope = scope;
 
                 if (args.event && args.event.altKey) {
@@ -234,7 +231,9 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 ev.stopPropagation();
                 ev.preventDefault();
 
-                scope.currentNode = args.node;
+                //TODO: what the heck is going on here? - this seems really zany, allowing us to modify the 
+                // navigationController.scope from within the navigationService to assign back to the args
+                // so that we can change the navigationController.scope from within the umbTree directive. Hrm.
                 args.scope = scope;
 
                 args.skipDefault = true;
@@ -247,7 +246,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 var n = args.node;
                 ev.stopPropagation();
                 ev.preventDefault();
-
 
                 if (n.metaData && n.metaData["jsClickCallback"] && angular.isString(n.metaData["jsClickCallback"]) && n.metaData["jsClickCallback"] !== "") {
                     //this is a legacy tree node!                
@@ -273,9 +271,11 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 else if (n.routePath) {
                     //add action to the history service
                     historyService.add({ name: n.name, link: n.routePath, icon: n.icon });
-                    //not legacy, lets just set the route value and clear the query string if there is one.
+                    
+                    //put this node into the tree state
+                    appState.setTreeState("selectedNode", args.node);
 
-                    ui.currentNode = n;
+                    //not legacy, lets just set the route value and clear the query string if there is one.
                     $location.path(n.routePath).search("");
                 }
                 else if (args.element.section) {
@@ -291,7 +291,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * @methodOf umbraco.services.navigationService
          *
          * @description
-         * Syncs a tree with a given path
+         * Syncs a tree with a given path, returns a promise
          * The path format is: ["itemId","itemId"], and so on
          * so to sync to a specific document type node do:
          * <pre>
@@ -301,6 +301,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * @param {String} args.tree the tree alias to sync to
          * @param {Array} args.path the path to sync the tree to
          * @param {Boolean} args.forceReload optional, specifies whether to force reload the node data from the server even if it already exists in the tree currently
+         * @param {Boolean} args.activate optional, specifies whether to set the synced node to be the active node, this will default to true if not specified
          */
         syncTree: function (args) {
             if (!args) {
@@ -314,8 +315,12 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             }
             
             if (mainTreeEventHandler) {
-                mainTreeEventHandler.syncTree(args);
+                //returns a promise
+                return mainTreeEventHandler.syncTree(args);
             }
+
+            //couldn't sync
+            return angularHelper.rejectedPromise();
         },
 
         /** 
@@ -328,12 +333,14 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             }
         },
 
+        //TODO: This should return a promise
         reloadNode: function(node) {
             if (mainTreeEventHandler) {
                 mainTreeEventHandler.reloadNode(node);
             }
         },
 
+        //TODO: This should return a promise
         reloadSection: function(sectionAlias) {
             if (mainTreeEventHandler) {
                 mainTreeEventHandler.clearCache({ section: sectionAlias });
@@ -350,46 +357,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 mainTreeEventHandler._setActiveTreeType(treeAlias, loadChildren);
             }
         },
-
-        /**
-         * @ngdoc method
-         * @name umbraco.services.navigationService#enterTree
-         * @methodOf umbraco.services.navigationService
-         *
-         * @description
-         * Sets a service variable as soon as the user hovers the navigation with the mouse
-         * used by the leaveTree method to delay hiding
-         */
-        enterTree: function(event) {
-            service.active = true;
-        },
-
-        /**
-         * @ngdoc method
-         * @name umbraco.services.navigationService#leaveTree
-         * @methodOf umbraco.services.navigationService
-         *
-         * @description
-         * Hides navigation tree, with a short delay, is cancelled if the user moves the mouse over the tree again
-         */
-        leaveTree: function(event) {
-            //this is a hack to handle IE touch events
-            //which freaks out due to no mouse events
-            //so the tree instantly shuts down
-            if (!event) {
-                return;
-            }
-
-            if (!appState.getGlobalState("touchDevice")) {
-                service.active = false;
-                $timeout(function() {
-                    if (!service.active) {
-                        service.hideTree();
-                    }
-                }, 300);
-            }
-        },
-
+        
         /**
          * @ngdoc method
          * @name umbraco.services.navigationService#hideTree
@@ -439,8 +407,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                         if (found) {
 
                             //NOTE: This is assigning the current action node - this is not the same as the currently selected node!
-                            //TODO: Change this to an entity instead of a node!
-                            appState.setMenuState("currentEntity", args.node);
+                            appState.setMenuState("currentNode", args.node);
                             
                             //ensure the current dialog is cleared before creating another!
                             if (currentDialog) {
@@ -464,8 +431,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
                     setMode("menu");
 
-                    //TODO: Change this to an entity instead of a node!
-                    appState.setMenuState("currentEntity", args.node);
+                    appState.setMenuState("currentNode", args.node);
                     appState.setMenuState("menuActions", data.menuItems);
                     appState.setMenuState("dialogTitle", args.node.name);                    
 
@@ -486,7 +452,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          */
         hideMenu: function() {
             //SD: Would we ever want to access the last action'd node instead of clearing it here?
-            appState.setMenuState("currentEntity", null);
+            appState.setMenuState("currentNode", null);
             appState.setMenuState("menuActions", []);
             setMode("tree");
         },
@@ -551,12 +517,12 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          */
         showUserDialog: function() {
 
-            if(service.userDialog){
-                service.userDialog.close();
-                service.userDialog = undefined;
+            if(userDialog){
+                userDialog.close();
+                userDialog = null;
             }
 
-            service.userDialog = dialogService.open(
+            userDialog = dialogService.open(
                 {
                     template: "views/common/dialogs/user.html",
                     modalClass: "umb-modal-left",
@@ -565,7 +531,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         
             
 
-            return service.userDialog;
+            return userDialog;
         },
 
         /**
@@ -634,9 +600,9 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             setMode("dialog");
 
             //set up the scope object and assign properties
-            var scope = args.scope || $rootScope.$new();
-            scope.currentNode = args.node;
-            scope.currentAction = args.action;
+            var dialogScope = args.scope || $rootScope.$new();
+            dialogScope.currentNode = args.node;
+            dialogScope.currentAction = args.action;
 
             //the title might be in the meta data, check there first
             if (args.action.metaData["dialogTitle"]) {
@@ -692,7 +658,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             var dialog = dialogService.open(
                 {
                     container: $("#dialog div.umb-modalcolumn-body"),
-                    scope: scope,
+                    scope: dialogScope,
                     currentNode: args.node,
                     currentAction: args.action,
                     inline: true,
@@ -715,8 +681,8 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 	     * @description
 	     * hides the currently open dialog
 	     */
-        hideDialog: function() {
-            this.showMenu(undefined, { skipDefault: true, node: appState.getMenuState("currentEntity") });
+        hideDialog: function () {
+            this.showMenu(undefined, { skipDefault: true, node: appState.getMenuState("currentNode") });
         },
         /**
           * @ngdoc method

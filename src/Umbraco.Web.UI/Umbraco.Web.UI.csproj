@@ -618,6 +618,13 @@
     <Compile Include="Umbraco\TreeInit.aspx.designer.cs">
       <DependentUpon>treeInit.aspx</DependentUpon>
     </Compile>
+    <Compile Include="UserControls\MyTest.ascx.cs">
+      <DependentUpon>MyTest.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="UserControls\MyTest.ascx.designer.cs">
+      <DependentUpon>MyTest.ascx</DependentUpon>
+    </Compile>
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Logout.aspx" />
     <Content Include="Umbraco\umbraco.aspx" />
@@ -2188,6 +2195,7 @@
     <None Include="Umbraco_client\CodeMirror\js\mode\r\LICENSE" />
     <Content Include="Umbraco_client\CodeMirror\js\mode\sieve\LICENSE" />
     <None Include="Umbraco_client\CodeMirror\js\mode\xquery\LICENSE" />
+    <Content Include="UserControls\MyTest.ascx" />
     <Content Include="Views\Web.config" />
     <Content Include="Web.config">
       <SubType>Designer</SubType>
@@ -2624,7 +2632,6 @@
     <Folder Include="Scripts\" />
     <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
     <Folder Include="Umbraco_Client\Tags\images\" />
-    <Folder Include="UserControls\" />
     <Folder Include="Views\MacroPartials\" />
     <Folder Include="Views\Partials\" />
   </ItemGroup>

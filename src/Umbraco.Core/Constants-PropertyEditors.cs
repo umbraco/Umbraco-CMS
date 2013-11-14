@@ -186,6 +186,8 @@ namespace Umbraco.Core
             /// </summary>
             public const string MediaPickerAlias = "Umbraco.MediaPicker";
 
+            public const string MultipleMediaPickerAlias = "Umbraco.MultipleMediaPicker";
+
             /// <summary>
             /// Guid for the Member Picker datatype.
             /// </summary>

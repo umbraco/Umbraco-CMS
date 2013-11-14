@@ -5,6 +5,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Formatting;
+using System.Text;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
@@ -112,10 +113,14 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        public string GetNiceUrl(int id)
+        public HttpResponseMessage GetNiceUrl(int id)
         {
             var url = Umbraco.NiceUrl(id);
-            return url;
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(url, Encoding.UTF8, "application/json")
+            };
+            return response;
         }
 
         /// <summary>
@@ -458,12 +463,17 @@ namespace Umbraco.Web.Editors
         /// <param name="move"></param>
         /// <returns></returns>
         [EnsureUserPermissionForContent("move.ParentId", 'M')]
-        public string PostMove(MoveOrCopy move)
+        public HttpResponseMessage PostMove(MoveOrCopy move)
         {
             var toMove = ValidateMoveOrCopy(move);
 
             Services.ContentService.Move(toMove, move.ParentId);
-            return toMove.Path;
+
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json")
+            };
+            return response;            
         }
 
         /// <summary>
@@ -472,12 +482,17 @@ namespace Umbraco.Web.Editors
         /// <param name="copy"></param>
         /// <returns></returns>
         [EnsureUserPermissionForContent("copy.ParentId", 'C')]
-        public string PostCopy(MoveOrCopy copy)
+        public HttpResponseMessage PostCopy(MoveOrCopy copy)
         {
             var toCopy = ValidateMoveOrCopy(copy);
 
             var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal);
-            return c.Path;
+
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = new StringContent(c.Path, Encoding.UTF8, "application/json")
+            };
+            return response;
         }
 
         /// <summary>

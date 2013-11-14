@@ -113,15 +113,18 @@ namespace umbraco
 
                     _repoGuid = HttpContext.Current.Request.QueryString["repoGuid"];
                     Umbraco.Web.org.umbraco.our.Repository r = new Umbraco.Web.org.umbraco.our.Repository();
+                    
                     foreach (var cat in r.Categories(_repoGuid))
                     {
                         XmlTreeNode xNode = XmlTreeNode.Create(this);
+                        xNode.NodeID = cat.Id.ToInvariantString();
                         xNode.Text = cat.Text;
                         xNode.Action = "javascript:openPackageCategory('BrowseRepository.aspx?category=" + cat.Id + "&repoGuid=" + _repoGuid + "');";
                         xNode.Icon = "icon-folder";
                         xNode.OpenIcon = "icon-folder";
                         xNode.NodeType = "packagesCategory" + cat.Id;                        
                         tree.Add(xNode);
+                    
                     }
                     
                     break;
