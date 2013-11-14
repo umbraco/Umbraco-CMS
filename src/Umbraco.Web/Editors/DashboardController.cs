@@ -19,58 +19,53 @@ namespace Umbraco.Web.Editors
         public IEnumerable<Tab<DashboardControl>> GetDashboard(string section)
         {
             var tabs = new List<Tab<DashboardControl>>();
-
-            var dashboardSection = UmbracoConfig.For.DashboardSettings()
-                                                .Sections.FirstOrDefault(x => x.Areas.Contains(section));
-            
-            //if we cannot find it for whatever reason just return an empty one.
-            if (dashboardSection == null)
-            {
-                return tabs;
-            }
-
-            //we need to validate access to this section
-            if (DashboardSecurity.AuthorizeAccess(dashboardSection, Security.CurrentUser, Services.SectionService) == false)
-            {
-                //return empty collection
-                return tabs;
-            }
-
             var i = 1;
-            foreach (var dashTab in dashboardSection.Tabs)
+
+            // The dashboard config can contain more than one area inserted by a package.
+            foreach( var dashboardSection in UmbracoConfig.For.DashboardSettings().Sections.Where(x => x.Areas.Contains(section)))
             {
-                //we need to validate access to this tab
-                if (DashboardSecurity.AuthorizeAccess(dashTab, Security.CurrentUser, Services.SectionService))
+                //we need to validate access to this section
+                if (DashboardSecurity.AuthorizeAccess(dashboardSection, Security.CurrentUser, Services.SectionService))
                 {
-                    var props = new List<DashboardControl>();
-                    
-                    foreach (var dashCtrl in dashTab.Controls)
+                    //User is authorized
+                    foreach (var dashTab in dashboardSection.Tabs)
                     {
-                        if (DashboardSecurity.AuthorizeAccess(dashCtrl, Security.CurrentUser, Services.SectionService))
+                        //we need to validate access to this tab
+                        if (DashboardSecurity.AuthorizeAccess(dashTab, Security.CurrentUser, Services.SectionService))
                         {
-                            var ctrl = new DashboardControl();
-                            var controlPath = dashCtrl.ControlPath.Trim(' ', '\r', '\n');
-                            ctrl.Path = IOHelper.FindFile(controlPath);
-                            if (controlPath.ToLower().EndsWith(".ascx"))
+                            var props = new List<DashboardControl>();
+
+                            foreach (var dashCtrl in dashTab.Controls)
                             {
-                                ctrl.ServerSide = true;
+                                if (DashboardSecurity.AuthorizeAccess(dashCtrl, Security.CurrentUser,
+                                                                      Services.SectionService))
+                                {
+                                    var ctrl = new DashboardControl();
+                                    var controlPath = dashCtrl.ControlPath.Trim(' ', '\r', '\n');
+                                    ctrl.Path = IOHelper.FindFile(controlPath);
+                                    if (controlPath.ToLower().EndsWith(".ascx"))
+                                    {
+                                        ctrl.ServerSide = true;
+                                    }
+                                    props.Add(ctrl);
+                                }
                             }
-                            props.Add(ctrl);
+
+                            tabs.Add(new Tab<DashboardControl>
+                                {
+                                    Id = i,
+                                    Alias = dashTab.Caption.ToSafeAlias(),
+                                    IsActive = i == 1,
+                                    Label = dashTab.Caption,
+                                    Properties = props
+                                });
+                            i++;
                         }
                     }
-
-                    tabs.Add(new Tab<DashboardControl>
-                    {
-                        Id = i,
-                        Alias = dashTab.Caption.ToSafeAlias(),
-                        IsActive = i == 1,
-                        Label = dashTab.Caption,
-                        Properties = props
-                    });
-                    i++;
                 }
             }
 
+            //In case there are no tabs or a user doesn't have access the empty tabs list is returned
             return tabs;
 
         }
