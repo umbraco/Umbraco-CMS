@@ -14,7 +14,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 	{
         public override bool IsConverter(PublishedPropertyType propertyType)
         {
-            return propertyType.PropertyEditorAlias == Constants.PropertyEditors.TinyMCEv3Alias;
+            return propertyType.PropertyEditorAlias == Constants.PropertyEditors.TinyMCEAlias;
         }
 
         public override object ConvertDataToSource(PublishedPropertyType propertyType, object source, bool preview)

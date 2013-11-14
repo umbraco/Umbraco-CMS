@@ -51,7 +51,7 @@ namespace Umbraco.Tests.PublishedContent
                     new PublishedPropertyType("umbracoNaviHide", 0, Constants.PropertyEditors.TrueFalseAlias), 
                     new PublishedPropertyType("selectedNodes", 0, "?"), 
                     new PublishedPropertyType("umbracoUrlAlias", 0, "?"), 
-                    new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEv3Alias), 
+                    new PublishedPropertyType("content", 0, Constants.PropertyEditors.TinyMCEAlias), 
                     new PublishedPropertyType("testRecursive", 0, "?"), 
                 };
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);

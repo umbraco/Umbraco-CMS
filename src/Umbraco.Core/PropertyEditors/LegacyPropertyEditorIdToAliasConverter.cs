@@ -128,7 +128,7 @@ namespace Umbraco.Core.PropertyEditors
             CreateMap(Guid.Parse(Constants.PropertyEditors.Tags), Constants.PropertyEditors.TagsAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.Textbox), Constants.PropertyEditors.TextboxAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.TextboxMultiple), Constants.PropertyEditors.TextboxMultipleAlias);
-            CreateMap(Guid.Parse(Constants.PropertyEditors.TinyMCEv3), Constants.PropertyEditors.TinyMCEv3Alias);
+            CreateMap(Guid.Parse(Constants.PropertyEditors.TinyMCEv3), Constants.PropertyEditors.TinyMCEAlias);
             CreateMap(Guid.Parse(Constants.PropertyEditors.TrueFalse), Constants.PropertyEditors.TrueFalseAlias);            
             CreateMap(Guid.Parse(Constants.PropertyEditors.UserPicker), Constants.PropertyEditors.UserPickerAlias);            
             CreateMap(Guid.Parse(Constants.PropertyEditors.UploadField), Constants.PropertyEditors.UploadFieldAlias);

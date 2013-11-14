@@ -319,9 +319,9 @@ namespace Umbraco.Core
             public const string TinyMCEv3 = "5E9B75AE-FACE-41C8-B47E-5F4B0FD82F83";
 
             /// <summary>
-            /// Alias for the TinyMCE v3 wysiwyg datatype.
+            /// Alias for the TinyMCE wysiwyg datatype.
             /// </summary>
-            public const string TinyMCEv3Alias = "Umbraco.TinyMCEv3";
+            public const string TinyMCEAlias = "Umbraco.TinyMCEv3";
 
             /// <summary>
             /// Guid for the True/False (Ja/Nej) datatype.
