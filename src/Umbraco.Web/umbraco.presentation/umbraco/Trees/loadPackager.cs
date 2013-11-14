@@ -124,9 +124,11 @@ namespace umbraco
 
                     case "BrowseRepository.aspx":
 
+                        /*
                         //Gets all the repositories registered in umbracoSettings.config
                         var repos = cms.businesslogic.packager.repositories.Repository.getAll();
                         
+
                         //if more then one repo, then list them as child nodes under the "Install from repository" node.
                         // the repositories will then be fetched from the loadPackages class.
                         if (repos.Count > 1)
@@ -136,24 +138,17 @@ namespace umbraco
                             xNode.Text = ui.Text("treeHeaders", "repositories");
                             xNode.HasChildren = true;
                         }
-
+                        */
                         //if only one repo, then just list it directly and name it as the repository.
                         //the packages will be loaded from the loadPackages class with a repoAlias querystring
-                        else if (repos.Count == 1)
-                        {
-                            xNode.Text = repos[0].Name;
-                            xNode.Source = "tree.aspx?app=" + this._app + "&id=" + this._id + "&treeType=packagerPackages&packageType=repository&repoGuid=" + repos[0].Guid + "&rnd=" + Guid.NewGuid();
-                            xNode.NodeType = "packagesRepository";
-                            xNode.Action = "javascript:openPackageCategory('BrowseRepository.aspx?repoGuid=" + repos[0].Guid + "');";
-                            xNode.Icon = "icon-server-alt";
-                            xNode.HasChildren = true;
-                        }
-
-                       //if none registered, then remove the repo node.
-                        else if (repos.Count == 0)
-                        {
-                            xNode.Text = "";
-                        }
+                        var repos = cms.businesslogic.packager.repositories.Repository.getAll();
+                        
+                        xNode.Text = repos[0].Name;
+                        xNode.Source = "tree.aspx?app=" + this._app + "&id=" + this._id + "&treeType=packagerPackages&packageType=repository&repoGuid=" + repos[0].Guid + "&rnd=" + Guid.NewGuid();
+                        xNode.NodeType = "packagesRepository";
+                        xNode.Action = "javascript:openPackageCategory('BrowseRepository.aspx?repoGuid=" + repos[0].Guid + "');";
+                        xNode.Icon = "icon-server-alt";
+                        xNode.HasChildren = true;
 
                         break;
 

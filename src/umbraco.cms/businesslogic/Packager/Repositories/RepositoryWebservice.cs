@@ -53,7 +53,7 @@ namespace umbraco.cms.businesslogic.packager.repositories
         /// <remarks/>
         public RepositoryWebservice(string url)
         {
-            this.Url = url;//"http://packages.umbraco.org/umbraco/webservices/api/repository.asmx";
+            this.Url = url;//"http://our.umbraco.org/umbraco/webservices/api/repository.asmx";
         }
 
         /// <remarks/>
