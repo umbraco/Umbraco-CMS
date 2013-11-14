@@ -9,6 +9,9 @@ using Umbraco.Web.Cache;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.web;
 using umbraco.presentation.cache;
+using Umbraco.Core.IO;
+using System.IO;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web
 {
@@ -40,8 +43,33 @@ namespace Umbraco.Web
 					global::umbraco.cms.businesslogic.member.Member.AfterSave
 						+= (sender, args) =>
                            applicationContext.ApplicationCache.ClearPartialViewCache();
+
+
+                    //also need to clear cach on partial view changes.
+                    var viewPath = HttpContext.Current.Server.MapPath(SystemDirectories.MvcViews + "/Partials");
+
+                    // Watch for file changes ot any macros.
+                    HttpContext.Current.Application.Add("partialViewWatcher",
+                        new FileSystemWatcher(viewPath)
+                        {
+                            EnableRaisingEvents = true,
+                            IncludeSubdirectories = true
+                        });
+                    var partialViewWatcher = (FileSystemWatcher)HttpContext.Current.Application["partialViewWatcher"];
+                    partialViewWatcher.Changed += partialViewWatcher_Changed;
 				}
 			}
+
+            /// <summary>
+            /// This method is called each time a partial view file is updated and will clear out any cached versions of the view.
+            /// </summary>
+            void partialViewWatcher_Changed(object sender, FileSystemEventArgs e)
+            {
+                // Technicaly this could just clear the entire cache with ApplicationCache.ClearPartialViewCache() instead of just the changed file.
+                var key = PartialViewCacheKey + e.Name.Replace(".cshtml", "").Replace(@"\", "/");
+                LogHelper.Info<CacheHelperApplicationEventListener>("A Partial View was saved, claring Cache. " + key);
+                ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(key);
+            }
 
 		}
 
