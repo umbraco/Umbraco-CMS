@@ -221,19 +221,6 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
             }    
     };
     
-    $scope.options = function(content){
-            if(!content.id){
-                return;
-            }
-
-            if(!$scope.actions){
-                treeService.getMenu({ treeNode: $scope.nav.ui.currentNode })
-                    .then(function(data) {
-                            $scope.actions = data.menuItems;
-                    });    
-            }
-        };
-
     /** this method is called for all action buttons and then we proxy based on the btn definition */
     $scope.performAction = function(btn) {
         if (!btn || !angular.isFunction(btn.handler)) {

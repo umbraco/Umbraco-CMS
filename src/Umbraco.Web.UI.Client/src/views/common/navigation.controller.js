@@ -27,7 +27,7 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     $scope.showSearchResults = false;
     $scope.menuDialogTitle = null;
     $scope.menuActions = [];
-    $scope.menuEntity = null;
+    $scope.menuNode = null;
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.showNavigation = appState.getGlobalState("showNavigation");
     
@@ -66,8 +66,8 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
         if (args.key === "menuActions") {
             $scope.menuActions = args.value;
         }
-        if (args.key === "currentEntity") {
-            $scope.menuEntity = args.value;
+        if (args.key === "currentNode") {
+            $scope.menuNode = args.value;
         }
     });
     

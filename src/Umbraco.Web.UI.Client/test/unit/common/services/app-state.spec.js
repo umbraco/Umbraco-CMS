@@ -44,8 +44,8 @@ describe('appState tests', function () {
     
     describe('Tree state', function () {
         it('Can get/set state', function () {
-            appState.setTreeState("currentEntity", true);
-            expect(appState.getTreeState("currentEntity")).toBe(true);
+            appState.setTreeState("selectedNode", true);
+            expect(appState.getTreeState("selectedNode")).toBe(true);
         });
         it('Throws when invalid key', function () {
             function setInvalidKey() {

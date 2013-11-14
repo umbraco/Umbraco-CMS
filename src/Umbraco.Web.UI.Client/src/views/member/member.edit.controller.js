@@ -54,22 +54,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
         }
 
     }
-
-
-
-    $scope.options = function(content){
-            if(!content.id){
-                return;
-            }
-
-            if(!$scope.actions){
-                treeService.getMenu({ treeNode: $scope.nav.ui.currentNode })
-                    .then(function(data) {
-                            $scope.actions = data.menuItems;
-                    });    
-            }
-        };
-
+    
     $scope.save = function() {
 
         if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {

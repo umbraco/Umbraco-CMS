@@ -198,6 +198,11 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         setupTreeEvents: function(treeEventHandler, scope) {
             mainTreeEventHandler = treeEventHandler;
 
+            //when a tree is loaded into a section, we need to put it into appState
+            mainTreeEventHandler.bind("treeLoaded", function(ev, args) {
+                appState.setTreeState("currentRootNode", args.tree);
+            });
+
             //when a tree node is synced this event will fire, this allows us to set the currentNode
             mainTreeEventHandler.bind("treeSynced", function (ev, args) {
                 
@@ -218,8 +223,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 ev.preventDefault();
 
                 //Set the current action node (this is not the same as the current selected node!)
-                //TODO: Convert this to basic entity , not tree node
-                appState.setMenuState("currentEntity", args.node);
+                appState.setMenuState("currentNode", args.node);
                 
                 args.scope = scope;
 
@@ -248,6 +252,8 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 ev.stopPropagation();
                 ev.preventDefault();
 
+                //put this into the app state
+                appState.setTreeState("selectedNode", args.node);
 
                 if (n.metaData && n.metaData["jsClickCallback"] && angular.isString(n.metaData["jsClickCallback"]) && n.metaData["jsClickCallback"] !== "") {
                     //this is a legacy tree node!                
@@ -439,8 +445,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                         if (found) {
 
                             //NOTE: This is assigning the current action node - this is not the same as the currently selected node!
-                            //TODO: Change this to an entity instead of a node!
-                            appState.setMenuState("currentEntity", args.node);
+                            appState.setMenuState("currentNode", args.node);
                             
                             //ensure the current dialog is cleared before creating another!
                             if (currentDialog) {
@@ -464,8 +469,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 
                     setMode("menu");
 
-                    //TODO: Change this to an entity instead of a node!
-                    appState.setMenuState("currentEntity", args.node);
+                    appState.setMenuState("currentNode", args.node);
                     appState.setMenuState("menuActions", data.menuItems);
                     appState.setMenuState("dialogTitle", args.node.name);                    
 
@@ -486,7 +490,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          */
         hideMenu: function() {
             //SD: Would we ever want to access the last action'd node instead of clearing it here?
-            appState.setMenuState("currentEntity", null);
+            appState.setMenuState("currentNode", null);
             appState.setMenuState("menuActions", []);
             setMode("tree");
         },
@@ -666,8 +670,8 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 	     * @description
 	     * hides the currently open dialog
 	     */
-        hideDialog: function() {
-            this.showMenu(undefined, { skipDefault: true, node: appState.getMenuState("currentEntity") });
+        hideDialog: function () {
+            this.showMenu(undefined, { skipDefault: true, node: appState.getMenuState("currentNode") });
         },
         /**
           * @ngdoc method

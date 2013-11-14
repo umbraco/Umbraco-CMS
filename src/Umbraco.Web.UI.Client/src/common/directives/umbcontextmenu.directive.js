@@ -1,10 +1,10 @@
 angular.module("umbraco.directives")
-.directive('umbContextMenu', function ($injector, navigationService) {
+.directive('umbContextMenu', function ($injector, umbModelMapper, treeService) {
     return {
         scope: {
             menuDialogTitle: "@",
             currentSection: "@",
-            currentEntity: "=",
+            currentNode: "=",
             menuActions: "="
         },
         restrict: 'E',
@@ -14,7 +14,7 @@ angular.module("umbraco.directives")
             
             //adds a handler to the context menu item click, we need to handle this differently
             //depending on what the menu item is supposed to do.
-            scope.executeMenuItem = function (currentNode, action, currentSection) {
+            scope.executeMenuItem = function (action) {
 
                 if (action.metaData && action.metaData["jsAction"] && angular.isString(action.metaData["jsAction"])) {
 
@@ -41,9 +41,13 @@ angular.module("umbraco.directives")
                         }
 
                         method.apply(this, [{
-                            treeNode: currentNode,
+                            //map our content object to a basic entity to pass in to the menu handlers,
+                            //this is required for consistency since a menu item needs to be decoupled from a tree node since the menu can
+                            //exist standalone in the editor for which it can only pass in an entity (not tree node).
+                            entity: umbModelMapper.convertToEntityBasic(scope.currentNode),
                             action: action,
-                            section: currentSection
+                            section: scope.currentSection,
+                            treeAlias: treeService.getTreeAlias(scope.currentNode)
                         }]);
                     }
                 }
@@ -54,7 +58,7 @@ angular.module("umbraco.directives")
                     // the problem with all these dialogs is were passing other object's scopes around which isn't nice at all.
                     // Each of these passed scopes expects a .nav property assigned to it which is a reference to the navigationService,
                     // which should not be happenning... should simply be using the navigation service, no ?!
-                    scope.$parent.openDialog(currentNode, action, currentSection);
+                    scope.$parent.openDialog(scope.currentNode, action, scope.currentSection);
                 }
             };
 

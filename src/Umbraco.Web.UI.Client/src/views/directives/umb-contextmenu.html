@@ -7,7 +7,7 @@
         <ul class="umb-actions">
             <li class="action" ng-class="{sep:action.seperator}" ng-repeat="action in menuActions">
                 <a prevent-default
-                    ng-click="executeMenuItem(currentEntity,action,currentSection)">
+                    ng-click="executeMenuItem(action)">
                     <i class="icon icon-{{action.cssclass}}"></i>
                     <span class="menu-label">{{action.name}}</span>
                 </a>
