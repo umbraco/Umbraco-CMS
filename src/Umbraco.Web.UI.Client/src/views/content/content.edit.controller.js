@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, $q, $timeout, $window, appState, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, editorContext, treeService, fileManager, formHelper, umbRequestHelper, keyboardService) {
+function ContentEditController($scope, $routeParams, $q, $timeout, $window, appState, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper) {
 
     //setup scope vars
     $scope.defaultButton = null;
@@ -15,9 +15,6 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.currentNode = null; //the editors affiliated node
     
-    //we need this to share our content object with property editors
-    editorContext = $scope.content;
-
     //This sets up the action buttons based on what permissions the user has.
     //The allowedActions parameter contains a list of chars, each represents a button by permission so 
     //here we'll build the buttons according to the chars of the user.
@@ -123,11 +120,15 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
 
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,
-                        newContent: data,
+                        savedContent: data,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                     });
 
+                    //update appState
+                    appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+
                     configureButtons(data);
+
                     navigationService.syncTree({ tree: "content", path: data.path.split(","), forceReload: true }).then(function (syncArgs) {
                         $scope.currentNode = syncArgs.node;
                     });
@@ -139,9 +140,11 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
                     contentEditingHelper.handleSaveError({
                         redirectOnFailure: true,
                         err: err,
-                        allNewProps: contentEditingHelper.getAllProps(err.data),
-                        allOrigProps: contentEditingHelper.getAllProps($scope.content)
+                        rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
                     });
+
+                    //update appState
+                    appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
 
                     deferred.reject(err);
                 });
@@ -159,6 +162,8 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
             .then(function(data) {
                 $scope.loaded = true;
                 $scope.content = data;
+                //put this into appState
+                appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
                 configureButtons($scope.content);
             });
     }
@@ -168,6 +173,8 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
             .then(function(data) {
                 $scope.loaded = true;
                 $scope.content = data;
+                //put this into appState
+                appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
                 configureButtons($scope.content);
                 
                 //in one particular special case, after we've created a new item we redirect back to the edit
@@ -194,7 +201,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
 
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,
-                        newContent: data,
+                        savedContent: data,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                     });
 

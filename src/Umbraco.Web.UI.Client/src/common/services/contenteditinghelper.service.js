@@ -2,11 +2,13 @@
 /**
 * @ngdoc service
 * @name umbraco.services.contentEditingHelper
-* @description A helper service for content/media/member controllers when editing/creating/saving content.
+* @description A helper service for most editors, some methods are specific to content/media/member model types but most are used by 
+* all editors to share logic and reduce the amount of replicated code among editors.
 **/
-function contentEditingHelper($location, $routeParams, notificationsService, serverValidationManager, dialogService, formHelper) {
+function contentEditingHelper($location, $routeParams, notificationsService, serverValidationManager, dialogService, formHelper, appState) {
 
     return {
+        
 
         /**
          * @ngdoc method
@@ -36,15 +38,15 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
          * @function
          *
          * @description
-         * re-binds all changed property values to the origContent object from the newContent object and returns an array of changed properties.
+         * re-binds all changed property values to the origContent object from the savedContent object and returns an array of changed properties.
          */
-        reBindChangedProperties: function (origContent, newContent) {
+        reBindChangedProperties: function (origContent, savedContent) {
 
             var changed = [];
 
             //get a list of properties since they are contained in tabs
             var allOrigProps = this.getAllProps(origContent);
-            var allNewProps = this.getAllProps(newContent);
+            var allNewProps = this.getAllProps(savedContent);
 
             function getNewProp(alias) {                
                 return _.find(allNewProps, function (item) {
@@ -66,8 +68,8 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
                     continue;
                 }
                 
-                if (!_.isEqual(origContent[o], newContent[o])) {
-                    origContent[o] = newContent[o];
+                if (!_.isEqual(origContent[o], savedContent[o])) {
+                    origContent[o] = savedContent[o];
                 }
             }
 
@@ -108,9 +110,6 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
              
             if (!args.err) {
                 throw "args.err cannot be null";
-            }
-            if (!args.allNewProps && !angular.isArray(args.allNewProps)) {
-                throw "args.allNewProps must be a valid array";
             }
             if (args.redirectOnFailure === undefined || args.redirectOnFailure === null) {
                 throw "args.redirectOnFailure must be set to true or false";
@@ -168,11 +167,11 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
             if (!args) {
                 throw "args cannot be null";
             }
-            if (!args.newContent) {
-                throw "args.newContent cannot be null";
+            if (!args.savedContent) {
+                throw "args.savedContent cannot be null";
             }
 
-            if (!this.redirectToCreatedContent(args.redirectId ? args.redirectId : args.newContent.id)) {
+            if (!this.redirectToCreatedContent(args.redirectId ? args.redirectId : args.savedContent.id)) {
                 
                 //we are not redirecting because this is not new content, it is existing content. In this case
                 // we need to detect what properties have changed and re-bind them with the server data.

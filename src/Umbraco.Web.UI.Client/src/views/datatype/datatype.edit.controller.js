@@ -45,8 +45,8 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
     $scope.preValues = [];
 
     if ($routeParams.create) {
-        //we are creating so get an empty content item
-        dataTypeResource.getScaffold($routeParams.id, $routeParams.doctype)
+        //we are creating so get an empty data type item
+        dataTypeResource.getScaffold($routeParams.id)
             .then(function(data) {
                 $scope.loaded = true;
                 $scope.preValuesLoaded = true;
@@ -101,7 +101,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
 
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,
-                        newContent: data,
+                        savedContent: data,
                         rebindCallback: function() {
                             createPreValueProps(data.preValues);
                         }
@@ -117,9 +117,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                     // to be the same thing since that only really matters for content/media.
                     contentEditingHelper.handleSaveError({
                         redirectOnFailure: false,
-                        err: err,
-                        allNewProps: $scope.preValues,
-                        allOrigProps: $scope.preValues
+                        err: err
                     });
                 });
         }
