@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, $q, $timeout, $window, appState, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService) {
+function ContentEditController($scope, $routeParams, $q, $timeout, $window, appState, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, editorContext, treeService, fileManager, formHelper, umbRequestHelper, keyboardService) {
 
     //setup scope vars
     $scope.defaultButton = null;
@@ -14,6 +14,9 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
     $scope.nav = navigationService;
     $scope.currentSection = appState.getSectionState("currentSection");
     
+    //we need this to share our content object with property editors
+    editorContext = $scope.content;
+
     //This sets up the action buttons based on what permissions the user has.
     //The allowedActions parameter contains a list of chars, each represents a button by permission so 
     //here we'll build the buttons according to the chars of the user.
@@ -124,9 +127,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
                     });
 
                     configureButtons(data);
-
                     navigationService.syncTree({ tree: "content", path: data.path.split(","), forceReload: true });
-
                     deferred.resolve(data);
                     
                 }, function (err) {
@@ -222,17 +223,22 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
     };
     
     $scope.options = function(content){
-            if(!content.id){
-                return;
-            }
+        if(!content.id){
+            return;
+        }
 
-            if(!$scope.actions){
-                treeService.getMenu({ treeNode: $scope.nav.ui.currentNode })
-                    .then(function(data) {
-                            $scope.actions = data.menuItems;
-                    });    
-            }
-        };
+        if(!$scope.actions){
+            treeService.getMenu({ treeNode: $scope.nav.ui.currentNode })
+                .then(function(data) {
+                        $scope.actions = data.menuItems;
+                });    
+        }
+    };
+
+    $scope.executeOption = function(action){
+         navigationService.executeMenuAction($scope.nav.ui.currentNode, action, $scope.currentSection);   
+    };
+            
 
     /** this method is called for all action buttons and then we proxy based on the btn definition */
     $scope.performAction = function(btn) {

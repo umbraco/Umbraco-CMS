@@ -15,7 +15,7 @@
  * Section navigation and search, and maintain their state for the entire application lifetime
  *
  */
-function navigationService($rootScope, $routeParams, $log, $location, $q, $timeout, dialogService, treeService, notificationsService, historyService, appState) {
+function navigationService($rootScope, $routeParams, $log, $location, $q, $timeout, $injector, dialogService, treeService, notificationsService, historyService, appState) {
 
     var minScreenSize = 1100;
     //used to track the current dialog object
@@ -489,6 +489,55 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             appState.setMenuState("currentEntity", null);
             appState.setMenuState("menuActions", []);
             setMode("tree");
+        },
+
+        executeMenuAction: function (currentNode, action, currentSection) {
+
+            if (action.metaData && action.metaData["jsAction"] && angular.isString(action.metaData["jsAction"])) {
+
+                //we'll try to get the jsAction from the injector
+                var menuAction = action.metaData["jsAction"].split('.');
+                if (menuAction.length !== 2) {
+
+                    //if it is not two parts long then this most likely means that it's a legacy action                         
+                    var js = action.metaData["jsAction"].replace("javascript:", "");
+                    
+                    //there's not really a different way to acheive this except for eval 
+                    eval(js);
+                }
+                else {
+                    var _s = $injector.get(menuAction[0]);
+                    if (!_s) {
+                        throw "The angular service " + menuAction[0] + " could not be found";
+                    }
+
+                    var method = _s[menuAction[1]];
+                    if (!method) {
+                        throw "The method " + menuAction[1] + " on the angular service " + menuAction[0] + " could not be found";
+                    }
+
+                    method.apply(this, [{
+                        treeNode: currentNode,
+                        action: action,
+                        section: currentSection
+                    }]);
+                }
+            }
+            else {
+                //by default we launch the dialog
+                
+                //TODO: This is temporary using $parent, now that this is an isolated scope
+                // the problem with all these dialogs is were passing other object's scopes around which isn't nice at all.
+                // Each of these passed scopes expects a .nav property assigned to it which is a reference to the navigationService,
+                // which should not be happenning... should simply be using the navigation service, no ?!
+                //scope.$parent.openDialog(currentNode, action, currentSection);
+
+                service.showDialog({
+                    node: currentNode,
+                    action: action,
+                    section: currentSection
+                });
+            }
         },
 
         /**

@@ -19,7 +19,7 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     //Put the navigation service on this scope so we can use it's methods/properties in the view.
     // IMPORTANT: all properties assigned to this scope are generally available on the scope object on dialogs since
     //   when we create a dialog we pass in this scope to be used for the dialog's scope instead of creating a new one.
-    $scope.nav = navigationService;
+    $rootScope.nav = navigationService;
 
     //set up our scope vars
     $scope.showContextMenuDialog = false;
@@ -116,16 +116,6 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     //todo, migrate to nav service
     $scope.searchHide = function () {   
         navigationService.hideSearch();
-    };
-    
-    /** Opens a dialog but passes in this scope instance to be used for the dialog */
-    $scope.openDialog = function (currentNode, action, currentSection) {        
-        navigationService.showDialog({
-            scope: $scope,
-            node: currentNode,
-            action: action,
-            section: currentSection
-        });
     };
 }
 
