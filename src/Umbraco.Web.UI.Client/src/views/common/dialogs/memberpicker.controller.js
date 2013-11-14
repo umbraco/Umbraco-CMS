@@ -62,27 +62,26 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberPickerController",
                 return;
             }
 
-            eventsService.publish("Umbraco.Dialogs.MemberPickerController.Select", args).then(function(a) {
+            eventsService.publish("Umbraco.Dialogs.MemberPickerController.Select", args);
+            
+            //This is a tree node, so we don't have an entity to pass in, it will need to be looked up
+            //from the server in this method.
+            select(args.node.name, args.node.id);
 
-                //This is a tree node, so we don't have an entity to pass in, it will need to be looked up
-                //from the server in this method.
-                select(a.node.name, a.node.id);
+            if (dialogOptions && dialogOptions.multipicker) {
 
-                if (dialogOptions && dialogOptions.multipicker) {
-
-                    var c = $(a.event.target.parentElement);
-                    if (!a.node.selected) {
-                        a.node.selected = true;
-                        c.find("i.umb-tree-icon").hide()
-                            .after("<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>");
-                    }
-                    else {
-                        a.node.selected = false;
-                        c.find(".temporary").remove();
-                        c.find("i.umb-tree-icon").show();
-                    }
+                var c = $(args.event.target.parentElement);
+                if (!args.node.selected) {
+                    args.node.selected = true;
+                    c.find("i.umb-tree-icon").hide()
+                        .after("<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>");
                 }
-            });
+                else {
+                    args.node.selected = false;
+                    c.find(".temporary").remove();
+                    c.find("i.umb-tree-icon").show();
+                }
+            }
 
         });
     });

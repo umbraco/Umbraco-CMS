@@ -17,41 +17,67 @@ describe('angular event tests', function () {
                 val: ""
             };
             
-            eventsService.subscribe("testEvent", function (args) {
-                args.val = "changed";
+            eventsService.subscribe("testEvent", function (e, args) {                
+                args.args.val = "changed";
             });
 
-            eventsService.publish("testEvent", eventArgs).then(function (args) {
-                expect(eventArgs.val).toBe("changed");
-                expect(args.val).toBe("changed");
-            });
+            eventsService.publish("testEvent", eventArgs);
+            
+            expect(eventArgs.val).toBe("changed");
             
             $rootScope.$digest();
         });
         
-        //NOTE: This will fail because our eventsService doesn't actually wait for async events to finish.
+        it('will handle 2 non async process', function () {
+            var eventArgs = {
+                val: ""
+            };
 
-        //it('will handle one async process', function () {
-        //    var eventArgs = {
-        //        val: ""
-        //    };
+            eventsService.subscribe("testEvent", function (e, args) {
+                args.args.val = "changed";
+            });
+            
+            eventsService.subscribe("testEvent", function (e, args) {
+                args.args.val = "changed1";
+            });
 
-        //    eventsService.subscribe("testEvent", function (args) {
-        //        $timeout(function() {
-        //            args.val = "changed";
-        //        }, 1000);
-        //    });
+            eventsService.publish("testEvent", eventArgs);
 
-        //    eventsService.publish("testEvent", eventArgs).then(function (args) {
-        //        expect(eventArgs.val).toBe("changed");
-        //        expect(args.val).toBe("changed");
-        //    });
+            expect(eventArgs.val).toBe("changed1");
 
-        //    $rootScope.$digest();
-        //    $timeout.flush();
-        //});
+            $rootScope.$digest();
+        });
+
+        it('will handle one async process', function () {
+            var eventArgs = {
+                val: ""
+            };
+
+            eventsService.subscribe("testEvent", function (e, msg) {
+                $timeout(function () {                    
+                    msg.args.val = "changed";
+                    //NOTE: We could resolve anything here
+                    msg.resolve(msg.args);
+                }, 1000);
+            });
+
+            var promises = eventsService.publish("testEvent", eventArgs);
+
+            //this won't be changed yet
+            expect(eventArgs.val).toBe("");
+
+            promises[0].then(function (args) {
+                console.log("WOOT");
+                expect(args.val).toBe("changed");
+                expect(eventArgs.val).toBe("changed");
+            });
+
+            $rootScope.$digest();
+            $timeout.flush();
+        });
         
-        it('will wait to execute after all handlers', function () {
+        //NOTE: This logic has been merged into the eventsService
+        it('POC will wait to execute after all handlers', function () {
 
             //assign multiple listeners
 

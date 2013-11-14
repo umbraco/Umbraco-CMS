@@ -10,19 +10,20 @@ angular.module("umbraco").controller("Umbraco.Editors.Media.MoveController",
 		args.event.preventDefault();
 		args.event.stopPropagation();
 
-		eventsService.publish("Umbraco.Editors.Media.MoveController.Select", args).then(function(args){
-			var c = $(args.event.target.parentElement);
-			if($scope.selectedEl){
-				$scope.selectedEl.find(".temporary").remove();
-				$scope.selectedEl.find("i.umb-tree-icon").show();
-			}
+		eventsService.publish("Umbraco.Editors.Media.MoveController.Select", args);
+	    
+		var c = $(args.event.target.parentElement);
+		if ($scope.selectedEl) {
+		    $scope.selectedEl.find(".temporary").remove();
+		    $scope.selectedEl.find("i.umb-tree-icon").show();
+		}
 
-			c.find("i.umb-tree-icon").hide()
-			.after("<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>");
-			
-			$scope.target = args.node;
-			$scope.selectedEl = c;
-		});
+		c.find("i.umb-tree-icon").hide()
+        .after("<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>");
+
+		$scope.target = args.node;
+		$scope.selectedEl = c;
+	    
 	});
 
 	$scope.move = function(){

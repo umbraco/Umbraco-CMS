@@ -167,35 +167,35 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 		args.event.preventDefault();
 		args.event.stopPropagation();
 
-		eventsService.publish("Umbraco.Dialogs.TreePickerController.Select", args).then(function (a) {
-			if (a.node.filtered) {
-				return;
-			}
+		eventsService.publish("Umbraco.Dialogs.TreePickerController.Select", args);
+	    
+		if (args.node.filtered) {
+		    return;
+		}
 
-			//This is a tree node, so we don't have an entity to pass in, it will need to be looked up
-			//from the server in this method.
-			select(a.node.name, a.node.id);
+	    //This is a tree node, so we don't have an entity to pass in, it will need to be looked up
+	    //from the server in this method.
+		select(args.node.name, args.node.id);
 
-			//ui...
-			if ($scope.multiPicker) {
-				var c = $(a.event.target.parentElement);
-				if (!a.node.selected) {
-					a.node.selected = true;
-					var temp = "<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>";
-					var icon = c.find("i.umb-tree-icon");
-					if (icon.length > 0) {
-						icon.hide().after(temp);
-					}
-					else {
-						c.prepend(temp);
-					}
-				}
-				else {
-					a.node.selected = false;
-					c.find(".temporary").remove();
-					c.find("i.umb-tree-icon").show();
-				}
-			}
-		});
+	    //ui...
+		if ($scope.multiPicker) {
+		    var c = $(args.event.target.parentElement);
+		    if (!args.node.selected) {
+		        args.node.selected = true;
+		        var temp = "<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>";
+		        var icon = c.find("i.umb-tree-icon");
+		        if (icon.length > 0) {
+		            icon.hide().after(temp);
+		        }
+		        else {
+		            c.prepend(temp);
+		        }
+		    }
+		    else {
+		        args.node.selected = false;
+		        c.find(".temporary").remove();
+		        c.find("i.umb-tree-icon").show();
+		    }
+		}
 	});
 });

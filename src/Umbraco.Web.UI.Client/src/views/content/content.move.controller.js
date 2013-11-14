@@ -10,26 +10,26 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
 		args.event.preventDefault();
 		args.event.stopPropagation();
 
-		eventsService.publish("Umbraco.Editors.Content.MoveController.Select", args).then(function(args){
-			var c = $(args.event.target.parentElement);
-			
-			if($scope.selectedEl){
-				$scope.selectedEl.find(".temporary").remove();
-				$scope.selectedEl.find("i.umb-tree-icon").show();
-			}
+		eventsService.publish("Umbraco.Editors.Content.MoveController.Select", args);
+	    
+		var c = $(args.event.target.parentElement);
 
-			var temp = "<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>";
-			var icon = c.find("i.umb-tree-icon");
-			if(icon.length > 0){
-				icon.hide().after(temp);
-			}else{
-				c.prepend(temp);
-			}
+		if ($scope.selectedEl) {
+		    $scope.selectedEl.find(".temporary").remove();
+		    $scope.selectedEl.find("i.umb-tree-icon").show();
+		}
 
-			
-			$scope.target = args.node;
-			$scope.selectedEl = c;
-		});
+		var temp = "<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>";
+		var icon = c.find("i.umb-tree-icon");
+		if (icon.length > 0) {
+		    icon.hide().after(temp);
+		} else {
+		    c.prepend(temp);
+		}
+
+
+		$scope.target = args.node;
+		$scope.selectedEl = c;
 	});
 
 	$scope.move = function(){

@@ -43,34 +43,33 @@ angular.module("umbraco").controller("Umbraco.Dialogs.ContentPickerController",
 		args.event.preventDefault();
 		args.event.stopPropagation();
 
-		eventsService.publish("Umbraco.Dialogs.ContentPickerController.Select", args).then(function(args){
-			if(dialogOptions && dialogOptions.multiPicker){
-				
-				var c = $(args.event.target.parentElement);
-				if(!args.node.selected){
-					args.node.selected = true;
-					
-					var temp = "<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>";
-					var icon = c.find("i.umb-tree-icon");
-					if(icon.length > 0){
-						icon.hide().after(temp);
-					}else{
-						c.prepend(temp);
-					}
-						
-				}else{
-					args.node.selected = false;
-					c.find(".temporary").remove();
-					c.find("i.umb-tree-icon").show();
-				}
+		eventsService.publish("Umbraco.Dialogs.ContentPickerController.Select", args);
+	    
+		if (dialogOptions && dialogOptions.multiPicker) {
 
-				$scope.select(args.node);
+		    var c = $(args.event.target.parentElement);
+		    if (!args.node.selected) {
+		        args.node.selected = true;
 
-			}else{
-				$scope.submit(args.node);					
-			}
-			
-		});
+		        var temp = "<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>";
+		        var icon = c.find("i.umb-tree-icon");
+		        if (icon.length > 0) {
+		            icon.hide().after(temp);
+		        } else {
+		            c.prepend(temp);
+		        }
+
+		    } else {
+		        args.node.selected = false;
+		        c.find(".temporary").remove();
+		        c.find("i.umb-tree-icon").show();
+		    }
+
+		    $scope.select(args.node);
+
+		} else {
+		    $scope.submit(args.node);
+		}
 
 	});
 });

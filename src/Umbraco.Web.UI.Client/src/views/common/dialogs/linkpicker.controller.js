@@ -30,40 +30,40 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 		args.event.preventDefault();
 		args.event.stopPropagation();
 
-		eventsService.publish("Umbraco.Dialogs.LinkPickerController.Select", args).then(function(args){
-				var c = $(args.event.target.parentElement);
+		eventsService.publish("Umbraco.Dialogs.LinkPickerController.Select", args);
+	    
+		var c = $(args.event.target.parentElement);
 
-				//renewing
-				if(args.node !== $scope.target){
-					if($scope.selectedEl){
-						$scope.selectedEl.find(".temporary").remove();
-						$scope.selectedEl.find("i.umb-tree-icon").show();
-					}
+	    //renewing
+		if (args.node !== $scope.target) {
+		    if ($scope.selectedEl) {
+		        $scope.selectedEl.find(".temporary").remove();
+		        $scope.selectedEl.find("i.umb-tree-icon").show();
+		    }
 
-					$scope.selectedEl = c;
-					$scope.target = args.node;
-					$scope.target.name = args.node.name;
+		    $scope.selectedEl = c;
+		    $scope.target = args.node;
+		    $scope.target.name = args.node.name;
 
-					$scope.selectedEl.find("i.umb-tree-icon")
-					 .hide()
-					 .after("<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>");
-					
-					if(args.node.id < 0){
-						$scope.target.url = "/";
-					}else{
-						contentResource.getNiceUrl(args.node.id).then(function(url){
-							$scope.target.url = angular.fromJson(url);
-						});
-					}
-				}else{
-					$scope.target = undefined;
-					//resetting
-					if($scope.selectedEl){
-						$scope.selectedEl.find(".temporary").remove();
-						$scope.selectedEl.find("i.umb-tree-icon").show();
-					}
-				}
-		});
+		    $scope.selectedEl.find("i.umb-tree-icon")
+             .hide()
+             .after("<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>");
+
+		    if (args.node.id < 0) {
+		        $scope.target.url = "/";
+		    } else {
+		        contentResource.getNiceUrl(args.node.id).then(function (url) {
+		            $scope.target.url = angular.fromJson(url);
+		        });
+		    }
+		} else {
+		    $scope.target = undefined;
+		    //resetting
+		    if ($scope.selectedEl) {
+		        $scope.selectedEl.find(".temporary").remove();
+		        $scope.selectedEl.find("i.umb-tree-icon").show();
+		    }
+		}
 
 	});
 });

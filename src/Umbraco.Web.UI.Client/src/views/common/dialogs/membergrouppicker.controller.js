@@ -40,29 +40,28 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberGroupPickerControlle
             args.event.stopPropagation();
 
 
-            eventsService.publish("Umbraco.Dialogs.MemberGroupPickerController.Select", args).then(function(a) {
+            eventsService.publish("Umbraco.Dialogs.MemberGroupPickerController.Select", args);
+            
+            //This is a tree node, so we don't have an entity to pass in, it will need to be looked up
+            //from the server in this method.
+            select(args.node.name, args.node.id);
 
-                //This is a tree node, so we don't have an entity to pass in, it will need to be looked up
-                //from the server in this method.
-                select(a.node.name, a.node.id);
-
-                if (dialogOptions.multiPicker) {
-                    var c = $(a.event.target.parentElement);
-                    if (!a.node.selected) {
-                        a.node.selected = true;
-                        c.find("i.umb-tree-icon").hide()
-                            .after("<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>");
-                    }
-                    else {
-                        
-                        remove(a.node.name, a.node.id);
-                        
-                        a.node.selected = false;
-                        c.find(".temporary").remove();
-                        c.find("i.umb-tree-icon").show();
-                    }
+            if (dialogOptions.multiPicker) {
+                var c = $(args.event.target.parentElement);
+                if (!args.node.selected) {
+                    args.node.selected = true;
+                    c.find("i.umb-tree-icon").hide()
+                        .after("<i class='icon umb-tree-icon sprTree icon-check blue temporary'></i>");
                 }
-            });
+                else {
+
+                    remove(args.node.name, args.node.id);
+
+                    args.node.selected = false;
+                    c.find(".temporary").remove();
+                    c.find("i.umb-tree-icon").show();
+                }
+            }
 
         });
     });
