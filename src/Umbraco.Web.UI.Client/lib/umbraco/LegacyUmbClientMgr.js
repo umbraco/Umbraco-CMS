@@ -107,7 +107,10 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     },
                     reloadActionNode: function () {
                         angularHelper.safeApply($rootScope, function() {
-                            navService.reloadNode();
+                            var currentMenuNode = appState.getMenuState("currentNode");
+                            if (currentMenuNode) {
+                                navService.reloadNode(currentMenuNode);
+                            }
                         });
                     },
                     refreshTree: function (treeAlias) {
