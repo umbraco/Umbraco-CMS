@@ -92,7 +92,7 @@ namespace Umbraco.Web.Models.Trees
         private static void SetActionUrl(this MenuItem menuItem, string url, ActionUrlMethod method = ActionUrlMethod.Dialog)
         {
             menuItem.AdditionalData[ActionUrlKey] = url;
-            menuItem.AdditionalData[ActionUrlMethodKey] = url;
+            menuItem.AdditionalData[ActionUrlMethodKey] = method;
         }
 
         internal static void ConvertLegacyMenuItem(this MenuItem menuItem, IUmbracoEntity item, string nodeType, string currentSection)

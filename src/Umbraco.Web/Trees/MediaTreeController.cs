@@ -100,7 +100,7 @@ namespace Umbraco.Web.Trees
             menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
             menu.Items.Add<ActionMove>(ui.Text("actions", ActionMove.Instance.Alias));
             menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
-            menu.Items.Add<ActionSort>(ui.Text("actions", ActionSort.Instance.Alias)).ConvertLegacyMenuItem(null, "media", "media");
+            menu.Items.Add<ActionSort>(ui.Text("actions", ActionSort.Instance.Alias)).ConvertLegacyMenuItem(item, "media", "media");
             menu.Items.Add<ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
 
             //if the media item is in the recycle bin, don't have a default menu, just show the regular menu
