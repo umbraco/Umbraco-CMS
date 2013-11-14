@@ -11,10 +11,13 @@ using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Reflection;
 using System.Collections.Specialized;
+using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models;
+using Umbraco.Core.PropertyEditors;
 using umbraco.BusinessLogic;
-using umbraco.cms.businesslogic.macro;
 using System.Collections.Generic;
+using MacroProperty = umbraco.cms.businesslogic.macro.MacroProperty;
 
 namespace umbraco.developer
 {
@@ -94,7 +97,7 @@ namespace umbraco.developer
                         MacroProperties.Items.Clear();
                         foreach (var pi in type.GetProperties())
                         {
-                            if (pi.CanWrite && fullControlAssemblyName == pi.DeclaringType.Namespace + "." + pi.DeclaringType.Name)
+                            if (pi.CanWrite && ((fullControlAssemblyName == pi.DeclaringType.Namespace + "." + pi.DeclaringType.Name) || pi.DeclaringType == type))
                             {
                                 MacroProperties.Items.Add(new ListItem(pi.Name + " <span style=\"color: #99CCCC\">(" + pi.PropertyType.Name + ")</span>", pi.PropertyType.Name));
                             }
@@ -120,51 +123,54 @@ namespace umbraco.developer
             var result = "";
 
             // Get the macro object
-            var macroObject = new Macro(Convert.ToInt32(Request.QueryString["macroID"]));
+            var macroObject = ApplicationContext.Current.Services.MacroService.GetById(Convert.ToInt32(Request.QueryString["macroID"]));
+            
+            //// Load all macroPropertyTypes
+            //var macroPropertyTypes = new Hashtable();
+            //var macroPropertyIds = new Hashtable();
 
-            // Load all macroPropertyTypes
-            var macroPropertyTypes = new Hashtable();
-            var macroPropertyIds = new Hashtable();
-
-            var macroPropTypes = MacroPropertyType.GetAll;
-            foreach (var mpt in macroPropTypes)
-            {
-                macroPropertyIds.Add(mpt.Alias, mpt.Id.ToString());
-
-                macroPropertyTypes.Add(mpt.Alias, mpt.BaseType);
-            }
+            //var macroPropTypes = ParameterEditorResolver.Current.ParameterEditors.ToArray();
+            
+            //foreach (var mpt in macroPropTypes)
+            //{
+            //    macroPropertyIds.Add(mpt.Alias, mpt.Id.ToString());
+            //    macroPropertyTypes.Add(mpt.Alias, mpt.BaseType);
+            //}
+            var changed = false;
 
             foreach (ListItem li in MacroProperties.Items)
             {
-                if (li.Selected && !MacroHasProperty(macroObject, li.Text.Substring(0, li.Text.IndexOf(" ")).ToLower()))
+                if (li.Selected && MacroHasProperty(macroObject, li.Text.Substring(0, li.Text.IndexOf(" ", StringComparison.Ordinal)).ToLower()) == false)
                 {
                     result += "<li>Added: " + SpaceCamelCasing(li.Text) + "</li>";
-                    var macroPropertyTypeAlias = FindMacroType(macroPropertyTypes, li.Value);
-                    if (macroPropertyTypeAlias == "")
-                        macroPropertyTypeAlias = "text";
-                    var propertyId = macroPropertyIds[macroPropertyTypeAlias];
-                    if (propertyId != null)
+                    var macroPropertyTypeAlias = GetMacroTypeFromClrType(li.Value);
+
+                    macroObject.Properties.Add(new Umbraco.Core.Models.MacroProperty
                     {
-                        var macroPropertyTypeId = 0;
-                        if(int.TryParse(string.Format("{0}", propertyId), out macroPropertyTypeId))
-                        {
-                            MacroProperty.MakeNew(macroObject,
-                                true,
-                                li.Text.Substring(0, li.Text.IndexOf(" ")),
-                                SpaceCamelCasing(li.Text),
-                                macroPropTypes.Find(mpt => mpt.Id == macroPropertyTypeId));
-                        }
-                    }
+                        Name = SpaceCamelCasing(li.Text),
+                        Alias = li.Text.Substring(0, li.Text.IndexOf(" ", StringComparison.Ordinal)),
+                        EditorAlias = macroPropertyTypeAlias                        
+                    });
+
+                    changed = true;
                 }
                 else if (li.Selected)
+                {
                     result += "<li>Skipped: " + SpaceCamelCasing(li.Text) + " (already exists as a parameter)</li>";
+                }
             }
+
+            if (changed)
+            {
+                ApplicationContext.Current.Services.MacroService.Save(macroObject);    
+            }
+
             ChooseProperties.Visible = false;
             ConfigProperties.Visible = true;
             resultLiteral.Text = result;
         }
 
-        private static bool MacroHasProperty(Macro macroObject, string propertyAlias)
+        private static bool MacroHasProperty(IMacro macroObject, string propertyAlias)
         {
             return macroObject.Properties.Any(mp => mp.Alias.ToLower() == propertyAlias);
         }
@@ -183,31 +189,22 @@ namespace umbraco.developer
             return tempString;
         }
 
-        private static string FindMacroType(Hashtable macroPropertyTypes, string baseTypeName)
+        private static string GetMacroTypeFromClrType(string baseTypeName)
         {
-            var tempType = "";
-            // Hard-code numeric values
-            if (baseTypeName == "Int32")
-                tempType = "number";
-            else if (baseTypeName == "Decimal")
-                tempType = "decimal";
-            else if (baseTypeName == "String")
-                tempType = "text";
-            else if (baseTypeName == "Boolean")
-                tempType = "bool";
-            else
+            switch (baseTypeName)
             {
-                foreach (DictionaryEntry de in macroPropertyTypes)
-                {
-                    if (de.Value.ToString() == baseTypeName)
-                    {
-                        tempType = de.Key.ToString();
-                        break;
-                    }
-                }
+                case "Int32":
+                    return Constants.PropertyEditors.IntegerAlias;
+                case "Decimal":
+                    //we previously only had an integer editor too! - this would of course
+                    // fail if someone enters a real long number
+                    return Constants.PropertyEditors.IntegerAlias;                
+                case "Boolean":
+                    return Constants.PropertyEditors.TrueFalseAlias;
+                case "String":
+                default:
+                    return Constants.PropertyEditors.TextboxAlias;
             }
-
-            return tempType;
         }
 
     }
