@@ -38,6 +38,9 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
 				$scope.error = false;
 				$scope.success = true;
 
+			    //first we need to remove the node that launched the dialog
+				treeService.removeNode($scope.currentNode);
+
 			    //get the currently edited node (if any)
 				var activeNode = appState.getTreeState("selectedNode");
 
