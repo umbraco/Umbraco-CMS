@@ -227,12 +227,13 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             return this.getChildren(args)
                 .then(function(data) {
 
-                    //set state to done and expand
+                    //set state to done and expand (only if there actually are children!)
                     args.node.loading = false;
                     args.node.children = data;
-                    args.node.expanded = true;
-                    args.node.hasChildren = true;
-
+                    if (args.node.children && args.node.children.length > 0) {
+                        args.node.expanded = true;
+                        args.node.hasChildren = true;
+                    }
                     return data;
 
                 }, function(reason) {

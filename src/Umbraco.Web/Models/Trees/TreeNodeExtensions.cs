@@ -18,6 +18,18 @@
         /// Sets the node style to show that it is currently protected publicly
         /// </summary>
         /// <param name="treeNode"></param>
+        public static void SetContainerStyle(this TreeNode treeNode)
+        {
+            if (treeNode.CssClasses.Contains("is-container") == false)
+            {
+                treeNode.CssClasses.Add("is-container");
+            }
+        }
+
+        /// <summary>
+        /// Sets the node style to show that it is currently protected publicly
+        /// </summary>
+        /// <param name="treeNode"></param>
         public static void SetProtectedStyle(this TreeNode treeNode)
         {
             if (treeNode.CssClasses.Contains("protected") == false)

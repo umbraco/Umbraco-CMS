@@ -83,6 +83,14 @@ namespace Umbraco.Web.Trees
                 return nodes;
             }
 
+            //before we get the children we need to see if this is a container node
+            var current = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.Document);
+            if (current != null && current.AdditionalData.ContainsKey("IsContainer") && current.AdditionalData["IsContainer"] is bool && (bool)current.AdditionalData["IsContainer"])
+            {
+                //no children!
+                return new TreeNodeCollection();
+            }
+
             return PerformGetTreeNodes(id, queryStrings);
         }
 

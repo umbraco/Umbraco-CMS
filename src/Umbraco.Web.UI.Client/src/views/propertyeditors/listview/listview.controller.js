@@ -74,7 +74,9 @@ angular.module("umbraco")
 
             $scope.selectAll = function ($event) {
                 var checkbox = $event.target;
-
+                if (!angular.isArray($scope.listViewResultSet.items)) {
+                    return;
+                }
                 for (var i = 0; i < $scope.listViewResultSet.items.length; i++) {
                     var entity = $scope.listViewResultSet.items[i];
                     entity.selected = checkbox.checked;
@@ -82,12 +84,18 @@ angular.module("umbraco")
             };
 
             $scope.isSelectedAll = function () {
+                if (!angular.isArray($scope.listViewResultSet.items)) {
+                    return false;
+                }
                 return _.every($scope.listViewResultSet.items, function (item) {
                     return item.selected;
                 });
             };
 
             $scope.isAnythingSelected = function () {
+                if (!angular.isArray($scope.listViewResultSet.items)) {
+                    return false;
+                }
                 return _.some($scope.listViewResultSet.items, function (item) {
                     return item.selected;
                 });

@@ -52,12 +52,21 @@ namespace Umbraco.Web.Trees
             get { return Security.CurrentUser.StartContentId; }
         }
 
+        /// <summary>
+        /// Gets the tree nodes for the given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// If the content item is a container node then we will not return anything
+        /// </remarks>
         protected override TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings)
         {
+            var nodes = new TreeNodeCollection();
+
             var entities = GetChildEntities(id);
 
-            var nodes = new TreeNodeCollection();
-            
             foreach (var entity in entities)
             {
                 var e = (UmbracoEntity)entity;
@@ -65,23 +74,24 @@ namespace Umbraco.Web.Trees
                 var allowedUserOptions = GetAllowedUserMenuItemsForNode(e);
                 if (CanUserAccessNode(e, allowedUserOptions))
                 {                    
-                    var hasChildren = e.HasChildren;
 
                     //Special check to see if it ia a container, if so then we'll hide children.
-                    if (entity.AdditionalData.ContainsKey("IsContainer") && entity.AdditionalData["IsContainer"] is bool && (bool) entity.AdditionalData["IsContainer"])
-                    {
-                        hasChildren = false;
-                    }
-
+                    var isContainer = entity.AdditionalData.ContainsKey("IsContainer") 
+                        && entity.AdditionalData["IsContainer"] is bool 
+                        && (bool) entity.AdditionalData["IsContainer"];
+                    
                     var node = CreateTreeNode(
                         e.Id.ToInvariantString(),
                         id,
                         queryStrings,
                         e.Name,
                         e.ContentTypeIcon,
-                        hasChildren);
+                        e.HasChildren && (isContainer == false));
 
                     node.AdditionalData.Add("contentType", e.ContentTypeAlias);
+
+                    if (isContainer)
+                        node.SetContainerStyle();
 
                     if (e.IsPublished == false)
                         node.SetNotPublishedStyle();
