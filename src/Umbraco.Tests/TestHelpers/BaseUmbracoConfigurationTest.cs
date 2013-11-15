@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Configuration.UmbracoSettings;
 
 namespace Umbraco.Tests.TestHelpers
@@ -9,17 +10,25 @@ namespace Umbraco.Tests.TestHelpers
     [TestFixture]
     public abstract class BaseUmbracoConfigurationTest
     {
+        [TestFixtureSetUp]
+        public void InitializeFixture()
+        {
+            TestHelper.SetupLog4NetForTests();
+        }
+
         [SetUp]
         public virtual void Initialize()
         {
-            TestHelper.SetupLog4NetForTests();
+            using (DisposableTimer.TraceDuration < BaseUmbracoConfigurationTest>("init"))
+            {                
+                //mock the Umbraco settings that we need
+                var settings = SettingsForTests.GetMockSettings();
+                //sets the global singleton to use the mocked format
+                SettingsForTests.ConfigureSettings(settings);
+                //set our local variable for tests to use (preferably)
+                UmbracoSettings = settings;    
+            }
             
-            //mock the Umbraco settings that we need
-            var settings = SettingsForTests.GetMockSettings();
-            //sets the global singleton to use the mocked format
-            SettingsForTests.ConfigureSettings(settings);
-            //set our local variable for tests to use (preferably)
-            UmbracoSettings = settings;
         }
 
         [TearDown]

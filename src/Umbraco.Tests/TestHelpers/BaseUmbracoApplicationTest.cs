@@ -28,17 +28,23 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.Initialize();
 
-            TestHelper.InitializeContentDirectories();
-            TestHelper.EnsureUmbracoSettingsConfig();
+            using (DisposableTimer.TraceDuration<BaseUmbracoApplicationTest>("init"))
+            {
+                TestHelper.InitializeContentDirectories();
+                //TestHelper.EnsureUmbracoSettingsConfig();
+
+                //Create the legacy prop-eds mapping
+                LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
+
+                SetupPluginManager();
+
+                SetupApplicationContext();
+
+                InitializeMappers();
+
+                FreezeResolution();
+            }
             
-            //Create the legacy prop-eds mapping
-            LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
-
-            SetupPluginManager();            
-            SetupApplicationContext();
-            InitializeMappers();
-
-            FreezeResolution();
         }
 
         [TearDown]
