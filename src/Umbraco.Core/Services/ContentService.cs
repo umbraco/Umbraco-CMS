@@ -1170,14 +1170,11 @@ namespace Umbraco.Core.Services
                         }
                     }
 
-                    //Special case for the Tags DataType
-                    if (content.Properties.Any(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.TagsAlias))
+                    //Special case for the associated tags
+                    var tags = uow.Database.Fetch<TagRelationshipDto>("WHERE nodeId = @Id", new { Id = content.Id });
+                    foreach (var tag in tags)
                     {
-                        var tags = uow.Database.Fetch<TagRelationshipDto>("WHERE nodeId = @Id", new { Id = content.Id });
-                        foreach (var tag in tags)
-                        {
-                            uow.Database.Insert(new TagRelationshipDto { NodeId = copy.Id, TagId = tag.TagId });
-                        }
+                        uow.Database.Insert(new TagRelationshipDto { NodeId = copy.Id, TagId = tag.TagId, PropertyTypeId = tag.PropertyTypeId });
                     }
                 }
 

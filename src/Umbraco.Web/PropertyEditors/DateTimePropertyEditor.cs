@@ -12,7 +12,9 @@ namespace Umbraco.Web.PropertyEditors
         {
             _defaultPreVals = new Dictionary<string, object>
                 {
-                    {"format", "yyyy-MM-dd HH:mm:ss"}
+                    //NOTE: This is very important that we do not use .Net format's there, this format
+                    // is the correct format for the JS picker we are using so you cannot capitalize the HH, they need to be 'hh'
+                    {"format", "yyyy-MM-dd hh:mm:ss"}
                 };
         }
 

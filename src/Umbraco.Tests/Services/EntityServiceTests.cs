@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
@@ -23,6 +24,11 @@ namespace Umbraco.Tests.Services
         public override void TearDown()
         {
             base.TearDown();
+        }
+
+        protected override DatabaseBehavior DatabaseTestBehavior
+        {
+            get { return DatabaseBehavior.NewSchemaPerFixture; }
         }
 
         [Test]
@@ -136,24 +142,32 @@ namespace Umbraco.Tests.Services
                         y => y.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias)), Is.True);
         }
 
+        private static bool _isSetup = false;
+
         public override void CreateTestData()
         {
-            base.CreateTestData();
+            if (_isSetup == false)
+            {
+                _isSetup = true;
 
-            //Create and Save folder-Media -> 1050
-            var folderMediaType = ServiceContext.ContentTypeService.GetMediaType(1031);
-            var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
-            ServiceContext.MediaService.Save(folder, 0);
+                base.CreateTestData();
 
-            //Create and Save image-Media -> 1051
-            var imageMediaType = ServiceContext.ContentTypeService.GetMediaType(1032);
-            var image = MockedMedia.CreateMediaImage(imageMediaType, folder.Id);
-            ServiceContext.MediaService.Save(image, 0);
+                //Create and Save folder-Media -> 1050
+                var folderMediaType = ServiceContext.ContentTypeService.GetMediaType(1031);
+                var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
+                ServiceContext.MediaService.Save(folder, 0);
 
-            //Create and Save file-Media -> 1052
-            var fileMediaType = ServiceContext.ContentTypeService.GetMediaType(1033);
-            var file = MockedMedia.CreateMediaFile(fileMediaType, folder.Id);
-            ServiceContext.MediaService.Save(file, 0);
+                //Create and Save image-Media -> 1051
+                var imageMediaType = ServiceContext.ContentTypeService.GetMediaType(1032);
+                var image = MockedMedia.CreateMediaImage(imageMediaType, folder.Id);
+                ServiceContext.MediaService.Save(image, 0);
+
+                //Create and Save file-Media -> 1052
+                var fileMediaType = ServiceContext.ContentTypeService.GetMediaType(1033);
+                var file = MockedMedia.CreateMediaFile(fileMediaType, folder.Id);
+                ServiceContext.MediaService.Save(file, 0);
+            }
+            
         }
     }
 }

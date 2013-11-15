@@ -176,15 +176,11 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             appState.setGlobalState("showTray", false);
         },
 
-        //adding this to get clean global access to the main tree directive
-        //there will only ever be one main tree event handler
-        //we need to pass in the current scope for binding these actions
-
-        //TODO: How many places are we assigning a currentNode?? Now we're assigning a currentNode arbitrarily to this
-        // scope - which looks to be the scope of the navigation controller - but then we are assigning a global current
-        // node on the ui object?? This is a mess.
-        
-        setupTreeEvents: function(treeEventHandler, scope) {
+        /** 
+            Called to assign the main tree event handler - this is called by the navigation controller.
+            TODO: Potentially another dev could call this which would kind of mung the whole app so potentially there's a better way.
+        */
+        setupTreeEvents: function(treeEventHandler) {
             mainTreeEventHandler = treeEventHandler;
 
             //when a tree is loaded into a section, we need to put it into appState
@@ -199,12 +195,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                     //set the current selected node
                     appState.setTreeState("selectedNode", args.node);
                 }
-                
-                //TODO: what the heck is going on here? - this seems really zany, allowing us to modify the 
-                // navigationController.scope from within the navigationService to assign back to the args
-                // so that we can change the navigationController.scope from within the umbTree directive. Hrm.
-                args.scope = scope;
-                
             });
 
             //this reacts to the options item in the tree
@@ -215,11 +205,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 //Set the current action node (this is not the same as the current selected node!)
                 appState.setMenuState("currentNode", args.node);
                 
-                //TODO: what the heck is going on here? - this seems really zany, allowing us to modify the 
-                // navigationController.scope from within the navigationService to assign back to the args
-                // so that we can change the navigationController.scope from within the umbTree directive. Hrm.
-                args.scope = scope;
-
                 if (args.event && args.event.altKey) {
                     args.skipDefault = true;
                 }
@@ -230,11 +215,6 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             mainTreeEventHandler.bind("treeNodeAltSelect", function(ev, args) {
                 ev.stopPropagation();
                 ev.preventDefault();
-
-                //TODO: what the heck is going on here? - this seems really zany, allowing us to modify the 
-                // navigationController.scope from within the navigationService to assign back to the args
-                // so that we can change the navigationController.scope from within the umbTree directive. Hrm.
-                args.scope = scope;
 
                 args.skipDefault = true;
                 service.showMenu(ev, args);
@@ -457,7 +437,18 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
             setMode("tree");
         },
 
+        /** Executes a given menu action */
         executeMenuAction: function (action, node, section) {
+
+            if (!action) {
+                throw "action cannot be null";
+            }
+            if (!node) {
+                throw "node cannot be null";                
+            }
+            if (!section) {
+                throw "section cannot be null";
+            }
 
             if (action.metaData && action.metaData["jsAction"] && angular.isString(action.metaData["jsAction"])) {
 
@@ -471,12 +462,12 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                     eval(js);
                 }
                 else {
-                    var _service = $injector.get(menuAction[0]);
-                    if (!_service) {
+                    var menuActionService = $injector.get(menuAction[0]);
+                    if (!menuActionService) {
                         throw "The angular service " + menuAction[0] + " could not be found";
                     }
 
-                    var method = _service[menuAction[1]];
+                    var method = menuActionService[menuAction[1]];
 
                     if (!method) {
                         throw "The method " + menuAction[1] + " on the angular service " + menuAction[0] + " could not be found";

@@ -30,13 +30,13 @@ namespace Umbraco.Tests.Models.Mapping
             get { return DatabaseBehavior.NewSchemaPerFixture; }
         }
 
-        protected override void FreezeResolution()
-        {
-            //PropertyEditorResolver.Current = new PropertyEditorResolver(
-            //    () => new List<Type> {typeof (TestPropertyEditor)});
+        //protected override void FreezeResolution()
+        //{
+        //    PropertyEditorResolver.Current = new PropertyEditorResolver(
+        //        () => PluginManager.Current.ResolvePropertyEditors());
 
-            base.FreezeResolution();
-        }
+        //    base.FreezeResolution();
+        //}
 
         [Test]
         public void To_Media_Item_Simple()

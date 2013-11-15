@@ -6,12 +6,20 @@
  * @description
  * The controller for the member editor
  */
-function MemberEditController($scope, $routeParams, $location, $q, $window, appState, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, treeService) {
+function MemberEditController($scope, $routeParams, $location, $q, $window, appState, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, umbModelMapper) {
     
     //setup scope vars
     $scope.nav = navigationService;
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.currentNode = null; //the editors affiliated node
+
+    //build a path to sync the tree with
+    function buildTreePath(data) {
+        //TODO: Will this work for the 'other' list ?
+        var path = data.name[0] + "," + data.key;
+        path = path.replace(/-/g, '');
+        return path;
+    }
 
     if ($routeParams.create) {
         //we are creating so get an empty member item
@@ -19,6 +27,8 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
             .then(function(data) {
                 $scope.loaded = true;
                 $scope.content = data;
+                //put this into appState
+                appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
             });
     }
     else {
@@ -40,9 +50,10 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     $scope.loaded = true;
                     $scope.content = data;
 
-                    //build a path to sync the tree with
-                    var path = data.name[0]+"," + data.key;
-                    path = path.replace(/-/g,'');
+                    //put this into appState
+                    appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                    
+                    var path = buildTreePath(data);
 
                     navigationService.syncTree({ tree: "member", path: path.split(",") }).then(function (syncArgs) {
                         $scope.currentNode = syncArgs.node;
@@ -69,13 +80,18 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
 
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,
-                        newContent: data,
+                        savedContent: data,
                         //specify a custom id to redirect to since we want to use the GUID
                         redirectId: data.key,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                     });
                     
-                    navigationService.syncTree({ tree: "member", path: path.split(",") }).then(function (syncArgs) {
+                    //update appState
+                    appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+
+                    var path = buildTreePath(data);
+
+                    navigationService.syncTree({ tree: "member", path: path.split(","), forceReload: true }).then(function (syncArgs) {
                         $scope.currentNode = syncArgs.node;
                     });
 
@@ -84,9 +100,11 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     contentEditingHelper.handleSaveError({
                         redirectOnFailure: false,
                         err: err,
-                        allNewProps: contentEditingHelper.getAllProps(err.data),
-                        allOrigProps: contentEditingHelper.getAllProps($scope.content)
+                        rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
                     });
+                    
+                    //update appState
+                    appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
 
                 });
         }

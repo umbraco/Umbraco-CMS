@@ -14,7 +14,7 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     //TODO: Need to think about this and an nicer way to acheive what this is doing.
     //the tree event handler i used to subscribe to the main tree click events
     $scope.treeEventHandler = $({});
-    navigationService.setupTreeEvents($scope.treeEventHandler, $scope);
+    navigationService.setupTreeEvents($scope.treeEventHandler);
 
     //Put the navigation service on this scope so we can use it's methods/properties in the view.
     // IMPORTANT: all properties assigned to this scope are generally available on the scope object on dialogs since

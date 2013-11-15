@@ -61,12 +61,11 @@ namespace Umbraco.Web.Models.Mapping
 
         private static void MapGenericCustomProperties(IMedia media, MediaItemDisplay display)
         {
-            /*
-             * Should this be added? if so we need some changes in the UI tho.
+            
             if (media.ContentType.IsContainer)
             {
-                TabsAndPropertiesResolver.AddContainerView(display);
-            }*/
+                TabsAndPropertiesResolver.AddContainerView(display, "media");
+            }
 
             TabsAndPropertiesResolver.MapGenericProperties(media, display);
         }

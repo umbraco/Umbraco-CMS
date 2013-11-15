@@ -55,10 +55,10 @@ namespace Umbraco.Tests.TestHelpers
         public override void Initialize()
         {
             InitializeFirstRunFlags();
-            
+
             var path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
-            
+
             //disable cache
             var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
 
@@ -67,25 +67,26 @@ namespace Umbraco.Tests.TestHelpers
                 GetDbProviderName());
 
             _appContext = new ApplicationContext(
-				//assign the db context
-                new DatabaseContext(dbFactory),
-				//assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),
-                cacheHelper)
-                {
-                    IsReady = true
-                };
+                //assign the db context
+            new DatabaseContext(dbFactory),
+                //assign the service context
+            new ServiceContext(new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),
+            cacheHelper)
+            {
+                IsReady = true
+            };
 
             base.Initialize();
 
-            DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
+            using (DisposableTimer.TraceDuration<BaseDatabaseFactoryTest>("init"))
+            {
+                DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
+                CreateSqlCeDatabase();
+                InitializeDatabase();
 
-            CreateSqlCeDatabase();
-
-            InitializeDatabase();
-
-            //ensure the configuration matches the current version for tests
-            SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
+                //ensure the configuration matches the current version for tests
+                SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
+            }
         }
 
         protected override void SetupApplicationContext()

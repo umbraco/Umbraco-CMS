@@ -6,7 +6,7 @@
  * @description
  * The controller for the media editor
  */
-function mediaEditController($scope, $routeParams, appState, mediaResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService,  formHelper) {
+function mediaEditController($scope, $routeParams, appState, mediaResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService, formHelper, umbModelMapper) {
 
     //setup scope vars
     $scope.nav = navigationService;
@@ -19,7 +19,8 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
             .then(function (data) {
                 $scope.loaded = true;
                 $scope.content = data;
-
+                //put this into appState
+                appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
             });
     }
     else {
@@ -27,7 +28,9 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
             .then(function (data) {
                 $scope.loaded = true;
                 $scope.content = data;
-                                
+                //put this into appState
+                appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                
                 //in one particular special case, after we've created a new item we redirect back to the edit
                 // route but there might be server validation errors in the collection which we need to display
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors
@@ -52,9 +55,12 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
 
                     contentEditingHelper.handleSuccessfulSave({
                         scope: $scope,
-                        newContent: data,
+                        savedContent: data,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                     });
+
+                    //update appState
+                    appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
 
                     navigationService.syncTree({ tree: "media", path: data.path, forceReload: true }).then(function (syncArgs) {
                         $scope.currentNode = syncArgs.node;
@@ -65,9 +71,11 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
                     contentEditingHelper.handleSaveError({
                         err: err,
                         redirectOnFailure: true,
-                        allNewProps: contentEditingHelper.getAllProps(err.data),
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
                     });
+                    
+                    //update appState
+                    appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
                 });
         }
         

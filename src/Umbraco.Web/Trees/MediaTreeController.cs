@@ -55,9 +55,25 @@ namespace Umbraco.Web.Trees
             foreach (var entity in entities)
             {
                 var e = (UmbracoEntity)entity;
-                var node = CreateTreeNode(e.Id.ToInvariantString(), id, queryStrings, e.Name, e.ContentTypeIcon, e.HasChildren);
+
+                //Special check to see if it ia a container, if so then we'll hide children.
+                var isContainer = entity.AdditionalData.ContainsKey("IsContainer")
+                    && entity.AdditionalData["IsContainer"] is bool
+                    && (bool)entity.AdditionalData["IsContainer"];
                 
+                var node = CreateTreeNode(
+                    e.Id.ToInvariantString(), 
+                    id, 
+                    queryStrings, 
+                    e.Name, 
+                    e.ContentTypeIcon,
+                    e.HasChildren && (isContainer == false));
+
                 node.AdditionalData.Add("contentType", e.ContentTypeAlias);
+
+                if (isContainer)
+                    node.SetContainerStyle();
+
                 nodes.Add(node);
             }
             return nodes;
