@@ -1,13 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
+using System.Reflection;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Core.Persistence.Factories
 {
     internal class UmbracoEntityFactory : IEntityFactory<UmbracoEntity, EntityRepository.UmbracoEntityDto>
     {
+        internal void AddAdditionalData(UmbracoEntity entity, IDictionary<string, object> originalEntityProperties)
+        {
+            var entityProps = TypeHelper.GetPublicProperties(typeof(IUmbracoEntity)).Select(x => x.Name).ToArray();
+            
+            //figure out what extra properties we have that are not on the IUmbracoEntity and add them to additional data
+            foreach (var k in originalEntityProperties.Keys
+                .Select(x => new { orig = x, title = x.ConvertCase(StringAliasCaseType.PascalCase) })
+                .Where(x => entityProps.InvariantContains(x.title) == false))
+            {
+                entity.AdditionalData[k.title] = originalEntityProperties[k.orig];
+            }
+        }
+
         internal UmbracoEntity BuildEntityFromDynamic(dynamic d)
         {
             var entity = new UmbracoEntity(d.trashed)
@@ -38,12 +54,18 @@ namespace Umbraco.Core.Persistence.Factories
                 Guid.TryParse(d.publishedVersion.ToString(), out publishedVersion);    
             }
             var newestVersion = default(Guid);
-            Guid.TryParse(d.newestVersion.ToString(), out newestVersion);
+            if (d.newestVersion != null)
+            {
+                Guid.TryParse(d.newestVersion.ToString(), out newestVersion);    
+            }
 
             entity.IsPublished = publishedVersion != default(Guid) || (newestVersion != default(Guid) && publishedVersion == newestVersion);
             entity.IsDraft = newestVersion != default(Guid) && (publishedVersion == default(Guid) || publishedVersion != newestVersion);
             entity.HasPendingChanges = (publishedVersion != default(Guid) && newestVersion != default(Guid)) && publishedVersion != newestVersion;
-
+            
+            //Now we can assign the additional data!                        
+            AddAdditionalData(entity, asDictionary);
+            
             return entity;
         }
 

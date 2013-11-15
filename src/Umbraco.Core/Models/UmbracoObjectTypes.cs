@@ -61,6 +61,7 @@ namespace Umbraco.Core.Models
         [FriendlyName("Member Group")]
         MemberGroup,
 
+        //TODO: What is a 'Content Item' supposed to be???
         /// <summary>
         /// Content Item
         /// </summary>
