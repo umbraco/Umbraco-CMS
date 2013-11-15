@@ -26,6 +26,8 @@ namespace Umbraco.Core.Persistence.Factories
 
         internal UmbracoEntity BuildEntityFromDynamic(dynamic d)
         {
+            var asDictionary = (IDictionary<string, object>)d;
+
             var entity = new UmbracoEntity(d.trashed)
             {
                 CreateDate = d.createDate,
@@ -39,13 +41,11 @@ namespace Umbraco.Core.Persistence.Factories
                 Path = d.path,
                 SortOrder = d.sortOrder,
                 HasChildren = d.children > 0,
-                ContentTypeAlias = d.alias ?? string.Empty,
-                ContentTypeIcon = d.icon ?? string.Empty,
-                ContentTypeThumbnail = d.thumbnail ?? string.Empty,
+                ContentTypeAlias = asDictionary.ContainsKey("alias") ? (d.alias ?? string.Empty) : string.Empty,
+                ContentTypeIcon = asDictionary.ContainsKey("icon") ? (d.icon ?? string.Empty) : string.Empty,
+                ContentTypeThumbnail = asDictionary.ContainsKey("thumbnail") ? (d.thumbnail ?? string.Empty) : string.Empty,
                 UmbracoProperties = new List<UmbracoEntity.UmbracoProperty>()
             };
-
-            var asDictionary = (IDictionary<string, object>)d;
 
             var publishedVersion = default(Guid);            
             //some content items don't have a published version
@@ -54,7 +54,7 @@ namespace Umbraco.Core.Persistence.Factories
                 Guid.TryParse(d.publishedVersion.ToString(), out publishedVersion);    
             }
             var newestVersion = default(Guid);
-            if (d.newestVersion != null)
+            if (asDictionary.ContainsKey("newestVersion") && d.newestVersion != null)
             {
                 Guid.TryParse(d.newestVersion.ToString(), out newestVersion);    
             }
