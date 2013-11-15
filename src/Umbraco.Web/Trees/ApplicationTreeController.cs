@@ -75,8 +75,12 @@ namespace Umbraco.Web.Trees
             foreach (var apptree in appTrees)
             {
                 //return the root nodes for each tree in the app
-                var rootNode = GetRootForMultipleAppTree(apptree, queryStrings);                
-                collection.Add(rootNode); 
+                var rootNode = GetRootForMultipleAppTree(apptree, queryStrings);
+                //This could be null if the tree decides not to return it's root (i.e. the member type tree does this when not in umbraco membership mode)
+                if (rootNode != null)
+                {
+                    collection.Add(rootNode);     
+                }
             }
 
             var multiTree = SectionRootNode.CreateMultiTreeSectionRoot(rootId, collection);

@@ -82,6 +82,12 @@ namespace Umbraco.Web.Trees
                 return Attempt<TreeNode>.Fail(xmlTreeNodeAttempt.Exception);
             }
 
+            //the root can potentially be null, in that case we'll just return a null success which means it won't be included
+            if (xmlTreeNodeAttempt.Result == null)
+            {
+                return Attempt<TreeNode>.Succeed(null);
+            }
+
             var legacyController = new LegacyTreeController(xmlTreeNodeAttempt.Result, appTree.Alias, currentSection, urlHelper);
             var newRoot = legacyController.GetRootNode(formCollection);
 
