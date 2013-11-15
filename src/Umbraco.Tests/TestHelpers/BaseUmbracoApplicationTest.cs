@@ -31,7 +31,7 @@ namespace Umbraco.Tests.TestHelpers
             using (DisposableTimer.TraceDuration<BaseUmbracoApplicationTest>("init"))
             {
                 TestHelper.InitializeContentDirectories();
-                //TestHelper.EnsureUmbracoSettingsConfig();
+                TestHelper.EnsureUmbracoSettingsConfig();
 
                 //Create the legacy prop-eds mapping
                 LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
