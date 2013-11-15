@@ -43,18 +43,17 @@
         },
 
         _saveSort: function() {
-            var rows = jQuery('#sortableNodes tbody tr');
+            var rows = $('#sortableNodes tbody tr');
             var sortOrder = "";
 
             $.each(rows, function () {
                 sortOrder += $(this).attr("id").replace("node_", "") + ",";
             });
 
-            document.getElementById("sortingDone").style.display = 'none';
-            document.getElementById("sortArea").style.display = 'none';
-
-            document.getElementById("loading").style.display = 'block';
-
+            $("#sortingDone").hide();
+            $("#sortArea").hide();
+            $("#loading").show();
+            
             var self = this;
 
             $.ajax({
@@ -69,9 +68,10 @@
             });
         },
         
-        _showConfirm: function() {
-            document.getElementById("loading").style.display = 'none';
-            document.getElementById("sortingDone").style.display = 'block';
+        _showConfirm: function () {
+            $(".umb-dialog-footer").hide();
+            $("#loading").hide();
+            $("#sortingDone").show();
             UmbClientMgr.mainTree().reloadActionNode();
         },
 
@@ -101,7 +101,7 @@
             });
             
             //setup the drag/drop sorting
-            $("#sortableNodes").tableDnD({ containment: jQuery("#sortableFrame") });
+            $("#sortableNodes").tableDnD({ containment: $("#sortableFrame") });
             
             //wire up the submit button
             self._opts.submitButton.click(function() {
