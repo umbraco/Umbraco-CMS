@@ -108,11 +108,17 @@ namespace Umbraco.Web.Models.Mapping
 
         }
 
-        internal static void AddContainerView<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display)
+        /// <summary>
+        /// Adds the container (listview) tab to the document
+        /// </summary>
+        /// <typeparam name="TPersisted"></typeparam>
+        /// <param name="display"></param>
+        /// <param name="entityType">This must be either 'content' or 'media'</param>
+        internal static void AddContainerView<TPersisted>(TabbedContentItem<ContentPropertyDisplay, TPersisted> display, string entityType)
              where TPersisted : IContentBase
         {
             var listViewTab = new Tab<ContentPropertyDisplay>();
-            listViewTab.Alias = "containerView";
+            listViewTab.Alias = "umbContainerView";
             listViewTab.Label = ui.Text("content", "childItems");
             listViewTab.Id = 25;
             listViewTab.IsActive = true;
@@ -124,7 +130,11 @@ namespace Umbraco.Web.Models.Mapping
                 Label = "",
                 Value = null,
                 View = "listview",
-                HideLabel = true
+                HideLabel = true,
+                Config = new Dictionary<string, object>
+                    {
+                        {"entityType", entityType}
+                    }
             });
             listViewTab.Properties = listViewProperties;
 

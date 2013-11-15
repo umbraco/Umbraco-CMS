@@ -84,7 +84,7 @@ namespace Umbraco.Web.Trees
             }
 
             //before we get the children we need to see if this is a container node
-            var current = Services.EntityService.Get(int.Parse(id), UmbracoObjectTypes.Document);
+            var current = Services.EntityService.Get(int.Parse(id), UmbracoObjectType);
             if (current != null && current.AdditionalData.ContainsKey("IsContainer") && current.AdditionalData["IsContainer"] is bool && (bool)current.AdditionalData["IsContainer"])
             {
                 //no children!

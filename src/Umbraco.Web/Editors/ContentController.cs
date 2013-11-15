@@ -95,7 +95,10 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
-        /// <returns></returns>
+        /// <returns>
+        /// If this is a container type, we'll remove the umbContainerView tab for a new item since
+        /// it cannot actually list children if it doesn't exist yet.
+        /// </returns>
         public ContentItemDisplay GetEmpty(string contentTypeAlias, int parentId)
         {
             var contentType = Services.ContentTypeService.GetContentType(contentTypeAlias);
@@ -105,7 +108,12 @@ namespace Umbraco.Web.Editors
             }
 
             var emptyContent = new Content("", parentId, contentType);
-            return Mapper.Map<IContent, ContentItemDisplay>(emptyContent);
+            var mapped = Mapper.Map<IContent, ContentItemDisplay>(emptyContent);
+
+            //remove this tab if it exists: umbContainerView
+            var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == "umbContainerView");
+            mapped.Tabs = mapped.Tabs.Except(new[] {containerTab});
+            return mapped;
         }
 
         /// <summary>

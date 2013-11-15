@@ -152,7 +152,12 @@ namespace Umbraco.Web.Editors
             }
 
             var emptyContent = new Core.Models.Media("", parentId, contentType);
-            return Mapper.Map<IMedia, MediaItemDisplay>(emptyContent);
+            var mapped = Mapper.Map<IMedia, MediaItemDisplay>(emptyContent);
+
+            //remove this tab if it exists: umbContainerView
+            var containerTab = mapped.Tabs.FirstOrDefault(x => x.Alias == "umbContainerView");
+            mapped.Tabs = mapped.Tabs.Except(new[] { containerTab });
+            return mapped;
         }
 
         /// <summary>
