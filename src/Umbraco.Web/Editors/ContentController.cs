@@ -594,10 +594,21 @@ namespace Umbraco.Web.Editors
                     display.AddWarningNotification(
                         ui.Text("publish"),
                         ui.Text("speechBubbles", "contentPublishedFailedByEvent"));
+                    break;                
+                case PublishStatusType.FailedAwaitingRelease:
+                    display.AddWarningNotification(
+                        ui.Text("publish"),
+                        ui.Text("publish", "contentPublishedFailedAwaitingRelease",
+                                new[]
+                                    {
+                                        string.Format("{0} ({1})", status.ContentItem.Name, status.ContentItem.Id)
+                                    },
+                                UmbracoUser).Trim());
                     break;
                 case PublishStatusType.FailedHasExpired:
-                case PublishStatusType.FailedAwaitingRelease:
+                    //TODO: We should add proper error messaging for this!
                 case PublishStatusType.FailedIsTrashed:
+                    //TODO: We should add proper error messaging for this!
                 case PublishStatusType.FailedContentInvalid:
                     display.AddWarningNotification(
                         ui.Text("publish"),
