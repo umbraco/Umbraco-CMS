@@ -865,6 +865,27 @@ namespace Umbraco.Tests.Services
             //Assert.AreNotEqual(content.Name, copy.Name);
         }
 
+        [Test]
+        public void Can_Copy_Content_With_Tags()
+        {
+            // Arrange
+            var contentService = ServiceContext.ContentService;
+            var contentType = ServiceContext.ContentTypeService.GetContentType("umbTextpage");
+            var temp = MockedContent.CreateSimpleContent(contentType, "Simple Text Page", -1);
+            var prop = temp.Properties.First();
+            temp.SetTags(prop.Alias, new[] {"hello", "world"}, true);
+            var status = contentService.PublishWithStatus(temp);
+
+            // Act
+            var copy = contentService.Copy(temp, temp.ParentId, false, 0);
+
+            // Assert
+            var copiedTags = ServiceContext.TagService.GetTagsForEntity(copy.Id).ToArray();
+            Assert.AreEqual(2, copiedTags.Count());
+            Assert.AreEqual("hello", copiedTags[0].Text);
+            Assert.AreEqual("world", copiedTags[1].Text);
+        }
+
         [Test, NUnit.Framework.Ignore]
         public void Can_Send_To_Publication()
         { }
