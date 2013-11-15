@@ -20,6 +20,9 @@ namespace Umbraco.Tests.TestHelpers
     [TestFixture]
     public abstract class BaseUmbracoApplicationTest : BaseUmbracoConfigurationTest
     {
+        private static bool _mappersInitialized = false;
+        private static readonly object Locker = new object();
+
         [SetUp]
         public override void Initialize()
         {
@@ -57,17 +60,23 @@ namespace Umbraco.Tests.TestHelpers
         
         private void InitializeMappers()
         {
-            Mapper.Initialize(configuration =>
+            lock (Locker)
             {
-                var mappers = PluginManager.Current.FindAndCreateInstances<IMapperConfiguration>();
-                foreach (var mapper in mappers)
+                //only need to initialize one time
+                if (_mappersInitialized == false)
                 {
-                    mapper.ConfigureMappings(configuration, ApplicationContext);
-                }
-            });
+                    _mappersInitialized = true;
+                    Mapper.Initialize(configuration =>
+                    {
+                        var mappers = PluginManager.Current.FindAndCreateInstances<IMapperConfiguration>();
+                        foreach (var mapper in mappers)
+                        {
+                            mapper.ConfigureMappings(configuration, ApplicationContext);
+                        }
+                    });       
+                }                
+            }            
         }
-
-        
 
         /// <summary>
         /// By default this returns false which means the plugin manager will not be reset so it doesn't need to re-scan 

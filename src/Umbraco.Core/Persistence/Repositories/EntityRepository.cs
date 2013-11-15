@@ -142,15 +142,6 @@ namespace Umbraco.Core.Persistence.Repositories
                         yield return entity;
                     }
                 }
-                else
-                {
-                    var dtos = _work.Database.Fetch<dynamic>(sql);
-                    foreach (var entity in dtos.Select(dto => factory.BuildEntityFromDynamic(dto)))
-                    {
-                        yield return entity;
-                    }
-                }
-            }
             }
         }
 
@@ -277,7 +268,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected virtual Sql GetBaseWhere(Func<bool, bool, string, Sql> baseQuery, bool isContent, bool isMedia, int id)
         {
-            var sql = baseQuery(isContent, isMedia, " AND umbracoNode.id = '" + id + "'")
+            var sql = baseQuery(isContent, isMedia, " AND umbracoNode.id = '"+ id +"'")
                 .Where("umbracoNode.id = @Id", new { Id = id })
                 .Append(GetGroupBy(isContent, isMedia));
             return sql;
@@ -293,9 +284,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected virtual Sql GetBaseWhere(Func<bool, bool, string, Sql> baseQuery, bool isContent, bool isMedia, Guid nodeObjectType, int id)
         {
-            var sql = baseQuery(isContent, isMedia, " AND umbracoNode.id = '" + id + "'")
+            var sql = baseQuery(isContent, isMedia, " AND umbracoNode.id = '"+ id +"'")
                 .Where("umbracoNode.id = @Id AND umbracoNode.nodeObjectType = @NodeObjectType",
-                       new { Id = id, NodeObjectType = nodeObjectType });
+                       new {Id = id, NodeObjectType = nodeObjectType});
             return sql;
         }
 
