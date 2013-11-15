@@ -46,6 +46,21 @@ namespace umbraco.cms.businesslogic.datatype
         /// <summary>
         /// Initializes a new instance of the <see cref="PreValue"/> class.
         /// </summary>
+        /// <param name="Id">The unique identifier.</param>
+        /// <param name="SortOrder">The sort order.</param>
+        /// <param name="Value">The value.</param>
+        /// <param name="Alias">The alias.</param>
+        public PreValue(int Id, int SortOrder, string Value, string Alias)
+        {
+            _id = Id;
+            _sortOrder = SortOrder;
+            _value = Value;
+            _alias = Alias;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PreValue"/> class.
+        /// </summary>
         /// <param name="Id">The id.</param>
         public PreValue(int Id)
         {
@@ -92,7 +107,8 @@ namespace umbraco.cms.businesslogic.datatype
         private int _dataTypeId;
         private int? _id;
         private string _value;
-        private int _sortOrder; 
+        private int _sortOrder;
+        private string _alias;
         #endregion
 
         #region Public properties
@@ -134,7 +150,23 @@ namespace umbraco.cms.businesslogic.datatype
         {
             get { return _sortOrder; }
             set { _sortOrder = value; }
-        } 
+        }
+
+        /// <summary>
+        /// Gets or sets the alias.
+        /// </summary>
+        /// <value>The alias.</value>
+        public string Alias
+        {
+            get
+            {
+                if (_alias == null)
+                    _alias = string.Empty;
+
+                return _alias;
+            }
+            set { _alias = value; }
+        }
         #endregion
 
         #region Public methods
@@ -171,11 +203,15 @@ namespace umbraco.cms.businesslogic.datatype
                 else
                     SortOrder = 1;
 
-                IParameter[] SqlParams = new IParameter[] {
-								SqlHelper.CreateParameter("@value",Value),
-								SqlHelper.CreateParameter("@dtdefid",DataTypeId)};
+                var SqlParams = new IParameter[]
+                {
+                    SqlHelper.CreateParameter("@value", Value),
+                    SqlHelper.CreateParameter("@dtdefid", DataTypeId),
+                    SqlHelper.CreateParameter("@alias", Alias)
+                };
+
                 // The method is synchronized
-                SqlHelper.ExecuteNonQuery("INSERT INTO cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) VALUES (@dtdefid,@value,0,'')", SqlParams);
+                SqlHelper.ExecuteNonQuery("INSERT INTO cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) VALUES (@dtdefid,@value,0,@alias)", SqlParams);
                 _id = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsDataTypePreValues");
             }
 
@@ -183,7 +219,8 @@ namespace umbraco.cms.businesslogic.datatype
                 "update cmsDataTypePreValues set sortorder = @sortOrder, [value] = @value where id = @id",
                 SqlHelper.CreateParameter("@sortOrder", SortOrder),
                 SqlHelper.CreateParameter("@value", Value),
-                SqlHelper.CreateParameter("@id", Id));
+                SqlHelper.CreateParameter("@id", Id),
+                SqlHelper.CreateParameter("@alias", Alias));
         } 
         
         #endregion

@@ -791,8 +791,25 @@ namespace Umbraco.Core.Services
                 var dataTypeDefinitionName = dataTypeElement.Attribute("Name").Value;
                 var dataTypeDefinition = dataTypes.First(x => x.Name == dataTypeDefinitionName);
 
-                var values = prevaluesElement.Elements("PreValue").Select(prevalue => prevalue.Attribute("Value").Value).ToList();
-                _dataTypeService.SavePreValues(dataTypeDefinition.Id, values);
+                var values = new List<string>();
+                var prevalues = new List<Tuple<string, string>>();
+                foreach (var prevalue in prevaluesElement.Elements("PreValue"))
+                {
+                    if (prevalue.Attribute("Alias") != null)
+                    {
+                        prevalues.Add(new Tuple<string, string>(prevalue.Attribute("Alias").Value, prevalue.Attribute("Value").Value));
+                    }
+                    else
+                    {
+                        values.Add(prevalue.Attribute("Value").Value);
+                    }
+                }
+
+                if (values.Count > 0)
+                    _dataTypeService.SavePreValues(dataTypeDefinition.Id, values);
+
+                if (prevalues.Count > 0)
+                    _dataTypeService.SavePreValues(dataTypeDefinition.Id, prevalues);
             }
         }
 
