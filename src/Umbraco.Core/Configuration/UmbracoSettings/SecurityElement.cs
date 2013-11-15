@@ -12,7 +12,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 return new OptionalInnerTextConfigurationElement<bool>(
                     (InnerTextConfigurationElement<bool>)this["keepUserLoggedIn"],
                     //set the default
-                    false);   
+                    true);   
             }
         }
 

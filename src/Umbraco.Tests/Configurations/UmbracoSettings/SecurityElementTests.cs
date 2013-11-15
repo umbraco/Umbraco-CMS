@@ -8,7 +8,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void KeepUserLoggedIn()
         {
-            Assert.IsTrue(SettingsSection.Security.KeepUserLoggedIn == false);
+            Assert.IsTrue(SettingsSection.Security.KeepUserLoggedIn == true);
         }
         [Test]
         public void HideDisabledUsersInBackoffice()

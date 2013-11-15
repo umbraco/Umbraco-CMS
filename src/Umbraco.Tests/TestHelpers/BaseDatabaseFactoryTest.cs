@@ -80,18 +80,9 @@ namespace Umbraco.Tests.TestHelpers
 
             using (DisposableTimer.TraceDuration<BaseDatabaseFactoryTest>("init"))
             {
-                using (DisposableTimer.TraceDuration<BaseDatabaseFactoryTest>("DatabaseContext.Initialize"))
-                {
-                    DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
-                }
-                using (DisposableTimer.TraceDuration<BaseDatabaseFactoryTest>("CreateSqlCeDatabase"))
-                {
-                    CreateSqlCeDatabase();
-                }
-                using (DisposableTimer.TraceDuration<BaseDatabaseFactoryTest>("InitializeDatabase"))
-                {
-                    InitializeDatabase();
-                }
+                DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
+                CreateSqlCeDatabase();
+                InitializeDatabase();
 
                 //ensure the configuration matches the current version for tests
                 SettingsForTests.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
