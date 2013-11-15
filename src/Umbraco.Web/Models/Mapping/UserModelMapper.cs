@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
+using umbraco;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -14,6 +15,7 @@ namespace Umbraco.Web.Models.Mapping
             config.CreateMap<IUser, UserDetail>()
                   .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => GetIntId(user.Id)))
                   .ForMember(detail => detail.UserType, opt => opt.MapFrom(user => user.UserType.Alias))
+                  .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => ui.Culture(user)))
                   .ForMember(
                       detail => detail.EmailHash,
                       opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().ToMd5()));
