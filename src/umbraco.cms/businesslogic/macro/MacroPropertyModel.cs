@@ -8,7 +8,10 @@ namespace umbraco.cms.businesslogic.macro
 		public string Key { get; set; }
 		public string Value { get; set; }
 		public string Type { get; set; }
-		public string CLRType { get; set; }
+		
+        [Obsolete("This is no longer used an will be removed in future versions")]
+        public string CLRType { get; set; }
+
 		public MacroPropertyModel()
 		{
 

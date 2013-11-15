@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -31,7 +32,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public override Stylesheet Get(string id)
         {
-            if (!FileSystem.FileExists(id))
+            if (FileSystem.FileExists(id) == false)
             {
                 throw new Exception(string.Format("The file {0} was not found", id));
             }
@@ -73,11 +74,12 @@ namespace Umbraco.Core.Persistence.Repositories
         private int GetStylesheetId(string path)
         {
             var sql = new Sql()
-                .Select("id")
-                .From("umbracoNode")
-                .Where("umbracoNode.nodeObjectType = @NodeObjectType AND umbracoNode.text = @Alias",
-                    new { NodeObjectType = UmbracoObjectTypes.Stylesheet.GetGuid(), Alias = path.TrimEnd(".css").Replace("\\", "/") });
-            var nodeDto = _dbwork.Database.FirstOrDefault<Umbraco.Core.Models.Rdbms.NodeDto>(sql);
+                .Select("*")
+                .From<NodeDto>()
+                .Where("nodeObjectType = @NodeObjectType AND umbracoNode.text = @Alias",
+                    new { NodeObjectType = UmbracoObjectTypes.Stylesheet.GetGuid(), 
+                        Alias = path.TrimEnd(".css").Replace("\\", "/") });
+            var nodeDto = _dbwork.Database.FirstOrDefault<NodeDto>(sql);
             return nodeDto == null ? 0 : nodeDto.NodeId;
         }
 

@@ -33,7 +33,7 @@ namespace umbraco
 		public static IEnumerable<Document> GetAncestorDocuments(this Document document)
 		{
 			var ancestor = uQuery.GetDocument(document.ParentId);
-			while (ancestor != null)
+			while (ancestor != null && ancestor.Id != -1)
 			{
 				yield return ancestor;
 
