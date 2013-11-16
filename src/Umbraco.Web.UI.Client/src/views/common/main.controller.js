@@ -42,7 +42,7 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         }
 
         //SD: I've updated this so that we don't close the dialog when clicking inside of the dialog
-        var nav = $(event.target).parents("#navigation");
+        var nav = $(event.target).parents("#dialog");
         if (nav.length === 1) {
             return;
         }
