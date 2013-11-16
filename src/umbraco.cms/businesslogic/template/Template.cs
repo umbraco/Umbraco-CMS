@@ -149,6 +149,7 @@ namespace umbraco.cms.businesslogic.template
             var dto = Database.FirstOrDefault<TemplateDto>("Select alias,design,master from cmsTemplate where nodeId = @0", this.Id);
            if (dto == null) 
            {
+               //System.Console.WriteLine  
                _alias = this.Text; //SS:nov13 - added to fix exception 'Object reference not set to an instance of an object'
             }
            else
@@ -158,7 +159,6 @@ namespace umbraco.cms.businesslogic.template
                 //set the master template to zero if it's null
                 _mastertemplate = dto.Master == null ? 0 : (int)dto.Master;
             };
-
 
             if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(this))
                 _design = ViewHelper.GetFileContents(this);
@@ -487,6 +487,7 @@ namespace umbraco.cms.businesslogic.template
         public static List<Template> GetAllAsList()
         {
             Guid[] ids = CMSNode.TopMostNodeIds(ObjectType);
+
             List<Template> retVal = new List<Template>();
             foreach (Guid id in ids)
             {
@@ -540,7 +541,9 @@ namespace umbraco.cms.businesslogic.template
             // NH: Changed this; if you delete a template we'll remove all references instead of 
             // throwing an exception
             if (DocumentType.GetAllAsList().Where(x => x.allowedTemplates.Select(t => t.Id).Contains(this.Id)).Count() > 0)
+            {
                 RemoveAllReferences();
+            }
 
             DeleteEventArgs e = new DeleteEventArgs();
             FireBeforeDelete(e);

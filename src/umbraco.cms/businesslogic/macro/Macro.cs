@@ -61,6 +61,7 @@ namespace umbraco.cms.businesslogic.macro
             get { return ApplicationContext.Current.DatabaseContext.Database; }
         }
 
+
 		/// <summary>
 		/// id
 		/// </summary>

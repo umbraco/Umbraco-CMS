@@ -9,6 +9,9 @@ using umbraco.cms.businesslogic.macro;
 
 namespace Umbraco.Tests.BusinessLogic
 {
+    //
+    //
+    //
     [TestFixture]
     public class cms_businesslogic_Macro_Tests : BaseDatabaseFactoryTestWithContext
     {
