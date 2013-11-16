@@ -223,7 +223,7 @@ namespace umbraco.cms.businesslogic
         {
             return Database.Fetch<Guid>(
                 "Select uniqueID from umbracoNode where nodeObjectType = @type And parentId = -1 order by sortOrder",
-                new {type = ObjectType}
+                new { type = ObjectType }
                 )
                 .ToArray();
         }
@@ -359,6 +359,12 @@ namespace umbraco.cms.businesslogic
             : this(Id, false)
         {
         }
+        //public CMSNode(int Id)
+        //{
+        //    _id = Id;
+        //    setupNode();
+        //}
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CMSNode"/> class.
@@ -372,6 +378,13 @@ namespace umbraco.cms.businesslogic
             if (!noSetup)
                 SetupNodeFromDto("WHERE id = @id", new { id });
         }
+        //public CMSNode(int id, bool noSetup)
+        //{
+        //    _id = id;
+
+        //    if (!noSetup)
+        //        setupNode();
+        //}
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CMSNode"/> class.
@@ -385,9 +398,9 @@ namespace umbraco.cms.businesslogic
         public CMSNode(Guid uniqueID, bool noSetup)
         {
             if (!noSetup)
-                SetupNodeFromDto("WHERE uniqueID = @uniqueID", new { uniqueID });
+                SetupNodeFromDto("WHERE uniqueID = @uniqueID", new { uniqueID = uniqueID });
             else
-                _id = Database.ExecuteScalar<int>("SELECT id FROM umbracoNode WHERE uniqueId = @uniqueID", new { uniqueID });
+                _id = Database.ExecuteScalar<int>("SELECT id FROM umbracoNode WHERE uniqueId = @uniqueID", new { uniqueID = uniqueID });
         }
 
         internal CMSNode(NodeDto dto)
@@ -522,7 +535,7 @@ order by level,sortOrder";
                 {
                     int maxSortOrder = Database.ExecuteScalar<int>(
                         "select coalesce(max(sortOrder),0) from umbracoNode where parentid = @parentId",
-                        new { parentId = newParent.Id } 
+                        new { parentId = newParent.Id }
                     );
 
                     this.Parent = newParent;
@@ -1001,20 +1014,35 @@ order by level,sortOrder";
         /// </summary>
         protected virtual void setupNode()
         {
-            try
-            {
-                SetupNodeFromDto("WHERE id = @id", new { id=_id });
-            }
-            catch (InvalidOperationException)
-            {
-                throw new ArgumentException(string.Format("No node exists with id '{0}'", Id));
-            }
+            //if (_setupNodeFromDto2InProgress) return; 
+            //try
+            //{
+            //    SetupNodeFromDto("WHERE id = @id", new { id = _id });
+            //}
+            //catch (InvalidOperationException)
+            //{
+            //    throw new ArgumentException(string.Format("No node exists with id '{0}'", Id));
+            //}
         }
 
+        private bool _setupNodeInProgress; // this flag field is not needed actually - I'm putting it here to prevent "stackoverflow"
+                                           // if somebody will use this class setupNode() method to call SetupNodeFromDto(...)
+                                           // as it probably happened once in the past. 
         protected void SetupNodeFromDto(string whereStatement, params object[] args)
         {
-            var node = Database.Single<NodeDto>(whereStatement, args);
-            PopulateCMSNodeFromDto(node);
+            if (_setupNodeInProgress) return; 
+            try
+            {
+                _setupNodeInProgress = true;
+                var node = Database.Single<NodeDto>(whereStatement, args);
+                PopulateCMSNodeFromDto(node);
+
+                setupNode();
+            }
+            finally
+            {
+                _setupNodeInProgress = false;
+            }
         }
 
         /// <summary>
