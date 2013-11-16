@@ -97,8 +97,8 @@ angular.module('umbraco.services')
 
               if(dialog.element){
                  dialog.element.modal('hide');
+                 dialog.element.find("iframe").attr("src", "#");
                  dialog.element.remove();
-                 $("#" + dialog.element.attr("id")).remove();
                }
            };
 
