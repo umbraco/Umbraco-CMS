@@ -123,7 +123,10 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(_node5, !Is.Null);
             Assert.That(CMSNode.IsNode(_node5.Id), Is.True);
 
-            Assert.That(CMSNode.CountByObjectType(Document._objectType), Is.EqualTo(5));
+            Guid objectType = Document._objectType;
+            int expectedValue = independentDatabase.ExecuteScalar<int>("SELECT COUNT(*) from umbracoNode WHERE nodeObjectType = @objectType", new { objectType});
+
+            Assert.That(CMSNode.CountByObjectType(Document._objectType), Is.EqualTo(expectedValue));
 
             Assert.That(_relationType1, !Is.Null);
             Assert.That(_relationType2, !Is.Null);
@@ -136,7 +139,8 @@ namespace Umbraco.Tests.BusinessLogic
             //int count31 = database.ExecuteScalar<int>("select count(*) from [umbracoRelation]");
             //l("Count = {0}", count31); // = 0 + 0
 
-            Assert.That(CMSNode.CountByObjectType(Document._objectType), Is.EqualTo(0));
+            expectedValue = independentDatabase.ExecuteScalar<int>("SELECT COUNT(*) from umbracoNode WHERE nodeObjectType = @objectType", new { objectType });
+            Assert.That(CMSNode.CountByObjectType(Document._objectType), Is.EqualTo(expectedValue));
 
             // see the next test code line: Assert.Throws(typeof(ArgumentException), delegate { RelationType.GetById(_relationType.Id); });
             Assert.That(RelationType.GetById(_relationType1.Id), Is.Null);

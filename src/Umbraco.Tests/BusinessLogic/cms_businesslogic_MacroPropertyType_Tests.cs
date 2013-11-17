@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define TRACE_EXECUTION_SPEED
+using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using NUnit.Framework;
@@ -10,84 +11,71 @@ using umbraco.cms.businesslogic.macro;
 namespace Umbraco.Tests.BusinessLogic
 {
     [TestFixture]
-    public class cms_businesslogic_MacroPropertyType_Tests : BaseDatabaseFactoryTestWithContext
+    public class cms_businesslogic_MacroPropertyType_Tests : BaseORMTest
     {
-        #region EnsureData
-        const string TEST_ALIAS = "testAlias";
-        private MacroPropertyTypeDto _macroPropertyType1;
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        protected override void EnsureData()
-        {
-            if (!initialized)
-            {
-                independentDatabase.Execute("insert into [cmsMacroPropertyType] (macroPropertyTypeAlias, macroPropertyTypeRenderAssembly, macroPropertyTypeRenderType, macroPropertyTypeBaseType) " +  
-                                           " values (@macroPropertyTypeAlias, @macroPropertyTypeRenderAssembly, @macroPropertyTypeRenderType, @macroPropertyTypeBaseType) ",
-                                           new { macroPropertyTypeAlias = TEST_ALIAS, macroPropertyTypeRenderAssembly = "umbraco.macroRenderings",
-                                                 macroPropertyTypeRenderType = "context", macroPropertyTypeBaseType = "string" });
-                int id = independentDatabase.ExecuteScalar<int>("select MAX(id) from [cmsMacroPropertyType]");
-                _macroPropertyType1 = getTestMacroPropertyType(id);  
-            }
+        protected override void EnsureData() { Ensure_MacroPropertyType_TestData(); }
 
-            initialized = true;
-        }
-
-        private MacroPropertyTypeDto getTestMacroPropertyType(int id)
-        {
-            return getPersistedTestDto<MacroPropertyTypeDto>(id);
-        }
-
-        private void EnsureAllTestRecordsAreDeleted()
-        {
-            independentDatabase.Execute("delete from  [cmsMacroPropertyType] where macroPropertyTypeAlias = @0", TEST_ALIAS);
-            initialized = false; 
-        }
-
-        #endregion
-
-        #region Tests
         [Test(Description = "Test EnsureData()")]
-        public void Test_EnsureData()
+        public void _1st_Test_MacroPropertyType_EnsureData()
         {
             Assert.IsTrue(initialized);
             Assert.That(_macroPropertyType1, !Is.Null);
 
-            EnsureAllTestRecordsAreDeleted();
+            EnsureAll_MacroPropertyType_TestRecordsAreDeleted();
 
-            Assert.That(getTestMacroPropertyType(_macroPropertyType1.Id), Is.Null);
+            Assert.That(getPersistedTestDto<MacroPropertyTypeDto>(_macroPropertyType1.Id), Is.Null);
         }
 
-        [Test(Description = "Test 'public MacroPropertyType(int Id)' method")]
-        public void Test_MacroPropertyType_Constructor_1_and_Setup()
+        [Test(Description = "Test 'public MacroPropertyType(int Id)' constructor")]
+        public void _2nd_Test_MacroPropertyType_Constructor_I_and_setup()
         {
             var testMacroPropertyType = new MacroPropertyType(_macroPropertyType1.Id);
-
-            Assert.That(testMacroPropertyType.Id, Is.EqualTo(_macroPropertyType1.Id));
-            Assert.That(testMacroPropertyType.Alias, Is.EqualTo(_macroPropertyType1.Alias));
-            Assert.That(testMacroPropertyType.Assembly, Is.EqualTo(_macroPropertyType1.RenderAssembly));
-            Assert.That(testMacroPropertyType.Type, Is.EqualTo(_macroPropertyType1.RenderType));
-            Assert.That(testMacroPropertyType.BaseType, Is.EqualTo(_macroPropertyType1.BaseType));
+            Assert.That(testMacroPropertyType, !Is.Null);
+            assertMacroPropertyTypeSetup(testMacroPropertyType, _macroPropertyType1); 
         }
 
-        [Test(Description = "Test 'public MacroPropertyType(string Alias)' method")]
-        public void Test_MacroPropertyType_Constructor_2_and_Setup()
+        private void assertMacroPropertyTypeSetup(MacroPropertyType testMacroPropertyType, MacroPropertyTypeDto savedMacropPropertyType)
+        {
+            Assert.That(testMacroPropertyType.Id, Is.EqualTo(savedMacropPropertyType.Id), "Id test failed");
+            Assert.That(testMacroPropertyType.Alias, Is.EqualTo(savedMacropPropertyType.Alias), "Alias test failed");
+            Assert.That(testMacroPropertyType.Assembly, Is.EqualTo(savedMacropPropertyType.RenderAssembly), "RenderAssembly test failed");
+            Assert.That(testMacroPropertyType.Type, Is.EqualTo(savedMacropPropertyType.RenderType), "RenderType test failed");
+            Assert.That(testMacroPropertyType.BaseType, Is.EqualTo(savedMacropPropertyType.BaseType), "BaseType test failed");
+        }
+
+        [Test(Description = "Test 'public MacroPropertyType(string Alias)' constructor")]
+        public void _3rd_Test_MacroPropertyType_Constructor_II_and_Setup()
         {
             var testMacroPropertyType = new MacroPropertyType(_macroPropertyType1.Alias);
-
-            Assert.That(testMacroPropertyType.Id, Is.EqualTo(_macroPropertyType1.Id));
-            Assert.That(testMacroPropertyType.Alias, Is.EqualTo(_macroPropertyType1.Alias));
-            Assert.That(testMacroPropertyType.Assembly, Is.EqualTo(_macroPropertyType1.RenderAssembly));
-            Assert.That(testMacroPropertyType.Type, Is.EqualTo(_macroPropertyType1.RenderType));
-            Assert.That(testMacroPropertyType.BaseType, Is.EqualTo(_macroPropertyType1.BaseType));
+            Assert.That(testMacroPropertyType, !Is.Null);
+            assertMacroPropertyTypeSetup(testMacroPropertyType, _macroPropertyType1); 
         }
 
+        // TRACE_EXECUTION_SPEED result
+        //1. 6:12:19 PM
+        //2. 86 6:12:22 PM  !!!
+        //3. 86 6:12:22 PM
+        //4. 86 6:12:26 PM  !!!
         [Test(Description = "Test 'public static List<MacroPropertyType> GetAll' method")]
         public void Test_MacroPropertyType_GetAll()
         {
-            var all = MacroPropertyType.GetAll;
-            //l("Count = {0}", all.Count);  // 16 - default
+#if TRACE_EXECUTION_SPEED
+            l("1. {0:T}", DateTime.Now);  
+#endif
+            var all = MacroPropertyType.GetAll; // ! 3 seconds for 86 property types
+#if TRACE_EXECUTION_SPEED
+            l("2. {0} {1:T}", all.Count, DateTime.Now);
+#endif
+            int count = independentDatabase.ExecuteScalar<int>("select count(id) from cmsMacroPropertyType");
+#if TRACE_EXECUTION_SPEED
+            l("3. {0} {1:T}", count, DateTime.Now);
+#endif
+            Assert.That(all.Count, Is.EqualTo(count));
 
-            Assert.That(all.Count, Is.EqualTo(17));   // 16 + 1
+            all.ForEach(x =>  assertMacroPropertyTypeSetup(x, getDto<MacroPropertyTypeDto>(x.Id)));
+#if TRACE_EXECUTION_SPEED
+            l("4. {0} {1:T}", count, DateTime.Now);
+#endif
         }
-        #endregion
     }
 }

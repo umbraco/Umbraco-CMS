@@ -11,54 +11,7 @@ namespace Umbraco.Tests.BusinessLogic
     [TestFixture]
     public class cms_businesslogic_RelationType_Tests : BaseDatabaseFactoryTestWithContext
     {
-        #region EnsureData
-        private RelationTypeDto _relationType1;
-        private RelationTypeDto _relationType2;
-
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        protected override void EnsureData()
-        {
-            if (!initialized)
-            {
-                _relationType1 = insertTestRelationType(1);                
-                _relationType2 = insertTestRelationType(2); 
-            }
-
-            initialized = true;
-        }
-
-        private RelationTypeDto getTestRelationTypeDto(int relationTypeId)
-        {
-            return getPersistedTestDto<RelationTypeDto>(relationTypeId);  
-        }
-
-        private const string TEST_RELATION_TYPE_NAME = "Test Relation Type";
-        private const string TEST_RELATION_TYPE_ALIAS = "testRelationTypeAlias";
-        private RelationTypeDto insertTestRelationType(int testRelationTypeNumber)
-        {
-            independentDatabase.Execute("insert into [umbracoRelationType] ([dual], [parentObjectType], [childObjectType], [name], [alias]) values " +
-                            "(@dual, @parentObjectType, @childObjectType, @name, @alias)",
-                            new { 
-                                  dual = 1, 
-                                  parentObjectType = Guid.NewGuid(), 
-                                  childObjectType = Guid.NewGuid(),
-                                  name = string.Format("{0}_{1}", TEST_RELATION_TYPE_NAME, testRelationTypeNumber),
-                                  alias = string.Format("{0}_{1}", TEST_RELATION_TYPE_ALIAS, testRelationTypeNumber),
-                            });
-            int relationTypeId = independentDatabase.ExecuteScalar<int>("select max(id) from [umbracoRelationType]");
-            return getTestRelationTypeDto(relationTypeId);   
-        }
-
-        private void EnsureAllTestRecordsAreDeleted()
-        {
-            if (_relationType1 != null) independentDatabase.Execute("delete from [umbracoRelationType] where (Id = @0)", _relationType1.Id);
-            if (_relationType2 != null) independentDatabase.Execute("delete from [umbracoRelationType] where (Id = @0)", _relationType2.Id);
-
-           initialized = false; 
-        }
-
-        #endregion
-
+ 
         #region Tests
         [Test(Description = "Verify if EnsureData() and related helper test methods execute well")]
         public void Test_EnsureData()
@@ -117,9 +70,11 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static IEnumerable<RelationType> GetAll()' method")]
         public void Test_RelationType_GetAll()
         {
+            int expectedValue = independentDatabase.Query<RelationTypeDto>(
+                      "SELECT id, [dual], name, alias FROM umbracoRelationType").ToArray().Length;  
             var relationTypes = RelationType.GetAll().ToArray<RelationType>();
 
-            Assert.That(relationTypes.Length, Is.EqualTo(3));  // 1 default + 2 created in this test suite
+            Assert.That(relationTypes.Length, Is.EqualTo(expectedValue));  // 1 default + 2 created in this test suite
         }
 
 
@@ -163,5 +118,63 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(relationType2.Dual, Is.EqualTo(dual));
         }
         #endregion
+
+        #region EnsureData
+        private RelationTypeDto _relationType1;
+        private RelationTypeDto _relationType2;
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        protected override void EnsureData()
+        {
+            if (!initialized)
+            {
+                _relationType1 = insertTestRelationType(uniqueRelationName);
+                _relationType2 = insertTestRelationType(uniqueRelationName);
+            }
+
+            initialized = true;
+        }
+
+        protected string uniqueRelationName
+        {
+            get
+            {
+                return string.Format("Relation Name {0}", Guid.NewGuid().ToString());
+            }
+        }
+
+        private RelationTypeDto getTestRelationTypeDto(int relationTypeId)
+        {
+            return getPersistedTestDto<RelationTypeDto>(relationTypeId);
+        }
+
+        private const string TEST_RELATION_TYPE_NAME = "Test Relation Type";
+        private const string TEST_RELATION_TYPE_ALIAS = "testRelationTypeAlias";
+        private RelationTypeDto insertTestRelationType(string testRelationName)
+        {
+            independentDatabase.Execute("insert into [umbracoRelationType] ([dual], [parentObjectType], [childObjectType], [name], [alias]) values " +
+                            "(@dual, @parentObjectType, @childObjectType, @name, @alias)",
+                            new
+                            {
+                                dual = 1,
+                                parentObjectType = Guid.NewGuid(),
+                                childObjectType = Guid.NewGuid(),
+                                name = testRelationName,
+                                alias = testRelationName.Replace(" ", "")
+                            });
+            int relationTypeId = independentDatabase.ExecuteScalar<int>("select max(id) from [umbracoRelationType]");
+            return getTestRelationTypeDto(relationTypeId);
+        }
+
+        private void EnsureAllTestRecordsAreDeleted()
+        {
+            if (_relationType1 != null) independentDatabase.Execute("delete from [umbracoRelationType] where (Id = @0)", _relationType1.Id);
+            if (_relationType2 != null) independentDatabase.Execute("delete from [umbracoRelationType] where (Id = @0)", _relationType2.Id);
+
+            initialized = false;
+        }
+
+        #endregion
+
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿//#define TRACE_EXECUTION_SPEED
+using System;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using NUnit.Framework;
@@ -9,126 +10,13 @@ using umbraco.cms.businesslogic.macro;
 
 namespace Umbraco.Tests.BusinessLogic
 {
-    //
-    //
-    //
     [TestFixture]
-    public class cms_businesslogic_Macro_Tests : BaseDatabaseFactoryTestWithContext
+    public class cms_businesslogic_Macro_Tests : BaseORMTest
     {
-        #region EnsureData
+        protected override void EnsureData() { Ensure_Macro_TestData(); }
 
-        const string TEST_MACRO_PROPERTY_TYPE_ALIAS1 = "testAlias1";
-        const string TEST_MACRO_PROPERTY_TYPE_ALIAS2 = "testAlias2";
-
-        const string TEST_MACRO_PROPERTY_NAME = "Your Web Site";
-        const string TEST_MACRO_PROPERTY_ALIAS = "yourWebSite";
-
-        private MacroPropertyTypeDto _macroPropertyType1;
-        private MacroPropertyTypeDto _macroPropertyType2;
-        private MacroDto _macro1;
-        private MacroDto _macro2;
-        private MacroPropertyDto _macroProperty1;
-
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        protected override void EnsureData()
-        {
-            if (!initialized)
-            {
-                _macroPropertyType1 = insertMacroPropertyType(TEST_MACRO_PROPERTY_TYPE_ALIAS1);
-                _macroPropertyType2 = insertMacroPropertyType(TEST_MACRO_PROPERTY_TYPE_ALIAS2);
-
-                _macro1 = insertMacro("Twitter Ads", "twitterAds");
-                _macro2 = insertMacro("Yahoo Ads", "yahooAds");
-
-
-                independentDatabase.Execute("insert into [cmsMacroProperty] (macroPropertyHidden, macroPropertyType, macro, macroPropertySortOrder, macroPropertyAlias, macroPropertyName) " +
-                                           " values (@macroPropertyHidden, @macroPropertyType, @macro, @macroPropertySortOrder, @macroPropertyAlias, @macroPropertyName) ",
-                                           new
-                                           {
-                                               macroPropertyHidden = true,
-                                               macroPropertyType = _macroPropertyType1.Id,
-                                               macro = _macro1.Id,
-                                               macroPropertySortOrder = 0,
-                                               macroPropertyAlias = TEST_MACRO_PROPERTY_ALIAS,
-                                               macroPropertyName = TEST_MACRO_PROPERTY_NAME
-                                           });
-                int id = independentDatabase.ExecuteScalar<int>("select MAX(id) from [cmsMacroProperty]");
-                _macroProperty1 = getTestMacroProperty(id);
-            }
-
-            initialized = true;
-        }
-
-        private MacroDto insertMacro(string name, string alias)
-        {
-            independentDatabase.Execute("insert into [cmsMacro] " +
-                 " (macroUseInEditor, macroRefreshRate, macroAlias, macroName, macroScriptType, " +
-                 " macroScriptAssembly, macroXSLT, macroPython, macroDontRender, macroCacheByPage, macroCachePersonalized) " +
-                 " VALUES  " +
-                 " (@macroUseInEditor, @macroRefreshRate, @macroAlias, @macroName, @macroScriptType, " +
-                 " @macroScriptAssembly, @macroXSLT, @macroPython, @macroDontRender, @macroCacheByPage, @macroCachePersonalized) ",
-                 new
-                 {
-                     macroUseInEditor = true,
-                     macroRefreshRate = 0,
-                     macroAlias = alias, // "twitterAds",
-                     macroName = name, //"Twitter Ads",
-                     macroScriptType = "mst",
-                     macroScriptAssembly = "",
-                     macroXSLT = "some.xslt",
-                     macroPython = "",
-                     macroDontRender = false,
-                     macroCacheByPage = true,
-                     macroCachePersonalized = false
-                 });
-            int id = independentDatabase.ExecuteScalar<int>("select MAX(id) from [cmsMacro]");
-            return getTestMacro(id);
-        }
-
-        private MacroPropertyTypeDto insertMacroPropertyType(string alias)
-        {
-            independentDatabase.Execute("insert into [cmsMacroPropertyType] (macroPropertyTypeAlias, macroPropertyTypeRenderAssembly, macroPropertyTypeRenderType, macroPropertyTypeBaseType) " +
-                                      " values (@macroPropertyTypeAlias, @macroPropertyTypeRenderAssembly, @macroPropertyTypeRenderType, @macroPropertyTypeBaseType) ",
-                                      new
-                                      {
-                                          macroPropertyTypeAlias = alias, //TEST_MACRO_PROPERTY_TYPE_ALIAS,
-                                          macroPropertyTypeRenderAssembly = "umbraco.macroRenderings",
-                                          macroPropertyTypeRenderType = "context",
-                                          macroPropertyTypeBaseType = "string"
-                                      });
-            int id = independentDatabase.ExecuteScalar<int>("select MAX(id) from [cmsMacroPropertyType]");
-            return getTestMacroPropertyType(id);
-        }
-
-        private MacroPropertyTypeDto getTestMacroPropertyType(int id)
-        {
-            return getPersistedTestDto<MacroPropertyTypeDto>(id);
-        }
-        private MacroPropertyDto getTestMacroProperty(int id)
-        {
-            return getPersistedTestDto<MacroPropertyDto>(id);
-        }
-        private MacroDto getTestMacro(int id)
-        {
-            return getPersistedTestDto<MacroDto>(id);
-        }
-
-        private void EnsureAllTestRecordsAreDeleted()
-        {
-            independentDatabase.Execute("delete from  [cmsMacroProperty] where id = @0", _macroProperty1.Id);
-            independentDatabase.Execute("delete from  [cmsMacro] where id = @0", _macro1.Id);
-            independentDatabase.Execute("delete from  [cmsMacro] where id = @0", _macro2.Id);
-            independentDatabase.Execute("delete from  [cmsMacroPropertyType] where macroPropertyTypeAlias = @0", TEST_MACRO_PROPERTY_TYPE_ALIAS1);
-            independentDatabase.Execute("delete from  [cmsMacroPropertyType] where macroPropertyTypeAlias = @0", TEST_MACRO_PROPERTY_TYPE_ALIAS2);
-            initialized = false;
-        }
-
-        #endregion
-
-        #region Tests
-
-        [Test(Description = "Test EnsureData()")]
-        public void Test_EnsureData()
+        [Test(Description = "Test Ensure_Macro_TestData()")]
+        public void _1st_Test_Macro_EnsureTestData()
         {
             Assert.IsTrue(initialized);
             Assert.That(_macroPropertyType1, !Is.Null);
@@ -137,323 +25,288 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(_macro2, !Is.Null);
             Assert.That(_macroProperty1, !Is.Null);
 
-            EnsureAllTestRecordsAreDeleted();
+            EnsureAll_Macro_TestRecordsAreDeleted();
 
-            Assert.That(getTestMacroProperty(_macroProperty1.Id), Is.Null);
-            Assert.That(getTestMacro(_macro1.Id), Is.Null);
-            Assert.That(getTestMacro(_macro2.Id), Is.Null);
-            Assert.That(getTestMacroPropertyType(_macroPropertyType1.Id), Is.Null);
-            Assert.That(getTestMacroPropertyType(_macroPropertyType2.Id), Is.Null);
+            Assert.That(getPersistedTestDto <MacroPropertyDto>(_macroProperty1.Id), Is.Null);
+            Assert.That(getPersistedTestDto <MacroDto>(_macro1.Id), Is.Null);
+            Assert.That(getPersistedTestDto <MacroDto>(_macro2.Id), Is.Null);
+            Assert.That(getPersistedTestDto <MacroPropertyTypeDto>(_macroPropertyType1.Id), Is.Null);
+            Assert.That(getPersistedTestDto <MacroPropertyTypeDto>(_macroPropertyType2.Id), Is.Null);
         }
 
-        [Test(Description = "Test 'public Macro(int Id)' constructor")]
-        [TestCase(1)] // .ctor
-        [TestCase(2)] // static Macro.GetById(...)
-        public void Test_Macro_Constructor_1_and_Setup(int testCase)
+        [Test(Description = "Test 'public Macro()' constructor")]
+        public void _2nd_Test_Macro_I_Constructor()
         {
-            // public Macro() {}
-            // public Macro(int Id)
-            // private void setup()
-            // private void PopulateMacroFromDto(MacroDto dto)       
-            Macro testMacro = new Macro();
-
+            var testMacro = new Macro();
             Assert.That(testMacro.Id, Is.EqualTo(0));  
+
+            // test Macro constructor with non-existent Id
             Assert.Throws<ArgumentException>(() => { new Macro(12345); });
-
-            testMacro = testCase == 1 ?
-                new Macro(_macro1.Id) :
-                Macro.GetById(_macro1.Id);  
-
-            // public bool UseInEditor .set
-            // public int RefreshRate .set
-            // public string Alias .set
-            // public string Name .set
-            // public string Assembly .set
-            // public string Type .set
-            // public string Xslt .set
-            // public string ScriptingFile .set
-            // public bool RenderContent .set
-            // public bool CachePersonalized  .set
-            // public bool CacheByPage { .set
-            Assert.That(testMacro.Id, Is.EqualTo(_macro1.Id));
-            Assert.That(testMacro.UseInEditor, Is.EqualTo(_macro1.UseInEditor));
-            Assert.That(testMacro.RefreshRate, Is.EqualTo(_macro1.RefreshRate));
-            Assert.That(testMacro.Alias, Is.EqualTo(_macro1.Alias));
-            Assert.That(testMacro.Name, Is.EqualTo(_macro1.Name));
-            Assert.That(testMacro.Assembly, Is.EqualTo(_macro1.ScriptAssembly));
-            Assert.That(testMacro.Type, Is.EqualTo(_macro1.ScriptType));
-            Assert.That(testMacro.Xslt, Is.EqualTo(_macro1.Xslt));
-            Assert.That(testMacro.ScriptingFile, Is.EqualTo(_macro1.Python));
-            Assert.That(testMacro.RenderContent, Is.EqualTo(_macro1.DontRender));
-            Assert.That(testMacro.CachePersonalized, Is.EqualTo(_macro1.CachePersonalized));
-            Assert.That(testMacro.CacheByPage, Is.EqualTo(_macro1.CacheByPage));
         }
 
-        [Test(Description = "public Macro(string alias)' constructor")]
-        [TestCase(1)] // .ctor
-        [TestCase(2)] // static Macro.GetByAlias(...)
-        public void Test_Macro_Constructor_2_and_Setup(int testCase)
+        [Test(Description = "Test 'public Macro(int Id) and public Macro(string alias)' constructors")]
+        [TestCase(1)] // public Macro(int Id) .ctor
+        [TestCase(2)] // public Macro(string alias) .ctor
+        public void _3rd_Test_Macro_II_Constructors(int testCase)
         {
-            // public Macro(string alias)
-            // private void setup()
-            // private void PopulateMacroFromDto(MacroDto dto)       
-            Macro testMacro = testCase == 1 ?
-                new Macro(_macro1.Alias) :
-                Macro.GetByAlias(_macro1.Alias);  
-
-            // public bool UseInEditor .set
-            // public int RefreshRate .set
-            // public string Alias .set
-            // public string Name .set
-            // public string Assembly .set
-            // public string Type .set
-            // public string Xslt .set
-            // public string ScriptingFile .set
-            // public bool RenderContent .set
-            // public bool CachePersonalized  .set
-            // public bool CacheByPage { .set
-            Assert.That(testMacro.Id, Is.EqualTo(_macro1.Id));
-            Assert.That(testMacro.UseInEditor, Is.EqualTo(_macro1.UseInEditor));
-            Assert.That(testMacro.RefreshRate, Is.EqualTo(_macro1.RefreshRate));
-            Assert.That(testMacro.Alias, Is.EqualTo(_macro1.Alias));
-            Assert.That(testMacro.Name, Is.EqualTo(_macro1.Name));
-            Assert.That(testMacro.Assembly, Is.EqualTo(_macro1.ScriptAssembly));
-            Assert.That(testMacro.Type, Is.EqualTo(_macro1.ScriptType));
-            Assert.That(testMacro.Xslt, Is.EqualTo(_macro1.Xslt));
-            Assert.That(testMacro.ScriptingFile, Is.EqualTo(_macro1.Python));
-            Assert.That(testMacro.RenderContent, Is.EqualTo(_macro1.DontRender));
-            Assert.That(testMacro.CachePersonalized, Is.EqualTo(_macro1.CachePersonalized));
-            Assert.That(testMacro.CacheByPage, Is.EqualTo(_macro1.CacheByPage));
+            var testMacro = testCase == 1 ? new Macro(_macro1.Id) : new Macro (_macro1.Alias);
+            Assert.That(testMacro, !Is.Null); 
+            assertMacroSetup(testMacro, getDto<MacroDto>(testMacro.Id));    
         }
 
-        [Test(Description = "Test 'public bool UseInEditor .set' property")]
-        public void Test_UseEditor_set()
+        private void assertMacroSetup(Macro testMacro, MacroDto savedMacro)
         {
-            var valueToSet = !_macro1.UseInEditor;
-
-            // before new value is set
-            var testMacro1 = new Macro(_macro1.Id);
-            Assert.That(testMacro1.UseInEditor, !Is.EqualTo(valueToSet));
-
-            testMacro1.UseInEditor = valueToSet;
-
-            // after new value is set
-            var testMacro2 = getTestMacro(_macro1.Id);
-            Assert.That(testMacro2.UseInEditor, Is.EqualTo(valueToSet));
+            Assert.That(testMacro.Id, Is.EqualTo(savedMacro.Id), "ID test failed");
+            Assert.That(testMacro.UseInEditor, Is.EqualTo(savedMacro.UseInEditor), "UseInEditor test  failed");
+            Assert.That(testMacro.RefreshRate, Is.EqualTo(savedMacro.RefreshRate), "RefreshRate test  failed");
+            Assert.That(testMacro.Alias, Is.EqualTo(savedMacro.Alias), "Alias test failed");
+            Assert.That(testMacro.Name, Is.EqualTo(savedMacro.Name), "Name test failed");
+            Assert.That(testMacro.Assembly, Is.EqualTo(savedMacro.ScriptAssembly), "ScriptAssembly test failed");
+            Assert.That(testMacro.Type, Is.EqualTo(savedMacro.ScriptType), "ScriptType test failed");
+            Assert.That(testMacro.Xslt, Is.EqualTo(savedMacro.Xslt), "Xslt test failed");
+            Assert.That(testMacro.ScriptingFile, Is.EqualTo(savedMacro.Python), "Python test failed");
+            Assert.That(testMacro.RenderContent, Is.EqualTo(savedMacro.DontRender), "DontRender test failed");
+            Assert.That(testMacro.CachePersonalized, Is.EqualTo(savedMacro.CachePersonalized), "CachePersonalized test failed");
+            Assert.That(testMacro.CacheByPage, Is.EqualTo(savedMacro.CacheByPage), "CacheByPage test failed");
         }
 
-        [Test(Description = "Test 'public int RefreshRate .set' property")]
-        public void Test_RefreshRate_set()
+        [Test(Description = "Test 'public static Macro.GetById(int id) and public static Macro.GetByAlias(string alias)' methods")]
+        [TestCase(1, Description="Test 'public static Macro.GetById(int id)' method")]
+        [TestCase(2, Description="Test 'public static Macro.GetByAlias(string alias)' method")]
+        public void Test_Macro_GetById_and_GetByAlias(int testCase)
         {
-            var valueToSet = _macro1.RefreshRate + 101;
+            var testMacro = testCase == 1 ?
+                Macro.GetById(_macro1.Id)   :
+                Macro.GetByAlias(_macro1.Alias);
+            Assert.That(testMacro, !Is.Null);
+            assertMacroSetup(testMacro, getDto<MacroDto>(testMacro.Id));    
+        }
 
-            // before new value is set
-            var testMacro1 = new Macro(_macro1.Id);
-            Assert.That(testMacro1.RefreshRate, !Is.EqualTo(valueToSet));
+        [Test(Description = "Test 'public bool UseInEditor' property.set")]
+        public void Test_Macro_UseEditor_set()
+        {
+            var newValue =  !_macro1.UseInEditor;
+            var expectedValue = newValue;
+            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, bool, bool>(
+                    n => n.UseInEditor,
+                    n => n.UseInEditor = newValue,
+                    "cmsMacro",
+                    "macroUseInEditor",
+                    expectedValue,
+                    "Id",
+                    _macro1.Id
+                );
+        }
 
-            testMacro1.RefreshRate = valueToSet;
-
-            // after new value is set
-            var testMacro2 = getTestMacro(_macro1.Id);
-            Assert.That(testMacro2.RefreshRate, Is.EqualTo(valueToSet));
+        [Test(Description = "Test 'public int RefreshRate' property.set")]
+        public void Test_Macro_RefreshRate_set()
+        {
+            var newValue = _macro1.RefreshRate + 101;
+            var expectedValue = newValue;
+            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, int, int>(
+                    n => n.RefreshRate,
+                    n => n.RefreshRate = newValue,
+                    "cmsMacro",
+                    "macroRefreshRate",
+                    expectedValue,
+                    "Id",
+                    _macro1.Id
+                );
         }
         
-        [Test(Description = "Test 'public string Alias .set' property")]
-        public void Test_Alias_set()
+        [Test(Description = "Test 'public string Alias' property.set")]
+        public void Test_Macro_Alias_set()
         {
-            var valueToSet = _macro1.Alias + "_SUFFIX" ;
-
-            // before new value is set
-            var testMacro1 = new Macro(_macro1.Id);
-            Assert.That(testMacro1.Alias, !Is.EqualTo(valueToSet));
-
-            testMacro1.Alias = valueToSet;
-
-            // after new value is set
-            var testMacro2 = getTestMacro(_macro1.Id);
-            Assert.That(testMacro2.Alias, Is.EqualTo(valueToSet));
+            var newValue = _macro1.Alias + "_a_Test_Suffix";
+            var expectedValue = newValue;
+            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, string, string>(
+                    n => n.Alias,
+                    n => n.Alias = newValue,
+                    "cmsMacro",
+                    "macroAlias",
+                    expectedValue,
+                    "Id",
+                    _macro1.Id
+                );
 
         }  
         
-        [Test(Description = "Test 'public string Name .set' property")]
-        public void Test_Name_set()
+        [Test(Description = "Test 'public string Name' property.set")]
+        public void Test_Macro_Name_set()
         {
-            var valueToSet = "PREFIX_" + _macro1.Name;
-
-            // before new value is set
-            var testMacro1 = new Macro(_macro1.Id);
-            Assert.That(testMacro1.Name, !Is.EqualTo(valueToSet));
-
-            testMacro1.Name = valueToSet;
-
-            // after new value is set
-            var testMacro2 = getTestMacro(_macro1.Id);
-            Assert.That(testMacro2.Name, Is.EqualTo(valueToSet));
+            var newValue = "A_Name_Prefix_" + _macro1.Name;
+            var expectedValue = newValue;
+            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, string, string>(
+                    n => n.Name,
+                    n => n.Name = newValue,
+                    "cmsMacro",
+                    "macroName",
+                    expectedValue,
+                    "Id",
+                    _macro1.Id
+                );
         }        
         
-        [Test(Description = "Test 'public string Assembly .set' property")]
-        public void Test_Assembly_set()
+        [Test(Description = "Test 'public string Assembly' property.set")]
+        public void Test_Macro_Assembly_set()
         {
-            var valueToSet = "NewAssembly.DLL";
-
-            // before new value is set
-            var testMacro1 = new Macro(_macro1.Id);
-            Assert.That(testMacro1.Assembly, !Is.EqualTo(valueToSet));
-
-            testMacro1.Assembly = valueToSet;
-
-            // after new value is set
-            var testMacro2 = getTestMacro(_macro1.Id);
-            Assert.That(testMacro2.ScriptAssembly, Is.EqualTo(valueToSet));
+            var newValue = "NewAssembly.DLL";
+            var expectedValue = newValue;
+            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, string, string>(
+                    n => n.Assembly,
+                    n => n.Assembly = newValue,
+                    "cmsMacro",
+                    "macroScriptAssembly",
+                    expectedValue,
+                    "Id",
+                    _macro1.Id
+                );
         }        
         
-        [Test(Description = "Test 'public string Type .set' property")]
-        public void Test_Type_set()
+        [Test(Description = "Test 'public string Type' property.set")]
+        public void Test_Macro_Type_set()
         {
-            var valueToSet = "test"; // _macro1.ScriptType;
-
-            // before new value is set
-            var testMacro1 = new Macro(_macro1.Id);
-            Assert.That(testMacro1.UseInEditor, !Is.EqualTo(valueToSet));
-
-            testMacro1.Type = valueToSet;
-
-            // after new value is set
-            var testMacro2 = getTestMacro(_macro1.Id);
-            Assert.That(testMacro2.ScriptType, Is.EqualTo(valueToSet));
+            var newValue = "Python";
+            var expectedValue = newValue;
+            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, string, string>(
+                    n => n.Type,
+                    n => n.Type = newValue,
+                    "cmsMacro",
+                    "macroScriptType",
+                    expectedValue,
+                    "Id",
+                    _macro1.Id
+                );
         }        
         
-        [Test(Description = "Test 'public string Xslt .set' property")]
-        public void Test_Xslt_set()
+        [Test(Description = "Test 'public string Xslt' property.set")]
+        public void Test_Macro_Xslt_set()
         {
-            var valueToSet = "NewTest.xslt";
-
-            // before new value is set
-            var testMacro1 = new Macro(_macro1.Id);
-            Assert.That(testMacro1.Xslt, !Is.EqualTo(valueToSet));
-
-            testMacro1.Xslt = valueToSet;
-
-            // after new value is set
-            var testMacro2 = getTestMacro(_macro1.Id);
-            Assert.That(testMacro2.Xslt, Is.EqualTo(valueToSet));
+            var newValue = "NewTest.xslt";
+            var expectedValue = newValue;
+            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, string, string>(
+                    n => n.Xslt,
+                    n => n.Xslt = newValue,
+                    "cmsMacro",
+                    "macroXslt",
+                    expectedValue,
+                    "Id",
+                    _macro1.Id
+                );
         }        
         
-        [Test(Description = "Test 'public string ScriptingFile .set' property")]
-        public void Test_ScriptingFile_set()
+        [Test(Description = "Test 'public string ScriptingFile' property.set")]
+        public void Test_Macro_ScriptingFile_set()
         {
-            var valueToSet = "_macro1.Python";
-
-            // before new value is set
-            var testMacro1 = new Macro(_macro1.Id);
-            Assert.That(testMacro1.ScriptingFile, !Is.EqualTo(valueToSet));
-
-            testMacro1.ScriptingFile = valueToSet;
-
-            // after new value is set
-            var testMacro2 = getTestMacro(_macro1.Id);
-            Assert.That(testMacro2.Python, Is.EqualTo(valueToSet));
+            var newValue = "macro1.pt";
+            var expectedValue = newValue;
+            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, string, string>(
+                    n => n.ScriptingFile,
+                    n => n.ScriptingFile = newValue,
+                    "cmsMacro",
+                    "macroPython",
+                    expectedValue,
+                    "Id",
+                    _macro1.Id
+                );
         }    
         
-        [Test(Description = "Test 'public bool RenderContent .set' property")]
-        public void Test_RenderContent_set()
+        [Test(Description = "Test 'public bool RenderContent' property.set")]
+        public void Test_Macro_RenderContent_set()
         {
-            var valueToSet = !_macro1.DontRender;
-
-            // before new value is set
-            var testMacro1 = new Macro(_macro1.Id);
-            Assert.That(testMacro1.RenderContent, !Is.EqualTo(valueToSet));
-
-            testMacro1.RenderContent = valueToSet;
-
-            // after new value is set
-            var testMacro2 = getTestMacro(_macro1.Id);
-            Assert.That(testMacro2.DontRender, Is.EqualTo(valueToSet));
+            var newValue = !_macro1.DontRender;
+            var expectedValue = newValue;
+            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, bool, bool>(
+                    n => n.RenderContent,
+                    n => n.RenderContent = newValue,
+                    "cmsMacro",
+                    "macroDontRender",
+                    expectedValue,
+                    "Id",
+                    _macro1.Id
+                );
         }        
         
-        [Test(Description = "Test 'public bool CachePersonalized  .set' property")]
-        public void Test_CachePersonalized_set()
+        [Test(Description = "Test 'public bool CachePersonalized' property.set")]
+        public void Test_Macro_CachePersonalized_set()
         {
-            var valueToSet = !_macro1.CachePersonalized;
-
-            // before new value is set
-            var testMacro1 = new Macro(_macro1.Id);
-            Assert.That(testMacro1.CachePersonalized, !Is.EqualTo(valueToSet));
-
-            testMacro1.CachePersonalized = valueToSet;
-
-            // after new value is set
-            var testMacro2 = getTestMacro(_macro1.Id);
-            Assert.That(testMacro2.CachePersonalized, Is.EqualTo(valueToSet));
+            var newValue = !_macro1.CachePersonalized;
+            var expectedValue = newValue;
+            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, bool, bool>(
+                    n => n.CachePersonalized,
+                    n => n.CachePersonalized = newValue,
+                    "cmsMacro",
+                    "macroCachePersonalized",
+                    expectedValue,
+                    "Id",
+                    _macro1.Id
+                );
         }        
         
-        [Test(Description = "Test 'public bool CacheByPage { .set' property")]
-        public void Test_CacheByPage_set()
+        [Test(Description = "Test 'public bool CacheByPage' property.set")]
+        public void Test_Macro_CacheByPage_set()
         {
-            var valueToSet = !_macro1.CacheByPage;
-
-            // before new value is set
-            var testMacro1 = new Macro(_macro1.Id);
-            Assert.That(testMacro1.CacheByPage, !Is.EqualTo(valueToSet));
-
-            testMacro1.CacheByPage = valueToSet;
-
-            // after new value is set
-            var testMacro2 = getTestMacro(_macro1.Id);
-            Assert.That(testMacro2.CacheByPage, Is.EqualTo(valueToSet));
+            var newValue = !_macro1.CacheByPage;
+            var expectedValue = newValue;
+            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, bool, bool>(
+                    n => n.CacheByPage,
+                    n => n.CacheByPage = newValue,
+                    "cmsMacro",
+                    "macroCacheByPage",
+                    expectedValue,
+                    "Id",
+                    _macro1.Id
+                );
         }
 
         [Test(Description = "public static Macro MakeNew(string Name)' method")]
-        public void Test_MakeNew()
+        public void Test_Macro_MakeNew()
         {
-            var testMacro1 = Macro.MakeNew("My new macro"); 
-            Assert.That(testMacro1, !Is.Null, "testMacro1 is null");
-
-            var testMacro2 = getTestMacro(testMacro1.Id);
-
-            Assert.That(testMacro1.Id, Is.EqualTo(testMacro2.Id), "ID test failed");
-            Assert.That(testMacro1.UseInEditor, Is.EqualTo(testMacro2.UseInEditor), "UseInEditor test  failed");
-            Assert.That(testMacro1.RefreshRate, Is.EqualTo(testMacro2.RefreshRate), "RefreshRate test  failed");
-            Assert.That(testMacro1.Alias, Is.EqualTo(testMacro2.Alias), "Alias test failed");
-            Assert.That(testMacro1.Name, Is.EqualTo(testMacro2.Name), "Name test failed");
-            Assert.That(testMacro1.Assembly, Is.EqualTo(testMacro2.ScriptAssembly), "ScriptAssembly test failed");
-            Assert.That(testMacro1.Type, Is.EqualTo(testMacro2.ScriptType), "ScriptType test failed");
-            Assert.That(testMacro1.Xslt, Is.EqualTo(testMacro2.Xslt), "Xslt test failed");
-            Assert.That(testMacro1.ScriptingFile, Is.EqualTo(testMacro2.Python), "Python test failed");
-            Assert.That(testMacro1.RenderContent, Is.EqualTo(testMacro2.DontRender), "DontRender test failed");
-            Assert.That(testMacro1.CachePersonalized, Is.EqualTo(testMacro2.CachePersonalized), "CachePersonalized test failed");
-            Assert.That(testMacro1.CacheByPage, Is.EqualTo(testMacro2.CacheByPage), "CacheByPage test failed");
+            var testMacro = Macro.MakeNew("My new macro" + uniqueNameSuffix); 
+            Assert.That(testMacro, !Is.Null, "testMacro1 is null");
+            assertMacroSetup(testMacro, getPersistedTestDto<MacroDto>(testMacro.Id));
         }
 
 
         [Test(Description = "public void Delete()' method")]
-        public void Test_Delete()
+        public void Test_Macro_Delete()
         {
             var testMacro1 = new Macro(_macro1.Id);  
             Assert.That(testMacro1, !Is.Null, "testMacro1 is null");
 
-            testMacro1.Delete();  
+            testMacro1.Delete();
 
-            var testMacro2 = getTestMacro(testMacro1.Id);
-            Assert.That(testMacro2, Is.Null, "testMacro2 is not null");
+            var testMacro2 = getPersistedTestDto <MacroDto>(testMacro1.Id);
+            Assert.That(testMacro2, Is.Null, "Macro hasn't been deleted - testMacro2 is not null");
 
-            var testMacroProperty = getTestMacroProperty(_macroProperty1.Id);
-            Assert.That(testMacroProperty, Is.Null, "testMacroProperty is not null");
+            var testMacroProperty = getPersistedTestDto <MacroPropertyDto>(_macroProperty1.Id);
+            Assert.That(testMacroProperty, Is.Null, "Macro peroperty hasn't been deleted - testMacroProperty is not null");
 
-            EnsureAllTestRecordsAreDeleted(); // reset test db
+            initialized = false; // reset test data on the next test run
         }
 
+        // TRACE_EXECUTION_SPEED test results
+        //1. 6:17:43 PM
+        //2. 64 6:17:46 PM
         [Test(Description = "public static Macro[] GetAll()' method")]
-        public void Test_GetAll()
+        public void Test_Macro_GetAll()
         {
+#if TRACE_EXECUTION_SPEED
+            l("1. {0:T}", DateTime.Now);
+#endif
             var macros = Macro.GetAll();
-            Assert.That(macros.Length, !Is.EqualTo(0), "There is no any macros saved in DB");
+#if TRACE_EXECUTION_SPEED
+            l("2. {0} {1:T}", macros.Length, DateTime.Now);
+#endif
+            int count = independentDatabase.ExecuteScalar<int>("select count(id) from cmsMacro");  
+            Assert.That(macros.Length, Is.EqualTo(count), "Macro.GetAll() test failed");
         }
 
-        [Test(Description = "public MacroProperty[] Properties' method")]
-        public void Test_Properties()
+        [Test(Description = "public MacroProperty[] Properties' property.get")]
+        public void Test_Macro_Properties()
         {
-            var macro = new Macro(_macro1.Id);  
+            var macro = new Macro(_macro1.Id);
+            int count = independentDatabase.ExecuteScalar<int>("select count(id) from cmsMacroProperty where [macro] = @0", _macro1.Id);
             Assert.That(macro.Properties.Length, Is.EqualTo(1), "There is more than one test property saved for macro");
         }
         
@@ -463,7 +316,5 @@ namespace Umbraco.Tests.BusinessLogic
         // public static Macro Import(XmlNode n)
         // public XmlNode ToXml(XmlDocument xd)
         // public static MacroTypes FindMacroType(string xslt, string scriptFile, string scriptType, string scriptAssembly)
-
-        #endregion
     }
 }

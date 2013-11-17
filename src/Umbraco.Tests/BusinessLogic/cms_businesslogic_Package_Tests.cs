@@ -16,45 +16,20 @@ namespace Umbraco.Tests.BusinessLogic
     // 
     // failed: System.Data.SqlServerCe.SqlCeException : The specified table does not exist. [ umbracoInstalledPackages ]
     //
-    // ******************************************************************************************************************
-    
+    // ******************************************************************************************************************   
     [TestFixture]
-    public class cms_businesslogic_Package_Tests : BaseDatabaseFactoryTestWithContext
+    public class cms_businesslogic_Package_Tests : BaseORMTest
     {
-        #region EnsureData
-
-        private InstalledPackageDto _package1;
-
+ 
         [MethodImpl(MethodImplOptions.Synchronized)]
-        protected override void EnsureData()
-        {
-            if (!initialized)
-            {
-                //_package1 = insertTestPackage(1);                
-            }
-
-            initialized = true;
-        }
-
-        private InstalledPackageDto getTestPackageDto(int packageId)
-        {
-            return getPersistedTestDto<InstalledPackageDto>(packageId);
-        }
-
-        private void EnsureAllTestRecordsAreDeleted()
-        {
-            initialized = false; 
-        }
-
-        #endregion
-
-        #region Tests
+        protected override void EnsureData() {  Ensure_Package_TestData(); }
+ 
         [Test(Description = "Test_EnsureData")]
-        public void Test_EnsureData()
+        public void _1st_Test_Package_EnsureTestData()
         {
             Assert.IsTrue(initialized);
 
-            EnsureAllTestRecordsAreDeleted();
+            EnsureAll_Package_TestRecordsAreDeleted();
         }
 
         // public Package()
@@ -63,11 +38,14 @@ namespace Umbraco.Tests.BusinessLogic
 
         // failed: System.Data.SqlServerCe.SqlCeException : The specified table does not exist. [ umbracoInstalledPackages ]
         [Test(Description = "description")]
-        public void Test_Package_Constructor_and_PopulateFromDto()
+        public void _2nd_Test_Package_Constructor_and_PopulateFromDto()
         {
+            //  [umbracoInstalledPackages] table doesn't exist (yet?)
+
             Package testPackage = null;
 
-            Assert.Throws<SqlCeException>(() => { testPackage = new Package(Guid.NewGuid()); }); 
+            Assert.Throws<SqlCeException>(() => { testPackage = new Package(12345); });
+            Assert.Throws<SqlCeException>(() => { testPackage = new Package(Guid.NewGuid()); });
         }
 
         // public void Save()
@@ -83,6 +61,5 @@ namespace Umbraco.Tests.BusinessLogic
         // public int VersionMajor get/set
 
 
-        #endregion
     }
 }

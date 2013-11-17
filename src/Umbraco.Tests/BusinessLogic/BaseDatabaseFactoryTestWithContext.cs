@@ -55,14 +55,6 @@ namespace Umbraco.Tests.TestHelpers
             return getPersistedTestDto<T>(id, idKeyName);  
         }
 
-        protected string uniqueLabel
-        {
-            get
-            {
-                return string.Format("* {0} *", Guid.NewGuid().ToString());
-            }
-        }
-
         protected void Setter_Persists_Ext<T, S, U>(
               Func<T, S> getter,
               Action<T> setter,
@@ -110,11 +102,42 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-
+        #region 'One-Liners'
         protected void l(string format, params object[] args)
         {
             System.Console.WriteLine(format, args);
         }
+
+
+        protected string uniqueLabel
+        {
+            get
+            {
+                return string.Format("* {0} *", uniqueValue);
+            }
+        }
+        protected string uniqueNameSuffix
+        {
+            get
+            {
+                return string.Format(" - {0}", uniqueValue);
+            }
+        }
+        protected string uniqueAliasSuffix
+        {
+            get
+            {
+                return uniqueValue;
+            }
+        }
+        protected string uniqueValue
+        {
+            get
+            {
+                return Guid.NewGuid().ToString();
+            }
+        }
+        #endregion
 
         #region Helper methods borroed from umbraco
         protected string getSqlStringArray(string commaSeparatedArray)

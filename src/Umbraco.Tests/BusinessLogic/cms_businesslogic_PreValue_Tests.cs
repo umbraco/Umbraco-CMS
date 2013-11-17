@@ -10,162 +10,129 @@ using System.Reflection;
 namespace Umbraco.Tests.BusinessLogic
 {
     [TestFixture]
-    public class cms_cms_businesslogic_PreValue_Tests : BaseDatabaseFactoryTestWithContext
+    public class cms_businesslogic_PreValue_Tests : BaseORMTest
     {
-        #region EnsureData()
-
-        private UserType _userType;
-        private User _user;
-        private DataTypeDefinition _dataTypeDefinition;
-        private umbraco.cms.businesslogic.datatype.PreValue.PreValueDto _preValue;
-        
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        protected override void EnsureData()
-        {
-            if (!initialized)
-            {
-                _userType = UserType.MakeNew("Tester", "CADMOSKTPIURZ:5F", "Test User");
-                _user = User.MakeNew("TEST", "TEST", "abcdefg012345", _userType);
-                _dataTypeDefinition = DataTypeDefinition.MakeNew(_user, "Nvarchar");
-            }
-
-            if ((int)independentDatabase.ExecuteScalar<int>("select count(*) from cmsDataTypePreValues where datatypenodeid = @0", _dataTypeDefinition.Id) == 0)
-            {
-                initialized = false;
-
-                string value = ",code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,|1|1,2,3,|0|500,400|1049,|true|";
-
-                independentDatabase.Execute(
-                    "insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')",
-                    new { dtdefid = _dataTypeDefinition.Id, value = value });
-                var id = PreValue.Database.ExecuteScalar<int>("SELECT MAX(id) FROM cmsDataTypePreValues");
-
-                _preValue = getTestPrevalueDto(id);
-            }
-
-            initialized = true;
-        }
-
-        private umbraco.cms.businesslogic.datatype.PreValue.PreValueDto getTestPrevalueDto(int id)
-        {
-            return getPersistedTestDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(id);
-        }
-
-        #endregion
-
-        #region Tests
-        const int TEST_ID_VALUE = 12345;
-        const string TEST_VALUE_VALUE = "test value";
+        protected override void EnsureData() { Ensure_PreValue_TestData(); }
 
         [Test(Description = "Verify if EnsureData() executes well")]
-        public void Test_EnsureData()
+        public void _1st_Test_PreValue_EnsureData()
         {
             Assert.IsTrue(initialized);
-            Assert.That(_userType, !Is.Null);
             Assert.That(_dataTypeDefinition, !Is.Null);
             Assert.That(_preValue, !Is.Null);
             Assert.That(_dataTypeDefinition.Id, !Is.EqualTo(0));
             Assert.That(_preValue.Id, !Is.EqualTo(0));
         }
 
-        [Test(Description = "Fetch PreValue object instance created by Database.Execute(...) in EnsureData() method")]
-        public void Test_Get()
+        [Test(Description = "Test 'public PreValue(int id)' constructor")]
+        public void _2nd_Test_PreValue_Constructor_I()
         {
-            // PreValue class doesn't have any explicit GetById(...) methods - a PreValue object instance is created from a saved in the database record
-            // by using a set of constructors, with the most simple one being PreValue(int id). 
-            // This PreValue(int id) constructor's functionality is tested here.
-            
-            // Assert.That fetched from a database record by Id PreValue object instance has the same properties as an in-memory test PreValue object instance
-            var savedPrevalue = new PreValue(_preValue.Id);
-            Assert.That(_preValue.Id, Is.EqualTo(savedPrevalue.Id));
-            Assert.That(_preValue.SortOrder, Is.EqualTo(savedPrevalue.SortOrder));
-            Assert.That(_preValue.Value, Is.EqualTo(savedPrevalue.Value));
-            Assert.That(_preValue.DataTypeId, Is.EqualTo(savedPrevalue.DataTypeId));
+            var testPrevalue = new PreValue(_preValue.Id);
+            assertPreValueSetup(testPrevalue, _preValue);
         }
 
-        [Test(Description = "Test constructors and initialize() method for the new non-database PreValue object instances")]
-        public void Test_initialize()
+        [Test(Description = "Test 'public PreValue(int DataTypeId, string Value)' constructor")]
+        public void _3rd_Test_PreValue_Constructor_II()
         {
-            Assert.IsNotNull(_preValue);
-
-            // test parametersless constructor public PreValue()
-            var newPreValue1 = new PreValue();
-
-            //Assert.Throws(typeof(InvalidOperationException), delegate { l("ID = {0}", newPreValue1.Id); });
-            Assert.Throws(typeof(InvalidOperationException), delegate { int test = newPreValue1.Id; });
-            Assert.That(newPreValue1.SortOrder, Is.EqualTo(0));
-            Assert.That(newPreValue1.Value, Is.Null);
-
-            // test public PreValue(int Id) constructor - trying to fetch not existing instance by Id
-            PreValue newPreValue2 = null;
-            Assert.Throws(typeof(ArgumentException), delegate { newPreValue2 = new PreValue(TEST_ID_VALUE); });
-
-            // test public PreValue(int DataTypeId, string Value) constructor - trying to fetch not existing instance by Data Type Definition Id and Value
-            PreValue newPreValue3 = null;
-            Assert.Throws(typeof(ArgumentException), delegate { newPreValue3 = new PreValue(_dataTypeDefinition.Id, TEST_VALUE_VALUE); });
-
-            // test public PreValue(int Id, int SortOrder, string Value) constructor - create new object instance to be used for .Save
-            var newPreValue4 = new PreValue(TEST_ID_VALUE, 1, TEST_VALUE_VALUE);
-            Assert.That(newPreValue4.Id, Is.EqualTo(TEST_ID_VALUE));
-            Assert.That(newPreValue4.SortOrder, Is.EqualTo(1));
-            Assert.That(newPreValue4.Value, Is.EqualTo(TEST_VALUE_VALUE));
-
+            var testPrevalue = new PreValue(_dataTypeDefinition.Id, _preValue.Value);
+            assertPreValueSetup(testPrevalue, _preValue);
         }
 
-        [Test(Description = "Test PreValue(int Id) and PreValue(int DataTypeId, string Value) constructors and initialize() method for saved in the database PreValue object instances")]
-        public void Test_get_Values()
+        private void assertPreValueSetup(PreValue testPreValue, umbraco.cms.businesslogic.datatype.PreValue.PreValueDto savedPreValue)
         {
-            Assert.IsNotNull(_preValue);
-           
-            // test public PreValue(int Id) constructor - fetch existing instance by Id
-            var newPreValue1 = new PreValue(_preValue.Id);
-            Assert.That(newPreValue1.Id, Is.EqualTo(_preValue.Id));
-            Assert.That(newPreValue1.SortOrder, Is.EqualTo(_preValue.SortOrder));
-            Assert.That(newPreValue1.Value, Is.EqualTo(_preValue.Value) );
-
-            // test public PreValue(int DataTypeId, string Value) constructor - fetch existing instance by Data Type Definition Id and Value
-            var newPreValue2 = new PreValue(_dataTypeDefinition.Id, _preValue.Value);
-            Assert.That(newPreValue2.Id, Is.EqualTo(_preValue.Id));
-            Assert.That(newPreValue2.SortOrder, Is.EqualTo(_preValue.SortOrder));
-            Assert.That(newPreValue2.Value, Is.EqualTo(_preValue.Value));
-
+            Assert.That(testPreValue.Id, Is.EqualTo(savedPreValue.Id), "Id test failed");
+            Assert.That(testPreValue.SortOrder, Is.EqualTo(savedPreValue.SortOrder), "SortOrder test failed");
+            Assert.That(testPreValue.Value, Is.EqualTo(savedPreValue.Value), "Value test failed");
+            Assert.That(testPreValue.DataTypeId, Is.EqualTo(savedPreValue.DataTypeId), "DataTypeId Test failed");
         }
 
-        [Test(Description="Test MakeNew(...) static method" )]
-        public void Test_MakeNew()
+        [Test(Description = "Test constructors and initialize() method for the new not-persisted PreValue object instances")]
+        [TestCase(3, Description = "test public PreValue(int Id) constructor - trying to fetch not existing instance by Id")]
+        [TestCase(2, Description = "Test accesing Id and other properties of a PreValue instance created by default constructor")]
+        [TestCase(1, Description = "Test 'public PreValue(int Id, int SortOrder, string Value) ' constructor")]
+        public void _4th_Test_PreValue_Constructors_Various_Calls(int testCase)
         {
-            var newPreValue = PreValue.MakeNew(_dataTypeDefinition.Id, TEST_VALUE_VALUE);
-            var savedPrevalue = getTestPrevalueDto(newPreValue.Id);
+            PreValue newPreValue = null;
 
-            Assert.That(newPreValue.Id, Is.EqualTo(savedPrevalue.Id));
-            Assert.That(newPreValue.SortOrder, Is.EqualTo(savedPrevalue.SortOrder));
-            Assert.That(newPreValue.Value, Is.EqualTo(savedPrevalue.Value));
+            switch (testCase)
+            {
+                case 1:
+                    // test public PreValue(int Id, int SortOrder, string Value) constructor - create new object instance to be used for .Save
+                    string value = "value " + uniqueValue;
+                    newPreValue = new PreValue(NON_EXISTENT_TEST_ID_VALUE, 1, value);
+                    Assert.That(newPreValue.Id, Is.EqualTo(NON_EXISTENT_TEST_ID_VALUE));
+                    Assert.That(newPreValue.SortOrder, Is.EqualTo(1));
+                    Assert.That(newPreValue.Value, Is.EqualTo(value));
+                    break;
+                case 2:
+                    // test parametersless constructor public PreValue()
+                    newPreValue = new PreValue();
+                    Assert.Throws(typeof(InvalidOperationException), delegate { int test = newPreValue.Id; });
+                    Assert.That(newPreValue.SortOrder, Is.EqualTo(0));
+                    Assert.That(newPreValue.Value, Is.Null);
+                    break;
+
+                case 3:
+
+                    // test public PreValue(int Id) constructor - trying to fetch not existing instance by Id
+                    Assert.Throws(typeof(ArgumentException), delegate { newPreValue = new PreValue(NON_EXISTENT_TEST_ID_VALUE); });
+
+                    // test public PreValue(int DataTypeId, string Value) constructor - trying to fetch not existing instance by Data Type Definition Id and Value
+                    newPreValue = null;
+                    Assert.Throws(typeof(ArgumentException), delegate { newPreValue = new PreValue(_dataTypeDefinition.Id, "value " + uniqueValue); });
+                    break;
+            }
         }
 
-        [Test(Description = "Test Delete() method")]
-        public void Test_Delete()
+        [Test(Description = "Test 'static PreValue MakeNew(int dataTypeDefId, string value)' method")]
+        public void Test_PreValue_MakeNew()
         {
-            var newPreValue1 = new PreValue();
-
-            // new non-saved Prevalue instance can't be deleted
-            Assert.Throws(typeof(ArgumentNullException), delegate { newPreValue1.Delete(); });
-
-            var newPreValue = PreValue.MakeNew(_dataTypeDefinition.Id, TEST_VALUE_VALUE);
-            int id = newPreValue.Id; 
-            newPreValue.Delete();
-
-            // PreValue deleted - it can't be now fetched PreValue(int id) constructor
-            PreValue savedPrevalue = null;
-            Assert.Throws(typeof(ArgumentException), delegate { savedPrevalue = new PreValue(id); });
-
+            var newPreValue = PreValue.MakeNew(_dataTypeDefinition.Id, "value " + uniqueValue);
+            Assert.That(newPreValue, !Is.Null);
+ 
+            var savedPrevalue = getDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(newPreValue.Id);
+            assertPreValueSetup(newPreValue, savedPrevalue);
         }
 
-        [Test(Description = "Test Save() method")]
-        public void Test_Save()
+        [Test(Description = "Test 'public void Delete()' method")]
+        [TestCase(2, Description = "")]
+        [TestCase(1, Description = "Test that new non-saved Prevalue instance can't be deleted")]
+        public void Test_PreValue_Delete(int testCase)
+        {
+            switch (testCase)
+            {
+                case 1:
+                    {
+                        var newPreValue = new PreValue();
+                        // new non-saved Prevalue instance can't be deleted
+                        Assert.Throws(typeof(ArgumentNullException), delegate { newPreValue.Delete(); });
+                    }
+                    break;
+                case 2:
+                    {
+                        var savedPrevalue1 = getDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(_preValue.Id);
+                        Assert.That(savedPrevalue1, !Is.Null);
+
+                        var preValue = new PreValue(_preValue.Id);
+                        Assert.That(preValue, !Is.Null);
+
+                        preValue.Delete();
+
+                        var savedPrevalue2 = getDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(_preValue.Id);
+                        Assert.That(savedPrevalue2, Is.Null); 
+                    }
+                    break;
+            }
+
+            initialized = false;
+        }
+
+        [Test(Description = "Test 'public void Save(' method")]
+        public void Test_PreValue_Save()
         {
             const int ZERO_ID = 0; // for the .Save(...) method to create a new PreValue record the Id value should be equal to Zero
 
-            var newPreValue = new PreValue(ZERO_ID, 1, TEST_VALUE_VALUE);
+            var newPreValue = new PreValue(ZERO_ID, 1, "value " + uniqueValue);
             newPreValue.DataTypeId = _dataTypeDefinition.Id; 
             newPreValue.Save();
 
@@ -173,14 +140,11 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(newPreValue.Id, !Is.Null);    
 
             //  fetched by Id Prevalue object instance has the same properties as an in-memory just saved PreValue object instance
-            var savedPrevalue = getTestPrevalueDto(newPreValue.Id);
-            Assert.That(newPreValue.Id, Is.EqualTo(savedPrevalue.Id));
-            Assert.That(newPreValue.SortOrder, Is.EqualTo(savedPrevalue.SortOrder));
-            Assert.That(newPreValue.Value, Is.EqualTo(savedPrevalue.Value));
-            Assert.That(newPreValue.DataTypeId, Is.EqualTo(savedPrevalue.DataTypeId));
+            var savedNewPreValue = getDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(newPreValue.Id);
+            assertPreValueSetup(newPreValue, savedNewPreValue);
+
 
         }
-        #endregion
 
     }
 }
