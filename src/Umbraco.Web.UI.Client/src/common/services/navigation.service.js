@@ -450,7 +450,14 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 throw "section cannot be null";
             }
 
-            if (action.metaData && action.metaData["jsAction"] && angular.isString(action.metaData["jsAction"])) {
+            if (action.metaData && action.metaData["actionRoute"] && angular.isString(action.metaData["actionRoute"])) {
+                //first check if the menu item simply navigates to a route
+                var parts = action.metaData["actionRoute"].split("?");
+                $location.path(parts[0]).search(parts.length > 1 ? parts[1] : "");
+                this.hideNavigation();
+                return;
+            }
+            else if (action.metaData && action.metaData["jsAction"] && angular.isString(action.metaData["jsAction"])) {
 
                 //we'll try to get the jsAction from the injector
                 var menuAction = action.metaData["jsAction"].split('.');

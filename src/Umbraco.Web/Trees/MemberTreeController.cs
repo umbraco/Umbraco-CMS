@@ -81,11 +81,25 @@ namespace Umbraco.Web.Trees
 
             if (id == Constants.System.Root.ToInvariantString())
             {
-                //set default
-                menu.DefaultMenuAlias = ActionNew.Instance.Alias;
+                // root actions      
+                if (Member.InUmbracoMemberMode())
+                {
+                    //set default
+                    menu.DefaultMenuAlias = ActionNew.Instance.Alias;
 
-                // root actions         
-                menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
+                    //Create the normal create action
+                    menu.Items.Add<ActionNew>(ui.Text("actions", ActionNew.Instance.Alias));
+                }
+                else
+                {
+                    //Create a custom create action - this does not launch a dialog, it just navigates to the create screen
+                    // we'll create it baesd on the ActionNew so it maintains the same icon properties, name, etc...
+                    var createMenuItem = new MenuItem(ActionNew.Instance);
+                    //we want to go to this route: /member/member/edit/-1?create=true
+                    createMenuItem.NavigateToRoute("/member/member/edit/-1?create=true");
+                    menu.Items.Add(createMenuItem);
+                }
+                
                 menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);
                 return menu;
             }

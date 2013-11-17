@@ -118,13 +118,23 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
          */
         getScaffold: function (alias) {
             
-            return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "memberApiBaseUrl",
-                       "GetEmpty",
-                       [{ contentTypeAlias: alias }])),
-               'Failed to retreive data for empty member item type ' + alias);
+            if (alias) {
+                return umbRequestHelper.resourcePromise(
+                    $http.get(
+                        umbRequestHelper.getApiUrl(
+                            "memberApiBaseUrl",
+                            "GetEmpty",
+                            [{ contentTypeAlias: alias }])),
+                    'Failed to retreive data for empty member item type ' + alias);
+            }
+            else {
+                return umbRequestHelper.resourcePromise(
+                    $http.get(
+                        umbRequestHelper.getApiUrl(
+                            "memberApiBaseUrl",
+                            "GetEmpty")),
+                    'Failed to retreive data for empty member item type ' + alias);
+            }
 
         },
         

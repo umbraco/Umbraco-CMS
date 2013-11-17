@@ -16,6 +16,7 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Services;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
@@ -81,17 +82,34 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <returns></returns>
-        public MemberDisplay GetEmpty(string contentTypeAlias)
+        public MemberDisplay GetEmpty(string contentTypeAlias = null)
         {
-            var contentType = Services.MemberTypeService.GetMemberType(contentTypeAlias);
-            if (contentType == null)
+            //if this is null and we are in umbraco member mode we cannot continue, return not found
+            if (global::umbraco.cms.businesslogic.member.Member.InUmbracoMemberMode())
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+                if (contentTypeAlias == null)
+                {
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                }
 
-            IMember emptyContent = new Member("", contentType);
-            emptyContent.AdditionalData["NewPassword"] = Membership.GeneratePassword(Membership.MinRequiredPasswordLength, Membership.MinRequiredNonAlphanumericCharacters);
-            return Mapper.Map<IMember, MemberDisplay>(emptyContent);
+                var contentType = Services.MemberTypeService.GetMemberType(contentTypeAlias);
+                if (contentType == null)
+                {
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                }
+
+                IMember emptyContent = new Member("", contentType);
+                emptyContent.AdditionalData["NewPassword"] = Membership.GeneratePassword(Membership.MinRequiredPasswordLength, Membership.MinRequiredNonAlphanumericCharacters);
+                return Mapper.Map<IMember, MemberDisplay>(emptyContent);
+
+            }
+            else
+            {
+                //we need to return a scaffold of a 'simple' member - basically just what a membership provider can edit
+                IMember emptyContent = MemberService.CreateGenericMembershipProviderMember();
+                emptyContent.AdditionalData["NewPassword"] = Membership.GeneratePassword(Membership.MinRequiredPasswordLength, Membership.MinRequiredNonAlphanumericCharacters);
+                return Mapper.Map<IMember, MemberDisplay>(emptyContent);
+            }
         }
 
         /// <summary>

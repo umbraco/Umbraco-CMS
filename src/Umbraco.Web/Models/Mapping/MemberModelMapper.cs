@@ -200,21 +200,33 @@ namespace Umbraco.Web.Models.Mapping
 
                 if (Membership.Provider.Name != Constants.Conventions.Member.UmbracoMemberProviderName)
                 {
-                    throw new NotSupportedException("Editing member with a non-umbraco membership provider is currently not supported");
+                    //it's a generic provider so update the locked out property based on our know constant alias
+                    var isLockedOutProperty = result.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
+                    if (isLockedOutProperty != null && isLockedOutProperty.Value.ToString() != "1")
+                    {
+                        isLockedOutProperty.View = "readonlyvalue";
+                        isLockedOutProperty.Value = ui.Text("general", "no");
+                    }
+
+                    return result;    
                 }
-
-                var umbracoProvider = (global::umbraco.providers.members.UmbracoMembershipProvider) Membership.Provider;
-
-                //This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
-                // if we just had all of the membeship provider fields on the member table :(
-                var isLockedOutProperty = result.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == umbracoProvider.LockPropertyTypeAlias);
-                if (isLockedOutProperty != null && isLockedOutProperty.Value.ToString() != "1")
+                else
                 {
-                    isLockedOutProperty.View = "readonlyvalue";
-                    isLockedOutProperty.Value = ui.Text("general", "no");
+                    var umbracoProvider = (global::umbraco.providers.members.UmbracoMembershipProvider)Membership.Provider;
+
+                    //This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
+                    // if we just had all of the membeship provider fields on the member table :(
+                    var isLockedOutProperty = result.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == umbracoProvider.LockPropertyTypeAlias);
+                    if (isLockedOutProperty != null && isLockedOutProperty.Value.ToString() != "1")
+                    {
+                        isLockedOutProperty.View = "readonlyvalue";
+                        isLockedOutProperty.Value = ui.Text("general", "no");
+                    }
+
+                    return result;    
                 }
 
-                return result;
+                
             }
         }
 
@@ -227,17 +239,26 @@ namespace Umbraco.Web.Models.Mapping
             {
                 if (Membership.Provider.Name != Constants.Conventions.Member.UmbracoMemberProviderName)
                 {
-                    throw new NotSupportedException("Editing member with a non-umbraco membership provider is currently not supported");
+                    return new Dictionary<string, string>
+                    {
+                        {Constants.Conventions.Member.IsLockedOut, Constants.Conventions.Member.IsLockedOut},
+                        {Constants.Conventions.Member.IsApproved, Constants.Conventions.Member.IsApproved},
+                        {Constants.Conventions.Member.Comments, Constants.Conventions.Member.Comments}
+                    };    
                 }
+                else
+                {
+                    var umbracoProvider = (global::umbraco.providers.members.UmbracoMembershipProvider)Membership.Provider;
 
-                var umbracoProvider = (global::umbraco.providers.members.UmbracoMembershipProvider) Membership.Provider;
-
-                return new Dictionary<string, string>
+                    return new Dictionary<string, string>
                     {
                         {Constants.Conventions.Member.IsLockedOut, umbracoProvider.LockPropertyTypeAlias},
                         {Constants.Conventions.Member.IsApproved, umbracoProvider.ApprovedPropertyTypeAlias},
                         {Constants.Conventions.Member.Comments, umbracoProvider.CommentPropertyTypeAlias}
-                    };
+                    };    
+                }
+
+                
             }
         } 
 

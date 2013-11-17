@@ -12,6 +12,7 @@ using umbraco.cms.businesslogic.member;
 
 namespace umbraco
 {
+    [Obsolete("this is no longer used and will be removed from the codebase in the future")]
     public class memberTasks : LegacyDialogTask
     {
         /// <summary>

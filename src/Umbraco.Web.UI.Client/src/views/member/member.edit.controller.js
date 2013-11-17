@@ -22,14 +22,29 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
     }
 
     if ($routeParams.create) {
-        //we are creating so get an empty member item
-        memberResource.getScaffold($routeParams.doctype)
-            .then(function(data) {
-                $scope.loaded = true;
-                $scope.content = data;
-                //put this into appState
-                appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
-            });
+        
+        //if there is no doc type specified then we are going to assume that 
+        // we are not using the umbraco membership provider
+        if ($routeParams.doctype) {
+            //we are creating so get an empty member item
+            memberResource.getScaffold($routeParams.doctype)
+                .then(function(data) {
+                    $scope.loaded = true;
+                    $scope.content = data;
+                    //put this into appState
+                    appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                });
+        }
+        else {
+            memberResource.getScaffold()
+                .then(function (data) {
+                    $scope.loaded = true;
+                    $scope.content = data;
+                    //put this into appState
+                    appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                });
+        }
+        
     }
     else {
         //so, we usually refernce all editors with the Int ID, but with members we have

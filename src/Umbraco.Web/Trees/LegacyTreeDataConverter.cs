@@ -138,10 +138,10 @@ namespace Umbraco.Web.Trees
                                    view => menuItem.LaunchDialogView(
                                        view,
                                        ui.GetText("defaultdialogs", "confirmdelete") + " '" + xmlTreeNode.Text + "' ?"))
-                        .OnFailure(() => menuItem.AdditionalData.ContainsKey(MenuItemExtensions.JsActionKey)
+                        .OnFailure(() => menuItem.AdditionalData.ContainsKey(MenuItem.JsActionKey)
                                              ? Attempt.Fail(false)
                                              : Attempt.Succeed(true),
-                                   b => menuItem.LaunchLegacyJs(menuItem.Action.JsFunctionName));
+                                   b => menuItem.ExecuteLegacyJs(menuItem.Action.JsFunctionName));
                     
                     numAdded++;
                 }

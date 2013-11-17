@@ -396,5 +396,80 @@ namespace Umbraco.Core.Services
         public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saved;
         
         #endregion
+
+        /// <summary>
+        /// A helper method that will create a basic/generic member for use with a generic membership provider
+        /// </summary>
+        /// <returns></returns>
+        internal static IMember CreateGenericMembershipProviderMember()
+        {
+            var identity = int.MaxValue;
+
+            var memType = new MemberType(-1);
+            var propGroup = new PropertyGroup
+                {
+                    Name = "Membership",
+                    Id = --identity
+                };            
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+                {
+                    Alias = Constants.Conventions.Member.Comments,
+                    Name = Constants.Conventions.Member.CommentsLabel,
+                    SortOrder = 0,
+                    Id = --identity
+                });
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Nvarchar)
+                {
+                    Alias = Constants.Conventions.Member.FailedPasswordAttempts,
+                    Name = Constants.Conventions.Member.FailedPasswordAttemptsLabel,
+                    SortOrder = 1,
+                    Id = --identity
+                });
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Nvarchar)
+                {
+                    Alias = Constants.Conventions.Member.IsApproved,
+                    Name = Constants.Conventions.Member.IsApprovedLabel,
+                    SortOrder = 2,
+                    Id = --identity
+                });
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TrueFalseAlias, DataTypeDatabaseType.Integer)
+                {
+                    Alias = Constants.Conventions.Member.IsApproved,
+                    Name = Constants.Conventions.Member.IsApprovedLabel,
+                    SortOrder = 3,
+                    Id = --identity
+                });
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TrueFalseAlias, DataTypeDatabaseType.Integer)
+                {
+                    Alias = Constants.Conventions.Member.IsLockedOut,
+                    Name = Constants.Conventions.Member.IsLockedOutLabel,
+                    SortOrder = 4,
+                    Id = --identity
+                });
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date)
+                {
+                    Alias = Constants.Conventions.Member.LastLockoutDate,
+                    Name = Constants.Conventions.Member.LastLockoutDateLabel,
+                    SortOrder = 5,
+                    Id = --identity
+                });
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date)
+                {
+                    Alias = Constants.Conventions.Member.LastLoginDate,
+                    Name = Constants.Conventions.Member.LastLoginDateLabel,
+                    SortOrder = 6,
+                    Id = --identity
+                });
+            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date)
+                {
+                    Alias = Constants.Conventions.Member.LastPasswordChangeDate,
+                    Name = Constants.Conventions.Member.LastPasswordChangeDateLabel,
+                    SortOrder = 7,
+                    Id = --identity
+                });
+            memType.PropertyGroups.Add(propGroup);
+
+            return new Member("", memType);
+        }
     }
 }

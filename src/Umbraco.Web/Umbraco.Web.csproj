@@ -505,7 +505,6 @@
     <Compile Include="Trees\LegacyTreeParams.cs" />
     <Compile Include="Models\Trees\MenuItem.cs" />
     <Compile Include="Models\Trees\MenuItemCollection.cs" />
-    <Compile Include="Models\Trees\MenuItemExtensions.cs" />
     <Compile Include="Models\Trees\RefreshNode.cs" />
     <Compile Include="Models\ContentEditing\SearchResultItem.cs" />
     <Compile Include="Models\Trees\SectionRootNode.cs" />
