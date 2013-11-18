@@ -19,12 +19,8 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class MultiNodePickerPreValueEditor : PreValueEditor
         {
-
-            [PreValueField("type", "Type", "nodetype")]
-            public string Type { get; set; }
-
-            [PreValueField("startNode", "Start node", "treepicker")]
-            public int StartNode { get; set; }
+            [PreValueField("startNode", "Node type", "treesource")]
+            public string StartNode { get; set; }
 
             [PreValueField("multiPicker", "Pick multiple items", "boolean")]
             public bool MultiPicker { get; set; }
