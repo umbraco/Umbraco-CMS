@@ -37,7 +37,7 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
                   .ForMember(member => member.UpdateDate, expression => expression.MapFrom(user => user.LastActivityDate))
                   .ForMember(member => member.LastPasswordChangeDate, expression => expression.MapFrom(user => user.LastPasswordChangedDate))
-                  .ForMember(member => member.Key, expression => expression.MapFrom(user => user.ProviderUserKey.TryConvertTo<Guid>().Result))
+                  .ForMember(member => member.Key, expression => expression.MapFrom(user => user.ProviderUserKey.TryConvertTo<Guid>().Result.ToString("N")))
                   //This is a special case for password - we don't actually care what the password is but it either needs to be something or nothing
                   // so we'll set it to something if the member is actually created, otherwise nothing if it is a new member.
                   .ForMember(member => member.Password, expression => expression.MapFrom(user => user.CreationDate > DateTime.MinValue ? Guid.NewGuid().ToString("N") : ""))

@@ -61,7 +61,7 @@ namespace Umbraco.Web.Trees
                         int total;
                         nodes.AddRange(
                             Membership.Provider.FindUsersByName(id + "%", 0, 9999, out total).Cast<MembershipUser>()
-                                      .Select(m => CreateTreeNode(m.ProviderUserKey.ToString(), id, queryStrings, m.UserName, "icon-user")));
+                                      .Select(m => CreateTreeNode(GetNodeIdForCustomProvider(m.ProviderUserKey), id, queryStrings, m.UserName, "icon-user")));
                     }
                 }
                 else if (id == "others")
@@ -73,6 +73,22 @@ namespace Umbraco.Web.Trees
                 }
             }
             return nodes;
+        }
+
+        /// <summary>
+        /// We'll see if it is a GUID, if so we'll ensure to format it without hyphens
+        /// </summary>
+        /// <param name="providerUserKey"></param>
+        /// <returns></returns>
+        private string GetNodeIdForCustomProvider(object providerUserKey)
+        {
+            if (providerUserKey == null) throw new ArgumentNullException("providerUserKey");
+            var guidAttempt = providerUserKey.TryConvertTo<Guid>();
+            if (guidAttempt.Success)
+            {
+                return guidAttempt.Result.ToString("N");
+            }
+            return providerUserKey.ToString();
         }
 
         protected override MenuItemCollection GetMenuForNode(string id, FormDataCollection queryStrings)

@@ -6,6 +6,17 @@ namespace Umbraco.Web.WebApi
     internal static class ControllerContextExtensions
     {
         /// <summary>
+        /// Sets the JSON GUID format to not have hyphens
+        /// </summary>
+        /// <param name="controllerContext"></param>
+        internal static void SetOutgoingNoHyphenGuidFormat(this HttpControllerContext controllerContext)
+        {
+            var jsonFormatter = controllerContext.Configuration.Formatters.JsonFormatter;
+            jsonFormatter.SerializerSettings.Converters.Add(new GuidNoHyphenConverter());
+        }
+
+
+        /// <summary>
         /// Sets the JSON datetime format to be a custom one
         /// </summary>
         /// <param name="controllerContext"></param>

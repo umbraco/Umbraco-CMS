@@ -55,6 +55,16 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Ensure all GUIDs are formatted without hyphens
+        /// </summary>
+        /// <param name="controllerContext"></param>
+        protected override void Initialize(System.Web.Http.Controllers.HttpControllerContext controllerContext)
+        {
+            base.Initialize(controllerContext);
+            controllerContext.SetOutgoingNoHyphenGuidFormat();
+        }
+
+        /// <summary>
         /// Returns the currently configured membership scenario for members in umbraco
         /// </summary>
         /// <value></value>

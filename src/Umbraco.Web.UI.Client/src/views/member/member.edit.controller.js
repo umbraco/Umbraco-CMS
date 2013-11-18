@@ -16,8 +16,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
     //build a path to sync the tree with
     function buildTreePath(data) {
         //TODO: Will this work for the 'other' list ?
-        var path = data.name[0] + "," + data.key;
-        path = path.replace(/-/g, '');
+        var path = data.name[0].toLowerCase() + "," + data.key;
         return path;
     }
 
