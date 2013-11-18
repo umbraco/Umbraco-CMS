@@ -39,6 +39,9 @@ namespace Umbraco.Tests.BusinessLogic
 
             Assert.That(_relationType1, !Is.Null);
             Assert.That(_relationType2, !Is.Null);
+            Assert.That(_relation1, !Is.Null);
+            Assert.That(_relation2, !Is.Null);
+            Assert.That(_relation3, !Is.Null);
 
             EnsureAll_Relation_TestRecordsAreDeleted();
 
@@ -158,7 +161,7 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static Relation MakeNew(int parentId, int childId, RelationType relType, string comment)' method")]
         public void Test_Relation_MakeNew()
         {
-            var  testRelation1 = Relation.MakeNew(_node4.Id, _node5.Id, _relationType2, "Test Relation MakeNew");
+            var  testRelation1 = Relation.MakeNew(_node4.Id, _node5.Id, new RelationType(_relationType2.Id), "Test Relation MakeNew");
             int testRelationId = testRelation1.Id;
 
             var testRelation2 = getDto<RelationDto>(testRelationId);
@@ -185,11 +188,11 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static Relation[] GetRelations(int NodeId, RelationType Filter)' method")]
         public void Test_Relation_GetRelations_2()
         {
-            var relations1 = Relation.GetRelations(_node1.Id, _relationType1);
+            var relations1 = Relation.GetRelations(_node1.Id, new RelationType(_relationType1.Id));
             // there is one test relation of type _ralationType1 for _node1 created in EnsureData()
             Assert.That(relations1.Length, Is.EqualTo(1));
 
-            var relations2 = Relation.GetRelations(_node1.Id, _relationType2);
+            var relations2 = Relation.GetRelations(_node1.Id, new RelationType(_relationType2.Id));
             // there is one test relation of type _ralationType2 for _node1 created in EnsureData()
             Assert.That(relations1.Length, Is.EqualTo(1));
         }
@@ -206,9 +209,9 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static bool IsRelated(int ParentID, int ChildId, RelationType Filter)' method")]
         public void Test_Relation_IsRelated_2()
         {
-            var result1 = Relation.IsRelated(_node1.Id, _node2.Id, _relationType1);
+            var result1 = Relation.IsRelated(_node1.Id, _node2.Id, new RelationType(_relationType1.Id));
             Assert.IsTrue(result1);
-            var result2 = Relation.IsRelated(_node1.Id, _node2.Id, _relationType2);
+            var result2 = Relation.IsRelated(_node1.Id, _node2.Id, new RelationType(_relationType2.Id));
             Assert.IsFalse(result2);
         }
 

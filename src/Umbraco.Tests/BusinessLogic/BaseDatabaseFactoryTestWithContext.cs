@@ -16,7 +16,6 @@ namespace Umbraco.Tests.TestHelpers
     {
         protected abstract void EnsureData();
 
-        const bool NO_BASE_CLASS_ASSERTS = true;
         protected override DatabaseBehavior DatabaseTestBehavior
         {
             get 
@@ -139,7 +138,7 @@ namespace Umbraco.Tests.TestHelpers
         }
         #endregion
 
-        #region Helper methods borroed from umbraco
+        #region Helper methods borrowed from umbraco
         protected string getSqlStringArray(string commaSeparatedArray)
         {
             // create array
@@ -176,7 +175,7 @@ namespace Umbraco.Tests.TestHelpers
         protected CMSNode _node4;
         protected CMSNode _node5;
 
-        private class TestCMSNode : CMSNode
+        protected class TestCMSNode : CMSNode
         {
             public TestCMSNode(int id)
                 : base(id)
@@ -220,36 +219,37 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-        public void MakeNew_PersistsNewUmbracoNodeRow()
-        {
-            // Testing Document._objectType, since it has exclusive use of GetNewDocumentSortOrder. :)
+        //public void MakeNew_PersistsNewUmbracoNodeRow()
+        //{
+        //    // Testing Document._objectType, since it has exclusive use of GetNewDocumentSortOrder. :)
 
-            int id = 0;
-            try
-            {
-                _node1 = TestCMSNode.MakeNew(-1, 1, "TestContent 1", Document._objectType);
-                _node2 = TestCMSNode.MakeNew(-1, 1, "TestContent 2", Document._objectType);
-                _node3 = TestCMSNode.MakeNew(-1, 1, "TestContent 3", Document._objectType);
-                _node4 = TestCMSNode.MakeNew(-1, 1, "TestContent 4", Document._objectType);
-                _node5 = TestCMSNode.MakeNew(-1, 1, "TestContent 5", Document._objectType);
-                var totalDocuments = independentDatabase.ExecuteScalar<int>(
-                    "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @ObjectTypeId",
-                    new { ObjectTypeId = Document._objectType });
-                if (!NO_BASE_CLASS_ASSERTS)  Assert.AreEqual(5, totalDocuments);
-                id = _node3.Id;
-                var loadedNode = new CMSNode(id);
+        //    int id = 0;
+        //    try
+        //    {
+        //        _node1 = TestCMSNode.MakeNew(-1, 1, "TestContent 1", Document._objectType);
+        //        _node2 = TestCMSNode.MakeNew(-1, 1, "TestContent 2", Document._objectType);
+        //        _node3 = TestCMSNode.MakeNew(-1, 1, "TestContent 3", Document._objectType);
+        //        _node4 = TestCMSNode.MakeNew(-1, 1, "TestContent 4", Document._objectType);
+        //        _node5 = TestCMSNode.MakeNew(-1, 1, "TestContent 5", Document._objectType);
 
-                if (!NO_BASE_CLASS_ASSERTS)
-                {
-                    AssertNonEmptyNode(loadedNode);
-                    Assert.AreEqual(2, loadedNode.sortOrder);
-                }
-            }
-            finally
-            {
-                //DeleteContent();
-            }
-        }
+        //        var totalDocuments = independentDatabase.ExecuteScalar<int>(
+        //            "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @ObjectTypeId",
+        //            new { ObjectTypeId = Document._objectType });
+        //        if (!NO_BASE_CLASS_ASSERTS)  Assert.AreEqual(5, totalDocuments);
+        //        id = _node3.Id;
+        //        var loadedNode = new CMSNode(id);
+
+        //        if (!NO_BASE_CLASS_ASSERTS)
+        //        {
+        //            AssertNonEmptyNode(loadedNode);
+        //            Assert.AreEqual(2, loadedNode.sortOrder);
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        //DeleteContent();
+        //    }
+        //}
 
         private void AssertNonEmptyNode(CMSNode node)
         {

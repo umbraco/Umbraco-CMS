@@ -17,9 +17,10 @@ namespace Umbraco.Tests.BusinessLogic
     // cmsTagRelationship: nodeId, tagId < cmdNode (NodeId)
 
     [TestFixture]
-    public class cms_businesslogic_Tag_Tests : BaseDatabaseFactoryTestWithContext
+    public class cms_businesslogic_Tag_Tests : BaseORMTest
     {
-        #region Tests
+        protected override void EnsureData() { Ensure_Tag_TestData(); }
+
         [Test(Description = "Test EnsureData()")]
         public void _1st_Test_EnsureTestData()
         {
@@ -45,13 +46,13 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(_node4, !Is.Null);
             Assert.That(_node5, !Is.Null);
 
-            EnsureAllTestRecordsAreDeleted();
+            EnsureAll_Tag_TestRecordsAreDeleted();
 
-            Assert.That(getTestTagDto(_tag1.Id), Is.Null);
-            Assert.That(getTestTagDto(_tag2.Id), Is.Null);
-            Assert.That(getTestTagDto(_tag3.Id), Is.Null);
-            Assert.That(getTestTagDto(_tag4.Id), Is.Null);
-            Assert.That(getTestTagDto(_tag5.Id), Is.Null);
+            Assert.That(getDto<TagDto>(_tag1.Id), Is.Null);
+            Assert.That(getDto<TagDto>(_tag2.Id), Is.Null);
+            Assert.That(getDto<TagDto>(_tag3.Id), Is.Null);
+            Assert.That(getDto<TagDto>(_tag4.Id), Is.Null);
+            Assert.That(getDto<TagDto>(_tag5.Id), Is.Null);
 
             Assert.That(getTestTagRelationshipDto(_node1.Id, _tag1.Id), Is.Null);
             Assert.That(getTestTagRelationshipDto(_node1.Id, _tag2.Id), Is.Null);
@@ -59,11 +60,11 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(getTestTagRelationshipDto(_node2.Id, _tag4.Id), Is.Null);
             Assert.That(getTestTagRelationshipDto(_node3.Id, _tag5.Id), Is.Null);
 
-            Assert.That(getTestNodeDto(_node1.Id), Is.Null);
-            Assert.That(getTestNodeDto(_node2.Id), Is.Null);
-            Assert.That(getTestNodeDto(_node3.Id), Is.Null);
-            Assert.That(getTestNodeDto(_node4.Id), Is.Null);
-            Assert.That(getTestNodeDto(_node5.Id), Is.Null);
+            Assert.That(getDto<NodeDto>(_node1.Id), Is.Null);
+            Assert.That(getDto<NodeDto>(_node2.Id), Is.Null);
+            Assert.That(getDto<NodeDto>(_node3.Id), Is.Null);
+            Assert.That(getDto<NodeDto>(_node4.Id), Is.Null);
+            Assert.That(getDto<NodeDto>(_node5.Id), Is.Null);
         }
 
         [Test(Description = "Constructors")]
@@ -80,7 +81,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             string tagName = string.Format("Tag {0}", uniqueLabel);
             int id = addTag(tagName, TEST_GROUP_NAME);
-            var tagDto = getTestTagDto(id);
+            var tagDto = getDto<TagDto>(id);
 
             Assert.That(tagDto, !Is.Null, "Failed to add Tag");
             Assert.That(id, Is.EqualTo(tagDto.Id), "Double-check - AddTag - failed");
@@ -92,7 +93,7 @@ namespace Umbraco.Tests.BusinessLogic
             string tagName = string.Format("Tag {0}", uniqueLabel); 
             int id1 = addTag(tagName, TEST_GROUP_NAME);
             int id2 = Tag.GetTagId(tagName, TEST_GROUP_NAME);
-            var tagDto = getTestTagDto(id2);
+            var tagDto = getDto<TagDto>(id2);
 
             Assert.That(tagDto, !Is.Null, "Failed to get Tag Id");
             Assert.That(id2, Is.EqualTo(id1), "Double-check - GetTagId - 1 failed");
@@ -308,251 +309,7 @@ namespace Umbraco.Tests.BusinessLogic
 
             Assert.That(testCount2, Is.EqualTo(testCount1), "GetAllDocumentsWithTags test failed");
         }
-        #endregion
-
-        #region EnsureData
-        const int TEST_ITEMS_MAX_COUNT = 7;
-
-        private TagDto _tag1;
-        private TagDto _tag2;
-        private TagDto _tag3;
-        private TagDto _tag4;
-        private TagDto _tag5;
-
-        private TagRelationshipDto _tagRel1;
-        private TagRelationshipDto _tagRel2;
-        private TagRelationshipDto _tagRel3;
-        private TagRelationshipDto _tagRel4;
-        private TagRelationshipDto _tagRel5;
-
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        protected override void EnsureData()
-        {
-            if (!initialized)
-            {
-                _node1 = TestCMSNode.MakeNew(-1, 1, "TestContent 1", Document._objectType);
-                _node2 = TestCMSNode.MakeNew(-1, 1, "TestContent 2", Document._objectType);
-                _node3 = TestCMSNode.MakeNew(-1, 1, "TestContent 3", Document._objectType);
-                _node4 = TestCMSNode.MakeNew(-1, 1, "TestContent 4", Document._objectType);
-                _node5 = TestCMSNode.MakeNew(-1, 1, "TestContent 5", Document._objectType);
-
-                _tag1 = InsertTestTag("Tag11", "1");
-                _tag2 = InsertTestTag("Tag12", "1");
-                _tag3 = InsertTestTag("Tag13", "1");
-                _tag4 = InsertTestTag("Tag21", "2");
-                _tag5 = InsertTestTag("Tag22", "2");
-
-                _tagRel1 = InsertTestTagRelationship(_node1.Id, _tag1.Id);
-                _tagRel2 = InsertTestTagRelationship(_node1.Id, _tag2.Id);
-                _tagRel3 = InsertTestTagRelationship(_node1.Id, _tag3.Id);
-                _tagRel4 = InsertTestTagRelationship(_node2.Id, _tag4.Id);
-                _tagRel5 = InsertTestTagRelationship(_node3.Id, _tag5.Id);
-            }
-
-            initialized = true;
-        }
-
-        private TagDto InsertTestTag(string tag, string group)
-        {
-            independentDatabase.Execute("insert into [cmsTags] ([Tag], [Group]) values (@0, @1)", tag, group);
-            int id = independentDatabase.ExecuteScalar<int>("select Max(id) from cmsTags");
-            return getTestTagDto(id);
-        }
-        private TagRelationshipDto InsertTestTagRelationship(int nodeId, int tagId)
-        {
-            independentDatabase.Execute("insert into [cmsTagRelationship] ([nodeId], [tagId]) values (@0, @1)", nodeId, tagId);
-            return getTestTagRelationshipDto(nodeId, tagId);
-        }
-
-        private TagDto getTestTagDto(int id)
-        {
-            return getPersistedTestDto<TagDto>(id);
-        }
-        private TagRelationshipDto getTestTagRelationshipDto(int nodeId, int tagId)
-        {
-            return independentDatabase.SingleOrDefault<TagRelationshipDto>(string.Format("where [nodeId] = @0 and [tagId] = @1"), nodeId, tagId);
-        }
-
-        private NodeDto getTestNodeDto(int id)
-        {
-            return getPersistedTestDto<NodeDto>(id);
-        }
-
-        private void delRel(TagRelationshipDto tagRel)
-        {
-            if (tagRel != null) independentDatabase.Execute("delete from [cmsTagRelationship] " +
-                                                                      string.Format("where [nodeId] = @0 and [tagId] = @1"), tagRel.NodeId, tagRel.TagId);
-        }
-        private void delTag(TagDto tag)
-        {
-            if (tag != null) independentDatabase.Execute("delete from [cmsTags] " +
-                                                                      string.Format("where [Id] = @0"), tag.Id);
-        }
-
-        const string TEST_GROUP_NAME = "my test group";
-        private int addTestTags(int qty = 5, string groupName = TEST_GROUP_NAME, int? nodeId = null)
-        {
-            for (int i = 1; i <= qty; i++)
-            {
-                string tagName = string.Format("Tag #{0}", uniqueLabel);
-                if (nodeId == null)
-                    addTag(tagName, groupName);
-                else
-                    addTagToNode((int)nodeId, tagName, groupName);
-            }
-            return qty;
-        }
-
-        private int addTagToNode(int nodeId, string tag, string group)
-        {
-            int id = getTagId(tag, group);
-            if (id == 0) id = addTag(tag, group);
-
-            //Perform a subselect insert into cmsTagRelationship using a left outer join to perform the if not exists check
-            string sql = "insert into cmsTagRelationship (nodeId,tagId) select " + string.Format("{0}", nodeId) + ", " + string.Format("{0}", id) + " from cmsTags ";
-            //sorry, gotta do this, @params not supported in join clause
-            sql += "left outer join cmsTagRelationship on (cmsTags.id = cmsTagRelationship.TagId and cmsTagRelationship.nodeId = " + string.Format("{0}", nodeId) + ") ";
-            sql += "where cmsTagRelationship.tagId is null and cmsTags.id = " + string.Format("{0}", id);
-
-            independentDatabase.Execute(sql);
-
-            return id;
-        }
-
-        private int addTag(string tag, string group)
-        {
-            // independentDatabase.Insert returns System.Decimal - why?
-            return (int)(decimal)independentDatabase.Insert(new TagDto() { Tag = tag, Group = group });
-        }
-
-        internal class TagDtoExt : TagDto
-        {
-            public int NodeCount { get; set; }
-        }
-
-        private IEnumerable<TagDto> convertSqlToTags(string sql, params object[] param)
-        {
-            //string testSql = sql;
-            //int index = 0;
-            //foreach (var p in param)
-            //{
-            //    testSql = testSql.Replace(string.Format("@{0}", index++), p.ToString());  
-            //}
-
-            //l("TEST SQL = '{0}'", testSql);
-
-            foreach (var tagDto in independentDatabase.Query<TagDtoExt>(sql, param))
-            {
-                yield return tagDto;
-                //new Tag(tagDto.Id, tagDto.Tag, tagDto.Group, tagDto.NodeCount);
-            }
-        }
-        private int convertSqlToTagsCount(string sql, params object[] param)
-        {
-            return convertSqlToTags(sql, param).ToArray().Length;
-        }
-
-        private int countTags(int? nodeId = null, string groupName = "")
-        {
-            var groupBy = " GROUP BY cmsTags.id, cmsTags.tag, cmsTags.[group]";
-            var sql = @"SELECT cmsTags.id, cmsTags.tag, cmsTags.[group], count(cmsTagRelationShip.tagid) AS nodeCount FROM cmsTags " +
-                        "INNER JOIN cmsTagRelationship ON cmsTagRelationShip.tagId = cmsTags.id";
-            if (nodeId != null && !string.IsNullOrWhiteSpace(groupName))
-                return convertSqlToTagsCount(sql + " WHERE cmsTags.[group] = @0 AND cmsTagRelationship.nodeid = @1" + groupBy, groupName, nodeId);
-            else if (nodeId != null)
-                return convertSqlToTagsCount(sql +  " WHERE cmsTagRelationship.nodeid = @0" + groupBy, nodeId);
-            else if (!string.IsNullOrWhiteSpace(groupName))
-                return convertSqlToTagsCount(sql + " WHERE cmsTags.[group] = @0" + groupBy, groupName);
-            else
-                return convertSqlToTagsCount(sql.Replace("INNER JOIN", "LEFT JOIN") + groupBy);
-        }
-
-
-        private int getTagId(string tag, string group)
-        {
-            var tagDto = independentDatabase.FirstOrDefault<TagDto>("where tag=@0 AND [group]=@1", tag, group);
-            if (tagDto == null) return 0;
-            return tagDto.Id;
-        }
-
-        public void addTagsToNode(int nodeId, string tags, string group)
-        {
-            string[] allTags = tags.Split(",".ToCharArray());
-            for (int i = 0; i < allTags.Length; i++)
-            {
-                //if not found we'll get zero and handle that onsave instead...
-                int id = getTagId(allTags[i], group);
-                if (id == 0)
-                    id = addTag(allTags[i], group);
-
-                //Perform a subselect insert into cmsTagRelationship using a left outer join to perform the if not exists check
-                string sql = "insert into cmsTagRelationship (nodeId,tagId) select " + string.Format("{0}", nodeId) + ", " + string.Format("{0}", id) + " from cmsTags ";
-                //sorry, gotta do this, @params not supported in join clause
-                sql += "left outer join cmsTagRelationship on (cmsTags.id = cmsTagRelationship.TagId and cmsTagRelationship.nodeId = " + string.Format("{0}", nodeId) + ") ";
-                sql += "where cmsTagRelationship.tagId is null and cmsTags.id = " + string.Format("{0}", id);
-
-                independentDatabase.Execute(sql);
-            }
-        }
-
-        private int countDocumentsWithTags(string tags, bool publishedOnly = false)
-        {
-            int count = 0;
-            var docs = new List<DocumentDto>();
-            string sql = @"SELECT DISTINCT cmsTagRelationShip.nodeid from cmsTagRelationShip
-                            INNER JOIN cmsTags ON cmsTagRelationShip.tagid = cmsTags.id 
-                            INNER JOIN umbracoNode ON cmsTagRelationShip.nodeId = umbracoNode.id
-                            WHERE (cmsTags.tag IN ({0})) AND nodeObjectType=@nodeType";
-            foreach (var id in independentDatabase.Query<int>(string.Format(sql, getSqlStringArray(tags)),
-                                                   new { nodeType = Document._objectType }))
-            {
-                Document cnode = new Document(id);
-
-                if (cnode != null && (!publishedOnly || cnode.Published)) count++;
-            }
-
-            return count;
-        }
-
-        private int countNodesWithTags(string tags)
-        {
-            int count = 0;
-
-            string sql = @"SELECT DISTINCT cmsTagRelationShip.nodeid from cmsTagRelationShip
-                            INNER JOIN cmsTags ON cmsTagRelationShip.tagid = cmsTags.id WHERE (cmsTags.tag IN (" + getSqlStringArray(tags) + "))";
-            foreach (var id in independentDatabase.Query<int>(sql)) count++;
-            return count;
-        }
-
-
-        private void EnsureAllTestRecordsAreDeleted()
-        {
-            delRel(_tagRel1);
-            delRel(_tagRel2);
-            delRel(_tagRel3);
-            delRel(_tagRel4);
-            delRel(_tagRel5);
-
-            delTag(_tag1);
-            delTag(_tag2);
-            delTag(_tag3);
-            delTag(_tag4);
-            delTag(_tag5);
-
-            // nodes deletion recursively deletes all relations...
-            if (_node1 != null) _node1.delete();
-            if (_node2 != null) _node2.delete();
-            if (_node3 != null) _node3.delete();
-            if (_node4 != null) _node4.delete();
-            if (_node5 != null) _node5.delete();
-
-            //deleteContent();
-
-            initialized = false;
-        }
-
-        #endregion
-    
+   
     }
 }
 
