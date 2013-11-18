@@ -31,6 +31,8 @@ namespace Umbraco.Web.Models.Mapping
             //FROM MembershipUser TO IMember - used when using a non-umbraco membership provider
             config.CreateMap<MembershipUser, IMember>()
                   .ConstructUsing(user => MemberService.CreateGenericMembershipProviderMember(user.UserName, user.Email, user.UserName, ""))
+                  //we're giving this entity an ID - we cannot really map it but it needs an id so the system knows it's not a new entity
+                  .ForMember(member => member.Id, expression => expression.MapFrom(user => int.MaxValue))
                   .ForMember(member => member.Comments, expression => expression.MapFrom(user => user.Comment))
                   .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
                   .ForMember(member => member.UpdateDate, expression => expression.MapFrom(user => user.LastActivityDate))
@@ -63,8 +65,8 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(display => display.MemberProviderFieldMapping,
                              expression => expression.ResolveUsing<MemberProviderFieldMappingResolver>())
                     .ForMember(display => display.MembershipScenario,
-                            expression => expression.ResolveUsing(new MembershipScenarioMappingResolver(new Lazy<IMemberTypeService>(() => applicationContext.Services.MemberTypeService))))                             
-                  .AfterMap(MapGenericCustomProperties);
+                            expression => expression.ResolveUsing(new MembershipScenarioMappingResolver(new Lazy<IMemberTypeService>(() => applicationContext.Services.MemberTypeService))))
+                  .AfterMap((member, display) => MapGenericCustomProperties(applicationContext.Services.MemberService, member, display));
 
             //FROM IMember TO ContentItemBasic<ContentPropertyBasic, IMember>
             config.CreateMap<IMember, ContentItemBasic<ContentPropertyBasic, IMember>>()
@@ -90,13 +92,14 @@ namespace Umbraco.Web.Models.Mapping
         /// <summary>
         /// Maps the generic tab with custom properties for content
         /// </summary>
+        /// <param name="memberService"></param>
         /// <param name="member"></param>
         /// <param name="display"></param>
-        private static void MapGenericCustomProperties(IMember member, MemberDisplay display)
+        private static void MapGenericCustomProperties(IMemberService memberService, IMember member, MemberDisplay display)
         {
             TabsAndPropertiesResolver.MapGenericProperties(
                 member, display,
-                GetLoginProperty(member, display),
+                GetLoginProperty(memberService, member, display),
                 new ContentPropertyDisplay
                     {
                         Alias = string.Format("{0}email", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
@@ -139,6 +142,7 @@ namespace Umbraco.Web.Models.Mapping
         /// <summary>
         /// Returns the login property display field
         /// </summary>
+        /// <param name="memberService"></param>
         /// <param name="member"></param>
         /// <param name="display"></param>
         /// <returns></returns>
@@ -147,7 +151,7 @@ namespace Umbraco.Web.Models.Mapping
         /// the membership provider is a custom one, we cannot allow chaning the username because MembershipProvider's do not actually natively 
         /// allow that.
         /// </remarks>
-        internal static ContentPropertyDisplay GetLoginProperty(IMember member, MemberDisplay display)
+        internal static ContentPropertyDisplay GetLoginProperty(IMemberService memberService, IMember member, MemberDisplay display)
         {
             var prop = new ContentPropertyDisplay
                 {
@@ -155,8 +159,11 @@ namespace Umbraco.Web.Models.Mapping
                     Label = ui.Text("login"),
                     Value = display.Username            
                 };
+
+            var scenario = memberService.GetMembershipScenario();
+            
             //only allow editing if this is a new member, or if the membership provider is the umbraco one
-            if (member.HasIdentity == false || Membership.Provider.Name == Constants.Conventions.Member.UmbracoMemberProviderName)
+            if (member.HasIdentity == false || scenario == MembershipScenario.NativeUmbraco)
             {
                 prop.View = "textbox";
                 prop.Config = new Dictionary<string, object> {{"IsRequired", true}};
