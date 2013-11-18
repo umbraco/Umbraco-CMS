@@ -10,9 +10,12 @@
                 section: s,
                 callback: function (data) {
                     //this returns the content object picked
-                    jQuery(that).parent().find("input").val(data.id);
-                    jQuery(that).parent().find(".treePickerTitle").text(data.name).show();
-                    jQuery(that).parent().find(".clear").show();
+                    var p = jQuery(that).parent();
+                    p.find(".buttons").show();
+
+                    p.find("input").val(data.id);
+                    p.find(".treePickerTitle").text(data.name).show();
+                    p.find(".clear").show();
                 }
             });
 

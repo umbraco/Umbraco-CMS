@@ -199,6 +199,7 @@ namespace umbraco.uicontrols.TreePicker
             ItemTitle.Style.Add(HtmlTextWriterStyle.FontWeight, "bold");
             ItemTitle.Attributes.Add("class", "treePickerTitle");      // solely for styling, e.g. with an underline or dotted border, etc.
             ButtonContainer.Controls.Add(ItemTitle);
+            ButtonContainer.Attributes.Add("class", "buttons");
             ButtonContainer.Controls.Add(new LiteralControl("&nbsp;"));
             ButtonContainer.Controls.Add(new LiteralControl("&nbsp;"));
 
