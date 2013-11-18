@@ -54,11 +54,11 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(TRAL.GetDto<TagDto>(_tag4.Id), Is.Null);
             Assert.That(TRAL.GetDto<TagDto>(_tag5.Id), Is.Null);
 
-            Assert.That(getTestTagRelationshipDto(_node1.Id, _tag1.Id), Is.Null);
-            Assert.That(getTestTagRelationshipDto(_node1.Id, _tag2.Id), Is.Null);
-            Assert.That(getTestTagRelationshipDto(_node1.Id, _tag3.Id), Is.Null);
-            Assert.That(getTestTagRelationshipDto(_node2.Id, _tag4.Id), Is.Null);
-            Assert.That(getTestTagRelationshipDto(_node3.Id, _tag5.Id), Is.Null);
+            Assert.That(TRAL.Tag.GetTestTagRelationshipDto(_node1.Id, _tag1.Id), Is.Null);
+            Assert.That(TRAL.Tag.GetTestTagRelationshipDto(_node1.Id, _tag2.Id), Is.Null);
+            Assert.That(TRAL.Tag.GetTestTagRelationshipDto(_node1.Id, _tag3.Id), Is.Null);
+            Assert.That(TRAL.Tag.GetTestTagRelationshipDto(_node2.Id, _tag4.Id), Is.Null);
+            Assert.That(TRAL.Tag.GetTestTagRelationshipDto(_node3.Id, _tag5.Id), Is.Null);
 
             Assert.That(TRAL.GetDto<NodeDto>(_node1.Id), Is.Null);
             Assert.That(TRAL.GetDto<NodeDto>(_node2.Id), Is.Null);
@@ -76,11 +76,11 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.True(true);  
         }
 
-        [Test(Description = "Test 'public static int AddTag(string tag, string group)' method")]
+        [Test(Description = "Test 'public static int TRAL.Tag.CreateTag(string tag, string group)' method")]
         public void Test_Tag_AddTag_Using_TagName_GroupName()
         {
             string tagName = string.Format("Tag {0}", uniqueLabel);
-            int id = addTag(tagName, TEST_GROUP_NAME);
+            int id = TRAL.Tag.CreateTag(tagName, TEST_GROUP_NAME);
             var tagDto = TRAL.GetDto<TagDto>(id);
 
             Assert.That(tagDto, !Is.Null, "Failed to add Tag");
@@ -90,8 +90,8 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static int GetTagId(string tag, string group)' method")]
         public void Test_Tag_GetTagId_By_TagName_GroupName()
         {
-            string tagName = string.Format("Tag {0}", uniqueLabel); 
-            int id1 = addTag(tagName, TEST_GROUP_NAME);
+            string tagName = string.Format("Tag {0}", uniqueLabel);
+            int id1 = TRAL.Tag.CreateTag(tagName, TEST_GROUP_NAME);
             int id2 = Tag.GetTagId(tagName, TEST_GROUP_NAME);
             var tagDto = TRAL.GetDto<TagDto>(id2);
 
@@ -103,8 +103,8 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static IEnumerable<Tag> GetTags(string group)' method")]
         public void Test_Tag_GetTags_By_GroupName()
         {
-            int tagsAddedCount = addTestTags(groupName: TEST_GROUP_NAME);
-            int testCount = countTags(groupName: TEST_GROUP_NAME);
+            int tagsAddedCount = TRAL.Tag.CreateTestTags(groupName: TEST_GROUP_NAME);
+            int testCount = TRAL.Tag.CountTags(groupName: TEST_GROUP_NAME);
             
             var testGroup = Tag.GetTags(TEST_GROUP_NAME).ToArray();
 
@@ -114,35 +114,35 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static IEnumerable<Tag> GetTags()' method")]
         public void Test_Tag_GetTags_All()
         {
-            int tagsAddedCount = addTestTags();
-            int testCount = countTags();
+            int tagsAddedCount = TRAL.Tag.CreateTestTags();
+            int testCount = TRAL.Tag.CountTags();
 
             var testGroup = Tag.GetTags().ToArray();
 
             Assert.That(testGroup.Length, Is.EqualTo(testCount), "IEnumerable<Tag> GetTags() test failed");
         }
 
-        [Test(Description = "Test 'public static void AddTagsToNode(int nodeId, string tags, string group)' method")]
+        [Test(Description = "Test 'public static void TRAL.Tag.AddTagsToNode(int nodeId, string tags, string group)' method")]
         public void Test_Tag_AddTagsToNode_Using_NodeId_TagsListString_GroupName()
         {
-            int testCount1 = countTags(_node1.Id, TEST_GROUP_NAME);
+            int testCount1 = TRAL.Tag.CountTags(_node1.Id, TEST_GROUP_NAME);
 
             var list = new List<string>();
             for (int i = 1; i <= TEST_ITEMS_MAX_COUNT; i++) list.Add(string.Format("Tag #{0}", uniqueLabel));
             string tagsSeparatedByComma = string.Join(",", list);
 
-            Tag.AddTagsToNode(_node1.Id,  tagsSeparatedByComma, TEST_GROUP_NAME);
+            TRAL.Tag.AddTagsToNode(_node1.Id,  tagsSeparatedByComma, TEST_GROUP_NAME);
 
-            int testCount2 = countTags(_node1.Id, TEST_GROUP_NAME);
+            int testCount2 = TRAL.Tag.CountTags(_node1.Id, TEST_GROUP_NAME);
 
-            Assert.That(testCount2, Is.EqualTo(testCount1 + list.Count), "AddTagsToNode(int nodeId, string tags, string group) test failed");
+            Assert.That(testCount2, Is.EqualTo(testCount1 + list.Count), "TRAL.Tag.AddTagsToNode(int nodeId, string tags, string group) test failed");
         }
 
         [Test(Description = "Test 'public static IEnumerable<Tag> GetTags(int nodeId, string group)' method")]
         public void Test_Tag_GetTags_By_NodeId_GroupName()
         {
-            int tagsAddedCount = addTestTags (nodeId: _node1.Id,  groupName: TEST_GROUP_NAME);
-            int testCount1 = countTags       (nodeId: _node1.Id, groupName: TEST_GROUP_NAME);
+            int tagsAddedCount = TRAL.Tag.CreateTestTags(nodeId: _node1.Id,  groupName: TEST_GROUP_NAME);
+            int testCount1 = TRAL.Tag.CountTags(nodeId: _node1.Id, groupName: TEST_GROUP_NAME);
 
             int testCount2  = Tag.GetTags(_node1.Id, TEST_GROUP_NAME).ToArray().Length;
 
@@ -152,8 +152,8 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static IEnumerable<Tag> GetTags(int nodeId)' method")]
         public void Test_Tag_GetTags_By_NodeId()
         {
-            int tagsAddedCount = addTestTags(nodeId: _node1.Id, groupName: TEST_GROUP_NAME);
-            int testCount1 = countTags(nodeId: _node1.Id);
+            int tagsAddedCount = TRAL.Tag.CreateTestTags(nodeId: _node1.Id, groupName: TEST_GROUP_NAME);
+            int testCount1 = TRAL.Tag.CountTags(nodeId: _node1.Id);
 
             int testCount2 = Tag.GetTags(_node1.Id).ToArray().Length;
 
@@ -163,12 +163,12 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static void AssociateTagToNode(int nodeId, int tagId)' method")]
         public void Test_Tag_AssociateTagToNode_Using_NodeId_TagId()
         {
-            int tagId = addTag(uniqueLabel, TEST_GROUP_NAME);  
-            int testCount1 = countTags(nodeId: _node1.Id);
+            int tagId = TRAL.Tag.CreateTag(uniqueLabel, TEST_GROUP_NAME);  
+            int testCount1 = TRAL.Tag.CountTags(nodeId: _node1.Id);
 
             Tag.AssociateTagToNode(_node1.Id, tagId);
 
-            int testCount2 = countTags(nodeId: _node1.Id);
+            int testCount2 = TRAL.Tag.CountTags(nodeId: _node1.Id);
 
             Assert.That(testCount2, Is.EqualTo(testCount1+1), "AssociateTagToNode test failed");
         }
@@ -176,12 +176,12 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static void RemoveTag(int tagId)' method")]
         public void Test_Tag_RemoveTag_By_NodeId()
         {
-            int tagId = addTag(uniqueLabel, TEST_GROUP_NAME);
-            int testCount1 = countTags();
+            int tagId = TRAL.Tag.CreateTag(uniqueLabel, TEST_GROUP_NAME);
+            int testCount1 = TRAL.Tag.CountTags();
 
             Tag.RemoveTag(tagId);
 
-            int testCount2 = countTags();
+            int testCount2 = TRAL.Tag.CountTags();
 
             Assert.That(testCount2, Is.EqualTo(testCount1 - 1), "RemoveTag test failed");
         }
@@ -189,13 +189,13 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static void RemoveTagsFromNode(int nodeId)' method")]
         public void Test_Tag_RemoveTagsFromNode_Using_NodeId()
         {
-            int testCount1 = countTags(nodeId: _node1.Id);
-            int addedCount = addTestTags(nodeId: _node1.Id);   
-            int testCount2 = countTags(nodeId: _node1.Id);
+            int testCount1 = TRAL.Tag.CountTags(nodeId: _node1.Id);
+            int addedCount = TRAL.Tag.CreateTestTags(nodeId: _node1.Id);   
+            int testCount2 = TRAL.Tag.CountTags(nodeId: _node1.Id);
 
             Tag.RemoveTagsFromNode(_node1.Id);
 
-            int testCount3 = countTags(nodeId: _node1.Id);
+            int testCount3 = TRAL.Tag.CountTags(nodeId: _node1.Id);
 
             Assert.That(testCount3, Is.EqualTo(testCount2 - addedCount - testCount1), "RemoveTagsFromNode(int nodeId) test failed");
         }
@@ -203,13 +203,13 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static void RemoveTagsFromNode(int nodeId, string group)' method")]
         public void Test_Tag_RemoveTagsFromNode_Using_NodeId_GroupName()
         {
-            int testCount1 = countTags(nodeId: _node1.Id, groupName: TEST_GROUP_NAME);
-            int addedCount = addTestTags(nodeId: _node1.Id, groupName: TEST_GROUP_NAME);
-            int testCount2 = countTags(nodeId: _node1.Id, groupName:TEST_GROUP_NAME );
+            int testCount1 = TRAL.Tag.CountTags(nodeId: _node1.Id, groupName: TEST_GROUP_NAME);
+            int addedCount = TRAL.Tag.CreateTestTags(nodeId: _node1.Id, groupName: TEST_GROUP_NAME);
+            int testCount2 = TRAL.Tag.CountTags(nodeId: _node1.Id, groupName:TEST_GROUP_NAME );
 
             Tag.RemoveTagsFromNode(_node1.Id, TEST_GROUP_NAME);
 
-            int testCount3 = countTags(nodeId: _node1.Id, groupName: TEST_GROUP_NAME);
+            int testCount3 = TRAL.Tag.CountTags(nodeId: _node1.Id, groupName: TEST_GROUP_NAME);
 
             Assert.That(testCount3, Is.EqualTo(testCount2 - addedCount - testCount1), "RemoveTagsFromNode(int nodeId, string group) test failed");
         }
@@ -218,12 +218,12 @@ namespace Umbraco.Tests.BusinessLogic
         public void Test_Tag_RemoveTagFromNode_Using_NodeId_TagName_GroupName()
         {
             string tagName = "My Test Tag";
-            int tagId = addTagToNode(_node1.Id, tagName, TEST_GROUP_NAME);
-            int testCount1 = countTags(nodeId:_node1.Id);
+            int tagId = TRAL.Tag.AddTagToNode(_node1.Id, tagName, TEST_GROUP_NAME);
+            int testCount1 = TRAL.Tag.CountTags(nodeId:_node1.Id);
 
             Tag.RemoveTagFromNode(_node1.Id, tagName, TEST_GROUP_NAME);
 
-            int testCount2 = countTags(nodeId: _node1.Id);
+            int testCount2 = TRAL.Tag.CountTags(nodeId: _node1.Id);
 
             Assert.That(testCount2, Is.EqualTo(testCount1 - 1), "RemoveTagFromNode test failed");
         }
@@ -246,7 +246,7 @@ namespace Umbraco.Tests.BusinessLogic
             //On a lot of tags, or a very full cmsTagRelationship table, this will perform too slowly
             Tag.MergeTagsToNode(_node1.Id, tagsSeparatedByComma, TEST_GROUP_NAME);
 
-            int testCount = countTags(_node1.Id, TEST_GROUP_NAME);
+            int testCount = TRAL.Tag.CountTags(_node1.Id, TEST_GROUP_NAME);
             Assert.That(testCount, Is.EqualTo(list.Count), "MergeTagsToNode(int nodeId, string tags, string group) test failed");
 
 #if ENABLE_TRACE
@@ -265,11 +265,11 @@ namespace Umbraco.Tests.BusinessLogic
             var tagsList = new List<string>();
             for (int i = 1; i <= TEST_ITEMS_MAX_COUNT; i++) tagsList.Add(uniqueLabel);
             string tags = string.Join(",", tagsList);
-            addTagsToNode(_node1.Id, tags, TEST_GROUP_NAME);
-            addTagsToNode(_node2.Id, tags, TEST_GROUP_NAME);
-            addTagsToNode(_node3.Id, tags, TEST_GROUP_NAME);
+            TRAL.Tag.AddTagsToNode(_node1.Id, tags, TEST_GROUP_NAME);
+            TRAL.Tag.AddTagsToNode(_node2.Id, tags, TEST_GROUP_NAME);
+            TRAL.Tag.AddTagsToNode(_node3.Id, tags, TEST_GROUP_NAME);
 
-            int testCount1 = countNodesWithTags(tags);
+            int testCount1 = TRAL.Tag.CountNodesWithTags(tags);
 
             int testCount2 = Tag.GetNodesWithTags(tags).ToArray().Length;
 
@@ -285,11 +285,11 @@ namespace Umbraco.Tests.BusinessLogic
             for (int i = 1; i <= TEST_ITEMS_MAX_COUNT; i++) tagsList.Add(uniqueLabel);
             string tags = string.Join(",", tagsList);
 
-            addTagsToNode(_node1.Id, tags, TEST_GROUP_NAME);
-            addTagsToNode(_node2.Id, tags, TEST_GROUP_NAME);
-            addTagsToNode(_node3.Id, tags, TEST_GROUP_NAME);
+            TRAL.Tag.AddTagsToNode(_node1.Id, tags, TEST_GROUP_NAME);
+            TRAL.Tag.AddTagsToNode(_node2.Id, tags, TEST_GROUP_NAME);
+            TRAL.Tag.AddTagsToNode(_node3.Id, tags, TEST_GROUP_NAME);
 
-            int testCount1 = countDocumentsWithTags(tags, publishedOnly: true);
+            int testCount1 = TRAL.Tag.CountDocumentsWithTags(tags, publishedOnly: true);
             int testCount2 = Tag.GetDocumentsWithTags(tags).ToArray().Length;
 
             Assert.That(testCount2, Is.EqualTo(testCount1), "GetDocumentsWithTags test failed");
@@ -302,11 +302,11 @@ namespace Umbraco.Tests.BusinessLogic
             var tagsList = new List<string>();
             for (int i = 1; i <= TEST_ITEMS_MAX_COUNT; i++) tagsList.Add(uniqueLabel);
             string tags = string.Join(",", tagsList);
-            addTagsToNode(_node1.Id, tags, TEST_GROUP_NAME);
-            addTagsToNode(_node2.Id, tags, TEST_GROUP_NAME);
-            addTagsToNode(_node3.Id, tags, TEST_GROUP_NAME);
+            TRAL.Tag.AddTagsToNode(_node1.Id, tags, TEST_GROUP_NAME);
+            TRAL.Tag.AddTagsToNode(_node2.Id, tags, TEST_GROUP_NAME);
+            TRAL.Tag.AddTagsToNode(_node3.Id, tags, TEST_GROUP_NAME);
 
-            int testCount1 = countDocumentsWithTags(tags, publishedOnly: false);
+            int testCount1 = TRAL.Tag.CountDocumentsWithTags(tags, publishedOnly: false);
             int testCount2 = Tag.GetAllDocumentsWithTags(tags).ToArray().Length;
 
             Assert.That(testCount2, Is.EqualTo(testCount1), "GetAllDocumentsWithTags test failed");

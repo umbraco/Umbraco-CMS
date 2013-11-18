@@ -24,7 +24,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
-using Umbraco.Web.Routing;
+//using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 
 namespace Umbraco.Tests.TestHelpers

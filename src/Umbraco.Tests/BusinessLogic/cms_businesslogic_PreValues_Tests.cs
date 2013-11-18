@@ -45,16 +45,16 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static DeleteByDataTypeDefinition(int dataTypeDefId)' method")]
         public void Test_PreValues_DeleteByDataTypeDefinition()
         {
-            Assert.That(getPreValuesCount(_dataTypeDefinition1.Id), Is.EqualTo(_dataTypeDefinition1_PrevaluesTestCount));
+            Assert.That(TRAL.PreValue.CountPreValuesByDataTypeId(_dataTypeDefinition1.Id), Is.EqualTo(_dataTypeDefinition1_PrevaluesTestCount));
 
             PreValues.DeleteByDataTypeDefinition(_dataTypeDefinition1.Id);
 
-            Assert.That(getPreValuesCount(_dataTypeDefinition1.Id), Is.EqualTo(0));
+            Assert.That(TRAL.PreValue.CountPreValuesByDataTypeId(_dataTypeDefinition1.Id), Is.EqualTo(0));
 
-            Assert.That(getPreValuesCount(_dataTypeDefinition2.Id), Is.EqualTo(_dataTypeDefinition2_PrevaluesTestCount));
+            Assert.That(TRAL.PreValue.CountPreValuesByDataTypeId(_dataTypeDefinition2.Id), Is.EqualTo(_dataTypeDefinition2_PrevaluesTestCount));
 
             PreValues.DeleteByDataTypeDefinition(_dataTypeDefinition2.Id);
-            Assert.That(getPreValuesCount(_dataTypeDefinition2.Id), Is.EqualTo(0));
+            Assert.That(TRAL.PreValue.CountPreValuesByDataTypeId(_dataTypeDefinition2.Id), Is.EqualTo(0));
 
             initialized = false;
         }
@@ -62,8 +62,8 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static GetPreValues(int DataTypeId)' method")]
         public void Test_PreValues_GetPreValues()
         {
-            Assert.That(PreValues.GetPreValues(_dataTypeDefinition1.Id).Count, Is.EqualTo(getPreValuesCount(_dataTypeDefinition1.Id)));
-            Assert.That(PreValues.GetPreValues(_dataTypeDefinition2.Id).Count, Is.EqualTo(getPreValuesCount(_dataTypeDefinition2.Id)));
+            Assert.That(PreValues.GetPreValues(_dataTypeDefinition1.Id).Count, Is.EqualTo(TRAL.PreValue.CountPreValuesByDataTypeId(_dataTypeDefinition1.Id)));
+            Assert.That(PreValues.GetPreValues(_dataTypeDefinition2.Id).Count, Is.EqualTo(TRAL.PreValue.CountPreValuesByDataTypeId(_dataTypeDefinition2.Id)));
         }
             
     }

@@ -157,7 +157,7 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "public static Template MakeNew(string name, BusinessLogic.User u)")]
         public void Test_Template_MakeNew_Using_Name_User()
         {
-            var newTemplate = Template.MakeNew(uniqueTemplateName, new User(_user.Id));
+            var newTemplate = Template.MakeNew(TRAL.Template.UniqueTemplateName, new User(_user.Id));
             Assert.That(newTemplate.Id, !Is.EqualTo(0), "MakeNew failed - Id = 0");
 
             var savedTemplate = TRAL.Template.GetTemplateNodeByTemplateNodeId(newTemplate.Id);
@@ -173,7 +173,7 @@ namespace Umbraco.Tests.BusinessLogic
             string masterPageFullPath = System.IO.Path.Combine(masterPagesFolder, fileName);
             System.IO.File.WriteAllText(masterPageFullPath, "TEST Template");
 
-            string newTemplateName = uniqueTemplateName;
+            string newTemplateName = TRAL.Template.UniqueTemplateName;
             var newTemplate = Template.MakeNew(newTemplateName, new User(_user.Id), new Template(_template1.NodeId));
             Assert.That(newTemplate.Id, !Is.EqualTo(0), "MakeNew failed - Id = 0");
 
@@ -203,7 +203,7 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public string Alias .set' property")]
         public void Test_Template_Alias_Property_Set()
         {
-            var newValue = uniqueTemplateAlias;
+            var newValue = TRAL.Template.UniqueTemplateAlias;
             var expectedValue = newValue;
             TRAL.Setter_Persists_Ext<umbraco.cms.businesslogic.template.Template, string, string>(
                     n => n.Alias,

@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models.Rdbms
 
         [Column("taskTypeId")]
         [ForeignKey(typeof(TaskTypeDto))]
-        public byte TaskTypeId { get; set; }
+        public int TaskTypeId { get; set; }
 
         [Column("nodeId")]
         [ForeignKey(typeof(NodeDto))]

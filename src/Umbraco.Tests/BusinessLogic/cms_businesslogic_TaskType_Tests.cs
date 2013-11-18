@@ -83,7 +83,7 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static IEnumerable<TaskType> GetAll()' method")]
         public void Test_TaskType_GetAll()
         {
-            int allTaskTypesCount1 = getAllTaskTypesCount();
+            int allTaskTypesCount1 = TRAL.Task.GetAllTaskTypesCount();
             int allTaskTypesCount2 = TaskType.GetAll().ToArray().Length;
 
             Assert.That(allTaskTypesCount2, Is.EqualTo(allTaskTypesCount1));
@@ -93,7 +93,7 @@ namespace Umbraco.Tests.BusinessLogic
         public void Test_TaskType_Tasks_get()
         {
             int id = _taskType1.Id;
-            int allTasksCount1 = getGetTaskTypesTasks(id);
+            int allTasksCount1 = TRAL.Task.GetGetTaskTypesTasks(id);
 
             var taskType1 = new TaskType(id);
             int allTasksCount2 = taskType1.Tasks.Count;
@@ -106,7 +106,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var taskType1 = new TaskType()
             {
-                Alias = newTaskTypeAlias 
+                Alias = TRAL.Task.NewTaskTypeAlias 
             };
             taskType1.Save();
 

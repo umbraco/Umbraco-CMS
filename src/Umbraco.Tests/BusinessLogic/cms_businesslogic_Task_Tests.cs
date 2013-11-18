@@ -78,7 +78,7 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static Tasks GetTasksByType(int taskType)' method")]
         public void Test_Task_GetTasksByType_By_TaskType()
         {
-            var tasksCount1 = countTasksByTaskType(_task1.TaskTypeId);
+            var tasksCount1 = TRAL.Task.CountTasksByTaskType(_task1.TaskTypeId);
             var tasks2 = Task.GetTasksByType(_task1.TaskTypeId);
 
             Assert.That(tasks2.Count, Is.EqualTo(tasksCount1), "Get Tasks By TaskType failed");
@@ -87,7 +87,7 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static Tasks GetTasks(int nodeId)' method")]
         public void Test_Task_GetTasks_By_Node()
         {
-            var tasksCount1 = countTasksByNodeId(_node1.Id);
+            var tasksCount1 = TRAL.Task.CountTasksByNodeId(_node1.Id);
             var tasks2 = Task.GetTasks(_node1.Id);
 
             Assert.That(tasks2.Count, Is.EqualTo(tasksCount1), "Get Tasks By Node failed");
@@ -96,12 +96,12 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static Tasks GetTasks(User User, bool IncludeClosed)' method")]
         public void Test_Task_GetTasks_By_User_IncludeClosedFlag()
         {
-            var tasksCount1 = countTasksByUserAndIncludeClosedFlag(_user.Id, true);
+            var tasksCount1 = TRAL.Task.CountTasksByUserAndIncludeClosedFlag(_user.Id, true);
             var tasks1 = Task.GetTasks(_user, true);
 
             Assert.That(tasks1.Count, Is.EqualTo(tasksCount1), "Get Tasks By Node failed, includeClosed = true ");
 
-            var tasksCount2 = countTasksByUserAndIncludeClosedFlag(_user.Id, false);
+            var tasksCount2 = TRAL.Task.CountTasksByUserAndIncludeClosedFlag(_user.Id, false);
             var tasks2 = Task.GetTasks(_user, false);
             Assert.That(tasks2.Count, Is.EqualTo(tasksCount2), "Get Tasks By Node failed, includeClosed = false");
         }
@@ -109,12 +109,12 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public static Tasks GetOwnedTasks(User User, bool IncludeClosed)' method")]
         public void Test_Task_GetOwnerTasks_By_User_IncludeClosedFlag()
         {
-            var tasksCount1 = countOwnedTasksByUserAndIncludeClosedFlag(_user.Id, true);
+            var tasksCount1 = TRAL.Task.CountOwnedTasksByUserAndIncludeClosedFlag(_user.Id, true);
             var tasks1 = Task.GetOwnedTasks(_user, true);
 
             Assert.That(tasks1.Count, Is.EqualTo(tasksCount1), "Get Owned Tasks By Node failed, includeClosed = true ");
 
-            var tasksCount2 = countOwnedTasksByUserAndIncludeClosedFlag(_user.Id, false);
+            var tasksCount2 = TRAL.Task.CountOwnedTasksByUserAndIncludeClosedFlag(_user.Id, false);
             var tasks2 = Task.GetOwnedTasks(_user, false);
             Assert.That(tasks2.Count, Is.EqualTo(tasksCount2), "Get Owned Tasks By Node failed, includeClosed = false");
         }
