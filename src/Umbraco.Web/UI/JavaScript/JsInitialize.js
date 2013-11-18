@@ -1,10 +1,13 @@
 ﻿[
+    'lib/jquery/jquery-ui-1.10.3.custom.min.js',
+
+    /*
+    'lib/jquery/jquery-ui-1.10.3.custom.min.js',
     'lib/jquery/jquery.ui.core.min.js',
     'lib/jquery/jquery.ui.widget.min.js',
     'lib/jquery/jquery.ui.mouse.min.js',
     'lib/jquery/jquery.ui.sortable.min.js',
-
-    'lib/moment.min.js',
+    */
 
     'lib/angular/1.1.5/angular-cookies.min.js',
     'lib/angular/1.1.5/angular-mobile.js',

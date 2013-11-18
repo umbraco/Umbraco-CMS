@@ -14,14 +14,14 @@
 }
 
 .umb-modal .umb-editor {
-    width: 95%;
+  width: 95%;
 }
 
 .umb-dialog .umb-editor {
-    width: 95%;
+  width: 95%;
 }
 .umb-dialog .umb-control-group .help-block {
-    width: 95%;
+  width: 95%;
 }
 
 .umb-codeeditor{
@@ -37,21 +37,21 @@
 .umb-contentpicker li a:hover .hover-show{display: inline-block;}
 
 .umb-contentpicker-popover .search-holder {
-    padding: 10px;
+  padding: 10px;
 }
 
 /* CODEMIRROR DATATYPE */
 div.umb-codeeditor {
-    border: 1px solid #e8e8e8;
+  border: 1px solid #e8e8e8;
 }
 div.umb-codeeditor .umb-el-wrap {
-    padding: 0px;
+  padding: 0px;
 }
 div.umb-codeeditor .umb-btn-toolbar {
-    padding: 0px;
-    margin: 0px;
-    border-bottom: #e8e8e8 1px solid;
-    background: #f7f7f7
+  padding: 0px;
+  margin: 0px;
+  border-bottom: #e8e8e8 1px solid;
+  background: #f7f7f7
 }
 
 
@@ -65,8 +65,8 @@ div.umb-codeeditor .umb-btn-toolbar {
 /* Special case to support helviticons for the tiny mce button controls */
 .mce-ico.mce-i-custom[class^="icon-"],
 .mce-ico.mce-i-custom[class*=" icon-"] {    
-    font-family: icomoon;
-    font-size:16px !important;
+  font-family: icomoon;
+  font-size:16px !important;
 }
 
 
@@ -74,13 +74,13 @@ div.umb-codeeditor .umb-btn-toolbar {
 // Color picker
 // --------------------------------------------------
 ul.color-picker li {
-    padding: 2px;
-    margin: 3px;
-    border: 2px solid transparent;
-    width: 60px;
+  padding: 2px;
+  margin: 3px;
+  border: 2px solid transparent;
+  width: 60px;
 }
 ul.color-picker li.active {
-    border: 2px dashed #d9d9d9;
+  border: 2px dashed #d9d9d9;
 }
 ul.color-picker li a  {
   height: 50px;
@@ -89,8 +89,8 @@ ul.color-picker li a  {
 }
 
 .control-group.color-picker-preval .thumbnail {
-    width:30px;
-    border:none;
+  width:30px;
+  border:none;
 }
 
 
@@ -108,50 +108,70 @@ ul.color-picker li a  {
   text-decoration: none;
 }
 
-//wtf? where does this opacity crap comes from?
-.umb-mediapicker *:hover{
-  opacity: 1 !important;
+.umb-mediapicker .picked-image{
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  opacity: 0.5;
+
+  font-size: 24px;
+  color: red;
+  background: white;
+
+  line-height: 36px;
+  text-align: center;
+  -moz-border-radius: 15px;
+  border-radius: 15px;
+
+  height: 32px;
+  width: 32px;
+  overflow: hidden;
+  display: none;
+  text-decoration: none;
 }
 
-.umb-mediapicker .picked-image:hover:before{
-    content: "\e1a4";
-    font-family: Icomoon;
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
-    opacity: 0.5;
+.umb-thumbnails{
+  position: relative;
+}
 
-    font-size: 24px;
-    color: red;
-    background: white;
-    
-    line-height: 36px;
-    text-align: center;
-    -moz-border-radius: 15px;
-    border-radius: 15px;
 
-    height: 32px;
-    width: 32px;
-    overflow: hidden;
-    display: block;
-  }
+.umb-thumbnails i{margin: auto;}
+.umb-thumbnails a{
+  outline: none;
+  border:none !important;
+  box-shadow:none !important;
+}
 
-  .umb-thumbnails .thumbnail {
+
+.umb-sortable-thumbnails {
+    list-style-type: none;
+    margin: 0;
     padding: 0;
-    border:none;
-  }
+    display: block;
+    width: 520px;
+}
 
-  .umb-thumbnails > li {
-    margin: 1px;
-    text-align: center;
-  }
 
-  .umb-thumbnails i{margin: auto;}
-  .umb-thumbnails a{
-    outline: none;
-    border:none !important;
-    box-shadow:none !important;
-  }
+.umb-sortable-thumbnails li{
+    display: inline-block;
+    border: 1px solid @grayLighter;
+    padding: 2px;
+    background: white;
+    margin: 5px;
+    position: relative;
+}
+
+.umb-sortable-thumbnails li:hover a{
+  display: block;
+}
+
+.umb-sortable-thumbnails li img
+{
+max-width:100%; 
+max-height:100%;
+margin:auto;
+display:block;
+}
 
 
 //
@@ -167,16 +187,16 @@ ul.color-picker li a  {
 }
 
 .umb-upload-drop-zone .info, .umb-upload-button-big{
-    display: block;
-    padding: 20px;
-    opacity: 1;
+  display: block;
+  padding: 20px;
+  opacity: 1;
 
-    border: 1px dashed @grayLight;
-    background: none;
-    text-align: center;
-    font-size: 14px;
+  border: 1px dashed @grayLight;
+  background: none;
+  text-align: center;
+  font-size: 14px;
 
-    color: @grayLight;
+  color: @grayLight;
 }
 
 .umb-upload-button-big:hover{color: @grayLight;}
@@ -200,7 +220,7 @@ ul.color-picker li a  {
 // --------------------------------------------------
 
 .umb-photo-folder .picrow{
-    overflow-y: hidden;
+  overflow-y: hidden;
 }
 
 .umb-photo-folder .picrow a, .umb-photo-preview{
@@ -235,76 +255,76 @@ ul.color-picker li a  {
 }
 
 .umb-photo-folder .selected:before{
-    content: "\e165";
-    font-family: Icomoon;
-    position: absolute;
-    bottom: 10px;
-    right: 10px;
+  content: "\e165";
+  font-family: Icomoon;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
 
-    font-size: 24px;
-    color: black;
-    opacity: 0.5;
-    background: white;
-    
-    line-height: 36px;
-    text-align: center;
-    -moz-border-radius: 15px;
-    border-radius: 15px;
+  font-size: 24px;
+  color: black;
+  opacity: 0.5;
+  background: white;
 
-    height: 32px;
-    width: 32px;
-    overflow: hidden;
-    display: block;
-  }
+  line-height: 36px;
+  text-align: center;
+  -moz-border-radius: 15px;
+  border-radius: 15px;
+
+  height: 32px;
+  width: 32px;
+  overflow: hidden;
+  display: block;
+}
 
 
-  //
-  // File upload
-  // --------------------------------------------------
-  .umb-fileupload .preview {
-      border-radius: 5px;
-      border: 1px solid #a0a0a0;
-      padding: 3px;
-      background: #efefef;
-      float: left;
-      margin-right: 30px;
-      margin-bottom: 30px
-  }
-  .umb-fileupload ul {
-      list-style: none;
-      vertical-align: middle;
-      margin-bottom: 0px
-  }
-  .umb-fileupload label {
-      vertical-align: middle;
-      padding-left: 7px;
-      font-weight: normal
-  }
-  .umb-fileupload .preview-file {
-      color: #666;
-      height: 45px;
-      width: 55px;
-      text-align: center;
-      text-transform: uppercase;
-      font-size: 10px;
-      padding-top: 27px
-  }
-  .umb-fileupload input {
-      font-size: 12px
-  }
+//
+// File upload
+// --------------------------------------------------
+.umb-fileupload .preview {
+  border-radius: 5px;
+  border: 1px solid #a0a0a0;
+  padding: 3px;
+  background: #efefef;
+  float: left;
+  margin-right: 30px;
+  margin-bottom: 30px
+}
+.umb-fileupload ul {
+  list-style: none;
+  vertical-align: middle;
+  margin-bottom: 0px
+}
+.umb-fileupload label {
+  vertical-align: middle;
+  padding-left: 7px;
+  font-weight: normal
+}
+.umb-fileupload .preview-file {
+  color: #666;
+  height: 45px;
+  width: 55px;
+  text-align: center;
+  text-transform: uppercase;
+  font-size: 10px;
+  padding-top: 27px
+}
+.umb-fileupload input {
+  font-size: 12px
+}
 
 //
 // Member group picker
 // --------------------------------------------------
 
 .umb-member-group-box {
-    width: 45%;
+  width: 45%;
 }
 .umb-member-group-box:nth-child(1){
-    float:left;
+  float:left;
 }
 .umb-member-group-box:nth-child(2){
-    float:right;
+  float:right;
 }
 
 //

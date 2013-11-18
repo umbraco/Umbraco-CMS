@@ -255,7 +255,7 @@
     <key alias="newtab">New tab</key>
     <key alias="tab">Tab</key>
     <key alias="thumbnail">Thumbnail</key>
-    <key alias="iscontainercontenttype">Use as container content type</key>
+    <key alias="hasListView">Enable list view</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Add prevalue</key>

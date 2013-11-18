@@ -59,7 +59,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         };
 
        $scope.sortableOptions = {
-            update: function(e, ui) {
+           update: function(e, ui) {
                 var r = [];
                 angular.forEach($scope.renderModel, function(value, key){
                     r.push(value.id);
