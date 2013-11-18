@@ -7,6 +7,7 @@ using Umbraco.Core.Events;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Web.Trees
 {

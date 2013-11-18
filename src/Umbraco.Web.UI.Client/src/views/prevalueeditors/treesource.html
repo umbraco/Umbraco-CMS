@@ -8,20 +8,22 @@
 
 	<br/><br/>
 
-	<ul class="unstyled list-icons" ng-if="node" >	
-		<li>	
-			<i class="icon icon-delete red hover-show pull-right" ng-click="clear()"></i>
-			<i class="icon {{node.icon}} hover-hide"></i>
-			<a href prevent-default ng-click="openContentPicker()" >{{node.name}}</a>
-		</li>
-	</ul>
+	<div ng-hide="model.type === 'member'">
+		<ul class="unstyled list-icons" ng-if="node" >	
+			<li>	
+				<i class="icon icon-delete red hover-show pull-right" ng-click="clear()"></i>
+				<i class="icon {{node.icon}} hover-hide"></i>
+				<a href prevent-default ng-click="openContentPicker()" >{{node.name}}</a>
+			</li>
+		</ul>
 
-	<ul class="unstyled list-icons" ng-show="multipicker || !node">	
-		<li>
-			<i class="icon icon-add blue"></i>
-			<a href ng-click="openContentPicker()" prevent-default>
-				<localize key="general_choose">Choose</localize>...
-			</a>
-		</li>
-	</ul>
+		<ul class="unstyled list-icons" ng-show="multipicker || !node">	
+			<li>
+				<i class="icon icon-add blue"></i>
+				<a href ng-click="openContentPicker()" prevent-default>
+					<localize key="general_choose">Choose</localize>...
+				</a>
+			</li>
+		</ul>
+	</div>
 </div>

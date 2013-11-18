@@ -8,6 +8,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web.Models.Trees;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
+using System.Globalization;
 
 namespace Umbraco.Web.Trees
 {
@@ -65,6 +66,13 @@ namespace Umbraco.Web.Trees
         {
             if (id == Constants.System.Root.ToInvariantString() && UserStartNode == Constants.System.Root)
             {
+                if (queryStrings.HasKey(TreeQueryStringParameters.RootNode) && queryStrings.GetValue<string>(TreeQueryStringParameters.RootNode) != Constants.System.Root.ToString(CultureInfo.InvariantCulture))
+                   id = queryStrings.GetValue<string>(TreeQueryStringParameters.RootNode);
+
+                /*    if (Security.CurrentUser.HasPathAccess(c))
+                        node = CreateCustomRootNode(queryStrings, c.Id, c.ParentId, c.Name);
+                */
+
                 //we need to append the recycle bin to the end (if not in dialog mode)
                 var nodes = PerformGetTreeNodes(id, queryStrings);
 

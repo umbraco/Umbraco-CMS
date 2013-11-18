@@ -12,16 +12,12 @@ angular.module('umbraco')
 			$scope.model.type = "content";
 		}		
 
-
-
-		if($scope.model.id){
+		if($scope.model.id && $scope.model.type !== "member"){
 			var ent = "Document";
 			if($scope.model.type === "media"){
 				ent = "Media";
-			}else if ($scope.model.type === "member"){
-				ent = "Member";
 			}
-
+			
 			entityResource.getById($scope.model.id, ent).then(function(item){
 				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
 				$scope.node = item;
@@ -44,6 +40,10 @@ angular.module('umbraco')
 		};
 		
 	    $scope.$on("formSubmitting", function (ev, args) {
+	    	if($scope.model.type === "member"){
+	    		$scope.model.id = -1;
+	    	}
+
 			$scope.model.value = {type: $scope.model.type, id: $scope.model.id};
 	    });
 
