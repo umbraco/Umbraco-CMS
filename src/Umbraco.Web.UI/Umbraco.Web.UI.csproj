@@ -968,6 +968,7 @@
     <Content Include="Umbraco_Client\Installer\Images\btn-buisness-repeat.png" />
     <Content Include="Umbraco_Client\Installer\Images\btn-confirm.png" />
     <Content Include="Umbraco_Client\Installer\Images\pbar.gif" />
+    <Content Include="Umbraco_Client\Installer\Images\zoom-in.png" />
     <Content Include="Umbraco_Client\Installer\Js\PackageInstaller.js" />
     <Content Include="Umbraco_Client\Splitbutton\InsertMacroSplitButton.js" />
     <Content Include="Umbraco_Client\Tablesorting\img\asc.gif" />
