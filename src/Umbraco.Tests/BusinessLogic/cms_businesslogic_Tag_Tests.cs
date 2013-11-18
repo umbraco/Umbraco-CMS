@@ -330,7 +330,11 @@ namespace Umbraco.Tests.BusinessLogic
         {
             if (!initialized)
             {
-                MakeNew_PersistsNewUmbracoNodeRow();
+                _node1 = TestCMSNode.MakeNew(-1, 1, "TestContent 1", Document._objectType);
+                _node2 = TestCMSNode.MakeNew(-1, 1, "TestContent 2", Document._objectType);
+                _node3 = TestCMSNode.MakeNew(-1, 1, "TestContent 3", Document._objectType);
+                _node4 = TestCMSNode.MakeNew(-1, 1, "TestContent 4", Document._objectType);
+                _node5 = TestCMSNode.MakeNew(-1, 1, "TestContent 5", Document._objectType);
 
                 _tag1 = InsertTestTag("Tag11", "1");
                 _tag2 = InsertTestTag("Tag12", "1");

@@ -18,10 +18,21 @@ namespace Umbraco.Tests.BusinessLogic
         public void _1st_Test_PreValue_EnsureData()
         {
             Assert.IsTrue(initialized);
-            Assert.That(_dataTypeDefinition, !Is.Null);
+            Assert.That(_dataTypeDefinition1, !Is.Null);
             Assert.That(_preValue, !Is.Null);
-            Assert.That(_dataTypeDefinition.Id, !Is.EqualTo(0));
-            Assert.That(_preValue.Id, !Is.EqualTo(0));
+
+            Assert.That(independentDatabase.ExecuteScalar<int>("select count(pk) from cmsDataType where nodeid = @0", _dataTypeDefinition1.Id), Is.EqualTo(1));
+            Assert.That(independentDatabase.ExecuteScalar<int>("select count(id) from umbracoNode where id = @0", _dataTypeDefinition1.Id), Is.EqualTo(1));
+            Assert.That(independentDatabase.ExecuteScalar<int>("select count(pk) from cmsDataType where nodeid = @0", _dataTypeDefinition2.Id), Is.EqualTo(1));
+            Assert.That(independentDatabase.ExecuteScalar<int>("select count(id) from umbracoNode where id = @0", _dataTypeDefinition2.Id), Is.EqualTo(1));
+
+            EnsureAll_PreValue_TestRecordsAreDeleted();
+
+            Assert.That(getDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(_preValue.Id), Is.Null);
+            Assert.That(independentDatabase.ExecuteScalar<int>("select count(pk) from cmsDataType where nodeid = @0", _dataTypeDefinition1.Id), Is.EqualTo(0));
+            Assert.That(independentDatabase.ExecuteScalar<int>("select count(id) from umbracoNode where id = @0", _dataTypeDefinition1.Id), Is.EqualTo(0));
+            Assert.That(independentDatabase.ExecuteScalar<int>("select count(pk) from cmsDataType where nodeid = @0", _dataTypeDefinition2.Id), Is.EqualTo(0));
+            Assert.That(independentDatabase.ExecuteScalar<int>("select count(id) from umbracoNode where id = @0", _dataTypeDefinition2.Id), Is.EqualTo(0));
         }
 
         [Test(Description = "Test 'public PreValue(int id)' constructor")]
@@ -34,7 +45,7 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'public PreValue(int DataTypeId, string Value)' constructor")]
         public void _3rd_Test_PreValue_Constructor_II()
         {
-            var testPrevalue = new PreValue(_dataTypeDefinition.Id, _preValue.Value);
+            var testPrevalue = new PreValue(_dataTypeDefinition1.Id, _preValue.Value);
             assertPreValueSetup(testPrevalue, _preValue);
         }
 
@@ -79,7 +90,7 @@ namespace Umbraco.Tests.BusinessLogic
 
                     // test public PreValue(int DataTypeId, string Value) constructor - trying to fetch not existing instance by Data Type Definition Id and Value
                     newPreValue = null;
-                    Assert.Throws(typeof(ArgumentException), delegate { newPreValue = new PreValue(_dataTypeDefinition.Id, "value " + uniqueValue); });
+                    Assert.Throws(typeof(ArgumentException), delegate { newPreValue = new PreValue(_dataTypeDefinition1.Id, "value " + uniqueValue); });
                     break;
             }
         }
@@ -87,7 +98,7 @@ namespace Umbraco.Tests.BusinessLogic
         [Test(Description = "Test 'static PreValue MakeNew(int dataTypeDefId, string value)' method")]
         public void Test_PreValue_MakeNew()
         {
-            var newPreValue = PreValue.MakeNew(_dataTypeDefinition.Id, "value " + uniqueValue);
+            var newPreValue = PreValue.MakeNew(_dataTypeDefinition1.Id, "value " + uniqueValue);
             Assert.That(newPreValue, !Is.Null);
  
             var savedPrevalue = getDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(newPreValue.Id);
@@ -133,7 +144,7 @@ namespace Umbraco.Tests.BusinessLogic
             const int ZERO_ID = 0; // for the .Save(...) method to create a new PreValue record the Id value should be equal to Zero
 
             var newPreValue = new PreValue(ZERO_ID, 1, "value " + uniqueValue);
-            newPreValue.DataTypeId = _dataTypeDefinition.Id; 
+            newPreValue.DataTypeId = _dataTypeDefinition1.Id; 
             newPreValue.Save();
 
             // saved PreValue object instance gets not null ID

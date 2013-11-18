@@ -10,107 +10,61 @@ using System.Reflection;
 namespace Umbraco.Tests.BusinessLogic
 {
     [TestFixture]
-    public class cms_businesslogic_PreValues_Tests : BaseDatabaseFactoryTestWithContext
+    public class cms_businesslogic_PreValues_Tests : BaseORMTest
     {
-        #region EnsureData()
-        private UserType _userType;
-        private User _user;
-        private DataTypeDefinition _dataTypeDefinition1;
-        private int _dataTypeDefinition1_PrevaluesTestCount;
-        private DataTypeDefinition _dataTypeDefinition2;
-        private int _dataTypeDefinition2_PrevaluesTestCount;
+        protected override void EnsureData() { Ensure_PreValues_TestData(); }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        protected override void EnsureData()
-        {
-            if (!initialized)
-            {
-                _userType = UserType.MakeNew("Tester", "CADMOSKTPIURZ:5F", "Test User");
-                _user = User.MakeNew("TEST", "TEST", "abcdefg012345", _userType);
-                _dataTypeDefinition1 = DataTypeDefinition.MakeNew(_user, "Nvarchar");
-                _dataTypeDefinition2 = DataTypeDefinition.MakeNew(_user, "Ntext");
-            }
-
-            var values = new List<string> 
-                {
-                    "default",
-                    ",code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,|1|1,2,3,|0|500,400|1049,|true|",
-                    "test"
-                };
-
-            if ((int)PreValues.Database.ExecuteScalar<int>("select count(*) from cmsDataTypePreValues where datatypenodeid = @0", _dataTypeDefinition1.Id) == 0)
-            {
-                initialized = false;
-
-                // insert three test PreValue records
-                _dataTypeDefinition1_PrevaluesTestCount = values.Count;
-                values.ForEach(x =>
-                    {
-                        PreValue.Database.Execute(
-                            "insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')",
-                            new { dtdefid = _dataTypeDefinition1.Id, value = x });
-                    });
-            }
-
-            if ((int)PreValues.Database.ExecuteScalar<int>("select count(*) from cmsDataTypePreValues where datatypenodeid = @0", _dataTypeDefinition2.Id) == 0)
-            {
-                initialized = false;
-
-                // insert one test PreValueRecord
-                _dataTypeDefinition2_PrevaluesTestCount = 1;
-                PreValue.Database.Execute(
-                    "insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')",
-                    new { dtdefid = _dataTypeDefinition2.Id, value = values[0] });
-            }
-
-            initialized = true;
-        }
-
-        private umbraco.cms.businesslogic.datatype.PreValue.PreValueDto getTestPrevalueDto(int id)
-        {
-            return getPersistedTestDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(id);
-        }
-        #endregion
-
-        #region Tests
         [Test(Description = "Verify if EnsureData() executes well")]
-        public void Test_EnsureData()
+        public void _1st_Test_PreValue_EnsureData()
         {
             Assert.IsTrue(initialized);
-            Assert.That(_userType, !Is.Null);
             Assert.That(_dataTypeDefinition1, !Is.Null);
-            Assert.That(_dataTypeDefinition1.Id, !Is.EqualTo(0));
-            Assert.That(_dataTypeDefinition2, !Is.Null);
-            Assert.That(_dataTypeDefinition2.Id, !Is.EqualTo(0));
+            Assert.That(_preValue, !Is.Null);
+
+            Assert.That(independentDatabase.ExecuteScalar<int>("select count(pk) from cmsDataType where nodeid = @0", _dataTypeDefinition1.Id), Is.EqualTo(1));
+            Assert.That(independentDatabase.ExecuteScalar<int>("select count(id) from umbracoNode where id = @0", _dataTypeDefinition1.Id), Is.EqualTo(1));
+            Assert.That(independentDatabase.ExecuteScalar<int>("select count(pk) from cmsDataType where nodeid = @0", _dataTypeDefinition2.Id), Is.EqualTo(1));
+            Assert.That(independentDatabase.ExecuteScalar<int>("select count(id) from umbracoNode where id = @0", _dataTypeDefinition2.Id), Is.EqualTo(1));
+
+            EnsureAll_PreValue_TestRecordsAreDeleted();
+
+            Assert.That(getDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(_preValue.Id), Is.Null);
+            Assert.That(independentDatabase.ExecuteScalar<int>("select count(pk) from cmsDataType where nodeid = @0", _dataTypeDefinition1.Id), Is.EqualTo(0));
+            Assert.That(independentDatabase.ExecuteScalar<int>("select count(id) from umbracoNode where id = @0", _dataTypeDefinition1.Id), Is.EqualTo(0));
+            Assert.That(independentDatabase.ExecuteScalar<int>("select count(pk) from cmsDataType where nodeid = @0", _dataTypeDefinition2.Id), Is.EqualTo(0));
+            Assert.That(independentDatabase.ExecuteScalar<int>("select count(id) from umbracoNode where id = @0", _dataTypeDefinition2.Id), Is.EqualTo(0));
         }
 
-        [Test(Description = "Test static CountOfPreValues(int dataTypeDefId) method")]
-        public void Test_CountOfPreValues()
+        [Test(Description = "Test 'public static CountOfPreValues(int dataTypeDefId)' method")]
+        public void Test_PreValues_CountOfPreValues()
         {
             Assert.That(PreValues.CountOfPreValues(_dataTypeDefinition1.Id), Is.EqualTo(_dataTypeDefinition1_PrevaluesTestCount));
             Assert.That(PreValues.CountOfPreValues(_dataTypeDefinition2.Id), Is.EqualTo(_dataTypeDefinition2_PrevaluesTestCount));
         }
 
-        [Test(Description = "Test static DeleteByDataTypeDefinition(int dataTypeDefId) method")]
-        public void Test_DeleteByDataTypeDefinition()
+        [Test(Description = "Test 'public static DeleteByDataTypeDefinition(int dataTypeDefId)' method")]
+        public void Test_PreValues_DeleteByDataTypeDefinition()
         {
+            Assert.That(getPreValuesCount(_dataTypeDefinition1.Id), Is.EqualTo(_dataTypeDefinition1_PrevaluesTestCount));
+
             PreValues.DeleteByDataTypeDefinition(_dataTypeDefinition1.Id);
-            Assert.That(PreValues.GetPreValues(_dataTypeDefinition1.Id).Count, Is.EqualTo(0));
-            Assert.That(PreValues.GetPreValues(_dataTypeDefinition2.Id).Count, Is.EqualTo(_dataTypeDefinition2_PrevaluesTestCount));
+
+            Assert.That(getPreValuesCount(_dataTypeDefinition1.Id), Is.EqualTo(0));
+
+            Assert.That(getPreValuesCount(_dataTypeDefinition2.Id), Is.EqualTo(_dataTypeDefinition2_PrevaluesTestCount));
 
             PreValues.DeleteByDataTypeDefinition(_dataTypeDefinition2.Id);
-            Assert.That(PreValues.GetPreValues(_dataTypeDefinition2.Id).Count, Is.EqualTo(0));
+            Assert.That(getPreValuesCount(_dataTypeDefinition2.Id), Is.EqualTo(0));
 
+            initialized = false;
         }
 
-        [Test(Description = "Test static GetPreValues(int DataTypeId) method")]
-        public void Test_GetPreValues()
+        [Test(Description = "Test 'public static GetPreValues(int DataTypeId)' method")]
+        public void Test_PreValues_GetPreValues()
         {
-            Assert.That(PreValues.GetPreValues(_dataTypeDefinition1.Id).Count, Is.EqualTo(_dataTypeDefinition1_PrevaluesTestCount));
-            Assert.That(PreValues.GetPreValues(_dataTypeDefinition2.Id).Count, Is.EqualTo(_dataTypeDefinition2_PrevaluesTestCount));
+            Assert.That(PreValues.GetPreValues(_dataTypeDefinition1.Id).Count, Is.EqualTo(getPreValuesCount(_dataTypeDefinition1.Id)));
+            Assert.That(PreValues.GetPreValues(_dataTypeDefinition2.Id).Count, Is.EqualTo(getPreValuesCount(_dataTypeDefinition2.Id)));
         }
-
-        #endregion
             
     }
 }

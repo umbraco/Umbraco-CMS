@@ -7,6 +7,10 @@ using System.Runtime.CompilerServices;
 using System.Diagnostics;
 using System.Reflection;
 using umbraco.cms.businesslogic;
+using umbraco.cms.businesslogic.media;
+using umbraco.cms.businesslogic.web;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core;
 
 namespace Umbraco.Tests.BusinessLogic
 {
@@ -15,53 +19,71 @@ namespace Umbraco.Tests.BusinessLogic
     /// TODO: Populate test database with RecycleBin related test data. Implement additional tests.
     /// </remarks> 
     [TestFixture]
-    public class cms_businesslogic_RecycleBin_Tests : BaseDatabaseFactoryTestWithContext
+    public class cms_businesslogic_RecycleBin_Tests : BaseORMTest
     {
+        protected override void EnsureData() { Ensure_RecycleBin_TestData(); }
 
-        #region EnsureData()
-        public override void Initialize()
+        [Test(Description = "Verify if EnsureData() executes well")]
+        public void Test_RecycleBin_EnsureData()
         {
-            base.Initialize();
-            EnsureData(); 
+            Assert.IsTrue(initialized);
+
+            Assert.That(_recycleBinNode1, !Is.Null);
+            Assert.That(_recycleBinNode2, !Is.Null);
+            Assert.That(_recycleBinNode3, !Is.Null);
+            Assert.That(_recycleBinNode4, !Is.Null);
+            Assert.That(_recycleBinNode5, !Is.Null);
+
+            EnsureAll_RecycleBin_TestRecordsAreDeleted();
+
+            Assert.That(getDto<NodeDto>(_recycleBinNode1.Id), Is.Null);
+            Assert.That(getDto<NodeDto>(_recycleBinNode2.Id), Is.Null);
+            Assert.That(getDto<NodeDto>(_recycleBinNode3.Id), Is.Null);
+            Assert.That(getDto<NodeDto>(_recycleBinNode4.Id), Is.Null);
+            Assert.That(getDto<NodeDto>(_recycleBinNode5.Id), Is.Null);
+
         }
 
-        [MethodImpl(MethodImplOptions.Synchronized)]
-        protected override void EnsureData()
-        {
-            //TODO: implement population of Recycle Bin and related test data into the test database
-            initialized = true;
-        }
-
-        private void EnsureAllRecycleBinRecordsAreDeleted()
-        {
-            //TODO: implement deletion of all Recycle Bin related test data from the test database
-        }        
-        #endregion
-
-        #region Tests
-        //[Test(Description = "Verify if EnsureData() executes well")]
-        //public void Test_EnsureData()
-        //{
-        //    Assert.IsTrue(initialized);
-        //}
+        const string countSQL = @"select count(id) from umbracoNode where nodeObjectType = @nodeObjectType and path like '%,{0},%'";
 
         [Test(Description = "Test 'static int Count(RecycleBinType type)' method")]
-        public void Test_Count()
+        public void Test_RecycleBin_Count_Media()
         {
-            EnsureAllRecycleBinRecordsAreDeleted();
-            Assert.That(RecycleBin.Count(umbraco.cms.businesslogic.RecycleBin.RecycleBinType.Content), Is.EqualTo(0));
-            Assert.That(RecycleBin.Count(umbraco.cms.businesslogic.RecycleBin.RecycleBinType.Media), Is.EqualTo(0));
+            int testCount = RecycleBin.Count(umbraco.cms.businesslogic.RecycleBin.RecycleBinType.Media);
+            int savedCount = independentDatabase.ExecuteScalar<int>(string.Format(countSQL, Constants.System.RecycleBinMedia), new { nodeObjectType = Media._objectType });
+
+            Assert.That(testCount, Is.EqualTo(savedCount));
         }
 
-        [Test(Description = "Test 'umbraco.BusinessLogic.console.IconI[] Children' property")]
-        public void Test_Children()
+        [Test(Description = "Test 'static int Count(RecycleBinType type)' method for Constants.System.RecycleBinContent")]
+        public void Test_RecycleBin_Count_Content()
         {
-            EnsureAllRecycleBinRecordsAreDeleted();
-            var recycleBin = new RecycleBin(RecycleBin.RecycleBinType.Content); 
-            Assert.That(recycleBin.Children.Length, Is.EqualTo(0));
+            int testCount = RecycleBin.Count(umbraco.cms.businesslogic.RecycleBin.RecycleBinType.Content);
+            int savedCount = independentDatabase.ExecuteScalar<int>(string.Format(countSQL, Constants.System.RecycleBinContent), new { nodeObjectType = Document._objectType });
+
+            Assert.That(testCount, Is.EqualTo(savedCount));
         }
 
-        #endregion
-            
+        const string childSQL = @"SELECT count(id) FROM umbracoNode where parentId = @parentId And nodeObjectType = @nodeObjectType";
+
+        [Test(Description = "Test 'umbraco.BusinessLogic.console.IconI[] Children' property for Constants.System.RecycleBinMedia")]
+        public void Test_RecycleBin_Media_Children()
+        {
+            var recycleBin = new RecycleBin(RecycleBin.RecycleBinType.Media);
+            int savedCount = independentDatabase.ExecuteScalar<int>(
+                        childSQL, new { parentId = RecycleBin.RecycleBinType.Media, nodeObjectType = Media._objectType });
+
+            Assert.That(recycleBin.Children.Length, Is.EqualTo(savedCount));
+        }
+
+        [Test(Description = "Test 'umbraco.BusinessLogic.console.IconI[] Children' property for Constants.System.RecycleBinContent")]
+        public void Test_RecycleBin_Content_Children()
+        {
+            var recycleBin = new RecycleBin(RecycleBin.RecycleBinType.Content);
+            int savedCount = independentDatabase.ExecuteScalar<int>(
+                        childSQL, new { parentId = RecycleBin.RecycleBinType.Content, nodeObjectType = Document._objectType });
+
+            Assert.That(recycleBin.Children.Length, Is.EqualTo(savedCount));
+        }
     }
 }

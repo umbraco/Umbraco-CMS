@@ -338,7 +338,7 @@ namespace umbraco.cms.businesslogic.propertytype
             FlushCache();
 
             // Delete all properties of propertytype
-            //ss:temp comment and used the following code line  // CleanPropertiesOnDeletion(_contenttypeid);
+            //ss:temp commented and used the following code line  CleanPropertiesOnDeletion(_contenttypeid);
             CleanAllPropertiesOnDeletion();
 
             // Delete PropertyType ..

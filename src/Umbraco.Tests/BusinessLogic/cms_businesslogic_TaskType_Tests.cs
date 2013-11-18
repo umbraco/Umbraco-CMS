@@ -6,6 +6,7 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Models.Rdbms;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.task;
+using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Tests.BusinessLogic
 {
@@ -175,7 +176,12 @@ namespace Umbraco.Tests.BusinessLogic
                 // OK - database.Execute("insert into [cmsMacroPropertyType] (macroPropertyTypeAlias) VALUES (@0)", "TEST");
                 // run-time error - database.Execute("insert into [cmsTaskType] (alias) VALUES (@0)", "TEST");
 
-                MakeNew_PersistsNewUmbracoNodeRow();
+                _node1 = TestCMSNode.MakeNew(-1, 1, "TestContent 1", umbraco.cms.businesslogic.web.Document._objectType);
+                _node2 = TestCMSNode.MakeNew(-1, 1, "TestContent 2", Document._objectType);
+                _node3 = TestCMSNode.MakeNew(-1, 1, "TestContent 3", Document._objectType);
+                _node4 = TestCMSNode.MakeNew(-1, 1, "TestContent 4", Document._objectType);
+                _node5 = TestCMSNode.MakeNew(-1, 1, "TestContent 5", Document._objectType); 
+                
                 _user = getAdminUser(); 
 
                 _taskType1 = insertTestTaskType(newTaskTypeAlias);
