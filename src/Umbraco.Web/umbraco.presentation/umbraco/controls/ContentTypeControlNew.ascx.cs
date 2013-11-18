@@ -104,7 +104,7 @@ namespace umbraco.controls
             pp_description.Text = ui.Text("editcontenttype", "description", Security.CurrentUser);
             pp_icon.Text = ui.Text("icon", Security.CurrentUser);
 
-            pp_isContainer.Text = ui.Text("editcontenttype", "iscontainercontenttype", Security.CurrentUser);
+            pp_isContainer.Text = ui.Text("editcontenttype", "hasListView", Security.CurrentUser);
             
             // we'll disable this...
             if (!Page.IsPostBack && _contentType.MasterContentType != 0)
