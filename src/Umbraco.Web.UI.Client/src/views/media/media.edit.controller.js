@@ -6,7 +6,7 @@
  * @description
  * The controller for the media editor
  */
-function mediaEditController($scope, $routeParams, appState, mediaResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService, formHelper, umbModelMapper) {
+function mediaEditController($scope, $routeParams, appState, mediaResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService, formHelper, umbModelMapper, editorState) {
 
     //setup scope vars
     $scope.nav = navigationService;
@@ -19,8 +19,10 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
             .then(function (data) {
                 $scope.loaded = true;
                 $scope.content = data;
+
                 //put this into appState
                 appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                editorState.set($scope.content);
             });
     }
     else {
@@ -30,7 +32,8 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
                 $scope.content = data;
                 //put this into appState
                 appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
-                
+                editorState.set($scope.content);
+
                 //in one particular special case, after we've created a new item we redirect back to the edit
                 // route but there might be server validation errors in the collection which we need to display
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors

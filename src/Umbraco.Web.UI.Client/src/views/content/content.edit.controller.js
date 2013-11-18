@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, $q, $timeout, $window, appState, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper) {
+function ContentEditController($scope, $routeParams, $q, $timeout, $window, appState, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState) {
 
     //setup scope vars
     $scope.defaultButton = null;
@@ -164,6 +164,8 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
                 $scope.content = data;
                 //put this into appState
                 appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                editorState.set($scope.content);
+
                 configureButtons($scope.content);
             });
     }
@@ -173,8 +175,11 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
             .then(function(data) {
                 $scope.loaded = true;
                 $scope.content = data;
+
                 //put this into appState
                 appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                editorState.set($scope.content);
+                
                 configureButtons($scope.content);
                 
                 //in one particular special case, after we've created a new item we redirect back to the edit

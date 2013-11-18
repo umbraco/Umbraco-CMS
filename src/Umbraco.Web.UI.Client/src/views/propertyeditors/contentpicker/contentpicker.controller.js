@@ -9,11 +9,12 @@ angular.module('umbraco')
         
 		//configuration
 		$scope.cfg = {
-			multiPicker: false, 
+			multiPicker: "0", 
 			entityType: "Document", 
-			type: "content", 
-			treeAlias: "content",
-			section: "content"
+			startNode:{
+				type: "content",
+				id: -1
+			}
 		};
 
 		if($scope.model.config){
@@ -21,18 +22,18 @@ angular.module('umbraco')
 		}
 	    
 	    //Umbraco persists boolean for prevalues as "0" or "1" so we need to convert that!
-		$scope.cfg.multiPicker = ($scope.cfg.multiPicker.toString() == "1" ? true : ($scope.cfg.multiPicker === true));
+		$scope.cfg.multiPicker = ($scope.cfg.multiPicker === "0" ? false : true);
 
-		if($scope.cfg.type === "member"){
+		if($scope.cfg.startNode.type === "member"){
 		    $scope.cfg.entityType = "Member";		    
-		}
-		else if ($scope.cfg.type === "media") {
+		}else if ($scope.cfg.type === "media") {
 			$scope.cfg.entityType = "Media";
 		}
 
 		$scope.cfg.callback = populate;
-		$scope.cfg.treeAlias = $scope.cfg.type;
-		$scope.cfg.section = $scope.cfg.type;
+		$scope.cfg.treeAlias = $scope.cfg.startNode.type;
+		$scope.cfg.section = $scope.cfg.startNode.type;
+		$scope.cfg.rootNodeId = $scope.cfg.startNode.id;
 		$scope.cfg.filterCssClass = "not-allowed not-published";
 		
 		//load current data

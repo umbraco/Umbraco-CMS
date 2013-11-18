@@ -188,3 +188,26 @@ function appState($rootScope) {
     };
 }
 angular.module('umbraco.services').factory('appState', appState);
+
+/**
+ * @ngdoc service
+ * @name umbraco.services.editorState
+ * @function
+ *
+ * @description
+ * Tracks the parent object for complex editors by exposing it as 
+ * an object reference via editorState.current.entity
+ *
+ * it is possible to modify this object, so should be used with care
+ */
+angular.module('umbraco.services').factory("editorState", function(){
+  return {
+        //we need this structure to return as an object reference
+        current: {entity: null},
+
+        //shortcut to current.entity = whatever;
+        set: function(entity){
+            this.current.entity = entity;
+        }
+    };
+});

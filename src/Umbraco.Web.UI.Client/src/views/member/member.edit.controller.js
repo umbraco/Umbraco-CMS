@@ -6,7 +6,7 @@
  * @description
  * The controller for the member editor
  */
-function MemberEditController($scope, $routeParams, $location, $q, $window, appState, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, umbModelMapper) {
+function MemberEditController($scope, $routeParams, $location, $q, $window, appState, memberResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, formHelper, umbModelMapper, editorState) {
     
     //setup scope vars
     $scope.nav = navigationService;
@@ -30,8 +30,10 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                 .then(function(data) {
                     $scope.loaded = true;
                     $scope.content = data;
+
                     //put this into appState
                     appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                    editorState.set($scope.content);
                 });
         }
         else {
@@ -41,6 +43,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     $scope.content = data;
                     //put this into appState
                     appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                    editorState.set($scope.content);
                 });
         }
         

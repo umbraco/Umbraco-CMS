@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function DataTypeEditController($scope, $routeParams, $location, appState, navigationService, treeService, dataTypeResource, notificationsService,  angularHelper, serverValidationManager, contentEditingHelper, formHelper) {
+function DataTypeEditController($scope, $routeParams, $location, appState, navigationService, treeService, dataTypeResource, notificationsService,  angularHelper, serverValidationManager, contentEditingHelper, formHelper, editorState) {
 
     //setup scope vars
     $scope.nav = navigationService;
@@ -51,6 +51,9 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                 $scope.loaded = true;
                 $scope.preValuesLoaded = true;
                 $scope.content = data;
+
+                //set a shared state
+                editorState.set($scope.content);
             });
     }
     else {
@@ -61,6 +64,9 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                 $scope.preValuesLoaded = true;
                 $scope.content = data;
 
+                //share state
+                editorState.set($scope.content);
+                
                 createPreValueProps($scope.content.preValues);
                 
                 //in one particular special case, after we've created a new item we redirect back to the edit
