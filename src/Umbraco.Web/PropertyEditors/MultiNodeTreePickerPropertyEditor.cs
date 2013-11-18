@@ -11,10 +11,24 @@ namespace Umbraco.Web.PropertyEditors
     [PropertyEditor(Constants.PropertyEditors.MultiNodeTreePickerAlias, "Multinode Treepicker", "contentpicker")]
     public class MultiNodeTreePickerPropertyEditor : PropertyEditor
     {
-       
+        public MultiNodeTreePickerPropertyEditor()
+        {
+            InternalPreValues = new Dictionary<string, object>
+                {
+                    {"multiPicker", true}
+                };
+        }
+  
         protected override PreValueEditor CreatePreValueEditor()
         {
             return new MultiNodePickerPreValueEditor();
+        }
+
+        protected IDictionary<string, object> InternalPreValues;
+        public override IDictionary<string, object> DefaultPreValues
+        {
+            get { return InternalPreValues; }
+            set { InternalPreValues = value; }
         }
 
         internal class MultiNodePickerPreValueEditor : PreValueEditor

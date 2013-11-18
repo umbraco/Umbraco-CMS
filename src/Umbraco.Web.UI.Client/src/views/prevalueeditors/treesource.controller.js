@@ -5,10 +5,7 @@ angular.module('umbraco')
 	
 	function($scope, dialogService, entityResource, $log, iconHelper){
 
-		
 		if(angular.isObject($scope.model.value)){
-			$log.log($scope.model.value);
-
 			$scope.model.type = $scope.model.value.type;
 			$scope.model.id = $scope.model.value.id;
 		}else{
@@ -52,7 +49,6 @@ angular.module('umbraco')
 
 		function populate(item){
 				$scope.clear();
-				
 				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
 				$scope.node = item;
 				$scope.model.id = item.id;
