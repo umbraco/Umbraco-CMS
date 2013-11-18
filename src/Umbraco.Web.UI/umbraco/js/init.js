@@ -15,6 +15,13 @@ app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 
                 firstRun = false;
                 userService.getCurrentUser({ broadcastEvent: true });
             }
+
+            if(current.params.section){
+                $rootScope.locationTitle = current.params.section + " - " + $location.$$host;
+            }else{
+                $rootScope.locationTitle = "Umbraco - " + $location.$$host;
+            }
+            
         });
 
         /** When the route change is rejected - based on checkAuth - we'll prevent the rejected route from executing including
