@@ -6,15 +6,13 @@
     <umb-panel>  
         <umb-header tabs="content.tabs">
             
-            <div class="span4">
-                <input type="text" 
-                                    class="umb-headline" 
-                                    localize="placeholder" 
-                                    placeholder="@placeholders_entername" 
-                                    ng-model="content.name" />
-            </div>
+            <div class="span5">
+                <umb-content-name
+                    placeholder="@placeholders_entername"
+                    ng-model="content.name"/>
+           </div>
 
-            <div class="span8">
+            <div class="span5">
                 <div class="btn-toolbar pull-right umb-btn-toolbar">
                     <div class="btn-group" ng-animate="'fade'" ng-show="formStatus">
                         <p class="btn btn-link umb-status-label">{{formStatus}}</p>
@@ -24,7 +22,6 @@
                         current-node="currentNode" 
                         current-section="{{currentSection}}">                        
                     </umb-options-menu>
-
                 </div>
             </div>
         </umb-header>

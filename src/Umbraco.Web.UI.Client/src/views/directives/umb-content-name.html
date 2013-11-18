@@ -1,18 +1,16 @@
 <ng-form name="contentNameForm">        
     <div class="umb-headline-editor-wrapper" ng-class="{'ng-invalid': contentNameForm.name.$invalid}">
         
-        <h1 ng-click="goEdit()" ng-hide="editMode">{{model}}</h1>
-        
-        <input
-            class="input-xlarge"
-        	on-blur="exitEdit()" 
-        	ng-show="editMode" 
-        	name="name" 
-        	type="text" 
-        	placeholder="{{placeholder}}" 
-        	ng-model="model" 
+        <input type="text"
+            name="name"
+            localize="placeholder" 
+            class="umb-headline" 
+            localize="placeholder"
+            select-on-focus 
+            placeholder="{{placeholder}}" 
+            ng-model="model" 
             required   
-            val-server-field="Name" />
+            val-server-field="Name"/>
 
         <span class="help-inline" val-msg-for="name" val-toggle-msg="required">Required</span>
         <span class="help-inline" val-msg-for="name" val-toggle-msg="valServerField">{{contentNameForm.name.errorMsg}}</span>

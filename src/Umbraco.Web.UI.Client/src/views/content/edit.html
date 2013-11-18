@@ -8,12 +8,9 @@
         <umb-header tabs="content.tabs">
 
             <div class="span7">
-                <input type="text"
-                    class="umb-headline" 
-                    localize="placeholder"
-					select-on-focus 
-                    placeholder="@placeholders_entername" 
-                    ng-model="content.name" />
+                <umb-content-name
+                    placeholder="@placeholders_entername"
+                    ng-model="content.name"/>
             </div>
 
             <div class="span5">     
