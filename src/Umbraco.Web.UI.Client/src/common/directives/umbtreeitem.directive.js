@@ -32,7 +32,7 @@ angular.module("umbraco.directives")
       tree:'='
     },
 
-    template: '<li ng-class="{\'current\': (node == currentNode)}"><div ng-style="setTreePadding(node)" class="{{node.stateCssClass}}" ng-class="{\'loading\': node.loading}" ng-swipe-right="options(this, node, $event)" >' +
+    template: '<li ng-class="{\'current\': (node == currentNode)}" on-right-click="altSelect(this, node, $event)"><div ng-style="setTreePadding(node)" class="{{node.stateCssClass}}" ng-class="{\'loading\': node.loading}" ng-swipe-right="options(this, node, $event)" >' +
         '<ins ng-hide="node.hasChildren" style="width:18px;"></ins>' +        
         '<ins ng-show="node.hasChildren" ng-class="{\'icon-navigation-right\': !node.expanded, \'icon-navigation-down\': node.expanded}" ng-click="load(node)"></ins>' +
         '<i title="#{{node.routePath}}" class="{{node.cssClass}}"></i>' +
