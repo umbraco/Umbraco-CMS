@@ -21,13 +21,7 @@ if ($project) {
 	$projectDestinationPath = Split-Path $project.FullName -Parent
 	$umbracoFilesPath = Join-Path $rootPath "UmbracoFiles\*"
 	Copy-Item $umbracoFilesPath $projectDestinationPath -recurse -force
-	
-	# Remove Newtonsoft.Json if present in the bin folder
-	# If we don't do this, the correct version never gets copied in
-	$projectDestinationPath = Split-Path $project.FullName -Parent
-	$jsonDllFile = Join-Path $projectDestinationPath "bin\Newtonsoft.Json.dll"
-	Remove-Item $jsonDllFile -Confirm:$false
-	
+		
 	# Open readme.txt file
 	$DTE.ItemOperations.OpenFile($toolsPath + '\Readme.txt')
 }
