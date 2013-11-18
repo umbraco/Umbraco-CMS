@@ -48,59 +48,58 @@ namespace Umbraco.Tests.BusinessLogic
         }
 
         [Test]
-        public void Ctor_Int_PopulatesNode()
+        public void Ctor_Int_PopulatesNode_CallsSetupNode()
         {
-            var node = new CMSNode(TextStringDataTypeId);
+            var node = new TestCMSNode(TextStringDataTypeId);
             AssertTextStringDataTypeNode(node);
+            Assert.IsTrue(node.SetupNodeCalled);
         }
 
         [Test]
         public void Ctor_Int_NoSetup_AssignsIdOnly()
         {
-            var node = new CMSNode(TextStringDataTypeId, true);
+            var node = new TestCMSNode(TextStringDataTypeId, true);
             AssertTextStringDataTypeIdOnly(node);
+            Assert.IsFalse(node.SetupNodeCalled);
         }
 
         [Test]
-        public void Ctor_Int_NoSetup_False_PopulatesNode()
+        public void Ctor_Int_NoSetup_False_PopulatesNode_CallsSetupNode()
         {
-            var node = new CMSNode(TextStringDataTypeId, false);
+            var node = new TestCMSNode(TextStringDataTypeId, false);
             AssertTextStringDataTypeNode(node);
+            Assert.IsTrue(node.SetupNodeCalled);
         }
 
         [Test]
-        public void Ctor_Guid_PopulatesNode()
+        public void Ctor_Guid_PopulatesNode_CallsSetupNode()
         {
-            var node = new CMSNode(textStringDataTypeUniqueId);
+            var node = new TestCMSNode(textStringDataTypeUniqueId);
             AssertTextStringDataTypeNode(node);
+            Assert.IsTrue(node.SetupNodeCalled);
         }
 
         [Test]
         public void Ctor_Guid_NoSetup_AssignsIdOnly()
         {
-            var node = new CMSNode(textStringDataTypeUniqueId, true);
+            var node = new TestCMSNode(textStringDataTypeUniqueId, true);
             AssertTextStringDataTypeIdOnly(node);
+            Assert.IsFalse(node.SetupNodeCalled);
         }
 
         [Test]
-        public void Ctor_Guid_NoSetup_False_PopulatesNode()
+        public void Ctor_Guid_NoSetup_False_PopulatesNode_CallsSetupNode()
         {
-            var node = new CMSNode(textStringDataTypeUniqueId, false);
+            var node = new TestCMSNode(textStringDataTypeUniqueId, false);
             AssertTextStringDataTypeNode(node);
-        }
-
-        [Test]
-        public void SetUpNode_PopulatesNode()
-        {
-            var node = TestCMSNode.CreateUsingSetupNode(TextStringDataTypeId);
-            AssertTextStringDataTypeNode(node);
+            Assert.IsTrue(node.SetupNodeCalled);
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentException), ExpectedMessage = "No node exists with id '999'")]
-        public void SetUpNode_InvalidNode_Throws()
+        public void Ctor_InvalidId_ThrowsArgumentException()
         {
-            TestCMSNode.CreateUsingSetupNode(999);
+            new CMSNode(999);
         }
 
         [Test]
@@ -214,8 +213,8 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.AreEqual(33, actual.Count());
             Assert.AreEqual(-1, actual[0].Id);
             for (var i = 0; i < actual.Count() - 1; i++)
-                Assert.LessOrEqual(((CMSNode)actual[i]).sortOrder, ((CMSNode)actual[i+1]).sortOrder);
-            foreach(var node in actual)
+                Assert.LessOrEqual(((CMSNode)actual[i]).sortOrder, ((CMSNode)actual[i + 1]).sortOrder);
+            foreach (var node in actual)
                 AssertNonEmptyNode((CMSNode)node);
         }
 
@@ -260,7 +259,7 @@ namespace Umbraco.Tests.BusinessLogic
             node.IsTrashed = true;
             var actual = database.ExecuteScalar<bool>(
                 "SELECT trashed FROM umbracoNode WHERE id = @id",
-                new {id = testContentType3.Id});
+                new { id = testContentType3.Id });
             Assert.IsTrue(actual);
         }
 
@@ -292,7 +291,7 @@ namespace Umbraco.Tests.BusinessLogic
             var guids = CMSNode.getAllUniquesFromObjectType(new Guid(DocumentTypeObjectTypeId));
             var expectedIds = database.Fetch<Guid>(
                 "SELECT uniqueId FROM umbracoNode WHERE nodeObjectType = @ObjectTypeId",
-                new {ObjectTypeId = DocumentTypeObjectTypeId})
+                new { ObjectTypeId = DocumentTypeObjectTypeId })
                 .OrderBy(id => id);
             var actualIds = guids.OrderBy(id => id);
             Assert.IsTrue(expectedIds.SequenceEqual(actualIds));
@@ -331,7 +330,7 @@ namespace Umbraco.Tests.BusinessLogic
                 var node3 = TestCMSNode.MakeNew(-1, 1, "TestContent 3", Document._objectType);
                 var totalDocuments = database.ExecuteScalar<int>(
                     "SELECT COUNT(*) FROM umbracoNode WHERE nodeObjectType = @ObjectTypeId",
-                    new {ObjectTypeId = Document._objectType});
+                    new { ObjectTypeId = Document._objectType });
                 Assert.AreEqual(3, totalDocuments);
                 id = node3.Id;
                 var loadedNode = new CMSNode(id);
@@ -355,10 +354,10 @@ namespace Umbraco.Tests.BusinessLogic
                 //var xmlNode = node.ToPreviewXml(new XmlDocument());
                 asTestNode.ExecuteSavePreviewXml(new XmlDocument(), node.Version);
                 var persistedXml = database.ExecuteScalar<string>("SELECT xml FROM cmsPreviewXml WHERE nodeId = @id",
-                    new {id = node.Id});
+                    new { id = node.Id });
 
                 Console.WriteLine(persistedXml);
-                
+
                 Assert.IsNotNullOrEmpty(persistedXml);
             }
             finally
@@ -424,15 +423,15 @@ namespace Umbraco.Tests.BusinessLogic
             try
             {
                 // oh yes, GetNodesForPreview in base returns both draft and not draft as draft
-                var expectedNodes = new[] { nodes[0], nodes[0] }; 
+                var expectedNodes = new[] { nodes[0], nodes[0] };
                 var result = new CMSNode(nodes[0].Id).GetNodesForPreview(false);
                 Assert.AreEqual(expectedNodes.Length, result.Count);
-                for(var i = 0; i<expectedNodes.Length; i++)
+                for (var i = 0; i < expectedNodes.Length; i++)
                     AssertXmlPreviewNode(expectedNodes, result, i);
             }
             finally
             {
-                for(var i = nodes.Count - 1; i>=0; i--)
+                for (var i = nodes.Count - 1; i >= 0; i--)
                     nodes[i].delete();
                 DeleteContent();
             }
@@ -445,10 +444,10 @@ namespace Umbraco.Tests.BusinessLogic
             var nodes = CreateContent();
             try
             {
-                var expectedNodes = new[] { nodes[2], nodes[2], nodes[1], nodes[1], nodes[3], nodes[3] }; 
+                var expectedNodes = new[] { nodes[2], nodes[2], nodes[1], nodes[1], nodes[3], nodes[3] };
                 var result = new CMSNode(nodes[0].Id).GetNodesForPreview(true);
                 Assert.AreEqual(expectedNodes.Length, result.Count);
-                for(var i = 0; i<expectedNodes.Length; i++)
+                for (var i = 0; i < expectedNodes.Length; i++)
                     AssertXmlPreviewNode(expectedNodes, result, i);
             }
             finally
@@ -466,7 +465,7 @@ namespace Umbraco.Tests.BusinessLogic
             var nodes = CreateContent();
             try
             {
-                var expected = new[] {nodes[1].Id, nodes[2].Id};
+                var expected = new[] { nodes[1].Id, nodes[2].Id };
                 var result = TestCMSNode.ExecuteGetUniquesFromObjectTypeAndFirstLetter(Document._objectType, 'B');
                 Assert.IsTrue(expected.SequenceEqual(result));
             }
@@ -508,10 +507,10 @@ namespace Umbraco.Tests.BusinessLogic
             var newDate = new DateTime(2013, 1, 1);
             EnsureTestDocumentTypes();
             Setter_Persists(
-                testContentType1.Id, 
-                n => n.CreateDateTime = newDate, 
-                n => n.CreateDateTime, 
-                newDate, 
+                testContentType1.Id,
+                n => n.CreateDateTime = newDate,
+                n => n.CreateDateTime,
+                newDate,
                 "createDate"
             );
         }
@@ -592,7 +591,7 @@ namespace Umbraco.Tests.BusinessLogic
             setter(node);
             var persisted = database.ExecuteScalar<T>(
                 String.Format("SELECT {0} FROM umbracoNode WHERE id = @id", field)
-                , new{id=nodeId});
+                , new { id = nodeId });
             Assert.AreEqual(expected, persisted);
             Assert.AreEqual(expected, getter(node));
             ResetTestDocumentTypes();
@@ -688,8 +687,8 @@ namespace Umbraco.Tests.BusinessLogic
             var contentTypeService = context.Application.Services.ContentTypeService;
             contentTypeService.Save(testContentType1);
             contentTypeService.Save(testContentType2);
-            testContentType3 = new ContentType(testContentType1.Id) { Alias = "Test1.1", Name = "Test 1.1", SortOrder = 1};
-            testContentType4 = new ContentType(testContentType1.Id) { Alias = "Test1.2", Name = "Test 1.2", SortOrder = 2};
+            testContentType3 = new ContentType(testContentType1.Id) { Alias = "Test1.1", Name = "Test 1.1", SortOrder = 1 };
+            testContentType4 = new ContentType(testContentType1.Id) { Alias = "Test1.2", Name = "Test 1.2", SortOrder = 2 };
             contentTypeService.Save(testContentType3);
             contentTypeService.Save(testContentType4);
             testContentType5 = new ContentType(testContentType4.Id) { Alias = "Test1.2.1", Name = "Test 1.2.1" };
@@ -711,13 +710,13 @@ namespace Umbraco.Tests.BusinessLogic
             database.Execute("DELETE cmsContentVersion");
             database.Execute("DELETE cmsDocument");
             database.Execute("DELETE cmsContent");
-            database.Delete<NodeDto>("WHERE nodeObjectType = @ObjectTypeId", new {ObjectTypeId = Document._objectType});
+            database.Delete<NodeDto>("WHERE nodeObjectType = @ObjectTypeId", new { ObjectTypeId = Document._objectType });
         }
 
         private void DeleteContentType(int id)
         {
-            database.Execute("DELETE cmsContentType WHERE nodeId = @NodeId", new {NodeId = id});
-            database.Execute("DELETE umbracoNode WHERE id = @Id", new {Id = id});
+            database.Execute("DELETE cmsContentType WHERE nodeId = @NodeId", new { NodeId = id });
+            database.Execute("DELETE umbracoNode WHERE id = @Id", new { Id = id });
         }
 
         private void CreateContext()
@@ -771,20 +770,39 @@ namespace Umbraco.Tests.BusinessLogic
 
         private class TestCMSNode : CMSNode
         {
+            public bool SetupNodeCalled;
+
             public TestCMSNode(int id)
                 : base(id)
             {
             }
 
-            private TestCMSNode(int id, bool nosetup)
+            public TestCMSNode(int id, bool nosetup)
                 : base(id, nosetup)
             {
             }
 
+            public TestCMSNode(Guid id)
+                : base(id)
+            {
+            }
+
+            public TestCMSNode(Guid id, bool nosetup)
+                : base(id, nosetup)
+            {
+            }
+
+            protected override void setupNode()
+            {
+                base.setupNode();
+
+                SetupNodeCalled = true;
+            }
+
             public static CMSNode MakeNew(
-                int parentId, 
+                int parentId,
                 int level,
-                string text, 
+                string text,
                 Guid objectType)
             {
                 return CMSNode.MakeNew(parentId, objectType, 0, level, text, Guid.NewGuid());

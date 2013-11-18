@@ -223,7 +223,7 @@ namespace umbraco.cms.businesslogic
         {
             return Database.Fetch<Guid>(
                 "Select uniqueID from umbracoNode where nodeObjectType = @type And parentId = -1 order by sortOrder",
-                new {type = ObjectType}
+                new { type = ObjectType }
                 )
                 .ToArray();
         }
@@ -370,7 +370,9 @@ namespace umbraco.cms.businesslogic
             _id = id;
 
             if (!noSetup)
+            {
                 SetupNodeFromDto("WHERE id = @id", new { id });
+            }
         }
 
         /// <summary>
@@ -385,7 +387,9 @@ namespace umbraco.cms.businesslogic
         public CMSNode(Guid uniqueID, bool noSetup)
         {
             if (!noSetup)
+            {
                 SetupNodeFromDto("WHERE uniqueID = @uniqueID", new { uniqueID });
+            }
             else
                 _id = Database.ExecuteScalar<int>("SELECT id FROM umbracoNode WHERE uniqueId = @uniqueID", new { uniqueID });
         }
@@ -522,7 +526,7 @@ order by level,sortOrder";
                 {
                     int maxSortOrder = Database.ExecuteScalar<int>(
                         "select coalesce(max(sortOrder),0) from umbracoNode where parentid = @parentId",
-                        new { parentId = newParent.Id } 
+                        new { parentId = newParent.Id }
                     );
 
                     this.Parent = newParent;
@@ -999,22 +1003,23 @@ order by level,sortOrder";
         /// <summary>
         /// Sets up the internal data of the CMSNode, used by the various constructors
         /// </summary>
+        [Obsolete("Popuplate from ctor instead of overriding base setupNode")]
         protected virtual void setupNode()
+        {
+        }
+
+        protected void SetupNodeFromDto(string whereStatement, params object[] args)
         {
             try
             {
-                SetupNodeFromDto("WHERE id = @id", new { id=_id });
+                var node = Database.Single<NodeDto>(whereStatement, args);
+                PopulateCMSNodeFromDto(node);
+                setupNode();
             }
             catch (InvalidOperationException)
             {
                 throw new ArgumentException(string.Format("No node exists with id '{0}'", Id));
             }
-        }
-
-        protected void SetupNodeFromDto(string whereStatement, params object[] args)
-        {
-            var node = Database.Single<NodeDto>(whereStatement, args);
-            PopulateCMSNodeFromDto(node);
         }
 
         /// <summary>
