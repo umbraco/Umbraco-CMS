@@ -1,6 +1,6 @@
 /** Executed when the application starts */
-app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 'appState',
-    function(userService, $log, $rootScope, $location, navigationService, appState) {
+app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 'appState', 'editorState',
+    function(userService, $log, $rootScope, $location, navigationService, appState, editorState) {
 
         var firstRun = true;
 
@@ -18,10 +18,14 @@ app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 
 
             if(current.params.section){
                 $rootScope.locationTitle = current.params.section + " - " + $location.$$host;
-            }else{
+            }
+            else {
                 $rootScope.locationTitle = "Umbraco - " + $location.$$host;
             }
             
+            //reset the editorState on each successful route chage
+            editorState.reset();
+
         });
 
         /** When the route change is rejected - based on checkAuth - we'll prevent the rejected route from executing including

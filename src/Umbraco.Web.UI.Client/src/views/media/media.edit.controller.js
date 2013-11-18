@@ -20,8 +20,6 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
                 $scope.loaded = true;
                 $scope.content = data;
 
-                //put this into appState
-                appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
                 editorState.set($scope.content);
             });
     }
@@ -30,8 +28,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
             .then(function (data) {
                 $scope.loaded = true;
                 $scope.content = data;
-                //put this into appState
-                appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                
                 editorState.set($scope.content);
 
                 //in one particular special case, after we've created a new item we redirect back to the edit
@@ -62,8 +59,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                     });
 
-                    //update appState
-                    appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                    editorState.set($scope.content);
 
                     navigationService.syncTree({ tree: "media", path: data.path, forceReload: true }).then(function (syncArgs) {
                         $scope.currentNode = syncArgs.node;
@@ -77,8 +73,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
                     });
                     
-                    //update appState
-                    appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                    editorState.set($scope.content);
                 });
         }
         

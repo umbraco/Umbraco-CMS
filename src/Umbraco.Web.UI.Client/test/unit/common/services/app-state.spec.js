@@ -1,12 +1,31 @@
 describe('appState tests', function () {
-    var appState, $rootScope;
+    var appState, $rootScope, editorState;
     
     beforeEach(module('umbraco.services'));
 
     beforeEach(inject(function ($injector) {
         appState = $injector.get('appState');
         $rootScope = $injector.get('$rootScope');
+        editorState = $injector.get('editorState');
     }));
+
+    describe('Editor state', function () {
+        it('Can set', function () {
+            editorState.set({ some: "object" });
+            expect(editorState.current).not.toBeNull();
+            expect(editorState.current.some).toBe("object");
+        });
+        it('Can reset', function () {
+            editorState.reset();
+            expect(editorState.current).toBeNull();
+        });
+        it('Throws when setting current', function () {
+            function setCurrent() {
+                editorState.current = { some: "object" };
+            }            
+            expect(setCurrent).toThrow();
+        });
+    });
 
     describe('Global state', function () {
         it('Can get/set state', function () {

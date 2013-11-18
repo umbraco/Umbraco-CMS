@@ -31,8 +31,6 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     $scope.loaded = true;
                     $scope.content = data;
 
-                    //put this into appState
-                    appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
                     editorState.set($scope.content);
                 });
         }
@@ -41,8 +39,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                 .then(function (data) {
                     $scope.loaded = true;
                     $scope.content = data;
-                    //put this into appState
-                    appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+
                     editorState.set($scope.content);
                 });
         }
@@ -67,8 +64,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     $scope.loaded = true;
                     $scope.content = data;
 
-                    //put this into appState
-                    appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                    editorState.set($scope.content);
                     
                     var path = buildTreePath(data);
 
@@ -103,8 +99,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                     });
                     
-                    //update appState
-                    appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                    editorState.set($scope.content);
 
                     var path = buildTreePath(data);
 
@@ -120,8 +115,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
                     });
                     
-                    //update appState
-                    appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                    editorState.set($scope.content);
 
                 });
         }

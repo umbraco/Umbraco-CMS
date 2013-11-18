@@ -124,8 +124,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                     });
 
-                    //update appState
-                    appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                    editorState.set($scope.content);
 
                     configureButtons(data);
 
@@ -143,8 +142,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, err.data)
                     });
 
-                    //update appState
-                    appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                    editorState.set($scope.content);
 
                     deferred.reject(err);
                 });
@@ -162,8 +160,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
             .then(function(data) {
                 $scope.loaded = true;
                 $scope.content = data;
-                //put this into appState
-                appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                
                 editorState.set($scope.content);
 
                 configureButtons($scope.content);
@@ -175,9 +172,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
             .then(function(data) {
                 $scope.loaded = true;
                 $scope.content = data;
-
-                //put this into appState
-                appState.setGlobalState("editingEntity", umbModelMapper.convertToEntityBasic($scope.content));
+                
                 editorState.set($scope.content);
                 
                 configureButtons($scope.content);
@@ -209,6 +204,8 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
                         savedContent: data,
                         rebindCallback: contentEditingHelper.reBindChangedProperties($scope.content, data)
                     });
+
+                    editorState.set($scope.content);
 
                     configureButtons(data);
 

@@ -64,11 +64,11 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                 $scope.preValuesLoaded = true;
                 $scope.content = data;
 
-                //share state
-                editorState.set($scope.content);
-                
                 createPreValueProps($scope.content.preValues);
                 
+                //share state
+                editorState.set($scope.content);
+
                 //in one particular special case, after we've created a new item we redirect back to the edit
                 // route but there might be server validation errors in the collection which we need to display
                 // after the redirect, so we will bind all subscriptions which will show the server validation errors
@@ -92,6 +92,9 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                     $scope.preValuesLoaded = true;
                     $scope.content.preValues = data;
                     createPreValueProps($scope.content.preValues);
+                    
+                    //share state
+                    editorState.set($scope.content);
                 });
         }
     });
@@ -113,6 +116,9 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                         }
                     });
 
+                    //share state
+                    editorState.set($scope.content);
+
                     navigationService.syncTree({ tree: "datatype", path: [String(data.id)], forceReload: true }).then(function (syncArgs) {
                         $scope.currentNode = syncArgs.node;
                     });
@@ -125,6 +131,9 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
                         redirectOnFailure: false,
                         err: err
                     });
+                    
+                    //share state
+                    editorState.set($scope.content);
                 });
         }
 

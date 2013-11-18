@@ -16,8 +16,7 @@ function appState($rootScope) {
         touchDevice: null,
         showTray: null,
         stickyNavigation: null,
-        navMode: null,
-        editingEntity: null
+        navMode: null
     };
     
     var sectionState = {
@@ -200,14 +199,28 @@ angular.module('umbraco.services').factory('appState', appState);
  *
  * it is possible to modify this object, so should be used with care
  */
-angular.module('umbraco.services').factory("editorState", function(){
-  return {
-        //we need this structure to return as an object reference
-        current: {entity: null},
+angular.module('umbraco.services').factory("editorState", function() {
 
-        //shortcut to current.entity = whatever;
-        set: function(entity){
-            this.current.entity = entity;
+    var current = null;
+    var state = {
+        set: function (entity) {
+            current = entity;
+        },
+        reset: function() {
+            current = null;
         }
+        
     };
+
+    //create a get/set property but don't allow setting
+    Object.defineProperty(state, "current", {
+        get: function () {
+            return current;
+        },
+        set: function (value) {
+            throw "Use editorState.set to set the value of the current entity";
+        },
+    });
+
+    return state;
 });
