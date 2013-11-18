@@ -46,15 +46,15 @@ namespace Umbraco.Tests.BusinessLogic
 
             EnsureAll_TaskType_TestRecordsAreDeleted();
 
-            Assert.That(getDto<TaskTypeDto>(_taskType1.Id), Is.Null);
-            Assert.That(getDto<TaskTypeDto>(_taskType2.Id), Is.Null);
-            Assert.That(getDto<TaskTypeDto>(_taskType3.Id), Is.Null);
+            Assert.That(TRAL.GetDto<TaskTypeDto>(_taskType1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<TaskTypeDto>(_taskType2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<TaskTypeDto>(_taskType3.Id), Is.Null);
 
-            Assert.That(getDto<TaskDto>(_task1.Id), Is.Null);
-            Assert.That(getDto<TaskDto>(_task2.Id), Is.Null);
-            Assert.That(getDto<TaskDto>(_task3.Id), Is.Null);
-            Assert.That(getDto<TaskDto>(_task4.Id), Is.Null);
-            Assert.That(getDto<TaskDto>(_task5.Id), Is.Null);
+            Assert.That(TRAL.GetDto<TaskDto>(_task1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<TaskDto>(_task2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<TaskDto>(_task3.Id), Is.Null);
+            Assert.That(TRAL.GetDto<TaskDto>(_task4.Id), Is.Null);
+            Assert.That(TRAL.GetDto<TaskDto>(_task5.Id), Is.Null);
         
         }
 
@@ -112,7 +112,7 @@ namespace Umbraco.Tests.BusinessLogic
 
             Assert.That(taskType1.Id, !Is.EqualTo(0), "ID is equal to Zero");
 
-            var taskType2 = getDto<TaskTypeDto>(taskType1.Id);
+            var taskType2 = TRAL.GetDto<TaskTypeDto>(taskType1.Id);
 
             Assert.That(taskType2.Id, Is.EqualTo(taskType1.Id), "IDs differ");
         }
@@ -126,7 +126,7 @@ namespace Umbraco.Tests.BusinessLogic
                 var taskType1 = new TaskType(id);
                 taskType1.Delete();
   
-                var taskType2 = getDto<TaskTypeDto>(id);
+                var taskType2 = TRAL.GetDto<TaskTypeDto>(id);
                 Assert.That(taskType2, Is.Null);   
             }
             finally

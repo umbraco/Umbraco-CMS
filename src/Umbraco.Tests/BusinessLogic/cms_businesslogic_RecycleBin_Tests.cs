@@ -36,11 +36,11 @@ namespace Umbraco.Tests.BusinessLogic
 
             EnsureAll_RecycleBin_TestRecordsAreDeleted();
 
-            Assert.That(getDto<NodeDto>(_recycleBinNode1.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_recycleBinNode2.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_recycleBinNode3.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_recycleBinNode4.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_recycleBinNode5.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_recycleBinNode1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_recycleBinNode2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_recycleBinNode3.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_recycleBinNode4.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_recycleBinNode5.Id), Is.Null);
 
         }
 
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.BusinessLogic
         public void Test_RecycleBin_Count_Media()
         {
             int testCount = RecycleBin.Count(umbraco.cms.businesslogic.RecycleBin.RecycleBinType.Media);
-            int savedCount = independentDatabase.ExecuteScalar<int>(string.Format(countSQL, Constants.System.RecycleBinMedia), new { nodeObjectType = Media._objectType });
+            int savedCount = TRAL.RecycleBin.MediaItemsCount;
 
             Assert.That(testCount, Is.EqualTo(savedCount));
         }
@@ -59,19 +59,17 @@ namespace Umbraco.Tests.BusinessLogic
         public void Test_RecycleBin_Count_Content()
         {
             int testCount = RecycleBin.Count(umbraco.cms.businesslogic.RecycleBin.RecycleBinType.Content);
-            int savedCount = independentDatabase.ExecuteScalar<int>(string.Format(countSQL, Constants.System.RecycleBinContent), new { nodeObjectType = Document._objectType });
+            int savedCount = TRAL.RecycleBin.ContentItemsCount;
 
             Assert.That(testCount, Is.EqualTo(savedCount));
         }
 
-        const string childSQL = @"SELECT count(id) FROM umbracoNode where parentId = @parentId And nodeObjectType = @nodeObjectType";
 
         [Test(Description = "Test 'umbraco.BusinessLogic.console.IconI[] Children' property for Constants.System.RecycleBinMedia")]
         public void Test_RecycleBin_Media_Children()
         {
             var recycleBin = new RecycleBin(RecycleBin.RecycleBinType.Media);
-            int savedCount = independentDatabase.ExecuteScalar<int>(
-                        childSQL, new { parentId = RecycleBin.RecycleBinType.Media, nodeObjectType = Media._objectType });
+            int savedCount = TRAL.RecycleBin.ChildrenMediaItemsCount;
 
             Assert.That(recycleBin.Children.Length, Is.EqualTo(savedCount));
         }
@@ -80,8 +78,7 @@ namespace Umbraco.Tests.BusinessLogic
         public void Test_RecycleBin_Content_Children()
         {
             var recycleBin = new RecycleBin(RecycleBin.RecycleBinType.Content);
-            int savedCount = independentDatabase.ExecuteScalar<int>(
-                        childSQL, new { parentId = RecycleBin.RecycleBinType.Content, nodeObjectType = Document._objectType });
+            int savedCount = TRAL.RecycleBin.ChildrenContentItemsCount;
 
             Assert.That(recycleBin.Children.Length, Is.EqualTo(savedCount));
         }

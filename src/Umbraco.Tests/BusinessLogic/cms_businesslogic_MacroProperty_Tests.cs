@@ -26,11 +26,11 @@ namespace Umbraco.Tests.BusinessLogic
 
             EnsureAll_MacroProperty_TestRecordsAreDeleted();
 
-            Assert.That(getPersistedTestDto <MacroPropertyDto>(_macroProperty1.Id), Is.Null);
-            Assert.That(getPersistedTestDto <MacroDto>(_macro1.Id), Is.Null);
-            Assert.That(getPersistedTestDto <MacroDto>(_macro2.Id), Is.Null);
-            Assert.That(getPersistedTestDto <MacroPropertyTypeDto>(_macroPropertyType1.Id), Is.Null);
-            Assert.That(getPersistedTestDto <MacroPropertyTypeDto>(_macroPropertyType2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<MacroPropertyDto>(_macroProperty1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<MacroDto>(_macro1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<MacroDto>(_macro2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<MacroPropertyTypeDto>(_macroPropertyType1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<MacroPropertyTypeDto>(_macroPropertyType2.Id), Is.Null);
         }
 
         [Test(Description = "Test 'public MacroProperty(int Id)' and indirectly private setup() method")]
@@ -67,7 +67,7 @@ namespace Umbraco.Tests.BusinessLogic
             // body
             var testMacroProperty = MacroProperty.MakeNew(macro, true, "testAlias" + uniqueAliasSuffix, "Test Name" + uniqueNameSuffix, macroPropertyType);
             Assert.That(testMacroProperty, !Is.Null);
-            assertMacroPropertySetup(testMacroProperty, getDto<MacroPropertyDto>(testMacroProperty.Id));    
+            assertMacroPropertySetup(testMacroProperty, TRAL.GetDto<MacroPropertyDto>(testMacroProperty.Id));    
         }
 
         [Test(Description = "Test 'public void Save()' method - create new MacroProperty")]
@@ -89,7 +89,7 @@ namespace Umbraco.Tests.BusinessLogic
             testMacroProperty.Type = macroPropertyType;
             testMacroProperty.Save();
 
-            assertMacroPropertySetup(testMacroProperty, getPersistedTestDto<MacroPropertyDto>(testMacroProperty.Id));    
+            assertMacroPropertySetup(testMacroProperty, TRAL.GetDto<MacroPropertyDto>(testMacroProperty.Id));    
         }
 
         [Test(Description = "Test 'public void Save()' method - update existing MacroProperty")]
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.BusinessLogic
             testMacroProperty.Type = macroPropertyType;
             testMacroProperty.Save();
 
-            assertMacroPropertySetup(testMacroProperty, getPersistedTestDto<MacroPropertyDto>(testMacroProperty.Id));    
+            assertMacroPropertySetup(testMacroProperty, TRAL.GetDto<MacroPropertyDto>(testMacroProperty.Id));    
 
             initialized = true; // next test will get new test data generated
         }
@@ -121,11 +121,11 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var all = MacroProperty.GetProperties(_macro1.Id);
 
-            int count = independentDatabase.ExecuteScalar<int>("select count(id) from cmsMacroProperty where macro = @0", _macro1.Id);
+            int count = TRAL.Macro.CountAllProperties(_macro1.Id);
             Assert.That(all.Length, Is.EqualTo(count));
 
             foreach (var testMacroProperty in all)
-                assertMacroPropertySetup(testMacroProperty, getPersistedTestDto<MacroPropertyDto>(testMacroProperty.Id));
+                assertMacroPropertySetup(testMacroProperty, TRAL.GetDto<MacroPropertyDto>(testMacroProperty.Id));
         }        
 
     }

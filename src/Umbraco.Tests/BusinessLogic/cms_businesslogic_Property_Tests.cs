@@ -45,23 +45,23 @@ namespace Umbraco.Tests.BusinessLogic
 
             EnsureAll_Property_TestRecordsAreDeleted();
 
-            Assert.That(getDto<PropertyDataDto>(_propertyData1.Id), Is.Null);
-            Assert.That(getDto<PropertyDataDto>(_propertyData2.Id), Is.Null);
-            Assert.That(getDto<PropertyDataDto>(_propertyData3.Id), Is.Null);
-            Assert.That(getDto<PropertyTypeDto>(_propertyType1.Id), Is.Null);
-            Assert.That(getDto<PropertyTypeDto>(_propertyType2.Id), Is.Null);
-            Assert.That(getDto<PropertyTypeDto>(_propertyType3.Id), Is.Null);
-            Assert.That(getDto<ContentTypeDto>(_contentType1.PrimaryKey, idKeyName: "pk"), Is.Null);
-            Assert.That(getDto<ContentTypeDto>(_contentType2.PrimaryKey, idKeyName: "pk"), Is.Null);
-            Assert.That(getDto<PropertyTypeGroupDto>(_propertyTypeGroup1.Id), Is.Null);
-            Assert.That(getDto<PropertyTypeGroupDto>(_propertyTypeGroup2.Id), Is.Null);
-            Assert.That(getDto<PropertyTypeGroupDto>(_propertyTypeGroup3.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyDataDto>(_propertyData1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyDataDto>(_propertyData2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyDataDto>(_propertyData3.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyTypeDto>(_propertyType1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyTypeDto>(_propertyType2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyTypeDto>(_propertyType3.Id), Is.Null);
+            Assert.That(TRAL.GetDto<ContentTypeDto>(_contentType1.PrimaryKey, idKeyName: "pk"), Is.Null);
+            Assert.That(TRAL.GetDto<ContentTypeDto>(_contentType2.PrimaryKey, idKeyName: "pk"), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyTypeGroupDto>(_propertyTypeGroup1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyTypeGroupDto>(_propertyTypeGroup2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyTypeGroupDto>(_propertyTypeGroup3.Id), Is.Null);
 
-            Assert.That(getDto<NodeDto>(_node1.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_node2.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_node3.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_node4.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_node5.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node3.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node4.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node5.Id), Is.Null);
         }
 
         [Test(Description = "Constructors")]
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.BusinessLogic
             //  Suppressed by try {} catch {} block in constructor code.
             //  Should be carefully investigated and solved later.
             var property = new Property(_propertyData1.Id);
-            var savedPropertyDto = getDto<PropertyDataDto>(_propertyData1.Id);
+            var savedPropertyDto = TRAL.GetDto<PropertyDataDto>(_propertyData1.Id);
 
             assertPropertySetup(property, savedPropertyDto);  
         }
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.BusinessLogic
 
             // ! Property constructor called in MakeNew fails
             var property = Property.MakeNew(propertyType, content, Guid.NewGuid());
-            var savedPropertyDto = getDto<PropertyDataDto>(property.Id);
+            var savedPropertyDto = TRAL.GetDto<PropertyDataDto>(property.Id);
 
             assertPropertySetup(property, savedPropertyDto);  
         }
@@ -111,12 +111,12 @@ namespace Umbraco.Tests.BusinessLogic
             var property = new Property(_propertyData1.Id);
             Assert.That(property, !Is.Null);
 
-            var savedPropertyDto = getDto<PropertyDataDto>(property.Id);
+            var savedPropertyDto = TRAL.GetDto<PropertyDataDto>(property.Id);
             Assert.That(property.Id, Is.EqualTo(savedPropertyDto.Id), "Id test failed");
 
             property.delete();
 
-            var savedPropertyDto2 = getDto<PropertyDataDto>(property.Id);
+            var savedPropertyDto2 = TRAL.GetDto<PropertyDataDto>(property.Id);
             Assert.That(savedPropertyDto2, Is.Null);
 
             initialized = false;

@@ -20,19 +20,18 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.IsTrue(initialized);
             Assert.That(_dataTypeDefinition1, !Is.Null);
             Assert.That(_preValue, !Is.Null);
-
-            Assert.That(independentDatabase.ExecuteScalar<int>("select count(pk) from cmsDataType where nodeid = @0", _dataTypeDefinition1.Id), Is.EqualTo(1));
-            Assert.That(independentDatabase.ExecuteScalar<int>("select count(id) from umbracoNode where id = @0", _dataTypeDefinition1.Id), Is.EqualTo(1));
-            Assert.That(independentDatabase.ExecuteScalar<int>("select count(pk) from cmsDataType where nodeid = @0", _dataTypeDefinition2.Id), Is.EqualTo(1));
-            Assert.That(independentDatabase.ExecuteScalar<int>("select count(id) from umbracoNode where id = @0", _dataTypeDefinition2.Id), Is.EqualTo(1));
+            
+            Assert.That(TRAL.PreValue.CountDataTypeOfId(_dataTypeDefinition1.Id), Is.EqualTo(1));
+            Assert.That(TRAL.PreValue.CountDataTypeNodes(_dataTypeDefinition1.Id), Is.EqualTo(1));
+            Assert.That(TRAL.PreValue.CountDataTypeOfId(_dataTypeDefinition2.Id), Is.EqualTo(1));
+            Assert.That(TRAL.PreValue.CountDataTypeNodes(_dataTypeDefinition2.Id), Is.EqualTo(1));
 
             EnsureAll_PreValue_TestRecordsAreDeleted();
 
-            Assert.That(getDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(_preValue.Id), Is.Null);
-            Assert.That(independentDatabase.ExecuteScalar<int>("select count(pk) from cmsDataType where nodeid = @0", _dataTypeDefinition1.Id), Is.EqualTo(0));
-            Assert.That(independentDatabase.ExecuteScalar<int>("select count(id) from umbracoNode where id = @0", _dataTypeDefinition1.Id), Is.EqualTo(0));
-            Assert.That(independentDatabase.ExecuteScalar<int>("select count(pk) from cmsDataType where nodeid = @0", _dataTypeDefinition2.Id), Is.EqualTo(0));
-            Assert.That(independentDatabase.ExecuteScalar<int>("select count(id) from umbracoNode where id = @0", _dataTypeDefinition2.Id), Is.EqualTo(0));
+            Assert.That(TRAL.PreValue.CountDataTypeOfId(_dataTypeDefinition1.Id), Is.EqualTo(0));
+            Assert.That(TRAL.PreValue.CountDataTypeNodes(_dataTypeDefinition1.Id), Is.EqualTo(0));
+            Assert.That(TRAL.PreValue.CountDataTypeOfId(_dataTypeDefinition2.Id), Is.EqualTo(0));
+            Assert.That(TRAL.PreValue.CountDataTypeNodes(_dataTypeDefinition2.Id), Is.EqualTo(0));
         }
 
         [Test(Description = "Test 'public PreValue(int id)' constructor")]
@@ -101,7 +100,7 @@ namespace Umbraco.Tests.BusinessLogic
             var newPreValue = PreValue.MakeNew(_dataTypeDefinition1.Id, "value " + uniqueValue);
             Assert.That(newPreValue, !Is.Null);
  
-            var savedPrevalue = getDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(newPreValue.Id);
+            var savedPrevalue = TRAL.GetDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(newPreValue.Id);
             assertPreValueSetup(newPreValue, savedPrevalue);
         }
 
@@ -121,7 +120,7 @@ namespace Umbraco.Tests.BusinessLogic
                     break;
                 case 2:
                     {
-                        var savedPrevalue1 = getDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(_preValue.Id);
+                        var savedPrevalue1 = TRAL.GetDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(_preValue.Id);
                         Assert.That(savedPrevalue1, !Is.Null);
 
                         var preValue = new PreValue(_preValue.Id);
@@ -129,7 +128,7 @@ namespace Umbraco.Tests.BusinessLogic
 
                         preValue.Delete();
 
-                        var savedPrevalue2 = getDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(_preValue.Id);
+                        var savedPrevalue2 = TRAL.GetDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(_preValue.Id);
                         Assert.That(savedPrevalue2, Is.Null); 
                     }
                     break;
@@ -151,7 +150,7 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(newPreValue.Id, !Is.Null);    
 
             //  fetched by Id Prevalue object instance has the same properties as an in-memory just saved PreValue object instance
-            var savedNewPreValue = getDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(newPreValue.Id);
+            var savedNewPreValue = TRAL.GetDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(newPreValue.Id);
             assertPreValueSetup(newPreValue, savedNewPreValue);
 
 

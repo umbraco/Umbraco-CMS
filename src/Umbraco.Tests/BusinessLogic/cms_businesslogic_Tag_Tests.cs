@@ -48,11 +48,11 @@ namespace Umbraco.Tests.BusinessLogic
 
             EnsureAll_Tag_TestRecordsAreDeleted();
 
-            Assert.That(getDto<TagDto>(_tag1.Id), Is.Null);
-            Assert.That(getDto<TagDto>(_tag2.Id), Is.Null);
-            Assert.That(getDto<TagDto>(_tag3.Id), Is.Null);
-            Assert.That(getDto<TagDto>(_tag4.Id), Is.Null);
-            Assert.That(getDto<TagDto>(_tag5.Id), Is.Null);
+            Assert.That(TRAL.GetDto<TagDto>(_tag1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<TagDto>(_tag2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<TagDto>(_tag3.Id), Is.Null);
+            Assert.That(TRAL.GetDto<TagDto>(_tag4.Id), Is.Null);
+            Assert.That(TRAL.GetDto<TagDto>(_tag5.Id), Is.Null);
 
             Assert.That(getTestTagRelationshipDto(_node1.Id, _tag1.Id), Is.Null);
             Assert.That(getTestTagRelationshipDto(_node1.Id, _tag2.Id), Is.Null);
@@ -60,11 +60,11 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(getTestTagRelationshipDto(_node2.Id, _tag4.Id), Is.Null);
             Assert.That(getTestTagRelationshipDto(_node3.Id, _tag5.Id), Is.Null);
 
-            Assert.That(getDto<NodeDto>(_node1.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_node2.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_node3.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_node4.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_node5.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node3.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node4.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node5.Id), Is.Null);
         }
 
         [Test(Description = "Constructors")]
@@ -81,7 +81,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             string tagName = string.Format("Tag {0}", uniqueLabel);
             int id = addTag(tagName, TEST_GROUP_NAME);
-            var tagDto = getDto<TagDto>(id);
+            var tagDto = TRAL.GetDto<TagDto>(id);
 
             Assert.That(tagDto, !Is.Null, "Failed to add Tag");
             Assert.That(id, Is.EqualTo(tagDto.Id), "Double-check - AddTag - failed");
@@ -93,7 +93,7 @@ namespace Umbraco.Tests.BusinessLogic
             string tagName = string.Format("Tag {0}", uniqueLabel); 
             int id1 = addTag(tagName, TEST_GROUP_NAME);
             int id2 = Tag.GetTagId(tagName, TEST_GROUP_NAME);
-            var tagDto = getDto<TagDto>(id2);
+            var tagDto = TRAL.GetDto<TagDto>(id2);
 
             Assert.That(tagDto, !Is.Null, "Failed to get Tag Id");
             Assert.That(id2, Is.EqualTo(id1), "Double-check - GetTagId - 1 failed");
@@ -276,6 +276,7 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(testCount2, Is.EqualTo(testCount1), "GetNodesWithTags(string tags) test failed");
         }
 
+        // System.InvalidOperationException : The ServiceContext has not been set on the ApplicationContext
         [Test(Description = "Test 'public static IEnumerable<Document> GetDocumentsWithTags(string tags)' method")]
         [Obsolete("As it follows from the Tag.cs code GetDocumentsWithTags(...) method selecting only published Documents is depreciated/obsolete.")]
         public void Test_Tag_GetDocumentsWithTags_PublishedOnly()
@@ -294,6 +295,7 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(testCount2, Is.EqualTo(testCount1), "GetDocumentsWithTags test failed");
         }
 
+        // System.InvalidOperationException : The ServiceContext has not been set on the ApplicationContext
         [Test(Description = "Test 'public static IEnumerable<Document> GetAllDocumentsWithTags(string tags)' method")]
         public void Test_Tag_GetDocumentsWithTags_All()
         {

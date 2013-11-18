@@ -23,7 +23,7 @@ namespace Umbraco.Tests.BusinessLogic
 
             EnsureAll_MacroPropertyType_TestRecordsAreDeleted();
 
-            Assert.That(getPersistedTestDto<MacroPropertyTypeDto>(_macroPropertyType1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<MacroPropertyTypeDto>(_macroPropertyType1.Id), Is.Null);
         }
 
         [Test(Description = "Test 'public MacroPropertyType(int Id)' constructor")]
@@ -66,13 +66,13 @@ namespace Umbraco.Tests.BusinessLogic
 #if TRACE_EXECUTION_SPEED
             l("2. {0} {1:T}", all.Count, DateTime.Now);
 #endif
-            int count = independentDatabase.ExecuteScalar<int>("select count(id) from cmsMacroPropertyType");
+            int count =  TRAL.Macro.CountAllPropertyTypes;
 #if TRACE_EXECUTION_SPEED
             l("3. {0} {1:T}", count, DateTime.Now);
 #endif
             Assert.That(all.Count, Is.EqualTo(count));
 
-            all.ForEach(x =>  assertMacroPropertyTypeSetup(x, getDto<MacroPropertyTypeDto>(x.Id)));
+            all.ForEach(x =>  assertMacroPropertyTypeSetup(x, TRAL.GetDto<MacroPropertyTypeDto>(x.Id)));
 #if TRACE_EXECUTION_SPEED
             l("4. {0} {1:T}", count, DateTime.Now);
 #endif

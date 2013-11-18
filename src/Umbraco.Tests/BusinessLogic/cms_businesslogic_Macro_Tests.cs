@@ -27,11 +27,11 @@ namespace Umbraco.Tests.BusinessLogic
 
             EnsureAll_Macro_TestRecordsAreDeleted();
 
-            Assert.That(getPersistedTestDto <MacroPropertyDto>(_macroProperty1.Id), Is.Null);
-            Assert.That(getPersistedTestDto <MacroDto>(_macro1.Id), Is.Null);
-            Assert.That(getPersistedTestDto <MacroDto>(_macro2.Id), Is.Null);
-            Assert.That(getPersistedTestDto <MacroPropertyTypeDto>(_macroPropertyType1.Id), Is.Null);
-            Assert.That(getPersistedTestDto <MacroPropertyTypeDto>(_macroPropertyType2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<MacroPropertyDto>(_macroProperty1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<MacroDto>(_macro1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<MacroDto>(_macro2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<MacroPropertyTypeDto>(_macroPropertyType1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<MacroPropertyTypeDto>(_macroPropertyType2.Id), Is.Null);
         }
 
         [Test(Description = "Test 'public Macro()' constructor")]
@@ -51,7 +51,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var testMacro = testCase == 1 ? new Macro(_macro1.Id) : new Macro (_macro1.Alias);
             Assert.That(testMacro, !Is.Null); 
-            assertMacroSetup(testMacro, getDto<MacroDto>(testMacro.Id));    
+            assertMacroSetup(testMacro, TRAL.GetDto<MacroDto>(testMacro.Id));    
         }
 
         private void assertMacroSetup(Macro testMacro, MacroDto savedMacro)
@@ -79,7 +79,7 @@ namespace Umbraco.Tests.BusinessLogic
                 Macro.GetById(_macro1.Id)   :
                 Macro.GetByAlias(_macro1.Alias);
             Assert.That(testMacro, !Is.Null);
-            assertMacroSetup(testMacro, getDto<MacroDto>(testMacro.Id));    
+            assertMacroSetup(testMacro, TRAL.GetDto<MacroDto>(testMacro.Id));    
         }
 
         [Test(Description = "Test 'public bool UseInEditor' property.set")]
@@ -87,7 +87,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue =  !_macro1.UseInEditor;
             var expectedValue = newValue;
-            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, bool, bool>(
+            TRAL.Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, bool, bool>(
                     n => n.UseInEditor,
                     n => n.UseInEditor = newValue,
                     "cmsMacro",
@@ -103,7 +103,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = _macro1.RefreshRate + 101;
             var expectedValue = newValue;
-            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, int, int>(
+            TRAL.Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, int, int>(
                     n => n.RefreshRate,
                     n => n.RefreshRate = newValue,
                     "cmsMacro",
@@ -119,7 +119,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = _macro1.Alias + "_a_Test_Suffix";
             var expectedValue = newValue;
-            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, string, string>(
+            TRAL.Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, string, string>(
                     n => n.Alias,
                     n => n.Alias = newValue,
                     "cmsMacro",
@@ -136,7 +136,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = "A_Name_Prefix_" + _macro1.Name;
             var expectedValue = newValue;
-            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, string, string>(
+            TRAL.Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, string, string>(
                     n => n.Name,
                     n => n.Name = newValue,
                     "cmsMacro",
@@ -152,7 +152,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = "NewAssembly.DLL";
             var expectedValue = newValue;
-            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, string, string>(
+            TRAL.Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, string, string>(
                     n => n.Assembly,
                     n => n.Assembly = newValue,
                     "cmsMacro",
@@ -168,7 +168,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = "Python";
             var expectedValue = newValue;
-            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, string, string>(
+            TRAL.Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, string, string>(
                     n => n.Type,
                     n => n.Type = newValue,
                     "cmsMacro",
@@ -184,7 +184,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = "NewTest.xslt";
             var expectedValue = newValue;
-            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, string, string>(
+            TRAL.Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, string, string>(
                     n => n.Xslt,
                     n => n.Xslt = newValue,
                     "cmsMacro",
@@ -200,7 +200,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = "macro1.pt";
             var expectedValue = newValue;
-            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, string, string>(
+            TRAL.Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, string, string>(
                     n => n.ScriptingFile,
                     n => n.ScriptingFile = newValue,
                     "cmsMacro",
@@ -216,7 +216,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = !_macro1.DontRender;
             var expectedValue = newValue;
-            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, bool, bool>(
+            TRAL.Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, bool, bool>(
                     n => n.RenderContent,
                     n => n.RenderContent = newValue,
                     "cmsMacro",
@@ -232,7 +232,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = !_macro1.CachePersonalized;
             var expectedValue = newValue;
-            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, bool, bool>(
+            TRAL.Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, bool, bool>(
                     n => n.CachePersonalized,
                     n => n.CachePersonalized = newValue,
                     "cmsMacro",
@@ -248,7 +248,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = !_macro1.CacheByPage;
             var expectedValue = newValue;
-            Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, bool, bool>(
+            TRAL.Setter_Persists_Ext<umbraco.cms.businesslogic.macro.Macro, bool, bool>(
                     n => n.CacheByPage,
                     n => n.CacheByPage = newValue,
                     "cmsMacro",
@@ -264,7 +264,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var testMacro = Macro.MakeNew("My new macro" + uniqueNameSuffix); 
             Assert.That(testMacro, !Is.Null, "testMacro1 is null");
-            assertMacroSetup(testMacro, getPersistedTestDto<MacroDto>(testMacro.Id));
+            assertMacroSetup(testMacro, TRAL.GetDto<MacroDto>(testMacro.Id));
         }
 
 
@@ -276,10 +276,10 @@ namespace Umbraco.Tests.BusinessLogic
 
             testMacro1.Delete();
 
-            var testMacro2 = getPersistedTestDto <MacroDto>(testMacro1.Id);
+            var testMacro2 = TRAL.GetDto<MacroDto>(testMacro1.Id);
             Assert.That(testMacro2, Is.Null, "Macro hasn't been deleted - testMacro2 is not null");
 
-            var testMacroProperty = getPersistedTestDto <MacroPropertyDto>(_macroProperty1.Id);
+            var testMacroProperty = TRAL.GetDto<MacroPropertyDto>(_macroProperty1.Id);
             Assert.That(testMacroProperty, Is.Null, "Macro peroperty hasn't been deleted - testMacroProperty is not null");
 
             initialized = false; // reset test data on the next test run
@@ -298,7 +298,7 @@ namespace Umbraco.Tests.BusinessLogic
 #if TRACE_EXECUTION_SPEED
             l("2. {0} {1:T}", macros.Length, DateTime.Now);
 #endif
-            int count = independentDatabase.ExecuteScalar<int>("select count(id) from cmsMacro");  
+            int count = TRAL.Macro.CountAll;
             Assert.That(macros.Length, Is.EqualTo(count), "Macro.GetAll() test failed");
         }
 
@@ -306,7 +306,7 @@ namespace Umbraco.Tests.BusinessLogic
         public void Test_Macro_Properties()
         {
             var macro = new Macro(_macro1.Id);
-            int count = independentDatabase.ExecuteScalar<int>("select count(id) from cmsMacroProperty where [macro] = @0", _macro1.Id);
+            int count = TRAL.Macro.CountAllProperties (_macro1.Id);
             Assert.That(macro.Properties.Length, Is.EqualTo(1), "There is more than one test property saved for macro");
         }
         

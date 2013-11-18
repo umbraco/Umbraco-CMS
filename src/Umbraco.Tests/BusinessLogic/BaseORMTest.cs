@@ -18,14 +18,129 @@ using System.Collections.Generic;
 using Umbraco.Core;
 using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.relation;
+using umbraco.cms.businesslogic.task;
 
 namespace Umbraco.Tests.TestHelpers
 {
-    public abstract partial class BaseORMTest : BaseDatabaseFactoryTestWithContext
+    public abstract partial class BaseORMTest : BaseDatabaseFactoryTest
     {
-        public const int ADMIN_USER_ID = 1;
+        protected abstract void EnsureData();
+
+        protected override DatabaseBehavior DatabaseTestBehavior
+        {
+            get
+            {
+                return DatabaseBehavior.NoDatabasePerFixture;
+                //return DatabaseBehavior.NewSchemaPerFixture; 
+            }
+        }
+
+        public override void Initialize()
+        {
+            base.Initialize();
+            if (!initialized) CreateContext();
+            EnsureData();
+        }
+
+        protected bool initialized;
+
+        protected UmbracoDatabase independentDatabase { get { return TRAL.Repository; } }
+        protected TestRepositoryAbstractionLayer TRAL { get; private set; }
+
+        protected void CreateContext()
+        {
+            this.TRAL = new TestRepositoryAbstractionLayer(GetUmbracoContext("http://localhost", 0));
+        }
+
+        #region 'One-Liners'
+        protected void l(string format, params object[] args)
+        {
+            System.Console.WriteLine(format, args);
+        }
+
+
+        protected string uniqueLabel
+        {
+            get
+            {
+                return string.Format("* {0} *", uniqueValue);
+            }
+        }
+        protected string uniqueNameSuffix
+        {
+            get
+            {
+                return string.Format(" - {0}", uniqueValue);
+            }
+        }
+        protected string uniqueAliasSuffix
+        {
+            get
+            {
+                return uniqueValue;
+            }
+        }
+        protected string uniqueValue
+        {
+            get
+            {
+                return Guid.NewGuid().ToString();
+            }
+        }
+        #endregion
+
+        #region Helper methods borrowed from umbraco
+        protected class ORMTestCMSNode : CMSNode
+        {
+            public static CMSNode MakeNew(
+                int parentId,
+                int level,
+                string text,
+                Guid objectType)
+            {
+                return CMSNode.MakeNew(parentId, objectType, 0, level, text, Guid.NewGuid());
+            }
+        }
+
+        protected string getSqlStringArray(string commaSeparatedArray)
+        {
+            // create array
+            string[] array = commaSeparatedArray.Trim().Split(',');
+
+            // build SQL array
+            StringBuilder sqlArray = new StringBuilder();
+            foreach (string item in array)
+            {
+                string trimmedItem = item.Trim();
+                if (trimmedItem.Length > 0)
+                {
+                    sqlArray.Append("'").Append(escapeString(trimmedItem)).Append("',");
+                }
+            }
+
+            // remove last comma
+            if (sqlArray.Length > 0)
+                sqlArray.Remove(sqlArray.Length - 1, 1);
+            return sqlArray.ToString();
+        }
+
+        protected static string escapeString(string value)
+        {
+            return string.IsNullOrEmpty(value) ? string.Empty : value.Replace("'", "''");
+        }
+
+        #endregion
+
+
+        public const int ADMIN_USER_ID = 0;
 
         internal User _user;
+
+        internal CMSNode _node1;
+        internal CMSNode _node2;
+        internal CMSNode _node3;
+        internal CMSNode _node4;
+        internal CMSNode _node5;
 
         internal MacroDto _macro1;
         internal MacroDto _macro2;
@@ -149,7 +264,7 @@ namespace Umbraco.Tests.TestHelpers
                                                macroPropertyName = TEST_MACRO_PROPERTY_NAME + uniqueNameSuffix
                                            });
                 int id = independentDatabase.ExecuteScalar<int>("select MAX(id) from [cmsMacroProperty]");
-                _macroProperty1 = getPersistedTestDto <MacroPropertyDto>(id);
+                _macroProperty1 = TRAL.GetDto<MacroPropertyDto>(id);
             }
 
             Assert.That(_macroPropertyType1, !Is.Null);
@@ -184,7 +299,7 @@ namespace Umbraco.Tests.TestHelpers
                      macroCachePersonalized = false
                  });
             int id = independentDatabase.ExecuteScalar<int>("select MAX(id) from [cmsMacro]");
-            return getPersistedTestDto <MacroDto>(id);
+            return TRAL.GetDto<MacroDto>(id);
         }
 
         private MacroPropertyTypeDto insertMacroPropertyType(string alias)
@@ -199,7 +314,7 @@ namespace Umbraco.Tests.TestHelpers
                                           macroPropertyTypeBaseType = "string"
                                       });
             int id = independentDatabase.ExecuteScalar<int>("select MAX(id) from [cmsMacroPropertyType]");
-            return getPersistedTestDto <MacroPropertyTypeDto>(id);
+            return TRAL.GetDto<MacroPropertyTypeDto>(id);
         }
 
         protected void EnsureAll_Macro_TestRecordsAreDeleted()
@@ -244,7 +359,7 @@ namespace Umbraco.Tests.TestHelpers
                                                macroPropertyTypeBaseType = "string"
                                            });
                 int id = independentDatabase.ExecuteScalar<int>("select MAX(id) from [cmsMacroPropertyType]");
-                _macroPropertyType1 = getPersistedTestDto <MacroPropertyTypeDto>(id);
+                _macroPropertyType1 = TRAL.GetDto<MacroPropertyTypeDto>(id);
             }
 
             Assert.That(_macroPropertyType1, !Is.Null);
@@ -298,20 +413,6 @@ namespace Umbraco.Tests.TestHelpers
                 _dataTypeDefinition2 = DataTypeDefinition.MakeNew(_user, "Ntext");
             }
 
-            //if ((int)independentDatabase.ExecuteScalar<int>("select count(*) from cmsDataTypePreValues where datatypenodeid = @0", _dataTypeDefinition1.Id) == 0)
-            //{
-            //    initialized = false;
-
-            //    string value = ",code,undo,redo,cut,copy,mcepasteword,stylepicker,bold,italic,bullist,numlist,outdent,indent,mcelink,unlink,mceinsertanchor,mceimage,umbracomacro,mceinserttable,umbracoembed,mcecharmap,|1|1,2,3,|0|500,400|1049,|true|";
-
-            //    independentDatabase.Execute(
-            //        "insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')",
-            //        new { dtdefid = _dataTypeDefinition1.Id, value = value });
-            //    var id = PreValue.Database.ExecuteScalar<int>("SELECT MAX(id) FROM cmsDataTypePreValues");
-
-            //    _preValue = getDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(id);
-            //}
-
             var values = new List<string> 
                 {
                     "default",
@@ -328,12 +429,12 @@ namespace Umbraco.Tests.TestHelpers
                 values.ForEach(x =>
                 {
                     PreValue.Database.Execute(
-                        "insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')",
+                        "insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid, @value,0,'')",
                         new { dtdefid = _dataTypeDefinition1.Id, value = x });
                     if (index++ == 1)
                     {
                         var id = PreValue.Database.ExecuteScalar<int>("SELECT MAX(id) FROM cmsDataTypePreValues");
-                        _preValue = getDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(id);
+                        _preValue = TRAL.GetDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(id);
                     }
 
                 });
@@ -405,11 +506,11 @@ namespace Umbraco.Tests.TestHelpers
 
             if (!initialized)
             {
-                _node1 = TestCMSNode.MakeNew(-1, 1, "TestContent 1", Document._objectType);
-                _node2 = TestCMSNode.MakeNew(-1, 1, "TestContent 2", Document._objectType);
-                _node3 = TestCMSNode.MakeNew(-1, 1, "TestContent 3", Document._objectType);
-                _node4 = TestCMSNode.MakeNew(-1, 1, "TestContent 4", Document._objectType);
-                _node5 = TestCMSNode.MakeNew(-1, 1, "TestContent 5", Document._objectType);
+                _node1 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 1", Document._objectType);
+                _node2 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 2", Document._objectType);
+                _node3 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 3", Document._objectType);
+                _node4 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 4", Document._objectType);
+                _node5 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 5", Document._objectType);
 
                 _contentType1 = insertContentType(1, _node1.Id, "testMedia1");
                 _contentType2 = insertContentType(1, _node2.Id, "testMedia2");
@@ -463,7 +564,7 @@ namespace Umbraco.Tests.TestHelpers
                       allowAtRoot = false
                   });
             int id = independentDatabase.ExecuteScalar<int>("select MAX(pk) from [cmsContentType]");
-            return getDto<ContentTypeDto>(id, idKeyName:"pk");
+            return TRAL.GetDto<ContentTypeDto>(id, idKeyName:"pk");
         }
 
         private PropertyTypeGroupDto insertPropertyTypeGroup(int contentNodeId, int? parentNodeId, string text)
@@ -473,7 +574,7 @@ namespace Umbraco.Tests.TestHelpers
                        " (@parentGroupId,@contenttypeNodeId,@text,@sortorder)",
                        new { parentGroupId = parentNodeId, contenttypeNodeId = contentNodeId, text = text, sortorder = 1 });
             int id = independentDatabase.ExecuteScalar<int>("select MAX(id) from [cmsPropertyTypeGroup]");
-            return getDto<PropertyTypeGroupDto>(id);
+            return TRAL.GetDto<PropertyTypeGroupDto>(id);
         }
 
         private PropertyTypeDto insertPropertyType(int dataTypeId, int contentNodeId, int? propertyGroupId, string text)
@@ -496,7 +597,7 @@ namespace Umbraco.Tests.TestHelpers
                            description = ""
                        });
             int id = independentDatabase.ExecuteScalar<int>("select MAX(id) from [cmsPropertyType]");
-            return getDto<PropertyTypeDto>(id);
+            return TRAL.GetDto<PropertyTypeDto>(id);
         }
 
         private PropertyDataDto insertPropertyTypeData(int propertyTypeId, int contentNodeId)
@@ -516,7 +617,7 @@ namespace Umbraco.Tests.TestHelpers
                            dataNtext = (string)null
                        });
             int id = independentDatabase.ExecuteScalar<int>("select MAX(id) from [cmsPropertyData]");
-            return getDto<PropertyDataDto>(id);
+            return TRAL.GetDto<PropertyDataDto>(id);
         }
 
 
@@ -578,11 +679,11 @@ namespace Umbraco.Tests.TestHelpers
         [MethodImpl(MethodImplOptions.Synchronized)]
         protected void Ensure_RecycleBin_TestData()
         {
-            _recycleBinNode1 = TestCMSNode.MakeNew(Constants.System.RecycleBinMedia, 2, "Test Media Content 1", Media._objectType);
-            _recycleBinNode2 = TestCMSNode.MakeNew(Constants.System.RecycleBinMedia, 2, "Test Media Content 2", Media._objectType);
-            _recycleBinNode3 = TestCMSNode.MakeNew(Constants.System.RecycleBinMedia, 2, "Test Media Content 3", Media._objectType);
-            _recycleBinNode4 = TestCMSNode.MakeNew(Constants.System.RecycleBinContent, 2, "Test Content 1", Document._objectType);
-            _recycleBinNode5 = TestCMSNode.MakeNew(Constants.System.RecycleBinContent, 2, "Test Content 2", Document._objectType);
+            _recycleBinNode1 = ORMTestCMSNode.MakeNew(Constants.System.RecycleBinMedia, 2, "Test Media Content 1", Media._objectType);
+            _recycleBinNode2 = ORMTestCMSNode.MakeNew(Constants.System.RecycleBinMedia, 2, "Test Media Content 2", Media._objectType);
+            _recycleBinNode3 = ORMTestCMSNode.MakeNew(Constants.System.RecycleBinMedia, 2, "Test Media Content 3", Media._objectType);
+            _recycleBinNode4 = ORMTestCMSNode.MakeNew(Constants.System.RecycleBinContent, 2, "Test Content 1", Document._objectType);
+            _recycleBinNode5 = ORMTestCMSNode.MakeNew(Constants.System.RecycleBinContent, 2, "Test Content 2", Document._objectType);
 
             initialized = true;
 
@@ -613,11 +714,11 @@ namespace Umbraco.Tests.TestHelpers
         {
             if (!initialized)
             {
-                _node1 = TestCMSNode.MakeNew(-1, 1, "TestContent 1", Document._objectType);
-                _node2 = TestCMSNode.MakeNew(-1, 1, "TestContent 2", Document._objectType);
-                _node3 = TestCMSNode.MakeNew(-1, 1, "TestContent 3", Document._objectType);
-                _node4 = TestCMSNode.MakeNew(-1, 1, "TestContent 4", Document._objectType);
-                _node5 = TestCMSNode.MakeNew(-1, 1, "TestContent 5", Document._objectType);
+                _node1 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 1", Document._objectType);
+                _node2 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 2", Document._objectType);
+                _node3 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 3", Document._objectType);
+                _node4 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 4", Document._objectType);
+                _node5 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 5", Document._objectType);
 
                 _relationType1 = insertTestRelationType(1);
                 _relationType2 = insertTestRelationType(2);
@@ -676,7 +777,7 @@ namespace Umbraco.Tests.TestHelpers
                                 alias = string.Format("{0}_{1}", TEST_RELATION_TYPE_ALIAS, testRelationTypeNumber),
                             });
             int relationTypeId = independentDatabase.ExecuteScalar<int>("select max(id) from [umbracoRelationType]");
-            return getDto<RelationTypeDto>(relationTypeId);
+            return TRAL.GetDto<RelationTypeDto>(relationTypeId);
         }
 
         private RelationDto insertTestRelation(RelationType relationType, int parentNodeId, int childNodeId, string comment)
@@ -684,7 +785,7 @@ namespace Umbraco.Tests.TestHelpers
             independentDatabase.Execute("insert into [umbracoRelation] (parentId, childId, relType, datetime, comment) values (@parentId, @childId, @relType, @datetime, @comment)",
                              new { parentId = parentNodeId, childId = childNodeId, relType = relationType.Id, datetime = DateTime.Now, comment = comment });
             int relationId = independentDatabase.ExecuteScalar<int>("select max(id) from [umbracoRelation]");
-            return getDto<RelationDto>(relationId);
+            return TRAL.GetDto<RelationDto>(relationId);
         }
 
 
@@ -736,7 +837,7 @@ namespace Umbraco.Tests.TestHelpers
                                 alias = testRelationName.Replace(" ", "")
                             });
             int relationTypeId = independentDatabase.ExecuteScalar<int>("select max(id) from [umbracoRelationType]");
-            return getDto<RelationTypeDto>(relationTypeId);
+            return TRAL.GetDto<RelationTypeDto>(relationTypeId);
         }
 
 
@@ -749,11 +850,11 @@ namespace Umbraco.Tests.TestHelpers
         {
             if (!initialized)
             {
-                _node1 = TestCMSNode.MakeNew(-1, 1, "TestContent 1", Document._objectType);
-                _node2 = TestCMSNode.MakeNew(-1, 1, "TestContent 2", Document._objectType);
-                _node3 = TestCMSNode.MakeNew(-1, 1, "TestContent 3", Document._objectType);
-                _node4 = TestCMSNode.MakeNew(-1, 1, "TestContent 4", Document._objectType);
-                _node5 = TestCMSNode.MakeNew(-1, 1, "TestContent 5", Document._objectType);
+                _node1 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 1", Document._objectType);
+                _node2 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 2", Document._objectType);
+                _node3 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 3", Document._objectType);
+                _node4 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 4", Document._objectType);
+                _node5 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 5", Document._objectType);
 
                 _tag1 = InsertTestTag("Tag11", "1");
                 _tag2 = InsertTestTag("Tag12", "1");
@@ -818,7 +919,7 @@ namespace Umbraco.Tests.TestHelpers
         {
             independentDatabase.Execute("insert into [cmsTags] ([Tag], [Group]) values (@0, @1)", tag, group);
             int id = independentDatabase.ExecuteScalar<int>("select Max(id) from cmsTags");
-            return getDto<TagDto>(id);
+            return TRAL.GetDto<TagDto>(id);
         }
         private TagRelationshipDto InsertTestTagRelationship(int nodeId, int tagId)
         {
@@ -833,7 +934,7 @@ namespace Umbraco.Tests.TestHelpers
 
         //private NodeDto getTestNodeDto(int id)
         //{
-        //    return getPersistedTestDto<NodeDto>(id);
+        //    return TRAL.GetDto<NodeDto>(id);
         //}
 
         internal void delRel(TagRelationshipDto tagRel)
@@ -1013,11 +1114,11 @@ namespace Umbraco.Tests.TestHelpers
                // OK - database.Execute("insert into [cmsMacroPropertyType] (macroPropertyTypeAlias) VALUES (@0)", "TEST");
                // run-time error - database.Execute("insert into [cmsTaskType] (alias) VALUES (@0)", "TEST");
 
-               _node1 = TestCMSNode.MakeNew(-1, 1, "TestContent 1", Document._objectType);
-               _node2 = TestCMSNode.MakeNew(-1, 1, "TestContent 2", Document._objectType);
-               _node3 = TestCMSNode.MakeNew(-1, 1, "TestContent 3", Document._objectType);
-               _node4 = TestCMSNode.MakeNew(-1, 1, "TestContent 4", Document._objectType);
-               _node5 = TestCMSNode.MakeNew(-1, 1, "TestContent 5", Document._objectType);
+               _node1 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 1", Document._objectType);
+               _node2 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 2", Document._objectType);
+               _node3 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 3", Document._objectType);
+               _node4 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 4", Document._objectType);
+               _node5 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 5", Document._objectType);
 
                _user = new User(0);
 
@@ -1071,7 +1172,7 @@ namespace Umbraco.Tests.TestHelpers
 
        private UserDto getAdminUser()
        {
-           return getDto<UserDto>(0);
+           return TRAL.GetDto<UserDto>(0);
        }
 
        protected string newTaskTypeAlias
@@ -1087,7 +1188,7 @@ namespace Umbraco.Tests.TestHelpers
        {
            independentDatabase.Execute("insert into [cmsTaskType] ([Alias]) values (@0)", alias);
            int id = independentDatabase.ExecuteScalar<int>("select Max(id) from cmsTaskType");
-           return getDto<TaskTypeDto>(id);
+           return TRAL.GetDto<TaskTypeDto>(id);
        }
 
        [MethodImpl(MethodImplOptions.Synchronized)]
@@ -1107,17 +1208,8 @@ namespace Umbraco.Tests.TestHelpers
                      comment = comment
                  });
            int id = independentDatabase.ExecuteScalar<int>("select Max(id) from cmsTask");
-           return getDto<TaskDto>(id);
+           return TRAL.GetDto<TaskDto>(id);
        }
-
-       //internal void delTaskType(TaskTypeDto dto)
-       //{
-       //    if (dto != null) independentDatabase.Delete<TaskTypeDto>("where [Id] = @0", dto.Id);
-       //}
-       //internal void delTask(TaskDto dto)
-       //{
-       //    if (dto != null) independentDatabase.Delete<TaskDto>("where [Id] = @0", dto.Id);
-       //}
 
        internal int countTasksByTaskType(int taskTypeId)
        {
@@ -1176,11 +1268,11 @@ namespace Umbraco.Tests.TestHelpers
                // OK - database.Execute("insert into [cmsMacroPropertyType] (macroPropertyTypeAlias) VALUES (@0)", "TEST");
                // run-time error - database.Execute("insert into [cmsTaskType] (alias) VALUES (@0)", "TEST");
 
-               _node1 = TestCMSNode.MakeNew(-1, 1, "TestContent 1", umbraco.cms.businesslogic.web.Document._objectType);
-               _node2 = TestCMSNode.MakeNew(-1, 1, "TestContent 2", Document._objectType);
-               _node3 = TestCMSNode.MakeNew(-1, 1, "TestContent 3", Document._objectType);
-               _node4 = TestCMSNode.MakeNew(-1, 1, "TestContent 4", Document._objectType);
-               _node5 = TestCMSNode.MakeNew(-1, 1, "TestContent 5", Document._objectType);
+               _node1 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 1", umbraco.cms.businesslogic.web.Document._objectType);
+               _node2 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 2", Document._objectType);
+               _node3 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 3", Document._objectType);
+               _node4 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 4", Document._objectType);
+               _node5 = ORMTestCMSNode.MakeNew(-1, 1, "TestContent 5", Document._objectType);
 
                _user = new User(ADMIN_USER_ID);
 
@@ -1238,28 +1330,6 @@ namespace Umbraco.Tests.TestHelpers
            initialized = false;
        }
 
-
-       //private string newTaskTypeAlias
-       //{
-       //    get
-       //    {
-       //        return string.Format("Test TaskType, GUID = {0}", Guid.NewGuid());
-       //    }
-       //}
-
-       //private UserDto getAdminUser()
-       //{
-       //    return getDto<UserDto>(0);
-       //}
-
-       //[MethodImpl(MethodImplOptions.Synchronized)]
-       //private TaskTypeDto insertTestTaskType(string alias)
-       //{
-       //    independentDatabase.Execute("insert into [cmsTaskType] ([Alias]) values (@0)", alias);
-       //    int id = independentDatabase.ExecuteScalar<int>("select Max(id) from cmsTaskType");
-       //    return getDto<TaskTypeDto>(id);
-       //}
-
        [MethodImpl(MethodImplOptions.Synchronized)]
        private TaskDto insertTestTask(TaskTypeDto taskType, CMSNode node, UserDto parentUser, UserDto user, string comment)
        {
@@ -1277,7 +1347,7 @@ namespace Umbraco.Tests.TestHelpers
                      comment = comment
                  });
            int id = independentDatabase.ExecuteScalar<int>("select Max(id) from cmsTask");
-           return getDto<TaskDto>(id);
+           return TRAL.GetDto<TaskDto>(id);
        }
 
        internal void delTaskType(TaskTypeDto dto)
@@ -1368,8 +1438,8 @@ namespace Umbraco.Tests.TestHelpers
                      values (@nodeId, @master, @alias, @design)",
                     new { nodeId = nodeId, master = masterNodeId, design = design, alias = alias });
            int pk = independentDatabase.ExecuteScalar<int>("select Max(pk) from cmsTemplate");
-           var dto = getDto<TemplateDto>(pk, idKeyName: "pk");
-           dto.NodeDto = getDto<NodeDto>(nodeId);
+           var dto = TRAL.GetDto<TemplateDto>(pk, idKeyName: "pk");
+           dto.NodeDto = TRAL.GetDto<NodeDto>(nodeId);
            return dto;
        }
 
@@ -1417,7 +1487,7 @@ namespace Umbraco.Tests.TestHelpers
 
        //private UserDto getAdminUser()
        //{
-       //    return getDto<UserDto>(0);
+       //    return TRAL.GetDto<UserDto>(0);
        //}
 
        private string newTemplateName

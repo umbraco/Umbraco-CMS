@@ -25,15 +25,15 @@ namespace Umbraco.Tests.BusinessLogic
             EnsureAll_RelationType_TestRecordsAreDeleted();
 
             // see the next test code line: Assert.Throws(typeof(ArgumentException), delegate { RelationType.GetById(_relationType.Id); });
-            Assert.That(getDto<RelationTypeDto>(_relationType1.Id), Is.Null);
-            Assert.That(getDto<RelationTypeDto>(_relationType2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<RelationTypeDto>(_relationType1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<RelationTypeDto>(_relationType2.Id), Is.Null);
         }
 
         [Test(Description = "Test 'public RelationType(int id)' and 'private void PopulateFromDTO(RelationTypeDto dto)' methods")]
         public void _2nd_Test_RelationType_Constructor_and_PopulateFromDto()
         {
             var testRelationType = new RelationType(_relationType1.Id);
-            assertRelationTypeSetup(testRelationType, getDto<RelationTypeDto>(testRelationType.Id));   
+            assertRelationTypeSetup(testRelationType, TRAL.GetDto<RelationTypeDto>(testRelationType.Id));   
         }
 
 
@@ -49,21 +49,20 @@ namespace Umbraco.Tests.BusinessLogic
         public void Test_RelationType_GetById()
         {
             var testRelationType = RelationType.GetById(_relationType1.Id);
-            assertRelationTypeSetup(testRelationType, getDto<RelationTypeDto>(testRelationType.Id));
+            assertRelationTypeSetup(testRelationType, TRAL.GetDto<RelationTypeDto>(testRelationType.Id));
         }
      
         [Test(Description = "Test 'public static RelationType GetByAlias(string Alias)' method")]
         public void Test_RelationType_GetByAlias()
         {
             var testRelationType = RelationType.GetByAlias(_relationType1.Alias);
-            assertRelationTypeSetup(testRelationType, getDto<RelationTypeDto>(testRelationType.Id));
+            assertRelationTypeSetup(testRelationType, TRAL.GetDto<RelationTypeDto>(testRelationType.Id));
         }
 
         [Test(Description = "Test 'public static IEnumerable<RelationType> GetAll()' method")]
         public void Test_RelationType_GetAll()
         {
-            int expectedValue = independentDatabase.Query<RelationTypeDto>(
-                      "SELECT id, [dual], name, alias FROM umbracoRelationType").ToArray().Length;  
+            int expectedValue = TRAL.Relation.CountAllRelationTypes; 
             var relationTypes = RelationType.GetAll().ToArray<RelationType>();
 
             Assert.That(relationTypes.Length, Is.EqualTo(expectedValue));  // 1 default + 2 created in this test suite
@@ -75,7 +74,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = "New Name";
             var expectedValue = newValue;
-            Setter_Persists_Ext<RelationType, string, string>(
+            TRAL.Setter_Persists_Ext<RelationType, string, string>(
                     n => n.Name,
                     n => n.Name = newValue,
                     "umbracoRelationType",
@@ -91,7 +90,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = "newAlias" + uniqueAliasSuffix;
             var expectedValue = newValue;
-            Setter_Persists_Ext<RelationType, string, string>(
+            TRAL.Setter_Persists_Ext<RelationType, string, string>(
                     n => n.Alias,
                     n => n.Alias = newValue,
                     "umbracoRelationType",
@@ -107,7 +106,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = !_relationType1.Dual; 
             var expectedValue = newValue;
-            Setter_Persists_Ext<RelationType, bool, bool>(
+            TRAL.Setter_Persists_Ext<RelationType, bool, bool>(
                     n => n.Dual,
                     n => n.Dual = newValue,
                     "umbracoRelationType",

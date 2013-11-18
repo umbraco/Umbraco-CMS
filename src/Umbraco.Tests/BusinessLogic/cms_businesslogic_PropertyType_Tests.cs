@@ -42,23 +42,23 @@ namespace Umbraco.Tests.BusinessLogic
 
             EnsureAll_PropertyType_TestRecordsAreDeleted();
 
-            Assert.That(getDto<PropertyDataDto>(_propertyData1.Id), Is.Null);
-            Assert.That(getDto<PropertyDataDto>(_propertyData2.Id), Is.Null);
-            Assert.That(getDto<PropertyDataDto>(_propertyData3.Id), Is.Null);
-            Assert.That(getDto<PropertyTypeDto>(_propertyType1.Id), Is.Null);
-            Assert.That(getDto<PropertyTypeDto>(_propertyType2.Id), Is.Null);
-            Assert.That(getDto<PropertyTypeDto>(_propertyType3.Id), Is.Null);
-            Assert.That(getDto<ContentTypeDto>(_contentType1.PrimaryKey, idKeyName: "pk"), Is.Null);
-            Assert.That(getDto<ContentTypeDto>(_contentType2.PrimaryKey, idKeyName: "pk"), Is.Null);
-            Assert.That(getDto<PropertyTypeGroupDto>(_propertyTypeGroup1.Id), Is.Null);
-            Assert.That(getDto<PropertyTypeGroupDto>(_propertyTypeGroup2.Id), Is.Null);
-            Assert.That(getDto<PropertyTypeGroupDto>(_propertyTypeGroup3.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyDataDto>(_propertyData1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyDataDto>(_propertyData2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyDataDto>(_propertyData3.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyTypeDto>(_propertyType1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyTypeDto>(_propertyType2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyTypeDto>(_propertyType3.Id), Is.Null);
+            Assert.That(TRAL.GetDto<ContentTypeDto>(_contentType1.PrimaryKey, idKeyName: "pk"), Is.Null);
+            Assert.That(TRAL.GetDto<ContentTypeDto>(_contentType2.PrimaryKey, idKeyName: "pk"), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyTypeGroupDto>(_propertyTypeGroup1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyTypeGroupDto>(_propertyTypeGroup2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyTypeGroupDto>(_propertyTypeGroup3.Id), Is.Null);
 
-            Assert.That(getDto<NodeDto>(_node1.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_node2.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_node3.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_node4.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_node5.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node3.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node4.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node5.Id), Is.Null);
         }
 
         [Test(Description = "Test 'public PropertyType(int id)' constructor")]
@@ -66,7 +66,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var testPropertyType = new PropertyType(_propertyType1.Id);
             Assert.That(testPropertyType, !Is.Null);  
-            var savedPropertyTypeDto = getDto<PropertyTypeDto>(_propertyType1.Id);
+            var savedPropertyTypeDto = TRAL.GetDto<PropertyTypeDto>(_propertyType1.Id);
             Assert.That(savedPropertyTypeDto, !Is.Null);  
 
             assertPropertyTypeSetup(testPropertyType, savedPropertyTypeDto);  
@@ -112,7 +112,7 @@ namespace Umbraco.Tests.BusinessLogic
             var propertyType = PropertyType.MakeNew(dataType, contentType, "Test Property Type 123", "testPropertyType123");
             Assert.That(propertyType, !Is.Null, "Object instance !Is.Null test failed");
 
-            var savedPropertyTypeDto = getDto<PropertyTypeDto>(propertyType.Id);
+            var savedPropertyTypeDto = TRAL.GetDto<PropertyTypeDto>(propertyType.Id);
 
             assertPropertyTypeSetup(propertyType, savedPropertyTypeDto, tabIdIsZero:true); 
         }
@@ -131,7 +131,7 @@ namespace Umbraco.Tests.BusinessLogic
             id = propertyType.Id; 
             propertyType.delete();  
 
-            var savedPropertyTypeDto = getDto<PropertyTypeDto>(id);
+            var savedPropertyTypeDto = TRAL.GetDto<PropertyTypeDto>(id);
 
             Assert.That(savedPropertyTypeDto, Is.Null, "Delete test failed");
 
@@ -143,7 +143,7 @@ namespace Umbraco.Tests.BusinessLogic
         { 
             var newValue = new DataTypeDefinition(TEST_DATA_TYPE_ID3);
             var expectedValue = newValue.Id;
-            Setter_Persists_Ext<PropertyType, DataTypeDefinition, int>(
+            TRAL.Setter_Persists_Ext<PropertyType, DataTypeDefinition, int>(
                     n => n.DataTypeDefinition,
                     n => n.DataTypeDefinition = newValue,
                     "cmsPropertyType",
@@ -163,7 +163,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = PropertyTypeGroup.GetPropertyTypeGroup(_propertyTypeGroup3.Id);
             var expectedValue = newValue.Id;
-            Setter_Persists_Ext<PropertyType, int, int>(
+            TRAL.Setter_Persists_Ext<PropertyType, int, int>(
                     n => n.TabId,
                     n => n.TabId = newValue.Id,
                     "cmsPropertyType",
@@ -179,7 +179,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = PropertyTypeGroup.GetPropertyTypeGroup(_propertyTypeGroup3.Id);
             var expectedValue = newValue.Id;
-            Setter_Persists_Ext<PropertyType, int, int>(
+            TRAL.Setter_Persists_Ext<PropertyType, int, int>(
                     n => n.PropertyTypeGroup,
                     n => n.PropertyTypeGroup = newValue.Id,
                     "cmsPropertyType",
@@ -198,7 +198,7 @@ namespace Umbraco.Tests.BusinessLogic
 
             var newValue = !oldValue;
             var expectedValue = !oldValue;
-            Setter_Persists_Ext<PropertyType, bool, bool>(
+            TRAL.Setter_Persists_Ext<PropertyType, bool, bool>(
                     n => n.Mandatory,
                     n => n.Mandatory = newValue,
                     "cmsPropertyType",
@@ -214,7 +214,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = @"[a-b]\w[1-9]";
             var expectedValue = @"[a-b]\w[1-9]";
-            Setter_Persists_Ext<PropertyType, string, string>(
+            TRAL.Setter_Persists_Ext<PropertyType, string, string>(
                     n => n.ValidationRegExp,
                     n => n.ValidationRegExp = newValue,
                     "cmsPropertyType",
@@ -230,7 +230,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = "New Description";
             var expectedValue = "New Description";
-            Setter_Persists_Ext<PropertyType, string, string>(
+            TRAL.Setter_Persists_Ext<PropertyType, string, string>(
                     n => n.Description,
                     n => n.Description = newValue,
                     "cmsPropertyType",
@@ -246,7 +246,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = 7;
             var expectedValue = 7;
-            Setter_Persists_Ext<PropertyType, int, int>(
+            TRAL.Setter_Persists_Ext<PropertyType, int, int>(
                     n => n.SortOrder,
                     n => n.SortOrder = newValue,
                     "cmsPropertyType",
@@ -262,7 +262,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue      = "theNewAliasValue";
             var expectedValue = "theNewAliasValue";
-            Setter_Persists_Ext<PropertyType, string, string>(
+            TRAL.Setter_Persists_Ext<PropertyType, string, string>(
                     n => n.Alias,
                     n => n.Alias = newValue,
                     "cmsPropertyType",
@@ -278,7 +278,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = "The New Name Value";
             var expectedValue = "The New Name Value";
-            Setter_Persists_Ext<PropertyType, string, string>(
+            TRAL.Setter_Persists_Ext<PropertyType, string, string>(
                     n => n.Name,
                     n => n.Name = newValue,
                     "cmsPropertyType",
@@ -293,7 +293,7 @@ namespace Umbraco.Tests.BusinessLogic
         public void Test_PropertyType_GetAll()
         {
             var all = PropertyType.GetAll();
-            int count = independentDatabase.ExecuteScalar<int>("select count(id) from cmsPropertyType");
+            int count = TRAL.Property.CountAllPropertyTypes;
 
             Assert.That(all.Length, Is.EqualTo(count), "GetAll test failed");
         }
@@ -302,9 +302,9 @@ namespace Umbraco.Tests.BusinessLogic
         public void Test_PropertyType_GetPropertyTypes()
         {
             var all = PropertyType.GetPropertyTypes().ToArray() ;
-            int count = independentDatabase.ExecuteScalar<int>("select count(id) from cmsPropertyType");
+            int count = TRAL.Property.CountAllPropertyTypes;
 
-            Assert.That(all.Length, Is.EqualTo(count), "GetAll test failed");
+            Assert.That(all.Length, Is.EqualTo(count), "GetPropertyTypes test failed");
         }
 
         [Test(Description = "Test 'public static PropertyType GetPropertyType(int id)' method")]
@@ -313,7 +313,7 @@ namespace Umbraco.Tests.BusinessLogic
             var propertyType = PropertyType.GetPropertyType(_propertyType1.Id);
             Assert.That(propertyType, !Is.Null, "Object instance !Is.Null test failed");
 
-            var savedPropertyTypeDto = getDto<PropertyTypeDto>(propertyType.Id);
+            var savedPropertyTypeDto = TRAL.GetDto<PropertyTypeDto>(propertyType.Id);
 
             assertPropertyTypeSetup(propertyType, savedPropertyTypeDto); 
         } 
@@ -322,7 +322,7 @@ namespace Umbraco.Tests.BusinessLogic
         public void Test_PropertyType_GetPropertyTypesByGroup_1()
         {
             var all = PropertyType.GetPropertyTypesByGroup(_propertyTypeGroup1.Id).ToArray() ;
-            int count = independentDatabase.ExecuteScalar<int>("SELECT count(id) FROM cmsPropertyType WHERE propertyTypeGroupId = @0", _propertyTypeGroup1.Id);
+            int count = TRAL.Property.CountPropertyTypesByGroupId(_propertyTypeGroup1.Id);
 
             Assert.That(all.Length, Is.EqualTo(count));  // there are two properties saved for _propertyTypeGroup1.Id
         }
@@ -344,7 +344,7 @@ namespace Umbraco.Tests.BusinessLogic
         public void Test_PropertyType_GetByDataTypeDefinition()
         {
             var all = PropertyType.GetByDataTypeDefinition(TEST_DATA_TYPE_ID1).ToArray();
-            int count = independentDatabase.ExecuteScalar<int>("select count(id) from cmsPropertyType where dataTypeId=@0", TEST_DATA_TYPE_ID1);
+            int count = TRAL.Property.CountPropertyTypesByDataTypeId(TEST_DATA_TYPE_ID1);
 
             Assert.That(all.Length , Is.EqualTo(count)); // this test suite adds just one PropertyType for TEST_DATA_TYPE_ID1
         }

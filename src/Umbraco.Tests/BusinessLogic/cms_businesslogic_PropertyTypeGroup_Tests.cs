@@ -52,23 +52,23 @@ namespace Umbraco.Tests.BusinessLogic
 
             EnsureAll_PropertyTypeGroup_TestRecordsAreDeleted();
 
-            Assert.That(getDto<PropertyDataDto>(_propertyData1.Id), Is.Null);
-            Assert.That(getDto<PropertyDataDto>(_propertyData2.Id), Is.Null);
-            Assert.That(getDto<PropertyDataDto>(_propertyData3.Id), Is.Null);
-            Assert.That(getDto<PropertyTypeDto>(_propertyType1.Id), Is.Null);
-            Assert.That(getDto<PropertyTypeDto>(_propertyType2.Id), Is.Null);
-            Assert.That(getDto<PropertyTypeDto>(_propertyType3.Id), Is.Null);
-            Assert.That(getDto<ContentTypeDto>(_contentType1.PrimaryKey, idKeyName: "pk"), Is.Null);
-            Assert.That(getDto<ContentTypeDto>(_contentType2.PrimaryKey, idKeyName: "pk"), Is.Null);
-            Assert.That(getDto<PropertyTypeGroupDto>(_propertyTypeGroup1.Id), Is.Null);
-            Assert.That(getDto<PropertyTypeGroupDto>(_propertyTypeGroup2.Id), Is.Null);
-            Assert.That(getDto<PropertyTypeGroupDto>(_propertyTypeGroup3.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyDataDto>(_propertyData1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyDataDto>(_propertyData2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyDataDto>(_propertyData3.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyTypeDto>(_propertyType1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyTypeDto>(_propertyType2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyTypeDto>(_propertyType3.Id), Is.Null);
+            Assert.That(TRAL.GetDto<ContentTypeDto>(_contentType1.PrimaryKey, idKeyName: "pk"), Is.Null);
+            Assert.That(TRAL.GetDto<ContentTypeDto>(_contentType2.PrimaryKey, idKeyName: "pk"), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyTypeGroupDto>(_propertyTypeGroup1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyTypeGroupDto>(_propertyTypeGroup2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<PropertyTypeGroupDto>(_propertyTypeGroup3.Id), Is.Null);
 
-            Assert.That(getDto<NodeDto>(_node1.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_node2.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_node3.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_node4.Id), Is.Null);
-            Assert.That(getDto<NodeDto>(_node5.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node1.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node2.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node3.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node4.Id), Is.Null);
+            Assert.That(TRAL.GetDto<NodeDto>(_node5.Id), Is.Null);
         }
 
         [Test(Description = "Constructors and Save")]
@@ -83,7 +83,7 @@ namespace Umbraco.Tests.BusinessLogic
             propertyTypeGroup.Save();
             Assert.That(propertyTypeGroup.Id, !Is.EqualTo(0));    
 
-            var savedPropertyTypeGroup = getDto<PropertyTypeGroupDto>(propertyTypeGroup.Id);
+            var savedPropertyTypeGroup = TRAL.GetDto<PropertyTypeGroupDto>(propertyTypeGroup.Id);
             assertPropertyTypeGroupSetup(propertyTypeGroup, savedPropertyTypeGroup);
 
         }
@@ -103,7 +103,7 @@ namespace Umbraco.Tests.BusinessLogic
             propertyTypeGroup.Save();
             Assert.That(propertyTypeGroup.Id, !Is.EqualTo(0));    
 
-            var savedPropertyTypeGroup = getDto<PropertyTypeGroupDto>(propertyTypeGroup.Id);
+            var savedPropertyTypeGroup = TRAL.GetDto<PropertyTypeGroupDto>(propertyTypeGroup.Id);
             assertPropertyTypeGroupSetup(propertyTypeGroup, savedPropertyTypeGroup);
         }
 
@@ -123,7 +123,7 @@ namespace Umbraco.Tests.BusinessLogic
         public void Test_PropertyTypeGroup_GetPropertyTypeGroup()
         {
             var propertyTypeGroup1 = PropertyTypeGroup.GetPropertyTypeGroup(_propertyTypeGroup1.Id);  
-            var propertyTypeGroup2 = getDto<PropertyTypeGroupDto>(_propertyTypeGroup1.Id);
+            var propertyTypeGroup2 = TRAL.GetDto<PropertyTypeGroupDto>(_propertyTypeGroup1.Id);
 
             assertPropertyTypeGroupSetup(propertyTypeGroup1, propertyTypeGroup2);
         }
@@ -141,7 +141,7 @@ namespace Umbraco.Tests.BusinessLogic
             propertyTypeGroup.Name = "New Name" + uniqueNameSuffix;
             propertyTypeGroup.Save();
 
-            var savedPropertyTypeGroup = getDto<PropertyTypeGroupDto>(propertyTypeGroup.Id);
+            var savedPropertyTypeGroup = TRAL.GetDto<PropertyTypeGroupDto>(propertyTypeGroup.Id);
 
             assertPropertyTypeGroupSetup(propertyTypeGroup, savedPropertyTypeGroup);
         }
@@ -156,7 +156,7 @@ namespace Umbraco.Tests.BusinessLogic
 
             propertyTypeGroup.Delete();
 
-            var savedPropertyTypeGroup = getDto<PropertyTypeGroupDto>(id);
+            var savedPropertyTypeGroup = TRAL.GetDto<PropertyTypeGroupDto>(id);
             Assert.That(savedPropertyTypeGroup, Is.Null);
 
             initialized = false;
@@ -168,7 +168,7 @@ namespace Umbraco.Tests.BusinessLogic
             var parentPropertyTypeGroup = PropertyTypeGroup.GetPropertyTypeGroup(_propertyTypeGroup1.Id);
             var childGroups = parentPropertyTypeGroup.GetPropertyTypeGroups().ToArray();
 
-            int count = independentDatabase.ExecuteScalar<int>(@"SELECT count(id) FROM cmsPropertyTypeGroup WHERE parentGroupId = @0", parentPropertyTypeGroup.Id);
+            int count = TRAL.Property.CountPropertyTypeGroupsByGroupId(parentPropertyTypeGroup.Id);
 
             Assert.That(childGroups.Length, Is.EqualTo(count));
         }
@@ -178,7 +178,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var contentGroups = PropertyTypeGroup.GetPropertyTypeGroupsFromContentType(_contentType1.NodeId).ToArray();
 
-            int count = independentDatabase.ExecuteScalar<int>(@" SELECT count(id) FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @0", _contentType1.NodeId);
+            int count = TRAL.Property.CountPropertyTypeGroupsByContentTypeId(_contentType1.NodeId);
 
             Assert.That(contentGroups.Length, Is.EqualTo(TEST_CHILD_PROPERTY_TYPE_GROUPS_QTY));
         }
@@ -189,8 +189,7 @@ namespace Umbraco.Tests.BusinessLogic
             var propertyTypeGroup = PropertyTypeGroup.GetPropertyTypeGroup(_propertyTypeGroup1.Id);
             var groupPropertyTypes = propertyTypeGroup.GetPropertyTypes().ToArray();
 
-            int count = independentDatabase.ExecuteScalar<int>("SELECT count(id) FROM cmsPropertyType WHERE propertyTypeGroupId = @0", propertyTypeGroup.Id);
-
+            int count = TRAL.Property.CountPropertyTypesByGroupId( propertyTypeGroup.Id);
 
             Assert.That(groupPropertyTypes.Length, Is.EqualTo(TEST_CHILD_PROPERTY_TYPES_QTY));
         }
@@ -204,7 +203,7 @@ namespace Umbraco.Tests.BusinessLogic
 
             int count = 0; 
             contentTypeIds.ForEach(x =>
-                   count += independentDatabase.ExecuteScalar<int>("SELECT count(id) FROM cmsPropertyType WHERE propertyTypeGroupId = @0 and contentTypeId = @1", _propertyTypeGroup1.Id, x));
+                   count += TRAL.Property.CountPropertyTypeGroupsByGroupIdAndContentTypeId(_propertyTypeGroup1.Id, x));
 
             Assert.That(groupPropertyTypes.Length, Is.EqualTo(count));
         }

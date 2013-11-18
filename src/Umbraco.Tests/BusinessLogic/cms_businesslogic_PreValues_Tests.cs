@@ -21,18 +21,18 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(_dataTypeDefinition1, !Is.Null);
             Assert.That(_preValue, !Is.Null);
 
-            Assert.That(independentDatabase.ExecuteScalar<int>("select count(pk) from cmsDataType where nodeid = @0", _dataTypeDefinition1.Id), Is.EqualTo(1));
-            Assert.That(independentDatabase.ExecuteScalar<int>("select count(id) from umbracoNode where id = @0", _dataTypeDefinition1.Id), Is.EqualTo(1));
-            Assert.That(independentDatabase.ExecuteScalar<int>("select count(pk) from cmsDataType where nodeid = @0", _dataTypeDefinition2.Id), Is.EqualTo(1));
-            Assert.That(independentDatabase.ExecuteScalar<int>("select count(id) from umbracoNode where id = @0", _dataTypeDefinition2.Id), Is.EqualTo(1));
+            Assert.That(TRAL.PreValue.CountDataTypeOfId(_dataTypeDefinition1.Id), Is.EqualTo(1));
+            Assert.That(TRAL.PreValue.CountDataTypeNodes(_dataTypeDefinition1.Id), Is.EqualTo(1));
+            Assert.That(TRAL.PreValue.CountDataTypeOfId(_dataTypeDefinition2.Id), Is.EqualTo(1));
+            Assert.That(TRAL.PreValue.CountDataTypeNodes(_dataTypeDefinition2.Id), Is.EqualTo(1));
 
             EnsureAll_PreValue_TestRecordsAreDeleted();
 
-            Assert.That(getDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(_preValue.Id), Is.Null);
-            Assert.That(independentDatabase.ExecuteScalar<int>("select count(pk) from cmsDataType where nodeid = @0", _dataTypeDefinition1.Id), Is.EqualTo(0));
-            Assert.That(independentDatabase.ExecuteScalar<int>("select count(id) from umbracoNode where id = @0", _dataTypeDefinition1.Id), Is.EqualTo(0));
-            Assert.That(independentDatabase.ExecuteScalar<int>("select count(pk) from cmsDataType where nodeid = @0", _dataTypeDefinition2.Id), Is.EqualTo(0));
-            Assert.That(independentDatabase.ExecuteScalar<int>("select count(id) from umbracoNode where id = @0", _dataTypeDefinition2.Id), Is.EqualTo(0));
+            Assert.That(TRAL.GetDto<umbraco.cms.businesslogic.datatype.PreValue.PreValueDto>(_preValue.Id), Is.Null);
+            Assert.That(TRAL.PreValue.CountDataTypeOfId(_dataTypeDefinition1.Id), Is.EqualTo(0));
+            Assert.That(TRAL.PreValue.CountDataTypeNodes(_dataTypeDefinition1.Id), Is.EqualTo(0));
+            Assert.That(TRAL.PreValue.CountDataTypeOfId(_dataTypeDefinition2.Id), Is.EqualTo(0));
+            Assert.That(TRAL.PreValue.CountDataTypeNodes(_dataTypeDefinition2.Id), Is.EqualTo(0));
         }
 
         [Test(Description = "Test 'public static CountOfPreValues(int dataTypeDefId)' method")]

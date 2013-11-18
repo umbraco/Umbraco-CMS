@@ -34,7 +34,7 @@ namespace Umbraco.Tests.BusinessLogic
             Assert.That(_node5, !Is.Null);
 
             Guid objectType = Document._objectType;
-            int expectedValue = independentDatabase.ExecuteScalar<int>("SELECT COUNT(*) from umbracoNode WHERE nodeObjectType = @objectType", new { objectType});
+            int expectedValue = TRAL.Nodes.CountNodesByObjectTypeGuid(objectType);
             Assert.That(CMSNode.CountByObjectType(Document._objectType), Is.EqualTo(expectedValue));
 
             Assert.That(_relationType1, !Is.Null);
@@ -45,7 +45,7 @@ namespace Umbraco.Tests.BusinessLogic
 
             EnsureAll_Relation_TestRecordsAreDeleted();
 
-            expectedValue = independentDatabase.ExecuteScalar<int>("SELECT COUNT(*) from umbracoNode WHERE nodeObjectType = @objectType", new { objectType });
+            expectedValue = TRAL.Nodes.CountNodesByObjectTypeGuid(objectType);
             Assert.That(CMSNode.CountByObjectType(Document._objectType), Is.EqualTo(expectedValue));
 
             Assert.That(RelationType.GetById(_relationType1.Id), Is.Null);
@@ -72,7 +72,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = _node4;
             var expectedValue = newValue.Id;
-            Setter_Persists_Ext<Relation, CMSNode, int>(
+            TRAL.Setter_Persists_Ext<Relation, CMSNode, int>(
                     n => n.Parent,
                     n => n.Parent = newValue,
                     "umbracoRelation",
@@ -91,7 +91,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = _node4;
             var expectedValue = newValue.Id;
-            Setter_Persists_Ext<Relation, CMSNode, int>(
+            TRAL.Setter_Persists_Ext<Relation, CMSNode, int>(
                     n => n.Child,
                     n => n.Child = newValue,
                     "umbracoRelation",
@@ -110,7 +110,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
             var newValue = "new comment";
             var expectedValue = newValue;
-            Setter_Persists_Ext<Relation, string, string>(
+            TRAL.Setter_Persists_Ext<Relation, string, string>(
                     n => n.Comment,
                     n => n.Comment = newValue,
                     "umbracoRelation",
@@ -126,7 +126,7 @@ namespace Umbraco.Tests.BusinessLogic
         {
            var newValue = new RelationType(_relationType2.Id);
             var expectedValue = newValue.Id;
-            Setter_Persists_Ext<Relation, RelationType, int>(
+            TRAL.Setter_Persists_Ext<Relation, RelationType, int>(
                     n => n.RelType,
                     n => n.RelType = newValue,
                     "umbracoRelation",
@@ -153,7 +153,7 @@ namespace Umbraco.Tests.BusinessLogic
 
             // after relation is deleted
             Assert.Throws<ArgumentException>( () => { new Relation(relationId); });
-            Assert.That(getDto<RelationDto>(relationId), Is.Null);
+            Assert.That(TRAL.GetDto<RelationDto>(relationId), Is.Null);
 
             initialized = false;
         }
@@ -164,7 +164,7 @@ namespace Umbraco.Tests.BusinessLogic
             var  testRelation1 = Relation.MakeNew(_node4.Id, _node5.Id, new RelationType(_relationType2.Id), "Test Relation MakeNew");
             int testRelationId = testRelation1.Id;
 
-            var testRelation2 = getDto<RelationDto>(testRelationId);
+            var testRelation2 = TRAL.GetDto<RelationDto>(testRelationId);
 
             Assert.That(testRelationId, Is.EqualTo(testRelation2.Id));
         }
