@@ -14,7 +14,8 @@ angular.module('umbraco.mocks').
           }
 
           var id = mocksUtils.getParameterByName(data, "id") || 1234;
-          
+          id = parseInt(id, 10);
+
           var node = {
               name: "My content with id: " + id,
               updateDate: new Date(),
@@ -24,7 +25,7 @@ angular.module('umbraco.mocks').
               icon: "icon-file-alt",
               owner: {name: "Administrator", id: 0},
               updater: {name: "Per Ploug Krogslund", id: 1},
-
+              path: "-1,1234,2455", 
               tabs: [
               {
                   label: "Child documents",
@@ -32,7 +33,8 @@ angular.module('umbraco.mocks').
                   id: 0,
                   active: true,
                   properties: [
-                  { alias: "list", label: "List", view: "listview", value: "", hideLabel: true }
+                  { 
+                    alias: "list", label: "List", view: "listview", value: "", hideLabel: true }
                   ]
               },
               {
