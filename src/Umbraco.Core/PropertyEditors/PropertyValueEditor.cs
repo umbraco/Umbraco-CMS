@@ -291,9 +291,17 @@ namespace Umbraco.Core.PropertyEditors
         /// it is a CDATA fragment, otherwise it is just a text fragment.
         /// 
         /// This method by default will only return XText or XCData which must be wrapped in an element!
+        /// 
+        /// If the value is empty we will not return as CDATA since that will just take up more space in the file.
         /// </remarks>
         public virtual XNode ConvertDbToXml(Property property)
         {
+            //check for null or empty value, we don't want to return CDATA if that is the case
+            if (property.Value == null || property.Value.ToString().IsNullOrWhiteSpace())
+            {
+                return new XText(ConvertDbToString(property));
+            }
+
             switch (GetDatabaseType())
             {
                 case DataTypeDatabaseType.Date:
