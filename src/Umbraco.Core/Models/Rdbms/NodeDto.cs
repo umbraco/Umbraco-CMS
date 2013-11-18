@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class NodeDto
     {
         [Column("id")]
-        [PrimaryKeyColumn(Name = "PK_structure", IdentitySeed = 1045)]
+        [PrimaryKeyColumn(Name = "PK_structure", IdentitySeed = 1050)]
         public int NodeId { get; set; }
 
         [Column("trashed")]
