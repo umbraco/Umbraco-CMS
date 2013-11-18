@@ -12,10 +12,10 @@
     <div ng-show="persistedFiles.length > 0">        
         <ul class="thumbnails">
             <li class="thumbnail" ng-repeat="file in persistedFiles">
-                <div ng-switch on="file.isImage" >
+                <a href="{{file.file}}" target="_blank" ng-switch on="file.isImage" >
                     <img ng-src="{{file.thumbnail}}" ng-switch-when="true" alt="{{file.file}}"/>
                     <span ng-switch-default>{{file.file}}</span>
-                </div>                
+                </a>                
             </li>
         </ul>
         <input type="checkbox" id="clearFiles-{{model.id}}" name="clearFiles" ng-model="clearFiles" />
