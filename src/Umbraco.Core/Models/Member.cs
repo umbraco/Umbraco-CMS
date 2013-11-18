@@ -117,6 +117,10 @@ namespace Umbraco.Core.Models
         [DataMember]
         public IEnumerable<string> Groups { get; set; }
 
+        //TODO: When get/setting all of these properties we MUST:
+        // * Check if we are using the umbraco membership provider, if so then we need to use the configured fields - not the explicit fields below
+        // * If any of the fields don't exist, what should we do? Currently it will throw an exception!
+
         /// <summary>
         /// Gets or sets the Password Question
         /// </summary>
@@ -201,6 +205,7 @@ namespace Umbraco.Core.Models
                 if (Properties[Constants.Conventions.Member.IsApproved].Value is bool)
                     return (bool)Properties[Constants.Conventions.Member.IsApproved].Value;
 
+                //TODO: Use TryConvertTo<T> instead
                 return (bool)Convert.ChangeType(Properties[Constants.Conventions.Member.IsApproved].Value, typeof(bool));
             }
             set
@@ -227,6 +232,7 @@ namespace Umbraco.Core.Models
                 if (Properties[Constants.Conventions.Member.IsLockedOut].Value is bool)
                     return (bool)Properties[Constants.Conventions.Member.IsLockedOut].Value;
 
+                //TODO: Use TryConvertTo<T> instead
                 return (bool)Convert.ChangeType(Properties[Constants.Conventions.Member.IsLockedOut].Value, typeof(bool));
             }
             set
@@ -253,6 +259,7 @@ namespace Umbraco.Core.Models
                 if (Properties[Constants.Conventions.Member.LastLoginDate].Value is DateTime)
                     return (DateTime)Properties[Constants.Conventions.Member.LastLoginDate].Value;
 
+                //TODO: Use TryConvertTo<T> instead
                 return (DateTime)Convert.ChangeType(Properties[Constants.Conventions.Member.LastLoginDate].Value, typeof(DateTime));
             }
             set
@@ -279,6 +286,7 @@ namespace Umbraco.Core.Models
                 if (Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value is DateTime)
                     return (DateTime)Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value;
 
+                //TODO: Use TryConvertTo<T> instead
                 return (DateTime)Convert.ChangeType(Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value, typeof(DateTime));
             }
             set
@@ -305,6 +313,7 @@ namespace Umbraco.Core.Models
                 if (Properties[Constants.Conventions.Member.LastLockoutDate].Value is DateTime)
                     return (DateTime)Properties[Constants.Conventions.Member.LastLockoutDate].Value;
 
+                //TODO: Use TryConvertTo<T> instead
                 return (DateTime)Convert.ChangeType(Properties[Constants.Conventions.Member.LastLockoutDate].Value, typeof(DateTime));
             }
             set
@@ -332,6 +341,7 @@ namespace Umbraco.Core.Models
                 if (Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value is int)
                     return (int)Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value;
 
+                //TODO: Use TryConvertTo<T> instead
                 return (int)Convert.ChangeType(Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value, typeof(int));
             }
             set

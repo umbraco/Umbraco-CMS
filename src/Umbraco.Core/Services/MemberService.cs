@@ -401,7 +401,7 @@ namespace Umbraco.Core.Services
         /// A helper method that will create a basic/generic member for use with a generic membership provider
         /// </summary>
         /// <returns></returns>
-        internal static IMember CreateGenericMembershipProviderMember()
+        internal static IMember CreateGenericMembershipProviderMember(string name, string email, string username, string password)
         {
             var identity = int.MaxValue;
 
@@ -410,26 +410,12 @@ namespace Umbraco.Core.Services
                 {
                     Name = "Membership",
                     Id = --identity
-                };            
+                };
             propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
                 {
                     Alias = Constants.Conventions.Member.Comments,
                     Name = Constants.Conventions.Member.CommentsLabel,
                     SortOrder = 0,
-                    Id = --identity
-                });
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Nvarchar)
-                {
-                    Alias = Constants.Conventions.Member.FailedPasswordAttempts,
-                    Name = Constants.Conventions.Member.FailedPasswordAttemptsLabel,
-                    SortOrder = 1,
-                    Id = --identity
-                });
-            propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Nvarchar)
-                {
-                    Alias = Constants.Conventions.Member.IsApproved,
-                    Name = Constants.Conventions.Member.IsApprovedLabel,
-                    SortOrder = 2,
                     Id = --identity
                 });
             propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TrueFalseAlias, DataTypeDatabaseType.Integer)
@@ -467,9 +453,10 @@ namespace Umbraco.Core.Services
                     SortOrder = 7,
                     Id = --identity
                 });
+
             memType.PropertyGroups.Add(propGroup);
 
-            return new Member("", memType);
+            return new Member(name, email, username, password, -1, memType);
         }
     }
 }

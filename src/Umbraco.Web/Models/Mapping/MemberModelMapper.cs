@@ -5,6 +5,8 @@ using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco;
 using System.Linq;
@@ -18,6 +20,29 @@ namespace Umbraco.Web.Models.Mapping
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
+            //FROM MembershipUser TO MediaItemDisplay - used when using a non-umbraco membership provider
+            config.CreateMap<MembershipUser, MemberDisplay>()
+                .ConvertUsing(user =>
+                    {
+                        var member = Mapper.Map<MembershipUser, IMember>(user);
+                        return Mapper.Map<IMember, MemberDisplay>(member);
+                    });
+
+            //FROM MembershipUser TO IMember - used when using a non-umbraco membership provider
+            config.CreateMap<MembershipUser, IMember>()
+                  .ConstructUsing(user => MemberService.CreateGenericMembershipProviderMember(user.UserName, user.Email, user.UserName, ""))
+                  .ForMember(member => member.Comments, expression => expression.MapFrom(user => user.Comment))
+                  .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
+                  .ForMember(member => member.UpdateDate, expression => expression.MapFrom(user => user.LastActivityDate))
+                  .ForMember(member => member.LastPasswordChangeDate, expression => expression.MapFrom(user => user.LastPasswordChangedDate))
+                  .ForMember(member => member.Key, expression => expression.MapFrom(user => user.ProviderUserKey.TryConvertTo<Guid>().Result))
+                  //This is a special case for password - we don't actually care what the password is but it either needs to be something or nothing
+                  // so we'll set it to something if the member is actually created, otherwise nothing if it is a new member.
+                  .ForMember(member => member.Password, expression => expression.MapFrom(user => user.CreationDate > DateTime.MinValue ? Guid.NewGuid().ToString("N") : ""))
+                    //TODO: Support these eventually
+                  .ForMember(member => member.PasswordQuestion, expression => expression.Ignore())
+                  .ForMember(member => member.PasswordAnswer, expression => expression.Ignore());
+
             //FROM IMember TO MediaItemDisplay
             config.CreateMap<IMember, MemberDisplay>()
                   .ForMember(
@@ -37,6 +62,8 @@ namespace Umbraco.Web.Models.Mapping
                              expression => expression.ResolveUsing<MemberTabsAndPropertiesResolver>())
                   .ForMember(display => display.MemberProviderFieldMapping,
                              expression => expression.ResolveUsing<MemberProviderFieldMappingResolver>())
+                    .ForMember(display => display.MembershipScenario,
+                            expression => expression.ResolveUsing(new MembershipScenarioMappingResolver(new Lazy<IMemberTypeService>(() => applicationContext.Services.MemberTypeService))))                             
                   .AfterMap(MapGenericCustomProperties);
 
             //FROM IMember TO ContentItemBasic<ContentPropertyBasic, IMember>
@@ -216,6 +243,7 @@ namespace Umbraco.Web.Models.Mapping
 
                     //This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
                     // if we just had all of the membeship provider fields on the member table :(
+                    // TODO: But is there a way to map the IMember.IsLockedOut to the property ? i dunno.
                     var isLockedOutProperty = result.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == umbracoProvider.LockPropertyTypeAlias);
                     if (isLockedOutProperty != null && isLockedOutProperty.Value.ToString() != "1")
                     {
@@ -227,6 +255,28 @@ namespace Umbraco.Web.Models.Mapping
                 }
 
                 
+            }
+        }
+
+        internal class MembershipScenarioMappingResolver : ValueResolver<IMember, MembershipScenario>
+        {
+            private readonly Lazy<IMemberTypeService> _memberTypeService;
+
+            public MembershipScenarioMappingResolver(Lazy<IMemberTypeService> memberTypeService)
+            {
+                _memberTypeService = memberTypeService;
+            }
+
+            protected override MembershipScenario ResolveCore(IMember source)
+            {
+                if (Membership.Provider.Name == Constants.Conventions.Member.UmbracoMemberProviderName)
+                {
+                    return MembershipScenario.NativeUmbraco;
+                }
+                var memberType = _memberTypeService.Value.GetMemberType(Constants.Conventions.MemberTypes.Member);
+                return memberType != null
+                           ? MembershipScenario.CustomProviderWithUmbracoLink
+                           : MembershipScenario.StandaloneCustomProvider;
             }
         }
 

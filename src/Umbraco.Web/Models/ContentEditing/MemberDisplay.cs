@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
@@ -21,6 +22,9 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "email")]
         public string Email { get; set; }
+
+        [DataMember(Name = "membershipScenario")]
+        public MembershipScenario MembershipScenario { get; set; }
 
         /// <summary>
         /// This is used to indicate how to map the membership provider properties to the save model, this mapping

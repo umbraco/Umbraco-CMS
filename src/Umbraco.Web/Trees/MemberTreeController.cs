@@ -36,7 +36,7 @@ namespace Umbraco.Web.Trees
                     nodes.Add(folder);
                 }
                 //list out 'Others' if the membership provider is umbraco
-                if (Member.InUmbracoMemberMode())
+                if (Membership.Provider.Name == Constants.Conventions.Member.UmbracoMemberProviderName)
                 {
                     var folder = CreateTreeNode("others", id, queryStrings, "Others", "icon-folder-close", true);
                     folder.NodeType = "member-folder";
@@ -48,7 +48,7 @@ namespace Umbraco.Web.Trees
                 //if it is a letter
                 if (id.Length == 1 && char.IsLower(id, 0))
                 {
-                    if (Member.InUmbracoMemberMode())
+                    if (Membership.Provider.Name == Constants.Conventions.Member.UmbracoMemberProviderName)
                     {
                         //get the members from our member data layer
                         nodes.AddRange(
@@ -82,7 +82,7 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 // root actions      
-                if (Member.InUmbracoMemberMode())
+                if (Membership.Provider.Name == Constants.Conventions.Member.UmbracoMemberProviderName)
                 {
                     //set default
                     menu.DefaultMenuAlias = ActionNew.Instance.Alias;
