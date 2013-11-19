@@ -21,7 +21,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 			}
 
 			contentResource.getNiceUrl($scope.target.id).then(function(url){
-				$scope.target.url = angular.fromJson(url);
+				$scope.target.url = url;
 			});
 		}
 	}
@@ -53,7 +53,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 		        $scope.target.url = "/";
 		    } else {
 		        contentResource.getNiceUrl(args.node.id).then(function (url) {
-		            $scope.target.url = angular.fromJson(url);
+		            $scope.target.url = url;
 		        });
 		    }
 		} else {
