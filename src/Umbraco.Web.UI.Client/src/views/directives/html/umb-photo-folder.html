@@ -1,28 +1,30 @@
 <div class="umb-photo-folder">
 	<div class="picrow" ng-repeat="row in rows">
-		<a 
-			href="#media/media/edit/{{img.id}}" 
-			ng-click="clickHandler(img, $event)" 
-			ng-switch="img.thumbnail" 
-			ng-repeat="img in row.photos"
-			style="margin: 0px; padding: 0px; border: none; display: inline-block"
-			ng-class="img.cssclass"
-			title="{{img.name}}">
-
-				<div ng-style="img.style" class="umb-non-thumbnail" ng-switch-when="none">
-					<i class="icon large icon-folder"></i>
-					{{img.name}}
-				</div>
-
-				<img class="umb-photo" 
-					ng-switch-default  
-					ng-src="{{img.thumbnail}}"
-					ng-style="img.style"
-
-					alt="{{img.name}}"/>
-		</a>
-	
-
 		
+		<div class="pic" ng-class="img.cssclass" style="margin: 0px; padding: 0px; border: none; display: inline-block; overflow: hidden" ng-style="img.style" ng-repeat="img in row.photos">		
+			<a 
+				href="#media/media/edit/{{img.id}}" 
+				ng-click="clickHandler(img, $event, false)" 
+				ng-switch="img.thumbnail" 
+				title="{{img.name}}">
+
+					<div ng-style="img.style" class="umb-non-thumbnail" ng-switch-when="none">
+						<i class="icon large {{img.icon}}"></i>
+						{{img.name}}
+					</div>
+
+					<img class="umb-photo" 
+						ng-switch-default  
+						ng-src="{{img.thumbnail}}"
+						ng-style="img.style"
+						alt="{{img.name}}"/>
+			</a>
+
+			<a href ng-click="clickHandler(img, $event, true)" ng-show="img.contentTypeAlias === 'Folder'" class="selector-overlay">
+				Select
+			</a>
+			<div>
+		</div>
+
 	</div>
 </div>

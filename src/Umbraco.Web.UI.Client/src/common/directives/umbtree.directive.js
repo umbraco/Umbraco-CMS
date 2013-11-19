@@ -13,8 +13,8 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
         scope: {
             section: '@',
             treealias: '@',
-            showoptions: '@',
-            showheader: '@',
+            hideoptions: '@',
+            hideheader: '@',
             cachekey: '@',
             isdialog: '@',
             //Custom query string arguments to pass in to the tree as a string, example: "startnodeid=123&something=value"
@@ -24,18 +24,13 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
 
         compile: function(element, attrs) {
             //config
-            var hideheader = (attrs.showheader === 'false') ? true : false;
-            var hideoptions = (attrs.showoptions === 'false') ? "hide-options" : "";
-
-            var template = '<ul class="umb-tree ' + hideoptions + '">' +
-                '<li class="root">';
-
-            if (!hideheader) {
-                template += '<div>' +
-                    '<h5><a href="#/{{section}}" ng-click="select(this, tree.root, $event)" on-right-click="altSelect(this, tree.root, $event)"  class="root-link">{{tree.name}}</a></h5>' +
-                    '<a href class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(this, tree.root, $event)" ng-swipe-right="options(this, tree.root, $event)"><i></i><i></i><i></i></a>' +
-                    '</div>';
-            }
+            //var showheader = (attrs.showheader !== 'false');
+            var hideoptions = (attrs.hideoptions === 'true') ? "hide-options" : "";
+            var template = '<ul class="umb-tree ' + hideoptions + '"><li class="root">';
+            template += '<div ng-hide="hideheader">' +
+                '<h5><a href="#/{{section}}" ng-click="select(this, tree.root, $event)" on-right-click="altSelect(this, tree.root, $event)"  class="root-link">{{tree.name}}</a></h5>' +
+                '<a href class="umb-options" ng-hide="tree.root.isContainer || !tree.root.menuUrl" ng-click="options(this, tree.root, $event)" ng-swipe-right="options(this, tree.root, $event)"><i></i><i></i><i></i></a>' +
+                '</div>';
             template += '<ul>' +
                 '<umb-tree-item ng-repeat="child in tree.root.children" eventhandler="eventhandler" node="child" current-node="currentNode" tree="child" section="{{section}}" ng-animate="animation()"></umb-tree-item>' +
                 '</ul>' +

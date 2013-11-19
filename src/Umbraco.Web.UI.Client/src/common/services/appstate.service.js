@@ -5,6 +5,32 @@
  *
  * @description
  * Tracks the various application state variables when working in the back office, raises events when state changes.
+ *
+ * ##Samples
+ *
+ * ####Subscribe to global state changes:
+ * 
+ * <pre>
+  *    scope.showTree = appState.getGlobalState("showNavigation");
+  *
+  *    scope.$on("appState.globalState.changed", function (e, args) {
+  *               if (args.key === "showNavigation") {
+  *                   scope.showTree = args.value;
+  *               }
+  *           });  
+  * </pre>
+ *
+ * ####Subscribe to section-state changes
+ *
+ * <pre>
+ *    scope.currentSection = appState.getSectionState("currentSection");
+ *
+ *    scope.$on("appState.sectionState.changed", function (e, args) {
+ *               if (args.key === "currentSection") {
+ *                   scope.currentSection = args.value;
+ *               }
+ *           });  
+ * </pre>
  */
 function appState($rootScope) {
     
@@ -75,7 +101,7 @@ function appState($rootScope) {
          * @function
          *
          * @description
-         * Returns the current global state value by key - we do not return an object here - we do NOT want this
+         * Returns the current global state value by key - we do not return an object reference here - we do NOT want this
          * to be publicly mutable and allow setting arbitrary values
          *
          */
@@ -203,13 +229,52 @@ angular.module('umbraco.services').factory("editorState", function() {
 
     var current = null;
     var state = {
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.angularHelper#set
+         * @methodOf umbraco.services.editorState
+         * @function
+         *
+         * @description
+         * Sets the current entity object for the currently active editor
+         * This is only used when implementing an editor with a complex model
+         * like the content editor, where the model is modified by several
+         * child controllers. 
+         */
         set: function (entity) {
             current = entity;
         },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.angularHelper#reset
+         * @methodOf umbraco.services.editorState
+         * @function
+         *
+         * @description
+         * Since the editorstate entity is read-only, you cannot set it to null
+         * only through the reset() method
+         */
         reset: function() {
             current = null;
         }
-        
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.angularHelper#current
+         * @methodOf umbraco.services.editorState
+         * @function
+         *
+         * @description
+         * Returns an object reference to the current editor entity.
+         * the entity is the root object of the editor.
+         * EditorState is used by property/parameter editors that need
+         * access to the entire entity being edited, not just the property/parameter 
+         *
+         * editorState.current can not be overwritten, you should only read values from it
+         * since modifying individual properties should be handled by the property editors
+         */
     };
 
     //create a get/set property but don't allow setting

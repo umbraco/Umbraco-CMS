@@ -81,11 +81,26 @@ namespace umbraco.cms.presentation.Trees
                     
                 }
             }
-            FileInfo[] fileInfo = dirInfo.GetFiles(FileSearchPattern);
+
+            //this is a hack to enable file system tree to support multiple file extension look-up
+            //so the pattern both support *.* *.xml and xml,js,vb for lookups
+            string[] allowedExtensions = new string[0];
+            bool filterByMultipleExtensions = FileSearchPattern.Contains(",");
+            FileInfo[] fileInfo;
+
+            if (filterByMultipleExtensions){
+                fileInfo = dirInfo.GetFiles();
+                allowedExtensions = FileSearchPattern.ToLower().Split(',');
+            }else
+                fileInfo = dirInfo.GetFiles(FileSearchPattern);
+            
             foreach (FileInfo file in fileInfo)
             {
                 if ((file.Attributes & FileAttributes.Hidden) == 0)
                 {
+                    if (filterByMultipleExtensions && Array.IndexOf<string>(allowedExtensions, file.Extension.ToLower().Trim('.')) < 0)
+                        continue;
+                    
                     XmlTreeNode xFileNode = XmlTreeNode.Create(this);
 					xFileNode.NodeID = orgPath + file.Name;
                     xFileNode.Text = file.Name;

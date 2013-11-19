@@ -121,7 +121,20 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             return undefined;
         },
 
-        /** clears the tree cache - with optional cacheKey, optional section or optional filter */
+        /**
+         * @ngdoc method
+         * @name umbraco.services.treeService#clearCache
+         * @methodOf umbraco.services.treeService
+         * @function
+         *
+         * @description
+         * Clears the tree cache - with optional cacheKey, optional section or optional filter.
+         * 
+         * @param {Object} args arguments
+         * @param {String} args.cacheKey optional cachekey - this is used to clear specific trees in dialogs
+         * @param {String} args.section optional section alias - clear tree for a given section
+         * @param {String} args.childrenOf optional parent ID - only clear the cache below a specific node
+         */
         clearCache: function (args) {
             //clear all if not specified
             if (!args) {
@@ -252,7 +265,16 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
 
         },
 
-        /** Removes a given tree node from the tree */
+        /**
+         * @ngdoc method
+         * @name umbraco.services.treeService#removeNode
+         * @methodOf umbraco.services.treeService
+         * @function
+         *
+         * @description
+         * Removes a given node from the tree
+         * @param {object} treeNode the node to remove
+         */
         removeNode: function(treeNode) {
             if (treeNode.parent() == null) {
                 throw "Cannot remove a node that doesn't have a parent";
@@ -261,14 +283,33 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             treeNode.parent().children.splice(treeNode.parent().children.indexOf(treeNode), 1);            
         },
         
-        /** Removes all child nodes from a given tree node */
+        /**
+         * @ngdoc method
+         * @name umbraco.services.treeService#removeChildNodes
+         * @methodOf umbraco.services.treeService
+         * @function
+         *
+         * @description
+         * Removes all child nodes from a given tree node 
+         * @param {object} treeNode the node to remove children from
+         */
         removeChildNodes : function(treeNode) {
             treeNode.expanded = false;
             treeNode.children = [];
             treeNode.hasChildren = false;
         },
 
-        /** Gets a child node by id */
+        /**
+         * @ngdoc method
+         * @name umbraco.services.treeService#getChildNode
+         * @methodOf umbraco.services.treeService
+         * @function
+         *
+         * @description
+         * Gets a child node with a given ID, from a specific treeNode
+         * @param {object} treeNode to retrive child node from
+         * @param {int} id id of child node
+         */
         getChildNode: function (treeNode, id) {
             if (!treeNode.children) {
                 return null;
@@ -279,7 +320,18 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             return found === undefined ? null : found;
         },
 
-        /** Gets a descendant node by id */
+        /**
+         * @ngdoc method
+         * @name umbraco.services.treeService#getDescendantNode
+         * @methodOf umbraco.services.treeService
+         * @function
+         *
+         * @description
+         * Gets a descendant node by id
+         * @param {object} treeNode to retrive descendant node from
+         * @param {int} id id of descendant node
+         * @param {string} treeAlias - optional tree alias, if fetching descendant node from a child of a listview document
+         */
         getDescendantNode: function(treeNode, id, treeAlias) {
 
             //validate if it is a section container since we'll need a treeAlias if it is one
@@ -332,7 +384,16 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             return found === undefined ? null : found;
         },
 
-        /** Gets the root node of the current tree type for a given tree node */
+        /**
+         * @ngdoc method
+         * @name umbraco.services.treeService#getTreeRoot
+         * @methodOf umbraco.services.treeService
+         * @function
+         *
+         * @description
+         * Gets the root node of the current tree type for a given tree node
+         * @param {object} treeNode to retrive tree root node from
+         */
         getTreeRoot: function (treeNode) {
             if (!treeNode) {
                 throw "treeNode cannot be null";
@@ -354,6 +415,16 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
         },
 
         /** Gets the node's tree alias, this is done by looking up the meta-data of the current node's root node */
+        /**
+         * @ngdoc method
+         * @name umbraco.services.treeService#getTreeAlias
+         * @methodOf umbraco.services.treeService
+         * @function
+         *
+         * @description
+         * Gets the node's tree alias, this is done by looking up the meta-data of the current node's root node 
+         * @param {object} treeNode to retrive tree alias from
+         */
         getTreeAlias : function(treeNode) {
             var root = this.getTreeRoot(treeNode);
             if (root) {
@@ -362,7 +433,18 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             return "";
         },
 
-        /** gets the tree, returns a promise */
+        /**
+         * @ngdoc method
+         * @name umbraco.services.treeService#getTree
+         * @methodOf umbraco.services.treeService
+         * @function
+         *
+         * @description
+         * gets the tree, returns a promise 
+         * @param {object} args Arguments
+         * @param {string} args.section Section alias
+         * @param {string} args.cacheKey Optional cachekey
+         */
         getTree: function (args) {
 
             var deferred = $q.defer();
@@ -409,6 +491,17 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             return deferred.promise;
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.services.treeService#getMenu
+         * @methodOf umbraco.services.treeService
+         * @function
+         *
+         * @description
+         * Returns available menu actions for a given tree node
+         * @param {object} args Arguments
+         * @param {string} args.treeNode tree node object to retrieve the menu for
+         */
         getMenu: function (args) {
 
             if (!args) {
@@ -428,7 +521,18 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                 });
         },
         
-        /** Gets the children from the server for a given node */
+        /**
+         * @ngdoc method
+         * @name umbraco.services.treeService#getChildren
+         * @methodOf umbraco.services.treeService
+         * @function
+         *
+         * @description
+         * Gets the children from the server for a given node 
+         * @param {object} args Arguments
+         * @param {object} args.node tree node object to retrieve the children for
+         * @param {string} args.section current section alias
+         */
         getChildren: function (args) {
 
             if (!args) {
@@ -451,7 +555,16 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                 });
         },
         
-        /** This re-loads the single node from the server */
+        /**
+         * @ngdoc method
+         * @name umbraco.services.treeService#reloadNode
+         * @methodOf umbraco.services.treeService
+         * @function
+         *
+         * @description
+         * Re-loads the single node from the server
+         * @param {object} node Tree node to reload
+         */
         reloadNode: function(node) {
             if (!node) {
                 throw "node cannot be null";
@@ -495,7 +608,16 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
             return deferred.promise;
         },
 
-        /** This will return the current node's path by walking up the tree */
+        /**
+         * @ngdoc method
+         * @name umbraco.services.treeService#getPath
+         * @methodOf umbraco.services.treeService
+         * @function
+         *
+         * @description
+         * This will return the current node's path by walking up the tree 
+         * @param {object} node Tree node to retrieve path for
+         */
         getPath: function(node) {
             if (!node) {
                 throw "node cannot be null";                

@@ -46,7 +46,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
 
     if ($routeParams.create) {
         //we are creating so get an empty data type item
-        dataTypeResource.getScaffold($routeParams.id)
+        dataTypeResource.getScaffold()
             .then(function(data) {
                 $scope.loaded = true;
                 $scope.preValuesLoaded = true;

@@ -71,6 +71,7 @@
   
   <area alias="buttons">
     <key alias="select">Select</key>
+    <key alias="selectCurrentFolder">Select current folder</key>
     <key alias="somethingElse">Do something else</key>
     
     <key alias="bold">Bold</key>

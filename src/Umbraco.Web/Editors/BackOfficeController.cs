@@ -167,6 +167,7 @@ namespace Umbraco.Web.Editors
                         "umbracoSettings", new Dictionary<string, object>
                             {
                                 {"umbracoPath", GlobalSettings.Path},
+                                {"mediaPath", IOHelper.ResolveUrl(SystemDirectories.Media).TrimEnd('/')},
                                 {"appPluginsPath", IOHelper.ResolveUrl(SystemDirectories.AppPlugins).TrimEnd('/')},
                                 {
                                     "imageFileTypes",

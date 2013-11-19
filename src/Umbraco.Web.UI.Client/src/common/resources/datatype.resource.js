@@ -7,7 +7,28 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
     
     return {
         
-        getPreValues: function (editorId, dataTypeId) {
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.dataTypeResource#getPreValues
+         * @methodOf umbraco.resources.dataTypeResource
+         *
+         * @description
+         * Retrieves available prevalues for a given data type + editor
+         *
+         * ##usage
+         * <pre>
+         * dataTypeResource.getPrevalyes("Umbraco.MediaPicker", 1234)
+         *    .then(function(prevalues) {
+         *        alert('its gone!');
+         *    });
+         * </pre> 
+         * 
+         * @param {String} editorAlias string alias of editor type to retrive prevalues configuration for
+         * @param {Int} id id of datatype to retrieve prevalues for        
+         * @returns {Promise} resourcePromise object.
+         *
+         */  
+        getPreValues: function (editorAlias, dataTypeId) {
 
             if (!dataTypeId) {
                 dataTypeId = -1;
@@ -18,10 +39,30 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "dataTypeApiBaseUrl",
                        "GetPreValues",
-                       [{ editorAlias: editorId }, { dataTypeId: dataTypeId }])),
+                       [{ editorAlias: editorAlias }, { dataTypeId: dataTypeId }])),
                'Failed to retreive pre values for editor id ' + editorId);
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.dataTypeResource#getById
+         * @methodOf umbraco.resources.dataTypeResource
+         *
+         * @description
+         * Gets a data type item with a given id
+         *
+         * ##usage
+         * <pre>
+         * dataTypeResource.getById(1234)
+         *    .then(function() {
+         *        alert('its gone!');
+         *    });
+         * </pre> 
+         * 
+         * @param {Int} id id of data type to retrieve        
+         * @returns {Promise} resourcePromise object.
+         *
+         */
         getById: function (id) {
             
             return umbRequestHelper.resourcePromise(
@@ -39,21 +80,45 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "dataTypeApiBaseUrl",
-                       "GetAll",
-                       [{ id: id }])),
-               'Failed to retreive data for data type id ' + id);
+                       "GetAll")),
+               'Failed to retreive data');
         },
 
-        /** returns an empty content object which can be persistent on the content service
-            requires the parent id and the alias of the content type to base the scaffold on */
-        getScaffold: function (parentId, alias) {
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.contentResource#getScaffold
+         * @methodOf umbraco.resources.contentResource
+         *
+         * @description
+         * Returns a scaffold of an empty data type item
+         * 
+         * The scaffold is used to build editors for data types that has not yet been populated with data.
+         * 
+         * ##usage
+         * <pre>
+         * dataTypeResource.getScaffold()
+         *    .then(function(scaffold) {
+         *        var myType = scaffold;
+         *        myType.name = "My new data type"; 
+         *
+         *        dataTypeResource.save(myType, myType.preValues, true)
+         *            .then(function(type){
+         *                alert("Retrieved, updated and saved again");
+         *            });
+         *    });
+         * </pre> 
+         * 
+         * @returns {Promise} resourcePromise object containing the data type scaffold.
+         *
+         */
+        getScaffold: function () {
             
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "dataTypeApiBaseUrl",
                        "GetEmpty")),
-               'Failed to retreive data for empty datatype ' + alias);
+               'Failed to retreive data for empty datatype');
         },
         /**
          * @ngdoc method
@@ -61,7 +126,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
          * @methodOf umbraco.resources.dataTypeResource
          *
          * @description
-         * Deletes a content item with a given id
+         * Deletes a data type with a given id
          *
          * ##usage
          * <pre>
@@ -84,7 +149,33 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                         [{ id: id }])),
                 'Failed to delete item ' + id);
         },
-        /** saves or updates a data type object */
+        
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.dataTypeResource#deleteById
+         * @methodOf umbraco.resources.dataTypeResource
+         *
+         * @description
+         * Saves or update a data typw
+         *
+         * ##usage
+         * <pre>
+         * dataTypeResource.getById(1234)
+         *    .then(function(type) {
+         *        type.name ="hibba";
+         *  
+         *        dataTypeResource.save(type, type.preValues, false).then(function(type){
+         *          alert('its done!');
+         *        }): 
+         *    });
+         * </pre> 
+         * 
+         * @param {Object} dataType data type object to create/update
+         * @param {Array} preValues collection of prevalues on the datatype
+         * @param {Bool} isNew set to true if type should be create instead of updated  
+         * @returns {Promise} resourcePromise object.
+         *
+         */
         save: function (dataType, preValues, isNew) {
             
             var saveModel = umbDataFormatter.formatDataTypePostData(dataType, preValues, "save" + (isNew ? "New" : ""));

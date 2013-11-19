@@ -526,7 +526,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				//loop through remaining values that haven't been applied
 				foreach (var i in valueDictionary.Where(x => !_keysAdded.Contains(x.Key)))
 				{
-				    IPublishedProperty property;
+				    IPublishedProperty property = null;
 
                     // must ignore that one
 				    if (i.Key == "version") continue;
@@ -540,7 +540,9 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     {
                         // use property type to ensure proper conversion
                         var propertyType = _contentType.GetPropertyType(i.Key);
-                        property = new XmlPublishedProperty(propertyType, false, i.Value); // false :: never preview a media
+
+                        if (propertyType != null) 
+                            property = new XmlPublishedProperty(propertyType, false, i.Value); // false :: never preview a media
                     }
 
 					_properties.Add(property);

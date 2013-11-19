@@ -36,17 +36,21 @@ angular.module('umbraco.directives')
 })
 
 .directive('onRightClick',function(){
+    
     document.oncontextmenu = function (e) {
        if(e.target.hasAttribute('on-right-click')) {
+           e.preventDefault();
+           e.stopPropagation(); 
            return false;
        }
     };  
+
     return function(scope,el,attrs){
         el.bind('contextmenu',function(e){
             e.preventDefault();
             e.stopPropagation();
-            
             scope.$apply(attrs.onRightClick);
-        }) ;
+            return false;
+        });
     };
 });
