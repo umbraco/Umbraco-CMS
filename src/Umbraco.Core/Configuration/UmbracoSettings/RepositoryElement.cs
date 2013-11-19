@@ -19,7 +19,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             set { base["guid"] = value; }
         }
 
-        [ConfigurationProperty("repositoryurl", DefaultValue = "http://our.umbraco.org")]
+        [ConfigurationProperty("repositoryurl", DefaultValue = "http://packages.umbraco.org")]
         public string RepositoryUrl
         {
             get { return (string)base["repositoryurl"]; }
