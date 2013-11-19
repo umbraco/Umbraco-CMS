@@ -45,7 +45,7 @@ function stylesheetResource($q, $http, umbRequestHelper) {
                        "stylesheetApiBaseUrl",
                        "GetRules",
                        [{ id: id }]
-                       )),
+                       ) +"&rnd=" + Math.floor(Math.random()*1001), {cache: false}),
                'Failed to retreive stylesheets ');
         },
 
