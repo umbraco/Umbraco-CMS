@@ -15,8 +15,9 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.template;
 using umbraco.IO;
 using Umbraco.Core;
+using Umbraco.Tests.BusinessLogic;
 
-namespace Umbraco.Tests.BusinessLogic
+namespace Umbraco.Tests.ORM
 {
     // CommentRSS
     // NewsArticle

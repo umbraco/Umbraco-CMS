@@ -15,3 +15,4 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("Umbraco.LegacyTests")]
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
 [assembly: InternalsVisibleTo("umbraco.editorControls")]
+[assembly: InternalsVisibleTo("Umbraco.Tests.ORM")]

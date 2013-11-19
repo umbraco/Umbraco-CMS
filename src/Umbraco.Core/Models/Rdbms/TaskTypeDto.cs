@@ -9,9 +9,9 @@ namespace Umbraco.Core.Models.Rdbms
     internal class TaskTypeDto
     {
         [Column("id")]
-        [PrimaryKeyColumn(IdentitySeed=2)]
-        
-        public int Id { get; set; }
+        [PrimaryKeyColumn(IdentitySeed = 2)]
+
+        public int Id { get; set; } 
 
         [Column("alias")]
         [Index(IndexTypes.NonClustered)]

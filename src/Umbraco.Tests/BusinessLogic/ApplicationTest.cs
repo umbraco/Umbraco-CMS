@@ -10,7 +10,7 @@ namespace Umbraco.Tests.BusinessLogic
     ///This is a test class for ApplicationTest and is intended
     ///to contain all ApplicationTest Unit Tests
     ///</summary>
-    [TestFixture()]
+    [TestFixture(), Ignore]
     public class ApplicationTest : BaseTest
     {
 

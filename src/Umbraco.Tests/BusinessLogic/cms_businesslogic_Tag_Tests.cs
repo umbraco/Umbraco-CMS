@@ -9,8 +9,9 @@ using Umbraco.Core.Models.Rdbms;
 using System.Collections.Generic;
 using umbraco.cms.businesslogic.Tags;
 using umbraco.cms.businesslogic.web;
+using Umbraco.Tests.BusinessLogic;
 
-namespace Umbraco.Tests.BusinessLogic
+namespace Umbraco.Tests.ORM
 {
     // cmsTags: id, tag (chars), ParentId, [Group] (chars)
     //      V 

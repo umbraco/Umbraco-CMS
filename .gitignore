@@ -88,3 +88,4 @@ QueryResult.htm
 
 src/umbraco.sln
 src/umbraco.sln
+src/Umbraco.Tests.ORM/App_Data/TEMP/*

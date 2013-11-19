@@ -6,8 +6,9 @@ using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Models.Rdbms;
 using umbraco.cms.businesslogic.relation;
 using umbraco.cms.businesslogic.macro;
+using Umbraco.Tests.BusinessLogic;
 
-namespace Umbraco.Tests.BusinessLogic
+namespace Umbraco.Tests.ORM
 {
     [TestFixture]
     public class cms_businesslogic_MacroProperty_Tests : BaseORMTest

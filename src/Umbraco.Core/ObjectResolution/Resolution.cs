@@ -107,7 +107,7 @@ namespace Umbraco.Core.ObjectResolution
 		/// <exception cref="InvalidOperationException">resolution is already frozen.</exception>
 		public static void Freeze()
 		{
-            LogHelper.Debug(typeof(Resolution), "Freezing resolution");
+           // LogHelper.Debug(typeof(Resolution), "Freezing resolution");
 
 		    using (new WriteLock(ConfigurationLock))
 		    {
@@ -127,7 +127,7 @@ namespace Umbraco.Core.ObjectResolution
         /// <remarks>To be used in unit tests.</remarks>
         internal static void Reset()
         {
-            LogHelper.Debug(typeof(Resolution), "Resetting resolution");
+            //LogHelper.Debug(typeof(Resolution), "Resetting resolution");
 
             /*
             var trace = new System.Diagnostics.StackTrace();

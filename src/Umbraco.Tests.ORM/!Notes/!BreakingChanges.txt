@@ -1,0 +1,264 @@
+﻿(!new)
+
+----------------------------------------------------------------------------------------------------------
+
+1.
+
+src\Umbraco.Core\Properties\AssemblyInfo.cs
+
++
+[assembly: InternalsVisibleTo("Umbraco.Tests.ORM")]
+
+----------------------------------------------------------------------------------------------------------
+
+2.
+
+src\umbraco.cms\Properties\AssemblyInfo.cs
+
++ 
+[assembly: InternalsVisibleTo("Umbraco.Tests.ORM")]
+
+
+
+
+=========
+
+Here is a set of "breaking changes" to have my tests run with as they currently are.
+Only the first three are 'MUST HAVE', third one is questionnable, and ##5,6,7 seems to get "automagically fixed."
+
+----------------------------------------------------------------------------------------------------------
+
+1.  MUST HAVE
+
+ .\src\Umbraco.Core\Models\Rdbms\TaskTypeDto.cs   
+  
+      [TableName("cmsTaskType")]
+    [PrimaryKey("id")]
+    [ExplicitColumns]
+    internal class TaskTypeDto
+    {
+        [Column("id")]
+        [PrimaryKeyColumn(IdentitySeed = 2)]    // ss: nov13 - it was missing
+        
+        public int Id { get; set; }  // ss: nov13 - it was - public byte Id { get; set; }  
+
+        [Column("alias")]
+        [Index(IndexTypes.NonClustered)]
+        public string Alias { get; set; }
+    }
+
+----------------------------------------------------------------------------------------------------------
+
+2.  MUST HAVE
+
+.\src\Umbraco.Core\Models\Rdbms\TaskDto.cs   
+
+   [TableName("cmsTask")]
+    [PrimaryKey("id")]
+    [ExplicitColumns]
+    internal class TaskDto
+    {
+        [Column("closed")]
+        [Constraint(Default = "0")]
+        public bool Closed { get; set; }
+
+        [Column("id")]
+        [PrimaryKeyColumn]
+        public int Id { get; set; }
+
+        [Column("taskTypeId")]
+        [ForeignKey(typeof(TaskTypeDto))]
+        public int TaskTypeId { get; set; }    // ss: nov13 - it was - public byte TaskTypeId { get; set; }
+
+        [Column("nodeId")]
+        [ForeignKey(typeof(NodeDto))]
+        public int NodeId { get; set; }
+
+        [Column("parentUserId")]
+        [ForeignKey(typeof(UserDto), Name = "FK_cmsTask_umbracoUser")]
+        public int ParentUserId { get; set; }
+
+        [Column("userId")]
+        [ForeignKey(typeof(UserDto), Name = "FK_cmsTask_umbracoUser1")]
+        public int UserId { get; set; }
+
+        [Column("DateTime")]
+        [Constraint(Default = "getdate()")]
+        public DateTime DateTime { get; set; }
+
+        [Column("Comment")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Length(500)]
+        public string Comment { get; set; }
+    }
+
+----------------------------------------------------------------------------------------------------------
+	
+3. MUST HAVE
+
+.\src\umbraco.cms\businesslogic\template\Template.cs  
+  
+          protected override void setupNode()
+        {
+            base.setupNode();
+
+            //.IfNull<TemplateDto>(x => { throw new ArgumentException(string.Format("No Template found for the specified Id = '{0}'", this.Id)); })
+            var dto = Database.FirstOrDefault<TemplateDto>("Select alias,design,master from cmsTemplate where nodeId = @0", this.Id);
+           if (dto == null) 
+           {
+               //System.Console.WriteLine  
+               _alias = this.Text; //SS:nov13 - added to fix exception 'Object reference not set to an instance of an object'
+            }
+           else
+            {
+                _alias = dto.Alias;
+                _design = dto.Design;
+                //set the master template to zero if it's null
+                _mastertemplate = dto.Master == null ? 0 : (int)dto.Master;
+            };
+
+            if (Umbraco.Core.Configuration.UmbracoSettings.DefaultRenderingEngine == RenderingEngine.Mvc && ViewHelper.ViewExists(this))
+                _design = ViewHelper.GetFileContents(this);
+            else
+                _design = MasterPageHelper.GetFileContents(this);
+
+        }
+
+
+----------------------------------------------------------------------------------------------------------
+
+4. ??? NO need? There couldn't be more than one ContentType related to a PropertyType?
+
+    see -  cms_businesslogic_Property_Tests.cs. [public void Test_Property_Delete2_propertyType_CleanPropertiesOnDeletion()]
+
+        //SS: 11-NOV-2013
+        // for refs see https://groups.google.com/d/msg/umbraco-dev/9qLYrQrTQ8o/Uljx446Bv1YJ
+        //
+		// ? temp CleanAllPropertiesOnDeletion() used instead ?
+		// ? or there is no way to have 
+        private void CleanPropertiesOnDeletion(int contentTypeId)
+        {
+            // first delete from all master document types
+            //TODO: Verify no endless loops with mixins
+            DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentTypes.Contains(contentTypeId)).ForEach(
+                dt => CleanPropertiesOnDeletion(dt.Id)); //ss: nov13 - should be replaced with CleanAllPropertiesOnDeletion() ?
+
+            //Initially Content.getContentOfContentType() was called, but because this doesn't include members we resort to sql lookups and deletes
+            foreach (var contentId in
+                Database.Query<int>("SELECT nodeId FROM cmsContent INNER JOIN umbracoNode ON cmsContent.nodeId = umbracoNode.id WHERE ContentType = @0 ORDER BY umbracoNode.text ", contentTypeId))
+            {
+                Database.Execute("DELETE FROM cmsPropertyData WHERE PropertyTypeId = @0 AND contentNodeId = @1", this.Id, contentId);
+            }
+
+            // invalidate content type cache
+            ContentType.FlushFromCache(contentTypeId);
+        }
+
+Trace output:
+
+		//***** Umbraco.Tests.BusinessLogic.cms_businesslogic_Property_Tests.Test_Property_Delete2_propertyType_CleanPropertiesOnDeletion
+		//2013-11-19 17:48:42,946 Umbraco.Core.PluginManager: [Thread 11] Error creating type umbraco.editorControls.MultiNodeTreePicker.MNTP_DataType
+		//System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation. ---> System.TypeInitializationException: The type initializer for 'umbraco.editorControls.MultiNodeTreePicker.MNTP_DataEditor' threw an exception. ---> System.InvalidOperationException: Sequence contains no matching element
+		//   at System.Linq.Enumerable.Single[TSource](IEnumerable`1 source, Func`2 predicate)
+		//   at umbraco.editorControls.MultiNodeTreePicker.MNTP_DataEditor..cctor()
+		//   --- End of inner exception stack trace ---
+		//   at umbraco.editorControls.MultiNodeTreePicker.MNTP_DataEditor..ctor()
+		//   at umbraco.editorControls.MultiNodeTreePicker.MNTP_DataType..ctor()
+		//   --- End of inner exception stack trace ---
+		//   at System.RuntimeTypeHandle.CreateInstance(RuntimeType type, Boolean publicOnly, Boolean noCheck, Boolean& canBeCached, RuntimeMethodHandleInternal& ctor, Boolean& bNeedSecurityCheck)
+		//   at System.RuntimeType.CreateInstanceSlow(Boolean publicOnly, Boolean skipCheckThis, Boolean fillCache, StackCrawlMark& stackMark)
+		//   at System.RuntimeType.CreateInstanceDefaultCtor(Boolean publicOnly, Boolean skipCheckThis, Boolean fillCache, StackCrawlMark& stackMark)
+		//   at System.Activator.CreateInstance(Type type, Boolean nonPublic)
+		//   at System.Activator.CreateInstance(Type type)
+		//   at Umbraco.Core.PluginManager.CreateInstances[T](IEnumerable`1 types, Boolean throwException) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\PluginManager.cs:line 559
+
+
+----------------------------------------------------------------------------------------------------------
+
+5. * NO NEED *
+
+.\src\umbraco.cms\businesslogic\Property\Property.cs
+
+        public Property(int Id, propertytype.PropertyType pt)
+        {
+
+            _pt = pt;
+            _id = Id;
+
+#if ADD_DUMB_TRY_CATCH_TO_HAVE_TESTS_RUNNING
+            // 12-nov-2013 - it fails here -> _pt.DataTypeDefinition.DataType == null
+            // suppress by try/catch - till it will be clear how to fix it
+            try
+            {
+#endif
+                _data = _pt.DataTypeDefinition.DataType.Data;
+                _data.PropertyId = Id;
+#if ADD_DUMB_TRY_CATCH_TO_HAVE_TESTS_RUNNING
+            }
+            catch { }
+#endif
+        }
+
+----------------------------------------------------------------------------------------------------------
+
+6. * NO NEED *
+
+.\src\umbraco.cms\businesslogic\Property\Property.cs
+
+  
+        public Property(int Id)
+        {
+            _id = Id;
+
+            int propertyTypeId = Database.ExecuteScalar<int>("select propertytypeid from cmsPropertyData where id = @0", Id);
+
+            _pt = PropertyType.GetPropertyType(propertyTypeId);
+
+#if ADD_DUMB_TRY_CATCH_TO_HAVE_TESTS_RUNNING
+            // 12-nov-2013 - it fails here -> _pt.DataTypeDefinition.DataType == null
+            // suppress by try/catch - till it will be clear how to fix it
+            try
+            {
+#endif
+                _data = _pt.DataTypeDefinition.DataType.Data;
+                _data.PropertyId = Id;
+#if ADD_DUMB_TRY_CATCH_TO_HAVE_TESTS_RUNNING
+            }
+            catch { }
+#endif
+        }
+
+----------------------------------------------------------------------------------------------------------
+
+7. * NO NEED *
+
+.\src\umbraco.cms\businesslogic\Property\Property.cs  
+
+        [MethodImpl(MethodImplOptions.Synchronized)]
+        public static Property MakeNew(propertytype.PropertyType pt, Content c, Guid versionId)
+        {
+            int newPropertyId = 0;
+            // The method is synchronized
+            // UmbracoPropertyDto is used for another entity type - use plain sql for now
+            Database.Execute("INSERT INTO cmsPropertyData (contentNodeId, versionId, propertyTypeId) VALUES(@0, @1, @2)", c.Id, versionId, pt.Id); 
+            newPropertyId = Database.ExecuteScalar<int>("SELECT MAX(id) FROM cmsPropertyData");
+
+#if ADD_DUMB_TRY_CATCH_TO_HAVE_TESTS_RUNNING
+            // 12-nov-2013 - it fails here -> _pt.DataTypeDefinition.DataType == null
+            // suppress by try/catch - till it will be clear how to fix it
+            try
+            {
+#endif
+                interfaces.IData d = pt.DataTypeDefinition.DataType.Data;
+                d.MakeNew(newPropertyId);
+#if ADD_DUMB_TRY_CATCH_TO_HAVE_TESTS_RUNNING
+            }
+            catch { }
+#endif
+            return new Property(newPropertyId, pt);
+        }
+
+
+
+
+  

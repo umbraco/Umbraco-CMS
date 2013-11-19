@@ -1,0 +1,69 @@
+﻿1. Manually merge with the main umbraco project
+2. Correct References
+3. Recompile
+4. Test
+
+===
+
+Sources:
+
+Web:
+
+./Umbraco.Web/umbraco.presentation/umbraco
+
+file:///E:/Projects/Git/Umbraco/Umbraco-CMS-My-Fork/src/Umbraco.Web/umbraco.presentation/umbraco/editMedia.aspx.cs
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Web\umbraco.presentation\umbraco\settings\editTemplate.aspx.cs
+
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Web\umbraco.presentation\umbraco\developer\RelationTypes\EditRelationType.aspx.cs
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Web\umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx.cs
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Web\umbraco.presentation\umbraco\developer\RelationTypes\RelationTypesWebService.asmx.cs
+
+
+Business:
+../umbraco.cms/businesslogic
+
+(tested): file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.cms\businesslogic\RecycleBin.cs
+(tested): file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.cms\businesslogic\relation\Relation.cs
+(tested): file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.cms\businesslogic\relation\RelationType.cs
+(tested): file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.cms\businesslogic\Tags\Tag.cs
+(tested): file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.cms\businesslogic\macro\MacroProperty.cs
+(tested): file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.cms\businesslogic\macro\MacroPropertyType.cs
+(tested): file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.cms\businesslogic\macro\Macro.cs
+(tested): - [umbracoInstalledPackages] doesn't exist (yet?)
+          file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.cms\businesslogic\Packager\Installer.cs
+ ----------
+(tested): - // ! constuctor fails
+          file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.cms\businesslogic\Property\Property.cs
+(tested): file://E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.cms\businesslogic\propertytype\propertytype.cs
+(tested): file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.cms\businesslogic\propertytype\PropertyTypeGroup.cs
+(tested): file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.cms\businesslogic\task\TaskType.cs
+           issue with createing taskTYpe just after test db was created
+(tested): file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.cms\businesslogic\task\Task.cs
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.cms\businesslogic\template\Template.cs
+(tested): file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.cms\businesslogic\datatype\PreValue.cs
+(tested): file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.cms\businesslogic\datatype\PreValues.cs
+
+
+Tests:
+../Umbraco.Tests/BusinessLogic/
+
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Tests\BusinessLogic\cms_businesslogic_Template_Tests.cs
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Tests\BusinessLogic\cms_businesslogic_Task_Tests.cs
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Tests\BusinessLogic\cms_businesslogic_TaskType_Tests.cs
+! file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Tests\BusinessLogic\cms_businesslogic_Tag_Tests.cs
+
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Tests\BusinessLogic\cms_businesslogic_Property_Tests.cs
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Tests\BusinessLogic\cms_businesslogic_PropertyTypeGroup_Tests.cs
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Tests\BusinessLogic\cms_businesslogic_PropertyType_Tests.cs
+
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Tests\BusinessLogic\cms_businesslogic_Package_Tests.cs  // [umbracoInstalledPackages] doesn't exist (yet?)
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Tests\BusinessLogic\cms_businesslogic_MacroPropertyType_Tests.cs
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Tests\BusinessLogic\cms_businesslogic_MacroProperty_Tests.cs
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Tests\BusinessLogic\cms_businesslogic_Macro_Tests.cs
+
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Tests\BusinessLogic\BaseDatabaseFactoryTestWithContext.cs
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Tests\BusinessLogic\cms_businesslogic_Relation_Tests.cs
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Tests\BusinessLogic\cms_businesslogic_RelationType_Tests.cs
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Tests\BusinessLogic\cms_businesslogic_PreValue_Tests.cs
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Tests\BusinessLogic\cms_businesslogic_PreValues_Tests.cs
+file:///E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Tests\BusinessLogic\cms_businesslogic_RecycleBin_Tests.cs  // for empty test DB only

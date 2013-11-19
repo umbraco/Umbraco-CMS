@@ -9,8 +9,10 @@ using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.datatype;
 using Umbraco.Core;
 using umbraco.cms.businesslogic.media;
+using Umbraco.Tests.BusinessLogic;
+using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.TestHelpers
+namespace Umbraco.Tests.ORM
 {
     public abstract partial class BaseORMTest : BaseDatabaseFactoryTest
     {

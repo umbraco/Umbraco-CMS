@@ -26,7 +26,7 @@ namespace umbraco.cms.businesslogic.propertytype
     public class PropertyType
     {
         #region Declarations
-        
+
         private readonly int _contenttypeid;
         private readonly int _id;
         private int _DataTypeId;
@@ -70,7 +70,7 @@ namespace umbraco.cms.businesslogic.propertytype
                 _validationRegExp = propertyTypeDto.ValidationRegExp;
                 _DataTypeId = propertyTypeDto.DataTypeId;
                 _contenttypeid = propertyTypeDto.ContentTypeId;
-                _description = propertyTypeDto.Description; 
+                _description = propertyTypeDto.Description;
 
                 if (propertyTypeDto.PropertyTypeGroupId != null)
                 {
@@ -215,7 +215,7 @@ namespace umbraco.cms.businesslogic.propertytype
             {
                 _alias = value;
                 InvalidateCache();
-                 Database.Execute("Update cmsPropertyType set alias = @0 where id= @1", Casing.SafeAliasWithForcingCheck(_alias), Id);
+                Database.Execute("Update cmsPropertyType set alias = @0 where id= @1", Casing.SafeAliasWithForcingCheck(_alias), Id);
             }
         }
 
@@ -284,10 +284,10 @@ namespace umbraco.cms.businesslogic.propertytype
             {
                 // The method is synchronized, but we'll still look it up with an additional parameter (alias)
                 Database.Execute(
-                    "INSERT INTO cmsPropertyType (DataTypeId, ContentTypeId, alias, name) VALUES (@0, @1, @2, @3)",dt.Id, ct.Id, alias, name);
+                    "INSERT INTO cmsPropertyType (DataTypeId, ContentTypeId, alias, name) VALUES (@0, @1, @2, @3)", dt.Id, ct.Id, alias, name);
                 pt =
                     new PropertyType(
-                        Database.ExecuteScalar<int>("SELECT MAX(id) FROM cmsPropertyType WHERE alias=@0", alias)); 
+                        Database.ExecuteScalar<int>("SELECT MAX(id) FROM cmsPropertyType WHERE alias=@0", alias));
             }
             finally
             {
@@ -312,12 +312,12 @@ namespace umbraco.cms.businesslogic.propertytype
             foreach (var id in ids) yield return GetPropertyType(id);
         }
 
-		public static IEnumerable<PropertyType> GetPropertyTypesByGroup(int groupId, List<int> contentTypeIds)
+        public static IEnumerable<PropertyType> GetPropertyTypesByGroup(int groupId, List<int> contentTypeIds)
         {
             return GetPropertyTypesByGroup(groupId).Where(x => contentTypeIds.Contains(x.ContentTypeId));
         }
 
-		public static IEnumerable<PropertyType> GetPropertyTypesByGroup(int groupId)
+        public static IEnumerable<PropertyType> GetPropertyTypesByGroup(int groupId)
         {
             return getobjects(Database.Query<int>("SELECT id FROM cmsPropertyType WHERE propertyTypeGroupId = @0 order by SortOrder", groupId));
         }
@@ -368,7 +368,8 @@ namespace umbraco.cms.businesslogic.propertytype
             Database.Execute("DELETE FROM cmsPropertyData WHERE PropertyTypeId = @0", this.Id);
         }
 
-        //SS: 11-NOV-2013 - not tested - see https://groups.google.com/d/msg/umbraco-dev/9qLYrQrTQ8o/Uljx446Bv1YJ
+        //SS: 11-NOV-2013 - see cmd_businesslogic_Property_Tests. - 
+        // for refs see https://groups.google.com/d/msg/umbraco-dev/9qLYrQrTQ8o/Uljx446Bv1YJ
         // temp CleanAllPropertiesOnDeletion() used instead
         private void CleanPropertiesOnDeletion(int contentTypeId)
         {
@@ -381,7 +382,7 @@ namespace umbraco.cms.businesslogic.propertytype
             foreach (var contentId in
                 Database.Query<int>("SELECT nodeId FROM cmsContent INNER JOIN umbracoNode ON cmsContent.nodeId = umbracoNode.id WHERE ContentType = @0 ORDER BY umbracoNode.text ", contentTypeId))
             {
-                System.Console.WriteLine("**** DELETED {0} {1} ****", this.Id, contentId); 
+                System.Console.WriteLine("**** DELETED {0} {1} ****", this.Id, contentId);
 
                 Database.Execute("DELETE FROM cmsPropertyData WHERE PropertyTypeId = @0 AND contentNodeId = @1", this.Id, contentId);
             }
@@ -436,16 +437,16 @@ namespace umbraco.cms.businesslogic.propertytype
                 GetCacheKey(id),
                 TimeSpan.FromMinutes(30),
                 delegate
+                {
+                    try
                     {
-                        try
-                        {
-                            return new PropertyType(id);
-                        }
-                        catch
-                        {
-                            return null;
-                        }
-                    });
+                        return new PropertyType(id);
+                    }
+                    catch
+                    {
+                        return null;
+                    }
+                });
         }
 
         private void InvalidateCache()

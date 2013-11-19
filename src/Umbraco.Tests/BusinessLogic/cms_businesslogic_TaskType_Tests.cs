@@ -8,8 +8,9 @@ using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.web;
 using umbraco.BusinessLogic;
+using Umbraco.Tests.BusinessLogic;
 
-namespace Umbraco.Tests.BusinessLogic
+namespace Umbraco.Tests.ORM
 {
     [TestFixture]
     public class cms_businesslogic_TaskType_Tests : BaseORMTest
@@ -93,7 +94,7 @@ namespace Umbraco.Tests.BusinessLogic
         public void Test_TaskType_Tasks_get()
         {
             int id = _taskType1.Id;
-            int allTasksCount1 = TRAL.Task.GetGetTaskTypesTasks(id);
+            int allTasksCount1 = TRAL.Task.GetTaskTypesTasks(id);
 
             var taskType1 = new TaskType(id);
             int allTasksCount2 = taskType1.Tasks.Count;

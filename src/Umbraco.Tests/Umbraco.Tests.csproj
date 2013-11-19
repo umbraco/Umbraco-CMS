@@ -144,6 +144,26 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AttemptTests.cs" />
+    <Compile Include="BusinessLogic\BaseORMTest.cs" />
+    <Compile Include="BusinessLogic\BaseORMTest_TRAL.cs" />
+    <Compile Include="BusinessLogic\cms_businesslogic_CMSNodeTests.cs" />
+    <Compile Include="BusinessLogic\cms_businesslogic_ContentTypeTests.cs" />
+    <Compile Include="BusinessLogic\cms_businesslogic_MacroPropertyType_Tests.cs" />
+    <Compile Include="BusinessLogic\cms_businesslogic_MacroProperty_Tests.cs" />
+    <Compile Include="BusinessLogic\cms_businesslogic_Macro_Tests.cs" />
+    <Compile Include="BusinessLogic\cms_businesslogic_Package_Tests.cs" />
+    <Compile Include="BusinessLogic\cms_businesslogic_PreValues_Tests.cs" />
+    <Compile Include="BusinessLogic\cms_businesslogic_PreValue_Tests.cs" />
+    <Compile Include="BusinessLogic\cms_businesslogic_PropertyTypeGroup_Tests.cs" />
+    <Compile Include="BusinessLogic\cms_businesslogic_PropertyType_Tests.cs" />
+    <Compile Include="BusinessLogic\cms_businesslogic_Property_Tests.cs" />
+    <Compile Include="BusinessLogic\cms_businesslogic_RecycleBin_Tests.cs" />
+    <Compile Include="BusinessLogic\cms_businesslogic_RelationType_Tests.cs" />
+    <Compile Include="BusinessLogic\cms_businesslogic_Relation_Tests.cs" />
+    <Compile Include="BusinessLogic\cms_businesslogic_Tag_Tests.cs" />
+    <Compile Include="BusinessLogic\cms_businesslogic_TaskType_Tests.cs" />
+    <Compile Include="BusinessLogic\cms_businesslogic_Task_Tests.cs" />
+    <Compile Include="BusinessLogic\cms_businesslogic_Template_Tests.cs" />
     <Compile Include="MockTests.cs" />
     <Compile Include="Mvc\UmbracoViewPageTests.cs" />
     <Compile Include="Persistence\Auditing\AuditTests.cs" />

@@ -13,8 +13,9 @@ using umbraco.cms.businesslogic.datatype;
 using System.Collections.Generic;
 using Umbraco.Core;
 using umbraco.cms.businesslogic.media;
+using Umbraco.Tests.BusinessLogic;
 
-namespace Umbraco.Tests.TestHelpers
+namespace Umbraco.Tests.ORM
 {
     public partial class TestRepositoryAbstractionLayer
     {
@@ -1213,7 +1214,7 @@ namespace Umbraco.Tests.TestHelpers
                 return _r.ExecuteScalar<int>("select count(*) from cmsTaskType");
             }
 
-            internal int GetGetTaskTypesTasks(int taskTypeId)
+            internal int GetTaskTypesTasks(int taskTypeId)
             {
                 return _r.ExecuteScalar<int>("select count(*) from cmsTask where TaskTypeId = @0", taskTypeId);
             }

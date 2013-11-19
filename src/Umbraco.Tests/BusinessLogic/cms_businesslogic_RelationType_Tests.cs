@@ -5,8 +5,9 @@ using NUnit.Framework;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Core.Models.Rdbms;
 using umbraco.cms.businesslogic.relation;
+using Umbraco.Tests.BusinessLogic;
 
-namespace Umbraco.Tests.BusinessLogic
+namespace Umbraco.Tests.ORM
 {
     [TestFixture]
     public class cms_businesslogic_RelationType_Tests : BaseORMTest

@@ -14,9 +14,9 @@ using umbraco.cms.businesslogic.task;
 using umbraco.cms.businesslogic.relation;
 using umbraco.cms.businesslogic.macro;
 using umbraco.BusinessLogic;
+using Umbraco.Tests.BusinessLogic;
 
-
-namespace Umbraco.Tests.BusinessLogic
+namespace Umbraco.Tests.ORM
 {
     [TestFixture]
     public class cms_businesslogic_Task_Tests : BaseORMTest

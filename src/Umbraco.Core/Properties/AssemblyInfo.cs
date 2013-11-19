@@ -45,3 +45,4 @@ using System.Security.Permissions;
 [assembly: InternalsVisibleTo("Umbraco.Belle")]
 [assembly: InternalsVisibleTo("Umbraco.VisualStudio")]
 [assembly: InternalsVisibleTo("umbraco.providers")]
+[assembly: InternalsVisibleTo("Umbraco.Tests.ORM")]

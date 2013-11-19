@@ -19,3 +19,4 @@ using System.Runtime.InteropServices;
 [assembly: Guid("04436b0a-1dc6-4ee1-9d96-4c04f1a9f429")]
 
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
+//[assembly: InternalsVisibleTo("Umbraco.BusinessLogic.Tests")]

@@ -19,3 +19,4 @@ using System.Runtime.CompilerServices;
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
 [assembly: InternalsVisibleTo("umbraco")]
 [assembly: InternalsVisibleTo("Umbraco.LegacyTests")]
+//[assembly: InternalsVisibleTo("Umbraco.BusinessLogic.Tests")]

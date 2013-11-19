@@ -11,8 +11,9 @@ using umbraco.cms.businesslogic.media;
 using umbraco.cms.businesslogic.web;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core;
+using Umbraco.Tests.BusinessLogic;
 
-namespace Umbraco.Tests.BusinessLogic
+namespace Umbraco.Tests.ORM
 {
     /// <remarks>
     /// Current test suite just tests RecycleBin's class PetaPOCO communication against empty test database

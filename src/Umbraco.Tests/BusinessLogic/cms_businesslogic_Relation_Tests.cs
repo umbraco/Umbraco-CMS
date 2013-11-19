@@ -14,8 +14,9 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Models.Rdbms;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.relation;
+using Umbraco.Tests.BusinessLogic;
 
-namespace Umbraco.Tests.BusinessLogic
+namespace Umbraco.Tests.ORM
 {
     [TestFixture]
     public class cms_businesslogic_Relation_Tests : BaseORMTest

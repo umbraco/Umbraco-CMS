@@ -78,7 +78,8 @@ namespace umbraco.cms.businesslogic
                 _isContainerContentType = isContainer.Value;
         }
 
-        internal ContentType(IContentTypeComposition contentType) : base(contentType)
+        internal ContentType(IContentTypeComposition contentType)
+            : base(contentType)
         {
             ContentTypeItem = contentType;
         }
@@ -114,11 +115,11 @@ namespace umbraco.cms.businesslogic
         internal static IDictionary<string, string> GetAliasesAndNames(string contentTypeAlias)
         {
             return AliasToNames.GetOrAdd(contentTypeAlias, s =>
-                {
-                    var ct = GetByAlias(contentTypeAlias);
-                    var userFields = ct.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
-                    return userFields;
-                });
+            {
+                var ct = GetByAlias(contentTypeAlias);
+                var userFields = ct.PropertyTypes.ToDictionary(x => x.Alias, x => x.Name);
+                return userFields;
+            });
         }
 
         /// <summary>
@@ -890,7 +891,7 @@ namespace umbraco.cms.businesslogic
         {
             var contentTypes = new List<ContentType>();
 
-            using (var dr = 
+            using (var dr =
                 SqlHelper.ExecuteReader(m_SQLOptimizedGetAll.Trim(), SqlHelper.CreateParameter("@nodeObjectType", nodeObjectType)))
             {
                 while (dr.Read())

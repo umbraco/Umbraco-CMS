@@ -7,8 +7,9 @@ using Umbraco.Core.Models.Rdbms;
 using umbraco.cms.businesslogic.relation;
 using umbraco.cms.businesslogic.packager;
 using System.Data.SqlServerCe;
+using Umbraco.Tests.BusinessLogic;
 
-namespace Umbraco.Tests.BusinessLogic
+namespace Umbraco.Tests.ORM
 {
     // ******************************************************************************************************************
     //

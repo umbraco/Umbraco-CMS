@@ -282,6 +282,7 @@
     <Compile Include="businesslogic\Tags\Tag.cs" />
     <Compile Include="businesslogic\task\Tasks.cs" />
     <Compile Include="businesslogic\template\MasterpageHelper.cs" />
+    <Compile Include="businesslogic\template\Template.cs" />
     <Compile Include="businesslogic\template\ViewHelper.cs" />
     <Compile Include="businesslogic\Tuple.cs" />
     <Compile Include="businesslogic\web\DocumentVersionList.cs" />
@@ -394,9 +395,6 @@
     </Compile>
     <Compile Include="businesslogic\task\Task.cs" />
     <Compile Include="businesslogic\task\TaskType.cs" />
-    <Compile Include="businesslogic\template\Template.cs">
-      <SubType>Code</SubType>
-    </Compile>
     <Compile Include="businesslogic\translation\Translation.cs" />
     <Compile Include="businesslogic\utilities\Diff.cs" />
     <Compile Include="businesslogic\utilities\File.cs" />

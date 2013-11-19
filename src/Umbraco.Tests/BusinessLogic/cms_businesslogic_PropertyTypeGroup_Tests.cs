@@ -8,8 +8,9 @@ using umbraco.cms.businesslogic.relation;
 using Umbraco.Core.Models;
 using umbraco.cms.businesslogic.propertytype;
 using System.Collections.Generic;
+using Umbraco.Tests.BusinessLogic;
 
-namespace Umbraco.Tests.BusinessLogic
+namespace Umbraco.Tests.ORM
 {
     [TestFixture]
     public class cms_businesslogic_PropertyTypeGroup_Tests : BaseORMTest

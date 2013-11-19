@@ -6,8 +6,9 @@ using umbraco.cms.businesslogic.datatype;
 using System.Runtime.CompilerServices;
 using System.Diagnostics;
 using System.Reflection;
+using Umbraco.Tests.BusinessLogic;
 
-namespace Umbraco.Tests.BusinessLogic
+namespace Umbraco.Tests.ORM
 {
     [TestFixture]
     public class cms_businesslogic_PreValues_Tests : BaseORMTest

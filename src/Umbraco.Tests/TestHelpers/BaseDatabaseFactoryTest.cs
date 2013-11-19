@@ -24,7 +24,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
-//using Umbraco.Web.Routing;
+using Umbraco.Web.Routing;
 using umbraco.BusinessLogic;
 
 namespace Umbraco.Tests.TestHelpers
@@ -53,7 +53,7 @@ namespace Umbraco.Tests.TestHelpers
         public override void Initialize()
         {
             InitializeFirstRunFlags();
-            
+
             var path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
@@ -61,15 +61,15 @@ namespace Umbraco.Tests.TestHelpers
                 GetDbConnectionString(),
                 GetDbProviderName());
             _appContext = new ApplicationContext(
-				//assign the db context
+                //assign the db context
                 new DatabaseContext(dbFactory),
-				//assign the service context
+                //assign the service context
                 new ServiceContext(new PetaPocoUnitOfWorkProvider(dbFactory), new FileUnitOfWorkProvider(), new PublishingStrategy()),
                 //disable cache
                 false)
-                {
-                    IsReady = true
-                };
+            {
+                IsReady = true
+            };
 
             base.Initialize();
 
@@ -106,7 +106,7 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual string GetDbConnectionString()
         {
-            return @"Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;";            
+            return @"Datasource=|DataDirectory|UmbracoPetaPocoTests.sdf;Flush Interval=1;";
         }
 
         /// <summary>
@@ -118,11 +118,11 @@ namespace Umbraco.Tests.TestHelpers
                 return;
 
             var path = TestHelper.CurrentAssemblyDirectory;
-            
+
             //Get the connectionstring settings from config
             var settings = ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName];
             ConfigurationManager.AppSettings.Set(
-                Core.Configuration.GlobalSettings.UmbracoConnectionName, 
+                Core.Configuration.GlobalSettings.UmbracoConnectionName,
                 GetDbConnectionString());
 
             string dbFilePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
@@ -134,18 +134,18 @@ namespace Umbraco.Tests.TestHelpers
             // - _isFirstTestInFixture + DbInitBehavior.NewDbFileAndSchemaPerFixture
 
             //if this is the first test in the session, always ensure a new db file is created
-            if (_isFirstRunInTestSession || !File.Exists(dbFilePath) 
+            if (_isFirstRunInTestSession || !File.Exists(dbFilePath)
                 || DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest
                 || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture))
             {
-                
+
                 RemoveDatabaseFile(ex =>
-                    {
-                        //if this doesn't work we have to make sure everything is reset! otherwise
-                        // well run into issues because we've already set some things up
-                        TearDown();
-                        throw ex;
-                    });
+                {
+                    //if this doesn't work we have to make sure everything is reset! otherwise
+                    // well run into issues because we've already set some things up
+                    TearDown();
+                    throw ex;
+                });
 
                 //Create the Sql CE database
                 var engine = new SqlCeEngine(settings.ConnectionString);
@@ -210,7 +210,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 //Create the umbraco database and its base data
                 DatabaseContext.Database.CreateDatabaseSchema(false);
-            }            
+            }
         }
 
         [TestFixtureTearDown]
@@ -234,8 +234,8 @@ namespace Umbraco.Tests.TestHelpers
             else if (DatabaseTestBehavior == DatabaseBehavior.NewSchemaPerTest)
             {
                 DatabaseContext.Database.UninstallDatabaseSchema();
-            }           
-           
+            }
+
             AppDomain.CurrentDomain.SetData("DataDirectory", null);
 
             SqlSyntaxContext.SqlSyntaxProvider = null;
@@ -304,26 +304,26 @@ namespace Umbraco.Tests.TestHelpers
             }
         }
 
-	    protected ServiceContext ServiceContext
-	    {
-		    get { return ApplicationContext.Services; }
-	    }
+        protected ServiceContext ServiceContext
+        {
+            get { return ApplicationContext.Services; }
+        }
 
-	    protected DatabaseContext DatabaseContext
-	    {
-		    get { return ApplicationContext.DatabaseContext; }
-	    }
+        protected DatabaseContext DatabaseContext
+        {
+            get { return ApplicationContext.DatabaseContext; }
+        }
 
         protected UmbracoContext GetUmbracoContext(string url, int templateId, RouteData routeData = null, bool setSingleton = false)
         {
             var cache = new PublishedContentCache();
 
             cache.GetXmlDelegate = (context, preview) =>
-                {
-                    var doc = new XmlDocument();
-                    doc.LoadXml(GetXmlContent(templateId));
-                    return doc;
-                };
+            {
+                var doc = new XmlDocument();
+                doc.LoadXml(GetXmlContent(templateId));
+                return doc;
+            };
 
             PublishedContentCache.UnitTesting = true;
 
