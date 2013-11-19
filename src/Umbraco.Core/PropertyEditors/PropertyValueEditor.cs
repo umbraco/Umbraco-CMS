@@ -7,6 +7,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -235,15 +236,17 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// A method used to format the database value to a value that can be used by the editor
         /// </summary>
-        /// <param name="dbValue"></param>
+        /// <param name="property"></param>
+        /// <param name="propertyType"></param>
+        /// <param name="dataTypeService"></param>
         /// <returns></returns>
         /// <remarks>
         /// The object returned will automatically be serialized into json notation. For most property editors
         /// the value returned is probably just a string but in some cases a json structure will be returned.
         /// </remarks>
-        public virtual object ConvertDbToEditor(object dbValue)
+        public virtual object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
         {
-            if (dbValue == null) return string.Empty;
+            if (property.Value == null) return string.Empty;
 
             switch (GetDatabaseType())
             {
@@ -251,7 +254,7 @@ namespace Umbraco.Core.PropertyEditors
                 case DataTypeDatabaseType.Nvarchar:
                     //if it is a string type, we will attempt to see if it is json stored data, if it is we'll try to convert
                     //to a real json object so we can pass the true json object directly to angular!
-                    var asString = dbValue.ToString();
+                    var asString = property.Value.ToString();
                     if (asString.DetectIsJson())
                     {
                         try
@@ -264,12 +267,12 @@ namespace Umbraco.Core.PropertyEditors
                             //swallow this exception, we thought it was json but it really isn't so continue returning a string
                         }
                     }
-                    return dbValue.ToString();
+                    return property.Value.ToString();
                 case DataTypeDatabaseType.Integer:
                     //we can just ToString() any of these types
-                    return dbValue.ToString();
-                case DataTypeDatabaseType.Date:                    
-                    var date = dbValue.TryConvertTo<DateTime?>();
+                    return property.Value.ToString();
+                case DataTypeDatabaseType.Date:
+                    var date = property.Value.TryConvertTo<DateTime?>();
                     if (date.Success == false || date.Result == null)
                     {
                         return string.Empty;
@@ -285,6 +288,8 @@ namespace Umbraco.Core.PropertyEditors
         /// Converts the property db value to an XML fragment
         /// </summary>
         /// <param name="property"></param>
+        /// <param name="propertyType"></param>
+        /// <param name="dataTypeService"></param>
         /// <returns></returns>
         /// <remarks>
         /// By default this will just return the value of ConvertDbToString but ensure that if the db value type is nvarchar or text
@@ -294,23 +299,23 @@ namespace Umbraco.Core.PropertyEditors
         /// 
         /// If the value is empty we will not return as CDATA since that will just take up more space in the file.
         /// </remarks>
-        public virtual XNode ConvertDbToXml(Property property)
+        public virtual XNode ConvertDbToXml(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
         {
             //check for null or empty value, we don't want to return CDATA if that is the case
             if (property.Value == null || property.Value.ToString().IsNullOrWhiteSpace())
             {
-                return new XText(ConvertDbToString(property));
+                return new XText(ConvertDbToString(property, propertyType, dataTypeService));
             }
 
             switch (GetDatabaseType())
             {
                 case DataTypeDatabaseType.Date:
                 case DataTypeDatabaseType.Integer:
-                    return new XText(ConvertDbToString(property));                    
+                    return new XText(ConvertDbToString(property, propertyType, dataTypeService));                    
                 case DataTypeDatabaseType.Nvarchar:
                 case DataTypeDatabaseType.Ntext:
                     //put text in cdata
-                    return new XCData(ConvertDbToString(property));
+                    return new XCData(ConvertDbToString(property, propertyType, dataTypeService));
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -320,8 +325,10 @@ namespace Umbraco.Core.PropertyEditors
         /// Converts the property value for use in the front-end cache
         /// </summary>
         /// <param name="property"></param>
+        /// <param name="propertyType"></param>
+        /// <param name="dataTypeService"></param>
         /// <returns></returns>
-        public virtual string ConvertDbToString(Property property)
+        public virtual string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
         {
             if (property.Value == null)
             {

@@ -41,7 +41,7 @@ namespace Umbraco.Core.PropertyEditors
                         Value = Value
                     };
                 var xd = new XmlDocument();
-                var xNode = propertyEditor.ValueEditor.ConvertDbToXml(property);
+                var xNode = propertyEditor.ValueEditor.ConvertDbToXml(property, property.PropertyType, ApplicationContext.Current.Services.DataTypeService);
                 
                 //check if this xml fragment can be converted to an XmlNode
                 var xContainer = xNode as XContainer;

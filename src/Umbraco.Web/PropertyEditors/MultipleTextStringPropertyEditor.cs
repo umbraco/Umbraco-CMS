@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -160,16 +161,18 @@ namespace Umbraco.Web.PropertyEditors
             /// We are actually passing back an array of simple objects instead of an array of strings because in angular a primitive (string) value
             /// cannot have 2 way binding, so to get around that each item in the array needs to be an object with a string.
             /// </summary>
-            /// <param name="dbValue"></param>
+            /// <param name="property"></param>
+            /// <param name="propertyType"></param>
+            /// <param name="dataTypeService"></param>
             /// <returns></returns>
             /// <remarks>
             /// The legacy property editor saved this data as new line delimited! strange but we have to maintain that.
             /// </remarks>
-            public override object ConvertDbToEditor(object dbValue)
+            public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
             {
-                return dbValue == null
+                return property.Value == null
                                   ? new JObject[] {}
-                                  : dbValue.ToString().Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries)
+                                  : property.Value.ToString().Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
                                            .Select(x => JObject.FromObject(new {value = x}));
 
 

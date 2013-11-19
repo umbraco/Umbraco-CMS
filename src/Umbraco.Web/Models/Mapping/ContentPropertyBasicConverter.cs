@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Mapping
@@ -15,6 +16,13 @@ namespace Umbraco.Web.Models.Mapping
     internal class ContentPropertyBasicConverter<T> : TypeConverter<Property, T>
         where T : ContentPropertyBasic, new()
     {
+        protected Lazy<IDataTypeService> DataTypeService { get; private set; }
+
+        public ContentPropertyBasicConverter(Lazy<IDataTypeService> dataTypeService)
+        {
+            DataTypeService = dataTypeService;
+        }
+
         /// <summary>
         /// Assigns the PropertyEditor, Id, Alias and Value to the property
         /// </summary>
@@ -34,11 +42,10 @@ namespace Umbraco.Web.Models.Mapping
             var result = new T
                 {
                     Id = property.Id,
-                    Value = editor.ValueEditor.ConvertDbToEditor(property.Value),
-                    Alias = property.Alias
+                    Value = editor.ValueEditor.ConvertDbToEditor(property, property.PropertyType, DataTypeService.Value),
+                    Alias = property.Alias, 
+                    PropertyEditor = editor
                 };
-
-            result.PropertyEditor = editor;
 
             return result;
         }

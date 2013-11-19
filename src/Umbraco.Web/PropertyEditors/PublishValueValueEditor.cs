@@ -34,8 +34,10 @@ namespace Umbraco.Web.PropertyEditors
         /// Need to lookup the pre-values and put the string version in cache, not the ID (which is what is stored in the db)
         /// </summary>
         /// <param name="property"></param>
+        /// <param name="propertyType"></param>
+        /// <param name="dataTypeService"></param>
         /// <returns></returns>
-        public override string ConvertDbToString(Property property)
+        public override string ConvertDbToString(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
         {
             var idAttempt = property.Value.TryConvertTo<int>();
             if (idAttempt.Success)
@@ -52,10 +54,8 @@ namespace Umbraco.Web.PropertyEditors
                     LogHelper.Warn<PublishValueValueEditor>("Could not find a pre value with ID " + preValId + " for property alias " + property.Alias);
                 }
             }
-
-
-
-            return base.ConvertDbToString(property);
+            
+            return base.ConvertDbToString(property, propertyType, dataTypeService);
         }
 
         protected IDictionary<string, PreValue> GetPreValues(Property property)

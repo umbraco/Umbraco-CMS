@@ -5,6 +5,7 @@ using Newtonsoft.Json.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -47,9 +48,9 @@ namespace Umbraco.Web.PropertyEditors
                 Validators.Add(new DateTimeValidator());
             }
 
-            public override object ConvertDbToEditor(object dbValue)
+            public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
             {
-                var date = dbValue.TryConvertTo<DateTime?>();
+                var date = property.Value.TryConvertTo<DateTime?>();
                 if (date.Success == false || date.Result == null)
                 {
                     return string.Empty;

@@ -12,18 +12,16 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentPropertyDtoConverter : ContentPropertyBasicConverter<ContentPropertyDto>
     {
-        private readonly Lazy<IDataTypeService> _dataTypeService;
-
         public ContentPropertyDtoConverter(Lazy<IDataTypeService> dataTypeService)
+            : base(dataTypeService)
         {
-            _dataTypeService = dataTypeService;
         }
 
         protected override ContentPropertyDto ConvertCore(Property originalProperty)
         {
             var propertyDto = base.ConvertCore(originalProperty);
 
-            var dataTypeService = _dataTypeService.Value;
+            var dataTypeService = DataTypeService.Value;
 
             propertyDto.IsRequired = originalProperty.PropertyType.Mandatory;
             propertyDto.ValidationRegExp = originalProperty.PropertyType.ValidationRegExp;

@@ -1,7 +1,10 @@
 ﻿using System;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Tests.PropertyEditors
 {
@@ -14,12 +17,14 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase("hello world", false)]
         public void Value_Editor_Can_Convert_To_Json_Object_For_Editor(string value, bool isOk)
         {
+            var prop = new Property(1, Guid.NewGuid(), new PropertyType("test", DataTypeDatabaseType.Nvarchar), value);
+
             var valueEditor = new PropertyValueEditor
                 {
                     ValueType = "STRING"
                 };
 
-            var result = valueEditor.ConvertDbToEditor(value);
+            var result = valueEditor.ConvertDbToEditor(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
             Assert.AreEqual(isOk, !(result is string));
         }
 
@@ -62,12 +67,14 @@ namespace Umbraco.Tests.PropertyEditors
         [TestCase("DATETIME", "", "")] //test empty string for date
         public void Value_Editor_Can_Serialize_Value(string valueType, object val, string expected)
         {
+            var prop = new Property(1, Guid.NewGuid(), new PropertyType("test", DataTypeDatabaseType.Nvarchar), val);
+
             var valueEditor = new PropertyValueEditor
                 {
                     ValueType = valueType
                 };
 
-            var result = valueEditor.ConvertDbToEditor(val);
+            var result = valueEditor.ConvertDbToEditor(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
             Assert.AreEqual(expected, result);
         }
 
@@ -80,7 +87,9 @@ namespace Umbraco.Tests.PropertyEditors
                     ValueType = "DATE"
                 };
 
-            var result = valueEditor.ConvertDbToEditor(now);
+            var prop = new Property(1, Guid.NewGuid(), new PropertyType("test", DataTypeDatabaseType.Date), now);
+
+            var result = valueEditor.ConvertDbToEditor(prop, prop.PropertyType, new Mock<IDataTypeService>().Object);
             Assert.AreEqual(now.ToIsoString(), result);
         }
     }

@@ -1,7 +1,9 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Macros;
+using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -54,14 +56,16 @@ namespace Umbraco.Web.PropertyEditors
             /// <summary>
             /// Format the data for the editor
             /// </summary>
-            /// <param name="dbValue"></param>
+            /// <param name="property"></param>
+            /// <param name="propertyType"></param>
+            /// <param name="dataTypeService"></param>
             /// <returns></returns>
-            public override object ConvertDbToEditor(object dbValue)
+            public override object ConvertDbToEditor(Property property, PropertyType propertyType, IDataTypeService dataTypeService)
             {
-                if (dbValue == null)
+                if (property.Value == null)
                     return null;
 
-                var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(dbValue.ToString(), new Dictionary<string, string>());
+                var parsed = MacroTagParser.FormatRichTextPersistedDataForEditor(property.Value.ToString(), new Dictionary<string, string>());
                 return parsed;
             }
 

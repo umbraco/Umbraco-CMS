@@ -26,7 +26,7 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM Property TO ContentPropertyBasic
             config.CreateMap<Property, ContentPropertyBasic>()
-                  .ConvertUsing<ContentPropertyBasicConverter<ContentPropertyBasic>>();
+                  .ConvertUsing(new ContentPropertyBasicConverter<ContentPropertyBasic>(lazyDataTypeService));
 
             //FROM Property TO ContentPropertyDto
             config.CreateMap<Property, ContentPropertyDto>()

@@ -13,18 +13,17 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class ContentPropertyDisplayConverter : ContentPropertyBasicConverter<ContentPropertyDisplay>
     {
-        private readonly Lazy<IDataTypeService> _dataTypeService;
-
         public ContentPropertyDisplayConverter(Lazy<IDataTypeService> dataTypeService)
+            : base(dataTypeService)
         {
-            _dataTypeService = dataTypeService;
+
         }
 
         protected override ContentPropertyDisplay ConvertCore(Property originalProp)
         {
             var display = base.ConvertCore(originalProp);
 
-            var dataTypeService = _dataTypeService.Value;
+            var dataTypeService = DataTypeService.Value;
             var preVals = dataTypeService.GetPreValuesCollectionByDataTypeId(originalProp.PropertyType.DataTypeDefinitionId);
 
             //configure the editor for display with the pre-values
