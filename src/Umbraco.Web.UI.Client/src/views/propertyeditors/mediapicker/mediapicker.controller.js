@@ -16,10 +16,9 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 mediaResource.getByIds($scope.ids).then(function (medias) {
                     //img.media = media;
                     _.each(medias, function (media, i) {
-                        var img = {};
-                        img.src = imageHelper.getImagePropertyValue({ imageModel: media });
-                        img.thumbnail = imageHelper.getThumbnailFromPath(img.src);
-                        $scope.images.push(img);
+                        media.src = imageHelper.getImagePropertyValue({ imageModel: media });
+                        media.thumbnail = imageHelper.getThumbnailFromPath(media.src);
+                        $scope.images.push(media);
                     });
                 });
             }
@@ -44,13 +43,11 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     }
                     
                     _.each(data, function(media, i) {
-                        var img = {};
-                        img.id = media.id;
-                        img.src = imageHelper.getImagePropertyValue({ imageModel: media });
-                        img.thumbnail = imageHelper.getThumbnailFromPath(img.src);
+                        media.src = imageHelper.getImagePropertyValue({ imageModel: media });
+                        media.thumbnail = imageHelper.getThumbnailFromPath(media.src);
                         
-                        $scope.images.push(img);
-                        $scope.ids.push(img.id);
+                        $scope.images.push(media);
+                        $scope.ids.push(media.id);
                     });
 
                     $scope.sync();

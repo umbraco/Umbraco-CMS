@@ -2,7 +2,13 @@
 
 	<ul ui-sortable="sortableOptions" ng-model="images" class="umb-sortable-thumbnails">
 		<li style="width: 120px; height: 100px; overflow: hidden;" ng-repeat="image in images">
-				<img ng-src="{{image.src}}" alt="">
+				<img ng-src="{{image.thumbnail}}" alt="" ng-show="image.src">
+
+				<span class="icon-holder" ng-hide="image.src">
+					<i class="icon {{image.icon}} large" ></i>
+					<small>{{image.name}}</small>
+				</span>
+
 				<a href class="picked-image" ng-click="remove($index)"><i class="icon icon-delete"></i></a>
 		</li>
 	</ul>
