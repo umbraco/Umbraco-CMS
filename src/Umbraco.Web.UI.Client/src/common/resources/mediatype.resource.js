@@ -10,7 +10,7 @@ function mediaTypeResource($q, $http, umbRequestHelper) {
         /**
          * @ngdoc method
          * @name umbraco.resources.mediaTypeResource#getAllowedTypes
-         * @methodOf umbraco.resources.mdiaTypeResource
+         * @methodOf umbraco.resources.mediaTypeResource
          *
          * @description
          * Returns a list of allowed media types underneath a media item with a given ID
