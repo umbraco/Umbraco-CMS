@@ -26,13 +26,13 @@
 
                             <ul>
                                 <li>
-                                    <input type="radio" id="databaseOptionBlank" name="database" value="blank" />
-                                    <label for="databaseOptionBlank">I already have a blank SQL Server, SQL Azure or MySQL database</label>
+                                    <input type="radio" id="databaseOptionEmbedded" name="database" value="embedded" />
+                                    <label for="databaseOptionEmbedded">I want to use SQL CE 4, a free, quick-and-simple embedded database</label>
 
                                 </li>
                                 <li>
-                                    <input type="radio" id="databaseOptionEmbedded" name="database" value="embedded" />
-                                    <label for="databaseOptionEmbedded">I want to use SQL CE 4, a free, quick-and-simple embedded database</label>
+                                    <input type="radio" id="databaseOptionBlank" name="database" value="blank" />
+                                    <label for="databaseOptionBlank">I already have a blank SQL Server, SQL Azure or MySQL database</label>
 
                                 </li>
                                 <li>
@@ -253,7 +253,6 @@
         </div>
     </div>
     <script type="text/javascript">
-        var hasEmbeddedDlls = <%= HasEmbeddedDatabaseFiles.ToString().ToLower() %>;
         var currentVersion = '<%=UmbracoVersion.Current.ToString(3)%> <%=UmbracoVersion.CurrentComment%> ';
         var configured = <%= IsConfigured.ToString().ToLower() %>;
 
@@ -278,15 +277,9 @@
                     $(".database-option").hide();
                     $("#database-embedded").show();
 
-                    if (!hasEmbeddedDlls) {
-                        $('.embeddedError').show();
-                        $(".installbtn").hide();
-                    }
-                    else {
-                        $('.embedded').show();
-                        $(".installbtn").show();
-                    }
-	                    
+                    $('.embedded').show();
+                    $(".installbtn").show();
+                    
                     break;
                 case "advanced":
                     $(".database-option").hide();
