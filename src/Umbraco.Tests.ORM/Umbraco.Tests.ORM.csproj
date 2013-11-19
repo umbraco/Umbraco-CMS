@@ -6,7 +6,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{96FACC39-F1A1-47EB-BC65-8B6FFC1E7C7F}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Umbraco.Tests.ORM</RootNamespace>
     <AssemblyName>Umbraco.Tests.ORM</AssemblyName>
@@ -46,6 +46,9 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>Umbraco.Tests.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Examine, Version=0.1.52.2941, Culture=neutral, processorArchitecture=MSIL">
@@ -207,6 +210,7 @@
     <Compile Include="..\Umbraco.Tests\BusinessLogic\cms_businesslogic_Template_Tests.cs">
       <Link>PetaPOCO Refactoring\Template\cms_businesslogic_Template_Tests.cs</Link>
     </Compile>
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
