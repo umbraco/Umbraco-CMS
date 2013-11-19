@@ -49,7 +49,7 @@ namespace umbraco.presentation.developer.packages {
 
             iframeGen.Text =
                 string.Format(
-                    "<iframe id=\"repoFrame\" frameborder=\"1\" style=\"border: none; display: block\" src=\"{0}/repo/?repoGuid={1}{2}&callback={3}:{4}{5}/developer/packages/proxy.htm?/{6}/developer/packages/installer.aspx?repoGuid={7}&version=v45&fullVersion={8}.{9}.{10}&useLegacySchema={11}&dotnetVersion={12}&trustLevel={13}\"></iframe>",
+                    "<iframe id=\"repoFrame\" frameborder=\"1\" style=\"border: none; display: block\" src=\"{0}?repoGuid={1}{2}&callback={3}:{4}{5}/developer/packages/proxy.htm?/{6}/developer/packages/installer.aspx?repoGuid={7}&version=v45&fullVersion={8}.{9}.{10}&useLegacySchema={11}&dotnetVersion={12}&trustLevel={13}\"></iframe>",
                     url, repoGuid, category, Request.ServerVariables["SERVER_NAME"],
                     Request.ServerVariables["SERVER_PORT"], IOHelper.ResolveUrl(SystemDirectories.Umbraco),
                     IOHelper.ResolveUrl(SystemDirectories.Umbraco).Trim('/'), repoGuid,
