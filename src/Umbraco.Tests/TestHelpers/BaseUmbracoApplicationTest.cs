@@ -9,6 +9,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Web;
+using Umbraco.Web.Models.Mapping;
 using ObjectExtensions = Umbraco.Core.ObjectExtensions;
 
 namespace Umbraco.Tests.TestHelpers
@@ -20,8 +21,6 @@ namespace Umbraco.Tests.TestHelpers
     [TestFixture]
     public abstract class BaseUmbracoApplicationTest : BaseUmbracoConfigurationTest
     {
-        private static bool _mappersInitialized = false;
-        private static readonly object Locker = new object();
 
         [SetUp]
         public override void Initialize()
@@ -66,22 +65,14 @@ namespace Umbraco.Tests.TestHelpers
         
         private void InitializeMappers()
         {
-            lock (Locker)
+            Mapper.Initialize(configuration =>
             {
-                //only need to initialize one time
-                if (_mappersInitialized == false)
+                var mappers = PluginManager.Current.FindAndCreateInstances<IMapperConfiguration>(specificAssemblies: new[] { typeof(ContentModelMapper).Assembly });
+                foreach (var mapper in mappers)
                 {
-                    _mappersInitialized = true;
-                    Mapper.Initialize(configuration =>
-                    {
-                        var mappers = PluginManager.Current.FindAndCreateInstances<IMapperConfiguration>();
-                        foreach (var mapper in mappers)
-                        {
-                            mapper.ConfigureMappings(configuration, ApplicationContext);
-                        }
-                    });       
-                }                
-            }            
+                    mapper.ConfigureMappings(configuration, ApplicationContext);
+                }
+            });       
         }
 
         /// <summary>

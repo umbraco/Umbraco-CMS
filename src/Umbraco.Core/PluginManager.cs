@@ -558,10 +558,12 @@ namespace Umbraco.Core
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="throwException">set to true if an exception is to be thrown if there is an error during instantiation</param>
+        /// <param name="cacheResult"></param>
+        /// <param name="specificAssemblies"></param>
         /// <returns></returns>
-        internal IEnumerable<T> FindAndCreateInstances<T>(bool throwException = false)
+        internal IEnumerable<T> FindAndCreateInstances<T>(bool throwException = false, bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
         {
-            var types = ResolveTypes<T>();
+            var types = ResolveTypes<T>(cacheResult, specificAssemblies);
             return CreateInstances<T>(types, throwException);
         }
 
