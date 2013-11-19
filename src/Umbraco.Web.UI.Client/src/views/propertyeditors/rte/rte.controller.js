@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-    function ($rootScope, $element, $scope, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource) {
+    function ($rootScope, $element, $scope, $q, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource) {
 
         tinyMceService.configuration().then(function(tinyMceConfig){
 
@@ -27,11 +27,16 @@ angular.module("umbraco")
             var toolbar = editorConfig.toolbar.join(" | ");
             var stylesheets = [];
             var styleFormats = [];
+            var await = [];
 
+            //queue file loading
+            await.push(assetsService.loadJs("lib/tinymce/tinymce.min.js", $scope));
+
+            //queue rules loading
             angular.forEach(editorConfig.stylesheets, function(val, key){
-                stylesheets.push("/css/" + val + ".css");
+                stylesheets.push("/css/" + val + ".css?" + new Date().getTime());
                 
-                stylesheetResource.getRulesByName(val).then(function(rules) {
+                await.push(stylesheetResource.getRulesByName(val).then(function(rules) {
                     angular.forEach(rules, function(rule) {
                         var r = {};
                         r.title = rule.name;
@@ -49,11 +54,12 @@ angular.module("umbraco")
 
                         styleFormats.push(r);
                     });
-                });
+                }));
             });
 
 
-            assetsService.loadJs("lib/tinymce/tinymce.min.js", $scope).then(function () {
+            //wait for queue to end
+            $q.all(await).then(function () {
                 
                 /** Loads in the editor */
                 function loadTinyMce() {
@@ -126,7 +132,7 @@ angular.module("umbraco")
                                 tinyMceService.createInsertMacro(editor, $scope);
                             }
                         });
-                    }, 1);
+                    }, 500);
                 }
                 
                 loadTinyMce();
