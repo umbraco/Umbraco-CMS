@@ -565,10 +565,57 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             return saveContentItem(content, "publish" + (isNew ? "New" : ""), files);
         },
         
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.contentResource#sendToPublish
+         * @methodOf umbraco.resources.contentResource
+         *
+         * @description
+         * Saves changes made to a content item, and notifies any subscribers about a pending publication
+         * 
+         * ##usage
+         * <pre>
+         * contentResource.getById(1234)
+         *    .then(function(content) {
+         *          content.name = "I want a new name, and be published!";
+         *          contentResource.sendToPublish(content, false)
+         *            .then(function(content){
+         *                alert("Retrieved, updated and notication send off");
+         *            });
+         *    });
+         * </pre> 
+         * 
+         * @param {Object} content The content item object with changes applied
+         * @param {Bool} isNew set to true to create a new item or to update an existing 
+         * @param {Array} files collection of files for the document      
+         * @returns {Promise} resourcePromise object containing the saved content item.
+         *
+         */
         sendToPublish: function (content, isNew, files) {
             return saveContentItem(content, "sendPublish" + (isNew ? "New" : ""), files);
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.contentResource#publishByid
+         * @methodOf umbraco.resources.contentResource
+         *
+         * @description
+         * Publishes a content item with a given ID
+         * 
+         * ##usage
+         * <pre>
+         * contentResource.publishById(1234)
+         *    .then(function(content) {
+         *        alert("published");
+         *    });
+         * </pre> 
+         * 
+         * @param {Int} id The ID of the conten to publish
+         * @returns {Promise} resourcePromise object containing the published content item.
+         *
+         */
         publishById: function(id){
 
             if (!id) {

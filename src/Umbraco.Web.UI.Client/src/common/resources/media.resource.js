@@ -329,12 +329,59 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                'Failed to retreive children for media item ' + parentId);
         },
         
-        /** saves or updates a media object */
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaResource#save
+         * @methodOf umbraco.resources.mediaResource
+         *
+         * @description
+         * Saves changes made to a media item, if the media item is new, the isNew paramater must be passed to force creation
+         * if the media item needs to have files attached, they must be provided as the files param and passed seperately 
+         * 
+         * 
+         * ##usage
+         * <pre>
+         * mediaResource.getById(1234)
+         *    .then(function(media) {
+         *          media.name = "I want a new name!";
+         *          mediaResource.save(media, false)
+         *            .then(function(media){
+         *                alert("Retrieved, updated and saved again");
+         *            });
+         *    });
+         * </pre> 
+         * 
+         * @param {Object} media The media item object with changes applied
+         * @param {Bool} isNew set to true to create a new item or to update an existing 
+         * @param {Array} files collection of files for the media item      
+         * @returns {Promise} resourcePromise object containing the saved media item.
+         *
+         */
         save: function (media, isNew, files) {
             return saveMediaItem(media, "save" + (isNew ? "New" : ""), files);
         },
 
-        //** shorthand for creating a new folder under a given parent **/
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaResource#addFolder
+         * @methodOf umbraco.resources.mediaResource
+         *
+         * @description
+         * Shorthand for adding a media item of the type "Folder" under a given parent ID
+         *
+         * ##usage
+         * <pre>
+         * mediaResource.addFolder("My gallery", 1234)
+         *    .then(function(folder) {
+         *        alert('New folder');
+         *    });
+         * </pre> 
+         *
+         * @param {string} name Name of the folder to create
+         * @param {int} parentId Id of the media item to create the folder underneath         
+         * @returns {Promise} resourcePromise object.
+         *
+         */
         addFolder: function(name, parentId){
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper

@@ -138,7 +138,34 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
         },
         
-        /** saves or updates a member object */
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.memberResource#save
+         * @methodOf umbraco.resources.memberResource
+         *
+         * @description
+         * Saves changes made to a member, if the member is new, the isNew paramater must be passed to force creation
+         * if the member needs to have files attached, they must be provided as the files param and passed seperately 
+         * 
+         * 
+         * ##usage
+         * <pre>
+         * memberResource.getBykey("23234-sd8djsd-3h8d3j-sdh8d")
+         *    .then(function(member) {
+         *          member.name = "Bob";
+         *          memberResource.save(member, false)
+         *            .then(function(member){
+         *                alert("Retrieved, updated and saved again");
+         *            });
+         *    });
+         * </pre> 
+         * 
+         * @param {Object} media The member item object with changes applied
+         * @param {Bool} isNew set to true to create a new item or to update an existing 
+         * @param {Array} files collection of files for the media item      
+         * @returns {Promise} resourcePromise object containing the saved media item.
+         *
+         */
         save: function (member, isNew, files) {
             return saveMember(member, "save" + (isNew ? "New" : ""), files);
         }
