@@ -177,8 +177,20 @@ function imageHelper() {
                 });    
             }
 
+            var mediaRoot = Umbraco.Sys.ServerVariables.umbracoSettings.mediaPath;
             var imageProp = _.find(props, function (item) {
-                return item.alias === 'umbracoFile';
+                if(item.alias === "umbracoFile")
+                {
+                    return true;
+                }
+
+                //this performs a simple check to see if we have a media file as value
+                //it doesnt catch everything, but better then nothing
+                if(item.value.indexOf(mediaRoot) === 0){
+                    return true;
+                }
+
+                return false;
             });
             
             if (!imageProp) {

@@ -10,7 +10,7 @@
 			title="{{img.name}}">
 
 				<div ng-style="img.style" class="umb-non-thumbnail" ng-switch-when="none">
-					<i class="icon large icon-folder"></i>
+					<i class="icon large {{img.icon}}"></i>
 					{{img.name}}
 				</div>
 
@@ -18,11 +18,7 @@
 					ng-switch-default  
 					ng-src="{{img.thumbnail}}"
 					ng-style="img.style"
-
 					alt="{{img.name}}"/>
 		</a>
-	
-
-		
 	</div>
 </div>
