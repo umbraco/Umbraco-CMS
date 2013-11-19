@@ -29,7 +29,7 @@ namespace Umbraco.Web.WebApi
 
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {
-            writer.WriteValue(Guid.Empty.Equals(value) ? "" : ((Guid) value).ToString("N"));
+            writer.WriteValue(Guid.Empty.Equals(value) ? Guid.Empty.ToString("N") : ((Guid)value).ToString("N"));
         }
 
         public override bool CanConvert(Type objectType)
