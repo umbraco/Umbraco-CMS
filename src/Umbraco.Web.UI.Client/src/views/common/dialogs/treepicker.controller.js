@@ -9,6 +9,12 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 		$scope.multiPicker = dialogOptions.multiPicker;
 		$scope.startNodeId = dialogOptions.startNodeId;
 
+	    //create the custom query string param for this tree
+		$scope.customTreeParams = "startNodeId=" + dialogOptions.startNodeId;
+		if (dialogOptions.customTreeParams) {
+		    $scope.customTreeParams += "&" + dialogOptions.customTreeParams;
+		}
+
 		//search defaults
 		$scope.searcher = searchService.searchContent;
 		$scope.entityType = "Document";

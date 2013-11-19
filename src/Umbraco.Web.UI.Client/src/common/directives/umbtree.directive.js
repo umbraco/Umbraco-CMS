@@ -17,7 +17,8 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
             showheader: '@',
             cachekey: '@',
             isdialog: '@',
-            startnodeid: '@',
+            //Custom query string arguments to pass in to the tree as a string, example: "startnodeid=123&something=value"
+            customtreeparams: '@',
             eventhandler: '='
         },
 
@@ -220,7 +221,15 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         //anytime we want to load the tree we need to disable the delete animations
                         deleteAnimations = false;
 
-                        treeService.getTree({ section: scope.section, tree: scope.treealias, cacheKey: scope.cachekey, isDialog: scope.isdialog ? scope.isdialog : false, startNodeId: scope.startnodeid ? scope.startnodeid : -1 })
+                        //default args
+                        var args = { section: scope.section, tree: scope.treealias, cacheKey: scope.cachekey, isDialog: scope.isdialog ? scope.isdialog : false };
+
+                        //add the extra query string params if specified
+                        if (scope.customtreeparams) {
+                            args["queryString"] = scope.customtreeparams;
+                        }
+
+                        treeService.getTree(args)
                             .then(function(data) {
                                 //set the data once we have it
                                 scope.tree = data;

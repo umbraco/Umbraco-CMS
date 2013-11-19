@@ -45,8 +45,13 @@ function treeResource($q, $http, umbRequestHelper) {
             if (!options.isDialog) {
                 options.isDialog = false;
             }
-            if (!options.startNodeId) {
-                options.startNodeId = -1;
+          
+            //create the query string for the tree request, these are the mandatory options:
+            var query = "application=" + options.section + "&tree=" + options.tree + "&isDialog=" + options.isDialog;
+
+            //the options can contain extra query string parameters
+            if (options.queryString) {
+                query += "&" + options.queryString;
             }
 
             return umbRequestHelper.resourcePromise(
@@ -54,12 +59,7 @@ function treeResource($q, $http, umbRequestHelper) {
                     umbRequestHelper.getApiUrl(
                         "treeApplicationApiBaseUrl",
                         "GetApplicationTrees",
-                            [
-                                {application: options.section}, 
-                                { tree: options.tree },
-                                { isDialog: options.isDialog },
-                                { startNodeId: options.startNodeId }
-                            ])),
+                            query)),
                 'Failed to retreive data for application tree ' + options.section);
         },
         
