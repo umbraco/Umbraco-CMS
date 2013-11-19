@@ -139,6 +139,7 @@ angular.module("umbraco.directives.html")
                     $timeout(function () {
                         var photos = ngModel.$modelValue;
 
+                        scope.imagesOnly = element.attr('imagesOnly');
                         scope.baseline = element.attr('baseline') ? parseInt(element.attr('baseline'), 10) : 0;
                         scope.minWidth = element.attr('min-width') ? parseInt(element.attr('min-width'), 10) : 420;
                         scope.minHeight = element.attr('min-height') ? parseInt(element.attr('min-height'), 10) : 200;
