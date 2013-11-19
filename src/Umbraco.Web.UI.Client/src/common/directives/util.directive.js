@@ -44,6 +44,8 @@ angular.module('umbraco.directives')
     return function(scope,el,attrs){
         el.bind('contextmenu',function(e){
             e.preventDefault();
+            e.stopPropagation();
+            
             scope.$apply(attrs.onRightClick);
         }) ;
     };
