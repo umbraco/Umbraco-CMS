@@ -60,7 +60,7 @@ namespace Umbraco.Web.Trees
                         //get the members from the provider
                         int total;
                         nodes.AddRange(
-                            Membership.Provider.FindUsersByName(id + "%", 0, 9999, out total).Cast<MembershipUser>()
+                            FindUsersByName(char.Parse(id)).Cast<MembershipUser>()
                                       .Select(m => CreateTreeNode(GetNodeIdForCustomProvider(m.ProviderUserKey), id, queryStrings, m.UserName, "icon-user")));
                     }
                 }
@@ -73,6 +73,30 @@ namespace Umbraco.Web.Trees
                 }
             }
             return nodes;
+        }
+
+        /// <summary>
+        /// Allows for developers to override this in case their provider does some funky stuff to search
+        /// </summary>
+        /// <param name="letter"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// We're going to do a special check here - for active dir provider or sql provider
+        /// </remarks>
+        protected virtual MembershipUserCollection FindUsersByName(char letter)
+        {
+            int total;
+            if (Membership.Provider is SqlMembershipProvider)
+            {
+                //this provider uses the % syntax
+                return Membership.Provider.FindUsersByName(letter + "%", 0, 9999, out total);
+            }
+            else
+            {
+                //the AD provider - and potentiall all other providers will use the asterisk syntax.
+                return Membership.Provider.FindUsersByName(letter + "*", 0, 9999, out total);
+            }
+            
         }
 
         /// <summary>
