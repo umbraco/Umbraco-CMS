@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models.Rdbms
         [Column("id")]
         [PrimaryKeyColumn(IdentitySeed = 2)]
 
-        public int Id { get; set; } 
+        public int Id { get; set; }  // ss: nov 13 - it was - public byte Id { get; set; }  
 
         [Column("alias")]
         [Index(IndexTypes.NonClustered)]
