@@ -76,10 +76,14 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString() && UserStartNode == Constants.System.Root)
             {
                 var nodes = new TreeNodeCollection();
+                var altStartId = string.Empty;
+                
+                if(queryStrings.HasKey(TreeQueryStringParameters.StartNodeId))
+                    queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
+
 
                 //check if a request has been made to render from a specific start node
-                if (queryStrings.HasKey(TreeQueryStringParameters.StartNodeId)
-                    && queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId) != Constants.System.Root.ToString(CultureInfo.InvariantCulture))
+                if (!string.IsNullOrEmpty(altStartId) && altStartId != "undefined" && altStartId != Constants.System.Root.ToString(CultureInfo.InvariantCulture))
                 {
                     id = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
 

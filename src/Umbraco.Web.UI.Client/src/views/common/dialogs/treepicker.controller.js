@@ -7,13 +7,12 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 		$scope.section = dialogOptions.section;
 		$scope.treeAlias = dialogOptions.treeAlias;
 		$scope.multiPicker = dialogOptions.multiPicker;
-		$scope.startNodeId = dialogOptions.startNodeId;
+		
+		$scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
 
 	    //create the custom query string param for this tree
-		$scope.customTreeParams = "startNodeId=" + dialogOptions.startNodeId;
-		if (dialogOptions.customTreeParams) {
-		    $scope.customTreeParams += "&" + dialogOptions.customTreeParams;
-		}
+		$scope.customTreeParams = dialogOptions.startNodeId ? "startNodeId=" + dialogOptions.startNodeId : "";
+		$scope.customTreeParams += dialogOptions.customTreeParams ? "&" + dialogOptions.customTreeParams : "";
 
 		//search defaults
 		$scope.searcher = searchService.searchContent;
