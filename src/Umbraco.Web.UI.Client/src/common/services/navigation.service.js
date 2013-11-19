@@ -194,6 +194,9 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 if (args.activate === undefined || args.activate === true) {
                     //set the current selected node
                     appState.setTreeState("selectedNode", args.node);
+                    //when a node is activated, this is the same as clicking it and we need to set the
+                    //current menu item to be this node as well.
+                    appState.setMenuState("currentNode", args.node);
                 }
             });
 
@@ -254,6 +257,8 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                     
                     //put this node into the tree state
                     appState.setTreeState("selectedNode", args.node);
+                    //when a node is clicked we also need to set the active menu node to this node
+                    appState.setMenuState("currentNode", args.node);
 
                     //not legacy, lets just set the route value and clear the query string if there is one.
                     $location.path(n.routePath).search("");

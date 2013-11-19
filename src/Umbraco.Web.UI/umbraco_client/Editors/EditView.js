@@ -8,7 +8,7 @@
         //private methods/variables
         _opts: null,
 
-        _updateNewProperties: function(filePath) {
+        _updateNewFileProperties: function(filePath) {
             /// <summary>Updates the current treeSyncPath and original file name to have the new file name</summary>
             
             //update the originalFileName prop
@@ -129,27 +129,26 @@
             
             UmbClientMgr.mainTree().setActiveTreeType(this._opts.currentTreeType);
 
-            var newFilePath = this._opts.nameTxtBox.val();
-
             if (this._opts.editorType == "Template") {
                 //templates are different because they are ID based, whereas view files are file based without a static id
 
                 if (pathChanged) {
                     UmbClientMgr.mainTree().moveNode(this._opts.templateId, path);
+                    this._opts.treeSyncPath = path;
                 }
                 else {
                     UmbClientMgr.mainTree().syncTree(path, true);
                 }
-
                 
             }
             else {
-                //we need to pass in the newId parameter so it knows which node to resync after retreival from the server
+                var newFilePath = this._opts.nameTxtBox.val();
+                //then we need to update our current tree sync path to represent the new one
+                this._updateNewFileProperties(newFilePath);
+                
                 UmbClientMgr.mainTree().syncTree(path, true, null, newFilePath.split("/")[1]);
             }
-
-            //then we need to update our current tree sync path to represent the new one
-            this._updateNewProperties(newFilePath);
+            
         },
         
         submitFailure: function (err, header) {
