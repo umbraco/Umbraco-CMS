@@ -165,41 +165,41 @@ function imageHelper() {
             if (!options && !options.imageModel) {
                 throw "The options objet does not contain the required parameters: imageModel";
             }
-            if (options.imageModel.contentTypeAlias.toLowerCase() === "image") {
 
-                //combine all props, TODO: we really need a better way then this
-                var props = [];
-                if(options.imageModel.properties){
-                    props = options.imageModel.properties;
-                }else{
-                    $(options.imageModel.tabs).each(function(i, tab){
-                        props = props.concat(tab.properties);
-                    });    
-                }
-
-                var imageProp = _.find(props, function (item) {
-                    return item.alias === 'umbracoFile';
-                });
-                
-                if (!imageProp) {
-                    return "";
-                }
-
-                var imageVal;
-
-                //our default images might store one or many images (as csv)
-                var split = imageProp.value.split(',');
-                var self = this;
-                imageVal = _.map(split, function(item) {
-                    return { file: item, isImage: self.detectIfImageByExtension(item) };
-                });
-                
-                //for now we'll just return the first image in the collection.
-                //TODO: we should enable returning many to be displayed in the picker if the uploader supports many.
-                if (imageVal.length && imageVal.length > 0 && imageVal[0].isImage) {
-                    return imageVal[0].file;
-                }
+            
+            //combine all props, TODO: we really need a better way then this
+            var props = [];
+            if(options.imageModel.properties){
+                props = options.imageModel.properties;
+            }else{
+                $(options.imageModel.tabs).each(function(i, tab){
+                    props = props.concat(tab.properties);
+                });    
             }
+
+            var imageProp = _.find(props, function (item) {
+                return item.alias === 'umbracoFile';
+            });
+            
+            if (!imageProp) {
+                return "";
+            }
+
+            var imageVal;
+
+            //our default images might store one or many images (as csv)
+            var split = imageProp.value.split(',');
+            var self = this;
+            imageVal = _.map(split, function(item) {
+                return { file: item, isImage: self.detectIfImageByExtension(item) };
+            });
+            
+            //for now we'll just return the first image in the collection.
+            //TODO: we should enable returning many to be displayed in the picker if the uploader supports many.
+            if (imageVal.length && imageVal.length > 0 && imageVal[0].isImage) {
+                return imageVal[0].file;
+            }
+            
             return "";
         },
         /** formats the display model used to display the content to the model used to save the content */
