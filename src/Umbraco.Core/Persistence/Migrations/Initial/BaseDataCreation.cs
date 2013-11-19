@@ -116,15 +116,12 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1032, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1032", SortOrder = 2, UniqueId = new Guid("cc07b313-0843-4aa8-bbda-871c8da728c8"), Text = Constants.Conventions.MediaTypes.Image, NodeObjectType = new Guid(Constants.ObjectTypes.MediaType), CreateDate = DateTime.Now });
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1033, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1033", SortOrder = 2, UniqueId = new Guid("4c52d8ab-54e6-40cd-999c-7a5f24903e4d"), Text = Constants.Conventions.MediaTypes.File, NodeObjectType = new Guid(Constants.ObjectTypes.MediaType), CreateDate = DateTime.Now });
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1034, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1034", SortOrder = 2, UniqueId = new Guid("a6857c73-d6e9-480c-b6e6-f15f6ad11125"), Text = "Content Picker", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
-            
-            //We will not install this by default but of course if people upgrade this will still be there and still work, the new media picker is the multiple media picker - which has a new primary key/nodeid
-            //_database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1035, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1035", SortOrder = 2, UniqueId = new Guid("93929b9a-93a2-4e2a-b239-d99334440a59"), Text = "Media Picker", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
-            _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1045, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1045", SortOrder = 2, UniqueId = new Guid("7E3962CC-CE20-4FFC-B661-5897A894BA7E"), Text = "Multiple Media Picker", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
-            
+            _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1035, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1035", SortOrder = 2, UniqueId = new Guid("93929b9a-93a2-4e2a-b239-d99334440a59"), Text = "Media Picker", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1036, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1036", SortOrder = 2, UniqueId = new Guid("2b24165f-9782-4aa3-b459-1de4a4d21f60"), Text = "Member Picker", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });                        
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1040, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1040", SortOrder = 2, UniqueId = new Guid("21e798da-e06e-4eda-a511-ed257f78d4fa"), Text = "Related Links", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1041, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1041", SortOrder = 2, UniqueId = new Guid("b6b73142-b9c1-4bf8-a16d-e1c23320b549"), Text = "Tags", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });            
             _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1044, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1044", SortOrder = 0, UniqueId = new Guid("d59be02f-1df9-4228-aa1e-01917d806cda"), Text = Constants.Conventions.MemberTypes.Member, NodeObjectType = new Guid(Constants.ObjectTypes.MemberType), CreateDate = DateTime.Now });
+            _database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1045, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1045", SortOrder = 2, UniqueId = new Guid("7E3962CC-CE20-4FFC-B661-5897A894BA7E"), Text = "Multiple Media Picker", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
 
             //TODO: We're not creating these for 7.0
             //_database.Insert("umbracoNode", "id", false, new NodeDto { NodeId = 1039, Trashed = false, ParentId = -1, UserId = 0, Level = 1, Path = "-1,1039", SortOrder = 2, UniqueId = new Guid("06f349a9-c949-4b6a-8660-59c10451af42"), Text = "Ultimate Picker", NodeObjectType = new Guid(Constants.ObjectTypes.DataType), CreateDate = DateTime.Now });
@@ -231,15 +228,14 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 14, DataTypeId = -42, PropertyEditorAlias = Constants.PropertyEditors.DropDownListAlias, DbType = "Integer" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 15, DataTypeId = -43, PropertyEditorAlias = Constants.PropertyEditors.CheckBoxListAlias, DbType = "Nvarchar" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 16, DataTypeId = 1034, PropertyEditorAlias = Constants.PropertyEditors.ContentPickerAlias, DbType = "Integer" });
+            _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 17, DataTypeId = 1035, PropertyEditorAlias = Constants.PropertyEditors.MediaPickerAlias, DbType = "Integer" });
             
-            //We will not install this by default but of course if people upgrade this will still be there and still work, the new media picker is the multiple media picker - which has a new primary key/nodeid
-            //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 17, DataTypeId = 1035, PropertyEditorAlias = Constants.PropertyEditors.MediaPickerAlias, DbType = "Integer" });
-            _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 25, DataTypeId = 1045, PropertyEditorAlias = Constants.PropertyEditors.MultipleMediaPickerAlias, DbType = "Nvarchar" });
             
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 18, DataTypeId = 1036, PropertyEditorAlias = Constants.PropertyEditors.MemberPickerAlias, DbType = "Integer" });            
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 21, DataTypeId = 1040, PropertyEditorAlias = Constants.PropertyEditors.RelatedLinksAlias, DbType = "Ntext" });
             _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 22, DataTypeId = 1041, PropertyEditorAlias = Constants.PropertyEditors.TagsAlias, DbType = "Ntext" });
-            
+
+            _database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 25, DataTypeId = 1045, PropertyEditorAlias = Constants.PropertyEditors.MultipleMediaPickerAlias, DbType = "Nvarchar" });
 
             //TODO: We're not creating these for 7.0
             //_database.Insert("cmsDataType", "pk", false, new DataTypeDto { PrimaryKey = 19, DataTypeId = 1038, PropertyEditorAlias = Constants.PropertyEditors.MarkdownEditorAlias, DbType = "Ntext" });            
