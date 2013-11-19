@@ -122,5 +122,67 @@ namespace Umbraco.Tests.BusinessLogic
             initialized = false;
         }
 
+        [Test(Description = "Test 'public void delete()' method")]
+        public void Test_Property_Delete2_propertyType_CleanPropertiesOnDeletion()
+        {
+            var property = new Property(_propertyData1.Id);
+            Assert.That(property, !Is.Null);
+
+            //+ the following code line if not commented results in this test to get trace output provied below in the end of this teswt method code.
+            //  Test itsefl runs well.
+            var propertyData = TRAL.Property.CreatePropertyTypeData(_propertyType2.Id, _contentType2.NodeId);
+            //-
+
+            var savedPropertyDto = TRAL.GetDto<PropertyDataDto>(property.Id);
+            Assert.That(property.Id, Is.EqualTo(savedPropertyDto.Id), "Id test failed");
+
+            property.delete();
+
+            var savedPropertyDto2 = TRAL.GetDto<PropertyDataDto>(property.Id);
+            Assert.That(savedPropertyDto2, Is.Null);
+
+            initialized = false;
+
+            //
+            // when running within a dedicated test project/solution
+            //
+            //***** Umbraco.Tests.BusinessLogic.cms_businesslogic_Property_Tests.Test_Property_Delete2_propertyType_CleanPropertiesOnDeletion
+            //2013-11-19 17:47:03,190 Umbraco.Core.PluginManager: [Thread 10] Error creating type umbraco.editorControls.MultiNodeTreePicker.MNTP_DataType
+            //System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation. ---> System.TypeInitializationException: The type initializer for 'umbraco.editorControls.MultiNodeTreePicker.MNTP_DataEditor' threw an exception. ---> System.InvalidOperationException: Sequence contains no matching element
+            //   at System.Linq.Enumerable.Single[TSource](IEnumerable`1 source, Func`2 predicate)
+            //   at umbraco.editorControls.MultiNodeTreePicker.MNTP_DataEditor..cctor() in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.editorControls\MultiNodeTreePicker\MNTP_DataEditor.cs:line 48
+            //   --- End of inner exception stack trace ---
+            //   at umbraco.editorControls.MultiNodeTreePicker.MNTP_DataEditor..ctor()
+            //   at umbraco.editorControls.MultiNodeTreePicker.MNTP_DataType..ctor() in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.editorControls\MultiNodeTreePicker\MNTP_DataType.cs:line 33
+            //   --- End of inner exception stack trace ---
+            //   at System.RuntimeTypeHandle.CreateInstance(RuntimeType type, Boolean publicOnly, Boolean noCheck, Boolean& canBeCached, RuntimeMethodHandleInternal& ctor, Boolean& bNeedSecurityCheck)
+            //   at System.RuntimeType.CreateInstanceSlow(Boolean publicOnly, Boolean skipCheckThis, Boolean fillCache, StackCrawlMark& stackMark)
+            //   at System.RuntimeType.CreateInstanceDefaultCtor(Boolean publicOnly, Boolean skipCheckThis, Boolean fillCache, StackCrawlMark& stackMark)
+            //   at System.Activator.CreateInstance(Type type, Boolean nonPublic)
+            //   at System.Activator.CreateInstance(Type type)
+            //   at Umbraco.Core.PluginManager.CreateInstances[T](IEnumerable`1 types, Boolean throwException) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\PluginManager.cs:line 559
+
+            //
+            // when running within the usual umbraco.tests project soltuion
+            //
+            //***** Umbraco.Tests.BusinessLogic.cms_businesslogic_Property_Tests.Test_Property_Delete2_propertyType_CleanPropertiesOnDeletion
+            //2013-11-19 17:48:42,946 Umbraco.Core.PluginManager: [Thread 11] Error creating type umbraco.editorControls.MultiNodeTreePicker.MNTP_DataType
+            //System.Reflection.TargetInvocationException: Exception has been thrown by the target of an invocation. ---> System.TypeInitializationException: The type initializer for 'umbraco.editorControls.MultiNodeTreePicker.MNTP_DataEditor' threw an exception. ---> System.InvalidOperationException: Sequence contains no matching element
+            //   at System.Linq.Enumerable.Single[TSource](IEnumerable`1 source, Func`2 predicate)
+            //   at umbraco.editorControls.MultiNodeTreePicker.MNTP_DataEditor..cctor()
+            //   --- End of inner exception stack trace ---
+            //   at umbraco.editorControls.MultiNodeTreePicker.MNTP_DataEditor..ctor()
+            //   at umbraco.editorControls.MultiNodeTreePicker.MNTP_DataType..ctor()
+            //   --- End of inner exception stack trace ---
+            //   at System.RuntimeTypeHandle.CreateInstance(RuntimeType type, Boolean publicOnly, Boolean noCheck, Boolean& canBeCached, RuntimeMethodHandleInternal& ctor, Boolean& bNeedSecurityCheck)
+            //   at System.RuntimeType.CreateInstanceSlow(Boolean publicOnly, Boolean skipCheckThis, Boolean fillCache, StackCrawlMark& stackMark)
+            //   at System.RuntimeType.CreateInstanceDefaultCtor(Boolean publicOnly, Boolean skipCheckThis, Boolean fillCache, StackCrawlMark& stackMark)
+            //   at System.Activator.CreateInstance(Type type, Boolean nonPublic)
+            //   at System.Activator.CreateInstance(Type type)
+            //   at Umbraco.Core.PluginManager.CreateInstances[T](IEnumerable`1 types, Boolean throwException) in e:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\PluginManager.cs:line 559
+
+
+        }
+
     }
 }

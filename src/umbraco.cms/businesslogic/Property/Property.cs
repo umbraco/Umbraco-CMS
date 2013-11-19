@@ -1,3 +1,4 @@
+//#define ADD_DUMB_TRY_CATCH_TO_HAVE_TESTS_RUNNING
 using System;
 using System.Runtime.CompilerServices;
 using System.Xml;
@@ -39,14 +40,18 @@ namespace umbraco.cms.businesslogic.property
             _pt = pt;
             _id = Id;
 
+#if ADD_DUMB_TRY_CATCH_TO_HAVE_TESTS_RUNNING
             // 12-nov-2013 - it fails here -> _pt.DataTypeDefinition.DataType == null
             // suppress by try/catch - till it will be clear how to fix it
             try
             {
+#endif
                 _data = _pt.DataTypeDefinition.DataType.Data;
                 _data.PropertyId = Id;
+#if ADD_DUMB_TRY_CATCH_TO_HAVE_TESTS_RUNNING
             }
             catch { }
+#endif
         }
 
         public Property(int Id)
@@ -57,14 +62,18 @@ namespace umbraco.cms.businesslogic.property
 
             _pt = PropertyType.GetPropertyType(propertyTypeId);
 
+#if ADD_DUMB_TRY_CATCH_TO_HAVE_TESTS_RUNNING
             // 12-nov-2013 - it fails here -> _pt.DataTypeDefinition.DataType == null
             // suppress by try/catch - till it will be clear how to fix it
             try
             {
+#endif
                 _data = _pt.DataTypeDefinition.DataType.Data;
                 _data.PropertyId = Id;
+#if ADD_DUMB_TRY_CATCH_TO_HAVE_TESTS_RUNNING
             }
             catch { }
+#endif
         }
 
         internal Property(Umbraco.Core.Models.Property property)
@@ -149,14 +158,18 @@ namespace umbraco.cms.businesslogic.property
             Database.Execute("INSERT INTO cmsPropertyData (contentNodeId, versionId, propertyTypeId) VALUES(@0, @1, @2)", c.Id, versionId, pt.Id); 
             newPropertyId = Database.ExecuteScalar<int>("SELECT MAX(id) FROM cmsPropertyData");
 
+#if ADD_DUMB_TRY_CATCH_TO_HAVE_TESTS_RUNNING
             // 12-nov-2013 - it fails here -> _pt.DataTypeDefinition.DataType == null
             // suppress by try/catch - till it will be clear how to fix it
             try
             {
+#endif
                 interfaces.IData d = pt.DataTypeDefinition.DataType.Data;
                 d.MakeNew(newPropertyId);
+#if ADD_DUMB_TRY_CATCH_TO_HAVE_TESTS_RUNNING
             }
             catch { }
+#endif
             return new Property(newPropertyId, pt);
         }
     }

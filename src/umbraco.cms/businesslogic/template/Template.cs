@@ -149,7 +149,6 @@ namespace umbraco.cms.businesslogic.template
             var dto = Database.FirstOrDefault<TemplateDto>("Select alias,design,master from cmsTemplate where nodeId = @0", this.Id);
            if (dto == null) 
            {
-               //System.Console.WriteLine  
                _alias = this.Text; //SS:nov13 - added to fix exception 'Object reference not set to an instance of an object'
             }
            else

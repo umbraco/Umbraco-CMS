@@ -368,7 +368,8 @@ namespace umbraco.cms.businesslogic.propertytype
             Database.Execute("DELETE FROM cmsPropertyData WHERE PropertyTypeId = @0", this.Id);
         }
 
-        //SS: 11-NOV-2013 - not tested - see https://groups.google.com/d/msg/umbraco-dev/9qLYrQrTQ8o/Uljx446Bv1YJ
+        //SS: 11-NOV-2013 - see cmd_businesslogic_Property_Tests. - 
+        // for refs see https://groups.google.com/d/msg/umbraco-dev/9qLYrQrTQ8o/Uljx446Bv1YJ
         // temp CleanAllPropertiesOnDeletion() used instead
         private void CleanPropertiesOnDeletion(int contentTypeId)
         {
