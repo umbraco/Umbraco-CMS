@@ -5,6 +5,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Serialization;
 using Umbraco.Tests.CodeFirst.Definitions;
 using Umbraco.Tests.CodeFirst.TestModels;
@@ -41,7 +42,7 @@ namespace Umbraco.Tests.CodeFirst
             var mappedContentTypes = ContentTypeDefinitionFactory.RetrieveMappedContentTypes();
             ServiceContext.ContentTypeService.Save(mappedContentTypes);
 
-            var model = ServiceContext.ContentTypeService.GetContentType(1046);
+            var model = ServiceContext.ContentTypeService.GetContentType(NodeDto.NodeIdSeed + 1);
             Assert.That(model, Is.Not.Null);
         }
 
@@ -147,8 +148,8 @@ namespace Umbraco.Tests.CodeFirst
             var mappedContentTypes = ContentTypeDefinitionFactory.RetrieveMappedContentTypes().ToList();
             ServiceContext.ContentTypeService.Save(mappedContentTypes);
 
-            var type1 = ServiceContext.ContentTypeService.GetContentType(1045);
-            var type2 = ServiceContext.ContentTypeService.GetContentType(1046);
+            var type1 = ServiceContext.ContentTypeService.GetContentType(NodeDto.NodeIdSeed);
+            var type2 = ServiceContext.ContentTypeService.GetContentType(NodeDto.NodeIdSeed + 1);
 
             Assert.That(type1, Is.Not.Null);
             Assert.That(type2, Is.Not.Null);
@@ -165,7 +166,7 @@ namespace Umbraco.Tests.CodeFirst
             var mappedContentTypes = ContentTypeDefinitionFactory.RetrieveMappedContentTypes().ToList();
             ServiceContext.ContentTypeService.Save(mappedContentTypes);
 
-            var type1 = ServiceContext.ContentTypeService.GetContentType(1047);
+            var type1 = ServiceContext.ContentTypeService.GetContentType(NodeDto.NodeIdSeed + 2);
 
             Assert.That(type1, Is.Not.Null);
             Assert.That(type1.PropertyGroups.Count(), Is.EqualTo(2));

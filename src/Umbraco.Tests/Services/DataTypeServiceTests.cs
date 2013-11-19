@@ -2,6 +2,7 @@
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Tests.Services
 {
@@ -59,7 +60,7 @@ namespace Umbraco.Tests.Services
             Assert.That(deletedDefinition, Is.Null);
 
             //Further assertions against the ContentType that contains PropertyTypes based on the TextField
-            var contentType = ServiceContext.ContentTypeService.GetContentType(1045);
+            var contentType = ServiceContext.ContentTypeService.GetContentType(NodeDto.NodeIdSeed);
             Assert.That(contentType.Alias, Is.EqualTo("umbTextpage"));
             Assert.That(contentType.PropertyTypes.Count(), Is.EqualTo(1));
         }

@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
@@ -146,7 +147,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var media = repository.Get(1046);
+                var media = repository.Get(NodeDto.NodeIdSeed + 1);
                 bool dirty = ((ICanBeDirty) media).IsDirty();
 
                 // Assert
@@ -165,12 +166,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var content = repository.Get(1047);
+                var content = repository.Get(NodeDto.NodeIdSeed + 2);
                 content.Name = "Test File Updated";
                 repository.AddOrUpdate(content);
                 unitOfWork.Commit();
 
-                var updatedContent = repository.Get(1047);
+                var updatedContent = repository.Get(NodeDto.NodeIdSeed + 2);
 
                 // Assert
                 Assert.That(updatedContent.Id, Is.EqualTo(content.Id));
@@ -189,12 +190,12 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var media = repository.Get(1047);
+                var media = repository.Get(NodeDto.NodeIdSeed + 2);
                 repository.Delete(media);
                 unitOfWork.Commit();
 
-                var deleted = repository.Get(1047);
-                var exists = repository.Exists(1047);
+                var deleted = repository.Get(NodeDto.NodeIdSeed + 2);
+                var exists = repository.Exists(NodeDto.NodeIdSeed + 2);
 
                 // Assert
                 Assert.That(deleted, Is.Null);
@@ -213,10 +214,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var media = repository.Get(1046);
+                var media = repository.Get(NodeDto.NodeIdSeed + 1);
 
                 // Assert
-                Assert.That(media.Id, Is.EqualTo(1046));
+                Assert.That(media.Id, Is.EqualTo(NodeDto.NodeIdSeed + 1));
                 Assert.That(media.CreateDate, Is.GreaterThan(DateTime.MinValue));
                 Assert.That(media.UpdateDate, Is.GreaterThan(DateTime.MinValue));
                 Assert.That(media.ParentId, Is.Not.EqualTo(0));
@@ -259,7 +260,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var medias = repository.GetAll(1046, 1047);
+                var medias = repository.GetAll(NodeDto.NodeIdSeed + 1, NodeDto.NodeIdSeed + 2);
 
                 // Assert
                 Assert.That(medias, Is.Not.Null);
@@ -299,9 +300,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var exists = repository.Exists(1046);
-                var existsToo = repository.Exists(1046);
-                var doesntExists = repository.Exists(1050);
+                var exists = repository.Exists(NodeDto.NodeIdSeed + 1);
+                var existsToo = repository.Exists(NodeDto.NodeIdSeed + 1);
+                var doesntExists = repository.Exists(NodeDto.NodeIdSeed + 5);
 
                 // Assert
                 Assert.That(exists, Is.True);
@@ -338,17 +339,17 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         public void CreateTestData()
         {
-            //Create and Save folder-Media -> 1045
+            //Create and Save folder-Media -> (NodeDto.NodeIdSeed)
             var folderMediaType = ServiceContext.ContentTypeService.GetMediaType(1031);
             var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
             ServiceContext.MediaService.Save(folder, 0);
 
-            //Create and Save image-Media -> 1046
+            //Create and Save image-Media -> (NodeDto.NodeIdSeed + 1)
             var imageMediaType = ServiceContext.ContentTypeService.GetMediaType(1032);
             var image = MockedMedia.CreateMediaImage(imageMediaType, folder.Id);
             ServiceContext.MediaService.Save(image, 0);
 
-            //Create and Save file-Media -> 1047
+            //Create and Save file-Media -> (NodeDto.NodeIdSeed + 2)
             var fileMediaType = ServiceContext.ContentTypeService.GetMediaType(1033);
             var file = MockedMedia.CreateMediaFile(fileMediaType, folder.Id);
             ServiceContext.MediaService.Save(file, 0);

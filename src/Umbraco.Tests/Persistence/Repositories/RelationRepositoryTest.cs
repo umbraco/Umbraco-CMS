@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
@@ -59,7 +60,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Act
                 var relationType = repositoryType.Get(1);
-                var relation = new Relation(1047, 1048, relationType);
+                var relation = new Relation(NodeDto.NodeIdSeed + 2, NodeDto.NodeIdSeed + 3, relationType);
                 repository.AddOrUpdate(relation);
                 unitOfWork.Commit();
 
@@ -132,8 +133,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(relation, Is.Not.Null);
                 Assert.That(relation.HasIdentity, Is.True);
-                Assert.That(relation.ChildId, Is.EqualTo(1047));
-                Assert.That(relation.ParentId, Is.EqualTo(1046));
+                Assert.That(relation.ChildId, Is.EqualTo(NodeDto.NodeIdSeed + 2));
+                Assert.That(relation.ParentId, Is.EqualTo(NodeDto.NodeIdSeed + 1));
                 Assert.That(relation.RelationType.Alias, Is.EqualTo("relateContentOnCopy"));
             }
         }
@@ -211,7 +212,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var query = Query<IRelation>.Builder.Where(x => x.ParentId == 1046);
+                var query = Query<IRelation>.Builder.Where(x => x.ParentId == NodeDto.NodeIdSeed + 1);
                 int count = repository.Count(query);
 
                 // Assert
@@ -251,7 +252,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork, out repositoryType))
             {
 
-                var content = ServiceContext.ContentService.GetById(1047);
+                var content = ServiceContext.ContentService.GetById(NodeDto.NodeIdSeed + 2);
                 ServiceContext.ContentService.Delete(content, 0);
 
                 // Act
@@ -284,19 +285,19 @@ namespace Umbraco.Tests.Persistence.Repositories
             relationTypeRepository.AddOrUpdate(relateContentType);
             unitOfWork.Commit();
 
-            //Create and Save ContentType "umbTextpage" -> 1045
+            //Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
             ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
             ServiceContext.ContentTypeService.Save(contentType);
 
-            //Create and Save Content "Homepage" based on "umbTextpage" -> 1046
+            //Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)
             Content textpage = MockedContent.CreateSimpleContent(contentType);
             ServiceContext.ContentService.Save(textpage, 0);
 
-            //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1047
+            //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 2)
             Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
             ServiceContext.ContentService.Save(subpage, 0);
 
-            //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1048
+            //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 3)
             Content subpage2 = MockedContent.CreateSimpleContent(contentType, "Text Page 2", textpage.Id);
             ServiceContext.ContentService.Save(subpage2, 0);
 
