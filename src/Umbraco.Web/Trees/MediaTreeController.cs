@@ -132,5 +132,21 @@ namespace Umbraco.Web.Trees
         {
             get { return UmbracoObjectTypes.Media; }
         }
+
+        /// <summary>
+        /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        protected override bool HasPathAccess(string id, FormDataCollection queryStrings)
+        {
+            var media = Services.MediaService.GetById(int.Parse(id));
+            if (media == null)
+            {
+                return false;
+            }
+            return Security.CurrentUser.HasPathAccess(media);
+        }
     }
 }

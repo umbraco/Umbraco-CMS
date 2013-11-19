@@ -45,8 +45,8 @@ function treeResource($q, $http, umbRequestHelper) {
             if (!options.isDialog) {
                 options.isDialog = false;
             }
-            if (!options.rootNodeId) {
-                options.rootNodeId = -1;
+            if (!options.startNodeId) {
+                options.startNodeId = -1;
             }
 
             return umbRequestHelper.resourcePromise(
@@ -58,7 +58,7 @@ function treeResource($q, $http, umbRequestHelper) {
                                 {application: options.section}, 
                                 { tree: options.tree },
                                 { isDialog: options.isDialog },
-                                { rootNodeId: options.rootNodeId },
+                                { startNodeId: options.startNodeId }
                             ])),
                 'Failed to retreive data for application tree ' + options.section);
         },

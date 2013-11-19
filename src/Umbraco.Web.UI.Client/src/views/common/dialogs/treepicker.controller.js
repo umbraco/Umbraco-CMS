@@ -7,7 +7,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 		$scope.section = dialogOptions.section;
 		$scope.treeAlias = dialogOptions.treeAlias;
 		$scope.multiPicker = dialogOptions.multiPicker;
-		$scope.rootNodeId = dialogOptions.rootNodeId;
+		$scope.startNodeId = dialogOptions.startNodeId;
 
 		//search defaults
 		$scope.searcher = searchService.searchContent;

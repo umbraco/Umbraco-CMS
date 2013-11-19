@@ -1,5 +1,5 @@
 <div class="umb-panel" ng-controller="Umbraco.Dialogs.TreePickerController">
-    <div class="umb-panel-header" ng-hide="rootNodeId > -1">
+    <div class="umb-panel-header" ng-hide="startNodeId > -1">
         <div class="umb-el-wrap umb-panel-buttons">
             <div class="form-search">
                 <i class="icon-search"></i>
@@ -11,7 +11,7 @@
             </div>
         </div>
     </div>
-    <div class="umb-panel-body with-footer" ng-class="{'no-header':rootNodeId > -1}">
+    <div class="umb-panel-body with-footer" ng-class="{'no-header':startNodeId > -1}">
         <div class="tab-content umb-control-group">
 
             <!-- Search results -->
@@ -40,7 +40,7 @@
                     showheader="true"
                     showoptions="false"
                     isdialog="true"
-                    rootnodeid="{{rootNodeId}}"
+                    startnodeid="{{startNodeId}}"
                     eventhandler="dialogTreeEventHandler">
 				</umb-tree>
             </div>

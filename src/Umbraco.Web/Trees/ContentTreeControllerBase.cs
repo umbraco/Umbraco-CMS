@@ -56,6 +56,14 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
+        /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        protected abstract bool HasPathAccess(string id, FormDataCollection queryStrings);
+
+        /// <summary>
         /// This will automatically check if the recycle bin needs to be rendered (i.e. its the first level)
         /// and will automatically append it to the result of GetChildNodes.
         /// </summary>
@@ -64,19 +72,32 @@ namespace Umbraco.Web.Trees
         /// <returns></returns>
         protected sealed override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
+            //check if we're rendering the root
             if (id == Constants.System.Root.ToInvariantString() && UserStartNode == Constants.System.Root)
             {
-                if (queryStrings.HasKey(TreeQueryStringParameters.RootNode) && queryStrings.GetValue<string>(TreeQueryStringParameters.RootNode) != Constants.System.Root.ToString(CultureInfo.InvariantCulture))
-                   id = queryStrings.GetValue<string>(TreeQueryStringParameters.RootNode);
+                var nodes = new TreeNodeCollection();
 
-                /*    if (Security.CurrentUser.HasPathAccess(c))
-                        node = CreateCustomRootNode(queryStrings, c.Id, c.ParentId, c.Name);
-                */
+                //check if a request has been made to render from a specific start node
+                if (queryStrings.HasKey(TreeQueryStringParameters.StartNodeId)
+                    && queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId) != Constants.System.Root.ToString(CultureInfo.InvariantCulture))
+                {
+                    id = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
 
-                //we need to append the recycle bin to the end (if not in dialog mode)
-                var nodes = PerformGetTreeNodes(id, queryStrings);
+                    //we need to verify that the user has access to view this node, otherwise we'll render an empty tree collection
+                    // TODO: in the future we could return a validation statement so we can have some UI to notify the user they don't have access                
+                    if (HasPathAccess(id, queryStrings))
+                    {   
+                        nodes = PerformGetTreeNodes(id, queryStrings);
+                    }
+                }
+                else
+                {
+                    //load normally
+                    nodes = PerformGetTreeNodes(id, queryStrings);
+                }
 
-                if (!IsDialog(queryStrings))
+                //only render the recycle bin if we are not in dialog and the start id id still the root
+                if (IsDialog(queryStrings) == false && id == Constants.System.Root.ToInvariantString())
                 {
                     nodes.Add(CreateTreeNode(
                         RecycleBinId.ToInvariantString(),

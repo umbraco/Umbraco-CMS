@@ -187,6 +187,22 @@ namespace Umbraco.Web.Trees
         }
 
         /// <summary>
+        /// Returns true or false if the current user has access to the node based on the user's allowed start node (path) access
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        protected override bool HasPathAccess(string id, FormDataCollection queryStrings)
+        {
+            var content = Services.ContentService.GetById(int.Parse(id));
+            if (content == null)
+            {
+                return false;
+            }
+            return Security.CurrentUser.HasPathAccess(content);
+        }
+
+        /// <summary>
         /// Returns a collection of all menu items that can be on a content node
         /// </summary>
         /// <param name="item"></param>

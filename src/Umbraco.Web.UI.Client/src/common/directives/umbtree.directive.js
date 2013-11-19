@@ -17,7 +17,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
             showheader: '@',
             cachekey: '@',
             isdialog: '@',
-            rootnodeid: '@',
+            startnodeid: '@',
             eventhandler: '='
         },
 
@@ -220,7 +220,7 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                         //anytime we want to load the tree we need to disable the delete animations
                         deleteAnimations = false;
 
-                        treeService.getTree({ section: scope.section, tree: scope.treealias, cacheKey: scope.cachekey, isDialog: scope.isdialog ? scope.isdialog : false, rootNodeId: scope.rootnodeid ? scope.rootnodeid : -1 })
+                        treeService.getTree({ section: scope.section, tree: scope.treealias, cacheKey: scope.cachekey, isDialog: scope.isdialog ? scope.isdialog : false, startNodeId: scope.startnodeid ? scope.startnodeid : -1 })
                             .then(function(data) {
                                 //set the data once we have it
                                 scope.tree = data;

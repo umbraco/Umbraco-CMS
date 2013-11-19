@@ -33,7 +33,7 @@ angular.module('umbraco')
 		$scope.cfg.callback = populate;
 		$scope.cfg.treeAlias = $scope.cfg.startNode.type;
 		$scope.cfg.section = $scope.cfg.startNode.type;
-		$scope.cfg.rootNodeId = $scope.cfg.startNode.id;
+		$scope.cfg.startNodeId = $scope.cfg.startNode.id;
 		$scope.cfg.filterCssClass = "not-allowed not-published";
 		
 		//load current data
