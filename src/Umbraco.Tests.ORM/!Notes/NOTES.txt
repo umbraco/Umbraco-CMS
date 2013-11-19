@@ -1,4 +1,49 @@
-﻿1. Manually merge with the main umbraco project
+﻿Umbraco.Tests.ORM project references:
+
+- using source projects within the same solution:
+
+E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.interfaces\bin\Debug\interfaces.dll
+E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.datalayer\bin\Debug\umbraco.DataLayer.dll
+E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Core\bin\Debug\Umbraco.Core.dll
+E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.cms\bin\Debug\cms.dll
+E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\umbraco.businesslogic\bin\Debug\businesslogic.dll
+
+- using compiled classlib DLLs
+
+E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Tests\bin\Release\Umbraco.Tests.dll
+E:\Projects\Git\Umbraco\Umbraco-CMS-My-Fork\src\Umbraco.Web\bin\Release\umbraco.dll
+
+----------------- solved conflicts while merging with githib ----
+1.
+
+"C:\Program Files (x86)\Git\bin\git.exe" push --recurse-submodules=check --progress "origin" 6.2.0:6.2.0
+To https://github.com/ShamilS/Umbraco-CMS
+ ! [rejected]        6.2.0 -> 6.2.0 (fetch first)
+error: failed to push some refs to 'https://github.com/ShamilS/Umbraco-CMS'
+hint: Updates were rejected because the remote contains work that you do
+hint: not have locally. This is usually caused by another repository pushing
+hint: to the same ref. You may want to first merge the remote changes (e.g.,
+hint: 'git pull') before pushing again.
+hint: See the 'Note about fast-forwards' in 'git push --help' for details.
+Done
+
+2
+
+"C:\Program Files (x86)\Git\bin\git.exe" pull --progress "origin" 
+remote: Total 21 (delta 18), reused 7 (delta 4)[K
+From https://github.com/ShamilS/Umbraco-CMS
+   c92da36..dbefa2b  6.2.0      -> origin/6.2.0
+Auto-merging src/umbraco.cms/businesslogic/template/Template.cs
+CONFLICT (content): Merge conflict in src/umbraco.cms/businesslogic/template/Template.cs
+Auto-merging src/umbraco.cms/businesslogic/Property/Property.cs
+CONFLICT (content): Merge conflict in src/umbraco.cms/businesslogic/Property/Property.cs
+Auto-merging src/Umbraco.Core/Models/Rdbms/TaskTypeDto.cs
+CONFLICT (content): Merge conflict in src/Umbraco.Core/Models/Rdbms/TaskTypeDto.cs
+Automatic merge failed; fix conflicts and then commit the result.
+Done
+
+
+1. Manually merge with the main umbraco project
 2. Correct References
 3. Recompile
 4. Test

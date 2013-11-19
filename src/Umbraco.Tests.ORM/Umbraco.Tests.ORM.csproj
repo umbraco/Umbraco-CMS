@@ -141,6 +141,10 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="umbraco, Version=1.0.5067.20971, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\Umbraco.Web\bin\Release\umbraco.dll</HintPath>
+    </Reference>
     <Reference Include="Umbraco.Tests, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Umbraco.Tests\bin\Release\Umbraco.Tests.dll</HintPath>
@@ -231,10 +235,6 @@
       <Project>{CCD75EC3-63DB-4184-B49D-51C1DD337230}</Project>
       <Name>umbraco.cms</Name>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.controls\umbraco.controls.csproj">
-      <Project>{6EDD2061-82F2-461B-BB6E-879245A832DE}</Project>
-      <Name>umbraco.controls</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj">
       <Project>{31785BC3-256C-4613-B2F5-A1B0BDDED8C1}</Project>
       <Name>Umbraco.Core</Name>
@@ -243,29 +243,9 @@
       <Project>{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}</Project>
       <Name>umbraco.datalayer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\umbraco.editorControls\umbraco.editorControls.csproj">
-      <Project>{255F5DF1-4E43-4758-AC05-7A0B68EB021B}</Project>
-      <Name>umbraco.editorControls</Name>
-    </ProjectReference>
     <ProjectReference Include="..\umbraco.interfaces\umbraco.interfaces.csproj">
       <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
       <Name>umbraco.interfaces</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\umbraco.MacroEngines\umbraco.MacroEngines.csproj">
-      <Project>{89C09045-1064-466B-B94A-DB3AFE2A5853}</Project>
-      <Name>umbraco.MacroEngines</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
-      <Project>{651E1350-91B6-44B7-BD60-7207006D7003}</Project>
-      <Name>Umbraco.Web</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UmbracoExamine.PDF\UmbracoExamine.PDF.csproj">
-      <Project>{f30dddb8-3994-4673-82ae-057123c6e1a8}</Project>
-      <Name>UmbracoExamine.PDF</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\UmbracoExamine\UmbracoExamine.csproj">
-      <Project>{07fbc26b-2927-4a22-8d96-d644c667fecc}</Project>
-      <Name>UmbracoExamine</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

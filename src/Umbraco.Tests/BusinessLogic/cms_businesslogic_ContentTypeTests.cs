@@ -28,11 +28,7 @@ namespace Umbraco.Tests.BusinessLogic
 
         protected override DatabaseBehavior DatabaseTestBehavior
         {
-            get
-            {
-                //return DatabaseBehavior.NewSchemaPerFixture;
-                return DatabaseBehavior.NoDatabasePerFixture;
-            }
+            get { return DatabaseBehavior.NewSchemaPerFixture; }
         }
 
         private void EnsureData()

@@ -1,20 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using NUnit.Framework;
-using umbraco.BusinessLogic;
-using Umbraco.Tests.TestHelpers;
-using umbraco.cms.businesslogic.datatype;
-using System.Runtime.CompilerServices;
-using System.Diagnostics;
-using System.Reflection;
 using umbraco.cms.businesslogic;
-using System;
-using System.Xml;
-using Umbraco.Web;
-using Umbraco.Core.Persistence;
 using Umbraco.Core.Models.Rdbms;
 using umbraco.cms.businesslogic.web;
 using umbraco.cms.businesslogic.relation;
-using Umbraco.Tests.BusinessLogic;
 
 namespace Umbraco.Tests.ORM
 {

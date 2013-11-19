@@ -22,8 +22,8 @@ namespace Umbraco.Tests.ORM
         {
             get
             {
-                return DatabaseBehavior.NoDatabasePerFixture;
-                //return DatabaseBehavior.NewSchemaPerFixture; 
+                //return DatabaseBehavior.NoDatabasePerFixture;
+                return DatabaseBehavior.NewSchemaPerFixture; 
             }
         }
 
