@@ -38,21 +38,20 @@ namespace Umbraco.Web.UI.Install.Steps
             get { return DatabaseType.SelectedValue != ""; }
         }
 
-        /// <summary>
-        /// Returns whether the selected database is an embedded database.
-        /// </summary>
-        protected bool HasEmbeddedDatabaseFiles
+        protected bool IsNewInstall
         {
             get
             {
-                // check if sql ce is present
-                if (
-                    !File.Exists(IOHelper.MapPath(Path.Combine(IOHelper.ResolveUrl(SystemDirectories.Bin), "System.Data.SqlServerCe.dll"))) ||
-                    !File.Exists(IOHelper.MapPath(Path.Combine(IOHelper.ResolveUrl(SystemDirectories.Bin), "SQLCE4Umbraco.dll")))
-                    )
-                    return false;
-                else
+                var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
+                if (databaseSettings != null && (
+                    databaseSettings.ConnectionString.Trim() == string.Empty
+                    && databaseSettings.ProviderName.Trim() == string.Empty
+                    && GlobalSettings.ConfigurationStatus == string.Empty))
+                {
                     return true;
+                }
+
+                return false;
             }
         }
 
@@ -167,8 +166,7 @@ namespace Umbraco.Web.UI.Install.Steps
             toggleVisible(DatabasePasswordItem, !ManualConnectionString && !IsEmbeddedDatabase);
             toggleVisible(DatabaseNameItem, !ManualConnectionString && !IsEmbeddedDatabase);
 
-
-            if (IsEmbeddedDatabase)
+            if (IsNewInstall || IsEmbeddedDatabase)
                 dbinit.Text = "$('#databaseOptionEmbedded').click();$('#databaseOptionEmbedded').change();";
             else if (ManualConnectionString)
                 dbinit.Text = "$('#databaseOptionAdvanced').click();$('#databaseOptionAdvanced').change();";
