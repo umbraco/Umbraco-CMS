@@ -79,7 +79,7 @@ namespace Umbraco.Web.Trees
                 var altStartId = string.Empty;
                 
                 if(queryStrings.HasKey(TreeQueryStringParameters.StartNodeId))
-                    queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
+                    altStartId = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
 
 
                 //check if a request has been made to render from a specific start node

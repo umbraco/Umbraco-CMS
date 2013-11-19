@@ -57,9 +57,8 @@ data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupl
         	min-width="220"
         	on-click="clickHandler"
         	ng-model="images"
-        	filter-by="searchTerm"
-        />
-	</div>
+        	filter-by="searchTerm"/>
+	</div>	
 
 	<div class="umb-panel-footer" >
 			<div class="umb-el-wrap umb-panel-buttons">
@@ -68,6 +67,13 @@ data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupl
 		        	<a href ng-click="close()" class="btn btn-link">
 		        		<localize key="general_cancel">Cancel</localize>
 					</a>
+
+					<button
+						class="btn"
+						ng-hide="onlyImages || dialogOptions.multiPicker"
+						ng-click="selectFolder(currentFolder)">
+						<localize key="buttons_selectCurrentFolder">Select current folder</localize>
+					</button>
 
 					<button
 						class="btn btn-primary"
