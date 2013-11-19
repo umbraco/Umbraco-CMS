@@ -36,6 +36,10 @@ angular.module("umbraco")
 
             $scope.gotoFolder = function(folder) {
 
+                if(!folder){
+                    folder = {id: -1, name: "Media", icon: "icon-folder"};
+                }
+
                 if (folder.id > 0) {
                     entityResource.getAncestors(folder.id, "media")
                         .then(function(anc) {
@@ -72,7 +76,7 @@ angular.module("umbraco")
 
                 $scope.options.formData.currentFolder = folder.id;
                 $scope.currentFolder = folder;   
-
+                
             };
 
 
@@ -80,9 +84,9 @@ angular.module("umbraco")
                 $scope.gotoFolder($scope.options.formData.currentFolder);
             });
 
-            $scope.clickHandler = function(image, ev) {
+            $scope.clickHandler = function(image, ev, select) {
 
-                if (image.contentTypeAlias.toLowerCase() == 'folder') {
+                if (image.contentTypeAlias.toLowerCase() == 'folder' && !select) {
                     $scope.gotoFolder(image);
                 }else{
                     eventsService.publish("Umbraco.Dialogs.MediaPickerController.Select", image);
@@ -124,5 +128,5 @@ angular.module("umbraco")
             };
 
             //default root item
-            $scope.gotoFolder({id: -1, name: "Media", icon: "icon-folder"});
+            $scope.gotoFolder();
         });
