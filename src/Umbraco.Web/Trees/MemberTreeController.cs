@@ -127,8 +127,7 @@ namespace Umbraco.Web.Trees
             }
             else
             {
-                menu.Items.Add<ActionDelete>(ui.Text("actions", ActionDelete.Instance.Alias));
-                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), true);    
+                menu.Items.Add<RefreshNode, ActionRefresh>(ui.Text("actions", ActionRefresh.Instance.Alias), false);    
             }
             return menu;
         }
