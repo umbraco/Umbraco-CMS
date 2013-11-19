@@ -1,6 +1,6 @@
 @ECHO OFF
 SET release=7.0.0
-SET comment=RC
+SET comment=
 SET version=%release%
 
 IF [%comment%] EQU [] (SET version=%release%) ELSE (SET version=%release%-%comment%)
@@ -19,6 +19,9 @@ echo This file is only here so that the containing folder will be included in th
 echo This file is only here so that the containing folder will be included in the NuGet package, it is safe to delete. > .\_BuildOutput\WebApp\usercontrols\dummy.txt
 echo This file is only here so that the containing folder will be included in the NuGet package, it is safe to delete. > .\_BuildOutput\WebApp\Views\Partials\dummy.txt
 echo This file is only here so that the containing folder will be included in the NuGet package, it is safe to delete. > .\_BuildOutput\WebApp\Views\MacroPartials\dummy.txt
+
+ren .\_BuildOutput\WebApp\MacroScripts\Web.config Web.config.transform
+ren .\_BuildOutput\WebApp\Views\Web.config Web.config.transform
 
 ..\src\.nuget\NuGet.exe pack NuSpecs\UmbracoCms.Core.nuspec -Version %version%
 ..\src\.nuget\NuGet.exe pack NuSpecs\UmbracoCms.nuspec -Version %version%
