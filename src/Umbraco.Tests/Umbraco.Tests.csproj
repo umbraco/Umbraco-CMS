@@ -146,6 +146,7 @@
     <Compile Include="AttemptTests.cs" />
     <Compile Include="BusinessLogic\BaseORMTest.cs" />
     <Compile Include="BusinessLogic\BaseORMTest_TRAL.cs" />
+    <Compile Include="BusinessLogic\BaseORMTest_TRAL_MacroRepository.cs" />
     <Compile Include="BusinessLogic\cms_businesslogic_CMSNodeTests.cs" />
     <Compile Include="BusinessLogic\cms_businesslogic_ContentTypeTests.cs" />
     <Compile Include="BusinessLogic\cms_businesslogic_MacroPropertyType_Tests.cs" />

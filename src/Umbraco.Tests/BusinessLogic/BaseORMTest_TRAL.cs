@@ -32,35 +32,22 @@ namespace Umbraco.Tests.ORM
 
         private TestDatabase _testDatabase; // just to have test context and its database initialized
 
-        internal NodesRepository Nodes { get; private set; }
-        internal MacroRepository Macro { get; private set; }
-        internal PreValueRepository PreValue { get; private set; }
-        internal PropertyRepository Property { get; private set; }
-        internal RecycleBinRepository RecycleBin { get; private set; }
-        internal RelationRepository Relation { get; private set; }
-        internal TemplateRepository Template { get; private set; }
-        internal UsersRepository Users { get; private set; }
-        internal TagRepository Tag { get; private set; }
-        internal TaskRepository Task { get; private set; }
+        internal NodesRepository Nodes { get {return new NodesRepository(this); }}
+        internal PreValueRepository PreValue{ get { return new PreValueRepository(this); }} 
+        internal PropertyRepository Property { get {return new PropertyRepository(this); }} 
+        internal RecycleBinRepository RecycleBin {get {return new RecycleBinRepository(this); }} 
+        internal RelationRepository Relation { get {return new RelationRepository(this); }} 
+        internal TemplateRepository Template { get {return new TemplateRepository(this); }} 
+        internal UsersRepository Users {get {return new UsersRepository(this); }} 
+        internal TagRepository Tag {get {return new TagRepository(this); }} 
+        internal TaskRepository Task { get { return new TaskRepository(this); } } 
 
         public UmbracoDatabase Repository { get; private set; }
 
         public TestRepositoryAbstractionLayer(UmbracoContext context)
         {
             _testDatabase = new TestDatabase(context);  
-
             Repository = (new DefaultDatabaseFactory()).CreateDatabase();
-
-            this.Nodes = new NodesRepository(this);
-            this.Macro = new MacroRepository(this);
-            this.PreValue = new PreValueRepository(this);
-            this.Property = new PropertyRepository(this);
-            this.RecycleBin = new RecycleBinRepository(this);
-            this.Relation = new RelationRepository(this);
-            this.Template = new TemplateRepository(this);
-            this.Users = new UsersRepository(this);
-            this.Tag = new TagRepository(this);
-            this.Task = new TaskRepository(this);
         }
 
         // short-cut
@@ -246,109 +233,6 @@ namespace Umbraco.Tests.ORM
                     return CMSNode.MakeNew(parentId, objectType, 0, level, text, Guid.NewGuid());
                 }
             }
-
-        }
-
-        internal class MacroRepository: EntityRepository
-        {
-            internal MacroRepository(TestRepositoryAbstractionLayer tral):base(tral) {}
-
-            public int CountAll
-            {
-                get
-                {
-                    return _r.ExecuteScalar<int>("select count(id) from cmsMacro");
-                }
-            }
-
-            public int CountAllProperties(int macroId)
-            {
-                return _r.ExecuteScalar<int>("select count(id) from cmsMacroProperty where [macro] = @0", macroId);
-            }
-
-            public int CountAllPropertyTypes
-            {
-                get
-                {
-                    return _r.ExecuteScalar<int>("select count(id) from cmsMacroPropertyType");
-                }
-            }
-
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            public MacroPropertyDto CreateTestMacroProperty(int macroId, int macroPropertyTypeId, string propertyName = TEST_MACRO_PROPERTY_NAME, string propertyAlias = TEST_MACRO_PROPERTY_ALIAS)
-            {
-                _r.Execute("insert into [cmsMacroProperty] (macroPropertyHidden, macroPropertyType, macro, macroPropertySortOrder, macroPropertyAlias, macroPropertyName) " +
-                                           " values (@macroPropertyHidden, @macroPropertyType, @macro, @macroPropertySortOrder, @macroPropertyAlias, @macroPropertyName) ",
-                                           new
-                                           {
-                                               macroPropertyHidden = true,
-                                               macroPropertyType = macroPropertyTypeId,
-                                               macro = macroId,
-                                               macroPropertySortOrder = 0,
-                                               macroPropertyAlias = propertyName + uniqueAliasSuffix,
-                                               macroPropertyName = propertyAlias + uniqueNameSuffix
-                                           });
-                int id = _r.ExecuteScalar<int>("select MAX(id) from [cmsMacroProperty]");
-                return _tral.GetDto<MacroPropertyDto>(id);
-            }
-
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            public MacroDto CreateMacro(string name, string alias)
-            {
-                _r.Execute("insert into [cmsMacro] " +
-                     " (macroUseInEditor, macroRefreshRate, macroAlias, macroName, macroScriptType, " +
-                     " macroScriptAssembly, macroXSLT, macroPython, macroDontRender, macroCacheByPage, macroCachePersonalized) " +
-                     " VALUES  " +
-                     " (@macroUseInEditor, @macroRefreshRate, @macroAlias, @macroName, @macroScriptType, " +
-                     " @macroScriptAssembly, @macroXSLT, @macroPython, @macroDontRender, @macroCacheByPage, @macroCachePersonalized) ",
-                     new
-                     {
-                         macroUseInEditor = true,
-                         macroRefreshRate = 0,
-                         macroAlias = alias, // "twitterAds",
-                         macroName = name, //"Twitter Ads",
-                         macroScriptType = "mst",
-                         macroScriptAssembly = "",
-                         macroXSLT = "some.xslt",
-                         macroPython = "",
-                         macroDontRender = false,
-                         macroCacheByPage = true,
-                         macroCachePersonalized = false
-                     });
-                int id = _r.ExecuteScalar<int>("select MAX(id) from [cmsMacro]");
-                return _tral.GetDto<MacroDto>(id);
-            }
-
-            [MethodImpl(MethodImplOptions.Synchronized)]
-            public MacroPropertyTypeDto CreateMacroPropertyType(string alias)
-            {
-                _r.Execute("insert into [cmsMacroPropertyType] (macroPropertyTypeAlias, macroPropertyTypeRenderAssembly, macroPropertyTypeRenderType, macroPropertyTypeBaseType) " +
-                                          " values (@macroPropertyTypeAlias, @macroPropertyTypeRenderAssembly, @macroPropertyTypeRenderType, @macroPropertyTypeBaseType) ",
-                                          new
-                                          {
-                                              macroPropertyTypeAlias = alias,
-                                              macroPropertyTypeRenderAssembly = "umbraco.macroRenderings",
-                                              macroPropertyTypeRenderType = "context",
-                                              macroPropertyTypeBaseType = "string"
-                                          });
-                int id = _r.ExecuteScalar<int>("select MAX(id) from [cmsMacroPropertyType]");
-                return _tral.GetDto<MacroPropertyTypeDto>(id);
-            }
-
-            public void DeleteMacro(int macroId)
-            {
-                _r.Execute("delete from  [cmsMacro] where id = @0", macroId);
-            }
-            public void DeleteMacroProperty(int macroPropertyId)
-            {
-                _r.Execute("delete from  [cmsMacroProperty] where id = @0", macroPropertyId);
-            }
-            public void DeleteMacroPropertyType(int macroPropertyTypeId)
-            {
-                _r.Execute("delete from  [cmsMacroPropertyType] where id = @0", macroPropertyTypeId);
-            }
-
-
 
         }
 

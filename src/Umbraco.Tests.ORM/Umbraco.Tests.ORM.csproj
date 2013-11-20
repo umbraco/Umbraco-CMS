@@ -160,6 +160,9 @@
     <Compile Include="..\Umbraco.Tests\BusinessLogic\BaseORMTest_TRAL.cs">
       <Link>PetaPOCO Refactoring\_1st. Generic Code Folder\BaseORMTest_TRAL.cs</Link>
     </Compile>
+    <Compile Include="..\Umbraco.Tests\BusinessLogic\BaseORMTest_TRAL_MacroRepository.cs">
+      <Link>PetaPOCO Refactoring\_1st. Generic Code Folder\BaseORMTest_TRAL_MacroRepository.cs</Link>
+    </Compile>
     <Compile Include="..\Umbraco.Tests\BusinessLogic\cms_businesslogic_CMSNodeTests.cs">
       <Link>PetaPOCO Refactoring\CMSNode\cms_businesslogic_CMSNodeTests.cs</Link>
     </Compile>
