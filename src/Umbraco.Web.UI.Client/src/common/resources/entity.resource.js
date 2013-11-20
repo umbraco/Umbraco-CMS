@@ -264,6 +264,28 @@ function entityResource($q, $http, umbRequestHelper) {
                'Failed to retreive entity data for query ' + query);
         },
         
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.entityResource#searchAll
+         * @methodOf umbraco.resources.entityResource
+         *
+         * @description
+         * Gets an array of entities from all available search indexes, given a lucene query
+         *
+         * ##usage
+         * <pre>
+         * entityResource.searchAll("bob")
+         *    .then(function(array) {
+         *        var myDoc = array; 
+         *        alert('they are here!');
+         *    });
+         * </pre> 
+         * 
+         * @param {String} Query search query 
+         * @returns {Promise} resourcePromise object containing the entity array.
+         *
+         */
         searchAll: function (query) {
 
             return umbRequestHelper.resourcePromise(

@@ -5,6 +5,32 @@
  *
  * @description
  * Tracks the various application state variables when working in the back office, raises events when state changes.
+ *
+ * ##Samples
+ *
+ * ####Subscribe to global state changes:
+ * 
+ * <pre>
+  *    scope.showTree = appState.getGlobalState("showNavigation");
+  *
+  *    scope.$on("appState.globalState.changed", function (e, args) {
+  *               if (args.key === "showNavigation") {
+  *                   scope.showTree = args.value;
+  *               }
+  *           });  
+  * </pre>
+ *
+ * ####Subscribe to section-state changes
+ *
+ * <pre>
+ *    scope.currentSection = appState.getSectionState("currentSection");
+ *
+ *    scope.$on("appState.sectionState.changed", function (e, args) {
+ *               if (args.key === "currentSection") {
+ *                   scope.currentSection = args.value;
+ *               }
+ *           });  
+ * </pre>
  */
 function appState($rootScope) {
     

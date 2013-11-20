@@ -1,8 +1,15 @@
 <div class="umb-dialog" ng-controller="Umbraco.Dialogs.LegacyDeleteController">
-    <div class="umb-dialog-body" auto-scale="90">
-        
-        <umb-confirm on-confirm="performDelete" on-cancel="cancel">    
-        </umb-confirm>
+    <div class="umb-dialog-body" >
 
+    	<div class="umb-pane">
+	        <p>
+	        	Are you sure you want to delete <strong>{{currentNode.name}}</strong> ?
+	        </p>
+
+	        <div class="pull-right">
+	        	<umb-confirm on-confirm="performDelete" on-cancel="cancel">    
+	        	</umb-confirm>
+	    	</div>
+		</div>
     </div>
 </div>

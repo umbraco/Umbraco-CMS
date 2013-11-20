@@ -6,6 +6,19 @@
 function dashboardResource($q, $http, umbRequestHelper) {
     //the factory object returned
     return {
+
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.dashboardResource#getDashboard
+         * @methodOf umbraco.resources.dashboardResource
+         *
+         * @description
+         * Retrieves the dashboard configuration for a given section
+         * 
+         * @param {string} section Alias of section to retrieve dashboard configuraton for
+         * @returns {Promise} resourcePromise object containing the user array.
+         *
+         */
         getDashboard: function (section) {
           
             return umbRequestHelper.resourcePromise(

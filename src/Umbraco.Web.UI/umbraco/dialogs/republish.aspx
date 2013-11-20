@@ -14,19 +14,18 @@
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
 <asp:Panel ID="p_republish" runat="server">
-      <div class="propertyDiv">      
+    <div class="propertyDiv">      
           <p><%= umbraco.ui.Text("defaultdialogs", "siterepublishHelp")%> </p>
-      </div>
+    </div>
       
-          <div id="buttons">
-            <asp:Button ID="bt_go" OnClick="go" OnClientClick="showProgress(document.getElementById('buttons'),'progress'); return true;" runat="server" Text="Republish" />
-            <em><%= umbraco.ui.Text("or") %></em>  
-            <a href="#" onclick="UmbClientMgr.closeModalWindow();"><%=umbraco.ui.Text("cancel")%></a>
-          </div>     
+    <div id="buttons" class="btn-toolbar umb-btn-toolbar">
+        <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow();"><%=umbraco.ui.Text("cancel")%></a>
+        <asp:Button ID="bt_go" cssclass="btn btn-primary" OnClick="go" OnClientClick="showProgress(document.getElementById('buttons'),'progress'); return true;" runat="server" Text="Republish" />
+    </div>     
       
-      <div id="progress" style="visibility: hidden;">
+    <div id="progress" style="visibility: hidden;">
 		<cc1:ProgressBar ID="progbar" runat="server" Title="Please wait..." />
-      </div>
+    </div>
       
     </asp:Panel>
     
@@ -35,6 +34,6 @@
       <p><%= umbraco.ui.Text("defaultdialogs", "siterepublished")%></p>
       
      </div>
-      <input type="button" class="guiInputButton" onclick="UmbClientMgr.closeModalWindow();" value="Ok" />
+      <input type="button" class="btn btn-primary" onclick="UmbClientMgr.closeModalWindow();" value="Ok" />
     </asp:Panel>
 </asp:Content>

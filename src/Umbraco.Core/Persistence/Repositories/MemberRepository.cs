@@ -173,6 +173,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                "DELETE FROM umbracoRelation WHERE childId = @Id",
                                "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
                                "DELETE FROM cmsPropertyData WHERE contentNodeId = @Id",
+                               "DELETE FROM cmsMember2MemberGroup WHERE Member = @Id",
                                "DELETE FROM cmsMember WHERE nodeId = @Id",
                                "DELETE FROM cmsContentVersion WHERE ContentId = @Id",
                                "DELETE FROM cmsContentXml WHERE nodeID = @Id",

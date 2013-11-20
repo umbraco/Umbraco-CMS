@@ -1,3 +1,25 @@
+/**
+ * @ngdoc service
+ * @name umbraco.services.searchService
+ *
+ *  
+ * @description
+ * Service for handling the main application search, can currently search content, media and members
+ *
+ * ##usage
+ * To use, simply inject the searchService into any controller that needs it, and make
+ * sure the umbraco.services module is accesible - which it should be by default.
+ *
+ * <pre>
+ *      searchService.searchMembers({term: 'bob'}).then(function(results){
+ *          angular.forEach(results, function(result){
+ *                  //returns:
+ *                  {name: "name", id: 1234, menuUrl: "url", editorPath: "url", metaData: {}, subtitle: "/path/etc" }
+ *           })          
+ *           var result = 
+ *       }) 
+ * </pre> 
+ */
 angular.module('umbraco.services')
 .factory('searchService', function ($q, $log, entityResource, contentResource, umbRequestHelper) {
 
@@ -23,6 +45,18 @@ angular.module('umbraco.services')
     }
 
     return {
+
+        /**
+        * @ngdoc method
+        * @name umbraco.services.searchService#searchMembers
+        * @methodOf umbraco.services.searchService
+        *
+        * @description
+        * Searches the default member search index
+        * @param {Object} args argument object
+        * @param {String} args.term seach term
+        * @returns {Promise} returns promise containing all matching members
+        */
         searchMembers: function(args) {
 
             if (!args.term) {
@@ -36,6 +70,18 @@ angular.module('umbraco.services')
                 return data;
             });
         },
+
+        /**
+        * @ngdoc method
+        * @name umbraco.services.searchService#searchContent
+        * @methodOf umbraco.services.searchService
+        *
+        * @description
+        * Searches the default internal content search index
+        * @param {Object} args argument object
+        * @param {String} args.term seach term
+        * @returns {Promise} returns promise containing all matching content items
+        */
         searchContent: function(args) {
 
             if (!args.term) {
@@ -49,6 +95,18 @@ angular.module('umbraco.services')
                 return data;
             });
         },
+
+        /**
+        * @ngdoc method
+        * @name umbraco.services.searchService#searchMedia
+        * @methodOf umbraco.services.searchService
+        *
+        * @description
+        * Searches the default media search index
+        * @param {Object} args argument object
+        * @param {String} args.term seach term
+        * @returns {Promise} returns promise containing all matching media items
+        */
         searchMedia: function(args) {
 
             if (!args.term) {
@@ -62,6 +120,18 @@ angular.module('umbraco.services')
                 return data;
             });
         },
+
+        /**
+        * @ngdoc method
+        * @name umbraco.services.searchService#searchAll
+        * @methodOf umbraco.services.searchService
+        *
+        * @description
+        * Searches all available indexes and returns all results in one collection
+        * @param {Object} args argument object
+        * @param {String} args.term seach term
+        * @returns {Promise} returns promise containing all matching items
+        */
         searchAll: function (args) {
             
             if (!args.term) {

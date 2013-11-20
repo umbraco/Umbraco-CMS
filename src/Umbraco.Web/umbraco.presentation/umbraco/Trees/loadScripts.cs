@@ -63,11 +63,13 @@ namespace umbraco
 
         protected override string FileSearchPattern
         {
-            get { return "*.*"; }
+            
+            get { return UmbracoSettings.ScriptFileTypes; }
         }
 
         protected override void OnRenderFolderNode(ref XmlTreeNode xNode)
         {
+            
             xNode.Menu = new List<IAction>(new IAction[] { ActionDelete.Instance, ContextMenuSeperator.Instance, ActionNew.Instance, ContextMenuSeperator.Instance, ActionRefresh.Instance });
             xNode.NodeType = "scriptsFolder";
         }

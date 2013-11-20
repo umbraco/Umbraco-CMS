@@ -38,24 +38,61 @@ function stylesheetResource($q, $http, umbRequestHelper) {
                'Failed to retreive stylesheets ');
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.stylesheetResource#getRules
+         * @methodOf umbraco.resources.stylesheetResource
+         *
+         * @description
+         * Returns all defined child rules for a stylesheet with a given ID
+         *
+         * ##usage
+         * <pre>
+         * stylesheetResource.getRules(2345)
+         *    .then(function(rules) {
+         *        alert('its here!');
+         *    });
+         * </pre> 
+         * 
+         * @returns {Promise} resourcePromise object containing the rules.
+         *
+         */
         getRules: function (id) {            
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "stylesheetApiBaseUrl",
                        "GetRules",
-                       [{ id: id }]
-                       ) +"&rnd=" + Math.floor(Math.random()*1001), {cache: false}),
+                       [{ id: id }]) +"&rnd=" + Math.floor(Math.random()*1001), {cache: false}),
                'Failed to retreive stylesheets ');
         },
 
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.stylesheetResource#getRulesByName
+         * @methodOf umbraco.resources.stylesheetResource
+         *
+         * @description
+         * Returns all defined child rules for a stylesheet with a given name
+         *
+         * ##usage
+         * <pre>
+         * stylesheetResource.getRulesByName("ie7stylesheet")
+         *    .then(function(rules) {
+         *        alert('its here!');
+         *    });
+         * </pre> 
+         * 
+         * @returns {Promise} resourcePromise object containing the rules.
+         *
+         */
         getRulesByName: function (name) {            
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "stylesheetApiBaseUrl",
                        "GetRulesByName",
-                       [{ name: name }])),
+                       [{ name: name }]) +"&rnd=" + Math.floor(Math.random()*1001), {cache: false}),
                'Failed to retreive stylesheets ');
         }
     };

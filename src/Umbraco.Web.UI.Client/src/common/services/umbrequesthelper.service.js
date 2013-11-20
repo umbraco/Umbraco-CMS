@@ -3,7 +3,7 @@
 * @name umbraco.services.umbRequestHelper
 * @description A helper object used for sending requests to the server
 **/
-function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogService) {
+function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogService, notificationsService) {
     return {
 
         /**
@@ -133,12 +133,20 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                 var result = callbacks.error.apply(this, [data, status, headers, config]);
 
                 //when there's a 500 (unhandled) error show a YSOD overlay if debugging is enabled.
-                if (status >= 500 && status < 600 && Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
+                if (status >= 500 && status < 600) {
 
-                    dialogService.ysodDialog({
-                        errorMsg: result.errorMsg,
-                        data: result.data
-                    });
+                    //show a ysod dialog
+                    if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
+                        dialogService.ysodDialog({
+                            errorMsg: result.errorMsg,
+                            data: result.data
+                        });
+                    }
+                    else {
+                        //show a simple error notification                         
+                        notificationsService.error("Server error", "Contact administrator, see log for full details.<br/><i>" + result.errorMsg + "</i>");
+                    }
+                    
                 }
                 else {
 
@@ -214,12 +222,20 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                     //failure callback
 
                     //when there's a 500 (unhandled) error show a YSOD overlay if debugging is enabled.
-                    if (status >= 500 && status < 600 && Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
+                    if (status >= 500 && status < 600) {
 
-                        dialogService.ysodDialog({
-                            errorMsg: 'An error occurred',
-                            data: data
-                        });
+                        //show a ysod dialog
+                        if (Umbraco.Sys.ServerVariables["isDebuggingEnabled"] === true) {
+                            dialogService.ysodDialog({
+                                errorMsg: 'An error occurred',
+                                data: data
+                            });
+                        }
+                        else {
+                            //show a simple error notification                         
+                            notificationsService.error("Server error", "Contact administrator, see log for full details.<br/><i>" + data.ExceptionMessage + "</i>");
+                        }
+                        
                     }
                     else {
 

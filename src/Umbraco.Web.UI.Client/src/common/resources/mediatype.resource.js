@@ -7,16 +7,34 @@ function mediaTypeResource($q, $http, umbRequestHelper) {
 
     return {
 
-        //return all types allowed under given document
-        getAllowedTypes: function (contentId) {
+        /**
+         * @ngdoc method
+         * @name umbraco.resources.mediaTypeResource#getAllowedTypes
+         * @methodOf umbraco.resources.mediaTypeResource
+         *
+         * @description
+         * Returns a list of allowed media types underneath a media item with a given ID
+         *
+         * ##usage
+         * <pre>
+         * mediaTypeResource.getAllowedTypes(1234)
+         *    .then(function(array) {
+         *        $scope.type = type;
+         *    });
+         * </pre> 
+         * @param {Int} mediaId id of the media item to retrive allowed child types for
+         * @returns {Promise} resourcePromise object.
+         *
+         */
+        getAllowedTypes: function (mediaId) {
 
             return umbRequestHelper.resourcePromise(
                $http.get(
                    umbRequestHelper.getApiUrl(
                        "mediaTypeApiBaseUrl",
                        "GetAllowedChildren",
-                       [{ contentId: contentId }])),
-               'Failed to retreive data for media id ' + contentId);
+                       [{ contentId: mediaId }])),
+               'Failed to retreive data for media id ' + mediaId);
         }
 
     };

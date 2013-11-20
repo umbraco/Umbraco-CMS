@@ -60,6 +60,12 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			    }
 			});
 
+			scope.$on("appState.sectionState.changed", function (e, args) {
+			    if (args.key === "currentSection") {
+			        scope.currentSection = args.value;
+			    }
+			});
+
 			//on page resize
 			window.onresize = calculateHeight;
 			

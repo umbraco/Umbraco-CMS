@@ -44,7 +44,6 @@ angular.module('umbraco.services')
 
        /** Internal method that handles opening all dialogs */
        function openDialog(options) {
-
            var defaults = {
               container: $("body"),
               animation: "fade",
@@ -97,8 +96,15 @@ angular.module('umbraco.services')
 
               if(dialog.element){
                  dialog.element.modal('hide');
-                 dialog.element.find("iframe").attr("src", "#");
-                 dialog.element.remove();
+
+                 if(dialog.iframe){
+                    dialog.element.find("iframe").attr("src", "#");
+                    $timeout(function(){
+                      dialog.element.remove();
+                    }, 1000); 
+                 }else{
+                    dialog.element.remove();
+                 }
                }
            };
 

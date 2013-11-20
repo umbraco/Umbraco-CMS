@@ -10,6 +10,7 @@ using System.Web;
 using System.Web.UI;
 using System.Xml;
 using System.Xml.XPath;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -234,6 +235,31 @@ namespace umbraco
         #endregion
 
         #region Xslt Helper functions
+
+        /// <summary>
+        /// This will convert a json structure to xml for use in xslt
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
+        public static XPathNodeIterator JsonToXml(string json)
+        {
+            try
+            {
+                if (json.StartsWith("["))
+                {
+                    //we'll assume it's an array, in which case we need to add a root
+                    json = "{\"arrayitem\":" + json + "}";
+                }
+                var xml = JsonConvert.DeserializeXmlNode(json, "json", false);
+                return xml.CreateNavigator().Select("/");
+            }
+            catch (Exception ex)
+            {
+                var xd = new XmlDocument();
+                xd.LoadXml(string.Format("<error>Could not convert json to xml. Error: {0}</error>", ex));
+                return xd.CreateNavigator().Select("/");
+            }
+        }
 
         /// <summary>
         /// Add a session variable to the current user

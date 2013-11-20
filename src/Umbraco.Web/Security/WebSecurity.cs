@@ -16,6 +16,7 @@ using Umbraco.Web.Models.ContentEditing;
 using umbraco;
 using umbraco.DataLayer;
 using umbraco.businesslogic.Exceptions;
+using umbraco.providers;
 using GlobalSettings = Umbraco.Core.Configuration.GlobalSettings;
 using Member = umbraco.cms.businesslogic.member.Member;
 using User = umbraco.BusinessLogic.User;
@@ -191,6 +192,88 @@ namespace Umbraco.Web.Security
         {
             var membershipProvider = Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider];
             return membershipProvider != null && membershipProvider.ValidateUser(username, password);
+        }
+
+        /// <summary>
+        /// Returns the MembershipUser from the back office membership provider
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="setOnline"></param>
+        /// <returns></returns>
+        internal MembershipUser GetBackOfficeMembershipUser(string username, bool setOnline)
+        {
+            var membershipProvider = Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider];
+            return membershipProvider != null ? membershipProvider.GetUser(username, setOnline) : null;
+        }
+
+        /// <summary>
+        /// Returns the back office IUser instance for the username specified
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This will return an Iuser instance no matter what membership provider is installed for the back office, it will automatically
+        /// create any missing Iuser accounts if one is not found and a custom membership provider is being used. 
+        /// </remarks>
+        internal IUser GetBackOfficeUser(string username)
+        {
+            //get the membership user (set user to be 'online' in the provider too)
+            var membershipUser = GetBackOfficeMembershipUser(username, true);
+
+            if (membershipUser == null)
+            {
+                throw new InvalidOperationException(
+                    "The username & password validated but the membership provider '" +
+                    Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider].Name +
+                    "' did not return a MembershipUser with the username supplied");
+            }
+
+            //regarldess of the membership provider used, see if this user object already exists in the umbraco data
+            var user = _applicationContext.Services.UserService.GetUserByUserName(membershipUser.UserName);
+
+            //we're using the built-in membership provider so the user will already be available
+            if (Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider] is UsersMembershipProvider)
+            {
+                if (user == null)
+                {
+                    //this should never happen
+                    throw new InvalidOperationException("The user '" + username + "' could not be found in the Umbraco database");
+                }
+                return user;
+            }
+
+            //we are using a custom membership provider for the back office, in this case we need to create user accounts for the logged in member.
+            //if we already have a user object in Umbraco we don't need to do anything, otherwise we need to create a mapped Umbraco account.
+            if (user != null) return user;
+
+            //we need to create an Umbraco IUser of a 'writer' type with access to only content - this was how v6 operates.
+            var writer = _applicationContext.Services.UserService.GetUserTypeByAlias("writer");
+            
+            var email = membershipUser.Email;
+            if (email.IsNullOrWhiteSpace())
+            {
+                //in some cases if there is no email we have to generate one since it is required!
+                email = Guid.NewGuid().ToString("N") + "@example.com";
+            }
+
+            user = new Core.Models.Membership.User(writer)
+            {
+                Email = email,
+                Language = GlobalSettings.DefaultUILanguage,
+                Name = membershipUser.UserName,
+                Password = Guid.NewGuid().ToString("N"), //Need to set this to something - will not be used though
+                DefaultPermissions = writer.Permissions,
+                Username = membershipUser.UserName,
+                StartContentId = -1,
+                StartMediaId = -1,
+                NoConsole = false,
+                IsApproved = true
+            };
+            user.AddAllowedSection("content");
+
+            _applicationContext.Services.UserService.SaveUser(user);
+
+            return user;
         }
 
         /// <summary>
@@ -496,7 +579,7 @@ namespace Umbraco.Web.Security
             {
             }
         }
-
+        
         protected override void DisposeResources()
         {
             _httpContext = null;
