@@ -114,11 +114,18 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 					NameTxt.Text = OriginalFileName;
 					var file = IOHelper.MapPath(SystemDirectories.MvcViews.EnsureEndsWith('/') + OriginalFileName);
 
+                    // validate file path
+                    if (file.StartsWith(IOHelper.MapPath(SystemDirectories.MvcViews.EnsureEndsWith('/')))) {
+
 					using (var sr = File.OpenText(file))
 					{
 						var s = sr.ReadToEnd();
 						editorSource.Text = s;
-					}					
+					}
+                    } else
+                    {
+                        throw new ArgumentException("Couldn't open file - illegal path");
+                    }
 				
 				}							
 			}
