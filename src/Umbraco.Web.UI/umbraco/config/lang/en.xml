@@ -127,7 +127,7 @@
     <key alias="alternativeUrls">Alternative Links</key>
     <key alias="clickToEdit">Click to edit this item</key>
     <key alias="createBy">Created by</key>
-    <key alias="createByDesc" version="7.0">Original autho</key>
+    <key alias="createByDesc" version="7.0">Original author</key>
     <key alias="updatedBy" version="7.0">Updated by</key>
     <key alias="createDate">Created</key>
     <key alias="createDateDesc" version="7.0">Date/time this document was created</key>

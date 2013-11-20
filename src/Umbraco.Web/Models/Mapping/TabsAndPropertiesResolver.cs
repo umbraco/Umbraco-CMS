@@ -68,7 +68,7 @@ namespace Umbraco.Web.Models.Mapping
                         {
                             Alias = string.Format("{0}creator", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                             Label = ui.Text("content", "createBy"),
-                            Description = "Original author", //TODO: Localize this
+                            Description = ui.Text("content", "createByDesc"), //TODO: Localize this
                             Value = display.Owner.Name,
                             View = labelEditor
                         },
@@ -76,7 +76,7 @@ namespace Umbraco.Web.Models.Mapping
                         {
                             Alias = string.Format("{0}createdate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                             Label = ui.Text("content", "createDate"),
-                            Description = "Date/time this document was created", //TODO: Localize this
+                            Description = ui.Text("content", "createDateDesc"), 
                             Value = display.CreateDate.ToIsoString(),
                             View = labelEditor
                         },
@@ -84,7 +84,7 @@ namespace Umbraco.Web.Models.Mapping
                         {
                             Alias = string.Format("{0}updatedate", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                             Label = ui.Text("content", "updateDate"),
-                            Description = "Date/time this document was created", //TODO: Localize this
+                            Description = ui.Text("content", "updateDateDesc"), 
                             Value = display.UpdateDate.ToIsoString(),
                             View = labelEditor
                         },                    
