@@ -13,8 +13,8 @@
                 xsltSelection.val(UmbClientMgr.contentFrame().xsltSnippet);
 
                 // automatically submit if page is chosen
-                var picker = Umbraco.Controls.TreePicker.GetPickerById('<%=contentPicker.ClientID%>');
-                if (picker.GetValue() != '') {
+                var picker = $(".umb-tree-picker input");
+                if (picker.val() != '') {
                     jQuery("#<%=visualizeDo.ClientID %>").click();
                 }
             }
@@ -30,26 +30,32 @@
                     html.replace(/<BR>/g, "\n").replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>'));
         }
         }
-
-    </script>
+</script>
 
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server">
-
 <cc1:Pane ID="Pane1" runat="server" Text="Visualize XSLT">
-  <cc1:PropertyPanel ID="PropertyPanel1" runat="server">
-    <input type="hidden" runat="server" id="xsltSelection" />
-    <cc2:ContentPicker ID="contentPicker" runat="server" /><br /><br />
-    <asp:Button ID="visualizeDo" runat="server" Text="Visualize XSLT" OnClick="visualizeDo_Click" />
-</cc1:PropertyPanel>
-</cc1:Pane>
-<cc1:Pane ID="visualizeContainer" runat="server" Text="Generated Result" Visible="false">
-<p style="float: right">
-    <input type="checkbox" id="encodeDecode" onclick="encodeDecodeResult(this.checked)" />
-    <label for="encodeDecode">Encode/Decode result</label></p>
-<cc1:PropertyPanel ID="visualizePanel" runat="server">
-    <asp:Literal ID="visualizeArea" runat="server"></asp:Literal>
-</cc1:PropertyPanel>
+
+    <cc1:PropertyPanel ID="PropertyPanel1" runat="server">
+        <input type="hidden" runat="server" id="xsltSelection" />
+        <cc2:ContentPicker ID="contentPicker" runat="server" /> <br /> <br />
+    </cc1:PropertyPanel>
+
+    <cc1:PropertyPanel runat="server">
+        <input type="checkbox" id="encodeDecode" onclick="encodeDecodeResult(this.checked)" />  <label for="encodeDecode">Encode/Decode result</label>
+    </cc1:PropertyPanel>
+    
+   
 </cc1:Pane>
 
+<cc1:Pane ID="visualizeContainer" runat="server" Text="Generated Result" Visible="false">
+    <cc1:PropertyPanel ID="visualizePanel" runat="server">
+        <asp:Literal ID="visualizeArea" runat="server"></asp:Literal>
+    </cc1:PropertyPanel>
+</cc1:Pane>
+
+
+ <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar">
+            <asp:Button ID="visualizeDo" runat="server" CssClass="btn btn-primary" Text="Visualize XSLT" OnClick="visualizeDo_Click" />
+ </div>
 </asp:Content>
