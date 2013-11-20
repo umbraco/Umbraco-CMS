@@ -860,11 +860,12 @@ namespace umbraco.cms.businesslogic.packager
 
                         if (_conflictingMacroAliases.ContainsKey(m.Name) == false)
                         {
-                            _conflictingMacroAliases.Add(m.Name, alias);    
+                            _conflictingMacroAliases.Add(m.Name, alias);
                         }
                     }
-                    catch (IndexOutOfRangeException) { } //thrown when the alias doesn't exist in the DB, ie - macro not there
-                    }                    
+                    catch (IndexOutOfRangeException)
+                    {
+                    } //thrown when the alias doesn't exist in the DB, ie - macro not there
                 }
             }
 
