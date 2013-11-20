@@ -19,11 +19,17 @@ namespace Umbraco.Core.Persistence.Relators
             // Is this the same MemberTypeReadOnlyDto as the current one we're processing
             if (Current != null && Current.UniqueId == a.UniqueId)
             {
-                // Yes, just add this PropertyTypeReadOnlyDto to the current MemberTypeReadOnlyDto's collection
-                Current.PropertyTypes.Add(p);
-
+                //This property may already be added so we need to check for that
+                if (p.Id.HasValue && Current.PropertyTypes.Any(x => x.Id == p.Id.Value) == false)
+                {
+                    // Add this PropertyTypeReadOnlyDto to the current MemberTypeReadOnlyDto's collection
+                    Current.PropertyTypes.Add(p);
+                }
+                
                 if (g.Id.HasValue && Current.PropertyTypeGroups != null && Current.PropertyTypeGroups.Any(x => x.Id == g.Id.Value) == false)
+                {
                     Current.PropertyTypeGroups.Add(g);
+                }
 
                 // Return null to indicate we're not done with this MemberTypeReadOnlyDto yet
                 return null;
@@ -46,7 +52,9 @@ namespace Umbraco.Core.Persistence.Relators
 
             Current.PropertyTypeGroups = new List<PropertyTypeGroupReadOnlyDto>();
             if (g.Id.HasValue)
+            {
                 Current.PropertyTypeGroups.Add(g);
+            }
 
             // Return the now populated previous MemberTypeReadOnlyDto (or null if first time through)
             return prev;
