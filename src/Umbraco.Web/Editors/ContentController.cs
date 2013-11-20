@@ -162,10 +162,18 @@ namespace Umbraco.Web.Editors
                 .Select(Mapper.Map<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>)
                 .AsQueryable();
 
+            if (!string.IsNullOrEmpty(filter))
+            {
+                filter = filter.ToLower();
+                result = result.Where(x => x.Name.ToLower().Contains(filter));
+            }
+
             var orderedResult = orderDirection == Direction.Ascending 
                 ? result.OrderBy(orderBy) 
                 : result.OrderByDescending(orderBy);
+
             
+
             var pagedResult = new PagedResult<ContentItemBasic<ContentPropertyBasic, IContent>>(
                totalChildren,
                pageNumber,
