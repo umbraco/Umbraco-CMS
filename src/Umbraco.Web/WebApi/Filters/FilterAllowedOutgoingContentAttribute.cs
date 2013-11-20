@@ -44,6 +44,16 @@ namespace Umbraco.Web.WebApi.Filters
             FilterBasedOnPermissions(items, user, ApplicationContext.Current.Services.UserService);
         }
 
+        protected override int GetUserStartNode(IUser user)
+        {
+            return user.StartContentId;
+        }
+
+        protected override int RecycleBinId
+        {
+            get { return Constants.System.RecycleBinContent; }
+        }
+
         internal void FilterBasedOnPermissions(IList items, IUser user, IUserService userService)
         {
             var length = items.Count;

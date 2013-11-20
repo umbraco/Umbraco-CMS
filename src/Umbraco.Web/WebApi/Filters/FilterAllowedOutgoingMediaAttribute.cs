@@ -39,6 +39,16 @@ namespace Umbraco.Web.WebApi.Filters
             get { return true; }
         }
 
+        protected virtual int GetUserStartNode(IUser user)
+        {
+            return user.StartMediaId;
+        }
+
+        protected virtual int RecycleBinId
+        {
+            get { return Constants.System.RecycleBinMedia; }
+        }
+
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {
             var user = UmbracoContext.Current.Security.CurrentUser;
@@ -77,7 +87,7 @@ namespace Umbraco.Web.WebApi.Filters
             var toRemove = new List<dynamic>();
             foreach (dynamic item in items)
             {
-                var hasPathAccess = (item != null && UserExtensions.HasPathAccess(item.Path, user.StartMediaId, Constants.System.RecycleBinMedia));
+                var hasPathAccess = (item != null && UserExtensions.HasPathAccess(item.Path, GetUserStartNode(user), RecycleBinId));
                 if (!hasPathAccess)
                 {
                     toRemove.Add(item);
