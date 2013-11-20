@@ -7,12 +7,14 @@ using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
+    [UmbracoApplicationAuthorize(Constants.Applications.Developer)]
     [Tree(Constants.Applications.Developer, Constants.Trees.DataTypes, "Data Types")]
     [PluginController("UmbracoTrees")]
     [CoreTree]
