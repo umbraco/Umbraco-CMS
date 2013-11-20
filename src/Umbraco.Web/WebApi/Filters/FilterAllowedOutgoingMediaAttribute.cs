@@ -74,19 +74,22 @@ namespace Umbraco.Web.WebApi.Filters
 
         internal void FilterBasedOnStartNode(IList items, IUser user)
         {
-            var toRemove = new List<dynamic>();
-            foreach (dynamic item in items)
+            if (items.Count > 0)
             {
-                var hasPathAccess = (item != null && UserExtensions.HasPathAccess(item.Path, user.StartContentId, Constants.System.RecycleBinContent));
-                if (!hasPathAccess)
+                var toRemove = new List<dynamic>();
+                foreach (dynamic item in items)
                 {
-                    toRemove.Add(item);
+                    var hasPathAccess = (item != null && UserExtensions.HasPathAccess(item.Path, user.StartContentId, Constants.System.RecycleBinContent));
+                    if (!hasPathAccess)
+                    {
+                        toRemove.Add(item);
+                    }
                 }
-            }
 
-            foreach (var item in toRemove)
-            {
-                items.Remove(item);
+                foreach (var item in toRemove)
+                {
+                    items.Remove(item);
+                }
             }
         }
 

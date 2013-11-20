@@ -47,40 +47,44 @@ namespace Umbraco.Web.WebApi.Filters
         internal void FilterBasedOnPermissions(IList items, IUser user, IUserService userService)
         {
             var length = items.Count;
-            var ids = new List<int>();
-            for (var i = 0; i < length; i++)
-            {
-                ids.Add(((dynamic)items[i]).Id);
-            }
-            //get all the permissions for these nodes in one call
-            var permissions = userService.GetPermissions(user, ids.ToArray()).ToArray();
-            var toRemove = new List<dynamic>();
-            foreach(dynamic item in items)
-            {
-                var nodePermission = permissions.Where(x => x.EntityId == Convert.ToInt32(item.Id)).ToArray();
-                //if there are no permissions for this id then we need to check what the user's default
-                // permissions are.
-                if (nodePermission.Any() == false)
-                {
-                    //var defaultP = user.DefaultPermissions
 
-                    toRemove.Add(item);                    
-                }
-                else
+            if (length > 0)
+            {
+                var ids = new List<int>();
+                for (var i = 0; i < length; i++)
                 {
-                    foreach (var n in nodePermission)
+                    ids.Add(((dynamic)items[i]).Id);
+                }
+                //get all the permissions for these nodes in one call
+                var permissions = userService.GetPermissions(user, ids.ToArray()).ToArray();
+                var toRemove = new List<dynamic>();
+                foreach (dynamic item in items)
+                {
+                    var nodePermission = permissions.Where(x => x.EntityId == Convert.ToInt32(item.Id)).ToArray();
+                    //if there are no permissions for this id then we need to check what the user's default
+                    // permissions are.
+                    if (nodePermission.Any() == false)
                     {
-                        //if the permission being checked doesn't exist then remove the item
-                        if (n.AssignedPermissions.Contains(_permissionToCheck.ToString(CultureInfo.InvariantCulture)) == false)
+                        //var defaultP = user.DefaultPermissions
+
+                        toRemove.Add(item);
+                    }
+                    else
+                    {
+                        foreach (var n in nodePermission)
                         {
-                            toRemove.Add(item);
+                            //if the permission being checked doesn't exist then remove the item
+                            if (n.AssignedPermissions.Contains(_permissionToCheck.ToString(CultureInfo.InvariantCulture)) == false)
+                            {
+                                toRemove.Add(item);
+                            }
                         }
                     }
                 }
-            }
-            foreach (var item in toRemove)
-            {
-                items.Remove(item);
+                foreach (var item in toRemove)
+                {
+                    items.Remove(item);
+                }
             }
         }
 
