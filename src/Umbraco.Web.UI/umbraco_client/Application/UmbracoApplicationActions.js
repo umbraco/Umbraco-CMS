@@ -94,21 +94,19 @@ Umbraco.Application.Actions = function () {
                 //v6 way
                 var link = jQuery(".btn[id*=save]:first, .editorIcon[id*=save]:first, .editorIcon:input:image[id*=Save]:first");
 
-                //var link = $(".umb-panel-header .btn-primary");
-
-                    //this is made of bad, to work around webforms horrible wiring
-                    if(!link.hasClass("client-side") && link.attr("href").indexOf("javascript:") == 0){
-                        eval(link.attr('href').replace('javascript:',''));
-                    }else{
-                        link.click();
-                    }
+                //this is made of bad, to work around webforms horrible wiring
+                if(!link.hasClass("client-side") && link.attr("href").indexOf("javascript:") == 0){
+                    eval(link.attr('href').replace('javascript:',''));
+                }else{
+                    link.click();
+                }
             }
             this._isSaving = false;
             return false;
         },
 
         bindSaveShortCut: function () {
-            alert("mac");
+            
             var keys = "ctrl+s";
             if (navigator.platform.toUpperCase().indexOf('MAC') >= 0) {
                 keys = "meta+s";
