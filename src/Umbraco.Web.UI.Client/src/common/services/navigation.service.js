@@ -272,7 +272,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
         },
         /**
          * @ngdoc method
-         * @name umbraco.services.navigationService#syncTreePath
+         * @name umbraco.services.navigationService#syncTree
          * @methodOf umbraco.services.navigationService
          *
          * @description
@@ -280,7 +280,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
          * The path format is: ["itemId","itemId"], and so on
          * so to sync to a specific document type node do:
          * <pre>
-         * navigationService.syncTreePath({tree: 'content', path: ["-1","123d"], forceReload: true});  
+         * navigationService.syncTree({tree: 'content', path: ["-1","123d"], forceReload: true});  
          * </pre>
          * @param {Object} args arguments passed to the function
          * @param {String} args.tree the tree alias to sync to

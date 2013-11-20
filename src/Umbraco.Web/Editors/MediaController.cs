@@ -472,6 +472,15 @@ namespace Umbraco.Web.Editors
                     });
             }
 
+            //ensure the user has access to this folder by parent id!
+            if (CheckPermissions(
+               new Dictionary<string, object>(), 
+               Security.CurrentUser,
+               Services.MediaService, parentId) == false)
+            {
+                return new HttpResponseMessage(HttpStatusCode.Unauthorized);
+            }
+
             //get the files
             foreach (var file in result.FileData)
             {

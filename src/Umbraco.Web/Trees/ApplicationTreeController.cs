@@ -4,6 +4,7 @@ using System.Linq;
 using System.Management.Instrumentation;
 using System.Net;
 using System.Net.Http.Formatting;
+using System.Threading.Tasks;
 using System.Web.Http;
 using System.Web.Mvc;
 using Umbraco.Core;
@@ -42,7 +43,7 @@ namespace Umbraco.Web.Trees
         /// <param name="queryStrings"></param>
         /// <returns></returns>
         [HttpQueryStringFilter("queryStrings")]
-        public SectionRootNode GetApplicationTrees(string application, string tree, FormDataCollection queryStrings)
+        public async Task<SectionRootNode> GetApplicationTrees(string application, string tree, FormDataCollection queryStrings)
         {
             if (string.IsNullOrEmpty(application)) throw new HttpResponseException(HttpStatusCode.NotFound);
 
@@ -59,14 +60,12 @@ namespace Umbraco.Web.Trees
 
                 if (apptree == null) throw new HttpResponseException(HttpStatusCode.NotFound);
 
-                var result = GetRootForSingleAppTree(
+                var result = await GetRootForSingleAppTree(
                     apptree,
                     Constants.System.Root.ToString(CultureInfo.InvariantCulture),
                     queryStrings, 
                     application);
 
-                ////PP: should this be further down in the logic?
-                //result.Title = ui.Text("sections", application);
                 return result;
             }
 
@@ -75,7 +74,7 @@ namespace Umbraco.Web.Trees
             foreach (var apptree in appTrees)
             {
                 //return the root nodes for each tree in the app
-                var rootNode = GetRootForMultipleAppTree(apptree, queryStrings);
+                var rootNode = await GetRootForMultipleAppTree(apptree, queryStrings);
                 //This could be null if the tree decides not to return it's root (i.e. the member type tree does this when not in umbraco membership mode)
                 if (rootNode != null)
                 {
@@ -94,10 +93,10 @@ namespace Umbraco.Web.Trees
         /// <param name="configTree"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        private TreeNode GetRootForMultipleAppTree(ApplicationTree configTree, FormDataCollection queryStrings)
+        private async Task<TreeNode> GetRootForMultipleAppTree(ApplicationTree configTree, FormDataCollection queryStrings)
         {
             if (configTree == null) throw new ArgumentNullException("configTree");
-            var byControllerAttempt = configTree.TryGetRootNodeFromControllerTree(queryStrings, ControllerContext);
+            var byControllerAttempt = await configTree.TryGetRootNodeFromControllerTree(queryStrings, ControllerContext);
             if (byControllerAttempt.Success)
             {
                 return byControllerAttempt.Result;
@@ -119,14 +118,14 @@ namespace Umbraco.Web.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        private SectionRootNode GetRootForSingleAppTree(ApplicationTree configTree, string id, FormDataCollection queryStrings, string application)
+        private async Task<SectionRootNode> GetRootForSingleAppTree(ApplicationTree configTree, string id, FormDataCollection queryStrings, string application)
         {
             var rootId = Constants.System.Root.ToString(CultureInfo.InvariantCulture);
             if (configTree == null) throw new ArgumentNullException("configTree");
             var byControllerAttempt = configTree.TryLoadFromControllerTree(id, queryStrings, ControllerContext);
             if (byControllerAttempt.Success)
             {
-                var rootNode = configTree.TryGetRootNodeFromControllerTree(queryStrings, ControllerContext);
+                var rootNode = await configTree.TryGetRootNodeFromControllerTree(queryStrings, ControllerContext);
                 if (rootNode.Success == false)
                 {
                     //This should really never happen if we've successfully got the children above.

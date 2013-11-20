@@ -83,6 +83,7 @@ namespace Umbraco.Web.Trees
 
 
                 //check if a request has been made to render from a specific start node
+                //TODO: This 'undefined' check should not be required whatseover - this parameter should not be sent up ever it if is null from the front-end.
                 if (!string.IsNullOrEmpty(altStartId) && altStartId != "undefined" && altStartId != Constants.System.Root.ToString(CultureInfo.InvariantCulture))
                 {
                     id = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);

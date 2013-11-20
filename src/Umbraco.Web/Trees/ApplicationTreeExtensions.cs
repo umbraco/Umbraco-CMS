@@ -6,15 +6,20 @@ using System.Management.Instrumentation;
 using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Web.Http;
 using System.Web.Http.Controllers;
+using System.Web.Http.Routing;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Web.Models.Trees;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
 using umbraco.cms.presentation.Trees;
 using ApplicationTree = Umbraco.Core.Models.ApplicationTree;
+using IAuthorizationFilter = System.Web.Http.Filters.IAuthorizationFilter;
 using UrlHelper = System.Web.Http.Routing.UrlHelper;
 
 namespace Umbraco.Web.Trees
@@ -38,18 +43,61 @@ namespace Umbraco.Web.Trees
             return Attempt.Succeed(foundControllerTree);
         }
 
-        internal static Attempt<TreeNode> TryGetRootNodeFromControllerTree(this ApplicationTree appTree, FormDataCollection formCollection, HttpControllerContext controllerContext)
+        /// <summary>
+        /// This will go and get the root node from a controller tree by executing the tree's GetRootNode method
+        /// </summary>
+        /// <param name="appTree"></param>
+        /// <param name="formCollection"></param>
+        /// <param name="controllerContext"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This ensures that authorization filters are applied to the sub request 
+        /// </remarks>
+        internal static async Task<Attempt<TreeNode>> TryGetRootNodeFromControllerTree(this ApplicationTree appTree, FormDataCollection formCollection, HttpControllerContext controllerContext)
         {
             var foundControllerTreeAttempt = appTree.TryGetControllerTree();
             if (foundControllerTreeAttempt.Success == false)
             {
                 return Attempt<TreeNode>.Fail(foundControllerTreeAttempt.Exception);
             }
+            
             var foundControllerTree = foundControllerTreeAttempt.Result;
             //instantiate it, since we are proxying, we need to setup the instance with our current context
             var instance = (TreeController)DependencyResolver.Current.GetService(foundControllerTree);
-            instance.ControllerContext = controllerContext;
+
+            //NOTE: This is all required in order to execute the auth-filters for the sub request, we 
+            // need to "trick" web-api into thinking that it is actually executing the proxied controller.
+
+            var urlHelper = controllerContext.Request.GetUrlHelper();
+            //create the proxied URL for the controller action
+            var proxiedUrl = controllerContext.Request.RequestUri.GetLeftPart(UriPartial.Authority) + 
+                urlHelper.GetUmbracoApiService("GetRootNode", instance.GetType());
+            //add the query strings to it
+            proxiedUrl += "?" + formCollection.ToQueryString();
+            //create proxy route data specifying the action / controller to execute
+            var proxiedRouteData = new HttpRouteData(
+                controllerContext.RouteData.Route,
+                new HttpRouteValueDictionary(new {action = "GetRootNode", controller = ControllerExtensions.GetControllerName(instance.GetType())}));
+            //create a proxied controller context
+            var proxiedControllerContext = new HttpControllerContext(
+                controllerContext.Configuration,
+                proxiedRouteData,
+                new HttpRequestMessage(HttpMethod.Get, proxiedUrl))
+                {
+                    ControllerDescriptor = new HttpControllerDescriptor(controllerContext.ControllerDescriptor.Configuration, ControllerExtensions.GetControllerName(instance.GetType()), instance.GetType())
+                };
+            
+            instance.ControllerContext = proxiedControllerContext;
             instance.Request = controllerContext.Request;
+            
+            //invoke auth filters for this sub request
+            var result = await instance.ControllerContext.InvokeAuthorizationFiltersForRequest();
+            //if a result is returned it means they are unauthorized, just throw the response.
+            if (result != null)
+            {
+                throw new HttpResponseException(result);
+            }
+            
             //return the root
             var node = instance.GetRootNode(formCollection);
             return node == null
@@ -193,4 +241,5 @@ namespace Umbraco.Web.Trees
         }
 
     }
+    
 }

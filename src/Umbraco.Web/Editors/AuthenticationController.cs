@@ -4,8 +4,11 @@ using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
+using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
@@ -13,6 +16,7 @@ using Umbraco.Core.Security;
 using Umbraco.Web.Security;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
+using umbraco.providers;
 
 namespace Umbraco.Web.Editors
 {
@@ -102,7 +106,8 @@ namespace Umbraco.Web.Editors
         {
             if (UmbracoContext.Security.ValidateBackOfficeCredentials(username, password))
             {
-                var user = Services.UserService.GetUserByUserName(username);
+                var user = Security.GetBackOfficeUser(username);
+
                 //TODO: Clean up the int cast!
                 var timeoutSeconds = UmbracoContext.Security.PerformLogin((int)user.Id);
                 var result = Mapper.Map<UserDetail>(user);
@@ -117,6 +122,7 @@ namespace Umbraco.Web.Editors
             // that the user doesn't have access to perform this function, we just want to return a normal invalid msg.
             throw new HttpResponseException(HttpStatusCode.BadRequest);
         }
+
 
         /// <summary>
         /// Logs the current user out

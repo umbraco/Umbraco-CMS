@@ -793,12 +793,10 @@ namespace umbraco.providers.members
                     }
                 }
 
-                // TODO: Make approving optional for all member types, forcing it on is not good
-
-                // check for approve status. If not approved, then set the member property to null
-                //if (!CheckApproveStatus(m)) {
-                //    m = null;
-                //}
+                //check for approve status. If not approved, then set the member property to null
+                if (!CheckApproveStatus(m)) {
+                    m = null;
+                }
 
                 // maybe update login date
                 if (m != null && string.IsNullOrEmpty(_lastLoginPropertyTypeAlias) == false)
@@ -851,7 +849,16 @@ namespace umbraco.providers.members
                     var approveStatus = GetMemberProperty(m, ApprovedPropertyTypeAlias, true);
                     if (string.IsNullOrEmpty(approveStatus) == false)
                     {
-                        bool.TryParse(approveStatus, out isApproved);
+                        //try parsing as bool first (just in case)
+                        if (bool.TryParse(approveStatus, out isApproved) == false)
+                        {
+                            int intStatus;
+                            //if that fails, try parsing as int (since its normally stored as 0 or 1)
+                            if (int.TryParse(approveStatus, out intStatus))
+                            {
+                                isApproved = intStatus != 0;
+                            }
+                        }
                     }
                 }
             }
@@ -1016,5 +1023,33 @@ namespace umbraco.providers.members
         }
 
         #endregion
+    }
+
+    /// <summary>
+    /// Adds some event handling
+    /// </summary>
+    public class MembershipEventHandler : ApplicationEventHandler
+    {
+        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            Member.New += Member_New;
+        }
+
+        void Member_New(Member sender, NewEventArgs e)
+        {
+            //This is a bit of a hack to ensure that the member is approved when created since many people will be using
+            // this old api to create members on the front-end and they need to be approved - which is based on whether or not 
+            // the Umbraco membership provider is configured.
+            var provider = Membership.Provider as UmbracoMembershipProvider;
+            if (provider != null)
+            {
+                var approvedField = provider.ApprovedPropertyTypeAlias;
+                var property = sender.getProperty(approvedField);
+                if (property != null)
+                {
+                    property.Value = 1;
+                }
+            }            
+        }
     }
 }

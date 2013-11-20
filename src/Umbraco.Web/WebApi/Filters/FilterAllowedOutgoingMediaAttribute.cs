@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -76,14 +76,10 @@ namespace Umbraco.Web.WebApi.Filters
         {
             if (items.Count > 0)
             {
-                var toRemove = new List<dynamic>();
-                foreach (dynamic item in items)
+                var hasPathAccess = (item != null && UserExtensions.HasPathAccess(item.Path, user.StartContentId, Constants.System.RecycleBinContent));
+                if (!hasPathAccess)
                 {
-                    var hasPathAccess = (item != null && UserExtensions.HasPathAccess(item.Path, user.StartContentId, Constants.System.RecycleBinContent));
-                    if (!hasPathAccess)
-                    {
-                        toRemove.Add(item);
-                    }
+					toRemove.Add(item);
                 }
 
                 foreach (var item in toRemove)

@@ -11,6 +11,7 @@ using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using umbraco.businesslogic;
@@ -20,6 +21,15 @@ using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Trees
 {
+    //We will not allow the tree to render unless the user has access to any of the sections that the tree gets rendered
+    // this is not ideal but until we change permissions to be tree based (not section) there's not much else we can do here.
+    [UmbracoApplicationAuthorize(
+        Constants.Applications.Content, 
+        Constants.Applications.Media, 
+        Constants.Applications.Users,
+        Constants.Applications.Settings,
+        Constants.Applications.Developer,
+        Constants.Applications.Members)]
     [LegacyBaseTree(typeof(loadContent))]
     [Tree(Constants.Applications.Content, Constants.Trees.Content, "Content")]
     [PluginController("UmbracoTrees")]

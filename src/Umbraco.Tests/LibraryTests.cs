@@ -62,7 +62,51 @@ namespace Umbraco.Tests
             get { return DatabaseBehavior.NoDatabasePerFixture; }
         }
 
-		[Test]
+	    [Test]
+	    public void Json_To_Xml_Object()
+	    {
+	        var json = "{ id: 1, name: 'hello', children: [{id: 2, name: 'child1'}, {id:3, name: 'child2'}]}";
+	        var result = library.JsonToXml(json);
+            Assert.AreEqual(@"<json>
+  <id>1</id>
+  <name>hello</name>
+  <children>
+    <id>2</id>
+    <name>child1</name>
+  </children>
+  <children>
+    <id>3</id>
+    <name>child2</name>
+  </children>
+</json>", result.Current.OuterXml);
+	    }
+
+        [Test]
+        public void Json_To_Xml_Array()
+        {
+            var json = "[{id: 2, name: 'child1'}, {id:3, name: 'child2'}]";
+            var result = library.JsonToXml(json);
+            Assert.AreEqual(@"<json>
+  <arrayitem>
+    <id>2</id>
+    <name>child1</name>
+  </arrayitem>
+  <arrayitem>
+    <id>3</id>
+    <name>child2</name>
+  </arrayitem>
+</json>", result.Current.OuterXml);
+        }
+
+        [Test]
+        public void Json_To_Xml_Error()
+        {
+            var json = "{ id: 1, name: 'hello', children: }";
+            var result = library.JsonToXml(json);
+            Assert.IsTrue(result.Current.OuterXml.StartsWith("<error>"));
+        }
+
+	    [Test]
 		public void Get_Item_User_Property()
 		{
 			var val = library.GetItem(1173, "content");
