@@ -256,7 +256,7 @@ namespace umbraco
             catch (Exception ex)
             {
                 var xd = new XmlDocument();
-                xd.LoadXml(string.Format("<error>Could not convert json to xml. Error: {0}</error>", ex));
+                xd.LoadXml(string.Format("<error>Could not convert JSON to XML. Error: {0}</error>", ex));
                 return xd.CreateNavigator().Select("/error");
             }
         }
