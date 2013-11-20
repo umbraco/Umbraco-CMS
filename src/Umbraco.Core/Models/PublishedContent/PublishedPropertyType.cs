@@ -92,8 +92,11 @@ namespace Umbraco.Core.Models.PublishedContent
                 }
                 else
                 {
-                    throw new InvalidOperationException(string.Format("More than one converter for property type {0}.{1}",
-                        ContentType.Alias, PropertyTypeAlias));
+                    throw new InvalidOperationException(string.Format("Type '{2}' cannot be an IPropertyValueConverter"
+                        + " for property '{1}' of content type '{0}' because type '{3}' has already been detected as a converter"
+                        + " for that property, and only one converter can exist for a property.",
+                        ContentType.Alias, PropertyTypeAlias,
+                        converter.GetType().FullName, _converter.GetType().FullName));
                 }
             }
 
