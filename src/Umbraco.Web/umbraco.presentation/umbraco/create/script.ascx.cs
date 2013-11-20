@@ -48,8 +48,8 @@ namespace umbraco.presentation.umbraco.create
                     relativepath + "¤" + rename.Text + "¤" + scriptType.SelectedValue);
 
 				BasePage.Current.ClientTools
-					.ChangeContentFrameUrl(returnUrl)
-					.ChildNodeCreated()
+                    .ChangeContentFrameUrl(returnUrl)
+                    .ReloadActionNode(false, true)
 					.CloseModalWindow();
 
 			}

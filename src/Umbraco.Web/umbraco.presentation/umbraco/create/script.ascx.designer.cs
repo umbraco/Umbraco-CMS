@@ -13,15 +13,6 @@ namespace umbraco.presentation.umbraco.create {
     public partial class script {
         
         /// <summary>
-        /// RequiredFieldValidator1 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator1;
-        
-        /// <summary>
         /// rename control.
         /// </summary>
         /// <remarks>
@@ -29,6 +20,15 @@ namespace umbraco.presentation.umbraco.create {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.TextBox rename;
+        
+        /// <summary>
+        /// RequiredFieldValidator1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator RequiredFieldValidator1;
         
         /// <summary>
         /// scriptType control.
@@ -40,13 +40,13 @@ namespace umbraco.presentation.umbraco.create {
         protected global::System.Web.UI.WebControls.ListBox scriptType;
         
         /// <summary>
-        /// Textbox1 control.
+        /// CreateMacroCheckBox control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.TextBox Textbox1;
+        protected global::System.Web.UI.WebControls.CheckBox CreateMacroCheckBox;
         
         /// <summary>
         /// sbmt control.

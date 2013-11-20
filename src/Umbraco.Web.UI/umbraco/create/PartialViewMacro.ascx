@@ -10,7 +10,7 @@
     </cc1:PropertyPanel>
 
     <cc1:PropertyPanel runat="server" Text="Choose a snippet:">
-        <asp:ListBox ID="PartialViewTemplate" runat="server" Width="350" CssClass="bigInput input-large-type input-block-level" Rows="1" SelectionMode="Single" />
+        <asp:ListBox ID="PartialViewTemplate" runat="server" CssClass="bigInput input-large-type input-block-level" Rows="1" SelectionMode="Single" />
     </cc1:PropertyPanel>
 
     <cc1:PropertyPanel runat="server">
