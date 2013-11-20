@@ -540,9 +540,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     {
                         // use property type to ensure proper conversion
                         var propertyType = _contentType.GetPropertyType(i.Key);
-
-                        if (propertyType != null) 
-                            property = new XmlPublishedProperty(propertyType, false, i.Value); // false :: never preview a media
+                        property = new XmlPublishedProperty(propertyType, false, i.Value); // false :: never preview a media
                     }
 
 					_properties.Add(property);
