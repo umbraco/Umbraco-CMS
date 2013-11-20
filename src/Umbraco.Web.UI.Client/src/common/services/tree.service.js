@@ -592,8 +592,17 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     var index = _.indexOf(node.parent().children, node);
                     //the trick here is to not actually replace the node - this would cause the delete animations
                     //to fire, instead we're just going to replace all the properties of this node.
-                    _.extend(node.parent().children[index], found);
-                    //set the node to loading
+
+                    //there should always be a method assigned but we'll check anyways
+                    if (angular.isFunction(node.parent().children[index].updateNodeData)) {
+                        node.parent().children[index].updateNodeData(found);
+                    }
+                    else {
+                        //just update as per normal - this means styles, etc.. won't be applied
+                        _.extend(node.parent().children[index], found);
+                    }
+                    
+                    //set the node loading
                     node.parent().children[index].loading = false;
                     //return
                     deferred.resolve(node.parent().children[index]);

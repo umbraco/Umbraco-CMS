@@ -54,6 +54,15 @@ angular.module("umbraco.directives")
           }
         }
 
+        /** updates the node's styles */
+        function styleNode(node) {
+            node.stateCssClass = (node.cssClasses || []).join(" ");
+
+            if (node.style) {
+                $(element).find("i").attr("style", node.style);
+            }
+        }
+
         /** This will deleteAnimations to true after the current digest */
         function enableDeleteAnimations() {
             //do timeout so that it re-enables them after this digest
@@ -62,6 +71,15 @@ angular.module("umbraco.directives")
                 deleteAnimations = true;
             }, 0, false);
         }
+
+        //add a method to the node which we can use to call to update the node data if we need to ,
+        // this is done by sync tree, we don't want to add a $watch for each node as that would be crazy insane slow
+        // so we have to do this
+        scope.node.updateNodeData = function (newNode) {            
+            _.extend(scope.node, newNode);
+            //now update the styles
+            styleNode(scope.node);
+        };
 
         /**
           Method called when the options button next to a node is called
@@ -153,12 +171,8 @@ angular.module("umbraco.directives")
         };
 
         //if the current path contains the node id, we will auto-expand the tree item children
-        
-        scope.node.stateCssClass = (scope.node.cssClasses || []).join(" ");
 
-        if(scope.node.style){
-          $(element).find("i").attr("style", scope.node.style);
-        }
+        styleNode(scope.node);
         
         var template = '<ul ng-class="{collapsed: !node.expanded}"><umb-tree-item  ng-repeat="child in node.children" eventhandler="eventhandler" tree="tree" current-node="currentNode" node="child" section="{{section}}" ng-animate="animation()"></umb-tree-item></ul>';
         var newElement = angular.element(template);
