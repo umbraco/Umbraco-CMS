@@ -880,7 +880,16 @@ namespace umbraco.providers.members
                     string approveStatus = GetMemberProperty(m, m_ApprovedPropertyTypeAlias, true);
                     if (!String.IsNullOrEmpty(approveStatus))
                     {
-                        bool.TryParse(approveStatus, out isApproved);
+                        //try parsing as bool first (just in case)
+                        if (bool.TryParse(approveStatus, out isApproved) == false)
+                        {
+                            int intStatus;
+                            //if that fails, try parsing as int (since its normally stored as 0 or 1)
+                            if (int.TryParse(approveStatus, out intStatus))
+                            {
+                                isApproved = intStatus != 0;
+                            }
+                        }
                     }
                 }
             }
@@ -1018,5 +1027,33 @@ namespace umbraco.providers.members
         }
 
         #endregion
+    }
+
+    /// <summary>
+    /// Adds some event handling
+    /// </summary>
+    public class MembershipEventHandler : ApplicationEventHandler
+    {
+        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
+        {
+            Member.New += Member_New;
+        }
+
+        void Member_New(Member sender, NewEventArgs e)
+        {
+            //This is a bit of a hack to ensure that the member is approved when created since many people will be using
+            // this old api to create members on the front-end and they need to be approved - which is based on whether or not 
+            // the Umbraco membership provider is configured.
+            var provider = Membership.Provider as UmbracoMembershipProvider;
+            if (provider != null)
+            {
+                var approvedField = provider.ApprovedPropertyTypeAlias;
+                var property = sender.getProperty(approvedField);
+                if (property != null)
+                {
+                    property.Value = 1;
+                }
+            }            
+        }
     }
 }
