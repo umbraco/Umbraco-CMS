@@ -63,7 +63,7 @@ namespace umbraco.cms.presentation.create.controls
 
 				BasePage.Current.ClientTools
 					.ChangeContentFrameUrl(returnUrl)
-					.ChildNodeCreated()
+					.ReloadActionNode(false, true)
 					.CloseModalWindow();
             }
 		
