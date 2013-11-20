@@ -97,8 +97,10 @@ angular.module('umbraco.services')
               if(dialog.element){
                  dialog.element.modal('hide');
 
+                 //this is not entirely enough since the damn
+                 //webforms scriploader still complains
                  if(dialog.iframe){
-                    dialog.element.find("iframe").attr("src", "#");
+                    dialog.element.find("iframe").attr("src", "about:blank");
                     $timeout(function(){
                       dialog.element.remove();
                     }, 1000); 
