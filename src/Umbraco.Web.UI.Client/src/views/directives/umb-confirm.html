@@ -1,6 +1,10 @@
 <div>
     <p ng-hide="!caption" class="umb-abstract">{{caption}}</p>
     
-    <a href class="btn btn-link" ng-click="onCancel()">Cancel</a>
-    <a href class="btn btn-primary" ng-click="onConfirm()">Ok</a>
+    <div class="umb-pane btn-toolbar umb-btn-toolbar">
+    	<div class="control-group umb-control-group">	
+    		<a href class="btn btn-link" ng-click="onCancel()"><localize key="general_cancel">Cancel</localize></a>
+    		<a href class="btn btn-primary" ng-click="onConfirm()"><localize key="general_ok">Ok</localize></a>
+    	</div>	
+	</div>
 </div>

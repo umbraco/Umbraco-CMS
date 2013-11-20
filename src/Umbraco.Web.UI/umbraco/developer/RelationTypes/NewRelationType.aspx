@@ -1,18 +1,7 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="NewRelationType.aspx.cs" Inherits="umbraco.cms.presentation.developer.RelationTypes.NewRelationType" MasterPageFile="../../masterpages/umbracoPage.Master"%>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="NewRelationType.aspx.cs" Inherits="umbraco.cms.presentation.developer.RelationTypes.NewRelationType" MasterPageFile="../../masterpages/umbracoDialog.Master"%>
 <%@ Register TagPrefix="umb" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
-
-<asp:Content ID="headContent" ContentPlaceHolderID="head" runat="server">
-    <style type="text/css">
-    </style>  
-  
-    <script type="text/javascript">
-    </script>
-</asp:Content>
-
 <asp:Content ID="bodyContent" ContentPlaceHolderID="body" runat="server">
-
-
     <umb:Pane ID="nameAliasPane" runat="server" Text="">
         	
 		<umb:PropertyPanel runat="server" ID="nameProperyPanel" Text="Name">			
@@ -27,6 +16,7 @@
 		</umb:PropertyPanel>
 
     </umb:Pane>
+
     <umb:Pane ID="directionPane" runat="server" Text="">
 
 		<umb:PropertyPanel runat="server" id="PropertyPanel1" Text="Direction">
@@ -35,10 +25,8 @@
                     <asp:ListItem Enabled="true" Selected="False" Text="Bidirectional" Value="1"/>
                 </asp:RadioButtonList>
 		</umb:PropertyPanel>
-        <% ///*<asp:RequiredFieldValidator ID="dualRequiredFieldValidator" runat="server" ControlToValidate="dualRadioButtonList" ValidationGroup="NewRelationType" ErrorMessage="Direction Required" Display="Dynamic" /> */ %>
-
-
     </umb:Pane>
+    
     <umb:Pane ID="objectTypePane" runat="server" Text="">
 
 		<umb:PropertyPanel runat="server" id="PropertyPanel2" Text="Parent">
@@ -51,12 +39,12 @@
 
 	</umb:Pane>
             
-    <div style="margin-top:15px">
-        <asp:Button ID="addButton" runat="server" Text="Create" onclick="AddButton_Click" CausesValidation="true" ValidationGroup="NewRelationType" />
-        <em>or</em>
-        <a onclick="top.UmbClientMgr.closeModalWindow()" style="color: blue;" href="#">Cancel</a>
-    </div>
+    
+    
+<umb:Pane runat="server" CssClass="btn-toolbar umb-btn-toolbar">
+     <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
+     <asp:Button ID="addButton" runat="server" Text="Create" cssclass="btn btn-primary" onclick="AddButton_Click" CausesValidation="true" ValidationGroup="NewRelationType" />
+</umb:Pane>
 
 
 </asp:Content>
-
