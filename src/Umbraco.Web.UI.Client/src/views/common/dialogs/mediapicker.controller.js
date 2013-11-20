@@ -5,6 +5,7 @@ angular.module("umbraco")
 
             var dialogOptions = $scope.$parent.dialogOptions;
             $scope.onlyImages = dialogOptions.onlyImages;
+            $scope.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
 
             $scope.options = {
                 url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
@@ -85,26 +86,26 @@ angular.module("umbraco")
             });
 
             $scope.clickHandler = function(image, ev, select) {
-
+                ev.preventDefault();
+                
                 if (image.contentTypeAlias.toLowerCase() == 'folder' && !select) {
                     $scope.gotoFolder(image);
                 }else{
                     eventsService.publish("Umbraco.Dialogs.MediaPickerController.Select", image);
                     
-                    if (dialogOptions && dialogOptions.multiPicker) {
+                    if ($scope.multiPicker) {
                         $scope.select(image);
                         image.cssclass = ($scope.dialogData.selection.indexOf(image) > -1) ? "selected" : "";
-                    }
-                    else {
+                    }else {
                         $scope.submit(image);
                     }
                 }
 
-                ev.preventDefault();
+                
             };
 
             $scope.selectFolder= function(folder) {
-                if (dialogOptions && dialogOptions.multiPicker) {
+                if ($scope.multiPicker) {
                     $scope.select(folder);
                 }
                 else {
@@ -118,7 +119,7 @@ angular.module("umbraco")
                 }else{
                     eventsService.publish("Umbraco.Dialogs.MediaPickerController.Select", image);
                     
-                    if (dialogOptions && dialogOptions.multiPicker) {
+                    if ($scope.multiPicker) {
                         $scope.select(image);
                     }
                     else {

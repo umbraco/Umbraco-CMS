@@ -4,7 +4,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
     function($rootScope, $scope, dialogService, mediaResource, imageHelper, $log) {
 
         //check the pre-values for multi-picker
-        var multiPicker = $scope.model.config.multiPicker !== undefined ? $scope.model.config.multiPicker : true;
+        var multiPicker = $scope.model.config.multiPicker !== '0' ? true : false;
 
         function setupViewModel() {
             $scope.images = [];
