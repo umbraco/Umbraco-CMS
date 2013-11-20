@@ -626,7 +626,10 @@ namespace umbraco.cms.businesslogic.packager
                     if (m != null)
                     {
                         ContainsMacroConflict = true;
-                        _conflictingMacroAliases.Add(m.Name, alias);
+                        if (_conflictingMacroAliases.ContainsKey(m.Name) == false)
+                        {
+                            _conflictingMacroAliases.Add(m.Name, alias);    
+                        }
                     }                    
                 }
             }
@@ -639,8 +642,11 @@ namespace umbraco.cms.businesslogic.packager
                     var t = Template.GetByAlias(alias);
                     if (t != null)
                     {
-                        this.ContainsTemplateConflicts = true;
-                        this._conflictingTemplateAliases.Add(t.Text, alias);
+                        ContainsTemplateConflicts = true;
+                        if (_conflictingTemplateAliases.ContainsKey(t.Text) == false)
+                        {
+                            _conflictingTemplateAliases.Add(t.Text, alias);
+                        }
                     }
                 }
             }
@@ -653,8 +659,11 @@ namespace umbraco.cms.businesslogic.packager
                     var s = StyleSheet.GetByName(alias);
                     if (s != null)
                     {
-                        this.ContainsStyleSheeConflicts = true;
-                        this._conflictingStyleSheetNames.Add(s.Text, alias);
+                        ContainsStyleSheeConflicts = true;
+                        if (_conflictingStyleSheetNames.ContainsKey(s.Text) == false)
+                        {
+                            _conflictingStyleSheetNames.Add(s.Text, alias);   
+                        }                        
                     }
                 }
             }
