@@ -857,9 +857,14 @@ namespace umbraco.cms.businesslogic.packager
                     {
                         var m = new Macro(alias);
                         this._containsMacroConflict = true;
-                        this._conflictingMacroAliases.Add(m.Name, alias);
+
+                        if (_conflictingMacroAliases.ContainsKey(m.Name) == false)
+                        {
+                            _conflictingMacroAliases.Add(m.Name, alias);    
+                        }
                     }
                     catch (IndexOutOfRangeException) { } //thrown when the alias doesn't exist in the DB, ie - macro not there
+                    }                    
                 }
             }
 
@@ -872,7 +877,10 @@ namespace umbraco.cms.businesslogic.packager
                     if (t != null)
                     {
                         this._containsTemplateConflict = true;
-                        this._conflictingTemplateAliases.Add(t.Text, alias);
+                        if (_conflictingTemplateAliases.ContainsKey(t.Text) == false)
+                        {
+                            _conflictingTemplateAliases.Add(t.Text, alias);
+                        }
                     }
                 }
             }
@@ -886,7 +894,10 @@ namespace umbraco.cms.businesslogic.packager
                     if (s != null)
                     {
                         this._containsStyleSheetConflict = true;
-                        this._conflictingStyleSheetNames.Add(s.Text, alias);
+                        if (_conflictingStyleSheetNames.ContainsKey(s.Text) == false)
+                        {
+                            _conflictingStyleSheetNames.Add(s.Text, alias);   
+                        }                        
                     }
                 }
             }
