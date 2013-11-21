@@ -15,8 +15,8 @@
         <language>en-US</language>
         <tags>umbraco</tags>
         <dependencies>
-            <dependency id="Microsoft.AspNet.Mvc" version="4.0" />
-            <dependency id="Microsoft.AspNet.WebApi" version="4.0" />
+            <dependency id="Microsoft.AspNet.Mvc" version="[4.0.0,5.0.0)" />
+            <dependency id="Microsoft.AspNet.WebApi" version="[4.0.0,5.0.0)" />
             <dependency id="Microsoft.AspNet.WebApi.Client" version="[4.0.0, 5.0.0)" />
             <dependency id="Microsoft.AspNet.Mvc.FixedDisplayModes" version="1.0.0" />
             <dependency id="Microsoft.Net.Http" version="[2.0.0, 3.0.0)" />
