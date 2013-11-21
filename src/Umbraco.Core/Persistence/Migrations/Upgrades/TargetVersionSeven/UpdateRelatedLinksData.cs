@@ -64,6 +64,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
                                 //store the serialized data
                                 data.Text = JsonConvert.SerializeObject(links);
+
+                                database.Update(data);
                             }
                         }
                     }
