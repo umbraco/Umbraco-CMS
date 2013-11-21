@@ -56,17 +56,21 @@
                             this.newWindow = $scope.newNewWindow;
                             this.edit = false;
                             this.isInternal = false;
+                            this.type = "external";
+                            this.title = $scope.newCaption;
                         };
                         $scope.model.value.push(newExtLink);
                     } else {
                         var newIntLink = new function() {
                             this.caption = $scope.newCaption;
-                            this.link = $scope.newLink;
+                            this.link = $scope.newInternal;
                             this.newWindow = $scope.newNewWindow;
                             this.internal = $scope.newInternal;
                             this.edit = false;
                             this.isInternal = true;
                             this.iternalName = $scope.newInternalName;
+                            this.type = "internal";
+                            this.title = $scope.newCaption;
                         };
                         $scope.model.value.push(newIntLink);
                     }
