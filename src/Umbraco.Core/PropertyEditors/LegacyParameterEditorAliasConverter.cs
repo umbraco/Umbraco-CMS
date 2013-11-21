@@ -10,7 +10,7 @@ namespace Umbraco.Core.PropertyEditors
     /// Used to map the legacy parameter editor aliases to the new ones, this is really just used during 
     /// installation but has been put in a separate class in case we need it for other purposes
     /// </summary>
-    internal static class LegacyParameterEditorAliasConverter
+    public static class LegacyParameterEditorAliasConverter
     {
         /// <summary>
         /// The map consists of a key which is always the legacy alias + new alias (trimmed))

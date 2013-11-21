@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.PropertyEditors;
@@ -34,12 +35,15 @@ namespace Umbraco.Web.Models.Mapping
                           var paramEditor = ParameterEditorResolver.Current.GetByAlias(property.EditorAlias);
                           if (paramEditor == null)
                           {
-                              throw new InvalidOperationException("Could not resolve macro parameter editor: " + property.EditorAlias);
+                              //we'll just map this to a text box
+                              paramEditor = ParameterEditorResolver.Current.GetByAlias(Constants.PropertyEditors.TextboxAlias);
+                              LogHelper.Warn<MacroModelMapper>("Could not resolve a parameter editor with alias " + property.EditorAlias + ", a textbox will be rendered in it's place");
                           }
-                          parameter.View = paramEditor.ValueEditor.View;
 
+                          parameter.View = paramEditor.ValueEditor.View;
                           //set the config
                           parameter.Configuration = paramEditor.Configuration;
+                          
                       });
 
         }
