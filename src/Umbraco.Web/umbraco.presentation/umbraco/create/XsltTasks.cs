@@ -63,6 +63,7 @@ namespace umbraco
 					cms.businesslogic.macro.Macro m =
 						cms.businesslogic.macro.Macro.MakeNew(name);
 					m.Xslt = fileName + ".xslt";
+                    m.Save();
 				}
 			}
 

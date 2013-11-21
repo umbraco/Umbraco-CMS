@@ -54,6 +54,7 @@ namespace umbraco
                         .SplitPascalCasing().ToFirstUpperInvariant();
 					cms.businesslogic.macro.Macro m = cms.businesslogic.macro.Macro.MakeNew(name);
 					m.ScriptingFile = fileName;
+				    m.Save();
 				}
 			}
 

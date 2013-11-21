@@ -67,6 +67,7 @@ namespace umbraco
                     .SplitPascalCasing().ToFirstUpperInvariant();
                 var m = cms.businesslogic.macro.Macro.MakeNew(name);
                 m.ScriptingFile = BasePath + fileName;
+                m.Save();
             }
 
             _returnUrl = string.Format(EditViewFile + "?file={0}", HttpUtility.UrlEncode(ParentFolderName.EnsureEndsWith('/') + fileName));
