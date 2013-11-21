@@ -58,7 +58,10 @@ angular.module("umbraco")
 
                         $scope.images = [];
                         $scope.searchTerm = "";
-                        $scope.images = data.items;
+                        if(data.items){
+                             $scope.images = data.items;
+                        }
+                       
 
                         //update the thumbnail property
                         _.each($scope.images, function(img) {
@@ -82,7 +85,7 @@ angular.module("umbraco")
 
 
             $scope.$on('fileuploadstop', function(event, files) {
-                $scope.gotoFolder($scope.options.formData.currentFolder);
+                $scope.gotoFolder($scope.currentFolder);
             });
 
             $scope.clickHandler = function(image, ev, select) {
