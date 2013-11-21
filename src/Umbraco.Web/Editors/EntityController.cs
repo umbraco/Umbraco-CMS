@@ -242,7 +242,7 @@ namespace Umbraco.Web.Editors
             {
                 m.Icon = "icon-user";
                 var searchResult = results.First(x => x.Id.ToInvariantString() == m.Id.ToString());
-                if (searchResult.Fields["email"] != null)
+                if (searchResult.Fields.ContainsKey("email") && searchResult.Fields["email"] != null)
                 {
                     m.AdditionalData["Email"] = results.First(x => x.Id.ToInvariantString() == m.Id.ToString()).Fields["email"];    
                 }
