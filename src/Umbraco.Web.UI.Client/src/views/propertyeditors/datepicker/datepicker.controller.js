@@ -60,7 +60,7 @@ function dateTimePickerController($scope, notificationsService, assetsService, a
     });
     
     assetsService.loadCss(
-        'views/propertyeditors/datepicker/bootstrap-datetimepicker.min.css'
+        'lib/datetimepicker/bootstrap-datetimepicker.min.css'
     );
 }
 
