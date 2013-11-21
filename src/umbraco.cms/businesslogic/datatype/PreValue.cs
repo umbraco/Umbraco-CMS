@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
@@ -7,6 +8,10 @@ using System.Runtime.CompilerServices;
 
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Persistence;
+using Umbraco.Core;
+using Umbraco.Core.Persistence.DatabaseAnnotations;
+
 
 namespace umbraco.cms.businesslogic.datatype
 {
@@ -16,9 +21,14 @@ namespace umbraco.cms.businesslogic.datatype
     /// </summary>
     public class PreValue
     {
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         private static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
+        }
+        internal static UmbracoDatabase Database
+        {
+            get { return ApplicationContext.Current.DatabaseContext.Database; }
         }
 
         #region Contructors
@@ -60,13 +70,11 @@ namespace umbraco.cms.businesslogic.datatype
         /// <param name="Value">The value.</param>
         public PreValue(int DataTypeId, string Value)
         {
-            object id = SqlHelper.ExecuteScalar<object>(
-                "Select id from cmsDataTypePreValues where [Value] = @value and DataTypeNodeId = @dataTypeId",
-                SqlHelper.CreateParameter("@dataTypeId", DataTypeId),
-                SqlHelper.CreateParameter("@value", Value));
-            if (id != null)
-                _id = int.Parse(id.ToString());
-
+            object id = Database.ExecuteScalar<object>("Select id from cmsDataTypePreValues where [Value] = @value and DataTypeNodeId = @dataTypeId",
+                                   new { value = Value, dataTypeId = DataTypeId });
+            if (id == null) throw new ArgumentException(string.Format("Can't fetch a PreValue instance from database for DataTypeId = {0} and Value = '{1}'", DataTypeId, Value ));   
+                
+            _id = (int)id;
             initialize();
         } 
         #endregion
@@ -80,11 +88,10 @@ namespace umbraco.cms.businesslogic.datatype
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static PreValue MakeNew(int dataTypeDefId, string value)
         {
-            SqlHelper.ExecuteNonQuery(
+            Database.Execute(
                 "insert into cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) values (@dtdefid,@value,0,'')",
-                SqlHelper.CreateParameter("@dtdefid", dataTypeDefId),
-                SqlHelper.CreateParameter("@value", value));
-            var id = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsDataTypePreValues");
+                new {dtdefid = dataTypeDefId, value =  value });
+            var id = Database.ExecuteScalar<int>("SELECT MAX(id) FROM cmsDataTypePreValues");
             return new PreValue(id);
         }
 
@@ -112,7 +119,11 @@ namespace umbraco.cms.businesslogic.datatype
         /// <value>The id.</value>
         public int Id
         {
-            get { return _id.Value; }
+            get 
+            {
+                if (_id == null) throw new InvalidOperationException("ID is null"); 
+                return _id.Value; 
+            }
             set { _id = value; }
         }
 
@@ -146,11 +157,10 @@ namespace umbraco.cms.businesslogic.datatype
         {
             if (_id == null) 
             {
-                throw new ArgumentNullException("Id");
+                throw new ArgumentNullException("Id is null");
             }
 
-            SqlHelper.ExecuteNonQuery("delete from cmsDataTypePreValues where id = @id",
-                SqlHelper.CreateParameter("@id", this.Id));
+            Database.Execute("delete from cmsDataTypePreValues where id = @0", this.Id); 
         }
 
         /// <summary>
@@ -163,7 +173,7 @@ namespace umbraco.cms.businesslogic.datatype
             if (Id == 0)
             {
                 // Update sortOrder
-                object tempSortOrder = SqlHelper.ExecuteScalar<object>("select max(sortorder) from cmsDataTypePreValues where datatypenodeid = @dataTypeId", SqlHelper.CreateParameter("@dataTypeId", DataTypeId));
+                object tempSortOrder = Database.ExecuteScalar<object>("select max(sortorder) from cmsDataTypePreValues where datatypenodeid = @0", DataTypeId);
                 int _sortOrder = 0;
 
                 if (tempSortOrder != null && int.TryParse(tempSortOrder.ToString(), out _sortOrder))
@@ -171,38 +181,54 @@ namespace umbraco.cms.businesslogic.datatype
                 else
                     SortOrder = 1;
 
-                IParameter[] SqlParams = new IParameter[] {
-								SqlHelper.CreateParameter("@value",Value),
-								SqlHelper.CreateParameter("@dtdefid",DataTypeId)};
                 // The method is synchronized
-                SqlHelper.ExecuteNonQuery("INSERT INTO cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) VALUES (@dtdefid,@value,0,'')", SqlParams);
-                _id = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsDataTypePreValues");
+                Database.Execute("INSERT INTO cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) VALUES (@0, @1, 0,'')", DataTypeId, Value);
+                _id = Database.ExecuteScalar<int>("SELECT MAX(id) FROM cmsDataTypePreValues");
             }
 
-            SqlHelper.ExecuteNonQuery(
+            Database.Execute(
                 "update cmsDataTypePreValues set sortorder = @sortOrder, [value] = @value where id = @id",
-                SqlHelper.CreateParameter("@sortOrder", SortOrder),
-                SqlHelper.CreateParameter("@value", Value),
-                SqlHelper.CreateParameter("@id", Id));
+                   new { sortOrder =  SortOrder, value = Value, id = Id });
         } 
         
         #endregion
 
         #region Private methods
+        [TableName("cmsDataTypePreValues")]
+        [PrimaryKey("id")]
+        [ExplicitColumns]
+        internal class PreValueDto
+        {
+            [Column("Id")]
+            [PrimaryKeyColumn(IdentitySeed = 1)]
+            public int Id { get; set; }
+            [Column("SortOrder")]
+            public int SortOrder { get; set; }
+            [Column("Value")]
+            public string Value { get; set; }
+            [Column("dataTypeNodeId")]
+            public int DataTypeId { get; set; }  // source DataTypeNodeId
+        }
+
         /// <summary>
         /// Initializes this instance.
         /// </summary>
         private void initialize()
         {
-            IRecordsReader dr = SqlHelper.ExecuteReader(
-                 "Select id, sortorder, [value] from cmsDataTypePreValues where id = @id order by sortorder",
-                 SqlHelper.CreateParameter("@id", Id));
-            if (dr.Read())
+            if (_id == null) throw new ArgumentNullException("Id is null");
+
+            Database.FirstOrDefault<PreValueDto>(
+                 "Select id, sortorder, [value], dataTypeNodeId from cmsDataTypePreValues where id = @id order by sortorder",
+                 new { id = _id })
+            .IfNull<PreValueDto>(x => { throw new ArgumentException(string.Format("Can't fetch a PreValue instance for ID = {0}", _id)); })
+            .IfNotNull<PreValueDto>(x =>
             {
-                _sortOrder = dr.GetInt("sortorder");
-                _value = dr.GetString("value");
-            }
-            dr.Close();
+                _sortOrder = x.SortOrder;
+                _value = x.Value;
+                _dataTypeId = x.DataTypeId;
+            });
+            
+
         } 
         #endregion
        

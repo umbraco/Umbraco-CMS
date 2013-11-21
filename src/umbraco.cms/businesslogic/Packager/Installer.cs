@@ -17,6 +17,8 @@ using System.Diagnostics;
 using umbraco.cms.businesslogic.macro;
 using umbraco.cms.businesslogic.template;
 using Umbraco.Core.IO;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace umbraco.cms.businesslogic.packager
 {
@@ -857,15 +859,9 @@ namespace umbraco.cms.businesslogic.packager
                     {
                         var m = new Macro(alias);
                         this._containsMacroConflict = true;
-
-                        if (_conflictingMacroAliases.ContainsKey(m.Name) == false)
-                        {
-                            _conflictingMacroAliases.Add(m.Name, alias);
-                        }
+                        this._conflictingMacroAliases.Add(m.Name, alias);
                     }
-                    catch (IndexOutOfRangeException)
-                    {
-                    } //thrown when the alias doesn't exist in the DB, ie - macro not there
+                    catch (IndexOutOfRangeException) { } //thrown when the alias doesn't exist in the DB, ie - macro not there
                 }
             }
 
@@ -878,10 +874,7 @@ namespace umbraco.cms.businesslogic.packager
                     if (t != null)
                     {
                         this._containsTemplateConflict = true;
-                        if (_conflictingTemplateAliases.ContainsKey(t.Text) == false)
-                        {
-                            _conflictingTemplateAliases.Add(t.Text, alias);
-                        }
+                        this._conflictingTemplateAliases.Add(t.Text, alias);
                     }
                 }
             }
@@ -895,10 +888,7 @@ namespace umbraco.cms.businesslogic.packager
                     if (s != null)
                     {
                         this._containsStyleSheetConflict = true;
-                        if (_conflictingStyleSheetNames.ContainsKey(s.Text) == false)
-                        {
-                            _conflictingStyleSheetNames.Add(s.Text, alias);   
-                        }                        
+                        this._conflictingStyleSheetNames.Add(s.Text, alias);
                     }
                 }
             }
@@ -1077,9 +1067,15 @@ namespace umbraco.cms.businesslogic.packager
 
     public class Package
     {
+        [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
         protected static ISqlHelper SqlHelper
         {
             get { return Application.SqlHelper; }
+        }
+
+        internal static UmbracoDatabase Database
+        {
+            get { return ApplicationContext.Current.DatabaseContext.Database; }
         }
 
         public Package()
@@ -1099,73 +1095,52 @@ namespace umbraco.cms.businesslogic.packager
 
         public Package(Guid Id)
         {
-            int installStatusId = SqlHelper.ExecuteScalar<int>(
-                "select id from umbracoInstalledPackages where package = @package and upgradeId = 0",
-                SqlHelper.CreateParameter("@package", Id));
-
-            if (installStatusId > 0)
-                initialize(installStatusId);
+            var list = Database.Fetch<int>("select id from umbracoInstalledPackages where package = @0 and upgradeId = 0", Id);
+            if (list.Count  > 0)
+                initialize(list[0]);
             else
                 throw new ArgumentException("Package with id '" + Id.ToString() + "' is not installed");
         }
-
+       
         private void initialize(int id)
         {
+            var package = Database.FirstOrDefault<InstalledPackageDto>("select id, uninstalled, upgradeId, installDate, userId, package, versionMajor, versionMinor, versionPatch from umbracoInstalledPackages where id = @0", id);
 
-            IRecordsReader dr =
-                SqlHelper.ExecuteReader(
-                "select id, uninstalled, upgradeId, installDate, userId, package, versionMajor, versionMinor, versionPatch from umbracoInstalledPackages where id = @id",
-                SqlHelper.CreateParameter("@id", id));
-
-            if (dr.Read())
-            {
-                Id = id;
-                Uninstalled = dr.GetBoolean("uninstalled");
-                UpgradeId = dr.GetInt("upgradeId");
-                InstallDate = dr.GetDateTime("installDate");
-                User = User.GetUser(dr.GetInt("userId"));
-                PackageId = dr.GetGuid("package");
-                VersionMajor = dr.GetInt("versionMajor");
-                VersionMinor = dr.GetInt("versionMinor");
-                VersionPatch = dr.GetInt("versionPatch");
-            }
-            dr.Close();
+            this.Id = id;
+            this.Uninstalled = package.Uninstalled;
+            this.UpgradeId = package.UpgradeId;
+            this.InstallDate = package.InstallDate;
+            this.User = new User(package.UserId);
+            this.PackageId = package.PackageId;
+            this.VersionMajor = package.VersionMajor;
+            this.VersionMinor = package.VersionMinor;
+            this.VersionPatch = package.VersionPatch;
         }
 
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void Save()
         {
-
-            IParameter[] values = {
-                SqlHelper.CreateParameter("@uninstalled", Uninstalled),
-                SqlHelper.CreateParameter("@upgradeId", UpgradeId),
-                SqlHelper.CreateParameter("@installDate", InstallDate),
-                SqlHelper.CreateParameter("@userId", User.Id),
-                SqlHelper.CreateParameter("@versionMajor", VersionMajor),
-                SqlHelper.CreateParameter("@versionMinor", VersionMinor),
-                SqlHelper.CreateParameter("@versionPatch", VersionPatch),
-                SqlHelper.CreateParameter("@id", Id)
+            var package = new InstalledPackageDto()
+            {
+                Uninstalled = Uninstalled,
+                UpgradeId = this.UpgradeId,
+                InstallDate = this.InstallDate,
+                UserId = this.User.Id, 
+                PackageId = this.PackageId,
+                VersionMajor = this.VersionMajor,
+                VersionMinor = this.VersionMinor,
+                VersionPatch = this.VersionPatch
             };
 
             // check if package status exists
             if (Id == 0)
             {
                 // The method is synchronized
-                SqlHelper.ExecuteNonQuery("INSERT INTO umbracoInstalledPackages (uninstalled, upgradeId, installDate, userId, versionMajor, versionMinor, versionPatch) VALUES (@uninstalled, @upgradeId, @installDate, @userId, @versionMajor, @versionMinor, @versionPatch)", values);
-                Id = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoInstalledPackages");
-            }
+                Database.Insert(package);
 
-            SqlHelper.ExecuteNonQuery(
-                "update umbracoInstalledPackages set " +
-                "uninstalled = @uninstalled, " +
-                "upgradeId = @upgradeId, " +
-                "installDate = @installDate, " +
-                "userId = @userId, " +
-                "versionMajor = @versionMajor, " +
-                "versionMinor = @versionMinor, " +
-                "versionPatch = @versionPatch " +
-                "where id = @id",
-                values);
+                Id = Database.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoInstalledPackages");
+            }
+            else Database.Update(package);   
         }
 
         private bool _uninstalled;
@@ -1248,7 +1223,37 @@ namespace umbraco.cms.businesslogic.packager
             set { _versionMajor = value; }
         }
 
-
-
     }
+
+    #region PackageDto // move to Umbraco.Core.Models.Rdbms
+    [TableName("umbracoInstalledPackages")]
+    [PrimaryKey("id")]
+    [ExplicitColumns]
+    internal class InstalledPackageDto
+    {
+        [Column("id")]
+        [PrimaryKeyColumn]
+        public int Id { get; set; }
+
+        [Column("uninstalled")]
+        [Constraint(Default = "0")]
+        public bool Uninstalled { get; set; }
+
+        [Column("upgradeId")]
+        public int UpgradeId { get; set; }
+        [Column("installDate")]
+        public DateTime InstallDate { get; set; }
+        [Column("userId")]
+        public int UserId { get; set; }
+        [Column("package")]
+        public Guid PackageId { get; set; }
+        [Column("versionMajor")]
+        public int VersionMajor { get; set; }
+        [Column("versionMinor")]
+        public int VersionMinor { get; set; }
+        [Column("versionPatch")]
+        public int VersionPatch { get; set; }
+    }
+    #endregion
+ 
 }
