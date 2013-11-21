@@ -31,36 +31,39 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                             "WHERE propertyTypeId in (SELECT id from cmsPropertyType where dataTypeID = 1040)");
                     foreach (var data in propertyData)
                     {
-                        //fetch the current data (that's in xml format)
-                        var xml = new XmlDocument();
-                        xml.LoadXml(data.Text);
-
-                        if (xml != null)
+                        if (!string.IsNullOrEmpty(data.Text))
                         {
-                            var links = new List<ExpandoObject>();
+                            //fetch the current data (that's in xml format)
+                            var xml = new XmlDocument();
+                            xml.LoadXml(data.Text);
 
-                            //loop all the stored links
-                            foreach (XmlNode node in xml.DocumentElement.ChildNodes)
+                            if (xml != null)
                             {
-                                var title = node.Attributes["title"].Value;
-                                var type = node.Attributes["type"].Value;
-                                var newwindow = node.Attributes["newwindow"].Value.Equals("1") ? true : false;
-                                var lnk = node.Attributes["link"].Value;
+                                var links = new List<ExpandoObject>();
 
-                                //create the links in the format the new prop editor expects it to be
-                                var link = new ExpandoObject() as IDictionary<string, Object>;
-                                link.Add("caption", title);
-                                link.Add("link", type.Equals("internal") ? null : lnk);
-                                link.Add("newWindow", newwindow);
-                                link.Add("internal", type.Equals("internal") ? lnk : null);
-                                link.Add("edit", false);
-                                link.Add("isInternal", type.Equals("internal"));
+                                //loop all the stored links
+                                foreach (XmlNode node in xml.DocumentElement.ChildNodes)
+                                {
+                                    var title = node.Attributes["title"].Value;
+                                    var type = node.Attributes["type"].Value;
+                                    var newwindow = node.Attributes["newwindow"].Value.Equals("1") ? true : false;
+                                    var lnk = node.Attributes["link"].Value;
 
-                                links.Add((ExpandoObject) link);
+                                    //create the links in the format the new prop editor expects it to be
+                                    var link = new ExpandoObject() as IDictionary<string, Object>;
+                                    link.Add("caption", title);
+                                    link.Add("link", type.Equals("internal") ? null : lnk);
+                                    link.Add("newWindow", newwindow);
+                                    link.Add("internal", type.Equals("internal") ? lnk : null);
+                                    link.Add("edit", false);
+                                    link.Add("isInternal", type.Equals("internal"));
+
+                                    links.Add((ExpandoObject) link);
+                                }
+
+                                //store the serialized data
+                                data.Text = new JavaScriptSerializer().Serialize(links);
                             }
-
-                            //store the serialized data
-                            data.Text = new JavaScriptSerializer().Serialize(links);
                         }
                     }
                 }
