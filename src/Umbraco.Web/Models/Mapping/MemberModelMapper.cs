@@ -95,6 +95,9 @@ namespace Umbraco.Web.Models.Mapping
         /// <param name="memberService"></param>
         /// <param name="member"></param>
         /// <param name="display"></param>
+        /// <remarks>
+        /// If this is a new entity and there is an approved field then we'll set it to true by default.
+        /// </remarks>
         private static void MapGenericCustomProperties(IMemberService memberService, IMember member, MemberDisplay display)
         {
             TabsAndPropertiesResolver.MapGenericProperties(
@@ -136,6 +139,18 @@ namespace Umbraco.Web.Models.Mapping
                         View = "membergroups",
                         Config = new Dictionary<string, object> { { "IsRequired", true } }
                     });
+
+            //check if there's an approval field
+            var provider = Membership.Provider as global::umbraco.providers.members.UmbracoMembershipProvider;
+            if (member.HasIdentity == false && provider != null)
+            {
+                var approvedField = provider.ApprovedPropertyTypeAlias;
+                var prop = display.Properties.FirstOrDefault(x => x.Alias == approvedField);
+                if (prop != null)
+                {
+                    prop.Value = 1;
+                }
+            }
 
         }
 
