@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Xml;
+using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
@@ -62,7 +63,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                                 }
 
                                 //store the serialized data
-                                data.Text = new JavaScriptSerializer().Serialize(links);
+                                data.Text = JsonConvert.SerializeObject(links);
                             }
                         }
                     }
