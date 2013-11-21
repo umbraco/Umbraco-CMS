@@ -93,6 +93,11 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         });
     };
 
+    //assign debounce method to the search to limit the queries
+    $scope.search = _.debounce(function() {
+        $scope.reloadView($scope.contentId);
+    }, 100);
+
     $scope.selectAll = function ($event) {
         var checkbox = $event.target;
         if (!angular.isArray($scope.listViewResultSet.items)) {

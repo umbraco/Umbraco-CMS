@@ -26,7 +26,7 @@ function SearchController($scope, searchService, $log, navigationService) {
             $scope.isSearching = false;
             navigationService.hideSearch();
         }
-    }), 400);
+    }, 100));
 
 }
 //register it
