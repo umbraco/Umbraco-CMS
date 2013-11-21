@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Xml;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
@@ -23,40 +24,49 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
         {
             if (database != null)
             {
-                var propertyData = database.Fetch<PropertyDataDto>("WHERE propertyTypeId in (SELECT id from propertyType where dataTypeID = 21)");
-                foreach (var data in propertyData)
+                try
                 {
-                    //fetch the current data (that's in xml format)
-                    var xml = new XmlDocument();
-                    xml.LoadXml(data.Text);
-
-                    if (xml != null)
+                    var propertyData =
+                        database.Fetch<PropertyDataDto>(
+                            "WHERE propertyTypeId in (SELECT id from propertyType where dataTypeID = 21)");
+                    foreach (var data in propertyData)
                     {
-                        var links = new List<ExpandoObject>();
+                        //fetch the current data (that's in xml format)
+                        var xml = new XmlDocument();
+                        xml.LoadXml(data.Text);
 
-                        //loop all the stored links
-                        foreach (XmlNode node in xml.DocumentElement.ChildNodes)
+                        if (xml != null)
                         {
-                            var title = node.Attributes["title"].Value;
-                            var type = node.Attributes["type"].Value;
-                            var newwindow = node.Attributes["newwindow"].Value.Equals("1") ? true : false;
-                            var lnk = node.Attributes["link"].Value;
+                            var links = new List<ExpandoObject>();
 
-                            //create the links in the format the new prop editor expects it to be
-                            var link = new ExpandoObject() as IDictionary<string, Object>;
-                            link.Add("caption", title);
-                            link.Add("link", type.Equals("internal") ? null : lnk);
-                            link.Add("newWindow", newwindow);
-                            link.Add("internal", type.Equals("internal") ? lnk : null);
-                            link.Add("edit", false);
-                            link.Add("isInternal", type.Equals("internal"));
+                            //loop all the stored links
+                            foreach (XmlNode node in xml.DocumentElement.ChildNodes)
+                            {
+                                var title = node.Attributes["title"].Value;
+                                var type = node.Attributes["type"].Value;
+                                var newwindow = node.Attributes["newwindow"].Value.Equals("1") ? true : false;
+                                var lnk = node.Attributes["link"].Value;
 
-                            links.Add((ExpandoObject)link);
+                                //create the links in the format the new prop editor expects it to be
+                                var link = new ExpandoObject() as IDictionary<string, Object>;
+                                link.Add("caption", title);
+                                link.Add("link", type.Equals("internal") ? null : lnk);
+                                link.Add("newWindow", newwindow);
+                                link.Add("internal", type.Equals("internal") ? lnk : null);
+                                link.Add("edit", false);
+                                link.Add("isInternal", type.Equals("internal"));
+
+                                links.Add((ExpandoObject) link);
+                            }
+
+                            //store the serialized data
+                            data.Text = new JavaScriptSerializer().Serialize(links);
                         }
-
-                        //store the serialized data
-                        data.Text = new JavaScriptSerializer().Serialize(links);
                     }
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<UpdateRelatedLinksData>("Exception was thrown when trying to update related links property data", ex);
                 }
             }
             return string.Empty;
