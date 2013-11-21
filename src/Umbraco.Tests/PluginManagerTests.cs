@@ -242,16 +242,16 @@ namespace Umbraco.Tests
             var list3 = new[] { f1, f3, f5, f7 };
 
             //Act
-            var hash1 = PluginManager.GetAssembliesHash(list1);
-            var hash2 = PluginManager.GetAssembliesHash(list2);
-            var hash3 = PluginManager.GetAssembliesHash(list3);
+            var hash1 = PluginManager.GetFileHash(list1);
+            var hash2 = PluginManager.GetFileHash(list2);
+            var hash3 = PluginManager.GetFileHash(list3);
 
             //Assert
             Assert.AreNotEqual(hash1, hash2);
             Assert.AreNotEqual(hash1, hash3);
             Assert.AreNotEqual(hash2, hash3);
 
-            Assert.AreEqual(hash1, PluginManager.GetAssembliesHash(list1));
+            Assert.AreEqual(hash1, PluginManager.GetFileHash(list1));
         }
 
         [Test]

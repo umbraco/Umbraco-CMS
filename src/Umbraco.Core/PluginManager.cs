@@ -171,17 +171,18 @@ namespace Umbraco.Core
                 if (_currentAssembliesHash != -1)
                     return _currentAssembliesHash;
 
-                _currentAssembliesHash = GetAssembliesHash(
-                    new FileSystemInfo[]
+                _currentAssembliesHash = GetFileHash(
+                    new List<Tuple<FileSystemInfo, bool>>
 						{
 							//add the bin folder and everything in it
-							new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Bin)),
+							new Tuple<FileSystemInfo, bool>(new DirectoryInfo(IOHelper.MapPath(SystemDirectories.Bin)), false),
 							//add the app code folder and everything in it
-							new DirectoryInfo(IOHelper.MapPath("~/App_Code")),
+							new Tuple<FileSystemInfo, bool>(new DirectoryInfo(IOHelper.MapPath("~/App_Code")), false),
 							//add the global.asax (the app domain also monitors this, if it changes will do a full restart)
-							new FileInfo(IOHelper.MapPath("~/global.asax")),
-                            //add the trees.config
-                            new FileInfo(IOHelper.MapPath(SystemDirectories.Config + "/trees.config"))
+							new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath("~/global.asax")), false),
+
+                            //add the trees.config - use the contents to create the has since this gets resaved on every app startup!
+                            new Tuple<FileSystemInfo, bool>(new FileInfo(IOHelper.MapPath(SystemDirectories.Config + "/trees.config")), true)
 						}
                     );
                 return _currentAssembliesHash;
@@ -200,18 +201,34 @@ namespace Umbraco.Core
         /// <summary>
         /// Returns a unique hash for the combination of FileInfo objects passed in
         /// </summary>
-        /// <param name="filesAndFolders"></param>
+        /// <param name="filesAndFolders">
+        /// A collection of files and whether or not to use their file contents to determine the hash or the file's properties 
+        /// (true will make a hash based on it's contents)
+        /// </param>
         /// <returns></returns>
-        internal static long GetAssembliesHash(IEnumerable<FileSystemInfo> filesAndFolders)
+        internal static long GetFileHash(IEnumerable<Tuple<FileSystemInfo, bool>> filesAndFolders)
         {
             using (DisposableTimer.TraceDuration<PluginManager>("Determining hash of code files on disk", "Hash determined"))
             {
                 var hashCombiner = new HashCodeCombiner();
-                //add each unique folder to the hash
-                foreach (var i in filesAndFolders.DistinctBy(x => x.FullName))
+
+                //get the file info's to check
+                var fileInfos = filesAndFolders.Where(x => x.Item2 == false).ToArray();
+                var fileContents = filesAndFolders.Except(fileInfos);
+                
+                //add each unique folder/file to the hash
+                foreach (var i in fileInfos.Select(x => x.Item1).DistinctBy(x => x.FullName))
                 {
                     hashCombiner.AddFileSystemItem(i);
                 }
+
+                //add each unique file's contents to the hash
+                foreach (var i in fileContents.Select(x => x.Item1).DistinctBy(x => x.FullName))
+                {
+                    var content = File.ReadAllText(i.FullName).Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty);
+                    hashCombiner.AddCaseInsensitiveString(content);
+                }
+
                 return ConvertPluginsHashFromHex(hashCombiner.GetCombinedHashCode());
             }
         }
