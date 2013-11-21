@@ -225,8 +225,12 @@ namespace Umbraco.Core
                 //add each unique file's contents to the hash
                 foreach (var i in fileContents.Select(x => x.Item1).DistinctBy(x => x.FullName))
                 {
-                    var content = File.ReadAllText(i.FullName).Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty);
-                    hashCombiner.AddCaseInsensitiveString(content);
+                    if (File.Exists(i.FullName))
+                    {
+                        var content = File.ReadAllText(i.FullName).Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty);
+                        hashCombiner.AddCaseInsensitiveString(content);    
+                    }
+                    
                 }
 
                 return ConvertPluginsHashFromHex(hashCombiner.GetCombinedHashCode());
