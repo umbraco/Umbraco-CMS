@@ -234,6 +234,21 @@ namespace Umbraco.Core
             }
         }
 
+        internal static long GetFileHash(IEnumerable<FileSystemInfo> filesAndFolders)
+        {
+            using (DisposableTimer.TraceDuration<PluginManager>("Determining hash of code files on disk", "Hash determined"))
+            {
+                var hashCombiner = new HashCodeCombiner();
+
+                //add each unique folder/file to the hash
+                foreach (var i in filesAndFolders.DistinctBy(x => x.FullName))
+                {
+                    hashCombiner.AddFileSystemItem(i);
+                }
+                return ConvertPluginsHashFromHex(hashCombiner.GetCombinedHashCode());
+            }
+        }
+
         /// <summary>
         /// Converts the hash value of current plugins to long from string
         /// </summary>
@@ -436,7 +451,7 @@ namespace Umbraco.Core
 
         #endregion
 
-        private readonly ReaderWriterLockSlim _lock = new ReaderWriterLockSlim();
+        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
         private readonly HashSet<TypeList> _types = new HashSet<TypeList>();
         private IEnumerable<Assembly> _assemblies;
 
@@ -642,7 +657,7 @@ namespace Umbraco.Core
             TypeResolutionKind resolutionType,
             bool cacheResult)
         {
-            using (var readLock = new UpgradeableReadLock(_lock))
+            using (var readLock = new UpgradeableReadLock(Locker))
             {
                 var typesFound = new List<Type>();
 
