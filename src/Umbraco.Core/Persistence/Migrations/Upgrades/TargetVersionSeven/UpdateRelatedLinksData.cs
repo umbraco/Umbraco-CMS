@@ -28,7 +28,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 {
                     var propertyData =
                         database.Fetch<PropertyDataDto>(
-                            "WHERE propertyTypeId in (SELECT id from cmsPropertyType where dataTypeID = 21)");
+                            "WHERE propertyTypeId in (SELECT id from cmsPropertyType where dataTypeID = 1040)");
                     foreach (var data in propertyData)
                     {
                         //fetch the current data (that's in xml format)
