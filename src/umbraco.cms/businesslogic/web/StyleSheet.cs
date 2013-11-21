@@ -68,10 +68,12 @@ namespace umbraco.cms.businesslogic.web
 
         //static bool isInitialized = false;
 
-        public StyleSheet(Guid id)
+      
+        public StyleSheet(Guid id, bool loadFileData, bool updateStyleProperties)
             : base(id)
         {
-            SetupStyleSheet(true, true);
+            if (loadFileData || updateStyleProperties)
+                SetupStyleSheet(true, true);
         }
 
         public StyleSheet(int id)
@@ -192,14 +194,18 @@ namespace umbraco.cms.businesslogic.web
         public static StyleSheet[] GetAll()
         {
 
+          
             var dbStylesheets = new ArrayList();
 
             var topNodeIds = CMSNode.TopMostNodeIds(ModuleObjectType);
+            var loadedStyleSheets = new System.Collections.Generic.Dictionary<int, StyleSheet>();
+
             //StyleSheet[] retval = new StyleSheet[topNodeIds.Length];
             for (int i = 0; i < topNodeIds.Length; i++)
             {
-                //retval[i] = new StyleSheet(topNodeIds[i]);
-                dbStylesheets.Add(new StyleSheet(topNodeIds[i]).Text.ToLower());
+                var styleSheet = new StyleSheet(topNodeIds[i], false, false);
+                loadedStyleSheets.Add(i, styleSheet);
+                dbStylesheets.Add(styleSheet.Text.ToLower());
             }
 
             var fileStylesheets = new ArrayList();
@@ -216,7 +222,7 @@ namespace umbraco.cms.businesslogic.web
             var retval = new StyleSheet[dbStylesheets.Count + fileStylesheets.Count];
             for (int i = 0; i < topNodeIds.Length; i++)
             {
-                retval[i] = new StyleSheet(topNodeIds[i]);
+                retval[i] = loadedStyleSheets[i];
 
             }
 
