@@ -78,8 +78,7 @@
 <div class="tab main-tabinfo">
 <div class="container">
 	<h1>Starter kits</h1>
-	<p>To help you get started here are some basic starter kits. They have been tailored to suit common site configurations and install useful functionality.<br />
-	Mouse over the icons to learn more about what the starter kits will install.</p>
+	<p>To help you get started here are some basic starter kits. They have been tailored to suit common site configurations and install useful functionality.</p>
 </div>
 <!-- menu -->
 <asp:PlaceHolder ID="ph_starterKits" runat="server" />
