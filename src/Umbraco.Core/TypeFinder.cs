@@ -279,7 +279,7 @@ namespace Umbraco.Core
                     "SqlCE4Umbraco,",
                     "umbraco.datalayer,",
                     "umbraco.interfaces,",										
-					"umbraco.providers,",
+					//"umbraco.providers,",
 					//"Umbraco.Web.UI,",
                     "umbraco.webservices",
                     "Lucene.",
@@ -290,7 +290,13 @@ namespace Umbraco.Core
                     "HtmlAgilityPack.",
                     "TidyNet.",
                     "ICSharpCode.",
-                    "CookComputing."
+                    "CookComputing.",
+                    "AutoMapper,",
+                    "AutoMapper.",
+                    "AzureDirectory,",
+                    "itextsharp,",
+                    "Lucene.Net,",
+                    "UrlRewritingNet."
                 };
 
         /// <summary>
