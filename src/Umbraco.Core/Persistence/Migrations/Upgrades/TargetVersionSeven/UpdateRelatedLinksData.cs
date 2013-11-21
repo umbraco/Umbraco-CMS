@@ -56,6 +56,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                                     //create the links in the format the new prop editor expects it to be
                                     var link = new ExpandoObject() as IDictionary<string, Object>;
                                     link.Add("title", title);
+                                    link.Add("caption", title);
                                     link.Add("link", lnk);
                                     link.Add("newWindow", newwindow);
                                     link.Add("type", type.Equals("internal") ? "internal" : "external");
