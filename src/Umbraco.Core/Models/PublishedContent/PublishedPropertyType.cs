@@ -82,24 +82,38 @@ namespace Umbraco.Core.Models.PublishedContent
         {
             var converters = PropertyValueConvertersResolver.Current.Converters.ToArray();
 
-            // todo: remove Union() once we drop IPropertyEditorValueConverter support.
-            _converter = null;
-            foreach (var converter in converters.Union(GetCompatConverters()).Where(x => x.IsConverter(this)))
-            {
-                if (_converter == null)
-                {
-                    _converter = converter;
-                }
-                else
-                {
-                    throw new InvalidOperationException(string.Format("Type '{2}' cannot be an IPropertyValueConverter"
-                        + " for property '{1}' of content type '{0}' because type '{3}' has already been detected as a converter"
-                        + " for that property, and only one converter can exist for a property.",
-                        ContentType.Alias, PropertyTypeAlias,
-                        converter.GetType().FullName, _converter.GetType().FullName));
-                }
-            }
+            var defaultConverters = converters
+                .Where(x => x.GetType().GetCustomAttribute<DefaultPropertyValueConverterAttribute>(false) != null)
+                .ToArray();
 
+            _converter = null;
+            
+            //get all converters for this property type
+            // todo: remove Union() once we drop IPropertyEditorValueConverter support.
+            var foundConverters = converters.Union(GetCompatConverters()).Where(x => x.IsConverter(this)).ToArray();
+            if (foundConverters.Length == 1)
+            {
+                _converter = foundConverters[0];
+            }
+            else if (foundConverters.Length > 1)
+            {
+                //more than one was found, we need to first figure out if one of these is an Umbraco default value type converter
+                var nonDefault = foundConverters.Except(defaultConverters).ToArray();
+                if (nonDefault.Length > 1)
+                {
+                    //this is not allowed, there cannot be more than 1 custom converter
+                    throw new InvalidOperationException(
+                        string.Format("Type '{2}' cannot be an IPropertyValueConverter"
+                                      + " for property '{1}' of content type '{0}' because type '{3}' has already been detected as a converter"
+                                      + " for that property, and only one converter can exist for a property.",
+                                      ContentType.Alias, PropertyTypeAlias,
+                                      nonDefault[1].GetType().FullName, nonDefault[0].GetType().FullName));
+                }
+
+                //there's only 1 custom converter registered that so use it
+                _converter = nonDefault[0];
+            }
+            
             // get the cache levels, quietely fixing the inconsistencies (no need to throw, really)
             _sourceCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.Source);
             _objectCacheLevel = GetCacheLevel(_converter, PropertyCacheValue.Object);
