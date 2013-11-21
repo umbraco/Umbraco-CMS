@@ -11,6 +11,10 @@ angular.module("umbraco")
         $scope.addTag = function(e) {
             var code = e.keyCode || e.which;
             if (code == 13) { //Enter keycode   
+
+                //this is required, otherwise the html form will attempt to submit.
+                e.preventDefault();
+                
                 if ($scope.currentTags.indexOf($scope.tagToAdd) < 0) {
                     $scope.currentTags.push($scope.tagToAdd);
                 }
