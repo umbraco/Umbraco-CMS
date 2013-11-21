@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 using System.Xml;
+using Newtonsoft.Json;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
@@ -33,6 +34,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                     {
                         if (!string.IsNullOrEmpty(data.Text))
                         {
+                             //var cs = ApplicationContext.Current.Services.ContentService;
+
                             //fetch the current data (that's in xml format)
                             var xml = new XmlDocument();
                             xml.LoadXml(data.Text);
@@ -58,11 +61,27 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                                     link.Add("edit", false);
                                     link.Add("isInternal", type.Equals("internal"));
 
+                                    //try
+                                    //{
+                                    //    if (type.Equals("internal"))
+                                    //    {
+                                    //        int nodeId;
+                                    //        if (int.TryParse(lnk, out nodeId))
+                                    //            link.Add("internalName", cs.GetById(nodeId).Name);
+                                    //    }
+                                    //}
+                                    //catch (Exception ex)
+                                    //{
+                                    //    LogHelper.Error<UpdateRelatedLinksData>("Exception was thrown when trying to update related links property data, fetching internal node id", ex);
+                                    //}
+
                                     links.Add((ExpandoObject) link);
                                 }
 
                                 //store the serialized data
-                                data.Text = new JavaScriptSerializer().Serialize(links);
+                                data.Text = JsonConvert.SerializeObject(links);
+
+                                database.Update(data);
                             }
                         }
                     }
