@@ -70,7 +70,7 @@ namespace umbraco
                 m.Save();
             }
 
-            _returnUrl = string.Format(EditViewFile + "?file={0}", HttpUtility.UrlEncode(ParentFolderName.EnsureEndsWith('/') + fileName));
+            _returnUrl = string.Format(EditViewFile + "?treeType={0}&file={1}", "partialViewMacros", HttpUtility.UrlEncode(ParentFolderName.EnsureEndsWith('/') + fileName));
             return true;
         }
 
