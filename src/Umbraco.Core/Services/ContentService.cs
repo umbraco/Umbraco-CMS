@@ -1602,6 +1602,10 @@ namespace Umbraco.Core.Services
                 using (var repository = _repositoryFactory.CreateContentRepository(uow))
                 {
                     //Since this is the Save and Publish method, the content should be saved even though the publish fails or isn't allowed
+                    if (content.HasIdentity == false)
+                    {
+                        content.CreatorId = userId;
+                    }
                     content.WriterId = userId;
 
                     repository.AddOrUpdate(content);
@@ -1662,6 +1666,10 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateContentRepository(uow))
                 {
+                    if (content.HasIdentity == false)
+                    {
+                        content.CreatorId = userId;
+                    }
                     content.WriterId = userId;
 
                     //Only change the publish state if the "previous" version was actually published or marked as unpublished

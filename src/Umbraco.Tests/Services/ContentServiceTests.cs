@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -76,6 +77,27 @@ namespace Umbraco.Tests.Services
             Assert.That(content, Is.Not.Null);
             Assert.That(content.HasIdentity, Is.False);
             Assert.That(content.CreatorId, Is.EqualTo(0));//Default to zero/administrator
+        }
+
+        [Test]
+        public void Can_Save_New_Content_With_Explicit_User()
+        {
+            var user = new User(ServiceContext.UserService.GetUserTypeByAlias("admin"))
+                {
+                    Name = "Test",
+                    Email = "test@test.com",
+                    Username = "test",
+                    Password = "test"
+                };
+            ServiceContext.UserService.SaveUser(user);
+            var content = new Content("Test", -1, ServiceContext.ContentTypeService.GetContentType("umbTextpage"));
+
+            // Act
+            ServiceContext.ContentService.Save(content, (int)user.Id);
+
+            // Assert
+            Assert.That(content.CreatorId, Is.EqualTo(user.Id));
+            Assert.That(content.WriterId, Is.EqualTo(user.Id));
         }
 
         [Test]
