@@ -132,12 +132,17 @@ namespace Umbraco.Core.PropertyEditors
         /// <remarks>
         /// This is generally not going to be used by anything unless a property editor wants to change the merging
         /// functionality or needs to convert some legacy persisted data, or convert the string values to strongly typed values in json (i.e. booleans)
+        /// 
+        /// IMPORTANT! When using this method the default pre values dictionary should not be modified which would change the property editor's global 
+        /// singleton pre-values!
         /// </remarks>
         public virtual IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
         {
-            if (defaultPreVals == null)
+            //we'll make a copy since we'll merge into the defaults - but we don't want to overwrite the global singleton ones passed in!
+            var defaultPreValCopy = new Dictionary<string, object>();
+            if (defaultPreVals != null)
             {
-                defaultPreVals = new Dictionary<string, object>();
+                defaultPreValCopy = new Dictionary<string, object>(defaultPreVals);
             }
 
             if (persistedPreVals.IsDictionaryBased)
@@ -147,13 +152,13 @@ namespace Umbraco.Core.PropertyEditors
                 {
                     //The persisted dictionary contains values of type PreValue which contain the ID and the Value, we don't care
                     // about the Id, just the value so ignore the id.
-                    defaultPreVals[item.Key] = item.Value.Value;
+                    defaultPreValCopy[item.Key] = item.Value.Value;
                 }
                 //now we're going to try to see if any of the values are JSON, if they are we'll convert them to real JSON objects
                 // so they can be consumed as real json in angular!
-                ConvertItemsToJsonIfDetected(defaultPreVals);
+                ConvertItemsToJsonIfDetected(defaultPreValCopy);
 
-                return defaultPreVals;
+                return defaultPreValCopy;
             }
 
             //it's an array so need to format it 
