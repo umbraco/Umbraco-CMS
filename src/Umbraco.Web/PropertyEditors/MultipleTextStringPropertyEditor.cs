@@ -44,7 +44,7 @@ namespace Umbraco.Web.PropertyEditors
                 });
                 Fields.Add(new PreValueField(new IntegerValidator())
                 {
-                    Description = "Enter the maximum amount of text boxes to be displayed, enter -1 for unlimited",
+                    Description = "Enter the maximum amount of text boxes to be displayed, enter 0 for unlimited",
                     Key = "max",
                     View = "requiredfield",
                     Name = "Maximum"
@@ -153,8 +153,13 @@ namespace Umbraco.Web.PropertyEditors
                                    .Where(x => x["value"] != null)
                                    .Select(x => x["value"].Value<string>());
                 
-                //only allow the max
-                return string.Join(Environment.NewLine, array.Take(max));
+                //only allow the max if over 0
+                if (max > 0)
+                {
+                    return string.Join(Environment.NewLine, array.Take(max));    
+                }
+                
+                return string.Join(Environment.NewLine, array);
             }
 
             /// <summary>
