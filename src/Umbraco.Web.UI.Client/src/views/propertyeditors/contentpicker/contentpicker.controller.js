@@ -26,7 +26,8 @@ angular.module('umbraco')
 
 		if($scope.cfg.startNode.type === "member"){
 		    $scope.cfg.entityType = "Member";		    
-		}else if ($scope.cfg.type === "media") {
+		}
+		else if ($scope.cfg.startNode.type === "media") {
 			$scope.cfg.entityType = "Media";
 		}
 
