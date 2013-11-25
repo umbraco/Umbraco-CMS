@@ -16,7 +16,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             InternalPreValues = new Dictionary<string, object>
                 {
-                    {"multiPicker", false}
+                    {"multiPicker", "0"}
                 };
         }
 
