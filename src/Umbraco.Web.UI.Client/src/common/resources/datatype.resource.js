@@ -22,7 +22,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
          *        alert('its gone!');
          *    });
          * </pre> 
-         * 
+         *  
          * @param {String} editorAlias string alias of editor type to retrive prevalues configuration for
          * @param {Int} id id of datatype to retrieve prevalues for        
          * @returns {Promise} resourcePromise object.
@@ -40,7 +40,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "dataTypeApiBaseUrl",
                        "GetPreValues",
                        [{ editorAlias: editorAlias }, { dataTypeId: dataTypeId }])),
-               'Failed to retreive pre values for editor id ' + editorId);
+               'Failed to retreive pre values for editor alias ' + editorAlias);
         },
 
         /**

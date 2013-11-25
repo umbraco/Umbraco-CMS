@@ -8,7 +8,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
         function setupViewModel() {
             $scope.images = [];
-            $scope.ids = [];
+            $scope.ids = []; 
 
             if ($scope.model.value) {
                 $scope.ids = $scope.model.value.split(',');
