@@ -151,7 +151,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var emptyContent = new Core.Models.Media("", parentId, contentType);
+            var emptyContent = Services.MediaService.CreateMedia("", parentId, contentType.Alias, UmbracoUser.Id);
             var mapped = Mapper.Map<IMedia, MediaItemDisplay>(emptyContent);
 
             //remove this tab if it exists: umbContainerView

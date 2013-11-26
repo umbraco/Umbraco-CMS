@@ -107,7 +107,7 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var emptyContent = new Content("", parentId, contentType);
+            var emptyContent = Services.ContentService.CreateContent("", parentId, contentType.Alias, UmbracoUser.Id);
             var mapped = Mapper.Map<IContent, ContentItemDisplay>(emptyContent);
 
             //remove this tab if it exists: umbContainerView
