@@ -1,6 +1,6 @@
 ﻿<div ng-controller="Umbraco.PropertyEditors.ColorPickerController">
 
-	<div ng-hide="model.config.items.length === 0" >
+	<div ng-if="!isConfigured" >
 		<localize key="colorpicker_noColors">You havn't defined any colors</localize>
 	</div>
 
