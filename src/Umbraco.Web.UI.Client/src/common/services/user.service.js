@@ -218,7 +218,7 @@ angular.module('umbraco.services')
 
                         var result = { user: data, authenticated: true, lastUserId: lastUserId };
 
-                        if (args.broadcastEvent) {
+                        if (args && args.broadcastEvent) {
                             //broadcast a global event, will inform listening controllers to load in the user specific data
                             $rootScope.$broadcast("authenticated", result);
                         }

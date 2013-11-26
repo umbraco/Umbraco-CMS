@@ -106,3 +106,4 @@ src/Umbraco.Web.UI/[Uu]mbraco/[Vv]iews/**/*.js
 src/Umbraco.Web.UI/[Cc]onfig/appSettings.config
 src/Umbraco.Web.UI/[Cc]onfig/connectionStrings.config
 src/Umbraco.Web.UI/umbraco/plugins/*
+src/Umbraco.Web.UI/umbraco/js/init.js
