@@ -54,7 +54,7 @@ namespace Umbraco.Web.Mvc
 			{
 				using (var writer = File.CreateText(Path.Combine(viewFolder, "web.config")))
 				{
-					writer.Write(Strings.web_config);
+					writer.Write(Strings.WebConfigTemplate);
 				}
 			}
 			//auto create the partials folder

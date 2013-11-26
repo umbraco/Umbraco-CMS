@@ -9,7 +9,7 @@ namespace Umbraco.Web.UI.JavaScript
     {
 
         /// <summary>
-        /// Can allow developers to add custom variables on startup
+        /// Could allow developers to add custom variables on startup - not sure if we want to allow that ? maybe.
         /// </summary>
         internal static EventHandler<Dictionary<string, object>> Parsing;
 

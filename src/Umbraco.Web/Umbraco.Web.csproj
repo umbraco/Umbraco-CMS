@@ -1791,6 +1791,9 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="WebViewPageExtensions.cs" />
+    <None Include="..\Umbraco.Web.UI\Views\web.config">
+      <Link>Mvc\web.config</Link>
+    </None>
     <None Include="Web References\org.umbraco.our\Reference.map">
       <Generator>MSDiscoCodeGenerator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
@@ -1901,7 +1904,6 @@
     </Content>
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx" />
     <None Include="app.config" />
-    <None Include="Mvc\web.config.template" />
     <None Include="packages.config" />
     <None Include="Web References\org.umbraco.our\repository.wsdl" />
     <None Include="Web References\org.umbraco.update\UpgradeResult.datasource">
