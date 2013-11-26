@@ -10,6 +10,7 @@ using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.media
 {
+    [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
     public class UmbracoFileMediaFactory : UmbracoMediaFactory
     {
         public override string MediaTypeAlias

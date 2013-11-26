@@ -5,6 +5,7 @@ namespace umbraco.interfaces
 	/// <summary>
 	/// Summary description for IMacroGuiRendering.
 	/// </summary>
+	[Obsolete("This interface is no longer used and will be removed from the codebase in future versions")]
 	public interface IMacroGuiRendering
 	{
         /// <summary>

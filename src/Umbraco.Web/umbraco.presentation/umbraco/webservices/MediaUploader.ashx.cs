@@ -19,6 +19,7 @@ using Umbraco.Core;
 
 namespace umbraco.presentation.umbraco.webservices
 {
+    [Obsolete("This should no longer be used, use the WebApi methods to upload media")]
     public class MediaUploader : IHttpHandler
     {
         protected User AuthenticatedUser { get; set; }

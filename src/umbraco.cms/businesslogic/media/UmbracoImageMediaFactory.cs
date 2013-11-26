@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.media
 {
+    [Obsolete("This interface is no longer used and will be removed from the codebase in future versions")]
     public class UmbracoImageMediaFactory : UmbracoMediaFactory
     {
         public override string MediaTypeAlias

@@ -12,6 +12,7 @@ using Umbraco.Core;
 
 namespace umbraco.cms.businesslogic.media
 {
+    [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
     public abstract class UmbracoMediaFactory : IMediaFactory
     {
         public abstract List<string> Extensions { get; }

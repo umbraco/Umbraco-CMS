@@ -6,6 +6,7 @@ using umbraco.BusinessLogic;
 
 namespace umbraco.cms.businesslogic.media
 {
+    [Obsolete("This interface is no longer used and will be removed from the codebase in future versions")]
     public interface IMediaFactory
     {
         List<string> Extensions { get; }
