@@ -6,9 +6,9 @@
     public class ContentItemFile
     {
         /// <summary>
-        /// The property id associated with the file
+        /// The property alias associated with the file
         /// </summary>
-        public int PropertyId { get; set; }
+        public string PropertyAlias { get; set; }
 
         /// <summary>
         /// The original file name

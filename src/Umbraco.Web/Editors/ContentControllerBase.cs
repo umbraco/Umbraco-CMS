@@ -95,7 +95,7 @@ namespace Umbraco.Web.Editors
                 //create the property data to send to the property editor
                 var d = new Dictionary<string, object>();
                 //add the files if any
-                var files = contentItem.UploadedFiles.Where(x => x.PropertyId == p.Id).ToArray();
+                var files = contentItem.UploadedFiles.Where(x => x.PropertyAlias == p.Alias).ToArray();
                 if (files.Any())
                 {
                     d.Add("files", files);

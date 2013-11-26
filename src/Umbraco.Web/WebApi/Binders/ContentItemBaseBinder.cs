@@ -144,22 +144,14 @@ namespace Umbraco.Web.WebApi.Binders
                                 ReasonPhrase = "The request was not formatted correctly the file name's must be underscore delimited"
                             });
                 }
-                int propertyId;
-                if (int.TryParse(parts[1], out propertyId) == false)
-                {
-                    throw new HttpResponseException(
-                        new HttpResponseMessage(HttpStatusCode.BadRequest)
-                            {
-                                ReasonPhrase = "The request was not formatted correctly the file name's 2nd part must be an integer"
-                            });
-                }
-
+                var propAlias = parts[1];
+             
                 var fileName = file.Headers.ContentDisposition.FileName.Trim(new char[] {'\"'});
 
                 model.UploadedFiles.Add(new ContentItemFile
                     {
                         TempFilePath = file.LocalFileName,
-                        PropertyId = propertyId,
+                        PropertyAlias = propAlias,
                         FileName = fileName
                     });
             }

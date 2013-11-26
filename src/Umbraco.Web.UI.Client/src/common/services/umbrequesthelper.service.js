@@ -200,9 +200,9 @@ function umbRequestHelper($http, $q, umbDataFormatter, angularHelper, dialogServ
                 function (data, formData) {
                     //now add all of the assigned files
                     for (var f in args.files) {
-                        //each item has a property id and the file object, we'll ensure that the id is suffixed to the key
+                        //each item has a property alias and the file object, we'll ensure that the alias is suffixed to the key
                         // so we know which property it belongs to on the server side
-                        formData.append("file_" + args.files[f].id, args.files[f].file);
+                        formData.append("file_" + args.files[f].alias, args.files[f].file);
                     }
 
                 },

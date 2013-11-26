@@ -18,7 +18,7 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
     /** Clears the file collections when content is saving (if we need to clear) or after saved */
     function clearFiles() {        
         //clear the files collection (we don't want to upload any!)
-        fileManager.setFiles($scope.id, []);
+        fileManager.setFiles($scope.model.alias, []);
         //clear the current files
         $scope.files = [];
     }
@@ -85,13 +85,13 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
     $scope.$on("filesSelected", function (event, args) {
         $scope.$apply(function () {
             //set the files collection
-            fileManager.setFiles($scope.model.id, args.files);
+            fileManager.setFiles($scope.model.alias, args.files);
             //clear the current files
             $scope.files = [];
             var newVal = "";
             for (var i = 0; i < args.files.length; i++) {
                 //save the file object to the scope's files collection
-                $scope.files.push({ id: $scope.model.id, file: args.files[i] });
+                $scope.files.push({ alias: $scope.model.alias, file: args.files[i] });
                 newVal += args.files[i].name + ",";
             }
             //set clear files to false, this will reset the model too

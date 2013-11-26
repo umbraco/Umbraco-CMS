@@ -1,6 +1,6 @@
 /** Executed when the application starts */
-app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 'appState', 'editorState',
-    function(userService, $log, $rootScope, $location, navigationService, appState, editorState) {
+app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 'appState', 'editorState', 'fileManager',
+    function (userService, $log, $rootScope, $location, navigationService, appState, editorState, fileManager) {
 
         var firstRun = true;
 
@@ -26,6 +26,10 @@ app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 
             //reset the editorState on each successful route chage
             editorState.reset();
 
+            //reset the file manager on each route change, the file collection is only relavent
+            // when working in an editor and submitting data to the server.
+            //This ensures that memory remains clear of any files and that the editors don't have to manually clear the files.
+            fileManager.clearFiles();
         });
 
         /** When the route change is rejected - based on checkAuth - we'll prevent the rejected route from executing including

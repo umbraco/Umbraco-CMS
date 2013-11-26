@@ -8,16 +8,9 @@
  * that need to attach files.
  * When a route changes successfully, we ensure that the collection is cleared.
  */
-function fileManager($rootScope) {
+function fileManager() {
 
     var fileCollection = [];
-
-    //Whenever a route changes - clear the curent file collection, the file collection is only relavent
-    // when working in an editor and submitting data to the server.
-    //This ensures that memory remains clear of any files and that the editors don't have to manually clear the files.
-    $rootScope.$on('$routeChangeSuccess', function (event, current, previous) {
-        fileCollection = [];
-    });
 
     return {
         /**
@@ -30,14 +23,14 @@ function fileManager($rootScope) {
          *  Attaches files to the current manager for the current editor for a particular property, if an empty array is set
          *   for the files collection that effectively clears the files for the specified editor.
          */
-        setFiles: function(propertyId, files) {
+        setFiles: function(propertyAlias, files) {
             //this will clear the files for the current property and then add the new ones for the current property
             fileCollection = _.reject(fileCollection, function (item) {
-                return item.id === propertyId;
+                return item.alias === propertyAlias;
             });
             for (var i = 0; i < files.length; i++) {
                 //save the file object to the files collection
-                fileCollection.push({ id: propertyId, file: files[i] });
+                fileCollection.push({ alias: propertyAlias, file: files[i] });
             }
         },
         
