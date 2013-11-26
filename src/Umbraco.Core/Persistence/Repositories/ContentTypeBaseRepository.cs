@@ -261,6 +261,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 foreach (var item in items)
                 {
                     //Before a PropertyType can be deleted, all Properties based on that PropertyType should be deleted.
+                    Database.Delete<TagRelationshipDto>("WHERE propertyTypeId = @Id", new { Id = item });
                     Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new {Id = item});
                     Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND id = @PropertyTypeId",
                                                      new {Id = entity.Id, PropertyTypeId = item});
