@@ -417,6 +417,7 @@
     <Compile Include="Models\Trees\CreateChildEntity.cs" />
     <Compile Include="Models\Trees\MenuItemList.cs" />
     <Compile Include="Trees\TreeControllerBase.cs" />
+    <Compile Include="UI\JavaScript\AssetInitialization.cs" />
     <Compile Include="UI\JavaScript\CssInitialization.cs" />
     <Compile Include="umbraco.presentation\umbraco\create.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>

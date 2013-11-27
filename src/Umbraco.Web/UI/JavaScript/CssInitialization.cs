@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using ClientDependency.Core;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ using Umbraco.Core.Manifest;
 
 namespace Umbraco.Web.UI.JavaScript
 {
-    internal class CssInitialization
+    internal class CssInitialization : AssetInitialization
     {
         private readonly ManifestParser _parser;
 
@@ -28,6 +29,9 @@ namespace Umbraco.Web.UI.JavaScript
             {
                 ManifestParser.MergeJArrays(merged, m.StylesheetInitialize);
             }
+
+            //now we can optimize if in release mode
+            merged = CheckIfReleaseAndOptimized(merged, ClientDependencyType.Css);
 
             return ParseMain(merged);
         }
