@@ -312,6 +312,7 @@
     <Compile Include="Models\ContentEditing\EntityTypeSearchResult.cs" />
     <Compile Include="Models\IRenderModel.cs" />
     <Compile Include="Models\RenderModelOfTContent.cs" />
+    <Compile Include="Mvc\MinifyJavaScriptResultAttribute.cs" />
     <Compile Include="Mvc\UmbracoTemplatePageOfTContent.cs" />
     <Compile Include="Mvc\UmbracoViewPage.cs" />
     <Compile Include="Editors\LogController.cs" />

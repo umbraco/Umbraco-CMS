@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
+using System.Web.UI;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -59,6 +60,8 @@ namespace Umbraco.Web.Editors
         /// Returns the JavaScript object representing the static server variables javascript object
         /// </summary>
         /// <returns></returns>
+        [MinifyJavaScriptResult(Order = 0)] 
+        [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Any, Duration = 5000)]
         public JavaScriptResult ServerVariables()
         {
             //now we need to build up the variables
