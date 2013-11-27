@@ -155,15 +155,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="Our.Umbraco.uGoLive">
-      <HintPath>..\packages\uGoLive.1.4.0\lib\Our.Umbraco.uGoLive.dll</HintPath>
-    </Reference>
-    <Reference Include="Our.Umbraco.uGoLive.47x">
-      <HintPath>..\packages\uGoLive.1.4.0\lib\Our.Umbraco.uGoLive.47x.dll</HintPath>
-    </Reference>
-    <Reference Include="Our.Umbraco.uGoLive.Checks">
-      <HintPath>..\packages\uGoLive.1.4.0\lib\Our.Umbraco.uGoLive.Checks.dll</HintPath>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>

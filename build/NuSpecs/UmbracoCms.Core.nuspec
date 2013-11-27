@@ -45,9 +45,6 @@
         <file src="..\_BuildOutput\WebApp\bin\log4net.dll" target="lib\log4net.dll" />
         <file src="..\_BuildOutput\WebApp\bin\Microsoft.ApplicationBlocks.Data.dll" target="lib\Microsoft.ApplicationBlocks.Data.dll" />
         <file src="..\_BuildOutput\WebApp\bin\Microsoft.Web.Helpers.dll" target="lib\Microsoft.Web.Helpers.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\Our.Umbraco.uGoLive.47x.dll" target="lib\Our.Umbraco.uGoLive.47x.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\Our.Umbraco.uGoLive.Checks.dll" target="lib\Our.Umbraco.uGoLive.Checks.dll" />
-        <file src="..\_BuildOutput\WebApp\bin\Our.Umbraco.uGoLive.dll" target="lib\Our.Umbraco.uGoLive.dll" />
         <file src="..\_BuildOutput\WebApp\bin\SQLCE4Umbraco.dll" target="lib\SQLCE4Umbraco.dll" />
         <file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.dll" target="lib\System.Data.SqlServerCe.dll" />
         <file src="..\_BuildOutput\WebApp\bin\System.Data.SqlServerCe.Entity.dll" target="lib\System.Data.SqlServerCe.Entity.dll" />

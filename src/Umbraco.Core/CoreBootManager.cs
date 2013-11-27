@@ -64,7 +64,7 @@ namespace Umbraco.Core
 	        InitializeProfilerResolver();
 
             _timer = DisposableTimer.DebugDuration<CoreBootManager>("Umbraco application starting", "Umbraco application startup complete");
-
+            
 	        CreateApplicationCache();
 
             //Create the legacy prop-eds mapping
@@ -223,10 +223,7 @@ namespace Umbraco.Core
 				throw new InvalidOperationException("The boot manager has already been completed");
 
 		    FreezeResolution();
-
-			//stop the timer and log the output
-			_timer.Dispose();
-
+            
             //call OnApplicationStarting of each application events handler
             ApplicationEventsResolver.Current.ApplicationEventHandlers
                 .ForEach(x => x.OnApplicationStarted(UmbracoApplication, ApplicationContext));
@@ -243,6 +240,9 @@ namespace Umbraco.Core
 
             // we're ready to serve content!
             ApplicationContext.IsReady = true;
+
+            //stop the timer and log the output
+            _timer.Dispose();
 
 			return this;
 		}
