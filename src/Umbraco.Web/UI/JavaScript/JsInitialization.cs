@@ -1,9 +1,15 @@
-﻿using System.IO;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
+using System.Web;
+using ClientDependency.Core;
+using ClientDependency.Core.Config;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
+using System.Linq;
 
 namespace Umbraco.Web.UI.JavaScript
 {
@@ -47,9 +53,54 @@ namespace Umbraco.Web.UI.JavaScript
                 ManifestParser.MergeJArrays(umbracoInit, additionalJsFiles);
             }
 
+            //now we can optimize if in release mode
+            umbracoInit = CheckIfReleaseAndOptimized(umbracoInit);
+
             return ParseMain(
                 umbracoInit.ToString(),
                 IOHelper.ResolveUrl(SystemDirectories.Umbraco));
+        }
+
+        /// <summary>
+        /// This will check if we're in release mode, if so it will create a CDF URL to load them all in at once
+        /// </summary>
+        /// <param name="fileRefs"></param>
+        /// <returns></returns>
+        internal JArray CheckIfReleaseAndOptimized(JArray fileRefs)
+        {
+            if (HttpContext.Current != null && HttpContext.Current.IsDebuggingEnabled == false)
+            {
+                return GetOptimized(fileRefs);
+            }
+            return fileRefs;
+        }
+
+        internal JArray GetOptimized(JArray fileRefs)
+        {
+            var depenencies = fileRefs.Select(x =>
+                {
+                    var asString = x.ToString();
+                    if (asString.StartsWith("/") == false)
+                    {
+                        if (Uri.IsWellFormedUriString(asString, UriKind.Relative))
+                        {
+                            var absolute = new Uri(HttpContext.Current.Request.Url, asString);                            
+                            return new JavascriptFile(absolute.AbsolutePath);
+                        }
+                        return null;
+                    }
+                    return new JavascriptFile(asString);
+                }).Where(x => x != null);
+
+            var urls = ClientDependencySettings.Instance.DefaultCompositeFileProcessingProvider.ProcessCompositeList(
+                depenencies, ClientDependencyType.Javascript, new HttpContextWrapper(HttpContext.Current));
+
+            var result = new JArray();
+            foreach (var u in urls)
+            {
+                result.Add(u);
+            }
+            return result;
         }
 
         /// <summary>
@@ -59,8 +110,13 @@ namespace Umbraco.Web.UI.JavaScript
         internal static JArray GetDefaultInitialization()
         {
             var init = Resources.JsInitialize;
-            var jArr = JsonConvert.DeserializeObject<JArray>(init);
-            return jArr;
+            var deserialized = JsonConvert.DeserializeObject<JArray>(init);
+            var result = new JArray();
+            foreach (var j in deserialized.Where(j => j.Type == JTokenType.String))
+            {
+                result.Add(j);
+            }
+            return result;
         }
 
         /// <summary>
