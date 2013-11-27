@@ -63,26 +63,6 @@ angular.module('umbraco.services').factory('umbSessionStorage', umbSessionStorag
 
 /**
  * @ngdoc function
- * @name umbraco.services.legacyJsLoader
- * @function
- *
- * @description
- * Used to lazy load in any JS dependencies that need to be manually loaded in
- */
-function legacyJsLoader(assetsService, umbRequestHelper) {
-    return {
-        
-        /** Called to load in the legacy tree js which is required on startup if a user is logged in or 
-         after login, but cannot be called until they are authenticated which is why it needs to be lazy loaded. */
-        loadLegacyTreeJs: function(scope) {
-            return assetsService.loadJs(umbRequestHelper.getApiUrl("legacyTreeJs", "", ""), scope);
-        }  
-    };
-}
-angular.module('umbraco.services').factory('legacyJsLoader', legacyJsLoader);
-
-/**
- * @ngdoc function
  * @name umbraco.services.updateChecker
  * @function
  *

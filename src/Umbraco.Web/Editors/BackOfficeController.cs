@@ -40,6 +40,8 @@ namespace Umbraco.Web.Editors
         /// Returns the JavaScript main file including all references found in manifests
         /// </summary>
         /// <returns></returns>
+        [MinifyJavaScriptResult(Order = 0)]
+        [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Any, Duration = 5000)]
         public JavaScriptResult Application()
         {
             var plugins = new DirectoryInfo(Server.MapPath("~/App_Plugins"));
@@ -60,10 +62,13 @@ namespace Umbraco.Web.Editors
         /// Returns the JavaScript object representing the static server variables javascript object
         /// </summary>
         /// <returns></returns>
-        [MinifyJavaScriptResult(Order = 0)] 
-        [OutputCache(Order = 1, VaryByParam = "none", Location = OutputCacheLocation.Any, Duration = 5000)]
+        [UmbracoAuthorize(Order = 0)]
+        [MinifyJavaScriptResult(Order = 1)] 
+        [OutputCache(Order = 2, VaryByParam = "none", Location = OutputCacheLocation.Any, Duration = 5000)]
         public JavaScriptResult ServerVariables()
         {
+            //authenticationApiBaseUrl
+
             //now we need to build up the variables
             var d = new Dictionary<string, object>
                 {
@@ -247,7 +252,9 @@ namespace Umbraco.Web.Editors
         /// Returns the JavaScript blocks for any legacy trees declared
         /// </summary>
         /// <returns></returns>
-        [UmbracoAuthorize]
+        [UmbracoAuthorize(Order = 0)]
+        [MinifyJavaScriptResult(Order = 1)]
+        [OutputCache(Order = 2, VaryByParam = "none", Location = OutputCacheLocation.Any, Duration = 5000)]
         public JavaScriptResult LegacyTreeJs()
         {            
             var javascript = new StringBuilder();

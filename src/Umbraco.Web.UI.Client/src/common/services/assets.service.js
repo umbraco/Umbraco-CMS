@@ -41,9 +41,36 @@
  * </pre>  
  */
 angular.module('umbraco.services')
-.factory('assetsService', function ($q, $log, angularHelper) {
+.factory('assetsService', function ($q, $log, angularHelper, umbRequestHelper, $rootScope) {
+
+    var initAssetsLoaded = false;
 
     return {
+        
+        /** 
+            Internal method. This is called when the application is loading and the user is already authenticated, or once the user is authenticated.
+            There's a few assets the need to be loaded for the application to function but these assets require authentication to load.
+        */
+        _loadInitAssets: function () {
+            var deferred = $q.defer();
+            //here we need to ensure the required application assets are loaded
+            if (initAssetsLoaded === false) {
+                var self = this;
+                self.loadJs(umbRequestHelper.getApiUrl("serverVarsJs", "", ""), $rootScope).then(function() {
+                    initAssetsLoaded = true;
+
+                    //now we need to go get the legacyTreeJs - but this can be done async without waiting.
+                    self.loadJs(umbRequestHelper.getApiUrl("legacyTreeJs", "", ""), $rootScope);
+
+                    deferred.resolve();
+                });
+            }
+            else {
+                deferred.resolve();
+            }
+            return deferred.promise;
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.services.assetsService#loadCss

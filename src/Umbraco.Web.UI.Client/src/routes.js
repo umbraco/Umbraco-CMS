@@ -4,9 +4,11 @@ app.config(function ($routeProvider) {
         Depending on whether isRequired = true, it first check if the user is authenticated and will resolve successfully
         otherwise the route will fail and the $routeChangeError event will execute, in that handler we will redirect to the rejected
         path that is resolved from this method and prevent default (prevent the route from executing) */
-    var checkAuth = function(isRequired) {
+    var canRoute = function(isRequired) {
+        
         return {
-            isAuthenticated: function ($q, userService, $route) {
+            /** Checks that the user is authenticated, then ensures that are requires assets are loaded */
+            isAuthenticatedAndReady: function ($q, userService, $route, assetsService) {
                 var deferred = $q.defer();
 
                 //don't need to check if we've redirected to login and we've already checked auth
@@ -17,15 +19,21 @@ app.config(function ($routeProvider) {
                 
                 userService.isAuthenticated()
                     .then(function () {
-                        if (isRequired) {
-                            //this will resolve successfully so the route will continue
-                            deferred.resolve(true);
-                        }
-                        else {
-                            deferred.reject({ path: "/" });
-                        }
+
+                        assetsService._loadInitAssets().then(function() {
+                            //is auth, check if we allow or reject
+                            if (isRequired) {
+                                //this will resolve successfully so the route will continue
+                                deferred.resolve(true);
+                            }
+                            else {
+                                deferred.reject({ path: "/" });
+                            }
+                        });
+
                     }, function () {
-                        if (isRequired) {                            
+                        //not auth, check if we allow or reject
+                        if (isRequired) {
                             //the check=false is checked above so that we don't have to make another http call to check
                             //if they are logged in since we already know they are not.
                             deferred.reject({ path: "/login", search: { check: false } });
@@ -43,8 +51,8 @@ app.config(function ($routeProvider) {
     $routeProvider
         .when('/login', {
             templateUrl: 'views/common/login.html',
-            //ensure auth is *not* required so it will redirect to /content otherwise
-            resolve: checkAuth(false)
+            //ensure auth is *not* required so it will redirect to / 
+            resolve: canRoute(false)
         })
         .when('/:section', {
             templateUrl: function (rp) {
@@ -56,7 +64,7 @@ app.config(function ($routeProvider) {
                 rp.url = "dashboard.aspx?app=" + rp.section;
                 return 'views/common/dashboard.html';
             },
-            resolve: checkAuth(true)
+            resolve: canRoute(true)
         })
         .when('/:section/framed/:url', {
             //This occurs when we need to launch some content in an iframe
@@ -66,7 +74,7 @@ app.config(function ($routeProvider) {
 
                 return 'views/common/legacy.html';
             },
-            resolve: checkAuth(true)
+            resolve: canRoute(true)
         })              
         .when('/:section/:tree/:method', {
             templateUrl: function (rp) {
@@ -81,7 +89,7 @@ app.config(function ($routeProvider) {
 
                 return 'views/' + rp.tree + '/' + rp.method + '.html';
             },
-            resolve: checkAuth(true)
+            resolve: canRoute(true)
         })
         .when('/:section/:tree/:method/:id', {
             //This allows us to dynamically change the template for this route since you cannot inject services into the templateUrl method.
@@ -112,7 +120,7 @@ app.config(function ($routeProvider) {
                 }
                 
             },            
-            resolve: checkAuth(true)
+            resolve: canRoute(true)
         })        
         .otherwise({ redirectTo: '/login' });
     }).config(function ($locationProvider) {

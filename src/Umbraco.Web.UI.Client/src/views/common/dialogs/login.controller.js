@@ -1,4 +1,4 @@
-﻿angular.module("umbraco").controller("Umbraco.Dialogs.LoginController", function ($scope, userService, legacyJsLoader, $routeParams, $window) {
+﻿angular.module("umbraco").controller("Umbraco.Dialogs.LoginController", function ($scope, userService) {
     
     /**
      * @ngdoc function

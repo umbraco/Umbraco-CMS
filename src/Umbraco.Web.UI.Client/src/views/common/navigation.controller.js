@@ -99,8 +99,8 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
         $scope.authenticated = false;
     });
 
-    //when a user is authorized setup the data
-    $scope.$on("authenticated", function (evt, data) {
+    //when the application is ready and the user is authorized setup the data
+    $scope.$on("ready", function (evt, data) {
         $scope.authenticated = true;
     });
 

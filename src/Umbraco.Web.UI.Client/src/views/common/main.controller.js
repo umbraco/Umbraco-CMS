@@ -8,10 +8,8 @@
  * The main application controller
  * 
  */
-function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, legacyJsLoader, updateChecker) {
+function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, updateChecker, assetsService, umbRequestHelper) {
 
-    var legacyTreeJsLoaded = false;
-    
     //the null is important because we do an explicit bool check on this in the view
     //the avatar is by default the umbraco logo    
     $scope.authenticated = null;
@@ -56,19 +54,9 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
         $scope.user = null;
     });
     
-    //when a user is authorized setup the data
-    $scope.$on("authenticated", function (evt, data) {
-
-        //We need to load in the legacy tree js but only once no matter what user has logged in 
-        if (!legacyTreeJsLoaded) {
-            legacyJsLoader.loadLegacyTreeJs($scope).then(
-                function (result) {
-                    legacyTreeJsLoaded = true;
-
-                    //TODO: We could wait for this to load before running the UI ?
-                });
-        }
-
+    //when the app is read/user is logged in, setup the data
+    $scope.$on("ready", function (evt, data) {
+        
         $scope.authenticated = data.authenticated;
         $scope.user = data.user;
 

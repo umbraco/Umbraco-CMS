@@ -2,6 +2,8 @@
 @using Umbraco.Core
 @using ClientDependency.Core
 @using ClientDependency.Core.Mvc
+@using Umbraco.Web
+@using Umbraco.Web.Editors
 @using umbraco
 @inherits System.Web.Mvc.WebViewPage
 @{
@@ -37,8 +39,20 @@
     <umb-notifications></umb-notifications>
 
 
-    @*Currently this needs to be loaded before anything*@
-    <script src="@Url.Action("ServerVariables", "BackOffice")" type="text/javascript"></script>
+    @*
+        These are the bare minimal server variables that are required for the application to start without being authenticated,
+        we will load the rest of the server vars after the user is authenticated.
+    *@    
+    <script type="text/javascript">
+        var Umbraco = {};
+        Umbraco.Sys = {};
+        Umbraco.Sys.ServerVariables = {
+            "umbracoUrls": {                
+                "authenticationApiBaseUrl": "@(Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>(controller => controller.PostLogin(null, null)))",
+                "serverVarsJs": '@Url.Action("ServerVariables", "BackOffice")'
+            }
+        };       
+    </script>
 
     @*And finally we can load in our angular app*@
     <script type="text/javascript" src="lib/yepnope/yepnope.min.js"></script>
