@@ -10,7 +10,7 @@ namespace Umbraco.Web.Models.Mapping
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
-            config.CreateMap<Section, Core.Models.Section>()
+            config.CreateMap<Core.Models.Section, Section>()
                 .ForMember(
                       dto => dto.Name,
                       expression => expression.MapFrom(section => ui.Text("sections", section.Alias)))
