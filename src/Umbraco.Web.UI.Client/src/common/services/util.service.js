@@ -570,21 +570,23 @@ function iconHelper($q, $timeout) {
                     for (var i = document.styleSheets.length - 1; i >= 0; i--) {
                         var classes = document.styleSheets[i].rules || document.styleSheets[i].cssRules;
                         
-                        for(var x=0;x<classes.length;x++) {
-                            var cur = classes[x];
-                            if(cur.selectorText && cur.selectorText.indexOf(c) === 0) {
-                                var s = cur.selectorText.substring(1);
-                                var hasSpace = s.indexOf(" ");
-                                if(hasSpace>0){
-                                    s = s.substring(0, hasSpace);
-                                }
-                                var hasPseudo = s.indexOf(":");
-                                if(hasPseudo>0){
-                                    s = s.substring(0, hasPseudo);
-                                }
+                        if (classes !== null) {
+                            for(var x=0;x<classes.length;x++) {
+                                var cur = classes[x];
+                                if(cur.selectorText && cur.selectorText.indexOf(c) === 0) {
+                                    var s = cur.selectorText.substring(1);
+                                    var hasSpace = s.indexOf(" ");
+                                    if(hasSpace>0){
+                                        s = s.substring(0, hasSpace);
+                                    }
+                                    var hasPseudo = s.indexOf(":");
+                                    if(hasPseudo>0){
+                                        s = s.substring(0, hasPseudo);
+                                    }
 
-                                if(collectedIcons.indexOf(s) < 0){
-                                    collectedIcons.push(s);
+                                    if(collectedIcons.indexOf(s) < 0){
+                                        collectedIcons.push(s);
+                                    }
                                 }
                             }
                         }
