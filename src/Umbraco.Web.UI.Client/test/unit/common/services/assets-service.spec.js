@@ -1,23 +1,33 @@
-describe('keyboard service tests', function () {
+describe('Assets service tests', function () {
    var assetsService, $window, $rootScope;
    beforeEach(module('umbraco.services'));
+   beforeEach(module('umbraco.mocks.services'));
+
    beforeEach(inject(function ($injector) {
         assetsService = $injector.get('assetsService');
         $window = $injector.get("$window");
         $rootScope = $injector.get('$rootScope');
    }));
 
+   afterEach(inject(function($rootScope) {
+     $rootScope.$apply();
+   }));
+
    describe('Loading js assets', function () {
         
         it('Loads a javascript file', function () {
-            assetsService.loadJs("base/lib/umbraco/NamespaceManager.js").then(function(){
-                console.log("loaded");
-            });
-            
-            //this currently doesnt work, the test server returns 404
-            $rootScope.$digest();
-        });
-        
 
+          var loaded = false;
+          runs( function(){
+                assetsService.loadJs("lib/umbraco/NamespaceManager.js").then(function(){
+                    console.log( "done" );
+                    expect(Umbraco.Sys).toNotBe(undefined);
+                });
+          });
+          runs(function(){
+            console.log( "asserting" );
+             expect(Umbraco.Sys).toNotBe(undefined);
+          });
+        });
     });
 });
