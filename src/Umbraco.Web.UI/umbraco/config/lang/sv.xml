@@ -81,7 +81,7 @@
     <key alias="linkInsert">Infoga länk</key>
     <key alias="linkLocal">Infoga intern länk (ankare)</key>
     <key alias="listBullet">Punktlista</key>
-    <key alias="listNumeric">Numerad lista</key>
+    <key alias="listNumeric">Numrerad lista</key>
     <key alias="macroInsert">Infoga macro</key>
     <key alias="pictureInsert">Infoga bild</key>
     <key alias="relations">Ändra relation</key>
