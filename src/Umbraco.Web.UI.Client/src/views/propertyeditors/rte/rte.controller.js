@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.RTEController",
-    function ($rootScope, $element, $scope, $q, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource) {
+    function ($rootScope, $scope, $q, dialogService, $log, imageHelper, assetsService, $timeout, tinyMceService, angularHelper, stylesheetResource) {
 
         tinyMceService.configuration().then(function(tinyMceConfig){
 
@@ -115,7 +115,7 @@ angular.module("umbraco")
                                 //when the element is disposed we need to unsubscribe!
                                 // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom 
                                 // element might still be there even after the modal has been hidden.
-                                $element.bind('$destroy', function () {
+                                $scope.$on('$destroy', function(){
                                     unsubscribe();
                                 });
 
