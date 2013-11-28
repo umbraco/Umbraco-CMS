@@ -56,7 +56,7 @@ namespace Umbraco.Web.Models.Trees
 
             var customMenuItem = new TMenuItem
                 {
-                    Name = item.Alias,
+                    Name = item.Name,
                     Alias = item.Alias,
                     SeperatorBefore = hasSeparator,
                     Icon = item.Icon,
