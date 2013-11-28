@@ -117,7 +117,6 @@ namespace umbraco.cms.presentation.settings.scripts
 
 
             SaveButton = Panel1.Menu.NewButton();
-            SaveButton.Icon = "save";
             SaveButton.Text = ui.Text("save");
             SaveButton.ButtonType = MenuButtonType.Primary;
             SaveButton.ID = "save";
