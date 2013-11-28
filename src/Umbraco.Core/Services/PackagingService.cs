@@ -736,6 +736,21 @@ namespace Umbraco.Core.Services
 
         #region DataTypes
 
+        /// <summary>
+        /// Export a list of data types
+        /// </summary>
+        /// <param name="dataTypeDefinitions"></param>
+        /// <returns></returns>
+        internal XElement Export(IEnumerable<IDataTypeDefinition >dataTypeDefinitions)
+        {
+            var container = new XElement("DataTypes");
+            foreach (var d in dataTypeDefinitions)
+            {
+                container.Add(Export(d));
+            }
+            return container;
+        }
+
         internal XElement Export(IDataTypeDefinition dataTypeDefinition)
         {
             var prevalues = new XElement("PreValues");
@@ -848,8 +863,19 @@ namespace Umbraco.Core.Services
                 var dataTypeDefinitionName = dataTypeElement.Attribute("Name").Value;
                 var dataTypeDefinition = dataTypes.First(x => x.Name == dataTypeDefinitionName);
 
-                var values = prevaluesElement.Elements("PreValue").Select(prevalue => prevalue.Attribute("Value").Value).ToList();
-                _dataTypeService.SavePreValues(dataTypeDefinition.Id, values);
+                var valuesWithoutKeys = prevaluesElement.Elements("PreValue")
+                                                        .Where(x => ((string) x.Attribute("Alias")).IsNullOrWhiteSpace())
+                                                        .Select(x => x.Attribute("Value").Value);
+
+                var valuesWithKeys = prevaluesElement.Elements("PreValue")
+                                                     .Where(x => ((string) x.Attribute("Alias")).IsNullOrWhiteSpace() == false)
+                                                     .ToDictionary(key => (string) key.Attribute("Alias"), val => new PreValue((string) val.Attribute("Value")));
+                
+                //save the values with keys
+                _dataTypeService.SavePreValues(dataTypeDefinition.Id, valuesWithKeys);
+
+                //save the values without keys (this is legacy)
+                _dataTypeService.SavePreValues(dataTypeDefinition.Id, valuesWithoutKeys);
             }
         }
 

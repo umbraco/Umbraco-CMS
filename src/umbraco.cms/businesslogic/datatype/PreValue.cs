@@ -40,8 +40,16 @@ namespace umbraco.cms.businesslogic.datatype
         public PreValue(int Id, int SortOrder, string Value)
         {
             _id = Id;
-            _sortOrder = SortOrder;
-            _value = Value;
+            this.SortOrder = SortOrder;
+            this.Value = Value;
+        }
+
+        public PreValue(int id, int sortOrder, string value, string alias)
+        {
+            _id = id;
+            SortOrder = sortOrder;
+            Value = value;
+            Alias = alias;
         }
 
         /// <summary>
@@ -51,7 +59,7 @@ namespace umbraco.cms.businesslogic.datatype
         public PreValue(int Id)
         {
             _id = Id;
-            initialize();
+            Initialize();
         }
 
         /// <summary>
@@ -61,14 +69,14 @@ namespace umbraco.cms.businesslogic.datatype
         /// <param name="Value">The value.</param>
         public PreValue(int DataTypeId, string Value)
         {
-            object id = SqlHelper.ExecuteScalar<object>(
+            var id = SqlHelper.ExecuteScalar<object>(
                 "Select id from cmsDataTypePreValues where [Value] = @value and DataTypeNodeId = @dataTypeId",
                 SqlHelper.CreateParameter("@dataTypeId", DataTypeId),
                 SqlHelper.CreateParameter("@value", Value));
             if (id != null)
                 _id = int.Parse(id.ToString());
 
-            initialize();
+            Initialize();
         } 
         #endregion
 
@@ -90,22 +98,18 @@ namespace umbraco.cms.businesslogic.datatype
         }
 
         #region Private members
-        private int _dataTypeId;
+
         private int? _id;
-        private string _value;
-        private int _sortOrder; 
+
         #endregion
 
         #region Public properties
+
         /// <summary>
         /// Gets or sets the data type id.
         /// </summary>
         /// <value>The data type id.</value>
-        public int DataTypeId
-        {
-            get { return _dataTypeId; }
-            set { _dataTypeId = value; }
-        }
+        public int DataTypeId { get; set; }
 
         /// <summary>
         /// Gets or sets the id.
@@ -121,21 +125,20 @@ namespace umbraco.cms.businesslogic.datatype
         /// Gets or sets the value.
         /// </summary>
         /// <value>The value.</value>
-        public string Value
-        {
-            get { return _value; }
-            set { _value = value; }
-        }
+        public string Value { get; set; }
 
         /// <summary>
         /// Gets or sets the sort order.
         /// </summary>
         /// <value>The sort order.</value>
-        public int SortOrder
-        {
-            get { return _sortOrder; }
-            set { _sortOrder = value; }
-        } 
+        public int SortOrder { get; set; }
+
+        /// <summary>
+        /// Gets or sets the sort order.
+        /// </summary>
+        /// <value>The sort order.</value>
+        public string Alias { get; set; }
+
         #endregion
 
         #region Public methods
@@ -164,27 +167,29 @@ namespace umbraco.cms.businesslogic.datatype
             if (Id == 0)
             {
                 // Update sortOrder
-                object tempSortOrder = SqlHelper.ExecuteScalar<object>("select max(sortorder) from cmsDataTypePreValues where datatypenodeid = @dataTypeId", SqlHelper.CreateParameter("@dataTypeId", DataTypeId));
-                int _sortOrder = 0;
+                var tempSortOrder = SqlHelper.ExecuteScalar<object>("select max(sortorder) from cmsDataTypePreValues where datatypenodeid = @dataTypeId", SqlHelper.CreateParameter("@dataTypeId", DataTypeId));
+                var sortOrder = 0;
 
-                if (tempSortOrder != null && int.TryParse(tempSortOrder.ToString(), out _sortOrder))
-                    SortOrder = _sortOrder + 1;
+                if (tempSortOrder != null && int.TryParse(tempSortOrder.ToString(), out sortOrder))
+                    SortOrder = sortOrder + 1;
                 else
                     SortOrder = 1;
 
-                IParameter[] SqlParams = new IParameter[] {
+                var sqlParams = new IParameter[] {
 								SqlHelper.CreateParameter("@value",Value),
-								SqlHelper.CreateParameter("@dtdefid",DataTypeId)};
+								SqlHelper.CreateParameter("@dtdefid",DataTypeId),
+                                SqlHelper.CreateParameter("@alias",Alias)};
                 // The method is synchronized
-                SqlHelper.ExecuteNonQuery("INSERT INTO cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) VALUES (@dtdefid,@value,0,'')", SqlParams);
+                SqlHelper.ExecuteNonQuery("INSERT INTO cmsDataTypePreValues (datatypenodeid,[value],sortorder,alias) VALUES (@dtdefid,@value,0,'@alias')", sqlParams);
                 _id = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM cmsDataTypePreValues");
             }
 
             SqlHelper.ExecuteNonQuery(
-                "update cmsDataTypePreValues set sortorder = @sortOrder, [value] = @value where id = @id",
+                "update cmsDataTypePreValues set sortorder = @sortOrder, [value] = @value, alias = @alias where id = @id",
                 SqlHelper.CreateParameter("@sortOrder", SortOrder),
                 SqlHelper.CreateParameter("@value", Value),
-                SqlHelper.CreateParameter("@id", Id));
+                SqlHelper.CreateParameter("@id", Id),
+                SqlHelper.CreateParameter("@alias", Alias));
         } 
         
         #endregion
@@ -193,15 +198,16 @@ namespace umbraco.cms.businesslogic.datatype
         /// <summary>
         /// Initializes this instance.
         /// </summary>
-        private void initialize()
+        private void Initialize()
         {
-            IRecordsReader dr = SqlHelper.ExecuteReader(
-                 "Select id, sortorder, [value] from cmsDataTypePreValues where id = @id order by sortorder",
+            var dr = SqlHelper.ExecuteReader(
+                 "Select id, sortorder, [value], alias from cmsDataTypePreValues where id = @id order by sortorder",
                  SqlHelper.CreateParameter("@id", Id));
             if (dr.Read())
             {
-                _sortOrder = dr.GetInt("sortorder");
-                _value = dr.GetString("value");
+                SortOrder = dr.GetInt("sortorder");
+                Value = dr.GetString("value");
+                Alias = dr.GetString("alias");
             }
             dr.Close();
         } 

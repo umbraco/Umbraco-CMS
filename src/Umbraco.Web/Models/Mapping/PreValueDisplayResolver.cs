@@ -24,40 +24,21 @@ namespace Umbraco.Web.Models.Mapping
         /// Maps pre-values in the dictionary to the values for the fields
         /// </summary>
         /// <param name="fields"></param>
-        /// <param name="preValues"></param>
-        /// <param name="isDictionaryBased"></param>
-        internal static void MapPreValueValuesToPreValueFields(PreValueFieldDisplay[] fields, IDictionary<string, object> preValues, bool isDictionaryBased)
+        /// <param name="preValues"></param>        
+        internal static void MapPreValueValuesToPreValueFields(PreValueFieldDisplay[] fields, IDictionary<string, object> preValues)
         {
             if (fields == null) throw new ArgumentNullException("fields");
             if (preValues == null) throw new ArgumentNullException("preValues");
-            //now we need to wire up the pre-values values with the actual fields defined
-            var currentIndex = 0; //used if the collection is non-dictionary based.
+            //now we need to wire up the pre-values values with the actual fields defined            
             foreach (var field in fields)
             {
-                if (isDictionaryBased == false)
+                var found = preValues.Any(x => x.Key.InvariantEquals(field.Key));
+                if (found == false)
                 {
-                    //we'll just need to wire up the values based on the order that the pre-values are stored
-                    var found = preValues.Any(x => x.Key.InvariantEquals(currentIndex.ToInvariantString()));
-                    if (found == false)
-                    {
-                        LogHelper.Warn<PreValueDisplayResolver>("Could not find persisted pre-value for index " + currentIndex);
-                        continue;
-                    }
-                    field.Value = preValues.Single(x => x.Key.InvariantEquals(currentIndex.ToInvariantString())).Value.ToString();
-                    currentIndex++;
+                    LogHelper.Warn<PreValueDisplayResolver>("Could not find persisted pre-value for field " + field.Key);
+                    continue;
                 }
-                else
-                {
-                    var found = preValues.Any(x => x.Key.InvariantEquals(field.Key));
-                    if (found == false)
-                    {
-                        LogHelper.Warn<PreValueDisplayResolver>("Could not find persisted pre-value for field " + field.Key);
-                        continue;
-                    }
-                    field.Value = preValues.Single(x => x.Key.InvariantEquals(field.Key)).Value;
-                }
-
-
+                field.Value = preValues.Single(x => x.Key.InvariantEquals(field.Key)).Value;
             }
         }
 
@@ -86,7 +67,7 @@ namespace Umbraco.Web.Models.Mapping
                 dictionaryVals = propEd.PreValueEditor.ConvertDbToEditor(propEd.DefaultPreValues, preVals);
             }
 
-            MapPreValueValuesToPreValueFields(result, dictionaryVals, preVals.IsDictionaryBased);
+            MapPreValueValuesToPreValueFields(result, dictionaryVals);
 
             return result;
         }
