@@ -44,11 +44,11 @@
   <area alias="assignDomain">
     <key alias="addNew">Lägg till nytt domännamn</key>
     <key alias="domain">Domännamn</key>
-    <key alias="domainCreated">Har skapat domännamnet '{0}'</key>
-    <key alias="domainDeleted">Har tagit bort domännamnet '{0}'</key>
+    <key alias="domainCreated">Har skapat domännamnet {0}</key>
+    <key alias="domainDeleted">Har tagit bort domännamnet {0}</key>
     <key alias="domainExists">Domänen {0} är redan tillagd</key>
     <key alias="domainHelp">t.ex.: dittdomannamn.se, www.dittdomannamn.se</key>
-    <key alias="domainUpdated">Domännamnet '{0}' har uppdaterats</key>
+    <key alias="domainUpdated">Domännamnet {0} har uppdaterats</key>
     <key alias="duplicateDomain">Domänen är redan tilldelad</key>
     <key alias="inherit">Ärv</key>
     <key alias="invalidDomain">Ogiltigt domännamn</key>
@@ -92,7 +92,7 @@
     <key alias="selectCurrentFolder">Välj aktuell mapp</key>
     <key alias="showPage">Förhandsgranska</key>
     <key alias="showPageDisabled">Förhandsgranskning är avstängt på grund av att det inte finns någon mall tilldelad</key>
-    <key alias="somethingElse">Gör någonting annat</key>
+    <key alias="somethingElse">Ångra</key>
     <key alias="styleChoose">Välj stil</key>
     <key alias="styleShow">Visa stil</key>
     <key alias="tableInsert">Infoga tabell</key>
@@ -122,7 +122,7 @@
   </area>
   <area alias="content">
     <key alias="about">Om denna sida</key>
-    <key alias="alias">Alternativ länk</key>
+    <key alias="alias">Alias</key>
     <key alias="alternativeTextHelp">(hur skulle du beskriva denna bild för någon över telefon)</key>
     <key alias="alternativeUrls">Alternativa länkar</key>
     <key alias="childItems">Underliggande noder</key>
@@ -147,7 +147,7 @@
     <key alias="nodeName">Sidnamn</key>
     <key alias="notmemberof">Ej medlem av grupp(er)</key>
     <key alias="otherElements">Egenskaper</key>
-    <key alias="parentNotPublished">Detta dokument är publicerat men syns inte eftersom den överordnade sidan '{0}' inte är publicerad</key>
+    <key alias="parentNotPublished">Detta dokument är publicerat men syns inte eftersom den överordnade sidan {0} inte är publicerad</key>
     <key alias="parentNotPublishedAnomaly">Oops: detta dokument är publicerat men finns inte i cacheminnet (internt fel)</key>
     <key alias="publish">Publicera</key>
     <key alias="publishStatus">Publiceringsstatus</key>
@@ -168,7 +168,7 @@
   </area>
   <area alias="create">
     <key alias="chooseNode">Var vill du skapa den nya {0}</key>
-    <key alias="createUnder">Skapa här</key>
+    <key alias="createUnder">Skapa innehåll under</key>
     <key alias="noDocumentTypes"><![CDATA[Det finns inga giltiga dokumenttyper tillgängliga. Du måste aktivera dessa under sektionen inställningar och under <strong>"dokumenttyper"</strong>.]]></key>
     <key alias="noMediaTypes"><![CDATA[Det finns inga giltiga mediatyper tillgängliga. Du måste aktivera dessa under sektionen inställningar och under <strong>"mediatyper"</strong>.]]></key>
     <key alias="updateData">Välj typ och rubrik</key>
@@ -229,7 +229,7 @@
     <key alias="viewCacheItem">Se cachat objekt</key>
   </area>
   <area alias="dictionaryItem">
-    <key alias="description">Redigera de olika översättningarna för ordboksinlägget '{0}' nedan. Du kan lägga till ytterligare språk under 'språk' i menyn till vänster.</key>
+    <key alias="description">Redigera de olika översättningarna för ordboksinlägget {0} nedan. Du kan lägga till ytterligare språk under 'språk' i menyn till vänster.</key>
     <key alias="displayName">Språknamn</key>
   </area>
   <area alias="editcontenttype">
@@ -450,7 +450,7 @@
     <key alias="theEndBrowseSite"><![CDATA[<h3>Besök din nya webbplats</h3> Du installerade Runway, så varför inte se hur din nya webbplats ser ut.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Ytterligare hjälp och information</h3> Få hjälp från våra prisbelönta community, bläddra i dokumentationen eller titta på några gratis videor om hur man bygger en enkel webbplats, hur du använder paket eller en snabbguide till umbracos terminologi]]></key>
     <key alias="theEndHeader">Umbraco {0} är installerat och klart för användning</key>
-    <key alias="theEndInstallFailed"><![CDATA[För att avsluta installationen måste du manuellt redigera <strong>/web.config</strong> filen och ändra AppSettingsnyckeln <strong>umbracoConfigurationStatus</strong> på slutet till <strong>'{0}'</strong>]]></key>
+    <key alias="theEndInstallFailed"><![CDATA[För att avsluta installationen måste du manuellt redigera <strong>/web.config</strong> filen och ändra AppSettingsnyckeln <strong>umbracoConfigurationStatus</strong> på slutet till <strong>{0}</strong>]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Du kan <strong>börja omedelbart</strong> genom att klicka på "Starta Umbraco"-knappen nedan. <br />Om du är en <strong>ny umbraco användare</strong>kan du hitta massor av resurser på våra kom igång sidor.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Starta Umbraco</h3> För att administrera din webbplats öppnar du bara umbraco back office och börjar lägga till innehåll, uppdatera mallar och stilmallar eller lägga till nya funktioner.]]></key>
     <key alias="Unavailable">Anslutningen till databasen misslyckades.</key>
@@ -756,8 +756,8 @@
     <key alias="noTranslators">Hittade inga användare som är översättare. Vänligen skapa en användare som är översättare innan du börjar skicka innehåll för översättning</key>
     <key alias="ownedTasks">Arbetsuppgifter som du har skapat</key>
     <key alias="ownedTasksHelp"><![CDATA[Listan nedan visar sidor <strong>som du har skapat</strong>. För att se en detaljvy med kommentarer, klicka på "Detaljer" eller på sidans namn. Du kan också ladda ned sidan i XML-format genom att klicka på länken "Ladda ned XML".<br/> För att markera ett översättningsjobb som avslutat, gå till detaljvyn och klicka på knappen "Stäng".]]></key>
-    <key alias="pageHasBeenSendToTranslation">Sidan '{0}' har skickats för översättning</key>
-    <key alias="sendToTranslate">Skicka sidan '{0}' för översättning</key>
+    <key alias="pageHasBeenSendToTranslation">Sidan {0} har skickats för översättning</key>
+    <key alias="sendToTranslate">Skicka sidan {0} för översättning</key>
     <key alias="taskAssignedBy">Tilldelat av</key>
     <key alias="taskOpened">Arbetsuppgift öppnad</key>
     <key alias="totalWords">Totalt antal ord</key>
