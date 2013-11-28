@@ -680,8 +680,13 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
 	     * @description
 	     * hides the currently open dialog
 	     */
-        hideDialog: function () {
-            this.showMenu(undefined, { skipDefault: true, node: appState.getMenuState("currentNode") });
+        hideDialog: function (showMenu) {
+            
+            setMode("default");
+          
+            if(showMenu){
+                this.showMenu(undefined, { skipDefault: true, node: appState.getMenuState("currentNode") });
+            }
         },
         /**
           * @ngdoc method
