@@ -51,9 +51,9 @@ namespace Umbraco.Web.Editors
 
             //get the legacy ActionJs file references to append as well
             var legacyActionJsRef = new JArray(GetLegacyActionJs(LegacyJsActionType.JsUrl));
-
-            var result = initJs.GetJavascriptInitialization(JsInitialization.GetDefaultInitialization(), legacyActionJsRef);
-            result += initCss.GetStylesheetInitialization();
+            
+            var result = initJs.GetJavascriptInitialization(HttpContext, JsInitialization.GetDefaultInitialization(), legacyActionJsRef);
+            result += initCss.GetStylesheetInitialization(HttpContext);
            
             return JavaScript(result);
         }

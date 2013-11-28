@@ -1,4 +1,5 @@
-﻿using ClientDependency.Core;
+﻿using System.Web;
+using ClientDependency.Core;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ namespace Umbraco.Web.UI.JavaScript
         /// <summary>
         /// Processes all found manifest files and outputs yepnope.injectcss calls for all css files found in all manifests
         /// </summary>
-        public string GetStylesheetInitialization()
+        public string GetStylesheetInitialization(HttpContextBase httpContext)
         {
             var merged = new JArray();    
             foreach (var m in _parser.GetManifests())
@@ -31,7 +32,10 @@ namespace Umbraco.Web.UI.JavaScript
             }
 
             //now we can optimize if in release mode
-            merged = CheckIfReleaseAndOptimized(merged, ClientDependencyType.Css);
+            merged = CheckIfReleaseAndOptimized(merged, ClientDependencyType.Css, httpContext);
+
+            //now we need to merge in any found cdf declarations on property editors
+            ManifestParser.MergeJArrays(merged, ScanPropertyEditors(ClientDependencyType.Css, httpContext));
 
             return ParseMain(merged);
         }

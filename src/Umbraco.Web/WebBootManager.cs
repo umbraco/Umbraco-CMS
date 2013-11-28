@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
+using ClientDependency.Core.Config;
 using StackExchange.Profiling.MVCHelpers;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -27,6 +29,7 @@ using Umbraco.Web.PropertyEditors.ValueConverters;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
+using Umbraco.Web.UI.JavaScript;
 using Umbraco.Web.WebApi;
 using umbraco.BusinessLogic;
 using ProfilingViewEngine = Umbraco.Core.Profiling.ProfilingViewEngine;
@@ -84,7 +87,12 @@ namespace Umbraco.Web
 
             //add the profiling action filter
             GlobalFilters.Filters.Add(new ProfilingActionFilter());
-            
+
+            //Register a custom renderer - used to process property editor dependencies
+            var renderer = new DependencyPathRenderer();
+            renderer.Initialize("Umbraco.DependencyPathRenderer", new NameValueCollection { { "compositeFileHandlerPath", "~/DependencyHandler.axd" } });
+            ClientDependencySettings.Instance.MvcRendererCollection.Add(renderer);
+
             return this;
         }
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Web;
 using ClientDependency.Core;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -37,7 +38,7 @@ namespace Umbraco.Web.UI.JavaScript
         /// <summary>
         /// Processes all found manifest files and outputs the main.js file containing all plugin manifests
         /// </summary>
-        public string GetJavascriptInitialization(JArray umbracoInit, JArray additionalJsFiles = null)
+        public string GetJavascriptInitialization(HttpContextBase httpContext, JArray umbracoInit, JArray additionalJsFiles = null)
         {
             foreach (var m in _parser.GetManifests())
             {
@@ -51,7 +52,10 @@ namespace Umbraco.Web.UI.JavaScript
             }
 
             //now we can optimize if in release mode
-            umbracoInit = CheckIfReleaseAndOptimized(umbracoInit, ClientDependencyType.Javascript);
+            umbracoInit = CheckIfReleaseAndOptimized(umbracoInit, ClientDependencyType.Javascript, httpContext);
+
+            //now we need to merge in any found cdf declarations on property editors
+            ManifestParser.MergeJArrays(umbracoInit, ScanPropertyEditors(ClientDependencyType.Javascript, httpContext));
 
             return ParseMain(
                 umbracoInit.ToString(),
