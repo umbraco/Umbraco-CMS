@@ -530,7 +530,7 @@ Mange hilsner fra umbraco robotten
     <key alias="concierge">Concierge</key>
     <key alias="content">Indhold</key>
     <key alias="courier">Courier</key>
-    <key alias="developer">Developer</key>
+    <key alias="developer">Udvikler</key>
     <key alias="installer">Umbraco konfigurationsguide</key>
     <key alias="media">Mediearkiv</key>
     <key alias="member">Medlemmer</key>

@@ -38,6 +38,7 @@ namespace Umbraco.Web.Trees
             {
                 node.MenuUrl = "";
             }
+            node.Name = ui.Text("sections", Constants.Trees.Media);
             return node;
         }
 
