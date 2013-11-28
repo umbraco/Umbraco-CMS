@@ -84,8 +84,10 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
     
     $scope.save = function() {
 
-        if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+        if (!$scope.busy && formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
             
+            $scope.busy = true;
+
             memberResource.save($scope.content, $routeParams.create, fileManager.getFiles())
                 .then(function(data) {
 
@@ -100,7 +102,8 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     });
                     
                     editorState.set($scope.content);
-
+                    $scope.busy = false;
+                    
                     var path = buildTreePath(data);
 
                     navigationService.syncTree({ tree: "member", path: path.split(","), forceReload: true }).then(function (syncArgs) {
@@ -116,7 +119,7 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     });
                     
                     editorState.set($scope.content);
-
+                    $scope.busy = false;
                 });
         }
         

@@ -111,6 +111,8 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
     function performSave(args) {
         var deferred = $q.defer();
 
+        $scope.busy = true;
+
         if (formHelper.submitForm({ scope: $scope, statusMessage: args.statusMessage })) {
 
             args.saveMethod($scope.content, $routeParams.create, fileManager.getFiles())
@@ -125,6 +127,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
                     });
 
                     editorState.set($scope.content);
+                    $scope.busy = false;
 
                     configureButtons(data);
 
@@ -143,6 +146,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
                     });
 
                     editorState.set($scope.content);
+                    $scope.busy = false;
 
                     deferred.reject(err);
                 });
@@ -241,10 +245,14 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
     
     /** this method is called for all action buttons and then we proxy based on the btn definition */
     $scope.performAction = function(btn) {
+
         if (!btn || !angular.isFunction(btn.handler)) {
             throw "btn.handler must be a function reference";
         }
-        btn.handler.apply(this);
+        
+        if(!$scope.busy){
+            btn.handler.apply(this);    
+        }
     };
 
 }

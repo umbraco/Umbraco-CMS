@@ -46,7 +46,9 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
     
     $scope.save = function () {
 
-        if (formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+        if (!$scope.busy && formHelper.submitForm({ scope: $scope, statusMessage: "Saving..." })) {
+
+            $scope.busy = true;
 
             mediaResource.save($scope.content, $routeParams.create, fileManager.getFiles())
                 .then(function(data) {
@@ -60,6 +62,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
                     });
 
                     editorState.set($scope.content);
+                    $scope.busy = false;
 
                     navigationService.syncTree({ tree: "media", path: data.path, forceReload: true }).then(function (syncArgs) {
                         $scope.currentNode = syncArgs.node;
@@ -74,6 +77,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
                     });
                     
                     editorState.set($scope.content);
+                    $scope.busy = false;
                 });
         }
         
