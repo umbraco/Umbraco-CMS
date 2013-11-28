@@ -109,7 +109,7 @@ namespace umbraco.cms.presentation.settings.scripts
                 editorSource.CodeBase = uicontrols.CodeArea.EditorType.HTML;
 
 
-            var editor = Panel1.NewTabPage(ui.Text("script"));
+            var editor = Panel1.NewTabPage(ui.Text("settings","script"));
             editor.Controls.Add(Pane7);
 
             var props = Panel1.NewTabPage(ui.Text("properties"));
