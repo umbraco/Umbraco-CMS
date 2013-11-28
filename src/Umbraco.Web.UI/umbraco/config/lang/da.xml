@@ -70,6 +70,7 @@
     <key alias="save">Gem</key>
     <key alias="saveAndPublish">Gem og udgiv</key>
     <key alias="saveToPublish">Gem og send til udgivelse</key>
+    <key alias="select">Vælg</key>
     <key alias="showPage">Se siden</key>
     <key alias="styleChoose">Vælg formattering</key>
     <key alias="styleShow">Vis koder</key>
@@ -227,9 +228,20 @@
     <key alias="xsltErrorHeader">Fejl i XSLT kode</key>
     <key alias="xsltErrorText">Din XSLT er ikke opdateret, da det indeholdt en fejl</key>
   </area>
+
+  <area alias="placeholders">
+    <key alias="username">Indtast dit brugernavn</key>
+    <key alias="password">Indtast dit kodeord</key>
+    <key alias="nameentity">Navngiv %0%...</key>
+    <key alias="entername">Indtast navn...</key>
+    <key alias="search">Søg...</key>
+    <key alias="filter">Filtre...</key>
+  </area>
+
   <area alias="general">
     <key alias="about">Om</key>
     <key alias="action">Handling</key>
+    <key alias="actions">Muligheder</key>
     <key alias="add">Tilføj</key>
     <key alias="alias">Alias</key>
     <key alias="areyousure">Er du sikker?</key>
@@ -539,6 +551,7 @@ Mange hilsner fra umbraco robotten
     <key alias="statistics">Statistik</key>
     <key alias="translation">Oversættelse</key>
     <key alias="users">Brugere</key>
+    <key alias="help">Hjælp</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Standard skabelon</key>
@@ -750,5 +763,9 @@ Mange hilsner fra umbraco robotten
     <key alias="usertype">Brugertype</key>
     <key alias="userTypes">Bruger typer</key>
     <key alias="writer">Forfatter</key>
+
+    <key alias="yourProfile">Din profil</key>
+    <key alias="yourHistory">Din historik</key>
+    <key alias="sessionExpires">Session udløber</key>
   </area>
 </language>
