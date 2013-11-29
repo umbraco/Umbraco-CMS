@@ -1474,6 +1474,38 @@ namespace Umbraco.Core.Services
             return templates;
         }
 
+        public IEnumerable<ILanguage> ImportLanguage(XElement element, int userId = 0)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<IFile> ImportStylesheets(XElement element, int userId = 0)
+        {
+            throw new NotImplementedException();
+
+
+            foreach (XmlNode n in xmlNodeList.OfType<XmlNode>())
+            {
+                StyleSheet s = StyleSheet.MakeNew(
+                    currentUser,
+                    XmlHelper.GetNodeValue(n.SelectSingleNode("Name")),
+                    XmlHelper.GetNodeValue(n.SelectSingleNode("FileName")),
+                    XmlHelper.GetNodeValue(n.SelectSingleNode("Content")));
+
+                foreach (XmlNode prop in n.SelectNodes("Properties/Property"))
+                {
+                    StylesheetProperty sp = StylesheetProperty.MakeNew(
+                        xmlHelper.GetNodeValue(prop.SelectSingleNode("Name")),
+                        s,
+                        currentUser);
+                    sp.Alias = XmlHelper.GetNodeValue(prop.SelectSingleNode("Alias"));
+                    sp.value = XmlHelper.GetNodeValue(prop.SelectSingleNode("Value"));
+                }
+                s.saveCssToFile();
+                s.Save();
+            }
+        }
+
         private bool IsMasterPageSyntax(string code)
         {
             return Regex.IsMatch(code, @"<%@\s*Master", RegexOptions.IgnoreCase) ||

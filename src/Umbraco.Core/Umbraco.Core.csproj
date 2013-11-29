@@ -47,6 +47,9 @@
     <Reference Include="HtmlAgilityPack">
       <HintPath>..\packages\HtmlAgilityPack.1.4.6\lib\Net45\HtmlAgilityPack.dll</HintPath>
     </Reference>
+    <Reference Include="ICSharpCode.SharpZipLib">
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\20\ICSharpCode.SharpZipLib.dll</HintPath>
+    </Reference>
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\log4net-mediumtrust.2.0.0\lib\log4net.dll</HintPath>
@@ -361,6 +364,8 @@
     <Compile Include="Models\TagCacheStorageType.cs" />
     <Compile Include="Models\TaggableObjectTypes.cs" />
     <Compile Include="Models\TemplateNode.cs" />
+    <Compile Include="Packaging\PackageImportIssues.cs" />
+    <Compile Include="Packaging\UnpackHelper.cs" />  
     <Compile Include="Models\UmbracoEntityExtensions.cs" />
     <Compile Include="Packaging\Models\InstallAction.cs" />
     <Compile Include="Packaging\Models\InstallationSummary.cs" />
@@ -1015,6 +1020,7 @@
     <Compile Include="Serialization\SerializationExtensions.cs" />
     <Compile Include="Serialization\SerializationService.cs" />
     <Compile Include="Serialization\StreamedResult.cs" />
+    <Compile Include="Models\IMacroPropertyType.cs" />
     <Compile Include="Services\ContentService.cs" />
     <Compile Include="Services\ContentServiceExtensions.cs" />
     <Compile Include="Services\ContentTypeService.cs" />
@@ -1030,6 +1036,7 @@
     <Compile Include="Services\IEntityService.cs" />
     <Compile Include="Services\IFileService.cs" />
     <Compile Include="Services\ILocalizationService.cs" />
+    <Compile Include="Models\IMacro.cs" />
     <Compile Include="Services\IMacroService.cs" />
     <Compile Include="Services\IMediaService.cs" />
     <Compile Include="Services\IMemberGroupService.cs" />
@@ -1041,9 +1048,12 @@
     <Compile Include="Services\IPackagingService.cs" />
     <Compile Include="Services\INotificationService.cs" />
     <Compile Include="Services\IRelationService.cs" />
+    <Compile Include="Services\IPackageInstallerService.cs" />
     <Compile Include="Services\ISectionService.cs" />
+    <Compile Include="Services\IPackagingService.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\ITagService.cs" />
+    <Compile Include="Packaging\IUnpackHelper.cs" />
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\LocalizationService.cs" />
     <Compile Include="Services\MacroService.cs" />
@@ -1053,6 +1063,9 @@
     <Compile Include="Services\MemberService.cs" />
     <Compile Include="Services\MemberTypeService.cs" />
     <Compile Include="Services\NotificationService.cs" />
+    <Compile Include="Packaging\PackageInstallationSummary.cs" />
+    <Compile Include="Services\PackageInstallerService.cs" />
+    <Compile Include="Packaging\PackageMetaData.cs" />
     <Compile Include="Services\RelationService.cs" />
     <Compile Include="Services\SectionService.cs" />
     <Compile Include="Services\ServerRegistrationService.cs" />
