@@ -16,6 +16,26 @@ namespace Umbraco.Core.Security
             Roles = new string[] {};
         }
 
+        /// <summary>
+        /// Use this constructor to create/assign new UserData to the ticket
+        /// </summary>
+        /// <param name="sessionId">
+        /// A unique id that is assigned to this ticket
+        /// </param>
+        public UserData(string sessionId)
+        {
+            SessionId = sessionId;
+            AllowedApplications = new string[] { };
+            Roles = new string[] { };
+        }
+
+        /// <summary>
+        /// This is used to Id the current ticket which we can then use to mitigate csrf attacks
+        /// and other things that require request validation.
+        /// </summary>        
+        [DataMember(Name = "sessionId")]
+        public string SessionId { get; set; } 
+
         [DataMember(Name = "id")]
         public object Id { get; set; }
         

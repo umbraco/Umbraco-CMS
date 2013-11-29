@@ -148,7 +148,7 @@ namespace Umbraco.Web.Security
         /// <returns>returns the number of seconds until their session times out</returns>
         internal double PerformLogin(IUser user)
         {
-            var ticket = _httpContext.CreateUmbracoAuthTicket(new UserData
+            var ticket = _httpContext.CreateUmbracoAuthTicket(new UserData(Guid.NewGuid().ToString("N"))
             {
                 Id = user.Id,
                 AllowedApplications = user.AllowedSections.ToArray(),
@@ -467,6 +467,18 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
+        /// Returns the current user's unique session id - used to mitigate csrf attacks or any other reason to validate a request
+        /// </summary>
+        /// <returns></returns>
+        public string GetSessionId()
+        {
+            var identity = _httpContext.GetCurrentIdentity(true);
+            if (identity == null)
+                return null;
+            return identity.SessionId;
+        }
+
+        /// <summary>
         /// Validates the user context ID.
         /// </summary>
         /// <param name="currentUmbracoUserContextId">This doesn't do anything</param>
@@ -568,12 +580,12 @@ namespace Umbraco.Web.Security
             return UserHasAppAccess(app, user);
         }
 
-        [Obsolete("This is no longer used at all, it will always return a new GUID though if a user is logged in")]
+        [Obsolete("Returns the current user's unique umbraco sesion id - this cannot be set and isn't intended to be used in your code")]
         public string UmbracoUserContextId
         {
             get
             {
-                return _httpContext.GetUmbracoAuthTicket() == null ? "" : Guid.NewGuid().ToString();
+                return _httpContext.GetUmbracoAuthTicket() == null ? "" : GetSessionId();                
             }
             set
             {

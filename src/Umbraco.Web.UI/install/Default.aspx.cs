@@ -69,7 +69,7 @@ namespace Umbraco.Web.UI.Install
                 {
                     Response.Redirect(
                         //We must add the token to prevent CSRF attacks since the logout occurs on a GET not a POST
-                        SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl) + "&t=" + Security.UmbracoUserContextId);
+                        SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl) + "&t=" + Security.GetSessionId());
                 }
             }
 

@@ -58,6 +58,11 @@ namespace Umbraco.Core.Security
             get { return DeserializedData.Culture; }
         }
 
+        public string SessionId
+        {
+            get { return DeserializedData.SessionId; }
+        }
+
         //public int SessionTimeout
         //{
         //    get

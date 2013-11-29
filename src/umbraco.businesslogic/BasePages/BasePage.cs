@@ -227,12 +227,13 @@ namespace umbraco.BasePages
         /// Gets or sets the umbraco user context ID.
         /// </summary>
         /// <value>The umbraco user context ID.</value>
-        [Obsolete("This is no longer used at all, it will always return a new GUID though if a user is logged in")]
+        [Obsolete("Returns the current user's unique umbraco sesion id - this cannot be set and isn't intended to be used in your code")]
         public static string umbracoUserContextID
         {
             get
             {
-                return HttpContext.Current.GetUmbracoAuthTicket() == null ? "" : Guid.NewGuid().ToString();
+                var identity = HttpContext.Current.GetCurrentIdentity(true);
+                return identity == null ? "" : identity.SessionId;
             }
             set
             {
@@ -264,7 +265,7 @@ namespace umbraco.BasePages
         /// <param name="u">The user</param>
         public static void doLogin(User u)
         {
-            HttpContext.Current.CreateUmbracoAuthTicket(new UserData
+            HttpContext.Current.CreateUmbracoAuthTicket(new UserData(Guid.NewGuid().ToString("N"))
             {
                 Id = u.Id,
                 AllowedApplications = u.GetApplications().Select(x => x.alias).ToArray(),
@@ -273,7 +274,9 @@ namespace umbraco.BasePages
                 Roles = new[] { u.UserType.Alias },
                 StartContentNode = u.StartNodeId,
                 StartMediaNode = u.StartMediaId,
-                Username = u.LoginName
+                Username = u.LoginName,
+                Culture = ui.Culture(u.Language)
+
             });
 			LogHelper.Info<BasePage>("User {0} (Id: {1}) logged in", () => u.Name, () => u.Id);
         }
