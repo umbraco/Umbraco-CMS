@@ -10,7 +10,7 @@
         <div ng-swipe-left="nav.hideNavigation()" class="navigation-inner-container span6" style="z-index: 100">
             
             <!-- the search -->
-            <div ng-controller="Umbraco.SearchController">
+            <div ng-controller="Umbraco.SearchController" ng-if="authenticated">
                           
                 <!-- Search form -->      
                 <div id="search-form">
