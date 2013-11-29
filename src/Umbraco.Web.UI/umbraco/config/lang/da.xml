@@ -71,6 +71,7 @@
     <key alias="saveAndPublish">Gem og udgiv</key>
     <key alias="saveToPublish">Gem og send til udgivelse</key>
     <key alias="select">Vælg</key>
+    <key alias="somethingElse">Flere muligheder...</key>
     <key alias="showPage">Se siden</key>
     <key alias="styleChoose">Vælg formattering</key>
     <key alias="styleShow">Vis koder</key>
@@ -116,6 +117,9 @@
     <key alias="chooseNode">Hvor ønsker du at oprette den nye %0%</key>
     <key alias="createUnder">Opret under</key>
     <key alias="updateData">Vælg en type og skriv en titel</key>
+
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte dokument typer. Du skal tillade disse i indstillinger under <strong>"dokument typer"</strong>.]]></key>
+    <key alias="noMediaTypes" version="7.0"><![CDATA[Der kunne ikke findes nogen tilladte media typer. Du skal tillade disse i indstillinger under <strong>"media typer"</strong>.]]></key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Til dit website</key>
@@ -415,8 +419,21 @@
     <key alias="renewSession">Forny for at gemme dine ændringer</key>
   </area>
   <area alias="login">
+
+    <key alias="greeting0">Så er det søndag!</key>  
+    <key alias="greeting1">Smil, det er mandag!</key>
+    <key alias="greeting2">Hurra, det er tirsdag!</key>
+    <key alias="greeting3">Hvilken herlig onsdag!</key>
+    <key alias="greeting4">Glædelig torsdag!</key>
+    <key alias="greeting5">Endelig fredag!</key>
+    <key alias="greeting6">Glædelig lørdag</key>
+    
+
+    <key alias="instruction">indtast brugernavn og kodeord</key>
+    <key alias="timeout">Din session er udløbet</key>
+
+
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
-    <key alias="topText">Velkommen til umbraco, indtast dit brugernavn og kodeord:</key>
   </area>
   <area alias="main">
     <key alias="dashboard">Skrivebord</key>

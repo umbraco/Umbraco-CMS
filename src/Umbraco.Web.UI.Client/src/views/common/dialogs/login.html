@@ -2,18 +2,21 @@
     <div id="login" class="umb-modalcolumn" ng-class="{'show-validation': loginForm.$invalid}">
 
         <div class="form">
-            <h1>Happy {{today}}!</h1>
-            <p><span ng-show="dialogData.isTimedOut">Session timed out. </span>Log in below</p>
+            <h1>{{greeting}}</h1>
+            <p>
+                <span ng-show="dialogData.isTimedOut"><localize key="login_timeout">Log in below</localize>.</span>
+                <localize key="login_instruction">Log in below</localize>
+            </p>
 
             <div class="control-group" ng-class="{error: loginForm.username.$invalid}">
-                <input type="text" autofocus ng-model="login" name="username" class="input-xlarge" placeholder="Enter your username" />
+                <input type="text" autofocus ng-model="login" name="username" class="input-xlarge" localize="placeholder" placeholder="@placeholders_username" />
             </div>
 
             <div class="control-group" ng-class="{error: loginForm.password.$invalid}">
-                <input type="password" ng-model="password" name="password" class="input-xlarge" placeholder="Enter your password" />
+                <input type="password" ng-model="password" name="password" class="input-xlarge" localize="placeholder" placeholder="@placeholders_password"  />
             </div>
 
-            <button type="submit" class="btn">Login</button>
+            <button type="submit" class="btn"><localize key="general_login">Login</localize></button>
             
             <div class="control-group" ng-show="loginForm.$invalid">
                 <div class="alert alert-error">{{errorMsg}}</div>
