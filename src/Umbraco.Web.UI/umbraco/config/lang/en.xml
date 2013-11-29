@@ -540,14 +540,16 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="renewSession">Renew now to save your work</key>
   </area>
   <area alias="login">
-    <key alias="greeting1">Happy super sunday</key>
-    <key alias="greeting2">Happy manic monday </key>
-    <key alias="greeting3">Happy tremendous tuesday</key>
-    <key alias="greeting4">Happy wonderfull wednesday</key>
-    <key alias="greeting5">Happy thunder thursday</key>
-    <key alias="greeting6">Happy friendly friday</key>
-    <key alias="greeting7">Happy shiny saturday</key>
-    <key alias="instruction">log in below:</key>
+    <key alias="greeting0">Happy super sunday</key>
+    <key alias="greeting1">Happy manic monday </key>
+    <key alias="greeting2">Happy tremendous tuesday</key>
+    <key alias="greeting3">Happy wonderful wednesday</key>
+    <key alias="greeting4">Happy thunder thursday</key>
+    <key alias="greeting5">Happy friendly friday</key>
+    <key alias="greeting6">Happy shiny saturday</key>
+    
+    <key alias="instruction">log in below</key>
+    <key alias="timeout">Session timed out</key>
 
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
    
