@@ -441,6 +441,18 @@ namespace umbraco.BasePages
             warning
         }
 
+        protected override void OnInit(EventArgs e)
+        {
+            base.OnInit(e);
+
+            //This must be set on each page to mitigate CSRF attacks which ensures that this unique token 
+            // is added to the viewstate of each request
+            if (umbracoUserContextID.IsNullOrWhiteSpace() == false)
+            {
+                ViewStateUserKey = umbracoUserContextID;
+            }
+        }
+
         /// <summary>
         /// Raises the <see cref="E:System.Web.UI.Control.Load"></see> event.
         /// </summary>
