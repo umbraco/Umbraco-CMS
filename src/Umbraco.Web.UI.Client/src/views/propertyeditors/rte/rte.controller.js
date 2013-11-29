@@ -79,6 +79,7 @@ angular.module("umbraco")
                             menubar: false,
                             statusbar: false,
                             height: editorConfig.dimensions.height,
+                            width: editorConfig.dimensions.width,
                             toolbar: toolbar,
                             content_css: stylesheets.join(','),
                             relative_urls: false,
