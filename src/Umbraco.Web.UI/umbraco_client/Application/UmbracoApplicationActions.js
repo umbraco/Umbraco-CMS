@@ -10,7 +10,7 @@ Umbraco.Application.Actions = function () {
     /// <summary>
     /// Application actions actions for the context menu, help dialogs, logout, etc...
     /// This class supports an event listener model. Currently the available events are:
-    /// "nodeDeleting","nodeDeleted","nodeRefresh","beforeLogout"
+    /// "nodeDeleting","nodeDeleted","nodeRefresh"
     /// </summary>
 
     return {
@@ -75,13 +75,17 @@ Umbraco.Application.Actions = function () {
                 alert('Not supported - please create by right clicking the parentnode and choose new...');
         },
 
-        logout: function () {
-            /// <summary>Logs the user out</summary>
+        logout: function (t) {
+            
+            if (!t) {
+                throw "The security token must be set in order to log a user out using this method";
+            }
+
             if (confirm(UmbClientMgr.uiKeys()["defaultdialogs_confirmlogout"])) {
                 //raise beforeLogout event
                 jQuery(window.top).trigger("beforeLogout", []);
 
-                document.location.href = 'logout.aspx';
+                document.location.href = 'logout.aspx?t=' + t;
             }
             return false;
         },
@@ -264,11 +268,14 @@ Umbraco.Application.Actions = function () {
             }
         },
 
-        actionQuit: function () {
-            /// <summary></summary>
+        actionQuit: function (t) {
+            
+            if (!t) {
+                throw "The security token must be set in order to log a user out using this method";
+            }
 
             if (confirm(uiKeys['defaultdialogs_confirmlogout'] + '\n\n'))
-                document.location.href = 'logout.aspx';
+                document.location.href = 'logout.aspx?t=' + t;
         },
 
         actionRePublish: function () {

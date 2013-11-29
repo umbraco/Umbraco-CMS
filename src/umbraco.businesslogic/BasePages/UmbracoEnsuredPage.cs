@@ -111,9 +111,9 @@ namespace umbraco.BasePages
 
                 // Some umbraco pages should not be loaded on timeout, but instead reload the main application in the top window. Like the treeview for instance
                 if (RedirectToUmbraco)
-                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?", true);
+                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?t=" + umbracoUserContextID, true);
                 else
-                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl), true);
+                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl) + "&t=" + umbracoUserContextID, true);
             }
         }
     }
