@@ -4,6 +4,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web;
 using System.Web.Http;
+using System.Web.Http.Controllers;
 using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core;
@@ -33,10 +34,10 @@ namespace Umbraco.Web.Editors
         /// Remove the xml formatter... only support JSON!
         /// </summary>
         /// <param name="controllerContext"></param>
-        protected override void Initialize(global::System.Web.Http.Controllers.HttpControllerContext controllerContext)
+        protected override void Initialize(HttpControllerContext controllerContext)
         {
             base.Initialize(controllerContext);
-            controllerContext.Configuration.Formatters.Remove(controllerContext.Configuration.Formatters.XmlFormatter);
+            controllerContext.EnsureJsonOutputOnly();
         }
         
         /// <summary>

@@ -24,7 +24,7 @@ namespace Umbraco.Web.Trees
         protected override void Initialize(global::System.Web.Http.Controllers.HttpControllerContext controllerContext)
         {
             base.Initialize(controllerContext);
-            controllerContext.Configuration.Formatters.Remove(controllerContext.Configuration.Formatters.XmlFormatter);
+            controllerContext.EnsureJsonOutputOnly();
         }
 
         /// <summary>
