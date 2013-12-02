@@ -11,7 +11,7 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class MacroProperty : TracksChangesEntityBase, IMacroProperty, IRememberBeingDirty
+    public class MacroProperty : TracksChangesEntityBase, IMacroProperty, IRememberBeingDirty
     {
         public MacroProperty()
         {
