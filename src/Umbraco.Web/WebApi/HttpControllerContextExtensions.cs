@@ -96,12 +96,14 @@ namespace Umbraco.Web.WebApi
         }
 
         /// <summary>
-        /// Removes the xml formatter so it only outputs json
+        /// Removes the xml formatter so it only outputs angularized json (with the json vulnerability prefix added)
         /// </summary>
         /// <param name="controllerContext"></param>
         internal static void EnsureJsonOutputOnly(this HttpControllerContext controllerContext)
         {
             controllerContext.Configuration.Formatters.Remove(controllerContext.Configuration.Formatters.XmlFormatter);
+            controllerContext.Configuration.Formatters.Remove(controllerContext.Configuration.Formatters.JsonFormatter);
+            controllerContext.Configuration.Formatters.Add(new AngularJsonMediaTypeFormatter());
         }
     }
 }

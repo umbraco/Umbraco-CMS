@@ -1,4 +1,5 @@
-﻿using Umbraco.Web.WebApi;
+﻿using System.Web.Http.Controllers;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Editors
 {
@@ -19,7 +20,7 @@ namespace Umbraco.Web.Editors
         /// Remove the xml formatter... only support JSON!
         /// </summary>
         /// <param name="controllerContext"></param>
-        protected override void Initialize(global::System.Web.Http.Controllers.HttpControllerContext controllerContext)
+        protected override void Initialize(HttpControllerContext controllerContext)
         {
             base.Initialize(controllerContext);
             controllerContext.EnsureJsonOutputOnly();

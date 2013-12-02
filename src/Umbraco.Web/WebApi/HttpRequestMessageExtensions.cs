@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -12,7 +13,7 @@ using Umbraco.Core;
 
 namespace Umbraco.Web.WebApi
 {
-
+    
     public static class HttpRequestMessageExtensions
     {
         /// <summary>

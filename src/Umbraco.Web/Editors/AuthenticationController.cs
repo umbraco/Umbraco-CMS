@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Http;
+using System.Web.Http.Controllers;
 using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core;
@@ -33,10 +35,10 @@ namespace Umbraco.Web.Editors
         /// Remove the xml formatter... only support JSON!
         /// </summary>
         /// <param name="controllerContext"></param>
-        protected override void Initialize(global::System.Web.Http.Controllers.HttpControllerContext controllerContext)
+        protected override void Initialize(HttpControllerContext controllerContext)
         {
             base.Initialize(controllerContext);
-            controllerContext.Configuration.Formatters.Remove(controllerContext.Configuration.Formatters.XmlFormatter);
+            controllerContext.EnsureJsonOutputOnly();
         }
         
         /// <summary>
@@ -102,6 +104,7 @@ namespace Umbraco.Web.Editors
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
+        [SetAngularAntiForgeryToken]
         public UserDetail PostLogin(string username, string password)
         {
             if (UmbracoContext.Security.ValidateBackOfficeCredentials(username, password))
@@ -110,6 +113,7 @@ namespace Umbraco.Web.Editors
 
                 //TODO: Clean up the int cast!
                 var timeoutSeconds = UmbracoContext.Security.PerformLogin((int)user.Id);
+                
                 var result = Mapper.Map<UserDetail>(user);
                 //set their remaining seconds
                 result.SecondsUntilTimeout = timeoutSeconds;
@@ -128,9 +132,10 @@ namespace Umbraco.Web.Editors
         /// Logs the current user out
         /// </summary>
         /// <returns></returns>
+        [UmbracoBackOfficeLogout]
+        [ClearAngularAntiForgeryToken]
         public HttpResponseMessage PostLogout()
-        {
-            UmbracoContext.Security.ClearCurrentLogin();
+        {           
             return Request.CreateResponse(HttpStatusCode.OK);
         }
     }
