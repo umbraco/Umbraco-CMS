@@ -124,6 +124,7 @@
     <Reference Include="System.Data">
       <Name>System.Data</Name>
     </Reference>
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Web">
       <Name>System.Web</Name>
     </Reference>

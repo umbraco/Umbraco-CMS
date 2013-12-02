@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Security.Principal;
 using System.Threading;
 using System.Web;
@@ -127,6 +129,26 @@ namespace Umbraco.Core.Security
             Logout(http, UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName);
         }
 
+        /// <summary>
+        /// This clears the forms authentication cookie
+        /// </summary>
+        /// <param name="response"></param>
+        public static void UmbracoLogout(this HttpResponseMessage response)
+        {
+            if (response == null) throw new ArgumentNullException("response");
+            //remove the cookie
+            var cookie = new CookieHeaderValue(UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName, "")
+            {
+                Expires = DateTime.Now.AddYears(-1),                
+                Path = "/"
+            };
+            response.Headers.AddCookies(new[] { cookie });
+        }
+
+        /// <summary>
+        /// This clears the forms authentication cookie
+        /// </summary>
+        /// <param name="http"></param>
         internal static void UmbracoLogout(this HttpContext http)
         {
             if (http == null) throw new ArgumentNullException("http");

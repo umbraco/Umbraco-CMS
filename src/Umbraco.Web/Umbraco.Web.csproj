@@ -440,7 +440,12 @@
     </Compile>
     <Compile Include="WebApi\AngularJsonMediaTypeFormatter.cs" />
     <Compile Include="WebApi\Binders\MemberBinder.cs" />
+    <Compile Include="WebApi\Filters\AngularAntiForgeryHelper.cs" />
+    <Compile Include="WebApi\Filters\ClearAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="WebApi\Filters\FilterGrouping.cs" />
+    <Compile Include="WebApi\Filters\SetAngularAntiForgeryTokenAttribute.cs" />
+    <Compile Include="WebApi\Filters\UmbracoBackOfficeLogoutAttribute.cs" />
+    <Compile Include="WebApi\Filters\ValidateAngularAntiForgeryTokenAttribute.cs" />
     <Compile Include="WebApi\HttpControllerContextExtensions.cs" />
     <Compile Include="WebApi\CustomDateTimeConvertor.cs" />
     <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />

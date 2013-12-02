@@ -57,6 +57,7 @@ namespace Umbraco.Web.Editors
                 //there is a result, set the outgoing cookie
                 var cookie = new CookieHeaderValue("UMB_UPDCHK", "1")
                     {
+                        Path = "/",
                         Expires = DateTimeOffset.Now.AddDays(GlobalSettings.VersionCheckPeriod),
                         HttpOnly = true,
                         Secure = GlobalSettings.UseSSL
