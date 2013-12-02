@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @ngdoc service
  * @name umbraco.services.tinyMceService
  *
@@ -38,9 +38,9 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
         */
         defaultPrevalues: function () {
                var cfg = {};
-                       cfg.toolbar = ["code", "bold", "italic", "umbracocss","alignleft", "aligncenter", "alignright", "bullist","numlist", "outdent", "indent", "link", "image", "umbmediapicker", "umbembeddialog", "umbmacro"];
+                       cfg.toolbar = ["code", "bold", "italic", "styleselect","alignleft", "aligncenter", "alignright", "bullist","numlist", "outdent", "indent", "link", "image", "umbmediapicker", "umbembeddialog", "umbmacro"];
                        cfg.stylesheets = [];
-                       cfg.dimensions = {height: 400, width: 600};
+                       cfg.dimensions = {height: 500};
                 return cfg;
         },
 
