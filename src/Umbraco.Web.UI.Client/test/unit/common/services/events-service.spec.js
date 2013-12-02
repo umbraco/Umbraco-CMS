@@ -17,11 +17,11 @@ describe('angular event tests', function () {
                 val: ""
             };
             
-            eventsService.subscribe("testEvent", function (e, args) {                
+            eventsService.on("testEvent", function (e, args) {                
                 args.args.val = "changed";
             });
 
-            eventsService.publish("testEvent", eventArgs);
+            eventsService.emit("testEvent", eventArgs);
             
             expect(eventArgs.val).toBe("changed");
             
@@ -33,15 +33,15 @@ describe('angular event tests', function () {
                 val: ""
             };
 
-            eventsService.subscribe("testEvent", function (e, args) {
+            eventsService.on("testEvent", function (e, args) {
                 args.args.val = "changed";
             });
             
-            eventsService.subscribe("testEvent", function (e, args) {
+            eventsService.on("testEvent", function (e, args) {
                 args.args.val = "changed1";
             });
 
-            eventsService.publish("testEvent", eventArgs);
+            eventsService.emit("testEvent", eventArgs);
 
             expect(eventArgs.val).toBe("changed1");
 
@@ -53,7 +53,7 @@ describe('angular event tests', function () {
                 val: ""
             };
 
-            eventsService.subscribe("testEvent", function (e, msg) {
+            eventsService.on("testEvent", function (e, msg) {
                 $timeout(function () {                    
                     msg.args.val = "changed";
                     //NOTE: We could resolve anything here
@@ -61,16 +61,16 @@ describe('angular event tests', function () {
                 }, 1000);
             });
 
-            var promises = eventsService.publish("testEvent", eventArgs);
+            var promises = eventsService.emit("testEvent", eventArgs);
 
             //this won't be changed yet
             expect(eventArgs.val).toBe("");
 
+            /*
             promises[0].then(function (args) {
-                console.log("WOOT");
                 expect(args.val).toBe("changed");
                 expect(eventArgs.val).toBe("changed");
-            });
+            });*/
 
             $rootScope.$digest();
             $timeout.flush();
@@ -82,7 +82,6 @@ describe('angular event tests', function () {
             //assign multiple listeners
 
             $rootScope.$on("testEvent", function(e, args) {
-                console.log("handler #1");
                 $timeout(function () {
                     console.log("timeout #1");
                     args.val = "changed1";
@@ -91,7 +90,6 @@ describe('angular event tests', function () {
             });
             
             $rootScope.$on("testEvent", function (e, args) {
-                console.log("handler #2");
                 $timeout(function () {
                     console.log("timeout #2");
                     args.val = "changed2";

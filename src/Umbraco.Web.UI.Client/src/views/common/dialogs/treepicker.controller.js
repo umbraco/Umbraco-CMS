@@ -173,7 +173,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 		args.event.preventDefault();
 		args.event.stopPropagation();
 
-		eventsService.publish("Umbraco.Dialogs.TreePickerController.Select", args);
+		eventsService.emit("dialogs.treePickerController.select", args);
 	    
 		if (args.node.filtered) {
 		    return;

@@ -1,24 +1,45 @@
 /** Used to broadcast and listen for global events and allow the ability to add async listeners to the callbacks */
+
+/*
+    Core app events: 
+
+    app.ready
+    app.authenticated
+    app.notAuthenticated
+    app.closeDialogs
+*/
+
 function eventsService($q, $rootScope) {
 	
     return {
         
         /** raise an event with a given name, returns an array of promises for each listener */
-        publish: function (name, args) {            
+        emit: function (name, args) {            
 
             //there are no listeners
             if (!$rootScope.$$listeners[name]) {
                 return [];
             }
 
+            //send the event
+            $rootScope.$emit(name, args);
+
+
+            //PP: I've commented out the below, since we currently dont
+            // expose the eventsService as a documented api
+            // and think we need to figure out our usecases for this
+            // since the below modifies the return value of the then on() method
+            /*
             //setup a deferred promise for each listener
             var deferred = [];
             for (var i = 0; i < $rootScope.$$listeners[name].length; i++) {
                 deferred.push($q.defer());
-            }
+            }*/
+
             //create a new event args object to pass to the 
-            // $broadcast containing methods that will allow listeners
+            // $emit containing methods that will allow listeners
             // to return data in an async if required
+            /*
             var eventArgs = {
                 args: args,
                 reject: function (a) {
@@ -27,20 +48,20 @@ function eventsService($q, $rootScope) {
                 resolve: function (a) {
                     deferred.pop().resolve(a);
                 }
-            };
+            };*/
             
-            //send the event
-            $rootScope.$broadcast(name, eventArgs);
             
+            
+            /*
             //return an array of promises
             var promises = _.map(deferred, function(p) {
                 return p.promise;
             });
-            return promises;
+            return promises;*/
         },
 
         /** subscribe to a method, or use scope.$on = same thing */
-		subscribe: function(name, callback) {
+		on: function(name, callback) {
 		    return $rootScope.$on(name, callback);
 		},
 		
@@ -50,7 +71,6 @@ function eventsService($q, $rootScope) {
 		        handle();
 		    }		    
 		}
-
 	};
 }
 

@@ -7,7 +7,7 @@
  * @description
  * The tree service factory, used internally by the umbTree and umbTreeItem directives
  */
-function treeService($q, treeResource, iconHelper, notificationsService, $rootScope) {
+function treeService($q, treeResource, iconHelper, notificationsService, eventsService) {
 
     //SD: Have looked at putting this in sessionStorage (not localStorage since that means you wouldn't be able to work
     // in multiple tabs) - however our tree structure is cyclical, meaning a node has a reference to it's parent and it's children
@@ -252,7 +252,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                 }, function(reason) {
 
                     //in case of error, emit event
-                    $rootScope.$broadcast("treeNodeLoadError", {error: reason });
+                    eventsService.emit("treeService.treeNodeLoadError", {error: reason } );
 
                     //stop show the loading indicator  
                     node.loading = false;

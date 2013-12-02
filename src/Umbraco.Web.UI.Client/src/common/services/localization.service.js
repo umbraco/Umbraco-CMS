@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-.factory('localizationService', function ($http, $q, $rootScope, $window, $filter, userService) {
+.factory('localizationService', function ($http, $q, eventsService, $window, $filter, userService) {
         var service = {
             // array to hold the localized resource string entries
             dictionary:[],
@@ -15,7 +15,7 @@ angular.module('umbraco.services')
                 // set the flag that the resource are loaded
                 service.resourceFileLoaded = true;
                 // broadcast that the file has been loaded
-                $rootScope.$broadcast('localizeResourcesUpdates');
+                eventsService.emit("localizationService.updated", data);
             },
 
             // allows setting of language on the fly
@@ -38,7 +38,7 @@ angular.module('umbraco.services')
                         service.resourceFileLoaded = true;
                         service.dictionary = response.data;
 
-                        $rootScope.$broadcast('localizeResourcesUpdates');
+                        eventsService.emit("localizationService.updated", service.dictionary);
 
                         return deferred.resolve(service.dictionary);
                     }, function(err){
@@ -102,12 +102,15 @@ angular.module('umbraco.services')
                 }
                 return "[" + value + "]";
             }
-
-
         };
 
         // force the load of the resource file
         service.initLocalizedResources();
+
+        //This happens after login / auth and assets loading
+        eventsService.on("app.authenticated", function(){
+            service.resourceFileLoaded = false;
+        });
 
         // return the local instance when called
         return service;

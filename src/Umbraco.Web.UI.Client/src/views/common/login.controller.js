@@ -1,13 +1,10 @@
 ﻿/** This controller is simply here to launch the login dialog when the route is explicitly changed to /login */
-angular.module('umbraco').controller("Umbraco.LoginController", function ($scope, userService, $location) {
+angular.module('umbraco').controller("Umbraco.LoginController", function (eventsService, $scope, userService, $location) {
 
-    userService._showLoginDialog();
-    
-    //when the app is ready and the user is authorized, redirect - this will only be handled here when we are actually on the /login route
-    $scope.$on("ready", function (evt, data) {
-    	//reset the avatar
-        $scope.avatar = "assets/img/application/logo.png";
-        $location.path("/").search("");
+    userService._showLoginDialog(); 
+       
+    eventsService.on("app.ready", function(){
+    	$scope.avatar = "assets/img/application/logo.png";
+    	$location.path("/").search("");
     });
-
 });

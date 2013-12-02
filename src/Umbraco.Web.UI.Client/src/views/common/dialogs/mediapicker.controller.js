@@ -94,7 +94,7 @@ angular.module("umbraco")
                 if (image.contentTypeAlias.toLowerCase() == 'folder' && !select) {
                     $scope.gotoFolder(image);
                 }else{
-                    eventsService.publish("Umbraco.Dialogs.MediaPickerController.Select", image);
+                    eventsService.emit("dialogs.mediaPicker.select", image);
                     
                     if ($scope.multiPicker) {
                         $scope.select(image);
@@ -120,7 +120,7 @@ angular.module("umbraco")
                 if (image.contentTypeAlias.toLowerCase() == 'folder') {
                     $scope.gotoFolder(image);
                 }else{
-                    eventsService.publish("Umbraco.Dialogs.MediaPickerController.Select", image);
+                    eventsService.emit("dialogs.mediaPicker.select", image);
                     
                     if ($scope.multiPicker) {
                         $scope.select(image);

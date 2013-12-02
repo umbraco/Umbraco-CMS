@@ -13,7 +13,7 @@
  * <pre>
   *    scope.showTree = appState.getGlobalState("showNavigation");
   *
-  *    scope.$on("appState.globalState.changed", function (e, args) {
+  *    eventsService.on("appState.globalState.changed", function (e, args) {
   *               if (args.key === "showNavigation") {
   *                   scope.showTree = args.value;
   *               }
@@ -25,14 +25,14 @@
  * <pre>
  *    scope.currentSection = appState.getSectionState("currentSection");
  *
- *    scope.$on("appState.sectionState.changed", function (e, args) {
+ *    eventsService.on("appState.sectionState.changed", function (e, args) {
  *               if (args.key === "currentSection") {
  *                   scope.currentSection = args.value;
  *               }
  *           });  
  * </pre>
  */
-function appState($rootScope) {
+function appState(eventsService) {
     
     //Define all variables here - we are never returning this objects so they cannot be publicly mutable
     // changed, we only expose methods to interact with the values.
@@ -80,7 +80,7 @@ function appState($rootScope) {
         var changed = stateObj[key] !== value;
         stateObj[key] = value;
         if (changed) {
-            $rootScope.$broadcast("appState." + stateObjName + ".changed", { key: key, value: value });
+            eventsService.emit("appState." + stateObjName + ".changed", { key: key, value: value });
         }
     }
     

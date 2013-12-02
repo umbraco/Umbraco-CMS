@@ -9,7 +9,7 @@
  * 
  * @param {navigationService} navigationService A reference to the navigationService
  */
-function NavigationController($scope, $rootScope, $location, $log, $routeParams, $timeout, appState, navigationService, keyboardService, dialogService, historyService, sectionResource, angularHelper) {
+function NavigationController($scope, $rootScope, $location, $log, $routeParams, $timeout, appState, navigationService, keyboardService, dialogService, historyService, eventsService, sectionResource, angularHelper) {
 
     //TODO: Need to think about this and an nicer way to acheive what this is doing.
     //the tree event handler i used to subscribe to the main tree click events
@@ -42,20 +42,20 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     //trigger dialods with a hotkey:
     //TODO: Unfortunately this will also close the login dialog.
     keyboardService.bind("esc", function () {
-        $rootScope.$emit("closeDialogs");
+        eventsService.emit("app.closeDialogs");
     });
 
     $scope.selectedId = navigationService.currentId;
 
     //Listen for global state changes
-    $scope.$on("appState.globalState.changed", function (e, args) {
+    eventsService.on("appState.globalState.changed", function (e, args) {
         if (args.key === "showNavigation") {
             $scope.showNavigation = args.value;
         }
     });
 
     //Listen for menu state changes
-    $scope.$on("appState.menuState.changed", function (e, args) {
+    eventsService.on("appState.menuState.changed", function (e, args) {
         if (args.key === "showMenuDialog") {
             $scope.showContextMenuDialog = args.value;
         }
@@ -74,7 +74,7 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     });
 
     //Listen for section state changes
-    $scope.$on("appState.sectionState.changed", function (e, args) {
+    eventsService.on("appState.sectionState.changed", function (e, args) {
         //section changed
         if (args.key === "currentSection") {
             $scope.currentSection = args.value;
@@ -86,7 +86,7 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     });
 
     //This reacts to clicks passed to the body element which emits a global call to close all dialogs
-    $rootScope.$on("closeDialogs", function (event) {
+    eventsService.on("app.closeDialogs", function (event) {
         if (appState.getGlobalState("stickyNavigation")) {
             navigationService.hideNavigation();
             //TODO: don't know why we need this? - we are inside of an angular event listener.
@@ -95,12 +95,12 @@ function NavigationController($scope, $rootScope, $location, $log, $routeParams,
     });
 
     //when a user logs out or timesout
-    $scope.$on("notAuthenticated", function () {
+    eventsService.on("app.notAuthenticated", function () {
         $scope.authenticated = false;
     });
 
     //when the application is ready and the user is authorized setup the data
-    $scope.$on("ready", function (evt, data) {
+    eventsService.on("app.ready", function (evt, data) {
         $scope.authenticated = true;
     });
 

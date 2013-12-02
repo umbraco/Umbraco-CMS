@@ -30,7 +30,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 		args.event.preventDefault();
 		args.event.stopPropagation();
 
-		eventsService.publish("Umbraco.Dialogs.LinkPickerController.Select", args);
+		eventsService.emit("dialogs.linkPicker.select", args);
 	    
 		var c = $(args.event.target.parentElement);
 

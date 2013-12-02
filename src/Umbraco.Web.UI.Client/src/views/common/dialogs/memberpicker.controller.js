@@ -62,7 +62,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.MemberPickerController",
                 return;
             }
 
-            eventsService.publish("Umbraco.Dialogs.MemberPickerController.Select", args);
+            eventsService.emit("dialogs.memberPickerController", args);
             
             //This is a tree node, so we don't have an entity to pass in, it will need to be looked up
             //from the server in this method.

@@ -1,17 +1,15 @@
 /** Executed when the application starts, binds to events and set global state */
-app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'umbRequestHelper',
-    function (userService, $log, $rootScope, $location, navigationService, appState, editorState, fileManager, assetsService, umbRequestHelper) {
+app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService','eventsService', 'umbRequestHelper',
+    function (userService, $log, $rootScope, $location, navigationService, appState, editorState, fileManager, assetsService, eventsService, umbRequestHelper) {
 
         var firstRun = true;
         
         /** Listens for authentication and checks if our required assets are loaded, if/once they are we'll broadcast a ready event */
-        $rootScope.$on("authenticated", function(evt, data) {
-
+        eventsService.on("app.authenticated", function(evt, data) {
             assetsService._loadInitAssets().then(function() {
                 //send the ready event
-                $rootScope.$broadcast("ready", data);
+                eventsService.emit("app.ready", data);
             });
-            
         });
 
         /** when we have a successful first route that is not the login page - *meaning the user is authenticated*
@@ -57,5 +55,4 @@ app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 
         //check for touch device, add to global appState
         var touchDevice = ("ontouchstart" in window || window.touch || window.navigator.msMaxTouchPoints === 5 || window.DocumentTouch && document instanceof DocumentTouch);
         appState.setGlobalState("touchDevice", touchDevice);
-        
     }]);

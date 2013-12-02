@@ -361,7 +361,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                 else {
                     //instead of calling just the dialog service we funnel it through the global 
                     //event emitter
-                    getRootScope().$emit("closeDialogs", undefined);
+                    getRootScope().$emit("app.closeDialogs", undefined);
                 }                
             },
             _debug: function(strMsg) {

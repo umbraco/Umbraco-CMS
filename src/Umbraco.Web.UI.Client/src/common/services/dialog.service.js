@@ -29,7 +29,7 @@
  */
 
 angular.module('umbraco.services')
-.factory('dialogService', function ($rootScope, $compile, $http, $timeout, $q, $templateCache, appState) {
+.factory('dialogService', function ($rootScope, $compile, $http, $timeout, $q, $templateCache, appState, eventsService) {
 
        var dialogs = [];
        
@@ -238,7 +238,7 @@ angular.module('umbraco.services')
        }
 
        /** Handles the closeDialogs event */
-       $rootScope.$on("closeDialogs", function (evt, args) {
+       eventsService.on("app.closeDialogs", function (evt, args) {
            removeAllDialogs(args);
        });
 

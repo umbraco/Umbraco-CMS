@@ -1,5 +1,5 @@
 angular.module('umbraco.services')
-.factory('userService', function ($rootScope, $q, $location, $log, securityRetryQueue, authResource, dialogService, $timeout, angularHelper) {
+.factory('userService', function ($rootScope, eventsService, $q, $location, $log, securityRetryQueue, authResource, dialogService, $timeout, angularHelper) {
 
     var currentUser = null;
     var lastUserId = null;
@@ -147,7 +147,7 @@ angular.module('umbraco.services')
         currentUser = null;
         
         //broadcast a global event that the user is no longer logged in
-        $rootScope.$broadcast("notAuthenticated");
+        eventsService.emit("app.notAuthenticated");
 
         openLoginDialog(isLogout === undefined ? true : !isLogout);
     }
@@ -189,8 +189,7 @@ angular.module('umbraco.services')
                     var result = { user: data, authenticated: true, lastUserId: lastUserId };
 
                     //broadcast a global event
-                    $rootScope.$broadcast("authenticated", result);
-
+                    eventsService.emit("app.authenticated", result);
                     return result;
                 });
         },
@@ -220,7 +219,7 @@ angular.module('umbraco.services')
 
                         if (args && args.broadcastEvent) {
                             //broadcast a global event, will inform listening controllers to load in the user specific data
-                            $rootScope.$broadcast("authenticated", result);
+                            eventsService.emit("app.authenticated", result);
                         }
 
                         setCurrentUser(data);

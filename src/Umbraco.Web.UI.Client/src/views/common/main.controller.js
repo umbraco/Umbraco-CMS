@@ -8,7 +8,7 @@
  * The main application controller
  * 
  */
-function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, updateChecker, assetsService, umbRequestHelper) {
+function MainController($scope, $rootScope, $location, $routeParams, $timeout, $http, $log, appState, treeService, notificationsService, userService, navigationService, historyService, updateChecker, assetsService, eventsService, umbRequestHelper) {
 
     //the null is important because we do an explicit bool check on this in the view
     //the avatar is by default the umbraco logo    
@@ -45,17 +45,17 @@ function MainController($scope, $rootScope, $location, $routeParams, $timeout, $
             return;
         }
 
-        $rootScope.$emit("closeDialogs", event);
+        eventsService.emit("app.closeDialogs", event);
     };
 
     //when a user logs out or timesout
-    $scope.$on("notAuthenticated", function() {
+    eventsService.on("app.notAuthenticated", function() {
         $scope.authenticated = null;
         $scope.user = null;
     });
     
     //when the app is read/user is logged in, setup the data
-    $scope.$on("ready", function (evt, data) {
+    eventsService.on("app.ready", function (evt, data) {
         
         $scope.authenticated = data.authenticated;
         $scope.user = data.user;
