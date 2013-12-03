@@ -85,8 +85,13 @@ namespace Umbraco.Web.Editors
         /// Returns the currently logged in Umbraco user
         /// </summary>
         /// <returns></returns>
+        /// <remarks>
+        /// We have the attribute [SetAngularAntiForgeryTokens] applied because this method is called initially to determine if the user
+        /// is valid before the login screen is displayed. The Auth cookie can be persisted for up to a day but the csrf cookies are only session
+        /// cookies which means that the auth cookie could be valid but the csrf cookies are no longer there, in that case we need to re-set the csrf cookies.
+        /// </remarks>
         [WebApi.UmbracoAuthorize]
-        [ValidateAngularAntiForgeryToken]
+        [SetAngularAntiForgeryTokens]
         public UserDetail GetCurrentUser()
         {
             var user = Services.UserService.GetUserById(UmbracoContext.Security.GetUserId());

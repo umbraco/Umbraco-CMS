@@ -165,7 +165,9 @@ namespace Umbraco.Core.Security
             if (http == null) throw new ArgumentNullException("http");
             return RenewAuthTicket(http,
                 UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName,
-                UmbracoConfig.For.UmbracoSettings().Security.AuthCookieDomain);
+                UmbracoConfig.For.UmbracoSettings().Security.AuthCookieDomain,
+                //Umbraco has always persisted it's original cookie for 1 day so we'll keep it that way
+                1440);
         }
 
         internal static bool RenewUmbracoAuthTicket(this HttpContext http)
@@ -301,8 +303,9 @@ namespace Umbraco.Core.Security
         /// <param name="http"></param>
         /// <param name="cookieName"></param>
         /// <param name="cookieDomain"></param>
+        /// <param name="minutesPersisted"></param>
         /// <returns>true if there was a ticket to renew otherwise false if there was no ticket</returns>
-        private static bool RenewAuthTicket(this HttpContextBase http, string cookieName, string cookieDomain)
+        private static bool RenewAuthTicket(this HttpContextBase http, string cookieName, string cookieDomain, int minutesPersisted)
         {
             if (http == null) throw new ArgumentNullException("http");
             //get the ticket
@@ -323,10 +326,17 @@ namespace Umbraco.Core.Security
             var hash = FormsAuthentication.Encrypt(renewed);
             //write it to the response
             var cookie = new HttpCookie(cookieName, hash)
-                {
-                    Expires = formsCookie.Expires,
+                {                    
+                    Expires = DateTime.Now.AddMinutes(minutesPersisted),
                     Domain = cookieDomain
                 };
+
+            if (GlobalSettings.UseSSL)
+                cookie.Secure = true;
+
+            //ensure http only, this should only be able to be accessed via the server
+            cookie.HttpOnly = true;
+
             //rewrite the cooke
             http.Response.Cookies.Set(cookie);
             return true;
