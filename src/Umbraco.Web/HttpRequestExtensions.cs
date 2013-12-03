@@ -11,6 +11,21 @@ namespace Umbraco.Web
 	/// </summary>
 	public static class HttpRequestExtensions
 	{
+        /// <summary>
+        /// Extracts the value from the query string and cleans it to prevent xss attacks.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>        
+        public static string GetCleanedItem(this HttpRequest request, string key)
+        {
+            var item = request.GetItemAsString(key);
+            //remove any html
+            item = item.StripHtml();
+            //strip out any potential chars involved with XSS
+            return item.ExceptChars(new HashSet<char>("(){}[];:%<>/\\|&'\"".ToCharArray()));
+        }
+
 		/// <summary>
 		/// Safely get a request item as string, if the item does not exist, an empty string is returned.
 		/// </summary>

@@ -159,13 +159,13 @@
     <script type="text/javascript">
 
         //used for deeplinking to specific content whilst still showing the tree
-        var initApp = '<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["app"]%>';
-        var rightAction = '<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["rightAction"]%>';
-        var rightActionId = '<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["id"]%>';
+        var initApp = '<%=InitApp%>';
+        var rightAction = '<%=RightAction%>';
+        var rightActionId = '<%=RightActionId%>';
         var base = '<%=string.Format("{0}/", Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco))%>';
-        var url = ''
+        var url = '';
         if (rightActionId && rightActionId != '') {
-            url = base + rightAction + ".aspx?id=" + rightActionId
+            url = base + rightAction + ".aspx?id=" + rightActionId;
         } else {
             url = base + rightAction;
         }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -6,8 +7,11 @@ using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Strings;
 using umbraco;
 using Umbraco.Core;
+using umbraco.BusinessLogic;
 
 namespace Umbraco.Web.UI.Umbraco
 {
@@ -15,7 +19,36 @@ namespace Umbraco.Web.UI.Umbraco
 	{        
         public string DefaultApp { get; private set; }
 
-        protected void Page_Load(object sender, System.EventArgs e)
+        protected string InitApp
+        {
+            get
+            {
+                var app = Request.GetCleanedItem("app");
+                //validate the app
+                if (global::umbraco.BusinessLogic.Application.getAll().Any(x => x.alias.InvariantEquals(app)) == false)
+                {
+                    LogHelper.Warn<Umbraco>("A requested app: " + Request.GetItemAsString("app") + " was not found");
+                    return string.Empty;
+                }
+                return app;
+            }
+        }
+
+        protected string RightAction
+        {
+            get
+            {
+                //manually clean the string, we need to allow / and other url chars but ensure to strip any other potential xss chars.
+                return Request.GetItemAsString("rightAction").StripHtml().ExceptChars(new HashSet<char>("(){}[];:<>\\'\"".ToCharArray()));
+            }
+        }
+
+        protected string RightActionId
+        {
+            get { return Request.GetCleanedItem("id").ReplaceNonAlphanumericChars('-'); }
+        }
+
+        protected void Page_Load(object sender, EventArgs e)
         {
             var apps = UmbracoUser.Applications.ToList();
             bool userHasAccesstodefaultApp = apps.Any(x => x.alias == Constants.Applications.Content);

@@ -1,4 +1,4 @@
-<%@ Page language="c#" MasterPageFile="masterpages/umbracoPage.Master" Title="dashboard" Codebehind="dashboard.aspx.cs" AutoEventWireup="True" Inherits="umbraco.cms.presentation.dashboard" trace="false" validateRequest="false"%>
+<%@ Page language="c#" MasterPageFile="masterpages/umbracoPage.Master" Title="dashboard" AutoEventWireup="True" Inherits="umbraco.cms.presentation.dashboard" trace="false" validateRequest="false"%>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <asp:Content ContentPlaceHolderID="body" ID="ContentBody" runat="server">

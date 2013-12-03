@@ -1,23 +1,15 @@
 using System;
-using System.Collections;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
+using System.Globalization;
 using System.IO;
 using System.Web;
-using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Web.UI.HtmlControls;
 using umbraco.BasePages;
-using System.Xml;
-using System.Xml.XPath;
-using umbraco.BusinessLogic.Actions;
-using ClientDependency.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core;
+using Umbraco.Web;
 using System.Linq;
 using System.Text;
-using ClientDependency.Core.Controls;
 using System.Text.RegularExpressions;
 
 namespace umbraco.cms.presentation
@@ -25,48 +17,49 @@ namespace umbraco.cms.presentation
     /// <summary>
     /// The back office rendering page
     /// </summary>
+    [Obsolete("This class is no longer used and will be removed from the codebase in future versions")]
     public class _umbraco : UmbracoEnsuredPage
     {
         [Obsolete("This property is no longer used")]
         protected umbWindow UmbWindow1;
-        protected System.Web.UI.WebControls.PlaceHolder bubbleText;
+        protected PlaceHolder bubbleText;
 
         public string DefaultApp { get; private set; }
 
-        protected void Page_Load(object sender, System.EventArgs e)
+        protected void Page_Load(object sender, EventArgs e)
         {
-            var apps = this.getUser().Applications.ToList();
-            bool userHasAccesstodefaultApp = apps.Where(x => x.alias == Umbraco.Core.Constants.Applications.Content).Count() > 0;
+            var apps = UmbracoUser.Applications.ToList();
+            var userHasAccesstodefaultApp = apps.Any(x => x.alias == Umbraco.Core.Constants.Applications.Content);
 
             // Load user module icons ..
             if (apps.Count() > 1)
             {
 
-                var JSEvents = new StringBuilder();
+                var jsEvents = new StringBuilder();
 
-                PlaceHolderAppIcons.Text = ui.Text("main", "sections", base.getUser());
+                PlaceHolderAppIcons.Text = ui.Text("main", "sections", UmbracoUser);
                 plcIcons.Text = "";
-                foreach (BusinessLogic.Application a in apps.OrderBy(x => x.sortOrder))
+                foreach (var a in apps.OrderBy(x => x.sortOrder))
                 {
 
-                    string appClass = a.icon.StartsWith(".") ? a.icon.Substring(1, a.icon.Length - 1) : a.alias;
+                    var appClass = a.icon.StartsWith(".") ? a.icon.Substring(1, a.icon.Length - 1) : a.alias;
 
                     //adds client side event handlers to the icon buttons
-                    JSEvents.Append(@"jQuery('." + appClass + "').click(function() { appClick.call(this, '" + a.alias + "'); } );");
-                    JSEvents.Append(@"jQuery('." + appClass + "').dblclick(function() { appDblClick.call(this, '" + a.alias + "'); } );");
+                    jsEvents.Append(@"jQuery('." + appClass + "').click(function() { appClick.call(this, '" + a.alias + "'); } );");
+                    jsEvents.Append(@"jQuery('." + appClass + "').dblclick(function() { appDblClick.call(this, '" + a.alias + "'); } );");
 
-                    string iconElement = String.Format("<li><a class=\"{0}\" title=\"" + ui.Text("sections", a.alias, base.getUser()) + "\" href=\"javascript:void(0);\">", appClass);
+                    var iconElement = String.Format("<li><a class=\"{0}\" title=\"" + ui.Text("sections", a.alias, UmbracoUser) + "\" href=\"javascript:void(0);\">", appClass);
                     if (a.icon.StartsWith("."))
                         iconElement +=
                             "<img src=\"images/nada.gif\" class=\"trayHolder\" alt=\"\" /></a></li>";
                     else
-                        iconElement += "<img src=\"images/tray/" + a.icon + "\" class=\"trayIcon\" alt=\"" + ui.Text("sections", a.alias, base.getUser()) + "\"></a></li>";
+                        iconElement += "<img src=\"images/tray/" + a.icon + "\" class=\"trayIcon\" alt=\"" + ui.Text("sections", a.alias, UmbracoUser) + "\"></a></li>";
                     plcIcons.Text += iconElement;
 
                 }
 
                 //registers the jquery event handlers.
-                Page.ClientScript.RegisterStartupScript(this.GetType(), "AppIcons", "jQuery(document).ready(function() { " + JSEvents.ToString() + " } );", true);
+                Page.ClientScript.RegisterStartupScript(GetType(), "AppIcons", "jQuery(document).ready(function() { " + jsEvents + " } );", true);
 
             }
             else
@@ -75,7 +68,7 @@ namespace umbraco.cms.presentation
 
             //if user does not have access to content (ie, he's probably a translator)...
             //then change the default tree app
-            if (!userHasAccesstodefaultApp)
+            if (userHasAccesstodefaultApp == false)
             {
                 JTree.App = apps[0].alias;
                 DefaultApp = apps[0].alias;
@@ -87,21 +80,21 @@ namespace umbraco.cms.presentation
 
 
             // Load globalized labels
-            treeWindow.Text = ui.Text("main", "tree", base.getUser());
+            treeWindow.Text = ui.Text("main", "tree", UmbracoUser);
 
-            RenderActionJS();
+            RenderActionJs();
 
             // Version check goes here!
 
             // zb-00004 #29956 : refactor cookies names & handling
-            var updChkCookie = new umbraco.BusinessLogic.StateHelper.Cookies.Cookie("UMB_UPDCHK", GlobalSettings.VersionCheckPeriod); // was "updateCheck"
-            string updateCheckCookie = updChkCookie.HasValue ? updChkCookie.GetValue() : "";
+            var updChkCookie = new BusinessLogic.StateHelper.Cookies.Cookie("UMB_UPDCHK", GlobalSettings.VersionCheckPeriod); // was "updateCheck"
+            var updateCheckCookie = updChkCookie.HasValue ? updChkCookie.GetValue() : "";
 
-            if (GlobalSettings.VersionCheckPeriod > 0 && String.IsNullOrEmpty(updateCheckCookie) && base.getUser().UserType.Alias == "admin")
+            if (GlobalSettings.VersionCheckPeriod > 0 && String.IsNullOrEmpty(updateCheckCookie) && UmbracoUser.UserType.Alias == "admin")
             {
 
                 // Add scriptmanager version check
-                ScriptManager sm = ScriptManager.GetCurrent(Page);
+                var sm = ScriptManager.GetCurrent(Page);
                 sm.Scripts.Add(new ScriptReference(SystemDirectories.Umbraco + "/js/umbracoUpgradeChecker.js"));
                 sm.Services.Add(new ServiceReference(SystemDirectories.WebServices + "/CheckForUpgrade.asmx"));
 
@@ -118,7 +111,7 @@ namespace umbraco.cms.presentation
         {
             if (Request.Browser.Browser == "IE" && Request.Browser.MajorVersion == 9)
             {
-                StringBuilder metadata = new StringBuilder();
+                var metadata = new StringBuilder();
                 metadata.AppendFormat(
     @"<link rel='icon' href='{0}' type='image/x-icon'>
                 <link rel='shortcut icon' href='{0}' type='image/x-icon'> 
@@ -129,7 +122,7 @@ namespace umbraco.cms.presentation
     IOHelper.ResolveUrl(SystemDirectories.Umbraco + "/images/pinnedIcons/umb.ico"),
     HttpContext.Current.Request.Url.Host.ToLower().Replace("www.", ""));
 
-                var user = base.getUser();
+                var user = UmbracoUser;
                 if (user != null && user.Applications != null && user.Applications.Length > 0)
                 {
                     foreach (var app in user.Applications)
@@ -154,10 +147,10 @@ namespace umbraco.cms.presentation
         /// <summary>
         /// Renders out all JavaScript references that have bee declared in IActions
         /// </summary>
-        private void RenderActionJS()
+        private void RenderActionJs()
         {
             var item = 0;
-            foreach (var jsFile in umbraco.BusinessLogic.Actions.Action.GetJavaScriptFileReferences())
+            foreach (var jsFile in BusinessLogic.Actions.Action.GetJavaScriptFileReferences())
             {
                 //validate that this is a url, if it is not, we'll assume that it is a text block and render it as a text
                 //block instead.
@@ -185,7 +178,7 @@ namespace umbraco.cms.presentation
                     if (isValid)
                     {
                         //add to page
-                        Page.ClientScript.RegisterClientScriptInclude(this.GetType(), item.ToString(), jsFile);
+                        Page.ClientScript.RegisterClientScriptInclude(GetType(), item.ToString(), jsFile);
                     }
                 }
                 catch (UriFormatException)
@@ -193,11 +186,11 @@ namespace umbraco.cms.presentation
                     isValid = false;
                 }
 
-                if (!isValid)
+                if (isValid == false)
                 {
                     //it is invalid, let's render it as a script block instead as devs may have written real Javascript instead
                     //of a JS path
-                    Page.ClientScript.RegisterClientScriptBlock(this.GetType(), item.ToString(), jsFile, true);
+                    Page.ClientScript.RegisterClientScriptBlock(GetType(), item.ToString(CultureInfo.InvariantCulture), jsFile, true);
                 }
 
                 item++;
