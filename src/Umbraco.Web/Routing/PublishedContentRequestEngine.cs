@@ -84,18 +84,39 @@ namespace Umbraco.Web.Routing
             // we don't take care of anything so if the content has changed, it's up to the user
             // to find out the appropriate template
 
-            // set the culture on the thread -- again, 'cos it might have changed in the event handler
-			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
+            //complete the PCR and assign the remaining values
+		    ConfigureRequest();
+		}
 
-			// if request has been flagged to redirect, or has no content to display,
+        /// <summary>
+        /// Called by PrepareRequest once everything has been discovered, resolved and assigned to the PCR. This method
+        /// finalizes the PCR with the values assigned.
+        /// </summary>
+        /// <remarks>
+        /// This method logic has been put into it's own method in case developers have created a custom PCR or are assigning their own values
+        /// but need to finalize it themselves.
+        /// 
+        /// This method will throw an exception if no content has been assigned
+        /// </remarks>
+        public void ConfigureRequest()
+        {
+            if (_pcr.HasPublishedContent == false)
+            {
+                throw new InvalidOperationException("Cannot configure the request if there is not content assigned");
+            }
+
+            // set the culture on the thread -- again, 'cos it might have changed in the event handler
+            Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
+
+            // if request has been flagged to redirect, or has no content to display,
             // then return - whoever called us is in charge of actually redirecting
             if (_pcr.IsRedirect || !_pcr.HasPublishedContent)
-				return;
+                return;
 
             // we may be 404 _and_ have a content
 
-			// can't go beyond that point without a PublishedContent to render
-			// it's ok not to have a template, in order to give MVC a chance to hijack routes
+            // can't go beyond that point without a PublishedContent to render
+            // it's ok not to have a template, in order to give MVC a chance to hijack routes
 
             // note - the page() ctor below will cause the "page" to get the value of all its
             // "elements" ie of all the IPublishedContent property. If we use the object value,
@@ -111,7 +132,7 @@ namespace Umbraco.Web.Routing
             // used by many legacy objects
             _routingContext.UmbracoContext.HttpContext.Items["pageID"] = _pcr.PublishedContent.Id;
             _routingContext.UmbracoContext.HttpContext.Items["pageElements"] = _pcr.UmbracoPage.Elements;
-		}
+        }
 
 		/// <summary>
 		/// Updates the request when there is no template to render the content.
