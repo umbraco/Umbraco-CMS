@@ -1,5 +1,7 @@
-using System;
+﻿using System;
+using System.Globalization;
 using System.Web.UI.WebControls;
+using Umbraco.Web;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.language;
@@ -22,23 +24,22 @@ namespace umbraco.dialogs
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            _currentId = int.Parse(helper.Request("id"));
-            prop_domain.Text = ui.Text("assignDomain", "domain", this.getUser());
-            prop_lang.Text = ui.Text("general", "language", this.getUser());
-            pane_addnew.Text = ui.Text("assignDomain", "addNew", this.getUser());
-            pane_edit.Text = ui.Text("assignDomain", "orEdit", this.getUser());
-            
-            // Put user code to initialize the page here
-            if (helper.Request("editDomain").Trim() != "")
+            _currentId = Request.GetItemAs<int>("id");
+            prop_domain.Text = ui.Text("assignDomain", "domain", UmbracoUser);
+            prop_lang.Text = ui.Text("general", "language", UmbracoUser);
+            pane_addnew.Text = ui.Text("assignDomain", "addNew", UmbracoUser);
+            pane_edit.Text = ui.Text("assignDomain", "orEdit", UmbracoUser);
+
+            if (Request.GetItemAsString("editDomain").Trim() != "")
             {
-                _editDomain = int.Parse(helper.Request("editDomain"));
+                _editDomain = Request.GetItemAs<int>("editDomain");
             }
 
-            if (helper.Request("delDomain").Trim() != "")
+            if (Request.GetItemAsString("delDomain").Trim() != "")
             {
-                var d = new Domain(int.Parse(helper.Request("delDomain")));
+                var d = new Domain(Request.GetItemAs<int>("delDomain"));
                 FeedBackMessage.type = uicontrols.Feedback.feedbacktype.success;
-                FeedBackMessage.Text = ui.Text("assignDomain", "domainDeleted", d.Name, getUser());
+                FeedBackMessage.Text = ui.Text("assignDomain", "domainDeleted", d.Name, UmbracoUser);
                 d.Delete();
                 UpdateDomainList();
             }
@@ -46,8 +47,8 @@ namespace umbraco.dialogs
             if (!IsPostBack)
             {
                 // Add caption to button
-                ok.Text = ui.Text("assignDomain", "addNew", getUser());
-              
+                ok.Text = ui.Text("assignDomain", "addNew", UmbracoUser);
+
                 var selectedLanguage = -1;
 
                 // Maybe add editing info - not the best way this is made ;-)
@@ -55,24 +56,24 @@ namespace umbraco.dialogs
                 {
                     var d = new Domain(_editDomain);
                     selectedLanguage = d.Language.id;
-					DomainName.Text = d.Name.StartsWith("*") ? "*" : d.Name;
-                    ok.Text = ui.Text("general", "update", getUser());
+                    DomainName.Text = d.Name.StartsWith("*") ? "*" : d.Name;
+                    ok.Text = ui.Text("general", "update", UmbracoUser);
                 }
 
                 // Add caption to language validator
-                LanguageValidator.ErrorMessage = ui.Text("defaultdialogs", "requiredField", base.getUser()) + "<br/>";
-                DomainValidator.ErrorMessage = ui.Text("defaultdialogs", "requiredField", base.getUser());
+                LanguageValidator.ErrorMessage = ui.Text("defaultdialogs", "requiredField", UmbracoUser) + "<br/>";
+                DomainValidator.ErrorMessage = ui.Text("defaultdialogs", "requiredField", UmbracoUser);
 
-				DomainValidator2.ErrorMessage = ui.Text("assignDomain", "invalidDomain", base.getUser());
-				//DomainValidator2.ValidationExpression = @"^(?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/[-\w]*)?$";
-				DomainValidator2.ValidationExpression = @"^(\*|((?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/[-\w]*)?))$";
+                DomainValidator2.ErrorMessage = ui.Text("assignDomain", "invalidDomain", UmbracoUser);
+                //DomainValidator2.ValidationExpression = @"^(?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/[-\w]*)?$";
+                DomainValidator2.ValidationExpression = @"^(\*|((?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/[-\w]*)?))$";
 
-                Languages.Items.Add(new ListItem(ui.Text("general", "choose", base.getUser()), ""));
-                foreach (var l in Language.getAll)
+                Languages.Items.Add(new ListItem(ui.Text("general", "choose", UmbracoUser), ""));
+                foreach (var l in Language.GetAllAsList())
                 {
                     var li = new ListItem();
                     li.Text = l.FriendlyName;
-                    li.Value = l.id.ToString();
+                    li.Value = l.id.ToString(CultureInfo.InvariantCulture);
                     if (selectedLanguage == l.id)
                         li.Selected = true;
                     Languages.Items.Add(li);
@@ -84,7 +85,7 @@ namespace umbraco.dialogs
 
         private void UpdateDomainList()
         {
-            
+
             var domainList = Domain.GetDomainsById(_currentId);
 
             if (domainList.Length > 0)
@@ -95,9 +96,9 @@ namespace umbraco.dialogs
                 {
                     var name = d.Name.StartsWith("*") ? "*" : d.Name;
                     allDomains.Text += "<tr><td>" + name + "</td><td>(" + d.Language.CultureAlias + ")</td><td><a href=\"?id=" + _currentId + "&editDomain=" +
-                                       d.Id.ToString() + "\">" + ui.Text("edit") + "</a></td><td><a href=\"?id=" + _currentId +
-                                       "&delDomain=" + d.Id.ToString() + "\" onClick=\"return confirm('" +
-                                       ui.Text("defaultdialogs", "confirmdelete", base.getUser()) +
+                                       d.Id.ToString(CultureInfo.InvariantCulture) + "\">" + ui.Text("edit") + "</a></td><td><a href=\"?id=" + _currentId +
+                                       "&delDomain=" + d.Id.ToString(CultureInfo.InvariantCulture) + "\" onClick=\"return confirm('" +
+                                       ui.Text("defaultdialogs", "confirmdelete", UmbracoUser) +
                                        "');\" style=\"color: red\">" + ui.Text("delete") + "</a></td></tr>";
                 }
 
@@ -107,7 +108,7 @@ namespace umbraco.dialogs
             else
             {
                 pane_edit.Visible = false;
-            }            
+            }
         }
 
         protected void SaveDomain(object sender, EventArgs e)
@@ -120,7 +121,7 @@ namespace umbraco.dialogs
                     d.Language = new Language(int.Parse(Languages.SelectedValue));
                     d.Name = DomainName.Text.ToLower();
                     FeedBackMessage.type = uicontrols.Feedback.feedbacktype.success;
-                    FeedBackMessage.Text = ui.Text("assignDomain", "domainUpdated", DomainName.Text, getUser());
+                    FeedBackMessage.Text = ui.Text("assignDomain", "domainUpdated", DomainName.Text, UmbracoUser);
                     d.Save();
 
                     DomainName.Text = "";
@@ -132,14 +133,14 @@ namespace umbraco.dialogs
                 }
                 else
                 {
-					// have to handle wildcard
+                    // have to handle wildcard
                     var domainName = DomainName.Text.Trim();
-					domainName = domainName == "*" ? ("*" + _currentId.ToString()) : domainName;
+                    domainName = domainName == "*" ? ("*" + _currentId.ToString(CultureInfo.InvariantCulture)) : domainName;
 
                     if (!Domain.Exists(domainName.ToLower()))
                     {
                         Domain.MakeNew(domainName, _currentId, int.Parse(Languages.SelectedValue));
-                        FeedBackMessage.Text = ui.Text("assignDomain", "domainCreated", domainName, getUser());
+                        FeedBackMessage.Text = ui.Text("assignDomain", "domainCreated", domainName, UmbracoUser);
                         FeedBackMessage.type = uicontrols.Feedback.feedbacktype.success;
 
                         DomainName.Text = "";
@@ -151,12 +152,119 @@ namespace umbraco.dialogs
                     }
                     else
                     {
-                        FeedBackMessage.Text = ui.Text("assignDomain", "domainExists", DomainName.Text.Trim(), getUser());
+                        FeedBackMessage.Text = ui.Text("assignDomain", "domainExists", DomainName.Text.Trim(), UmbracoUser);
                         FeedBackMessage.type = uicontrols.Feedback.feedbacktype.error;
                     }
-                }   
+                }
             }
         }
 
+        /// <summary>
+        /// FeedBackMessage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Feedback FeedBackMessage;
+
+        /// <summary>
+        /// pane_addnew control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane pane_addnew;
+
+        /// <summary>
+        /// prop_domain control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel prop_domain;
+
+        /// <summary>
+        /// DomainName control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox DomainName;
+
+        /// <summary>
+        /// DomainValidator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator DomainValidator;
+
+        /// <summary>
+        /// DomainValidator2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RegularExpressionValidator DomainValidator2;
+
+        /// <summary>
+        /// prop_lang control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel prop_lang;
+
+        /// <summary>
+        /// Languages control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.DropDownList Languages;
+
+        /// <summary>
+        /// LanguageValidator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RequiredFieldValidator LanguageValidator;
+
+        /// <summary>
+        /// ok control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button ok;
+
+        /// <summary>
+        /// pane_edit control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane pane_edit;
+
+        /// <summary>
+        /// allDomains control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Literal allDomains;
     }
 }
