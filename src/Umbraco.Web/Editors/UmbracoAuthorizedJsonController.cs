@@ -1,11 +1,13 @@
 ﻿using System.Web.Http.Controllers;
 using Umbraco.Web.WebApi;
+using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {
     /// <summary>
     /// An abstract API controller that only supports JSON
     /// </summary>
+    [ValidateAngularAntiForgeryToken]
     public abstract class UmbracoAuthorizedJsonController : UmbracoAuthorizedApiController
     {
         protected UmbracoAuthorizedJsonController()

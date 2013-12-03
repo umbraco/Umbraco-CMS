@@ -48,6 +48,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [WebApi.UmbracoAuthorize]
+        [ValidateAngularAntiForgeryToken]
         public double GetRemainingTimeoutSeconds()
         {
             var httpContextAttempt = TryGetHttpContext();
@@ -85,6 +86,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [WebApi.UmbracoAuthorize]
+        [ValidateAngularAntiForgeryToken]
         public UserDetail GetCurrentUser()
         {
             var user = Services.UserService.GetUserById(UmbracoContext.Security.GetUserId());
@@ -104,7 +106,7 @@ namespace Umbraco.Web.Editors
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        [SetAngularAntiForgeryToken]
+        [SetAngularAntiForgeryTokens]
         public UserDetail PostLogin(string username, string password)
         {
             if (UmbracoContext.Security.ValidateBackOfficeCredentials(username, password))
@@ -112,11 +114,18 @@ namespace Umbraco.Web.Editors
                 var user = Security.GetBackOfficeUser(username);
 
                 //TODO: Clean up the int cast!
-                var timeoutSeconds = UmbracoContext.Security.PerformLogin((int)user.Id);
-                
+                var ticket = UmbracoContext.Security.PerformLogin(user);
+
+                var http = this.TryGetHttpContext();
+                if (http.Success == false)
+                {
+                    throw new InvalidOperationException("This method requires that an HttpContext be active");
+                }
+                http.Result.AuthenticateCurrentRequest(ticket, false);
+
                 var result = Mapper.Map<UserDetail>(user);
                 //set their remaining seconds
-                result.SecondsUntilTimeout = timeoutSeconds;
+                result.SecondsUntilTimeout = ticket.GetRemainingAuthSeconds();
                 return result;
             }
 
@@ -134,6 +143,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [UmbracoBackOfficeLogout]
         [ClearAngularAntiForgeryToken]
+        [ValidateAngularAntiForgeryToken]
         public HttpResponseMessage PostLogout()
         {           
             return Request.CreateResponse(HttpStatusCode.OK);
