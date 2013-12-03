@@ -161,6 +161,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AngularIntegration\AngularAntiForgeryTests.cs" />
     <Compile Include="AngularIntegration\ContentModelSerializationTests.cs" />
     <Compile Include="AngularIntegration\JsInitializationTests.cs" />
     <Compile Include="AngularIntegration\ServerVariablesParserTests.cs" />

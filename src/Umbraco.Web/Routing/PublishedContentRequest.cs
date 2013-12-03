@@ -60,7 +60,21 @@ namespace Umbraco.Web.Routing
 		internal void Prepare()
 		{
 			_engine.PrepareRequest();
+		    ConfigureRequest();
 		}
+
+        /// <summary>
+        /// Called after the request is prepared - after content, templates, etc... have been assigned.
+        /// </summary>
+        /// <remarks>
+        /// This method must be called for the PCR to work, it is automatically called after the PCR is prepared.
+        /// This method has been exposed in case developers need to configure the request manually if they've manually assigned
+        /// a content instance to the PCR. (i.e. in EnsurePublishedContentRequestAttribute )
+        /// </remarks>
+        public void ConfigureRequest()
+        {
+            _engine.ConfigureRequest();
+        }
 
 		/// <summary>
 		/// Updates the request when there is no template to render the content.

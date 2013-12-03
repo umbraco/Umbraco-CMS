@@ -4,7 +4,7 @@ using Umbraco.Core.Security;
 namespace Umbraco.Web.WebApi.Filters
 {
     /// <summary>
-    /// A filter that is used to remove the authorization cookie for the current user
+    /// A filter that is used to remove the authorization cookie for the current user when the request is successful
     /// </summary>
     /// <remarks>
     /// This is used so that we can log a user out in conjunction with using other filters that modify the cookies collection.
@@ -14,8 +14,9 @@ namespace Umbraco.Web.WebApi.Filters
     public sealed class UmbracoBackOfficeLogoutAttribute : ActionFilterAttribute
     {
         public override void OnActionExecuted(HttpActionExecutedContext context)
-        {
+        {            
             if (context.Response == null) return;
+            if (context.Response.IsSuccessStatusCode == false) return;
             context.Response.UmbracoLogout();
         }
     }

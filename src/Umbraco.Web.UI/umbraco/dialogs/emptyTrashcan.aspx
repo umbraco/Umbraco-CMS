@@ -1,11 +1,12 @@
-<%@ Page Language="C#" MasterPageFile="../masterpages/umbracoDialog.Master" AutoEventWireup="true" CodeBehind="emptyTrashcan.aspx.cs" Inherits="umbraco.presentation.dialogs.emptyTrashcan" %>
+<%@ Page Language="C#" MasterPageFile="../masterpages/umbracoDialog.Master" AutoEventWireup="true" Inherits="umbraco.presentation.dialogs.emptyTrashcan" %>
+<%@ Import Namespace="System.Globalization" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
 		<script type="text/javascript">
 		
-		    var recycleBinType = '<%=umbraco.helper.Request("type")%>';
-		    var emptyTotal = '<%= umbraco.cms.businesslogic.RecycleBin.Count((umbraco.cms.businesslogic.RecycleBin.RecycleBinType) Enum.Parse(typeof(umbraco.cms.businesslogic.RecycleBin.RecycleBinType), umbraco.helper.Request("type"), true)).ToString()%>';
+		    var recycleBinType = '<%=BinType.ToString()%>';
+		    var emptyTotal = '<%= umbraco.cms.businesslogic.RecycleBin.Count(BinType).ToString(CultureInfo.InvariantCulture)%>';
 		    
 		    function emptyRecycleBin() {
     			jQuery('#formDiv').hide();
@@ -60,19 +61,19 @@
 		
 		<cc1:ProgressBar ID="progbar" runat="server" Title="Please wait..." />
 		<br />
-		<span class="guiDialogTiny" id="statusLabel"><%=umbraco.ui.Text("deleting", this.getUser())%></span>
+		<span class="guiDialogTiny" id="statusLabel"><%=umbraco.ui.Text("deleting", UmbracoUser)%></span>
 		</div>
 	  	  	  
 	  <div id="formDiv">
 	    <p><%= umbraco.ui.Text("defaultdialogs", "recycleBinWarning")%></p>
-		   <input type="checkbox" id="confirmDelete" onclick="$get('ok').disabled = !this.checked;" /> <label for="confirmDelete"><%=umbraco.ui.Text("defaultdialogs", "confirmEmptyTrashcan", umbraco.cms.businesslogic.RecycleBin.Count((umbraco.cms.businesslogic.RecycleBin.RecycleBinType)Enum.Parse(typeof(umbraco.cms.businesslogic.RecycleBin.RecycleBinType), umbraco.helper.Request("type"), true)).ToString(), this.getUser())%></label>
+		   <input type="checkbox" id="confirmDelete" onclick="$get('ok').disabled = !this.checked;" /> <label for="confirmDelete"><%=umbraco.ui.Text("defaultdialogs", "confirmEmptyTrashcan", umbraco.cms.businesslogic.RecycleBin.Count(BinType).ToString(CultureInfo.InvariantCulture), UmbracoUser)%></label>
 		</div>
 	  </cc1:PropertyPanel>
 	  </cc1:Pane>
 	  
 		<br />
 		<div id="buttons">
-		<input type="button" ID="ok" value="<%=umbraco.ui.Text("actions", "emptyTrashcan", this.getUser()) %>" class="guiInputButton" onclick="if ($get('confirmDelete').checked) {emptyRecycleBin();}" disabled="true" />  
+		<input type="button" ID="ok" value="<%=umbraco.ui.Text("actions", "emptyTrashcan", UmbracoUser) %>" class="guiInputButton" onclick="if ($get('confirmDelete').checked) {emptyRecycleBin();}" disabled="true" />  
 		<em><%= umbraco.ui.Text("or") %></em> 
     <a href="#" onclick="UmbClientMgr.closeModalWindow();">
       <%=umbraco.ui.Text("cancel")%>

@@ -138,7 +138,7 @@ namespace Umbraco.Web.Security
         public double PerformLogin(int userId)
         {
             var user = _applicationContext.Services.UserService.GetUserById(userId);
-            return PerformLogin(user);
+            return PerformLogin(user).GetRemainingAuthSeconds();
         }
 
         /// <summary>
@@ -146,7 +146,7 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <param name="user"></param>
         /// <returns>returns the number of seconds until their session times out</returns>
-        internal double PerformLogin(IUser user)
+        internal FormsAuthenticationTicket PerformLogin(IUser user)
         {
             var ticket = _httpContext.CreateUmbracoAuthTicket(new UserData(Guid.NewGuid().ToString("N"))
             {
@@ -163,7 +163,7 @@ namespace Umbraco.Web.Security
             
             LogHelper.Info<WebSecurity>("User Id: {0} logged in", () => user.Id);
 
-            return ticket.GetRemainingAuthSeconds();
+            return ticket;
         }
 
         /// <summary>

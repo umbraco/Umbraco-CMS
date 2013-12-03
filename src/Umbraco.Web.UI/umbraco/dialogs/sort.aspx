@@ -2,6 +2,7 @@
 
 <%@ Import Namespace="System.Globalization" %>
 <%@ Import Namespace="Umbraco.Core.IO" %>
+<%@ Import Namespace="Umbraco.Web" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
@@ -71,8 +72,8 @@
                 submitButton: jQuery("#submitButton"),
                 closeWindowButton: jQuery("#closeWindowButton"),
                 dateTimeFormat: "<%=CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern%> <%=CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern%>",
-                currentId: "<%=umbraco.helper.Request("ID")%>",
-                serviceUrl: "<%= IOHelper.ResolveUrl(SystemDirectories.Umbraco)%>/WebServices/NodeSorter.asmx/UpdateSortOrder?app=<%=umbraco.helper.Request("app")%>"
+                currentId: "<%=Request.GetCleanedItem("ID")%>",
+                serviceUrl: "<%= IOHelper.ResolveUrl(SystemDirectories.Umbraco)%>/WebServices/NodeSorter.asmx/UpdateSortOrder?app=<%=Request.GetCleanedItem("app")%>"
             });
 
             sortDialog.init();

@@ -48,6 +48,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [WebApi.UmbracoAuthorize]
+        [ValidateAngularAntiForgeryToken]
         public double GetRemainingTimeoutSeconds()
         {
             var httpContextAttempt = TryGetHttpContext();
@@ -84,7 +85,13 @@ namespace Umbraco.Web.Editors
         /// Returns the currently logged in Umbraco user
         /// </summary>
         /// <returns></returns>
+        /// <remarks>
+        /// We have the attribute [SetAngularAntiForgeryTokens] applied because this method is called initially to determine if the user
+        /// is valid before the login screen is displayed. The Auth cookie can be persisted for up to a day but the csrf cookies are only session
+        /// cookies which means that the auth cookie could be valid but the csrf cookies are no longer there, in that case we need to re-set the csrf cookies.
+        /// </remarks>
         [WebApi.UmbracoAuthorize]
+        [SetAngularAntiForgeryTokens]
         public UserDetail GetCurrentUser()
         {
             var user = Services.UserService.GetUserById(UmbracoContext.Security.GetUserId());
@@ -104,7 +111,7 @@ namespace Umbraco.Web.Editors
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        [SetAngularAntiForgeryToken]
+        [SetAngularAntiForgeryTokens]
         public UserDetail PostLogin(string username, string password)
         {
             if (UmbracoContext.Security.ValidateBackOfficeCredentials(username, password))
@@ -112,11 +119,18 @@ namespace Umbraco.Web.Editors
                 var user = Security.GetBackOfficeUser(username);
 
                 //TODO: Clean up the int cast!
-                var timeoutSeconds = UmbracoContext.Security.PerformLogin((int)user.Id);
-                
+                var ticket = UmbracoContext.Security.PerformLogin(user);
+
+                var http = this.TryGetHttpContext();
+                if (http.Success == false)
+                {
+                    throw new InvalidOperationException("This method requires that an HttpContext be active");
+                }
+                http.Result.AuthenticateCurrentRequest(ticket, false);
+
                 var result = Mapper.Map<UserDetail>(user);
                 //set their remaining seconds
-                result.SecondsUntilTimeout = timeoutSeconds;
+                result.SecondsUntilTimeout = ticket.GetRemainingAuthSeconds();
                 return result;
             }
 
@@ -134,6 +148,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         [UmbracoBackOfficeLogout]
         [ClearAngularAntiForgeryToken]
+        [ValidateAngularAntiForgeryToken]
         public HttpResponseMessage PostLogout()
         {           
             return Request.CreateResponse(HttpStatusCode.OK);

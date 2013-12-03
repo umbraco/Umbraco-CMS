@@ -907,7 +907,7 @@ namespace Umbraco.Core
         /// This allows you to replace strings like &amp; , etc.. with your replacement character before the automatic
         /// reduction.
         /// </remarks>
-        [UmbracoWillObsolete("This method should be removed. Use ToUrlSegment instead.")]
+        [Obsolete("This method should be removed. Use ToUrlSegment instead.")]
         public static string ToUrlAlias(this string value, IDictionary<string, string> charReplacements, bool replaceDoubleDashes, bool stripNonAscii, bool urlEncode)
         {
             var helper = ShortStringHelper;
@@ -931,7 +931,7 @@ namespace Umbraco.Core
         ///  and <c>UmbracoSettings.RemoveDoubleDashesFromUrlReplacing</c>.</para>
         /// <para>Other helpers may use different parameters.</para>
         /// </remarks>
-        [UmbracoWillObsolete("This method should be removed. Use ToUrlSegment instead.")]
+        [Obsolete("This method should be removed. Use ToUrlSegment instead.")]
         public static string FormatUrl(this string url)
         {
             var helper = ShortStringHelper;
@@ -1011,7 +1011,7 @@ namespace Umbraco.Core
         /// <param name="removeSpaces">Indicates whether spaces should be removed. THIS PARAMETER IS IGNORED.</param>
         /// <returns>The safe alias.</returns>
         /// <remarks>CamelCase, and remove spaces, whatever the parameters.</remarks>
-        [UmbracoWillObsolete("This method should be removed. Use ToSafeAlias instead.")]
+        [Obsolete("This method should be removed. Use ToSafeAlias instead.")]
         public static string ToUmbracoAlias(this string phrase, StringAliasCaseType caseType = StringAliasCaseType.CamelCase, bool removeSpaces = false)
         {
             var helper = ShortStringHelper;
@@ -1056,7 +1056,7 @@ namespace Umbraco.Core
         /// <para>This is the legacy method, so we can't really change it, although it has issues (see unit tests).</para>
         /// <para>It does more than "converting the case", and also remove spaces, etc.</para>
         /// </remarks>
-        [UmbracoWillObsolete("This method should be removed. Use CleanString instead.")]
+        [Obsolete("This method should be removed. Use CleanString instead.")]
         public static string ConvertCase(this string phrase, StringAliasCaseType cases)
         {
             var helper = ShortStringHelper;

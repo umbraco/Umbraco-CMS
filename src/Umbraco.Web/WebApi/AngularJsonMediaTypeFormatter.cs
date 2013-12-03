@@ -30,29 +30,32 @@ namespace Umbraco.Web.WebApi
         public async override Task WriteToStreamAsync(Type type, object value, Stream writeStream, HttpContent content, TransportContext transportContext)
         {
             
-            var memStream = new MemoryStream();
-
-            //Let the base class do all the processing using our custom stream
-            await base.WriteToStreamAsync(type, value, memStream, content, transportContext);
-
-            memStream.Flush();
-            memStream.Position = 0;
-            
-            //read the result string from the stream
-            string output;
-            using (var reader = new StreamReader(memStream))
+            using (var memStream = new MemoryStream())
             {
-                output = reader.ReadToEnd();
-            }
+                //Let the base class do all the processing using our custom stream
+                await base.WriteToStreamAsync(type, value, memStream, content, transportContext);
 
-            //pre-pend the angular chars to the result
-            output = ")]}',\n" + output;
-            
-            //write out the result to the original stream
-            using (var writer = new StreamWriter(writeStream))
-            {
-                writer.Write(output);
+                memStream.Flush();
+                memStream.Position = 0;
+
+                //read the result string from the stream
+                // (see: http://docs.angularjs.org/api/ng.$http)
+                string output;
+                using (var reader = new StreamReader(memStream))
+                {
+                    output = reader.ReadToEnd();
+                }
+
+                //pre-pend the angular chars to the result
+                output = ")]}',\n" + output;
+
+                //write out the result to the original stream
+                using (var writer = new StreamWriter(writeStream))
+                {
+                    writer.Write(output);
+                }
             }
+            
         }
 
     }
