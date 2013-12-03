@@ -224,27 +224,6 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Can_Save_New_Content_With_Explicit_User()
-        {
-            var user = new User(ServiceContext.UserService.GetUserTypeByAlias("admin"))
-                {
-                    Name = "Test",
-                    Email = "test@test.com",
-                    Username = "test",
-                    Password = "test"
-                };
-            ServiceContext.UserService.SaveUser(user);
-            var content = new Content("Test", -1, ServiceContext.ContentTypeService.GetContentType("umbTextpage"));
-
-            // Act
-            ServiceContext.ContentService.Save(content, (int)user.Id);
-
-            // Assert
-            Assert.That(content.CreatorId, Is.EqualTo(user.Id));
-            Assert.That(content.WriterId, Is.EqualTo(user.Id));
-        }
-
-        [Test]
         public void Cannot_Create_Content_With_Non_Existing_ContentType_Alias()
         {
             // Arrange

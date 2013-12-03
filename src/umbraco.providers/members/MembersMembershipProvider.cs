@@ -13,7 +13,6 @@ using System.Security.Cryptography;
 using System.Web.Util;
 using System.Collections.Specialized;
 using System.Configuration.Provider;
-using umbraco.cms.businesslogic;
 using System.Security;
 using System.Security.Permissions;
 using System.Runtime.CompilerServices;
@@ -1024,62 +1023,4 @@ namespace umbraco.providers.members
 
         #endregion
     }
-
-    /// <summary>
-    /// Adds some event handling
-    /// </summary>
-    public class MembershipEventHandler : ApplicationEventHandler
-    {
-        protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-        {
-            Member.New += Member_New;
-        }
-
-        void Member_New(Member sender, NewEventArgs e)
-        {
-            //This is a bit of a hack to ensure that the member is approved when created since many people will be using
-            // this old api to create members on the front-end and they need to be approved - which is based on whether or not 
-            // the Umbraco membership provider is configured.
-            var provider = Membership.Provider as UmbracoMembershipProvider;
-            if (provider != null)
-            {
-                var approvedField = provider.ApprovedPropertyTypeAlias;
-                var property = sender.getProperty(approvedField);
-                if (property != null)
-                {
-                    property.Value = 1;
-                }
-            }            
-        }
-    }
-
-    //TODO: We need to re-enable this in 6.2, but need to back port most of the membership provider changes (still in a custom branch atm)
-
-    ///// <summary>
-    ///// Adds some event handling
-    ///// </summary>
-    //public class MembershipEventHandler : ApplicationEventHandler
-    //{
-    //    protected override void ApplicationStarted(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-    //    {
-    //        Member.New += Member_New;
-    //    }
-
-    //    void Member_New(Member sender, NewEventArgs e)
-    //    {
-    //        //This is a bit of a hack to ensure that the member is approved when created since many people will be using
-    //        // this old api to create members on the front-end and they need to be approved - which is based on whether or not 
-    //        // the Umbraco membership provider is configured.
-    //        var provider = Membership.Provider as UmbracoMembershipProvider;
-    //        if (provider != null)
-    //        {
-    //            var approvedField = provider.ApprovedPropertyTypeAlias;
-    //            var property = sender.getProperty(approvedField);
-    //            if (property != null)
-    //            {
-    //                property.Value = 1;
-    //            }
-    //        }            
-    //    }
-    //}
 }
