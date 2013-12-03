@@ -3,6 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Reflection;
 using System.Web;
 using System.Web.SessionState;
@@ -12,6 +13,8 @@ using System.Web.UI.HtmlControls;
 using System.IO;
 using System.Xml;
 using System.Xml.XPath;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Web;
 using umbraco.uicontrols;
 using Umbraco.Core.IO;
@@ -25,9 +28,41 @@ namespace umbraco.cms.presentation
     /// </summary>
     public partial class dashboard : BasePages.UmbracoEnsuredPage
     {
+        private string _section;
 
-
-        private string _section = "";
+        protected string Section
+        {
+            get
+            {
+                if (_section == null)
+                {
+                    var qry = Request.GetCleanedItem("app");
+                    // Load dashboard content
+                    if (qry.IsNullOrWhiteSpace() == false)
+                    {
+                        //validate the app
+                        if (BusinessLogic.Application.getAll().Any(x => x.alias.InvariantEquals(qry)) == false)
+                        {
+                            LogHelper.Warn<dashboard>("A requested app: " + Request.GetItemAsString("app") + " was not found");
+                            _section = "default";
+                        }
+                        else
+                        {
+                            _section = qry;
+                        }
+                    }
+                    else if (UmbracoUser.Applications.Length > 0)
+                    {
+                        _section = "default";
+                    }
+                    else
+                    {
+                        _section = UmbracoUser.Applications[0].alias;
+                    }
+                }
+                return _section;
+            }
+        }
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -48,26 +83,13 @@ namespace umbraco.cms.presentation
         {
 
             base.OnInit(e);
-            // Load dashboard content
-            if (Request.GetItemAsString("app") != "")
-            {
-                _section = Request.GetItemAsString("app");
-            }
-            else if (UmbracoUser.Applications.Length > 0)
-            {
-                _section = "default";
-            }
-            else
-            {
-                _section = UmbracoUser.Applications[0].alias;
-            }
-
+           
             var dashBoardXml = new XmlDocument();
             dashBoardXml.Load(IOHelper.MapPath(SystemFiles.DashboardConfig));
 
             // test for new tab interface
             if (dashBoardXml.DocumentElement == null) return;
-            var nodeList = dashBoardXml.DocumentElement.SelectNodes("//section [areas/area = '" + _section.ToLower() + "']");
+            var nodeList = dashBoardXml.DocumentElement.SelectNodes("//section [areas/area = '" + Section.ToLower() + "']");
             if (nodeList == null) return;
 
             foreach (XmlNode section in nodeList)
@@ -139,7 +161,7 @@ namespace umbraco.cms.presentation
                 }
                 else
                 {
-                    var xmlNodeList = dashBoardXml.SelectNodes("//entry [@section='" + _section.ToLower() + "']");
+                    var xmlNodeList = dashBoardXml.SelectNodes("//entry [@section='" + Section.ToLower() + "']");
                     if (xmlNodeList != null)
                     {
                         foreach (XmlNode entry in xmlNodeList)
