@@ -1,5 +1,6 @@
 ﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="ModuleInjector.aspx.cs" Inherits="umbraco.presentation.umbraco.LiveEditing.Modules.SkinModule.ModuleInjector" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Import Namespace="Umbraco.Web" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
@@ -108,7 +109,7 @@
 
             top.jQuery('.umbModalBoxIframe').closest(".umbModalBox").ModalWindowAPI().close();
 
-            top.umbInsertModule('<%=umbraco.helper.Request("target")%>',macroString,'<%=umbraco.helper.Request("type")%>');
+            top.umbInsertModule('<%=Request.GetCleanedItem("target")%>',macroString,'<%=Request.GetCleanedItem("type")%>');
 		}
 
 		function pseudoHtmlEncode(text) {

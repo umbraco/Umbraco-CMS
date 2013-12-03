@@ -1,6 +1,7 @@
 <%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master" CodeBehind="umbracoField.aspx.cs"
     AutoEventWireup="True" Inherits="umbraco.dialogs.umbracoField" %>
 
+<%@ Import Namespace="Umbraco.Web" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
@@ -24,7 +25,7 @@
                     submitButton: $("#submitButton"),
                     form: document.forms[0],
                     tagName: document.forms[0].<%= tagName.ClientID %>.value,
-                    objectId: '<%=umbraco.helper.Request("objectId")%>'
+                    objectId: '<%=Request.GetCleanedItem("objectId")%>'
                 });
                 umbracoField.init();
             });            
@@ -126,5 +127,5 @@
     <br />
     <input id="submitButton" type="button" name="gem" value="<%=umbraco.ui.Text("insert")%>" />
     &nbsp; <em>or </em>&nbsp; <a id="cancelButton" href="#" style="color: blue">
-        <%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
+        <%=umbraco.ui.Text("general", "cancel", UmbracoUser)%></a>
 </asp:Content>
