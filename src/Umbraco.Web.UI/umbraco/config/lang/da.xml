@@ -112,6 +112,8 @@
     <key alias="updateDate">Sidst redigeret</key>
     <key alias="uploadClear">Fjern fil</key>
     <key alias="urls">Link til dokument</key>
+
+    <key alias="childItems" version="7.0">Undersider</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Hvor ønsker du at oprette den nye %0%</key>

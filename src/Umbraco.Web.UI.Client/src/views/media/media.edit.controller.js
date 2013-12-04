@@ -79,6 +79,8 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
                     editorState.set($scope.content);
                     $scope.busy = false;
                 });
+        }else{
+            $scope.busy = false;
         }
         
     };

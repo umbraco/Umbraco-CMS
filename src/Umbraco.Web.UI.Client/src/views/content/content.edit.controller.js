@@ -152,6 +152,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
                 });
         }
         else {
+            $scope.busy = false;
             deferred.reject();
         }
 

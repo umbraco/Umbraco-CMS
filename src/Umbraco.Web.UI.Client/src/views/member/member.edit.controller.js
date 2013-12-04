@@ -121,6 +121,8 @@ function MemberEditController($scope, $routeParams, $location, $q, $window, appS
                     editorState.set($scope.content);
                     $scope.busy = false;
                 });
+        }else{
+            $scope.busy = false;
         }
         
     };
