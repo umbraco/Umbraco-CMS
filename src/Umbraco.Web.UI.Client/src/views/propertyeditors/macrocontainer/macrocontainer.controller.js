@@ -7,15 +7,18 @@ angular.module('umbraco')
 		
 		if($scope.model.value){
 			var macros = $scope.model.value.split('>');
-			angular.forEach(macros, function(syntax, key){
 
+			angular.forEach(macros, function(syntax, key){
 				if(syntax && syntax.length > 10){
 					//re-add the char we split on
 					syntax = syntax + ">";
 					var parsed = macroService.parseMacroSyntax(syntax);
+					if(!parsed){
+						parsed = {};
+					}
+					
 					parsed.syntax = syntax;
 					collectDetails(parsed);
-
 					$scope.renderModel.push(parsed);
 				}
 			});
@@ -25,7 +28,6 @@ angular.module('umbraco')
 		function collectDetails(macro){
 			macro.details = "";
 			if(macro.marcoParamsDictionary){
-			
 				angular.forEach((macro.marcoParamsDictionary), function(value, key){
 					macro.details += key + ": " + value + " ";	
 				});	
