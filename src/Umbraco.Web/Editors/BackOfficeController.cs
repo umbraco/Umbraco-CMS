@@ -26,7 +26,6 @@ namespace Umbraco.Web.Editors
     /// </summary>
     public class BackOfficeController : UmbracoController
     {
-
         /// <summary>
         /// Render the default view
         /// </summary>
@@ -199,8 +198,7 @@ namespace Umbraco.Web.Editors
 
             return JavaScript(ServerVariablesParser.Parse(d));
         }
-
-
+        
         private Dictionary<string, object> GetApplicationState()
         {
             if (ApplicationContext.IsConfigured == false)
@@ -220,7 +218,6 @@ namespace Umbraco.Web.Editors
             return app;
         }
         
-
         private IEnumerable<Dictionary<string, string>> GetTreePluginsMetaData()
         {
             var treeTypes = PluginManager.Current.ResolveAttributedTreeControllers();

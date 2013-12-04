@@ -1,4 +1,6 @@
-﻿using System.Web.Mvc;
+﻿using System.Web;
+using System.Web.Mvc;
+using System.Web.Routing;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Install;
@@ -25,6 +27,13 @@ namespace Umbraco.Web.Mvc
                 "Umbraco_back_office",
                 GlobalSettings.UmbracoMvcArea + "/{action}/{id}",
                 new {controller = "BackOffice", action = "Default", id = UrlParameter.Optional},
+                //limit the action/id to only allow characters - this is so this route doesn't hog all other 
+                // routes like: /umbraco/channels/word.aspx, etc...
+                new
+                    {
+                        action = @"[a-zA-Z]*", 
+                        id = @"[a-zA-Z]*"
+                    },
                 new[] {typeof (BackOfficeController).Namespace});
 
             //Create the install routes
