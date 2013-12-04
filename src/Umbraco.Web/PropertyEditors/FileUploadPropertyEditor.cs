@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 using Newtonsoft.Json.Linq;
+using umbraco.cms.businesslogic.Files;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -79,7 +80,11 @@ namespace Umbraco.Web.PropertyEditors
                         var split = ((string) p.Value).Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
                         if (split.Any())
                         {
-                            var umbracoFile = new UmbracoMediaFile(IOHelper.MapPath(split[0]));
+                            UmbracoMediaFile umbracoFile;
+                            if (split[0].StartsWith("http"))
+                                umbracoFile = new UmbracoMediaFile(split[0]);
+                            else
+                                umbracoFile = new UmbracoMediaFile(IOHelper.MapPath(split[0]));
                             FillProperties(uploadFieldConfigNode, model, umbracoFile);
                         }
                     }
