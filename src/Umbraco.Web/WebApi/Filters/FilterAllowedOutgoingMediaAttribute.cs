@@ -51,12 +51,10 @@ namespace Umbraco.Web.WebApi.Filters
 
         public override void OnActionExecuted(HttpActionExecutedContext actionExecutedContext)
         {
+            if (actionExecutedContext.Response == null) return;
+
             var user = UmbracoContext.Current.Security.CurrentUser;
-            if (user == null)
-            {
-                base.OnActionExecuted(actionExecutedContext);
-                return;
-            }
+            if (user == null) return;
 
             var objectContent = actionExecutedContext.Response.Content as ObjectContent;
             if (objectContent != null)

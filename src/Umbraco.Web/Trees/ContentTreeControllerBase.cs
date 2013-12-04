@@ -91,14 +91,14 @@ namespace Umbraco.Web.Trees
                     //we need to verify that the user has access to view this node, otherwise we'll render an empty tree collection
                     // TODO: in the future we could return a validation statement so we can have some UI to notify the user they don't have access                
                     if (HasPathAccess(id, queryStrings))
-                    {   
-                        nodes = PerformGetTreeNodes(id, queryStrings);
+                    {
+                        nodes = GetTreeNodesInternal(id, queryStrings);
                     }
                 }
                 else
                 {
                     //load normally
-                    nodes = PerformGetTreeNodes(id, queryStrings);
+                    nodes = GetTreeNodesInternal(id, queryStrings);
                 }
 
                 //only render the recycle bin if we are not in dialog and the start id id still the root
@@ -121,6 +121,20 @@ namespace Umbraco.Web.Trees
                 return nodes;
             }
 
+            return GetTreeNodesInternal(id, queryStrings);
+        }
+
+        /// <summary>
+        /// Before we make a call to get the tree nodes we have to check if they can actually be rendered
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// Currently this just checks if it is a container type, if it is we cannot render children. In the future this might check for other things.
+        /// </remarks>
+        private TreeNodeCollection GetTreeNodesInternal(string id, FormDataCollection queryStrings)
+        {
             //before we get the children we need to see if this is a container node
             var current = Services.EntityService.Get(int.Parse(id), UmbracoObjectType);
             if (current != null && current.AdditionalData.ContainsKey("IsContainer") && current.AdditionalData["IsContainer"] is bool && (bool)current.AdditionalData["IsContainer"])
