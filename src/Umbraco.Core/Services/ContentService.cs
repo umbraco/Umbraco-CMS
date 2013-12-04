@@ -727,7 +727,7 @@ namespace Umbraco.Core.Services
                     var repository = _repositoryFactory.CreateContentRepository(uow);
                     //NOTE What about content that has the contenttype as part of its composition?
                     var query = Query<IContent>.Builder.Where(x => x.ContentTypeId == contentTypeId);
-                    var contents = repository.GetByQuery(query);
+                    var contents = repository.GetByQuery(query).ToArray();
 
                     if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IContent>(contents), this))
                         return;
