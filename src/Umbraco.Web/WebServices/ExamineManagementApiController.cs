@@ -55,7 +55,10 @@ namespace Umbraco.Web.WebServices
         public ISearchResults GetSearchResults(string searcherName, string query, string queryType)
         {
             if (queryType == null)
-                throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.NotFound));
+            {
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            }
+                
 
             if (query.IsNullOrWhiteSpace())
                 return SearchResults.Empty();
@@ -72,7 +75,7 @@ namespace Umbraco.Web.WebServices
                 {
                     return searcher.Search(searcher.CreateSearchCriteria().RawQuery(query));
                 }
-                throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.NotFound));
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
             }
             throw new HttpResponseException(msg);            
         }
@@ -90,13 +93,12 @@ namespace Umbraco.Web.WebServices
                 {
                     indexer.OptimizeIndex();
                 }
-                catch (System.Exception ex)
+                catch (Exception ex)
                 {
-                    return new HttpResponseMessage(HttpStatusCode.Conflict)
-                    {
-                        Content = new StringContent(string.Format("The index could not be optimized, most likely there is another thread currently writing to the index. Error: {0}", ex)),
-                        ReasonPhrase = "Could Not Optimize"
-                    };
+                    var response = Request.CreateResponse(HttpStatusCode.Conflict);
+                    response.Content = new StringContent(string.Format("The index could not be optimized, most likely there is another thread currently writing to the index. Error: {0}", ex));
+                    response.ReasonPhrase = "Could Not Optimize";
+                    return response;
                 }
             }
             return msg;
@@ -117,13 +119,12 @@ namespace Umbraco.Web.WebServices
                 {
                     indexer.RebuildIndex();
                 }
-                catch (System.Exception ex)
+                catch (Exception ex)
                 {
-                    return new HttpResponseMessage(HttpStatusCode.Conflict)
-                    {
-                        Content = new StringContent(string.Format("The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {0}", ex)),
-                        ReasonPhrase = "Could Not Rebuild"
-                    };
+                    var response = Request.CreateResponse(HttpStatusCode.Conflict);
+                    response.Content = new StringContent(string.Format("The index could not be rebuilt at this time, most likely there is another thread currently writing to the index. Error: {0}", ex));
+                    response.ReasonPhrase = "Could Not Rebuild";
+                    return response;
                 }
             }
             return msg;
@@ -206,22 +207,21 @@ namespace Umbraco.Web.WebServices
                 searcher = ExamineManager.Instance.SearchProviderCollection[searcherName] as LuceneSearcher;
                 if (searcher == null)
                 {
-                    return new HttpResponseMessage(HttpStatusCode.BadRequest)
-                    {
-                        Content = new StringContent(string.Format("The searcher {0} is not of type {1}", searcherName, typeof(LuceneSearcher))),
-                        ReasonPhrase = "Wrong Searcher Type"
-                    };
+                    var response = Request.CreateResponse(HttpStatusCode.BadRequest);
+                    response.Content = new StringContent(string.Format("The searcher {0} is not of type {1}", searcherName, typeof(LuceneSearcher)));
+                    response.ReasonPhrase = "Wrong Searcher Type";
+                    return response;
                 }
                 //return Ok!
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
 
             searcher = null;
-            return new HttpResponseMessage(HttpStatusCode.BadRequest)
-            {
-                Content = new StringContent(string.Format("No searcher found with name = {0}", searcherName)),
-                ReasonPhrase = "Searcher Not Found"
-            };
+
+            var response1 = Request.CreateResponse(HttpStatusCode.BadRequest);
+            response1.Content = new StringContent(string.Format("No searcher found with name = {0}", searcherName));
+            response1.ReasonPhrase = "Searcher Not Found";
+            return response1;
         }
 
         private HttpResponseMessage ValidateLuceneIndexer(string indexerName, out LuceneIndexer indexer)
@@ -231,22 +231,21 @@ namespace Umbraco.Web.WebServices
                 indexer = ExamineManager.Instance.IndexProviderCollection[indexerName] as LuceneIndexer;
                 if (indexer == null)
                 {
-                    return new HttpResponseMessage(HttpStatusCode.BadRequest)
-                    {
-                        Content = new StringContent(string.Format("The indexer {0} is not of type {1}", indexerName, typeof(LuceneIndexer))),
-                        ReasonPhrase = "Wrong Indexer Type"
-                    };
+                    var response1 = Request.CreateResponse(HttpStatusCode.BadRequest);
+                    response1.Content = new StringContent(string.Format("The indexer {0} is not of type {1}", indexerName, typeof(LuceneIndexer)));
+                    response1.ReasonPhrase = "Wrong Indexer Type";
+                    return response1;
                 }                
                 //return Ok!
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
 
             indexer = null;
-            return new HttpResponseMessage(HttpStatusCode.BadRequest)
-                {
-                    Content = new StringContent(string.Format("No indexer found with name = {0}", indexerName)),
-                    ReasonPhrase = "Indexer Not Found"
-                };
+
+            var response = Request.CreateResponse(HttpStatusCode.BadRequest);
+            response.Content = new StringContent(string.Format("No indexer found with name = {0}", indexerName));
+            response.ReasonPhrase = "Indexer Not Found";
+            return response;
         }
     }
 }

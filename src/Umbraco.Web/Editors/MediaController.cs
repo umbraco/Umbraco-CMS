@@ -78,12 +78,12 @@ namespace Umbraco.Web.Editors
             var media = Services.MediaService.GetById(mediaId);
             if (media == null)
             {
-                return new HttpResponseMessage(HttpStatusCode.NotFound);
+                return Request.CreateResponse(HttpStatusCode.NotFound);
             }
             var imageProp = media.Properties[Constants.Conventions.Media.File];
             if (imageProp == null)
             {
-                return new HttpResponseMessage(HttpStatusCode.NotFound);
+                return Request.CreateResponse(HttpStatusCode.NotFound);
             }
 
             var imagePath = imageProp.Value.ToString();
@@ -109,7 +109,7 @@ namespace Umbraco.Web.Editors
                 var origFilePath = IOHelper.MapPath(imagePath);
                 if (System.IO.File.Exists(origFilePath) == false)
                 {
-                    return new HttpResponseMessage(HttpStatusCode.NotFound);
+                    return Request.CreateResponse(HttpStatusCode.NotFound);
                 }
                 var mediaFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
                 using (var fileStream = new FileStream(origFilePath, FileMode.Open, FileAccess.Read))
@@ -127,7 +127,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            var result = new HttpResponseMessage(HttpStatusCode.OK);
+            var result = Request.CreateResponse(HttpStatusCode.OK);
             //NOTE: That we are not closing this stream as the framework will do that for us, if we try it will
             // fail. See http://stackoverflow.com/questions/9541351/returning-binary-file-from-controller-in-asp-net-web-api
             var stream = new FileStream(thumbFilePath, FileMode.Open, FileAccess.Read);
@@ -297,10 +297,8 @@ namespace Umbraco.Web.Editors
 
             Services.MediaService.Move(toMove, move.ParentId);
 
-            var response = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json")
-            };
+            var response = Request.CreateResponse(HttpStatusCode.OK);
+            response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
             return response; 
         }
 
@@ -465,18 +463,16 @@ namespace Umbraco.Web.Editors
             //must have a file
             if (result.FileData.Count == 0)
             {
-                return new HttpResponseMessage(HttpStatusCode.NotFound);
+                return Request.CreateResponse(HttpStatusCode.NotFound);
             }
 
             //get the string json from the request
             int parentId;
             if (int.TryParse(result.FormData["currentFolder"], out parentId) == false)
             {
-                throw new HttpResponseException(
-                    new HttpResponseMessage(HttpStatusCode.BadRequest)
-                    {
-                        ReasonPhrase = "The request was not formatted correctly, the currentFolder is not an integer"
-                    });
+                var response = Request.CreateResponse(HttpStatusCode.BadRequest);
+                response.ReasonPhrase = "The request was not formatted correctly, the currentFolder is not an integer";
+                throw new HttpResponseException(response);
             }
 
             //ensure the user has access to this folder by parent id!
@@ -485,7 +481,7 @@ namespace Umbraco.Web.Editors
                Security.CurrentUser,
                Services.MediaService, parentId) == false)
             {
-                return new HttpResponseMessage(HttpStatusCode.Unauthorized);
+                return Request.CreateResponse(HttpStatusCode.Unauthorized);
             }
 
             //get the files
@@ -515,7 +511,7 @@ namespace Umbraco.Web.Editors
                 System.IO.File.Delete(file.LocalFileName);
             }
 
-            return new HttpResponseMessage(HttpStatusCode.OK);
+            return Request.CreateResponse(HttpStatusCode.OK);
         }
 
 

@@ -69,12 +69,12 @@ namespace Umbraco.Web.Editors
             //if it isn't supposed to be rendered in the editor then return an empty string
             if (macro.DontRenderInEditor)
             {
-                return new HttpResponseMessage()
-                    {
-                        //need to create a specific content result formatted as html since this controller has been configured
-                        //with only json formatters.
-                        Content = new StringContent(string.Empty, Encoding.UTF8, "text/html")
-                    };
+                var response = Request.CreateResponse();
+                //need to create a specific content result formatted as html since this controller has been configured
+                //with only json formatters.
+                response.Content = new StringContent(string.Empty, Encoding.UTF8, "text/html");
+
+                return response;
             }
 
             //because macro's are filled with insane legacy bits and pieces we need all sorts of wierdness to make them render.
@@ -86,16 +86,14 @@ namespace Umbraco.Web.Editors
             UmbracoContext.HttpContext.Items["pageElements"] = legacyPage.Elements;
             UmbracoContext.HttpContext.Items[global::Umbraco.Core.Constants.Conventions.Url.AltTemplate] = null;
 
-            return new HttpResponseMessage()
-            {
-                //need to create a specific content result formatted as html since this controller has been configured
-                //with only json formatters.
-                Content = new StringContent(
-                    Umbraco.RenderMacro(macro, macroParams, legacyPage).ToString(),
-                    Encoding.UTF8,
-                    "text/html"
-                )
-            };
+            var result = Request.CreateResponse();
+            //need to create a specific content result formatted as html since this controller has been configured
+            //with only json formatters.
+            result.Content = new StringContent(
+                Umbraco.RenderMacro(macro, macroParams, legacyPage).ToString(),
+                Encoding.UTF8,
+                "text/html");
+            return result;
         }
 
     }

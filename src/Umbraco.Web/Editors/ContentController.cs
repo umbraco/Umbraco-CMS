@@ -124,10 +124,8 @@ namespace Umbraco.Web.Editors
         public HttpResponseMessage GetNiceUrl(int id)
         {
             var url = Umbraco.NiceUrl(id);
-            var response = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(url, Encoding.UTF8, "application/json")
-            };
+            var response = Request.CreateResponse(HttpStatusCode.OK);
+            response.Content = new StringContent(url, Encoding.UTF8, "application/json");        
             return response;
         }
 
@@ -481,10 +479,8 @@ namespace Umbraco.Web.Editors
 
             Services.ContentService.Move(toMove, move.ParentId);
 
-            var response = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json")
-            };
+            var response = Request.CreateResponse(HttpStatusCode.OK);
+            response.Content = new StringContent(toMove.Path, Encoding.UTF8, "application/json");
             return response;            
         }
 
@@ -500,10 +496,8 @@ namespace Umbraco.Web.Editors
 
             var c = Services.ContentService.Copy(toCopy, copy.ParentId, copy.RelateToOriginal);
 
-            var response = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(c.Path, Encoding.UTF8, "application/json")
-            };
+            var response = Request.CreateResponse(HttpStatusCode.OK);
+            response.Content = new StringContent(c.Path, Encoding.UTF8, "application/json");
             return response;
         }
 

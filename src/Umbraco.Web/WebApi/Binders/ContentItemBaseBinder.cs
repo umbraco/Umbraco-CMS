@@ -111,11 +111,9 @@ namespace Umbraco.Web.WebApi.Binders
 
             if (result.FormData["contentItem"] == null)
             {
-                throw new HttpResponseException(
-                    new HttpResponseMessage(HttpStatusCode.BadRequest)
-                        {
-                            ReasonPhrase = "The request was not formatted correctly and is missing the 'contentItem' parameter"
-                        });
+                var response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest);
+                response.ReasonPhrase = "The request was not formatted correctly and is missing the 'contentItem' parameter";
+                throw new HttpResponseException(response);
             }
 
             //get the string json from the request
@@ -138,11 +136,9 @@ namespace Umbraco.Web.WebApi.Binders
                 var parts = file.Headers.ContentDisposition.Name.Trim(new char[] { '\"' }).Split('_');
                 if (parts.Length != 2)
                 {
-                    throw new HttpResponseException(
-                        new HttpResponseMessage(HttpStatusCode.BadRequest)
-                            {
-                                ReasonPhrase = "The request was not formatted correctly the file name's must be underscore delimited"
-                            });
+                    var response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest);
+                    response.ReasonPhrase = "The request was not formatted correctly the file name's must be underscore delimited";
+                    throw new HttpResponseException(response);
                 }
                 var propAlias = parts[1];
              

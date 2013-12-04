@@ -25,18 +25,20 @@ namespace Umbraco.Web.WebServices
             var node = ApplicationContext.Current.Services.ContentService.GetById(model.NodeId);
 
             if (node == null)
-                throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.BadRequest)
-                {
-                    Content = new StringContent(string.Format("There is no content node with id {0}.", model.NodeId)),
-                    ReasonPhrase = "Node Not Found."
-                });
+            {
+                var response = Request.CreateResponse(HttpStatusCode.BadRequest);
+                response.Content = new StringContent(string.Format("There is no content node with id {0}.", model.NodeId));
+                response.ReasonPhrase = "Node Not Found.";
+                throw new HttpResponseException(response);
+            }
 
             if (UmbracoUser.GetPermissions(node.Path).Contains(ActionAssignDomain.Instance.Letter) == false)
-                throw new HttpResponseException(new HttpResponseMessage(HttpStatusCode.Unauthorized)
-                    {
-                        Content = new StringContent("You do not have permission to assign domains on that node."),
-                        ReasonPhrase = "Permission Denied."
-                    });
+            {
+                var response = Request.CreateResponse(HttpStatusCode.BadRequest);
+                response.Content = new StringContent("You do not have permission to assign domains on that node.");
+                response.ReasonPhrase = "Permission Denied.";
+                throw new HttpResponseException(response);
+            }
 
             model.Valid = true;
             var domains = Routing.DomainHelper.GetNodeDomains(model.NodeId, true);
