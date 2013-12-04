@@ -73,8 +73,8 @@
     
     <%if (Request["macroID"] != null || Request["macroAlias"] != null) {%>
     
-    <input type="hidden" name="macroID" value="<%=Request.GetCleanedItem("macroID")%>" />
-    <input type="hidden" name="macroAlias" value="<%=Request.GetCleanedItem("macroAlias")%>" />
+    <input type="hidden" name="macroID" value="<%=Request.CleanForXss("macroID")%>" />
+    <input type="hidden" name="macroAlias" value="<%=Request.CleanForXss("macroAlias")%>" />
     
     <div class="macroProperties">
       <cc1:Pane id="pane_edit" runat="server">

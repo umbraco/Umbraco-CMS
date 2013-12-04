@@ -14,7 +14,7 @@
                 result = result.substring(0, result.length - 2);
             result = result + ")";
             
-            document.location = 'xsltInsertValueOf.aspx?objectId=<%=Request.GetCleanedItem("objectId")%>&value=' + result;
+            document.location = 'xsltInsertValueOf.aspx?objectId=<%=Request.CleanForXss("objectId")%>&value=' + result;
         }
     </script>
 

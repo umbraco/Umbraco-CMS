@@ -38,7 +38,7 @@ namespace umbraco.dialogs
             {
                 if (_app == null)
                 {
-                    _app = Request.GetCleanedItem("app");
+                    _app = Request.CleanForXss("app");
                     //validate the app
                     if (BusinessLogic.Application.getAll().Any(x => x.alias.InvariantEquals(_app)) == false)
                     {

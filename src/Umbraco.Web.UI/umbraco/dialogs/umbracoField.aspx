@@ -14,7 +14,7 @@
                     submitButton: $("#submitButton"),
                     form: document.forms[0],
                     tagName: document.forms[0].<%= tagName.ClientID %>.value,
-                    objectId: '<%=Request.GetCleanedItem("objectId")%>'
+                    objectId: '<%=Request.CleanForXss("objectId")%>'
                 });
                 umbracoField.init();
             });            

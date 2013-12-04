@@ -63,6 +63,19 @@ namespace Umbraco.Core
             return mName;
         }
 
+        /// <summary>
+        /// Cleans string to aid in preventing xss attacks.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        internal static string CleanForXss(this string input)
+        {
+            //remove any html
+            input = input.StripHtml();
+            //strip out any potential chars involved with XSS
+            return input.ExceptChars(new HashSet<char>("*?(){}[];:%<>/\\|&'\"".ToCharArray()));
+        }
+
         public static string ExceptChars(this string str, HashSet<char> toExclude)
         {
             var sb = new StringBuilder(str.Length);

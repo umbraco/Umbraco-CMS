@@ -106,8 +106,8 @@
     <input type="hidden" name="macroMode" value="<%=Request["mode"]%>" />
     <%if (Request["umb_macroID"] != null || Request["umb_macroAlias"] != null)
       {%>
-    <input type="hidden" name="umb_macroID" value="<%=Request.GetCleanedItem("umb_macroID")%>" />
-    <input type="hidden" name="umb_macroAlias" value="<%=Request.GetCleanedItem("umb_macroAlias")%>" />
+    <input type="hidden" name="umb_macroID" value="<%=Request.CleanForXss("umb_macroID")%>" />
+    <input type="hidden" name="umb_macroAlias" value="<%=Request.CleanForXss("umb_macroAlias")%>" />
     <% }%>
     <ui:Pane ID="pane_edit" runat="server" Visible="false">
         <div class="macroPane">

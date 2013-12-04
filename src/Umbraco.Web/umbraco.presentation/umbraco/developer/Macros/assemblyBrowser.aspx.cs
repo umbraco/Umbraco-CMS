@@ -14,6 +14,7 @@ using System.Collections.Specialized;
 using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
+using Umbraco.Web;
 using Umbraco.Core.PropertyEditors;
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
@@ -43,7 +44,7 @@ namespace umbraco.developer
                 if (Request.QueryString["type"] == null)
                 {
                     isUserControl = true;
-                    var fileName = Request.QueryString["fileName"];
+                    var fileName = Request.CleanForXss("fileName");
                     if (!fileName.StartsWith("~"))
                     {
                         if (fileName.StartsWith("/"))
