@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Formatting;
 using System.Runtime.Remoting.Contexts;
 using System.Threading;
 using System.Threading.Tasks;
@@ -101,8 +102,15 @@ namespace Umbraco.Web.WebApi
         /// <param name="controllerContext"></param>
         internal static void EnsureJsonOutputOnly(this HttpControllerContext controllerContext)
         {
-            controllerContext.Configuration.Formatters.Remove(controllerContext.Configuration.Formatters.XmlFormatter);
-            controllerContext.Configuration.Formatters.Remove(controllerContext.Configuration.Formatters.JsonFormatter);
+            //remove all json/xml formatters then add our custom one
+            for (var i = 0; i < controllerContext.Configuration.Formatters.Count;i++)
+            {
+                if ((controllerContext.Configuration.Formatters[i] is JsonMediaTypeFormatter) 
+                    || (controllerContext.Configuration.Formatters[i] is XmlMediaTypeFormatter))
+                {
+                    controllerContext.Configuration.Formatters.RemoveAt(i);
+                }
+            }
             controllerContext.Configuration.Formatters.Add(new AngularJsonMediaTypeFormatter());
         }
     }
