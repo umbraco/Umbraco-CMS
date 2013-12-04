@@ -64,7 +64,8 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         static void AutoFillProperties(IContentBase model)
-        {            
+        {
+            var mediaFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
             foreach (var p in model.Properties)
             {
                 var uploadFieldConfigNode =
@@ -80,11 +81,8 @@ namespace Umbraco.Web.PropertyEditors
                         var split = ((string) p.Value).Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
                         if (split.Any())
                         {
-                            UmbracoMediaFile umbracoFile;
-                            if (split[0].StartsWith("http"))
-                                umbracoFile = new UmbracoMediaFile(split[0]);
-                            else
-                                umbracoFile = new UmbracoMediaFile(IOHelper.MapPath(split[0]));
+                            var fullPath = mediaFileSystem.GetFullPath(split[0]);
+                            var umbracoFile = new UmbracoMediaFile(fullPath);
                             FillProperties(uploadFieldConfigNode, model, umbracoFile);
                         }
                     }

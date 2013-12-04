@@ -87,6 +87,7 @@ namespace Umbraco.Web.Editors
             }
 
             var imagePath = imageProp.Value.ToString();
+
             return GetBigThumbnail(imagePath);
         }
 
@@ -100,61 +101,11 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         public HttpResponseMessage GetBigThumbnail(string originalImagePath)
         {
-            var imagePath = originalImagePath;
-            var thumbIsNew = false;
-            string thumbFilePath;
-            var mediaFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            if (imagePath.StartsWith("http"))
-            {
-                thumbFilePath = imagePath.TrimEnd(".jpg") + "_big-thumb.jpg";
-                thumbIsNew = mediaFileSystem.FileExists(thumbFilePath) == false;
-            }
-            else
-            {
-                var bigThumbPath = imagePath.Substring(0, imagePath.LastIndexOf('.')) + "_big-thumb" + ".jpg";
-                thumbFilePath = IOHelper.MapPath(bigThumbPath);
-                thumbIsNew = System.IO.File.Exists(thumbFilePath) == false;
-            }
-            if (thumbIsNew)
-            {
-                //we need to generate it
-                string origFilePath = imagePath;
-                if (imagePath.StartsWith("http") == false)
-                {
-                    origFilePath = IOHelper.MapPath(imagePath);
-                    if (System.IO.File.Exists(origFilePath) == false)
-                    {
-                        return new HttpResponseMessage(HttpStatusCode.NotFound);
-                    }
-                }
-
-                using (var fileStream = mediaFileSystem.OpenFile(origFilePath))
-                {
-                    if (fileStream.CanSeek) fileStream.Seek(0, 0);
-                    using (var originalImage = Image.FromStream(fileStream))
-                    {
-                        ImageHelper.GenerateThumbnail(
-                            originalImage,
-                            500,
-                            string.Format("{0}_{1}.jpg", origFilePath.Substring(0, origFilePath.LastIndexOf(".")), "big-thumb"),
-                            Path.GetExtension(origFilePath).Substring(1).ToLowerInvariant(),
-                            mediaFileSystem);
-                    }
-                }
-            }
-
-            var result = new HttpResponseMessage(HttpStatusCode.OK);
-            //NOTE: That we are not closing this stream as the framework will do that for us, if we try it will
-            // fail. See http://stackoverflow.com/questions/9541351/returning-binary-file-from-controller-in-asp-net-web-api
-            var stream = mediaFileSystem.OpenFile(thumbFilePath);
-            if (stream.CanSeek) stream.Seek(0, 0);
-            result.Content = new StreamContent(stream);
-            result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
-            return result;
+            return GetResized(originalImagePath, 500, "big-thumb");
         }
 
         /// <summary>
-        /// Gets a rezised image for the media id
+        /// Gets a resized image for the media id
         /// </summary>
         /// <param name="mediaId"></param>
         /// <param name="width"></param>
@@ -180,36 +131,37 @@ namespace Umbraco.Web.Editors
             return GetResized(imagePath, width);
         }
 
+        /// <summary>
+        /// Gets a resized image for the image at the given path
+        /// </summary>
+        /// <param name="imagePath"></param>
+        /// <param name="width"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// If there is no media, image property or image file is found then this will return not found.
+        /// </remarks>
         public HttpResponseMessage GetResized(string imagePath, int width)
         {
-            var thumbIsNew = false;
-            string thumbFilePath;
+            return GetResized(imagePath, width, Convert.ToString(width));
+        }
+
+        private static HttpResponseMessage GetResized(string imagePath, int width, string suffix)
+        {
             var mediaFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            if (imagePath.StartsWith("http"))
-            {
-                thumbFilePath = imagePath.TrimEnd(".jpg") + "_" + width + ".jpg";
-                thumbIsNew = mediaFileSystem.FileExists(thumbFilePath) == false;
-            }
-            else
-            {
-                var bigThumbPath = imagePath.Substring(0, imagePath.LastIndexOf('.')) + width + ".jpg";
-                thumbFilePath = IOHelper.MapPath(bigThumbPath);
-                thumbIsNew = System.IO.File.Exists(thumbFilePath) == false;
-            }
+            var ext = Path.GetExtension(imagePath);
+            var thumbFilePath = imagePath.TrimEnd(ext) + "_" + suffix + ".jpg";
+            var fullOrgPath = mediaFileSystem.GetFullPath(mediaFileSystem.GetRelativePath(imagePath));
+            var fullNewPath = mediaFileSystem.GetFullPath(mediaFileSystem.GetRelativePath(thumbFilePath));
+            var thumbIsNew = mediaFileSystem.FileExists(fullNewPath) == false;
             if (thumbIsNew)
             {
                 //we need to generate it
-                string origFilePath = imagePath;
-                if (imagePath.StartsWith("http") == false)
+                if (mediaFileSystem.FileExists(fullOrgPath) == false)
                 {
-                    origFilePath = IOHelper.MapPath(imagePath);
-                    if (System.IO.File.Exists(origFilePath) == false)
-                    {
-                        return new HttpResponseMessage(HttpStatusCode.NotFound);
-                    }
+                    return new HttpResponseMessage(HttpStatusCode.NotFound);
                 }
 
-                using (var fileStream = mediaFileSystem.OpenFile(origFilePath))
+                using (var fileStream = mediaFileSystem.OpenFile(fullOrgPath))
                 {
                     if (fileStream.CanSeek) fileStream.Seek(0, 0);
                     using (var originalImage = Image.FromStream(fileStream))
@@ -217,8 +169,8 @@ namespace Umbraco.Web.Editors
                         ImageHelper.GenerateThumbnail(
                             originalImage,
                             width,
-                            string.Format("{0}_{1}.jpg", origFilePath.Substring(0, origFilePath.LastIndexOf(".")), width),
-                            Path.GetExtension(origFilePath).Substring(1).ToLowerInvariant(),
+                            fullNewPath,
+                            "jpg",
                             mediaFileSystem);
                     }
                 }
@@ -227,9 +179,10 @@ namespace Umbraco.Web.Editors
             var result = new HttpResponseMessage(HttpStatusCode.OK);
             //NOTE: That we are not closing this stream as the framework will do that for us, if we try it will
             // fail. See http://stackoverflow.com/questions/9541351/returning-binary-file-from-controller-in-asp-net-web-api
-            var stream = mediaFileSystem.OpenFile(thumbFilePath);
+            var stream = mediaFileSystem.OpenFile(fullNewPath);
             if (stream.CanSeek) stream.Seek(0, 0);
             result.Content = new StreamContent(stream);
+            result.Headers.Date = mediaFileSystem.GetLastModified(imagePath);
             result.Content.Headers.ContentType = new MediaTypeHeaderValue("image/jpeg");
             return result;
         }
