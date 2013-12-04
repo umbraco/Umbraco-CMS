@@ -61,7 +61,7 @@
     })(jQuery);
 </script>
 
-<a href="#" id="changePasswordButton">Change password</a><br />
+<a href="#" id="changePasswordButton"><%= umbraco.ui.Text("user", "changePassword") %></a><br />
 
 <div class="propertyItem" id="umbPasswordChanger" style="display: none;">
 
@@ -85,7 +85,7 @@
                     <asp:RequiredFieldValidator ID="CurrentPasswordValidator" Enabled="False" runat="server"
                         Display="Dynamic"
                         ControlToValidate="umbPasswordChanger_passwordCurrent"
-                        ErrorMessage="Required" />
+                        ErrorMessage="*" />
                 </div>
             </div>
 
@@ -98,7 +98,7 @@
                 <asp:RequiredFieldValidator ID="NewPasswordRequiredValidator" Enabled="False" runat="server"
                     Display="Dynamic"
                     ControlToValidate="umbPasswordChanger_passwordNew"
-                    ErrorMessage="Required" />
+                    ErrorMessage="*" />
                 <asp:RegularExpressionValidator ID="NewPasswordLengthValidator" runat="server"
                     Display="Dynamic"
                     ControlToValidate="umbPasswordChanger_passwordNew"
