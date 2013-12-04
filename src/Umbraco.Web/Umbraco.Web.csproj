@@ -147,15 +147,6 @@
       <Private>True</Private>
       <HintPath>..\packages\CodeSharp.Package.AspNetWebPage.1.0\lib\net40\NuGet.Core.dll</HintPath>
     </Reference>
-    <Reference Include="Our.Umbraco.uGoLive">
-      <HintPath>..\packages\uGoLive.1.4.0\lib\Our.Umbraco.uGoLive.dll</HintPath>
-    </Reference>
-    <Reference Include="Our.Umbraco.uGoLive.47x">
-      <HintPath>..\packages\uGoLive.1.4.0\lib\Our.Umbraco.uGoLive.47x.dll</HintPath>
-    </Reference>
-    <Reference Include="Our.Umbraco.uGoLive.Checks">
-      <HintPath>..\packages\uGoLive.1.4.0\lib\Our.Umbraco.uGoLive.Checks.dll</HintPath>
-    </Reference>
     <Reference Include="System">
       <Name>System</Name>
     </Reference>
@@ -407,7 +398,6 @@
     <Compile Include="PropertyEditors\PublishValueValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownWithKeysPropertyEditor.cs" />
     <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\LabelPropertyValueEditor.cs" />
     <Compile Include="PropertyEditors\PropertyValueEditorWrapper.cs" />
     <Compile Include="PublishedContentQuery.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
