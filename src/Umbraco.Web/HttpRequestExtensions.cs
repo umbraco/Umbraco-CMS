@@ -20,10 +20,7 @@ namespace Umbraco.Web
         public static string GetCleanedItem(this HttpRequest request, string key)
         {
             var item = request.GetItemAsString(key);
-            //remove any html
-            item = item.StripHtml();
-            //strip out any potential chars involved with XSS
-            return item.ExceptChars(new HashSet<char>("(){}[];:%<>/\\|&'\"".ToCharArray()));
+            return item.CleanForXss();
         }
 
 		/// <summary>
