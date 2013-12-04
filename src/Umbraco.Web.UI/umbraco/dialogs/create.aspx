@@ -34,14 +34,14 @@
 		}
 		
 		function onNodeSelectionConfirmed() {
-		    document.location.href = 'create.aspx?nodeType=<%=Request.GetCleanedItem("nodeType")%>&app=<%=App%>&nodeId=' + document.getElementById('nodeId').value
+		    document.location.href = 'create.aspx?nodeType=<%=Request.CleanForXss("nodeType")%>&app=<%=App%>&nodeId=' + document.getElementById('nodeId').value
 		}
 	
     </script>
 
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server">
-    <input type="hidden" id="nodeId" name="nodeId" value="<%=Request.GetCleanedItem("nodeId")%>" />
+    <input type="hidden" id="nodeId" name="nodeId" value="<%=Request.CleanForXss("nodeId")%>" />
     <input type="hidden" id="path" name="path" value="" runat="server" />
     <cc1:Pane ID="pane_chooseNode" runat="server" Style="overflow: auto; height: 250px;">
         <umbraco:TreeControl runat="server" ID="JTree" App='<%#App %>'

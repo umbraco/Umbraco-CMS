@@ -14,13 +14,13 @@
     result = '<xsl:value-of select="' + document.getElementById('<%= valueOf.ClientID %>').value + '"' + checked + '/>';
 
     UmbClientMgr.contentFrame().focus();
-    UmbClientMgr.contentFrame().UmbEditor.Insert(result, '', '<%=Request.GetCleanedItem("objectId")%>');
+    UmbClientMgr.contentFrame().UmbEditor.Insert(result, '', '<%=Request.CleanForXss("objectId")%>');
 
     UmbClientMgr.closeModalWindow();
   }
 
   function getExtensionMethod() {
-    document.location = 'xsltChooseExtension.aspx?objectId=<%=Request.GetCleanedItem("objectId")%>';
+    document.location = 'xsltChooseExtension.aspx?objectId=<%=Request.CleanForXss("objectId")%>';
   }
 
   function recieveExtensionMethod(theValue) {

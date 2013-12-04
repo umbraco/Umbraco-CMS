@@ -23,7 +23,7 @@ namespace Umbraco.Web.UI.Umbraco
         {
             get
             {
-                var app = Request.GetCleanedItem("app");
+                var app = Request.CleanForXss("app");
                 //validate the app
                 if (global::umbraco.BusinessLogic.Application.getAll().Any(x => x.alias.InvariantEquals(app)) == false)
                 {
@@ -45,7 +45,7 @@ namespace Umbraco.Web.UI.Umbraco
 
         protected string RightActionId
         {
-            get { return Request.GetCleanedItem("id").ReplaceNonAlphanumericChars('-'); }
+            get { return Request.CleanForXss("id").ReplaceNonAlphanumericChars('-'); }
         }
 
         protected void Page_Load(object sender, EventArgs e)

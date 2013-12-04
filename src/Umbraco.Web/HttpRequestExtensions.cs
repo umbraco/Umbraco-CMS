@@ -17,7 +17,7 @@ namespace Umbraco.Web
         /// <param name="request"></param>
         /// <param name="key"></param>
         /// <returns></returns>        
-        public static string GetCleanedItem(this HttpRequest request, string key)
+        public static string CleanForXss(this HttpRequest request, string key)
         {
             var item = request.GetItemAsString(key);
             return item.CleanForXss();

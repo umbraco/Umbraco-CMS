@@ -109,7 +109,7 @@
 
             top.jQuery('.umbModalBoxIframe').closest(".umbModalBox").ModalWindowAPI().close();
 
-            top.umbInsertModule('<%=Request.GetCleanedItem("target")%>',macroString,'<%=Request.GetCleanedItem("type")%>');
+            top.umbInsertModule('<%=Request.CleanForXss("target")%>',macroString,'<%=Request.CleanForXss("type")%>');
 		}
 
 		function pseudoHtmlEncode(text) {

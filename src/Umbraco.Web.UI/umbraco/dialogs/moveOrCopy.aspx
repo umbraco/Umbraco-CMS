@@ -16,9 +16,9 @@
 				if (id > 0)
 						umbraco.presentation.webservices.CMSNode.GetNodeName('<%=umbracoUserContextID%>', id, updateName);
 				else{
-					//document.getElementById("pageNameContent").innerHTML = "'<strong><%=umbraco.ui.Text(Request.GetCleanedItem("app"))%></strong>' <%= umbraco.ui.Text("moveOrCopy","nodeSelected") %>";
+					//document.getElementById("pageNameContent").innerHTML = "'<strong><%=umbraco.ui.Text(Request.CleanForXss("app"))%></strong>' <%= umbraco.ui.Text("moveOrCopy","nodeSelected") %>";
 			    
-					jQuery("#pageNameContent").html("<strong><%=umbraco.ui.Text(Request.GetCleanedItem("app"))%></strong> <%= umbraco.ui.Text("moveOrCopy","nodeSelected") %>");
+					jQuery("#pageNameContent").html("<strong><%=umbraco.ui.Text(Request.CleanForXss("app"))%></strong> <%= umbraco.ui.Text("moveOrCopy","nodeSelected") %>");
 					jQuery("#pageNameHolder").attr("class","success");
 			  }
 			}
@@ -59,7 +59,7 @@
 	<cc1:Feedback ID="feedback" runat="server" />
 	<cc1:Pane ID="pane_form" runat="server" Visible="false">
 		<cc1:PropertyPanel runat="server" Style="overflow: auto; height: 220px;position: relative;">
-			<umbraco:TreeControl runat="server" ID="JTree" App='<%#Request.GetCleanedItem("app") %>'
+			<umbraco:TreeControl runat="server" ID="JTree" App='<%#Request.CleanForXss("app") %>'
                 IsDialog="true" DialogMode="id" ShowContextMenu="false" FunctionToCall="dialogHandler"
                 Height="200"></umbraco:TreeControl>
 		</cc1:PropertyPanel>

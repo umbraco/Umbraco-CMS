@@ -36,7 +36,7 @@ namespace umbraco.cms.presentation
             {
                 if (_section == null)
                 {
-                    var qry = Request.GetCleanedItem("app");
+                    var qry = Request.CleanForXss("app");
                     // Load dashboard content
                     if (qry.IsNullOrWhiteSpace() == false)
                     {

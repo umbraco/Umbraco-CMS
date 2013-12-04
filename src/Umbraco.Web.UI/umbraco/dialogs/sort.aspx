@@ -70,8 +70,8 @@
                 submitButton: jQuery("#submitButton"),
                 closeWindowButton : jQuery("#closeWindowButton"),
                 dateTimeFormat: "<%=CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern%> <%=CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern%>",
-                currentId: "<%=Request.GetCleanedItem("ID")%>",
-                serviceUrl: "<%= IOHelper.ResolveUrl(SystemDirectories.Umbraco)%>/WebServices/NodeSorter.asmx/UpdateSortOrder?app=<%=Request.GetCleanedItem("app")%>"
+                currentId: "<%=Request.CleanForXss("ID")%>",
+                serviceUrl: "<%= IOHelper.ResolveUrl(SystemDirectories.Umbraco)%>/WebServices/NodeSorter.asmx/UpdateSortOrder?app=<%=Request.CleanForXss("app")%>"
             });
 
             sortDialog.init();

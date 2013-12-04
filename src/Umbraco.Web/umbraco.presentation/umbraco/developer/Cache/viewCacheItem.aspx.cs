@@ -1,5 +1,6 @@
 using System;
 using System.Web;
+using Umbraco.Web;
 using umbraco.BasePages;
 
 namespace umbraco.cms.presentation.developer
@@ -17,7 +18,7 @@ namespace umbraco.cms.presentation.developer
         protected void Page_Load(object sender, EventArgs e)
         {
             Panel1.Text = ui.Text("viewCacheItem");
-            var cacheKey = Request.QueryString["key"];
+            var cacheKey = Request.CleanForXss("key");
             LabelCacheAlias.Text = cacheKey;
             var cacheItem = ApplicationContext.ApplicationCache.GetCacheItem<object>(cacheKey);            
             LabelCacheValue.Text = cacheItem != null ? cacheItem.ToString() : "Cache item isn't in cache anymore!";
