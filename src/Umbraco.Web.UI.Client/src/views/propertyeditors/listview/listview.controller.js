@@ -33,8 +33,8 @@ function listViewController($rootScope, $scope, $routeParams, $injector, notific
         pageSize: 10,
         pageNumber: 1,
         filter: '',
-        orderBy: 'Id',
-        orderDirection: "desc"
+        orderBy: 'SortOrder',
+        orderDirection: "asc"
     };
 
 
