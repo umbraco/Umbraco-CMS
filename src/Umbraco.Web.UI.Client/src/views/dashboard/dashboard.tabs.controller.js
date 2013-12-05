@@ -21,7 +21,7 @@ function startupLatestEditsController($scope) {
 }
 angular.module("umbraco").controller("Umbraco.Dashboard.StartupLatestEditsController", startupLatestEditsController);
 
-function MediaFolderBrowserDashboardController($rootScope, $scope, assetsService, $routeParams, $timeout, $element, $location, umbRequestHelper, mediaResource, $cookies) {
+function MediaFolderBrowserDashboardController($rootScope, $scope, assetsService, $routeParams, $timeout, $element, $location, umbRequestHelper,navigationService, mediaResource, $cookies) {
         var dialogOptions = $scope.$parent.dialogOptions;
 
         $scope.filesUploading = [];
@@ -50,9 +50,7 @@ function MediaFolderBrowserDashboardController($rootScope, $scope, assetsService
             $scope.loadChildren($scope.options.formData.currentFolder);
             $scope.queue = [];
             $scope.filesUploading = [];
-
-            var path = ["-1"];
-            navigationService.syncTree({ tree: "media", path: path });
+            navigationService.reloadSection("media");
         });
 
         $scope.$on('fileuploadprocessalways', function(e,data) {
