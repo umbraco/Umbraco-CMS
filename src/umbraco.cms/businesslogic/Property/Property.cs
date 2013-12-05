@@ -8,6 +8,7 @@ using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.datatype;
 using umbraco.cms.businesslogic.propertytype;
+using umbraco.interfaces;
 
 namespace umbraco.cms.businesslogic.property
 {
@@ -62,6 +63,14 @@ namespace umbraco.cms.businesslogic.property
             _pt = PropertyType.GetPropertyType(property.PropertyTypeId);
             _data = _pt.DataTypeDefinition.DataType.Data;
             _data.PropertyId = Id;
+
+            //set the value so it doesn't need to go to the database
+            var dvs = _data as IDataValueSetter;
+            if (dvs != null)
+            {
+                dvs.SetValue(property.Value, property.PropertyType.DataTypeDatabaseType.ToString());
+            }
+            
         }
 
         public Guid VersionId

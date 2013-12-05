@@ -381,6 +381,8 @@ namespace umbraco.cms.businesslogic.media
         private void SetupNode(IMedia media)
         {
             MediaItem = media;
+            //Also need to set the ContentBase item to this one so all the propery values load from it
+            ContentBase = MediaItem;
 
             //Setting private properties from IContentBase replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
             base.PopulateCMSNodeFromUmbracoEntity(MediaItem, _objectType);
