@@ -1,7 +1,10 @@
 ﻿using System;
+using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence;
 using umbraco.interfaces;
 
 namespace Umbraco.Core.PropertyEditors
@@ -14,6 +17,8 @@ namespace Umbraco.Core.PropertyEditors
     internal class BackwardsCompatibleData : IData, IDataValueSetter
     {
         private readonly string _propertyEditorAlias;
+        private bool _valueLoaded = false;
+        private object _value;
 
         public BackwardsCompatibleData(string propertyEditorAlias)
         {
@@ -21,8 +26,33 @@ namespace Umbraco.Core.PropertyEditors
         }
 
         public int PropertyId { set; get; }
-        
-        public object Value { get; set; }
+
+        /// <summary>
+        /// This returns the value
+        /// </summary>
+        /// <remarks>
+        /// There's code here to load the data from the db just like the legacy DefaultData does but in theory the value of this
+        /// IData should always be set using the IDataValueSetter.SetValue which is done externally. Just in case there's some edge
+        /// case out there that doesn't set this value, we'll go and get it based on the same logic in DefaultData.
+        /// </remarks>
+        public virtual object Value
+        {
+            get
+            {
+                //Lazy load the value when it is required.
+                if (_valueLoaded == false)
+                {
+                    LoadValueFromDatabase();
+                    _valueLoaded = true;
+                }
+                return _value;
+            }
+            set
+            {
+                _value = value;
+                _valueLoaded = true;
+            }
+        }
 
 
         public XmlNode ToXMl(XmlDocument data)
@@ -66,7 +96,7 @@ namespace Umbraco.Core.PropertyEditors
             return doc.CreateCDataSection(sValue);
         }
         
-        public void MakeNew(int PropertyId)
+        public void MakeNew(int propertyId)
         {
             //DO nothing
         }
@@ -87,7 +117,31 @@ namespace Umbraco.Core.PropertyEditors
         /// <param name="strDbType"></param>
         void IDataValueSetter.SetValue(object val, string strDbType)
         {            
-            Value = val;            
+            _value = val;
+            _valueLoaded = true;
+        }
+
+        /// <summary>
+        /// In the case where the value is not set, this will go get it from the db ourselves - this shouldn't really ever be needed,
+        /// the value should always be set with IDataValueSetter.SetValue
+        /// </summary>
+        private void LoadValueFromDatabase()
+        {
+            var sql = new Sql();
+            sql.Select("*")
+               .From<PropertyDataDto>()
+               .InnerJoin<PropertyTypeDto>()
+               .On<PropertyTypeDto, PropertyDataDto>(x => x.Id, y => y.PropertyTypeId)
+               .InnerJoin<DataTypeDto>()
+               .On<DataTypeDto, PropertyTypeDto>(x => x.DataTypeId, y => y.DataTypeId)
+               .Where<PropertyDataDto>(x => x.Id == PropertyId);
+            var dto = ApplicationContext.Current.DatabaseContext.Database.Fetch<PropertyDataDto, PropertyTypeDto, DataTypeDto>(sql).FirstOrDefault();
+
+            if (dto != null)
+            {
+                //get the value for the data type, if null, set it to an empty string
+                _value = dto.GetValue;
+            }
         }
     }
 }
