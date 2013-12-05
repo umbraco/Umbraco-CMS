@@ -648,7 +648,9 @@ namespace umbraco.cms.businesslogic
 
             if (ContentBase != null)
             {
-                m_LoadedProperties.AddRange(ContentBase.Properties.Select(x => new Property(x)));
+                //NOTE: we will not load any properties where HasIdentity = false - this is because if properties are 
+                // added to the property collection that aren't persisted we'll get ysods
+                m_LoadedProperties.AddRange(ContentBase.Properties.Where(x => x.HasIdentity).Select(x => new Property(x)));
                 return;
             }
 
