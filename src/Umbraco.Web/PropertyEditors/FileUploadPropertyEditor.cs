@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 using Newtonsoft.Json.Linq;
+using umbraco.cms.businesslogic.Files;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
@@ -63,7 +64,8 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         static void AutoFillProperties(IContentBase model)
-        {            
+        {
+            var mediaFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
             foreach (var p in model.Properties)
             {
                 var uploadFieldConfigNode =
@@ -79,7 +81,8 @@ namespace Umbraco.Web.PropertyEditors
                         var split = ((string) p.Value).Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
                         if (split.Any())
                         {
-                            var umbracoFile = new UmbracoMediaFile(IOHelper.MapPath(split[0]));
+                            var fullPath = mediaFileSystem.GetFullPath(split[0]);
+                            var umbracoFile = new UmbracoMediaFile(fullPath);
                             FillProperties(uploadFieldConfigNode, model, umbracoFile);
                         }
                     }
