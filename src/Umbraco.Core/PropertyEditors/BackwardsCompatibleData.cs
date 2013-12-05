@@ -11,7 +11,7 @@ namespace Umbraco.Core.PropertyEditors
     /// This is used purelty to attempt to maintain some backwards compatibility with new property editors that don't have a 
     /// legacy property editor predecessor when developers are using the legacy APIs
     /// </summary>
-    internal class BackwardsCompatibleData : IData
+    internal class BackwardsCompatibleData : IData, IDataValueSetter
     {
         private readonly string _propertyEditorAlias;
 
@@ -77,6 +77,17 @@ namespace Umbraco.Core.PropertyEditors
                     typeof(IData)
                     + " is a legacy object and is not supported by runtime generated "
                     + " instances to maintain backwards compatibility with the legacy APIs. Consider upgrading your code to use the new Services APIs.");
+        }
+
+        /// <summary>
+        /// This is here for performance reasons since in some cases we will have already resolved the value from the db
+        /// and want to just give this object the value so it doesn't go re-look it up from the database.
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="strDbType"></param>
+        void IDataValueSetter.SetValue(object val, string strDbType)
+        {            
+            Value = val;            
         }
     }
 }
