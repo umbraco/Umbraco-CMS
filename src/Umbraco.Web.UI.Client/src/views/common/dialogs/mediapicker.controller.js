@@ -8,10 +8,6 @@ angular.module("umbraco")
             $scope.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
 
             $scope.options = {
-                //NOTE: This header is very important since we check for csrf on the server side
-                headers: {
-                    "X-XSRF-TOKEN": $cookies["XSRF-TOKEN"]
-                },
                 url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
                 autoUpload: true,
                 formData: {

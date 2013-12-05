@@ -26,10 +26,6 @@ function MediaFolderBrowserDashboardController($rootScope, $scope, assetsService
 
         $scope.filesUploading = [];
         $scope.options = {
-            //NOTE: This header is very important since we check for csrf on the server side
-            headers: {
-                "X-XSRF-TOKEN": $cookies["XSRF-TOKEN"]
-            },
             url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
             autoUpload: true,
             disableImageResize: /Android(?!.*Chrome)|Opera/
