@@ -155,7 +155,7 @@ namespace umbraco.cms.businesslogic.web
         private User _creator;
         private User _writer;
         private int? _writerId;
-        private bool _optimizedMode;
+        private readonly bool _optimizedMode;
         protected internal IContent Content;
 
         /// <summary>
