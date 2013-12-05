@@ -36,6 +36,19 @@ namespace Umbraco.Core.Services
         #region IMemberService Implementation
 
         /// <summary>
+        /// Checks if a member with the id exists
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public bool Exists(int id)
+        {
+            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.Exists(id);
+            }
+        }
+
+        /// <summary>
         /// Gets a Member by its integer Id
         /// </summary>
         /// <param name="id"></param>
@@ -43,7 +56,7 @@ namespace Umbraco.Core.Services
         public IMember GetById(int id)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
-            {
+            {                
                 return repository.Get(id);
             }
         }

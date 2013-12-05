@@ -9,6 +9,13 @@ namespace Umbraco.Core.Services
     /// </summary>
     internal interface IMemberService : IMembershipMemberService
     {
+        /// <summary>
+        /// Checks if a member with the id exists
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        bool Exists(int id);
+
         IMember GetById(int id);
         IMember GetByKey(Guid id);
         IEnumerable<IMember> GetMembersByMemberType(string memberTypeAlias);
