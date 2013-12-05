@@ -1428,6 +1428,9 @@ namespace umbraco.cms.businesslogic.web
         private void SetupNode(IContent content)
         {
             Content = content;
+            //Also need to set the ContentBase item to this one so all the propery values load from it
+            ContentBase = Content;
+
             //Setting private properties from IContentBase replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
             base.PopulateCMSNodeFromUmbracoEntity(Content, _objectType);
 
