@@ -25,7 +25,7 @@ yepnope({
     'lib/jquery/jquery.upload/js/jquery.fileupload-process.js',
     'lib/jquery/jquery.upload/js/jquery.fileupload-angular.js',
     
-    'lib/bootstrap/js/bootstrap.js',
+    'lib/bootstrap/js/bootstrap.2.3.2.min.js',
     'lib/underscore/underscore.js',
     'lib/umbraco/Extensions.js',
     'lib/umbraco/NamespaceManager.js',
