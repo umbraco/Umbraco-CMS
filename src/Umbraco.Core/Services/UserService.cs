@@ -166,7 +166,8 @@ namespace Umbraco.Core.Services
 
             var uow = _uowProvider.GetUnitOfWork();
             var sql = new Sql();
-            sql.Select("app").From<User2AppDto>().Where("user = @userID", new {userID = user.Id});
+            sql.Select("app").From<User2AppDto>()
+                .Where<User2AppDto>(dto => dto.UserId == (int)user.Id);
             return uow.Database.Fetch<string>(sql);
         }
 
