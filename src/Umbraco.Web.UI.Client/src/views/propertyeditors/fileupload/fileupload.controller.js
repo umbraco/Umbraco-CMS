@@ -57,7 +57,7 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
         _.each($scope.persistedFiles, function (file) {
             
             var thumbnailUrl = umbRequestHelper.getApiUrl(
-                        "mediaApiBaseUrl",
+                        "imagesApiBaseUrl",
                         "GetBigThumbnail",
                         [{ originalImagePath: file.file }]);
 

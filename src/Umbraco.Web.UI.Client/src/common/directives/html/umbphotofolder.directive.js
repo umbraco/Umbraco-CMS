@@ -86,7 +86,7 @@ angular.module("umbraco.directives.html")
                     
                     //get the proxy url for big thumbnails (this ensures one is always generated)
                     var thumbnailUrl = umbRequestHelper.getApiUrl(
-                        "mediaApiBaseUrl",
+                        "imagesApiBaseUrl",
                         "GetBigThumbnail",
                         [{ mediaId: photo.id }]);
                     photo.thumbnail = thumbnailUrl;
