@@ -1,13 +1,17 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Dialogs.MediaPickerController",
-        function($scope, mediaResource, umbRequestHelper, entityResource, $log, imageHelper, eventsService, treeService) {
+        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, imageHelper, eventsService, treeService, $cookies) {
 
             var dialogOptions = $scope.$parent.dialogOptions;
             $scope.onlyImages = dialogOptions.onlyImages;
             $scope.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
 
             $scope.options = {
+                //NOTE: This header is very important since we check for csrf on the server side
+                headers: {
+                    "X-XSRF-TOKEN": $cookies["XSRF-TOKEN"]
+                },
                 url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
                 autoUpload: true,
                 formData: {

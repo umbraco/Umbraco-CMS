@@ -11,7 +11,7 @@ angular.module("umbraco")
         };
 })
 .controller("Umbraco.PropertyEditors.FolderBrowserController",
-    function ($rootScope, $scope, assetsService, $routeParams, $timeout, $element, $location, umbRequestHelper, mediaResource, imageHelper) {
+    function ($rootScope, $scope, assetsService, $routeParams, $timeout, $element, $location, umbRequestHelper, mediaResource, $cookies) {
         var dialogOptions = $scope.$parent.dialogOptions;
 
         $scope.creating = $routeParams.create;
@@ -20,6 +20,10 @@ angular.module("umbraco")
 
             $scope.filesUploading = [];
             $scope.options = {
+                //NOTE: This header is very important since we check for csrf on the server side
+                headers: {
+                    "X-XSRF-TOKEN": $cookies["XSRF-TOKEN"]
+                },
                 url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
                 autoUpload: true,
                 disableImageResize: /Android(?!.*Chrome)|Opera/
