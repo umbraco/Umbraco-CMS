@@ -50,6 +50,9 @@ function MediaFolderBrowserDashboardController($rootScope, $scope, assetsService
             $scope.loadChildren($scope.options.formData.currentFolder);
             $scope.queue = [];
             $scope.filesUploading = [];
+
+            var path = ["-1"];
+            navigationService.syncTree({ tree: "media", path: path });
         });
 
         $scope.$on('fileuploadprocessalways', function(e,data) {

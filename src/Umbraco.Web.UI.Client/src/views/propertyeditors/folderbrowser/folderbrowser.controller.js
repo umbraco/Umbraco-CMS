@@ -11,7 +11,7 @@ angular.module("umbraco")
         };
 })
 .controller("Umbraco.PropertyEditors.FolderBrowserController",
-    function ($rootScope, $scope, assetsService, $routeParams, $timeout, $element, $location, umbRequestHelper, mediaResource, imageHelper) {
+    function ($rootScope, $scope, assetsService, $routeParams, $timeout, $element, $location, umbRequestHelper, mediaResource, imageHelper, navigationService, editorState) {
         var dialogOptions = $scope.$parent.dialogOptions;
 
         $scope.creating = $routeParams.create;
@@ -44,6 +44,10 @@ angular.module("umbraco")
                 $scope.loadChildren($scope.options.formData.currentFolder);
                 $scope.queue = [];
                 $scope.filesUploading = [];
+
+                var path = editorState.current.path;
+                alert(path);
+                navigationService.syncTree({ tree: "media", path: path });
             });
 
             $scope.$on('fileuploadprocessalways', function(e,data) {
