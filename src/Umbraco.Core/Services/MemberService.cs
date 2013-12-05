@@ -38,7 +38,18 @@ namespace Umbraco.Core.Services
 
         #region IMemberService Implementation
 
-
+        /// <summary>
+        /// Checks if a member with the username exists
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        public bool Exists(string username)
+        {
+            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.Exists(username);
+            }
+        }
 
         /// <summary>
         /// Checks if a member with the id exists

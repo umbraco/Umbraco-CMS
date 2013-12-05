@@ -230,7 +230,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Assigns the given tags to a content item's property
         /// </summary>
         /// <param name="contentId"></param>
-        /// <param name="propertyTypeAlias"></param>
+        /// <param name="propertyTypeId"></param>
         /// <param name="tags">The tags to assign</param>
         /// <param name="replaceTags">
         /// If set to true, this will replace all tags with the given tags, 
@@ -240,7 +240,8 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <remarks>
         /// This can also be used to remove all tags from a property by specifying replaceTags = true and an empty tag list.
         /// </remarks>
-        public void AssignTagsToProperty(int contentId, string propertyTypeAlias, IEnumerable<ITag> tags, bool replaceTags)
+        //public void AssignTagsToProperty(int contentId, string propertyTypeAlias, IEnumerable<ITag> tags, bool replaceTags)
+        public void AssignTagsToProperty(int contentId, int propertyTypeId, IEnumerable<ITag> tags, bool replaceTags)
         {
             //First we need to ensure there are no duplicates
             var asArray = tags.Distinct(new TagComparer()).ToArray();
@@ -250,8 +251,6 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 return;
             }
-
-            var propertyTypeId = EnsureContentProperty(contentId, propertyTypeAlias);
 
             //next check if we're removing all of the tags
             if (asArray.Length == 0 && replaceTags)
@@ -310,7 +309,7 @@ namespace Umbraco.Core.Persistence.Repositories
                                                           "left outer join cmsTagRelationship ",
                                                           "on (cmsTagRelationship.TagId = NewTagsSet.Id and cmsTagRelationship.nodeId = ",
                                                           contentId,
-                                                          "and cmsTagRelationship.propertyTypeId = ",
+                                                          " and cmsTagRelationship.propertyTypeId = ",
                                                           propertyTypeId,
                                                           ") ",
                                                           "where cmsTagRelationship.tagId is null ");
@@ -327,12 +326,10 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Removes any of the given tags from the property association
         /// </summary>
         /// <param name="contentId"></param>
-        /// <param name="propertyTypeAlias"></param>
+        /// <param name="propertyTypeId"></param>
         /// <param name="tags">The tags to remove from the property</param>
-        public void RemoveTagsFromProperty(int contentId, string propertyTypeAlias, IEnumerable<ITag> tags)
+        public void RemoveTagsFromProperty(int contentId, int propertyTypeId, IEnumerable<ITag> tags)
         {
-            var propertyTypeId = EnsureContentProperty(contentId, propertyTypeAlias);
-            
             var tagSetSql = GetTagSet(tags);
             
             var deleteSql = string.Concat("DELETE FROM cmsTagRelationship WHERE nodeId = ",
@@ -396,36 +393,5 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        /// <summary>
-        /// Ensures the content and property alias exist, then returns the property type id for the alias
-        /// </summary>
-        /// <param name="contentId"></param>
-        /// <param name="propertyAlias"></param>
-        /// <returns></returns>
-        private int EnsureContentProperty(int contentId, string propertyAlias)
-        {
-            //ensure that there's content and a property to assign - NOTE: we cannot use the content repository here 
-            // because the content repository requires one of us TagsRepository instance, then we'll have circular dependencies
-            // instead we'll just look it up ourselves.
-
-            var sql = new Sql()
-                .Select("cmsPropertyType.id")
-                .From<ContentDto>()
-                .InnerJoin<ContentTypeDto>()
-                .On<ContentTypeDto, ContentDto>(left => left.NodeId, right => right.ContentTypeId)
-                .InnerJoin<PropertyTypeDto>()
-                .On<PropertyTypeDto, ContentTypeDto>(left => left.ContentTypeId, right => right.NodeId)
-                .Where<ContentDto>(dto => dto.NodeId == contentId)
-                .Where<PropertyTypeDto>(dto => dto.Alias == propertyAlias);
-
-            var result = Database.Fetch<int>(sql).ToArray();
-
-            if (result.Length == 0)
-            {
-                throw new InvalidOperationException("Cannot modify tags for content id " + contentId + " and property " + propertyAlias + " because the content item does not exist with this property");
-            }
-
-            return result.First();
-        }
     }
 }

@@ -154,25 +154,18 @@ namespace Umbraco.Web.Models.Mapping
             foreach (var propertyGroups in content.PropertyGroups.OrderBy(x => x.SortOrder).GroupBy(x => x.Name))
             {
                 var aggregateProperties = new List<ContentPropertyDisplay>();
-
-                //there will always be one group with a null parent id (the top-most)
-                //then we'll iterate over all of the groups and ensure the properties are
-                //added in order so that when they render they are rendered with highest leve
-                //parent properties first.
-                int? currentParentId = null;
-                for (var i = 0; i < propertyGroups.Count(); i++)
+                
+                //add the properties from each composite property group
+                foreach (var current in propertyGroups)
                 {
-                    var current = propertyGroups.Single(x => x.ParentId == currentParentId);
-
                     var propsForGroup = content.GetPropertiesForGroup(current)
                         .Where(x => IgnoreProperties.Contains(x.Alias) == false); //don't include ignored props
 
                     aggregateProperties.AddRange(
                         Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(
                             propsForGroup));
-                    currentParentId = current.Id;
                 }
-
+                
                 //then we'll just use the root group's data to make the composite tab
                 var rootGroup = propertyGroups.Single(x => x.ParentId == null);
                 aggregateTabs.Add(new Tab<ContentPropertyDisplay>

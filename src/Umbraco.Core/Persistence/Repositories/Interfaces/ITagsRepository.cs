@@ -34,7 +34,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Assigns the given tags to a content item's property
         /// </summary>
         /// <param name="contentId"></param>
-        /// <param name="propertyTypeAlias"></param>
+        /// <param name="propertyTypeId"></param>
         /// <param name="tags">The tags to assign</param>
         /// <param name="replaceTags">
         /// If set to true, this will replace all tags with the given tags, 
@@ -44,14 +44,14 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <remarks>
         /// This can also be used to remove all tags from a property by specifying replaceTags = true and an empty tag list.
         /// </remarks>
-        void AssignTagsToProperty(int contentId, string propertyTypeAlias, IEnumerable<ITag> tags, bool replaceTags);
+        void AssignTagsToProperty(int contentId, int propertyTypeId, IEnumerable<ITag> tags, bool replaceTags);
 
         /// <summary>
         /// Removes any of the given tags from the property association
         /// </summary>
         /// <param name="contentId"></param>
-        /// <param name="propertyTypeAlias"></param>
+        /// <param name="propertyTypeId"></param>
         /// <param name="tags">The tags to remove from the property</param>
-        void RemoveTagsFromProperty(int contentId, string propertyTypeAlias, IEnumerable<ITag> tags);
+        void RemoveTagsFromProperty(int contentId, int propertyTypeId, IEnumerable<ITag> tags);
     }
 }

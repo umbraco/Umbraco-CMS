@@ -106,7 +106,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     //remove the specific tags
                     tagRepo.RemoveTagsFromProperty(
                         entity.Id,
-                        tagProp.Alias,
+                        tagProp.PropertyTypeId,
                         tagProp.TagSupport.Tags.Select(x => new Tag { Text = x.Item1, Group = x.Item2 }));
                 }
                 else
@@ -114,7 +114,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     //assign the tags
                     tagRepo.AssignTagsToProperty(
                         entity.Id,
-                        tagProp.Alias,
+                        tagProp.PropertyTypeId,
                         tagProp.TagSupport.Tags.Select(x => new Tag { Text = x.Item1, Group = x.Item2 }),
                         tagProp.TagSupport.Behavior == PropertyTagBehavior.Replace);
                 }

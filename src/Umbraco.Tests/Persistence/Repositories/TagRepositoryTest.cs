@@ -105,18 +105,6 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void Cannot_Assign_Tags_To_Non_Existing_Property()
-        {
-            var provider = new PetaPocoUnitOfWorkProvider();
-            var unitOfWork = provider.GetUnitOfWork();
-            using (var repository = CreateRepository(unitOfWork))
-            {
-                Assert.Throws<InvalidOperationException>(() => repository.AssignTagsToProperty(1234, "hello", Enumerable.Empty<ITag>(), true));
-            }
-
-        }
-
-        [Test]
         public void Can_Create_Tag_Relations()
         {
             var provider = new PetaPocoUnitOfWorkProvider();
@@ -136,7 +124,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     repository.AssignTagsToProperty(
                         content.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
@@ -168,7 +156,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     repository.AssignTagsToProperty(
                         content.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
@@ -177,7 +165,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                     repository.AssignTagsToProperty(
                         content.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag3", Group = "test"},
@@ -209,7 +197,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     repository.AssignTagsToProperty(
                         content.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
@@ -218,7 +206,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                     repository.AssignTagsToProperty(
                         content.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag3", Group = "test"},
@@ -253,7 +241,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     repository.AssignTagsToProperty(
                         content.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
@@ -262,7 +250,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                     repository.AssignTagsToProperty(
                         content.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag2", Group = "test"},
@@ -295,7 +283,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     repository.AssignTagsToProperty(
                         content.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
@@ -304,7 +292,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                     repository.AssignTagsToProperty(
                         content.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         Enumerable.Empty<ITag>(), true);                    
 
                     var result = repository.GetTagsForEntity(content.Id);
@@ -333,7 +321,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     repository.AssignTagsToProperty(
                         content.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
@@ -344,7 +332,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                     repository.RemoveTagsFromProperty(
                         content.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag2", Group = "test"},
@@ -381,7 +369,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     repository.AssignTagsToProperty(
                         content1.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
@@ -392,7 +380,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                     repository.AssignTagsToProperty(
                         content2.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
@@ -427,7 +415,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     repository.AssignTagsToProperty(
                         content1.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
@@ -438,7 +426,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                     repository.AssignTagsToProperty(
                         content2.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
@@ -471,7 +459,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     repository.AssignTagsToProperty(
                         content1.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
@@ -482,7 +470,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                     repository.AssignTagsToProperty(
                         content1.Id,
-                        contentType.PropertyTypes.Last().Alias,
+                        contentType.PropertyTypes.Last().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
@@ -518,7 +506,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     repository.AssignTagsToProperty(
                         content1.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
@@ -529,7 +517,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                     repository.AssignTagsToProperty(
                         content1.Id,
-                        contentType.PropertyTypes.Last().Alias,
+                        contentType.PropertyTypes.Last().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
@@ -575,7 +563,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     repository.AssignTagsToProperty(
                         content1.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
@@ -585,7 +573,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                     repository.AssignTagsToProperty(
                         media1.Id,
-                        mediaType.PropertyTypes.Last().Alias,
+                        mediaType.PropertyTypes.Last().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
@@ -631,7 +619,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     repository.AssignTagsToProperty(
                         content1.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
@@ -642,7 +630,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                     repository.AssignTagsToProperty(
                         media1.Id,
-                        mediaType.PropertyTypes.Last().Alias,
+                        mediaType.PropertyTypes.Last().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
@@ -680,7 +668,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 {
                     repository.AssignTagsToProperty(
                         content1.Id,
-                        contentType.PropertyTypes.First().Alias,
+                        contentType.PropertyTypes.First().Id,
                         new[]
                             {
                                 new Tag {Text = "tag1", Group = "test"},
