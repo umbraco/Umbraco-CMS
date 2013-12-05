@@ -18,7 +18,7 @@ describe('angular event tests', function () {
             };
             
             eventsService.on("testEvent", function (e, args) {                
-                args.args.val = "changed";
+                args.val = "changed";
             });
 
             eventsService.emit("testEvent", eventArgs);
@@ -34,11 +34,11 @@ describe('angular event tests', function () {
             };
 
             eventsService.on("testEvent", function (e, args) {
-                args.args.val = "changed";
+                args.val = "changed";
             });
             
             eventsService.on("testEvent", function (e, args) {
-                args.args.val = "changed1";
+                args.val = "changed1";
             });
 
             eventsService.emit("testEvent", eventArgs);
@@ -55,14 +55,13 @@ describe('angular event tests', function () {
 
             eventsService.on("testEvent", function (e, msg) {
                 $timeout(function () {                    
-                    msg.args.val = "changed";
+                    msg.val = "changed";
                     //NOTE: We could resolve anything here
-                    msg.resolve(msg.args);
+                    msg.resolve(msg);
                 }, 1000);
             });
 
-            var promises = eventsService.emit("testEvent", eventArgs);
-
+            
             //this won't be changed yet
             expect(eventArgs.val).toBe("");
 
@@ -73,7 +72,6 @@ describe('angular event tests', function () {
             });*/
 
             $rootScope.$digest();
-            $timeout.flush();
         });
         
         //NOTE: This logic has been merged into the eventsService
