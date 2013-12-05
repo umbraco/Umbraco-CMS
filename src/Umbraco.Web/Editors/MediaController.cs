@@ -145,7 +145,7 @@ namespace Umbraco.Web.Editors
             return GetResized(imagePath, width, Convert.ToString(width));
         }
 
-        private static HttpResponseMessage GetResized(string imagePath, int width, string suffix)
+        private HttpResponseMessage GetResized(string imagePath, int width, string suffix)
         {
             var mediaFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
             var ext = Path.GetExtension(imagePath);
