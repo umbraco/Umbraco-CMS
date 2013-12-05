@@ -33,6 +33,13 @@ namespace Umbraco.Core.Services
     /// </remarks>
     internal interface IMembershipMemberService : IService
     {
+        /// <summary>
+        /// Checks if a member with the username exists
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        bool Exists(string username);
+
         IMember CreateMember(string username, string email, string password, string memberTypeAlias, int userId = 0);
 
         IMember GetById(object id);

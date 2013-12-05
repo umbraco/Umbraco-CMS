@@ -413,7 +413,7 @@ namespace umbraco.cms.businesslogic.member
         public static bool IsMember(string loginName)
         {
             Mandate.ParameterNotNullOrEmpty(loginName, "loginName");
-            return ApplicationContext.Current.Services.MemberService.GetByUsername(loginName) != null;
+            return ApplicationContext.Current.Services.MemberService.Exists(loginName);
         }
 
         /// <summary>

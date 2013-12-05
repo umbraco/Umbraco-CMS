@@ -446,6 +446,16 @@ namespace Umbraco.Core.Persistence.Repositories
             return BuildFromDtos(dtos);
         }
 
+        public bool Exists(string username)
+        {
+            var sql = new Sql();
+            sql.Select("COUNT(*)")
+                .From<MemberDto>()
+                .Where<MemberDto>(x => x.LoginName == username);
+
+            return Database.ExecuteScalar<int>(sql) > 0;
+        }
+
         private IMember BuildFromDto(List<MemberReadOnlyDto> dtos)
         {
             if (dtos == null || dtos.Any() == false)

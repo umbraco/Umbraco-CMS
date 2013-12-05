@@ -38,6 +38,8 @@ namespace Umbraco.Core.Services
 
         #region IMemberService Implementation
 
+
+
         /// <summary>
         /// Checks if a member with the id exists
         /// </summary>

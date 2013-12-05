@@ -12,5 +12,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         IEnumerable<IMember> GetByMemberGroup(string groupName);
 
+        /// <summary>
+        /// Checks if a member with the username exists
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
+        bool Exists(string username);
+
     }
 }
