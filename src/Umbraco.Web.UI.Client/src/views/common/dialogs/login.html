@@ -16,7 +16,7 @@
                 <input type="password" ng-model="password" name="password" class="input-xlarge" localize="placeholder" placeholder="@placeholders_password"  />
             </div>
 
-            <button type="submit" class="btn"><localize key="general_login">Login</localize></button>
+            <button type="submit" class="btn" val-trigger-change="#login .form input"><localize key="general_login">Login</localize></button>
             
             <div class="control-group" ng-show="loginForm.$invalid">
                 <div class="alert alert-error">{{errorMsg}}</div>
