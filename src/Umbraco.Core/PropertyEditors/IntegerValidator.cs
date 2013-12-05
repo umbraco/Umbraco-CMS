@@ -12,10 +12,13 @@ namespace Umbraco.Core.PropertyEditors
     {
         public override IEnumerable<ValidationResult> Validate(object value, string config, PreValueCollection preValues, PropertyEditor editor)
         {
-            var result = value.TryConvertTo<int>();
-            if (result.Success == false)
+            if (value != null && value.ToString() != string.Empty)
             {
-                yield return new ValidationResult("The value " + value + " is not a valid integer", new[] {"value"});
+                var result = value.TryConvertTo<int>();
+                if (result.Success == false)
+                {
+                    yield return new ValidationResult("The value " + value + " is not a valid integer", new[] { "value" });
+                }
             }
         }
 
