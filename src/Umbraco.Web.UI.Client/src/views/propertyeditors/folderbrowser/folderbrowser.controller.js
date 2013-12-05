@@ -19,7 +19,7 @@ angular.module("umbraco")
         if(!$scope.creating){
 
             $scope.filesUploading = [];
-            $scope.options = {
+            $scope.options = {                
                 url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
                 autoUpload: true,
                 disableImageResize: /Android(?!.*Chrome)|Opera/

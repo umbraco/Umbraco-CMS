@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Dialogs.MediaPickerController",
-        function($scope, mediaResource, umbRequestHelper, entityResource, $log, imageHelper, eventsService, treeService) {
+        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, imageHelper, eventsService, treeService, $cookies) {
 
             var dialogOptions = $scope.$parent.dialogOptions;
             $scope.onlyImages = dialogOptions.onlyImages;
