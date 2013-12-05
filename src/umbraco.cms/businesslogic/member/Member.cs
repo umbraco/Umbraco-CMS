@@ -9,7 +9,6 @@ using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using umbraco.cms.businesslogic.cache;
 using umbraco.BusinessLogic;
@@ -58,7 +57,6 @@ namespace umbraco.cms.businesslogic.member
         private string _password;
         private string _loginName;
         private Hashtable _groups = null;
-        protected internal IMember Content;
         #endregion
 
         #region Constructors
@@ -214,16 +212,16 @@ namespace umbraco.cms.businesslogic.member
         {
             if (mbt == null) throw new ArgumentNullException("mbt");
 
-            var loginName = (!string.IsNullOrEmpty(LoginName)) ? LoginName : Name;
+            var loginName = (!String.IsNullOrEmpty(LoginName)) ? LoginName : Name;
 
-            if (string.IsNullOrEmpty(loginName))
+            if (String.IsNullOrEmpty(loginName))
                 throw new ArgumentException("The loginname must be different from an empty string", "loginName");
 
             // Test for e-mail
             if (Email != "" && GetMemberFromEmail(Email) != null && Membership.Providers[UmbracoMemberProviderName].RequiresUniqueEmail)
-                throw new Exception(string.Format("Duplicate Email! A member with the e-mail {0} already exists", Email));
+                throw new Exception(String.Format("Duplicate Email! A member with the e-mail {0} already exists", Email));
             else if (GetMemberFromLoginName(loginName) != null)
-                throw new Exception(string.Format("Duplicate User name! A member with the user name {0} already exists", loginName));
+                throw new Exception(String.Format("Duplicate User name! A member with the user name {0} already exists", loginName));
 
             // Lowercased to prevent duplicates
             Email = Email.ToLower();
@@ -267,7 +265,7 @@ namespace umbraco.cms.businesslogic.member
         /// <returns>The member with the specified loginname - null if no Member with the login exists</returns>
         public static Member GetMemberFromLoginName(string loginName)
         {
-            if (string.IsNullOrEmpty(loginName))
+            if (String.IsNullOrEmpty(loginName))
                 throw new ArgumentException("The username of a Member must be different from an emptry string", "loginName");
             if (IsMember(loginName))
             {
@@ -365,13 +363,14 @@ namespace umbraco.cms.businesslogic.member
                 }
                 else
                 {
-                    LogHelper.Debug<Member>("Incorrect login/password attempt or member is locked out or not approved (" + loginName + ")", true);
+                    HttpContext.Current.Trace.Warn("Incorrect login/password");
                     return null;
                 }
             }
             else
             {
-                LogHelper.Debug<Member>("No member with loginname: " + loginName + " Exists", true);
+                HttpContext.Current.Trace.Warn("No member with loginname: " + loginName + " Exists");
+                //				throw new ArgumentException("No member with Loginname: " + LoginName + " exists");
                 return null;
             }
         }
@@ -412,7 +411,7 @@ namespace umbraco.cms.businesslogic.member
         public static bool IsMember(string loginName)
         {
             Mandate.ParameterNotNullOrEmpty(loginName, "loginName");
-            return ApplicationContext.Current.Services.MemberService.GetByUsername(loginName) != null;
+            return ApplicationContext.Current.Services.MemberService.Exists(loginName);
         }
 
         /// <summary>
@@ -506,7 +505,7 @@ namespace umbraco.cms.businesslogic.member
             }
             set
             {
-                if (string.IsNullOrEmpty(value))
+                if (String.IsNullOrEmpty(value))
                     throw new ArgumentException("The loginname must be different from an empty string", "LoginName");
                 if (value.Contains(","))
                     throw new ArgumentException("The parameter 'LoginName' must not contain commas.");
@@ -538,7 +537,7 @@ namespace umbraco.cms.businesslogic.member
         {
             get
             {
-                if (string.IsNullOrEmpty(_email))
+                if (String.IsNullOrEmpty(_email))
                 {
                     _email = SqlHelper.ExecuteScalar<string>(
                        "select Email from cmsMember where nodeId = @id",
@@ -564,7 +563,7 @@ namespace umbraco.cms.businesslogic.member
                 {
                     // If the value hasn't changed and there are more than 1 member with that email, then throw
                     // If the value has changed and there are any member with that new email, then throw
-                    throw new Exception(string.Format("Duplicate Email! A member with the e-mail {0} already exists", newEmail));
+                    throw new Exception(String.Format("Duplicate Email! A member with the e-mail {0} already exists", newEmail));
                 }
                 SqlHelper.ExecuteNonQuery(
                     "update cmsMember set Email = @email where nodeId = @id",
@@ -577,42 +576,27 @@ namespace umbraco.cms.businesslogic.member
 
         #region Public Methods
 
-        [Obsolete("Obsolete", false)]
         protected override void setupNode()
         {
-            if (Id == -1)
+            base.setupNode();
+
+            using (var dr = SqlHelper.ExecuteReader(
+                    @"SELECT Email, LoginName, Password FROM cmsMember WHERE nodeId=@nodeId",
+                     SqlHelper.CreateParameter("@nodeId", this.Id)))
             {
-                base.setupNode();
-                return;
+                if (dr.Read())
+                {
+                    if (!dr.IsNull("Email"))
+                        _email = dr.GetString("Email");
+                    _loginName = dr.GetString("LoginName");
+                    _password = dr.GetString("Password");
+                }
+                else
+                {
+                    throw new ArgumentException(string.Format("No Member exists with Id '{0}'", this.Id));
+                }
             }
-
-            var content = ApplicationContext.Current.Services.MemberService.GetById(Id);
-
-            if (content == null)
-                throw new ArgumentException(string.Format("No Member exists with id '{0}'", Id));
-
-            SetupNode(content);
         }
-
-        private void SetupNode(IMember content)
-        {
-            Content = content;
-            //Also need to set the ContentBase item to this one so all the propery values load from it
-            ContentBase = Content;
-
-            //Setting private properties from IContentBase replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
-            base.PopulateCMSNodeFromUmbracoEntity(Content, _objectType);
-
-            //If the version is empty we update with the latest version from the current IContent.
-            if (Version == Guid.Empty)
-                Version = Content.Version;
-            
-            _email = Content.Email;
-            _loginName = Content.Username;
-            _password = Content.Password;
-            
-        }
-
 
         /// <summary>
         /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
