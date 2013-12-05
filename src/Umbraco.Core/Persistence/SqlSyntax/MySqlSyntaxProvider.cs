@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             TimeColumnDefinition = "time";
             DecimalColumnDefinition = "decimal(38,6)";
             GuidColumnDefinition = "char(36)";
-            
+
             InitColumnTypeMap();
 
             DefaultValueFormat = "DEFAULT '{0}'";
@@ -48,7 +48,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                 var items =
                     db.Fetch<dynamic>(
                         "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = @TableSchema",
-                        new {TableSchema = db.Connection.Database});
+                        new { TableSchema = db.Connection.Database });
                 list = items.Select(x => x.TABLE_NAME).Cast<string>().ToList();
             }
             finally
@@ -67,7 +67,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                 var items =
                     db.Fetch<dynamic>(
                         "SELECT TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = @TableSchema",
-                        new {TableSchema = db.Connection.Database});
+                        new { TableSchema = db.Connection.Database });
                 list =
                     items.Select(
                         item =>
@@ -90,7 +90,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                 var items =
                     db.Fetch<dynamic>(
                         "SELECT TABLE_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_SCHEMA = @TableSchema",
-                        new {TableSchema = db.Connection.Database});
+                        new { TableSchema = db.Connection.Database });
                 list = items.Select(item => new Tuple<string, string>(item.TABLE_NAME, item.CONSTRAINT_NAME)).ToList();
             }
             finally
@@ -109,7 +109,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                 var items =
                     db.Fetch<dynamic>(
                         "SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.KEY_COLUMN_USAGE WHERE TABLE_SCHEMA = @TableSchema",
-                        new {TableSchema = db.Connection.Database});
+                        new { TableSchema = db.Connection.Database });
                 list =
                     items.Select(
                         item =>
@@ -133,7 +133,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                     db.ExecuteScalar<long>("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES " +
                                            "WHERE TABLE_NAME = @TableName AND " +
                                            "TABLE_SCHEMA = @TableSchema",
-                                           new {TableName = tableName, TableSchema = db.Connection.Database});
+                                           new { TableName = tableName, TableSchema = db.Connection.Database });
 
             }
             finally
@@ -213,7 +213,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
             return string.Format(CreateIndex,
                                  GetQuotedName(name),
-                                 GetQuotedTableName(index.TableName), 
+                                 GetQuotedTableName(index.TableName),
                                  columns);
         }
 
@@ -290,7 +290,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         {
             get
             {
-                throw new NotSupportedException("Default constraints are not supported in MySql");
+                return "ALTER TABLE {0} ALTER COLUMN {1} DROP DEFAULT";
             }
         }
 
@@ -303,7 +303,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public override string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD FOREIGN KEY ({1}) REFERENCES {2} ({3}){4}{5}"; } }
 
-        public override string DeleteConstraint { get { return "ALTER TABLE {0} DROP {1}{2}"; } }
+        public override string DeleteConstraint { get { return "ALTER TABLE {0} DROP {1} {2}"; } }
 
         public override string DropIndex { get { return "DROP INDEX {0} ON {1}"; } }
 
@@ -318,11 +318,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                 db.OpenSharedConnection();
                 // Need 4 @ signs as it is regarded as a parameter, @@ escapes it once, @@@@ escapes it twice
                 var lowerCaseTableNames = db.Fetch<int>("SELECT @@@@Global.lower_case_table_names");
-                
-                if(lowerCaseTableNames.Any())
+
+                if (lowerCaseTableNames.Any())
                     supportsCaseInsensitiveQueries = lowerCaseTableNames.First() == 1;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Logging.LogHelper.Error<MySqlSyntaxProvider>("Error querying for lower_case support", ex);
             }
