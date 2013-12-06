@@ -617,7 +617,9 @@ namespace Umbraco.Web.Editors
         /// Permanently deletes a member
         /// </summary>
         /// <param name="key"></param>
-        /// <returns></returns>        
+        /// <returns></returns>
+        /// 
+        [HttpPost]
         public HttpResponseMessage DeleteByKey(Guid key)
         {
             IMember foundMember;

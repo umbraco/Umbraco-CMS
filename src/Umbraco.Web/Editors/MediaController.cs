@@ -186,6 +186,7 @@ namespace Umbraco.Web.Editors
         /// <param name="id"></param>
         /// <returns></returns> 
         [EnsureUserPermissionForMedia("id")]
+        [HttpPost]
         public HttpResponseMessage DeleteById(int id)
         {
             var foundMedia = GetObjectFromRequest(() => Services.MediaService.GetById(id));
@@ -301,6 +302,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <returns></returns>
         [HttpDelete]
+        [HttpPost]
         public HttpResponseMessage EmptyRecycleBin()
         {
             Services.MediaService.EmptyRecycleBin();

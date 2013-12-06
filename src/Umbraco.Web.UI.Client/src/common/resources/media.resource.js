@@ -162,7 +162,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
          */
         deleteById: function(id) {
             return umbRequestHelper.resourcePromise(
-                $http.delete(
+                $http.post(
                     umbRequestHelper.getApiUrl(
                         "mediaApiBaseUrl",
                         "DeleteById",
@@ -414,7 +414,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
          */
         emptyRecycleBin: function() {
             return umbRequestHelper.resourcePromise(
-                $http.delete(
+                $http.post(
                     umbRequestHelper.getApiUrl(
                         "mediaApiBaseUrl",
                         "EmptyRecycleBin")),

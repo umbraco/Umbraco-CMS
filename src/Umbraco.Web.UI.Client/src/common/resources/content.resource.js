@@ -223,7 +223,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          */
         emptyRecycleBin: function() {
             return umbRequestHelper.resourcePromise(
-                $http.delete(
+                $http.post(
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
                         "EmptyRecycleBin")),
@@ -252,7 +252,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
          */
         deleteById: function(id) {
             return umbRequestHelper.resourcePromise(
-                $http.delete(
+                $http.post(
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
                         "DeleteById",

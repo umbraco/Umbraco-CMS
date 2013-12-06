@@ -390,6 +390,7 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         [EnsureUserPermissionForContent("id", 'D')]
         [HttpDelete]
+        [HttpPost]
         public HttpResponseMessage DeleteById(int id)
         {
             var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
@@ -420,6 +421,7 @@ namespace Umbraco.Web.Editors
         /// attributed with EnsureUserPermissionForContent to verify the user has access to the recycle bin
         /// </remarks>
         [HttpDelete]
+        [HttpPost]
         [EnsureUserPermissionForContent(Constants.System.RecycleBinContent)]
         public HttpResponseMessage EmptyRecycleBin()
         {            

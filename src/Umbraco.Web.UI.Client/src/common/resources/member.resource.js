@@ -78,7 +78,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
          */
         deleteByKey: function (key) {
             return umbRequestHelper.resourcePromise(
-                $http.delete(
+                $http.post(
                     umbRequestHelper.getApiUrl(
                         "memberApiBaseUrl",
                         "DeleteByKey",

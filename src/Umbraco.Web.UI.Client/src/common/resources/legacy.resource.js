@@ -15,7 +15,7 @@ function legacyResource($q, $http, umbRequestHelper) {
             } 
 
             return umbRequestHelper.resourcePromise(
-                $http.delete(
+                $http.post(
                     umbRequestHelper.getApiUrl(
                         "legacyApiBaseUrl",
                         "DeleteLegacyItem",

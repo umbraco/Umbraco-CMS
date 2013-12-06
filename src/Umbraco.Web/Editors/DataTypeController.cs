@@ -52,6 +52,7 @@ namespace Umbraco.Web.Editors
         /// <param name="id"></param>
         /// <returns></returns>
         [HttpDelete]
+        [HttpPost]
         public HttpResponseMessage DeleteById(int id)
         {
             var foundType = Services.DataTypeService.GetDataTypeDefinitionById(id);

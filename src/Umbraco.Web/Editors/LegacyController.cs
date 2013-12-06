@@ -41,6 +41,7 @@ namespace Umbraco.Web.Editors
         /// has functionality included in the ui.xml structure.
         /// </summary>
         /// <returns></returns>
+        [HttpPost]
         public HttpResponseMessage DeleteLegacyItem(string nodeId, string alias, string nodeType)
         {
             //U4-2686 - alias is html encoded, make sure to decode 
