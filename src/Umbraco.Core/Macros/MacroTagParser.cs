@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
+using HtmlAgilityPack;
 
 namespace Umbraco.Core.Macros
 {
@@ -10,7 +11,7 @@ namespace Umbraco.Core.Macros
 	/// </summary>
 	internal class MacroTagParser
 	{
-        private static readonly Regex MacroRteContent = new Regex(@"(<div.*?>.*?<!--\s*?)(<\?UMBRACO_MACRO.*?/>)(.*?</div>)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        private static readonly Regex MacroRteContent = new Regex(@"(<!--\s*?)(<\?UMBRACO_MACRO.*?/>)(\s*?-->)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
         private static readonly Regex MacroPersistedFormat = new Regex(@"(<\?UMBRACO_MACRO macroAlias=[""'](\w+?)[""'].+?)(?:/>|>.*?</\?UMBRACO_MACRO>)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
 	    /// <summary>
@@ -88,7 +89,33 @@ namespace Umbraco.Core.Macros
         /// </remarks>
         internal static string FormatRichTextContentForPersistence(string rteContent)
         {
-            return MacroRteContent.Replace(rteContent, match =>
+            if (string.IsNullOrEmpty(rteContent))
+            {
+                return string.Empty;
+            }
+
+            var html = new HtmlDocument();
+            html.LoadHtml(rteContent);
+
+            //get all the comment nodes we want
+            var commentNodes = html.DocumentNode.SelectNodes("//comment()[contains(., '<?UMBRACO_MACRO')]");
+            if (commentNodes == null)
+            {
+                return string.Empty;
+            }
+
+            //replace each containing parent <div> with the comment node itself. 
+            foreach (var c in commentNodes)
+            {
+                var div = c.ParentNode;
+                var divContainer = div.ParentNode;
+                divContainer.ReplaceChild(c, div);
+            }
+
+            var parsed = html.DocumentNode.OuterHtml;
+
+            //now replace all the <!-- and --> with nothing
+            return MacroRteContent.Replace(parsed, match =>
                 {
                     if (match.Groups.Count >= 3)
                     {
@@ -96,7 +123,7 @@ namespace Umbraco.Core.Macros
                         return match.Groups[2].Value;
                     }
                     //replace with nothing if we couldn't find the syntax for whatever reason
-                    return "";
+                    return string.Empty;
                 });
         }
 

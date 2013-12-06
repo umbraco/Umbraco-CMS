@@ -459,24 +459,24 @@ namespace Umbraco.Core
         private readonly HashSet<TypeList> _types = new HashSet<TypeList>();
         private IEnumerable<Assembly> _assemblies;
 
-
         /// <summary>
-        /// Returns all found property editors
+        /// Returns all found property editors (based on the resolved Iparameter editors - this saves a scan)
         /// </summary>
         internal IEnumerable<Type> ResolvePropertyEditors()
         {
             //return all proeprty editor types found except for the base property editor type
-            return ResolveTypes<PropertyEditor>().ToArray()
-                .Except(new[] {typeof (PropertyEditor)});
+            return ResolveTypes<IParameterEditor>()
+                .Where(x => x.IsType<PropertyEditor>())
+                .Except(new[] { typeof(PropertyEditor) });
         }
 
         /// <summary>
-        /// Returns all found parameter editors
+        /// Returns all found parameter editors (which includes property editors)
         /// </summary>
         internal IEnumerable<Type> ResolveParameterEditors()
         {
             //return all paramter editor types found except for the base property editor type
-            return ResolveTypes<IParameterEditor>().ToArray()
+            return ResolveTypes<IParameterEditor>()
                 .Except(new[] { typeof(ParameterEditor), typeof(PropertyEditor) });
         } 
 

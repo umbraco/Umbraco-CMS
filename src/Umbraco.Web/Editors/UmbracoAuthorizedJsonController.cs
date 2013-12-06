@@ -12,6 +12,7 @@ namespace Umbraco.Web.Editors
     /// methods that are not called by Angular or don't contain a valid csrf header will NOT work.
     /// </remarks>
     [ValidateAngularAntiForgeryToken]
+    [AngularJsonOnlyConfiguration]
     public abstract class UmbracoAuthorizedJsonController : UmbracoAuthorizedApiController
     {
         protected UmbracoAuthorizedJsonController()
@@ -21,18 +22,6 @@ namespace Umbraco.Web.Editors
         protected UmbracoAuthorizedJsonController(UmbracoContext umbracoContext) : base(umbracoContext)
         {
         }
-
-        /// <summary>
-        /// Remove the xml formatter... only support JSON!
-        /// </summary>
-        /// <param name="controllerContext"></param>
-        protected override void Initialize(HttpControllerContext controllerContext)
-        {
-            base.Initialize(controllerContext);
-            controllerContext.EnsureJsonOutputOnly();
-        }
-
-        
 
     }
 }
