@@ -10,7 +10,7 @@ angular.module("umbraco")
 		args.event.preventDefault();
 		args.event.stopPropagation();
 
-		eventsService.publish("editors.content.copyController.select", args);
+		eventsService.emit("editors.content.copyController.select", args);
 	    
 		var c = $(args.event.target.parentElement);
 		if ($scope.selectedEl) {

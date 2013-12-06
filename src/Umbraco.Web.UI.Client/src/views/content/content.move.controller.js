@@ -10,7 +10,7 @@ angular.module("umbraco").controller("Umbraco.Editors.Content.MoveController",
 		args.event.preventDefault();
 		args.event.stopPropagation();
 
-		eventsService.publish("editors.content.moveController.select", args);
+		eventsService.emit("editors.content.moveController.select", args);
 	    
 		var c = $(args.event.target.parentElement);
 
