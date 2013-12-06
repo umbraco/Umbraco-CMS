@@ -268,7 +268,7 @@ namespace Umbraco.Core.Configuration
         /// <param name="value">Value of the setting to be saved.</param>
         internal static void SaveSetting(string key, string value)
         {
-            var fileName = IOHelper.MapPath(string.Format("{0}/appSettings.config", SystemDirectories.Config));
+            var fileName = IOHelper.MapPath(string.Format("{0}/web.config", SystemDirectories.Root));
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
             var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();
@@ -290,7 +290,7 @@ namespace Umbraco.Core.Configuration
         /// <param name="key">Key of the setting to be removed.</param>
         internal static void RemoveSetting(string key)
         {
-            var fileName = IOHelper.MapPath(string.Format("{0}/appSettings.config", SystemDirectories.Config));
+            var fileName = IOHelper.MapPath(string.Format("{0}/web.config", SystemDirectories.Root));
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
 
             var appSettings = xml.Root.DescendantsAndSelf("appSettings").Single();

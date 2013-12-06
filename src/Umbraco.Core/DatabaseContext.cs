@@ -250,7 +250,7 @@ namespace Umbraco.Core
             _connectionString = connectionString;
             _providerName = providerName;
             
-            var fileName = IOHelper.MapPath(string.Format("{0}/connectionStrings.config", SystemDirectories.Config));
+            var fileName = IOHelper.MapPath(string.Format("{0}/web.config", SystemDirectories.Root));
             var xml = XDocument.Load(fileName, LoadOptions.PreserveWhitespace);
             var connectionstrings = xml.Root.DescendantsAndSelf("connectionStrings").Single();
 
