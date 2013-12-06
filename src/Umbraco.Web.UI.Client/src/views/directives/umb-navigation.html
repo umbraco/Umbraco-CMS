@@ -19,12 +19,13 @@
                         <form class="form-search" novalidate>
                             <i class="icon-search"></i>
                             <input type="text"
-                                hotkey="ctrl+shift+s"
+                                hotkey="ctrl+space"
                                 id="search-field"
                                 ng-model="searchTerm"
                                 class="umb-search-field search-query"
                                 localize="placeholder"
-                                placeholder="@placeholders_search"/>                            
+                                placeholder="@placeholders_search"
+                                ng-keydown="navigateResults($event)"/>                            
                         </form>
                     </div>
                 </div>
@@ -38,8 +39,8 @@
                                 <h5><localize key="general_searchResults">Search results</localize></h5>
                             </div>
                         
-                            <ul class="umb-search-group" ng-repeat="resultGroup in searchResults">
-                                <li ng-repeat="result in resultGroup.results">
+                            <ul class="umb-search-group" ng-repeat="group in groups">
+                                <li ng-repeat="result in group.results" ng-class="{'current':selectedItem == result}">
                                     <div>
                                         <a ng-class="{'first':$first}" ng-click="searchHide()" ng-href="#/{{result.editorPath}}">
 

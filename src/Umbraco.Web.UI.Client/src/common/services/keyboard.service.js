@@ -21,7 +21,7 @@ angular.module('umbraco.services')
 	keyboardManagerService.bind = function (label, callback, opt) {
 
 		//replace ctrl key with meta key
-		if(isMac){
+		if(isMac && label !== "ctrl+space"){
 		  label = label.replace("ctrl","meta");
 		}
 

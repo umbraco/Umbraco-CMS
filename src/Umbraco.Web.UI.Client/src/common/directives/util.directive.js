@@ -14,7 +14,7 @@ angular.module('umbraco.directives')
 .directive('onKeydown', function () {
     return {
         link: function (scope, elm, attrs) {
-            $key('keydown', scope, elm, attrs);
+            scope.$apply(attrs.onKeydown);
         }
     };
 })
