@@ -15,18 +15,9 @@ namespace Umbraco.Web.Trees
     /// A base controller reference for non-attributed trees (un-registered). Developers should inherit from
     /// TreeController.
     /// </summary>
+    [AngularJsonOnlyConfiguration]
     public abstract class TreeControllerBase : UmbracoAuthorizedApiController
     {
-        /// <summary>
-        /// Remove the xml formatter... only support JSON!
-        /// </summary>
-        /// <param name="controllerContext"></param>
-        protected override void Initialize(global::System.Web.Http.Controllers.HttpControllerContext controllerContext)
-        {
-            base.Initialize(controllerContext);
-            controllerContext.EnsureJsonOutputOnly();
-        }
-
         /// <summary>
         /// The method called to render the contents of the tree structure
         /// </summary>

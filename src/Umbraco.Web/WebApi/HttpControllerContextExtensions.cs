@@ -96,22 +96,38 @@ namespace Umbraco.Web.WebApi
             jsonFormatter.SerializerSettings.Converters.Add(new CustomDateTimeConvertor("yyyy-MM-dd HH:mm:ss"));
         }
 
-        /// <summary>
-        /// Removes the xml formatter so it only outputs angularized json (with the json vulnerability prefix added)
-        /// </summary>
-        /// <param name="controllerContext"></param>
-        internal static void EnsureJsonOutputOnly(this HttpControllerContext controllerContext)
-        {
+        ///// <summary>
+        ///// Removes the xml formatter so it only outputs angularized json (with the json vulnerability prefix added)
+        ///// </summary>
+        ///// <param name="controllerContext"></param>
+        //internal static void EnsureJsonOutputOnly(this HttpControllerContext controllerContext)
+        //{
+        //    controllerContext.Configuration.Formatters = new MediaTypeFormatterCollection();
+
+        //    //remove all json/xml formatters then add our custom one
+        //    var toRemove = controllerContext.Configuration.Formatters.Where(t => (t is JsonMediaTypeFormatter) || (t is XmlMediaTypeFormatter)).ToList();
+        //    foreach (var r in toRemove)
+        //    {
+        //        controllerContext.Configuration.Formatters.Remove(r);
+        //    }
+        //    controllerContext.Configuration.Formatters.Add(new AngularJsonMediaTypeFormatter());
+        //}
+    }
+
+    /// <summary>
+    /// Applying this attribute to any webapi controller will ensure that it only contains one json formatter compatible with the angular json vulnerability prevention.
+    /// </summary>
+    public class AngularJsonOnlyConfigurationAttribute : Attribute, IControllerConfiguration
+    {
+        public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+        {            
             //remove all json/xml formatters then add our custom one
-            for (var i = 0; i < controllerContext.Configuration.Formatters.Count;i++)
+            var toRemove = controllerSettings.Formatters.Where(t => (t is JsonMediaTypeFormatter) || (t is XmlMediaTypeFormatter)).ToList();
+            foreach (var r in toRemove)
             {
-                if ((controllerContext.Configuration.Formatters[i] is JsonMediaTypeFormatter) 
-                    || (controllerContext.Configuration.Formatters[i] is XmlMediaTypeFormatter))
-                {
-                    controllerContext.Configuration.Formatters.RemoveAt(i);
-                }
+                controllerSettings.Formatters.Remove(r);
             }
-            controllerContext.Configuration.Formatters.Add(new AngularJsonMediaTypeFormatter());
+            controllerSettings.Formatters.Add(new AngularJsonMediaTypeFormatter());
         }
     }
 }

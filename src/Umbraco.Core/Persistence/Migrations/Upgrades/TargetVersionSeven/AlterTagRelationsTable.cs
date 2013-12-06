@@ -26,11 +26,11 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             //create a new col which we will make a foreign key, but first needs to be populated with data.
             Alter.Table("cmsTagRelationship").AddColumn("propertyTypeId").AsInt32().Nullable();
 
+            //drop the foreign key on umbracoNode.  Must drop foreign key first before primary key can be removed in MySql.
+            Delete.ForeignKey("FK_cmsTagRelationship_umbracoNode_id").OnTable("cmsTagRelationship");
+
             //we need to drop the primary key
             Delete.PrimaryKey("PK_cmsTagRelationship").FromTable("cmsTagRelationship");
-
-            //drop the foreign key on umbracoNode
-            Delete.ForeignKey("FK_cmsTagRelationship_umbracoNode_id").OnTable("cmsTagRelationship");
         }
 
         private void Upgrade()
@@ -57,9 +57,9 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 var propertyTypes = propertyTypeIdRef.Where(x => x.NodeId == tr.NodeId).ToArray();
                 if (propertyTypes.Length == 0)
                 {
-                    LogHelper.Warn<AlterTagRelationsTable>("There was no cmsContent reference for cmsTagRelationship for nodeId " 
+                    LogHelper.Warn<AlterTagRelationsTable>("There was no cmsContent reference for cmsTagRelationship for nodeId "
                         + tr.NodeId +
-                        ". The new tag system only supports tags with references to content in the cmsContent and cmsPropertyType tables. This row will be deleted: " 
+                        ". The new tag system only supports tags with references to content in the cmsContent and cmsPropertyType tables. This row will be deleted: "
                         + string.Format("nodeId: {0}, tagId: {1}", tr.NodeId, tr.TagId));
                     Delete.FromTable("cmsTagRelationship").Row(new { nodeId = tr.NodeId, tagId = tr.TagId });
                 }
@@ -92,7 +92,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             Alter.Table("cmsTagRelationship").AlterColumn("propertyTypeId").AsInt32().NotNullable();
 
             //we need to re-add the new primary key on all 3 columns
-            Create.PrimaryKey("PK_cmsTagRelationship").OnTable("cmsTagRelationship").Columns(new[] {"nodeId", "propertyTypeId", "tagId"});
+            Create.PrimaryKey("PK_cmsTagRelationship").OnTable("cmsTagRelationship").Columns(new[] { "nodeId", "propertyTypeId", "tagId" });
 
             //now we need to add a foreign key to the propertyTypeId column and change it's constraints
             Create.ForeignKey("FK_cmsTagRelationship_cmsPropertyType")
@@ -102,7 +102,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                   .PrimaryColumn("id")
                   .OnDelete(Rule.None)
                   .OnUpdate(Rule.None);
-            
+
             //now we need to add a foreign key to the nodeId column to cmsContent (intead of the original umbracoNode)
             Create.ForeignKey("FK_cmsTagRelationship_cmsContent")
                   .FromTable("cmsTagRelationship")

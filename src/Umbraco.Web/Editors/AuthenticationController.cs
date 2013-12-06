@@ -28,18 +28,9 @@ namespace Umbraco.Web.Editors
     /// </summary>
     [PluginController("UmbracoApi")]
     [ValidationFilter]
+    [AngularJsonOnlyConfiguration]
     public class AuthenticationController : UmbracoApiController
     {
-
-        /// <summary>
-        /// Remove the xml formatter... only support JSON!
-        /// </summary>
-        /// <param name="controllerContext"></param>
-        protected override void Initialize(HttpControllerContext controllerContext)
-        {
-            base.Initialize(controllerContext);
-            controllerContext.EnsureJsonOutputOnly();
-        }
         
         /// <summary>
         /// This is a special method that will return the current users' remaining session seconds, the reason

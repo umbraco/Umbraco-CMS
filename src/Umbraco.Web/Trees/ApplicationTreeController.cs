@@ -20,21 +20,10 @@ using umbraco;
 
 namespace Umbraco.Web.Trees
 {
-
+    [AngularJsonOnlyConfiguration]
     [PluginController("UmbracoTrees")]
     public class ApplicationTreeController : UmbracoAuthorizedApiController
     {
-
-        /// <summary>
-        /// Remove the xml formatter... only support JSON!
-        /// </summary>
-        /// <param name="controllerContext"></param>
-        protected override void Initialize(global::System.Web.Http.Controllers.HttpControllerContext controllerContext)
-        {
-            base.Initialize(controllerContext);
-            controllerContext.EnsureJsonOutputOnly();
-        }
-
         /// <summary>
         /// Returns the tree nodes for an application
         /// </summary>

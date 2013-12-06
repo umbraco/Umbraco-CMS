@@ -796,7 +796,9 @@ namespace umbraco
             {
                 if (attributes.ContainsKey(mp.Key.ToLower()))
                 {
-                    mp.Value = attributes[mp.Key.ToLower()].ToString();
+                    var item = attributes[mp.Key.ToLower()];
+
+                    mp.Value = item == null ? string.Empty : item.ToString();
                 }
                 else
                 {

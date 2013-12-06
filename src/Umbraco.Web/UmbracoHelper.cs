@@ -976,35 +976,32 @@ namespace Umbraco.Web
 		{
 			var doc = new HtmlDocument();
 			doc.LoadHtml("<p>" + html + "</p>");
-			using (var ms = new MemoryStream())
-			{
-				var targets = new List<HtmlNode>();
+            var targets = new List<HtmlNode>();
 
-				var nodes = doc.DocumentNode.FirstChild.SelectNodes(".//*");
-				if (nodes != null)
-				{
-					foreach (var node in nodes)
-					{
-						//is element
-						if (node.NodeType != HtmlNodeType.Element) continue;
-						var filterAllTags = (tags == null || !tags.Any());
-						if (filterAllTags || tags.Any(tag => string.Equals(tag, node.Name, StringComparison.CurrentCultureIgnoreCase)))
-						{
-							targets.Add(node);
-						}
-					}
-					foreach (var target in targets)
-					{
-						HtmlNode content = doc.CreateTextNode(target.InnerText);
-						target.ParentNode.ReplaceChild(content, target);
-					}
-				}
-				else
-				{
-					return new HtmlString(html);
-				}
-				return new HtmlString(doc.DocumentNode.FirstChild.InnerHtml);
-			}
+            var nodes = doc.DocumentNode.FirstChild.SelectNodes(".//*");
+            if (nodes != null)
+            {
+                foreach (var node in nodes)
+                {
+                    //is element
+                    if (node.NodeType != HtmlNodeType.Element) continue;
+                    var filterAllTags = (tags == null || !tags.Any());
+                    if (filterAllTags || tags.Any(tag => string.Equals(tag, node.Name, StringComparison.CurrentCultureIgnoreCase)))
+                    {
+                        targets.Add(node);
+                    }
+                }
+                foreach (var target in targets)
+                {
+                    HtmlNode content = doc.CreateTextNode(target.InnerText);
+                    target.ParentNode.ReplaceChild(content, target);
+                }
+            }
+            else
+            {
+                return new HtmlString(html);
+            }
+            return new HtmlString(doc.DocumentNode.FirstChild.InnerHtml);
 		}
 
 		public string Coalesce(params object[] args)

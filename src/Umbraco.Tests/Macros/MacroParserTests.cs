@@ -158,5 +158,22 @@ asdfsdf
 </body>
 </html>".Replace(Environment.NewLine, string.Empty), result.Replace(Environment.NewLine, string.Empty));
         }
+
+        [Test]
+        public void Format_RTE_Data_For_Persistence_Custom_Single_Entry()
+        {
+            var content = @"<div class=""umb-macro-holder Test mceNonEditable umb-macro-mce_1""><!-- <?UMBRACO_MACRO macroAlias=""Test"" content=""1089"" textArea=""asdfasdf"" title="""" bool=""0"" number="""" contentType="""" multiContentType="""" multiProperties="""" properties="""" tabs="""" multiTabs="""" /> --><ins>
+<div class=""facts-box"">
+<div class=""fatcs-box-header"">
+<h3>null</h3>
+</div>
+<div class=""fatcs-box-body"">1089</div>
+</div>
+</ins></div>";
+            var result = MacroTagParser.FormatRichTextContentForPersistence(content);
+
+            Assert.AreEqual(@"<?UMBRACO_MACRO macroAlias=""Test"" content=""1089"" textArea=""asdfasdf"" title="""" bool=""0"" number="""" contentType="""" multiContentType="""" multiProperties="""" properties="""" tabs="""" multiTabs="""" />", result);
+        }
+    
     }
 }

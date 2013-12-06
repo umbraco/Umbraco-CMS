@@ -647,11 +647,6 @@
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
-    <Content Include="Config\appSettings.config" />
-    <None Include="Config\appSettings.Release.config">
-      <SubType>Designer</SubType>
-      <DependentUpon>appSettings.config</DependentUpon>
-    </None>
     <None Include="Config\ClientDependency.Release.config">
       <DependentUpon>ClientDependency.config</DependentUpon>
       <SubType>Designer</SubType>
@@ -661,10 +656,6 @@
     </Content>
     <None Include="Config\BaseRestExtensions.Release.config">
       <DependentUpon>BaseRestExtensions.config</DependentUpon>
-    </None>
-    <Content Include="Config\connectionStrings.config" />
-    <None Include="Config\connectionStrings.Release.config">
-      <DependentUpon>connectionStrings.config</DependentUpon>
     </None>
     <None Include="Config\log4net.Release.config">
       <DependentUpon>log4net.config</DependentUpon>
@@ -2654,10 +2645,6 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
   <Target Name="BeforeBuild">
     <!-- Create web.config file from Template if it doesn't exist -->
     <Copy SourceFiles="$(ProjectDir)web.Template.config" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Web.config')" />
-    <!-- Create connectionStrings.config file from Template if it doesn't exist -->
-    <Copy SourceFiles="$(ProjectDir)config\connectionStrings.Release.config" DestinationFiles="$(ProjectDir)config\connectionStrings.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)config\connectionStrings.config')" />
-    <!-- Create appSettings.config file from Template if it doesn't exist -->
-    <Copy SourceFiles="$(ProjectDir)config\appSettings.Release.config" DestinationFiles="$(ProjectDir)config\appSettings.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)config\appSettings.config')" />
     <!-- Transform the local Web.config file in Visual Studio -->
     <TransformXml Source="$(ProjectDir)Web.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="$(ProjectDir)Web.$(Configuration).config.transformed" Condition="$(BuildingInsideVisualStudio) == true" />
     <!-- Always transform the Template file when not in VS (ie: build.bat) -->

@@ -7,6 +7,7 @@ using System.Web;
 using System.Web.Compilation;
 using System.Web.WebPages;
 using Umbraco.Core;
+using umbraco.MacroEngines.Resources;
 using umbraco.cms.businesslogic.macro;
 using umbraco.interfaces;
 using Umbraco.Core.IO;
@@ -16,6 +17,7 @@ namespace umbraco.MacroEngines
     public class RazorMacroEngine : IMacroEngine, IMacroEngineResultStatus {
 
         public const string RazorTempDirectory = "~/App_Data/TEMP/Razor/";
+        private const string RazorWebConfig = "~/App_Data/TEMP/Razor/web.config";
 
         public string GetVirtualPathFromPhysicalPath(string physicalPath) {
             string rootpath = HttpContext.Current.Server.MapPath("~/");
@@ -40,6 +42,7 @@ namespace umbraco.MacroEngines
             var relativePath = RazorTempDirectory + fileName;
             var physicalPath = IOHelper.MapPath(relativePath);
             var physicalDirectoryPath = IOHelper.MapPath(RazorTempDirectory);
+            var webconfig = IOHelper.MapPath(RazorWebConfig);
 
             if (skipIfFileExists && File.Exists(physicalPath))
                 return relativePath;
@@ -47,6 +50,16 @@ namespace umbraco.MacroEngines
                 File.Delete(physicalPath);
             if (!Directory.Exists(physicalDirectoryPath))
                 Directory.CreateDirectory(physicalDirectoryPath);
+
+            //Ensure the correct razor web.config is there
+            if (File.Exists(webconfig) == false)
+            {
+                using (var writer = File.CreateText(webconfig))
+                {
+                    writer.Write(Strings.WebConfig);
+                }
+            }
+
             using (var file = new StreamWriter(physicalPath, false, Encoding.UTF8))
             {
                 file.Write(razorSyntax);
