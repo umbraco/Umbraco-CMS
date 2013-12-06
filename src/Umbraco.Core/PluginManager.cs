@@ -309,7 +309,7 @@ namespace Umbraco.Core
 
                 //return false but specify this exception type so we can detect it
                 if (typeElement == null)
-                    return Attempt<IEnumerable<string>>.Fail(new CachedPluginNotFoundInFile());
+                    return Attempt<IEnumerable<string>>.Fail(new CachedPluginNotFoundInFileException());
 
                 //return success
                 return Attempt.Succeed(typeElement.Elements("add")
@@ -671,8 +671,15 @@ namespace Umbraco.Core
                 {
                     //check if the TypeList already exists, if so return it, if not we'll create it
                     var typeList = _types.SingleOrDefault(x => x.IsTypeList<T>(resolutionType));
+
+                    //need to put some logging here to try to figure out why this is happening: http://issues.umbraco.org/issue/U4-3505
+                    if (cacheResult && typeList != null)
+                    {
+                        LogHelper.Debug<PluginManager>("Existing typeList found for {0} with resolution type {1}", () => typeof(T), () => resolutionType);
+                    }
+                    
                     //if we're not caching the result then proceed, or if the type list doesn't exist then proceed
-                    if (!cacheResult || typeList == null)
+                    if (cacheResult == false || typeList == null)
                     {
                         //upgrade to a write lock since we're adding to the collection
                         readLock.UpgradeToWriteLock();
@@ -681,15 +688,17 @@ namespace Umbraco.Core
 
                         //we first need to look into our cache file (this has nothing to do with the 'cacheResult' parameter which caches in memory).
                         //if assemblies have not changed and the cache file actually exists, then proceed to try to lookup by the cache file.
-                        if (!HaveAssembliesChanged && File.Exists(GetPluginListFilePath()))
+                        if (HaveAssembliesChanged == false && File.Exists(GetPluginListFilePath()))
                         {
                             var fileCacheResult = TryGetCachedPluginsFromFile<T>(resolutionType);
 
                             //here we need to identify if the CachedPluginNotFoundInFile was the exception, if it was then we need to re-scan
                             //in some cases the plugin will not have been scanned for on application startup, but the assemblies haven't changed
                             //so in this instance there will never be a result.
-                            if (fileCacheResult.Exception != null && fileCacheResult.Exception is CachedPluginNotFoundInFile)
+                            if (fileCacheResult.Exception != null && fileCacheResult.Exception is CachedPluginNotFoundInFileException)
                             {
+                                LogHelper.Debug<PluginManager>("Tried to find typelist for type {0} and resolution {1} in file cache but the type was not found so loading types by assembly scan ", () => typeof(T), () => resolutionType);
+
                                 //we don't have a cache for this so proceed to look them up by scanning
                                 LoadViaScanningAndUpdateCacheFile<T>(typeList, resolutionType, finder);
                             }
@@ -717,20 +726,22 @@ namespace Umbraco.Core
                                             break;
                                         }
                                     }
-                                    if (!successfullyLoadedFromCache)
+                                    if (successfullyLoadedFromCache == false)
                                     {
                                         //we need to manually load by scanning if loading from the file was not successful.
                                         LoadViaScanningAndUpdateCacheFile<T>(typeList, resolutionType, finder);
                                     }
                                     else
                                     {
-                                        LogHelper.Debug<PluginManager>("Loaded plugin types " + typeof(T).FullName + " from persisted cache");
+                                        LogHelper.Debug<PluginManager>("Loaded plugin types {0} with resolution {1} from persisted cache", () => typeof(T), () => resolutionType);
                                     }
                                 }
                             }
                         }
                         else
                         {
+                            LogHelper.Debug<PluginManager>("Assembly changes detected, loading types {0} for resolution {1} by assembly scan", () => typeof(T), () => resolutionType);
+
                             //we don't have a cache for this so proceed to look them up by scanning
                             LoadViaScanningAndUpdateCacheFile<T>(typeList, resolutionType, finder);
                         }
@@ -739,7 +750,10 @@ namespace Umbraco.Core
                         if (cacheResult)
                         {
                             //add the type list to the collection
-                            _types.Add(typeList);
+                            var added = _types.Add(typeList);
+
+                            LogHelper.Debug<PluginManager>("Caching of typelist for type {0} and resolution {1} was successful = {2}", () => typeof(T), () => resolutionType, () => added);
+
                         }
                     }
                     typesFound = typeList.GetTypes().ToList();
@@ -863,14 +877,14 @@ namespace Umbraco.Core
             }
 
             /// <summary>
-            /// Returns true if the current TypeList is of the same type and of the same type
+            /// Returns true if the current TypeList is of the same lookup type
             /// </summary>
             /// <typeparam name="TLookup"></typeparam>
             /// <param name="resolutionType"></param>
             /// <returns></returns>
             public override bool IsTypeList<TLookup>(TypeResolutionKind resolutionType)
             {
-                return _resolutionType == resolutionType && (typeof(T)).IsType<TLookup>();
+                return _resolutionType == resolutionType && (typeof(T)) == typeof(TLookup);
             }
 
             public override IEnumerable<Type> GetTypes()
@@ -883,7 +897,7 @@ namespace Umbraco.Core
         /// This class is used simply to determine that a plugin was not found in the cache plugin list with the specified
         /// TypeResolutionKind.
         /// </summary>
-        internal class CachedPluginNotFoundInFile : Exception
+        internal class CachedPluginNotFoundInFileException : Exception
         {
 
         }
