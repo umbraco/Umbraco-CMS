@@ -86,8 +86,8 @@ namespace Umbraco.Web.Editors
             foreach (var preVal in dataType.PreValues)
             {
                 var postedValue = preVal.Value;
-
-                foreach (var v in propertyEditor.PreValueEditor.Fields.SelectMany(x => x.Validators))
+                
+                foreach (var v in propertyEditor.PreValueEditor.Fields.Where(x => x.Key == preVal.Key).SelectMany(x => x.Validators))
                 {
                     foreach (var result in v.Validate(postedValue, null, propertyEditor))
                     {
