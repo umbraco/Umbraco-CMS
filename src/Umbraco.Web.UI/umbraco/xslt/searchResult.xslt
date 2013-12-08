@@ -18,6 +18,7 @@
               </xsl:if>
               <xsl:value-of select="@title"/>
             </a>
+			      <small><strong>Node Type: </strong> <xsl:value-of select="@type"/></small>
           </h4>
           <p>
             <em>Last updated <xsl:value-of select="@author"/> on <xsl:value-of select="@changeDate"/>
