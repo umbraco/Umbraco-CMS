@@ -53,7 +53,7 @@ namespace umbraco.cms.presentation.create.controls
 			}
 			else
 			{
-				if (DocumentType.GetByAlias(rename.Text.ToSafeAlias()) != null)
+				if (DocumentType.GetByAlias(alias) != null)
 					e.IsValid = false;
 			}
 		}
