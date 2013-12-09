@@ -8,7 +8,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// A basic structure the represents a user
     /// </summary>
     [DataContract(Name = "user", Namespace = "")]
-    public class UserBasic
+    public class UserBasic : System.IComparable
     {
         [DataMember(Name = "id", IsRequired = true)]
         [Required]
@@ -18,5 +18,10 @@ namespace Umbraco.Web.Models.ContentEditing
         [Required]
         public string Name { get; set; }
 
+
+        int System.IComparable.CompareTo(object obj)
+        {
+            return Name.CompareTo(((UserBasic)obj).Name);
+       }
     }
 }
