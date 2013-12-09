@@ -337,28 +337,28 @@ namespace Umbraco.Tests
             Assert.AreEqual(3, types.Count());
         }
         
-        /// <summary>
-        /// This demonstrates this issue: http://issues.umbraco.org/issue/U4-3505 - the TypeList was returning a list of assignable types
-        /// not explicit types which is sort of ideal but is confusing so we'll do it the less confusing way.
-        /// </summary>
-        [Test]
-        public void TypeList_Resolves_Explicit_Types()
-        {
-            var types = new HashSet<PluginManager.TypeList>();
+        ///// <summary>
+        ///// This demonstrates this issue: http://issues.umbraco.org/issue/U4-3505 - the TypeList was returning a list of assignable types
+        ///// not explicit types which is sort of ideal but is confusing so we'll do it the less confusing way.
+        ///// </summary>
+        //[Test]
+        //public void TypeList_Resolves_Explicit_Types()
+        //{
+        //    var types = new HashSet<PluginManager.TypeList>();
 
-            var propEditors = new PluginManager.TypeList<PropertyEditor>(PluginManager.TypeResolutionKind.FindAllTypes);
-            propEditors.AddType(typeof (LabelPropertyEditor));
-            types.Add(propEditors);
+        //    var propEditors = new PluginManager.TypeList<PropertyEditor>(PluginManager.TypeResolutionKind.FindAllTypes);
+        //    propEditors.AddType(typeof (LabelPropertyEditor));
+        //    types.Add(propEditors);
 
-            var found = types.SingleOrDefault(x => x.IsTypeList<PropertyEditor>(PluginManager.TypeResolutionKind.FindAllTypes));
+        //    var found = types.SingleOrDefault(x => x.IsTypeList<PropertyEditor>(PluginManager.TypeResolutionKind.FindAllTypes));
 
-            Assert.IsNotNull(found);
+        //    Assert.IsNotNull(found);
 
-            //This should not find a type list of this type
-            var shouldNotFind = types.SingleOrDefault(x => x.IsTypeList<IParameterEditor>(PluginManager.TypeResolutionKind.FindAllTypes));
+        //    //This should not find a type list of this type
+        //    var shouldNotFind = types.SingleOrDefault(x => x.IsTypeList<IParameterEditor>(PluginManager.TypeResolutionKind.FindAllTypes));
 
-            Assert.IsNull(shouldNotFind);
-        }
+        //    Assert.IsNull(shouldNotFind);
+        //}
      
         [XsltExtension("Blah.Blah")]
         public class MyXsltExtension

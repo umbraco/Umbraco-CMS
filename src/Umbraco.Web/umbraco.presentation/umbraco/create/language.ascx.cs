@@ -29,7 +29,6 @@ namespace umbraco.cms.presentation.create.controls
             Cultures.Items.Add(new ListItem(ui.Text("choose") + "...", ""));
             foreach (CultureInfo ci in CultureInfo.GetCultures(CultureTypes.AllCultures))
             {
-                if (!ci.IsNeutralCulture && !languageExists(ci.Name))
                     sortedCultures.Add(ci.DisplayName + "|||" + Guid.NewGuid().ToString(), ci.Name);
             }
 
