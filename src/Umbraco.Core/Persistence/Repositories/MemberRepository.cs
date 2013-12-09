@@ -449,9 +449,10 @@ namespace Umbraco.Core.Persistence.Repositories
         public bool Exists(string username)
         {
             var sql = new Sql();
+            var escapedUserName = Database.EscapeAtSymbols(username);
             sql.Select("COUNT(*)")
                 .From<MemberDto>()
-                .Where<MemberDto>(x => x.LoginName == username);
+                .Where<MemberDto>(x => x.LoginName == escapedUserName);
 
             return Database.ExecuteScalar<int>(sql) > 0;
         }
