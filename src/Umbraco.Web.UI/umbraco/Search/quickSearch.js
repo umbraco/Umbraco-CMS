@@ -56,7 +56,10 @@
                 return parsed;
             },
             formatItem: function (item) {
-                return item.Fields.nodeName + " <span class='nodeId'>(" + item.Id + ")</span>";
+                return item.Fields.nodeName + " <span class='nodeId'>(" + item.Id + ") </span>";
+            },
+            focus: function (event, ui) {
+                $(ui).attr("title", $(ui).find("span[title]").attr("title"));
             }
         };
 
