@@ -75,7 +75,18 @@ namespace umbraco.presentation.templateControls
                 // handle text before/after
                 xsltTransformedOutput = AddBeforeAfterText(xsltTransformedOutput, helper.FindAttribute(item.LegacyAttributes, "insertTextBefore"), helper.FindAttribute(item.LegacyAttributes, "insertTextAfter"));
                 string finalResult = xsltTransformedOutput.Trim().Length > 0 ? xsltTransformedOutput : GetEmptyText(item);
-                writer.Write(TemplateUtilities.ResolveUrlsFromTextString(finalResult));
+
+                //Don't parse urls if a content item is assigned since that is taken care
+                // of with the value converters
+                if (item.ContentItem == null)
+                {
+                    writer.Write(TemplateUtilities.ResolveUrlsFromTextString(finalResult));
+                }
+                else
+                {
+                    writer.Write(finalResult);
+                }
+                
             }
             catch (Exception renderException)
             {
@@ -149,6 +160,11 @@ namespace umbraco.presentation.templateControls
         /// <param name="item">The item.</param>
         protected virtual void ParseMacros(Item item)
         {
+
+            //Don't parse macros if there's a content item assigned since the content value
+            // converters take care of that
+            if (item.ContentItem != null) return;
+
             // do nothing if the macros have already been rendered
             if (item.Controls.Count > 0)
                 return;
