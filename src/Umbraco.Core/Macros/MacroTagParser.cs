@@ -101,7 +101,8 @@ namespace Umbraco.Core.Macros
             var commentNodes = html.DocumentNode.SelectNodes("//comment()[contains(., '<?UMBRACO_MACRO')]");
             if (commentNodes == null)
             {
-                return string.Empty;
+                //There are no macros found, just return the normal content
+                return rteContent;
             }
 
             //replace each containing parent <div> with the comment node itself. 

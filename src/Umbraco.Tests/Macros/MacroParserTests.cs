@@ -9,6 +9,14 @@ namespace Umbraco.Tests.Macros
     public class MacroParserTests
     {
         [Test]
+        public void Format_RTE_Data_For_Editor_With_No_Macros()
+        {
+            var content = @"<p>hello world</p>";
+            var result = MacroTagParser.FormatRichTextContentForPersistence(content);
+            Assert.AreEqual(@"<p>hello world</p>", content);
+        }
+
+        [Test]
         public void Format_RTE_Data_For_Editor()
         {
             var content = @"<p>asdfasdf</p>
