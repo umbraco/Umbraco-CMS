@@ -793,7 +793,7 @@ namespace umbraco.providers.members
                 }
 
                 //check for approve status. If not approved, then set the member property to null
-                if (!CheckApproveStatus(m)) {
+                if (m != null && !CheckApproveStatus(m)) {
                     m = null;
                 }
 
@@ -858,6 +858,11 @@ namespace umbraco.providers.members
                                 isApproved = intStatus != 0;
                             }
                         }
+                    }
+                    else
+                    {
+                        //There is no property so we shouldn't use the approve status
+                        isApproved = true;
                     }
                 }
             }
