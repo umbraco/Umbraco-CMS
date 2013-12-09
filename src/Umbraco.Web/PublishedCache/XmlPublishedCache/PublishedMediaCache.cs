@@ -528,7 +528,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				    IPublishedProperty property;
 
                     // must ignore that one
-				    if (i.Key == "version") continue;
+				    if (i.Key == "version" || i.Key == "isDoc") continue;
 
                     if (i.Key.InvariantStartsWith("__"))
 				    {

@@ -513,13 +513,19 @@ namespace Umbraco.Core.Services
 
 			var uow = _uowProvider.GetUnitOfWork();
 			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
-			{
+			{                
+                //Remove 'published' xml from the cmsContentXml table for the unpublished media
+                uow.Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new { Id = media.Id });
+
 				media.ChangeTrashedState(true, -21);
 				repository.AddOrUpdate(media);
 
                 //Loop through descendants to update their trash state, but ensuring structure by keeping the ParentId
                 foreach (var descendant in descendants)
                 {
+                    //Remove 'published' xml from the cmsContentXml table for the unpublished media
+                    uow.Database.Delete<ContentXmlDto>("WHERE nodeId = @Id", new { Id = descendant.Id });
+
                     descendant.ChangeTrashedState(true, descendant.ParentId);
                     repository.AddOrUpdate(descendant);
                 }
