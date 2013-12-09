@@ -27,7 +27,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 return new OptionalInnerTextConfigurationElement<bool>(
                        (InnerTextConfigurationElement<bool>)this["ResolveUrlsFromTextString"],
                         //set the default
-                       true);
+                       false);
             }
         }
 

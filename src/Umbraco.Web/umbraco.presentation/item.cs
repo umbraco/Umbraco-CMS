@@ -78,17 +78,30 @@ namespace umbraco
                 }
                 else
                 {
-                    if (elements[_fieldName] != null && !string.IsNullOrEmpty(elements[_fieldName].ToString()))
+                    //check for published content and get its value using that
+                    if (publishedContent != null)
                     {
-                        _fieldContent = elements[_fieldName].ToString().Trim();
+                        var pval = publishedContent.GetPropertyValue(_fieldName);
+                        var rval = pval == null ? string.Empty : pval.ToString();
+                        _fieldContent = rval.IsNullOrWhiteSpace() ? _fieldContent : rval;
                     }
-                    else if (!string.IsNullOrEmpty(helper.FindAttribute(attributes, "useIfEmpty")))
+                    else if (elements[_fieldName] != null && string.IsNullOrEmpty(elements[_fieldName].ToString()) == false)
+                    {                        
+                        //get the vaue the legacy way (this will not parse locallinks, etc... since that is handled with ipublishedcontent)
+                        _fieldContent = elements[_fieldName].ToString().Trim();                           
+                    }
+
+                    //now we check if the value is still empty and if so we'll check useIfEmpty
+                    if (string.IsNullOrEmpty(_fieldContent))
                     {
-                        if (elements[helper.FindAttribute(attributes, "useIfEmpty")] != null && !string.IsNullOrEmpty(elements[helper.FindAttribute(attributes, "useIfEmpty")].ToString()))
+                        if (string.IsNullOrEmpty(helper.FindAttribute(attributes, "useIfEmpty")) == false)
                         {
-                            _fieldContent = elements[helper.FindAttribute(attributes, "useIfEmpty")].ToString().Trim();
+                            if (elements[helper.FindAttribute(attributes, "useIfEmpty")] != null && string.IsNullOrEmpty(elements[helper.FindAttribute(attributes, "useIfEmpty")].ToString()) == false)
+                            {
+                                _fieldContent = elements[helper.FindAttribute(attributes, "useIfEmpty")].ToString().Trim();
+                            }
                         }
-                    }
+                    }                    
 
                 }
             }
