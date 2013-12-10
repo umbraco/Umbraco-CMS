@@ -59,7 +59,7 @@ angular.module("umbraco.directives")
             node.stateCssClass = (node.cssClasses || []).join(" ");
 
             if (node.style) {
-                $(element).find("i").attr("style", node.style);
+                $(element).find("i:first").attr("style", node.style);
             }
         }
 

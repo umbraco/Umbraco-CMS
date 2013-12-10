@@ -37,16 +37,19 @@ angular.module("umbraco")
                 mediaResource.getChildren(id)
                     .then(function(data) {
                         $scope.images = data.items;
-
-                        var path = editorState.current.path;
-                        navigationService.syncTree({ tree: "media", path: path, forceReload: true }).then(function (syncArgs) {
-                            $log.log(syncArgs.node);
-                        });
                     });    
             };
 
             $scope.$on('fileuploadstop', function(event, files){
                 $scope.loadChildren($scope.options.formData.currentFolder);
+                
+                //sync the tree - don't force reload since we're not updating this particular node (i.e. its name or anything),
+                // then we'll get the resulting tree node which we can then use to reload it's children.
+                var path = editorState.current.path;
+                navigationService.syncTree({ tree: "media", path: path, forceReload: false }).then(function (syncArgs) {
+                    navigationService.reloadNode(syncArgs.node);
+                });
+
                 $scope.queue = [];
                 $scope.filesUploading = [];
             });
