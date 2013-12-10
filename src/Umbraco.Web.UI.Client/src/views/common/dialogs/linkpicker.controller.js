@@ -1,6 +1,6 @@
 //used for the media picker dialog
 angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
-	function ($scope, eventsService, entityResource, contentResource, $log) {
+	function ($scope, eventsService, dialogService, entityResource, contentResource, imageHelper, $log) {
 	var dialogOptions = $scope.$parent.dialogOptions;
 	
 	$scope.dialogTreeEventHandler = $({});
@@ -25,6 +25,15 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 			});
 		}
 	}
+
+	$scope.switchToMediaPicker = function(){
+		dialogService.mediaPicker({callback: function(media){
+					$scope.target.id = undefined;
+					$scope.target.name = media.name;
+					$scope.target.url = imageHelper.getImagePropertyValue({imageModel: media});
+				}});
+	};
+
 
 	$scope.dialogTreeEventHandler.bind("treeNodeSelect", function(ev, args){
 		args.event.preventDefault();

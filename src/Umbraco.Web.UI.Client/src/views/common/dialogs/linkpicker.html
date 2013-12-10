@@ -17,8 +17,9 @@
 					class="umb-editor umb-textstring" 
 					ng-model="target.name" />
 			</umb-control-group>
-
 		</umb-pane>
+
+		
 
 		<umb-tree 
 			section="content" 
@@ -34,6 +35,8 @@
 	        	<a href ng-click="close()" class="btn btn-link">
 	        		<localize key="general_cancel">Cancel</localize>
 				</a>
+
+				<a href ng-click="switchToMediaPicker()" class="btn">Link to file</a>
 
 				<button
 					class="btn btn-primary"
