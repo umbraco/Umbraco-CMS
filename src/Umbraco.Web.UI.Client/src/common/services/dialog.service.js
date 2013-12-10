@@ -306,6 +306,7 @@ angular.module('umbraco.services')
             * Opens a media picker in a modal, the callback returns an array of selected media items
             * @param {Object} options mediapicker dialog options object
             * @param {$scope} options.scope dialog scope
+            * @param {Boolean} options.onlyImages Only display files that have an image file-extension
             * @param {Function} options.callback callback function
             * @returns {Object} modal object
             */
@@ -473,7 +474,6 @@ angular.module('umbraco.services')
            * @ngdoc method
            * @name umbraco.services.dialogService#ysodDialog
            * @methodOf umbraco.services.dialogService
-           *
            * @description
            * Opens a dialog to an embed dialog 
            */
