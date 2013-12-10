@@ -64,7 +64,6 @@ app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 
 
         //check for touch device, add to global appState
         //var touchDevice = ("ontouchstart" in window || window.touch || window.navigator.msMaxTouchPoints === 5 || window.DocumentTouch && document instanceof DocumentTouch);
-        var touchDevice = true; //  /android|webos|iphone|ipad|ipod|blackberry|iemobile|touch/i.test(navigator.userAgent.toLowerCase());
-
+        var touchDevice =  /android|webos|iphone|ipad|ipod|blackberry|iemobile|touch/i.test(navigator.userAgent.toLowerCase());
         appState.setGlobalState("touchDevice", touchDevice);
     }]);
