@@ -2157,7 +2157,6 @@
     <Content Include="Umbraco\PartialViews\Templates\MultinodeTree-picker.cshtml" />
     <Content Include="Umbraco\PartialViews\Templates\Navigation.cshtml" />
     <Content Include="Umbraco\PartialViews\Templates\SiteMap.cshtml" />
-    <Content Include="Umbraco\Views\AuthorizeUpgrade.cshtml" />
     <None Include="Umbraco_client\CodeMirror\js\mode\coffeescript\LICENSE" />
     <None Include="Umbraco_client\CodeMirror\js\mode\pascal\LICENSE" />
     <None Include="Umbraco_client\CodeMirror\js\mode\perl\LICENSE" />
