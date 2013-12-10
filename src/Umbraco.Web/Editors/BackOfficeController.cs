@@ -36,6 +36,17 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// This Action is used by the installer when an upgrade is detected but the admin user is not logged in. We need to 
+        /// ensure the user is authenticated before the install takes place so we redirect here to show the standard login screen.
+        /// </summary>
+        /// <returns></returns>      
+        [HttpGet]
+        public ActionResult AuthorizeUpgrade()
+        {
+            return View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml");
+        }
+
+        /// <summary>
         /// Returns the JavaScript main file including all references found in manifests
         /// </summary>
         /// <returns></returns>

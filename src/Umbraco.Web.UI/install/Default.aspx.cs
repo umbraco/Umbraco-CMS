@@ -64,12 +64,14 @@ namespace Umbraco.Web.UI.Install
             if (string.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus) == false)
             {
                 var result = Security.ValidateCurrentUser(false);
-                
-                if (result == ValidateRequestAttempt.FailedTimedOut || result == ValidateRequestAttempt.FailedNoPrivileges)
+
+                switch (result)
                 {
-                    Response.Redirect(
-                        //We must add the token to prevent CSRF attacks since the logout occurs on a GET not a POST
-                        SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl) + "&t=" + Security.GetSessionId());
+                    case ValidateRequestAttempt.FailedNoPrivileges:
+                    case ValidateRequestAttempt.FailedTimedOut:
+                    case ValidateRequestAttempt.FailedNoContextId:
+                        Response.Redirect(SystemDirectories.Umbraco + "/AuthorizeUpgrade?redir=" + Server.UrlEncode(Request.RawUrl));
+                        break;
                 }
             }
 

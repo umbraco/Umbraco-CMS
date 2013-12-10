@@ -35,7 +35,7 @@
 
         userService.authenticate(login, password)
             .then(function (data) {               
-                $scope.submit(true);                
+                $scope.submit(true);
             }, function (reason) {
                 $scope.errorMsg = reason.errorMsg;
                 
