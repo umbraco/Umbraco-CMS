@@ -100,6 +100,13 @@ namespace Umbraco.Web.Editors
             return GetResized(imagePath, width, Convert.ToString(width));
         }
 
+        /// <summary>
+        /// Gets a resized image - if the requested max width is greater than the original image, only the original image will be returned.
+        /// </summary>
+        /// <param name="imagePath"></param>
+        /// <param name="width"></param>
+        /// <param name="suffix"></param>
+        /// <returns></returns>
         private HttpResponseMessage GetResized(string imagePath, int width, string suffix)
         {
             var mediaFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
@@ -121,12 +128,22 @@ namespace Umbraco.Web.Editors
                     if (fileStream.CanSeek) fileStream.Seek(0, 0);
                     using (var originalImage = Image.FromStream(fileStream))
                     {
-                        ImageHelper.GenerateThumbnail(
-                            originalImage,
-                            width,
-                            fullNewPath,
-                            "jpg",
-                            mediaFileSystem);
+                        //If it is bigger, then do the resize
+                        if (originalImage.Width >= width && originalImage.Height >= width)
+                        {
+                            ImageHelper.GenerateThumbnail(
+                                originalImage,
+                                width,
+                                fullNewPath,
+                                "jpg",
+                                mediaFileSystem);
+                        }
+                        else
+                        {
+                            //just return the original image
+                            fullNewPath = fullOrgPath;
+                        }
+                        
                     }
                 }
             }

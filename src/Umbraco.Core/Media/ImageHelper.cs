@@ -25,6 +25,15 @@ namespace Umbraco.Core.Media
             return codec.MimeType;
         }
 
+        /// <summary>
+        /// Creates the thumbnails if the image is larger than all of the specified ones.
+        /// </summary>
+        /// <param name="fs"></param>
+        /// <param name="fileName"></param>
+        /// <param name="extension"></param>
+        /// <param name="originalImage"></param>
+        /// <param name="additionalThumbSizes"></param>
+        /// <returns></returns>
         internal static IEnumerable<ResizedImage> GenerateMediaThumbnails(
             IFileSystem fs, 
             string fileName, 
@@ -32,22 +41,33 @@ namespace Umbraco.Core.Media
             Image originalImage,
             IEnumerable<int> additionalThumbSizes)
         {
-            // Make default thumbnails
-            var thumbs = new List<ResizedImage>
-                {
-                    Resize(fs, fileName, extension, 100, "thumb", originalImage), 
-                    Resize(fs, fileName, extension, 500, "big-thumb", originalImage)
-                };
 
-            //make custom ones
-            foreach (var thumb in additionalThumbSizes.Where(x => x > 0).Distinct())
+            var result = new List<ResizedImage>();
+
+            var allSizes = new List<int> {100, 500};
+            allSizes.AddRange(additionalThumbSizes.Where(x => x > 0).Distinct());
+
+            foreach (var s in allSizes)
             {
-                thumbs.Add(Resize(fs, fileName, extension, thumb, string.Format("thumb_{0}", thumb), originalImage));
+                if (originalImage.Width >= s && originalImage.Height >= s)
+                {
+                    result.Add(Resize(fs, fileName, extension, s, "thumb", originalImage));
+                }
             }
 
-            return thumbs;
+            return result;
         }
 
+        /// <summary>
+        /// Performs an image resize
+        /// </summary>
+        /// <param name="fileSystem"></param>
+        /// <param name="path"></param>
+        /// <param name="extension"></param>
+        /// <param name="maxWidthHeight"></param>
+        /// <param name="fileNameAddition"></param>
+        /// <param name="originalImage"></param>
+        /// <returns></returns>
         private static ResizedImage Resize(IFileSystem fileSystem, string path, string extension, int maxWidthHeight, string fileNameAddition, Image originalImage)
         {
             var fileNameThumb = String.IsNullOrEmpty(fileNameAddition)
