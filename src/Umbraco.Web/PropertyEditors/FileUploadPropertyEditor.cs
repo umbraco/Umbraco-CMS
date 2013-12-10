@@ -80,8 +80,8 @@ namespace Umbraco.Web.PropertyEditors
                         //there might be multiple, we can only process the first one!
                         var split = ((string) p.Value).Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
                         if (split.Any())
-                        {
-                            var fullPath = mediaFileSystem.GetFullPath(split[0]);
+                        {                            
+                            var fullPath = mediaFileSystem.GetRelativePath(split[0]);
                             var umbracoFile = new UmbracoMediaFile(fullPath);
                             FillProperties(uploadFieldConfigNode, model, umbracoFile);
                         }
