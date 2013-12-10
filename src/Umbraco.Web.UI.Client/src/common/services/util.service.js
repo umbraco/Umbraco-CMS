@@ -12,6 +12,23 @@ function umbModelMapper() {
 
     return {
 
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.umbModelMapper#convertToEntityBasic
+         * @methodOf umbraco.services.umbModelMapper
+         * @function
+         *
+         * @description
+         * Converts the source model to a basic entity model, it will throw an exception if there isn't enough data to create the model.
+         * @param {Object} source The source model
+         * @param {Number} source.id The node id of the model
+         * @param {String} source.name The node name
+         * @param {String} source.icon The models icon as a css class (.icon-doc)
+         * @param {Number} source.parentId The parentID, if no parent, set to -1
+         * @param {path} source.path comma-seperated string of ancestor IDs (-1,1234,1782,1234)
+         */
+
         /** This converts the source model to a basic entity model, it will throw an exception if there isn't enough data to create the model */
         convertToEntityBasic: function (source) {
             var required = ["id", "name", "icon", "parentId", "path"];            
@@ -72,9 +89,17 @@ angular.module('umbraco.services').factory('umbSessionStorage', umbSessionStorag
 function updateChecker($http, umbRequestHelper) {
     return {
         
-        /** Called to load in the legacy tree js which is required on startup if a user is logged in or 
-         after login, but cannot be called until they are authenticated which is why it needs to be lazy loaded. */
-        check: function() {
+         /**
+          * @ngdoc function
+          * @name umbraco.services.updateChecker#check
+          * @methodOf umbraco.services.updateChecker
+          * @function
+          *
+          * @description
+          * Called to load in the legacy tree js which is required on startup if a user is logged in or 
+          * after login, but cannot be called until they are authenticated which is why it needs to be lazy loaded. 
+          */
+         check: function() {
                 
             return umbRequestHelper.resourcePromise(
                $http.get(
@@ -140,7 +165,18 @@ angular.module('umbraco.services').factory('umbPropEditorHelper', umbPropEditorH
 **/
 function imageHelper() {
     return {
-        /** Returns the actual image path associated with the image property if there is one */
+        /**
+         * @ngdoc function
+         * @name umbraco.services.imageHelper#getImagePropertyValue
+         * @methodOf umbraco.services.imageHelper
+         * @function    
+         *
+         * @description
+         * Returns the actual image path associated with the image property if there is one
+         * 
+         * @param {object} options Options object
+         * @param {object} options.imageModel The media object to retrieve the image path from
+         */
         getImagePropertyValue: function(options) {
             if (!options && !options.imageModel) {
                 throw "The options objet does not contain the required parameters: imageModel";
@@ -194,7 +230,18 @@ function imageHelper() {
             
             return "";
         },
-        /** formats the display model used to display the content to the model used to save the content */
+        /**
+         * @ngdoc function
+         * @name umbraco.services.imageHelper#getThumbnail
+         * @methodOf umbraco.services.imageHelper
+         * @function    
+         *
+         * @description
+         * formats the display model used to display the content to the model used to save the content
+         * 
+         * @param {object} options Options object
+         * @param {object} options.imageModel The media object to retrieve the image path from
+         */
         getThumbnail: function (options) {
             
             if (!options && !options.imageModel) {
@@ -208,6 +255,19 @@ function imageHelper() {
             return "";
         },
 
+        /**
+         * @ngdoc function
+         * @name umbraco.services.imageHelper#scaleToMaxSize
+         * @methodOf umbraco.services.imageHelper
+         * @function    
+         *
+         * @description
+         * Finds the corrct max width and max height, given maximum dimensions and keeping aspect ratios
+         * 
+         * @param {number} maxSize Maximum width & height
+         * @param {number} width Current width
+         * @param {number} height Current height
+         */
         scaleToMaxSize: function(maxSize, width, height){
             var retval = {width: width, height: height};
 
@@ -238,10 +298,33 @@ function imageHelper() {
             return retval;
         },
 
+        /**
+         * @ngdoc function
+         * @name umbraco.services.imageHelper#getThumbnailFromPath
+         * @methodOf umbraco.services.imageHelper
+         * @function    
+         *
+         * @description
+         * Returns the path to the thumbnail version of a given media library image path
+         * 
+         * @param {string} imagePath Image path, ex: /media/1234/my-image.jpg
+         */
         getThumbnailFromPath: function(imagePath) {
             var ext = imagePath.substr(imagePath.lastIndexOf('.'));
             return imagePath.substr(0, imagePath.lastIndexOf('.')) + "_big-thumb" + ".jpg";
         },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.imageHelper#detectIfImageByExtension
+         * @methodOf umbraco.services.imageHelper
+         * @function    
+         *
+         * @description
+         * Returns true/false, indicating if the given path has an allowed image extension
+         * 
+         * @param {string} imagePath Image path, ex: /media/1234/my-image.jpg
+         */
         detectIfImageByExtension: function(imagePath) {
             var lowered = imagePath.toLowerCase();
             var ext = lowered.substr(lowered.lastIndexOf(".") + 1);
