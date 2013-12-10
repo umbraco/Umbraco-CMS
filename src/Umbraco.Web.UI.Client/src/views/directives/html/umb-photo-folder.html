@@ -1,30 +1,32 @@
 <div class="umb-photo-folder">
-	<div class="picrow" ng-repeat="row in rows">
-		
-		<div class="pic" ng-class="img.cssclass" style="margin: 0px; padding: 0px; border: none; display: inline-block; overflow: hidden" ng-style="img.style" ng-repeat="img in row.photos">		
-			<a 
-				href="#media/media/edit/{{img.id}}" 
-				ng-click="clickHandler(img, $event, false)" 
-				ng-switch="img.thumbnail" 
-				title="{{img.name}}">
+    <div class="picrow" ng-repeat="row in rows">
 
-					<div ng-style="img.style" class="umb-non-thumbnail" ng-switch-when="none">
-						<i class="icon large {{img.icon}}"></i>
-						{{img.name}}
-					</div>
+        <div class="pic" ng-class="img.cssclass"
+            style="margin: 0px; padding: 0px; border: none; display: inline-block; overflow: hidden"
+            ng-style="img.style" ng-repeat="img in row.photos">
+            <a
+                href="#media/media/edit/{{img.id}}"
+                ng-click="clickHandler(img, $event, false)"
+                ng-switch="img.thumbnail"
+                title="{{img.name}}">
 
-					<img class="umb-photo" 
-						ng-switch-default  
-						ng-src="{{img.thumbnail}}"
-						ng-style="img.style"
-						alt="{{img.name}}"/>
-			</a>
+                <div ng-style="img.style" class="umb-non-thumbnail" ng-switch-when="none">
+                    <i class="icon large {{img.icon}}"></i>
+                    {{img.name}}
+                </div>
 
-			<a href ng-click="clickHandler(img, $event, true)" ng-show="img.contentTypeAlias === 'Folder'" class="selector-overlay">
-				Select
-			</a>
-			<div>
-		</div>
+                <img class="umb-photo"
+                    ng-switch-default
+                    ng-src="{{img.thumbnail}}"
+                    ng-style="img.style"
+                    alt="{{img.name}}" />
+            </a>
 
-	</div>
+            <a href ng-click="clickHandler(img, $event, true)" ng-show="img.contentTypeAlias === 'Folder'" class="selector-overlay">Select
+            </a>
+            <div>
+            </div>
+
+        </div>
+    </div>
 </div>
