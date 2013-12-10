@@ -243,6 +243,15 @@ namespace umbraco.cms.businesslogic.media
 
         #region Public methods
 
+        public override XmlNode ToXml(XmlDocument xd, bool Deep)
+        {
+            if (IsTrashed == false)
+            {
+                return base.ToXml(xd, Deep);   
+            }
+            return null;
+        }
+
         /// <summary>
         /// Overrides the moving of a <see cref="Media"/> object to a new location by changing its parent id.
         /// </summary>
