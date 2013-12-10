@@ -58,6 +58,9 @@ angular.module("umbraco")
             });
 
 
+            //stores a reference to the editor
+            var tinyMceEditor = null;
+
             //wait for queue to end
             $q.all(await).then(function () {
                 
@@ -86,6 +89,9 @@ angular.module("umbraco")
                             style_formats: styleFormats,
                             setup: function (editor) {
 
+                                //set the reference
+                                tinyMceEditor = editor;
+
                                 //We need to listen on multiple things here because of the nature of tinymce, it doesn't 
                                 //fire events when you think!
                                 //The change event doesn't fire when content changes, only when cursor points are changed and undo points
@@ -105,21 +111,7 @@ angular.module("umbraco")
                                         $scope.model.value = editor.getContent();
                                     });
                                 });
-                                //listen for formSubmitting event (the result is callback used to remove the event subscription)
-                                var unsubscribe = $scope.$on("formSubmitting", function () {
-
-                                    //TODO: Here we should parse out the macro rendered content so we can save on a lot of bytes in data xfer
-                                    // we do parse it out on the server side but would be nice to do that on the client side before as well.
-                                    $scope.model.value = editor.getContent();
-                                });
-
-                                //when the element is disposed we need to unsubscribe!
-                                // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom 
-                                // element might still be there even after the modal has been hidden.
-                                $scope.$on('$destroy', function(){
-                                    unsubscribe();
-                                });
-
+                                
                                 //Create the insert media plugin
                                 tinyMceService.createMediaPicker(editor, $scope);
 
@@ -133,7 +125,7 @@ angular.module("umbraco")
                                 tinyMceService.createInsertMacro(editor, $scope);
                             }
                         });
-                    }, 500);
+                    }, 200);
                 }
                 
                 loadTinyMce();
@@ -141,10 +133,27 @@ angular.module("umbraco")
                 //here we declare a special method which will be called whenever the value has changed from the server
                 //this is instead of doing a watch on the model.value = faster
                 $scope.model.onValueChanged = function (newVal, oldVal) {
-                    //update the display val again if it has changed from the server
-                    //TODO: Perhaps we don't need to re-load the whole editor, can probably just re-set the value ?
-                    loadTinyMce();
+                    //update the display val again if it has changed from the server;
+                    tinyMceEditor.setContent(newVal, { format: 'raw' });
+                    //we need to manually fire this event since it is only ever fired based on loading from the DOM, this
+                    // is required for our plugins listening to this event to execute
+                    tinyMceEditor.fire('LoadContent', null);
                 };
+                
+                //listen for formSubmitting event (the result is callback used to remove the event subscription)
+                var unsubscribe = $scope.$on("formSubmitting", function () {
+
+                    //TODO: Here we should parse out the macro rendered content so we can save on a lot of bytes in data xfer
+                    // we do parse it out on the server side but would be nice to do that on the client side before as well.
+                    $scope.model.value = tinyMceEditor.getContent();
+                });
+
+                //when the element is disposed we need to unsubscribe!
+                // NOTE: this is very important otherwise if this is part of a modal, the listener still exists because the dom 
+                // element might still be there even after the modal has been hidden.
+                $scope.$on('$destroy', function () {
+                    unsubscribe();
+                });
             });
         });
 
