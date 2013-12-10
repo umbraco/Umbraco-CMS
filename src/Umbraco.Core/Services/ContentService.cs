@@ -1429,49 +1429,48 @@ namespace Umbraco.Core.Services
                 var list = new List<IContent>();
 
                 var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateContentRepository(uow))
+
+                //First we're going to get the data that needs to be inserted before clearing anything, this 
+                //ensures that we don't accidentally leave the content xml table empty if something happens
+                //during the lookup process.
+
+                list.AddRange(contentTypeIds.Any() == false
+                    ? GetAllPublished()
+                    : contentTypeIds.SelectMany(GetPublishedContentOfContentType));
+
+                var xmlItems = new List<ContentXmlDto>();
+                foreach (var c in list)
                 {
-                    //First we're going to get the data that needs to be inserted before clearing anything, this 
-                    //ensures that we don't accidentally leave the content xml table empty if something happens
-                    //during the lookup process.
+                    var xml = c.ToXml();
+                    xmlItems.Add(new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) });
+                }
 
-                    list.AddRange(contentTypeIds.Any() == false 
-                        ? GetAllPublished() 
-                        : contentTypeIds.SelectMany(GetPublishedContentOfContentType));
-
-                    var xmlItems = new List<ContentXmlDto>();
-                    foreach (var c in list)
+                //Ok, now we need to remove the data and re-insert it, we'll do this all in one transaction too.
+                using (var tr = uow.Database.GetTransaction())
+                {
+                    if (contentTypeIds.Any() == false)
                     {
-                        var xml = c.ToXml();
-                        xmlItems.Add(new ContentXmlDto {NodeId = c.Id, Xml = xml.ToString(SaveOptions.None)});
-                    }
-
-                    //Ok, now we need to remove the data and re-insert it, we'll do this all in one transaction too.
-                    using (var tr = uow.Database.GetTransaction())
-                    {
-                        if (contentTypeIds.Any() == false)
-                        {
-                            //Remove all Document records from the cmsContentXml table (DO NOT REMOVE Media/Members!)
-                            uow.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                        //Remove all Document records from the cmsContentXml table (DO NOT REMOVE Media/Members!)
+                        uow.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
                                                 (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
                                                     INNER JOIN cmsDocument ON cmsContentXml.nodeId = cmsDocument.nodeId)");
-                        }
-                        else
+                    }
+                    else
+                    {
+                        foreach (var id in contentTypeIds)
                         {
-                            foreach (var id in contentTypeIds)
-                            {
-                                //first we'll clear out the data from the cmsContentXml table for this type
-                                uow.Database.Execute(@"delete from cmsContentXml where nodeId in 
+                            //first we'll clear out the data from the cmsContentXml table for this type
+                            uow.Database.Execute(@"delete from cmsContentXml where nodeId in 
 (select cmsDocument.nodeId from cmsDocument 
 	inner join cmsContent on cmsDocument.nodeId = cmsContent.nodeId
 	where published = 1 and contentType = @contentTypeId)", new { contentTypeId = id });
-                            }
                         }
-
-                        //bulk insert it into the database
-                        uow.Database.BulkInsertRecords(xmlItems, tr);
                     }
+
+                    //bulk insert it into the database
+                    uow.Database.BulkInsertRecords(xmlItems, tr);
                 }
+
                 Audit.Add(AuditTypes.Publish, "RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
             }                        
         }

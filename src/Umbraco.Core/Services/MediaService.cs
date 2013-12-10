@@ -862,7 +862,34 @@ namespace Umbraco.Core.Services
                 var list = new List<IMedia>();
 
                 var uow = _uowProvider.GetUnitOfWork();
-                using (var repository = _repositoryFactory.CreateContentRepository(uow))
+
+                //First we're going to get the data that needs to be inserted before clearing anything, this 
+                //ensures that we don't accidentally leave the content xml table empty if something happens
+                //during the lookup process.
+
+                if (contentTypeIds.Any() == false)
+                {
+                    var rootMedia = GetRootMedia();
+                    foreach (var media in rootMedia)
+                    {
+                        list.Add(media);
+                        list.AddRange(GetDescendants(media));
+                    }
+                }
+                else
+                {
+                    list.AddRange(contentTypeIds.SelectMany(i => GetMediaOfMediaType(i).Where(media => media.Trashed == false)));
+                }
+
+                var xmlItems = new List<ContentXmlDto>();
+                foreach (var c in list)
+                {
+                    var xml = c.ToXml();
+                    xmlItems.Add(new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) });
+                }
+
+                //Ok, now we need to remove the data and re-insert it, we'll do this all in one transaction too.
+                using (var tr = uow.Database.GetTransaction())
                 {
                     if (contentTypeIds.Any() == false)
                     {
@@ -871,16 +898,7 @@ namespace Umbraco.Core.Services
                                                 (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
                                                     INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
                                                     WHERE nodeObjectType = @nodeObjectType)",
-                                             new {nodeObjectType = Constants.ObjectTypes.Media});
-                        
-                        //  Consider creating a Path query instead of recursive method:
-                        //  var query = Query<IContent>.Builder.Where(x => x.Path.StartsWith("-1"));
-                        var rootMedia = GetRootMedia();
-                        foreach (var media in rootMedia)
-                        {
-                            list.Add(media);
-                            list.AddRange(GetDescendants(media));
-                        }
+                                             new { nodeObjectType = Constants.ObjectTypes.Media });
                     }
                     else
                     {
@@ -892,24 +910,14 @@ namespace Umbraco.Core.Services
                                 INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
                                 INNER JOIN cmsContent ON cmsContent.nodeId = umbracoNode.id
                                 WHERE nodeObjectType = @nodeObjectType AND cmsContent.contentType = @contentTypeId)",
-                                                 new {contentTypeId = id, nodeObjectType = Constants.ObjectTypes.Media});
-
-                            //now get all media objects of this type and add to the list
-                            list.AddRange(GetMediaOfMediaType(id));
+                                                 new { contentTypeId = id, nodeObjectType = Constants.ObjectTypes.Media });
                         }
                     }
 
-                    var xmlItems = new List<ContentXmlDto>();
-                    foreach (var c in list)
-                    {
-                        //generate the xml
-                        var xml = c.ToXml();
-                        //create the dto to insert
-                        xmlItems.Add(new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) });
-                    }
                     //bulk insert it into the database
-                    uow.Database.BulkInsertRecords(xmlItems);
+                    uow.Database.BulkInsertRecords(xmlItems, tr);
                 }
+
                 Audit.Add(AuditTypes.Publish, "RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
             }
         }
