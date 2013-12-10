@@ -292,8 +292,6 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                     /** helper method to select the macro element */
                     function selectMacroElement(macroElement) {
 
-                        $log.log("Selecting macro element");
-
                         // move selection to top element to ensure we can't edit this
                         editor.selection.select(macroElement);
 
@@ -336,8 +334,6 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                             //set the flag
                             isOnMacroElement = true;
 
-                            $log.log("isOnMacroElement = " + isOnMacroElement);
-
                             //re-add the event listener
                             editor.on('NodeChange', onNodeChanged);
                         }
@@ -357,19 +353,6 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
 
                     });
                     
-                    //editor.on('BeforeSetContent', function (e, o) {
-                    //    //$log.log('BeforeSetContent event', e);
-                        
-                    //    $(e.content.select(".umb-macro-holder.mceNonEditable")).each(function () {
-                    //        loadMacroContent($(this));
-                    //    });
-
-                    //    //get all macro divs and load their content
-                    //    $(editor.dom.select(".umb-macro-holder.mceNonEditable")).each(function () {
-                    //        loadMacroContent($(this));
-                    //    });
-                    //});
-
                     /** This prevents any other commands from executing when the current element is the macro so the content cannot be edited */
                     editor.on('BeforeExecCommand', function (o) {                        
                         if (isOnMacroElement) {
