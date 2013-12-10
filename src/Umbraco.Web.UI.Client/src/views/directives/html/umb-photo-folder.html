@@ -1,7 +1,7 @@
 <div class="umb-photo-folder">
-    <div class="picrow" ng-repeat="row in rows">
+    <div class="picrow" ng-repeat="row in rows" ng-style="row.style">
 
-        <div class="pic" ng-class="img.cssclass"
+        <div class="pic" 
             style="margin: 0px; padding: 0px; border: none; display: inline-block; overflow: hidden"
             ng-style="img.style" ng-repeat="img in row.photos">
             <a

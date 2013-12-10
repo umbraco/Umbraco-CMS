@@ -6,13 +6,12 @@
 angular.module("umbraco.directives.html")
 .directive('umbPhotoFolder', function ($compile, $log, $timeout, $filter, imageHelper, umbRequestHelper) {
 
-    function renderCollection(scope, photos) {
-        // get row width - this is fixed.
-        var w = scope.lastWidth;
+    function renderCollection(scope, photos, fixedRowWidth) {
+        
         var rows = [];
 
         // initial height - effectively the maximum height +/- 10%;
-        var h = Math.max(scope.minHeight, Math.floor(w / 5));
+        var initialHeight = Math.max(scope.minHeight, Math.floor(fixedRowWidth / 5));
 
         // store relative widths of all images (scaled to match estimate height above)
         var ws = [];
@@ -21,17 +20,23 @@ angular.module("umbraco.directives.html")
             val.width_n = $.grep(val.properties, function (v, index) { return (v.alias === "umbracoWidth"); })[0];
             val.height_n = $.grep(val.properties, function (v, index) { return (v.alias === "umbracoHeight"); })[0];
 
-            //val.url_n = imageHelper.getThumbnail({ imageModel: val, scope: scope });
-
             if (val.width_n && val.height_n) {
-                var wt = parseInt(val.width_n.value, 10);
-                var ht = parseInt(val.height_n.value, 10);
+                var parsedWidth = parseInt(val.width_n.value, 10);
+                var parsedHeight = parseInt(val.height_n.value, 10);
 
-                if (ht !== h) {
-                    wt = Math.floor(wt * (h / ht));
+                //if the parsedHeight is less than the minHeight than set it to the minHeight
+                //TODO: Should we set it to it's original in this case?
+                if (parsedHeight >= scope.minHeight) {
+                    if (parsedHeight !== initialHeight) {
+                        parsedWidth = Math.floor(parsedWidth * (initialHeight / parsedHeight));
+                    }
+
+                    ws.push(parsedWidth);
                 }
-
-                ws.push(wt);
+                else {
+                    ws.push(scope.minHeight);
+                }
+                
             } else {
                 //if its files or folders, we make them square
                 ws.push(scope.minHeight);
@@ -44,37 +49,37 @@ angular.module("umbraco.directives.html")
         while (scope.baseline < limit) {
             rowNum++;
             // number of images appearing in this row
-            var c = 0;
+            var imgsPerRow = 0;
             // total width of images in this row - including margins
-            var tw = 0;
+            var totalRowWidth = 0;
 
             // calculate width of images and number of images to view in this row.
-            while ((tw * 1.1 < w) && (scope.baseline + c < limit)) {
-                tw += ws[scope.baseline + c++] + scope.border * 2;
+            while ((totalRowWidth * 1.1 < fixedRowWidth) && (scope.baseline + imgsPerRow < limit)) {
+                totalRowWidth += ws[scope.baseline + imgsPerRow++] + scope.border * 2;
             }
 
             // Ratio of actual width of row to total width of images to be used.
-            var r = w / tw;
+            var r = fixedRowWidth / totalRowWidth;
             // image number being processed
             var i = 0;
             // reset total width to be total width of processed images
-            tw = 0;
+            totalRowWidth = 0;
 
             // new height is not original height * ratio
-            var ht = Math.floor(h * r);
+            var ht = Math.floor(initialHeight * r);
 
             var row = {};
             row.photos = [];
             row.style = {};
-            row.style = { "height": ht + scope.border * 2, "width": scope.lastWidth };
+            row.style = { "height": ht + scope.border * 2, "width": fixedRowWidth };
             rows.push(row);
 
-            while (i < c) {
+            while (i < imgsPerRow) {
                 var photo = photos[scope.baseline + i];
                 // Calculate new width based on ratio
-                var wt = Math.floor(ws[scope.baseline + i] * r);
+                var calcWidth = Math.floor(ws[scope.baseline + i] * r);
                 // add to total width with margins
-                tw += wt + scope.border * 2;
+                totalRowWidth += calcWidth + scope.border * 2;
 
                 //get the image property (if one exists)
                 var imageProp = imageHelper.getImagePropertyValue({ imageModel: photo });
@@ -92,13 +97,13 @@ angular.module("umbraco.directives.html")
                     photo.thumbnail = thumbnailUrl;
                 }
                 
-                photo.style = { "width": wt, "height": ht, "margin": scope.border + "px", "cursor": "pointer" };
+                photo.style = { "width": calcWidth, "height": ht, "margin": scope.border + "px", "cursor": "pointer" };
                 row.photos.push(photo);
                 i++;
             }
 
             // set row height to actual height + margins
-            scope.baseline += c;
+            scope.baseline += imgsPerRow;
 
             // if total width is slightly smaller than 
             // actual div width then add 1 to each 
@@ -115,10 +120,10 @@ angular.module("umbraco.directives.html")
             // actual div width then subtract 1 from each 
             // photo width till they match
             i = 0;
-            while (tw > w-1) {
+            while (totalRowWidth > fixedRowWidth - 1) {
                 row.photos[i].style.width--;
-                i = (i + 1) % c;
-                tw--;
+                i = (i + 1) % imgsPerRow;
+                totalRowWidth--;
             }
         }
 
@@ -145,9 +150,9 @@ angular.module("umbraco.directives.html")
                         scope.minHeight = element.attr('min-height') ? parseInt(element.attr('min-height'), 10) : 200;
                         scope.border = element.attr('border') ? parseInt(element.attr('border'), 10) : 5;
                         scope.clickHandler = scope.$eval(element.attr('on-click'));
-                        scope.lastWidth = Math.max(element.width(), scope.minWidth);
+                        var fixedRowWidth = Math.max(element.width(), scope.minWidth);
 
-                        scope.rows = renderCollection(scope, photos);
+                        scope.rows = renderCollection(scope, photos, fixedRowWidth);
 
                         if (attrs.filterBy) {
                             scope.$watch(attrs.filterBy, function (newVal, oldVal) {
@@ -160,7 +165,7 @@ angular.module("umbraco.directives.html")
                             });
                         }
 
-                    }, 500); //end timeout
+                    }, 200); //end timeout
                 } //end if modelValue
 
             }; //end $render
