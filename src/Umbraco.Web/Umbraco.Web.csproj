@@ -348,10 +348,12 @@
     <Compile Include="PropertyEditors\MultipleMediaPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\ContentTypeParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleContentTypeParameterEditor.cs" />
+    <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultiplePropertyGroupParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultiplePropertyTypeParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\PropertyGroupParameterEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\PropertyTypeParameterEditor.cs" />
+    <Compile Include="PropertyEditors\ParameterEditors\SingleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\PropertyEditorAssetAttribute.cs" />
     <Compile Include="PropertyEditors\RelatedLinksPropertyEditor.cs" />
     <Compile Include="PropertyEditors\RteEmbedController.cs" />
