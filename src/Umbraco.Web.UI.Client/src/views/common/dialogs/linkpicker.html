@@ -2,8 +2,9 @@
 	<div class="umb-panel-body no-header with-footer compact">
 		<umb-pane>
 			<umb-control-group label="@content_urls">
-				<input type="text" 
-					placeholder="Enter url" 
+				<input type="text"
+					localize="placeholder" 
+					placeholder="@general_url" 
 					class="umb-editor umb-textstring" 
 					ng-model="target.url"
 					ng-disabled="target.id"
@@ -13,9 +14,18 @@
 			<umb-control-group label="@content_nodeName">
 				<input type="text"
 					localize="placeholder" 
-					placeholder="@assignDomain_domainCreated:target.name" 
+					placeholder="@placeholders_entername" 
 					class="umb-editor umb-textstring" 
 					ng-model="target.name" />
+			</umb-control-group>
+
+			<umb-control-group label="@content_target">
+				<select class="umb-editor umb-dropdown" ng-model="target.target">
+					<option value=""></option>
+					<option value="_blank">Opens the linked document in a new window or tab</option>
+					<option value="_top">Opens the linked document in the full body of the window</option>
+					<option value="_parent">Opens the linked document in the parent frame</option>
+				</select>
 			</umb-control-group>
 		</umb-pane>
 

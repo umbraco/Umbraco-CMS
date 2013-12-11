@@ -51,7 +51,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 		    }
 
 		    $scope.selectedEl = c;
-		    $scope.target = args.node;
+		    $scope.target.id = args.node.id;
 		    $scope.target.name = args.node.name;
 
 		    $scope.selectedEl.find("i.umb-tree-icon")
