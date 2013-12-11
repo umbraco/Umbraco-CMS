@@ -1,5 +1,4 @@
 ﻿<div class="umb-editor umb-relatedlinks" ng-controller="Umbraco.PropertyEditors.RelatedLinksController">
-    <div class="row-fluid">
         <table class="table table-striped">
             <thead>
                 <tr>
@@ -11,11 +10,11 @@
             </thead>
             <tbody>
                 <tr ng-repeat="link in model.value">
-                    <td>
+                    <td style="word-wrap:break-word; word-break: break-all">
                         <span ng-show="!link.edit">{{link.caption}}</span>
                         <input type="text" ng-model="link.caption" ng-show="link.edit"/>
                     </td>
-                    <td>
+                    <td style="word-wrap:break-word; word-break: break-all">
                         <div ng-show="!link.edit">
                             <a href="{{link.link}}" target="_blank" ng-show="!link.isInternal">{{link.link}}</a>
                             <a href="#/content/content/edit/{{link.internal}}" target="_blank" ng-show="link.isInternal" ng-bind="link.iternalName">
@@ -76,5 +75,4 @@
                 </tr>
             </tbody>
         </table>
-    </div>  
 </div>
