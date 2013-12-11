@@ -95,7 +95,7 @@ angular.module("umbraco.directives.html")
                 newHeight = minDisplayHeight;
             }
             //always take the rounded down width so we know it will fit
-            return Math.floor(newHeight) - 1;
+            return Math.floor(newHeight);
         }
         else {
             
