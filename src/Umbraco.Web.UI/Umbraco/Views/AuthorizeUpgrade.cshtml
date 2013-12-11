@@ -1,0 +1,62 @@
+﻿@using System.Web.Mvc
+@using System.Web.Mvc.Html
+@using Umbraco.Core
+@using ClientDependency.Core
+@using ClientDependency.Core.Mvc
+@using Umbraco.Web
+@using Umbraco.Web.Editors
+@using umbraco
+@inherits System.Web.Mvc.WebViewPage
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <base href="@GlobalSettings.Path.EnsureEndsWith('/')" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">    
+
+    <title>Umbraco</title>
+    <link rel="stylesheet" href="assets/css/umbraco.css" />
+
+    @*Because we're lazy loading angular js, the embedded cloak style will not be loaded initially, but we need it*@
+    <style>
+        [ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+            display: none !important;
+        }
+    </style>
+
+</head>
+<body id="umbracoMainPageBody" ng-controller="Umbraco.AuthorizeUpgradeController">
+    
+    <div data-backdrop="false" class="modal hide login-overlay" aria-hidden="false" style="display: block;">
+        
+        <div ng-include="'views/common/dialogs/login.html'"></div>
+            
+    </div>
+    
+    @*
+        These are the bare minimal server variables that are required for the application to start without being authenticated,
+        we will load the rest of the server vars after the user is authenticated.
+    *@    
+    <script type="text/javascript">
+        var Umbraco = {};
+        Umbraco.Sys = {};
+        Umbraco.Sys.ServerVariables = {
+            "umbracoUrls": {                
+                "authenticationApiBaseUrl": "@(Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>(controller => controller.PostLogin(null)))",
+                "serverVarsJs": '@Url.Action("ServerVariables", "BackOffice")'
+            }
+        };       
+    </script>
+
+    @*And finally we can load in our angular app*@
+    <script type="text/javascript" src="lib/yepnope/yepnope.min.js"></script>
+    <script type="text/javascript" src="@Url.Action("Application", "BackOffice")"></script>
+
+</body>
+</html>
+

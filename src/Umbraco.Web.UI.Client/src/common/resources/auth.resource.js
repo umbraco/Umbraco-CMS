@@ -21,8 +21,10 @@ function authResource($q, $http, umbRequestHelper, angularHelper) {
                 $http.post(
                     umbRequestHelper.getApiUrl(
                         "authenticationApiBaseUrl",
-                        "PostLogin",
-                        [{ username: username }, { password: password }])),
+                        "PostLogin"), {
+                            username: username,
+                            password: password
+                        }),
                 'Login failed for user ' + username);
         },
         

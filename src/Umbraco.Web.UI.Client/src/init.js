@@ -11,31 +11,19 @@ app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 
                 xhr.setRequestHeader("X-XSRF-TOKEN", $cookies["XSRF-TOKEN"]);
             }
         }); 
-
-        var firstRun = true;
         
         /** Listens for authentication and checks if our required assets are loaded, if/once they are we'll broadcast a ready event */
         eventsService.on("app.authenticated", function(evt, data) {
             assetsService._loadInitAssets().then(function() {
+                appState.setGlobalState("isReady", true);
                 //send the ready event
                 eventsService.emit("app.ready", data);
             });
         });
 
-        /** when we have a successful first route that is not the login page - *meaning the user is authenticated*
-            we'll get the current user from the user service and ensure it broadcasts it's events. If the route
-            is successful from after a login then this will not actually do anything since the authenticated event would
-            have alraedy fired, but if the user is loading the angularjs app for the first time and they are already authenticated
-            then this is when the authenticated event will be fired.
-        */
+        /** execute code on each successful route */
         $rootScope.$on('$routeChangeSuccess', function(event, current, previous) {
-
-            if (firstRun && !$location.url().toLowerCase().startsWith("/login")) {
-                userService.getCurrentUser({ broadcastEvent: true }).then(function (user) {
-                    firstRun = false;                    
-                });                
-            }
-
+            
             if(current.params.section){
                 $rootScope.locationTitle = current.params.section + " - " + $location.$$host;
             }

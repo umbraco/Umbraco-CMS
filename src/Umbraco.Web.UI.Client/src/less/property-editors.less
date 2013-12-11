@@ -243,8 +243,23 @@ ul.color-picker li a  {
   position: relative;
 }
 
-.umb-photo-folder .picrow div a {
-    display: inline-block;
+.umb-photo-folder .picrow div.pic {
+    margin: 0px; 
+    padding: 0px; 
+    border: none; 
+    display: inline-block; 
+    overflow: hidden;
+}
+
+.umb-photo-folder .picrow div a:first-child {    
+    width:100%;
+    height:100%;
+}
+
+.umb-photo-folder .picrow div.umb-photo {
+    width:100%;
+    height:100%;
+    background-color: @grayLighter;
 }
 
 .umb-photo-folder a:hover{text-decoration: none}
@@ -258,7 +273,7 @@ ul.color-picker li a  {
 }
 
 //this is a temp hack, to provide selectors in the dialog:
-.umb-dialogs-mediapicker .umb-photo-folder .pic:hover .selector-overlay{
+.umb-photo-folder .pic:hover .selector-overlay{
   position: absolute;
   bottom: 0px;
   left: 0px;
