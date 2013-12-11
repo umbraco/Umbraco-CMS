@@ -47,8 +47,8 @@ angular.module("umbraco.directives.html")
     }
 
     /** sets the image style which get's used in the angular markup */
-    function setImageStyle(img, width, height) {
-        img.style = { width: width, height: height };
+    function setImageStyle(img, width, height, rightMargin, bottomMargin) {
+        img.style = { width: width, height: height, "margin-right": rightMargin + "px", "margin-bottom" : bottomMargin + "px"};
     }
 
     /** gets the image's scaled wdith based on the max row height and width */
@@ -66,28 +66,24 @@ angular.module("umbraco.directives.html")
         ideal image count per row. It will check if a row can be filled with this ideal count and if not - if there
         are additional images available to fill the row it will keep calculating until they fit.
     */
-    function getRowHeight(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow) {
+    function getRowHeight(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin) {
 
         var currRowWidth = 0;
-
         var idealImages = imgs.slice(0, idealImgPerRow);
-
+        //take into account the margin, we will have 1 less margin item than we have total images
+        // easiest to just reduce the maxRowWidth by that number
+        maxRowWidth = maxRowWidth - ((idealImages.length -1) * margin);
         var maxScaleableHeight = getMaxScaleableHeight(idealImages, maxRowHeight);
+        var targetHeight = Math.max(maxScaleableHeight, minDisplayHeight);
 
-        var biggerHeight = Math.max(maxScaleableHeight, minDisplayHeight);
-
-        for (var i = 0; i < idealImages.length; i++) {
-            var scaledWidth = getScaledWidth(
-                idealImages[i],
-                biggerHeight,
-                maxRowWidth);
-            currRowWidth += scaledWidth;
+        for (var i = 0; i < idealImages.length; i++) {            
+            currRowWidth += getScaledWidth(idealImages[i], targetHeight, maxRowWidth);
         }
         
         if (currRowWidth > maxRowWidth) {
             //get the ratio
             var r = maxRowWidth / currRowWidth;
-            var newHeight = biggerHeight * r;
+            var newHeight = targetHeight * r;
             //if this becomes smaller than the min display then we need to use the min display 
             if (newHeight < minDisplayHeight) {
                 newHeight = minDisplayHeight;
@@ -102,7 +98,7 @@ angular.module("umbraco.directives.html")
             
             if (idealImages.length === imgs.length) {
                 //we have no more remaining images to fill the space, so we'll just use the calc height
-                return biggerHeight;
+                return targetHeight;
             }
             else {
                 //we have additional images so we'll recurse and add 1 to the idealImgPerRow until it fits
@@ -112,18 +108,18 @@ angular.module("umbraco.directives.html")
     }
 
     /** builds an image grid row */
-    function buildRow(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow) {
+    function buildRow(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin) {
         var currRowWidth = 0;
         var row = [];
 
-        var calcRowHeight = getRowHeight(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow);
+        var calcRowHeight = getRowHeight(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin);
 
-        for (var i = 0; i < imgs.length; i++) {
-            
+        var sizes = [];
+        for (var i = 0; i < imgs.length; i++) {            
             var scaledWidth = getScaledWidth(imgs[i], calcRowHeight, maxRowWidth);
             if (currRowWidth + scaledWidth <= maxRowWidth) {
                 currRowWidth += scaledWidth;
-                setImageStyle(imgs[i], scaledWidth, calcRowHeight);
+                sizes.push({ width: scaledWidth, height: calcRowHeight });                
                 row.push(imgs[i]);
             }
             else {
@@ -131,6 +127,17 @@ angular.module("umbraco.directives.html")
                 break;
             }
         }
+        
+        //loop through the images for the row and apply the styles
+        for (var j = 0; j < row.length; j++) {
+            var bottomMargin = margin;
+            //make the margin 0 for the last one
+            if (j === (row.length - 1)) {
+                margin = 0;
+            }
+            setImageStyle(row[j], sizes[j].width, sizes[j].height, margin, bottomMargin);
+        }
+
         return row;
     }
 
@@ -147,7 +154,7 @@ angular.module("umbraco.directives.html")
     }
 
     /** Creates the image grid with calculated widths/heights for images to fill the grid nicely */
-    function buildGrid(images, maxRowWidth, maxRowHeight, startingIndex, minDisplayHeight, idealImgPerRow) {
+    function buildGrid(images, maxRowWidth, maxRowHeight, startingIndex, minDisplayHeight, idealImgPerRow, margin) {
         
         var rows = [];
         var imagesProcessed = 0;
@@ -163,7 +170,7 @@ angular.module("umbraco.directives.html")
             var currImgs = images.slice(imagesProcessed);
             
             //build the row
-            var row = buildRow(currImgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow);
+            var row = buildRow(currImgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin);
             if (row.length > 0) {
                 rows.push(row);
                 imagesProcessed += row.length;
@@ -195,9 +202,8 @@ angular.module("umbraco.directives.html")
 
                         //todo: this doesn't do anything
                         var imagesOnly = element.attr('imagesOnly');
-                        //todo: this doesn't do anything
-                        var border = element.attr('border') ? parseInt(element.attr('border'), 10) : 5;
                         
+                        var margin = element.attr('border') ? parseInt(element.attr('border'), 10) : 5;                        
                         var startingIndex = element.attr('baseline') ? parseInt(element.attr('baseline'), 10) : 0;
                         var minWidth = element.attr('min-width') ? parseInt(element.attr('min-width'), 10) : 420;
                         var minHeight = element.attr('min-height') ? parseInt(element.attr('min-height'), 10) : 100;
@@ -206,7 +212,7 @@ angular.module("umbraco.directives.html")
 
                         var fixedRowWidth = Math.max(element.width(), minWidth);
 
-                        scope.rows = buildGrid(photos, fixedRowWidth, maxHeight, startingIndex, minHeight, idealImgPerRow);
+                        scope.rows = buildGrid(photos, fixedRowWidth, maxHeight, startingIndex, minHeight, idealImgPerRow, margin);
                         
                         if (attrs.filterBy) {
                             scope.$watch(attrs.filterBy, function (newVal, oldVal) {
