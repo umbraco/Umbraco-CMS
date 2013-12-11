@@ -628,7 +628,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 // for example: /views/content/create.html
 
                 //we will also check for a 'packageName' for the current tree, if it exists then the convention will be:
-                // for example: /App_Plugins/{mypackage}/umbraco/{treetype}/create.html
+                // for example: /App_Plugins/{mypackage}/backoffice/{treetype}/create.html
 
                 var treeAlias = treeService.getTreeAlias(args.node);
                 var packageTreeFolder = treeService.getTreePackageFolder(treeAlias);
@@ -640,7 +640,7 @@ function navigationService($rootScope, $routeParams, $log, $location, $q, $timeo
                 if (packageTreeFolder) {
                     templateUrl = Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
                         "/" + packageTreeFolder +
-                        "/umbraco/" + treeAlias + "/" + args.action.alias + ".html";
+                        "/backoffice/" + treeAlias + "/" + args.action.alias + ".html";
                 }
                 else {
                     templateUrl = "views/" + treeAlias + "/" + args.action.alias + ".html";
