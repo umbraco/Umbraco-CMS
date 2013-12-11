@@ -11,6 +11,7 @@ using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
@@ -99,15 +100,13 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Logs a user in
         /// </summary>
-        /// <param name="username"></param>
-        /// <param name="password"></param>
         /// <returns></returns>
         [SetAngularAntiForgeryTokens]
-        public UserDetail PostLogin(string username, string password)
+        public UserDetail PostLogin(LoginModel loginModel)
         {
-            if (UmbracoContext.Security.ValidateBackOfficeCredentials(username, password))
+            if (UmbracoContext.Security.ValidateBackOfficeCredentials(loginModel.Username, loginModel.Password))
             {
-                var user = Security.GetBackOfficeUser(username);
+                var user = Security.GetBackOfficeUser(loginModel.Username);
 
                 //TODO: Clean up the int cast!
                 var ticket = UmbracoContext.Security.PerformLogin(user);

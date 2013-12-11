@@ -121,7 +121,7 @@ namespace Umbraco.Web.Editors
                                 },
                                 {
                                     "authenticationApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>(
-                                        controller => controller.PostLogin(null, null))
+                                        controller => controller.PostLogin(null))
                                 },
                                 {
                                     "currentUserApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<CurrentUserController>(

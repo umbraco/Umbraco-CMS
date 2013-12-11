@@ -508,9 +508,6 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        //TODO: Unpublish is NOT an assignable permission therefore this won't work, I'd assume to unpublish you'd need to be able to publish??!
-        // still waiting on feedback from HQ.
-        //[EnsureUserPermissionForContent("id", 'Z')]
         [EnsureUserPermissionForContent("id", 'U')]
         public ContentItemDisplay PostUnPublish(int id)
         {

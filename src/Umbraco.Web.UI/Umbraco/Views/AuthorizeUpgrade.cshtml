@@ -47,7 +47,7 @@
         Umbraco.Sys = {};
         Umbraco.Sys.ServerVariables = {
             "umbracoUrls": {                
-                "authenticationApiBaseUrl": "@(Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>(controller => controller.PostLogin(null, null)))",
+                "authenticationApiBaseUrl": "@(Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>(controller => controller.PostLogin(null)))",
                 "serverVarsJs": '@Url.Action("ServerVariables", "BackOffice")'
             }
         };       
