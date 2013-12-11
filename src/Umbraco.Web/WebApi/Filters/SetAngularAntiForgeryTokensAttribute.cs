@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System.Linq;
+using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Helpers;
 using System.Web.Http.Filters;
@@ -14,6 +15,13 @@ namespace Umbraco.Web.WebApi.Filters
         public override void OnActionExecuted(HttpActionExecutedContext context)
         {
             if (context.Response == null) return;
+
+            //don't need to set the cookie if they already exist
+            if (context.Request.Headers.GetCookies(AngularAntiForgeryHelper.AngularCookieName).Any()
+                && context.Request.Headers.GetCookies(AngularAntiForgeryHelper.CsrfValidationCookieName).Any())
+            {
+                return;
+            }
 
             string cookieToken, headerToken;
             AngularAntiForgeryHelper.GetTokens(out cookieToken, out headerToken);

@@ -1,5 +1,5 @@
 app.config(function ($routeProvider) {
-
+    
     /** This checks if the user is authenticated for a route and what the isRequired is set to. 
         Depending on whether isRequired = true, it first check if the user is authenticated and will resolve successfully
         otherwise the route will fail and the $routeChangeError event will execute, in that handler we will redirect to the rejected
@@ -8,7 +8,7 @@ app.config(function ($routeProvider) {
         
         return {
             /** Checks that the user is authenticated, then ensures that are requires assets are loaded */
-            isAuthenticatedAndReady: function ($q, userService, $route, assetsService) {
+            isAuthenticatedAndReady: function ($q, userService, $route, assetsService, appState) {
                 var deferred = $q.defer();
 
                 //don't need to check if we've redirected to login and we've already checked auth
@@ -21,14 +21,33 @@ app.config(function ($routeProvider) {
                     .then(function () {
 
                         assetsService._loadInitAssets().then(function() {
-                            //is auth, check if we allow or reject
-                            if (isRequired) {
-                                //this will resolve successfully so the route will continue
-                                deferred.resolve(true);
+                            
+                            //This could be the first time has loaded after the user has logged in, in this case
+                            // we need to broadcast the authenticated event - this will be handled by the startup (init)
+                            // handler to set/broadcast the ready state
+                            if (appState.getGlobalState("isReady") !== true) {
+                                userService.getCurrentUser({ broadcastEvent: true }).then(function(user) {
+                                    //is auth, check if we allow or reject
+                                    if (isRequired) {
+                                        //this will resolve successfully so the route will continue
+                                        deferred.resolve(true);
+                                    }
+                                    else {
+                                        deferred.reject({ path: "/" });
+                                    }
+                                });
                             }
                             else {
-                                deferred.reject({ path: "/" });
+                                //is auth, check if we allow or reject
+                                if (isRequired) {
+                                    //this will resolve successfully so the route will continue
+                                    deferred.resolve(true);
+                                }
+                                else {
+                                    deferred.reject({ path: "/" });
+                                }
                             }
+
                         });
 
                     }, function () {
