@@ -48,14 +48,20 @@ angular.module("umbraco.directives.html")
 
     /** sets the image style which get's used in the angular markup */
     function setImageStyle(img, width, height, rightMargin, bottomMargin) {
-        img.style = { width: width, height: height, "margin-right": rightMargin + "px", "margin-bottom" : bottomMargin + "px"};
+        img.style = { width: width, height: height, "margin-right": rightMargin + "px", "margin-bottom": bottomMargin + "px" };
+        img.thumbStyle = {
+            "background-image": "url('" + img.thumbnail + "')",
+            "background-repeat": "no-repeat",
+            "background-position": "center",
+            "background-size": Math.min(width, img.originalWidth) + "px " + Math.min(height, img.originalHeight) + "px"
+        };
     }
 
     /** gets the image's scaled wdith based on the max row height and width */
     function getScaledWidth(img, maxHeight, maxRowWidth) {
         var scaled = img.originalWidth * maxHeight / img.originalHeight;
-        //return to 2 dec places
-        var rounded = Math.round(scaled * 100) / 100;
+        //round down, we don't want it too big even by half a pixel otherwise it'll drop to the next row
+        var rounded = Math.floor(scaled);
         //if the max row width is smaller than the scaled width of the image then we better make
         // the scaled width the max row width so an image can actually fit on the row
         return Math.min(rounded, maxRowWidth);
@@ -72,24 +78,24 @@ angular.module("umbraco.directives.html")
         var idealImages = imgs.slice(0, idealImgPerRow);
         //take into account the margin, we will have 1 less margin item than we have total images
         // easiest to just reduce the maxRowWidth by that number
-        maxRowWidth = maxRowWidth - ((idealImages.length -1) * margin);
+        var targetRowWidth = maxRowWidth - ((idealImages.length -1) * margin);
         var maxScaleableHeight = getMaxScaleableHeight(idealImages, maxRowHeight);
         var targetHeight = Math.max(maxScaleableHeight, minDisplayHeight);
 
         for (var i = 0; i < idealImages.length; i++) {            
-            currRowWidth += getScaledWidth(idealImages[i], targetHeight, maxRowWidth);
+            currRowWidth += getScaledWidth(idealImages[i], targetHeight, targetRowWidth);
         }
         
-        if (currRowWidth > maxRowWidth) {
+        if (currRowWidth > targetRowWidth) {
             //get the ratio
-            var r = maxRowWidth / currRowWidth;
+            var r = targetRowWidth / currRowWidth;
             var newHeight = targetHeight * r;
-            //if this becomes smaller than the min display then we need to use the min display 
+            //if this becomes smaller than the min display then we need to use the min display,
             if (newHeight < minDisplayHeight) {
                 newHeight = minDisplayHeight;
             }
             //always take the rounded down width so we know it will fit
-            return Math.floor(newHeight);
+            return Math.floor(newHeight) - 1;
         }
         else {
             
@@ -102,7 +108,7 @@ angular.module("umbraco.directives.html")
             }
             else {
                 //we have additional images so we'll recurse and add 1 to the idealImgPerRow until it fits
-                return getRowHeight(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow + 1);
+                return getRowHeight(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow + 1, margin);
             }
         }
     }
