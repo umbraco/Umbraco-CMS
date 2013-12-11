@@ -1,9 +1,9 @@
 <div class="umb-photo-folder">
-    <div class="picrow" ng-repeat="row in rows" ng-style="row.style">
+    <div class="picrow" ng-repeat="row in rows">
 
         <div class="pic" 
-            style="margin: 0px; padding: 0px; border: none; display: inline-block; overflow: hidden"
-            ng-style="img.style" ng-repeat="img in row.photos">
+             style="margin: 0px; padding: 0px; border: none; display: inline-block; overflow: hidden" 
+            ng-style="img.style" ng-repeat="img in row">
             <a
                 href="#media/media/edit/{{img.id}}"
                 ng-click="clickHandler(img, $event, false)"
@@ -22,11 +22,10 @@
                     alt="{{img.name}}" />
             </a>
 
-            <a href ng-click="clickHandler(img, $event, true)" ng-show="img.contentTypeAlias === 'Folder'" class="selector-overlay">Select
-            </a>
-            <div>
-            </div>
-
+            <a href ng-click="clickHandler(img, $event, true)" ng-show="img.contentTypeAlias === 'Folder'" class="selector-overlay">
+				Select
+			</a>
+            
         </div>
     </div>
 </div>
