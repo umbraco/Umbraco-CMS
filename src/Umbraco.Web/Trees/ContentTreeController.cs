@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Web.Http;
 using Umbraco.Core;
@@ -36,6 +37,32 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class ContentTreeController : ContentTreeControllerBase
     {
+        #region Actions
+
+        [HttpQueryStringFilter("queryStrings")]
+        public TreeNode GetTreeNode(string id, FormDataCollection queryStrings)
+        {
+            int asInt;
+            if (int.TryParse(id, out asInt) == false)
+            {
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            }
+
+            var entity = Services.EntityService.Get(asInt, UmbracoObjectTypes.Document);
+            if (entity == null)
+            {
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            }
+
+            var node = GetContentTreeNode((UmbracoEntity) entity, entity.ParentId.ToInvariantString(), queryStrings);
+
+            //add the tree alias to the node since it is standalone (has no root for which this normally belongs)
+            node.AdditionalData["treeAlias"] = TreeAlias;
+            return node;
+        }
+
+        #endregion
+
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
             var node = base.CreateRootNode(queryStrings); 
@@ -81,42 +108,60 @@ namespace Umbraco.Web.Trees
             foreach (var entity in entities)
             {
                 var e = (UmbracoEntity)entity;
-               
-                var allowedUserOptions = GetAllowedUserMenuItemsForNode(e);
-                if (CanUserAccessNode(e, allowedUserOptions))
-                {                    
 
-                    //Special check to see if it ia a container, if so then we'll hide children.
-                    var isContainer = entity.AdditionalData.ContainsKey("IsContainer") 
-                        && entity.AdditionalData["IsContainer"] is bool 
-                        && (bool) entity.AdditionalData["IsContainer"];
-                    
-                    var node = CreateTreeNode(
-                        e.Id.ToInvariantString(),
-                        id,
-                        queryStrings,
-                        e.Name,
-                        e.ContentTypeIcon,
-                        e.HasChildren && (isContainer == false));
-
-                    node.AdditionalData.Add("contentType", e.ContentTypeAlias);
-
-                    if (isContainer)
-                        node.SetContainerStyle();
-
-                    if (e.IsPublished == false)
-                        node.SetNotPublishedStyle();
-
-                    if (e.HasPendingChanges)
-                        node.SetHasUnpublishedVersionStyle();
-
-                    if (Access.IsProtected(e.Id, e.Path))
-                        node.SetProtectedStyle();
-                    
+                var node = GetContentTreeNode(e, id, queryStrings);
+                if (node != null)
+                {
                     nodes.Add(node);
                 }
             }
             return nodes;
+        }
+
+        /// <summary>
+        /// Creates a tree node for a content item based on an UmbracoEntity
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="parentId"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        internal TreeNode GetContentTreeNode(UmbracoEntity e, string parentId, FormDataCollection queryStrings)
+        {
+            var allowedUserOptions = GetAllowedUserMenuItemsForNode(e);
+            if (CanUserAccessNode(e, allowedUserOptions))
+            {
+
+                //Special check to see if it ia a container, if so then we'll hide children.
+                var isContainer = e.AdditionalData.ContainsKey("IsContainer")
+                    && e.AdditionalData["IsContainer"] is bool
+                    && (bool)e.AdditionalData["IsContainer"];
+
+                var node = CreateTreeNode(
+                    e.Id.ToInvariantString(),
+                    parentId,
+                    queryStrings,
+                    e.Name,
+                    e.ContentTypeIcon,
+                    e.HasChildren && (isContainer == false));
+
+                node.AdditionalData.Add("contentType", e.ContentTypeAlias);
+
+                if (isContainer)
+                    node.SetContainerStyle();
+
+                if (e.IsPublished == false)
+                    node.SetNotPublishedStyle();
+
+                if (e.HasPendingChanges)
+                    node.SetHasUnpublishedVersionStyle();
+
+                if (Access.IsProtected(e.Id, e.Path))
+                    node.SetProtectedStyle();
+
+                return node;
+            }
+
+            return null;
         }
 
         protected override MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings)

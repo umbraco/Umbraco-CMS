@@ -407,8 +407,14 @@ function treeService($q, treeResource, iconHelper, notificationsService, eventsS
                 if (current.metaData && current.metaData["treeAlias"]) {
                     root = current;
                 }
-                else { 
+                else if (angular.isFunction(current.parent)) {
+                    //we can only continue if there is a parent() method which means this
+                    // tree node was loaded in as part of a real tree, not just as a single tree
+                    // node from the server.
                     current = current.parent();
+                }
+                else {
+                    current = null;
                 }
             }
             return root;

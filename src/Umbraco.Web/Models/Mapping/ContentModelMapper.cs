@@ -4,6 +4,9 @@ using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.Serialization;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Routing;
 using AutoMapper;
 using Newtonsoft.Json;
 using Umbraco.Core;
@@ -12,6 +15,7 @@ using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Web.Trees;
 using umbraco;
 using Umbraco.Web.Routing;
 using umbraco.BusinessLogic.Actions;
@@ -25,10 +29,10 @@ namespace Umbraco.Web.Models.Mapping
     {
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
-            
+
             //FROM IContent TO ContentItemDisplay
             config.CreateMap<IContent, ContentItemDisplay>()
-                .ForMember(
+                  .ForMember(
                       dto => dto.Owner,
                       expression => expression.ResolveUsing<OwnerResolver<IContent>>())
                   .ForMember(
@@ -44,6 +48,9 @@ namespace Umbraco.Web.Models.Mapping
                       dto => dto.ContentTypeName,
                       expression => expression.MapFrom(content => content.ContentType.Name))
                   .ForMember(
+                      dto => dto.IsChildOfListView,
+                      expression => expression.MapFrom(content => content.Parent().ContentType.IsContainer))
+                  .ForMember(
                       dto => dto.PublishDate,
                       expression => expression.MapFrom(content => GetPublishedDate(content, applicationContext)))
                   .ForMember(
@@ -58,7 +65,7 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
                   .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
                       new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService))))
-                  .AfterMap(MapGenericCustomProperties);
+                  .AfterMap(AfterMap);
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
@@ -81,7 +88,25 @@ namespace Umbraco.Web.Models.Mapping
                       dto => dto.Owner,
                       expression => expression.ResolveUsing<OwnerResolver<IContent>>());
 
-            
+
+        }
+
+        private static void AfterMap(IContent content, ContentItemDisplay display)
+        {
+            MapGenericCustomProperties(content, display);
+            MapTreeNodeUrl(content, display);
+        }
+
+        private static void MapTreeNodeUrl(IContent content, ContentItemDisplay display)
+        {
+            if (HttpContext.Current == null)
+            {
+                return;
+            }
+
+            var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
+            var url = urlHelper.GetUmbracoApiService<ContentTreeController>(controller => controller.GetTreeNode(display.Id.ToString(), null));
+            display.TreeNodeUrl = url;
         }
 
         /// <summary>
@@ -92,12 +117,12 @@ namespace Umbraco.Web.Models.Mapping
         private static void MapGenericCustomProperties(IContent content, ContentItemDisplay display)
         {
             //fill in the template config to be passed to the template drop down.
-            var templateItemConfig = new Dictionary<string, string> {{"", "Choose..."}};
+            var templateItemConfig = new Dictionary<string, string> { { "", "Choose..." } };
             foreach (var t in content.ContentType.AllowedTemplates)
             {
                 templateItemConfig.Add(t.Alias, t.Name);
             }
-            
+
             if (content.ContentType.IsContainer)
             {
                 TabsAndPropertiesResolver.AddContainerView(display, "content");
@@ -139,7 +164,7 @@ namespace Umbraco.Web.Models.Mapping
                     });
         }
 
-        
+
 
         /// <summary>
         /// Gets the published date value for the IContent object
@@ -214,7 +239,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 return result;
             }
-        } 
+        }
 
     }
 }

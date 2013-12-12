@@ -90,6 +90,19 @@ namespace Umbraco.Web.Editors
             return content;
        }
 
+        [EnsureUserPermissionForContent("id")]
+        public ContentItemDisplay GetWithTreeDefinition(int id)
+        {
+            var foundContent = GetObjectFromRequest(() => Services.ContentService.GetById(id));
+            if (foundContent == null)
+            {
+                HandleContentNotFound(id);
+            }
+
+            var content = Mapper.Map<IContent, ContentItemDisplay>(foundContent);
+            return content;
+        }
+
         /// <summary>
         /// Gets an empty content item for the 
         /// </summary>

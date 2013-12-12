@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, $q, $timeout, $window, appState, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState) {
+function ContentEditController($scope, $routeParams, $q, $timeout, $window, appState, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http) {
 
     //setup scope vars
     $scope.defaultButton = null;
@@ -107,6 +107,26 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
         }
     }
     
+    /** Syncs the content item to it's tree node - this occurs on first load and after saving */
+    function syncTreeNode(content, path, initialLoad) {        
+
+        //If this is a child of a list view then we can't actually sync the real tree
+        if (!$scope.content.isChildOfListView) {
+            navigationService.syncTree({ tree: "content", path: path.split(","), forceReload: true }).then(function (syncArgs) {
+                $scope.currentNode = syncArgs.node;
+            });
+        }
+        else if (initialLoad === true) {
+            //if this is a child of a list view and it's the initial load of the editor, we need to get the tree node 
+            // from the server so that we can load in the actions menu.
+            umbRequestHelper.resourcePromise(
+                $http.get(content.treeNodeUrl),
+                'Failed to retreive data for child node ' + content.id).then(function(node) {
+                    $scope.currentNode = node;
+                });
+        }
+    }
+
     /** This is a helper method to reduce the amount of code repitition for actions: Save, Publish, SendToPublish */
     function performSave(args) {
         var deferred = $q.defer();
@@ -131,9 +151,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
 
                     configureButtons(data);
 
-                    navigationService.syncTree({ tree: "content", path: data.path.split(","), forceReload: true }).then(function (syncArgs) {
-                        $scope.currentNode = syncArgs.node;
-                    });
+                    syncTreeNode($scope.content, data.path);
 
                     deferred.resolve(data);
                     
@@ -188,9 +206,8 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
 
-                navigationService.syncTree({ tree: "content", path: data.path.split(",") }).then(function(syncArgs) {
-                    $scope.currentNode = syncArgs.node;
-                });
+                syncTreeNode($scope.content, data.path, true);
+
             });
     }
 
@@ -214,9 +231,8 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
 
                     configureButtons(data);
 
-                    navigationService.syncTree({ tree: "content", path: data.path.split(","), forceReload: true }).then(function (syncArgs) {
-                        $scope.currentNode = syncArgs.node;
-                    });
+                    syncTreeNode($scope.content, data.path);
+
                 });
         }
         

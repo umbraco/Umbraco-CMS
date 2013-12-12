@@ -1,14 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http.Formatting;
 using System.Runtime.Serialization;
 using System.Web.Http;
 using System.Web.Http.ModelBinding;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Validation;
+using Umbraco.Web.Models.Trees;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Web.Models.ContentEditing
 {
+   
     /// <summary>
     /// A model representing a content item to be displayed in the back office
     /// </summary>    
@@ -29,7 +34,7 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "urls")]
         public string[] Urls { get; set; }
-
+        
         /// <summary>
         /// The allowed 'actions' based on the user's permissions - Create, Update, Publish, Send to publish
         /// </summary>
@@ -38,5 +43,12 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </remarks>
         [DataMember(Name = "allowedActions")]
         public IEnumerable<char> AllowedActions { get; set; }
+
+        [DataMember(Name = "isChildOfListView")]
+        public bool IsChildOfListView { get; set; }
+
+        [DataMember(Name = "treeNodeUrl")]
+        public string TreeNodeUrl { get; set; }
+
     }
 }
