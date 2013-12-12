@@ -1,6 +1,8 @@
 angular.module("umbraco")
     .controller("Umbraco.Dialogs.HelpController", function ($scope, $location, $routeParams, helpService, userService) {
         $scope.section = $routeParams.section;
+        $scope.version = Umbraco.Sys.ServerVariables.application.version + " assembly: " + Umbraco.Sys.ServerVariables.application.assemblyVersion;
+        
         if(!$scope.section){
             $scope.section ="content";
         }
