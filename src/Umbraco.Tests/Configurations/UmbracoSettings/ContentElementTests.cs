@@ -157,7 +157,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void ResolveUrlsFromTextString()
         {
-            Assert.IsTrue(SettingsSection.Content.ResolveUrlsFromTextString);
+            Assert.IsFalse(SettingsSection.Content.ResolveUrlsFromTextString);
         }
         [Test]
         public void MacroErrors()
