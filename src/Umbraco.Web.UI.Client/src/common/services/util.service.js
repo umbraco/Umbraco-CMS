@@ -85,9 +85,7 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, um
             var maxScaleableHeight = this.getMaxScaleableHeight(idealImages, maxRowHeight);
             //if the max scale height is smaller than the min display height, we'll use the min display height
             targetHeight = targetHeight ? targetHeight : Math.max(maxScaleableHeight, minDisplayHeight);
-
-            console.log("targetHeight = " + targetHeight);
-
+            
             var attemptedRowHeight = this.performGetRowHeight(idealImages, targetRowWidth, minDisplayHeight, targetHeight);
 
             if (attemptedRowHeight != null) {
@@ -151,17 +149,12 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, um
 
             for (var i = 0; i < idealImages.length; i++) {
                 var scaledW = this.getScaledWidth(idealImages[i], targetHeight);
-                console.log("Image " + i + " scaled width = " + scaledW);
                 currRowWidth += scaledW;
             }
 
             if (currRowWidth > targetRowWidth) {
                 //get the new scaled height to fit
                 var newHeight = targetRowWidth * targetHeight / currRowWidth;
-
-                console.log("currRowWidth = " + currRowWidth);
-                console.log("targetRowWidth = " + targetRowWidth);
-                console.log("Scaled down new height = " + newHeight);
                 
                 return newHeight;
             }
@@ -209,8 +202,6 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, um
 
             ////set the row style
             //row.style = { "width": maxRowWidth + "px" };
-
-            console.log("ROW built");
 
             return row;
         },
@@ -327,8 +318,6 @@ function umbSessionStorage($window) {
     return {
 
         get: function (key) {
-            console.log(storage);
-            console.log(storage["umb_" + key]);
             return angular.fromJson(storage["umb_" + key]);
         },
         

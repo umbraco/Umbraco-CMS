@@ -20,12 +20,10 @@ describe('Assets service tests', function () {
           var loaded = false;
           runs( function(){
                 assetsService.loadJs("lib/umbraco/NamespaceManager.js").then(function(){
-                    console.log( "done" );
                     expect(Umbraco.Sys).toNotBe(undefined);
                 });
           });
           runs(function(){
-            console.log( "asserting" );
              expect(Umbraco.Sys).toNotBe(undefined);
           });
         });

@@ -81,7 +81,6 @@ describe('angular event tests', function () {
 
             $rootScope.$on("testEvent", function(e, args) {
                 $timeout(function () {
-                    console.log("timeout #1");
                     args.val = "changed1";
                     args.resolve(args);
                 }, 1000);
@@ -89,7 +88,6 @@ describe('angular event tests', function () {
             
             $rootScope.$on("testEvent", function (e, args) {
                 $timeout(function () {
-                    console.log("timeout #2");
                     args.val = "changed2";
                     args.resolve(args);
                 }, 1000);
@@ -119,7 +117,6 @@ describe('angular event tests', function () {
             _.each(promises, function(p) {
                 p.promise.then(function (args) {
                     index++;
-                    console.log("YOU ARE HERE: " + args.val);
                     expect(args.val).toBe("changed" + index);
                 });
             });

@@ -26,7 +26,6 @@ describe('umbPhotoFolderHelper tests', function () {
 
             var result = umbPhotoFolderHelper.buildRow(images, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin);
 
-            console.log(result.images.length);
 
             expect(result.images.length).toBe(5);
 
@@ -49,7 +48,6 @@ describe('umbPhotoFolderHelper tests', function () {
 
             var result = umbPhotoFolderHelper.buildRow(images, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin);
 
-            console.log(result.images.length);
 
             expect(result.images.length).toBe(4);
             
