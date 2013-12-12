@@ -2,6 +2,7 @@
     <div class="picrow" ng-repeat="row in rows">
 
         <div class="pic"
+            ng-class="img.cssclass"
             ng-style="img.style" ng-repeat="img in row.images">
 
             <a href="#media/media/edit/{{img.id}}"
