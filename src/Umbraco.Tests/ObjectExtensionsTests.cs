@@ -12,13 +12,13 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests
 {
 	[TestFixture]
-	public class ObjectExtensionsTests : AbstractPartialTrustFixture<ObjectExtensionsTests>
+	public class ObjectExtensionsTests 
 	{
-		protected override void FixtureSetup()
-		{
-			base.FixtureSetup();
-			TestHelper.SetupLog4NetForTests();
-		}
+        [TestFixtureSetUp]
+        protected virtual void FixtureSetup()
+        {
+            TestHelper.SetupLog4NetForTests();
+        }
 
         [Test]
         public void CanParseStringToUnit()
@@ -169,7 +169,8 @@ namespace Umbraco.Tests
 	    /// <summary>
 		/// Run once before each test in derived test fixtures.
 		/// </summary>
-		public override void TestSetup()
+		[SetUp]
+		public void TestSetup()
 		{
 			savedCulture = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-GB"); // make sure the dates parse correctly
@@ -179,7 +180,8 @@ namespace Umbraco.Tests
 		/// <summary>
 		/// Run once after each test in derived test fixtures.
 		/// </summary>
-		public override void TestTearDown()
+		[TearDown]
+		public void TestTearDown()
 		{
 			Thread.CurrentThread.CurrentCulture = savedCulture;
 			return;
