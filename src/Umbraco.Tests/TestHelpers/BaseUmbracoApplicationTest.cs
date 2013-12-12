@@ -10,6 +10,7 @@ using Umbraco.Core.Publishing;
 using Umbraco.Core.Services;
 using Umbraco.Web;
 using Umbraco.Web.Models.Mapping;
+using umbraco.BusinessLogic;
 using ObjectExtensions = Umbraco.Core.ObjectExtensions;
 
 namespace Umbraco.Tests.TestHelpers
@@ -67,7 +68,12 @@ namespace Umbraco.Tests.TestHelpers
         {
             Mapper.Initialize(configuration =>
             {
-                var mappers = PluginManager.Current.FindAndCreateInstances<IMapperConfiguration>(specificAssemblies: new[] { typeof(ContentModelMapper).Assembly });
+                var mappers = PluginManager.Current.FindAndCreateInstances<IMapperConfiguration>(
+                    specificAssemblies: new[]
+                        {
+                            typeof(ContentModelMapper).Assembly,
+                            typeof(ApplicationRegistrar).Assembly
+                        });
                 foreach (var mapper in mappers)
                 {
                     mapper.ConfigureMappings(configuration, ApplicationContext);
