@@ -23,6 +23,8 @@ using Umbraco.Core.IO;
 
 namespace umbraco.presentation.preview
 {
+    //TODO : Migrate this to a new API!
+
     public class PreviewContent
     {
         // zb-00004 #29956 : refactor cookies names & handling

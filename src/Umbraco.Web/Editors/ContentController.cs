@@ -28,6 +28,8 @@ using umbraco;
 using Umbraco.Core.Models;
 using Umbraco.Core.Dynamics;
 using umbraco.BusinessLogic.Actions;
+using umbraco.cms.businesslogic.web;
+using umbraco.presentation.preview;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
@@ -303,7 +305,27 @@ namespace Umbraco.Web.Editors
                     break;
             }
 
+            UpdatePreviewContext(contentItem.PersistedContent.Id);
+
             return display;
+        }
+
+        /// <summary>
+        /// Checks if the user is currently in preview mode and if so will update the preview content for this item
+        /// </summary>
+        /// <param name="contentId"></param>
+        private void UpdatePreviewContext(int contentId)
+        {
+            var previewId = Request.GetPreviewCookieValue();
+            if (previewId.IsNullOrWhiteSpace()) return;
+            Guid id;
+            if (Guid.TryParse(previewId, out id))
+            {
+                var d = new Document(contentId);
+                var pc = new PreviewContent(UmbracoUser, id, false);
+                pc.PrepareDocument(UmbracoUser, d, true);
+                pc.SavePreviewSet();
+            }          
         }
 
         /// <summary>

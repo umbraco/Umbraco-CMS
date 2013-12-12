@@ -36,7 +36,7 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
                 return new OptionalInnerTextConfigurationElement<string>(
                     (InnerTextConfigurationElement<string>)this["authCookieName"],
                     //set the default
-                    "UMB_UCONTEXT");                
+                    Constants.Web.AuthCookieName);                
             }
         }
 

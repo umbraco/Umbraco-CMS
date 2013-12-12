@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" MasterPageFile="../masterpages/umbracoDialog.Master" CodeBehind="Preview.aspx.cs" Inherits="umbraco.presentation.dialogs.Preview" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" MasterPageFile="../masterpages/umbracoDialog.Master" Inherits="umbraco.presentation.dialogs.Preview" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <asp:Content ID="Content1" ContentPlaceHolderID="body" runat="server">

@@ -255,7 +255,8 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
                 $scope.save().then(function(data){
                       $window.open('dialogs/preview.aspx?id='+data.id,'umbpreview');  
                 });
-            }else{
+            }
+            else {
                 $window.open('dialogs/preview.aspx?id='+content.id,'umbpreview');
             }    
     };

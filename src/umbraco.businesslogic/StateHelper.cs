@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using System.Web;
 using System.Web.UI;
+using Umbraco.Core;
 
 namespace umbraco.BusinessLogic
 {
@@ -348,8 +349,8 @@ namespace umbraco.BusinessLogic
              * we currently reproduce this by configuring each cookie with a 30d expires, but does
              * that actually make sense? shouldn't some cookie have _no_ expires?
              */
-            static readonly Cookie _preview = new Cookie("UMB_PREVIEW", 30d); // was "PreviewSet"
-            static readonly Cookie _userContext = new Cookie("UMB_UCONTEXT", 30d); // was "UserContext"
+            static readonly Cookie _preview = new Cookie(Constants.Web.PreviewCookieName, 30d); // was "PreviewSet"
+            static readonly Cookie _userContext = new Cookie(Constants.Web.AuthCookieName, 30d); // was "UserContext"
             static readonly Cookie _member = new Cookie("UMB_MEMBER", 30d); // was "umbracoMember"
 
             public static Cookie Preview { get { return _preview; } }

@@ -1,4 +1,7 @@
-﻿using System.Web;
+﻿using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Web;
 using Umbraco.Core;
 
 namespace Umbraco.Web
@@ -11,7 +14,18 @@ namespace Umbraco.Web
     /// </remarks> 
     internal static class HttpCookieExtensions
     {
-        internal const string PreviewCookieName = "UMB_PREVIEW";
+        public static string GetPreviewCookieValue(this HttpRequestMessage request)
+        {
+            var cookie = request.Headers.GetCookies(Constants.Web.PreviewCookieName).FirstOrDefault();
+            if (cookie != null)
+            {
+                if (cookie[Constants.Web.PreviewCookieName] != null)
+                {
+                    return cookie[Constants.Web.PreviewCookieName].Value;
+                }
+            }
+            return null;
+        }
 
         /// <summary>
         /// Does a preview cookie exist ?
@@ -20,7 +34,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static bool HasPreviewCookie(this HttpRequestBase request)
         {
-            return request.Cookies[PreviewCookieName] != null;
+            return request.Cookies[Constants.Web.PreviewCookieName] != null;
         }
 
         /// <summary>
