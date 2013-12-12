@@ -27,12 +27,15 @@ namespace Umbraco.Web.WebApi.Filters
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             //get the query strings from the request properties
-            var queryStrings = actionContext.Request.Properties["MS_QueryNameValuePairs"] as IEnumerable<KeyValuePair<string, string>>;
-            if (queryStrings == null) return;
-            
-            var formData = new FormDataCollection(queryStrings);
+            if (actionContext.Request.Properties.ContainsKey("MS_QueryNameValuePairs"))
+            {
+                var queryStrings = actionContext.Request.Properties["MS_QueryNameValuePairs"] as IEnumerable<KeyValuePair<string, string>>;
+                if (queryStrings == null) return;
 
-            actionContext.ActionArguments[ParameterName] = formData;
+                var formData = new FormDataCollection(queryStrings);
+
+                actionContext.ActionArguments[ParameterName] = formData;    
+            }
             
             base.OnActionExecuting(actionContext);
         }
