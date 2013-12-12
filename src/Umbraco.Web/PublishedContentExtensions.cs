@@ -990,6 +990,16 @@ namespace Umbraco.Web
 		{
 			return content.Next(0);
 		}
+
+		public static IPublishedContent Next(this IPublishedContent current, Func<IPublishedContent, bool> func) {
+			IPublishedContent next = current.Next();
+			while (next != null) {
+				if (func(next)) return next;
+				next = next.Next();
+			}
+			return null;
+		}
+
 		public static IPublishedContent Next(this IPublishedContent content, int number)
 		{
             var ownersList = content.GetOwnersList();
@@ -1022,6 +1032,16 @@ namespace Umbraco.Web
 		{
 			return content.Previous(0);
 		}
+
+		public static IPublishedContent Previous(this IPublishedContent current, Func<IPublishedContent, bool> func) {
+			IPublishedContent prev = current.Previous();
+			while (prev != null) {
+				if (func(prev)) return prev;
+				prev = prev.Previous();
+			}
+			return null;
+		}
+
 		public static IPublishedContent Previous(this IPublishedContent content, int number)
 		{
             var ownersList = content.GetOwnersList();
