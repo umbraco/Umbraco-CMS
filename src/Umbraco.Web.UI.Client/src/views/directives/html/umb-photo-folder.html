@@ -1,8 +1,8 @@
-<div class="umb-photo-folder">
+<div class="umb-photo-folder" ng-style="containerStyle">
     <div class="picrow" ng-repeat="row in rows">
 
         <div class="pic"
-            ng-style="img.style" ng-repeat="img in row">
+            ng-style="img.style" ng-repeat="img in row.images">
 
             <a href="#media/media/edit/{{img.id}}"
                 ng-click="clickHandler(img, $event, false)"
@@ -13,7 +13,8 @@
                     <i class="icon large {{img.icon}}"></i>
                     {{img.name}}
                 </div>
-
+                
+                
                 <div ng-switch-default class="umb-photo" ng-style="img.thumbStyle" alt="{{img.name}}"></div>
                 
                 

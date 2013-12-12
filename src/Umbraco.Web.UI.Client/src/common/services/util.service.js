@@ -1,5 +1,267 @@
 /*Contains multiple services for various helper tasks */
 
+function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, umbRequestHelper) {
+    return {
+        /** sets the image's url - will check if it is a folder or a real image */
+        setImageUrl: function(img) {
+            //get the image property (if one exists)
+            var imageProp = imageHelper.getImagePropertyValue({ imageModel: img });
+            if (!imageProp) {
+                img.thumbnail = "none";
+            }
+            else {
+
+                //get the proxy url for big thumbnails (this ensures one is always generated)
+                var thumbnailUrl = umbRequestHelper.getApiUrl(
+                    "imagesApiBaseUrl",
+                    "GetBigThumbnail",
+                    [{ mediaId: img.id }]);
+                img.thumbnail = thumbnailUrl;
+            }
+        },
+
+        /** sets the images original size properties - will check if it is a folder and if so will just make it square */
+        setOriginalSize: function(img, maxHeight) {
+            //set to a square by default
+            img.originalWidth = maxHeight;
+            img.originalHeight = maxHeight;
+
+            var widthProp = _.find(img.properties, function(v) { return (v.alias === "umbracoWidth"); });
+            if (widthProp && widthProp.value) {
+                img.originalWidth = parseInt(widthProp.value, 10);
+                if (isNaN(img.originalWidth)) {
+                    img.originalWidth = maxHeight;
+                }
+            }
+            var heightProp = _.find(img.properties, function(v) { return (v.alias === "umbracoHeight"); });
+            if (heightProp && heightProp.value) {
+                img.originalHeight = parseInt(heightProp.value, 10);
+                if (isNaN(img.originalHeight)) {
+                    img.originalHeight = maxHeight;
+                }
+            }
+        },
+
+        /** sets the image style which get's used in the angular markup */
+        setImageStyle: function(img, width, height, rightMargin, bottomMargin) {
+            img.style = { width: width + "px", height: height + "px", "margin-right": rightMargin + "px", "margin-bottom": bottomMargin + "px" };
+            img.thumbStyle = {
+                "background-image": "url('" + img.thumbnail + "')",
+                "background-repeat": "no-repeat",
+                "background-position": "center",
+                "background-size": Math.min(width, img.originalWidth) + "px " + Math.min(height, img.originalHeight) + "px"
+            };
+        }, 
+
+        /** gets the image's scaled wdith based on the max row height */
+        getScaledWidth: function(img, maxHeight) {
+            var scaled = img.originalWidth * maxHeight / img.originalHeight;
+            return scaled;
+            //round down, we don't want it too big even by half a pixel otherwise it'll drop to the next row
+            //return Math.floor(scaled);
+        },
+
+        /** returns the target row width taking into account how many images will be in the row and removing what the margin is */
+        getTargetWidth: function(imgsPerRow, maxRowWidth, margin) {
+            //take into account the margin, we will have 1 less margin item than we have total images
+            return (maxRowWidth - ((imgsPerRow - 1) * margin));
+        },
+
+        /** 
+            This will determine the row/image height for the next collection of images which takes into account the 
+            ideal image count per row. It will check if a row can be filled with this ideal count and if not - if there
+            are additional images available to fill the row it will keep calculating until they fit.
+
+            It will return the calculated height and the number of images for the row.
+
+            targetHeight = optional;
+        */
+        getRowHeightForImages: function(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin, targetHeight) {
+
+            var idealImages = imgs.slice(0, idealImgPerRow);
+            //get the target row width without margin
+            var targetRowWidth = this.getTargetWidth(idealImages.length, maxRowWidth, margin);
+            //this gets the image with the smallest height which equals the maximum we can scale up for this image block
+            var maxScaleableHeight = this.getMaxScaleableHeight(idealImages, maxRowHeight);
+            //if the max scale height is smaller than the min display height, we'll use the min display height
+            targetHeight = targetHeight ? targetHeight : Math.max(maxScaleableHeight, minDisplayHeight);
+
+            console.log("targetHeight = " + targetHeight);
+
+            var attemptedRowHeight = this.performGetRowHeight(idealImages, targetRowWidth, minDisplayHeight, targetHeight);
+
+            if (attemptedRowHeight != null) {
+
+                //if this is smaller than the min display then we need to use the min display,
+                // which means we'll need to remove one from the row so we can scale up to fill the row
+                if (attemptedRowHeight < minDisplayHeight) {
+
+                    if (idealImages.length > 2) {
+                        //we'll generate a new targetHeight that is halfway between the max and the current and recurse, passing in a new targetHeight
+                        targetHeight += Math.floor((maxRowHeight - targetHeight) / 2);
+                        return this.getRowHeightForImages(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow - 1, margin, targetHeight);
+                    }
+                    else {
+                        //well this shouldn't happen and we don't want to end up with a row of only one so we're just gonna have to return the 
+                        //newHeight which will not actually scale to the row correctly
+                        return { height: minDisplayHeight, imgCount: idealImages.length };
+                    }
+                }
+                else {
+                    //success!
+                    return { height: attemptedRowHeight, imgCount: idealImages.length };
+                }
+            }
+
+            //we know the width will fit in a row, but we now need to figure out if we can fill 
+            // the entire row in the case that we have more images remaining than the idealImgPerRow.
+
+            if (idealImages.length === imgs.length) {
+                //we have no more remaining images to fill the space, so we'll just use the calc height
+                return { height: targetHeight, imgCount: idealImages.length };
+            }
+            if (idealImages.length === idealImgPerRow && targetHeight < maxRowHeight) {
+                //if we're already dealing with the ideal images per row and it's not quite there, we can scale up a little bit so 
+                // long as the targetHeight is currently less than the maxRowHeight. The scale up will be half-way between our current
+                // target height and the maxRowHeight
+
+                targetHeight += Math.floor((maxRowHeight - targetHeight) / 2);
+                while (targetHeight < maxRowHeight) {
+                    attemptedRowHeight = this.performGetRowHeight(idealImages, targetRowWidth, minDisplayHeight, targetHeight);
+                    if (attemptedRowHeight != null) {
+                        //success!
+                        return { height: attemptedRowHeight, imgCount: idealImages.length };
+                    }
+                }
+
+                //Ok, we couldn't actually scale it up with the ideal row count (TBH I'm not sure that this would ever happen but we'll take it into account)
+                // we'll just recurse with another image count.
+                return this.getRowHeightForImages(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow + 1, margin);
+            }
+            else {
+                //we have additional images so we'll recurse and add 1 to the idealImgPerRow until it fits
+                return this.getRowHeightForImages(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow + 1, margin);
+            }
+
+        },
+
+        performGetRowHeight: function(idealImages, targetRowWidth, minDisplayHeight, targetHeight) {
+
+            var currRowWidth = 0;
+
+            for (var i = 0; i < idealImages.length; i++) {
+                var scaledW = this.getScaledWidth(idealImages[i], targetHeight);
+                console.log("Image " + i + " scaled width = " + scaledW);
+                currRowWidth += scaledW;
+            }
+
+            if (currRowWidth > targetRowWidth) {
+                //get the new scaled height to fit
+                var newHeight = targetRowWidth * targetHeight / currRowWidth;
+
+                console.log("currRowWidth = " + currRowWidth);
+                console.log("targetRowWidth = " + targetRowWidth);
+                console.log("Scaled down new height = " + newHeight);
+                
+                return newHeight;
+            }
+
+            //if it's not successful, return false
+            return null;
+        },
+
+        /** builds an image grid row */
+        buildRow: function(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin) {
+            var currRowWidth = 0;
+            var row = { images: [] };
+
+            var imageRowHeight = this.getRowHeightForImages(imgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin);
+            var targetWidth = this.getTargetWidth(imageRowHeight.imgCount, maxRowWidth, margin);
+
+            var sizes = [];
+            for (var i = 0; i < imgs.length; i++) {
+                //get the lower width to ensure it always fits
+                var scaledWidth = Math.floor(this.getScaledWidth(imgs[i], imageRowHeight.height));
+                if (currRowWidth + scaledWidth <= targetWidth) {
+                    currRowWidth += scaledWidth;                    
+                    sizes.push({
+                        width: scaledWidth,
+                        //ensure that the height is rounded
+                        height: Math.round(imageRowHeight.height)
+                    });
+                    row.images.push(imgs[i]);
+                }
+                else {
+                    //the max width has been reached
+                    break;
+                }
+            }
+
+            //loop through the images for the row and apply the styles
+            for (var j = 0; j < row.images.length; j++) {
+                var bottomMargin = margin;
+                //make the margin 0 for the last one
+                if (j === (row.images.length - 1)) {
+                    margin = 0;
+                }
+                this.setImageStyle(row.images[j], sizes[j].width, sizes[j].height, margin, bottomMargin);
+            }
+
+            ////set the row style
+            //row.style = { "width": maxRowWidth + "px" };
+
+            console.log("ROW built");
+
+            return row;
+        },
+
+        /** Returns the maximum image scaling height for the current image collection */
+        getMaxScaleableHeight: function(imgs, maxRowHeight) {
+
+            var smallestHeight = _.min(imgs, function(item) { return item.originalHeight; }).originalHeight;
+
+            //adjust the smallestHeight if it is larger than the static max row height
+            if (smallestHeight > maxRowHeight) {
+                smallestHeight = maxRowHeight;
+            }
+            return smallestHeight;
+        },
+
+        /** Creates the image grid with calculated widths/heights for images to fill the grid nicely */
+        buildGrid: function(images, maxRowWidth, maxRowHeight, startingIndex, minDisplayHeight, idealImgPerRow, margin) {
+
+            var rows = [];
+            var imagesProcessed = 0;
+
+            //first fill in all of the original image sizes and URLs
+            for (var i = startingIndex; i < images.length; i++) {
+                this.setImageUrl(images[i]);
+                this.setOriginalSize(images[i], maxRowHeight);
+            }
+
+            while ((imagesProcessed + startingIndex) < images.length) {
+                //get the maxHeight for the current un-processed images
+                var currImgs = images.slice(imagesProcessed);
+
+                //build the row
+                var row = this.buildRow(currImgs, maxRowHeight, minDisplayHeight, maxRowWidth, idealImgPerRow, margin);
+                if (row.images.length > 0) {
+                    rows.push(row);
+                    imagesProcessed += row.images.length;
+                }
+                else {
+                    //if there was nothing processed, exit
+                    break;
+                }
+            }
+
+            return rows;
+        }
+    };
+}
+
+angular.module("umbraco.services").factory("umbPhotoFolderHelper", umbPhotoFolderHelper);
+
 /**
  * @ngdoc function
  * @name umbraco.services.umbModelMapper
