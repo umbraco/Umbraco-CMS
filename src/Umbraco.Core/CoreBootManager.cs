@@ -268,7 +268,9 @@ namespace Umbraco.Core
                 {
                     new Lazy<Type>(() => typeof (RequiredManifestValueValidator)),
                     new Lazy<Type>(() => typeof (RegexValidator)),
-                    new Lazy<Type>(() => typeof (DelimitedManifestValueValidator))
+                    new Lazy<Type>(() => typeof (DelimitedManifestValueValidator)),
+                    new Lazy<Type>(() => typeof (EmailValidator)),
+                    new Lazy<Type>(() => typeof (IntegerValidator)),
                 });
 
             //by default we'll use the standard configuration based sync
