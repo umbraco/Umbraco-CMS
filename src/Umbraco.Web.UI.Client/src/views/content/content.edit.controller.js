@@ -112,7 +112,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
 
         //If this is a child of a list view then we can't actually sync the real tree
         if (!$scope.content.isChildOfListView) {
-            navigationService.syncTree({ tree: "content", path: path.split(","), forceReload: true }).then(function (syncArgs) {
+            navigationService.syncTree({ tree: "content", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
                 $scope.currentNode = syncArgs.node;
             });
         }

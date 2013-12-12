@@ -91,31 +91,22 @@ namespace Umbraco.Web.Models.Mapping
 
         }
 
-        private static void AfterMap(IContent content, ContentItemDisplay display)
-        {
-            MapGenericCustomProperties(content, display);
-            MapTreeNodeUrl(content, display);
-        }
-
-        private static void MapTreeNodeUrl(IContent content, ContentItemDisplay display)
-        {
-            if (HttpContext.Current == null)
-            {
-                return;
-            }
-
-            var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
-            var url = urlHelper.GetUmbracoApiService<ContentTreeController>(controller => controller.GetTreeNode(display.Id.ToString(), null));
-            display.TreeNodeUrl = url;
-        }
 
         /// <summary>
         /// Maps the generic tab with custom properties for content
         /// </summary>
         /// <param name="content"></param>
         /// <param name="display"></param>
-        private static void MapGenericCustomProperties(IContent content, ContentItemDisplay display)
+        private static void AfterMap(IContent content, ContentItemDisplay display)
         {
+            //map the tree node url
+            if (HttpContext.Current != null)
+            {
+                var urlHelper = new UrlHelper(new RequestContext(new HttpContextWrapper(HttpContext.Current), new RouteData()));
+                var url = urlHelper.GetUmbracoApiService<ContentTreeController>(controller => controller.GetTreeNode(display.Id.ToString(), null));
+                display.TreeNodeUrl = url;    
+            }
+
             //fill in the template config to be passed to the template drop down.
             var templateItemConfig = new Dictionary<string, string> { { "", "Choose..." } };
             foreach (var t in content.ContentType.AllowedTemplates)

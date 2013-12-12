@@ -37,32 +37,7 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class ContentTreeController : ContentTreeControllerBase
     {
-        #region Actions
-
-        [HttpQueryStringFilter("queryStrings")]
-        public TreeNode GetTreeNode(string id, FormDataCollection queryStrings)
-        {
-            int asInt;
-            if (int.TryParse(id, out asInt) == false)
-            {
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-            }
-
-            var entity = Services.EntityService.Get(asInt, UmbracoObjectTypes.Document);
-            if (entity == null)
-            {
-                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
-            }
-
-            var node = GetContentTreeNode((UmbracoEntity) entity, entity.ParentId.ToInvariantString(), queryStrings);
-
-            //add the tree alias to the node since it is standalone (has no root for which this normally belongs)
-            node.AdditionalData["treeAlias"] = TreeAlias;
-            return node;
-        }
-
-        #endregion
-
+       
         protected override TreeNode CreateRootNode(FormDataCollection queryStrings)
         {
             var node = base.CreateRootNode(queryStrings); 
@@ -102,19 +77,8 @@ namespace Umbraco.Web.Trees
         protected override TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
-
             var entities = GetChildEntities(id);
-
-            foreach (var entity in entities)
-            {
-                var e = (UmbracoEntity)entity;
-
-                var node = GetContentTreeNode(e, id, queryStrings);
-                if (node != null)
-                {
-                    nodes.Add(node);
-                }
-            }
+            nodes.AddRange(entities.Select(entity => GetSingleTreeNode(entity, id, queryStrings)).Where(node => node != null));            
             return nodes;
         }
 
@@ -125,8 +89,10 @@ namespace Umbraco.Web.Trees
         /// <param name="parentId"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        internal TreeNode GetContentTreeNode(UmbracoEntity e, string parentId, FormDataCollection queryStrings)
+        protected override TreeNode GetSingleTreeNode(IUmbracoEntity e, string parentId, FormDataCollection queryStrings)
         {
+            var entity = (UmbracoEntity) e;
+
             var allowedUserOptions = GetAllowedUserMenuItemsForNode(e);
             if (CanUserAccessNode(e, allowedUserOptions))
             {
@@ -141,18 +107,18 @@ namespace Umbraco.Web.Trees
                     parentId,
                     queryStrings,
                     e.Name,
-                    e.ContentTypeIcon,
-                    e.HasChildren && (isContainer == false));
+                    entity.ContentTypeIcon,
+                    entity.HasChildren && (isContainer == false));
 
-                node.AdditionalData.Add("contentType", e.ContentTypeAlias);
+                node.AdditionalData.Add("contentType", entity.ContentTypeAlias);
 
                 if (isContainer)
                     node.SetContainerStyle();
 
-                if (e.IsPublished == false)
+                if (entity.IsPublished == false)
                     node.SetNotPublishedStyle();
 
-                if (e.HasPendingChanges)
+                if (entity.HasPendingChanges)
                     node.SetHasUnpublishedVersionStyle();
 
                 if (Access.IsProtected(e.Id, e.Path))

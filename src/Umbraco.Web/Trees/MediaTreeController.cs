@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
@@ -59,35 +60,42 @@ namespace Umbraco.Web.Trees
 
         protected override TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings)
         {
-            var entities = GetChildEntities(id);
             var nodes = new TreeNodeCollection();
-
-            foreach (var entity in entities)
-            {
-                var e = (UmbracoEntity)entity;
-
-                //Special check to see if it ia a container, if so then we'll hide children.
-                var isContainer = entity.AdditionalData.ContainsKey("IsContainer")
-                    && entity.AdditionalData["IsContainer"] is bool
-                    && (bool)entity.AdditionalData["IsContainer"];
-                
-                var node = CreateTreeNode(
-                    e.Id.ToInvariantString(), 
-                    id, 
-                    queryStrings, 
-                    e.Name, 
-                    e.ContentTypeIcon,
-                    e.HasChildren && (isContainer == false));
-
-                node.AdditionalData.Add("contentType", e.ContentTypeAlias);
-
-                if (isContainer)
-                    node.SetContainerStyle();
-
-                nodes.Add(node);
-            }
+            var entities = GetChildEntities(id);
+            nodes.AddRange(entities.Select(entity => GetSingleTreeNode(entity, id, queryStrings)).Where(node => node != null));
             return nodes;
+        }
 
+        /// <summary>
+        /// Creates a tree node for a content item based on an UmbracoEntity
+        /// </summary>
+        /// <param name="e"></param>
+        /// <param name="parentId"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        protected override TreeNode GetSingleTreeNode(IUmbracoEntity e, string parentId, FormDataCollection queryStrings)
+        {
+            var entity = (UmbracoEntity)e;
+
+            //Special check to see if it ia a container, if so then we'll hide children.
+            var isContainer = entity.AdditionalData.ContainsKey("IsContainer")
+                && entity.AdditionalData["IsContainer"] is bool
+                && (bool)entity.AdditionalData["IsContainer"];
+
+            var node = CreateTreeNode(
+                e.Id.ToInvariantString(),
+                parentId,
+                queryStrings,
+                e.Name,
+                entity.ContentTypeIcon,
+                entity.HasChildren && (isContainer == false));
+
+            node.AdditionalData.Add("contentType", entity.ContentTypeAlias);
+
+            if (isContainer)
+                node.SetContainerStyle();
+
+            return node;
         }
 
         protected override MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings)

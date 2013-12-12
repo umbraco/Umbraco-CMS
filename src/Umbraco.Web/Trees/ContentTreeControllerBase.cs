@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Net.Http.Formatting;
+using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Web.Models.Trees;
+using Umbraco.Web.WebApi.Filters;
 using umbraco;
 using umbraco.BusinessLogic.Actions;
 using System.Globalization;
@@ -14,6 +18,41 @@ namespace Umbraco.Web.Trees
 {
     public abstract class ContentTreeControllerBase : TreeController
     {
+
+        #region Actions
+
+        /// <summary>
+        /// Gets an individual tree node
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="queryStrings"></param>
+        /// <returns></returns>
+        [HttpQueryStringFilter("queryStrings")]
+        public TreeNode GetTreeNode(string id, FormDataCollection queryStrings)
+        {
+            int asInt;
+            if (int.TryParse(id, out asInt) == false)
+            {
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            }
+
+            var entity = Services.EntityService.Get(asInt, UmbracoObjectType);
+            if (entity == null)
+            {
+                throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.NotFound));
+            }
+
+            var node = GetSingleTreeNode(entity, entity.ParentId.ToInvariantString(), queryStrings);
+
+            //add the tree alias to the node since it is standalone (has no root for which this normally belongs)
+            node.AdditionalData["treeAlias"] = TreeAlias;
+            return node;
+        }
+
+        #endregion
+
+        protected abstract TreeNode GetSingleTreeNode(IUmbracoEntity e, string parentId, FormDataCollection queryStrings);
+
         /// <summary>
         /// Returns the 
         /// </summary>

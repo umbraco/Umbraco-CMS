@@ -18,7 +18,7 @@ namespace Umbraco.Web.Models.ContentEditing
     /// A model representing a content item to be displayed in the back office
     /// </summary>    
     [DataContract(Name = "content", Namespace = "")]
-    public class ContentItemDisplay : ContentItemDisplayBase<ContentPropertyDisplay, IContent>
+    public class ContentItemDisplay : ListViewAwareContentItemDisplayBase<ContentPropertyDisplay, IContent>
     {
         [DataMember(Name = "publishDate")]
         public DateTime? PublishDate { get; set; }
@@ -43,12 +43,6 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </remarks>
         [DataMember(Name = "allowedActions")]
         public IEnumerable<char> AllowedActions { get; set; }
-
-        [DataMember(Name = "isChildOfListView")]
-        public bool IsChildOfListView { get; set; }
-
-        [DataMember(Name = "treeNodeUrl")]
-        public string TreeNodeUrl { get; set; }
 
     }
 }

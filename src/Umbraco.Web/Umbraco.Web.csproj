@@ -302,6 +302,7 @@
     <Compile Include="Editors\EntityControllerActionSelector.cs" />
     <Compile Include="Editors\ImagesController.cs" />
     <Compile Include="Models\ContentEditing\EntityTypeSearchResult.cs" />
+    <Compile Include="Models\ContentEditing\ListViewAwareContentItemDisplayBase.cs" />
     <Compile Include="Models\IRenderModel.cs" />
     <Compile Include="Models\RenderModelOfTContent.cs" />
     <Compile Include="Mvc\MinifyJavaScriptResultAttribute.cs" />

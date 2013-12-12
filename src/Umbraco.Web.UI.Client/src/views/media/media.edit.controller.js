@@ -6,12 +6,32 @@
  * @description
  * The controller for the media editor
  */
-function mediaEditController($scope, $routeParams, appState, mediaResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService, formHelper, umbModelMapper, editorState) {
+function mediaEditController($scope, $routeParams, appState, mediaResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService, formHelper, umbModelMapper, editorState, umbRequestHelper, $http) {
 
     //setup scope vars
     $scope.nav = navigationService;
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.currentNode = null; //the editors affiliated node
+
+    /** Syncs the content item to it's tree node - this occurs on first load and after saving */
+    function syncTreeNode(content, path, initialLoad) {
+
+        //If this is a child of a list view then we can't actually sync the real tree
+        if (!$scope.content.isChildOfListView) {
+            navigationService.syncTree({ tree: "media", path: path.split(","), forceReload: initialLoad !== true }).then(function (syncArgs) {
+                $scope.currentNode = syncArgs.node;
+            });
+        }
+        else if (initialLoad === true) {
+            //if this is a child of a list view and it's the initial load of the editor, we need to get the tree node 
+            // from the server so that we can load in the actions menu.
+            umbRequestHelper.resourcePromise(
+                $http.get(content.treeNodeUrl),
+                'Failed to retreive data for child node ' + content.id).then(function (node) {
+                    $scope.currentNode = node;
+                });
+        }
+    }
 
     if ($routeParams.create) {
 
@@ -37,9 +57,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
                 // if there are any and then clear them so the collection no longer persists them.
                 serverValidationManager.executeAndClearAllSubscriptions();
 
-                navigationService.syncTree({ tree: "media", path: data.path }).then(function (syncArgs) {
-                    $scope.currentNode = syncArgs.node;
-                });
+                syncTreeNode($scope.content, data.path, true);
                 
             });
     }
@@ -64,9 +82,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
                     editorState.set($scope.content);
                     $scope.busy = false;
 
-                    navigationService.syncTree({ tree: "media", path: data.path, forceReload: true }).then(function (syncArgs) {
-                        $scope.currentNode = syncArgs.node;
-                    });
+                    syncTreeNode($scope.content, data.path);
 
                 }, function(err) {
 
