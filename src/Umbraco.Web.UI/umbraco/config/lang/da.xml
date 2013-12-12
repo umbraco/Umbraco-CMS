@@ -84,7 +84,10 @@
     <key alias="alternativeUrls">Alternative links</key>
     <key alias="clickToEdit">Klik på musen for at redigere dette punkt</key>
     <key alias="createBy">Oprettet af</key>
+    <key alias="createByDesc" version="7.0">Oprindelig forfatter</key>
+    <key alias="updatedBy" version="7.0">Opdateret af</key>
     <key alias="createDate">Oprettet den</key>
+    <key alias="createDateDesc" version="7.0">tidspunkt for oprettelse</key>
     <key alias="documentType">Dokumenttype</key>
     <key alias="editing">Redigerer</key>
     <key alias="expireDate">Nedtagningsdato</key>
@@ -110,11 +113,19 @@
     <key alias="type">Type</key>
     <key alias="unPublish">Fortryd udgivelse</key>
     <key alias="updateDate">Sidst redigeret</key>
+    <key alias="updateDateDesc" version="7.0">Tidspunkt for seneste redigering</key>
     <key alias="uploadClear">Fjern fil</key>
     <key alias="urls">Link til dokument</key>
 
     <key alias="childItems" version="7.0">Undersider</key>
+    <key alias="target" version="7.0">Åben i vindue</key>
   </area>
+
+  <area alias="media">
+    <key alias="clickToUpload">Klik for at uploade</key>
+    <key alias="dropFilesHere">Slip filerne her...</key>
+  </area>
+  
   <area alias="create">
     <key alias="chooseNode">Hvor ønsker du at oprette den nye %0%</key>
     <key alias="createUnder">Opret under</key>
