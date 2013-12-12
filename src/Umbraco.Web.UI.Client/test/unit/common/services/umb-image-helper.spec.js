@@ -23,16 +23,5 @@ describe('image helper tests', function () {
             expect(umbImageHelper.detectIfImageByExtension(doc1)).toBe(false);
         });
         
-        it('gets a thumbnail path', function () {
-            
-            var image1 = "a-jpeg.jpg";
-            var image2 = "a-png.png";
-            var image3 = "thisisagif.blah.gif";
-
-            expect(umbImageHelper.getThumbnailFromPath(image1)).toBe("a-jpeg_big-thumb.jpg");
-            expect(umbImageHelper.getThumbnailFromPath(image2)).toBe("a-png_big-thumb.jpg");
-            expect(umbImageHelper.getThumbnailFromPath(image3)).toBe("thisisagif.blah_big-thumb.jpg");
-        });
-        
     });
 });
