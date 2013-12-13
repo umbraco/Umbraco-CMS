@@ -14,6 +14,9 @@ namespace Umbraco.Core.Strings
         // note: you have 32 bits at your disposal
         // 0xffffffff
 
+
+        // masks
+
         /// <summary>
         /// Flag mask for casing.
         /// </summary>
@@ -27,12 +30,18 @@ namespace Umbraco.Core.Strings
         /// <summary>
         /// Flag mask for role.
         /// </summary>
-        RoleMask = 0x030000, // 0xff0000 - 8 possible values
+        RoleMask = 0x070000, // 0xff0000 - 8 possible values
+
+
+        // no value
 
         /// <summary>
         /// No value.
         /// </summary>
         None = 0x00,
+
+
+        // casing values
 
         /// <summary>
         /// Pascal casing eg "PascalCase".
@@ -66,9 +75,13 @@ namespace Umbraco.Core.Strings
         /// and is pascal otherwise.</remarks>
         UmbracoCase = 0x20,
 
+
+        // encoding values
+
         /// <summary>
         /// Unicode encoding.
         /// </summary>
+        [Obsolete("Use .Utf8 instead.")]
         Unicode = 0x0100,
 
         /// <summary>
@@ -81,14 +94,22 @@ namespace Umbraco.Core.Strings
         /// </summary>
         Ascii = 0x0400,
 
+
+        // role values
+
         /// <summary>
         ///  Url role.
         /// </summary>
-        Url = 0x010000,
+        UrlSegment = 0x010000,
 
         /// <summary>
         /// Alias role.
         /// </summary>
-        Alias = 0x020000
+        Alias = 0x020000,
+
+        /// <summary>
+        /// FileName role.
+        /// </summary>
+        FileName = 0x040000
     }
 }

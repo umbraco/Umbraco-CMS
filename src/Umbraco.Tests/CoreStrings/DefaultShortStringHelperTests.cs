@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -29,10 +33,39 @@ namespace Umbraco.Tests.CoreStrings
             // so there still may be utf8 chars even though you want ascii
 
             _helper = new DefaultShortStringHelper()
-                .WithConfig(CleanStringType.Url, StripQuotes, allowLeadingDigits: true)
-                .WithConfig(new CultureInfo("fr-FR"), CleanStringType.Url, FilterFrenchElisions, allowLeadingDigits: true)
-                .WithConfig(CleanStringType.Alias, StripQuotes)
-                .WithConfig(new CultureInfo("fr-FR"), CleanStringType.Alias, WhiteQuotes);
+                .WithConfig(CleanStringType.FileName, new DefaultShortStringHelper.Config
+                {
+                    //PreFilter = ClearFileChars, // done in IsTerm
+                    IsTerm = (c, leading) => (char.IsLetterOrDigit(c) || c == '_') && DefaultShortStringHelper.IsValidFileNameChar(c),
+                    StringType = CleanStringType.LowerCase | CleanStringType.Ascii,
+                    Separator = '-'
+                })
+                .WithConfig(CleanStringType.UrlSegment, new DefaultShortStringHelper.Config
+                {
+                    PreFilter = StripQuotes,
+                    IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
+                    StringType = CleanStringType.LowerCase | CleanStringType.Ascii,
+                    Separator = '-'
+                })
+                .WithConfig(new CultureInfo("fr-FR"), CleanStringType.UrlSegment, new DefaultShortStringHelper.Config
+                {
+                    PreFilter = FilterFrenchElisions,
+                    IsTerm = (c, leading) => leading ? char.IsLetter(c) : (char.IsLetterOrDigit(c) || c == '_'),
+                    StringType = CleanStringType.LowerCase | CleanStringType.Ascii,
+                    Separator = '-'
+                })
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    PreFilter = StripQuotes,
+                    IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c),
+                    StringType = CleanStringType.UmbracoCase | CleanStringType.Ascii
+                })
+                .WithConfig(new CultureInfo("fr-FR"), CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    PreFilter = WhiteQuotes,
+                    IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c),
+                    StringType = CleanStringType.UmbracoCase | CleanStringType.Ascii
+                });
 
             ShortStringHelperResolver.Reset();
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(_helper);
@@ -63,6 +96,333 @@ namespace Umbraco.Tests.CoreStrings
         {
             s = s.ReplaceMany(new Dictionary<string, string> { { "'", " " }, { "\u8217", " " } });
             return s;
+        }
+
+        [Test]
+        public void CleanStringUnderscoreInTerm()
+        {
+            var helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    // underscore is accepted within terms
+                    IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    Separator = '*'
+                });
+            Assert.AreEqual("foo_bar*nil", helper.CleanString("foo_bar nil", CleanStringType.Alias));
+
+            helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    // underscore is not accepted within terms
+                    IsTerm = (c, leading) => char.IsLetterOrDigit(c),
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    Separator = '*'
+                });
+            Assert.AreEqual("foo*bar*nil", helper.CleanString("foo_bar nil", CleanStringType.Alias));
+        }
+
+        [Test]
+        public void CleanStringLeadingChars()
+        {
+            var helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    // letters and digits are valid leading chars
+                    IsTerm = (c, leading) => char.IsLetterOrDigit(c),
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    Separator = '*'
+                });
+            Assert.AreEqual("0123foo*bar*nil", helper.CleanString("0123foo_bar nil", CleanStringType.Alias));
+
+            helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    // only letters are valid leading chars
+                    IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c),
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    Separator = '*'
+                });
+            Assert.AreEqual("foo*bar*nil", helper.CleanString("0123foo_bar nil", CleanStringType.Alias));
+            Assert.AreEqual("foo*bar*nil", helper.CleanString("0123 foo_bar nil", CleanStringType.Alias));
+        }
+
+        [Test]
+        public void CleanStringTermOnUpper()
+        {
+            var helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    // uppercase letter means new term
+                    BreakTermsOnUpper = true,
+                    Separator = '*'
+                });
+            Assert.AreEqual("foo*Bar", helper.CleanString("fooBar", CleanStringType.Alias));
+
+            helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    // uppercase letter is part of term
+                    BreakTermsOnUpper = false,
+                    Separator = '*'
+                });
+            Assert.AreEqual("fooBar", helper.CleanString("fooBar", CleanStringType.Alias));
+        }
+
+        [Test]
+        public void CleanStringAcronymOnNonUpper()
+        {
+            var helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    // non-uppercase letter means cut acronym
+                    CutAcronymOnNonUpper = true,
+                    Separator = '*'
+                });
+            Assert.AreEqual("foo*BAR*Rnil", helper.CleanString("foo BARRnil", CleanStringType.Alias));
+            Assert.AreEqual("foo*BA*Rnil", helper.CleanString("foo BARnil", CleanStringType.Alias));
+            Assert.AreEqual("foo*BAnil", helper.CleanString("foo BAnil", CleanStringType.Alias));
+            Assert.AreEqual("foo*Bnil", helper.CleanString("foo Bnil", CleanStringType.Alias));
+
+            helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    // non-uppercase letter means word
+                    CutAcronymOnNonUpper = false,
+                    Separator = '*'
+                });
+            Assert.AreEqual("foo*BARRnil", helper.CleanString("foo BARRnil", CleanStringType.Alias));
+            Assert.AreEqual("foo*BARnil", helper.CleanString("foo BARnil", CleanStringType.Alias));
+            Assert.AreEqual("foo*BAnil", helper.CleanString("foo BAnil", CleanStringType.Alias));
+            Assert.AreEqual("foo*Bnil", helper.CleanString("foo Bnil", CleanStringType.Alias));
+        }
+
+        [Test]
+        public void CleanStringGreedyAcronyms()
+        {
+            var helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    CutAcronymOnNonUpper = true,
+                    GreedyAcronyms = true,
+                    Separator = '*'
+                });
+            Assert.AreEqual("foo*BARR*nil", helper.CleanString("foo BARRnil", CleanStringType.Alias));
+            Assert.AreEqual("foo*BAR*nil", helper.CleanString("foo BARnil", CleanStringType.Alias));
+            Assert.AreEqual("foo*BA*nil", helper.CleanString("foo BAnil", CleanStringType.Alias));
+            Assert.AreEqual("foo*Bnil", helper.CleanString("foo Bnil", CleanStringType.Alias));
+
+            helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    CutAcronymOnNonUpper = true,
+                    GreedyAcronyms = false,
+                    Separator = '*'
+                });
+            Assert.AreEqual("foo*BAR*Rnil", helper.CleanString("foo BARRnil", CleanStringType.Alias));
+            Assert.AreEqual("foo*BA*Rnil", helper.CleanString("foo BARnil", CleanStringType.Alias));
+            Assert.AreEqual("foo*BAnil", helper.CleanString("foo BAnil", CleanStringType.Alias));
+            Assert.AreEqual("foo*Bnil", helper.CleanString("foo Bnil", CleanStringType.Alias));
+        }
+
+        [Test]
+        public void CleanStringWhiteSpace()
+        {
+            var helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    Separator = '*'
+                });
+            Assert.AreEqual("foo", helper.CleanString("   foo   ", CleanStringType.Alias));
+            Assert.AreEqual("foo*bar", helper.CleanString("   foo   bar   ", CleanStringType.Alias));
+        }
+
+        [Test]
+        public void CleanStringSeparator()
+        {
+            var helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    Separator = '*'
+                });
+            Assert.AreEqual("foo*bar", helper.CleanString("foo bar", CleanStringType.Alias));
+
+            helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    Separator = ' '
+                });
+            Assert.AreEqual("foo bar", helper.CleanString("foo bar", CleanStringType.Alias));
+
+            helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged
+                });
+            Assert.AreEqual("foobar", helper.CleanString("foo bar", CleanStringType.Alias));
+
+            helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    Separator = '文'
+                });
+            Assert.AreEqual("foo文bar", helper.CleanString("foo bar", CleanStringType.Alias));
+        }
+
+        [Test]
+        public void CleanStringSymbols()
+        {
+            var helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    Separator = '*'
+                });
+            Assert.AreEqual("house*2", helper.CleanString("house (2)", CleanStringType.Alias));
+            
+            // FIXME but for a filename we want to keep them!
+            // FIXME and what about a url?
+        }
+
+        [Test]
+        public void Utf8Surrogates()
+        {
+            // Unicode values between 0x10000 and 0x10FFF are represented by two 16-bit "surrogate" characters
+            const string str = "a\U00010F00z\uA74Ft";
+            Assert.AreEqual(6, str.Length);
+            Assert.IsTrue(char.IsSurrogate(str[1]));
+            Assert.IsTrue(char.IsHighSurrogate(str[1]));
+            Assert.IsTrue(char.IsSurrogate(str[2]));
+            Assert.IsTrue(char.IsLowSurrogate(str[2]));
+            Assert.AreEqual('z', str[3]);
+            Assert.IsFalse(char.IsSurrogate(str[4]));
+            Assert.AreEqual('\uA74F', str[4]);
+            Assert.AreEqual('t', str[5]);
+
+            Assert.AreEqual("z", str.Substring(3, 1));
+            Assert.AreEqual("\U00010F00", str.Substring(1, 2));
+
+            var bytes = Encoding.UTF8.GetBytes(str);
+            Assert.AreEqual(10, bytes.Length);
+            Assert.AreEqual('a', bytes[0]);
+            // then next string element is two chars (surrogate pair) or 4 bytes, 21 bits of code point
+            Assert.AreEqual('z', bytes[5]);
+            // then next string element is one char and 3 bytes, 16 bits of code point
+            Assert.AreEqual('t', bytes[9]);
+            //foreach (var b in bytes)
+            //    Console.WriteLine("{0:X}", b);
+
+            Console.WriteLine("\U00010B70");
+        }
+
+        [Test]
+        public void Utf8ToAsciiConverter()
+        {
+            const string str = "a\U00010F00z\uA74Ftéô";
+            var output = Core.Strings.Utf8ToAsciiConverter.ToAsciiString(str);
+            Assert.AreEqual("a?zooteo", output);
+        }
+
+        [Test]
+        public void CleanStringEncoding()
+        {
+            var helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    Separator = '*'
+                });
+            Assert.AreEqual("中文测试", helper.CleanString("中文测试", CleanStringType.Alias));
+            Assert.AreEqual("léger*中文测试*ZÔRG", helper.CleanString("léger 中文测试 ZÔRG", CleanStringType.Alias));
+
+            helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    StringType = CleanStringType.Ascii | CleanStringType.Unchanged,
+                    Separator = '*'
+                });
+            Assert.AreEqual("", helper.CleanString("中文测试", CleanStringType.Alias));
+            Assert.AreEqual("leger*ZORG", helper.CleanString("léger 中文测试 ZÔRG", CleanStringType.Alias));
+        }
+
+        [Test]
+        public void CleanStringDefaultConfig()
+        {
+            var helper = new DefaultShortStringHelper().WithDefaultConfig();
+
+            const string input = "0123 中文测试 中文测试 léger ZÔRG (2) a?? *x";
+
+            var alias = helper.CleanStringForSafeAlias(input);
+            var filename = helper.CleanStringForSafeFileName(input);
+            var segment = helper.CleanStringForUrlSegment(input);
+
+            // umbraco-cased ascii alias, must begin with a proper letter
+            Assert.AreEqual("legerZORG2AX", alias, "alias");
+
+            // lower-cased, utf8 filename, removing illegal filename chars, using dash-separator
+            Assert.AreEqual("0123-中文测试-中文测试-léger-zôrg-2-a-x", filename, "filename");
+
+            // lower-cased, utf8 url segment, only letters and digits, using dash-separator
+            Assert.AreEqual("0123-中文测试-中文测试-léger-zôrg-2-a-x", segment, "segment");
+        }
+
+        [Test]
+        public void CleanStringCasing()
+        {
+            var helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
+                {
+                    StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
+                    Separator = ' '
+                });
+
+            // BBB is an acronym
+            // E is a word (too short to be an acronym)
+            // FF is an acronym
+
+            // FIXME "C" can't be an acronym
+            // FIXME "DBXreview" = acronym?!
+
+            Assert.AreEqual("aaa BBB CCc Ddd E FF", helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias)); // unchanged
+            Assert.AreEqual("aaa Bbb Ccc Ddd E FF", helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias | CleanStringType.CamelCase));
+            Assert.AreEqual("Aaa Bbb Ccc Ddd E FF", helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias | CleanStringType.PascalCase));
+            Assert.AreEqual("aaa bbb ccc ddd e ff", helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias | CleanStringType.LowerCase));
+            Assert.AreEqual("AAA BBB CCC DDD E FF", helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias | CleanStringType.UpperCase));
+            Assert.AreEqual("aaa BBB CCc Ddd E FF", helper.CleanString("aaa BBB CCc Ddd E FF", CleanStringType.Alias | CleanStringType.UmbracoCase));
+
+            // MS rules & guidelines:
+            // - Do capitalize both characters of two-character acronyms, except the first word of a camel-cased identifier.
+            //     eg "DBRate" (pascal) or "ioHelper" (camel) - "SpecialDBRate" (pascal) or "specialIOHelper" (camel)
+            // - Do capitalize only the first character of acronyms with three or more characters, except the first word of a camel-cased identifier.
+            //     eg "XmlWriter (pascal) or "htmlReader" (camel) - "SpecialXmlWriter" (pascal) or "specialHtmlReader" (camel)
+            // - Do not capitalize any of the characters of any acronyms, whatever their length, at the beginning of a camel-cased identifier.
+            //     eg "xmlWriter" or "dbWriter" (camel)
+
+            Assert.AreEqual("aaa BB Ccc", helper.CleanString("aaa BB ccc", CleanStringType.Alias | CleanStringType.CamelCase));
+            Assert.AreEqual("aa Bb Ccc", helper.CleanString("AA bb ccc", CleanStringType.Alias | CleanStringType.CamelCase));
+            Assert.AreEqual("aaa Bb Ccc", helper.CleanString("AAA bb ccc", CleanStringType.Alias | CleanStringType.CamelCase));
+            Assert.AreEqual("db Rate", helper.CleanString("DB rate", CleanStringType.Alias | CleanStringType.CamelCase));
+            Assert.AreEqual("special DB Rate", helper.CleanString("special DB rate", CleanStringType.Alias | CleanStringType.CamelCase));
+            Assert.AreEqual("xml Writer", helper.CleanString("XML writer", CleanStringType.Alias | CleanStringType.CamelCase));
+            Assert.AreEqual("special Xml Writer", helper.CleanString("special XML writer", CleanStringType.Alias | CleanStringType.CamelCase));
+
+            Assert.AreEqual("Aaa BB Ccc", helper.CleanString("aaa BB ccc", CleanStringType.Alias | CleanStringType.PascalCase));
+            Assert.AreEqual("AA Bb Ccc", helper.CleanString("AA bb ccc", CleanStringType.Alias | CleanStringType.PascalCase));
+            Assert.AreEqual("Aaa Bb Ccc", helper.CleanString("AAA bb ccc", CleanStringType.Alias | CleanStringType.PascalCase));
+            Assert.AreEqual("DB Rate", helper.CleanString("DB rate", CleanStringType.Alias | CleanStringType.PascalCase));
+            Assert.AreEqual("Special DB Rate", helper.CleanString("special DB rate", CleanStringType.Alias | CleanStringType.PascalCase));
+            Assert.AreEqual("Xml Writer", helper.CleanString("XML writer", CleanStringType.Alias | CleanStringType.PascalCase));
+            Assert.AreEqual("Special Xml Writer", helper.CleanString("special XML writer", CleanStringType.Alias | CleanStringType.PascalCase));
         }
 
         #region Cases
@@ -104,29 +464,29 @@ namespace Umbraco.Tests.CoreStrings
             Assert.AreEqual(expected, output);
         }
 
-        #region Cases
-        [TestCase("This is my_little_house so cute.", "thisIsMyLittleHouseSoCute", false)]
-        [TestCase("This is my_little_house so cute.", "thisIsMy_little_houseSoCute", true)]
-        [TestCase("This is my_Little_House so cute.", "thisIsMyLittleHouseSoCute", false)]
-        [TestCase("This is my_Little_House so cute.", "thisIsMy_Little_HouseSoCute", true)]
-        [TestCase("An UPPER_CASE_TEST to check", "anUpperCaseTestToCheck", false)]
-        [TestCase("An UPPER_CASE_TEST to check", "anUpper_case_testToCheck", true)]
-        [TestCase("Trailing_", "trailing", false)]
-        [TestCase("Trailing_", "trailing_", true)]
-        [TestCase("_Leading", "leading", false)]
-        [TestCase("_Leading", "leading", true)]
-        [TestCase("Repeat___Repeat", "repeatRepeat", false)]
-        [TestCase("Repeat___Repeat", "repeat___Repeat", true)]
-        [TestCase("Repeat___repeat", "repeatRepeat", false)]
-        [TestCase("Repeat___repeat", "repeat___repeat", true)]
-        #endregion
-        public void CleanStringWithUnderscore(string input, string expected, bool allowUnderscoreInTerm)
-        {
-            var helper = new DefaultShortStringHelper()
-                .WithConfig(allowUnderscoreInTerm: allowUnderscoreInTerm);
-            var output = helper.CleanString(input, CleanStringType.Alias | CleanStringType.Ascii | CleanStringType.CamelCase);
-            Assert.AreEqual(expected, output);
-        }
+        //#region Cases
+        //[TestCase("This is my_little_house so cute.", "thisIsMyLittleHouseSoCute", false)]
+        //[TestCase("This is my_little_house so cute.", "thisIsMy_little_houseSoCute", true)]
+        //[TestCase("This is my_Little_House so cute.", "thisIsMyLittleHouseSoCute", false)]
+        //[TestCase("This is my_Little_House so cute.", "thisIsMy_Little_HouseSoCute", true)]
+        //[TestCase("An UPPER_CASE_TEST to check", "anUpperCaseTestToCheck", false)]
+        //[TestCase("An UPPER_CASE_TEST to check", "anUpper_case_testToCheck", true)]
+        //[TestCase("Trailing_", "trailing", false)]
+        //[TestCase("Trailing_", "trailing_", true)]
+        //[TestCase("_Leading", "leading", false)]
+        //[TestCase("_Leading", "leading", true)]
+        //[TestCase("Repeat___Repeat", "repeatRepeat", false)]
+        //[TestCase("Repeat___Repeat", "repeat___Repeat", true)]
+        //[TestCase("Repeat___repeat", "repeatRepeat", false)]
+        //[TestCase("Repeat___repeat", "repeat___repeat", true)]
+        //#endregion
+        //public void CleanStringWithUnderscore(string input, string expected, bool allowUnderscoreInTerm)
+        //{
+        //    var helper = new DefaultShortStringHelper()
+        //        .WithConfig(allowUnderscoreInTerm: allowUnderscoreInTerm);
+        //    var output = helper.CleanString(input, CleanStringType.Alias | CleanStringType.Ascii | CleanStringType.CamelCase);
+        //    Assert.AreEqual(expected, output);
+        //}
 
         #region Cases
         [TestCase("Home Page", "home-page")]
@@ -137,7 +497,6 @@ namespace Umbraco.Tests.CoreStrings
         [TestCase("汉#字*/漢?字", "")]
         [TestCase("Réalösk fix bran#lo'sk", "realosk-fix-bran-losk")]
         [TestCase("200 ways to be happy", "200-ways-to-be-happy")]
-        [TestCase("aBCdEfGhIJK", "a-b-cd-ef-gh-ijk")]
         #endregion
         public void CleanStringForUrlSegment(string input, string expected)
         {
@@ -166,173 +525,19 @@ namespace Umbraco.Tests.CoreStrings
         }
 
         #region Cases
-        [TestCase("foo", "foo")]
-        [TestCase("    foo    ", "foo")]
-        [TestCase("Foo", "foo")]
-        [TestCase("FoO", "foO")]
-        [TestCase("FoO bar", "foOBar")]
-        [TestCase("FoO bar NIL", "foOBarNil")]
-        [TestCase("FoO 33bar 22NIL", "foO33bar22Nil")]
-        [TestCase("FoO 33bar 22NI", "foO33bar22NI")]
-        [TestCase("0foo", "foo")]
-        [TestCase("2foo bar", "fooBar")]
-        [TestCase("9FOO", "foo")]
-        [TestCase("foo-BAR", "fooBar")]
-        [TestCase("foo-BA-dang", "fooBADang")]
-        [TestCase("foo_BAR", "fooBar")]
-        [TestCase("foo'BAR", "fooBar")]
-        [TestCase("sauté dans l'espace", "sautéDansLEspace")]
-        [TestCase("foo\"\"bar", "fooBar")]
-        [TestCase("-foo-", "foo")]
-        [TestCase("_foo_", "foo")]
-        [TestCase("spécial", "spécial")]
-        [TestCase("brô dëk ", "brôDëk")]
-        [TestCase("1235brô dëk ", "brôDëk")]
-        [TestCase("汉#字*/漢?字", "汉字漢字")]
-        [TestCase("aa DB cd EFG X KLMN OP qrst", "aaDBCdEfgXKlmnOPQrst")]
-        [TestCase("AA db cd EFG X KLMN OP qrst", "aaDbCdEfgXKlmnOPQrst")]
-        [TestCase("AAA db cd EFG X KLMN OP qrst", "aaaDbCdEfgXKlmnOPQrst")]
-        [TestCase("quelle élévation à partir", "quelleÉlévationÀPartir")]
-        #endregion
-        public void CleanUtf8String(string input, string expected)
-        {
-            input = _helper.Recode(input, CleanStringType.Utf8);
-            var output = _helper.CleanUtf8String(input);
-            Assert.AreEqual(expected, output);
-        }
-
-        #region Cases
-        [TestCase("sauté dans l'espace", "saute-dans-espace", "fr-FR", CleanStringType.Url | CleanStringType.Ascii | CleanStringType.LowerCase)]
-        [TestCase("sauté dans l'espace", "sauté-dans-espace", "fr-FR", CleanStringType.Url | CleanStringType.Utf8 | CleanStringType.LowerCase)]
+        [TestCase("sauté dans l'espace", "saute-dans-espace", "fr-FR", CleanStringType.UrlSegment | CleanStringType.Ascii | CleanStringType.LowerCase)]
+        [TestCase("sauté dans l'espace", "sauté-dans-espace", "fr-FR", CleanStringType.UrlSegment | CleanStringType.Utf8 | CleanStringType.LowerCase)]
         [TestCase("sauté dans l'espace", "SauteDansLEspace", "fr-FR", CleanStringType.Alias | CleanStringType.Ascii | CleanStringType.PascalCase)]
-        [TestCase("he doesn't want", "he-doesnt-want", null, CleanStringType.Url | CleanStringType.Ascii | CleanStringType.LowerCase)]
+        [TestCase("he doesn't want", "he-doesnt-want", null, CleanStringType.UrlSegment | CleanStringType.Ascii | CleanStringType.LowerCase)]
         [TestCase("he doesn't want", "heDoesntWant", null, CleanStringType.Alias | CleanStringType.Ascii | CleanStringType.CamelCase)]
         #endregion
         public void CleanStringWithTypeAndCulture(string input, string expected, string culture, CleanStringType stringType)
         {
             var cinfo = culture == null ? CultureInfo.InvariantCulture : new CultureInfo(culture);
-            var separator = (stringType & CleanStringType.Url) == CleanStringType.Url ? '-' : char.MinValue;
-            var output = _helper.CleanString(input, stringType, separator, cinfo);
-            Assert.AreEqual(expected, output);
-        }
 
-        #region Cases
-        [TestCase("foo", "foo")]
-        [TestCase("    foo    ", "foo")]
-        [TestCase("Foo", "foo")]
-        [TestCase("FoO", "foO")]
-        [TestCase("FoO bar", "foOBar")]
-        [TestCase("FoO bar NIL", "foOBarNil")]
-        [TestCase("FoO 33bar 22NIL", "foO33bar22Nil")]
-        [TestCase("FoO 33bar 22NI", "foO33bar22NI")]
-        [TestCase("0foo", "foo")]
-        [TestCase("2foo bar", "fooBar")]
-        [TestCase("9FOO", "foo")]
-        [TestCase("foo-BAR", "fooBar")]
-        [TestCase("foo-BA-dang", "fooBADang")]
-        [TestCase("foo_BAR", "fooBar")]
-        [TestCase("foo'BAR", "fooBar")]
-        [TestCase("sauté dans l'espace", "sauteDansLEspace")]
-        [TestCase("foo\"\"bar", "fooBar")]
-        [TestCase("-foo-", "foo")]
-        [TestCase("_foo_", "foo")]
-        [TestCase("spécial", "special")]
-        [TestCase("brô dëk ", "broDek")]
-        [TestCase("1235brô dëk ", "broDek")]
-        [TestCase("汉#字*/漢?字", "")]
-        [TestCase("aa DB cd EFG X KLMN OP qrst", "aaDBCdEfgXKlmnOPQrst")]
-        [TestCase("AA db cd EFG X KLMN OP qrst", "aaDbCdEfgXKlmnOPQrst")]
-        [TestCase("AAA db cd EFG X KLMN OP qrst", "aaaDbCdEfgXKlmnOPQrst")]
-        #endregion
-        public void CleanStringToAscii(string input, string expected)
-        {
-            var output = _helper.CleanString(input, CleanStringType.Ascii | CleanStringType.CamelCase);
-            Assert.AreEqual(expected, output);
-        }
-
-        #region Cases
-        [TestCase("1235brô dëK tzARlan ban123!pOo", "brodeKtzARlanban123pOo", CleanStringType.Unchanged)]
-        [TestCase("    1235brô dëK tzARlan ban123!pOo    ", "brodeKtzARlanban123pOo", CleanStringType.Unchanged)]
-        [TestCase("1235brô dëK tzARlan ban123!pOo", "BroDeKTzARlanBan123POo", CleanStringType.PascalCase)]
-        [TestCase("1235brô dëK tzARlan ban123!pOo", "broDeKTzARlanBan123POo", CleanStringType.CamelCase)]
-        [TestCase("1235brô dëK tzARlan ban123!pOo", "BRODEKTZARLANBAN123POO", CleanStringType.UpperCase)]
-        [TestCase("1235brô dëK tzARlan ban123!pOo", "brodektzarlanban123poo", CleanStringType.LowerCase)]
-        [TestCase("aa DB cd EFG X KLMN OP qrst", "aaDBCdEfgXKlmnOPQrst", CleanStringType.CamelCase)]
-        [TestCase("aaa DB cd EFG X KLMN OP qrst", "aaaDBCdEfgXKlmnOPQrst", CleanStringType.CamelCase)]
-        [TestCase("aa DB cd EFG X KLMN OP qrst", "AaDBCdEfgXKlmnOPQrst", CleanStringType.PascalCase)]
-        [TestCase("aaa DB cd EFG X KLMN OP qrst", "AaaDBCdEfgXKlmnOPQrst", CleanStringType.PascalCase)]
-        [TestCase("AA db cd EFG X KLMN OP qrst", "aaDbCdEfgXKlmnOPQrst", CleanStringType.CamelCase)]
-        [TestCase("AAA db cd EFG X KLMN OP qrst", "aaaDbCdEfgXKlmnOPQrst", CleanStringType.CamelCase)]
-        [TestCase("AA db cd EFG X KLMN OP qrst", "AADbCdEfgXKlmnOPQrst", CleanStringType.PascalCase)]
-        [TestCase("AAA db cd EFG X KLMN OP qrst", "AaaDbCdEfgXKlmnOPQrst", CleanStringType.PascalCase)]
-        [TestCase("We store some HTML in the DB for performance", "WeStoreSomeHtmlInTheDBForPerformance", CleanStringType.PascalCase)]
-        [TestCase("We store some HTML in the DB for performance", "weStoreSomeHtmlInTheDBForPerformance", CleanStringType.CamelCase)]
-        [TestCase("X is true", "XIsTrue", CleanStringType.PascalCase)]
-        [TestCase("X is true", "xIsTrue", CleanStringType.CamelCase)]
-        [TestCase("IO are slow", "IOAreSlow", CleanStringType.PascalCase)]
-        [TestCase("IO are slow", "ioAreSlow", CleanStringType.CamelCase)]
-        [TestCase("RAM is fast", "RamIsFast", CleanStringType.PascalCase)]
-        [TestCase("RAM is fast", "ramIsFast", CleanStringType.CamelCase)]
-        [TestCase("Tab 1", "tab1", CleanStringType.CamelCase)]
-        [TestCase("Home - Page", "homePage", CleanStringType.CamelCase)]
-        [TestCase("Shannon's Document Type", "shannonSDocumentType", CleanStringType.CamelCase)]
-        [TestCase("Shannon's Document Type", "shannonsDocumentType", CleanStringType.CamelCase | CleanStringType.Alias)]
-        [TestCase("!BADDLY nam-ed Document Type", "baddlyNamEdDocumentType", CleanStringType.CamelCase)]
-        [TestCase("  !BADDLY nam-ed Document Type", "BADDLYnamedDocumentType", CleanStringType.Unchanged)]
-        [TestCase("!BADDLY nam-ed   Document Type", "BaddlyNamEdDocumentType", CleanStringType.PascalCase)]
-        [TestCase("i %Want!thisTo end up In Proper@case", "IWantThisToEndUpInProperCase", CleanStringType.PascalCase)]
-        [TestCase("Räksmörgås %%$£¤¤¤§ kéKé", "raksmorgasKeKe", CleanStringType.CamelCase)]
-        [TestCase("Räksmörgås %%$£¤¤¤§ kéKé", "RaksmorgasKeKe", CleanStringType.PascalCase)]
-        [TestCase("Räksmörgås %%$£¤¤¤§ kéKé", "RaksmorgaskeKe", CleanStringType.Unchanged)]
-        [TestCase("TRii", "TRii", CleanStringType.Unchanged)]
-        [TestCase("**TRii", "TRii", CleanStringType.Unchanged)]
-        [TestCase("TRii", "tRii", CleanStringType.CamelCase)]
-        [TestCase("TRXii", "trXii", CleanStringType.CamelCase)]
-        [TestCase("**TRii", "tRii", CleanStringType.CamelCase)]
-        [TestCase("TRii", "TRii", CleanStringType.PascalCase)]
-        [TestCase("TRXii", "TRXii", CleanStringType.PascalCase)]
-        [TestCase("**TRii", "TRii", CleanStringType.PascalCase)]
-        [TestCase("trII", "trII", CleanStringType.Unchanged)]
-        [TestCase("**trII", "trII", CleanStringType.Unchanged)]
-        [TestCase("trII", "trII", CleanStringType.CamelCase)]
-        [TestCase("**trII", "trII", CleanStringType.CamelCase)]
-        [TestCase("trII", "TrII", CleanStringType.PascalCase)]
-        [TestCase("**trII", "TrII", CleanStringType.PascalCase)]
-        [TestCase("trIIX", "trIix", CleanStringType.CamelCase)]
-        [TestCase("**trIIX", "trIix", CleanStringType.CamelCase)]
-        [TestCase("trIIX", "TrIix", CleanStringType.PascalCase)]
-        [TestCase("**trIIX", "TrIix", CleanStringType.PascalCase)]
-        #endregion
-        public void CleanStringToAsciiWithType(string input, string expected, CleanStringType caseType)
-        {
-            var output = _helper.CleanString(input, caseType | CleanStringType.Ascii);
-            Assert.AreEqual(expected, output);
-        }
-
-        #region Cases
-        [TestCase("1235brô dëK tzARlan ban123!pOo", "bro de K tz A Rlan ban123 p Oo", ' ', CleanStringType.Unchanged)]
-        [TestCase("    1235brô dëK tzARlan ban123!pOo    ", "bro de K tz A Rlan ban123 p Oo", ' ', CleanStringType.Unchanged)]
-        [TestCase("1235brô dëK tzARlan ban123!pOo", "Bro De K Tz A Rlan Ban123 P Oo", ' ', CleanStringType.PascalCase)]
-        [TestCase("1235brô dëK     tzARlan ban123!pOo", "Bro De K Tz A Rlan Ban123 P Oo", ' ', CleanStringType.PascalCase)]
-        [TestCase("1235brô dëK tzARlan ban123!pOo", "bro De K Tz A Rlan Ban123 P Oo", ' ', CleanStringType.CamelCase)]
-        [TestCase("1235brô dëK tzARlan ban123!pOo", "bro-De-K-Tz-A-Rlan-Ban123-P-Oo", '-', CleanStringType.CamelCase)]
-        [TestCase("1235brô dëK tzARlan ban123!pOo", "BRO-DE-K-TZ-A-RLAN-BAN123-P-OO", '-', CleanStringType.UpperCase)]
-        [TestCase("1235brô dëK tzARlan ban123!pOo", "bro-de-k-tz-a-rlan-ban123-p-oo", '-', CleanStringType.LowerCase)]
-        [TestCase("Tab 1", "tab 1", ' ', CleanStringType.CamelCase)]
-        [TestCase("Home - Page", "home Page", ' ', CleanStringType.CamelCase)]
-        [TestCase("Shannon's Document Type", "shannon S Document Type", ' ', CleanStringType.CamelCase)]
-        [TestCase("Shannon's Document Type", "shannons Document Type", ' ', CleanStringType.CamelCase | CleanStringType.Alias)]
-        [TestCase("!BADDLY nam-ed Document Type", "baddly Nam Ed Document Type", ' ', CleanStringType.CamelCase)]
-        [TestCase("  !BADDLY nam-ed Document Type", "BADDLY nam ed Document Type", ' ', CleanStringType.Unchanged)]
-        [TestCase("!BADDLY nam-ed   Document Type", "Baddly Nam Ed Document Type", ' ', CleanStringType.PascalCase)]
-        [TestCase("i %Want!thisTo end up In Proper@case", "I Want This To End Up In Proper Case", ' ', CleanStringType.PascalCase)]
-        [TestCase("Räksmörgås %%$£¤¤¤§ kéKé", "raksmorgas Ke Ke", ' ', CleanStringType.CamelCase)]
-        [TestCase("Räksmörgås %%$£¤¤¤§ kéKé", "Raksmorgas Ke Ke", ' ', CleanStringType.PascalCase)]
-        [TestCase("Räksmörgås %%$£¤¤¤§ kéKé", "Raksmorgas ke Ke", ' ', CleanStringType.Unchanged)]
-        #endregion
-        public void CleanStringToAsciiWithTypeAndSeparator(string input, string expected, char separator, CleanStringType caseType)
-        {
-            var output = _helper.CleanString(input, caseType | CleanStringType.Ascii, separator);
+            // picks the proper config per culture
+            // and overrides some stringType params (ascii...)
+            var output = _helper.CleanString(input, stringType, cinfo);
             Assert.AreEqual(expected, output);
         }
 
