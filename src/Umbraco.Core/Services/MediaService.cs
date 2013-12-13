@@ -846,7 +846,7 @@ namespace Umbraco.Core.Services
 
             return true;
         }
-
+        
         /// <summary>
         /// Rebuilds all xml content in the cmsContentXml table for all media
         /// </summary>
