@@ -266,17 +266,10 @@ namespace Umbraco.Core
             PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
                 PluginManager.Current.ResolveTypes<IPropertyValueConverter>());
 
-            // use the new DefaultShortStringHelper but sort-of remain compatible
-            // - use UmbracoSettings UrlReplaceCharacters
-            // - allow underscores in terms, allow leading digits
+            // use the new DefaultShortStringHelper
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(
-                new DefaultShortStringHelper()
-                    .WithConfig(CleanStringType.Url, DefaultShortStringHelper.ApplyUrlReplaceCharacters, 
-                        allowUnderscoreInTerm: true, allowLeadingDigits: true));
-
-            // that was the old one
-            //ShortStringHelperResolver.Current = new ShortStringHelperResolver(
-            //    new LegacyShortStringHelper());
+                //new LegacyShortStringHelper());
+                new DefaultShortStringHelper().WithDefaultConfig());
 
 		    UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(
 		        typeof (DefaultUrlSegmentProvider));
