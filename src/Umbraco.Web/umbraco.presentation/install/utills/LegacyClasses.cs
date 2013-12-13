@@ -66,7 +66,11 @@ namespace umbraco.presentation.install.utills
         {
             LogHelper.Info<p>("Running 'installOrUpgrade' service");
 
-            var result = ApplicationContext.Current.DatabaseContext.CreateDatabaseSchemaAndDataOrUpgrade();
+            var result = ApplicationContext.Current.DatabaseContext.CreateDatabaseSchemaAndData();
+            if (result.RequiresUpgrade)
+            {
+                result = ApplicationContext.Current.DatabaseContext.UpgradeSchemaAndData();
+            }
 
             // Remove legacy umbracoDbDsn configuration setting if it exists and connectionstring also exists
             if (ConfigurationManager.ConnectionStrings[Umbraco.Core.Configuration.GlobalSettings.UmbracoConnectionName] != null)
