@@ -389,6 +389,7 @@
     <Compile Include="Search\LuceneIndexerExtensions.cs" />
     <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
+    <Compile Include="Strategies\Migrations\RebuildMediaXmlCacheAfterUpgrade.cs" />
     <Compile Include="UI\CdfLogger.cs" />
     <Compile Include="umbraco.presentation\CompatibilityHelper.cs" />
     <Compile Include="umbraco.presentation\LegacyClasses.cs" />

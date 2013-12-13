@@ -189,7 +189,6 @@
     <Compile Include="Models\PublishedContent\IPublishedContentModelFactory.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\RemoveCachedRecycleMediaXml.cs" />
     <Compile Include="PropertyEditors\PropertyCacheValue.cs" />
     <Compile Include="PropertyEditors\PropertyValueCacheAttribute.cs" />
     <Compile Include="PropertyEditors\PropertyValueTypeAttribute.cs" />
