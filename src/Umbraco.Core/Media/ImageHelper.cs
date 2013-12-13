@@ -125,8 +125,23 @@ namespace Umbraco.Core.Media
             {
                 using (var g = Graphics.FromImage(bp))
                 {
-                    g.SmoothingMode = SmoothingMode.HighQuality;
-                    g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    //if the image size is rather large we cannot use the best quality interpolation mode
+                    // because we'll get out of mem exceptions. So we'll detect how big the image is and use
+                    // the mid quality interpolation mode when the image size exceeds our max limit.
+
+                    if (image.Width > 5000 || image.Height > 5000)
+                    {
+                        //use mid quality
+                        g.InterpolationMode = InterpolationMode.Bilinear;
+                    }
+                    else
+                    {
+                        //use best quality
+                        g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                    }
+                    
+
+                    g.SmoothingMode = SmoothingMode.HighQuality;                    
                     g.PixelOffsetMode = PixelOffsetMode.HighQuality;
                     g.CompositingQuality = CompositingQuality.HighQuality;
 
