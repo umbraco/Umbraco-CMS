@@ -361,33 +361,81 @@
 
     <script type="text/javascript">
         jQuery(document).ready(function() {
+            
             updateProgressBar("5");
             updateStatusMessage("Connecting to database..");
 
-            $.ajax({
-                type: 'POST',
-                contentType: 'application/json; charset=utf-8',
-                data: '{}',
-                dataType: 'json',
-                url: 'InstallerRestService.aspx/InstallOrUpgrade',
-                success: function(data) {
-                    var json = JSON.parse(data.d);
+            var upgradeTimeout;
 
-                    updateProgressBar(json.Percentage);
-                    updateStatusMessage(json.Message);
-                
-                    if (json.Success) {    
-                        $(".btn-box").show();
-                        $('.ui-progressbar-value').css("background-image", "url(../umbraco_client/installer/images/pbar.gif)");
-                        $(".result-status-container").show();
-                        $(".progress-status-container").hide();
-                    } else {
-                        $(".btn-continue").hide();
-                        $(".btn-back").show();
-                        $(".btn-box").show();
-                    }
+            function upgradeProgress(currProgress) {
+                if (currProgress < 90) {
+                    upgradeTimeout = setTimeout(function() {
+                        currProgress++;
+                        updateProgressBar(currProgress.toString());
+                        upgradeProgress(currProgress);
+                    }, 10000);
                 }
-            });
+            }
+
+            function handleSuccess(json) {
+                if (json.Success) {    
+                    $(".btn-box").show();
+                    $('.ui-progressbar-value').css("background-image", "url(../umbraco_client/installer/images/pbar.gif)");
+                    $(".result-status-container").show();
+                    $(".progress-status-container").hide();
+                } 
+                else {
+                    $(".btn-continue").hide();
+                    $(".btn-back").show();
+                    $(".btn-box").show();
+                }
+            }
+
+            function runUpgrade() {
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: '{}',
+                    dataType: 'json',
+                    url: 'InstallerRestService.aspx/Upgrade',
+                    success: function(data) {
+                        clearTimeout(upgradeTimeout);
+                        var json = JSON.parse(data.d);
+
+                        updateProgressBar(json.Percentage);
+                        updateStatusMessage(json.Message);
+                
+                        handleSuccess(json);
+                    }
+                });
+                upgradeProgress(30);
+            }
+
+            function runInstall() {
+                $.ajax({
+                    type: 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    data: '{}',
+                    dataType: 'json',
+                    url: 'InstallerRestService.aspx/Install',
+                    success: function(data) {
+                        var json = JSON.parse(data.d);
+
+                        updateProgressBar(json.Percentage);
+                        updateStatusMessage(json.Message);
+                
+                        if (json.RequiresUpgrade) {
+                            runUpgrade();
+                        }
+                        else {
+                            handleSuccess(json);
+                        }
+                    }
+                });
+            }
+
+            //kick it off
+            runInstall();
         });
     </script>
 
