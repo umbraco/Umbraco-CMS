@@ -466,6 +466,7 @@ namespace umbraco.cms.businesslogic.member
         /// <summary>
         /// The members password, used when logging in on the public website
         /// </summary>
+        [Obsolete("Do not use this property, use GetPassword and ChangePassword instead, if using ChangePassword ensure that the password is encrypted or hashed based on the active membership provider")]
         public string Password
         {
             get
@@ -478,7 +479,7 @@ namespace umbraco.cms.businesslogic.member
                 }
                 return _password;
 
-            }
+            }            
             set
             {
                 // We need to use the provider for this in order for hashing, etc. support
@@ -744,6 +745,10 @@ namespace umbraco.cms.businesslogic.member
             }
         }
 
+        /// <summary>
+        /// Sets the password for the user - ensure it is encrypted or hashed based on the active membership provider.
+        /// </summary>
+        /// <param name="newPassword"></param>
         public void ChangePassword(string newPassword)
         {
             SqlHelper.ExecuteNonQuery(
@@ -768,6 +773,21 @@ namespace umbraco.cms.businesslogic.member
                 SqlHelper.CreateParameter("@id", Id));
             }
             return _password;
+        }
+
+        /// <summary>
+        /// Returns the currently stored password - this may be encrypted or hashed string depending on the active membership provider
+        /// </summary>
+        /// <returns></returns>
+        public string GetPassword()
+        {
+            if (string.IsNullOrEmpty(m_Password))
+            {
+                m_Password = SqlHelper.ExecuteScalar<string>(
+                "select Password from cmsMember where nodeId = @id",
+                SqlHelper.CreateParameter("@id", Id));
+            }
+            return m_Password;
         }
 
         /// <summary>

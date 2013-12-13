@@ -19,4 +19,19 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
             throw new NotImplementedException();
         }
     }
+
+    [Migration("6.2.0", 2, GlobalSettings.UmbracoMigrationName)]
+    public class ChangePasswordColumn : MigrationBase
+    {
+        public override void Up()
+        {
+            //up to 500 chars
+            Alter.Table("umbracoUser").AlterColumn("userPassword").AsString(500).NotNullable();
+        }
+
+        public override void Down()
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

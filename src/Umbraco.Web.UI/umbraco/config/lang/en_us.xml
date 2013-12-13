@@ -972,6 +972,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="modules">Sections</key>
     <key alias="noConsole">Disable Umbraco Access</key>
     <key alias="password">Password</key>
+    <key alias="resetPassword">Reset password</key>
     <key alias="passwordChanged">Your password has been changed!</key>
     <key alias="passwordConfirm">Please confirm the new password</key>
     <key alias="passwordEnterNew">Enter your new password</key>
