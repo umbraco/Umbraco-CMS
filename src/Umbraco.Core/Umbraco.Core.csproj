@@ -337,10 +337,8 @@
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
     <Compile Include="Models\TaggableObjectTypes.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\RemoveCachedRecycleMediaXml.cs" />
     <Compile Include="Models\TemplateNode.cs" />
     <Compile Include="Packaging\PackageBinaryInspector.cs" />
-    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenZeroOne\RemoveCachedRecycleMediaXml.cs" />
     <Compile Include="PropertyEditors\DefaultPropertyValueConverterAttribute.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\UpdateRelatedLinksData.cs" />
     <Compile Include="PropertyEditors\IValueEditor.cs" />
