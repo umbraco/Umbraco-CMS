@@ -11,7 +11,7 @@
 					<li ng-repeat="topic in topics">
 				    	<i class="icon icon-help-alt"></i>
 
-				    	<a target="_blank" href="{{topic.link}}" title="{{topic.title}}">
+				    	<a target="_blank" href="{{topic.link}}?utm_source=core&utm_medium=help&utm_content=topic-link&utm_campaign=our" title="{{topic.title}}">
 				    		 {{topic.title}}
 				    	</a>
 				    	<small class="umb-detail">{{topic.description}}</small>
@@ -21,7 +21,7 @@
 			    <ul class="unstyled list-icons">	
 	    			<li>
 	    		    	<i class="icon icon-favorite"></i>
-	    		    	<a target="_blank" href="http://our.umbraco.org">
+	    		    	<a target="_blank" href="http://our.umbraco.org?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=our">
 	    		    		 go to our.umbraco.org
 	    		    	</a>
 	    		    	<small class="umb-detail">The friendliest community</small>
@@ -35,7 +35,7 @@
 				<ul class="thumbnails" ng-show="videos">
 					<li class="span2" ng-repeat="video in videos">
 				    	<div class="thumbnail" style="margin-right: 20px">
-					    	<a target="_blank" href="{{video.link}}" title="{{video.title}}">
+					    	<a target="_blank" href="{{video.link}}?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv" title="{{video.title}}">
 					    		<img ng-src="{{video.thumbnail}}"  alt="{{video.title}}">
 					    	</a>
 				    	</div>
@@ -45,7 +45,7 @@
 				<ul class="unstyled list-icons">    
 		    		<li>
 		    	    	<i class="icon icon-tv-old"></i>
-		    	    	<a target="_blank" href="http://our.umbraco.org">
+		    	    	<a target="_blank" href="http://umbraco.tv?utm_source=core&utm_medium=help&utm_content=link&utm_campaign=tv">
 		    	    		 go to umbraco.tv
 		    	    	</a>
 		    	    	<small class="umb-detail">The best umbraco video tutorials</small>
