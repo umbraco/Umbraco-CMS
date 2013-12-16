@@ -79,6 +79,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="members\Helper.cs" />
+    <Compile Include="members\MembershipEventHandler.cs" />
     <Compile Include="members\MembersMembershipProvider.cs" />
     <Compile Include="members\MembersProfileProvider.cs" />
     <Compile Include="members\MembersRoleProvider.cs" />

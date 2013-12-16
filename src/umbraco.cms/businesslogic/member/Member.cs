@@ -774,22 +774,7 @@ namespace umbraco.cms.businesslogic.member
             }
             return _password;
         }
-
-        /// <summary>
-        /// Returns the currently stored password - this may be encrypted or hashed string depending on the active membership provider
-        /// </summary>
-        /// <returns></returns>
-        public string GetPassword()
-        {
-            if (string.IsNullOrEmpty(m_Password))
-            {
-                m_Password = SqlHelper.ExecuteScalar<string>(
-                "select Password from cmsMember where nodeId = @id",
-                SqlHelper.CreateParameter("@id", Id));
-            }
-            return m_Password;
-        }
-
+        
         /// <summary>
         /// Adds the member to group with the specified id
         /// </summary>
