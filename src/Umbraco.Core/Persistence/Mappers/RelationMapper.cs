@@ -39,7 +39,7 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<Relation, RelationDto>(src => src.ParentId, dto => dto.ParentId);
             CacheMap<Relation, RelationDto>(src => src.RelationTypeId, dto => dto.RelationType);
         }
-        
+
         #endregion
     }
 }

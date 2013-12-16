@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         [SetUp]
         public override void Initialize()
-        {           
+        {
             base.Initialize();
 
             CreateTestData();
@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.Current.ResolveByType<IRelationRepository>(unitOfWork);            
+            var repository = RepositoryResolver.Current.ResolveByType<IRelationRepository>(unitOfWork);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
