@@ -26,9 +26,9 @@ namespace Umbraco.Core.Publishing
         /// </summary>
         public PublishStatus(IContent content)
             : this(content, PublishStatusType.Success)
-        {            
+        {
         }
-        
+
         public IContent ContentItem { get; private set; }
         public PublishStatusType StatusType { get; internal set; }
 
