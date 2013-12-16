@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Globalization;
@@ -15,14 +16,13 @@ namespace Umbraco.Core.Strings
     /// <remarks>
     /// <para>Not optimized to work on large bodies of text.</para>
     /// <para>Meant to replace <c>LegacyShortStringHelper</c> where/when backward compatibility is not an issue.</para>
-    /// <para>Full-unicode support is probably not so good.</para>
     /// <para>NOTE: pre-filters run _before_ the string is re-encoded.</para>
     /// </remarks>
     public class DefaultShortStringHelper : IShortStringHelper
     {
         #region Ctor and vars
 
-        static DefaultShortStringHelper()
+        public DefaultShortStringHelper()
         {
             InitializeLegacyUrlReplaceCharacters();
         }
@@ -43,7 +43,7 @@ namespace Umbraco.Core.Strings
 
         private CultureInfo _defaultCulture = CultureInfo.InvariantCulture;
         private bool _frozen;
-        private readonly Dictionary<CultureInfo, Dictionary<CleanStringType, HelperConfig>> _configs = new Dictionary<CultureInfo, Dictionary<CleanStringType, HelperConfig>>();
+        private readonly Dictionary<CultureInfo, Dictionary<CleanStringType, Config>> _configs = new Dictionary<CultureInfo, Dictionary<CleanStringType, Config>>();
 
         // see notes for CleanAsciiString
         //static DefaultShortStringHelper()
@@ -53,11 +53,11 @@ namespace Umbraco.Core.Strings
 
         #endregion
 
-        #region Legacy UrlReplaceCharacters
+        #region Filters
 
-        static readonly Dictionary<string, string> UrlReplaceCharacters = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _urlReplaceCharacters = new Dictionary<string, string>();
 
-        static void InitializeLegacyUrlReplaceCharacters()
+        private void InitializeLegacyUrlReplaceCharacters()
         {
             foreach (var node in UmbracoConfig.For.UmbracoSettings().RequestHandler.CharCollection)
             {
@@ -71,9 +71,21 @@ namespace Umbraco.Core.Strings
         /// </summary>
         /// <param name="s">The string to filter.</param>
         /// <returns>The filtered string.</returns>
-        public static string ApplyUrlReplaceCharacters(string s)
+        public string ApplyUrlReplaceCharacters(string s)
         {
-            return s.ReplaceMany(UrlReplaceCharacters);
+            return s.ReplaceMany(_urlReplaceCharacters);
+        }
+
+        // ok to be static here because it's not configureable in any way
+        private static readonly char[] InvalidFileNameChars =
+            Path.GetInvalidFileNameChars()
+            .Union("!*'();:@&=+$,/?%#[]-~{}\"<>\\^`| ".ToCharArray())
+            .Distinct()
+            .ToArray();
+
+        public static bool IsValidFileNameChar(char c)
+        {
+            return InvalidFileNameChars.Contains(c) == false;
         }
 
         #endregion
@@ -86,6 +98,11 @@ namespace Umbraco.Core.Strings
                 throw new InvalidOperationException("Cannot configure the helper once it is frozen.");            
         }
 
+        /// <summary>
+        /// Sets a default culture.
+        /// </summary>
+        /// <param name="culture">The default culture.</param>
+        /// <returns>The short string helper.</returns>
         public DefaultShortStringHelper WithDefaultCulture(CultureInfo culture)
         {
             EnsureNotFrozen();
@@ -93,75 +110,131 @@ namespace Umbraco.Core.Strings
             return this;
         }
 
-        public DefaultShortStringHelper WithConfig(
-            Func<string, string> preFilter = null, 
-            bool breakTermsOnUpper = true, bool allowLeadingDigits = false, bool allowUnderscoreInTerm = false)
+        public DefaultShortStringHelper WithConfig(Config config)
         {
-            return WithConfig(_defaultCulture, CleanStringType.RoleMask,
-                preFilter, breakTermsOnUpper, allowLeadingDigits, allowUnderscoreInTerm);
+            return WithConfig(_defaultCulture, CleanStringType.RoleMask, config);
         }
 
-        public DefaultShortStringHelper WithConfig(CleanStringType stringRole,
-            Func<string, string> preFilter = null,
-            bool breakTermsOnUpper = true, bool allowLeadingDigits = false, bool allowUnderscoreInTerm = false)
+        public DefaultShortStringHelper WithConfig(CleanStringType stringRole, Config config)
         {
-            return WithConfig(_defaultCulture, stringRole,
-                preFilter, breakTermsOnUpper, allowLeadingDigits, allowUnderscoreInTerm);
+            return WithConfig(_defaultCulture, stringRole, config);
         }
 
-        public DefaultShortStringHelper WithConfig(CultureInfo culture, CleanStringType stringRole,
-            Func<string, string> preFilter = null,
-            bool breakTermsOnUpper = true, bool allowLeadingDigits = false, bool allowUnderscoreInTerm = false)
+        public DefaultShortStringHelper WithConfig(CultureInfo culture, CleanStringType stringRole, Config config)
         {
+            if (config == null)
+                throw new ArgumentNullException("config");
+
             EnsureNotFrozen();
             if (_configs.ContainsKey(culture) == false)
-                _configs[culture] = new Dictionary<CleanStringType, HelperConfig>();
-            _configs[culture][stringRole] = new HelperConfig(preFilter, breakTermsOnUpper, allowLeadingDigits, allowUnderscoreInTerm);
+                _configs[culture] = new Dictionary<CleanStringType, Config>();
+            _configs[culture][stringRole] = config.Clone(); // clone so it can't be changed
             return this;
         }
 
-        internal sealed class HelperConfig
+        /// <summary>
+        /// Sets the default configuration.
+        /// </summary>
+        /// <returns>The short string helper.</returns>
+        public DefaultShortStringHelper WithDefaultConfig()
         {
-            private HelperConfig()
+            return WithConfig(CleanStringType.UrlSegment, new Config
             {
+                PreFilter = ApplyUrlReplaceCharacters,
+                IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
+                StringType = CleanStringType.Utf8 | CleanStringType.LowerCase,
+                BreakTermsOnUpper = false,
+                Separator = '-'
+            }).WithConfig(CleanStringType.FileName, new Config
+            {
+                PreFilter = ApplyUrlReplaceCharacters,
+                IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
+                StringType = CleanStringType.Utf8 | CleanStringType.LowerCase,
+                BreakTermsOnUpper = false,
+                Separator = '-'
+            }).WithConfig(CleanStringType.Alias, new Config
+            {
+                PreFilter = ApplyUrlReplaceCharacters,
+                IsTerm = (c, leading) => leading 
+                    ? char.IsLetter(c) // only letters
+                    : (char.IsLetterOrDigit(c) || c == '_'), // letter, digit or underscore
+                StringType = CleanStringType.Ascii | CleanStringType.UmbracoCase,
+                BreakTermsOnUpper = false
+            });
+        }
+
+        public sealed class Config
+        {
+            public Config()
+            {
+                StringType = CleanStringType.Utf8 | CleanStringType.Unchanged;
                 PreFilter = null;
-                BreakTermsOnUpper = true;
-                AllowLeadingDigits = false;
+                IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c);
+                BreakTermsOnUpper = false;
+                CutAcronymOnNonUpper = false;
+                GreedyAcronyms = false;
+                Separator = Char.MinValue;
             }
 
-            public HelperConfig(Func<string, string> preFilter, bool breakTermsOnUpper, bool allowLeadingDigits, bool allowUnderscoreInTerm)
-                : this()
+            public Config Clone()
             {
-                PreFilter = preFilter;
-                BreakTermsOnUpper = breakTermsOnUpper;
-                AllowLeadingDigits = allowLeadingDigits;
-                AllowUnderscoreInTerm = allowUnderscoreInTerm;
+                return new Config
+                {
+                    PreFilter = PreFilter,
+                    IsTerm = IsTerm,
+                    StringType = StringType,
+                    BreakTermsOnUpper = BreakTermsOnUpper,
+                    CutAcronymOnNonUpper =  CutAcronymOnNonUpper,
+                    GreedyAcronyms =  GreedyAcronyms,
+                    Separator = Separator
+                };
             }
 
-            public Func<string, string> PreFilter { get; private set; }
+            public Func<string, string> PreFilter { get; set; }
+            public Func<char, bool, bool> IsTerm { get; set; }
+
+            public CleanStringType StringType { get; set; }
 
             // indicate whether an uppercase within a term eg "fooBar" is to break
             // into a new term, or to be considered as part of the current term
-            public bool BreakTermsOnUpper { get; private set; }
+            public bool BreakTermsOnUpper { get; set; }
 
-            // indicates whether it is legal to have leading digits, or whether they
-            // should be stripped as any other illegal character
-            public bool AllowLeadingDigits { get; private set; }
-
-            // indicates whether underscore is a valid character in a term or is
-            // to be considered as a separator
-            public bool AllowUnderscoreInTerm { get; private set; }
+            // indicate whether a non-uppercase within an acronym eg "FOOBar" is to cut
+            // the acronym (at "B" or "a" depending on GreedyAcronyms) or to give
+            // up the acronym and treat the term as a word
+            public bool CutAcronymOnNonUpper { get; set; }
 
             // indicates whether acronyms parsing is greedy ie whether "FOObar" is
             // "FOO" + "bar" (greedy) or "FO" + "Obar" (non-greedy)
-            public bool GreedyAcronyms { get { return false; } }
+            public bool GreedyAcronyms { get; set; }
 
-            public static readonly HelperConfig Empty = new HelperConfig();
+            // the separator char
+            // but then how can we tell we dont want any?
+            public char Separator { get; set; }
+
+            // extends the config
+            public CleanStringType StringTypeExtend(CleanStringType stringType)
+            {
+                var st = StringType;
+                foreach (var mask in new[] { CleanStringType.CaseMask, CleanStringType.CodeMask })
+                {
+                    var a = stringType & mask;
+                    if (a == 0) continue;
+
+                    st = st & ~mask; // clear what we have
+                    st = st | a; // set the new value
+                }
+                return st;
+            }
+
+            internal static readonly Config NotConfigured = new Config();
         }
 
-        private HelperConfig GetConfig(CleanStringType stringType, CultureInfo culture)
+        private Config GetConfig(CleanStringType stringType, CultureInfo culture)
         {
-            Dictionary<CleanStringType, HelperConfig> config;
+            stringType = stringType & CleanStringType.RoleMask;
+
+            Dictionary<CleanStringType, Config> config;
             if (_configs.ContainsKey(culture))
             {
                 config = _configs[culture];
@@ -179,7 +252,7 @@ namespace Umbraco.Core.Strings
                     return config[CleanStringType.RoleMask];
             }
 
-            return HelperConfig.Empty;
+            return Config.NotConfigured;
         }
 
         #endregion
@@ -247,7 +320,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// </remarks>
         public virtual string CleanStringForSafeAlias(string text)
         {
-            return CleanString(text, CleanStringType.Ascii | CleanStringType.UmbracoCase | CleanStringType.Alias);
+            return CleanStringForSafeAlias(text, _defaultCulture);
         }
 
         /// <summary>
@@ -261,7 +334,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// </remarks>
         public virtual string CleanStringForSafeAlias(string text, CultureInfo culture)
         {
-            return CleanString(text, CleanStringType.Ascii | CleanStringType.UmbracoCase | CleanStringType.Alias, culture);
+            return CleanString(text, CleanStringType.Alias, culture);
         }
 
         /// <summary>
@@ -275,7 +348,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// </remarks>
         public virtual string CleanStringForUrlSegment(string text)
         {
-            return CleanString(text, CleanStringType.Ascii | CleanStringType.LowerCase | CleanStringType.Url, '-');
+            return CleanStringForUrlSegment(text, _defaultCulture);
         }
 
         /// <summary>
@@ -289,11 +362,11 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// </remarks>
         public virtual string CleanStringForUrlSegment(string text, CultureInfo culture)
         {
-            return CleanString(text, CleanStringType.Ascii | CleanStringType.LowerCase | CleanStringType.Url, '-', culture);
+            return CleanString(text, CleanStringType.UrlSegment, culture);
         }
 
         /// <summary>
-        /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
+        /// Cleans a string, in the context of the default culture, to produce a string that can safely be used as a filename,
         /// both internally (on disk) and externally (as a url).
         /// </summary>
         /// <param name="text">The text to filter.</param>
@@ -301,94 +374,11 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// <remarks>Legacy says this was used to "overcome an issue when Umbraco is used in IE in an intranet environment" but that issue is not documented.</remarks>
         public virtual string CleanStringForSafeFileName(string text)
         {
-            // - Original version
-
-            if (String.IsNullOrEmpty(text))
-                return String.Empty;
-
-            text = string.IsNullOrWhiteSpace(text) == false 
-                ? text.ReplaceMany(Path.GetInvalidFileNameChars(), '-') 
-                : string.Empty;
-
-            //Break up the file in name and extension before applying the UrlReplaceCharacters
-            var fileNamePart = text.Substring(0, text.LastIndexOf('.'));
-            var ext = text.Substring(text.LastIndexOf('.'));
-
-            fileNamePart = ApplyUrlReplaceCharacters(fileNamePart);
-
-            text = string.Concat(fileNamePart, ext);
-
-            // Adapted from: http://stackoverflow.com/a/4827510/5018
-            // Combined both Reserved Characters and Character Data 
-            // from http://en.wikipedia.org/wiki/Percent-encoding
-            var stringBuilder = new StringBuilder();
-
-            const string reservedCharacters = "!*'();:@&=+$,/?%#[]-~{}\"<>\\^`| ";
-
-            foreach (var character in text)
-            {
-                if (reservedCharacters.IndexOf(character) == -1)
-                    stringBuilder.Append(character);
-                else
-                    stringBuilder.Append("-");
-            }
-
-            // Remove repeating dashes
-            // From: http://stackoverflow.com/questions/5111967/regex-to-remove-a-specific-repeated-character
-            var reducedString = Regex.Replace(stringBuilder.ToString(), "-+", "-");
-
-            return reducedString;
-
-
-            // - Version 2 (Legacy Short string)
-
-            //const string UmbracoValidAliasCharacters = "_-abcdefghijklmnopqrstuvwxyz1234567890";
-            //const string UmbracoInvalidFirstCharacters = "0123456789";
-            //const string validAliasCharacters = UmbracoValidAliasCharacters;
-            //const string invalidFirstCharacters = UmbracoInvalidFirstCharacters;
-            //var safeString = new StringBuilder();
-            //int aliasLength = text.Length;
-            //for (var i = 0; i < aliasLength; i++)
-            //{
-            //    var currentChar = text.Substring(i, 1);
-            //    if (validAliasCharacters.Contains(currentChar.ToLowerInvariant()))
-            //    {
-            //        // check for camel (if previous character is a space, we'll upper case the current one
-            //        if (safeString.Length == 0 && invalidFirstCharacters.Contains(currentChar.ToLowerInvariant()))
-            //        {
-            //            //currentChar = "";
-            //        }
-            //        else
-            //        {
-            //            if (i < aliasLength - 1 && i > 0 && text.Substring(i - 1, 1) == " ")
-            //                currentChar = currentChar.ToUpperInvariant();
-
-            //            safeString.Append(currentChar);
-            //        }
-            //    }
-            //}
-            //return safeString.ToString();
-
-
-            // - Version 3 (Default short string)
-
-            //if (string.IsNullOrWhiteSpace(text))
-            //    return string.Empty;
-
-            //text = text.ReplaceMany(Path.GetInvalidFileNameChars(), '-');
-
-            //var pos = text.LastIndexOf('.');
-            //var name = pos < 0 ? text : text.Substring(0, pos);
-            //var ext = pos < 0 ? string.Empty : text.Substring(pos + 1);
-
-            //name = CleanString(name, CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.LowerCase, '-');
-            //ext = CleanString(ext, CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.LowerCase, '-');
-
-            //return pos < 0 ? name : (name + "." + ext);
+            return CleanStringForSafeFileName(text, _defaultCulture);
         }
 
         /// <summary>
-        /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
+        /// Cleans a string to produce a string that can safely be used as a filename,
         /// both internally (on disk) and externally (as a url).
         /// </summary>
         /// <param name="text">The text to filter.</param>
@@ -401,14 +391,17 @@ function validateSafeAlias(id, value, immediate, callback) {{
 
             text = text.ReplaceMany(Path.GetInvalidFileNameChars(), '-');
 
-            var pos = text.LastIndexOf('.');
-            var name = pos < 0 ? text : text.Substring(0, pos);
-            var ext = pos < 0 ? string.Empty : text.Substring(pos + 1);
+            var name = Path.GetFileNameWithoutExtension(text);
+            var ext = Path.GetExtension(text); // includes the dot, empty if no extension
 
-            name = CleanString(name, CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.LowerCase, '-', culture);
-            ext = CleanString(ext, CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.LowerCase, '-', culture);
+            Debug.Assert(name != null, "name != null");
+            if (name.Length > 0)
+                name = CleanString(name, CleanStringType.FileName, culture);
+            Debug.Assert(ext != null, "ext != null");
+            if (ext.Length > 0)
+                ext = CleanString(ext.Substring(1), CleanStringType.FileName, culture);
 
-            return pos < 0 ? name : (name + "." + ext);
+            return ext.Length > 0 ? (name + "." + ext) : name;
         }
 
         #endregion
@@ -417,7 +410,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
 
         // MS rules & guidelines:
         // - Do capitalize both characters of two-character acronyms, except the first word of a camel-cased identifier.
-        //     eg "DBRate" (pascal) or "ioHelper" (camel) - "specialDBRate" (pascal) or "specialIOHelper" (camel)
+        //     eg "DBRate" (pascal) or "ioHelper" (camel) - "SpecialDBRate" (pascal) or "specialIOHelper" (camel)
         // - Do capitalize only the first character of acronyms with three or more characters, except the first word of a camel-cased identifier.
         //     eg "XmlWriter (pascal) or "htmlReader" (camel) - "SpecialXmlWriter" (pascal) or "specialHtmlReader" (camel)
         // - Do not capitalize any of the characters of any acronyms, whatever their length, at the beginning of a camel-cased identifier.
@@ -442,7 +435,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// <remarks>The string is cleaned in the context of the default culture.</remarks>
         public string CleanString(string text, CleanStringType stringType)
         {
-            return CleanString(text, stringType, char.MinValue, _defaultCulture);
+            return CleanString(text, stringType, _defaultCulture, null);
         }
 
         /// <summary>
@@ -456,7 +449,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// <remarks>The string is cleaned in the context of the default culture.</remarks>
         public string CleanString(string text, CleanStringType stringType, char separator)
         {
-            return CleanString(text, stringType, separator, _defaultCulture);
+            return CleanString(text, stringType, _defaultCulture, separator);
         }
 
         /// <summary>
@@ -469,7 +462,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// <returns>The clean string.</returns>
         public string CleanString(string text, CleanStringType stringType, CultureInfo culture)
         {
-            return CleanString(text, stringType, char.MinValue, culture);
+            return CleanString(text, stringType, culture, null);
         }
 
         /// <summary>
@@ -481,23 +474,12 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// <param name="separator">The separator.</param>
         /// <param name="culture">The culture.</param>
         /// <returns>The clean string.</returns>
-        public virtual string CleanString(string text, CleanStringType stringType, char separator, CultureInfo culture)
+        public string CleanString(string text, CleanStringType stringType, char separator, CultureInfo culture)
         {
-            var config = GetConfig(stringType & CleanStringType.RoleMask, culture);
-            return CleanString(text, stringType, separator, culture, config);
+            return CleanString(text, stringType, culture, separator);
         }
 
-        /// <summary>
-        /// Cleans a string in the context of a specified culture, using a specified separator and configuration.
-        /// </summary>
-        /// <param name="text">The text to clean.</param>
-        /// <param name="stringType">A flag indicating the target casing and encoding of the string. By default, 
-        /// strings are cleaned up to camelCase and Ascii.</param>
-        /// <param name="separator">The separator.</param>
-        /// <param name="culture">The culture.</param>
-        /// <param name="config">The configuration.</param>
-        /// <returns>The clean string.</returns>
-        private string CleanString(string text, CleanStringType stringType, char separator, CultureInfo culture, HelperConfig config)
+        protected virtual string CleanString(string text, CleanStringType stringType, CultureInfo culture, char? separator)
         {
             // be safe
             if (text == null)
@@ -505,13 +487,18 @@ function validateSafeAlias(id, value, immediate, callback) {{
             if (culture == null)
                 throw new ArgumentNullException("culture");
 
+            // get config
+            var config = GetConfig(stringType, culture);
+            stringType = config.StringTypeExtend(stringType);
+
             // apply defaults
             if ((stringType & CleanStringType.CaseMask) == CleanStringType.None)
                 stringType |= CleanStringType.CamelCase;
             if ((stringType & CleanStringType.CodeMask) == CleanStringType.None)
                 stringType |= CleanStringType.Ascii;
 
-            var codeType = stringType & CleanStringType.CodeMask;
+            // use configured unless specified
+            separator = separator ?? config.Separator;
 
             // apply pre-filter
             if (config.PreFilter != null)
@@ -522,231 +509,46 @@ function validateSafeAlias(id, value, immediate, callback) {{
             //    text = ReplaceMany(text, config.Replacements);
 
             // recode
-            text = Recode(text, stringType);
+            var codeType = stringType & CleanStringType.CodeMask;
+            text = codeType == CleanStringType.Ascii 
+                ? Utf8ToAsciiConverter.ToAsciiString(text) 
+                : RemoveSurrogatePairs(text);
 
             // clean
-            switch (codeType)
-            {
-                case CleanStringType.Ascii:
-                    // see note below - don't use CleanAsciiString
-                    //text = CleanAsciiString(text, stringType, separator);
-                    //break;
-                case CleanStringType.Utf8:
-                    text = CleanUtf8String(text, stringType, separator, culture, config);
-                    break;
-                case CleanStringType.Unicode:
-                    throw new NotImplementedException("DefaultShortStringHelper does not handle unicode yet.");
-                default:
-                    throw new ArgumentOutOfRangeException("stringType");
-            }
+            text = CleanCodeString(text, stringType, separator.Value, culture, config);
 
             return text;
         }
 
-        // however proud I can be of that subtle, ascii-optimized code,
-        // benchmarking shows it is an order of magnitude slower that the utf8 version
-        // don't use it - keep it here should anyone be tempted to micro-optimize again...
-        //
-        // beware, it has bugs that are fixed in CleanUtf8String but I'm not going to
-        // bugfix commented code....
-
-        /*
-        internal string CleanAsciiString(string text)
+        private static string RemoveSurrogatePairs(string text)
         {
-            return CleanAsciiString(text, CleanStringType.CamelCase, char.MinValue);
-        }
+            var input = text.ToCharArray();
+            var output = new char[input.Length];
+            var opos = 0;
 
-        internal string CleanAsciiString(string text, CleanStringType caseType, char separator)
-        {
-            int opos = 0, ipos = 0;
-            var state = StateBreak;
-
-            caseType &= CleanStringType.CaseMask;
-
-            //switch (caseType)
-            //{
-            //    case CleanStringType.LowerCase:
-            //        input = text.ToLowerInvariant().ToCharArray();
-            //        break;
-            //    case CleanStringType.UpperCase:
-            //        input = text.ToUpperInvariant().ToCharArray();
-            //        break;
-            //    default:
-            //        input =  text.ToCharArray();
-            //        break;
-            //}
-            // if we apply global ToUpper or ToLower to text here
-            // then we cannot break words on uppercase chars
-            var input = text;
-
-            // because we shouldn't be adding any extra char
-            // it's faster to use an array than a StringBuilder
-            var ilen = input.Length;
-            var output = new char[ilen];
-
-            Func<string, string> termFilter = null;
-
-            for (var i = 0; i < ilen; i++)
+            for (var ipos = 0; ipos < input.Length; ipos++)
             {
-                var idx = ValidStringCharacters.IndexOf(input[i]);
-
-                switch (state)
+                var c = input[ipos];
+                if (char.IsSurrogate(c)) // ignore high surrogate
                 {
-                    case StateBreak:
-                        if (idx >= 0 && (opos > 0 || idx < 26 || idx >= 36))
-                        {
-                            ipos = i;
-                            if (opos > 0 && separator != char.MinValue)
-                                output[opos++] = separator;
-                            state = idx < 36 ? StateWord : StateUp;
-                        }
-                        break;
-
-                    case StateWord:
-                        if (idx < 0 || (_breakTermsOnUpper && idx >= 36))
-                        {
-                            CopyAsciiTerm(input, ipos, output, ref opos, i - ipos, caseType, termFilter, false);
-                            ipos = i;
-                            state = idx < 0 ? StateBreak : StateUp;
-                            if (state != StateBreak && separator != char.MinValue)
-                                output[opos++] = separator;
-                        }
-                        break;
-
-                    case StateAcronym:
-                        if (idx < 36)
-                        {
-                            CopyAsciiTerm(input, ipos, output, ref opos, i - ipos, caseType, termFilter, true);
-                            ipos = i;
-                            state = idx < 0 ? StateBreak : StateWord;
-                            if (state != StateBreak && separator != char.MinValue)
-                                output[opos++] = separator;
-                        }
-                        break;
-
-                    case StateUp:
-                        if (idx >= 0)
-                        {
-                            state = idx < 36 ? StateWord : StateAcronym;
-                        }
-                        else
-                        {
-                            CopyAsciiTerm(input, ipos, output, ref opos, 1, caseType, termFilter, false);
-                            state = StateBreak;
-                        }
-                        break;
-
-                    default:
-                        throw new Exception("Invalid state.");
+                    ipos++; // and skip low surrogate
+                    output[opos++] = '?';
                 }
-            }
-
-            //Console.WriteLine("xx: ({0}) {1}, {2}, {3}", state, input.Length, ipos, opos);
-            switch (state)
-            {
-                case StateBreak:
-                    break;
-
-                case StateWord:
-                    CopyAsciiTerm(input, ipos, output, ref opos, input.Length - ipos, caseType, termFilter, false);
-                    break;
-
-                case StateAcronym:
-                case StateUp:
-                    CopyAsciiTerm(input, ipos, output, ref opos, input.Length - ipos, caseType, termFilter, true);
-                    break;
-
-                default:
-                    throw new Exception("Invalid state.");
+                else
+                {
+                    output[opos++] = c;
+                }
             }
 
             return new string(output, 0, opos);
         }
 
-        internal void CopyAsciiTerm(string input, int ipos, char[] output, ref int opos, int len,
-            CleanStringType caseType, Func<string, string> termFilter, bool isAcronym)
-        {
-            var term = input.Substring(ipos, len);
-            ipos = 0;
+        // here was a subtle, ascii-optimized version of the cleaning code, and I was
+        // very proud of it until benchmarking showed it was an order of magnitude slower
+        // that the utf8 version. Micro-optimizing sometimes isn't such a good idea.
 
-            if (termFilter != null)
-            {
-                term = termFilter(term);
-                len = term.Length;
-            }
-
-            if (isAcronym)
-            {
-                if (caseType == CleanStringType.CamelCase && len <= 2 && opos > 0)
-                    caseType = CleanStringType.Unchanged;
-                else if (caseType == CleanStringType.PascalCase && len <= 2)
-                    caseType = CleanStringType.Unchanged;
-            }
-
-            int idx;
-            switch (caseType)
-            {
-                //case CleanStringType.LowerCase:
-                //case CleanStringType.UpperCase:
-                case CleanStringType.Unchanged:
-                    term.CopyTo(ipos, output, opos, len);
-                    opos += len;
-                    break;
-
-                case CleanStringType.LowerCase:
-                    for (var i = ipos; i < ipos + len; i++)
-                    {
-                        idx = ValidStringCharacters.IndexOf(term[i]);
-                        output[opos++] = ValidStringCharacters[idx >= 36 ? idx - 36 : idx];
-                    }
-                    break;
-
-                case CleanStringType.UpperCase:
-                    for (var i = ipos; i < ipos + len; i++)
-                    {
-                        idx = ValidStringCharacters.IndexOf(term[i]);
-                        output[opos++] = ValidStringCharacters[idx < 26 ? idx + 36 : idx];
-                    }
-                    break;
-
-                case CleanStringType.CamelCase:
-                    idx = ValidStringCharacters.IndexOf(term[ipos]);
-                    if (opos == 0)
-                        output[opos++] = ValidStringCharacters[idx >= 36 ? idx - 36 : idx];
-                    else
-                        output[opos++] = ValidStringCharacters[idx < 26 ? idx + 36 : idx];
-                    for (var i = ipos + 1; i < ipos + len; i++)
-                    {
-                        idx = ValidStringCharacters.IndexOf(term[i]);
-                        output[opos++] = ValidStringCharacters[idx >= 36 ? idx - 36 : idx];
-                    }
-                    break;
-
-                case CleanStringType.PascalCase:
-                    idx = ValidStringCharacters.IndexOf(term[ipos]);
-                    output[opos++] = ValidStringCharacters[idx < 26 ? idx + 36 : idx];
-                    for (var i = ipos + 1; i < ipos + len; i++)
-                    {
-                        idx = ValidStringCharacters.IndexOf(term[i]);
-                        output[opos++] = ValidStringCharacters[idx >= 36 ? idx - 36 : idx];
-                    }
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException("caseType");
-            }
-        }
-        */
-
-        // that's the default code that will work for utf8 strings
-        // will not handle unicode, though
-
-        internal string CleanUtf8String(string text)
-        {
-            return CleanUtf8String(text, CleanStringType.CamelCase, char.MinValue, _defaultCulture, HelperConfig.Empty);
-        }
-
-        internal string CleanUtf8String(string text, CleanStringType caseType, char separator, CultureInfo culture, HelperConfig config)
+        // note: does NOT support surrogate pairs in text
+        internal string CleanCodeString(string text, CleanStringType caseType, char separator, CultureInfo culture, Config config)
         {
             int opos = 0, ipos = 0;
             var state = StateBreak;
@@ -761,21 +563,28 @@ function validateSafeAlias(id, value, immediate, callback) {{
             var ilen = input.Length;
             var output = new char[ilen * 2]; // twice the length should be OK in all cases
 
-            //var termFilter = config.TermFilter;
-
             for (var i = 0; i < ilen; i++)
             {
                 var c = input[i];
-                var isDigit = char.IsDigit(c);
+                var isTerm = config.IsTerm(c, opos == 0);
+
+                //var isDigit = char.IsDigit(c);
                 var isUpper = char.IsUpper(c); // false for digits, symbols...
-                var isLower = char.IsLower(c); // false for digits, symbols...
-                var isUnder = config.AllowUnderscoreInTerm && c == '_';
-                var isTerm = char.IsLetterOrDigit(c) || isUnder;
+                //var isLower = char.IsLower(c); // false for digits, symbols...
+
+                // what should I do with surrogates?
+                // no idea, really, so they are not supported at the moment
+                var isPair = char.IsSurrogate(c);
+                if (isPair)
+                    throw new NotSupportedException("Surrogate pairs are not supported.");
 
                 switch (state)
                 {
+                    // within a break
                     case StateBreak:
-                        if (isTerm && (opos > 0 || (isUnder == false && (config.AllowLeadingDigits || isDigit == false))))
+                        // begin a new term if char is a term char,
+                        // and ( pos > 0 or it's also a valid leading char )
+                        if (isTerm)
                         {
                             ipos = i;
                             if (opos > 0 && separator != char.MinValue)
@@ -784,10 +593,13 @@ function validateSafeAlias(id, value, immediate, callback) {{
                         }
                         break;
 
+                    // within a term / word
                     case StateWord:
+                        // end a term if char is not a term char,
+                        // or ( it's uppercase and we break terms on uppercase)
                         if (isTerm == false || (config.BreakTermsOnUpper && isUpper))
                         {
-                            CopyUtf8Term(input, ipos, output, ref opos, i - ipos, caseType, culture, /*termFilter,*/ false);
+                            CopyTerm(input, ipos, output, ref opos, i - ipos, caseType, culture, false);
                             ipos = i;
                             state = isTerm ? StateUp : StateBreak;
                             if (state != StateBreak && separator != char.MinValue)
@@ -795,27 +607,48 @@ function validateSafeAlias(id, value, immediate, callback) {{
                         }
                         break;
 
+                    // within a term / acronym
                     case StateAcronym:
-                        if (isTerm == false || isLower || isDigit)
+                        // end an acronym if char is not a term char,
+                        // or if it's not uppercase / config
+                        //Console.WriteLine("acro {0} {1}", c, (config.CutAcronymOnNonUpper && isUpper == false));
+                        if (isTerm == false || (config.CutAcronymOnNonUpper && isUpper == false))
                         {
-                            if (isLower && config.GreedyAcronyms == false)
-                                i -= 1;
-                            CopyUtf8Term(input, ipos, output, ref opos, i - ipos, caseType, culture, /*termFilter,*/ true);
-                            ipos = i;
-                            state = isTerm ? StateWord : StateBreak;
-                            if (state != StateBreak && separator != char.MinValue)
-                                output[opos++] = separator;
+                            // whether it's part of the acronym depends on whether we're greedy
+                            if (isTerm && config.GreedyAcronyms == false)
+                                i -= 1; // handle that char again, in another state - not part of the acronym
+                            if (i - ipos > 1) // single-char can't be an acronym
+                            {
+                                CopyTerm(input, ipos, output, ref opos, i - ipos, caseType, culture, true);
+                                ipos = i;
+                                state = isTerm ? StateWord : StateBreak;
+                                if (state != StateBreak && separator != char.MinValue)
+                                    output[opos++] = separator;
+                            }
+                            else if (isTerm)
+                            {
+                                state = StateWord;
+                            }
+                        }
+                        else if (isUpper == false) // isTerm == true
+                        {
+                            // it's a term char and we don't cut...
+                            // keep moving forward as a word
+                            state = StateWord;
                         }
                         break;
 
+                    // within a term / uppercase = could be a word or an acronym
                     case StateUp:
                         if (isTerm)
                         {
+                            // add that char to the term and pick word or acronym
                             state = isUpper ? StateAcronym : StateWord;
                         }
                         else
                         {
-                            CopyUtf8Term(input, ipos, output, ref opos, 1, caseType, culture, /*termFilter,*/ false);
+                            // single char, copy then break
+                            CopyTerm(input, ipos, output, ref opos, 1, caseType, culture, false);
                             state = StateBreak;
                         }
                         break;
@@ -831,12 +664,12 @@ function validateSafeAlias(id, value, immediate, callback) {{
                     break;
 
                 case StateWord:
-                    CopyUtf8Term(input, ipos, output, ref opos, input.Length - ipos, caseType, culture, /*termFilter,*/ false);
+                    CopyTerm(input, ipos, output, ref opos, input.Length - ipos, caseType, culture, false);
                     break;
 
                 case StateAcronym:
                 case StateUp:
-                    CopyUtf8Term(input, ipos, output, ref opos, input.Length - ipos, caseType, culture, /*termFilter,*/ true);
+                    CopyTerm(input, ipos, output, ref opos, input.Length - ipos, caseType, culture, true);
                     break;
 
                 default:
@@ -846,17 +679,15 @@ function validateSafeAlias(id, value, immediate, callback) {{
             return new string(output, 0, opos);
         }
 
-        internal void CopyUtf8Term(string input, int ipos, char[] output, ref int opos, int len,
-            CleanStringType caseType, CultureInfo culture, /*Func<string, string> termFilter,*/ bool isAcronym)
+        // note: supports surrogate pairs in input string
+        internal void CopyTerm(string input, int ipos, char[] output, ref int opos, int len,
+            CleanStringType caseType, CultureInfo culture, bool isAcronym)
         {
             var term = input.Substring(ipos, len);
-            ipos = 0;
-
-            //if (termFilter != null)
-            //{
-            //    term = termFilter(term);
-            //    len = term.Length;
-            //}
+            //Console.WriteLine("TERM \"{0}\" {1} {2}", 
+            //    term, 
+            //    isAcronym ? "acronym" : "word",
+            //    caseType);
 
             if (isAcronym)
             {
@@ -866,48 +697,100 @@ function validateSafeAlias(id, value, immediate, callback) {{
                     caseType = CleanStringType.Unchanged;
             }
 
+            // note: MSDN seems to imply that ToUpper or ToLower preserve the length
+            // of the string, but that this behavior is not guaranteed and could change.
+
             char c;
+            int i;
+            string s;
             switch (caseType)
             {
                 //case CleanStringType.LowerCase:
                 //case CleanStringType.UpperCase:
                 case CleanStringType.Unchanged:
-                    term.CopyTo(ipos, output, opos, len);
+                    term.CopyTo(0, output, opos, len);
                     opos += len;
                     break;
 
                 case CleanStringType.LowerCase:
-                    term.ToLower(culture).CopyTo(ipos, output, opos, len);
-                    opos += len;
+                    term = term.ToLower(culture);
+                    term.CopyTo(0, output, opos, term.Length);
+                    opos += term.Length;
                     break;
 
                 case CleanStringType.UpperCase:
-                    term.ToUpper(culture).CopyTo(ipos, output, opos, len);
-                    opos += len;
+                    term = term.ToUpper(culture);
+                    term.CopyTo(0, output, opos, term.Length);
+                    opos += term.Length;
                     break;
 
                 case CleanStringType.CamelCase:
-                    c = term[ipos++];
-                    output[opos] = opos++ == 0 ? char.ToLower(c, culture) : char.ToUpper(c, culture);
-                    if (len > 1)
-                        term.ToLower(culture).CopyTo(ipos, output, opos, len - 1);
-                    opos += len - 1;
+                    c = term[0];
+                    i = 1;
+                    if (char.IsSurrogate(c))
+                    {
+                        s = term.Substring(ipos, 2);
+                        s = opos == 0 ? s.ToLower(culture) : s.ToUpper(culture);
+                        s.CopyTo(0, output, opos, s.Length);
+                        opos += s.Length;
+                        i++; // surrogate pair len is 2
+                    }
+                    else
+                    {
+                        output[opos] = opos++ == 0 ? char.ToLower(c, culture) : char.ToUpper(c, culture);
+                    }
+                    if (len > i)
+                    {
+                        term = term.Substring(i).ToLower(culture);
+                        term.CopyTo(0, output, opos, term.Length);
+                        opos += term.Length;
+                    }
                     break;
 
                 case CleanStringType.PascalCase:
-                    c = term[ipos++];
-                    output[opos++] = char.ToUpper(c, culture);
-                    if (len > 1)
-                        term.ToLower(culture).CopyTo(ipos, output, opos, len - 1);
-                    opos += len - 1;
+                    c = term[0];
+                    i = 1;
+                    if (char.IsSurrogate(c))
+                    {
+                        s = term.Substring(ipos, 2);
+                        s = s.ToUpper(culture);
+                        s.CopyTo(0, output, opos, s.Length);
+                        opos += s.Length;
+                        i++; // surrogate pair len is 2
+                    }
+                    else
+                    {
+                        output[opos++] = char.ToUpper(c, culture);
+                    }
+                    if (len > i)
+                    {
+                        term = term.Substring(i).ToLower(culture);
+                        term.CopyTo(0, output, opos, term.Length);
+                        opos += term.Length;
+                    }
                     break;
 
                 case CleanStringType.UmbracoCase:
-                    c = term[ipos++];
-                    output[opos] = opos++ == 0 ? c : char.ToUpper(c, culture);
-                    if (len > 1)
-                        term.CopyTo(ipos, output, opos, len - 1);
-                    opos += len - 1;
+                    c = term[0];
+                    i = 1;
+                    if (char.IsSurrogate(c))
+                    {
+                        s = term.Substring(ipos, 2);
+                        s = opos == 0 ? s : s.ToUpper(culture);
+                        s.CopyTo(0, output, opos, s.Length);
+                        opos += s.Length;
+                        i++; // surrogate pair len is 2
+                    }
+                    else
+                    {
+                        output[opos] = opos++ == 0 ? c : char.ToUpper(c, culture);
+                    }
+                    if (len > i)
+                    {
+                        term = term.Substring(i);
+                        term.CopyTo(0, output, opos, term.Length);
+                        opos += term.Length;                        
+                    }
                     break;
 
                 default:
@@ -926,6 +809,7 @@ function validateSafeAlias(id, value, immediate, callback) {{
         /// <param name="separator">The separator, which defaults to a whitespace.</param>
         /// <returns>The splitted text.</returns>
         /// <remarks>Supports Utf8 and Ascii strings, not Unicode strings.</remarks>
+        // NOTE does not support surrogates pairs at the moment
         public virtual string SplitPascalCasing(string text, char separator)
         {
             // be safe
@@ -965,55 +849,6 @@ function validateSafeAlias(id, value, immediate, callback) {{
             }
             if (a != char.MinValue)
                 output[opos++] = a;
-            return new string(output, 0, opos);
-        }
-
-        #endregion
-
-        #region Recode
-
-        /// <summary>
-        /// Returns a new string containing only characters within the specified code type.
-        /// </summary>
-        /// <param name="text">The string to filter.</param>
-        /// <param name="stringType">The string type.</param>
-        /// <returns>The filtered string.</returns>
-        /// <remarks>If <paramref name="stringType"/> is not <c>Unicode</c> then non-utf8 characters are
-        /// removed. If it is <c>Ascii</c> we try to do some intelligent replacement of accents, etc.</remarks>
-        public virtual string Recode(string text, CleanStringType stringType)
-        {
-            // be safe
-            if (text == null)
-                throw new ArgumentNullException("text");
-
-            var codeType = stringType & CleanStringType.CodeMask;
-
-            // unicode to utf8 or ascii: just remove the unicode chars
-            // utf8 to ascii: try to be clever and replace some chars
-
-            // what's the point?
-            if (codeType == CleanStringType.Unicode)
-                return text;
-
-            return codeType == CleanStringType.Utf8 
-                ? RemoveNonUtf8(text) 
-                : Utf8ToAsciiConverter.ToAsciiString(text);
-        }
-
-        private string RemoveNonUtf8(string text)
-        {
-            var len = text.Length;
-            var output = new char[len]; // we won't be adding chars
-            int opos = 0;
-
-            for (var ipos = 0; ipos < len; ipos++)
-            {
-                var c = text[ipos];
-                if (char.IsSurrogate(c))
-                    ipos++;
-                else
-                    output[opos++] = c;
-            }
             return new string(output, 0, opos);
         }
 
