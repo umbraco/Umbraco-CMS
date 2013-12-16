@@ -97,6 +97,21 @@ namespace Umbraco.Core.Services
         ITemplate GetTemplate(int id);
 
         /// <summary>
+        /// Returns a template as a template node which can be traversed (parent, children)
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        TemplateNode GetTemplateNode(string alias);
+
+        /// <summary>
+        /// Given a template node in a tree, this will find the template node with the given alias if it is found in the hierarchy, otherwise null
+        /// </summary>
+        /// <param name="anyNode"></param>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        TemplateNode FindTemplateInTree(TemplateNode anyNode, string alias);
+
+        /// <summary>
         /// Saves a <see cref="ITemplate"/>
         /// </summary>
         /// <param name="template"><see cref="ITemplate"/> to save</param>
