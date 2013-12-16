@@ -6,7 +6,7 @@ using System.Threading;
 
 namespace Umbraco.Core.Cache
 {
-    internal abstract class DictionaryCacheProdiverBase : ICacheProvider
+    internal abstract class DictionaryCacheProviderBase : ICacheProvider
     {
         protected static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         protected abstract DictionaryCacheWrapper DictionaryCache { get; }

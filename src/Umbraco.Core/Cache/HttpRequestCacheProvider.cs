@@ -10,7 +10,7 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// A cache provider that caches items in the HttpContext.Items
     /// </summary>
-    internal class HttpRequestCacheProvider : DictionaryCacheProdiverBase
+    internal class HttpRequestCacheProvider : DictionaryCacheProviderBase
     {
         private readonly Func<HttpContextBase> _context;
 
