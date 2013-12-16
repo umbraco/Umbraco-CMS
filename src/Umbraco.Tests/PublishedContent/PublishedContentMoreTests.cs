@@ -40,7 +40,7 @@ namespace Umbraco.Tests.PublishedContent
 
             var caches = CreatePublishedContent();
 
-            ApplicationContext.Current = new ApplicationContext(false) { IsReady = true };
+            ApplicationContext.Current = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper()) { IsReady = true };
             var factory = new FakeHttpContextFactory("http://umbraco.local/");
             StateHelper.HttpContext = factory.HttpContext;
             var context = new UmbracoContext(

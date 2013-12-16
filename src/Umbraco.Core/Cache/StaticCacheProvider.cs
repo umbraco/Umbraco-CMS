@@ -27,75 +27,47 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearCacheObjectTypes(string typeName)
         {
-            foreach (var key in StaticCache.Keys)
-            {
-                if (StaticCache[key] != null
-                    && StaticCache[key].GetType().ToString().InvariantEquals(typeName))
-                {
-                    object val;
-                    StaticCache.TryRemove(key, out val);
-                }
-            }
+            StaticCache.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType().ToString().InvariantEquals(typeName));
         }
 
         public virtual void ClearCacheObjectTypes<T>()
         {
-            foreach (var key in StaticCache.Keys)
-            {
-                if (StaticCache[key] != null
-                    && StaticCache[key].GetType() == typeof(T))
-                {
-                    object val;
-                    StaticCache.TryRemove(key, out val);
-                }
-            }
+            var typeOfT = typeof(T);
+            StaticCache.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT);
+        }
+
+        public virtual void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
+        {
+            var typeOfT = typeof(T);
+            StaticCache.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT && predicate(kvp.Key, (T)kvp.Value));
         }
 
         public virtual void ClearCacheByKeySearch(string keyStartsWith)
         {
-            foreach (var key in StaticCache.Keys)
-            {
-                if (key.InvariantStartsWith(keyStartsWith))
-                {
-                    ClearCacheItem(key);
-                }
-            }
+            StaticCache.RemoveAll(kvp => kvp.Key.InvariantStartsWith(keyStartsWith));
         }
 
         public virtual void ClearCacheByKeyExpression(string regexString)
         {
-            foreach (var key in StaticCache.Keys)
-            {
-                if (Regex.IsMatch(key, regexString))
-                {
-                    ClearCacheItem(key);
-                }
-            }
+            StaticCache.RemoveAll(kvp => Regex.IsMatch(kvp.Key, regexString)); 
         }
 
-        public virtual IEnumerable<T> GetCacheItemsByKeySearch<T>(string keyStartsWith)
+        public virtual IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
         {
             return (from KeyValuePair<string, object> c in StaticCache
                     where c.Key.InvariantStartsWith(keyStartsWith)
-                    select c.Value.TryConvertTo<T>()
-                    into attempt
-                    where attempt.Success
-                    select attempt.Result).ToList();
+                    select c.Value).ToList();
         }
 
-        public virtual T GetCacheItem<T>(string cacheKey)
+        public virtual object GetCacheItem(string cacheKey)
         {
             var result = StaticCache[cacheKey];
-            if (result == null)
-            {
-                return default(T);
-            }
-            return result.TryConvertTo<T>().Result;
+            return result;
         }
 
-        public virtual T GetCacheItem<T>(string cacheKey, Func<T> getCacheItem)
+        public virtual object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
-            return (T)StaticCache.GetOrAdd(cacheKey, getCacheItem());
+            return StaticCache.GetOrAdd(cacheKey, key => getCacheItem());
         }
         
     }

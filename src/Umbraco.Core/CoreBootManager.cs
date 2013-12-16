@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
@@ -38,6 +39,7 @@ namespace Umbraco.Core
 		private bool _isComplete = false;
         private readonly UmbracoApplicationBase _umbracoApplication;
 		protected ApplicationContext ApplicationContext { get; private set; }
+        protected CacheHelper ApplicationCache { get; set; }
 
 	    protected UmbracoApplicationBase UmbracoApplication
 	    {
@@ -57,16 +59,19 @@ namespace Umbraco.Core
 
 	        InitializeProfilerResolver();
 
+            CreateApplicationCache();
+
             _timer = DisposableTimer.DebugDuration<CoreBootManager>("Umbraco application starting", "Umbraco application startup complete");
 
 			//create database and service contexts for the app context
 			var dbFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName);
 		    Database.Mapper = new PetaPocoMapper();
 			var dbContext = new DatabaseContext(dbFactory);
-			var serviceContext = new ServiceContext(
-				new PetaPocoUnitOfWorkProvider(dbFactory), 
-				new FileUnitOfWorkProvider(), 
-				new PublishingStrategy());
+            var serviceContext = new ServiceContext(
+                new PetaPocoUnitOfWorkProvider(dbFactory),
+                new FileUnitOfWorkProvider(),
+                new PublishingStrategy(),
+                ApplicationCache);
 
             CreateApplicationContext(dbContext, serviceContext);
 
@@ -94,7 +99,21 @@ namespace Umbraco.Core
         protected virtual void CreateApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
         {
             //create the ApplicationContext
-            ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext);
+            ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext, ApplicationCache);
+        }
+
+        /// <summary>
+        /// Creates and assigns the ApplicationCache based on a new instance of System.Web.Caching.Cache
+        /// </summary>
+        protected virtual void CreateApplicationCache()
+        {
+            var cacheHelper = new CacheHelper(
+                        new ObjectCacheRuntimeCacheProvider(),
+                        new StaticCacheProvider(),
+                //we have no request based cache when not running in web-based context
+                        new NullCacheProvider());
+
+            ApplicationCache = cacheHelper;
         }
 
         /// <summary>

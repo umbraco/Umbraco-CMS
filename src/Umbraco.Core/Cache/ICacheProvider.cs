@@ -6,19 +6,17 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// An abstract class for implementing a basic cache provider
     /// </summary>
-    /// <remarks>
-    /// THIS MUST REMAIN INTERNAL UNTIL WE STREAMLINE HOW ALL CACHE IS HANDLED, WE NEED TO SUPPORT HTTP RUNTIME CACHE, IN MEMORY CACHE, ETC...
-    /// </remarks>
-    internal interface ICacheProvider
+    public interface ICacheProvider
     {
         void ClearAllCache();
         void ClearCacheItem(string key);
         void ClearCacheObjectTypes(string typeName);
         void ClearCacheObjectTypes<T>();
+        void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate);
         void ClearCacheByKeySearch(string keyStartsWith);
         void ClearCacheByKeyExpression(string regexString);
-        IEnumerable<T> GetCacheItemsByKeySearch<T>(string keyStartsWith);
-        T GetCacheItem<T>(string cacheKey);
-        T GetCacheItem<T>(string cacheKey, Func<T> getCacheItem);
+        IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith);
+        object GetCacheItem(string cacheKey);
+        object GetCacheItem(string cacheKey, Func<object> getCacheItem);
     }
 }

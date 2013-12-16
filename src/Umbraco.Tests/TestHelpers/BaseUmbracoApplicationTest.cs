@@ -2,6 +2,10 @@
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.ObjectResolution;
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Publishing;
+using Umbraco.Core.Services;
 using Umbraco.Web;
 
 namespace Umbraco.Tests.TestHelpers
@@ -71,8 +75,18 @@ namespace Umbraco.Tests.TestHelpers
         /// </summary>
         protected virtual void SetupApplicationContext()
         {
-            //DO NOT ENABLE CACHE
-            ApplicationContext.Current = new ApplicationContext(false) {IsReady = true};
+            //disable cache
+            var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
+
+            ApplicationContext.Current = new ApplicationContext(
+                //assign the db context
+                new DatabaseContext(new DefaultDatabaseFactory()),
+                //assign the service context
+                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),
+                cacheHelper)
+            {
+                IsReady = true
+            };
         }
 
         /// <summary>

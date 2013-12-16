@@ -27,17 +27,19 @@ namespace Umbraco.Tests.Persistence
 
             RepositoryResolver.Current = new RepositoryResolver(
                 new RepositoryFactory());
-            
+
+            //disable cache
+            var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
+
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
                 new DatabaseContext(new DefaultDatabaseFactory()),
                 //assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy()),
-                //disable cache
-                false)
-                {
-                    IsReady = true
-                };
+                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),
+                cacheHelper)
+            {
+                IsReady = true
+            };
 
             Resolution.Freeze();
         }

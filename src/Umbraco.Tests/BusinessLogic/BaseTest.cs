@@ -32,7 +32,7 @@ namespace Umbraco.Tests.BusinessLogic
         [SetUp]
         public void Initialize()
         {
-            ApplicationContext.Current = new ApplicationContext(false){IsReady = true};
+            ApplicationContext.Current = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper()) { IsReady = true };
             InitializeDatabase();
             InitializeApps();
             InitializeAppConfigFile();

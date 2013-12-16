@@ -24,27 +24,30 @@ namespace Umbraco.Tests.Services
 		private PerThreadPetaPocoUnitOfWorkProvider _uowProvider;
 		private PerThreadDatabaseFactory _dbFactory;
 
-		[SetUp]
-		public override void Initialize()
-		{            
-			base.Initialize();
-			
-			//we need to use our own custom IDatabaseFactory for the DatabaseContext because we MUST ensure that 
-			//a Database instance is created per thread, whereas the default implementation which will work in an HttpContext
-			//threading environment, or a single apartment threading environment will not work for this test because 
-			//it is multi-threaded.
-			_dbFactory = new PerThreadDatabaseFactory();
-			//overwrite the local object
-			ApplicationContext.DatabaseContext = new DatabaseContext(_dbFactory);
+        [SetUp]
+        public override void Initialize()
+        {
+            base.Initialize();
 
-			//here we are going to override the ServiceContext because normally with our test cases we use a 
-			//global Database object but this is NOT how it should work in the web world or in any multi threaded scenario.
-			//we need a new Database object for each thread.
-			_uowProvider = new PerThreadPetaPocoUnitOfWorkProvider(_dbFactory);			
-			ApplicationContext.Services = new ServiceContext(_uowProvider, new FileUnitOfWorkProvider(), new PublishingStrategy());
+            //we need to use our own custom IDatabaseFactory for the DatabaseContext because we MUST ensure that 
+            //a Database instance is created per thread, whereas the default implementation which will work in an HttpContext
+            //threading environment, or a single apartment threading environment will not work for this test because 
+            //it is multi-threaded.
+            _dbFactory = new PerThreadDatabaseFactory();
+            //overwrite the local object
+            ApplicationContext.DatabaseContext = new DatabaseContext(_dbFactory);
 
-			CreateTestData();
-		}
+            //disable cache
+            var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
+
+            //here we are going to override the ServiceContext because normally with our test cases we use a 
+            //global Database object but this is NOT how it should work in the web world or in any multi threaded scenario.
+            //we need a new Database object for each thread.
+            _uowProvider = new PerThreadPetaPocoUnitOfWorkProvider(_dbFactory);
+            ApplicationContext.Services = new ServiceContext(_uowProvider, new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper);
+
+            CreateTestData();
+        }
 
 		[TearDown]
 		public override void TearDown()

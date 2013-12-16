@@ -20,7 +20,7 @@ namespace Umbraco.Tests
         [Test]
         public void Can_Create_Empty_App_Context()
         {
-            var appCtx = new ApplicationContext(false);
+            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
             Assert.Pass();
         }
 
@@ -43,11 +43,13 @@ namespace Umbraco.Tests
                     new Mock<ILocalizationService>().Object,
                     new RepositoryFactory(true),
                     new Mock<IDatabaseUnitOfWorkProvider>().Object),
-                new Mock<IEntityService>().Object,
+                new Mock<IEntityService>().Object/*,
                 new RelationService(
                     new Mock<IDatabaseUnitOfWorkProvider>().Object,
                     new RepositoryFactory(true),
-                    new Mock<IEntityService>().Object));
+                    new Mock<IEntityService>().Object),
+                new Mock<ISectionService>().Object,
+                new Mock<IApplicationTreeService>().Object*/);
             Assert.Pass();
         }
 
@@ -79,19 +81,19 @@ namespace Umbraco.Tests
                     new Mock<ILocalizationService>().Object,
                     new RepositoryFactory(true),
                     new Mock<IDatabaseUnitOfWorkProvider>().Object),
-                new Mock<IEntityService>().Object,
+                new Mock<IEntityService>().Object/*,
                 new RelationService(
                     new Mock<IDatabaseUnitOfWorkProvider>().Object,
                     new RepositoryFactory(true),
-                    new Mock<IEntityService>().Object)),
-                false);
+                    new Mock<IEntityService>().Object)*/),
+                CacheHelper.CreateDisabledCacheHelper());
             Assert.Pass();
         }
-        
+
         [Test]
         public void Can_Assign_App_Context_Singleton()
         {
-            var appCtx = new ApplicationContext(false);
+            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
             var result = ApplicationContext.EnsureContext(appCtx, true);
             Assert.AreEqual(appCtx, result);
         }
@@ -99,8 +101,8 @@ namespace Umbraco.Tests
         [Test]
         public void Does_Not_Overwrite_App_Context_Singleton()
         {
-            ApplicationContext.EnsureContext(new ApplicationContext(false), true);
-            var appCtx = new ApplicationContext(false);
+            ApplicationContext.EnsureContext(new ApplicationContext(CacheHelper.CreateDisabledCacheHelper()), true);
+            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
             var result = ApplicationContext.EnsureContext(appCtx, false);
             Assert.AreNotEqual(appCtx, result);
         }
@@ -109,14 +111,14 @@ namespace Umbraco.Tests
         [Test]
         public void Can_Get_Umbraco_Context()
         {
-            var appCtx = new ApplicationContext(false);
+            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
             ApplicationContext.EnsureContext(appCtx, true);
-            
+
             var umbCtx = UmbracoContext.EnsureContext(
                 new Mock<HttpContextBase>().Object,
                 appCtx,
                 true);
-            
+
             Assert.AreEqual(umbCtx, UmbracoContext.Current);
         }
 

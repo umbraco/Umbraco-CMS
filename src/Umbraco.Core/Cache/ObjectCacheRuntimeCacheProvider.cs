@@ -16,7 +16,7 @@ namespace Umbraco.Core.Cache
     /// </summary>
     internal class ObjectCacheRuntimeCacheProvider : IRuntimeCacheProvider
     {
-        private static readonly ReaderWriterLockSlim ClearLock = new ReaderWriterLockSlim();
+        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
         internal ObjectCache MemoryCache;
 
         public ObjectCacheRuntimeCacheProvider()
@@ -26,7 +26,7 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearAllCache()
         {
-            using (new WriteLock(ClearLock))
+            using (new WriteLock(Locker))
             {
                 MemoryCache.DisposeIfDisposable();
                 MemoryCache = new MemoryCache("in-memory");
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearCacheItem(string key)
         {
-            using (new WriteLock(ClearLock))
+            using (new WriteLock(Locker))
             {
                 if (MemoryCache[key] == null) return;
                 MemoryCache.Remove(key);
@@ -44,31 +44,48 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearCacheObjectTypes(string typeName)
         {
-            using (new WriteLock(ClearLock))
+            using (new WriteLock(Locker))
             {
-                var keysToRemove = (from c in MemoryCache where c.Value.GetType().ToString().InvariantEquals(typeName) select c.Key).ToList();
+                var keysToRemove = MemoryCache
+                    .Where(c => c.Value != null && c.Value.GetType().ToString().InvariantEquals(typeName))
+                    .Select(c => c.Key)
+                    .ToArray();
                 foreach (var k in keysToRemove)
-                {
                     MemoryCache.Remove(k);
-                }
             }
         }
 
         public virtual void ClearCacheObjectTypes<T>()
         {
-            using (new WriteLock(ClearLock))
+            using (new WriteLock(Locker))
             {
-                var keysToRemove = (from c in MemoryCache where c.Value.GetType() == typeof (T) select c.Key).ToList();
+                var typeOfT = typeof (T);
+                var keysToRemove = MemoryCache
+                    .Where(c => c.Value != null && c.Value.GetType() == typeOfT)
+                    .Select(c => c.Key)
+                    .ToArray();
                 foreach (var k in keysToRemove)
-                {
                     MemoryCache.Remove(k);
-                }
+            }
+        }
+
+        public virtual void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
+        {
+            using (new WriteLock(Locker))
+            {
+                var typeOfT = typeof(T);
+                var keysToRemove = MemoryCache
+                    .Where(c => c.Value != null && c.Value.GetType() == typeOfT && predicate(c.Key, (T)c.Value))
+                    .Select(c => c.Key)
+                    .ToArray();
+                foreach (var k in keysToRemove)
+                    MemoryCache.Remove(k);
             }
         }
 
         public virtual void ClearCacheByKeySearch(string keyStartsWith)
         {
-            using (new WriteLock(ClearLock))
+            using (new WriteLock(Locker))
             {
                 var keysToRemove = (from c in MemoryCache where c.Key.InvariantStartsWith(keyStartsWith) select c.Key).ToList();
                 foreach (var k in keysToRemove)
@@ -80,7 +97,7 @@ namespace Umbraco.Core.Cache
 
         public virtual void ClearCacheByKeyExpression(string regexString)
         {
-            using (new WriteLock(ClearLock))
+            using (new WriteLock(Locker))
             {
                 var keysToRemove = (from c in MemoryCache where Regex.IsMatch(c.Key, regexString) select c.Key).ToList();
                 foreach (var k in keysToRemove)
@@ -90,49 +107,34 @@ namespace Umbraco.Core.Cache
             }     
         }
 
-        public virtual IEnumerable<T> GetCacheItemsByKeySearch<T>(string keyStartsWith)
+        public virtual IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
         {
             return (from c in MemoryCache
                     where c.Key.InvariantStartsWith(keyStartsWith)
-                    select c.Value.TryConvertTo<T>()
-                        into attempt
-                        where attempt.Success
-                        select attempt.Result).ToList();
+                    select c.Value).ToList();
         }
 
-        public virtual T GetCacheItem<T>(string cacheKey)
+        public virtual object GetCacheItem(string cacheKey)
         {
             var result = MemoryCache.Get(cacheKey);
-            if (result == null)
-            {
-                return default(T);
-            }
-            return result.TryConvertTo<T>().Result;
+            return result;
         }
 
-        public virtual T GetCacheItem<T>(string cacheKey, Func<T> getCacheItem)
+        public virtual object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
-            return GetCacheItem(cacheKey, CacheItemPriority.Normal, null, null, null, getCacheItem);
+            return GetCacheItem(cacheKey, getCacheItem, null);
         }
 
-        public virtual T GetCacheItem<T>(string cacheKey, TimeSpan? timeout, Func<T> getCacheItem)
+        public object GetCacheItem(
+            string cacheKey, 
+            Func<object> getCacheItem, 
+            TimeSpan? timeout, 
+            bool isSliding = false, 
+            CacheItemPriority priority = CacheItemPriority.Normal,
+            CacheItemRemovedCallback removedCallback = null, 
+            string[] dependentFiles = null)
         {
-            return GetCacheItem(cacheKey, null, timeout, getCacheItem);
-        }
-
-        public virtual T GetCacheItem<T>(string cacheKey, CacheItemRemovedCallback refreshAction, TimeSpan? timeout, Func<T> getCacheItem)
-        {
-            return GetCacheItem(cacheKey, CacheItemPriority.Normal, refreshAction, timeout, getCacheItem);
-        }
-
-        public virtual T GetCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheItemRemovedCallback refreshAction, TimeSpan? timeout, Func<T> getCacheItem)
-        {
-            return GetCacheItem(cacheKey, priority, refreshAction, null, timeout, getCacheItem);
-        }
-
-        public virtual T GetCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheItemRemovedCallback refreshAction, CacheDependency cacheDependency, TimeSpan? timeout, Func<T> getCacheItem)
-        {
-            using (var lck = new UpgradeableReadLock(ClearLock))
+            using (var lck = new UpgradeableReadLock(Locker))
             {
                 var result = MemoryCache.Get(cacheKey);
                 if (result == null)
@@ -142,56 +144,69 @@ namespace Umbraco.Core.Cache
                     result = getCacheItem();
                     if (result != null)
                     {
-                        var policy = new CacheItemPolicy
-                            {
-                                AbsoluteExpiration = timeout == null ? ObjectCache.InfiniteAbsoluteExpiration : DateTime.Now.Add(timeout.Value),
-                                SlidingExpiration = TimeSpan.Zero
-                            };
-                        
-                        //TODO: CUrrently we cannot implement this in this provider, we'll have to change the underlying interface
-                        // to accept an array of files instead of CacheDependency.
-                        //policy.ChangeMonitors.Add(new HostFileChangeMonitor(cacheDependency.));
-
+                        var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
                         MemoryCache.Set(cacheKey, result, policy);
                     }
                 }
-                return result.TryConvertTo<T>().Result;
+                return result;
             }
         }
 
-        public virtual void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, Func<T> getCacheItem)
-        {
-            InsertCacheItem(cacheKey, priority, null, null, null, getCacheItem);
-        }
-
-        public virtual void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, TimeSpan? timeout, Func<T> getCacheItem)
-        {
-            InsertCacheItem(cacheKey, priority, null, null, timeout, getCacheItem);
-        }
-
-        public virtual void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheDependency cacheDependency, TimeSpan? timeout, Func<T> getCacheItem)
-        {
-            InsertCacheItem(cacheKey, priority, null, cacheDependency, timeout, getCacheItem);
-        }
-
-        public virtual void InsertCacheItem<T>(string cacheKey, CacheItemPriority priority, CacheItemRemovedCallback refreshAction, CacheDependency cacheDependency, TimeSpan? timeout, Func<T> getCacheItem)
+        public void InsertCacheItem(string cacheKey, Func<object> getCacheItem, TimeSpan? timeout = null, bool isSliding = false, CacheItemPriority priority = CacheItemPriority.Normal, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
         {
             object result = getCacheItem();
             if (result != null)
             {
-
-                var policy = new CacheItemPolicy
-                {
-                    AbsoluteExpiration = timeout == null ? ObjectCache.InfiniteAbsoluteExpiration : DateTime.Now.Add(timeout.Value),
-                    SlidingExpiration = TimeSpan.Zero
-                };
-
-                //TODO: CUrrently we cannot implement this in this provider, we'll have to change the underlying interface
-                // to accept an array of files instead of CacheDependency.
-                //policy.ChangeMonitors.Add(new HostFileChangeMonitor(cacheDependency.));
-
+                var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
                 MemoryCache.Set(cacheKey, result, policy);
             }
+        }
+
+        private static CacheItemPolicy GetPolicy(TimeSpan? timeout = null, bool isSliding = false, CacheItemRemovedCallback removedCallback = null, string[] dependentFiles = null)
+        {
+            var absolute = isSliding ? ObjectCache.InfiniteAbsoluteExpiration : (timeout == null ? ObjectCache.InfiniteAbsoluteExpiration : DateTime.Now.Add(timeout.Value));
+            var sliding = isSliding == false ? ObjectCache.NoSlidingExpiration : (timeout ?? ObjectCache.NoSlidingExpiration);
+
+            var policy = new CacheItemPolicy
+            {
+                AbsoluteExpiration = absolute,
+                SlidingExpiration = sliding
+            };
+
+            if (dependentFiles != null && dependentFiles.Any())
+            {
+                policy.ChangeMonitors.Add(new HostFileChangeMonitor(dependentFiles.ToList()));
+            }
+            
+            if (removedCallback != null)
+            {
+                policy.RemovedCallback = arguments =>
+                {
+                    //convert the reason
+                    var reason = CacheItemRemovedReason.Removed;
+                    switch (arguments.RemovedReason)
+                    {
+                        case CacheEntryRemovedReason.Removed:
+                            reason = CacheItemRemovedReason.Removed;
+                            break;
+                        case CacheEntryRemovedReason.Expired:
+                            reason = CacheItemRemovedReason.Expired;
+                            break;
+                        case CacheEntryRemovedReason.Evicted:
+                            reason = CacheItemRemovedReason.Underused;
+                            break;
+                        case CacheEntryRemovedReason.ChangeMonitorChanged:
+                            reason = CacheItemRemovedReason.Expired;
+                            break;
+                        case CacheEntryRemovedReason.CacheSpecificEviction:
+                            reason = CacheItemRemovedReason.Underused;
+                            break;
+                    }
+                    //call the callback
+                    removedCallback(arguments.CacheItem.Key, arguments.CacheItem.Value, reason);
+                };
+            }
+            return policy;
         }
         
     }
