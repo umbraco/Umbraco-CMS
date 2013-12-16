@@ -221,6 +221,19 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets an <see cref="IContent"/> object by Id
+        /// </summary>
+        /// <param name="ids">Ids of the Content to retrieve</param>
+        /// <returns><see cref="IContent"/></returns>
+        public IEnumerable<IContent> GetByIds(IEnumerable<int> ids)
+        {
+            using (var repository = _repositoryFactory.CreateContentRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.GetAll(ids.ToArray());
+            }
+        }
+
+        /// <summary>
         /// Gets an <see cref="IContent"/> object by its 'UniqueId'
         /// </summary>
         /// <param name="key">Guid key of the Content to retrieve</param>
@@ -597,10 +610,22 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to publish</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
+        [Obsolete("Use PublishWithStatus instead, that method will provide more detailed information on the outcome")]
         public bool Publish(IContent content, int userId = 0)
         {
             var result = SaveAndPublishDo(content, userId);
-	        return result.Success;
+            return result.Success;
+        }
+
+        /// <summary>
+        /// Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        public Attempt<PublishStatus> PublishWithStatus(IContent content, int userId = 0)
+        {
+            return SaveAndPublishDo(content, userId);
         }
 
         /// <summary>
@@ -609,16 +634,29 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
+        [Obsolete("Use PublishWithChildrenWithStatus instead, that method will provide more detailed information on the outcome and also allows the includeUnpublished flag")]
         public bool PublishWithChildren(IContent content, int userId = 0)
         {
             var result = PublishWithChildrenDo(content, userId, true);
-            
+
             //This used to just return false only when the parent content failed, otherwise would always return true so we'll
             // do the same thing for the moment
-	        if (!result.Any(x => x.Result.ContentItem.Id == content.Id))
-	            return false;
+            if (!result.Any(x => x.Result.ContentItem.Id == content.Id))
+                return false;
 
-	        return result.Single(x => x.Result.ContentItem.Id == content.Id).Success;	        
+            return result.Single(x => x.Result.ContentItem.Id == content.Id).Success;
+        }
+
+        /// <summary>
+        /// Publishes a <see cref="IContent"/> object and all its children
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="includeUnpublished">set to true if you want to also publish children that are currently unpublished</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        public IEnumerable<Attempt<PublishStatus>> PublishWithChildrenWithStatus(IContent content, int userId = 0, bool includeUnpublished = false)
+        {
+            return PublishWithChildrenDo(content, userId, includeUnpublished);
         }
 
         /// <summary>
@@ -639,10 +677,23 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise save events.</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
+        [Obsolete("Use SaveAndPublishWithStatus instead, that method will provide more detailed information on the outcome")]
         public bool SaveAndPublish(IContent content, int userId = 0, bool raiseEvents = true)
         {
             var result = SaveAndPublishDo(content, userId, raiseEvents);
-	        return result.Success;
+            return result.Success;
+        }
+
+        /// <summary>
+        /// Saves and Publishes a single <see cref="IContent"/> object
+        /// </summary>
+        /// <param name="content">The <see cref="IContent"/> to save and publish</param>
+        /// <param name="userId">Optional Id of the User issueing the publishing</param>
+        /// <param name="raiseEvents">Optional boolean indicating whether or not to raise save events.</param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        public Attempt<PublishStatus> SaveAndPublishWithStatus(IContent content, int userId = 0, bool raiseEvents = true)
+        {
+            return SaveAndPublishDo(content, userId, raiseEvents);
         }
 
         /// <summary>
@@ -1160,18 +1211,20 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to send to publication</param>
         /// <param name="userId">Optional Id of the User issueing the send to publication</param>
         /// <returns>True if sending publication was succesfull otherwise false</returns>
-        internal bool SendToPublication(IContent content, int userId = 0)
+        public bool SendToPublication(IContent content, int userId = 0)
         {
 
             if (SendingToPublish.IsRaisedEventCancelled(new SendToPublishEventArgs<IContent>(content), this))
                 return false;
 
-            //TODO: Do some stuff here.. RunActionHandlers
+            //TODO: Do some stuff here.. ... what is it supposed to do ?
+            // pretty sure all that legacy stuff did was raise an event? and we no longer have IActionHandlers so no worries there.
 
             SentToPublish.RaiseEvent(new SendToPublishEventArgs<IContent>(content, false), this);
 
             Audit.Add(AuditTypes.SendToPublish, "Send to Publish performed by user", content.WriterId, content.Id);
 
+            //TODO: will this ever be false??
             return true;
         }
 

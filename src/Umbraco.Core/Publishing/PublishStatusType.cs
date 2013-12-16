@@ -6,7 +6,7 @@ namespace Umbraco.Core.Publishing
     /// <remarks>
     /// Anything less than 10 = Success!
     /// </remarks>
-    internal enum PublishStatusType
+    public enum PublishStatusType
     {
         /// <summary>
         /// The publishing was successful.
