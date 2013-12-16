@@ -45,7 +45,11 @@ namespace umbraco.editorControls.MultiNodeTreePicker
 			//need to add our tree definitions to the collection.
 
 			//find the content tree to duplicate
-			var contentTree = TreeDefinitionCollection.Instance.Single(x => string.Equals(x.Tree.Alias, Umbraco.Core.Constants.Applications.Content, StringComparison.OrdinalIgnoreCase));
+			var contentTree = TreeDefinitionCollection.Instance.SingleOrDefault(x => string.Equals(x.Tree.Alias, Umbraco.Core.Constants.Applications.Content, StringComparison.OrdinalIgnoreCase));
+            //we cannot continue
+            if (contentTree == null)            
+                return;
+
 			var filteredContentTree = new TreeDefinition(typeof(FilteredContentTree),
 			                                             new umbraco.BusinessLogic.ApplicationTree(true, false, 0,
 			                                                                                       contentTree.Tree.ApplicationAlias,
