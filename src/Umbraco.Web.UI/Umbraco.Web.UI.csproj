@@ -867,13 +867,6 @@
     <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xml\index.html" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xml\xml.js" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\Test\index.html" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\Test\testBase.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\Test\testEmptySequenceKeyword.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\Test\testMultiAttr.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\Test\testNamespaces.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\Test\testProcessingInstructions.js" />
-    <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\Test\testQuotes.js" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Xquery\xquery.js" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Yaml\index.html" />
     <Content Include="Umbraco_Client\CodeMirror\Js\Mode\Yaml\yaml.js" />
