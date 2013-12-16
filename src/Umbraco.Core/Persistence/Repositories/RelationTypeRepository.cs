@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
@@ -13,21 +14,21 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="RelationType"/>
     /// </summary>
-    internal class RelationTypeRepository : PetaPocoRepositoryBase<int, RelationType>, IRelationTypeRepository
+    internal class RelationTypeRepository : PetaPocoRepositoryBase<int, IRelationType>, IRelationTypeRepository
     {
-		public RelationTypeRepository(IDatabaseUnitOfWork work)
-			: base(work)
+        public RelationTypeRepository(IDatabaseUnitOfWork work)
+            : base(work)
         {
         }
 
-		public RelationTypeRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
+        public RelationTypeRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
             : base(work, cache)
         {
         }
 
         #region Overrides of RepositoryBase<int,RelationType>
 
-        protected override RelationType PerformGet(int id)
+        protected override IRelationType PerformGet(int id)
         {
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
@@ -41,12 +42,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //on initial construction we don't want to have dirty properties tracked
             // http://issues.umbraco.org/issue/U4-1946
-            entity.ResetDirtyProperties(false);
+            ((TracksChangesEntityBase)entity).ResetDirtyProperties(false);
 
             return entity;
         }
 
-        protected override IEnumerable<RelationType> PerformGetAll(params int[] ids)
+        protected override IEnumerable<IRelationType> PerformGetAll(params int[] ids)
         {
             if (ids.Any())
             {
@@ -65,10 +66,10 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
 
-        protected override IEnumerable<RelationType> PerformGetByQuery(IQuery<RelationType> query)
+        protected override IEnumerable<IRelationType> PerformGetByQuery(IQuery<IRelationType> query)
         {
             var sqlClause = GetBaseQuery(false);
-            var translator = new SqlTranslator<RelationType>(sqlClause, query);
+            var translator = new SqlTranslator<IRelationType>(sqlClause, query);
             var sql = translator.Translate();
 
             var dtos = Database.Fetch<RelationTypeDto>(sql);
@@ -115,9 +116,9 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Unit of Work Implementation
 
-        protected override void PersistNewItem(RelationType entity)
+        protected override void PersistNewItem(IRelationType entity)
         {
-            entity.AddingEntity();
+            ((Entity)entity).AddingEntity();
 
             var factory = new RelationTypeFactory();
             var dto = factory.BuildDto(entity);
@@ -125,18 +126,18 @@ namespace Umbraco.Core.Persistence.Repositories
             var id = Convert.ToInt32(Database.Insert(dto));
             entity.Id = id;
 
-            entity.ResetDirtyProperties();
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
-        protected override void PersistUpdatedItem(RelationType entity)
+        protected override void PersistUpdatedItem(IRelationType entity)
         {
-            entity.UpdatingEntity();
+            ((Entity)entity).UpdatingEntity();
 
             var factory = new RelationTypeFactory();
             var dto = factory.BuildDto(entity);
             Database.Update(dto);
 
-            entity.ResetDirtyProperties();
+            ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
         #endregion

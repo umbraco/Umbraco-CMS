@@ -21,7 +21,7 @@ namespace Umbraco.Tests.Persistence.Repositories
     {
         [SetUp]
         public override void Initialize()
-        {           
+        {
             base.Initialize();
 
             CreateTestData();
@@ -42,7 +42,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.Current.ResolveByType<IRelationRepository>(unitOfWork);            
+            var repository = RepositoryResolver.Current.ResolveByType<IRelationRepository>(unitOfWork);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -212,7 +212,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var query = Query<Relation>.Builder.Where(x => x.ParentId == NodeDto.NodeIdSeed + 1);
+                var query = Query<IRelation>.Builder.Where(x => x.ParentId == NodeDto.NodeIdSeed + 1);
                 int count = repository.Count(query);
 
                 // Assert
@@ -231,7 +231,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
 
                 // Act
-                var query = Query<Relation>.Builder.Where(x => x.RelationTypeId == 2);
+                var query = Query<IRelation>.Builder.Where(x => x.RelationTypeId == 2);
                 var relations = repository.GetByQuery(query);
 
                 // Assert
@@ -285,19 +285,19 @@ namespace Umbraco.Tests.Persistence.Repositories
             relationTypeRepository.AddOrUpdate(relateContentType);
             unitOfWork.Commit();
 
-            //Create and Save ContentType "umbTextpage" -> NodeDto.NodeIdSeed
+            //Create and Save ContentType "umbTextpage" -> (NodeDto.NodeIdSeed)
             ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
             ServiceContext.ContentTypeService.Save(contentType);
 
-            //Create and Save Content "Homepage" based on "umbTextpage" -> NodeDto.NodeIdSeed + 1
+            //Create and Save Content "Homepage" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 1)
             Content textpage = MockedContent.CreateSimpleContent(contentType);
             ServiceContext.ContentService.Save(textpage, 0);
 
-            //Create and Save Content "Text Page 1" based on "umbTextpage" -> NodeDto.NodeIdSeed + 2
+            //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 2)
             Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
             ServiceContext.ContentService.Save(subpage, 0);
 
-            //Create and Save Content "Text Page 1" based on "umbTextpage" -> NodeDto.NodeIdSeed + 3
+            //Create and Save Content "Text Page 1" based on "umbTextpage" -> (NodeDto.NodeIdSeed + 3)
             Content subpage2 = MockedContent.CreateSimpleContent(contentType, "Text Page 2", textpage.Id);
             ServiceContext.ContentService.Save(subpage2, 0);
 
