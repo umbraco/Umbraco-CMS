@@ -195,7 +195,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="mediaPath">Path of the media item to retreive (for example: /media/1024/koala_403x328.jpg)</param>
         /// <returns><see cref="IMedia"/></returns>
-        IMedia GetMediaByPath(string mediaPath);        
+        IMedia GetMediaByPath(string mediaPath);
 
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects, which are ancestors of the current media.

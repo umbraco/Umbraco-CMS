@@ -155,7 +155,7 @@ namespace Umbraco.Core.Services
                 return repository.GetByQuery(query);
             }
         }
-        
+
         /// <summary>
         /// Gets a list of <see cref="Relation"/> objects by the Name of the <see cref="RelationType"/>
         /// </summary>
@@ -311,7 +311,7 @@ namespace Umbraco.Core.Services
                 yield return new Tuple<IUmbracoEntity, IUmbracoEntity>(parent, child);
             }
         }
-        
+
         /// <summary>
         /// Relates two objects that are based on the <see cref="IUmbracoEntity"/> interface.
         /// </summary>
@@ -322,7 +322,7 @@ namespace Umbraco.Core.Services
         public IRelation Relate(IUmbracoEntity parent, IUmbracoEntity child, IRelationType relationType)
         {
             //Ensure that the RelationType has an indentity before using it to relate two entities
-            if(relationType.HasIdentity == false)
+            if (relationType.HasIdentity == false)
                 Save(relationType);
 
             var relation = new Relation(parent.Id, child.Id, relationType);
@@ -346,7 +346,7 @@ namespace Umbraco.Core.Services
         public IRelation Relate(IUmbracoEntity parent, IUmbracoEntity child, string relationTypeAlias)
         {
             var relationType = GetRelationTypeByAlias(relationTypeAlias);
-            if(relationType == null || string.IsNullOrEmpty(relationType.Alias))
+            if (relationType == null || string.IsNullOrEmpty(relationType.Alias))
                 throw new ArgumentNullException(string.Format("No RelationType with Alias '{0}' exists.", relationTypeAlias));
 
             var relation = new Relation(parent.Id, child.Id, relationType);

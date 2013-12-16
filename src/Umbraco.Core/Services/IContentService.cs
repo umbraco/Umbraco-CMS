@@ -128,7 +128,7 @@ namespace Umbraco.Core.Services
         /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        void Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);		
+        void Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Deletes all content of specified type. All children of deleted content is moved to Recycle Bin.

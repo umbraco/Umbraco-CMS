@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.Current.ResolveByType<IRelationTypeRepository>(unitOfWork);  
+            var repository = RepositoryResolver.Current.ResolveByType<IRelationTypeRepository>(unitOfWork);
 
             // Assert
             Assert.That(repository, Is.Not.Null);
@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var relateMemberToContent = new RelationType(new Guid(Constants.ObjectTypes.Member),
                                                              new Guid(Constants.ObjectTypes.Document),
-                                                             "relateMemberToContent") {IsBidirectional = true, Name = "Relate Member to Content"};
+                                                             "relateMemberToContent") { IsBidirectional = true, Name = "Relate Member to Content" };
 
                 repository.AddOrUpdate(relateMemberToContent);
                 unitOfWork.Commit();

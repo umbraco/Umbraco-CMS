@@ -782,7 +782,7 @@ namespace umbraco.cms.businesslogic.member
             }
             return _password;
         }
-
+        
         /// <summary>
         /// Adds the member to group with the specified id
         /// </summary>

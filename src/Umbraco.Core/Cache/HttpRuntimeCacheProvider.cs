@@ -12,7 +12,7 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// A CacheProvider that wraps the logic of the HttpRuntime.Cache
     /// </summary>
-    internal class HttpRuntimeCacheProvider : DictionaryCacheProdiverBase, IRuntimeCacheProvider
+    internal class HttpRuntimeCacheProvider : DictionaryCacheProviderBase, IRuntimeCacheProvider
     {
         private readonly System.Web.Caching.Cache _cache;
         private readonly DictionaryCacheWrapper _wrapper;
