@@ -440,6 +440,16 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Converts an integer to an invariant formatted string
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string ToInvariantString(this int str)
+        {
+            return str.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
         /// Compares 2 strings with invariant culture and case ignored
         /// </summary>
         /// <param name="compare">The compare.</param>

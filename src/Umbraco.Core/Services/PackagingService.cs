@@ -707,20 +707,23 @@ namespace Umbraco.Core.Services
         {
             var prevalues = new XElement("PreValues");
 
-            var prevalueList = ((DataTypeService)_dataTypeService).GetDetailedPreValuesByDataTypeId(dataTypeDefinition.Id);
-            foreach (var tuple in prevalueList)
+            var prevalueList = _dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id)
+                .FormatAsDictionary();
+
+            var sort = 0;
+            foreach (var pv in prevalueList)
             {
                 var prevalue = new XElement("PreValue");
-                prevalue.Add(new XAttribute("Id", tuple.Item1));
-                prevalue.Add(new XAttribute("Value", tuple.Item4));
-                prevalue.Add(new XAttribute("Alias", tuple.Item2));
-                prevalue.Add(new XAttribute("SortOrder", tuple.Item3));
+                prevalue.Add(new XAttribute("Id", pv.Value.Id));
+                prevalue.Add(new XAttribute("Value", pv.Value.Value));
+                prevalue.Add(new XAttribute("Alias", pv.Key));
+                prevalue.Add(new XAttribute("SortOrder", sort));
                 prevalues.Add(prevalue);
+                sort++;
             }
 
             var xml = new XElement("DataType", prevalues);
             xml.Add(new XAttribute("Name", dataTypeDefinition.Name));
-            //The 'ID' when exporting is actually the property editor alias (in pre v7 it was the IDataType GUID id)
             xml.Add(new XAttribute("Id", dataTypeDefinition.ControlId));
             xml.Add(new XAttribute("Definition", dataTypeDefinition.Key));
             xml.Add(new XAttribute("DatabaseType", dataTypeDefinition.DatabaseType.ToString()));

@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -25,7 +26,7 @@ namespace Umbraco.Tests.Services
         public void Creating_100_Items()
         {
             // Arrange
-            var contentType = ServiceContext.ContentTypeService.GetContentType(1045);
+            var contentType = ServiceContext.ContentTypeService.GetContentType(NodeDto.NodeIdSeed);
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
 
             // Act
@@ -44,7 +45,7 @@ namespace Umbraco.Tests.Services
         public void Creating_1000_Items()
         {
             // Arrange
-            var contentType = ServiceContext.ContentTypeService.GetContentType(1045);
+            var contentType = ServiceContext.ContentTypeService.GetContentType(NodeDto.NodeIdSeed);
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
 
             // Act
@@ -63,7 +64,7 @@ namespace Umbraco.Tests.Services
         public void Getting_100_Uncached_Items()
         {
             // Arrange
-            var contentType = ServiceContext.ContentTypeService.GetContentType(1045);
+            var contentType = ServiceContext.ContentTypeService.GetContentType(NodeDto.NodeIdSeed);
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
             ServiceContext.ContentService.Save(pages, 0);
 
@@ -88,7 +89,7 @@ namespace Umbraco.Tests.Services
         public void Getting_1000_Uncached_Items()
         {
             // Arrange
-            var contentType = ServiceContext.ContentTypeService.GetContentType(1045);
+            var contentType = ServiceContext.ContentTypeService.GetContentType(NodeDto.NodeIdSeed);
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
             ServiceContext.ContentService.Save(pages, 0);
 
@@ -113,7 +114,7 @@ namespace Umbraco.Tests.Services
         public void Getting_100_Cached_Items()
         {
             // Arrange
-            var contentType = ServiceContext.ContentTypeService.GetContentType(1045);
+            var contentType = ServiceContext.ContentTypeService.GetContentType(NodeDto.NodeIdSeed);
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 100);
             ServiceContext.ContentService.Save(pages, 0);
 
@@ -141,7 +142,7 @@ namespace Umbraco.Tests.Services
         public void Getting_1000_Cached_Items()
         {
             // Arrange
-            var contentType = ServiceContext.ContentTypeService.GetContentType(1045);
+            var contentType = ServiceContext.ContentTypeService.GetContentType(NodeDto.NodeIdSeed);
             var pages = MockedContent.CreateTextpageContent(contentType, -1, 1000);
             ServiceContext.ContentService.Save(pages, 0);
 
@@ -173,7 +174,7 @@ namespace Umbraco.Tests.Services
 
         public void CreateTestData()
         {
-            //Create and Save ContentType "textpage" -> 1045
+            //Create and Save ContentType "textpage" -> NodeDto.NodeIdSeed
             ContentType contentType = MockedContentTypes.CreateTextpageContentType();
             ServiceContext.ContentTypeService.Save(contentType);
         }

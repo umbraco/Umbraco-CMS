@@ -461,7 +461,7 @@ namespace Umbraco.Tests.Services
             contentService.Save(content);
 
             var parent = contentService.GetById(NodeDto.NodeIdSeed + 1);
-            bool parentPublished = contentService.Publish(parent, 0);//Publish root Home node to enable publishing of '1048'
+            bool parentPublished = contentService.Publish(parent, 0);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
 
             // Act
             bool published = contentService.Publish(content, 0);
@@ -482,7 +482,7 @@ namespace Umbraco.Tests.Services
             contentService.Save(content, 0);
 
             var parent = contentService.GetById(NodeDto.NodeIdSeed + 1);
-            bool parentPublished = contentService.Publish(parent, 0);//Publish root Home node to enable publishing of '1048'
+            bool parentPublished = contentService.Publish(parent, 0);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
 
             // Act
             bool published = contentService.Publish(content, 0);
