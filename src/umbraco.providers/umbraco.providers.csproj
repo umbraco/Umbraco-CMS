@@ -79,6 +79,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="members\Helper.cs" />
+    <Compile Include="members\MembershipEventHandler.cs" />
     <Compile Include="members\MembersMembershipProvider.cs" />
     <Compile Include="members\MembersProfileProvider.cs" />
     <Compile Include="members\MembersRoleProvider.cs" />
@@ -104,6 +105,10 @@
     <ProjectReference Include="..\umbraco.datalayer\umbraco.datalayer.csproj">
       <Project>{C7CB79F0-1C97-4B33-BFA7-00731B579AE2}</Project>
       <Name>umbraco.datalayer</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\umbraco.interfaces\umbraco.interfaces.csproj">
+      <Project>{511F6D8D-7717-440A-9A57-A507E9A8B27F}</Project>
+      <Name>umbraco.interfaces</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

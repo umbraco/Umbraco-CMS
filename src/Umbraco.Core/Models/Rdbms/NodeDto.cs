@@ -9,8 +9,10 @@ namespace Umbraco.Core.Models.Rdbms
     [ExplicitColumns]
     internal class NodeDto
     {
+        public const int NodeIdSeed = 1050;
+
         [Column("id")]
-        [PrimaryKeyColumn(Name = "PK_structure", IdentitySeed = 1045)]
+        [PrimaryKeyColumn(Name = "PK_structure", IdentitySeed = NodeIdSeed)]
         public int NodeId { get; set; }
 
         [Column("trashed")]

@@ -71,7 +71,7 @@ namespace Umbraco.Web.UI.Controls
 			var divMacroItemContainer = new TagBuilder("div");
 			divMacroItemContainer.Attributes.Add("style", "width: 285px;display:none;");
 			divMacroItemContainer.Attributes.Add("class", "sbMenu");
-			var macros = ApplicationContext.DatabaseContext.Database.Query<MacroDto>("select id, macroAlias, macroName from cmsMacro order by macroName");
+			var macros = ApplicationContext.DatabaseContext.Database.Fetch<MacroDto>("select id, macroAlias, macroName from cmsMacro order by macroName");
 			foreach (var macro in macros)
 			{
 				var divMacro = new TagBuilder("div");
@@ -137,7 +137,7 @@ namespace Umbraco.Web.UI.Controls
 
 		private bool DoesMacroHaveParameters(int macroId)
 		{
-			return ApplicationContext.DatabaseContext.Database.ExecuteScalar<int>(string.Format("select 1 from cmsMacroProperty where macro = {0}", macroId)) == 1;
+            return ApplicationContext.DatabaseContext.Database.ExecuteScalar<int>(string.Format("SELECT COUNT(*) from cmsMacroProperty where macro = {0}", macroId)) > 0;
 		}
 	}
 }

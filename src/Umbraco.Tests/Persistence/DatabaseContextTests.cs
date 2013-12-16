@@ -15,18 +15,18 @@ namespace Umbraco.Tests.Persistence
     {
 	    private DatabaseContext _dbContext;
 
-		[SetUp]
-		public void Setup()
-		{
-			_dbContext = new DatabaseContext(new DefaultDatabaseFactory());
+        [SetUp]
+        public void Setup()
+        {
+            _dbContext = new DatabaseContext(new DefaultDatabaseFactory());
 
-			//unfortunately we have to set this up because the PetaPocoExtensions require singleton access
-			ApplicationContext.Current = new ApplicationContext(false)
-				{
-					DatabaseContext = _dbContext,
-					IsReady = true
-				};			
-		}
+            //unfortunately we have to set this up because the PetaPocoExtensions require singleton access
+            ApplicationContext.Current = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper())
+            {
+                DatabaseContext = _dbContext,
+                IsReady = true
+            };
+        }
 
 		[TearDown]
 		public void TearDown()

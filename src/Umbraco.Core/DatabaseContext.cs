@@ -433,24 +433,19 @@ namespace Umbraco.Core
             return _result;
         }
 
-        internal Result CreateDatabaseSchemaAndDataOrUpgrade()
+        internal Result CreateDatabaseSchemaAndData()
         {
-            if (_configured == false || (string.IsNullOrEmpty(_connectionString) || string.IsNullOrEmpty(ProviderName)))
+            var readyForInstall = CheckReadyForInstall();
+            if (readyForInstall.Success == false)
             {
-                return new Result
-                           {
-                               Message =
-                                   "Database configuration is invalid. Please check that the entered database exists and that the provided username and password has write access to the database.",
-                               Success = false,
-                               Percentage = "10"
-                           };
+                return readyForInstall.Result;
             }
-
+            
             try
             {
                 LogHelper.Info<DatabaseContext>("Database configuration status: Started");
 
-                var message = string.Empty;
+                string message;
 
                 var database = new UmbracoDatabase(_connectionString, ProviderName);
                 var supportsCaseInsensitiveQueries = SqlSyntaxContext.SqlSyntaxProvider.SupportsCaseInsensitiveQueries(database);
@@ -465,50 +460,73 @@ namespace Umbraco.Core
 
                     return new Result { Message = message, Success = false, Percentage = "15" };
                 }
-                else if (supportsCaseInsensitiveQueries == null)
-                {
-                    message = "<p>&nbsp;</p><p>Warning! Could not check if your database type supports case insensitive queries. <br />We currently do not support these databases that do not support case insensitive queries.</p>" +
-                              "<p>You can check this by looking for the following setting in your my.ini file in your MySQL installation directory:</p>" +
-                              "<pre>lower_case_table_names=1</pre><br />" +
-                              "<p>Note: Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
-                              "<p>For more technical information on case sensitivity in MySQL, have a look at " +
-                              "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
-                }
-                else
-                {
-                    if (SqlSyntaxContext.SqlSyntaxProvider.GetType() == typeof(MySqlSyntaxProvider))
-                    {
-                        message = "<p>&nbsp;</p><p>Congratulations, the database step ran successfully!</p>" +
-                                  "<p>Note: You're using MySQL and the database instance you're connecting to seems to support case insensitive queries.</p>" +
-                                  "<p>However, your hosting provider may not support this option. Umbraco does not currently support MySQL installs that do not support case insensitive queries</p>" +
-                                  "<p>Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
-                                  "<p>They can check this by looking for the following setting in the my.ini file in their MySQL installation directory:</p>" +
-                                  "<pre>lower_case_table_names=1</pre><br />" +
-                                  "<p>For more technical information on case sensitivity in MySQL, have a look at " +
-                                  "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
-                    }
-                }
+
+                message = GetResultMessageForMySql(supportsCaseInsensitiveQueries);
 
                 var schemaResult = ValidateDatabaseSchema();
                 var installedVersion = schemaResult.DetermineInstalledVersion();
                 
-
                 //If Configuration Status is empty and the determined version is "empty" its a new install - otherwise upgrade the existing
                 if (string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus) && installedVersion.Equals(new Version(0, 0, 0)))
                 {
                     database.CreateDatabaseSchema();
                     message = message + "<p>Installation completed!</p>";
+
+                    //now that everything is done, we need to determine the version of SQL server that is executing
+                    LogHelper.Info<DatabaseContext>("Database configuration status: " + message);
+                    return new Result { Message = message, Success = true, Percentage = "100" };
                 }
-                else
-                {
-                    var configuredVersion = string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus)
+
+                //we need to do an upgrade so return a new status message and it will need to be done during the next step
+                LogHelper.Info<DatabaseContext>("Database requires upgrade");
+                message = "<p>Upgrading database, this may take some time...</p>";
+                return new Result
+                    {
+                        RequiresUpgrade = true, 
+                        Message = message, 
+                        Success = true, 
+                        Percentage = "30"
+                    };
+            }
+            catch (Exception ex)
+            {
+                return HandleInstallException(ex);
+            }
+        }
+
+        /// <summary>
+        /// This assumes all of the previous checks are done!
+        /// </summary>
+        /// <returns></returns>
+        internal Result UpgradeSchemaAndData()
+        {
+            var readyForInstall = CheckReadyForInstall();
+            if (readyForInstall.Success == false)
+            {
+                return readyForInstall.Result;
+            }
+
+            try
+            {
+                LogHelper.Info<DatabaseContext>("Database upgrade started");
+
+                var database = new UmbracoDatabase(_connectionString, ProviderName);
+                var supportsCaseInsensitiveQueries = SqlSyntaxContext.SqlSyntaxProvider.SupportsCaseInsensitiveQueries(database);                
+
+                var message = GetResultMessageForMySql(supportsCaseInsensitiveQueries);
+
+                var schemaResult = ValidateDatabaseSchema();
+                var installedVersion = schemaResult.DetermineInstalledVersion();
+                
+                //DO the upgrade!
+
+                var configuredVersion = string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus)
                                                 ? installedVersion
                                                 : new Version(GlobalSettings.ConfigurationStatus);
-                    var targetVersion = UmbracoVersion.Current;
-                    var runner = new MigrationRunner(configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
-                    var upgraded = runner.Execute(database, true);
-                    message = message + "<p>Upgrade completed!</p>";
-                }
+                var targetVersion = UmbracoVersion.Current;
+                var runner = new MigrationRunner(configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+                var upgraded = runner.Execute(database, true);
+                message = message + "<p>Upgrade completed!</p>";
 
                 //now that everything is done, we need to determine the version of SQL server that is executing
 
@@ -518,26 +536,72 @@ namespace Umbraco.Core
             }
             catch (Exception ex)
             {
-                LogHelper.Info<DatabaseContext>("Database configuration failed with the following error and stack trace: " + ex.Message + "\n" + ex.StackTrace);
-
-                if (_result != null)
-                {
-                    LogHelper.Info<DatabaseContext>("The database schema validation produced the following summary: \n" + _result.GetSummary());
-                }
-
-                return new Result
-                           {
-                               Message =
-                                   "The database configuration failed with the following message: " + ex.Message +
-                                   "\n Please check log file for additional information (can be found in '/App_Data/Logs/UmbracoTraceLog.txt')",
-                               Success = false,
-                               Percentage = "90"
-                           };
+                return HandleInstallException(ex);
             }
+        }
+
+        private string GetResultMessageForMySql(bool? supportsCaseInsensitiveQueries)
+        {
+            if (supportsCaseInsensitiveQueries == null)
+            {
+                return "<p>&nbsp;</p><p>Warning! Could not check if your database type supports case insensitive queries. <br />We currently do not support these databases that do not support case insensitive queries.</p>" +
+                          "<p>You can check this by looking for the following setting in your my.ini file in your MySQL installation directory:</p>" +
+                          "<pre>lower_case_table_names=1</pre><br />" +
+                          "<p>Note: Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
+                          "<p>For more technical information on case sensitivity in MySQL, have a look at " +
+                          "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
+            }
+            if (SqlSyntaxContext.SqlSyntaxProvider.GetType() == typeof(MySqlSyntaxProvider))
+            {
+                return "<p>&nbsp;</p><p>Congratulations, the database step ran successfully!</p>" +
+                       "<p>Note: You're using MySQL and the database instance you're connecting to seems to support case insensitive queries.</p>" +
+                       "<p>However, your hosting provider may not support this option. Umbraco does not currently support MySQL installs that do not support case insensitive queries</p>" +
+                       "<p>Make sure to check with your hosting provider if they support case insensitive queries as well.</p>" +
+                       "<p>They can check this by looking for the following setting in the my.ini file in their MySQL installation directory:</p>" +
+                       "<pre>lower_case_table_names=1</pre><br />" +
+                       "<p>For more technical information on case sensitivity in MySQL, have a look at " +
+                       "<a href='http://dev.mysql.com/doc/refman/5.0/en/identifier-case-sensitivity.html'>the documentation on the subject</a></p>";
+            }
+            return string.Empty;
+        }
+
+        private Attempt<Result> CheckReadyForInstall()
+        {
+            if (_configured == false || (string.IsNullOrEmpty(_connectionString) || string.IsNullOrEmpty(ProviderName)))
+            {
+                return Attempt.Fail(new Result
+                {
+                    Message =
+                        "Database configuration is invalid. Please check that the entered database exists and that the provided username and password has write access to the database.",
+                    Success = false,
+                    Percentage = "10"
+                });
+            }
+            return Attempt<Result>.Succeed();
+        }
+
+        private Result HandleInstallException(Exception ex)
+        {
+            LogHelper.Info<DatabaseContext>("Database configuration failed with the following error and stack trace: " + ex.Message + "\n" + ex.StackTrace);
+
+            if (_result != null)
+            {
+                LogHelper.Info<DatabaseContext>("The database schema validation produced the following summary: \n" + _result.GetSummary());
+            }
+
+            return new Result
+            {
+                Message =
+                    "The database configuration failed with the following message: " + ex.Message +
+                    "\n Please check log file for additional information (can be found in '/App_Data/Logs/UmbracoTraceLog.txt')",
+                Success = false,
+                Percentage = "90"
+            };
         }
 
         internal class Result
         {
+            public bool RequiresUpgrade { get; set; }
             public string Message { get; set; }
             public bool Success { get; set; }
             public string Percentage { get; set; }

@@ -49,7 +49,7 @@ namespace umbraco.cms.presentation.create.controls
 				string returnUrl = umbraco.presentation.create.dialogHandler_temp.Create(
 					umbraco.helper.Request("nodeType"),
 					nodeId,
-					rename.Text);
+					rename.Text.Trim());
 
 
 				BasePage.Current.ClientTools

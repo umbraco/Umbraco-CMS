@@ -294,12 +294,15 @@
     <Compile Include="Controllers\ProfileController.cs" />
     <Compile Include="Controllers\LoginStatusController.cs" />
     <Compile Include="Editors\MediaController.cs" />
+    <Compile Include="Models\ChangingPasswordModel.cs" />
     <Compile Include="Models\IRenderModel.cs" />
     <Compile Include="Models\RenderModelOfTContent.cs" />
+    <Compile Include="Mvc\EnsurePublishedContentRequestAttribute.cs" />
     <Compile Include="Mvc\UmbracoTemplatePageOfTContent.cs" />
     <Compile Include="Mvc\UmbracoViewPage.cs" />
     <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />
     <Compile Include="Controllers\RegisterController.cs" />
+    <Compile Include="Models\PasswordChangedModel.cs" />
     <Compile Include="Models\ProfileModel.cs" />
     <Compile Include="Models\LoginStatusModel.cs" />
     <Compile Include="PropertyEditors\ValueConverters\SimpleEditorValueConverter.cs" />
@@ -388,14 +391,27 @@
     <Compile Include="Search\LuceneIndexerExtensions.cs" />
     <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
+    <Compile Include="Strategies\Migrations\RebuildMediaXmlCacheAfterUpgrade.cs" />
     <Compile Include="UI\CdfLogger.cs" />
     <Compile Include="umbraco.presentation\CompatibilityHelper.cs" />
     <Compile Include="umbraco.presentation\LegacyClasses.cs" />
     <Compile Include="umbraco.presentation\umbraco\ActionHandlers\SimilarNodeNameComparer.cs" />
+    <Compile Include="umbraco.presentation\umbraco\controls\PasswordChanger.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\dialogs\emptyTrashcan.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\dialogs\create.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.cs">
@@ -405,7 +421,11 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain2.aspx.designer.cs">
       <DependentUpon>AssignDomain2.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\members\EditMember.aspx.cs">
+        <Compile Include="umbraco.presentation\umbraco\members\EditMember.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+
+    <Compile Include="umbraco.presentation\umbraco\users\EditUser.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="UmbracoContextExtensions.cs" />
@@ -833,13 +853,6 @@
     <Compile Include="umbraco.presentation\umbraco\controls\GenericValidation.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\LabelButton.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\macroParameterControl.cs" />
-    <Compile Include="umbraco.presentation\umbraco\controls\passwordChanger.ascx.cs">
-      <DependentUpon>passwordChanger.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\passwordChanger.ascx.designer.cs">
-      <DependentUpon>passwordChanger.ascx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
       <DependentUpon>ProgressBar.ascx</DependentUpon>
@@ -1260,33 +1273,12 @@
     <Compile Include="umbraco.presentation\umbraco\dialogs\about.aspx.designer.cs">
       <DependentUpon>about.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain.aspx.cs">
-      <DependentUpon>AssignDomain.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\AssignDomain.aspx.designer.cs">
-      <DependentUpon>AssignDomain.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\create.aspx.cs">
-      <DependentUpon>create.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\create.aspx.designer.cs">
-      <DependentUpon>create.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\cruds.aspx.cs">
       <DependentUpon>cruds.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\cruds.aspx.designer.cs">
       <DependentUpon>cruds.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\emptyTrashcan.aspx.cs">
-      <DependentUpon>emptyTrashcan.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\emptyTrashcan.aspx.designer.cs">
-      <DependentUpon>emptyTrashcan.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\exportDocumenttype.aspx.cs">
       <DependentUpon>exportDocumenttype.aspx</DependentUpon>
@@ -1642,13 +1634,6 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\urlRewriter\UrlRewriterFormWriter.cs" />
-    <Compile Include="umbraco.presentation\umbraco\users\EditUser.aspx.cs">
-      <DependentUpon>EditUser.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\users\EditUser.aspx.designer.cs">
-      <DependentUpon>EditUser.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\users\EditUserType.aspx.cs">
       <DependentUpon>EditUserType.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1834,7 +1819,6 @@
     <Content Include="umbraco.presentation\umbraco\LiveEditing\Modules\SkinModule\SkinCustomizer.ascx" />
     <Content Include="umbraco.presentation\umbraco\members\MemberSearch.ascx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\Preview.aspx" />
-    <Content Include="umbraco.presentation\umbraco\controls\passwordChanger.ascx" />
     <Content Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
@@ -1880,14 +1864,7 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\about.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\AssignDomain.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
-    <Content Include="umbraco.presentation\umbraco\dialogs\create.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\cruds.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\emptyTrashcan.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\exportDocumenttype.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\imageViewer.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\importDocumenttype.aspx" />
@@ -1976,7 +1953,6 @@
     <Content Include="umbraco.presentation\umbraco\settings\EditMediaType.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\users\EditUser.aspx" />
     <Content Include="umbraco.presentation\umbraco\users\EditUserType.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>

@@ -1,6 +1,7 @@
 <%@ Page Language="c#" ValidateRequest="false" CodeBehind="insertMacro.aspx.cs" AutoEventWireup="True"
     Inherits="umbraco.presentation.tinymce3.insertMacro" Trace="false" %>
 
+<%@ Import Namespace="Umbraco.Web" %>
 <%@ Register TagPrefix="ui" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <%@ Register TagPrefix="asp" Namespace="System.Web.UI" Assembly="System.Web" %>
@@ -105,8 +106,8 @@
     <input type="hidden" name="macroMode" value="<%=Request["mode"]%>" />
     <%if (Request["umb_macroID"] != null || Request["umb_macroAlias"] != null)
       {%>
-    <input type="hidden" name="umb_macroID" value="<%=umbraco.helper.Request("umb_macroID")%>" />
-    <input type="hidden" name="umb_macroAlias" value="<%=umbraco.helper.Request("umb_macroAlias")%>" />
+    <input type="hidden" name="umb_macroID" value="<%=Request.CleanForXss("umb_macroID")%>" />
+    <input type="hidden" name="umb_macroAlias" value="<%=Request.CleanForXss("umb_macroAlias")%>" />
     <% }%>
     <ui:Pane ID="pane_edit" runat="server" Visible="false">
         <div class="macroPane">
@@ -118,7 +119,7 @@
             <asp:Button ID="bt_renderMacro" OnClick="renderMacro_Click" runat="server" Text="ok">
             </asp:Button>
             <em>or </em><a id="cancelbtn" href="#" style="color: blue" onclick="tinyMCEPopup.close();">
-                <%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
+                <%=umbraco.ui.Text("general", "cancel", UmbracoUser)%></a>
         </p>
     </asp:Panel>
     <ui:Pane ID="pane_insert" runat="server">
@@ -128,16 +129,16 @@
     </ui:Pane>
     <asp:Panel ID="insert_buttons" runat="server">
         <p>
-            <input type="submit" value="<%=umbraco.ui.Text("general", "ok", this.getUser())%>" />
+            <input type="submit" value="<%=umbraco.ui.Text("general", "ok", UmbracoUser)%>" />
             <em>or </em><a href="#" style="color: blue" onclick="tinyMCEPopup.close();">
-                <%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
+                <%=umbraco.ui.Text("general", "cancel", UmbracoUser)%></a>
         </p>
     </asp:Panel>
     <div id="renderContent" style="display: none">
         <asp:PlaceHolder ID="renderHolder" runat="server"></asp:PlaceHolder>
     </div>
     </form>
-    <script type="text/javascript" language="javascript">
+    <script type="text/javascript" >
         var inst; // =  tinyMCEPopup.editor;
         var elm; // = inst.selection.getNode();
 

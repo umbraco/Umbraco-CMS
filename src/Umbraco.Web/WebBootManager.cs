@@ -116,7 +116,6 @@ namespace Umbraco.Web
         protected override void InitializeApplicationEventsResolver()
         {
             base.InitializeApplicationEventsResolver();
-            ApplicationEventsResolver.Current.AddType<CacheHelperExtensions.CacheHelperApplicationEventListener>();
             ApplicationEventsResolver.Current.AddType<LegacyScheduledTasks>();
             //We need to remove these types because we've obsoleted them and we don't want them executing:
             ApplicationEventsResolver.Current.RemoveType<global::umbraco.LibraryCacheRefresher>();
@@ -147,6 +146,15 @@ namespace Umbraco.Web
             ApplicationEventsResolver.Current.InstantiateLegacyStartupHandlers();
 
             return this;
+        }
+
+        /// <summary>
+        /// Creates the application cache based on the HttpRuntime cache
+        /// </summary>
+        protected override void CreateApplicationCache()
+        {
+            //create a web-based cache helper
+            ApplicationCache = new CacheHelper();
         }
 
         /// <summary>

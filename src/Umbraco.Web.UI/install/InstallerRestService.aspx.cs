@@ -59,7 +59,7 @@ namespace Umbraco.Web.UI.Install
 
         [WebMethod]
         [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
-        public static string InstallOrUpgrade()
+        public static string Install()
         {
             //if its not configured then we can continue
             if (ApplicationContext.Current == null || ApplicationContext.Current.IsConfigured)
@@ -67,10 +67,43 @@ namespace Umbraco.Web.UI.Install
                 throw new AuthenticationException("The application is already configured");
             }
 
-            LogHelper.Info<InstallerRestService>("Running 'InstallOrUpgrade' service");
+            LogHelper.Info<InstallerRestService>("Running 'Install' service");
 
-            var result = ApplicationContext.Current.DatabaseContext.CreateDatabaseSchemaAndDataOrUpgrade();
+            var result = ApplicationContext.Current.DatabaseContext.CreateDatabaseSchemaAndData();
 
+            if (result.RequiresUpgrade == false)
+            {
+                HandleConnectionStrings();
+            }            
+
+            var js = new JavaScriptSerializer();
+            var jsonResult = js.Serialize(result);
+            return jsonResult;
+        }
+
+        [WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public static string Upgrade()
+        {
+            //if its not configured then we can continue
+            if (ApplicationContext.Current == null || ApplicationContext.Current.IsConfigured)
+            {
+                throw new AuthenticationException("The application is already configured");
+            }
+
+            LogHelper.Info<InstallerRestService>("Running 'Upgrade' service");
+
+            var result = ApplicationContext.Current.DatabaseContext.UpgradeSchemaAndData();
+
+            HandleConnectionStrings();
+
+            var js = new JavaScriptSerializer();
+            var jsonResult = js.Serialize(result);
+            return jsonResult;
+        }
+
+        private static void HandleConnectionStrings()
+        {
             // Remove legacy umbracoDbDsn configuration setting if it exists and connectionstring also exists
             if (ConfigurationManager.ConnectionStrings[Core.Configuration.GlobalSettings.UmbracoConnectionName] != null)
             {
@@ -82,10 +115,6 @@ namespace Umbraco.Web.UI.Install
                 LogHelper.Error<InstallerRestService>("", ex);
                 throw ex;
             }
-
-            var js = new JavaScriptSerializer();
-            var jsonResult = js.Serialize(result);
-            return jsonResult;
         }
     }
 }

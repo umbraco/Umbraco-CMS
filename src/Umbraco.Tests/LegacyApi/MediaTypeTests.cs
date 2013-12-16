@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using umbraco.BusinessLogic;
@@ -27,7 +28,7 @@ namespace Umbraco.Tests.LegacyApi
             // Arrange
             var folder = MediaType.GetByAlias(Constants.Conventions.MediaTypes.Folder);
             var folderStructure = folder.AllowedChildContentTypeIDs.ToList();
-            folderStructure.Add(1045);
+            folderStructure.Add(NodeDto.NodeIdSeed);
 
             // Act
             folder.AllowedChildContentTypeIDs = folderStructure.ToArray();
@@ -37,7 +38,7 @@ namespace Umbraco.Tests.LegacyApi
             var updated = MediaType.GetByAlias(Constants.Conventions.MediaTypes.Folder);
 
             Assert.That(updated.AllowedChildContentTypeIDs.Any(), Is.True);
-            Assert.That(updated.AllowedChildContentTypeIDs.Any(x => x == 1045), Is.True);
+            Assert.That(updated.AllowedChildContentTypeIDs.Any(x => x == NodeDto.NodeIdSeed), Is.True);
         }
 
         [Test]
@@ -85,7 +86,7 @@ namespace Umbraco.Tests.LegacyApi
 
         public void CreateTestData()
         {
-            //Create and Save ContentType "video" -> 1045
+            //Create and Save ContentType "video" -> NodeDto.NodeIdSeed
             var videoMediaType = MockedContentTypes.CreateVideoMediaType();
             ServiceContext.ContentTypeService.Save(videoMediaType);
         }

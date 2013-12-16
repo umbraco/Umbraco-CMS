@@ -402,7 +402,7 @@ namespace Umbraco.Tests.Mvc
             //PublishedContentCache.UnitTesting = true;
 
             // ApplicationContext.Current = new ApplicationContext(false) { IsReady = true };
-            var appCtx = new ApplicationContext(false) { IsReady = true };
+            var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper()) { IsReady = true };
 
             var ctx = new UmbracoContext(
                 GetHttpContextFactory(url, routeData).HttpContext,

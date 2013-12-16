@@ -113,7 +113,7 @@ namespace umbraco.presentation.install
 				}
 				catch (Exception)
 				{
-					Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl));
+					Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl) + "&t=" + umbracoUserContextID);
 				}
 
 				//set the first step to upgrade.

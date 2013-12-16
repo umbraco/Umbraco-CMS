@@ -91,14 +91,19 @@
                 </div>
             </asp:Panel>
             <div class="topBarButtons">
+                
                 <button onclick="UmbClientMgr.appActions().launchAbout();" class="topBarButton">
                     <img src="images/aboutNew.png" alt="about" /><span><%=umbraco.ui.Text("general", "about")%></span></button>
                 <button onclick="UmbClientMgr.appActions().launchHelp('<%=UmbracoUser.Language%>', '<%=UmbracoUser.UserType.Name%>');"
                     class="topBarButton">
                     <img src="images/help.png" alt="Help" /><span><%=umbraco.ui.Text("general", "help")%></span></button>
-                <button onclick="UmbClientMgr.appActions().logout();" class="topBarButton">
-                    <img src="images/logout.png" alt="Log out" /><span><%=umbraco.ui.Text("general", "logout")%>:
-                        <%=UmbracoUser.Name%></span></button>
+                <form action="logout.aspx" method="get" style="display: inline;" >
+                    <button class="topBarButton" type="submit">
+                        <img src="images/logout.png" alt="Log out" />
+                        <span><%=umbraco.ui.Text("general", "logout")%>:<%=UmbracoUser.Name%></span>
+                    </button>
+                    <input type="hidden" value="<%=Security.UmbracoUserContextId %>" name="t" id="t"/>
+                </form>
             </div>
         </div>
     </div>
@@ -154,13 +159,13 @@
     <script type="text/javascript">
 
         //used for deeplinking to specific content whilst still showing the tree
-        var initApp = '<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["app"]%>';
-        var rightAction = '<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["rightAction"]%>';
-        var rightActionId = '<%=umbraco.presentation.UmbracoContext.Current.Request.QueryString["id"]%>';
+        var initApp = '<%=InitApp%>';
+        var rightAction = '<%=RightAction%>';
+        var rightActionId = '<%=RightActionId%>';
         var base = '<%=string.Format("{0}/", Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco))%>';
-        var url = ''
+        var url = '';
         if (rightActionId && rightActionId != '') {
-            url = base + rightAction + ".aspx?id=" + rightActionId
+            url = base + rightAction + ".aspx?id=" + rightActionId;
         } else {
             url = base + rightAction;
         }
@@ -341,7 +346,7 @@
         function umbracoSessionLogout() {
 
             //alert('Session has expired on server - can\'t renew. Logging out!');
-            top.document.location.href = 'logout.aspx';
+            top.document.location.href = 'logout.aspx?t=<%=Security.UmbracoUserContextId%>';
         }
 
         function blink($target) {

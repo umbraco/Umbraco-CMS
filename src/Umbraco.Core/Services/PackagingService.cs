@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -33,17 +34,14 @@ namespace Umbraco.Core.Services
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private Dictionary<string, IContentType> _importedContentTypes;
 
-        //Support recursive locks because some of the methods that require locking call other methods that require locking. 
-        //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
-        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
-        public PackagingService(IContentService contentService, 
-            IContentTypeService contentTypeService, 
-            IMediaService mediaService, 
-            IDataTypeService dataTypeService, 
-            IFileService fileService, 
+        public PackagingService(IContentService contentService,
+            IContentTypeService contentTypeService,
+            IMediaService mediaService,
+            IDataTypeService dataTypeService,
+            IFileService fileService,
             ILocalizationService localizationService,
-            RepositoryFactory repositoryFactory, 
+            RepositoryFactory repositoryFactory,
             IDatabaseUnitOfWorkProvider uowProvider)
         {
             _contentService = contentService;
@@ -59,7 +57,7 @@ namespace Umbraco.Core.Services
         }
 
         #region Generic export methods
-        
+
         internal void ExportToFile(string absoluteFilePath, string nodeType, int id)
         {
             XElement xml = null;
@@ -94,7 +92,7 @@ namespace Umbraco.Core.Services
                 xml = Export(dataType);
             }
 
-            if(xml != null)
+            if (xml != null)
                 xml.Save(absoluteFilePath);
         }
 
@@ -296,7 +294,7 @@ namespace Umbraco.Core.Services
             var properties = from property in element.Elements()
                              where property.Attribute("isDoc") == null
                              select property;
-            
+
             IContent content = parent == null
                                    ? new Content(nodeName, parentId, contentType)
                                    {
@@ -327,7 +325,7 @@ namespace Umbraco.Core.Services
                         {
                             propertyValueList.Add(dtos.Single(x => x.Value == preValue).Id.ToString(CultureInfo.InvariantCulture));
                         }
-                        
+
                         propertyValue = string.Join(",", propertyValueList.ToArray());
                     }
 
@@ -358,7 +356,7 @@ namespace Umbraco.Core.Services
                                     new XElement("AllowAtRoot", contentType.AllowedAsRoot.ToString()));
 
             var masterContentType = contentType.CompositionAliases().FirstOrDefault();
-            if(masterContentType != null)
+            if (masterContentType != null)
                 info.Add(new XElement("Master", masterContentType));
 
             var allowedTemplates = new XElement("AllowedTemplates");
@@ -367,7 +365,7 @@ namespace Umbraco.Core.Services
                 allowedTemplates.Add(new XElement("Template", template.Alias));
             }
             info.Add(allowedTemplates);
-            if(contentType.DefaultTemplate != null && contentType.DefaultTemplate.Id != 0)
+            if (contentType.DefaultTemplate != null && contentType.DefaultTemplate.Id != 0)
                 info.Add(new XElement("DefaultTemplate", contentType.DefaultTemplate.Alias));
             else
                 info.Add(new XElement("DefaultTemplate", ""));
@@ -394,7 +392,7 @@ namespace Umbraco.Core.Services
                                                    new XElement("Description", new XCData(propertyType.Description)));
                 genericProperties.Add(genericProperty);
             }
-            
+
             var tabs = new XElement("Tabs");
             foreach (var propertyGroup in contentType.PropertyGroups)
             {
@@ -544,7 +542,7 @@ namespace Umbraco.Core.Services
                     var template = _fileService.GetTemplate(alias.ToSafeAlias());
                     if (template != null)
                     {
-                        if(allowedTemplates.Any(x => x.Id == template.Id)) continue;
+                        if (allowedTemplates.Any(x => x.Id == template.Id)) continue;
                         allowedTemplates.Add(template);
                     }
                     else
@@ -612,7 +610,7 @@ namespace Umbraco.Core.Services
                         dataTypeDefinition = dataTypeDefinitions.First();
                     }
                 }
-
+                
                 // For backwards compatibility, if no datatype with that ID can be found, we're letting this fail silently.
                 // This means that the property will not be created.
                 if (dataTypeDefinition == null)
@@ -703,24 +701,42 @@ namespace Umbraco.Core.Services
 
         #region DataTypes
 
+        /// <summary>
+        /// Export a list of data types
+        /// </summary>
+        /// <param name="dataTypeDefinitions"></param>
+        /// <returns></returns>
+        internal XElement Export(IEnumerable<IDataTypeDefinition >dataTypeDefinitions)
+        {
+            var container = new XElement("DataTypes");
+            foreach (var d in dataTypeDefinitions)
+            {
+                container.Add(Export(d));
+            }
+            return container;
+        }
+
         internal XElement Export(IDataTypeDefinition dataTypeDefinition)
         {
             var prevalues = new XElement("PreValues");
 
-            var prevalueList = ((DataTypeService)_dataTypeService).GetDetailedPreValuesByDataTypeId(dataTypeDefinition.Id);
-            foreach (var tuple in prevalueList)
+            var prevalueList = _dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id)
+                .FormatAsDictionary();
+
+            var sort = 0;
+            foreach (var pv in prevalueList)
             {
                 var prevalue = new XElement("PreValue");
-                prevalue.Add(new XAttribute("Id", tuple.Item1));
-                prevalue.Add(new XAttribute("Value", tuple.Item4));
-                prevalue.Add(new XAttribute("Alias", tuple.Item2));
-                prevalue.Add(new XAttribute("SortOrder", tuple.Item3));
+                prevalue.Add(new XAttribute("Id", pv.Value.Id));
+                prevalue.Add(new XAttribute("Value", pv.Value.Value));
+                prevalue.Add(new XAttribute("Alias", pv.Key));
+                prevalue.Add(new XAttribute("SortOrder", sort));
                 prevalues.Add(prevalue);
+                sort++;
             }
 
             var xml = new XElement("DataType", prevalues);
             xml.Add(new XAttribute("Name", dataTypeDefinition.Name));
-            //The 'ID' when exporting is actually the property editor alias (in pre v7 it was the IDataType GUID id)
             xml.Add(new XAttribute("Id", dataTypeDefinition.ControlId));
             xml.Add(new XAttribute("Definition", dataTypeDefinition.Key));
             xml.Add(new XAttribute("DatabaseType", dataTypeDefinition.DatabaseType.ToString()));
@@ -791,8 +807,19 @@ namespace Umbraco.Core.Services
                 var dataTypeDefinitionName = dataTypeElement.Attribute("Name").Value;
                 var dataTypeDefinition = dataTypes.First(x => x.Name == dataTypeDefinitionName);
 
-                var values = prevaluesElement.Elements("PreValue").Select(prevalue => prevalue.Attribute("Value").Value).ToList();
-                _dataTypeService.SavePreValues(dataTypeDefinition.Id, values);
+                var valuesWithoutKeys = prevaluesElement.Elements("PreValue")
+                                                        .Where(x => ((string) x.Attribute("Alias")).IsNullOrWhiteSpace())
+                                                        .Select(x => x.Attribute("Value").Value);
+
+                var valuesWithKeys = prevaluesElement.Elements("PreValue")
+                                                     .Where(x => ((string) x.Attribute("Alias")).IsNullOrWhiteSpace() == false)
+                                                     .ToDictionary(key => (string) key.Attribute("Alias"), val => new PreValue((string) val.Attribute("Value")));
+                
+                //save the values with keys
+                _dataTypeService.SavePreValues(dataTypeDefinition.Id, valuesWithKeys);
+
+                //save the values without keys (this is legacy)
+                _dataTypeService.SavePreValues(dataTypeDefinition.Id, valuesWithoutKeys);
             }
         }
 
@@ -808,6 +835,31 @@ namespace Umbraco.Core.Services
         #endregion
 
         #region Macros
+        #endregion
+
+        #region Members
+
+        /// <summary>
+        /// Exports an <see cref="IMedia"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="member">Member to export</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the Member object</returns>
+        internal XElement Export(IMember member)
+        {
+            //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
+            var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : member.ContentType.Alias.ToSafeAliasWithForcingCheck();
+
+            var xml = Export(member, nodeName);
+            xml.Add(new XAttribute("nodeType", member.ContentType.Id));
+            xml.Add(new XAttribute("nodeTypeAlias", member.ContentType.Alias));
+
+            xml.Add(new XAttribute("loginName", member.Username));
+            xml.Add(new XAttribute("email", member.Email));
+            xml.Add(new XAttribute("key", member.Key));
+
+            return xml;
+        }
+
         #endregion
 
         #region Media
@@ -950,7 +1002,7 @@ namespace Umbraco.Core.Services
             var templates = new List<ITemplate>();
             var templateElements = name.Equals("Templates")
                                        ? (from doc in element.Elements("Template") select doc).ToList()
-                                       : new List<XElement> { element.Element("Template") };
+                                       : new List<XElement> { element };
 
             var fields = new List<TopologicalSorter.DependencyField<XElement>>();
             foreach (XElement tempElement in templateElements)

@@ -8,6 +8,8 @@ using System.Web;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using umbraco.cms.businesslogic.cache;
 using umbraco.BusinessLogic;
@@ -34,11 +36,9 @@ namespace umbraco.cms.businesslogic.member
         public static readonly string UmbracoRoleProviderName = Constants.Conventions.Member.UmbracoRoleProviderName;
         public static readonly Guid _objectType = new Guid(Constants.ObjectTypes.Member);
 
-        private static readonly object m_Locker = new object();
-
         // zb-00004 #29956 : refactor cookies names & handling
 
-        private const string m_SQLOptimizedMany = @"	
+        private const string _sQLOptimizedMany = @"	
 			select 
 	            umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, 
 	            umbracoNode.parentId, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.createDate, 
@@ -53,11 +53,12 @@ namespace umbraco.cms.businesslogic.member
         #endregion
 
         #region Private members
-        private string m_Text;
-        private string m_Email;
-        private string m_Password;
-        private string m_LoginName;
-        private Hashtable m_Groups = null;
+        private string _text;
+        private string _email;
+        private string _password;
+        private string _loginName;
+        private Hashtable _groups = null;
+        protected internal IMember Content;
         #endregion
 
         #region Constructors
@@ -103,13 +104,13 @@ namespace umbraco.cms.businesslogic.member
         public static IEnumerable<Member> GetAllAsList()
         {
             var tmp = new List<Member>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedMany.Trim(), "1=1", "umbracoNode.text"),
+            using (var dr = SqlHelper.ExecuteReader(
+                                        string.Format(_sQLOptimizedMany.Trim(), "1=1", "umbracoNode.text"),
                                             SqlHelper.CreateParameter("@nodeObjectType", Member._objectType)))
             {
                 while (dr.Read())
                 {
-                    Member m = new Member(dr.GetInt("id"), true);
+                    var m = new Member(dr.GetInt("id"), true);
                     m.PopulateMemberFromReader(dr);
                     tmp.Add(m);
                 }
@@ -126,13 +127,13 @@ namespace umbraco.cms.businesslogic.member
         {
 
             var tmp = new List<Member>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedMany.Trim(), "LOWER(SUBSTRING(text, 1, 1)) NOT IN ('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z')", "umbracoNode.text"),
+            using (var dr = SqlHelper.ExecuteReader(
+                                        string.Format(_sQLOptimizedMany.Trim(), "LOWER(SUBSTRING(text, 1, 1)) NOT IN ('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z')", "umbracoNode.text"),
                                             SqlHelper.CreateParameter("@nodeObjectType", Member._objectType)))
             {
                 while (dr.Read())
                 {
-                    Member m = new Member(dr.GetInt("id"), true);
+                    var m = new Member(dr.GetInt("id"), true);
                     m.PopulateMemberFromReader(dr);
                     tmp.Add(m);
                 }
@@ -156,8 +157,8 @@ namespace umbraco.cms.businesslogic.member
             string field = matchByNameInsteadOfLogin ? "umbracoNode.text" : "cmsMember.loginName";
 
             var tmp = new List<Member>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                                        string.Format(m_SQLOptimizedMany.Trim(),
+            using (var dr = SqlHelper.ExecuteReader(
+                                        string.Format(_sQLOptimizedMany.Trim(),
                                         string.Format("{0} like @letter", field),
                                         "umbracoNode.text"),
                                             SqlHelper.CreateParameter("@nodeObjectType", Member._objectType),
@@ -165,7 +166,7 @@ namespace umbraco.cms.businesslogic.member
             {
                 while (dr.Read())
                 {
-                    Member m = new Member(dr.GetInt("id"), true);
+                    var m = new Member(dr.GetInt("id"), true);
                     m.PopulateMemberFromReader(dr);
                     tmp.Add(m);
                 }
@@ -213,26 +214,26 @@ namespace umbraco.cms.businesslogic.member
         {
             if (mbt == null) throw new ArgumentNullException("mbt");
 
-            var loginName = (!String.IsNullOrEmpty(LoginName)) ? LoginName : Name;
+            var loginName = (!string.IsNullOrEmpty(LoginName)) ? LoginName : Name;
 
-            if (String.IsNullOrEmpty(loginName))
+            if (string.IsNullOrEmpty(loginName))
                 throw new ArgumentException("The loginname must be different from an empty string", "loginName");
 
             // Test for e-mail
-            if (Email != "" && Member.GetMemberFromEmail(Email) != null && Membership.Providers[UmbracoMemberProviderName].RequiresUniqueEmail)
-                throw new Exception(String.Format("Duplicate Email! A member with the e-mail {0} already exists", Email));
-            else if (Member.GetMemberFromLoginName(loginName) != null)
-                throw new Exception(String.Format("Duplicate User name! A member with the user name {0} already exists", loginName));
+            if (Email != "" && GetMemberFromEmail(Email) != null && Membership.Providers[UmbracoMemberProviderName].RequiresUniqueEmail)
+                throw new Exception(string.Format("Duplicate Email! A member with the e-mail {0} already exists", Email));
+            else if (GetMemberFromLoginName(loginName) != null)
+                throw new Exception(string.Format("Duplicate User name! A member with the user name {0} already exists", loginName));
 
             // Lowercased to prevent duplicates
             Email = Email.ToLower();
-            Guid newId = Guid.NewGuid();
+            var newId = Guid.NewGuid();
 
             //create the cms node first
-            CMSNode newNode = MakeNew(-1, _objectType, u.Id, 1, Name, newId);
+            var newNode = MakeNew(-1, _objectType, u.Id, 1, Name, newId);
 
             //we need to create an empty member and set the underlying text property
-            Member tmp = new Member(newId, true);
+            var tmp = new Member(newId, true);
             tmp.SetText(Name);
 
             //create the content data for the new member
@@ -246,9 +247,9 @@ namespace umbraco.cms.businesslogic.member
                 SqlHelper.CreateParameter("@email", Email));
 
             //read the whole object from the db
-            Member m = new Member(newId);
+            var m = new Member(newId);
 
-            NewEventArgs e = new NewEventArgs();
+            var e = new NewEventArgs();
 
             m.OnNew(e);
 
@@ -266,11 +267,11 @@ namespace umbraco.cms.businesslogic.member
         /// <returns>The member with the specified loginname - null if no Member with the login exists</returns>
         public static Member GetMemberFromLoginName(string loginName)
         {
-            if (String.IsNullOrEmpty(loginName))
+            if (string.IsNullOrEmpty(loginName))
                 throw new ArgumentException("The username of a Member must be different from an emptry string", "loginName");
             if (IsMember(loginName))
             {
-                object o = SqlHelper.ExecuteScalar<object>(
+                var o = SqlHelper.ExecuteScalar<object>(
                     "select nodeID from cmsMember where LoginName = @loginName",
                     SqlHelper.CreateParameter("@loginName", loginName));
 
@@ -301,7 +302,7 @@ namespace umbraco.cms.businesslogic.member
             if (string.IsNullOrEmpty(email))
                 return null;
 
-            object o = SqlHelper.ExecuteScalar<object>(
+            var o = SqlHelper.ExecuteScalar<object>(
                 "select nodeID from cmsMember where Email = @email",
                 SqlHelper.CreateParameter("@email", email.ToLower()));
 
@@ -328,7 +329,7 @@ namespace umbraco.cms.businesslogic.member
                 return null;
 
             var tmp = new List<Member>();
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(string.Format(m_SQLOptimizedMany.Trim(),
+            using (var dr = SqlHelper.ExecuteReader(string.Format(_sQLOptimizedMany.Trim(),
                                         "Email = @email",
                                         "umbracoNode.text"),
                                             SqlHelper.CreateParameter("@nodeObjectType", Member._objectType),
@@ -336,7 +337,7 @@ namespace umbraco.cms.businesslogic.member
             {
                 while (dr.Read())
                 {
-                    Member m = new Member(dr.GetInt("id"), true);
+                    var m = new Member(dr.GetInt("id"), true);
                     m.PopulateMemberFromReader(dr);
                     tmp.Add(m);
                 }
@@ -364,21 +365,20 @@ namespace umbraco.cms.businesslogic.member
                 }
                 else
                 {
-                    HttpContext.Current.Trace.Warn("Incorrect login/password");
+                    LogHelper.Debug<Member>("Incorrect login/password attempt or member is locked out or not approved (" + loginName + ")", true);
                     return null;
                 }
             }
             else
             {
-                HttpContext.Current.Trace.Warn("No member with loginname: " + loginName + " Exists");
-                //				throw new ArgumentException("No member with Loginname: " + LoginName + " exists");
+                LogHelper.Debug<Member>("No member with loginname: " + loginName + " Exists", true);
                 return null;
             }
         }
 
         public static Member GetMemberFromLoginAndEncodedPassword(string loginName, string password)
         {
-            object o = SqlHelper.ExecuteScalar<object>(
+            var o = SqlHelper.ExecuteScalar<object>(
                 "select nodeID from cmsMember where LoginName = @loginName and Password = @password",
                 SqlHelper.CreateParameter("loginName", loginName),
                 SqlHelper.CreateParameter("password", password));
@@ -411,16 +411,8 @@ namespace umbraco.cms.businesslogic.member
         /// <returns>True if the member exists</returns>
         public static bool IsMember(string loginName)
         {
-            Debug.Assert(loginName != null, "loginName cannot be null");
-            object o = SqlHelper.ExecuteScalar<object>(
-                "select count(nodeID) as tmp from cmsMember where LoginName = @loginName",
-                SqlHelper.CreateParameter("@loginName", loginName));
-            if (o == null)
-                return false;
-            int count;
-            if (!int.TryParse(o.ToString(), out count))
-                return false;
-            return count > 0;
+            Mandate.ParameterNotNullOrEmpty(loginName, "loginName");
+            return ApplicationContext.Current.Services.MemberService.Exists(loginName);
         }
 
         /// <summary>
@@ -434,12 +426,12 @@ namespace umbraco.cms.businesslogic.member
         public static void DeleteFromType(MemberType dt)
         {
             var objs = getContentOfContentType(dt);
-            foreach (Content c in objs)
+            foreach (var c in objs)
             {
                 // due to recursive structure document might already been deleted..
                 if (IsNode(c.UniqueId))
                 {
-                    Member tmp = new Member(c.UniqueId);
+                    var tmp = new Member(c.UniqueId);
                     tmp.delete();
                 }
             }
@@ -456,17 +448,17 @@ namespace umbraco.cms.businesslogic.member
         {
             get
             {
-                if (string.IsNullOrEmpty(m_Text))
+                if (string.IsNullOrEmpty(_text))
                 {
-                    m_Text = SqlHelper.ExecuteScalar<string>(
+                    _text = SqlHelper.ExecuteScalar<string>(
                         "select text from umbracoNode where id = @id",
                         SqlHelper.CreateParameter("@id", Id));
                 }
-                return m_Text;
+                return _text;
             }
             set
             {
-                m_Text = value;
+                _text = value;
                 base.Text = value;
             }
         }
@@ -474,25 +466,26 @@ namespace umbraco.cms.businesslogic.member
         /// <summary>
         /// The members password, used when logging in on the public website
         /// </summary>
+        [Obsolete("Do not use this property, use GetPassword and ChangePassword instead, if using ChangePassword ensure that the password is encrypted or hashed based on the active membership provider")]
         public string Password
         {
             get
             {
-                if (string.IsNullOrEmpty(m_Password))
+                if (string.IsNullOrEmpty(_password))
                 {
-                    m_Password = SqlHelper.ExecuteScalar<string>(
+                    _password = SqlHelper.ExecuteScalar<string>(
                     "select Password from cmsMember where nodeId = @id",
                     SqlHelper.CreateParameter("@id", Id));
                 }
-                return m_Password;
+                return _password;
 
-            }
+            }            
             set
             {
                 // We need to use the provider for this in order for hashing, etc. support
                 // To write directly to the db use the ChangePassword method
                 // this is not pretty but nessecary due to a design flaw (the membership provider should have been a part of the cms project)
-                MemberShipHelper helper = new MemberShipHelper();
+                var helper = new MemberShipHelper();
                 ChangePassword(helper.EncodePassword(value, Membership.Provider.PasswordFormat));
             }
         }
@@ -504,17 +497,17 @@ namespace umbraco.cms.businesslogic.member
         {
             get
             {
-                if (string.IsNullOrEmpty(m_LoginName))
+                if (string.IsNullOrEmpty(_loginName))
                 {
-                    m_LoginName = SqlHelper.ExecuteScalar<string>(
+                    _loginName = SqlHelper.ExecuteScalar<string>(
                         "select LoginName from cmsMember where nodeId = @id",
                         SqlHelper.CreateParameter("@id", Id));
                 }
-                return m_LoginName;
+                return _loginName;
             }
             set
             {
-                if (String.IsNullOrEmpty(value))
+                if (string.IsNullOrEmpty(value))
                     throw new ArgumentException("The loginname must be different from an empty string", "LoginName");
                 if (value.Contains(","))
                     throw new ArgumentException("The parameter 'LoginName' must not contain commas.");
@@ -522,7 +515,7 @@ namespace umbraco.cms.businesslogic.member
                     "update cmsMember set LoginName = @loginName where nodeId =  @id",
                     SqlHelper.CreateParameter("@loginName", value),
                     SqlHelper.CreateParameter("@id", Id));
-                m_LoginName = value;
+                _loginName = value;
             }
         }
 
@@ -533,9 +526,9 @@ namespace umbraco.cms.businesslogic.member
         {
             get
             {
-                if (m_Groups == null)
+                if (_groups == null)
                     PopulateGroups();
-                return m_Groups;
+                return _groups;
             }
         }
 
@@ -546,14 +539,14 @@ namespace umbraco.cms.businesslogic.member
         {
             get
             {
-                if (String.IsNullOrEmpty(m_Email))
+                if (string.IsNullOrEmpty(_email))
                 {
-                    m_Email = SqlHelper.ExecuteScalar<string>(
+                    _email = SqlHelper.ExecuteScalar<string>(
                        "select Email from cmsMember where nodeId = @id",
                        SqlHelper.CreateParameter("@id", Id));
                 }
 
-                return string.IsNullOrWhiteSpace(m_Email) ? m_Email : m_Email.ToLower();
+                return string.IsNullOrWhiteSpace(_email) ? _email : _email.ToLower();
             }
             set
             {
@@ -572,47 +565,62 @@ namespace umbraco.cms.businesslogic.member
                 {
                     // If the value hasn't changed and there are more than 1 member with that email, then throw
                     // If the value has changed and there are any member with that new email, then throw
-                    throw new Exception(String.Format("Duplicate Email! A member with the e-mail {0} already exists", newEmail));
+                    throw new Exception(string.Format("Duplicate Email! A member with the e-mail {0} already exists", newEmail));
                 }
                 SqlHelper.ExecuteNonQuery(
                     "update cmsMember set Email = @email where nodeId = @id",
                     SqlHelper.CreateParameter("@id", Id), SqlHelper.CreateParameter("@email", newEmail));
                 // Set the backing field to new value
-                m_Email = newEmail;
+                _email = newEmail;
             }
         }
         #endregion
 
         #region Public Methods
 
+        [Obsolete("Obsolete", false)]
         protected override void setupNode()
         {
-            base.setupNode();
-
-            using (IRecordsReader dr = SqlHelper.ExecuteReader(
-                    @"SELECT Email, LoginName, Password FROM cmsMember WHERE nodeId=@nodeId",
-                     SqlHelper.CreateParameter("@nodeId", this.Id)))
+            if (Id == -1)
             {
-                if (dr.Read())
-                {
-                    if (!dr.IsNull("Email"))
-                        m_Email = dr.GetString("Email");
-                    m_LoginName = dr.GetString("LoginName");
-                    m_Password = dr.GetString("Password");
-                }
-                else
-                {
-                    throw new ArgumentException(string.Format("No Member exists with Id '{0}'", this.Id));
-                }
+                base.setupNode();
+                return;
             }
+
+            var content = ApplicationContext.Current.Services.MemberService.GetById(Id);
+
+            if (content == null)
+                throw new ArgumentException(string.Format("No Member exists with id '{0}'", Id));
+
+            SetupNode(content);
         }
+
+        private void SetupNode(IMember content)
+        {
+            Content = content;
+            //Also need to set the ContentBase item to this one so all the propery values load from it
+            ContentBase = Content;
+
+            //Setting private properties from IContentBase replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
+            base.PopulateCMSNodeFromUmbracoEntity(Content, _objectType);
+
+            //If the version is empty we update with the latest version from the current IContent.
+            if (Version == Guid.Empty)
+                Version = Content.Version;
+            
+            _email = Content.Email;
+            _loginName = Content.Username;
+            _password = Content.Password;
+            
+        }
+
 
         /// <summary>
         /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
         /// </summary>
         public override void Save()
         {
-            SaveEventArgs e = new SaveEventArgs();
+            var e = new SaveEventArgs();
             FireBeforeSave(e);
 
             if (!e.Cancel)
@@ -679,7 +687,7 @@ namespace umbraco.cms.businesslogic.member
                 }
 
                 // re-generate xml
-                XmlDocument xd = new XmlDocument();
+                var xd = new XmlDocument();
                 XmlGenerate(xd);
 
                 // generate preview for blame history?
@@ -701,7 +709,7 @@ namespace umbraco.cms.businesslogic.member
         /// <returns>A the xmlrepresentation of the current member</returns>
         public override XmlNode ToXml(XmlDocument xd, bool Deep)
         {
-            XmlNode x = base.ToXml(xd, Deep);
+            var x = base.ToXml(xd, Deep);
             if (x.Attributes["loginName"] == null)
             {
                 x.Attributes.Append(xmlHelper.addAttribute(xd, "loginName", LoginName));
@@ -715,7 +723,7 @@ namespace umbraco.cms.businesslogic.member
         /// </summary>
         public override void delete()
         {
-            DeleteEventArgs e = new DeleteEventArgs();
+            var e = new DeleteEventArgs();
             FireBeforeDelete(e);
 
             if (!e.Cancel)
@@ -737,6 +745,10 @@ namespace umbraco.cms.businesslogic.member
             }
         }
 
+        /// <summary>
+        /// Sets the password for the user - ensure it is encrypted or hashed based on the active membership provider.
+        /// </summary>
+        /// <param name="newPassword"></param>
         public void ChangePassword(string newPassword)
         {
             SqlHelper.ExecuteNonQuery(
@@ -745,9 +757,24 @@ namespace umbraco.cms.businesslogic.member
                     SqlHelper.CreateParameter("@id", Id));
 
             //update this object's password
-            m_Password = newPassword;
+            _password = newPassword;
         }
 
+        /// <summary>
+        /// Returns the currently stored password - this may be encrypted or hashed string depending on the active membership provider
+        /// </summary>
+        /// <returns></returns>
+        public string GetPassword()
+        {
+            if (string.IsNullOrEmpty(_password))
+            {
+                _password = SqlHelper.ExecuteScalar<string>(
+                "select Password from cmsMember where nodeId = @id",
+                SqlHelper.CreateParameter("@id", Id));
+            }
+            return _password;
+        }
+        
         /// <summary>
         /// Adds the member to group with the specified id
         /// </summary>
@@ -755,13 +782,13 @@ namespace umbraco.cms.businesslogic.member
         [MethodImpl(MethodImplOptions.Synchronized)]
         public void AddGroup(int GroupId)
         {
-            AddGroupEventArgs e = new AddGroupEventArgs();
+            var e = new AddGroupEventArgs();
             e.GroupId = GroupId;
             FireBeforeAddGroup(e);
 
             if (!e.Cancel)
             {
-                IParameter[] parameters = new IParameter[] { SqlHelper.CreateParameter("@id", Id),
+                var parameters = new IParameter[] { SqlHelper.CreateParameter("@id", Id),
                                                          SqlHelper.CreateParameter("@groupId", GroupId) };
                 bool exists = SqlHelper.ExecuteScalar<int>("SELECT COUNT(member) FROM cmsMember2MemberGroup WHERE member = @id AND memberGroup = @groupId",
                                                            parameters) > 0;
@@ -780,7 +807,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="GroupId">The MemberGroup from which the Member is removed</param>
         public void RemoveGroup(int GroupId)
         {
-            RemoveGroupEventArgs e = new RemoveGroupEventArgs();
+            var e = new RemoveGroupEventArgs();
             e.GroupId = GroupId;
             FireBeforeRemoveGroup(e);
 
@@ -817,9 +844,9 @@ namespace umbraco.cms.businesslogic.member
                 dr.GetDateTime("createDate"), false);
 
             if (!dr.IsNull("Email"))
-                m_Email = dr.GetString("Email");
-            m_LoginName = dr.GetString("LoginName");
-            m_Password = dr.GetString("Password");
+                _email = dr.GetString("Email");
+            _loginName = dr.GetString("LoginName");
+            _password = dr.GetString("Password");
 
         }
 
@@ -838,61 +865,12 @@ namespace umbraco.cms.businesslogic.member
                     temp.Add(dr.GetInt("memberGroup"),
                         new MemberGroup(dr.GetInt("memberGroup")));
             }
-            m_Groups = temp;
+            _groups = temp;
         }
 
         private static string GetCacheKey(int id)
         {
             return string.Format("{0}{1}", CacheKeys.MemberBusinessLogicCacheKey, id);
-        }
-
-        // zb-00035 #29931 : helper class to handle member state
-        class MemberState
-        {
-            public int MemberId { get; set; }
-            public Guid MemberGuid { get; set; }
-            public string MemberLogin { get; set; }
-
-            public MemberState(int memberId, Guid memberGuid, string memberLogin)
-            {
-                MemberId = memberId;
-                MemberGuid = memberGuid;
-                MemberLogin = memberLogin;
-            }
-        }
-
-        // zb-00035 #29931 : helper methods to handle member state
-
-        [Obsolete("Only use .NET Membership APIs to handle state now", true)]
-        static void SetMemberState(Member member)
-        {
-            SetMemberState(member.Id, member.UniqueId, member.LoginName);
-        }
-
-        [Obsolete("Only use .NET Membership APIs to handle state now", true)]
-        static void SetMemberState(int memberId, Guid memberGuid, string memberLogin)
-        {
-            string value = string.Format("{0}+{1}+{2}", memberId, memberGuid, memberLogin);
-            // zb-00004 #29956 : refactor cookies names & handling
-            StateHelper.Cookies.Member.SetValue(value);
-        }
-
-        [Obsolete("Only use .NET Membership APIs to handle state now", true)]
-        static void SetMemberState(Member member, bool useSession, double cookieDays)
-        {
-            SetMemberState(member.Id, member.UniqueId, member.LoginName, useSession, cookieDays);
-        }
-
-        [Obsolete("Only use .NET Membership APIs to handle state now", true)]
-        static void SetMemberState(int memberId, Guid memberGuid, string memberLogin, bool useSession, double cookieDays)
-        {
-            string value = string.Format("{0}+{1}+{2}", memberId, memberGuid, memberLogin);
-
-            // zb-00004 #29956 : refactor cookies names & handling
-            if (useSession)
-                HttpContext.Current.Session[StateHelper.Cookies.Member.Key] = value;
-            else
-                StateHelper.Cookies.Member.SetValue(value, cookieDays);
         }
 
         [Obsolete("Only use .NET Membership APIs to handle state now", true)]
@@ -901,87 +879,6 @@ namespace umbraco.cms.businesslogic.member
             // zb-00004 #29956 : refactor cookies names & handling
             StateHelper.Cookies.Member.Clear();
             FormsAuthentication.SignOut();
-        }
-
-        [Obsolete("Only use .NET Membership APIs to handle state now", true)]
-        static MemberState GetMemberState()
-        {
-            // NH: Refactor to fix issue 30171, where auth using pure .NET Members doesn't clear old Umbraco cookie, thus this method gets the previous
-            // umbraco user instead of the new one
-            // zb-00004 #29956 : refactor cookies names & handling + bring session-related stuff here
-            string value = null;
-            if (StateHelper.Cookies.Member.HasValue)
-            {
-                value = StateHelper.Cookies.Member.GetValue();
-                if (!String.IsNullOrEmpty(value))
-                {
-                    string validateMemberId = value.Substring(0, value.IndexOf("+"));
-                    if (Membership.GetUser() == null || validateMemberId != Membership.GetUser().ProviderUserKey.ToString())
-                    {
-                        Member.RemoveMemberFromCache(int.Parse(validateMemberId));
-                        value = String.Empty;
-                    }
-                }
-            }
-
-            // compatibility with .NET Memberships
-            if (String.IsNullOrEmpty(value) && HttpContext.Current.User.Identity.IsAuthenticated)
-            {
-                int _currentMemberId = 0;
-                if (int.TryParse(Membership.GetUser().ProviderUserKey.ToString(), out _currentMemberId))
-                {
-                    if (memberExists(_currentMemberId))
-                    {
-                        // current member is always in the cache, else add it!
-                        Member m = GetMemberFromCache(_currentMemberId);
-                        if (m == null)
-                        {
-                            m = new Member(_currentMemberId);
-                            AddMemberToCache(m);
-                        }
-                        return new MemberState(m.Id, m.UniqueId, m.LoginName);
-                    }
-                }
-            }
-            else
-            {
-                var context = HttpContext.Current;
-                if (context != null && context.Session != null && context.Session[StateHelper.Cookies.Member.Key] != null)
-                {
-                    string v = context.Session[StateHelper.Cookies.Member.Key].ToString();
-                    if (v != "0")
-                        value = v;
-                }
-            }
-
-            if (value == null)
-                return null;
-
-            // #30350 - do not use Split as memberLogin could contain '+'
-            int pos1 = value.IndexOf('+');
-            if (pos1 < 0)
-                return null;
-            int pos2 = value.IndexOf('+', pos1 + 1);
-            if (pos2 < 0)
-                return null;
-
-            int memberId;
-            if (!Int32.TryParse(value.Substring(0, pos1), out memberId))
-                return null;
-            Guid memberGuid;
-            try
-            {
-                // Guid.TryParse is in .NET 4 only
-                // using try...catch for .NET 3.5 compatibility
-                memberGuid = new Guid(value.Substring(pos1 + 1, pos2 - pos1 - 1));
-            }
-            catch
-            {
-                return null;
-            }
-
-            MemberState ms = new MemberState(memberId, memberGuid, value.Substring(pos2 + 1));
-            return ms;
         }
 
         #endregion
@@ -1003,7 +900,7 @@ namespace umbraco.cms.businesslogic.member
 
             if (m != null)
             {
-                AddToCacheEventArgs e = new AddToCacheEventArgs();
+                var e = new AddToCacheEventArgs();
                 m.FireBeforeAddToCache(e);
 
                 if (!e.Cancel)
@@ -1221,11 +1118,11 @@ namespace umbraco.cms.businesslogic.member
         /// <summary>
         /// Make a lookup in the database to verify if a member truely exists
         /// </summary>
-        /// <param name="NodeId">The node id of the member</param>
+        /// <param name="nodeId">The node id of the member</param>
         /// <returns>True is a record exists in db</returns>
-        private static bool memberExists(int NodeId)
+        private static bool MemberExists(int nodeId)
         {
-            return SqlHelper.ExecuteScalar<int>("select count(nodeId) from cmsMember where nodeId = @nodeId", SqlHelper.CreateParameter("@nodeId", NodeId)) == 1;
+            return ApplicationContext.Current.Services.MemberService.Exists(nodeId);
         }
 
 
@@ -1235,32 +1132,15 @@ namespace umbraco.cms.businesslogic.member
         /// <returns>The current visitors members id, if the visitor is not logged in it returns 0</returns>
         public static int CurrentMemberId()
         {
-            int _currentMemberId = 0;
+            int currentMemberId = 0;
 
             // For backwards compatibility between umbraco members and .net membership
             if (HttpContext.Current.User.Identity.IsAuthenticated)
             {
-                int.TryParse(Membership.GetUser().ProviderUserKey.ToString(), out _currentMemberId);
+                int.TryParse(Membership.GetUser().ProviderUserKey.ToString(), out currentMemberId);
             }
 
-            // NH 4.7.1: We'll no longer use legacy Umbraco cookies to handle members
-            /*
-        else
-        {
-            // zb-00035 #29931 : cleanup member state management
-            MemberState ms = GetMemberState();
-            if (ms != null)
-                _currentMemberId = ms.MemberId;
-        }
-
-        if (_currentMemberId > 0 && !memberExists(_currentMemberId))
-        {
-            _currentMemberId = 0;
-            // zb-00035 #29931 : cleanup member state management
-            ClearMemberState();
-        }
-        */
-            return _currentMemberId;
+            return currentMemberId;
         }
 
         /// <summary>
@@ -1273,28 +1153,17 @@ namespace umbraco.cms.businesslogic.member
             {
                 if (HttpContext.Current.User.Identity.IsAuthenticated)
                 {
-                    // zb-00035 #29931 : cleanup member state management
-                    /*MemberState ms = GetMemberState();
-
-                    if (ms == null || ms.MemberId == 0)
-                        return null;
-
-                    // return member from cache
-                    Member member = GetMemberFromCache(ms.MemberId);
-                    if (member == null)
-                        member = new Member(ms.MemberId);
-                    */
-
-                    int _currentMemberId = 0;
-                    if (int.TryParse(Membership.GetUser().ProviderUserKey.ToString(), out _currentMemberId))
+                    int currentMemberId = 0;
+                    if (int.TryParse(Membership.GetUser().ProviderUserKey.ToString(), out currentMemberId))
                     {
-                        Member m = new Member(_currentMemberId);
+                        var m = new Member(currentMemberId);
                         return m;
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
+                LogHelper.Error<Member>("An error occurred in GetCurrentMember", ex);
             }
             return null;
         }

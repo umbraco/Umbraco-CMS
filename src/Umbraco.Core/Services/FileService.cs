@@ -13,24 +13,24 @@ namespace Umbraco.Core.Services
     /// </summary>
     public class FileService : IFileService
     {
-	    private readonly RepositoryFactory _repositoryFactory;
+        private readonly RepositoryFactory _repositoryFactory;
         private readonly IUnitOfWorkProvider _fileUowProvider;
         private readonly IDatabaseUnitOfWorkProvider _dataUowProvider;
 
         public FileService()
             : this(new RepositoryFactory())
-        {}
+        { }
 
         public FileService(RepositoryFactory repositoryFactory)
-			: this(new FileUnitOfWorkProvider(), new PetaPocoUnitOfWorkProvider(), repositoryFactory)
+            : this(new FileUnitOfWorkProvider(), new PetaPocoUnitOfWorkProvider(), repositoryFactory)
         {
         }
 
-		public FileService(IUnitOfWorkProvider fileProvider, IDatabaseUnitOfWorkProvider dataProvider, RepositoryFactory repositoryFactory)
+        public FileService(IUnitOfWorkProvider fileProvider, IDatabaseUnitOfWorkProvider dataProvider, RepositoryFactory repositoryFactory)
         {
-			_repositoryFactory = repositoryFactory;
-		    _fileUowProvider = fileProvider;
-		    _dataUowProvider = dataProvider;
+            _repositoryFactory = repositoryFactory;
+            _fileUowProvider = fileProvider;
+            _dataUowProvider = dataProvider;
         }
 
         /// <summary>
@@ -65,19 +65,19 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void SaveStylesheet(Stylesheet stylesheet, int userId = 0)
         {
-	        if (SavingStylesheet.IsRaisedEventCancelled(new SaveEventArgs<Stylesheet>(stylesheet), this)) 
-				return;
-	        
-			var uow = _fileUowProvider.GetUnitOfWork();
+            if (SavingStylesheet.IsRaisedEventCancelled(new SaveEventArgs<Stylesheet>(stylesheet), this))
+                return;
+
+            var uow = _fileUowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateStylesheetRepository(uow, _dataUowProvider.GetUnitOfWork()))
-	        {
-		        repository.AddOrUpdate(stylesheet);
-		        uow.Commit();
+            {
+                repository.AddOrUpdate(stylesheet);
+                uow.Commit();
 
-		        SavedStylesheet.RaiseEvent(new SaveEventArgs<Stylesheet>(stylesheet, false), this);
-	        }
+                SavedStylesheet.RaiseEvent(new SaveEventArgs<Stylesheet>(stylesheet, false), this);
+            }
 
-	        Audit.Add(AuditTypes.Save, string.Format("Save Stylesheet performed by user"), userId, -1);
+            Audit.Add(AuditTypes.Save, string.Format("Save Stylesheet performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -92,15 +92,15 @@ namespace Umbraco.Core.Services
             {
                 var stylesheet = repository.Get(name);
 
-				if (DeletingStylesheet.IsRaisedEventCancelled(new DeleteEventArgs<Stylesheet>(stylesheet), this))
-					return;
+                if (DeletingStylesheet.IsRaisedEventCancelled(new DeleteEventArgs<Stylesheet>(stylesheet), this))
+                    return;
 
-				repository.Delete(stylesheet);
-				uow.Commit();
+                repository.Delete(stylesheet);
+                uow.Commit();
 
-				DeletedStylesheet.RaiseEvent(new DeleteEventArgs<Stylesheet>(stylesheet, false), this);
+                DeletedStylesheet.RaiseEvent(new DeleteEventArgs<Stylesheet>(stylesheet, false), this);
 
-				Audit.Add(AuditTypes.Delete, string.Format("Delete Stylesheet performed by user"), userId, -1);
+                Audit.Add(AuditTypes.Delete, string.Format("Delete Stylesheet performed by user"), userId, -1);
             }
         }
 
@@ -146,19 +146,19 @@ namespace Umbraco.Core.Services
         /// <param name="userId"></param>
         public void SaveScript(Script script, int userId = 0)
         {
-	        if (SavingScript.IsRaisedEventCancelled(new SaveEventArgs<Script>(script), this)) 
-				return;
-	        
-			var uow = _fileUowProvider.GetUnitOfWork();
-	        using (var repository = _repositoryFactory.CreateScriptRepository(uow))
-	        {
-		        repository.AddOrUpdate(script);
-		        uow.Commit();
+            if (SavingScript.IsRaisedEventCancelled(new SaveEventArgs<Script>(script), this))
+                return;
 
-		        SavedScript.RaiseEvent(new SaveEventArgs<Script>(script, false), this);
-	        }
+            var uow = _fileUowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateScriptRepository(uow))
+            {
+                repository.AddOrUpdate(script);
+                uow.Commit();
 
-	        Audit.Add(AuditTypes.Save, string.Format("Save Script performed by user"), userId, -1);
+                SavedScript.RaiseEvent(new SaveEventArgs<Script>(script, false), this);
+            }
+
+            Audit.Add(AuditTypes.Save, string.Format("Save Script performed by user"), userId, -1);
         }
 
         /// <summary>
@@ -173,15 +173,15 @@ namespace Umbraco.Core.Services
             {
                 var script = repository.Get(name);
 
-				if (DeletingScript.IsRaisedEventCancelled(new DeleteEventArgs<Script>(script), this))
-					return; ;
-				
-				repository.Delete(script);
-				uow.Commit();
+                if (DeletingScript.IsRaisedEventCancelled(new DeleteEventArgs<Script>(script), this))
+                    return; ;
 
-				DeletedScript.RaiseEvent(new DeleteEventArgs<Script>(script, false), this);
+                repository.Delete(script);
+                uow.Commit();
 
-				Audit.Add(AuditTypes.Delete, string.Format("Delete Script performed by user"), userId, -1);
+                DeletedScript.RaiseEvent(new DeleteEventArgs<Script>(script, false), this);
+
+                Audit.Add(AuditTypes.Delete, string.Format("Delete Script performed by user"), userId, -1);
             }
         }
 
@@ -234,25 +234,52 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Returns a template as a template node which can be traversed (parent, children)
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        public TemplateNode GetTemplateNode(string alias)
+        {
+            using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))
+            {
+                return repository.GetTemplateNode(alias);
+            }
+        }
+
+        /// <summary>
+        /// Given a template node in a tree, this will find the template node with the given alias if it is found in the hierarchy, otherwise null
+        /// </summary>
+        /// <param name="anyNode"></param>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        public TemplateNode FindTemplateInTree(TemplateNode anyNode, string alias)
+        {
+            using (var repository = _repositoryFactory.CreateTemplateRepository(_dataUowProvider.GetUnitOfWork()))
+            {
+                return repository.FindTemplateInTree(anyNode, alias);
+            }
+        }
+
+        /// <summary>
         /// Saves a <see cref="Template"/>
         /// </summary>
         /// <param name="template"><see cref="Template"/> to save</param>
         /// <param name="userId"></param>
         public void SaveTemplate(ITemplate template, int userId = 0)
         {
-	        if (SavingTemplate.IsRaisedEventCancelled(new SaveEventArgs<ITemplate>(template), this)) 
-				return;
-	        
-			var uow = _dataUowProvider.GetUnitOfWork();
-	        using (var repository = _repositoryFactory.CreateTemplateRepository(uow))
-	        {
-		        repository.AddOrUpdate(template);
-		        uow.Commit();
+            if (SavingTemplate.IsRaisedEventCancelled(new SaveEventArgs<ITemplate>(template), this))
+                return;
 
-		        SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(template, false), this);
-	        }
+            var uow = _dataUowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateTemplateRepository(uow))
+            {
+                repository.AddOrUpdate(template);
+                uow.Commit();
 
-	        Audit.Add(AuditTypes.Save, string.Format("Save Template performed by user"), userId, template.Id);
+                SavedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(template, false), this);
+            }
+
+            Audit.Add(AuditTypes.Save, string.Format("Save Template performed by user"), userId, template.Id);
         }
 
         /// <summary>
@@ -292,15 +319,15 @@ namespace Umbraco.Core.Services
             {
                 var template = repository.Get(alias);
 
-				if (DeletingTemplate.IsRaisedEventCancelled(new DeleteEventArgs<ITemplate>(template), this))
-					return;
+                if (DeletingTemplate.IsRaisedEventCancelled(new DeleteEventArgs<ITemplate>(template), this))
+                    return;
 
-				repository.Delete(template);
-				uow.Commit();
+                repository.Delete(template);
+                uow.Commit();
 
-				DeletedTemplate.RaiseEvent(new DeleteEventArgs<ITemplate>(template, false), this);
+                DeletedTemplate.RaiseEvent(new DeleteEventArgs<ITemplate>(template, false), this);
 
-				Audit.Add(AuditTypes.Delete, string.Format("Delete Template performed by user"), userId, template.Id);
+                Audit.Add(AuditTypes.Delete, string.Format("Delete Template performed by user"), userId, template.Id);
             }
         }
 
@@ -320,62 +347,62 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Delete
         /// </summary>        
-		public static event TypedEventHandler<IFileService, DeleteEventArgs<ITemplate>> DeletingTemplate;
+        public static event TypedEventHandler<IFileService, DeleteEventArgs<ITemplate>> DeletingTemplate;
 
         /// <summary>
         /// Occurs after Delete
         /// </summary>
-		public static event TypedEventHandler<IFileService, DeleteEventArgs<ITemplate>> DeletedTemplate;
+        public static event TypedEventHandler<IFileService, DeleteEventArgs<ITemplate>> DeletedTemplate;
 
-		/// <summary>
-		/// Occurs before Delete
-		/// </summary>        
-		public static event TypedEventHandler<IFileService, DeleteEventArgs<Script>> DeletingScript;
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>        
+        public static event TypedEventHandler<IFileService, DeleteEventArgs<Script>> DeletingScript;
 
-		/// <summary>
-		/// Occurs after Delete
-		/// </summary>
-		public static event TypedEventHandler<IFileService, DeleteEventArgs<Script>> DeletedScript;
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        public static event TypedEventHandler<IFileService, DeleteEventArgs<Script>> DeletedScript;
 
-		/// <summary>
-		/// Occurs before Delete
-		/// </summary>        
-		public static event TypedEventHandler<IFileService, DeleteEventArgs<Stylesheet>> DeletingStylesheet;
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>        
+        public static event TypedEventHandler<IFileService, DeleteEventArgs<Stylesheet>> DeletingStylesheet;
 
-		/// <summary>
-		/// Occurs after Delete
-		/// </summary>
-		public static event TypedEventHandler<IFileService, DeleteEventArgs<Stylesheet>> DeletedStylesheet;
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        public static event TypedEventHandler<IFileService, DeleteEventArgs<Stylesheet>> DeletedStylesheet;
 
         /// <summary>
         /// Occurs before Save
         /// </summary>
-		public static event TypedEventHandler<IFileService, SaveEventArgs<ITemplate>> SavingTemplate;
+        public static event TypedEventHandler<IFileService, SaveEventArgs<ITemplate>> SavingTemplate;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-		public static event TypedEventHandler<IFileService, SaveEventArgs<ITemplate>> SavedTemplate;
+        public static event TypedEventHandler<IFileService, SaveEventArgs<ITemplate>> SavedTemplate;
 
-		/// <summary>
-		/// Occurs before Save
-		/// </summary>
-		public static event TypedEventHandler<IFileService, SaveEventArgs<Script>> SavingScript;
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        public static event TypedEventHandler<IFileService, SaveEventArgs<Script>> SavingScript;
 
-		/// <summary>
-		/// Occurs after Save
-		/// </summary>
-		public static event TypedEventHandler<IFileService, SaveEventArgs<Script>> SavedScript;
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        public static event TypedEventHandler<IFileService, SaveEventArgs<Script>> SavedScript;
 
-		/// <summary>
-		/// Occurs before Save
-		/// </summary>
-		public static event TypedEventHandler<IFileService, SaveEventArgs<Stylesheet>> SavingStylesheet;
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        public static event TypedEventHandler<IFileService, SaveEventArgs<Stylesheet>> SavingStylesheet;
 
-		/// <summary>
-		/// Occurs after Save
-		/// </summary>
-		public static event TypedEventHandler<IFileService, SaveEventArgs<Stylesheet>> SavedStylesheet;
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        public static event TypedEventHandler<IFileService, SaveEventArgs<Stylesheet>> SavedStylesheet;
 
         #endregion
     }

@@ -72,8 +72,11 @@ namespace Umbraco.Core.Strings
             var opos = 0;
 
             for (var ipos = 0; ipos < input.Length; ipos++)
-                if (char.IsSurrogate(input[ipos]))
-                    ipos++;
+                if (char.IsSurrogate(input[ipos])) // ignore high surrogate
+                {
+                    ipos++; // and skip low surrogate
+                    output[opos++] = '?';
+                }
                 else
                     ToAscii(input, ipos, output, ref opos);
 

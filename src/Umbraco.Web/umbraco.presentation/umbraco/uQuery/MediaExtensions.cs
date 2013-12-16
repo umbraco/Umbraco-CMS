@@ -21,7 +21,7 @@ namespace umbraco
 		{
 			var ancestor = new Media(media.Parent.Id);
 
-			while (ancestor != null)
+			while (ancestor != null && ancestor.Id != -1)
 			{
 				yield return ancestor;
 

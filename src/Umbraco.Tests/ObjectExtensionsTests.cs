@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using System.Web.UI.WebControls;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Tests.PartialTrust;
@@ -11,13 +12,27 @@ using Umbraco.Tests.TestHelpers;
 namespace Umbraco.Tests
 {
 	[TestFixture]
-	public class ObjectExtensionsTests : AbstractPartialTrustFixture<ObjectExtensionsTests>
+	public class ObjectExtensionsTests 
 	{
-		protected override void FixtureSetup()
-		{
-			base.FixtureSetup();
-			TestHelper.SetupLog4NetForTests();
-		}
+        [TestFixtureSetUp]
+        protected virtual void FixtureSetup()
+        {
+            TestHelper.SetupLog4NetForTests();
+        }
+
+        [Test]
+        public void CanParseStringToUnit()
+        {
+            var stringUnit = "1234px";
+            object objUnit = "1234px";
+            var result = stringUnit.TryConvertTo<Unit>();
+            var result2 = objUnit.TryConvertTo<Unit>();
+            var unit = new Unit("1234px");
+            Assert.IsTrue(result.Success);
+            Assert.IsTrue(result2.Success);
+            Assert.AreEqual(unit, result.Result);
+            Assert.AreEqual(unit, result2.Result);
+        }
 
 	    [Test]
 	    public void Can_Convert_List_To_Enumerable()
@@ -154,7 +169,8 @@ namespace Umbraco.Tests
 	    /// <summary>
 		/// Run once before each test in derived test fixtures.
 		/// </summary>
-		public override void TestSetup()
+		[SetUp]
+		public void TestSetup()
 		{
 			savedCulture = Thread.CurrentThread.CurrentCulture;
 			Thread.CurrentThread.CurrentCulture = new CultureInfo("en-GB"); // make sure the dates parse correctly
@@ -164,7 +180,8 @@ namespace Umbraco.Tests
 		/// <summary>
 		/// Run once after each test in derived test fixtures.
 		/// </summary>
-		public override void TestTearDown()
+		[TearDown]
+		public void TestTearDown()
 		{
 			Thread.CurrentThread.CurrentCulture = savedCulture;
 			return;
