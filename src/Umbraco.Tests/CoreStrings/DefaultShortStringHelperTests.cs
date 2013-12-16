@@ -133,7 +133,7 @@ namespace Umbraco.Tests.CoreStrings
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = '*'
                 });
-            Assert.AreEqual("0123foo*bar*nil", helper.CleanString("0123foo_bar nil", CleanStringType.Alias));
+            Assert.AreEqual("0123foo*bar*543*nil*321", helper.CleanString("0123foo_bar 543 nil 321", CleanStringType.Alias));
 
             helper = new DefaultShortStringHelper()
                 .WithConfig(CleanStringType.Alias, new DefaultShortStringHelper.Config
@@ -143,8 +143,11 @@ namespace Umbraco.Tests.CoreStrings
                     StringType = CleanStringType.Utf8 | CleanStringType.Unchanged,
                     Separator = '*'
                 });
-            Assert.AreEqual("foo*bar*nil", helper.CleanString("0123foo_bar nil", CleanStringType.Alias));
-            Assert.AreEqual("foo*bar*nil", helper.CleanString("0123 foo_bar nil", CleanStringType.Alias));
+            Assert.AreEqual("foo*bar*543*nil*321", helper.CleanString("0123foo_bar 543 nil 321", CleanStringType.Alias));
+            Assert.AreEqual("foo*bar*543*nil*321", helper.CleanString("0123 foo_bar 543 nil 321", CleanStringType.Alias));
+
+            helper = new DefaultShortStringHelper().WithDefaultConfig();
+            Assert.AreEqual("child2", helper.CleanStringForSafeAlias("1child2"));
         }
 
         [Test]
