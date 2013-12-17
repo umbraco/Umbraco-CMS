@@ -393,8 +393,15 @@ namespace Umbraco.Core.Services
         /// Saves an updated Member
         /// </summary>
         /// <param name="member"></param>
-        public void Save(IMember member)
+        /// <param name="raiseEvents"></param>
+        public void Save(IMember member, bool raiseEvents = true)
         {
+            if (raiseEvents)
+            {
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(member), this))
+                    return;
+            }
+
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
@@ -404,6 +411,9 @@ namespace Umbraco.Core.Services
                 var xml = member.ToXml();
                 CreateAndSaveMemberXml(xml, member.Id, uow.Database);
             }
+
+            if (raiseEvents)
+                Saved.RaiseEvent(new SaveEventArgs<IMember>(member, false), this);
         }
 
         #endregion
@@ -483,14 +493,91 @@ namespace Umbraco.Core.Services
             int result = exists ? db.Update(poco) : Convert.ToInt32(db.Insert(poco));
         }
 
+        #region Event Handlers
+
+
         /// <summary>
         /// Occurs before Delete
-        /// </summary>		
+        /// </summary>
         public static event TypedEventHandler<IMemberService, DeleteEventArgs<IMember>> Deleting;
 
         /// <summary>
         /// Occurs after Delete
         /// </summary>
         public static event TypedEventHandler<IMemberService, DeleteEventArgs<IMember>> Deleted;
+
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saving;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saved;
+
+        #endregion
+
+        ///// <summary>
+        ///// A helper method that will create a basic/generic member for use with a generic membership provider
+        ///// </summary>
+        ///// <returns></returns>
+        //internal static IMember CreateGenericMembershipProviderMember(string name, string email, string username, string password)
+        //{
+        //    var identity = int.MaxValue;
+
+        //    var memType = new MemberType(-1);
+        //    var propGroup = new PropertyGroup
+        //    {
+        //        Name = "Membership",
+        //        Id = --identity
+        //    };
+        //    propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TextboxAlias, DataTypeDatabaseType.Ntext)
+        //    {
+        //        Alias = Constants.Conventions.Member.Comments,
+        //        Name = Constants.Conventions.Member.CommentsLabel,
+        //        SortOrder = 0,
+        //        Id = --identity
+        //    });
+        //    propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TrueFalseAlias, DataTypeDatabaseType.Integer)
+        //    {
+        //        Alias = Constants.Conventions.Member.IsApproved,
+        //        Name = Constants.Conventions.Member.IsApprovedLabel,
+        //        SortOrder = 3,
+        //        Id = --identity
+        //    });
+        //    propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.TrueFalseAlias, DataTypeDatabaseType.Integer)
+        //    {
+        //        Alias = Constants.Conventions.Member.IsLockedOut,
+        //        Name = Constants.Conventions.Member.IsLockedOutLabel,
+        //        SortOrder = 4,
+        //        Id = --identity
+        //    });
+        //    propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date)
+        //    {
+        //        Alias = Constants.Conventions.Member.LastLockoutDate,
+        //        Name = Constants.Conventions.Member.LastLockoutDateLabel,
+        //        SortOrder = 5,
+        //        Id = --identity
+        //    });
+        //    propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date)
+        //    {
+        //        Alias = Constants.Conventions.Member.LastLoginDate,
+        //        Name = Constants.Conventions.Member.LastLoginDateLabel,
+        //        SortOrder = 6,
+        //        Id = --identity
+        //    });
+        //    propGroup.PropertyTypes.Add(new PropertyType(Constants.PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date)
+        //    {
+        //        Alias = Constants.Conventions.Member.LastPasswordChangeDate,
+        //        Name = Constants.Conventions.Member.LastPasswordChangeDateLabel,
+        //        SortOrder = 7,
+        //        Id = --identity
+        //    });
+
+        //    memType.PropertyGroups.Add(propGroup);
+
+        //    return new Member(name, email, username, password, -1, memType);
+        //}
     }
 }

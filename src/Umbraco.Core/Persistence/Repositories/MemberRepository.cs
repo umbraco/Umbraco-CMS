@@ -22,14 +22,17 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IMemberTypeRepository _memberTypeRepository;
 
-        public MemberRepository(IDatabaseUnitOfWork work, IMemberTypeRepository memberTypeRepository) : base(work)
+        public MemberRepository(IDatabaseUnitOfWork work, IMemberTypeRepository memberTypeRepository)
+            : base(work)
         {
+            if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
             _memberTypeRepository = memberTypeRepository;
         }
 
         public MemberRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMemberTypeRepository memberTypeRepository)
             : base(work, cache)
         {
+            if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
             _memberTypeRepository = memberTypeRepository;
         }
 
@@ -104,11 +107,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
             sql.Select("umbracoNode.*", "cmsContent.contentType", "cmsContentType.alias AS ContentTypeAlias", "cmsContentVersion.VersionId",
                 "cmsContentVersion.VersionDate", "cmsContentVersion.LanguageLocale", "cmsMember.Email",
-                "cmsMember.LoginName", "cmsMember.Password", "cmsPropertyData.id AS PropertyDataId", "cmsPropertyData.propertytypeid", 
+                "cmsMember.LoginName", "cmsMember.Password", "cmsPropertyData.id AS PropertyDataId", "cmsPropertyData.propertytypeid",
                 "cmsPropertyData.dataDate", "cmsPropertyData.dataInt", "cmsPropertyData.dataNtext", "cmsPropertyData.dataNvarchar",
                 "cmsPropertyType.id", "cmsPropertyType.Alias", "cmsPropertyType.Description",
                 "cmsPropertyType.Name", "cmsPropertyType.mandatory", "cmsPropertyType.validationRegExp",
-                "cmsPropertyType.helpText", "cmsPropertyType.sortOrder AS PropertyTypeSortOrder", "cmsPropertyType.propertyTypeGroupId", 
+                "cmsPropertyType.helpText", "cmsPropertyType.sortOrder AS PropertyTypeSortOrder", "cmsPropertyType.propertyTypeGroupId",
                 "cmsPropertyType.dataTypeId", "cmsDataType.controlId", "cmsDataType.dbType")
                 .From<NodeDto>()
                 .InnerJoin<ContentDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
@@ -247,7 +250,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 property.Id = keyDictionary[property.PropertyTypeId];
             }
-
+            
             ((Member)entity).ResetDirtyProperties();
         }
 
@@ -256,8 +259,10 @@ namespace Umbraco.Core.Persistence.Repositories
             //Updates Modified date
             ((Member)entity).UpdatingEntity();
 
+            var dirtyEntity = (ICanBeDirty)entity;
+
             //Look up parent to get and set the correct Path and update SortOrder if ParentId has changed
-            if (((ICanBeDirty)entity).IsPropertyDirty("ParentId"))
+            if (dirtyEntity.IsPropertyDirty("ParentId"))
             {
                 var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = ((IUmbracoEntity)entity).ParentId });
                 ((IUmbracoEntity)entity).Path = string.Concat(parent.Path, ",", entity.Id);
@@ -293,13 +298,32 @@ namespace Umbraco.Core.Persistence.Repositories
             //Updates the current version - cmsContentVersion
             //Assumes a Version guid exists and Version date (modified date) has been set/updated
             Database.Update(dto.ContentVersionDto);
-            //Updates the cmsMember entry
-            Database.Update(dto);
+
+            //Updates the cmsMember entry if it has changed
+            var changedCols = new List<string>();
+            if (dirtyEntity.IsPropertyDirty("Email"))
+            {
+                changedCols.Add("Email");
+            }
+            if (dirtyEntity.IsPropertyDirty("Username"))
+            {
+                changedCols.Add("LoginName");
+            }
+            // DO NOT update the password if it is null or empty
+            if (dirtyEntity.IsPropertyDirty("Password") && entity.Password.IsNullOrWhiteSpace() == false)
+            {
+                changedCols.Add("Password");
+            }
+            //only update the changed cols
+            if (changedCols.Count > 0)
+            {
+                Database.Update(dto, changedCols);
+            }
 
             //TODO ContentType for the Member entity
 
             //Create the PropertyData for this version - cmsPropertyData
-            var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);            
+            var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
             var keyDictionary = new Dictionary<int, int>();
 
             //Add Properties
@@ -333,8 +357,8 @@ namespace Umbraco.Core.Persistence.Repositories
                     property.Id = keyDictionary[property.PropertyTypeId];
                 }
             }
-
-            ((ICanBeDirty)entity).ResetDirtyProperties();
+            
+            dirtyEntity.ResetDirtyProperties();
         }
 
         protected override void PersistDeletedItem(IMember entity)
@@ -416,9 +440,10 @@ namespace Umbraco.Core.Persistence.Repositories
         public bool Exists(string username)
         {
             var sql = new Sql();
+            var escapedUserName = Database.EscapeAtSymbols(username);
             sql.Select("COUNT(*)")
                 .From<MemberDto>()
-                .Where<MemberDto>(x => x.LoginName == username);
+                .Where<MemberDto>(x => x.LoginName == escapedUserName);
 
             return Database.ExecuteScalar<int>(sql) > 0;
         }
