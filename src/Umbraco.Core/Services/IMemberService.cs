@@ -25,6 +25,8 @@ namespace Umbraco.Core.Services
         
         //TODO: Need to get all members that start with a certain letter
 
+        //TODO: Need to get all members that start with a certain letter
+
         void DeleteMembersOfType(int memberTypeId);
     }
 
