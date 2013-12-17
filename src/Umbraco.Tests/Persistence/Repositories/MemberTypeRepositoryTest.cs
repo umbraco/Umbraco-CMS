@@ -60,7 +60,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 Assert.That(sut, Is.Not.Null);
                 Assert.That(sut.PropertyGroups.Count(), Is.EqualTo(1));
-                Assert.That(sut.PropertyTypes.Count(), Is.EqualTo(12));
+                Assert.That(sut.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.StandardPropertyTypeStubs.Count));
 
                 Assert.That(sut.PropertyGroups.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
                 Assert.That(sut.PropertyTypes.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
