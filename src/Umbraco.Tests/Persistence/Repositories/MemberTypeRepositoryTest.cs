@@ -58,9 +58,11 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var sut = repository.Get(memberType.Id);
 
+                var standardProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+
                 Assert.That(sut, Is.Not.Null);
                 Assert.That(sut.PropertyGroups.Count(), Is.EqualTo(1));
-                Assert.That(sut.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.StandardPropertyTypeStubs.Count));
+                Assert.That(sut.PropertyTypes.Count(), Is.EqualTo(3 + standardProps.Count));
 
                 Assert.That(sut.PropertyGroups.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
                 Assert.That(sut.PropertyTypes.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
@@ -146,8 +148,30 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 memberType = repository.Get(memberType.Id);
 
-                Assert.That(memberType.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.StandardPropertyTypeStubs.Count));
+                Assert.That(memberType.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
                 Assert.That(memberType.PropertyGroups.Count(), Is.EqualTo(1));
+            }
+        }
+
+        //This is to show that new properties are created for each member type - there was a bug before
+        // that was reusing the same properties with the same Ids between member types
+        [Test]
+        public void Built_In_Member_Type_Properties_Are_Not_Reused_For_Different_Member_Types()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                IMemberType memberType1 = MockedContentTypes.CreateSimpleMemberType();
+                IMemberType memberType2 = MockedContentTypes.CreateSimpleMemberType("test2");
+                repository.AddOrUpdate(memberType1);
+                repository.AddOrUpdate(memberType2);
+                unitOfWork.Commit();
+
+                var m1Ids = memberType1.PropertyTypes.Select(x => x.Id).ToArray();
+                var m2Ids = memberType2.PropertyTypes.Select(x => x.Id).ToArray();
+
+                Assert.IsFalse(m1Ids.Any(m2Ids.Contains));
             }
         }
 

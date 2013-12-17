@@ -288,7 +288,7 @@ namespace Umbraco.Core.Services
         #region IMembershipMemberService Implementation
 
         /// <summary>
-        /// Creates a new Member
+        /// Creates and persists a new Member
         /// </summary>
         /// <param name="email"></param>
         /// <param name="username"></param>
@@ -400,6 +400,9 @@ namespace Umbraco.Core.Services
             {
                 repository.AddOrUpdate(member);
                 uow.Commit();
+
+                var xml = member.ToXml();
+                CreateAndSaveMemberXml(xml, member.Id, uow.Database);
             }
         }
 
@@ -471,6 +474,13 @@ namespace Umbraco.Core.Services
                     uow.Database.BulkInsertRecords(xmlItems, tr);
                 }
             }
+        }
+
+        private void CreateAndSaveMemberXml(XElement xml, int id, UmbracoDatabase db)
+        {
+            var poco = new ContentXmlDto { NodeId = id, Xml = xml.ToString(SaveOptions.None) };
+            var exists = db.FirstOrDefault<ContentXmlDto>("WHERE nodeId = @Id", new { Id = id }) != null;
+            int result = exists ? db.Update(poco) : Convert.ToInt32(db.Insert(poco));
         }
 
         /// <summary>

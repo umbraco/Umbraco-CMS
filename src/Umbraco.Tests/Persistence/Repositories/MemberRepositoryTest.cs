@@ -215,8 +215,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var sut = repository.Get(member.Id);
 
                 Assert.That(sut.ContentType.PropertyGroups.Count(), Is.EqualTo(1));
-                Assert.That(sut.ContentType.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.StandardPropertyTypeStubs.Count));
-                Assert.That(sut.Properties.Count(), Is.EqualTo(3 + Constants.Conventions.Member.StandardPropertyTypeStubs.Count));
+                Assert.That(sut.ContentType.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
+                Assert.That(sut.Properties.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
                 Assert.That(sut.Properties.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
             }
         }
