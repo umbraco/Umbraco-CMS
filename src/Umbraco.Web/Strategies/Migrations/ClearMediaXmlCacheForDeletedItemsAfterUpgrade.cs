@@ -29,12 +29,11 @@ namespace Umbraco.Web.Strategies.Migrations
 
             if (e.ConfiguredVersion <= target70)
             {
-                
 
-                var sql = @"DELETE FROM cmsContentXml WHERE nodeId IN
-    (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
-        INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
-        WHERE nodeObjectType = 'B796F64C-1F99-4FFB-B886-4BF4BC011A9C' AND " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("path") + " like '%-21%')";
+
+                var sql = @"DELETE cmsContentXml.* FROM cmsContentXml
+INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
+        WHERE nodeObjectType = 'B796F64C-1F99-4FFB-B886-4BF4BC011A9C' AND " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("path") + " like '%-21%'";
 
                 var count = e.MigrationContext.Database.Execute(sql);
 
