@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Xml.Linq;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -16,6 +20,8 @@ namespace Umbraco.Core.Services
     {
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
+
+        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
 
         public MemberService(RepositoryFactory repositoryFactory)
             : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
@@ -109,6 +115,22 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets a list of Members by their MemberType
+        /// </summary>
+        /// <param name="memberTypeId"></param>
+        /// <returns></returns>
+        public IEnumerable<IMember> GetMembersByMemberType(int memberTypeId)
+        {
+            using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
+            {
+                repository.Get(memberTypeId);
+                var query = Query<IMember>.Builder.Where(x => x.ContentTypeId == memberTypeId);
+                var members = repository.GetByQuery(query);
+                return members;
+            }
+        }
+
+        /// <summary>
         /// Gets a list of Members by the MemberGroup they are part of
         /// </summary>
         /// <param name="memberGroupName"></param>
@@ -131,6 +153,29 @@ namespace Umbraco.Core.Services
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
             {
                 return repository.GetAll(ids);
+            }
+        }
+
+        public void DeleteMembersOfType(int memberTypeId)
+        {
+            using (new WriteLock(Locker))
+            {
+                using (var uow = _uowProvider.GetUnitOfWork())
+                {
+                    var repository = _repositoryFactory.CreateMemberRepository(uow);
+                    //NOTE What about content that has the contenttype as part of its composition?
+                    var query = Query<IMember>.Builder.Where(x => x.ContentTypeId == memberTypeId);
+                    var members = repository.GetByQuery(query).ToArray();
+
+                    if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMember>(members), this))
+                        return;
+
+                    foreach (var member in members)
+                    {
+                        //Permantly delete the member
+                        Delete(member);
+                    }
+                }
             }
         }
 
@@ -249,9 +294,8 @@ namespace Umbraco.Core.Services
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <param name="memberTypeAlias"></param>
-        /// <param name="userId"></param>
         /// <returns></returns>
-        public IMember CreateMember(string email, string username, string password, string memberTypeAlias, int userId = 0)
+        public IMember CreateMember(string email, string username, string password, string memberTypeAlias)
         {
             var uow = _uowProvider.GetUnitOfWork();
             IMemberType memberType;
@@ -360,5 +404,83 @@ namespace Umbraco.Core.Services
         }
 
         #endregion
+
+        /// <summary>
+        /// Rebuilds all xml content in the cmsContentXml table for all media
+        /// </summary>
+        /// <param name="memberTypeIds">
+        /// Only rebuild the xml structures for the content type ids passed in, if none then rebuilds the structures
+        /// for all members = USE WITH CARE!
+        /// </param>
+        /// <returns>True if publishing succeeded, otherwise False</returns>
+        internal void RebuildXmlStructures(params int[] memberTypeIds)
+        {
+            using (new WriteLock(Locker))
+            {
+                var list = new List<IMember>();
+
+                var uow = _uowProvider.GetUnitOfWork();
+
+                //First we're going to get the data that needs to be inserted before clearing anything, this 
+                //ensures that we don't accidentally leave the content xml table empty if something happens
+                //during the lookup process.
+
+                if (memberTypeIds.Any() == false)
+                {
+                    list.AddRange(GetAllMembers());
+                }
+                else
+                {
+                    list.AddRange(memberTypeIds.SelectMany(GetMembersByMemberType));
+                }
+
+                var xmlItems = new List<ContentXmlDto>();
+                foreach (var c in list)
+                {
+                    var xml = c.ToXml();
+                    xmlItems.Add(new ContentXmlDto { NodeId = c.Id, Xml = xml.ToString(SaveOptions.None) });
+                }
+
+                //Ok, now we need to remove the data and re-insert it, we'll do this all in one transaction too.
+                using (var tr = uow.Database.GetTransaction())
+                {
+                    if (memberTypeIds.Any() == false)
+                    {
+                        //Remove all media records from the cmsContentXml table (DO NOT REMOVE Content/Members!)
+                        uow.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
+                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
+                                                    INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
+                                                    WHERE nodeObjectType = @nodeObjectType)",
+                                             new { nodeObjectType = Constants.ObjectTypes.Member });
+                    }
+                    else
+                    {
+                        foreach (var id in memberTypeIds)
+                        {
+                            //first we'll clear out the data from the cmsContentXml table for this type
+                            uow.Database.Execute(@"delete from cmsContentXml where nodeId in 
+                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
+                                INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
+                                INNER JOIN cmsContent ON cmsContent.nodeId = umbracoNode.id
+                                WHERE nodeObjectType = @nodeObjectType AND cmsContent.contentType = @contentTypeId)",
+                                                 new { contentTypeId = id, nodeObjectType = Constants.ObjectTypes.Member });
+                        }
+                    }
+
+                    //bulk insert it into the database
+                    uow.Database.BulkInsertRecords(xmlItems, tr);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>		
+        public static event TypedEventHandler<IMemberService, DeleteEventArgs<IMember>> Deleting;
+
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        public static event TypedEventHandler<IMemberService, DeleteEventArgs<IMember>> Deleted;
     }
 }

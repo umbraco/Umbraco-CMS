@@ -598,7 +598,7 @@ namespace Umbraco.Core.Services
 	                //The ContentType has to be removed from the composition somehow as it would otherwise break
 	                //Dbl.check+test that the ContentType's Id is removed from the ContentType2ContentType table
 	                var query = Query<IMedia>.Builder.Where(x => x.ContentTypeId == mediaTypeId);
-	                var contents = repository.GetByQuery(query);
+	                var contents = repository.GetByQuery(query).ToArray();
 
 	                if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMedia>(contents), this))
 	                    return;
