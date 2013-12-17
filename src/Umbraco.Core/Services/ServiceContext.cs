@@ -147,7 +147,7 @@ namespace Umbraco.Core.Services
                 _macroService = new Lazy<IMacroService>(() => new MacroService(provider, repositoryFactory.Value));
 
             if (_memberTypeService == null)
-                _memberTypeService = new Lazy<IMemberTypeService>(() => new MemberTypeService(provider, repositoryFactory.Value));
+                _memberTypeService = new Lazy<IMemberTypeService>(() => new MemberTypeService(provider, repositoryFactory.Value, _memberService.Value));
 
             if (_tagService == null)
                 _tagService = new Lazy<ITagService>(() => new TagService(provider, repositoryFactory.Value));

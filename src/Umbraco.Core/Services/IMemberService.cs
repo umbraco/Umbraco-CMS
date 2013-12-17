@@ -19,10 +19,13 @@ namespace Umbraco.Core.Services
         IMember GetById(int id);
         IMember GetByKey(Guid id);
         IEnumerable<IMember> GetMembersByMemberType(string memberTypeAlias);
+        IEnumerable<IMember> GetMembersByMemberType(int memberTypeId);
         IEnumerable<IMember> GetMembersByGroup(string memberGroupName);
         IEnumerable<IMember> GetAllMembers(params int[] ids);
         
         //TODO: Need to get all members that start with a certain letter
+
+        void DeleteMembersOfType(int memberTypeId);
     }
 
     /// <summary>
@@ -40,7 +43,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         bool Exists(string username);
 
-        IMember CreateMember(string username, string email, string password, string memberTypeAlias, int userId = 0);
+        IMember CreateMember(string username, string email, string password, string memberTypeAlias);
 
         IMember GetById(object id);
 

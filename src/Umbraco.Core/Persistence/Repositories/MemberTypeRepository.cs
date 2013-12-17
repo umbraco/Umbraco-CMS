@@ -168,7 +168,7 @@ namespace Umbraco.Core.Persistence.Repositories
             ((MemberType)entity).AddingEntity();
 
             //By Convention we add 9 stnd PropertyTypes to an Umbraco MemberType
-            var standardPropertyTypes = Constants.Conventions.Member.StandardPropertyTypeStubs;
+            var standardPropertyTypes = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
             foreach (var standardPropertyType in standardPropertyTypes)
             {
                 entity.AddPropertyType(standardPropertyType.Value);

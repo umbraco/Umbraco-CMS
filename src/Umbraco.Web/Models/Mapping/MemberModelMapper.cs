@@ -219,8 +219,10 @@ namespace Umbraco.Web.Models.Mapping
         {
             protected override IEnumerable<ContentPropertyDto> ResolveCore(IMember source)
             {
+                var defaultProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+
                 //remove all membership properties, these values are set with the membership provider.
-                var exclude = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
+                var exclude = defaultProps.Select(x => x.Value.Alias).ToArray();
                 
                 return source.Properties
                              .Where(x => exclude.Contains(x.Alias) == false)

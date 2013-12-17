@@ -216,8 +216,8 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var sut = repository.Get(member.Id);
 
                 Assert.That(sut.ContentType.PropertyGroups.Count(), Is.EqualTo(1));
-                Assert.That(sut.ContentType.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.StandardPropertyTypeStubs.Count));
-                Assert.That(sut.Properties.Count(), Is.EqualTo(3 + Constants.Conventions.Member.StandardPropertyTypeStubs.Count));
+                Assert.That(sut.ContentType.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
+                Assert.That(sut.Properties.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
                 Assert.That(sut.Properties.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
             }
         }
@@ -235,7 +235,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 memberTypeRepository.AddOrUpdate(memberType);
                 unitOfWork.Commit();
 
-                var member = MockedMember.CreateSimpleContent(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty", -1);
+                var member = MockedMember.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
                 repository.AddOrUpdate(member);
                 unitOfWork.Commit();
 
@@ -263,7 +263,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 memberTypeRepository.AddOrUpdate(memberType);
                 unitOfWork.Commit();
 
-                var member = MockedMember.CreateSimpleContent(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty", -1);
+                var member = MockedMember.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
                 repository.AddOrUpdate(member);
                 unitOfWork.Commit();
 

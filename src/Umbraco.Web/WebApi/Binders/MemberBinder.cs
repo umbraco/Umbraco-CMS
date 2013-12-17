@@ -93,8 +93,10 @@ namespace Umbraco.Web.WebApi.Binders
                 throw new InvalidOperationException("Could not find member with key " + key);
             }
 
+            var standardProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+
             //remove all membership properties, these values are set with the membership provider.
-            var exclude = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
+            var exclude = standardProps.Select(x => x.Value.Alias).ToArray();
 
             foreach (var remove in exclude)
             {
@@ -160,8 +162,9 @@ namespace Umbraco.Web.WebApi.Binders
         /// <param name="contentType"></param>
         private void FilterMembershipProviderProperties(IContentTypeBase contentType)
         {
+            var defaultProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
             //remove all membership properties, these values are set with the membership provider.
-            var exclude = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
+            var exclude = defaultProps.Select(x => x.Value.Alias).ToArray();
             FilterContentTypeProperties(contentType, exclude);
         }
 
@@ -190,7 +193,8 @@ namespace Umbraco.Web.WebApi.Binders
             protected override bool ValidateProperties(ContentItemBasic<ContentPropertyBasic, IMember> postedItem, HttpActionContext actionContext)
             {
                 var propertiesToValidate = postedItem.Properties.ToList();
-                var exclude = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
+                var defaultProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+                var exclude = defaultProps.Select(x => x.Value.Alias).ToArray();
                 foreach (var remove in exclude)
                 {
                     propertiesToValidate.RemoveAll(property => property.Alias == remove);

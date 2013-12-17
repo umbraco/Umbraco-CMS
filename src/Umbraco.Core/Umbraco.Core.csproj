@@ -960,6 +960,7 @@
     <Compile Include="Services\ContentService.cs" />
     <Compile Include="Services\ContentServiceExtensions.cs" />
     <Compile Include="Services\ContentTypeService.cs" />
+    <Compile Include="Services\ContentTypeServiceBase.cs" />
     <Compile Include="Services\DataTypeService.cs" />
     <Compile Include="Services\EntityService.cs" />
     <Compile Include="Services\FileService.cs" />

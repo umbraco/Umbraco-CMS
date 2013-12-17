@@ -58,9 +58,11 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var sut = repository.Get(memberType.Id);
 
+                var standardProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+
                 Assert.That(sut, Is.Not.Null);
                 Assert.That(sut.PropertyGroups.Count(), Is.EqualTo(1));
-                Assert.That(sut.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.StandardPropertyTypeStubs.Count));
+                Assert.That(sut.PropertyTypes.Count(), Is.EqualTo(3 + standardProps.Count));
 
                 Assert.That(sut.PropertyGroups.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
                 Assert.That(sut.PropertyTypes.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
@@ -79,6 +81,33 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
 
                 var memberType2 = MockedContentTypes.CreateSimpleMemberType();
+                memberType2.Name = "AnotherType";
+                memberType2.Alias = "anotherType";
+                repository.AddOrUpdate(memberType2);
+                unitOfWork.Commit();
+
+                var result = repository.GetAll();
+
+                //there are 3 because of the Member type created for init data
+                Assert.AreEqual(3, result.Count());
+            }
+        }
+
+        //NOTE: This tests for left join logic (rev 7b14e8eacc65f82d4f184ef46c23340c09569052)
+        [Test]
+        public void Can_Get_All_Members_When_No_Properties_Assigned()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var memberType1 = MockedContentTypes.CreateSimpleMemberType();
+                memberType1.PropertyTypeCollection.Clear();
+                repository.AddOrUpdate(memberType1);
+                unitOfWork.Commit();
+
+                var memberType2 = MockedContentTypes.CreateSimpleMemberType();
+                memberType2.PropertyTypeCollection.Clear();
                 memberType2.Name = "AnotherType";
                 memberType2.Alias = "anotherType";
                 repository.AddOrUpdate(memberType2);
@@ -119,8 +148,30 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 memberType = repository.Get(memberType.Id);
 
-                Assert.That(memberType.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.StandardPropertyTypeStubs.Count));
+                Assert.That(memberType.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
                 Assert.That(memberType.PropertyGroups.Count(), Is.EqualTo(1));
+            }
+        }
+
+        //This is to show that new properties are created for each member type - there was a bug before
+        // that was reusing the same properties with the same Ids between member types
+        [Test]
+        public void Built_In_Member_Type_Properties_Are_Not_Reused_For_Different_Member_Types()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                IMemberType memberType1 = MockedContentTypes.CreateSimpleMemberType();
+                IMemberType memberType2 = MockedContentTypes.CreateSimpleMemberType("test2");
+                repository.AddOrUpdate(memberType1);
+                repository.AddOrUpdate(memberType2);
+                unitOfWork.Commit();
+
+                var m1Ids = memberType1.PropertyTypes.Select(x => x.Id).ToArray();
+                var m2Ids = memberType2.PropertyTypes.Select(x => x.Id).ToArray();
+
+                Assert.IsFalse(m1Ids.Any(m2Ids.Contains));
             }
         }
 

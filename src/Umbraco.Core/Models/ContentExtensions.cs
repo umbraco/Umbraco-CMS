@@ -641,21 +641,16 @@ namespace Umbraco.Core.Models
             return ApplicationContext.Current.Services.PackagingService.Export(media);
         }
 
+        /// <summary>
+        /// Creates the full xml representation for the <see cref="IMedia"/> object and all of it's descendants
+        /// </summary>
+        /// <param name="media"><see cref="IMedia"/> to generate xml for</param>
+        /// <returns>Xml representation of the passed in <see cref="IMedia"/></returns>
         internal static XElement ToDeepXml(this IMedia media)
         {
             return ApplicationContext.Current.Services.PackagingService.Export(media, true);
         }
-
-        /// <summary>
-        /// Creates the xml representation for the <see cref="IMedia"/> object
-        /// </summary>
-        /// <param name="member"><see cref="IContent"/> to generate xml for</param>
-        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
-        public static XElement ToXml(this IMember member)
-        {
-            return ApplicationContext.Current.Services.PackagingService.Export(member);
-        }
-        
+       
         /// <summary>
         /// Creates the xml representation for the <see cref="IContent"/> object
         /// </summary>
@@ -667,6 +662,16 @@ namespace Umbraco.Core.Models
             //TODO Do a proper implementation of this
             //If current IContent is published we should get latest unpublished version
             return content.ToXml();
+        }
+
+        /// <summary>
+        /// Creates the xml representation for the <see cref="IMember"/> object
+        /// </summary>
+        /// <param name="member"><see cref="IMember"/> to generate xml for</param>
+        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+        public static XElement ToXml(this IMember member)
+        {
+            return ApplicationContext.Current.Services.PackagingService.Export(member);
         }
         
         #endregion

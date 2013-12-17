@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 
@@ -28,6 +29,26 @@ namespace Umbraco.Tests.TestHelpers.Entities
             member.ResetDirtyProperties(false);
 
             return member;
+        }
+
+        public static IEnumerable<IMember> CreateSimpleMember(IMemberType memberType, int amount)
+        {
+            var list = new List<IMember>();
+
+            for (int i = 0; i < amount; i++)
+            {
+                var name = "Member No-" + i;
+                var member = new Member(name, "test" + i + "@test.com", "test" + i, "test" + i, memberType);
+                member.SetValue("title", name + " member" + i);
+                member.SetValue("bodyText", "This is a subpage" + i);
+                member.SetValue("author", "John Doe" + i);
+
+                member.ResetDirtyProperties(false);
+
+                list.Add(member);
+            }
+
+            return list;
         } 
     }
 }
