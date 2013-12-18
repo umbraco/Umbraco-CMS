@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
@@ -25,6 +26,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// </summary>
     public interface ISqlSyntaxProvider
     {
+        string GetStringColumnEqualComparison(string column, string value, TextColumnType columnType);
+        string GetStringColumnStartsWithComparison(string column, string value, TextColumnType columnType);
+        string GetStringColumnEndsWithComparison(string column, string value, TextColumnType columnType);
+        string GetStringColumnContainsComparison(string column, string value, TextColumnType columnType);
+
         string GetQuotedTableName(string tableName);
         string GetQuotedColumnName(string columnName);
         string GetQuotedName(string name);

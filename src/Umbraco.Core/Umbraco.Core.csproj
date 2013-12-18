@@ -342,6 +342,13 @@
     <Compile Include="PropertyEditors\DefaultPropertyValueConverterAttribute.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\UpdateRelatedLinksData.cs" />
     <Compile Include="PropertyEditors\IValueEditor.cs" />
+    <Compile Include="Persistence\Querying\SqlStringExtensions.cs" />
+    <Compile Include="Persistence\Querying\StringPropertyMatchType.cs" />
+    <Compile Include="Persistence\Querying\TextColumnType.cs" />
+    <Compile Include="Persistence\SqlSyntax\MySqlSyntax.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlCeSyntax.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlServerSyntax.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlServerVersionName.cs" />
     <Compile Include="PropertyEditors\PropertyCacheValue.cs" />
     <Compile Include="PropertyEditors\PropertyValueCacheAttribute.cs" />
     <Compile Include="PropertyEditors\PropertyValueTypeAttribute.cs" />
@@ -974,6 +981,7 @@
     <Compile Include="Services\IMacroService.cs" />
     <Compile Include="Services\IMediaService.cs" />
     <Compile Include="Services\IMemberService.cs" />
+    <Compile Include="Services\IMembershipMemberService.cs" />
     <Compile Include="Services\IMembershipUserService.cs" />
     <Compile Include="Services\IMemberTypeService.cs" />
     <Compile Include="Services\IRelationService.cs" />
