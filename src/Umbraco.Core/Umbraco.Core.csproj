@@ -200,6 +200,12 @@
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
     <Compile Include="Models\TemplateNode.cs" />
+    <Compile Include="Persistence\Querying\SqlStringExtensions.cs" />
+    <Compile Include="Persistence\Querying\TextColumnType.cs" />
+    <Compile Include="Persistence\SqlSyntax\MySqlSyntax.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlCeSyntax.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlServerSyntax.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlServerVersionName.cs" />
     <Compile Include="PropertyEditors\PropertyCacheValue.cs" />
     <Compile Include="PropertyEditors\PropertyValueCacheAttribute.cs" />
     <Compile Include="PropertyEditors\PropertyValueTypeAttribute.cs" />

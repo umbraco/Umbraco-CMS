@@ -7,14 +7,6 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
     /// <summary>
-    /// Static class that provides simple access to the MySql SqlSyntax Provider
-    /// </summary>
-    internal static class MySqlSyntax
-    {
-        public static ISqlSyntaxProvider Provider { get { return new MySqlSyntaxProvider(); } }
-    }
-
-    /// <summary>
     /// Represents an SqlSyntaxProvider for MySql
     /// </summary>
     [SqlSyntaxProviderAttribute("MySql.Data.MySqlClient")]
