@@ -118,7 +118,7 @@ namespace umbraco.presentation.plugins.tinymce3 {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.ScriptManager ScriptManager1;
+        protected global::System.Web.UI.WebControls.ScriptManager ScriptManager1;
         
         /// <summary>
         /// pane_src control.
@@ -136,7 +136,7 @@ namespace umbraco.presentation.plugins.tinymce3 {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.controls.Images.ImageViewer ImageViewer;
+        protected global::System.Web.UI.UserControl ImageViewer;
         
         /// <summary>
         /// pp_src control.
@@ -146,6 +146,15 @@ namespace umbraco.presentation.plugins.tinymce3 {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::umbraco.uicontrols.PropertyPanel pp_src;
+        
+        /// <summary>
+        /// pp_alt control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_alt;
         
         /// <summary>
         /// pp_title control.
