@@ -18,8 +18,7 @@ namespace umbraco.presentation.plugins.tinymce3
 			ClientLoader.DataBind();
 
             pp_src.Text = ui.Text("url");
-            pp_title.Text = ui.Text("titleOptional");
-            pp_alt.Text = ui.Text("altText");
+            pp_title.Text = ui.Text("name");
             pp_dimensions.Text = ui.Text("dimensions");
 
             pane_src.Style.Add("height", "105px");

@@ -18,7 +18,6 @@
             nl.width.value = dom.getAttrib(n, 'width');
             nl.height.value = dom.getAttrib(n, 'height');
             nl.alt.value = dom.getAttrib(n, 'alt');
-            nl.title.value = dom.getAttrib(n, 'title');
             nl.orgHeight.value = dom.getAttrib(n, 'rel').split(",")[1];
             nl.orgWidth.value = dom.getAttrib(n, 'rel').split(",")[0];
             
@@ -90,7 +89,7 @@
             width: nl.width.value,
             height: nl.height.value,
             alt: nl.alt.value,
-            title: nl.title.value,
+            title: nl.alt.value,
             rel: nl.orgWidth.value + ',' + nl.orgHeight.value
         });
 

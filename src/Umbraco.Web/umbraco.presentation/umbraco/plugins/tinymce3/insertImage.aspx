@@ -69,7 +69,6 @@
             formObj.src.value = src;
 
             formObj.alt.value = alt;
-            formObj.title.value = "";
 
             var imageWidth = width;
             var imageHeight = height;
@@ -159,11 +158,8 @@
       <ui:PropertyPanel id="pp_src" runat="server" Text="Url">
           <input type="text" id="src" style="width: 300px"/>
       </ui:PropertyPanel>
-      <ui:PropertyPanel id="pp_alt" runat="server" Text="Alt Text">
-           <input type="text" id="alt" style="width: 300px"/>
-      </ui:PropertyPanel>
       <ui:PropertyPanel id="pp_title" runat="server" Text="Title">
-           <input type="text" id="title" style="width: 300px"/>
+           <input type="text" id="alt" style="width: 300px"/>
       </ui:PropertyPanel>
       <ui:PropertyPanel id="pp_dimensions" runat="server" Text="Dimensions">
             <asp:Literal ID="lt_widthLabel" runat="server" />:  <input name="width" type="text" id="width" value="" size="5" maxlength="5" class="size" onchange="changeDimensions('width');" />

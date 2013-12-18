@@ -77,8 +77,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                                 width: msg.d.width,
                                 height: msg.d.height,
                                 url: msg.d.url,
-                                alt: msg.d.alt,
-                                title: msg.d.title
+                                alt: msg.d.alt
                             };
                             //call the callback method
                             callback.call(_this, params);
