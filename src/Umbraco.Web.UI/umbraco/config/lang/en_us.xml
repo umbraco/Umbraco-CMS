@@ -128,6 +128,7 @@
     <key alias="sortDone">Sortorder is updated</key>
     <key alias="sortHelp">To sort the nodes, simply drag the nodes or click one of the column headers. You can select multiple nodes by holding the "shift" or "control" key while selecting</key>
     <key alias="statistics">Statistics</key>
+    <key alias="altText">Alt Text</key>
     <key alias="titleOptional">Title (optional)</key>
     <key alias="type">Type</key>
     <key alias="unPublish">Unpublish</key>
