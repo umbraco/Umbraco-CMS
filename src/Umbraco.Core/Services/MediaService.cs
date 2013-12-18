@@ -760,30 +760,31 @@ namespace Umbraco.Core.Services
                 if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(medias), this))
 				return;
             }
+	        using (new WriteLock(Locker))
+	        {
+	            var uow = _uowProvider.GetUnitOfWork();
+	            using (var repository = _repositoryFactory.CreateMediaRepository(uow))
+	            {
+	                foreach (var media in medias)
+	                {
+	                    media.CreatorId = userId;
+	                    repository.AddOrUpdate(media);
+	                }
 
-	        var mediaXml = new Dictionary<int, Lazy<XElement>>();
-			var uow = _uowProvider.GetUnitOfWork();
-			using (var repository = _repositoryFactory.CreateMediaRepository(uow))
-			{
-				foreach (var media in medias)
-				{
-					media.CreatorId = userId;
-					repository.AddOrUpdate(media);
-				}
+	                //commit the whole lot in one go
+	                uow.Commit();
 
-				//commit the whole lot in one go
-				uow.Commit();
+	                foreach (var media in medias)
+	                {
+	                    CreateAndSaveMediaXml(media.ToXml(), media.Id, uow.Database);
+	                }
+	            }
 
-			    foreach (var media in medias)
-			    {
-                    CreateAndSaveMediaXml(media.ToXml(), media.Id, uow.Database);
-			    }
-			}
+	            if (raiseEvents)
+	                Saved.RaiseEvent(new SaveEventArgs<IMedia>(medias, false), this);
 
-            if(raiseEvents)
-		        Saved.RaiseEvent(new SaveEventArgs<IMedia>(medias, false), this);
-
-			Audit.Add(AuditTypes.Save, "Save Media items performed by user", userId, -1);
+	            Audit.Add(AuditTypes.Save, "Save Media items performed by user", userId, -1);
+	        }
 	    }
 
         /// <summary>

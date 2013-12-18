@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
 {
@@ -22,10 +23,13 @@ namespace Umbraco.Core.Services
         IEnumerable<IMember> GetMembersByMemberType(int memberTypeId);
         IEnumerable<IMember> GetMembersByGroup(string memberGroupName);
         IEnumerable<IMember> GetAllMembers(params int[] ids);
-
-        //TODO: Need to get all members that start with a certain letter
-
+        
         void DeleteMembersOfType(int memberTypeId);
+
+        IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact);
+        IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, int value);
+        IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, bool value);
+        IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, DateTime value);
     }
 
     /// <summary>
@@ -43,6 +47,14 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         bool Exists(string username);
 
+        /// <summary>
+        /// Creates and persists a new member
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="email"></param>
+        /// <param name="password"></param>
+        /// <param name="memberTypeAlias"></param>
+        /// <returns></returns>
         IMember CreateMember(string username, string email, string password, string memberTypeAlias);
 
         IMember GetById(object id);
@@ -55,6 +67,10 @@ namespace Umbraco.Core.Services
 
         void Save(IMember membershipUser, bool raiseEvents = true);
 
-        IEnumerable<IMember> FindMembersByEmail(string emailStringToMatch);
+        void Save(IEnumerable<IMember> members, bool raiseEvents = true);
+
+        IEnumerable<IMember> FindMembersByEmail(string emailStringToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
+
+        IEnumerable<IMember> FindMembersByUsername(string login, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
     }
 }

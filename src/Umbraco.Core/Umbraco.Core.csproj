@@ -201,6 +201,7 @@
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
     <Compile Include="Models\TemplateNode.cs" />
     <Compile Include="Persistence\Querying\SqlStringExtensions.cs" />
+    <Compile Include="Persistence\Querying\StringPropertyMatchType.cs" />
     <Compile Include="Persistence\Querying\TextColumnType.cs" />
     <Compile Include="Persistence\SqlSyntax\MySqlSyntax.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlCeSyntax.cs" />
