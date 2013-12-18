@@ -60,7 +60,7 @@ namespace Umbraco.Core.Services
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateUserRepository(uow))
             {
-                var escapedUser = uow.Database.EscapeAtSymbols(username);
+                var escapedUser = PetaPocoExtensions.EscapeAtSymbols(username);
                 var query = Query<IUser>.Builder.Where(x => x.Username == escapedUser);
                 return repository.GetByQuery(query).FirstOrDefault();
             }

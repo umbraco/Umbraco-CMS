@@ -439,7 +439,6 @@ namespace Umbraco.Core.Services
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
                 var query = Query<IMember>.Builder.Where(x => x.Email.Equals(email));
-                var query = Query<IMember>.Builder.Where(x => x.Email == escapedEmail);
                 var member = repository.GetByQuery(query).FirstOrDefault();
 
                 return member;
