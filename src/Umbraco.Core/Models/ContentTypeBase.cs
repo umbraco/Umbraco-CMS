@@ -43,6 +43,7 @@ namespace Umbraco.Core.Models
             _allowedContentTypes = new List<ContentTypeSort>();
             _propertyGroups = new PropertyGroupCollection();
             _propertyTypes = new PropertyTypeCollection();
+            _propertyTypes.CollectionChanged += PropertyTypesChanged;
             _additionalData = new Dictionary<string, object>();
         }
 
@@ -54,6 +55,7 @@ namespace Umbraco.Core.Models
 			_allowedContentTypes = new List<ContentTypeSort>();
 			_propertyGroups = new PropertyGroupCollection();
             _propertyTypes = new PropertyTypeCollection();
+            _propertyTypes.CollectionChanged += PropertyTypesChanged;
             _additionalData = new Dictionary<string, object>();
 		}
 
@@ -428,8 +430,7 @@ namespace Umbraco.Core.Models
         {
             if (PropertyTypeExists(propertyType.Alias) == false)
             {
-                _propertyTypes.Add(propertyType);
-                _propertyTypes.CollectionChanged += PropertyTypesChanged;
+                _propertyTypes.Add(propertyType);                
                 return true;
             }
 

@@ -215,6 +215,8 @@
     <Compile Include="PublishedContent\StronglyTypedModels\TypedModelBase.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\UmbracoTemplatePage`T.cs" />
     <Compile Include="Services\LocalizationServiceTests.cs" />
+    <Compile Include="Services\MemberServiceTests.cs" />
+    <Compile Include="Services\MemberTypeServiceTests.cs" />
     <Compile Include="Services\PackagingServiceTests.cs" />
     <Compile Include="Services\PerformanceTests.cs" />
     <Compile Include="Services\UserServiceTests.cs" />

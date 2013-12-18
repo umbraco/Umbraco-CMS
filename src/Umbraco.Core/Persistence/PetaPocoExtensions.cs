@@ -21,14 +21,18 @@ namespace Umbraco.Core.Persistence
         /// <summary>
         /// This will escape single @ symbols for peta poco values so it doesn't think it's a parameter
         /// </summary>
-        /// <param name="db"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static string EscapeAtSymbols(this Database db, string value)
+        public static string EscapeAtSymbols(string value)
         {
-            //this fancy regex will only match a single @ not a double, etc...
-            var regex = new Regex("(?<!@)@(?!@)");
-            return regex.Replace(value, "@@");
+            if (value.Contains("@"))
+            {
+                //this fancy regex will only match a single @ not a double, etc...
+                var regex = new Regex("(?<!@)@(?!@)");
+                return regex.Replace(value, "@@");    
+            }
+            return value;
+
         }
 
         public static void CreateTable<T>(this Database db)

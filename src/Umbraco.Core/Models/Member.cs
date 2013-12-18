@@ -20,7 +20,18 @@ namespace Umbraco.Core.Models
         private object _providerUserKey;
         private Type _userTypeKey;
 
-        public Member(string name, string email, string username, string password, int parentId, IMemberType contentType)
+        /// <summary>
+        /// Constructor for creating a Member object
+        /// </summary>
+        /// <param name="name">Name of the content</param>
+        /// <param name="contentType">ContentType for the current Content object</param>
+        public Member(string name, IMemberType contentType)
+            : base(name, -1, contentType, new PropertyCollection())
+        {
+            _contentType = contentType;
+        }
+
+        internal Member(string name, string email, string username, string password, int parentId, IMemberType contentType)
             : base(name, parentId, contentType, new PropertyCollection())
         {
             Mandate.ParameterNotNull(contentType, "contentType");
@@ -31,8 +42,8 @@ namespace Umbraco.Core.Models
             _password = password;
         }
 
-        public Member(string name, string email, string username, string password, IContentBase parent, IMemberType contentType)
-            : base(name, parent, contentType, new PropertyCollection())
+        public Member(string name, string email, string username, string password, IMemberType contentType)
+            : this(name, email, username, password, -1, contentType)
         {
             Mandate.ParameterNotNull(contentType, "contentType");
 
@@ -41,6 +52,17 @@ namespace Umbraco.Core.Models
             _username = username;
             _password = password;
         }
+
+        //public Member(string name, string email, string username, string password, IContentBase parent, IMemberType contentType)
+        //    : base(name, parent, contentType, new PropertyCollection())
+        //{
+        //    Mandate.ParameterNotNull(contentType, "contentType");
+
+        //    _contentType = contentType;
+        //    _email = email;
+        //    _username = username;
+        //    _password = password;
+        //}
 
         private static readonly PropertyInfo DefaultContentTypeAliasSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.ContentTypeAlias);
         private static readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Username);

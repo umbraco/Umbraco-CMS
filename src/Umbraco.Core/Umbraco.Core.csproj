@@ -200,6 +200,13 @@
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
     <Compile Include="Models\TemplateNode.cs" />
+    <Compile Include="Persistence\Querying\SqlStringExtensions.cs" />
+    <Compile Include="Persistence\Querying\StringPropertyMatchType.cs" />
+    <Compile Include="Persistence\Querying\TextColumnType.cs" />
+    <Compile Include="Persistence\SqlSyntax\MySqlSyntax.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlCeSyntax.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlServerSyntax.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlServerVersionName.cs" />
     <Compile Include="PropertyEditors\PropertyCacheValue.cs" />
     <Compile Include="PropertyEditors\PropertyValueCacheAttribute.cs" />
     <Compile Include="PropertyEditors\PropertyValueTypeAttribute.cs" />
@@ -745,6 +752,7 @@
     <Compile Include="Serialization\StreamedResult.cs" />
     <Compile Include="Services\ContentService.cs" />
     <Compile Include="Services\ContentTypeService.cs" />
+    <Compile Include="Services\ContentTypeServiceBase.cs" />
     <Compile Include="Services\DataTypeService.cs" />
     <Compile Include="Services\EntityService.cs" />
     <Compile Include="Services\FileService.cs" />
@@ -756,6 +764,7 @@
     <Compile Include="Services\ILocalizationService.cs" />
     <Compile Include="Services\IMediaService.cs" />
     <Compile Include="Services\IMemberService.cs" />
+    <Compile Include="Services\IMembershipMemberService.cs" />
     <Compile Include="Services\IMembershipUserService.cs" />
     <Compile Include="Services\IMemberTypeService.cs" />
     <Compile Include="Services\IRelationService.cs" />

@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(repository, Is.Not.Null);
         }
 
-        [Test, NUnit.Framework.Ignore]
+        [Test]
         public void MemberRepository_Can_Get_Member_By_Id()
         {
             var provider = new PetaPocoUnitOfWorkProvider();
@@ -58,31 +58,37 @@ namespace Umbraco.Tests.Persistence.Repositories
             MemberTypeRepository memberTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
             {
+                var member = CreateTestMember();
 
-                var member = repository.Get(1341);
+                member = repository.Get(member.Id);
 
                 Assert.That(member, Is.Not.Null);
+                Assert.That(member.HasIdentity, Is.True);
             }
         }
 
-        [Test, NUnit.Framework.Ignore]
-        public void MemberRepository_Can_Get_Specific_Members()
+        [Test]
+        public void Can_Get_Members_By_Ids()
         {
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
             {
+                var type = CreateTestMemberType();
+                var m1 = CreateTestMember(type, "Test 1", "test1@test.com", "pass1", "test1");
+                var m2 = CreateTestMember(type, "Test 2", "test2@test.com", "pass2", "test2");
 
-                var members = repository.GetAll(1341, 1383);
+                var members = repository.GetAll(m1.Id, m2.Id);
 
                 Assert.That(members, Is.Not.Null);
-                Assert.That(members.Any(x => x == null), Is.False);
                 Assert.That(members.Count(), Is.EqualTo(2));
+                Assert.That(members.Any(x => x == null), Is.False);
+                Assert.That(members.Any(x => x.HasIdentity == false), Is.False);
             }
         }
 
-        [Test, NUnit.Framework.Ignore]
+        [Test]
         public void MemberRepository_Can_Get_All_Members()
         {
             var provider = new PetaPocoUnitOfWorkProvider();
@@ -90,16 +96,22 @@ namespace Umbraco.Tests.Persistence.Repositories
             MemberTypeRepository memberTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
             {
+                var type = CreateTestMemberType();
+                for (var i = 0; i < 5; i++)
+                {
+                    CreateTestMember(type, "Test " + i, "test" + i + "@test.com", "pass" + i, "test" + i);
+                }
 
                 var members = repository.GetAll();
 
                 Assert.That(members, Is.Not.Null);
                 Assert.That(members.Any(x => x == null), Is.False);
-                Assert.That(members.Count(), Is.EqualTo(6));
+                Assert.That(members.Count(), Is.EqualTo(5));
+                Assert.That(members.Any(x => x.HasIdentity == false), Is.False);
             }
         }
 
-        [Test, NUnit.Framework.Ignore]
+        [Test]
         public void MemberRepository_Can_Perform_GetByQuery_With_Key()
         {
             // Arrange
@@ -108,14 +120,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             MemberTypeRepository memberTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
             {
+                var key = Guid.NewGuid();
+                var member = CreateTestMember(key: key);
 
                 // Act
-                var query = Query<IMember>.Builder.Where(x => x.Key == new Guid("A6B9CA6B-0615-42CA-B5F5-338417EC76BE"));
+                var query = Query<IMember>.Builder.Where(x => x.Key == key);
                 var result = repository.GetByQuery(query);
 
                 // Assert
                 Assert.That(result.Count(), Is.EqualTo(1));
-                Assert.That(result.First().Id, Is.EqualTo(1341));
+                Assert.That(result.First().Id, Is.EqualTo(member.Id));
             }
         }
 
@@ -161,7 +175,54 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
-        public void MemberRepository_Can_Persist_Member()
+        public void Can_Persist_Member()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
+                var member = CreateTestMember();
+
+                var sut = repository.Get(member.Id);
+
+                Assert.That(sut, Is.Not.Null);
+                Assert.That(sut.HasIdentity, Is.True);      
+                Assert.That(sut.Properties.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
+                Assert.That(sut.Name, Is.EqualTo("Johnny Hefty"));
+                Assert.That(sut.Email, Is.EqualTo("johnny@example.com"));
+                Assert.That(sut.Password, Is.EqualTo("123"));
+                Assert.That(sut.Username, Is.EqualTo("hefty"));      
+            }
+        }
+
+        [Test]
+        public void New_Member_Has_Built_In_Properties_By_Default()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
+                var memberType = MockedContentTypes.CreateSimpleMemberType();
+                memberTypeRepository.AddOrUpdate(memberType);
+                unitOfWork.Commit();
+
+                var member = MockedMember.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
+                repository.AddOrUpdate(member);
+                unitOfWork.Commit();
+
+                var sut = repository.Get(member.Id);
+
+                Assert.That(sut.ContentType.PropertyGroups.Count(), Is.EqualTo(1));
+                Assert.That(sut.ContentType.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
+                Assert.That(sut.Properties.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
+                Assert.That(sut.Properties.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
+            }
+        }
+
+        [Test]
+        public void MemberRepository_Does_Not_Replace_Password_When_Null()
         {
             IMember sut;
             var provider = new PetaPocoUnitOfWorkProvider();
@@ -173,18 +234,47 @@ namespace Umbraco.Tests.Persistence.Repositories
                 memberTypeRepository.AddOrUpdate(memberType);
                 unitOfWork.Commit();
 
-                var member = MockedMember.CreateSimpleContent(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty", -1);
+                var member = MockedMember.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
                 repository.AddOrUpdate(member);
                 unitOfWork.Commit();
 
                 sut = repository.Get(member.Id);
+                //when the password is null it will not overwrite what is already there.
+                sut.Password = null;
+                repository.AddOrUpdate(sut);
+                unitOfWork.Commit();
+                sut = repository.Get(member.Id);
 
-                Assert.That(sut, Is.Not.Null);
-                Assert.That(sut.ContentType.PropertyGroups.Count(), Is.EqualTo(1));
-                Assert.That(sut.ContentType.PropertyTypes.Count(), Is.EqualTo(12));
+                Assert.That(sut.Password, Is.EqualTo("123"));
+            }
+        }
 
-                Assert.That(sut.Properties.Count(), Is.EqualTo(12));
-                Assert.That(sut.Properties.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
+        [Test]
+        public void MemberRepository_Can_Update_Email_And_Login_When_Changed()
+        {
+            IMember sut;
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
+                var memberType = MockedContentTypes.CreateSimpleMemberType();
+                memberTypeRepository.AddOrUpdate(memberType);
+                unitOfWork.Commit();
+
+                var member = MockedMember.CreateSimpleMember(memberType, "Johnny Hefty", "johnny@example.com", "123", "hefty");
+                repository.AddOrUpdate(member);
+                unitOfWork.Commit();
+
+                sut = repository.Get(member.Id);
+                sut.Username = "This is new";
+                sut.Email = "thisisnew@hello.com";
+                repository.AddOrUpdate(sut);
+                unitOfWork.Commit();
+                sut = repository.Get(member.Id);
+
+                Assert.That(sut.Email, Is.EqualTo("thisisnew@hello.com"));
+                Assert.That(sut.Username, Is.EqualTo("This is new"));
             }
         }
 
@@ -205,6 +295,42 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             Console.WriteLine(sql.SQL);
             Assert.That(sql.SQL, Is.Not.Empty);
+        }
+
+        private IMember CreateTestMember(IMemberType memberType = null, string name = null, string email = null, string password = null, string username = null, Guid? key = null)
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
+                if (memberType == null)
+                {
+                    memberType = MockedContentTypes.CreateSimpleMemberType();
+                    memberTypeRepository.AddOrUpdate(memberType);
+                    unitOfWork.Commit();    
+                }
+
+                var member = MockedMember.CreateSimpleMember(memberType, name ?? "Johnny Hefty", email ?? "johnny@example.com", password ?? "123", username ?? "hefty", key);
+                repository.AddOrUpdate(member);
+                unitOfWork.Commit();
+
+                return member;
+            }
+        }
+
+        private IMemberType CreateTestMemberType()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            MemberTypeRepository memberTypeRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            {
+                var memberType = MockedContentTypes.CreateSimpleMemberType();
+                memberTypeRepository.AddOrUpdate(memberType);
+                unitOfWork.Commit();
+                return memberType;
+            }
         }
 
         private Sql GetBaseQuery(bool isCount)

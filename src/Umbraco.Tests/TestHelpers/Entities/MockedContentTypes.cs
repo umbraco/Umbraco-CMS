@@ -266,12 +266,12 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return mediaType;
         }
 
-        public static MemberType CreateSimpleMemberType()
+        public static MemberType CreateSimpleMemberType(string alias = null, string name = null)
         {
             var contentType = new MemberType(-1)
             {
-                Alias = "simple",
-                Name = "Simple Page",
+                Alias = alias ?? "simple",
+                Name = name ?? "Simple Page",
                 Description = "ContentType used for simple text pages",
                 Icon = ".sprTreeDoc3",
                 Thumbnail = "doc.png",

@@ -166,140 +166,84 @@ namespace Umbraco.Core
 
                 public const string FailedPasswordAttemptsLabel = "Failed Password Attempts";
 
-		        internal static Dictionary<string, PropertyType>
-		            StandardPropertyTypeStubs = new Dictionary<string, PropertyType>
-		                                        {
-		                                            {
-		                                                Comments,
-		                                                new PropertyType(
-		                                                new Guid(
-		                                                PropertyEditors
-		                                                .TextboxMultiple),
-		                                                DataTypeDatabaseType
-		                                                .Ntext)
-		                                                {
-		                                                    Alias = Comments,
-		                                                    Name =
-		                                                        CommentsLabel
-		                                                }
-		                                            },
-		                                            {
-		                                                FailedPasswordAttempts,
-		                                                new PropertyType(
-		                                                new Guid(
-		                                                PropertyEditors
-		                                                .Integer),
-		                                                DataTypeDatabaseType
-		                                                .Integer)
-		                                                {
-		                                                    Alias =
-		                                                        FailedPasswordAttempts,
-		                                                    Name =
-		                                                        FailedPasswordAttemptsLabel
-		                                                }
-		                                            },
-		                                            {
-		                                                IsApproved,
-		                                                new PropertyType(
-		                                                new Guid(
-		                                                PropertyEditors
-		                                                .TrueFalse),
-		                                                DataTypeDatabaseType
-		                                                .Integer)
-		                                                {
-		                                                    Alias = IsApproved,
-		                                                    Name =
-		                                                        IsApprovedLabel
-		                                                }
-		                                            },
-		                                            {
-		                                                IsLockedOut,
-		                                                new PropertyType(
-		                                                new Guid(
-		                                                PropertyEditors
-		                                                .TrueFalse),
-		                                                DataTypeDatabaseType
-		                                                .Integer)
-		                                                {
-		                                                    Alias =
-		                                                        IsLockedOut,
-		                                                    Name =
-		                                                        IsLockedOutLabel
-		                                                }
-		                                            },
-		                                            {
-		                                                LastLockoutDate,
-		                                                new PropertyType(
-		                                                new Guid(
-		                                                PropertyEditors.Date),
-		                                                DataTypeDatabaseType
-		                                                .Date)
-		                                                {
-		                                                    Alias =
-		                                                        LastLockoutDate,
-		                                                    Name =
-		                                                        LastLockoutDateLabel
-		                                                }
-		                                            },
-		                                            {
-		                                                LastLoginDate,
-		                                                new PropertyType(
-		                                                new Guid(
-		                                                PropertyEditors.Date),
-		                                                DataTypeDatabaseType
-		                                                .Date)
-		                                                {
-		                                                    Alias =
-		                                                        LastLoginDate,
-		                                                    Name =
-		                                                        LastLoginDateLabel
-		                                                }
-		                                            },
-		                                            {
-		                                                LastPasswordChangeDate,
-		                                                new PropertyType(
-		                                                new Guid(
-		                                                PropertyEditors.Date),
-		                                                DataTypeDatabaseType
-		                                                .Date)
-		                                                {
-		                                                    Alias =
-		                                                        LastPasswordChangeDate,
-		                                                    Name =
-		                                                        LastPasswordChangeDateLabel
-		                                                }
-		                                            },
-		                                            {
-		                                                PasswordAnswer,
-		                                                new PropertyType(
-		                                                new Guid(
-		                                                PropertyEditors
-		                                                .Textbox),
-		                                                DataTypeDatabaseType
-		                                                .Nvarchar)
-		                                                {
-		                                                    Alias =
-		                                                        PasswordAnswer,
-		                                                    Name =
-		                                                        PasswordAnswerLabel
-		                                                }
-		                                            },
-		                                            {
-		                                                PasswordQuestion,
-		                                                new PropertyType(
-		                                                new Guid(
-		                                                PropertyEditors
-		                                                .Textbox),
-		                                                DataTypeDatabaseType
-		                                                .Nvarchar)
-		                                                {
-		                                                    Alias =
-		                                                        PasswordQuestion,
-		                                                    Name =
-		                                                        PasswordQuestionLabel
-		                                                }
-		                                            }
-		                                        };
+		        internal static Dictionary<string, PropertyType> GetStandardPropertyTypeStubs()
+		        {
+		            return new Dictionary<string, PropertyType>
+		                {
+		                    {
+		                        Comments,
+		                        new PropertyType(new Guid(PropertyEditors.TextboxMultiple), DataTypeDatabaseType.Ntext)
+		                            {
+		                                Alias = Comments,
+		                                Name = CommentsLabel
+		                            }
+		                    },
+		                    {
+		                        FailedPasswordAttempts,
+		                        new PropertyType(new Guid(PropertyEditors.Integer), DataTypeDatabaseType.Integer)
+		                            {
+		                                Alias = FailedPasswordAttempts,
+		                                Name = FailedPasswordAttemptsLabel
+		                            }
+		                    },
+		                    {
+		                        IsApproved,
+		                        new PropertyType(new Guid(PropertyEditors.TrueFalse), DataTypeDatabaseType.Integer)
+		                            {
+		                                Alias = IsApproved,
+		                                Name = IsApprovedLabel
+		                            }
+		                    },
+		                    {
+		                        IsLockedOut,
+		                        new PropertyType(new Guid(PropertyEditors.TrueFalse), DataTypeDatabaseType.Integer)
+		                            {
+		                                Alias = IsLockedOut,
+		                                Name = IsLockedOutLabel
+		                            }
+		                    },
+		                    {
+		                        LastLockoutDate,
+		                        new PropertyType(new Guid(PropertyEditors.Date), DataTypeDatabaseType.Date)
+		                            {
+		                                Alias = LastLockoutDate,
+		                                Name = LastLockoutDateLabel
+		                            }
+		                    },
+		                    {
+		                        LastLoginDate,
+		                        new PropertyType(new Guid(PropertyEditors.Date), DataTypeDatabaseType.Date)
+		                            {
+		                                Alias = LastLoginDate,
+		                                Name = LastLoginDateLabel
+		                            }
+		                    },
+		                    {
+		                        LastPasswordChangeDate,
+		                        new PropertyType(new Guid(PropertyEditors.Date), DataTypeDatabaseType.Date)
+		                            {
+		                                Alias = LastPasswordChangeDate,
+		                                Name = LastPasswordChangeDateLabel
+		                            }
+		                    },
+		                    {
+		                        PasswordAnswer,
+		                        new PropertyType(new Guid(PropertyEditors.Textbox), DataTypeDatabaseType.Nvarchar)
+		                            {
+		                                Alias = PasswordAnswer,
+		                                Name = PasswordAnswerLabel
+		                            }
+		                    },
+		                    {
+		                        PasswordQuestion,
+		                        new PropertyType(new Guid(PropertyEditors.Textbox), DataTypeDatabaseType.Nvarchar)
+		                            {
+		                                Alias = PasswordQuestion,
+		                                Name = PasswordQuestionLabel
+		                            }
+		                    }
+		                };
+		        } 
 		    }
 
 			/// <summary>
