@@ -449,7 +449,7 @@ namespace Umbraco.Core.Persistence.Repositories
         public bool Exists(string username)
         {
             var sql = new Sql();
-            var escapedUserName = Database.EscapeAtSymbols(username);
+            var escapedUserName = PetaPocoExtensions.EscapeAtSymbols(username);
             sql.Select("COUNT(*)")
                 .From<MemberDto>()
                 .Where<MemberDto>(x => x.LoginName == escapedUserName);

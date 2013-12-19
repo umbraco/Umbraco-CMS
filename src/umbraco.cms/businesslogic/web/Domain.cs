@@ -151,8 +151,7 @@ namespace umbraco.cms.businesslogic.web
                 () =>
                     {
                         var result = new List<Domain>();
-                        using (var dr = SqlHelper.ExecuteReader(
-                            "select id, domainName from umbracoDomains"))
+                        using (var dr = SqlHelper.ExecuteReader("SELECT id, domainName FROM umbracoDomains ORDER BY id"))
                         {
                             while (dr.Read())
                             {
@@ -177,7 +176,7 @@ namespace umbraco.cms.businesslogic.web
 
         public static Domain GetDomain(string DomainName)
         {
-        	return GetDomains().FirstOrDefault(d => d.Name == DomainName);
+            return GetDomains().FirstOrDefault(d => d.Name.InvariantEquals(DomainName));
         }
 
         public static int GetRootFromDomain(string DomainName)

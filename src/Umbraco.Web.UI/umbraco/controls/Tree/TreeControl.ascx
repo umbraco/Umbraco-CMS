@@ -1,23 +1,15 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="TreeControl.ascx.cs" Inherits="umbraco.controls.Tree.TreeControl" %>
+﻿<%@ Control Language="C#" AutoEventWireup="true" Inherits="umbraco.controls.Tree.TreeControl" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Register TagPrefix="umbClient" Namespace="Umbraco.Web.UI.Bundles" Assembly="umbraco" %>
 
 <umb:CssInclude ID="CssInclude2" runat="server" FilePath="Tree/treeIcons.css" PathNameAlias="UmbracoClient" Priority="10" />
 <umb:CssInclude ID="CssInclude3" runat="server" FilePath="Tree/menuIcons.css" PathNameAlias="UmbracoClient" Priority="11" />
 <umb:CssInclude ID="CssInclude1" runat="server" FilePath="Tree/Themes/umbraco/style.css" PathNameAlias="UmbracoClient" Priority="12" />
 
-<umb:JsInclude ID="JsInclude1" runat="server" FilePath="Application/NamespaceManager.js" PathNameAlias="UmbracoClient" Priority="0" />
-<umb:JsInclude ID="JsInclude2" runat="server" FilePath="Application/UmbracoClientManager.js" PathNameAlias="UmbracoClient" />
-<umb:JsInclude ID="JsInclude3" runat="server" FilePath="Application/UmbracoApplicationActions.js" PathNameAlias="UmbracoClient" />
-<umb:JsInclude ID="JsInclude4" runat="server" FilePath="Application/UmbracoUtils.js" PathNameAlias="UmbracoClient" />
-<umb:JsInclude ID="JsInclude5" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" />
-<umb:JsInclude ID="JsInclude6" runat="server" FilePath="Application/JQuery/jquery.metadata.min.js" PathNameAlias="UmbracoClient" Priority="10" />
-<umb:JsInclude ID="JsInclude8" runat="server" FilePath="Tree/jquery.tree.js" PathNameAlias="UmbracoClient" Priority="11"  />
-<umb:JsInclude ID="JsInclude11" runat="server" FilePath="Tree/UmbracoContext.js" PathNameAlias="UmbracoClient" Priority="12"  />
-<umb:JsInclude ID="JsInclude7" runat="server" FilePath="Tree/jquery.tree.contextmenu.js" PathNameAlias="UmbracoClient" Priority="12"  />
-<umb:JsInclude ID="JsInclude12" runat="server" FilePath="Tree/jquery.tree.checkbox.js" PathNameAlias="UmbracoClient" Priority="12"  />
-<umb:JsInclude ID="JsInclude9" runat="server" FilePath="Tree/NodeDefinition.js" PathNameAlias="UmbracoClient" Priority="12"  />
-<umb:JsInclude ID="JsInclude10" runat="server" FilePath="Tree/UmbracoTree.js" PathNameAlias="UmbracoClient" Priority="13" />
-
+<umbClient:JsApplicationLib ID="JsUmbracoApplicationLib1" runat="server"/>
+<umbClient:JsJQueryCore ID="JsJQueryCore1" runat="server"/>
+<umbClient:JsJQueryPlugins ID="JsJQueryPlugins1" runat="server"/>
+<umbClient:JsUmbracoTree  runat="server"/>
 
 <script type="text/javascript">
 jQuery(document).ready(function() {
@@ -47,6 +39,13 @@ jQuery(document).ready(function() {
         dataUrl: "<%#global::Umbraco.Core.IO.IOHelper.ResolveUrl(global::Umbraco.Core.IO.SystemDirectories.Umbraco)%>/webservices/TreeDataService.ashx",
         serviceUrl: "<%#global::Umbraco.Core.IO.IOHelper.ResolveUrl(global::Umbraco.Core.IO.SystemDirectories.Umbraco)%>/webservices/TreeClientService.asmx/GetInitAppTreeData"});
   
+    <%if(string.IsNullOrEmpty(SelectedNodePath) == false) {%>
+    setTimeout(function() {
+        treeApi = jQuery("#<%=ClientID%>").UmbracoTreeAPI();
+		        treeApi.syncTree('<%=SelectedNodePath%>', true, true);
+    }, 500);
+    <% } %>
+
     <%#GetLegacyIActionJavascript()%>
 	
 });	

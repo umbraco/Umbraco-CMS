@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Querying
 {
@@ -226,6 +228,39 @@ namespace Umbraco.Core.Persistence.Querying
 
         }
 
+        private string HandleStringComparison(string col, string val, string verb, TextColumnType columnType)
+        {
+            switch (verb)
+            {
+                case "Equals":
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnEqualComparison(col, EscapeAtArgument(RemoveQuote(val)), columnType);
+                case "StartsWith":
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnStartsWithComparison(col, EscapeAtArgument(RemoveQuote(val)), columnType);                   
+                case "EndsWith":
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnEndsWithComparison(col, EscapeAtArgument(RemoveQuote(val)), columnType);
+                case "Contains":
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnContainsComparison(col, EscapeAtArgument(RemoveQuote(val)), columnType);
+                case "InvariantEquals":
+                case "SqlEquals":
+                    //recurse
+                    return HandleStringComparison(col, val, "Equals", columnType);
+                case "InvariantStartsWith":
+                case "SqlStartsWith":
+                    //recurse
+                    return HandleStringComparison(col, val, "StartsWith", columnType);
+                case "InvariantEndsWith":
+                case "SqlEndsWith":
+                    //recurse
+                    return HandleStringComparison(col, val, "EndsWith", columnType);
+                case "InvariantContains":
+                case "SqlContains":
+                    //recurse
+                    return HandleStringComparison(col, val, "Contains", columnType);
+                default:
+                    throw new ArgumentOutOfRangeException("verb");
+            }
+        }
+
         protected virtual string VisitMethodCall(MethodCallExpression m)
         {
             List<Object> args = this.VisitExpressionList(m.Arguments);
@@ -245,12 +280,31 @@ namespace Umbraco.Core.Persistence.Querying
                     return string.Format("upper({0})", r);
                 case "ToLower":
                     return string.Format("lower({0})", r);
+                
                 case "StartsWith":
-                    return string.Format("upper({0}) like '{1}%'", r, EscapeAtArgument(RemoveQuote(args[0].ToString().ToUpper())));
                 case "EndsWith":
-                    return string.Format("upper({0}) like '%{1}'", r, EscapeAtArgument(RemoveQuote(args[0].ToString()).ToUpper()));
                 case "Contains":
-                    return string.Format("{0} like '%{1}%'", r, EscapeAtArgument(RemoveQuote(args[0].ToString()).ToUpper()));
+                case "Equals":
+                case "SqlStartsWith":
+                case "SqlEndsWith":
+                case "SqlContains":
+                case "SqlEquals":
+                case "InvariantStartsWith":
+                case "InvariantEndsWith":
+                case "InvariantContains":
+                case "InvariantEquals":
+                    //default
+                    var colType = TextColumnType.NVarchar;
+                    //then check if this arg has been passed in
+                    if (m.Arguments.Count > 1)
+                    {
+                        var colTypeArg = m.Arguments.FirstOrDefault(x => x is ConstantExpression && x.Type == typeof(TextColumnType));
+                        if (colTypeArg != null)
+                        {
+                            colType = (TextColumnType) ((ConstantExpression) colTypeArg).Value;
+                        }
+                    }
+                    return HandleStringComparison(r.ToString(), args[0].ToString(), m.Method.Name, colType);
                 case "Substring":
                     var startIndex = Int32.Parse(args[0].ToString()) + 1;
                     if (args.Count == 2)

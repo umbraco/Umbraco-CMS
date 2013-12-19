@@ -580,11 +580,11 @@ function validateSafeAlias(id, value, immediate, callback) {{
                 if (isPair)
                     throw new NotSupportedException("Surrogate pairs are not supported.");
 
-                Console.WriteLine("CHAR '{0}' {1} {2} - {3} - {4}/{5} {6}", 
-                    c,
-                    isTerm ? "term" : "!term", isUpper ? "upper" : "!upper", 
-                    state,
-                    i, ipos, leading ? "leading" : "!leading");
+                //Console.WriteLine("CHAR '{0}' {1} {2} - {3} - {4}/{5} {6}", 
+                //    c,
+                //    isTerm ? "term" : "!term", isUpper ? "upper" : "!upper", 
+                //    state,
+                //    i, ipos, leading ? "leading" : "!leading");
 
                 switch (state)
                 {
@@ -692,10 +692,10 @@ function validateSafeAlias(id, value, immediate, callback) {{
             CleanStringType caseType, CultureInfo culture, bool isAcronym)
         {
             var term = input.Substring(ipos, len);
-            Console.WriteLine("TERM \"{0}\" {1} {2}",
-                term,
-                isAcronym ? "acronym" : "word",
-                caseType);
+            //Console.WriteLine("TERM \"{0}\" {1} {2}",
+            //    term,
+            //    isAcronym ? "acronym" : "word",
+            //    caseType);
 
             if (isAcronym)
             {

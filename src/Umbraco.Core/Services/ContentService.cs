@@ -1055,7 +1055,7 @@ namespace Umbraco.Core.Services
                 }
 
                 //Ensure that Path and Level is updated on children
-                var children = GetChildren(content.Id);
+                var children = GetChildren(content.Id).ToArray();
                 if (children.Any())
                 {
                     foreach (var child in children)

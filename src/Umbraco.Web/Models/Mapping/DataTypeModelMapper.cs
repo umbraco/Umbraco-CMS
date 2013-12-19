@@ -39,10 +39,13 @@ namespace Umbraco.Web.Models.Mapping
                       {
                           var resolver = new PreValueDisplayResolver(lazyDataTypeService);
                           return resolver.Convert(definition);
-                      });               
+                      });
 
             config.CreateMap<DataTypeSave, IDataTypeDefinition>()
                   .ConstructUsing(save => new DataTypeDefinition(-1, save.SelectedEditor) {CreateDate = DateTime.Now})
+                //we have to ignore the Key otherwise this will reset the UniqueId field which should never change!
+                // http://issues.umbraco.org/issue/U4-3911
+                  .ForMember(definition => definition.Key, expression => expression.Ignore())
                   .ForMember(definition => definition.Path, expression => expression.Ignore())
                   .ForMember(definition => definition.PropertyEditorAlias, expression => expression.MapFrom(save => save.SelectedEditor))
                   .ForMember(definition => definition.ParentId, expression => expression.MapFrom(save => -1))

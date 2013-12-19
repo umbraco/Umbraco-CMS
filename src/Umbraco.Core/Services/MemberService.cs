@@ -185,16 +185,61 @@ namespace Umbraco.Core.Services
         /// Does a search for members that contain the specified string in their email address
         /// </summary>
         /// <param name="emailStringToMatch"></param>
+        /// <param name="matchType"></param>
         /// <returns></returns>
-        public IEnumerable<IMember> FindMembersByEmail(string emailStringToMatch)
+        public IEnumerable<IMember> FindMembersByEmail(string emailStringToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
                 var query = new Query<IMember>();
 
+                switch (matchType)
+                {
+                    case StringPropertyMatchType.Exact:
+                        query.Where(member => member.Email.Equals(emailStringToMatch));
+                        break;
+                    case StringPropertyMatchType.Contains:
+                        query.Where(member => member.Email.Contains(emailStringToMatch));
+                        break;
+                    case StringPropertyMatchType.StartsWith:
+                        query.Where(member => member.Email.StartsWith(emailStringToMatch));
+                        break;
+                    case StringPropertyMatchType.EndsWith:
+                        query.Where(member => member.Email.EndsWith(emailStringToMatch));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("matchType");
+                }
 
-                query.Where(member => member.Email.Contains(emailStringToMatch));
+                return repository.GetByQuery(query);
+            }
+        }
+
+        public IEnumerable<IMember> FindMembersByUsername(string login, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
+            {
+                var query = new Query<IMember>();
+
+                switch (matchType)
+                {
+                    case StringPropertyMatchType.Exact:
+                        query.Where(member => member.Username.Equals(login));
+                        break;
+                    case StringPropertyMatchType.Contains:
+                        query.Where(member => member.Username.Contains(login));
+                        break;
+                    case StringPropertyMatchType.StartsWith:
+                        query.Where(member => member.Username.StartsWith(login));
+                        break;
+                    case StringPropertyMatchType.EndsWith:
+                        query.Where(member => member.Username.EndsWith(login));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("matchType");
+                }
 
                 return repository.GetByQuery(query);
             }
@@ -205,17 +250,51 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="propertyTypeAlias"></param>
         /// <param name="value"></param>
+        /// <param name="matchType"></param>
         /// <returns></returns>
-        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, string value)
+        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query =
-                    Query<IMember>.Builder.Where(
-                        x =>
-                            ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
-                            (((Member)x).LongStringPropertyValue.Contains(value) ||
-                             ((Member)x).ShortStringPropertyValue.Contains(value)));
+                IQuery<IMember> query;
+
+                switch (matchType)
+                {
+                    case StringPropertyMatchType.Exact:
+                        query =
+                            Query<IMember>.Builder.Where(
+                                x =>
+                                ((Member) x).PropertyTypeAlias == propertyTypeAlias &&
+                                (((Member)x).LongStringPropertyValue.SqlEquals(value, TextColumnType.NText) ||
+                                 ((Member)x).ShortStringPropertyValue.SqlEquals(value, TextColumnType.NVarchar)));
+                        break;
+                    case StringPropertyMatchType.Contains:
+                        query =
+                            Query<IMember>.Builder.Where(
+                                x =>
+                                ((Member) x).PropertyTypeAlias == propertyTypeAlias &&
+                                (((Member)x).LongStringPropertyValue.SqlContains(value, TextColumnType.NText) ||
+                                 ((Member)x).ShortStringPropertyValue.SqlContains(value, TextColumnType.NVarchar)));
+                        break;
+                    case StringPropertyMatchType.StartsWith:
+                        query =
+                            Query<IMember>.Builder.Where(
+                                x =>
+                                ((Member) x).PropertyTypeAlias == propertyTypeAlias &&
+                                (((Member)x).LongStringPropertyValue.SqlStartsWith(value, TextColumnType.NText) ||
+                                 ((Member)x).ShortStringPropertyValue.SqlStartsWith(value, TextColumnType.NVarchar)));
+                        break;
+                    case StringPropertyMatchType.EndsWith:
+                        query =
+                            Query<IMember>.Builder.Where(
+                                x =>
+                                ((Member) x).PropertyTypeAlias == propertyTypeAlias &&
+                                (((Member)x).LongStringPropertyValue.SqlEndsWith(value, TextColumnType.NText) ||
+                                 ((Member)x).ShortStringPropertyValue.SqlEndsWith(value, TextColumnType.NVarchar)));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("matchType");
+                }
 
                 var members = repository.GetByQuery(query);
                 return members;
@@ -359,8 +438,7 @@ namespace Umbraco.Core.Services
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                var escapedEmail = uow.Database.EscapeAtSymbols(email);
-                var query = Query<IMember>.Builder.Where(x => x.Email == escapedEmail);
+                var query = Query<IMember>.Builder.Where(x => x.Email.Equals(email));
                 var member = repository.GetByQuery(query).FirstOrDefault();
 
                 return member;
@@ -377,8 +455,7 @@ namespace Umbraco.Core.Services
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                var escapedUser = uow.Database.EscapeAtSymbols(userName);
-                var query = Query<IMember>.Builder.Where(x => x.Username == escapedUser);
+                var query = Query<IMember>.Builder.Where(x => x.Username == userName);
                 var member = repository.GetByQuery(query).FirstOrDefault();
 
                 return member;
@@ -429,6 +506,37 @@ namespace Umbraco.Core.Services
 
             if (raiseEvents)
                 Saved.RaiseEvent(new SaveEventArgs<IMember>(member, false), this);
+        }
+
+        public void Save(IEnumerable<IMember> members, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(members), this))
+                    return;
+            }
+            using (new WriteLock(Locker))
+            {                
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateMemberRepository(uow))
+                {
+                    foreach (var member in members)
+                    {
+                        repository.AddOrUpdate(member);
+                    }
+
+                    //commit the whole lot in one go
+                    uow.Commit();
+
+                    foreach (var member in members)
+                    {
+                        CreateAndSaveMemberXml(member.ToXml(), member.Id, uow.Database);
+                    }
+                }
+
+                if (raiseEvents)
+                    Saved.RaiseEvent(new SaveEventArgs<IMember>(members, false), this);
+            }
         }
 
         #endregion
