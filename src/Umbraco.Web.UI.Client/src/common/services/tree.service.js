@@ -1,4 +1,3 @@
-
 /**
  * @ngdoc service
  * @name umbraco.services.treeService
@@ -255,7 +254,7 @@ function treeService($q, treeResource, iconHelper, notificationsService, $rootSc
                     $rootScope.$broadcast("treeNodeLoadError", {error: reason });
 
                     //stop show the loading indicator  
-                    node.loading = false;
+                    args.node.loading = false;
 
                     //tell notications about the error
                     notificationsService.error(reason);
