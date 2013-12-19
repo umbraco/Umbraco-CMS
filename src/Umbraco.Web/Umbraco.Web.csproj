@@ -1866,6 +1866,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\insertTable.aspx" />
+    <Content Include="umbraco.presentation\umbraco\dialogs\moveOrCopy.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\notifications.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
