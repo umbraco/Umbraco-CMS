@@ -907,6 +907,7 @@
     <key alias="newPassword">更改密码</key>
     <key alias="noConsole">禁用后台管理界面</key>
     <key alias="password">密码</key>
+    <key alias="resetPassword">重设密码</key>
     <key alias="passwordChanged">您的密码已更改！</key>
     <key alias="passwordConfirm">重输密码</key>
     <key alias="passwordCurrent">当前密码</key>
