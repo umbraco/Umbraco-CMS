@@ -627,6 +627,9 @@
     <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1061,13 +1064,6 @@
     <Compile Include="umbraco.presentation\umbraco\controls\Tree\JTreeContextMenuItem.cs" />
     <Compile Include="umbraco.presentation\umbraco\controls\Tree\NodeInfo.cs">
       <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx.cs">
-      <DependentUpon>TreeControl.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx.designer.cs">
-      <DependentUpon>TreeControl.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\contentItemTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\contentItemTypeTasks.cs" />
