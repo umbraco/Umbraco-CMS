@@ -425,6 +425,7 @@
     <Compile Include="umbraco.presentation\umbraco\members\EditMember.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\JsonSpellCheckerResult.cs" />
     <Compile Include="umbraco.presentation\umbraco\users\EditUser.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

@@ -6,6 +6,7 @@ using System.Net;
 using System.Text;
 using System.Xml;
 using System.Collections.Generic;
+using Newtonsoft.Json;
 
 // NB: This class was moved out of the client tinymce folder to aid with upgrades
 // but we'll keep the old namespace to make things easier for now (MB)
@@ -70,16 +71,16 @@ namespace umbraco.presentation.umbraco_client.tinymce3.plugins.spellchecker
         public override SpellCheckerResult CheckWords(string language, string[] words)
         {
             string data = string.Join(" ", words); //turn them into a space-separated string as that's what google takes
-            string json = SendRequest(language, data);
-            var jsonRes = new JavaScriptSerializer().Deserialize<JsonSpellCheckerResult>(json);
+            string json = SendRequest(language, data);            
+            var jsonRes = JsonConvert.DeserializeObject<JsonSpellCheckerResult>(json);
 
             var res = new SpellCheckerResult();
             // Get list of misspelled words
-            if (jsonRes.result != null && jsonRes.result.spellingCheckResponse != null)
+            if (jsonRes.Result != null && jsonRes.Result.SpellingCheckResponse != null)
             {
-                foreach (var misspelling in jsonRes.result.spellingCheckResponse.misspellings)
+                foreach (var misspelling in jsonRes.Result.SpellingCheckResponse.Misspellings)
                 {
-                    res.result.Add(data.Substring(misspelling.charStart, misspelling.charLength));
+                    res.result.Add(data.Substring(misspelling.CharStart, misspelling.CharLength));
                 }
             }
 
@@ -95,17 +96,17 @@ namespace umbraco.presentation.umbraco_client.tinymce3.plugins.spellchecker
         public override SpellCheckerResult GetSuggestions(string language, string word)
         {
             string json = SendRequest(language, word);
-            var jsonRes = new JavaScriptSerializer().Deserialize<JsonSpellCheckerResult>(json);
+            var jsonRes = JsonConvert.DeserializeObject<JsonSpellCheckerResult>(json);
 
             var res = new SpellCheckerResult();
             // Get list of suggestions
-            if (jsonRes.result != null && jsonRes.result.spellingCheckResponse != null)
+            if (jsonRes.Result != null && jsonRes.Result.SpellingCheckResponse != null)
             {
-                foreach (var misspelling in jsonRes.result.spellingCheckResponse.misspellings)
+                foreach (var misspelling in jsonRes.Result.SpellingCheckResponse.Misspellings)
                 {
-                    foreach (var suggestion in misspelling.suggestions)
+                    foreach (var suggestion in misspelling.Suggestions)
                     {
-                        res.result.Add(suggestion.suggestion);
+                        res.result.Add(suggestion.Suggestion);
                     }
                 }
             }
