@@ -13,8 +13,11 @@ namespace umbraco.uicontrols.TreePicker
         {
             get
             {
-                if (HttpContext.Current.Request.QueryString["id"] != null)
+                if (HttpContext.Current != null && HttpContext.Current.Request.QueryString["id"] != null)
+                {
                     return TreeUrlGenerator.GetPickerUrl(Constants.Applications.Content, "content") + "&selected=" + HttpContext.Current.Request.QueryString["id"];
+                }
+                    
 
                 return TreeUrlGenerator.GetPickerUrl(Constants.Applications.Content, "content");
             }

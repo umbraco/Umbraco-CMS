@@ -1,4 +1,4 @@
-﻿<%@ Control Language="C#" AutoEventWireup="true" CodeBehind="TreeControl.ascx.cs" Inherits="umbraco.controls.Tree.TreeControl" %>
+﻿<%@ Control Language="C#" AutoEventWireup="true" Inherits="umbraco.controls.Tree.TreeControl" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
 <umb:CssInclude ID="CssInclude2" runat="server" FilePath="Tree/treeIcons.css" PathNameAlias="UmbracoClient" Priority="10" />
@@ -47,10 +47,10 @@ jQuery(document).ready(function() {
         dataUrl: "<%#Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco)%>/webservices/TreeDataService.ashx",
         serviceUrl: "<%#Umbraco.Core.IO.IOHelper.ResolveUrl(Umbraco.Core.IO.SystemDirectories.Umbraco)%>/webservices/TreeClientService.asmx/GetInitAppTreeData"});
         
-    <%if(!String.IsNullOrEmpty(this.SelectedNodePath)) {%>
+    <%if(string.IsNullOrEmpty(SelectedNodePath) == false) {%>
     setTimeout(function() {
         treeApi = jQuery("#<%=ClientID%>").UmbracoTreeAPI();
-		        treeApi.syncTree('<%=this.SelectedNodePath%>', true, true);
+		        treeApi.syncTree('<%=SelectedNodePath%>', true, true);
     }, 500);
     <% } %>
 

@@ -10,6 +10,7 @@ using umbraco.interfaces;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.editorControls.pagepicker;
+using umbraco.uicontrols;
 using umbraco.uicontrols.TreePicker;
 namespace umbraco.editorControls
 {
@@ -27,10 +28,12 @@ namespace umbraco.editorControls
         {
             get
             {
-                if(HttpContext.Current.Request.QueryString["id"] != null)
-                    return TreeService.GetPickerUrl(Umbraco.Core.Constants.Applications.Content, "content") + "&selected=" + HttpContext.Current.Request.QueryString["id"];
+                if (HttpContext.Current != null && HttpContext.Current.Request.QueryString["id"] != null)
+                {
+                    return TreeUrlGenerator.GetPickerUrl(Umbraco.Core.Constants.Applications.Content, "content") + "&selected=" + HttpContext.Current.Request.QueryString["id"];
+                }
 
-                return TreeService.GetPickerUrl(Umbraco.Core.Constants.Applications.Content, "content");
+                return TreeUrlGenerator.GetPickerUrl(Umbraco.Core.Constants.Applications.Content, "content");
             }
         }
 
