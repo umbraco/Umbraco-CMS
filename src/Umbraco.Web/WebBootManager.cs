@@ -140,13 +140,7 @@ namespace Umbraco.Web
         public override IBootManager Complete(Action<ApplicationContext> afterComplete)
         {
 			//Wrap viewengines in the profiling engine
-	        IViewEngine[] engines = ViewEngines.Engines.Select(e => e).ToArray();
-			ViewEngines.Engines.Clear();
-	        foreach (var engine in engines)
-	        {
-		        var wrappedEngine = engine is ProfilingViewEngine ? engine : new ProfilingViewEngine(engine);
-		        ViewEngines.Engines.Add(wrappedEngine);
-	        }
+	        WrapViewEngines(ViewEngines.Engines);
 
 	        //set routes
             CreateRoutes();
@@ -159,7 +153,20 @@ namespace Umbraco.Web
             return this;
         }
 
-        /// <summary>
+		internal static void WrapViewEngines(IList<IViewEngine> viewEngines)
+	    {
+			if (viewEngines == null || viewEngines.Count == 0) return;
+
+			var originalEngines = viewEngines.Select(e => e).ToArray();
+			viewEngines.Clear();
+			foreach (var engine in originalEngines)
+			{
+				var wrappedEngine = engine is ProfilingViewEngine ? engine : new ProfilingViewEngine(engine);
+				viewEngines.Add(wrappedEngine);
+			}
+	    }
+
+	    /// <summary>
         /// Creates the application cache based on the HttpRuntime cache
         /// </summary>
         protected override void CreateApplicationCache()
