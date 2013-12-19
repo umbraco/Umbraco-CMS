@@ -1,4 +1,5 @@
 using System;
+using System.Web;
 using System.Web.UI;
 
 using umbraco.cms.presentation.Trees;
@@ -26,6 +27,9 @@ namespace umbraco.editorControls
         {
             get
             {
+                if(HttpContext.Current.Request.QueryString["id"] != null)
+                    return TreeService.GetPickerUrl(Umbraco.Core.Constants.Applications.Content, "content") + "&selected=" + HttpContext.Current.Request.QueryString["id"];
+
                 return TreeService.GetPickerUrl(Umbraco.Core.Constants.Applications.Content, "content");
             }
         }
