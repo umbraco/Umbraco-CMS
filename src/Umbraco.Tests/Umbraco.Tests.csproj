@@ -281,6 +281,7 @@
     <Compile Include="Services\LocalizationServiceTests.cs" />
     <Compile Include="Resolvers\XsltExtensionsResolverTests.cs" />
     <Compile Include="Services\MemberServiceTests.cs" />
+    <Compile Include="Services\MediaServiceTests.cs" />
     <Compile Include="Services\MemberTypeServiceTests.cs" />
     <Compile Include="Services\PackagingServiceTests.cs" />
     <Compile Include="Services\PerformanceTests.cs" />
