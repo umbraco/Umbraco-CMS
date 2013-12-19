@@ -11,6 +11,8 @@ using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Models.Membership;
 
@@ -19,25 +21,8 @@ namespace Umbraco.Web.Security.Providers
     /// <summary>
     /// Custom Membership Provider for Umbraco Members (User authentication for Frontend applications NOT umbraco CMS)  
     /// </summary>
-    internal class MembersMembershipProvider : MembershipProvider
+    internal class MembersMembershipProvider : UmbracoMembershipProviderBase
     {
-        #region Fields
-        private string _applicationName;
-        private bool _enablePasswordReset;
-        private bool _enablePasswordRetrieval;
-        private int _maxInvalidPasswordAttempts;
-        private int _minRequiredNonAlphanumericCharacters;
-        private int _minRequiredPasswordLength;
-        private int _passwordAttemptWindow;
-
-        private MembershipPasswordFormat _passwordFormat;
-
-        private string _passwordStrengthRegularExpression;
-        private bool _requiresQuestionAndAnswer;
-        private bool _requiresUniqueEmail;
-
-        #endregion
-
         private IMembershipMemberService _memberService;
 
         protected IMembershipMemberService MemberService
@@ -45,125 +30,8 @@ namespace Umbraco.Web.Security.Providers
             get { return _memberService ?? (_memberService = ApplicationContext.Current.Services.MemberService); }
         }
 
-        /// <summary>
-        /// The name of the application using the custom membership provider.
-        /// </summary>
-        /// <value></value>
-        /// <returns>The name of the application using the custom membership provider.</returns>
-        public override string ApplicationName
+        public string ProviderName 
         {
-            get { return _applicationName;  }
-            set { _applicationName = value; }
-        }
-
-        /// <summary>
-        /// Indicates whether the membership provider is configured to allow users to reset their passwords.
-        /// </summary>
-        /// <value></value>
-        /// <returns>true if the membership provider supports password reset; otherwise, false. The default is true.</returns>
-        public override bool EnablePasswordReset
-        {
-            get { return _enablePasswordReset; }
-        }
-
-        /// <summary>
-        /// Indicates whether the membership provider is configured to allow users to retrieve their passwords.
-        /// </summary>
-        /// <value></value>
-        /// <returns>true if the membership provider is configured to support password retrieval; otherwise, false. The default is false.</returns>        
-        public override bool EnablePasswordRetrieval
-        {
-            get { return _enablePasswordRetrieval; }
-        }
-
-        /// <summary>
-        /// Gets the number of invalid password or password-answer attempts allowed before the membership user is locked out.
-        /// </summary>
-        /// <value></value>
-        /// <returns>The number of invalid password or password-answer attempts allowed before the membership user is locked out.</returns>        
-        public override int MaxInvalidPasswordAttempts
-        {
-            get { return _maxInvalidPasswordAttempts; }
-        }
-
-        /// <summary>
-        /// Gets the minimum number of special characters that must be present in a valid password.
-        /// </summary>
-        /// <value></value>
-        /// <returns>The minimum number of special characters that must be present in a valid password.</returns>        
-        public override int MinRequiredNonAlphanumericCharacters
-        {
-            get { return _minRequiredNonAlphanumericCharacters; }
-        }
-
-        /// <summary>
-        /// Gets the minimum length required for a password.
-        /// </summary>
-        /// <value></value>
-        /// <returns>The minimum length required for a password. </returns>        
-        public override int MinRequiredPasswordLength
-        {
-            get { return _minRequiredPasswordLength; }
-        }
-
-        /// <summary>
-        /// Gets the number of minutes in which a maximum number of invalid password or password-answer attempts are allowed before the membership user is locked out.
-        /// </summary>
-        /// <value></value>
-        /// <returns>The number of minutes in which a maximum number of invalid password or password-answer attempts are allowed before the membership user is locked out.</returns>        
-        public override int PasswordAttemptWindow
-        {
-            get { return _passwordAttemptWindow; }
-        }
-
-        /// <summary>
-        /// Gets a value indicating the format for storing passwords in the membership data store.
-        /// </summary>
-        /// <value></value>
-        /// <returns>One of the <see cref="T:System.Web.Security.MembershipPasswordFormat"></see> values indicating the format for storing passwords in the data store.</returns>        
-        public override MembershipPasswordFormat PasswordFormat
-        {
-            get { return _passwordFormat; }
-        }
-
-        /// <summary>
-        /// Gets the regular expression used to evaluate a password.
-        /// </summary>
-        /// <value></value>
-        /// <returns>A regular expression used to evaluate a password.</returns>        
-        public override string PasswordStrengthRegularExpression
-        {
-            get { return _passwordStrengthRegularExpression; }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the membership provider is configured to require the user to answer a password question for password reset and retrieval.
-        /// </summary>
-        /// <value></value>
-        /// <returns>true if a password answer is required for password reset and retrieval; otherwise, false. The default is true.</returns>        
-        public override bool RequiresQuestionAndAnswer
-        {
-            get { return _requiresQuestionAndAnswer; }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the membership provider is configured to require a unique e-mail address for each user name.
-        /// </summary>
-        /// <value></value>
-        /// <returns>true if the membership provider requires a unique e-mail address; otherwise, false. The default is true.</returns>        
-        public override bool RequiresUniqueEmail
-        {
-            get { return _requiresUniqueEmail; }
-        }
-
-        /// <summary>
-        /// The default Umbraco member type alias to create when registration is performed using .net Membership
-        /// </summary>
-        /// <value></value>
-        /// <returns>Member type alias</returns>        
-        public string DefaultMemberTypeAlias { get; private set; }
-        
-        public string ProviderName {
             get { return "MembersMembershipProvider"; }
         }
         
@@ -186,80 +54,127 @@ namespace Umbraco.Web.Security.Providers
             // Initialize base provider class
             base.Initialize(name, config);
 
-            _applicationName = string.IsNullOrEmpty(config["applicationName"]) ? GetDefaultAppName() : config["applicationName"];
+            //// test for membertype (if not specified, choose the first member type available)
+            //if (config["defaultMemberTypeAlias"] != null)
+            //    _defaultMemberTypeAlias = config["defaultMemberTypeAlias"];
+            //else if (MemberType.GetAll.Length == 1)
+            //    _defaultMemberTypeAlias = MemberType.GetAll[0].Alias;
+            //else
+            //    throw new ProviderException("No default MemberType alias is specified in the web.config string. Please add a 'defaultMemberTypeAlias' to the add element in the provider declaration in web.config");
 
-            _enablePasswordRetrieval = GetBooleanValue(config, "enablePasswordRetrieval", false);
-            _enablePasswordReset = GetBooleanValue(config, "enablePasswordReset", false);
-            _requiresQuestionAndAnswer = GetBooleanValue(config, "requiresQuestionAndAnswer", false);
-            _requiresUniqueEmail = GetBooleanValue(config, "requiresUniqueEmail", true);
-            _maxInvalidPasswordAttempts = GetIntValue(config, "maxInvalidPasswordAttempts", 5, false, 0);
-            _passwordAttemptWindow = GetIntValue(config, "passwordAttemptWindow", 10, false, 0);
-            _minRequiredPasswordLength = GetIntValue(config, "minRequiredPasswordLength", 7, true, 0x80);
-            _minRequiredNonAlphanumericCharacters = GetIntValue(config, "minRequiredNonalphanumericCharacters", 1, true, 0x80);
-            _passwordStrengthRegularExpression = config["passwordStrengthRegularExpression"];
-
-            // make sure password format is Hashed by default.
-            var str = config["passwordFormat"] ?? "Hashed";
-
-            LogHelper.Debug<MembersMembershipProvider>("Loaded membership provider properties");
-            LogHelper.Debug<MembersMembershipProvider>(ToString());
-
-            switch (str.ToLower())
+            // test for approve status
+            if (config["umbracoApprovePropertyTypeAlias"] != null)
             {
-                case "clear":
-                    _passwordFormat = MembershipPasswordFormat.Clear;
-                    break;
-                case "encrypted":
-                    _passwordFormat = MembershipPasswordFormat.Encrypted;
-                    break;
-                case "hashed":
-                    _passwordFormat = MembershipPasswordFormat.Hashed;
-                    break;
-                default:
-                    var e = new ProviderException("Provider bad password format");
-                    LogHelper.Error<MembersMembershipProvider>(e.Message, e);
-                    throw e;
+                ApprovedPropertyTypeAlias = config["umbracoApprovePropertyTypeAlias"];
             }
-
-            if ((PasswordFormat == MembershipPasswordFormat.Hashed) && EnablePasswordRetrieval)
+            // test for lock attempts
+            if (config["umbracoLockPropertyTypeAlias"] != null)
             {
-                var e = new ProviderException("Provider can not retrieve hashed password");
-                LogHelper.Error<MembersMembershipProvider>(e.Message, e);
-                throw e;
+                LockPropertyTypeAlias = config["umbracoLockPropertyTypeAlias"];
             }
-
-            // TODO: rationalise what happens when no member alias is specified....
-            DefaultMemberTypeAlias = config["defaultMemberTypeAlias"];
-            
-            LogHelper.Debug<MembersMembershipProvider>("Finished initialising member ship provider " + GetType().FullName);
+            if (config["umbracoLastLockedPropertyTypeAlias"] != null)
+            {
+                LastLockedOutPropertyTypeAlias = config["umbracoLastLockedPropertyTypeAlias"];
+            }
+            if (config["umbracoLastPasswordChangedPropertyTypeAlias"] != null)
+            {
+                LastPasswordChangedPropertyTypeAlias = config["umbracoLastPasswordChangedPropertyTypeAlias"];
+            }
+            if (config["umbracoFailedPasswordAttemptsPropertyTypeAlias"] != null)
+            {
+                FailedPasswordAttemptsPropertyTypeAlias = config["umbracoFailedPasswordAttemptsPropertyTypeAlias"];
+            }
+            // comment property
+            if (config["umbracoCommentPropertyTypeAlias"] != null)
+            {
+                CommentPropertyTypeAlias = config["umbracoCommentPropertyTypeAlias"];
+            }
+            // last login date
+            if (config["umbracoLastLoginPropertyTypeAlias"] != null)
+            {
+                LastLoginPropertyTypeAlias = config["umbracoLastLoginPropertyTypeAlias"];
+            }
+            // password retrieval
+            if (config["umbracoPasswordRetrievalQuestionPropertyTypeAlias"] != null)
+            {
+                PasswordRetrievalQuestionPropertyTypeAlias = config["umbracoPasswordRetrievalQuestionPropertyTypeAlias"];
+            }
+            if (config["umbracoPasswordRetrievalAnswerPropertyTypeAlias"] != null)
+            {
+                PasswordRetrievalAnswerPropertyTypeAlias = config["umbracoPasswordRetrievalAnswerPropertyTypeAlias"];
+            }        
         }
 
-        public override string ToString()
+        /// <summary>
+        /// Processes a request to update the password for a membership user.
+        /// </summary>
+        /// <param name="username">The user to update the password for.</param>
+        /// <param name="oldPassword">This property is ignore for this provider</param>
+        /// <param name="newPassword">The new password for the specified user.</param>
+        /// <returns>
+        /// true if the password was updated successfully; otherwise, false.
+        /// </returns>
+        protected override bool PerformChangePassword(string username, string oldPassword, string newPassword)
         {
-            var result = base.ToString();
+            //NOTE: due to backwards compatibilty reasons (and UX reasons), this provider doesn't care about the old password and 
+            // allows simply setting the password manually so we don't really care about the old password.
+            // This is allowed based on the overridden AllowManuallyChangingPassword option.
 
-            result +=  "_applicationName =" + _applicationName + Environment.NewLine;
-            result += "_enablePasswordReset=" + _enablePasswordReset + Environment.NewLine;
-            result += "_enablePasswordRetrieval=" + _enablePasswordRetrieval + Environment.NewLine;
-            result += "_maxInvalidPasswordAttempts=" + _maxInvalidPasswordAttempts + Environment.NewLine;
-            result += "_minRequiredNonAlphanumericCharacters=" + _minRequiredNonAlphanumericCharacters + Environment.NewLine;
-            result += "_minRequiredPasswordLength=" + _minRequiredPasswordLength + Environment.NewLine;
-            result += "_passwordAttemptWindow=" + _passwordAttemptWindow + Environment.NewLine;
+            // in order to support updating passwords from the umbraco core, we can't validate the old password
+            var m = _memberService.GetByUsername(username);
+            if (m == null) return false;
 
-            result += "_passwordFormat=" + _passwordFormat + Environment.NewLine;
+            var args = new ValidatePasswordEventArgs(username, newPassword, false);
+            OnValidatingPassword(args);
 
-            result += "_passwordStrengthRegularExpression=" + _passwordStrengthRegularExpression + Environment.NewLine;
-            result += "_requiresQuestionAndAnswer=" + _requiresQuestionAndAnswer + Environment.NewLine;
-            result += "_requiresUniqueEmail=" + _requiresUniqueEmail + Environment.NewLine;
-            result += "DefaultMemberTypeAlias=" + DefaultMemberTypeAlias + Environment.NewLine;
+            if (args.Cancel)
+            {
+                if (args.FailureInformation != null)
+                    throw args.FailureInformation;
+                throw new MembershipPasswordException("Change password canceled due to password validation failure.");
+            }
 
-            return result;
+            string salt;
+            var encodedPassword = EncryptOrHashNewPassword(newPassword, out salt);
+
+            m.Password = FormatPasswordForStorage(encodedPassword, salt);
+            m.LastPasswordChangeDate = DateTime.Now;
+            
+            _memberService.Save(m);
+
+            return true;
+        }
+
+        /// <summary>
+        /// Processes a request to update the password question and answer for a membership user.
+        /// </summary>
+        /// <param name="username">The user to change the password question and answer for.</param>
+        /// <param name="password">The password for the specified user.</param>
+        /// <param name="newPasswordQuestion">The new password question for the specified user.</param>
+        /// <param name="newPasswordAnswer">The new password answer for the specified user.</param>
+        /// <returns>
+        /// true if the password question and answer are updated successfully; otherwise, false.
+        /// </returns>
+        protected override bool PerformChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer)
+        {
+            var member = MemberService.GetByUsername(username);
+            if (member == null)
+            {
+                return false;
+            }
+
+            member.PasswordQuestion = newPasswordQuestion;
+            member.PasswordAnswer = newPasswordAnswer;
+
+            MemberService.Save(member);
+
+            return true;
         }
 
         /// <summary>
         /// Adds a new membership user to the data source with the specified member type
         /// </summary>
-        /// <param name="memberType">A specific member type to create the member for</param>
+        /// <param name="memberTypeAlias">A specific member type to create the member for</param>
         /// <param name="username">The user name for the new user.</param>
         /// <param name="password">The password for the new user.</param>
         /// <param name="email">The e-mail address for the new user.</param>
@@ -271,48 +186,11 @@ namespace Umbraco.Web.Security.Providers
         /// <returns>
         /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the information for the newly created user.
         /// </returns>
-        public MembershipUser CreateUser(string memberType, string username, string password, string email, string passwordQuestion, string passwordAnswer,
-                                                  bool isApproved, object providerUserKey, out MembershipCreateStatus status)
+        protected override MembershipUser PerformCreateUser(string memberTypeAlias, string username, string password, string email, string passwordQuestion, 
+                                                    string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
         {
-            LogHelper.Debug<MembersMembershipProvider>("Member signup requested: username -> " + username + ". email -> " + email);
-
-            // Validate password
-            if (IsPasswordValid(password) == false)
-            {
-                status = MembershipCreateStatus.InvalidPassword;
-                return null;
-            }
-
-            // Validate email
-            if (IsEmaiValid(email) == false)
-            {
-                status = MembershipCreateStatus.InvalidEmail;
-                return null;
-            }
-
-            // Make sure username isn't all whitespace
-            if (string.IsNullOrWhiteSpace(username.Trim()))
-            {
-                status = MembershipCreateStatus.InvalidUserName;
-                return null;
-            }
-
-            // Check password question
-            if (string.IsNullOrWhiteSpace(passwordQuestion) && _requiresQuestionAndAnswer)
-            {
-                status = MembershipCreateStatus.InvalidQuestion;
-                return null;
-            }
-
-            // Check password answer
-            if (string.IsNullOrWhiteSpace(passwordAnswer) && _requiresQuestionAndAnswer)
-            {
-                status = MembershipCreateStatus.InvalidAnswer;
-                return null;
-            }
-
             // See if the user already exists
-            if (MemberService.GetByUsername(username) != null)
+            if (MemberService.Exists(username))
             {
                 status = MembershipCreateStatus.DuplicateUserName;
                 LogHelper.Warn<MembersMembershipProvider>("Cannot create member as username already exists: " + username);
@@ -328,14 +206,16 @@ namespace Umbraco.Web.Security.Providers
                 return null;
             }
 
-            var member = MemberService.CreateMember(email, username, password, memberType);
+            string salt;
+            var encodedPassword = EncryptOrHashNewPassword(password, out salt);
 
-            member.IsApproved = isApproved;
+            var member = MemberService.CreateMember(email, username, encodedPassword, memberTypeAlias);
+            
             member.PasswordQuestion = passwordQuestion;
             member.PasswordAnswer = passwordAnswer;
-
-            //encrypts/hashes the password depending on the settings
-            member.Password = EncryptOrHashPassword(member.Password);
+            member.IsApproved = isApproved;
+            member.LastLoginDate = DateTime.Now;
+            member.LastPasswordChangeDate = DateTime.Now;
 
             MemberService.Save(member);
 
@@ -344,68 +224,72 @@ namespace Umbraco.Web.Security.Providers
         }
 
         /// <summary>
-        /// Adds a new membership user to the data source.
+        /// Removes a user from the membership data source.
         /// </summary>
-        /// <param name="username">The user name for the new user.</param>
-        /// <param name="password">The password for the new user.</param>
-        /// <param name="email">The e-mail address for the new user.</param>
-        /// <param name="passwordQuestion">The password question for the new user.</param>
-        /// <param name="passwordAnswer">The password answer for the new user</param>
-        /// <param name="isApproved">Whether or not the new user is approved to be validated.</param>
-        /// <param name="providerUserKey">The unique identifier from the membership data source for the user.</param>
-        /// <param name="status">A <see cref="T:System.Web.Security.MembershipCreateStatus"></see> enumeration value indicating whether the user was created successfully.</param>
+        /// <param name="username">The name of the user to delete.</param>
+        /// <param name="deleteAllRelatedData">
+        /// TODO: This setting currently has no effect
+        /// </param>
         /// <returns>
-        /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the information for the newly created user.
+        /// true if the user was successfully deleted; otherwise, false.
         /// </returns>
-        public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer,
-                                                  bool isApproved, object providerUserKey, out MembershipCreateStatus status)
+        public override bool DeleteUser(string username, bool deleteAllRelatedData)
         {
-            return CreateUser(DefaultMemberTypeAlias, username, password, email, passwordQuestion, passwordAnswer, isApproved, providerUserKey, out status);
+            var member = MemberService.GetByUsername(username);
+            if (member == null) return false;
+
+            MemberService.Delete(member);
+            return true;
         }
 
         /// <summary>
-        /// Processes a request to update the password question and answer for a membership user.
+        /// Gets a collection of membership users where the e-mail address contains the specified e-mail address to match.
         /// </summary>
-        /// <param name="username">The user to change the password question and answer for.</param>
-        /// <param name="password">The password for the specified user.</param>
-        /// <param name="newPasswordQuestion">The new password question for the specified user.</param>
-        /// <param name="newPasswordAnswer">The new password answer for the specified user.</param>
+        /// <param name="emailToMatch">The e-mail address to search for.</param>
+        /// <param name="pageIndex">The index of the page of results to return. pageIndex is zero-based.</param>
+        /// <param name="pageSize">The size of the page of results to return.</param>
+        /// <param name="totalRecords">The total number of matched users.</param>
         /// <returns>
-        /// true if the password question and answer are updated successfully; otherwise, false.
+        /// A <see cref="T:System.Web.Security.MembershipUserCollection"></see> collection that contains a page of pageSize<see cref="T:System.Web.Security.MembershipUser"></see> objects beginning at the page specified by pageIndex.
         /// </returns>
-        public override bool ChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion,
-                                                             string newPasswordAnswer)
+        public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            if (_requiresQuestionAndAnswer == false)
+            var byEmail = MemberService.FindMembersByEmail(emailToMatch, StringPropertyMatchType.Wildcard).ToArray();
+            totalRecords = byEmail.Length;
+            var pagedResult = new PagedResult<IMember>(totalRecords, pageIndex, pageSize);
+
+            var collection = new MembershipUserCollection();
+            foreach (var m in byEmail.Skip(pagedResult.SkipSize).Take(pageSize))
             {
-                throw new NotSupportedException("Updating the password Question and Answer is not available if requiresQuestionAndAnswer is not set in web.config");
+                collection.Add(m.AsConcreteMembershipUser());
             }
-
-            if (ValidateUser(username, password) == false)
-            {
-                throw new MembershipPasswordException("Invalid username and password combinatio");
-            }
-
-            var member = MemberService.GetByUsername(username);
-            var encodedPassword = EncryptOrHashPassword(password);
-
-            if (member.Password == encodedPassword)
-            {
-                member.PasswordQuestion = newPasswordQuestion;
-                member.PasswordAnswer = newPasswordAnswer;
-
-                MemberService.Save(member);
-
-                return true;
-            }
-            else
-            {
-                //TODO: Throw here? or just return false;
-            }
-
-            return false;
+            return collection;
         }
 
+        /// <summary>
+        /// Gets a collection of membership users where the user name contains the specified user name to match.
+        /// </summary>
+        /// <param name="usernameToMatch">The user name to search for.</param>
+        /// <param name="pageIndex">The index of the page of results to return. pageIndex is zero-based.</param>
+        /// <param name="pageSize">The size of the page of results to return.</param>
+        /// <param name="totalRecords">The total number of matched users.</param>
+        /// <returns>
+        /// A <see cref="T:System.Web.Security.MembershipUserCollection"></see> collection that contains a page of pageSize<see cref="T:System.Web.Security.MembershipUser"></see> objects beginning at the page specified by pageIndex.
+        /// </returns>
+        public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords)
+        {
+            var byEmail = MemberService.FindMembersByUsername(usernameToMatch, StringPropertyMatchType.Wildcard).ToArray();
+            totalRecords = byEmail.Length;
+            var pagedResult = new PagedResult<IMember>(totalRecords, pageIndex, pageSize);
+
+            var collection = new MembershipUserCollection();
+            foreach (var m in byEmail.Skip(pagedResult.SkipSize).Take(pageSize))
+            {
+                collection.Add(m.AsConcreteMembershipUser());
+            }
+            return collection;
+        }
+        
         /// <summary>
         /// Gets the password for the specified user name from the data source.
         /// </summary>
@@ -416,59 +300,22 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         public override string GetPassword(string username, string answer)
         {
-            if (_enablePasswordRetrieval == false)
+            if (EnablePasswordRetrieval == false)
                 throw new ProviderException("Password Retrieval Not Enabled.");
 
-            if (_passwordFormat == MembershipPasswordFormat.Hashed)
+            if (PasswordFormat == MembershipPasswordFormat.Hashed)
                 throw new ProviderException("Cannot retrieve Hashed passwords.");
 
             var member = MemberService.GetByUsername(username);
 
-            if (_requiresQuestionAndAnswer && member.PasswordAnswer != answer)
+            if (RequiresQuestionAndAnswer && member.PasswordAnswer != answer)
             {
                 throw new ProviderException("Password retrieval answer doesn't match");
             } 
 
             return member.Password;
         }
-        
-        /// <summary>
-        /// Processes a request to update the password for a membership user.
-        /// </summary>
-        /// <param name="username">The user to update the password for.</param>
-        /// <param name="oldPassword">The current password for the specified user.</param>
-        /// <param name="newPassword">The new password for the specified user.</param>
-        /// <returns>
-        /// true if the password was updated successfully; otherwise, false.
-        /// </returns>
-        public override bool ChangePassword(string username, string oldPassword, string newPassword)
-        {
-            // Validate new password
-            if (IsPasswordValid(newPassword) == false)
-            {
-                var e = new MembershipPasswordException("Change password canceled due to new password validation failure.");
-                LogHelper.WarnWithException<MembersMembershipProvider>(e.Message, e);
-                throw e;
-            }
-
-            var member = MemberService.GetByUsername(username);
-            if (member == null) return false;
-            
-            var encodedPassword = EncryptOrHashPassword(oldPassword);
-
-            if (member.Password == encodedPassword)
-            {
-
-                member.Password = EncryptOrHashPassword(newPassword);
-                MemberService.Save(member);
-
-                return true;
-            }
-
-            LogHelper.Warn<MembersMembershipProvider>("Can't change password as old password was incorrect");
-            return false;
-        }
-
+      
         /// <summary>
         /// Resets a user's password to a new, automatically generated password.
         /// </summary>
@@ -477,30 +324,34 @@ namespace Umbraco.Web.Security.Providers
         /// <returns>The new password for the specified user.</returns>
         public override string ResetPassword(string username, string answer)
         {
-            if (_enablePasswordReset == false)
-                throw new ProviderException("Password reset is Not Enabled.");
+            //TODO: Get logic from other provider
 
-            var member = MemberService.GetByUsername(username);
+            throw new NotImplementedException();
 
-            if (member == null)
-                throw new ProviderException("The supplied user is not found");
+            //if (EnablePasswordReset == false)
+            //    throw new ProviderException("Password reset is Not Enabled.");
 
-            if(member.IsLockedOut)
-                throw new ProviderException("The member is locked out.");
+            //var member = MemberService.GetByUsername(username);
 
-            if (_requiresQuestionAndAnswer == false || (_requiresQuestionAndAnswer && answer == member.PasswordAnswer))
-            {
-                member.Password =
-                    EncryptOrHashPassword(Membership.GeneratePassword(_minRequiredPasswordLength,
-                                                               _minRequiredNonAlphanumericCharacters));
-                MemberService.Save(member);
-            }
-            else
-            {
-                throw new MembershipPasswordException("Incorrect password answer");
-            }
+            //if (member == null)
+            //    throw new ProviderException("The supplied user is not found");
+
+            //if(member.IsLockedOut)
+            //    throw new ProviderException("The member is locked out.");
+
+            //if (RequiresQuestionAndAnswer == false || (RequiresQuestionAndAnswer && answer == member.PasswordAnswer))
+            //{
+            //    member.Password =
+            //        EncryptOrHashPassword(Membership.GeneratePassword(MinRequiredPasswordLength,
+            //                                                   MinRequiredNonAlphanumericCharacters));
+            //    MemberService.Save(member);
+            //}
+            //else
+            //{
+            //    throw new MembershipPasswordException("Incorrect password answer");
+            //}
             
-            return null;
+            //return null;
         }
         
         /// <summary>
@@ -511,8 +362,8 @@ namespace Umbraco.Web.Security.Providers
         /// <param name="user">A <see cref="T:System.Web.Security.MembershipUser"></see> object that represents the user to update and the updated information for the user.</param>      
         public override void UpdateUser(MembershipUser user)
         {
-            var member = user.AsIMember();
-            MemberService.Save(member);
+            //var member = user.AsIMember();
+            //MemberService.Save(member);
         }
 
         /// <summary>
@@ -532,7 +383,8 @@ namespace Umbraco.Web.Security.Providers
             if (member.IsLockedOut)
                 throw new ProviderException("The member is locked out.");
 
-            var encodedPassword = EncryptOrHashPassword(password);
+            string salt;
+            var encodedPassword = EncryptOrHashNewPassword(password, out salt);
             
             var authenticated = (encodedPassword == member.Password);
 
@@ -645,22 +497,7 @@ namespace Umbraco.Web.Security.Providers
             return member == null ? null : member.Username;
         }
 
-        /// <summary>
-        /// Removes a user from the membership data source.
-        /// </summary>
-        /// <param name="username">The name of the user to delete.</param>
-        /// <param name="deleteAllRelatedData">true to delete data related to the user from the database; false to leave data related to the user in the database.</param>
-        /// <returns>
-        /// true if the user was successfully deleted; otherwise, false.
-        /// </returns>
-        public override bool DeleteUser(string username, bool deleteAllRelatedData)
-        {
-            var member = MemberService.GetByUsername(username);
-            if (member == null) return false;
-
-            MemberService.Delete(member);
-            return true;
-        }
+        
 
         /// <summary>
         /// Gets a collection of all the users in the data source in pages of data.
@@ -687,182 +524,14 @@ namespace Umbraco.Web.Security.Providers
             throw new System.NotImplementedException();
         }
         
-        /// <summary>
-        /// Gets a collection of membership users where the user name contains the specified user name to match.
-        /// </summary>
-        /// <param name="usernameToMatch">The user name to search for.</param>
-        /// <param name="pageIndex">The index of the page of results to return. pageIndex is zero-based.</param>
-        /// <param name="pageSize">The size of the page of results to return.</param>
-        /// <param name="totalRecords">The total number of matched users.</param>
-        /// <returns>
-        /// A <see cref="T:System.Web.Security.MembershipUserCollection"></see> collection that contains a page of pageSize<see cref="T:System.Web.Security.MembershipUser"></see> objects beginning at the page specified by pageIndex.
-        /// </returns>
-        public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords)
+
+        public override string ToString()
         {
-            throw new System.NotImplementedException();
+            var result = base.ToString();
+            var sb = new StringBuilder(result);
+            sb.AppendLine("DefaultMemberTypeAlias=" + DefaultMemberTypeAlias);
+            return sb.ToString();
         }
 
-        /// <summary>
-        /// Gets a collection of membership users where the e-mail address contains the specified e-mail address to match.
-        /// </summary>
-        /// <param name="emailToMatch">The e-mail address to search for.</param>
-        /// <param name="pageIndex">The index of the page of results to return. pageIndex is zero-based.</param>
-        /// <param name="pageSize">The size of the page of results to return.</param>
-        /// <param name="totalRecords">The total number of matched users.</param>
-        /// <returns>
-        /// A <see cref="T:System.Web.Security.MembershipUserCollection"></see> collection that contains a page of pageSize<see cref="T:System.Web.Security.MembershipUser"></see> objects beginning at the page specified by pageIndex.
-        /// </returns>
-        public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
-        {
-            var byEmail = MemberService.FindMembersByEmail(emailToMatch).ToArray();
-            totalRecords = byEmail.Length;
-            var pagedResult = new PagedResult<IMember>(totalRecords, pageIndex, pageSize);
-
-            var collection = new MembershipUserCollection();
-            foreach (var m in byEmail.Skip(pagedResult.SkipSize).Take(pageSize))
-            {
-                collection.Add(m.AsConcreteMembershipUser());
-            }
-            return collection;
-        }
-
-        #region Private methods
-
-        private bool IsPasswordValid(string password)
-        {
-            if (_minRequiredNonAlphanumericCharacters > 0)
-            {
-                var nonAlphaNumeric = Regex.Replace(password, "[a-zA-Z0-9]", "", RegexOptions.Multiline | RegexOptions.IgnoreCase);
-                if (nonAlphaNumeric.Length < _minRequiredNonAlphanumericCharacters)
-                {
-                    return false;
-                }
-            }
-
-            var valid = true;
-            if(string.IsNullOrEmpty(_passwordStrengthRegularExpression) == false)
-            {
-                valid = Regex.IsMatch(password, _passwordStrengthRegularExpression, RegexOptions.Compiled);
-            }
-
-            return valid && password.Length >= _minRequiredPasswordLength;
-        }
-
-        private bool IsEmaiValid(string email)
-        {
-            const string pattern = @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|"
-                                   + @"([-a-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)"
-                                   + @"@[a-z0-9][\w\.-]*[a-z0-9]\.[a-z][a-z\.]*[a-z]$";
-            
-            return Regex.IsMatch(email, pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);            
-        }
-        
-        /// <summary>
-        /// Encodes the password.
-        /// </summary>
-        /// <param name="password">The password.</param>
-        /// <returns>The encoded password.</returns>
-        private string EncryptOrHashPassword(string password)
-        {
-            var encodedPassword = password;
-            switch (PasswordFormat)
-            {
-                case MembershipPasswordFormat.Clear:
-                    break;
-                case MembershipPasswordFormat.Encrypted:
-                    encodedPassword =
-                      Convert.ToBase64String(EncryptPassword(Encoding.Unicode.GetBytes(password)));
-                    break;
-                case MembershipPasswordFormat.Hashed:
-                    var hash = new HMACSHA1 {Key = Encoding.Unicode.GetBytes(password)};
-                    encodedPassword =
-                      Convert.ToBase64String(hash.ComputeHash(Encoding.Unicode.GetBytes(password)));
-                    break;
-                default:
-                    throw new ProviderException("Unsupported password format.");
-            }
-            return encodedPassword;
-        }
-
-        /// <summary>
-        /// Gets the boolean value.
-        /// </summary>
-        /// <param name="config">The config.</param>
-        /// <param name="valueName">Name of the value.</param>
-        /// <param name="defaultValue">if set to <c>true</c> [default value].</param>
-        /// <returns></returns>
-        private bool GetBooleanValue(NameValueCollection config, string valueName, bool defaultValue)
-        {
-            bool flag;
-            var str = config[valueName];
-            if (str == null)
-                return defaultValue;
-
-            if (bool.TryParse(str, out flag) == false)
-            {
-                throw new ProviderException("Value must be boolean.");
-            }
-            return flag;
-        }
-
-        /// <summary>
-        /// Gets the int value.
-        /// </summary>
-        /// <param name="config">The config.</param>
-        /// <param name="valueName">Name of the value.</param>
-        /// <param name="defaultValue">The default value.</param>
-        /// <param name="zeroAllowed">if set to <c>true</c> [zero allowed].</param>
-        /// <param name="maxValueAllowed">The max value allowed.</param>
-        /// <returns></returns>
-        private int GetIntValue(NameValueCollection config, string valueName, int defaultValue, bool zeroAllowed, int maxValueAllowed)
-        {
-            int num;
-            var s = config[valueName];
-            if (s == null)
-            {
-                return defaultValue;
-            }
-            if (int.TryParse(s, out num) == false)
-            {
-                if (zeroAllowed)
-                {
-                    throw new ProviderException("Value must be non negative integer");
-                }
-                throw new ProviderException("Value must be positive integer");
-            }
-            if (zeroAllowed && (num < 0))
-            {
-                throw new ProviderException("Value must be non negativeinteger");
-            }
-            if (zeroAllowed == false && (num <= 0))
-            {
-                throw new ProviderException("Value must be positive integer");
-            }
-            if ((maxValueAllowed > 0) && (num > maxValueAllowed))
-            {
-                throw new ProviderException("Value too big");
-            }
-            return num;
-        }
-
-
-        /// <summary>
-        /// Gets the name of the default app.
-        /// </summary>
-        /// <returns></returns>
-        private string GetDefaultAppName()
-        {
-            try
-            {
-                var applicationVirtualPath = HostingEnvironment.ApplicationVirtualPath;
-                return string.IsNullOrEmpty(applicationVirtualPath) ? "/" : applicationVirtualPath;
-            }
-            catch
-            {
-                return "/";
-            }
-        }
-
-        #endregion
     }
 }

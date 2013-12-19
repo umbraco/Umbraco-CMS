@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.RegularExpressions;
 
 namespace Umbraco.Core.Persistence.Querying
 {
@@ -7,6 +8,15 @@ namespace Umbraco.Core.Persistence.Querying
     /// </summary>
     internal static class SqlStringExtensions
     {
+        public static bool SqlWildcard(this string str, string txt, TextColumnType columnType)
+        {
+            var wildcardmatch = new Regex("^" + Regex.Escape(txt).
+                                                    //deal with any wildcard chars % 
+                                                      Replace(@"\%", ".*") + "$");
+
+            return wildcardmatch.IsMatch(str);
+        }
+
         public static bool SqlContains(this string str, string txt, TextColumnType columnType)
         {
             return str.InvariantContains(txt);

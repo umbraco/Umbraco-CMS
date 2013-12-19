@@ -22,7 +22,7 @@ namespace umbraco.providers
         /// <summary>
         /// Override to maintain backwards compatibility with 0 required non-alphanumeric chars
         /// </summary>
-        protected override int DefaultMinNonAlphanumericChars
+        public override int DefaultMinNonAlphanumericChars
         {
             get { return 0; }
         }
@@ -30,7 +30,7 @@ namespace umbraco.providers
         /// <summary>
         /// Override to maintain backwards compatibility with only 4 required length
         /// </summary>
-        protected override int DefaultMinPasswordLength
+        public override int DefaultMinPasswordLength
         {
             get { return 4; }
         }
@@ -38,7 +38,7 @@ namespace umbraco.providers
         /// <summary>
         /// Override to maintain backwards compatibility
         /// </summary>
-        protected override bool DefaultUseLegacyEncoding
+        public override bool DefaultUseLegacyEncoding
         {
             get { return true; }
         }
@@ -110,7 +110,7 @@ namespace umbraco.providers
         /// <returns>
         /// true if the password question and answer are updated successfully; otherwise, false.
         /// </returns>
-        public override bool ChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer)
+        protected override bool PerformChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer)
         {
             throw new Exception("The method or operation is not implemented.");
         }
@@ -129,7 +129,7 @@ namespace umbraco.providers
         /// <returns>
         /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the information for the newly created user.
         /// </returns>
-        public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
+        protected override MembershipUser PerformCreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
         {
             var args = new ValidatePasswordEventArgs(username, password, true);
             OnValidatingPassword(args);

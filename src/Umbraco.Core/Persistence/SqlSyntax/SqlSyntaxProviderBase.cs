@@ -127,6 +127,12 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return string.Format("upper({0}) like '%{1}%'", column, value.ToUpper());
         }
 
+        public virtual string GetStringColumnWildcardComparison(string column, string value, TextColumnType columnType)
+        {
+            //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
+            return string.Format("upper({0}) like '{1}'", column, value.ToUpper());
+        }
+
         public virtual string GetQuotedTableName(string tableName)
         {
             return string.Format("\"{0}\"", tableName);

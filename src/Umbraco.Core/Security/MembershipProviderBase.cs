@@ -7,9 +7,110 @@ using System.Text.RegularExpressions;
 using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Security;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Security
 {
+
+    public abstract class UmbracoMembershipProviderBase : MembershipProviderBase
+    {
+        protected UmbracoMembershipProviderBase()
+        {
+            //Set the defaults!
+            DefaultMemberTypeAlias = "Member";
+            LockPropertyTypeAlias = Constants.Conventions.Member.IsLockedOut;
+            LastLockedOutPropertyTypeAlias = Constants.Conventions.Member.LastLockoutDate;
+            FailedPasswordAttemptsPropertyTypeAlias = Constants.Conventions.Member.FailedPasswordAttempts;
+            ApprovedPropertyTypeAlias = Constants.Conventions.Member.IsApproved;
+            CommentPropertyTypeAlias = Constants.Conventions.Member.Comments;
+            LastLoginPropertyTypeAlias = Constants.Conventions.Member.LastLoginDate;
+            LastPasswordChangedPropertyTypeAlias = Constants.Conventions.Member.LastPasswordChangeDate;
+            PasswordRetrievalQuestionPropertyTypeAlias = Constants.Conventions.Member.PasswordQuestion;
+            PasswordRetrievalAnswerPropertyTypeAlias = Constants.Conventions.Member.PasswordAnswer;
+        }
+
+        public string DefaultMemberTypeAlias { get; protected set; }
+        public string LockPropertyTypeAlias { get; protected set; }
+        public string LastLockedOutPropertyTypeAlias { get; protected set; }
+        public string FailedPasswordAttemptsPropertyTypeAlias { get; protected set; }
+        public string ApprovedPropertyTypeAlias { get; protected set; }
+        public string CommentPropertyTypeAlias { get; protected set; }
+        public string LastLoginPropertyTypeAlias { get; protected set; }
+        public string LastPasswordChangedPropertyTypeAlias { get; protected set; }
+        public string PasswordRetrievalQuestionPropertyTypeAlias { get; protected set; }
+        public string PasswordRetrievalAnswerPropertyTypeAlias { get; protected set; }
+
+        public override bool ChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer)
+        {
+            base.ChangePasswordQuestionAndAnswer(username, password, newPasswordQuestion, newPasswordAnswer);
+
+            if (string.IsNullOrEmpty(PasswordRetrievalQuestionPropertyTypeAlias) || string.IsNullOrEmpty(PasswordRetrievalAnswerPropertyTypeAlias))
+            {
+                throw new NotSupportedException("Updating the password Question and Answer is not valid if the properties aren't set in the config file");
+            }
+
+            return PerformChangePasswordQuestionAndAnswer(username, password, newPasswordQuestion, newPasswordAnswer);
+        }
+
+        /// <summary>
+        /// Adds a new membership user to the data source.
+        /// </summary>
+        /// <param name="username">The user name for the new user.</param>
+        /// <param name="password">The password for the new user.</param>
+        /// <param name="email">The e-mail address for the new user.</param>
+        /// <param name="passwordQuestion">The password question for the new user.</param>
+        /// <param name="passwordAnswer">The password answer for the new user</param>
+        /// <param name="isApproved">Whether or not the new user is approved to be validated.</param>
+        /// <param name="providerUserKey">The unique identifier from the membership data source for the user.</param>
+        /// <param name="status">A <see cref="T:System.Web.Security.MembershipCreateStatus"></see> enumeration value indicating whether the user was created successfully.</param>
+        /// <returns>
+        /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the information for the newly created user.
+        /// </returns>
+        protected sealed override MembershipUser PerformCreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
+        {
+            return PerformCreateUser(DefaultMemberTypeAlias, username, password, email, passwordQuestion, passwordAnswer, isApproved, providerUserKey, out status);
+        }
+
+        /// <summary>
+        /// Adds a new membership user to the data source.
+        /// </summary>
+        /// <param name="memberTypeAlias">The member type alias to use when creating the member</param>
+        /// <param name="username">The user name for the new user.</param>
+        /// <param name="password">The password for the new user.</param>
+        /// <param name="email">The e-mail address for the new user.</param>
+        /// <param name="passwordQuestion">The password question for the new user.</param>
+        /// <param name="passwordAnswer">The password answer for the new user</param>
+        /// <param name="isApproved">Whether or not the new user is approved to be validated.</param>
+        /// <param name="providerUserKey">The unique identifier from the membership data source for the user.</param>
+        /// <param name="status">A <see cref="T:System.Web.Security.MembershipCreateStatus"></see> enumeration value indicating whether the user was created successfully.</param>
+        /// <returns>
+        /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the information for the newly created user.
+        /// </returns>
+        public MembershipUser CreateUser(string memberTypeAlias, string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
+        {
+            //do the base validation first
+            base.CreateUser(username, password, email, passwordQuestion, passwordAnswer, isApproved, providerUserKey, out status);
+
+            return PerformCreateUser(memberTypeAlias, username, password, email, passwordQuestion, passwordAnswer, isApproved, providerUserKey, out status);
+        }
+
+        /// <summary>
+        /// Adds a new membership user to the data source.
+        /// </summary>
+        /// <param name="memberTypeAlias">The member type alias to use when creating the member</param>
+        /// <param name="username">The user name for the new user.</param>
+        /// <param name="password">The password for the new user.</param>
+        /// <param name="email">The e-mail address for the new user.</param>
+        /// <param name="passwordQuestion">The password question for the new user.</param>
+        /// <param name="passwordAnswer">The password answer for the new user</param>
+        /// <param name="isApproved">Whether or not the new user is approved to be validated.</param>
+        /// <param name="providerUserKey">The unique identifier from the membership data source for the user.</param>
+        /// <param name="status">A <see cref="T:System.Web.Security.MembershipCreateStatus"></see> enumeration value indicating whether the user was created successfully.</param>
+        /// <returns>
+        /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the information for the newly created user.
+        /// </returns>
+        protected abstract MembershipUser PerformCreateUser(string memberTypeAlias, string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status);
+    }
     /// <summary>
     /// A base membership provider class offering much of the underlying functionality for initializing and password encryption/hashing.
     /// </summary>
@@ -18,7 +119,7 @@ namespace Umbraco.Core.Security
         /// <summary>
         /// Providers can override this setting, default is 7
         /// </summary>
-        protected virtual int DefaultMinPasswordLength
+        public virtual int DefaultMinPasswordLength
         {
             get { return 7; }
         }
@@ -26,7 +127,7 @@ namespace Umbraco.Core.Security
         /// <summary>
         /// Providers can override this setting, default is 1
         /// </summary>
-        protected virtual int DefaultMinNonAlphanumericChars
+        public virtual int DefaultMinNonAlphanumericChars
         {
             get { return 1; }
         }
@@ -34,7 +135,7 @@ namespace Umbraco.Core.Security
         /// <summary>
         /// Providers can override this setting, default is false to use better security
         /// </summary>
-        protected virtual bool DefaultUseLegacyEncoding
+        public virtual bool DefaultUseLegacyEncoding
         {
             get { return false; }
         }
@@ -44,7 +145,7 @@ namespace Umbraco.Core.Security
         /// authenticate the username + password when ChangePassword is called. This property exists purely for
         /// backwards compatibility.
         /// </summary>
-        internal virtual bool AllowManuallyChangingPassword
+        public virtual bool AllowManuallyChangingPassword
         {
             get { return false; }
         }
@@ -60,7 +161,8 @@ namespace Umbraco.Core.Security
         private string _passwordStrengthRegularExpression;
         private bool _requiresQuestionAndAnswer;
         private bool _requiresUniqueEmail;
-        private bool _useLegacyEncoding;
+        
+        internal bool UseLegacyEncoding;
 
         #region Properties
 
@@ -208,7 +310,7 @@ namespace Umbraco.Core.Security
             _enablePasswordRetrieval = config.GetValue("enablePasswordRetrieval", false);
             _enablePasswordReset = config.GetValue("enablePasswordReset", false);
             _requiresQuestionAndAnswer = config.GetValue("requiresQuestionAndAnswer", false);
-            _requiresUniqueEmail = config.GetValue("requiresUniqueEmail", false);
+            _requiresUniqueEmail = config.GetValue("requiresUniqueEmail", true);
             _maxInvalidPasswordAttempts = GetIntValue(config, "maxInvalidPasswordAttempts", 5, false, 0);
             _passwordAttemptWindow = GetIntValue(config, "passwordAttemptWindow", 10, false, 0);
             _minRequiredPasswordLength = GetIntValue(config, "minRequiredPasswordLength", DefaultMinPasswordLength, true, 0x80);
@@ -220,10 +322,10 @@ namespace Umbraco.Core.Security
                 _applicationName = GetDefaultAppName();
 
             //by default we will continue using the legacy encoding.
-            _useLegacyEncoding = config.GetValue("useLegacyEncoding", DefaultUseLegacyEncoding);
+            UseLegacyEncoding = config.GetValue("useLegacyEncoding", DefaultUseLegacyEncoding);
 
-            // make sure password format is clear by default.
-            string str = config["passwordFormat"] ?? "Clear";
+            // make sure password format is Hashed by default.
+            string str = config["passwordFormat"] ?? "Hashed";
 
             switch (str.ToLower())
             {
@@ -244,7 +346,11 @@ namespace Umbraco.Core.Security
             }
 
             if ((PasswordFormat == MembershipPasswordFormat.Hashed) && EnablePasswordRetrieval)
-                throw new ProviderException("Provider can not retrieve hashed password");
+            {
+                var ex = new ProviderException("Provider can not retrieve a hashed password");
+                LogHelper.Error<MembershipProviderBase>("Cannot specify a Hashed password format with the enabledPasswordRetrieval option set to true", ex);
+                throw ex;
+            }
 
         }
 
@@ -271,14 +377,19 @@ namespace Umbraco.Core.Security
             AlphanumericChars,
             Strength
         }
-
+        
         /// <summary>
-        /// Checks to ensure the AllowManuallyChangingPassword rule is adhered to
+        /// Processes a request to update the password for a membership user.
         /// </summary>
-        /// <param name="username"></param>
-        /// <param name="oldPassword"></param>
-        /// <param name="newPassword"></param>
-        /// <returns></returns>
+        /// <param name="username">The user to update the password for.</param>
+        /// <param name="oldPassword">This property is ignore for this provider</param>
+        /// <param name="newPassword">The new password for the specified user.</param>
+        /// <returns>
+        /// true if the password was updated successfully; otherwise, false.
+        /// </returns>
+        /// <remarks>
+        /// Checks to ensure the AllowManuallyChangingPassword rule is adhered to
+        /// </remarks>       
         public sealed override bool ChangePassword(string username, string oldPassword, string newPassword)
         {
             if (oldPassword.IsNullOrWhiteSpace() && AllowManuallyChangingPassword == false)
@@ -290,7 +401,138 @@ namespace Umbraco.Core.Security
             return PerformChangePassword(username, oldPassword, newPassword);
         }
 
+        /// <summary>
+        /// Processes a request to update the password for a membership user.
+        /// </summary>
+        /// <param name="username">The user to update the password for.</param>
+        /// <param name="oldPassword">This property is ignore for this provider</param>
+        /// <param name="newPassword">The new password for the specified user.</param>
+        /// <returns>
+        /// true if the password was updated successfully; otherwise, false.
+        /// </returns>
         protected abstract bool PerformChangePassword(string username, string oldPassword, string newPassword);
+
+        /// <summary>
+        /// Processes a request to update the password question and answer for a membership user.
+        /// </summary>
+        /// <param name="username">The user to change the password question and answer for.</param>
+        /// <param name="password">The password for the specified user.</param>
+        /// <param name="newPasswordQuestion">The new password question for the specified user.</param>
+        /// <param name="newPasswordAnswer">The new password answer for the specified user.</param>
+        /// <returns>
+        /// true if the password question and answer are updated successfully; otherwise, false.
+        /// </returns>
+        /// <remarks>
+        /// Performs the basic validation before passing off to PerformChangePasswordQuestionAndAnswer
+        /// </remarks>
+        public override bool ChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer)
+        {
+            if (RequiresQuestionAndAnswer == false)
+            {
+                throw new NotSupportedException("Updating the password Question and Answer is not available if requiresQuestionAndAnswer is not set in web.config");
+            }
+
+            if (ValidateUser(username, password) == false)
+            {
+                return false;
+            }
+
+            return PerformChangePasswordQuestionAndAnswer(username, password, newPasswordQuestion, newPasswordAnswer);
+        }
+
+        /// <summary>
+        /// Processes a request to update the password question and answer for a membership user.
+        /// </summary>
+        /// <param name="username">The user to change the password question and answer for.</param>
+        /// <param name="password">The password for the specified user.</param>
+        /// <param name="newPasswordQuestion">The new password question for the specified user.</param>
+        /// <param name="newPasswordAnswer">The new password answer for the specified user.</param>
+        /// <returns>
+        /// true if the password question and answer are updated successfully; otherwise, false.
+        /// </returns>
+        protected abstract bool PerformChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer);
+
+        /// <summary>
+        /// Adds a new membership user to the data source.
+        /// </summary>
+        /// <param name="username">The user name for the new user.</param>
+        /// <param name="password">The password for the new user.</param>
+        /// <param name="email">The e-mail address for the new user.</param>
+        /// <param name="passwordQuestion">The password question for the new user.</param>
+        /// <param name="passwordAnswer">The password answer for the new user</param>
+        /// <param name="isApproved">Whether or not the new user is approved to be validated.</param>
+        /// <param name="providerUserKey">The unique identifier from the membership data source for the user.</param>
+        /// <param name="status">A <see cref="T:System.Web.Security.MembershipCreateStatus"></see> enumeration value indicating whether the user was created successfully.</param>
+        /// <returns>
+        /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the information for the newly created user.
+        /// </returns>
+        /// <remarks>
+        /// Ensures the ValidatingPassword event is executed before executing PerformCreateUser and performs basic membership provider validation of values.
+        /// </remarks>
+        public sealed override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
+        {
+            var args = new ValidatePasswordEventArgs(username, password, true);
+            OnValidatingPassword(args);
+            if (args.Cancel)
+            {
+                status = MembershipCreateStatus.InvalidPassword;
+                return null;
+            }
+
+            // Validate password
+            var passwordValidAttempt = IsPasswordValid(password, MinRequiredNonAlphanumericCharacters, PasswordStrengthRegularExpression, MinRequiredPasswordLength);
+            if (passwordValidAttempt.Success == false)
+            {
+                status = MembershipCreateStatus.InvalidPassword;
+                return null;
+            }
+
+            // Validate email
+            if (IsEmailValid(email) == false)
+            {
+                status = MembershipCreateStatus.InvalidEmail;
+                return null;
+            }
+
+            // Make sure username isn't all whitespace
+            if (string.IsNullOrWhiteSpace(username.Trim()))
+            {
+                status = MembershipCreateStatus.InvalidUserName;
+                return null;
+            }
+
+            // Check password question
+            if (string.IsNullOrWhiteSpace(passwordQuestion) && RequiresQuestionAndAnswer)
+            {
+                status = MembershipCreateStatus.InvalidQuestion;
+                return null;
+            }
+
+            // Check password answer
+            if (string.IsNullOrWhiteSpace(passwordAnswer) && RequiresQuestionAndAnswer)
+            {
+                status = MembershipCreateStatus.InvalidAnswer;
+                return null;
+            }
+
+            return PerformCreateUser(username, password, email, passwordQuestion, passwordAnswer, isApproved, providerUserKey, out status);
+        }
+
+        /// <summary>
+        /// Adds a new membership user to the data source.
+        /// </summary>
+        /// <param name="username">The user name for the new user.</param>
+        /// <param name="password">The password for the new user.</param>
+        /// <param name="email">The e-mail address for the new user.</param>
+        /// <param name="passwordQuestion">The password question for the new user.</param>
+        /// <param name="passwordAnswer">The password answer for the new user</param>
+        /// <param name="isApproved">Whether or not the new user is approved to be validated.</param>
+        /// <param name="providerUserKey">The unique identifier from the membership data source for the user.</param>
+        /// <param name="status">A <see cref="T:System.Web.Security.MembershipCreateStatus"></see> enumeration value indicating whether the user was created successfully.</param>
+        /// <returns>
+        /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the information for the newly created user.
+        /// </returns>
+        protected abstract MembershipUser PerformCreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status);
 
         protected internal static Attempt<PasswordValidityError> IsPasswordValid(string password, int minRequiredNonAlphanumericChars, string strengthRegex, int minLength)
         {
@@ -374,7 +616,7 @@ namespace Umbraco.Core.Security
 
         protected string FormatPasswordForStorage(string pass, string salt)
         {
-            if (_useLegacyEncoding)
+            if (UseLegacyEncoding)
             {
                 return pass;
             }
@@ -383,11 +625,20 @@ namespace Umbraco.Core.Security
             return salt + pass;
         }
 
+        protected bool IsEmailValid(string email)
+        {
+            const string pattern = @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|"
+                                   + @"([-a-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)"
+                                   + @"@[a-z0-9][\w\.-]*[a-z0-9]\.[a-z][a-z\.]*[a-z]$";
+
+            return Regex.IsMatch(email, pattern, RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        }
+
         protected string EncryptOrHashPassword(string pass, string salt)
         {
             //if we are doing it the old way
 
-            if (_useLegacyEncoding)
+            if (UseLegacyEncoding)
             {
                 return LegacyEncodePassword(pass);
             }
@@ -465,7 +716,7 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         protected string EncryptOrHashExistingPassword(string storedPassword)
         {
-            if (_useLegacyEncoding)
+            if (UseLegacyEncoding)
             {
                 return EncryptOrHashPassword(storedPassword, storedPassword);
             }
@@ -481,7 +732,7 @@ namespace Umbraco.Core.Security
         {
             //if we are doing it the old way
 
-            if (_useLegacyEncoding)
+            if (UseLegacyEncoding)
             {
                 return LegacyUnEncodePassword(pass);
             }
@@ -533,7 +784,7 @@ namespace Umbraco.Core.Security
 
         protected HashAlgorithm GetHashAlgorithm(string password)
         {
-            if (_useLegacyEncoding)
+            if (UseLegacyEncoding)
             {
                 //before we were never checking for an algorithm type so we were always using HMACSHA1
                 // for any SHA specified algorithm :( so we'll need to keep doing that for backwards compat support.
@@ -599,6 +850,25 @@ namespace Umbraco.Core.Security
                     throw new ProviderException("Unsupported password format.");
             }
             return password;
+        }
+
+        public override string ToString()
+        {
+            var result = base.ToString();
+            var sb = new StringBuilder(result);
+            sb.AppendLine("Name =" + Name);
+            sb.AppendLine("_applicationName =" + _applicationName);
+            sb.AppendLine("_enablePasswordReset=" + _enablePasswordReset);
+            sb.AppendLine("_enablePasswordRetrieval=" + _enablePasswordRetrieval);
+            sb.AppendLine("_maxInvalidPasswordAttempts=" + _maxInvalidPasswordAttempts);
+            sb.AppendLine("_minRequiredNonAlphanumericCharacters=" + _minRequiredNonAlphanumericCharacters);
+            sb.AppendLine("_minRequiredPasswordLength=" + _minRequiredPasswordLength);
+            sb.AppendLine("_passwordAttemptWindow=" + _passwordAttemptWindow);
+            sb.AppendLine("_passwordFormat=" + _passwordFormat);
+            sb.AppendLine("_passwordStrengthRegularExpression=" + _passwordStrengthRegularExpression);
+            sb.AppendLine("_requiresQuestionAndAnswer=" + _requiresQuestionAndAnswer);
+            sb.AppendLine("_requiresUniqueEmail=" + _requiresUniqueEmail);
+            return sb.ToString();
         }
 
     }
