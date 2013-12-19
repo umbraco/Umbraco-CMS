@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using Umbraco.Core.Models;
+using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
@@ -25,14 +27,15 @@ namespace Umbraco.Tests.Services
         public void Can_Move_Media()
         {
             // Arrange
+            var mediaItems = CreateTrashedTestMedia();
             var mediaService = ServiceContext.MediaService;
-            var media = mediaService.GetById(1052);
+            var media = mediaService.GetById(mediaItems.Item3.Id);
 
             // Act
-            mediaService.Move(media, 1051);
+            mediaService.Move(media, mediaItems.Item2.Id);
 
             // Assert
-            Assert.That(media.ParentId, Is.EqualTo(1051));
+            Assert.That(media.ParentId, Is.EqualTo(mediaItems.Item2.Id));
             Assert.That(media.Trashed, Is.False);
         }
 
@@ -40,8 +43,9 @@ namespace Umbraco.Tests.Services
         public void Can_Move_Media_To_RecycleBin()
         {
             // Arrange
+            var mediaItems = CreateTrashedTestMedia();
             var mediaService = ServiceContext.MediaService;
-            var media = mediaService.GetById(1050);
+            var media = mediaService.GetById(mediaItems.Item1.Id);
 
             // Act
             mediaService.MoveToRecycleBin(media);
@@ -55,18 +59,49 @@ namespace Umbraco.Tests.Services
         public void Can_Move_Media_From_RecycleBin()
         {
             // Arrange
+            var mediaItems = CreateTrashedTestMedia();
             var mediaService = ServiceContext.MediaService;
-            var media = mediaService.GetById(1053);
+            var media = mediaService.GetById(mediaItems.Item4.Id);
 
             // Act - moving out of recycle bin
-            mediaService.Move(media, 1050);
-            var mediaChild = mediaService.GetById(1054);
+            mediaService.Move(media, mediaItems.Item1.Id);
+            var mediaChild = mediaService.GetById(mediaItems.Item5.Id);
 
             // Assert
-            Assert.That(media.ParentId, Is.EqualTo(1050));
+            Assert.That(media.ParentId, Is.EqualTo(mediaItems.Item1.Id));
             Assert.That(media.Trashed, Is.False);
-            Assert.That(mediaChild.ParentId, Is.EqualTo(1053));
+            Assert.That(mediaChild.ParentId, Is.EqualTo(mediaItems.Item4.Id));
             Assert.That(mediaChild.Trashed, Is.False);
+        }
+
+        private Tuple<IMedia, IMedia, IMedia, IMedia, IMedia> CreateTrashedTestMedia()
+        {
+            //Create and Save folder-Media -> 1050
+            var folderMediaType = ServiceContext.ContentTypeService.GetMediaType(1031);
+            var folder = MockedMedia.CreateMediaFolder(folderMediaType, -1);
+            ServiceContext.MediaService.Save(folder);
+            
+            //Create and Save folder-Media -> 1051
+            var folder2 = MockedMedia.CreateMediaFolder(folderMediaType, -1);
+            ServiceContext.MediaService.Save(folder2);
+            
+            //Create and Save image-Media  -> 1052
+            var imageMediaType = ServiceContext.ContentTypeService.GetMediaType(1032);
+            var image = (Media)MockedMedia.CreateMediaImage(imageMediaType, 1050);
+            ServiceContext.MediaService.Save(image);
+            
+            //Create and Save folder-Media that is trashed -> 1053
+            var folderTrashed = (Media)MockedMedia.CreateMediaFolder(folderMediaType, -21);
+            folderTrashed.Trashed = true;
+            ServiceContext.MediaService.Save(folderTrashed);
+            
+            //Create and Save image-Media child of folderTrashed -> 1054            
+            var imageTrashed = (Media)MockedMedia.CreateMediaImage(imageMediaType, folderTrashed.Id);
+            imageTrashed.Trashed = true;
+            ServiceContext.MediaService.Save(imageTrashed);
+
+
+            return new Tuple<IMedia, IMedia, IMedia, IMedia, IMedia>(folder, folder2, image, folderTrashed, imageTrashed);
         }
     }
 }

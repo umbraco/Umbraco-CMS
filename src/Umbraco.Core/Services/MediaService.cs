@@ -480,6 +480,8 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Id of the User moving the Media</param>
 		public void Move(IMedia media, int parentId, int userId = 0)
 		{
+		    if (media == null) throw new ArgumentNullException("media");
+
 		    using (new WriteLock(Locker))
 		    {
 		        //This ensures that the correct method is called if this method is used to Move to recycle bin.
@@ -500,7 +502,7 @@ namespace Umbraco.Core.Services
 		        Save(media, userId);
 
 		        //Ensure that relevant properties are updated on children
-		        var children = GetChildren(media.Id);
+		        var children = GetChildren(media.Id).ToArray();
 		        if (children.Any())
 		        {
 		            var parentPath = media.Path;
@@ -516,14 +518,16 @@ namespace Umbraco.Core.Services
 		    }
 		}
 
-	    /// <summary>
+        /// <summary>
 	    /// Deletes an <see cref="IMedia"/> object by moving it to the Recycle Bin
 	    /// </summary>
 	    /// <param name="media">The <see cref="IMedia"/> to delete</param>
 	    /// <param name="userId">Id of the User deleting the Media</param>
 	    public void MoveToRecycleBin(IMedia media, int userId = 0)
 	    {
-	        if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, -21), this))
+            if (media == null) throw new ArgumentNullException("media");
+
+            if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, -21), this))
 				return;
 
             //Find Descendants, which will be moved to the recycle bin along with the parent/grandparent.
@@ -951,7 +955,7 @@ namespace Umbraco.Core.Services
                 
                 list.Add(child);
 
-                var grandkids = GetChildren(child.Id);
+                var grandkids = GetChildren(child.Id).ToArray();
                 if (grandkids.Any())
                 {
                     list.AddRange(UpdatePropertiesOnChildren(grandkids, child.Path, child.Level, child.Trashed));
