@@ -425,7 +425,8 @@ namespace Umbraco.Web
         {
             get
             {
-                return new User(Security.CurrentUser);
+                var user = Security.CurrentUser;
+                return user == null ? null : new User(user);
             }
 
         }
