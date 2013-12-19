@@ -102,7 +102,7 @@ namespace Umbraco.Web
 			if (contextualKeyBuilder != null)
 		    {
 		        var contextualKey = contextualKeyBuilder(model, viewData);
-		        cacheKey.Append("c{0}-", contextualKey);
+                cacheKey.AppendFormat("c{0}-", contextualKey);
 		    }
 			return ApplicationContext.Current.ApplicationCache.CachedPartialView(htmlHelper, partialViewName, model, cachedSeconds, cacheKey.ToString(), viewData);
 		}
