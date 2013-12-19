@@ -25,11 +25,11 @@
     <umb:JsInclude ID="JSON2" runat="server" FilePath="ui/json2.js" PathNameAlias="UmbracoClient"
         Priority="0" />
     <umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient"
-        Priority="0" />
+        Priority="0" Group="0" />
     <umb:JsInclude ID="JsInclude3" runat="server" FilePath="ui/jqueryui.js" PathNameAlias="UmbracoClient"
-        Priority="1" />
+        Priority="1" Group="0" />
     <umb:JsInclude ID="JsInclude14" runat="server" FilePath="Application/jQuery/jquery.ba-bbq.min.js"
-        PathNameAlias="UmbracoClient" Priority="2" />
+        PathNameAlias="UmbracoClient" Priority="2" Group="0" />
     <umb:JsInclude ID="JsInclude5" runat="server" FilePath="Application/UmbracoApplicationActions.js"
         PathNameAlias="UmbracoClient" Priority="2" />
     <umb:JsInclude ID="JsInclude6" runat="server" FilePath="Application/UmbracoUtils.js"
@@ -40,19 +40,19 @@
         PathNameAlias="UmbracoClient" Priority="4" />
     <umb:JsInclude ID="JsInclude8" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient"
         Priority="5" />
-    <umb:JsInclude ID="JsInclude9" runat="server" FilePath="ui/jQueryWresize.js" PathNameAlias="UmbracoClient" />
+    <umb:JsInclude ID="JsInclude9" runat="server" FilePath="ui/jQueryWresize.js" PathNameAlias="UmbracoClient" Group="0" />
     <umb:JsInclude ID="JsInclude10" runat="server" FilePath="js/guiFunctions.js" PathNameAlias="UmbracoRoot" />
     <umb:JsInclude ID="JsInclude11" runat="server" FilePath="js/language.aspx" PathNameAlias="UmbracoRoot" />
     <umb:JsInclude ID="JsInclude4" runat="server" FilePath="modal/modal.js" PathNameAlias="UmbracoClient"
         Priority="10" />
     <umb:JsInclude ID="JsInclude17" runat="server" FilePath="modal/jquery.simplemodal.1.4.1.custom.js"
-        PathNameAlias="UmbracoClient" Priority="10" />
+        PathNameAlias="UmbracoClient" Priority="10" Group="0" />
     <umb:JsInclude ID="JsInclude12" runat="server" FilePath="js/UmbracoSpeechBubbleBackend.js"
         PathNameAlias="UmbracoRoot" />
     <umb:JsInclude ID="JsInclude15" runat="server" FilePath="js/UmbracoSpeechBubbleBackend.js"
         PathNameAlias="UmbracoRoot" />
     <umb:JsInclude ID="JsInclude16" runat="server" FilePath="Application/jQuery/jquery.cookie.js"
-        PathNameAlias="UmbracoClient" Priority="1" />
+        PathNameAlias="UmbracoClient" Priority="1" Group="0" />
     <script type="text/javascript">
         this.name = 'umbracoMain';
     </script>
