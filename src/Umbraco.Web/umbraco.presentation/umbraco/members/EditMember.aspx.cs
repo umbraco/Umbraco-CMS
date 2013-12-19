@@ -30,6 +30,7 @@ namespace umbraco.cms.presentation.members
 
         protected TextBox MemberLoginNameTxt = new TextBox();
         protected RequiredFieldValidator MemberLoginNameVal = new RequiredFieldValidator();
+      protected CustomValidator MemberLoginNameExistCheck = new CustomValidator();
 
         protected PlaceHolder MemberPasswordTxt = new PlaceHolder();
         protected TextBox MemberEmail = new TextBox();
@@ -102,12 +103,19 @@ namespace umbraco.cms.presentation.members
                 MemberLoginNameVal.EnableClientScript = false;
                 MemberLoginNameVal.Display = ValidatorDisplay.Dynamic;
 
+                MemberLoginNameExistCheck.ErrorMessage = ui.Text("errorHandling", "errorExistsWithoutTab", "Login Name", BasePages.UmbracoEnsuredPage.CurrentUser);
+                MemberLoginNameExistCheck.EnableClientScript = false;
+                MemberLoginNameExistCheck.ValidateEmptyText = false;
+                MemberLoginNameExistCheck.ControlToValidate = MemberLoginNameTxt.ID;
+                MemberLoginNameExistCheck.ServerValidate += MemberLoginNameExistCheck_ServerValidate;
+
                 MemberEmailExistCheck.ErrorMessage = ui.Text("errorHandling", "errorExistsWithoutTab", "E-mail", BasePages.UmbracoEnsuredPage.CurrentUser);
                 MemberEmailExistCheck.EnableClientScript = false;
                 MemberEmailExistCheck.ValidateEmptyText = false;
                 MemberEmailExistCheck.ControlToValidate = MemberEmail.ID;
                 MemberEmailExistCheck.ServerValidate += MemberEmailExistCheck_ServerValidate;
 
+                _contentControl.PropertiesPane.addProperty("", MemberLoginNameExistCheck);
                 _contentControl.PropertiesPane.addProperty(ui.Text("login"), ph);
                 _contentControl.PropertiesPane.addProperty(ui.Text("password"), MemberPasswordTxt);
                 _contentControl.PropertiesPane.addProperty("", MemberEmailExistCheck);
@@ -187,7 +195,18 @@ namespace umbraco.cms.presentation.members
 
         }
 
-        void MemberEmailExistCheck_ServerValidate(object source, ServerValidateEventArgs args)
+        void MemberLoginNameExistCheck_ServerValidate(object source, ServerValidateEventArgs args)
+        {
+          var oldLoginName = _document.LoginName.Replace(" ", "").ToLower();
+          var newLoginName = MemberLoginNameTxt.Text.Replace(" ", "").ToLower();
+
+          if (oldLoginName != newLoginName && newLoginName != "" && Member.GetMemberFromLoginName(newLoginName) != null)
+            args.IsValid = false;
+          else
+            args.IsValid = true;
+        }
+
+          void MemberEmailExistCheck_ServerValidate(object source, ServerValidateEventArgs args)
         {
             var oldEmail = _document.Email.ToLower();
             var newEmail = MemberEmail.Text.ToLower();
