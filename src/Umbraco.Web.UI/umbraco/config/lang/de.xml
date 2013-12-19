@@ -15,8 +15,6 @@
     <key alias="disable">Deaktivieren</key>
     <key alias="emptyTrashcan">Papierkorb leeren</key>
     <key alias="exportDocumentType">Dokumenttyp exportieren</key>
-    <key alias="exportDocumentTypeAsCode">Export zu .NET</key>
-    <key alias="exportDocumentTypeAsCode-Full">Export zu .NET</key>
     <key alias="importDocumentType">Dokumenttyp importieren</key>
     <key alias="importPackage">Paket importieren</key>
     <key alias="liveEdit">'Canvas'-Modus starten</key>
@@ -86,11 +84,13 @@
     <key alias="styleShow">Stil anzeigen</key>
     <key alias="tableInsert">Tabelle einfügen</key>
     <key alias="showPageDisabled">Die Vorschaufunktion ist deaktiviert, da keine Vorlage zugewiesen ist</key>
+    <key alias="select">Auswählen</key>
+    <key alias="somethingElse">Etwas anders machen</key>
   </area>
   <area alias="content">
     <key alias="about">Über dieses Dokument</key>
-    <key alias="alias">Alternative URLs</key>
-    <key alias="alternativeTextHelp">(Wie würden Sie das Bild über dem Telefon beschreiben?)</key>
+    <key alias="alias">Alias</key>
+    <key alias="alternativeTextHelp">(Wie würden Sie das Bild über das Telefon beschreiben?)</key>
     <key alias="alternativeUrls">Alternative Links</key>
     <key alias="clickToEdit">Klicken, um das Dokument zu bearbeiten</key>
     <key alias="createBy">Erstellt von</key>
@@ -124,11 +124,21 @@
     <key alias="urls">Link zum Dokument</key>
     <key alias="mediaLinks">Verweis auf Medienobjekt(e)</key>
     <key alias="parentNotPublishedAnomaly">Ups! Dieses Dokument ist veröffentlicht aber nicht im internen Cache aufzufinden: Systemfehler.</key>
+    <key alias="createByDesc">Ursprünglicher Autor</key>
+    <key alias="updatedBy">Aktualisiert von</key>
+    <key alias="createDateDesc">Erstellungszeitpunkt des Dokuments</key>
+    <key alias="unpublishDate">Veröffentlichung widerrufen am</key>
+    <key alias="updateDateDesc">Letzter Änderungszeitpunkt des Dokuments</key>
+    <key alias="memberof">Mitglied der Gruppe(n)</key>
+    <key alias="notmemberof">Kein Mitglied der Gruppe(n)</key>
+    <key alias="childItems">Untergeordnete Elemente</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">An welcher Stellen wollen Sie das Element erstellen</key>
     <key alias="createUnder">Erstellen unter</key>
     <key alias="updateData">Wählen Sie einen Namen und einen Typ</key>
+    <key alias="noDocumentTypes">Es stehen keine erlaubten Dokumenttypen zur Verfügung. Sie müssen diese in den Einstellungen (unter "Dokumenttypen") aktivieren.</key>
+    <key alias="noMediaTypes">Es stehen keine erlaubten Medientypen zur Verfügung. Sie müssen diese in den Einstellungen (unter "Medientypen") aktivieren.</key>
   </area>
   <area alias="dashboard">
     <key alias="browser">Website anzeigen</key>
@@ -197,6 +207,7 @@
     <key alias="newtab">Neue Registerkarte</key>
     <key alias="tab">Registerkarte</key>
     <key alias="thumbnail">Illustration</key>
+    <key alias="hasListView">Listenansicht aktivieren</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Vorgabewert hinzufügen</key>
@@ -225,8 +236,8 @@
     <key alias="errorRegExpWithoutTab">'%0%' hat ein falsches Format</key>
   </area>
   <area alias="errors">
-    <key alias="codemirroriewarning">ACHTUNG! Obwohl CodeMirror in den Einstellungen aktiviert ist bleibt das Modul wegen mangelnder Stabilität in Internet Explorer deaktiviert.</key>
-    <key alias="contentTypeAliasAndNameNotNull">Bitte geben Sie die Bezeichnung und den Alias des neuen Dokumenttyps ein!</key>
+    <key alias="codemirroriewarning">ACHTUNG! Obwohl CodeMirror in den Einstellungen aktiviert ist, bleibt das Modul wegen mangelnder Stabilität in Internet Explorer deaktiviert.</key>
+    <key alias="contentTypeAliasAndNameNotNull">Bitte geben Sie die Bezeichnung und den Alias des neuen Dokumenttyps ein.</key>
     <key alias="filePermissionsError">Es besteht ein Problem mit den Lese-/Schreibrechten auf eine Datei oder einen Ordner</key>
     <key alias="missingTitle">Bitte geben Sie einen Titel ein</key>
     <key alias="missingType">Bitte wählen Sie einen Typ</key>
@@ -336,6 +347,10 @@
     <key alias="width">Breite</key>
     <key alias="yes">Ja</key>
     <key alias="folder">Ordner</key>
+    <key alias="actions">Aktionen</key>
+    <key alias="more">Mehr</key>
+    <key alias="required">Pflichtangabe</key>
+    <key alias="searchResults">Suchergebnisse</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Hintergrundfarbe</key>
@@ -372,16 +387,14 @@
     <key alias="defaultUserDisabled">&lt;strong&gt;Der Standard-Benutzer wurde deaktiviert oder hat keinen Zugriff auf Umbraco.&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Es sind keine weiteren Aktionen notwendig. Klicken Sie auf &lt;b&gt;Weiter&lt;/b&gt; um fortzufahren.</key>
     <key alias="defaultUserPassChanged">&lt;strong&gt;Das Kennwort des Standard-Benutzers wurde seit der Installation verändert.&lt;/strong&gt;&lt;/p&gt;&lt;p&gt;Es sind keine weiteren Aktionen notwendig. Klicken Sie auf &lt;b&gt;Weiter&lt;/b&gt; um fortzufahren.</key>
     <key alias="defaultUserPasswordChanged">Das Kennwort wurde geändert!</key>
-    <key alias="defaultUserText">
-	&lt;p&gt;
-	  Bei der Installation von Umbraco erzeugt einen Standard-Benutzer mit dem Login-Namen &lt;strong&gt;'admin'&lt;/strong&gt; und dem Kennwort &lt;strong&gt;'default'&lt;/strong&gt;.
-	  &lt;strong&gt;WICHTIG:&lt;/strong&gt; Das Standardkennwort sollte auf ein eigenes Kennwort geändert werden.
+    <key alias="defaultUserText">&lt;p&gt;
+	  Bei der Installation von Umbraco wurde ein Standard-Benutzer mit dem Login-Namen &lt;strong&gt;'admin'&lt;/strong&gt; und dem Kennwort &lt;strong&gt;'default'&lt;/strong&gt; erstellt.
+	  &lt;strong&gt;WICHTIG:&lt;/strong&gt; Das Kennwort sollte auf ein sicheres, eigenes Kennwort geändert werden.
 	&lt;/p&gt;
 	&lt;p&gt;
 	  Das Kennwort des Standard-Benutzers wird jetzt geprüft und im Anschluss werden eventuell notwendige Änderungen vorschlagen.
-	&lt;/p&gt;
-  </key>
-    <key alias="greatStart">Schauen Sie sich für einen tollen Start unsere Einführungsvideos an.</key>
+	&lt;/p&gt;</key>
+    <key alias="greatStart">Schauen Sie sich die Einführungsvideos für einen schnellen und einfachen Start an.</key>
     <key alias="licenseText">Mit der Installation stimmen Sie der angezeigten Lizenz für diese Software zu. Bitte beachten Sie, dass diese Umbraco-Distribution aus zwei Lizenzen besteht. Einer freien Open-Source MIT-Lizenz für das Framework und der Umbraco-Freeware-Lizenz für die Verwaltungsoberfläche.</key>
     <key alias="None">Noch nicht installiert.</key>
     <key alias="permissionsAffectedFolders">Betroffene Verzeichnisse und Dateien</key>
@@ -449,11 +462,18 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
   </area>
   <area alias="lockout">
     <key alias="lockoutWillOccur">Sie haben keine Tätigkeiten mehr durchgeführt und werden automatisch abgemeldet in</key>
-    <key alias="renewSession">Erneuern Sie um Ihre Arbeit zu speichern...</key>
+    <key alias="renewSession">Erneuern Sie, um Ihre Arbeit zu speichern ...</key>
   </area>
   <area alias="login">
     <key alias="bottomText">&lt;p style="text-align:right;"&gt;&amp;copy; 2001 - %0% &lt;br /&gt;&lt;a href="http://umbraco.org" style="text-decoration: none" target="_blank"&gt;umbraco.org&lt;/a&gt;&lt;/p&gt; </key>
-    <key alias="topText">Willkommen zu Umbraco, bitte geben Sie Ihren Benutzernamen und Ihr Kennwort ein:</key>
+    <key alias="greeting1">Einen wunderbaren Sonntag</key>
+    <key alias="greeting6">Frohen freundlichen Freitag</key>
+    <key alias="greeting5">Donnerwetter Donnerstag</key>
+    <key alias="greeting2">Schönen Montag</key>
+    <key alias="greeting3">Einen großartigen Dienstag</key>
+    <key alias="greeting4">Wunderbaren Mittwoch</key>
+    <key alias="greeting7">Wunderbaren sonnigen Samstag</key>
+    <key alias="instruction">Hier anmelden:</key>
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>
@@ -472,6 +492,7 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
     <key alias="notAllowedByPath">Das ausgewählte Element kann nicht zu einem seiner eigenen Unterelemente verschoben werden.</key>
     <key alias="notValid">Diese Aktion ist nicht erlaubt, da Sie unzureichende Berechtigungen für mindestens ein untergeordnetes Element haben.</key>
     <key alias="relateToOriginal">Kopierte Elemente mit dem Original verknüpfen</key>
+    <key alias="notAllowedAtRoot">Dieses Element kann nicht auf der obersten Ebene platziert werden.</key>
   </area>
   <area alias="notifications">
     <key alias="editNotifications">Bearbeiten Sie Ihre Benachrichtigungseinstellungen für '%0%'</key>
@@ -575,9 +596,10 @@ Ihr freundlicher Umbraco-Robot
     <key alias="publishHelp">Mit &lt;em&gt;Ok&lt;/em&gt; wird &lt;strong&gt;%0%&lt;/strong&gt; veröffentlicht und auf der Website sichtbar.&lt;br/&gt;&lt;br /&gt;Sie können dieses Element mitsamt seinen untergeordneten Elementen veröffentlichen, indem Sie &lt;em&gt;Unveröffentlichte Unterelemente einschließen&lt;/em&gt; aktivieren.</key>
     <key alias="contentPublishedFailedInvalid">%0% konnte nicht veröffentlicht werden, da einige Daten die Gültigkeitsprüfung nicht bestanden haben.</key>
     <key alias="contentPublishedFailedByParent">%0% kann nicht veröffentlicht werden, da das übergeordnete Dokument nicht veröffentlicht ist.</key>
+    <key alias="contentPublishedFailedAwaitingRelease">%0% kann nicht veröffentlicht werden, da die Veröffentlichung zeitlich geplant ist.</key>
   </area>
   <area alias="relatedlinks">
-    <key alias="addExternal">Neuer exerner Link</key>
+    <key alias="addExternal">Neuer externer Link</key>
     <key alias="addInternal">Neuer interner Link</key>
     <key alias="addlink">Link hinzufügen</key>
     <key alias="caption">Beschriftung</key>
@@ -601,9 +623,9 @@ Ihr freundlicher Umbraco-Robot
     <key alias="editscript">Skript bearbeiten</key>
   </area>
   <area alias="sections">
-    <key alias="concierge">Concierge</key>
+    <key alias="concierge">Umbraco Concierge</key>
     <key alias="content">Inhalte</key>
-    <key alias="courier">Courier</key>
+    <key alias="courier">Umbraco Courier</key>
     <key alias="developer">Entwickler</key>
     <key alias="installer">Konfigurationsassistent</key>
     <key alias="media">Medien</key>
@@ -613,6 +635,8 @@ Ihr freundlicher Umbraco-Robot
     <key alias="statistics">Statistiken</key>
     <key alias="translation">Übersetzung</key>
     <key alias="users">Benutzer</key>
+    <key alias="contour">Umbraco Contour</key>
+    <key alias="help">Hilfe</key>
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Standardvorlage</key>
@@ -629,11 +653,12 @@ Ihr freundlicher Umbraco-Robot
     <key alias="contentTypeUses">Dieser Dokumenttyp verwendet</key>
     <key alias="contentTypeEnabled">Masterdokumenttyp aktiviert</key>
     <key alias="asAContentMasterType">als Masterdokumenttyp. Register vom Masterdokumenttyp werden nicht angezeigt und können nur im Masterdokumenttyp selbst bearbeitet werden</key>
+    <key alias="noPropertiesDefinedOnTab">Für dieses Register sind keine Eigenschaften definiert. Klicken Sie oben auf "neue Eigenschaft hinzufügen", um eine neue Eigenschaft hinzuzufügen.</key>
   </area>
   <area alias="sort">
     <key alias="sortDone">Sortierung abgeschlossen.</key>
     <key alias="sortHelp">Ziehen Sie die Elemente an ihre gewünschte neue Position.</key>
-    <key alias="sortPleaseWait">Bitte warten, die Seiten werden sortiert. Das kann einen Moment dauern.Bitte schließen Sie dieses Fenster nicht, bis der Sortiervorgang abgeschlossen ist.</key>
+    <key alias="sortPleaseWait">Bitte warten, die Seiten werden sortiert. Das kann einen Moment dauern. Bitte schließen Sie dieses Fenster nicht, bis der Sortiervorgang abgeschlossen ist.</key>
   </area>
   <area alias="speechBubbles">
     <key alias="contentPublishedFailedByEvent">Das Veröffentlichen wurde von einem individuellen Ereignishandler abgebrochen</key>
@@ -688,6 +713,7 @@ Ihr freundlicher Umbraco-Robot
     <key alias="partialViewErrorHeader">Partielle Ansicht nicht gespeichert</key>
     <key alias="partialViewErrorText">Fehler beim Speichern der Datei.</key>
     <key alias="editUserTypeSaved">Benutzertyp gepsichert</key>
+    <key alias="editMediaSavedText">Medium fehlerfrei gespeichert</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Gewünschter CSS-Selektor, zum Beispiel 'h1', '.bigHeader' oder 'p.infoText'</key>
@@ -736,6 +762,7 @@ Ihr freundlicher Umbraco-Robot
     <key alias="withTime">Datum und Zeit mit Trennzeichen: </key>
     <key alias="customFields">Benutzerdefinierte Felder</key>
     <key alias="standardFields">Standardfelder</key>
+    <key alias="encoding">Kodierung</key>
   </area>
   <area alias="translation">
     <key alias="assignedTasks">Ihre Aufgaben</key>
@@ -754,7 +781,7 @@ das Dokument '%1%' wurde von '%2%' zur Übersetzung in '%5%' freigegeben.
 
 Zum Bearbeiten verwenden Sie bitte diesen Link: http://%3%/umbraco/translation/details.aspx?id=%4%.
 
-Sie können sich auch alle anstehenden Übersetzungen gesammelt im Umbraco-Verwaltungsbereich anzeigen lassen: http://%3%/umbraco
+Sie können sich auch alle anstehenden Übersetzungen gesammelt im Umbraco-Verwaltungsbereich anzeigen lassen: http://%3%/umbraco/umbraco.aspx
 
 Einen schönen Tag wünscht
 Ihr freundlicher Umbraco-Robot
@@ -849,5 +876,9 @@ Ihr freundlicher Umbraco-Robot
     <key alias="newPassword">Neues Kennwort</key>
     <key alias="confirmNewPassword">Neues Kennwort (Bestätigung)</key>
     <key alias="passwordConfirm">Bitte bestätigen Sie das neue Kennwort</key>
+    <key alias="resetPassword">Kennwort zurücksetzen</key>
+    <key alias="yourProfile">Ihr Profil</key>
+    <key alias="yourHistory">Ihr Verlauf</key>
+    <key alias="sessionExpires">Sitzung läuft ab in</key>
   </area>
 </language>
