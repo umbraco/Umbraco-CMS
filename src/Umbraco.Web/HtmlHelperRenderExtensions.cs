@@ -302,7 +302,7 @@ namespace Umbraco.Web
                                                object htmlAttributes,
                                                FormMethod method)
         {
-            return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, htmlAttributes.ToDictionary<object>(), method);
+            return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes), method);
         }
 
         /// <summary>
@@ -318,7 +318,7 @@ namespace Umbraco.Web
 											   object additionalRouteVals,
 											   object htmlAttributes)
 		{
-			return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, htmlAttributes.ToDictionary<object>());
+            return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
 		}
 
         /// <summary>
@@ -486,7 +486,7 @@ namespace Umbraco.Web
                                                object htmlAttributes,
                                                FormMethod method)
         {
-            return html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, htmlAttributes.ToDictionary<object>(), method);
+            return html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes), method);
         }
 
         /// <summary>
@@ -502,7 +502,7 @@ namespace Umbraco.Web
 											   object additionalRouteVals,
 											   object htmlAttributes)
 		{
-			return html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, htmlAttributes.ToDictionary<object>());
+            return html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
 		}
 
         /// <summary>
