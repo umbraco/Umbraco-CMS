@@ -66,6 +66,7 @@
         </div>
     </div>
 </li>
+<script type="text/javascript">    
     function ValidateValidation(sender, args) {
         try {
             var patt = new RegExp(args.Value);
@@ -75,3 +76,4 @@
             args.IsValid = false;
         }
     }
+</script>
