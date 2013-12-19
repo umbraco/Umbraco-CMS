@@ -28,7 +28,8 @@ namespace Umbraco.Web
 		{
             protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
 			{
-                if (applicationContext != null)
+                // Only run in 
+                if (applicationContext != null && SystemUtilities.GetCurrentTrustLevel() == AspNetHostingPermissionLevel.Unrestricted)
 				{
 					//bind to events to clear the cache, after publish, after media save and after member save
 
