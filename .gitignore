@@ -85,3 +85,4 @@ NDependOut/*
 *.ndproj
 QueryResult.htm
 *.ndproj
+src/Umbraco.Tests/Views/web.config
