@@ -4,14 +4,15 @@
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Register TagPrefix="umbClient" Namespace="Umbraco.Web.UI.Bundles" Assembly="umbraco" %>
+
 <asp:Content ContentPlaceHolderID="head" runat="server">
 </asp:Content>
 <asp:Content ID="Content1" ContentPlaceHolderID="body" runat="server">
     <umb:JsInclude ID="JsInclude1" runat="server" FilePath="js/umbracoCheckKeys.js" PathNameAlias="UmbracoRoot" />
-    <umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient"
-        Priority="0" />
-    <umb:JsInclude ID="JsInclude3" runat="server" FilePath="ui/jqueryui.js" PathNameAlias="UmbracoClient"
-        Priority="1" />
+    
+    <umbClient:JsJQueryCore ID="JsJQueryCore1" runat="server"/>
+
     <table style="height: 38px; width: 371px; border: none 0px;" cellspacing="0" cellpadding="0"
         id="__controls">
         <tr valign="top">

@@ -23,7 +23,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
             onNavigate: function(e) {
                 var fragment = getHashFragment($.param.fragment());
                 if (fragment != "") {
-                    jQuery(window.top).trigger("navigating", [fragment]); //raise event!   
+                    $(window.top).trigger("navigating", [fragment]); //raise event!   
                 }
                 
             },
@@ -43,11 +43,11 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
 
             addEventHandler: function(fnName, fn) {
                 /// <summary>Adds an event listener to the event name event</summary>
-                if (typeof (jQuery) != "undefined") jQuery(window.top).bind(fnName, fn); //if there's no jQuery, there is no events
+                if (typeof ($) != "undefined") $(window.top).bind(fnName, fn); //if there's no jQuery, there is no events
             },
             removeEventHandler: function(fnName, fn) {
                 /// <summary>Removes an event listener to the event name event</summary>
-                if (typeof (jQuery) != "undefined") jQuery(window.top).unbind(fnName, fn); //if there's no jQuery, there is no events
+                if (typeof ($) != "undefined") $(window.top).unbind(fnName, fn); //if there's no jQuery, there is no events
             }
         };
 

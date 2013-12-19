@@ -393,6 +393,12 @@
     <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\RebuildMediaXmlCacheAfterUpgrade.cs" />
+    <Compile Include="UI\Bundles\JsApplicationLib.cs" />
+    <Compile Include="UI\Bundles\JsJQueryCore.cs" />
+    <Compile Include="UI\Bundles\JsJQueryPlugins.cs" />
+    <Compile Include="UI\Bundles\JsUmbracoApplicationCore.cs" />
+    <Compile Include="UI\Bundles\JsUmbracoApplicationUI.cs" />
+    <Compile Include="UI\Bundles\JsUmbracoTree.cs" />
     <Compile Include="UI\CdfLogger.cs" />
     <Compile Include="umbraco.presentation\CompatibilityHelper.cs" />
     <Compile Include="umbraco.presentation\LegacyClasses.cs" />
