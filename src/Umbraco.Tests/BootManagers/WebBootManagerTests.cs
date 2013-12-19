@@ -9,7 +9,7 @@ using Umbraco.Web.Mvc;
 namespace Umbraco.Tests.BootManagers
 {
 	[TestFixture]
-	public class WebBootManagerTester
+	public class WebBootManagerTests
 	{
 		[Test]
 		public void WrapViewEngines_HasEngines_WrapsAll()

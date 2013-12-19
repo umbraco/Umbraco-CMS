@@ -146,9 +146,9 @@ namespace Umbraco.Web
 	    {
 			if (viewEngines == null || viewEngines.Count == 0) return;
 
-			var origninaleEngines = viewEngines.Select(e => e).ToArray();
+			var originalEngines = viewEngines.Select(e => e).ToArray();
 			viewEngines.Clear();
-			foreach (var engine in origninaleEngines)
+			foreach (var engine in originalEngines)
 			{
 				var wrappedEngine = engine is ProfilingViewEngine ? engine : new ProfilingViewEngine(engine);
 				viewEngines.Add(wrappedEngine);
