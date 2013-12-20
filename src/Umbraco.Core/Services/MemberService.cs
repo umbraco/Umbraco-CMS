@@ -310,8 +310,9 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="propertyTypeAlias"></param>
         /// <param name="value"></param>
+        /// <param name="matchType"></param>
         /// <returns></returns>
-        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, int value)
+        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
             {
@@ -352,8 +353,9 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="propertyTypeAlias"></param>
         /// <param name="value"></param>
+        /// <param name="matchType"></param>
         /// <returns></returns>
-        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, DateTime value)
+        public IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
             {
@@ -371,6 +373,26 @@ namespace Umbraco.Core.Services
         #endregion
 
         #region IMembershipMemberService Implementation
+
+        /// <summary>
+        /// Returns the count of members based on the countType
+        /// </summary>
+        /// <param name="countType"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// The way the Online count is done is the same way that it is done in the MS SqlMembershipProvider - We query for any members
+        /// that have their last active date within the Membership.UserIsOnlineTimeWindow (which is in minutes). It isn't exact science
+        /// but that is how MS have made theirs so we'll follow that principal.
+        /// </remarks>
+        public int GetMemberCount(MemberCountType countType)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<IMember> GetAllMembers(int pageIndex, int pageSize, out int totalRecords)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Creates and persists a new Member

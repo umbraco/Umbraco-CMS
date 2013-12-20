@@ -18,40 +18,10 @@ namespace Umbraco.Core.Security
         {
             //Set the defaults!
             DefaultMemberTypeAlias = "Member";
-            LockPropertyTypeAlias = Constants.Conventions.Member.IsLockedOut;
-            LastLockedOutPropertyTypeAlias = Constants.Conventions.Member.LastLockoutDate;
-            FailedPasswordAttemptsPropertyTypeAlias = Constants.Conventions.Member.FailedPasswordAttempts;
-            ApprovedPropertyTypeAlias = Constants.Conventions.Member.IsApproved;
-            CommentPropertyTypeAlias = Constants.Conventions.Member.Comments;
-            LastLoginPropertyTypeAlias = Constants.Conventions.Member.LastLoginDate;
-            LastPasswordChangedPropertyTypeAlias = Constants.Conventions.Member.LastPasswordChangeDate;
-            PasswordRetrievalQuestionPropertyTypeAlias = Constants.Conventions.Member.PasswordQuestion;
-            PasswordRetrievalAnswerPropertyTypeAlias = Constants.Conventions.Member.PasswordAnswer;
         }
 
         public string DefaultMemberTypeAlias { get; protected set; }
-        public string LockPropertyTypeAlias { get; protected set; }
-        public string LastLockedOutPropertyTypeAlias { get; protected set; }
-        public string FailedPasswordAttemptsPropertyTypeAlias { get; protected set; }
-        public string ApprovedPropertyTypeAlias { get; protected set; }
-        public string CommentPropertyTypeAlias { get; protected set; }
-        public string LastLoginPropertyTypeAlias { get; protected set; }
-        public string LastPasswordChangedPropertyTypeAlias { get; protected set; }
-        public string PasswordRetrievalQuestionPropertyTypeAlias { get; protected set; }
-        public string PasswordRetrievalAnswerPropertyTypeAlias { get; protected set; }
-
-        public override bool ChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer)
-        {
-            base.ChangePasswordQuestionAndAnswer(username, password, newPasswordQuestion, newPasswordAnswer);
-
-            if (string.IsNullOrEmpty(PasswordRetrievalQuestionPropertyTypeAlias) || string.IsNullOrEmpty(PasswordRetrievalAnswerPropertyTypeAlias))
-            {
-                throw new NotSupportedException("Updating the password Question and Answer is not valid if the properties aren't set in the config file");
-            }
-
-            return PerformChangePasswordQuestionAndAnswer(username, password, newPasswordQuestion, newPasswordAnswer);
-        }
-
+        
         /// <summary>
         /// Adds a new membership user to the data source.
         /// </summary>
@@ -398,6 +368,21 @@ namespace Umbraco.Core.Security
                 throw new NotSupportedException("This provider does not support manually changing the password");
             }
 
+            var args = new ValidatePasswordEventArgs(username, newPassword, false);
+            OnValidatingPassword(args);
+
+            if (args.Cancel)
+            {
+                if (args.FailureInformation != null)
+                    throw args.FailureInformation;
+                throw new MembershipPasswordException("Change password canceled due to password validation failure.");
+            }
+
+            if (AllowManuallyChangingPassword == false)
+            {
+                if (ValidateUser(username, oldPassword) == false) return false;
+            }
+
             return PerformChangePassword(username, oldPassword, newPassword);
         }
 
@@ -431,10 +416,13 @@ namespace Umbraco.Core.Security
             {
                 throw new NotSupportedException("Updating the password Question and Answer is not available if requiresQuestionAndAnswer is not set in web.config");
             }
-
-            if (ValidateUser(username, password) == false)
+            
+            if (AllowManuallyChangingPassword == false)
             {
-                return false;
+                if (ValidateUser(username, password) == false)
+                {
+                    return false;
+                }
             }
 
             return PerformChangePasswordQuestionAndAnswer(username, password, newPasswordQuestion, newPasswordAnswer);
@@ -534,6 +522,56 @@ namespace Umbraco.Core.Security
         /// </returns>
         protected abstract MembershipUser PerformCreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status);
 
+        /// <summary>
+        /// Gets the members password if password retreival is enabled
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="answer"></param>
+        /// <returns></returns>
+        public sealed override string GetPassword(string username, string answer)
+        {
+            if (EnablePasswordRetrieval == false)
+                throw new ProviderException("Password Retrieval Not Enabled.");
+
+            if (PasswordFormat == MembershipPasswordFormat.Hashed)
+                throw new ProviderException("Cannot retrieve Hashed passwords.");
+
+            return PerformGetPassword(username, answer);
+        }
+
+        /// <summary>
+        /// Gets the members password if password retreival is enabled
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="answer"></param>
+        /// <returns></returns>
+        protected abstract string PerformGetPassword(string username, string answer);
+
+        public sealed override string ResetPassword(string username, string answer)
+        {
+            if (EnablePasswordReset == false)
+            {
+                throw new NotSupportedException("Password reset is not supported");
+            }
+
+            var newPassword = Membership.GeneratePassword(MinRequiredPasswordLength, MinRequiredNonAlphanumericCharacters);
+
+            var args = new ValidatePasswordEventArgs(username, newPassword, true);
+            OnValidatingPassword(args);
+            if (args.Cancel)
+            {
+                if (args.FailureInformation != null)
+                {
+                    throw args.FailureInformation;
+                }
+                throw new MembershipPasswordException("Reset password canceled due to password validation failure.");
+            }
+
+            return PerformResetPassword(username, answer, newPassword);
+        }
+
+        protected abstract string PerformResetPassword(string username, string answer, string generatedPassword);
+
         protected internal static Attempt<PasswordValidityError> IsPasswordValid(string password, int minRequiredNonAlphanumericChars, string strengthRegex, int minLength)
         {
             if (minRequiredNonAlphanumericChars > 0)
@@ -561,7 +599,7 @@ namespace Umbraco.Core.Security
 
             return Attempt.Succeed(PasswordValidityError.Ok);
         }
-
+        
         /// <summary>
         /// Gets the name of the default app.
         /// </summary>

@@ -305,7 +305,7 @@ namespace umbraco.providers
         /// <returns>
         /// The password for the specified user name.
         /// </returns>
-        public override string GetPassword(string username, string answer)
+        protected override string PerformGetPassword(string username, string answer)
         {
             throw new ProviderException("Password Retrieval Not Enabled.");
         }
@@ -355,13 +355,8 @@ namespace umbraco.providers
         /// <param name="username">The user to reset the password for.</param>
         /// <param name="answer">The password answer for the specified user.</param>
         /// <returns>The new password for the specified user.</returns>
-        public override string ResetPassword(string username, string answer)
-        {
-            if (EnablePasswordReset == false)
-            {
-                throw new NotSupportedException("Password reset is not supported");
-            }
-
+        protected override string PerformResetPassword(string username, string answer, string generatedPassword)
+        {            
             //TODO: This should be here - but how do we update failure count in this provider??
             //if (answer == null && RequiresQuestionAndAnswer)
             //{
@@ -370,18 +365,7 @@ namespace umbraco.providers
             //    throw new ProviderException("Password answer required for password reset.");
             //}
 
-            var newPassword = Membership.GeneratePassword(MinRequiredPasswordLength, MinRequiredNonAlphanumericCharacters);
-
-            var args = new ValidatePasswordEventArgs(username, newPassword, true);
-            OnValidatingPassword(args);
-            if (args.Cancel)
-            {
-                if (args.FailureInformation != null)
-                    throw args.FailureInformation;
-                throw new MembershipPasswordException("Reset password canceled due to password validation failure.");
-            }
-
-            var found = User.GetAllByLoginName(username, false);
+            var found = User.GetAllByLoginName(username, false).ToArray();
             if (found == null || found.Any() == false)
                 throw new MembershipPasswordException("The supplied user is not found");
 
@@ -389,12 +373,12 @@ namespace umbraco.providers
 
             //Yes, it's true, this actually makes a db call to set the password
             string salt;
-            var encPass = EncryptOrHashNewPassword(newPassword, out salt);
+            var encPass = EncryptOrHashNewPassword(generatedPassword, out salt);
             user.Password = FormatPasswordForStorage(encPass, salt);
             //call this just for fun.
             user.Save();
 
-            return newPassword;
+            return generatedPassword;
         }
 
         /// <summary>

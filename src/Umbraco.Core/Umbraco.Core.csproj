@@ -203,6 +203,7 @@
     <Compile Include="Persistence\Querying\SqlStringExtensions.cs" />
     <Compile Include="Persistence\Querying\StringPropertyMatchType.cs" />
     <Compile Include="Persistence\Querying\TextColumnType.cs" />
+    <Compile Include="Persistence\Querying\ValuePropertyMatchType.cs" />
     <Compile Include="Persistence\SqlSyntax\MySqlSyntax.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlCeSyntax.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlServerSyntax.cs" />
@@ -772,6 +773,7 @@
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\LocalizationService.cs" />
     <Compile Include="Services\MediaService.cs" />
+    <Compile Include="Services\MemberCountType.cs" />
     <Compile Include="Services\MemberService.cs" />
     <Compile Include="Services\MemberTypeService.cs" />
     <Compile Include="Services\RelationService.cs" />

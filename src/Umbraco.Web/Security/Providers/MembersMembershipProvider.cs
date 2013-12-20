@@ -61,48 +61,7 @@ namespace Umbraco.Web.Security.Providers
             //    _defaultMemberTypeAlias = MemberType.GetAll[0].Alias;
             //else
             //    throw new ProviderException("No default MemberType alias is specified in the web.config string. Please add a 'defaultMemberTypeAlias' to the add element in the provider declaration in web.config");
-
-            // test for approve status
-            if (config["umbracoApprovePropertyTypeAlias"] != null)
-            {
-                ApprovedPropertyTypeAlias = config["umbracoApprovePropertyTypeAlias"];
-            }
-            // test for lock attempts
-            if (config["umbracoLockPropertyTypeAlias"] != null)
-            {
-                LockPropertyTypeAlias = config["umbracoLockPropertyTypeAlias"];
-            }
-            if (config["umbracoLastLockedPropertyTypeAlias"] != null)
-            {
-                LastLockedOutPropertyTypeAlias = config["umbracoLastLockedPropertyTypeAlias"];
-            }
-            if (config["umbracoLastPasswordChangedPropertyTypeAlias"] != null)
-            {
-                LastPasswordChangedPropertyTypeAlias = config["umbracoLastPasswordChangedPropertyTypeAlias"];
-            }
-            if (config["umbracoFailedPasswordAttemptsPropertyTypeAlias"] != null)
-            {
-                FailedPasswordAttemptsPropertyTypeAlias = config["umbracoFailedPasswordAttemptsPropertyTypeAlias"];
-            }
-            // comment property
-            if (config["umbracoCommentPropertyTypeAlias"] != null)
-            {
-                CommentPropertyTypeAlias = config["umbracoCommentPropertyTypeAlias"];
-            }
-            // last login date
-            if (config["umbracoLastLoginPropertyTypeAlias"] != null)
-            {
-                LastLoginPropertyTypeAlias = config["umbracoLastLoginPropertyTypeAlias"];
-            }
-            // password retrieval
-            if (config["umbracoPasswordRetrievalQuestionPropertyTypeAlias"] != null)
-            {
-                PasswordRetrievalQuestionPropertyTypeAlias = config["umbracoPasswordRetrievalQuestionPropertyTypeAlias"];
-            }
-            if (config["umbracoPasswordRetrievalAnswerPropertyTypeAlias"] != null)
-            {
-                PasswordRetrievalAnswerPropertyTypeAlias = config["umbracoPasswordRetrievalAnswerPropertyTypeAlias"];
-            }        
+            
         }
 
         /// <summary>
@@ -123,17 +82,7 @@ namespace Umbraco.Web.Security.Providers
             // in order to support updating passwords from the umbraco core, we can't validate the old password
             var m = _memberService.GetByUsername(username);
             if (m == null) return false;
-
-            var args = new ValidatePasswordEventArgs(username, newPassword, false);
-            OnValidatingPassword(args);
-
-            if (args.Cancel)
-            {
-                if (args.FailureInformation != null)
-                    throw args.FailureInformation;
-                throw new MembershipPasswordException("Change password canceled due to password validation failure.");
-            }
-
+            
             string salt;
             var encodedPassword = EncryptOrHashNewPassword(newPassword, out salt);
 
@@ -289,7 +238,45 @@ namespace Umbraco.Web.Security.Providers
             }
             return collection;
         }
-        
+
+        /// <summary>
+        /// Gets a collection of all the users in the data source in pages of data.
+        /// </summary>
+        /// <param name="pageIndex">The index of the page of results to return. pageIndex is zero-based.</param>
+        /// <param name="pageSize">The size of the page of results to return.</param>
+        /// <param name="totalRecords">The total number of matched users.</param>
+        /// <returns>
+        /// A <see cref="T:System.Web.Security.MembershipUserCollection"></see> collection that contains a page of pageSize<see cref="T:System.Web.Security.MembershipUser"></see> objects beginning at the page specified by pageIndex.
+        /// </returns>
+        public override MembershipUserCollection GetAllUsers(int pageIndex, int pageSize, out int totalRecords)
+        {
+            var membersList = new MembershipUserCollection();
+
+            var pagedMembers = MemberService.GetAllMembers(pageIndex, pageSize, out totalRecords);
+            
+            foreach (var m in pagedMembers)
+            {
+                membersList.Add(m.AsConcreteMembershipUser());
+            }
+            return membersList;
+        }
+
+        /// <summary>
+        /// Gets the number of users currently accessing the application.
+        /// </summary>
+        /// <returns>
+        /// The number of users currently accessing the application.       
+        /// </returns>
+        /// <remarks>
+        /// The way this is done is the same way that it is done in the MS SqlMembershipProvider - We query for any members
+        /// that have their last active date within the Membership.UserIsOnlineTimeWindow (which is in minutes). It isn't exact science
+        /// but that is how MS have made theirs so we'll follow that principal.
+        /// </remarks>
+        public override int GetNumberOfUsersOnline()
+        {
+            return MemberService.GetMemberCount(MemberCountType.Online);
+        }
+
         /// <summary>
         /// Gets the password for the specified user name from the data source.
         /// </summary>
@@ -298,168 +285,24 @@ namespace Umbraco.Web.Security.Providers
         /// <returns>
         /// The password for the specified user name.
         /// </returns>
-        public override string GetPassword(string username, string answer)
-        {
-            if (EnablePasswordRetrieval == false)
-                throw new ProviderException("Password Retrieval Not Enabled.");
-
-            if (PasswordFormat == MembershipPasswordFormat.Hashed)
-                throw new ProviderException("Cannot retrieve Hashed passwords.");
-
-            var member = MemberService.GetByUsername(username);
-
-            if (RequiresQuestionAndAnswer && member.PasswordAnswer != answer)
+        protected override string PerformGetPassword(string username, string answer)
+        {            
+            var m = MemberService.GetByUsername(username);
+            if (m == null)
             {
-                throw new ProviderException("Password retrieval answer doesn't match");
-            } 
-
-            return member.Password;
-        }
-      
-        /// <summary>
-        /// Resets a user's password to a new, automatically generated password.
-        /// </summary>
-        /// <param name="username">The user to reset the password for.</param>
-        /// <param name="answer">The password answer for the specified user (not used with Umbraco).</param>
-        /// <returns>The new password for the specified user.</returns>
-        public override string ResetPassword(string username, string answer)
-        {
-            //TODO: Get logic from other provider
-
-            throw new NotImplementedException();
-
-            //if (EnablePasswordReset == false)
-            //    throw new ProviderException("Password reset is Not Enabled.");
-
-            //var member = MemberService.GetByUsername(username);
-
-            //if (member == null)
-            //    throw new ProviderException("The supplied user is not found");
-
-            //if(member.IsLockedOut)
-            //    throw new ProviderException("The member is locked out.");
-
-            //if (RequiresQuestionAndAnswer == false || (RequiresQuestionAndAnswer && answer == member.PasswordAnswer))
-            //{
-            //    member.Password =
-            //        EncryptOrHashPassword(Membership.GeneratePassword(MinRequiredPasswordLength,
-            //                                                   MinRequiredNonAlphanumericCharacters));
-            //    MemberService.Save(member);
-            //}
-            //else
-            //{
-            //    throw new MembershipPasswordException("Incorrect password answer");
-            //}
-            
-            //return null;
-        }
-        
-        /// <summary>
-        /// Updates e-mail and potentially approved status, lock status and comment on a user.
-        /// Note: To automatically support lock, approve and comments you'll need to add references to the membertype properties in the 
-        /// 'Member' element in web.config by adding their aliases to the 'umbracoApprovePropertyTypeAlias', 'umbracoLockPropertyTypeAlias' and 'umbracoCommentPropertyTypeAlias' attributes
-        /// </summary>
-        /// <param name="user">A <see cref="T:System.Web.Security.MembershipUser"></see> object that represents the user to update and the updated information for the user.</param>      
-        public override void UpdateUser(MembershipUser user)
-        {
-            //var member = user.AsIMember();
-            //MemberService.Save(member);
-        }
-
-        /// <summary>
-        /// Verifies that the specified user name and password exist in the data source.
-        /// </summary>
-        /// <param name="username">The name of the user to validate.</param>
-        /// <param name="password">The password for the specified user.</param>
-        /// <returns>
-        /// true if the specified username and password are valid; otherwise, false.
-        /// </returns>
-        public override bool ValidateUser(string username, string password)
-        {
-            var member = MemberService.GetByUsername(username);
-
-            if (member == null || member.IsApproved == false) return false;
-
-            if (member.IsLockedOut)
-                throw new ProviderException("The member is locked out.");
-
-            string salt;
-            var encodedPassword = EncryptOrHashNewPassword(password, out salt);
-            
-            var authenticated = (encodedPassword == member.Password);
-
-            if (authenticated == false)
-            {
-                // TODO: Increment login attempts - lock if too many.
-
-                //var count = member.GetValue<int>("loginAttempts");
-                //count++;
-
-                //if (count >= _maxInvalidPasswordAttempts)
-                //{
-                //    member.SetValue("loginAttempts", 0);
-                //    member.IsLockedOut = true;
-                //    throw new ProviderException("The member " + member.Username + " is locked out.");
-                //}
-                //else
-                //{
-                //    member.SetValue("loginAttempts", count);
-                //}
-            }
-            else
-            {
-                // add this later - member.SetValue("loginAttempts", 0);
-                member.LastLoginDate = DateTime.Now;
+                throw new ProviderException("The supplied user is not found");
             }
 
-            MemberService.Save(member);
-            return authenticated;
-        }
+            //TODO: We need to encrypt the answer here to match against the encrypted answer in the database
 
-        /// <summary>
-        /// Clears a lock so that the membership user can be validated.
-        /// </summary>
-        /// <param name="username">The membership user to clear the lock status for.</param>
-        /// <returns>
-        /// true if the membership user was successfully unlocked; otherwise, false.
-        /// </returns>
-        public override bool UnlockUser(string username)
-        {
-            var member = MemberService.GetByUsername(username);
-
-            if(member == null)
-                throw new ProviderException("Cannot find member " + username);
-
-            // Non need to update
-            if (member.IsLockedOut == false) return true;
-
-            member.IsLockedOut = false;
-            // TODO: add this later - member.SetValue("loginAttempts", 0);
-
-            MemberService.Save(member);
-            
-            return true;
-        }
-        
-        /// <summary>
-        /// Gets information from the data source for a user based on the unique identifier for the membership user. Provides an option to update the last-activity date/time stamp for the user.
-        /// </summary>
-        /// <param name="providerUserKey">The unique identifier for the membership user to get information for.</param>
-        /// <param name="userIsOnline">true to update the last-activity date/time stamp for the user; false to return user information without updating the last-activity date/time stamp for the user.</param>
-        /// <returns>
-        /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the specified user's information from the data source.
-        /// </returns>
-        public override MembershipUser GetUser(object providerUserKey, bool userIsOnline)
-        {
-            var member = MemberService.GetById(providerUserKey);
-
-            if (userIsOnline)
+            if (RequiresQuestionAndAnswer && m.PasswordAnswer != answer)
             {
-                member.UpdateDate = DateTime.Now;
-                MemberService.Save(member);
+                throw new ProviderException("Incorrect password answer");
             }
 
-            return member.AsConcreteMembershipUser();
+            var decodedPassword = DecodePassword(m.Password);
+
+            return decodedPassword;
         }
 
         /// <summary>
@@ -473,9 +316,40 @@ namespace Umbraco.Web.Security.Providers
         public override MembershipUser GetUser(string username, bool userIsOnline)
         {
             var member = MemberService.GetByUsername(username);
+            if (member == null)
+            {
+                return null;
+            }
 
             if (userIsOnline)
             {
+                member.LastLoginDate = DateTime.Now;
+                member.UpdateDate = DateTime.Now;
+                MemberService.Save(member);
+            }
+
+            return member.AsConcreteMembershipUser();
+        }
+
+        /// <summary>
+        /// Gets information from the data source for a user based on the unique identifier for the membership user. Provides an option to update the last-activity date/time stamp for the user.
+        /// </summary>
+        /// <param name="providerUserKey">The unique identifier for the membership user to get information for.</param>
+        /// <param name="userIsOnline">true to update the last-activity date/time stamp for the user; false to return user information without updating the last-activity date/time stamp for the user.</param>
+        /// <returns>
+        /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the specified user's information from the data source.
+        /// </returns>
+        public override MembershipUser GetUser(object providerUserKey, bool userIsOnline)
+        {
+            var member = MemberService.GetById(providerUserKey);
+            if (member == null)
+            {
+                return null;
+            }
+
+            if (userIsOnline)
+            {
+                member.LastLoginDate = DateTime.Now;
                 member.UpdateDate = DateTime.Now;
                 MemberService.Save(member);
             }
@@ -497,33 +371,158 @@ namespace Umbraco.Web.Security.Providers
             return member == null ? null : member.Username;
         }
 
-        
-
         /// <summary>
-        /// Gets a collection of all the users in the data source in pages of data.
+        /// Resets a user's password to a new, automatically generated password.
         /// </summary>
-        /// <param name="pageIndex">The index of the page of results to return. pageIndex is zero-based.</param>
-        /// <param name="pageSize">The size of the page of results to return.</param>
-        /// <param name="totalRecords">The total number of matched users.</param>
-        /// <returns>
-        /// A <see cref="T:System.Web.Security.MembershipUserCollection"></see> collection that contains a page of pageSize<see cref="T:System.Web.Security.MembershipUser"></see> objects beginning at the page specified by pageIndex.
-        /// </returns>
-        public override MembershipUserCollection GetAllUsers(int pageIndex, int pageSize, out int totalRecords)
+        /// <param name="username">The user to reset the password for.</param>
+        /// <param name="answer">The password answer for the specified user (not used with Umbraco).</param>
+        /// <param name="generatedPassword"></param>
+        /// <returns>The new password for the specified user.</returns>
+        protected override string PerformResetPassword(string username, string answer, string generatedPassword)
         {
-            throw new System.NotImplementedException();
+            //TODO: This should be here - but how do we update failure count in this provider??
+            //if (answer == null && RequiresQuestionAndAnswer)
+            //{
+            //    UpdateFailureCount(username, "passwordAnswer");
+
+            //    throw new ProviderException("Password answer required for password reset.");
+            //}
+            
+            var m = MemberService.GetByUsername(username);
+            if (m == null)
+            {
+                throw new ProviderException("The supplied user is not found");
+            }
+
+            if (m.IsLockedOut)
+            {
+                throw new ProviderException("The member is locked out.");
+            }
+
+            //TODO: We need to encrypt the answer here to match against the encrypted answer in the database
+
+            if (RequiresQuestionAndAnswer && m.PasswordAnswer != answer)
+            {
+                throw new ProviderException("Incorrect password answer");
+            }
+
+            string salt;
+            var encodedPassword = EncryptOrHashNewPassword(generatedPassword, out salt);
+            m.Password = encodedPassword;
+            m.LastPasswordChangeDate = DateTime.Now;
+            MemberService.Save(m);
+            
+            return generatedPassword;
         }
 
         /// <summary>
-        /// Gets the number of users currently accessing the application.
+        /// Clears a lock so that the membership user can be validated.
         /// </summary>
+        /// <param name="username">The membership user to clear the lock status for.</param>
         /// <returns>
-        /// The number of users currently accessing the application.
+        /// true if the membership user was successfully unlocked; otherwise, false.
         /// </returns>
-        public override int GetNumberOfUsersOnline()
+        public override bool UnlockUser(string username)
         {
-            throw new System.NotImplementedException();
+            var member = MemberService.GetByUsername(username);
+
+            if (member == null)
+            {
+                throw new ProviderException(string.Format("No member with the username '{0}' found", username));
+            }                
+
+            // Non need to update
+            if (member.IsLockedOut == false) return true;
+
+            member.IsLockedOut = false;
+            member.FailedPasswordAttempts = 0;
+
+            MemberService.Save(member);
+
+            return true;
         }
-        
+
+        /// <summary>
+        /// Updates e-mail  approved status, lock status and comment on a user.
+        /// </summary>
+        /// <param name="user">A <see cref="T:System.Web.Security.MembershipUser"></see> object that represents the user to update and the updated information for the user.</param>      
+        public override void UpdateUser(MembershipUser user)
+        {
+            var m = MemberService.GetByUsername(user.UserName);
+
+            if (m == null)
+            {
+                throw new ProviderException(string.Format("No member with the username '{0}' found", user.UserName));
+            }                
+
+            m.Email = user.Email;
+            m.IsApproved = user.IsApproved;
+            m.IsLockedOut = user.IsLockedOut;
+            if (user.IsLockedOut)
+            {
+                m.LastLockoutDate = DateTime.Now;
+            }
+            m.Comments = user.Comment;
+
+            MemberService.Save(m);
+        }
+
+        /// <summary>
+        /// Verifies that the specified user name and password exist in the data source.
+        /// </summary>
+        /// <param name="username">The name of the user to validate.</param>
+        /// <param name="password">The password for the specified user.</param>
+        /// <returns>
+        /// true if the specified username and password are valid; otherwise, false.
+        /// </returns>
+        public override bool ValidateUser(string username, string password)
+        {
+            var member = MemberService.GetByUsername(username);
+
+            if (member == null) return false;
+
+            if (member.IsApproved == false)
+            {
+                LogHelper.Info<MembersMembershipProvider>("Cannot validate member " + username + " because they are not approved");
+                return false;
+            }
+            if (member.IsLockedOut)
+            {
+                LogHelper.Info<MembersMembershipProvider>("Cannot validate member " + username + " because they are currently locked out");
+                return false;
+            }
+
+            string salt;
+            var encodedPassword = EncryptOrHashNewPassword(password, out salt);
+            
+            var authenticated = (encodedPassword == member.Password);
+
+            if (authenticated == false)
+            {
+                // TODO: Increment login attempts - lock if too many.
+
+                var count = member.FailedPasswordAttempts;
+                count++;
+                member.FailedPasswordAttempts = count;
+
+                if (count >= MaxInvalidPasswordAttempts)
+                {
+                    member.IsLockedOut = true;
+                    member.LastLockoutDate = DateTime.Now;
+                    LogHelper.Info<MembersMembershipProvider>("Member " + username + " is now locked out, max invalid password attempts exceeded");
+                }
+            }
+            else
+            {
+                member.FailedPasswordAttempts = 0;
+                member.LastLoginDate = DateTime.Now;
+            }
+
+            MemberService.Save(member);
+            return authenticated;
+        }
+
+
 
         public override string ToString()
         {

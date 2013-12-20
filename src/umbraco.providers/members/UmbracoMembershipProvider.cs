@@ -31,12 +31,35 @@ namespace umbraco.providers.members
 
     public class UmbracoMembershipProvider : UmbracoMembershipProviderBase
     {
+        public UmbracoMembershipProvider()
+        {
+            LockPropertyTypeAlias = Constants.Conventions.Member.IsLockedOut;
+            LastLockedOutPropertyTypeAlias = Constants.Conventions.Member.LastLockoutDate;
+            FailedPasswordAttemptsPropertyTypeAlias = Constants.Conventions.Member.FailedPasswordAttempts;
+            ApprovedPropertyTypeAlias = Constants.Conventions.Member.IsApproved;
+            CommentPropertyTypeAlias = Constants.Conventions.Member.Comments;
+            LastLoginPropertyTypeAlias = Constants.Conventions.Member.LastLoginDate;
+            LastPasswordChangedPropertyTypeAlias = Constants.Conventions.Member.LastPasswordChangeDate;
+            PasswordRetrievalQuestionPropertyTypeAlias = Constants.Conventions.Member.PasswordQuestion;
+            PasswordRetrievalAnswerPropertyTypeAlias = Constants.Conventions.Member.PasswordAnswer;
+        }
+
         #region Fields
         
         private string _providerName = Member.UmbracoMemberProviderName;       
 
         #endregion
-        
+
+        public string LockPropertyTypeAlias { get; protected set; }
+        public string LastLockedOutPropertyTypeAlias { get; protected set; }
+        public string FailedPasswordAttemptsPropertyTypeAlias { get; protected set; }
+        public string ApprovedPropertyTypeAlias { get; protected set; }
+        public string CommentPropertyTypeAlias { get; protected set; }
+        public string LastLoginPropertyTypeAlias { get; protected set; }
+        public string LastPasswordChangedPropertyTypeAlias { get; protected set; }
+        public string PasswordRetrievalQuestionPropertyTypeAlias { get; protected set; }
+        public string PasswordRetrievalAnswerPropertyTypeAlias { get; protected set; }
+
         /// <summary>
         /// Override to maintain backwards compatibility with 0 required non-alphanumeric chars
         /// </summary>
@@ -164,17 +187,7 @@ namespace umbraco.providers.members
             // in order to support updating passwords from the umbraco core, we can't validate the old password
             var m = Member.GetMemberFromLoginName(username);            
             if (m == null) return false;
-
-            var args = new ValidatePasswordEventArgs(username, newPassword, false);
-            OnValidatingPassword(args);
-
-            if (args.Cancel)
-            {
-                if (args.FailureInformation != null)
-                    throw args.FailureInformation;
-                throw new MembershipPasswordException("Change password canceled due to password validation failure.");
-            }
-
+            
             string salt;
             var encodedPassword = EncryptOrHashNewPassword(newPassword, out salt);
             m.ChangePassword(
@@ -199,6 +212,11 @@ namespace umbraco.providers.members
         /// </returns>
         protected override bool PerformChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer)
         {
+            if (string.IsNullOrEmpty(PasswordRetrievalQuestionPropertyTypeAlias) || string.IsNullOrEmpty(PasswordRetrievalAnswerPropertyTypeAlias))
+            {
+                throw new NotSupportedException("Updating the password Question and Answer is not valid if the properties aren't set in the config file");
+            }
+
             var m = Member.GetMemberFromLoginName(username);
             if (m == null)
             {
@@ -409,50 +427,45 @@ namespace umbraco.providers.members
         /// <returns>
         /// The password for the specified user name.
         /// </returns>
-        public override string GetPassword(string username, string answer)
+        protected override string PerformGetPassword(string username, string answer)
         {
-            if (EnablePasswordRetrieval == false)
-                throw new ProviderException("Password Retrieval Not Enabled.");
-
-            if (PasswordFormat == MembershipPasswordFormat.Hashed)
-                throw new ProviderException("Cannot retrieve Hashed passwords.");
-
             var m = Member.GetMemberFromLoginName(username);
-            if (m != null)
-            {
-                if (RequiresQuestionAndAnswer)
-                {
-                    // check if password answer property alias is set
-                    if (string.IsNullOrEmpty(PasswordRetrievalAnswerPropertyTypeAlias) == false)
-                    {
-                        // check if user is locked out
-                        if (string.IsNullOrEmpty(LockPropertyTypeAlias) == false)
-                        {
-                            var isLockedOut = false;
-                            bool.TryParse(GetMemberProperty(m, LockPropertyTypeAlias, true), out isLockedOut);
-                            if (isLockedOut)
-                            {
-                                throw new MembershipPasswordException("The supplied user is locked out");
-                            }
-                        }
-
-                        // match password answer
-                        if (GetMemberProperty(m, PasswordRetrievalAnswerPropertyTypeAlias, false) != answer)
-                        {
-                            throw new MembershipPasswordException("Incorrect password answer");
-                        }
-                    }
-                    else
-                    {
-                        throw new ProviderException("Password retrieval answer property alias is not set! To automatically support password question/answers you'll need to add references to the membertype properties in the 'Member' element in web.config by adding their aliases to the 'umbracoPasswordRetrievalQuestionPropertyTypeAlias' and 'umbracoPasswordRetrievalAnswerPropertyTypeAlias' attributes");
-                    }
-                }
-            }
             if (m == null)
             {
                 throw new MembershipPasswordException("The supplied user is not found");
             }
-            return m.GetPassword();
+
+            // check if user is locked out
+            if (string.IsNullOrEmpty(LockPropertyTypeAlias) == false)
+            {
+                var isLockedOut = false;
+                bool.TryParse(GetMemberProperty(m, LockPropertyTypeAlias, true), out isLockedOut);
+                if (isLockedOut)
+                {
+                    throw new MembershipPasswordException("The supplied user is locked out");
+                }
+            }
+
+            if (RequiresQuestionAndAnswer)
+            {
+                // check if password answer property alias is set
+                if (string.IsNullOrEmpty(PasswordRetrievalAnswerPropertyTypeAlias) == false)
+                {
+                    // match password answer
+                    if (GetMemberProperty(m, PasswordRetrievalAnswerPropertyTypeAlias, false) != answer)
+                    {
+                        throw new MembershipPasswordException("Incorrect password answer");
+                    }
+                }
+                else
+                {
+                    throw new ProviderException("Password retrieval answer property alias is not set! To automatically support password question/answers you'll need to add references to the membertype properties in the 'Member' element in web.config by adding their aliases to the 'umbracoPasswordRetrievalQuestionPropertyTypeAlias' and 'umbracoPasswordRetrievalAnswerPropertyTypeAlias' attributes");
+                }
+            }
+
+            var decodedPassword = DecodePassword(m.GetPassword());
+
+            return decodedPassword;
         }
 
         /// <summary>
@@ -465,11 +478,21 @@ namespace umbraco.providers.members
         /// </returns>
         public override MembershipUser GetUser(string username, bool userIsOnline)
         {
-            if (String.IsNullOrEmpty(username))
+            if (string.IsNullOrEmpty(username))
                 return null;
-            Member m = Member.GetMemberFromLoginName(username);
-            if (m == null) return null;
-            else return ConvertToMembershipUser(m);
+            var m = Member.GetMemberFromLoginName(username);
+            
+            if (m == null)
+            {
+                return null;
+            }
+
+            if (userIsOnline && LastLoginPropertyTypeAlias.IsNullOrWhiteSpace() == false)
+            {
+                UpdateMemberProperty(m, LastLoginPropertyTypeAlias, DateTime.Now);
+            }
+
+            return ConvertToMembershipUser(m);
         }
 
         /// <summary>
@@ -486,14 +509,23 @@ namespace umbraco.providers.members
             if (asGuid.Success)
             {
                 var m = new Member(asGuid.Result);
+                if (userIsOnline && LastLoginPropertyTypeAlias.IsNullOrWhiteSpace() == false)
+                {
+                    UpdateMemberProperty(m, LastLoginPropertyTypeAlias, DateTime.Now);
+                }
                 return ConvertToMembershipUser(m);    
             }
             var asInt = providerUserKey.TryConvertTo<int>();
             if (asInt.Success)
             {
                 var m = new Member(asInt.Result);
+                if (userIsOnline && LastLoginPropertyTypeAlias.IsNullOrWhiteSpace() == false)
+                {
+                    UpdateMemberProperty(m, LastLoginPropertyTypeAlias, DateTime.Now);
+                }
                 return ConvertToMembershipUser(m);    
             }
+
             throw new InvalidOperationException("The " + GetType() + " provider only supports GUID or Int as a providerUserKey");
 
         }
@@ -508,7 +540,7 @@ namespace umbraco.providers.members
         /// </returns>
         public override string GetUserNameByEmail(string email)
         {
-            Member m = Member.GetMemberFromEmail(email);
+            var m = Member.GetMemberFromEmail(email);
             return m == null ? null : m.LoginName;
         }
 
@@ -517,14 +549,10 @@ namespace umbraco.providers.members
         /// </summary>
         /// <param name="username">The user to reset the password for.</param>
         /// <param name="answer">The password answer for the specified user (not used with Umbraco).</param>
+        /// <param name="generatedPassword"></param>
         /// <returns>The new password for the specified user.</returns>
-        public override string ResetPassword(string username, string answer)
+        protected override string PerformResetPassword(string username, string answer, string generatedPassword)
         {
-            if (EnablePasswordReset == false)
-            {
-                throw new NotSupportedException("Password reset is not supported");
-            }
-
             //TODO: This should be here - but how do we update failure count in this provider??
             //if (answer == null && RequiresQuestionAndAnswer)
             //{
@@ -532,42 +560,33 @@ namespace umbraco.providers.members
 
             //    throw new ProviderException("Password answer required for password reset.");
             //}
-
-            var newPassword = Membership.GeneratePassword(MinRequiredPasswordLength, MinRequiredNonAlphanumericCharacters);
-
-            var args = new ValidatePasswordEventArgs(username, newPassword, true);
-            OnValidatingPassword(args);
-            if (args.Cancel)
-            {
-                if (args.FailureInformation != null)
-                    throw args.FailureInformation;
-                throw new MembershipPasswordException("Reset password canceled due to password validation failure.");
-            }
             
             var m = Member.GetMemberFromLoginName(username);
             if (m == null)
-                throw new MembershipPasswordException("The supplied user is not found");
+            {
+                throw new ProviderException("The supplied user is not found");
+            }
+
+            // check if user is locked out
+            if (string.IsNullOrEmpty(LockPropertyTypeAlias) == false)
+            {
+                var isLockedOut = false;
+                bool.TryParse(GetMemberProperty(m, LockPropertyTypeAlias, true), out isLockedOut);
+                if (isLockedOut)
+                {
+                    throw new ProviderException("The member is locked out.");
+                }
+            }
 
             if (RequiresQuestionAndAnswer)
             {
                 // check if password answer property alias is set
                 if (string.IsNullOrEmpty(PasswordRetrievalAnswerPropertyTypeAlias) == false)
                 {
-                    // check if user is locked out
-                    if (string.IsNullOrEmpty(LockPropertyTypeAlias) == false)
-                    {
-                        var isLockedOut = false;
-                        bool.TryParse(GetMemberProperty(m, LockPropertyTypeAlias, true), out isLockedOut);
-                        if (isLockedOut)
-                        {
-                            throw new MembershipPasswordException("The supplied user is locked out");
-                        }
-                    }
-
                     // match password answer
                     if (GetMemberProperty(m, PasswordRetrievalAnswerPropertyTypeAlias, false) != answer)
                     {
-                        throw new MembershipPasswordException("Incorrect password answer");
+                        throw new ProviderException("Incorrect password answer");
                     }
                 }
                 else
@@ -577,10 +596,9 @@ namespace umbraco.providers.members
             }
 
             string salt;
-            var encodedPassword = EncryptOrHashNewPassword(newPassword, out salt);
+            var encodedPassword = EncryptOrHashNewPassword(generatedPassword, out salt);
             //set the password on the member
-            m.ChangePassword(
-                FormatPasswordForStorage(encodedPassword, salt));
+            m.ChangePassword(FormatPasswordForStorage(encodedPassword, salt));
 
             if (string.IsNullOrEmpty(LastPasswordChangedPropertyTypeAlias) == false)
             {
@@ -589,7 +607,7 @@ namespace umbraco.providers.members
 
             m.Save();
 
-            return newPassword;
+            return generatedPassword;
         }
 
         /// <summary>
@@ -607,10 +625,14 @@ namespace umbraco.providers.members
                 if (m != null)
                 {
                     UpdateMemberProperty(m, LockPropertyTypeAlias, 0);
+                    if (string.IsNullOrEmpty(FailedPasswordAttemptsPropertyTypeAlias) == false)
+                    {
+                        UpdateMemberProperty(m, FailedPasswordAttemptsPropertyTypeAlias, 0);
+                    }
                     m.Save();
                     return true;
                 }
-                throw new Exception(String.Format("No member with the username '{0}' found", userName));
+                throw new ProviderException(string.Format("No member with the username '{0}' found", userName));
             }
             throw new ProviderException("To enable lock/unlocking, you need to add a 'bool' property on your membertype and add the alias of the property in the 'umbracoLockPropertyTypeAlias' attribute of the membership element in the web.config.");
         }
@@ -622,6 +644,12 @@ namespace umbraco.providers.members
         public override void UpdateUser(MembershipUser user)
         {
             var m = Member.GetMemberFromLoginName(user.UserName);
+
+            if (m == null)
+            {
+                throw new ProviderException(string.Format("No member with the username '{0}' found", user.UserName));
+            }                
+
             m.Email = user.Email;
 
             // if supported, update approve status
@@ -638,6 +666,86 @@ namespace umbraco.providers.members
             UpdateMemberProperty(m, CommentPropertyTypeAlias, user.Comment);
 
             m.Save();
+        }
+
+        /// <summary>
+        /// Verifies that the specified user name and password exist in the data source.
+        /// </summary>
+        /// <param name="username">The name of the user to validate.</param>
+        /// <param name="password">The password for the specified user.</param>
+        /// <returns>
+        /// true if the specified username and password are valid; otherwise, false.
+        /// </returns>
+        public override bool ValidateUser(string username, string password)
+        {
+            var m = Member.GetMemberFromLoginAndEncodedPassword(username, EncryptOrHashExistingPassword(password));
+            if (m != null)
+            {
+                // check for lock status. If locked, then set the member property to null
+                if (string.IsNullOrEmpty(LockPropertyTypeAlias) == false)
+                {
+                    string lockedStatus = GetMemberProperty(m, LockPropertyTypeAlias, true);
+                    if (string.IsNullOrEmpty(lockedStatus) == false)
+                    {
+                        var isLocked = false;
+                        if (bool.TryParse(lockedStatus, out isLocked))
+                        {
+                            if (isLocked)
+                            {
+                                LogHelper.Info<UmbracoMembershipProvider>("Cannot validate member " + username + " because they are currently locked out");
+                                m = null;
+                            }
+                        }
+                    }
+                }
+
+                //check for approve status. If not approved, then set the member property to null
+                if (m != null && CheckApproveStatus(m) == false)
+                {
+                    LogHelper.Info<UmbracoMembershipProvider>("Cannot validate member " + username + " because they are not approved");
+                    m = null;
+                }
+
+                // maybe update login date
+                if (m != null && string.IsNullOrEmpty(LastLoginPropertyTypeAlias) == false)
+                {
+                    UpdateMemberProperty(m, LastLoginPropertyTypeAlias, DateTime.Now);
+                }
+
+                // maybe reset password attempts
+                if (m != null && string.IsNullOrEmpty(FailedPasswordAttemptsPropertyTypeAlias) == false)
+                {
+                    UpdateMemberProperty(m, FailedPasswordAttemptsPropertyTypeAlias, 0);
+                }
+
+                // persist data
+                if (m != null)
+                    m.Save();
+            }
+            else if (string.IsNullOrEmpty(LockPropertyTypeAlias) == false
+                && string.IsNullOrEmpty(FailedPasswordAttemptsPropertyTypeAlias) == false)
+            {
+                var updateMemberDataObject = Member.GetMemberFromLoginName(username);
+                // update fail rate if it's approved
+                if (updateMemberDataObject != null && CheckApproveStatus(updateMemberDataObject))
+                {
+                    int failedAttempts = 0;
+                    int.TryParse(GetMemberProperty(updateMemberDataObject, FailedPasswordAttemptsPropertyTypeAlias, false), out failedAttempts);
+                    failedAttempts = failedAttempts + 1;
+                    UpdateMemberProperty(updateMemberDataObject, FailedPasswordAttemptsPropertyTypeAlias, failedAttempts);
+
+                    // lock user?
+                    if (failedAttempts >= MaxInvalidPasswordAttempts)
+                    {
+                        UpdateMemberProperty(updateMemberDataObject, LockPropertyTypeAlias, 1);
+                        UpdateMemberProperty(updateMemberDataObject, LastLockedOutPropertyTypeAlias, DateTime.Now);
+                        LogHelper.Info<UmbracoMembershipProvider>("Member " + username + " is now locked out, max invalid password attempts exceeded");
+                    }
+                    updateMemberDataObject.Save();
+                }
+
+            }
+            return (m != null);
         }
 
         private static void UpdateMemberProperty(Member m, string propertyTypeAlias, object propertyValue)
@@ -688,83 +796,7 @@ namespace umbraco.providers.members
 
             return null;
         }
-
-        /// <summary>
-        /// Verifies that the specified user name and password exist in the data source.
-        /// </summary>
-        /// <param name="username">The name of the user to validate.</param>
-        /// <param name="password">The password for the specified user.</param>
-        /// <returns>
-        /// true if the specified username and password are valid; otherwise, false.
-        /// </returns>
-        public override bool ValidateUser(string username, string password)
-        {
-            var m = Member.GetMemberFromLoginAndEncodedPassword(username, EncryptOrHashExistingPassword(password));
-            if (m != null)
-            {
-                // check for lock status. If locked, then set the member property to null
-                if (string.IsNullOrEmpty(LockPropertyTypeAlias) == false)
-                {
-                    string lockedStatus = GetMemberProperty(m, LockPropertyTypeAlias, true);
-                    if (string.IsNullOrEmpty(lockedStatus) == false)
-                    {
-                        var isLocked = false;
-                        if (bool.TryParse(lockedStatus, out isLocked))
-                        {
-                            if (isLocked)
-                            {
-                                m = null;
-                            }
-                        }
-                    }
-                }
-
-                //check for approve status. If not approved, then set the member property to null
-                if (m != null && !CheckApproveStatus(m)) {
-                    m = null;
-                }
-
-                // maybe update login date
-                if (m != null && string.IsNullOrEmpty(LastLoginPropertyTypeAlias) == false)
-                {
-                    UpdateMemberProperty(m, LastLoginPropertyTypeAlias, DateTime.Now);
-                }
-
-                // maybe reset password attempts
-                if (m != null && string.IsNullOrEmpty(FailedPasswordAttemptsPropertyTypeAlias) == false)
-                {
-                    UpdateMemberProperty(m, FailedPasswordAttemptsPropertyTypeAlias, 0);
-                }
-
-                // persist data
-                if (m != null)
-                    m.Save();
-            }
-            else if (string.IsNullOrEmpty(LockPropertyTypeAlias) == false
-                && string.IsNullOrEmpty(FailedPasswordAttemptsPropertyTypeAlias) == false)
-            {
-                var updateMemberDataObject = Member.GetMemberFromLoginName(username);
-                // update fail rate if it's approved
-                if (updateMemberDataObject != null && CheckApproveStatus(updateMemberDataObject))
-                {
-                    int failedAttempts = 0;
-                    int.TryParse(GetMemberProperty(updateMemberDataObject, FailedPasswordAttemptsPropertyTypeAlias, false), out failedAttempts);
-                    failedAttempts = failedAttempts+1;
-                    UpdateMemberProperty(updateMemberDataObject, FailedPasswordAttemptsPropertyTypeAlias, failedAttempts);
-
-                    // lock user?
-                    if (failedAttempts >= MaxInvalidPasswordAttempts)
-                    {
-                        UpdateMemberProperty(updateMemberDataObject, LockPropertyTypeAlias, 1);
-                        UpdateMemberProperty(updateMemberDataObject, LastLockedOutPropertyTypeAlias, DateTime.Now);
-                    }
-                    updateMemberDataObject.Save();
-                }
-
-            }
-            return (m != null);
-        }
-
+        
         private bool CheckApproveStatus(Member m)
         {
             var isApproved = false;
@@ -834,7 +866,7 @@ namespace umbraco.providers.members
         /// </summary>
         /// <param name="password">The password.</param>
         /// <returns>The encoded password.</returns>
-        [Obsolete("Do not use this, it is the legacy way to encode a password")]
+        [Obsolete("Do not use this, it is the legacy way to encode a password - use the base class EncryptOrHashExistingPassword instead")]
         public string EncodePassword(string password)
         {
             return LegacyEncodePassword(password);
@@ -845,7 +877,7 @@ namespace umbraco.providers.members
         /// </summary>
         /// <param name="encodedPassword">The encoded password.</param>
         /// <returns>The unencoded password.</returns>
-        [Obsolete("Do not use this, it is the legacy way to decode a password")]
+        [Obsolete("Do not use this, it is the legacy way to decode a password - use the base class DecodePassword instead")]
         public string UnEncodePassword(string encodedPassword)
         {
             return LegacyUnEncodePassword(encodedPassword);

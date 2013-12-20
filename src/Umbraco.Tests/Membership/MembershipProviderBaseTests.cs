@@ -14,6 +14,16 @@ using Umbraco.Web.Security.Providers;
 namespace Umbraco.Tests.Membership
 {
     [TestFixture]
+    public class MembersMembershipProviderTests
+    {
+        //[Test]
+        //public void Set_Default_Member_Type_On_Init()
+
+        //[Test]
+        //public void Question_Answer_Is_Encrypted()
+    }
+
+    [TestFixture]
     public class MembershipProviderBaseTests
     {
         //[Test]
@@ -111,16 +121,6 @@ namespace Umbraco.Tests.Membership
 
         private class TestProvider : MembershipProviderBase
         {
-            public override string GetPassword(string username, string answer)
-            {
-                throw new NotImplementedException();
-            }
-
-            public override string ResetPassword(string username, string answer)
-            {
-                throw new NotImplementedException();
-            }
-
             public override void UpdateUser(MembershipUser user)
             {
                 throw new NotImplementedException();
@@ -187,6 +187,16 @@ namespace Umbraco.Tests.Membership
             }
 
             protected override MembershipUser PerformCreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override string PerformGetPassword(string username, string answer)
+            {
+                throw new NotImplementedException();
+            }
+
+            protected override string PerformResetPassword(string username, string answer, string generatedPassword)
             {
                 throw new NotImplementedException();
             }
