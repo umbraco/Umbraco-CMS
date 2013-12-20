@@ -204,11 +204,8 @@ namespace Umbraco.Web.Security.Providers
         public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
             var byEmail = MemberService.FindMembersByEmail(emailToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
-            //totalRecords = byEmail.Length;
-            //var pagedResult = new PagedResult<IMember>(totalRecords, pageIndex, pageSize);
-
+            
             var collection = new MembershipUserCollection();
-            //foreach (var m in byEmail.Skip(pagedResult.SkipSize).Take(pageSize))
             foreach (var m in byEmail)
             {
                 collection.Add(m.AsConcreteMembershipUser());
@@ -229,11 +226,8 @@ namespace Umbraco.Web.Security.Providers
         public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
             var byEmail = MemberService.FindMembersByUsername(usernameToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
-            //totalRecords = byEmail.Length;
-            //var pagedResult = new PagedResult<IMember>(totalRecords, pageIndex, pageSize);
 
             var collection = new MembershipUserCollection();
-            //foreach (var m in byEmail.Skip(pagedResult.SkipSize).Take(pageSize))
             foreach (var m in byEmail)
             {
                 collection.Add(m.AsConcreteMembershipUser());

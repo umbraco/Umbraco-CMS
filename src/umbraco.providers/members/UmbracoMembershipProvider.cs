@@ -344,11 +344,8 @@ namespace umbraco.providers.members
         public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
             var byEmail = ApplicationContext.Current.Services.MemberService.FindMembersByEmail(emailToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
-            //totalRecords = byEmail.Length;
-            //var pagedResult = new PagedResult<IMember>(totalRecords, pageIndex, pageSize);
-
-            var collection = new MembershipUserCollection();            
-            //foreach (var m in byEmail.Skip(pagedResult.SkipSize).Take(pageSize))
+            
+            var collection = new MembershipUserCollection();                        
             foreach (var m in byEmail)
             {
                 collection.Add(ConvertToMembershipUser(m));
@@ -369,11 +366,8 @@ namespace umbraco.providers.members
         public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
             var byEmail = ApplicationContext.Current.Services.MemberService.FindMembersByUsername(usernameToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
-            //totalRecords = byEmail.Length;
-            //var pagedResult = new PagedResult<IMember>(totalRecords, pageIndex, pageSize);
-
-            var collection = new MembershipUserCollection();
-            //foreach (var m in byEmail.Skip(pagedResult.SkipSize).Take(pageSize))
+            
+            var collection = new MembershipUserCollection();            
             foreach (var m in byEmail)
             {
                 collection.Add(ConvertToMembershipUser(m));
@@ -392,22 +386,15 @@ namespace umbraco.providers.members
         /// </returns>
         public override MembershipUserCollection GetAllUsers(int pageIndex, int pageSize, out int totalRecords)
         {
-            var counter = 0;
-            var startIndex = pageSize * pageIndex;
-            var endIndex = startIndex + pageSize - 1;
             var membersList = new MembershipUserCollection();
-            var memberArray = Member.GetAll;
-            totalRecords = memberArray.Length;
 
-            foreach (var m in memberArray)
+            var pagedMembers = ApplicationContext.Current.Services.MemberService.GetAllMembers(pageIndex, pageSize, out totalRecords);
+
+            foreach (var m in pagedMembers)
             {
-                if (counter >= startIndex)
-                    membersList.Add(ConvertToMembershipUser(m));
-                if (counter >= endIndex) break;
-                counter++;
+                membersList.Add(ConvertToMembershipUser(m));
             }
             return membersList;
-
         }
 
         /// <summary>
