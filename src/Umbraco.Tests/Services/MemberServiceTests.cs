@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Querying;
@@ -552,6 +553,72 @@ namespace Umbraco.Tests.Services
                 "date", new DateTime(2013, 12, 20, 1, 5, 0), ValuePropertyMatchType.LessThanOrEqualTo);
 
             Assert.AreEqual(7, found.Count());
+        }
+
+        [Test]
+        public void Count_All_Members()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();            
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10);
+            ServiceContext.MemberService.Save(members);
+            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            ServiceContext.MemberService.Save(customMember);
+
+            var found = ServiceContext.MemberService.GetMemberCount(MemberCountType.All);
+
+            Assert.AreEqual(11, found);
+        }
+
+        [Test]
+        public void Count_All_Online_Members()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();            
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.LastLoginDate = DateTime.Now.AddMinutes(i * -2));
+            ServiceContext.MemberService.Save(members);
+
+            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            customMember.SetValue(Constants.Conventions.Member.LastLoginDate, DateTime.Now);
+            ServiceContext.MemberService.Save(customMember);
+
+            var found = ServiceContext.MemberService.GetMemberCount(MemberCountType.Online);
+
+            Assert.AreEqual(9, found);
+        }
+
+        [Test]
+        public void Count_All_Locked_Members()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.IsLockedOut = i % 2 == 0);
+            ServiceContext.MemberService.Save(members);
+
+            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            customMember.SetValue(Constants.Conventions.Member.IsLockedOut, true);
+            ServiceContext.MemberService.Save(customMember);
+
+            var found = ServiceContext.MemberService.GetMemberCount(MemberCountType.LockedOut);
+
+            Assert.AreEqual(6, found);
+        }
+
+        [Test]
+        public void Count_All_Approved_Members()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.IsApproved = i % 2 == 0);
+            ServiceContext.MemberService.Save(members);
+
+            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            customMember.SetValue(Constants.Conventions.Member.IsApproved, false);
+            ServiceContext.MemberService.Save(customMember);
+
+            var found = ServiceContext.MemberService.GetMemberCount(MemberCountType.Approved);
+
+            Assert.AreEqual(5, found);
         }
 
     }

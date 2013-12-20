@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -18,6 +19,13 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="username"></param>
         /// <returns></returns>
         bool Exists(string username);
+
+        /// <summary>
+        /// Gets the count of items based on a complex query
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        int GetCountByQuery(IQuery<IMember> query);
 
     }
 }

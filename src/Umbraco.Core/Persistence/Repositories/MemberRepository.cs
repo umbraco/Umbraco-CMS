@@ -448,6 +448,18 @@ namespace Umbraco.Core.Persistence.Repositories
             return Database.ExecuteScalar<int>(sql) > 0;
         }
 
+        public int GetCountByQuery(IQuery<IMember> query)
+        {
+            var sqlSubquery = GetSubquery();
+            var translator = new SqlTranslator<IMember>(sqlSubquery, query);
+            var subquery = translator.Translate();
+            //get the COUNT base query
+            var sql = GetBaseQuery(true)
+                .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments));
+
+            return Database.ExecuteScalar<int>(sql);
+        }
+
         private IMember BuildFromDto(List<MemberReadOnlyDto> dtos)
         {
             if (dtos == null || dtos.Any() == false)
