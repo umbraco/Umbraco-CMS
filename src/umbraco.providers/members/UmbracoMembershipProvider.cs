@@ -343,12 +343,13 @@ namespace umbraco.providers.members
         /// </returns>
         public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            var byEmail = ApplicationContext.Current.Services.MemberService.FindMembersByEmail(emailToMatch, StringPropertyMatchType.Wildcard).ToArray();
-            totalRecords = byEmail.Length;
-            var pagedResult = new PagedResult<IMember>(totalRecords, pageIndex, pageSize);
+            var byEmail = ApplicationContext.Current.Services.MemberService.FindMembersByEmail(emailToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
+            //totalRecords = byEmail.Length;
+            //var pagedResult = new PagedResult<IMember>(totalRecords, pageIndex, pageSize);
 
             var collection = new MembershipUserCollection();            
-            foreach (var m in byEmail.Skip(pagedResult.SkipSize).Take(pageSize))
+            //foreach (var m in byEmail.Skip(pagedResult.SkipSize).Take(pageSize))
+            foreach (var m in byEmail)
             {
                 collection.Add(ConvertToMembershipUser(m));
             }
@@ -367,12 +368,13 @@ namespace umbraco.providers.members
         /// </returns>
         public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            var byEmail = ApplicationContext.Current.Services.MemberService.FindMembersByUsername(usernameToMatch, StringPropertyMatchType.Wildcard).ToArray();
-            totalRecords = byEmail.Length;
-            var pagedResult = new PagedResult<IMember>(totalRecords, pageIndex, pageSize);
+            var byEmail = ApplicationContext.Current.Services.MemberService.FindMembersByUsername(usernameToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
+            //totalRecords = byEmail.Length;
+            //var pagedResult = new PagedResult<IMember>(totalRecords, pageIndex, pageSize);
 
             var collection = new MembershipUserCollection();
-            foreach (var m in byEmail.Skip(pagedResult.SkipSize).Take(pageSize))
+            //foreach (var m in byEmail.Skip(pagedResult.SkipSize).Take(pageSize))
+            foreach (var m in byEmail)
             {
                 collection.Add(ConvertToMembershipUser(m));
             }

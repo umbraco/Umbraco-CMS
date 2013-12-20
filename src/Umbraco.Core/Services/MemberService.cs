@@ -184,9 +184,12 @@ namespace Umbraco.Core.Services
         /// Does a search for members that contain the specified string in their email address
         /// </summary>
         /// <param name="emailStringToMatch"></param>
+        /// <param name="totalRecords"></param>
         /// <param name="matchType"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
         /// <returns></returns>
-        public IEnumerable<IMember> FindMembersByEmail(string emailStringToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+        public IEnumerable<IMember> FindMembersByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
@@ -214,11 +217,13 @@ namespace Umbraco.Core.Services
                         throw new ArgumentOutOfRangeException("matchType");
                 }
 
-                return repository.GetByQuery(query);
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Email);
+                
+                //return repository.GetByQuery(query);
             }
         }
 
-        public IEnumerable<IMember> FindMembersByUsername(string login, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+        public IEnumerable<IMember> FindMembersByUsername(string login, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
@@ -246,7 +251,9 @@ namespace Umbraco.Core.Services
                         throw new ArgumentOutOfRangeException("matchType");
                 }
 
-                return repository.GetByQuery(query);
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Username);
+
+                //return repository.GetByQuery(query);
             }
         }
 
