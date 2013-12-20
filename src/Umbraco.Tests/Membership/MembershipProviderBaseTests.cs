@@ -35,6 +35,12 @@ namespace Umbraco.Tests.Membership
         //[Test]
         //public void CreateUser_Base_Validation()
 
+        //[Test]
+        //public void GetPassword_Base_Validation()
+
+        //[Test]
+        //public void ResetPassword_Base_Validation()
+
         [Test]
         public void Sets_Defaults()
         {

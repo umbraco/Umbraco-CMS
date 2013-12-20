@@ -316,12 +316,49 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query =
-                    Query<IMember>.Builder.Where(
-                        x =>
-                            ((Member)x).PropertyTypeAlias == propertyTypeAlias && 
-                            ((Member)x).IntegerropertyValue == value);
+                IQuery<IMember> query;
 
+                switch (matchType)
+                {
+                    case ValuePropertyMatchType.Exact:
+                        query =
+                            Query<IMember>.Builder.Where(
+                                x =>
+                                ((Member) x).PropertyTypeAlias == propertyTypeAlias &&
+                                ((Member) x).IntegerropertyValue == value);
+                        break;
+                    case ValuePropertyMatchType.GreaterThan:
+                        query =
+                            Query<IMember>.Builder.Where(
+                                x =>
+                                ((Member) x).PropertyTypeAlias == propertyTypeAlias &&
+                                ((Member) x).IntegerropertyValue > value);
+                        break;
+                    case ValuePropertyMatchType.LessThan:
+                        query =
+                            Query<IMember>.Builder.Where(
+                                x =>
+                                ((Member) x).PropertyTypeAlias == propertyTypeAlias &&
+                                ((Member) x).IntegerropertyValue < value);
+                        break;
+                    case ValuePropertyMatchType.GreaterThanOrEqualTo:
+                        query =
+                            Query<IMember>.Builder.Where(
+                                x =>
+                                ((Member) x).PropertyTypeAlias == propertyTypeAlias &&
+                                ((Member) x).IntegerropertyValue >= value);
+                        break;
+                    case ValuePropertyMatchType.LessThanOrEqualTo:
+                        query =
+                            Query<IMember>.Builder.Where(
+                                x =>
+                                ((Member) x).PropertyTypeAlias == propertyTypeAlias &&
+                                ((Member) x).IntegerropertyValue <= value);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("matchType");
+                }
+                
                 var members = repository.GetByQuery(query);
                 return members;
             }
@@ -359,11 +396,48 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query =
-                    Query<IMember>.Builder.Where(
-                        x =>
-                            ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
-                            ((Member)x).DateTimePropertyValue == value);
+                IQuery<IMember> query;
+
+                switch (matchType)
+                {
+                    case ValuePropertyMatchType.Exact:
+                        query =
+                            Query<IMember>.Builder.Where(
+                                x =>
+                                ((Member) x).PropertyTypeAlias == propertyTypeAlias &&
+                                ((Member) x).DateTimePropertyValue == value);
+                        break;
+                    case ValuePropertyMatchType.GreaterThan:
+                        query =
+                            Query<IMember>.Builder.Where(
+                                x =>
+                                ((Member) x).PropertyTypeAlias == propertyTypeAlias &&
+                                ((Member) x).DateTimePropertyValue > value);
+                        break;
+                    case ValuePropertyMatchType.LessThan:
+                        query =
+                            Query<IMember>.Builder.Where(
+                                x =>
+                                ((Member) x).PropertyTypeAlias == propertyTypeAlias &&
+                                ((Member) x).DateTimePropertyValue < value);
+                        break;
+                    case ValuePropertyMatchType.GreaterThanOrEqualTo:
+                        query =
+                            Query<IMember>.Builder.Where(
+                                x =>
+                                ((Member) x).PropertyTypeAlias == propertyTypeAlias &&
+                                ((Member) x).DateTimePropertyValue >= value);
+                        break;
+                    case ValuePropertyMatchType.LessThanOrEqualTo:
+                        query =
+                            Query<IMember>.Builder.Where(
+                                x =>
+                                ((Member)x).PropertyTypeAlias == propertyTypeAlias &&
+                                ((Member)x).DateTimePropertyValue <= value);
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("matchType");
+                }
 
                 var members = repository.GetByQuery(query);
                 return members;

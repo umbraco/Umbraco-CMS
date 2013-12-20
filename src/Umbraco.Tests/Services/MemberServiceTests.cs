@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
@@ -239,7 +240,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Get_By_Property_Value_Exact()
+        public void Get_By_Property_String_Value_Exact()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
             ServiceContext.MemberTypeService.Save(memberType);
@@ -255,7 +256,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Get_By_Property_Value_Contains()
+        public void Get_By_Property_String_Value_Contains()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
             ServiceContext.MemberTypeService.Save(memberType);
@@ -271,7 +272,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Get_By_Property_Value_Starts_With()
+        public void Get_By_Property_String_Value_Starts_With()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
             ServiceContext.MemberTypeService.Save(memberType);
@@ -287,7 +288,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Get_By_Property_Value_Ends_With()
+        public void Get_By_Property_String_Value_Ends_With()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
             ServiceContext.MemberTypeService.Save(memberType);
@@ -303,6 +304,255 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(1, found.Count());
         }
 
+        [Test]
+        public void Get_By_Property_Int_Value_Exact()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            memberType.AddPropertyType(new PropertyType(new Guid(), DataTypeDatabaseType.Integer)
+                {
+                    Alias = "number",
+                    Name = "Number",
+                    //NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                    DataTypeDefinitionId = -36
+                }, "Content");
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.SetValue("number", i));
+            ServiceContext.MemberService.Save(members);
+
+            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            customMember.SetValue("number", 2);
+            ServiceContext.MemberService.Save(customMember);
+
+            var found = ServiceContext.MemberService.GetMembersByPropertyValue(
+                "number", 2, ValuePropertyMatchType.Exact);
+
+            Assert.AreEqual(2, found.Count());
+        }
+
+        [Test]
+        public void Get_By_Property_Int_Value_Greater_Than()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            memberType.AddPropertyType(new PropertyType(new Guid(), DataTypeDatabaseType.Integer)
+            {
+                Alias = "number",
+                Name = "Number",
+                //NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                DataTypeDefinitionId = -36
+            }, "Content");
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.SetValue("number", i));
+            ServiceContext.MemberService.Save(members);
+
+            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            customMember.SetValue("number", 10);
+            ServiceContext.MemberService.Save(customMember);
+
+            var found = ServiceContext.MemberService.GetMembersByPropertyValue(
+                "number", 3, ValuePropertyMatchType.GreaterThan);
+
+            Assert.AreEqual(7, found.Count());
+        }
+
+        [Test]
+        public void Get_By_Property_Int_Value_Greater_Than_Equal_To()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            memberType.AddPropertyType(new PropertyType(new Guid(), DataTypeDatabaseType.Integer)
+            {
+                Alias = "number",
+                Name = "Number",
+                //NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                DataTypeDefinitionId = -36
+            }, "Content");
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.SetValue("number", i));
+            ServiceContext.MemberService.Save(members);
+
+            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            customMember.SetValue("number", 10);
+            ServiceContext.MemberService.Save(customMember);
+
+            var found = ServiceContext.MemberService.GetMembersByPropertyValue(
+                "number", 3, ValuePropertyMatchType.GreaterThanOrEqualTo);
+
+            Assert.AreEqual(8, found.Count());
+        }
+
+        [Test]
+        public void Get_By_Property_Int_Value_Less_Than()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            memberType.AddPropertyType(new PropertyType(new Guid(), DataTypeDatabaseType.Date)
+            {
+                Alias = "date",
+                Name = "Date",
+                //NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                DataTypeDefinitionId = -36
+            }, "Content");
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.SetValue("number", i));
+            ServiceContext.MemberService.Save(members);
+
+            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            customMember.SetValue("number", 1);
+            ServiceContext.MemberService.Save(customMember);
+
+            var found = ServiceContext.MemberService.GetMembersByPropertyValue(
+                "number", 5, ValuePropertyMatchType.LessThan);
+
+            Assert.AreEqual(6, found.Count());
+        }
+
+        [Test]
+        public void Get_By_Property_Int_Value_Less_Than_Or_Equal()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            memberType.AddPropertyType(new PropertyType(new Guid(), DataTypeDatabaseType.Integer)
+            {
+                Alias = "number",
+                Name = "Number",
+                //NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                DataTypeDefinitionId = -36
+            }, "Content");
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.SetValue("number", i));
+            ServiceContext.MemberService.Save(members);
+
+            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            customMember.SetValue("number", 1);
+            ServiceContext.MemberService.Save(customMember);
+
+            var found = ServiceContext.MemberService.GetMembersByPropertyValue(
+                "number", 5, ValuePropertyMatchType.LessThanOrEqualTo);
+
+            Assert.AreEqual(7, found.Count());
+        }
+
+        [Test]
+        public void Get_By_Property_Date_Value_Exact()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            memberType.AddPropertyType(new PropertyType(new Guid(), DataTypeDatabaseType.Integer)
+            {
+                Alias = "date",
+                Name = "Date",
+                //NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                DataTypeDefinitionId = -36
+            }, "Content");
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
+            ServiceContext.MemberService.Save(members);
+
+            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 2, 0));
+            ServiceContext.MemberService.Save(customMember);
+
+            var found = ServiceContext.MemberService.GetMembersByPropertyValue(
+                "date", new DateTime(2013, 12, 20, 1, 2, 0), ValuePropertyMatchType.Exact);
+
+            Assert.AreEqual(2, found.Count());
+        }
+
+        [Test]
+        public void Get_By_Property_Date_Value_Greater_Than()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            memberType.AddPropertyType(new PropertyType(new Guid(), DataTypeDatabaseType.Integer)
+            {
+                Alias = "date",
+                Name = "Date",
+                //NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                DataTypeDefinitionId = -36
+            }, "Content");
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
+            ServiceContext.MemberService.Save(members);
+
+            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 10, 0));
+            ServiceContext.MemberService.Save(customMember);
+
+            var found = ServiceContext.MemberService.GetMembersByPropertyValue(
+                "date", new DateTime(2013, 12, 20, 1, 3, 0), ValuePropertyMatchType.GreaterThan);
+
+            Assert.AreEqual(7, found.Count());
+        }
+
+        [Test]
+        public void Get_By_Property_Date_Value_Greater_Than_Equal_To()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            memberType.AddPropertyType(new PropertyType(new Guid(), DataTypeDatabaseType.Integer)
+            {
+                Alias = "date",
+                Name = "Date",
+                //NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                DataTypeDefinitionId = -36
+            }, "Content");
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
+            ServiceContext.MemberService.Save(members);
+
+            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 10, 0));
+            ServiceContext.MemberService.Save(customMember);
+
+            var found = ServiceContext.MemberService.GetMembersByPropertyValue(
+                "date", new DateTime(2013, 12, 20, 1, 3, 0), ValuePropertyMatchType.GreaterThanOrEqualTo);
+
+            Assert.AreEqual(8, found.Count());
+        }
+
+        [Test]
+        public void Get_By_Property_Date_Value_Less_Than()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            memberType.AddPropertyType(new PropertyType(new Guid(), DataTypeDatabaseType.Integer)
+            {
+                Alias = "date",
+                Name = "Date",
+                //NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                DataTypeDefinitionId = -36
+            }, "Content");
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
+            ServiceContext.MemberService.Save(members);
+
+            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 1, 0));
+            ServiceContext.MemberService.Save(customMember);
+
+            var found = ServiceContext.MemberService.GetMembersByPropertyValue(
+                "date", new DateTime(2013, 12, 20, 1, 5, 0), ValuePropertyMatchType.LessThan);
+
+            Assert.AreEqual(6, found.Count());            
+        }
+
+        [Test]
+        public void Get_By_Property_Date_Value_Less_Than_Or_Equal()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            memberType.AddPropertyType(new PropertyType(new Guid(), DataTypeDatabaseType.Integer)
+            {
+                Alias = "date",
+                Name = "Date",
+                //NOTE: This is what really determines the db type - the above definition doesn't really do anything
+                DataTypeDefinitionId = -36
+            }, "Content");
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.SetValue("date", new DateTime(2013, 12, 20, 1, i, 0)));
+            ServiceContext.MemberService.Save(members);
+
+            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            customMember.SetValue("date", new DateTime(2013, 12, 20, 1, 1, 0));
+            ServiceContext.MemberService.Save(customMember);
+
+            var found = ServiceContext.MemberService.GetMembersByPropertyValue(
+                "date", new DateTime(2013, 12, 20, 1, 5, 0), ValuePropertyMatchType.LessThanOrEqualTo);
+
+            Assert.AreEqual(7, found.Count());
+        }
 
     }
 }
