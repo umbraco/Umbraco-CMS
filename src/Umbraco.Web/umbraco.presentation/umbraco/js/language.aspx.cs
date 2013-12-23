@@ -22,8 +22,7 @@ namespace umbraco.js
 				return;
 
             StringBuilder sb = new StringBuilder();
-
-			sb.Append("{");
+            
 			foreach(XmlNode x in all.DocumentElement.ChildNodes)
 			{
 				if(x == null)
@@ -50,16 +49,10 @@ namespace umbraco.js
 
                     sb.Append("\"" + _tempKey + "\": \"" + tmpStr + "\",");
 
-                    
-
                 }
-
-				
 			}
-            sb.Remove(sb.Length - 1, 1);
-            sb.Append("}");
-            
-            Response.Write(sb.ToString());
+            var f = "{" + sb.ToString().Trim().Trim(',').Trim() + "}";          
+            Response.Write(f);
 		}
 
 		#region Web Form Designer generated code

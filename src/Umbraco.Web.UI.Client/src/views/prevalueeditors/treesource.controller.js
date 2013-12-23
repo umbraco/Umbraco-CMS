@@ -5,20 +5,13 @@ angular.module('umbraco')
 	
 	function($scope, dialogService, entityResource, $log, iconHelper){
 
-		if(angular.isObject($scope.model.value)){
-			$scope.model.type = $scope.model.value.type;
-			$scope.model.id = $scope.model.value.id;
-		}else{
-			$scope.model.type = "content";
-		}		
-
-		if($scope.model.id && $scope.model.type !== "member"){
+		if($scope.model.value.id && $scope.model.value.type !== "member"){
 			var ent = "Document";
-			if($scope.model.type === "media"){
+			if($scope.model.value.type === "media"){
 				ent = "Media";
 			}
 			
-			entityResource.getById($scope.model.id, ent).then(function(item){
+			entityResource.getById($scope.model.value.id, ent).then(function(item){
 				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
 				$scope.node = item;
 			});
@@ -27,30 +20,29 @@ angular.module('umbraco')
 
 		$scope.openContentPicker =function(){
 			var d = dialogService.treePicker({
-								section: $scope.model.type,
-								treeAlias: $scope.model.type,
+								section: $scope.model.value.type,
+								treeAlias: $scope.model.value.type,
 								scope: $scope, 
 								multiPicker: false,
 								callback: populate});
 		};
 
 		$scope.clear = function() {
-		    $scope.model.id = undefined;
+		    $scope.model.value.id = undefined;
 		    $scope.node = undefined;
 		};
 		
 	    $scope.$on("formSubmitting", function (ev, args) {
-	    	if($scope.model.type === "member"){
-	    		$scope.model.id = -1;
+	    	if($scope.model.value.type === "member"){
+	    		$scope.model.value.id = -1;
+	    		$scope.model.value.query = "";
 	    	}
-
-			$scope.model.value = {type: $scope.model.type, id: $scope.model.id};
 	    });
 
 		function populate(item){
 				$scope.clear();
 				item.icon = iconHelper.convertFromLegacyIcon(item.icon);
 				$scope.node = item;
-				$scope.model.id = item.id;
+				$scope.model.value.id = item.id;
 		}
 });
