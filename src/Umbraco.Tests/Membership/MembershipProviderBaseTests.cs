@@ -7,8 +7,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Security;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core;
+using Umbraco.Core.Models;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web.Security.Providers;
 
 namespace Umbraco.Tests.Membership
@@ -20,31 +25,243 @@ namespace Umbraco.Tests.Membership
         //public void Set_Default_Member_Type_On_Init()
 
         //[Test]
-        //public void Question_Answer_Is_Encrypted()
+        //public void Create_User_Already_Exists()
+        //{
+
+        //}
+
+        //[Test]
+        //public void Create_User_Requires_Unique_Email()
+        //{
+
+        //}
+
+        [Test]
+        public void Answer_Is_Encrypted()
+        {
+            IMember createdMember = null;
+            var memberType = MockedContentTypes.CreateSimpleMemberType();
+            foreach (var p in Constants.Conventions.Member.GetStandardPropertyTypeStubs())
+            {
+                memberType.AddPropertyType(p.Value);
+            }
+            var mServiceMock = new Mock<IMemberService>();
+            mServiceMock.Setup(service => service.Exists("test")).Returns(false);
+            mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
+            mServiceMock.Setup(
+                service => service.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                        .Callback((string u, string e, string p, string m) =>
+                            {
+                                createdMember = new Member("test", e, u, p, memberType);
+                            })
+                        .Returns(() => createdMember);
+            var provider = new MembersMembershipProvider(mServiceMock.Object);
+
+            MembershipCreateStatus status;
+            provider.CreateUser("test", "test", "test", "test@test.com", "test", "test", true, "test", out status);
+
+            Assert.AreNotEqual("test", createdMember.PasswordAnswer);
+            Assert.AreEqual(provider.EncryptString("test"), createdMember.PasswordAnswer);
+        }
+
+        [Test]
+        public void Password_Encrypted_With_Salt()
+        {
+            IMember createdMember = null;
+            var memberType = MockedContentTypes.CreateSimpleMemberType();
+            foreach (var p in Constants.Conventions.Member.GetStandardPropertyTypeStubs())
+            {
+                memberType.AddPropertyType(p.Value);
+            }
+            var mServiceMock = new Mock<IMemberService>();
+            mServiceMock.Setup(service => service.Exists("test")).Returns(false);
+            mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
+            mServiceMock.Setup(
+                service => service.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+                        .Callback((string u, string e, string p, string m) =>
+                        {
+                            createdMember = new Member("test", e, u, p, memberType);
+                        })
+                        .Returns(() => createdMember);
+
+            var provider = new MembersMembershipProvider(mServiceMock.Object);
+            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Encrypted" } });
+            MembershipCreateStatus status;
+            provider.CreateUser("test", "test", "test", "test@test.com", "test", "test", true, "test", out status);
+
+            Assert.AreNotEqual("test", createdMember.Password);
+            //Assert.AreNotEqual(provider.EncryptString("test"), createdMember.PasswordAnswer);
+            string salt;
+            var encodedPassword = provider.EncryptOrHashNewPassword("test", out salt);
+            Assert.AreEqual(encodedPassword, createdMember.Password);
+        }
+
+        //[Test]
+        //public void Password_Hashed_With_Salt()
+        //{
+        //    IMember createdMember = null;
+        //    var memberType = MockedContentTypes.CreateSimpleMemberType();
+        //    foreach (var p in Constants.Conventions.Member.GetStandardPropertyTypeStubs())
+        //    {
+        //        memberType.AddPropertyType(p.Value);
+        //    }
+        //    var mServiceMock = new Mock<IMemberService>();
+        //    mServiceMock.Setup(service => service.Exists("test")).Returns(false);
+        //    mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
+        //    mServiceMock.Setup(
+        //        service => service.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
+        //                .Callback((string u, string e, string p, string m) =>
+        //                {
+        //                    createdMember = new Member("test", e, u, p, memberType);
+        //                })
+        //                .Returns(() => createdMember);
+
+        //    var provider = new MembersMembershipProvider(mServiceMock.Object);
+        //    provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" } });
+        //    MembershipCreateStatus status;
+        //    provider.CreateUser("test", "test", "test", "test@test.com", "test", "test", true, "test", out status);
+
+        //    Assert.AreNotEqual("test", createdMember.Password);
+        //    Assert.AreNotEqual(provider.EncryptString("test"), createdMember.PasswordAnswer);
+        //    string salt;
+        //    var encodedPassword = provider.EncryptOrHashNewPassword("test", out salt);
+        //    Assert.AreEqual(encodedPassword, createdMember.Password);
+        //}
+        
+        //[Test]
+        //public void Password_Encrypted_Validated_With_Salt()
+
+        //[Test]
+        //public void Password_Encrypted_Validated_With_Salt()
+
     }
 
     [TestFixture]
     public class MembershipProviderBaseTests
     {
-        //[Test]
-        //public void Change_Password_Base_Validation()
         
-        //[Test]
-        //public void ChangePasswordQuestionAndAnswer_Base_Validation()
 
-        //[Test]
-        //public void CreateUser_Base_Validation()
+        [Test]
+        public void Change_Password_Without_AllowManuallyChangingPassword_And_No_Pass_Validation()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };         
+            providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
+            var provider = providerMock.Object;
 
-        //[Test]
-        //public void GetPassword_Base_Validation()
+            Assert.Throws<NotSupportedException>(() => provider.ChangePassword("test", "", "test"));
+        }
 
-        //[Test]
-        //public void ResetPassword_Base_Validation()
+        [Test]
+        public void Change_Password_With_AllowManuallyChangingPassword_And_Invalid_Creds()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };         
+            providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
+            providerMock.Setup(@base => @base.ValidateUser("test", "test")).Returns(false);
+            var provider = providerMock.Object;
+
+            Assert.IsFalse(provider.ChangePassword("test", "test", "test"));
+
+        }
+        
+        [Test]
+        public void ChangePasswordQuestionAndAnswer_Without_RequiresQuestionAndAnswer()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            providerMock.Setup(@base => @base.RequiresQuestionAndAnswer).Returns(false);
+            var provider = providerMock.Object;
+
+            Assert.Throws<NotSupportedException>(() => provider.ChangePasswordQuestionAndAnswer("test", "test", "test", "test"));
+        }
+
+        [Test]
+        public void ChangePasswordQuestionAndAnswer_Without_AllowManuallyChangingPassword_And_Invalid_Creds()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            providerMock.Setup(@base => @base.RequiresQuestionAndAnswer).Returns(true);
+            providerMock.Setup(@base => @base.AllowManuallyChangingPassword).Returns(false);
+            providerMock.Setup(@base => @base.ValidateUser("test", "test")).Returns(false);
+            var provider = providerMock.Object;
+
+            Assert.IsFalse(provider.ChangePasswordQuestionAndAnswer("test", "test", "test", "test"));
+        }
+
+        [Test]
+        public void CreateUser_Not_Whitespace()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() {CallBase = true};
+            var provider = providerMock.Object;
+
+            MembershipCreateStatus status;
+            var result = provider.CreateUser("", "", "test@test.com", "", "", true, "", out status);
+
+            Assert.IsNull(result);
+            Assert.AreEqual(MembershipCreateStatus.InvalidUserName, status);
+        }
+
+        [Test]
+        public void CreateUser_Invalid_Question()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            providerMock.Setup(@base => @base.RequiresQuestionAndAnswer).Returns(true);
+            var provider = providerMock.Object;
+
+            MembershipCreateStatus status;
+            var result = provider.CreateUser("test", "test", "test@test.com", "", "", true, "", out status);
+
+            Assert.IsNull(result);
+            Assert.AreEqual(MembershipCreateStatus.InvalidQuestion, status);
+        }
+
+        [Test]
+        public void CreateUser_Invalid_Answer()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            providerMock.Setup(@base => @base.RequiresQuestionAndAnswer).Returns(true);
+            var provider = providerMock.Object;
+
+            MembershipCreateStatus status;
+            var result = provider.CreateUser("test", "test", "test@test.com", "test", "", true, "", out status);
+
+            Assert.IsNull(result);
+            Assert.AreEqual(MembershipCreateStatus.InvalidAnswer, status);
+        }
+
+        [Test]
+        public void GetPassword_Without_EnablePasswordRetrieval()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            providerMock.Setup(@base => @base.EnablePasswordRetrieval).Returns(false);
+            var provider = providerMock.Object;
+
+            Assert.Throws<ProviderException>(() => provider.GetPassword("test", "test"));
+        }
+
+        [Test]
+        public void GetPassword_With_Hashed()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            providerMock.Setup(@base => @base.EnablePasswordRetrieval).Returns(true);
+            providerMock.Setup(@base => @base.PasswordFormat).Returns(MembershipPasswordFormat.Hashed);
+            var provider = providerMock.Object;
+
+            Assert.Throws<ProviderException>(() => provider.GetPassword("test", "test"));
+        }
+
+        [Test]
+        public void ResetPassword_Without_EnablePasswordReset()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            providerMock.Setup(@base => @base.EnablePasswordReset).Returns(false);
+            var provider = providerMock.Object;
+
+            Assert.Throws<NotSupportedException>(() => provider.ResetPassword("test", "test"));
+        }
 
         [Test]
         public void Sets_Defaults()
         {
-            var provider = new TestProvider();
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };                  
+            var provider = providerMock.Object;
             provider.Initialize("test", new NameValueCollection());
 
             Assert.AreEqual("test", provider.Name);
@@ -65,7 +282,8 @@ namespace Umbraco.Tests.Membership
         [Test]
         public void Throws_Exception_With_Hashed_Password_And_Password_Retrieval()
         {
-            var provider = new TestProvider();
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };         
+            var provider = providerMock.Object;
 
             Assert.Throws<ProviderException>(() => provider.Initialize("test", new NameValueCollection()
                 {
@@ -123,89 +341,6 @@ namespace Umbraco.Tests.Membership
             var result = MembershipProviderBase.StoredPassword(stored, MembershipPasswordFormat.Hashed, out initSalt);
 
             Assert.AreEqual(salt, initSalt);
-        }
-
-        private class TestProvider : MembershipProviderBase
-        {
-            public override void UpdateUser(MembershipUser user)
-            {
-                throw new NotImplementedException();
-            }
-
-            public override bool ValidateUser(string username, string password)
-            {
-                throw new NotImplementedException();
-            }
-
-            public override bool UnlockUser(string userName)
-            {
-                throw new NotImplementedException();
-            }
-
-            public override MembershipUser GetUser(object providerUserKey, bool userIsOnline)
-            {
-                throw new NotImplementedException();
-            }
-
-            public override MembershipUser GetUser(string username, bool userIsOnline)
-            {
-                throw new NotImplementedException();
-            }
-
-            public override string GetUserNameByEmail(string email)
-            {
-                throw new NotImplementedException();
-            }
-
-            public override bool DeleteUser(string username, bool deleteAllRelatedData)
-            {
-                throw new NotImplementedException();
-            }
-
-            public override MembershipUserCollection GetAllUsers(int pageIndex, int pageSize, out int totalRecords)
-            {
-                throw new NotImplementedException();
-            }
-
-            public override int GetNumberOfUsersOnline()
-            {
-                throw new NotImplementedException();
-            }
-
-            public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords)
-            {
-                throw new NotImplementedException();
-            }
-
-            public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override bool PerformChangePassword(string username, string oldPassword, string newPassword)
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override bool PerformChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer)
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override MembershipUser PerformCreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override string PerformGetPassword(string username, string answer)
-            {
-                throw new NotImplementedException();
-            }
-
-            protected override string PerformResetPassword(string username, string answer, string generatedPassword)
-            {
-                throw new NotImplementedException();
-            }
         }
 
     }

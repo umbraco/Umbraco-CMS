@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Security;
 using Umbraco.Core;
@@ -28,6 +29,15 @@ namespace Umbraco.Web.Security.Providers
         protected IMembershipMemberService MemberService
         {
             get { return _memberService ?? (_memberService = ApplicationContext.Current.Services.MemberService); }
+        }
+
+        public MembersMembershipProvider()
+        {            
+        }
+
+        internal MembersMembershipProvider(IMemberService memberService)
+        {
+            _memberService = memberService;
         }
 
         public string ProviderName 
@@ -80,7 +90,7 @@ namespace Umbraco.Web.Security.Providers
             // This is allowed based on the overridden AllowManuallyChangingPassword option.
 
             // in order to support updating passwords from the umbraco core, we can't validate the old password
-            var m = _memberService.GetByUsername(username);
+            var m = MemberService.GetByUsername(username);
             if (m == null) return false;
             
             string salt;
@@ -88,8 +98,8 @@ namespace Umbraco.Web.Security.Providers
 
             m.Password = FormatPasswordForStorage(encodedPassword, salt);
             m.LastPasswordChangeDate = DateTime.Now;
-            
-            _memberService.Save(m);
+
+            MemberService.Save(m);
 
             return true;
         }
@@ -113,7 +123,7 @@ namespace Umbraco.Web.Security.Providers
             }
 
             member.PasswordQuestion = newPasswordQuestion;
-            member.PasswordAnswer = newPasswordAnswer;
+            member.PasswordAnswer = EncryptString(newPasswordAnswer);
 
             MemberService.Save(member);
 
@@ -158,10 +168,14 @@ namespace Umbraco.Web.Security.Providers
             string salt;
             var encodedPassword = EncryptOrHashNewPassword(password, out salt);
 
-            var member = MemberService.CreateMember(email, username, encodedPassword, memberTypeAlias);
+            var member = MemberService.CreateMember(
+                email, 
+                username,
+                FormatPasswordForStorage(encodedPassword, salt), 
+                memberTypeAlias);
             
             member.PasswordQuestion = passwordQuestion;
-            member.PasswordAnswer = passwordAnswer;
+            member.PasswordAnswer = EncryptString(passwordAnswer);
             member.IsApproved = isApproved;
             member.LastLoginDate = DateTime.Now;
             member.LastPasswordChangeDate = DateTime.Now;
@@ -289,9 +303,9 @@ namespace Umbraco.Web.Security.Providers
                 throw new ProviderException("The supplied user is not found");
             }
 
-            //TODO: We need to encrypt the answer here to match against the encrypted answer in the database
+            var encAnswer = EncryptString(answer);
 
-            if (RequiresQuestionAndAnswer && m.PasswordAnswer != answer)
+            if (RequiresQuestionAndAnswer && m.PasswordAnswer != encAnswer)
             {
                 throw new ProviderException("Incorrect password answer");
             }
@@ -299,6 +313,15 @@ namespace Umbraco.Web.Security.Providers
             var decodedPassword = DecodePassword(m.Password);
 
             return decodedPassword;
+        }
+
+        internal string EncryptString(string str)
+        {
+            var bytes = Encoding.Unicode.GetBytes(str);
+            var password = new byte[bytes.Length];
+            Buffer.BlockCopy(bytes, 0, password, 0, bytes.Length);
+            var encBytes = EncryptPassword(password, MembershipPasswordCompatibilityMode.Framework40);
+            return Convert.ToBase64String(encBytes);
         }
 
         /// <summary>
@@ -395,16 +418,16 @@ namespace Umbraco.Web.Security.Providers
                 throw new ProviderException("The member is locked out.");
             }
 
-            //TODO: We need to encrypt the answer here to match against the encrypted answer in the database
+            var encAnswer = EncryptString(answer);
 
-            if (RequiresQuestionAndAnswer && m.PasswordAnswer != answer)
+            if (RequiresQuestionAndAnswer && m.PasswordAnswer != encAnswer)
             {
                 throw new ProviderException("Incorrect password answer");
             }
 
             string salt;
             var encodedPassword = EncryptOrHashNewPassword(generatedPassword, out salt);
-            m.Password = encodedPassword;
+            m.Password = FormatPasswordForStorage(encodedPassword, salt);
             m.LastPasswordChangeDate = DateTime.Now;
             MemberService.Save(m);
             
