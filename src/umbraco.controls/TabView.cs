@@ -98,7 +98,7 @@ namespace umbraco.uicontrols {
 	            string TabId = this.ClientID + "_tab0" + (i + 1);
 	            writer.WriteLine("          <li id='" + TabId + "' class='tabOff'>");
 	            writer.WriteLine("              <a id='" + TabId + "a' href='#' onclick=\"setActiveTab('" + this.ClientID + "','" + TabId + "'," + this.ClientID + "_tabs); return false;\">");
-	            writer.WriteLine("                  <span><nobr>" + TabPageCaption + "</nobr></span>");
+	            writer.WriteLine("                  <span><nobr>" + HttpUtility.HtmlEncode(TabPageCaption) + "</nobr></span>");
 	            writer.WriteLine("              </a>");
 	            writer.WriteLine("          </li>");
 	        }
@@ -107,9 +107,9 @@ namespace umbraco.uicontrols {
 	        writer.WriteLine("  <div id='' class='tabpagecontainer'>");
 	        this.RenderChildren(writer);
 	        writer.WriteLine("\t</div>");
-	        writer.WriteLine("\t<div class='footer'><div class='status'><h2>" + this._status + "</h2></div></div>");
+	        writer.WriteLine("\t<div class='footer'><div class='status'><h2>" + HttpUtility.HtmlEncode(this._status) + "</h2></div></div>");
 	        writer.WriteLine("</div>");
-	        writer.WriteLine("<input type='hidden' name='" + this.ClientID + "_activetab' id='" + this.ClientID + "_activetab' value='" + this.ActiveTabId + "'/>");
+            writer.WriteLine("<input type=\"hidden\" name=\"" + this.ClientID + "_activetab\" id=\"" + this.ClientID + "_activetab\" value=\"" + HttpUtility.HtmlAttributeEncode(this.ActiveTabId) + "\"/>");
 	    }
 	}
 }
