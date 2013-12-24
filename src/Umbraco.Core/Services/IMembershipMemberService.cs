@@ -10,7 +10,7 @@ namespace Umbraco.Core.Services
     /// <remarks>
     /// Idea is to have this is an isolated interface so that it can be easily 'replaced' in the membership provider impl.
     /// </remarks>
-    internal interface IMembershipMemberService : IService
+    public interface IMembershipMemberService : IService
     {
         /// <summary>
         /// Checks if a member with the username exists
