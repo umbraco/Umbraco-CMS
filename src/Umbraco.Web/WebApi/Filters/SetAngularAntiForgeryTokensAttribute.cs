@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web.Helpers;
@@ -16,11 +17,19 @@ namespace Umbraco.Web.WebApi.Filters
         {
             if (context.Response == null) return;
 
-            //don't need to set the cookie if they already exist
+            //DO not set the token cookies if the request has failed!!
+            if (context.Response.StatusCode != HttpStatusCode.OK) return;
+
+            //don't need to set the cookie if they already exist and they are valid
             if (context.Request.Headers.GetCookies(AngularAntiForgeryHelper.AngularCookieName).Any()
                 && context.Request.Headers.GetCookies(AngularAntiForgeryHelper.CsrfValidationCookieName).Any())
             {
-                return;
+                //if they are not valid for some strange reason - we need to continue setting valid ones
+                string failedReason;
+                if (AngularAntiForgeryHelper.ValidateHeaders(context.Request.Headers, out failedReason))
+                {                    
+                    return;
+                }
             }
 
             string cookieToken, headerToken;
