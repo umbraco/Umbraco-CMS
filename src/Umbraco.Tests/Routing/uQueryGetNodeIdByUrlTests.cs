@@ -1,5 +1,6 @@
 ﻿using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web.Routing;
@@ -11,6 +12,9 @@ namespace Umbraco.Tests.Routing
 	[TestFixture]
 	public class uQueryGetNodeIdByUrlTests : BaseRoutingTest
 	{
+
+        private IUmbracoSettingsSection _umbracoSettings;
+
 		public override void Initialize()
 		{
 			base.Initialize();
@@ -36,6 +40,10 @@ namespace Umbraco.Tests.Routing
 			////assign the routing context back to the umbraco context
 			//umbracoContext.RoutingContext = routingContext;
 			Umbraco.Web.UmbracoContext.Current = routingContext.UmbracoContext;
+
+            //generate new mock settings and assign so we can configure in individual tests
+            _umbracoSettings = SettingsForTests.GenerateMockSettings();
+            SettingsForTests.ConfigureSettings(_umbracoSettings);
 		}
 
         public override void TearDown()
@@ -57,9 +65,10 @@ namespace Umbraco.Tests.Routing
 		{
 		    SettingsForTests.UseDirectoryUrls = true;
 		    SettingsForTests.HideTopLevelNodeFromPath = false;
-            var requestMock = Mock.Get(UmbracoSettings.RequestHandler);
-            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
+            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
+            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
+		    
 			Assert.AreEqual(nodeId, global::umbraco.uQuery.GetNodeIdByUrl("http://example.com" + url));
 		}
 
@@ -76,9 +85,10 @@ namespace Umbraco.Tests.Routing
 		{
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false;
-            var requestMock = Mock.Get(UmbracoSettings.RequestHandler);
-            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
+            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
+            requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
+            
 			Assert.AreEqual(nodeId, global::umbraco.uQuery.GetNodeIdByUrl(url));
 		}
 	}

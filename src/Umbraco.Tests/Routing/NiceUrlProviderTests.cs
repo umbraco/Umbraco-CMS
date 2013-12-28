@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using Umbraco.Web.Routing;
@@ -18,6 +19,17 @@ namespace Umbraco.Tests.Routing
             base.FreezeResolution();
         }
 
+	    private IUmbracoSettingsSection _umbracoSettings;
+
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            //generate new mock settings and assign so we can configure in individual tests
+            _umbracoSettings = SettingsForTests.GenerateMockSettings();
+            SettingsForTests.ConfigureSettings(_umbracoSettings);
+        }
+
 		/// <summary>
 		/// This checks that when we retreive a NiceUrl for multiple items that there are no issues with cache overlap 
 		/// and that they are all cached correctly.
@@ -29,7 +41,7 @@ namespace Umbraco.Tests.Routing
 		    SettingsForTests.UseDirectoryUrls = true;
 		    SettingsForTests.HideTopLevelNodeFromPath = false;
 
-		    var requestHandlerMock = Mock.Get(UmbracoSettings.RequestHandler);
+            var requestHandlerMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestHandlerMock.Setup(x => x.AddTrailingSlash).Returns(false);// (cached routes have none)
 
 			var samples = new Dictionary<int, string> {
@@ -93,7 +105,7 @@ namespace Umbraco.Tests.Routing
 
 		    SettingsForTests.UseDirectoryUrls = true;
 		    SettingsForTests.HideTopLevelNodeFromPath = false;
-		    var requestMock = Mock.Get(UmbracoSettings.RequestHandler);
+            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
 			var result = routingContext.UrlProvider.GetUrl(nodeId);
@@ -117,7 +129,7 @@ namespace Umbraco.Tests.Routing
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = true;
-            var requestMock = Mock.Get(UmbracoSettings.RequestHandler);
+            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
 			var result = routingContext.UrlProvider.GetUrl(nodeId);
@@ -131,7 +143,7 @@ namespace Umbraco.Tests.Routing
 
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false;
-            var requestMock = Mock.Get(UmbracoSettings.RequestHandler);
+            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
 			Assert.AreEqual("/home/sub1/custom-sub-1/", routingContext.UrlProvider.GetUrl(1177));
@@ -153,7 +165,7 @@ namespace Umbraco.Tests.Routing
             SettingsForTests.HideTopLevelNodeFromPath = false;
 
             //mock the Umbraco settings that we need
-            var requestMock = Mock.Get(UmbracoSettings.RequestHandler);
+            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(false);
 
 			Assert.AreEqual("#", routingContext.UrlProvider.GetUrl(999999));

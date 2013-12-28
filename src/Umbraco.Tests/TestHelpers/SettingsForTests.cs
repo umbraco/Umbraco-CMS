@@ -25,7 +25,7 @@ namespace Umbraco.Tests.TestHelpers
         /// Returns generated settings which can be stubbed to return whatever values necessary
         /// </summary>
         /// <returns></returns>
-        public static IUmbracoSettingsSection GetMockSettings()
+        public static IUmbracoSettingsSection GenerateMockSettings()
         {
             var settings = new Mock<IUmbracoSettingsSection>();
 
@@ -157,14 +157,20 @@ namespace Umbraco.Tests.TestHelpers
             ConfigureSettings(GetDefault());
         }
 
+        private static IUmbracoSettingsSection _defaultSettings;
+
         internal static IUmbracoSettingsSection GetDefault()
         {
-            var config = new FileInfo(TestHelper.MapPathForTest("~/Configurations/UmbracoSettings/web.config"));
+            if (_defaultSettings == null)
+            {
+                var config = new FileInfo(TestHelper.MapPathForTest("~/Configurations/UmbracoSettings/web.config"));
 
-            var fileMap = new ExeConfigurationFileMap() { ExeConfigFilename = config.FullName };
-            var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
+                var fileMap = new ExeConfigurationFileMap() { ExeConfigFilename = config.FullName };
+                var configuration = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
+                _defaultSettings = configuration.GetSection("umbracoConfiguration/defaultSettings") as UmbracoSettingsSection;
+            }
 
-            return configuration.GetSection("umbracoConfiguration/defaultSettings") as UmbracoSettingsSection;
+            return _defaultSettings;
         }
     }
 }

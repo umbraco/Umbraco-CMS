@@ -85,7 +85,7 @@ namespace Umbraco.Tests
 		{
 			ConfigurationManager.AppSettings.Set("umbracoUseDirectoryUrls", directoryUrls ? "true" : "false");
 
-		    var settings = SettingsForTests.GetMockSettings();
+            var settings = SettingsForTests.GenerateMockSettings();
             var requestMock = Mock.Get(settings.RequestHandler);
             requestMock.Setup(x => x.AddTrailingSlash).Returns(trailingSlash);
             SettingsForTests.ConfigureSettings(settings);
