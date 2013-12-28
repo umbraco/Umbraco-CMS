@@ -2,7 +2,7 @@ param($rootPath, $toolsPath, $package, $project)
 
 if ($project) {	
 	# Create a backup of extisting umbraco config files
-	$configPath = Join-Path (Split-Path $project.FullName -Parent) "\config"
+	$configPath = Join-Path ($project.Properties.Item("FullPath").Value) "\config"
     $backupPath = Join-Path $configPath "\backup"
 	Get-ChildItem -path $configPath |
 	   Where -filterscript {($_.Name.EndsWith("config"))} | Foreach-Object {
@@ -12,13 +12,13 @@ if ($project) {
 	   }
 		
 	# Create a backup of original web.config
-	$projectDestinationPath = Split-Path $project.FullName -Parent
+	$projectDestinationPath = $project.Properties.Item("FullPath").Value
 	$webConfigSource = Join-Path $projectDestinationPath "web.config"
 	$webConfigDestination = Join-Path $projectDestinationPath "web.config.backup"
 	Copy-Item $webConfigSource $webConfigDestination
 	
 	# Copy umbraco files from package to project folder
-	$projectDestinationPath = Split-Path $project.FullName -Parent
+	$projectDestinationPath = $project.Properties.Item("FullPath").Value
 	$umbracoFilesPath = Join-Path $rootPath "UmbracoFiles\*"
 	Copy-Item $umbracoFilesPath $projectDestinationPath -recurse -force
 	
