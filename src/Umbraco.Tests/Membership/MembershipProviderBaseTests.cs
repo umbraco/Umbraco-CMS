@@ -4,138 +4,16 @@ using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Security;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Models;
 using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Web.Security.Providers;
 
 namespace Umbraco.Tests.Membership
 {
-    [TestFixture]
-    public class MembersMembershipProviderTests
-    {
-        //[Test]
-        //public void Set_Default_Member_Type_On_Init()
-
-        //[Test]
-        //public void Create_User_Already_Exists()
-        //{
-
-        //}
-
-        //[Test]
-        //public void Create_User_Requires_Unique_Email()
-        //{
-
-        //}
-
-        [Test]
-        public void Answer_Is_Encrypted()
-        {
-            IMember createdMember = null;
-            var memberType = MockedContentTypes.CreateSimpleMemberType();
-            foreach (var p in Constants.Conventions.Member.GetStandardPropertyTypeStubs())
-            {
-                memberType.AddPropertyType(p.Value);
-            }
-            var mServiceMock = new Mock<IMemberService>();
-            mServiceMock.Setup(service => service.Exists("test")).Returns(false);
-            mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
-            mServiceMock.Setup(
-                service => service.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                        .Callback((string u, string e, string p, string m) =>
-                            {
-                                createdMember = new Member("test", e, u, p, memberType);
-                            })
-                        .Returns(() => createdMember);
-            var provider = new MembersMembershipProvider(mServiceMock.Object);
-
-            MembershipCreateStatus status;
-            provider.CreateUser("test", "test", "test", "test@test.com", "test", "test", true, "test", out status);
-
-            Assert.AreNotEqual("test", createdMember.PasswordAnswer);
-            Assert.AreEqual(provider.EncryptString("test"), createdMember.PasswordAnswer);
-        }
-
-        [Test]
-        public void Password_Encrypted_With_Salt()
-        {
-            IMember createdMember = null;
-            var memberType = MockedContentTypes.CreateSimpleMemberType();
-            foreach (var p in Constants.Conventions.Member.GetStandardPropertyTypeStubs())
-            {
-                memberType.AddPropertyType(p.Value);
-            }
-            var mServiceMock = new Mock<IMemberService>();
-            mServiceMock.Setup(service => service.Exists("test")).Returns(false);
-            mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
-            mServiceMock.Setup(
-                service => service.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                        .Callback((string u, string e, string p, string m) =>
-                        {
-                            createdMember = new Member("test", e, u, p, memberType);
-                        })
-                        .Returns(() => createdMember);
-
-            var provider = new MembersMembershipProvider(mServiceMock.Object);
-            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Encrypted" } });
-            MembershipCreateStatus status;
-            provider.CreateUser("test", "test", "test", "test@test.com", "test", "test", true, "test", out status);
-
-            Assert.AreNotEqual("test", createdMember.Password);
-            //Assert.AreNotEqual(provider.EncryptString("test"), createdMember.PasswordAnswer);
-            string salt;
-            var encodedPassword = provider.EncryptOrHashNewPassword("test", out salt);
-            Assert.AreEqual(encodedPassword, createdMember.Password);
-        }
-
-        //[Test]
-        //public void Password_Hashed_With_Salt()
-        //{
-        //    IMember createdMember = null;
-        //    var memberType = MockedContentTypes.CreateSimpleMemberType();
-        //    foreach (var p in Constants.Conventions.Member.GetStandardPropertyTypeStubs())
-        //    {
-        //        memberType.AddPropertyType(p.Value);
-        //    }
-        //    var mServiceMock = new Mock<IMemberService>();
-        //    mServiceMock.Setup(service => service.Exists("test")).Returns(false);
-        //    mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
-        //    mServiceMock.Setup(
-        //        service => service.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-        //                .Callback((string u, string e, string p, string m) =>
-        //                {
-        //                    createdMember = new Member("test", e, u, p, memberType);
-        //                })
-        //                .Returns(() => createdMember);
-
-        //    var provider = new MembersMembershipProvider(mServiceMock.Object);
-        //    provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" } });
-        //    MembershipCreateStatus status;
-        //    provider.CreateUser("test", "test", "test", "test@test.com", "test", "test", true, "test", out status);
-
-        //    Assert.AreNotEqual("test", createdMember.Password);
-        //    Assert.AreNotEqual(provider.EncryptString("test"), createdMember.PasswordAnswer);
-        //    string salt;
-        //    var encodedPassword = provider.EncryptOrHashNewPassword("test", out salt);
-        //    Assert.AreEqual(encodedPassword, createdMember.Password);
-        //}
-        
-        //[Test]
-        //public void Password_Encrypted_Validated_With_Salt()
-
-        //[Test]
-        //public void Password_Encrypted_Validated_With_Salt()
-
-    }
-
     [TestFixture]
     public class MembershipProviderBaseTests
     {
@@ -330,18 +208,204 @@ namespace Umbraco.Tests.Membership
                 lastLength = result.Length;                
             }
         }
-
+        
         [Test]
-        public void Get_StoredPassword()
+        public void Get_Stored_Password_Hashed()
         {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            var provider = providerMock.Object;
+            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" }, { "hashAlgorithmType", "HMACSHA256" } });
+
             var salt = MembershipProviderBase.GenerateSalt();
             var stored = salt + "ThisIsAHashedPassword";
 
             string initSalt;
-            var result = MembershipProviderBase.StoredPassword(stored, MembershipPasswordFormat.Hashed, out initSalt);
+            var result = provider.StoredPassword(stored, out initSalt);
 
-            Assert.AreEqual(salt, initSalt);
+            Assert.AreEqual("ThisIsAHashedPassword", result);
         }
+
+        [Test]
+        public void Get_Stored_Password_Encrypted()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            var provider = providerMock.Object;
+            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Encrypted" } });
+
+            var stored = "ThisIsAnEncryptedPassword";
+
+            string initSalt;
+            var result = provider.StoredPassword(stored, out initSalt);
+
+            Assert.AreEqual("ThisIsAnEncryptedPassword", result);
+        }
+
+        [Test]
+        public void Get_Stored_Password_Clear()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            var provider = providerMock.Object;
+            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Clear" } });
+
+            var salt = MembershipProviderBase.GenerateSalt();
+            var stored = "ThisIsAClearPassword";
+
+            string initSalt;
+            var result = provider.StoredPassword(stored, out initSalt);
+
+            Assert.AreEqual("ThisIsAClearPassword", result);
+        }
+
+        [Test]
+        public void Format_Pass_For_Storage_Hashed()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            var provider = providerMock.Object;
+            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" }, { "hashAlgorithmType", "HMACSHA256" } });
+
+            var salt = MembershipProviderBase.GenerateSalt();
+            var stored = "ThisIsAHashedPassword";
+
+            var result = provider.FormatPasswordForStorage(stored, salt);
+
+            Assert.AreEqual(salt + "ThisIsAHashedPassword", result);
+        }
+
+        [Test]
+        public void Format_Pass_For_Storage_Encrypted()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            var provider = providerMock.Object;
+            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Encrypted" } });
+
+            var salt = MembershipProviderBase.GenerateSalt();
+            var stored = "ThisIsAnEncryptedPassword";
+
+            var result = provider.FormatPasswordForStorage(stored, salt);
+
+            Assert.AreEqual("ThisIsAnEncryptedPassword", result);
+        }
+
+        [Test]
+        public void Format_Pass_For_Storage_Clear()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            var provider = providerMock.Object;
+            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Clear" } });
+
+            var salt = MembershipProviderBase.GenerateSalt();
+            var stored = "ThisIsAClearPassword";
+
+            var result = provider.FormatPasswordForStorage(stored, salt);
+
+            Assert.AreEqual("ThisIsAClearPassword", result);
+        }
+
+        [Test]
+        public void Check_Password_Hashed_KeyedHashAlgorithm()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            var provider = providerMock.Object;
+            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" }, { "hashAlgorithmType", "HMACSHA256" } });
+
+            string salt;
+            var pass = "ThisIsAHashedPassword";
+            var hashed = provider.EncryptOrHashNewPassword(pass, out salt);
+            var storedPassword = provider.FormatPasswordForStorage(hashed, salt);
+
+            var result = provider.CheckPassword("ThisIsAHashedPassword", storedPassword);
+
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void Check_Password_Hashed_Non_KeyedHashAlgorithm()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            var provider = providerMock.Object;
+            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" } });
+
+            string salt;
+            var pass = "ThisIsAHashedPassword";
+            var hashed = provider.EncryptOrHashNewPassword(pass, out salt);
+            var storedPassword = provider.FormatPasswordForStorage(hashed, salt);
+
+            var result = provider.CheckPassword("ThisIsAHashedPassword", storedPassword);
+
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void Check_Password_Encrypted()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            var provider = providerMock.Object;
+            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Encrypted" } });
+
+            string salt;
+            var pass = "ThisIsAnEncryptedPassword";
+            var encrypted = provider.EncryptOrHashNewPassword(pass, out salt);
+            
+            var result = provider.CheckPassword("ThisIsAnEncryptedPassword", encrypted);
+
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void Check_Password_Clear()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            var provider = providerMock.Object;
+            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Clear" } });
+
+            var pass = "ThisIsAClearPassword";
+
+            var result = provider.CheckPassword("ThisIsAClearPassword", pass);
+
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void Can_Decrypt_Password()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            var provider = providerMock.Object;
+            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Encrypted" } });
+
+            string salt;
+            var pass = "ThisIsAnEncryptedPassword";
+            var encrypted = provider.EncryptOrHashNewPassword(pass, out salt);
+            
+            var result = provider.DecryptPassword(encrypted);
+
+            Assert.AreEqual(pass, result);
+
+        }
+
+        [Test]
+        public void Get_Hash_Algorithm_Legacy()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            var provider = providerMock.Object;
+            provider.Initialize("test", new NameValueCollection { {"useLegacyEncoding", "true"}, { "passwordFormat", "Hashed" }, { "hashAlgorithmType", "HMACSHA256" } });
+
+            var alg = provider.GetHashAlgorithm("blah");
+
+            Assert.IsTrue(alg is HMACSHA1);
+        }
+
+        [Test]
+        public void Get_Hash_Algorithm()
+        {
+            var providerMock = new Mock<MembershipProviderBase>() { CallBase = true };
+            var provider = providerMock.Object;
+            provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" }, { "hashAlgorithmType", "HMACSHA256" } });
+
+            var alg = provider.GetHashAlgorithm("blah");
+
+            Assert.IsTrue(alg is HMACSHA256);
+        }
+
 
     }
 }

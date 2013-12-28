@@ -452,7 +452,7 @@ namespace umbraco.providers.members
                 }
             }
 
-            var decodedPassword = DecodePassword(m.GetPassword());
+            var decodedPassword = DecryptPassword(m.GetPassword());
 
             return decodedPassword;
         }
@@ -667,8 +667,11 @@ namespace umbraco.providers.members
         /// </returns>
         public override bool ValidateUser(string username, string password)
         {
-            var m = Member.GetMemberFromLoginAndEncodedPassword(username, EncryptOrHashExistingPassword(password));
-            if (m != null)
+            var m = Member.GetMemberFromLoginName(username);
+            if (m == null) return false;
+            var authenticated = CheckPassword(password, m.GetPassword());
+            
+            if (authenticated)
             {
                 // check for lock status. If locked, then set the member property to null
                 if (string.IsNullOrEmpty(LockPropertyTypeAlias) == false)
@@ -824,32 +827,6 @@ namespace umbraco.providers.members
 
         #region Helper Methods
         
-        /// <summary>
-        /// Checks the password.
-        /// </summary>
-        /// <param name="password">The password.</param>
-        /// <param name="dbPassword">The dbPassword.</param>
-        /// <returns></returns>
-        internal bool CheckPassword(string password, string dbPassword)
-        {
-            string pass1 = password;
-            string pass2 = dbPassword;
-
-            switch (PasswordFormat)
-            {
-                case MembershipPasswordFormat.Encrypted:
-                    pass2 = DecodePassword(dbPassword);
-                    break;
-                case MembershipPasswordFormat.Hashed:
-                    pass1 = EncryptOrHashExistingPassword(password);
-                    break;
-                default:
-                    break;
-            }
-            return (pass1 == pass2) ? true : false;
-        }
-
-
         /// <summary>
         /// Encodes the password.
         /// </summary>

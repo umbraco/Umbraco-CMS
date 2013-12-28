@@ -460,7 +460,7 @@ namespace umbraco.providers
                         return true;
                     }
 
-                    return user.ValidatePassword(EncryptOrHashExistingPassword(password));    
+                    return CheckPassword(password, user.Password);
                 }
             }
             return false;
@@ -468,32 +468,7 @@ namespace umbraco.providers
         #endregion
 
         #region Helper Methods
-        /// <summary>
-        /// Checks the password.
-        /// </summary>
-        /// <param name="password">The password.</param>
-        /// <param name="dbPassword">The dbPassword.</param>
-        /// <returns></returns>
-        internal bool CheckPassword(string password, string dbPassword)
-        {
-            string pass1 = password;
-            string pass2 = dbPassword;
-
-            switch (PasswordFormat)
-            {
-                case MembershipPasswordFormat.Encrypted:
-                    pass2 = DecodePassword(dbPassword);
-                    break;
-                case MembershipPasswordFormat.Hashed:
-                    pass1 = EncryptOrHashExistingPassword(password);
-                    break;
-                default:
-                    break;
-            }
-            return (pass1 == pass2) ? true : false;
-        }
-
-
+       
         /// <summary>
         /// Encodes the password.
         /// </summary>

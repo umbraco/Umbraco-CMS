@@ -310,7 +310,7 @@ namespace Umbraco.Web.Security.Providers
                 throw new ProviderException("Incorrect password answer");
             }
 
-            var decodedPassword = DecodePassword(m.Password);
+            var decodedPassword = DecryptPassword(m.Password);
 
             return decodedPassword;
         }
@@ -511,10 +511,7 @@ namespace Umbraco.Web.Security.Providers
                 return false;
             }
 
-            string salt;
-            var encodedPassword = EncryptOrHashNewPassword(password, out salt);
-            
-            var authenticated = (encodedPassword == member.Password);
+            var authenticated = CheckPassword(password, member.Password);
 
             if (authenticated == false)
             {
