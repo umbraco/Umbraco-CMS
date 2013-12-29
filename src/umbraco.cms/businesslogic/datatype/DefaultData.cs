@@ -81,7 +81,10 @@ namespace umbraco.cms.businesslogic.datatype
             //instead of making it query for itself. This is a peformance optimization enhancement.
             var dbType = BaseDataType.GetDBType(strDbType);
             var fieldName = BaseDataType.GetDataFieldName(dbType);
-            _dataType.SetDataTypeProperties(fieldName, dbType);
+
+            //if misconfigured (datatype created in the tree, but save button never clicked), the datatype will be null
+            if(_dataType != null)
+                _dataType.SetDataTypeProperties(fieldName, dbType);
 
             //ensures that it doesn't go back to the db
             _valueLoaded = true;
@@ -102,7 +105,7 @@ namespace umbraco.cms.businesslogic.datatype
                .Where<PropertyDataDto>(x => x.Id == _propertyId);
             var dto = Database.Fetch<PropertyDataDto, PropertyTypeDto, DataTypeDto>(sql).FirstOrDefault();
 
-            if (dto != null)
+            if (dto != null && _dataType != null)
             {
                 //the type stored in the cmsDataType table
                 var strDbType = dto.PropertyTypeDto.DataTypeDto.DbType;
