@@ -73,9 +73,9 @@ namespace Umbraco.Web.UI.Umbraco
                     string iconElement = String.Format("<li><a class=\"{0}\" title=\"" + ui.Text("sections", a.alias, UmbracoUser) + "\" href=\"javascript:void(0);\">", appClass);
                     if (a.icon.StartsWith("."))
                         iconElement +=
-                            "<img src=\"images/nada.gif\" class=\"trayHolder\" alt=\"\" /></a></li>";
+							"<img src=\"images/nada.gif\" class=\"trayHolder\" alt=\"\" /></a><a class=\"" + appClass + " name\" title=\"" + ui.Text("sections", a.alias, UmbracoUser) + "\" href=\"javascript:void(0);\">" + a.name + "</a></li>";
                     else
-                        iconElement += "<img src=\"images/tray/" + a.icon + "\" class=\"trayIcon\" alt=\"" + ui.Text("sections", a.alias, UmbracoUser) + "\"></a></li>";
+						iconElement += "<img src=\"images/tray/" + a.icon + "\" class=\"trayIcon\" alt=\"" + ui.Text("sections", a.alias, UmbracoUser) + "\"></a><a class=\"" + appClass + " name\" title=\"" + ui.Text("sections", a.alias, UmbracoUser) + "\" href=\"javascript:void(0);\">" + a.name + "</a></li>";
                     plcIcons.Text += iconElement;
 
                 }
