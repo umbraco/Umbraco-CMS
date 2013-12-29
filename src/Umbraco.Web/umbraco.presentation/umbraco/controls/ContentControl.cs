@@ -178,7 +178,7 @@ namespace umbraco.controls
 
             //if the property is not in a tab, add it to the general tab
             var props = _content.GenericProperties;
-            foreach (Property p in props)
+            foreach (Property p in props.OrderBy(x => x.PropertyType.SortOrder))
             {
                 if (inTab[p.PropertyType.Id.ToString()] == null)
                     AddControlNew(p, tpProp, ui.Text("general", "properties", null));
