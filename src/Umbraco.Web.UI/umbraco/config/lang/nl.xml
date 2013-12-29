@@ -205,7 +205,6 @@
     <key alias="errorExistsWithoutTab">%0% bestaat al</key>
     <key alias="errorHeader">Er zijn fouten geconstateerd:</key>
     <key alias="errorHeaderWithoutTab">Er zijn fouten geconstateerd:</key>
-    <key alias="errorInPasswordFormat">Het wachtwoord moet minstens %0% tekens lang zijn en moet minstens %1% cijfers bevatten</key>
     <key alias="errorIntegerWithoutTab">%0% moet een geheel getal zijn</key>
     <key alias="errorMandatory">%0% op tab %1% is een verplicht veld</key>
     <key alias="errorMandatoryWithoutTab">%0% is een verplicht veld</key>

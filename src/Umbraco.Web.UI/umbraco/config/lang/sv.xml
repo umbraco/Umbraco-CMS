@@ -218,7 +218,6 @@
     <key alias="errorExistsWithoutTab">%0% redan finns</key>
     <key alias="errorHeader">Följande fel inträffade:</key>
     <key alias="errorHeaderWithoutTab">Följande fel inträffade:</key>
-    <key alias="errorInPasswordFormat">Lösenordet måste bestå av minst %0% tecken varav minst %1% är icke-alfanumeriska tecken (t.ex. %, #, !, @).</key>
     <key alias="errorIntegerWithoutTab">%0% måste vara ett heltal</key>
     <key alias="errorMandatory">%0% under %1% är ett obligatoriskt fält</key>
     <key alias="errorMandatoryWithoutTab">%0% är ett obligatoriskt fält</key>

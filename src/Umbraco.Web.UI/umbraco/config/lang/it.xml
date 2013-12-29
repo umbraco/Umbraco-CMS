@@ -205,7 +205,6 @@
     <key alias="errorExistsWithoutTab"><![CDATA[%0% esiste già]]></key>
     <key alias="errorHeader"><![CDATA[Si sono verificati degli errori:]]></key>
     <key alias="errorHeaderWithoutTab"><![CDATA[Si sono verificati degli errori:]]></key>
-    <key alias="errorInPasswordFormat"><![CDATA[La password deve essere lunga almeno %0% caratteri e deve contenere almeno %1% carattere(i) non alfanumerico(i)]]></key>
     <key alias="errorIntegerWithoutTab"><![CDATA[%0% deve essere un intero]]></key>
     <key alias="errorMandatory"><![CDATA[%0% nella tab %1% è un campo obbligatorio]]></key>
     <key alias="errorMandatoryWithoutTab"><![CDATA[%0% è un campo obbligatorio]]></key>

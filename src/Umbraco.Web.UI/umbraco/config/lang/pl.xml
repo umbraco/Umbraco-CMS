@@ -204,7 +204,6 @@ Możesz dodać dodatkowe języki w menu "Języki" po lewej stronie.]]></key>
     <key alias="errorExistsWithoutTab">TRANSLATE ME: '%0% already exists'</key>
     <key alias="errorHeader">Wystąpiły błędy:</key>
     <key alias="errorHeaderWithoutTab">Wystąpiły błędy:</key>
-    <key alias="errorInPasswordFormat">Hasło powinno mieć minimum %0% znaków, i zawierać co najmniej %1% niealfanumeryczny znak</key>
     <key alias="errorIntegerWithoutTab">%0% musi być liczbą całkowitą</key>
     <key alias="errorMandatory">%0% (%1%) to pole wymagane</key>
     <key alias="errorMandatoryWithoutTab">%0% to pole wymagane</key>

@@ -244,7 +244,6 @@
     <key alias="errorExistsWithoutTab">%0% 已存在</key>
     <key alias="errorHeader">发现错误：</key>
     <key alias="errorHeaderWithoutTab">发现错误：</key>
-    <key alias="errorInPasswordFormat">密码最少%0%位，且至少包含%1%位非字母数字符号</key>
     <key alias="errorIntegerWithoutTab">%0% 必须是整数</key>
     <key alias="errorMandatory">%1% 中的 %0% 字段是必填项</key>
     <key alias="errorMandatoryWithoutTab">%0% 是必填项</key>

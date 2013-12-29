@@ -215,7 +215,6 @@
     <key alias="errorExistsWithoutTab">%0% finnes allerede</key>
     <key alias="errorHeader">Det var feil i dokumentet:</key>
     <key alias="errorHeaderWithoutTab">Det var feil i skjemaet:</key>
-    <key alias="errorInPasswordFormat">Passordet bør være minst %0% tegn og inneholde minst %1% numeriske tegn</key>
     <key alias="errorIntegerWithoutTab">%0% må være et heltall</key>
     <key alias="errorMandatory">%0% under %1% er obligatorisk</key>
     <key alias="errorMandatoryWithoutTab">%0% er obligatorisk</key>
