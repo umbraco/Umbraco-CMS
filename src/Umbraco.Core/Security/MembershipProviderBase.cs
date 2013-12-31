@@ -748,6 +748,12 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         internal string StoredPassword(string storedString, out string salt)
         {
+            if (UseLegacyEncoding)
+            {
+                salt = string.Empty;
+                return storedString;
+            }
+
             switch (PasswordFormat)
             {
                 case MembershipPasswordFormat.Hashed:
