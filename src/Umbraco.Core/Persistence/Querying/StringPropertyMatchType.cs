@@ -8,6 +8,8 @@
         Exact,
         Contains,
         StartsWith,
-        EndsWith
+        EndsWith,
+        //Deals with % as wildcard chars in a string
+        Wildcard
     }
 }

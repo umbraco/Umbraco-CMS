@@ -232,6 +232,8 @@ namespace Umbraco.Core.Persistence.Querying
         {
             switch (verb)
             {
+                case "SqlWildcard":
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnWildcardComparison(col, EscapeAtArgument(RemoveQuote(val)), columnType);
                 case "Equals":
                     return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnEqualComparison(col, EscapeAtArgument(RemoveQuote(val)), columnType);
                 case "StartsWith":
@@ -280,7 +282,7 @@ namespace Umbraco.Core.Persistence.Querying
                     return string.Format("upper({0})", r);
                 case "ToLower":
                     return string.Format("lower({0})", r);
-                
+                case "SqlWildcard":
                 case "StartsWith":
                 case "EndsWith":
                 case "Contains":

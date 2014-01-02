@@ -228,6 +228,7 @@ namespace umbraco.BusinessLogic
             return UserType.Alias == "admin";
         }
 
+        [Obsolete("Do not use this method to validate credentials, use the user's membership provider to do authentication. This method will not work if the password format is 'Encrypted'")]
         public bool ValidatePassword(string password)
         {
             string userLogin =
@@ -326,6 +327,7 @@ namespace umbraco.BusinessLogic
         /// <param name="lname">The login name.</param>
         /// <param name="passw">The password.</param>
         /// <returns></returns>
+        [Obsolete("Do not use this method to validate credentials, use the user's membership provider to do authentication. This method will not work if the password format is 'Encrypted'")]
         public static bool validateCredentials(string lname, string passw)
         {
             return validateCredentials(lname, passw, true);
@@ -338,6 +340,7 @@ namespace umbraco.BusinessLogic
         /// <param name="passw">The password.</param>
         /// <param name="checkForUmbracoConsoleAccess">if set to <c>true</c> [check for umbraco console access].</param>
         /// <returns></returns>
+        [Obsolete("Do not use this method to validate credentials, use the user's membership provider to do authentication. This method will not work if the password format is 'Encrypted'")]
         public static bool validateCredentials(string lname, string passw, bool checkForUmbracoConsoleAccess)
         {
             string consoleCheckSql = "";

@@ -1,6 +1,6 @@
 <%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoPage.Master" CodeBehind="installer.aspx.cs"
     AutoEventWireup="True" Inherits="umbraco.presentation.developer.packages.Installer"
-    Trace="false" %>
+    Trace="false" ValidateRequest="false" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">

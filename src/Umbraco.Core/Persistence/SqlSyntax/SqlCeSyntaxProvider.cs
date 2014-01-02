@@ -116,6 +116,20 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             }  
         }
 
+        public override string GetStringColumnWildcardComparison(string column, string value, TextColumnType columnType)
+        {
+            switch (columnType)
+            {
+                case TextColumnType.NVarchar:
+                    return base.GetStringColumnContainsComparison(column, value, columnType);
+                case TextColumnType.NText:
+                    //MSSQL doesn't allow for upper methods with NText columns
+                    return string.Format("{0} LIKE '{1}'", column, value);
+                default:
+                    throw new ArgumentOutOfRangeException("columnType");
+            }
+        }
+
         public override string GetQuotedTableName(string tableName)
         {
             return string.Format("[{0}]", tableName);

@@ -6,15 +6,15 @@ namespace Umbraco.Core.Models.Membership
 {
     internal static class MembershipExtensions
     {
-        internal static MembershipUser AsConcreteMembershipUser(this IMember member)
+        internal static UmbracoMembershipMember AsConcreteMembershipUser(this IMember member)
         {
             var membershipMember = new UmbracoMembershipMember(member);
             return membershipMember;
         }
 
-        internal static IMember AsIMember(this MembershipUser membershipMember)
+        internal static IMember AsIMember(this UmbracoMembershipMember membershipMember)
         {
-            var member = membershipMember as UmbracoMembershipMember;
+            var member = membershipMember;
             if (member != null)
             {
                 return member.Member;

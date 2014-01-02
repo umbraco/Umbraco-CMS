@@ -31,7 +31,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return member;
         }
 
-        public static IEnumerable<IMember> CreateSimpleMember(IMemberType memberType, int amount)
+        public static IEnumerable<IMember> CreateSimpleMember(IMemberType memberType, int amount, Action<int, IMember> onCreating = null)
         {
             var list = new List<IMember>();
 
@@ -43,8 +43,13 @@ namespace Umbraco.Tests.TestHelpers.Entities
                 member.SetValue("bodyText", "This is a subpage" + i);
                 member.SetValue("author", "John Doe" + i);
 
-                member.ResetDirtyProperties(false);
+                if (onCreating != null)
+                {
+                    onCreating(i, member);
+                }
 
+                member.ResetDirtyProperties(false);
+                
                 list.Add(member);
             }
 

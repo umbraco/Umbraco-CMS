@@ -30,6 +30,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string GetStringColumnStartsWithComparison(string column, string value, TextColumnType columnType);
         string GetStringColumnEndsWithComparison(string column, string value, TextColumnType columnType);
         string GetStringColumnContainsComparison(string column, string value, TextColumnType columnType);
+        string GetStringColumnWildcardComparison(string column, string value, TextColumnType columnType);
 
         string GetQuotedTableName(string tableName);
         string GetQuotedColumnName(string columnName);

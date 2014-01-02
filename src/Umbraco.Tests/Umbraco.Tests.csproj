@@ -170,6 +170,7 @@
     <Compile Include="AngularIntegration\ServerVariablesParserTests.cs" />
     <Compile Include="AttemptTests.cs" />
     <Compile Include="Membership\MembershipProviderBaseTests.cs" />
+    <Compile Include="Membership\MembersMembershipProviderTests.cs" />
     <Compile Include="MockTests.cs" />
     <Compile Include="Mvc\UmbracoViewPageTests.cs" />
     <Compile Include="Persistence\Auditing\AuditTests.cs" />
@@ -273,6 +274,7 @@
     <Compile Include="Models\Mapping\ContentWebModelMappingTests.cs" />
     <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
     <Compile Include="PropertyEditors\ColorListValidatorTest.cs" />
+    <Compile Include="PublishedContent\PublishedContentRequestEngineTests.cs" />
     <Compile Include="PropertyEditors\DropDownPropertyPreValueEditorTests.cs" />
     <Compile Include="PropertyEditors\EnsureUniqueValuesValidatorTest.cs" />
     <Compile Include="PropertyEditors\LegacyPropertyEditorIdToAliasConverterTests.cs" />
