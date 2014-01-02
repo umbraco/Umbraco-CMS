@@ -73,7 +73,7 @@ namespace Umbraco.Web.UI.Umbraco.Create
 
         public global::umbraco.BusinessLogic.User CurrentUser
         {
-            get { return Security.CurrentUser; }
+            get { return UmbracoContext.UmbracoUser; }
         }
 
         protected void EmailValidator_OnServerValidate(object source, ServerValidateEventArgs args)

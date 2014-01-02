@@ -274,7 +274,6 @@
     <Compile Include="Models\Mapping\ContentWebModelMappingTests.cs" />
     <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
     <Compile Include="PropertyEditors\ColorListValidatorTest.cs" />
-    <Compile Include="PublishedContent\PublishedContentRequestEngineTests.cs" />
     <Compile Include="PropertyEditors\DropDownPropertyPreValueEditorTests.cs" />
     <Compile Include="PropertyEditors\EnsureUniqueValuesValidatorTest.cs" />
     <Compile Include="PropertyEditors\LegacyPropertyEditorIdToAliasConverterTests.cs" />

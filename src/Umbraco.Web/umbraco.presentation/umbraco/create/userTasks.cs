@@ -40,7 +40,7 @@ namespace umbraco
 
                 var password = Membership.GeneratePassword(
                     Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider].MinRequiredPasswordLength,
-                    Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider].MinRequiredNonAlphanumericCharacters),
+                    Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider].MinRequiredNonAlphanumericCharacters);
 
                 var parts = Alias.Split(new[] {'|'}, StringSplitOptions.RemoveEmptyEntries);
                 if (parts.Length != 2)
