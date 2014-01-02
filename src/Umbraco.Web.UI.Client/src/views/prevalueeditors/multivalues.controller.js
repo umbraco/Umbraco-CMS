@@ -20,7 +20,6 @@ angular.module("umbraco").controller("Umbraco.Editors.MultiValuesController",
         }
 
         $scope.remove = function(item, evt) {
-
             evt.preventDefault();
 
             $scope.model.value = _.reject($scope.model.value, function (x) {
@@ -30,7 +29,6 @@ angular.module("umbraco").controller("Umbraco.Editors.MultiValuesController",
         };
 
         $scope.add = function (evt) {
-            
             evt.preventDefault();
             
             
@@ -45,6 +43,18 @@ angular.module("umbraco").controller("Umbraco.Editors.MultiValuesController",
 
             //there was an error, do the highlight (will be set back by the directive)
             $scope.hasError = true;            
+        };
+
+        $scope.move = function (index, direction, evt) {
+            evt.preventDefault();
+
+            if ((index == 0 && direction == -1) || (index == $scope.model.value.length - 1 && direction == 1)) {
+                return;
+            }
+
+            var temp = $scope.model.value[index];
+            $scope.model.value[index] = $scope.model.value[index + direction];
+            $scope.model.value[index + direction] = temp;
         };
 
     });
