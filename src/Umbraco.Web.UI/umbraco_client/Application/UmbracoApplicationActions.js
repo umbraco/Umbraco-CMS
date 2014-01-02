@@ -6,7 +6,7 @@
 
 Umbraco.Sys.registerNamespace("Umbraco.Application");
 
-Umbraco.Application.Actions = function () {
+Umbraco.Application.Actions = function() {
     /// <summary>
     /// Application actions actions for the context menu, help dialogs, logout, etc...
     /// This class supports an event listener model. Currently the available events are:
@@ -14,7 +14,6 @@ Umbraco.Application.Actions = function () {
     /// </summary>
 
     return {
-
         _utils: Umbraco.Utils, //alias to Umbraco Utils
         _dialogWindow: null,
         /// <field name="_dialogWindow">A reference to a dialog window to open, any action that doesn't open in an overlay, opens in a dialog</field>
@@ -23,24 +22,24 @@ Umbraco.Application.Actions = function () {
         _currApp: "",
         _isSaving: "",
 
-        addEventHandler: function (fnName, fn) {
+        addEventHandler: function(fnName, fn) {
             /// <summary>Adds an event listener to the event name event</summary>
-            if (typeof (jQuery) != "undefined") jQuery(window.top).bind(fnName, fn); //if there's no jQuery, there is no events
+            if (typeof(jQuery) != "undefined") jQuery(window.top).bind(fnName, fn); //if there's no jQuery, there is no events
         },
 
-        removeEventHandler: function (fnName, fn) {
+        removeEventHandler: function(fnName, fn) {
             /// <summary>Removes an event listener to the event name event</summary>
-            if (typeof (jQuery) != "undefined") jQuery(window.top).unbind(fnName, fn); //if there's no jQuery, there is no events
+            if (typeof(jQuery) != "undefined") jQuery(window.top).unbind(fnName, fn); //if there's no jQuery, there is no events
         },
 
-        showSpeachBubble: function (ico, hdr, msg) {
-            if (typeof (UmbClientMgr.mainWindow().UmbSpeechBubble) != "undefined") {
+        showSpeachBubble: function(ico, hdr, msg) {
+            if (typeof(UmbClientMgr.mainWindow().UmbSpeechBubble) != "undefined") {
                 UmbClientMgr.mainWindow().UmbSpeechBubble.ShowMessage(ico, hdr, msg);
             }
             else alert(msg);
         },
 
-        launchHelp: function (lang, userType) {
+        launchHelp: function(lang, userType) {
             /// <summary>Launches the contextual help window</summary>
             var rightUrl = UmbClientMgr.contentFrame().document.location.href.split("\/");
             if (rightUrl.length > 0) {
@@ -54,13 +53,13 @@ Umbraco.Application.Actions = function () {
             return false;
         },
 
-        launchAbout: function () {
+        launchAbout: function() {
             /// <summary>Launches the about Umbraco window</summary>
             UmbClientMgr.openModalWindow("dialogs/about.aspx", UmbClientMgr.uiKeys()['general_about'], true, 450, 390);
             return false;
         },
 
-        launchCreateWizard: function () {
+        launchCreateWizard: function() {
             /// <summary>Launches the create content wizard</summary>
 
             if (this._currApp == 'media' || this._currApp == 'content' || this._currApp == '') {
@@ -71,12 +70,13 @@ Umbraco.Application.Actions = function () {
                 UmbClientMgr.openModalWindow("dialogs/create.aspx?nodeType=" + this._currApp + "&app=" + this._currApp + "&rnd=" + this._utils.generateRandom(), UmbClientMgr.uiKeys()['actions_create'] + " " + this._currApp, true, 620, 470);
                 return false;
 
-            } else
+            }
+            else
                 alert('Not supported - please create by right clicking the parentnode and choose new...');
         },
 
-        logout: function (t) {
-            
+        logout: function(t) {
+
             if (!t) {
                 throw "The security token must be set in order to log a user out using this method";
             }
@@ -90,7 +90,7 @@ Umbraco.Application.Actions = function () {
             return false;
         },
 
-        submitDefaultWindow: function () {
+        submitDefaultWindow: function() {
             if (!this._isSaving) {
                 this._isSaving = true;
                 jQuery(".editorIcon[id*=save]:first, .editorIcon:input:image[id*=Save]:first").click();
@@ -99,13 +99,22 @@ Umbraco.Application.Actions = function () {
             return false;
         },
 
-        bindSaveShortCut: function () {
-            jQuery(document).bind('keydown', 'ctrl+s', function (evt) { UmbClientMgr.appActions().submitDefaultWindow(); return false; });
-            jQuery(":input").bind('keydown', 'ctrl+s', function (evt) { UmbClientMgr.appActions().submitDefaultWindow(); return false; });
-            jQuery(document).bind('UMBRACO_TINYMCE_SAVE', function (evt, orgEvent) { UmbClientMgr.appActions().submitDefaultWindow(); return false; });
+        bindSaveShortCut: function() {
+            jQuery(document).bind('keydown', 'ctrl+s', function(evt) {
+                UmbClientMgr.appActions().submitDefaultWindow();
+                return false;
+            });
+            jQuery(":input").bind('keydown', 'ctrl+s', function(evt) {
+                UmbClientMgr.appActions().submitDefaultWindow();
+                return false;
+            });
+            jQuery(document).bind('UMBRACO_TINYMCE_SAVE', function(evt, orgEvent) {
+                UmbClientMgr.appActions().submitDefaultWindow();
+                return false;
+            });
         },
 
-        shiftApp: function (whichApp, appName) {
+        shiftApp: function(whichApp, appName) {
             /// <summary>Changes the application</summary>
 
             this._debug("shiftApp: " + whichApp + ", " + appName);
@@ -129,16 +138,16 @@ Umbraco.Application.Actions = function () {
                 jQuery("#FindDocuments .umbracoSearchHolder").fadeIn(500);
                 //need to set the recycle bin node id based on app
                 switch (this._currApp) {
-                    case ("media"):
-                        UmbClientMgr.mainTree().setRecycleBinNodeId(-21);
-                        break;
-                    case ("content"):
-                        UmbClientMgr.mainTree().setRecycleBinNodeId(-20);
-                        break;
+                case ("media"):
+                    UmbClientMgr.mainTree().setRecycleBinNodeId(-21);
+                    break;
+                case ("content"):
+                    UmbClientMgr.mainTree().setRecycleBinNodeId(-20);
+                    break;
                 }
             }
 
-            UmbClientMgr.mainTree().rebuildTree(whichApp, function (args) {
+            UmbClientMgr.mainTree().rebuildTree(whichApp, function(args) {
                 //the callback will fire when the tree rebuilding is done, we
                 //need to check the args to see if the tree was rebuild from cache
                 //and if it had a previously selected node, if it didn't then load the dashboard.
@@ -152,13 +161,13 @@ Umbraco.Application.Actions = function () {
             UmbClientMgr.mainWindow().document.title = appName + this._windowTitle + window.location.hostname.toLowerCase().replace('www', '');
         },
 
-        getCurrApp: function () {
+        getCurrApp: function() {
             return this._currApp;
         },
 
 
         //TODO: Move this into a window manager class
-        openDialog: function (diaTitle, diaDoc, dwidth, dheight, optionalParams) {
+        openDialog: function(diaTitle, diaDoc, dwidth, dheight, optionalParams) {
             /// <summary>Opens the dialog window</summary>
 
             if (this._dialogWindow != null && !this._dialogWindow.closed) {
@@ -167,16 +176,16 @@ Umbraco.Application.Actions = function () {
             this._dialogWindow = UmbClientMgr.mainWindow().open(diaDoc, 'dialogpage', "width=" + dwidth + "px,height=" + dheight + "px" + optionalParams);
         },
 
-        openDashboard: function (whichApp) {
+        openDashboard: function(whichApp) {
             UmbClientMgr.contentFrame('dashboard.aspx?app=' + whichApp);
         },
 
-        actionTreeEditMode: function () {
+        actionTreeEditMode: function() {
             /// <summary></summary>
             UmbClientMgr.mainTree().toggleEditMode(true);
         },
 
-        actionSort: function () {
+        actionSort: function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '0' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
@@ -185,7 +194,7 @@ Umbraco.Application.Actions = function () {
 
         },
 
-        actionChangeDocType: function () {
+        actionChangeDocType: function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '0' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
@@ -194,7 +203,7 @@ Umbraco.Application.Actions = function () {
 
         },
 
-        actionRights: function () {
+        actionRights: function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
@@ -202,7 +211,7 @@ Umbraco.Application.Actions = function () {
             }
         },
 
-        actionProtect: function () {
+        actionProtect: function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
@@ -210,20 +219,20 @@ Umbraco.Application.Actions = function () {
             }
         },
 
-        actionRollback: function () {
+        actionRollback: function() {
             /// <summary></summary>
 
             UmbClientMgr.openModalWindow('dialogs/rollback.aspx?nodeId=' + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_rollback'], true, 600, 550);
         },
 
-        actionRefresh: function () {
+        actionRefresh: function() {
             /// <summary></summary>
 
             //raise nodeRefresh event
             jQuery(window.top).trigger("nodeRefresh", []);
         },
 
-        actionNotify: function () {
+        actionNotify: function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
@@ -231,11 +240,11 @@ Umbraco.Application.Actions = function () {
             }
         },
 
-        actionUpdate: function () {
+        actionUpdate: function() {
             /// <summary></summary>
         },
 
-        actionPublish: function () {
+        actionPublish: function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '' != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
@@ -243,7 +252,7 @@ Umbraco.Application.Actions = function () {
             }
         },
 
-        actionToPublish: function () {
+        actionToPublish: function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
@@ -253,8 +262,8 @@ Umbraco.Application.Actions = function () {
             }
         },
 
-        actionQuit: function (t) {
-            
+        actionQuit: function(t) {
+
             if (!t) {
                 throw "The security token must be set in order to log a user out using this method";
             }
@@ -263,13 +272,13 @@ Umbraco.Application.Actions = function () {
                 document.location.href = 'logout.aspx?t=' + t;
         },
 
-        actionRePublish: function () {
+        actionRePublish: function() {
             /// <summary></summary>
 
             UmbClientMgr.openModalWindow('dialogs/republish.aspx?rnd=' + this._utils.generateRandom(), 'Republishing entire site', true, 450, 210);
         },
 
-        actionAssignDomain: function () {
+        actionAssignDomain: function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
@@ -277,13 +286,13 @@ Umbraco.Application.Actions = function () {
             }
         },
 
-        actionLiveEdit: function () {
+        actionLiveEdit: function() {
             /// <summary></summary>
 
             window.open("canvas.aspx?redir=/" + UmbClientMgr.mainTree().getActionNode().nodeId + ".aspx", "liveediting");
         },
 
-        actionNew: function () {
+        actionNew: function() {
             /// <summary>Show the create new modal overlay</summary>
             var actionNode = UmbClientMgr.mainTree().getActionNode();
             if (actionNode.nodeType != '') {
@@ -291,6 +300,9 @@ Umbraco.Application.Actions = function () {
                     UmbClientMgr.openModalWindow("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], true, 600, 425);
                 }
                 else if (actionNode.nodeType == "initmember") {
+                    UmbClientMgr.openModalWindow("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], true, 480, 380);
+                }
+                else if (actionNode.nodeType == "users") {
                     UmbClientMgr.openModalWindow("create.aspx?nodeId=" + actionNode.nodeId + "&nodeType=" + actionNode.nodeType + "&nodeName=" + actionNode.nodeName + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_create'], true, 480, 380);
                 }
                 else if (actionNode.nodeType == "initpython" || actionNode.nodeType == "initdlrscripting") {
@@ -302,7 +314,7 @@ Umbraco.Application.Actions = function () {
             }
         },
 
-        actionNewFolder: function () {
+        actionNewFolder: function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeType != '') {
@@ -310,7 +322,7 @@ Umbraco.Application.Actions = function () {
             }
         },
 
-        actionSendToTranslate: function () {
+        actionSendToTranslate: function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
@@ -318,7 +330,7 @@ Umbraco.Application.Actions = function () {
             }
         },
 
-        actionEmptyTranscan: function () {
+        actionEmptyTranscan: function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
@@ -326,7 +338,7 @@ Umbraco.Application.Actions = function () {
             }
         },
 
-        actionImport: function () {
+        actionImport: function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeType != '') {
@@ -334,7 +346,7 @@ Umbraco.Application.Actions = function () {
             }
         },
 
-        actionExport: function () {
+        actionExport: function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeType != '') {
@@ -342,17 +354,17 @@ Umbraco.Application.Actions = function () {
             }
         },
 
-        actionAudit: function () {
+        actionAudit: function() {
             /// <summary></summary>
 
             UmbClientMgr.openModalWindow('dialogs/viewAuditTrail.aspx?nodeId=' + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_auditTrail'], true, 550, 500);
         },
 
-        actionPackage: function () {
+        actionPackage: function() {
             /// <summary></summary>
         },
 
-        actionDelete: function () {
+        actionDelete: function() {
             /// <summary></summary>
 
             var actionNode = UmbClientMgr.mainTree().getActionNode();
@@ -377,7 +389,7 @@ Umbraco.Application.Actions = function () {
                     umbraco.presentation.webservices.legacyAjaxCalls.DeleteContentPermanently(
                         UmbClientMgr.mainTree().getActionNode().nodeId,
                         UmbClientMgr.mainTree().getActionNode().nodeType,
-                        function () {
+                        function() {
                             _this._debug("actionDelete: Raising event");
                             //raise nodeDeleted event
                             jQuery(window.top).trigger("nodeDeleted", []);
@@ -388,12 +400,12 @@ Umbraco.Application.Actions = function () {
                         UmbClientMgr.mainTree().getActionNode().nodeId,
                         UmbClientMgr.mainTree().getActionNode().nodeName,
                         UmbClientMgr.mainTree().getActionNode().nodeType,
-                        function () {
+                        function() {
                             _this._debug("actionDelete: Raising event");
                             //raise nodeDeleted event
                             jQuery(window.top).trigger("nodeDeleted", []);
                         },
-                        function (error) {
+                        function(error) {
                             _this._debug("actionDelete: Raising public error event");
                             //raise public error event
                             jQuery(window.top).trigger("publicError", [error]);
@@ -403,19 +415,19 @@ Umbraco.Application.Actions = function () {
 
         },
 
-        actionDisable: function () {
+        actionDisable: function() {
             /// <summary>
             /// Used for users when disable is selected.
             /// </summary>
 
             if (confirm(uiKeys['defaultdialogs_confirmdisable'] + ' "' + UmbClientMgr.mainTree().getActionNode().nodeName + '"?\n\n')) {
-                umbraco.presentation.webservices.legacyAjaxCalls.DisableUser(UmbClientMgr.mainTree().getActionNode().nodeId, function () {
+                umbraco.presentation.webservices.legacyAjaxCalls.DisableUser(UmbClientMgr.mainTree().getActionNode().nodeId, function() {
                     UmbClientMgr.mainTree().reloadActionNode();
                 });
             }
         },
 
-        actionMove: function () {
+        actionMove: function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
@@ -423,17 +435,17 @@ Umbraco.Application.Actions = function () {
             }
         },
 
-        actionCopy: function () {
+        actionCopy: function() {
             /// <summary></summary>
 
             if (UmbClientMgr.mainTree().getActionNode().nodeId != '-1' && UmbClientMgr.mainTree().getActionNode().nodeType != '') {
                 UmbClientMgr.openModalWindow("dialogs/moveOrCopy.aspx?app=" + this._currApp + "&mode=copy&id=" + UmbClientMgr.mainTree().getActionNode().nodeId + '&rnd=' + this._utils.generateRandom(), uiKeys['actions_copy'], true, 500, 470);
             }
         },
-        _debug: function (strMsg) {
+        _debug: function(strMsg) {
             if (this._isDebug) {
                 Sys.Debug.trace("AppActions: " + strMsg);
             }
         }
-    }
-}
+    };
+};

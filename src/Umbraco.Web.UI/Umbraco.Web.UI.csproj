@@ -434,6 +434,13 @@
     <Compile Include="Umbraco\Create\PartialViewMacro.ascx.designer.cs">
       <DependentUpon>PartialViewMacro.ascx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\Create\User.ascx.cs">
+      <DependentUpon>User.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Create\User.ascx.designer.cs">
+      <DependentUpon>User.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Dashboard\ExamineManagement.ascx.cs">
       <DependentUpon>ExamineManagement.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -589,6 +596,7 @@
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Umbraco\Create\PartialView.ascx" />
+    <Content Include="Umbraco\Create\User.ascx" />
     <Content Include="Umbraco\Images\PinnedIcons\task_content.ico" />
     <Content Include="Umbraco\Images\PinnedIcons\task_default.ico" />
     <Content Include="Umbraco\Images\PinnedIcons\task_developer.ico" />

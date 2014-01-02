@@ -131,13 +131,6 @@ namespace umbraco.providers
         /// </returns>
         protected override MembershipUser PerformCreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
         {
-            var args = new ValidatePasswordEventArgs(username, password, true);
-            OnValidatingPassword(args);
-            if (args.Cancel)
-            {
-                status = MembershipCreateStatus.InvalidPassword;
-                return null;
-            }
 
             // TODO: Does umbraco allow duplicate emails??
             //if (RequiresUniqueEmail && !string.IsNullOrEmpty(GetUserNameByEmail(email)))
@@ -162,7 +155,7 @@ namespace umbraco.providers
                     string salt;
                     var encodedPass = EncryptOrHashNewPassword(password, out salt);
 
-                    User.MakeNew(username, username, FormatPasswordForStorage(encodedPass, salt), ut);
+                    User.MakeNew(username, username, FormatPasswordForStorage(encodedPass, salt), email, ut);
 
                     status = MembershipCreateStatus.Success;
                 }
@@ -346,7 +339,12 @@ namespace umbraco.providers
         /// </returns>
         public override string GetUserNameByEmail(string email)
         {
-            throw new Exception("The method or operation is not implemented.");
+            var found = User.getAllByEmail(email.Trim().ToLower(), true);
+            if (found == null || found.Any() == false)
+            {
+                return null;
+            }
+            return found.First().LoginName;
         }
 
         /// <summary>

@@ -605,7 +605,7 @@ namespace Umbraco.Core.Security
             return pass;
         }
 
-        protected bool IsEmailValid(string email)
+        internal static bool IsEmailValid(string email)
         {
             const string pattern = @"^(?!\.)(""([^""\r\\]|\\[""\r\\])*""|"
                                    + @"([-a-z0-9!#$%&'*+/=?^_`{|}~]|(?<!\.)\.)*)(?<!\.)"
