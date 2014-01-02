@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
+using Umbraco.Core.Services;
 using umbraco.BusinessLogic;
 using System.Security.Cryptography;
 using System.Web.Util;
@@ -405,7 +406,7 @@ namespace umbraco.providers.members
         /// </returns>
         public override int GetNumberOfUsersOnline()
         {
-            return Member.CachedMembers().Count;
+            return ApplicationContext.Current.Services.MemberService.GetMemberCount(MemberCountType.Online);
         }
 
         /// <summary>
