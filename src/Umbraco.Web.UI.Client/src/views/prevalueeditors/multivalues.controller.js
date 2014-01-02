@@ -7,14 +7,20 @@ angular.module("umbraco").controller("Umbraco.Editors.MultiValuesController",
         $scope.hasError = false;
        
         if (!angular.isArray($scope.model.value)) {
+
             //make an array from the dictionary
             var items = [];
             for (var i in $scope.model.value) { 
                 items.push({
-                    value: $scope.model.value[i],
+                    value: $scope.model.value[i].value,
+                    sortOrder: $scope.model.value[i].sortOrder,
                     id: i
                 });
             }
+
+            //ensure the items are sorted by the provided sort order
+            items.sort(function (a, b) { return (a.sortOrder > b.sortOrder) ? 1 : ((b.sortOrder > a.sortOrder) ? -1 : 0); });
+            
             //now make the editor model the array
             $scope.model.value = items;
         }
