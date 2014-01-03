@@ -40,6 +40,8 @@
                     <td>
                        
                         <div class="btn-group" ng-show="!link.edit">
+                            <button type="button" class="btn btn-default" ng-click="move($index, -1)" ng-disabled="$first">Up</button>
+                            <button type="button" class="btn btn-default" ng-click="move($index, 1)" ng-disabled="$last">Down</button>
                             <button type="button" class="btn btn-default" ng-click="edit($index)">Edit</button>
                             <button type="button" class="btn btn-default" ng-click="delete($index)">Delete</button>
                         </div>

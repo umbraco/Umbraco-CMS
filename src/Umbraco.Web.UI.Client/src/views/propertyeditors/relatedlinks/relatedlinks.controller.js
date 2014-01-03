@@ -92,6 +92,12 @@
                 link.isInternal = !link.isInternal;
                 $event.preventDefault();
             };
+
+            $scope.move = function (index, direction) {
+                var temp = $scope.model.value[index];
+                $scope.model.value[index] = $scope.model.value[index + direction];
+                $scope.model.value[index + direction] = temp;                
+            };
             
             function select(data) {
                 if ($scope.currentEditLink != null) {
