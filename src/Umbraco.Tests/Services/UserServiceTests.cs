@@ -4,6 +4,8 @@ using System.Security.Cryptography;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence.Querying;
+using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
@@ -26,7 +28,97 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void UserService_Can_Persist_New_User()
+        public void Can_Delete_User()
+        {
+            var userType = MockedUserType.CreateUserType();
+            ServiceContext.UserService.SaveUserType(userType);
+            var user = ServiceContext.UserService.CreateMember("JohnDoe", "john@umbraco.io", "12345", userType);
+            
+            ServiceContext.UserService.Delete(user);
+            var deleted = ServiceContext.UserService.GetById(user.Id);
+
+            // Assert
+            Assert.That(deleted, Is.Null);
+        }
+
+        [Test]
+        public void Exists_By_Username()
+        {
+            var userType = MockedUserType.CreateUserType();
+            ServiceContext.UserService.SaveUserType(userType);
+            var user = ServiceContext.UserService.CreateMember("JohnDoe", "john@umbraco.io", "12345", userType);
+
+            Assert.IsTrue(ServiceContext.UserService.Exists("JohnDoe"));
+            Assert.IsFalse(ServiceContext.UserService.Exists("notFound"));
+        }
+
+        [Test]
+        public void Get_By_Email()
+        {
+            var userType = MockedUserType.CreateUserType();
+            ServiceContext.UserService.SaveUserType(userType);
+            var user = ServiceContext.UserService.CreateMember("JohnDoe", "john@umbraco.io", "12345", userType);
+
+            Assert.IsNotNull(ServiceContext.UserService.GetByEmail(user.Email));
+            Assert.IsNull(ServiceContext.UserService.GetByEmail("do@not.find"));
+        }
+
+        [Test]
+        public void Get_By_Username()
+        {
+            var userType = MockedUserType.CreateUserType();
+            ServiceContext.UserService.SaveUserType(userType);
+            var user = ServiceContext.UserService.CreateMember("JohnDoe", "john@umbraco.io", "12345", userType);
+
+            Assert.IsNotNull(ServiceContext.UserService.GetByUsername(user.Username));
+            Assert.IsNull(ServiceContext.UserService.GetByUsername("notFound"));
+        }
+
+        [Test]
+        public void Get_By_Object_Id()
+        {
+            var userType = MockedUserType.CreateUserType();
+            ServiceContext.UserService.SaveUserType(userType);
+            var user = ServiceContext.UserService.CreateMember("JohnDoe", "john@umbraco.io", "12345", userType);
+
+            Assert.IsNotNull(ServiceContext.UserService.GetById(user.Id));
+            Assert.IsNull(ServiceContext.UserService.GetById(9876));
+        }
+
+        [Test]
+        public void Find_By_Email_Starts_With()
+        {
+            var userType = MockedUserType.CreateUserType();
+            ServiceContext.UserService.SaveUserType(userType);
+            var users = MockedUser.CreateUser(userType, 10);
+            ServiceContext.UserService.Save(users);
+            //don't find this
+            var customUser = MockedUser.CreateUser(userType);
+            customUser.Email = "hello@hello.com";
+            ServiceContext.UserService.Save(customUser);
+
+            int totalRecs;
+            var found = ServiceContext.UserService.FindMembersByEmail("tes", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
+
+            Assert.AreEqual(10, found.Count());
+        }
+
+        [Test]
+        public void Can_Persist_New_User_Type()
+        {
+            // Arrange
+            var userService = ServiceContext.UserService;
+            var userType = MockedUserType.CreateUserType();
+
+            // Act
+            userService.SaveUserType(userType);
+
+            // Assert
+            Assert.That(userType.HasIdentity, Is.True);
+        }
+
+        [Test]
+        public void Can_Persist_New_User()
         {
             // Arrange
             var userService = ServiceContext.UserService;
@@ -43,7 +135,7 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void UserService_Can_Persist_New_User_With_Hashed_Password()
+        public void Can_Persist_New_User_With_Hashed_Password()
         {
             // Arrange
             var userService = ServiceContext.UserService;
@@ -77,8 +169,8 @@ namespace Umbraco.Tests.Services
             //adds some allowed sections
             user1.AddAllowedSection("test");
             user2.AddAllowedSection("test");
-            ServiceContext.UserService.SaveUser(user1);
-            ServiceContext.UserService.SaveUser(user2);
+            ServiceContext.UserService.Save(user1);
+            ServiceContext.UserService.Save(user2);
 
             //now clear the section from all users
             ServiceContext.UserService.DeleteSectionFromAllUsers("test");

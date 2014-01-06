@@ -38,7 +38,10 @@ namespace Umbraco.Core.Services
 
         public bool Exists(string username)
         {
-            throw new NotImplementedException();
+            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.Exists(username);
+            }
         }
 
         public IUser CreateMember(string username, string email, string password, IUserType userType)
@@ -87,12 +90,28 @@ namespace Umbraco.Core.Services
 
         public IUser GetById(object id)
         {
-            throw new NotImplementedException();
+            if (id is int)
+            {
+                using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
+                {
+                    var user = repository.Get((int) id);
+
+                    return user;
+                }
+            }
+
+            return null;
         }
 
         public IUser GetByEmail(string email)
         {
-            throw new NotImplementedException();
+            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IUser>.Builder.Where(x => x.Email.Equals(email));
+                var user = repository.GetByQuery(query).FirstOrDefault();
+
+                return user;
+            }
         }
 
         public IUser GetByUsername(string login)
@@ -106,17 +125,59 @@ namespace Umbraco.Core.Services
 
         public void Delete(IUser membershipUser)
         {
-            throw new NotImplementedException();
+            if (UserDeleting.IsRaisedEventCancelled(new DeleteEventArgs<IUser>(membershipUser), this))
+                return;
+
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateUserRepository(uow))
+            {
+                repository.Delete(membershipUser);
+                uow.Commit();
+            }
+
+            UserDeleted.RaiseEvent(new DeleteEventArgs<IUser>(membershipUser, false), this);
         }
 
         public void Save(IUser membershipUser, bool raiseEvents = true)
         {
-            throw new NotImplementedException();
+            if (raiseEvents)
+            {
+                if (UserSaving.IsRaisedEventCancelled(new SaveEventArgs<IUser>(membershipUser), this))
+                    return;
+            }
+
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateUserRepository(uow))
+            {
+                repository.AddOrUpdate(membershipUser);
+                uow.Commit();
+            }
+
+            if (raiseEvents)
+                UserSaved.RaiseEvent(new SaveEventArgs<IUser>(membershipUser, false), this);
         }
 
         public void Save(IEnumerable<IUser> members, bool raiseEvents = true)
         {
-            throw new NotImplementedException();
+            if (raiseEvents)
+            {
+                if (UserSaving.IsRaisedEventCancelled(new SaveEventArgs<IUser>(members), this))
+                    return;
+            }
+
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateUserRepository(uow))
+            {
+                foreach (var member in members)
+                {
+                    repository.AddOrUpdate(member);                 
+                }
+                //commit the whole lot in one go
+                uow.Commit();
+            }
+
+            if (raiseEvents)
+                UserSaved.RaiseEvent(new SaveEventArgs<IUser>(members, false), this);
         }
 
         public IEnumerable<IUser> FindMembersByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
@@ -198,23 +259,38 @@ namespace Umbraco.Core.Services
             }
         }
 
-        /// <summary>
-        /// Savers changes to a user to the database
-        /// </summary>
-        /// <param name="user"></param>
-        public void SaveUser(IUser user)
+        public void SaveUserType(IUserType userType, bool raiseEvents = true)
         {
-            if (UserSaving.IsRaisedEventCancelled(new SaveEventArgs<IUser>(user), this))
-                return;
+            if (raiseEvents)
+            {
+                if (UserTypeSaving.IsRaisedEventCancelled(new SaveEventArgs<IUserType>(userType), this))
+                    return;
+            }
 
             var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateUserRepository(uow))
+            using (var repository = _repositoryFactory.CreateUserTypeRepository(uow))
             {
-                repository.AddOrUpdate(user);
+                repository.AddOrUpdate(userType);
                 uow.Commit();
             }
 
-            UserSaved.RaiseEvent(new SaveEventArgs<IUser>(user, false), this);
+            if (raiseEvents)
+                UserTypeSaved.RaiseEvent(new SaveEventArgs<IUserType>(userType, false), this);
+        }
+
+        public void DeleteUserType(IUserType userType)
+        {
+            if (UserTypeDeleting.IsRaisedEventCancelled(new DeleteEventArgs<IUserType>(userType), this))
+                return;
+
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateUserTypeRepository(uow))
+            {
+                repository.Delete(userType);
+                uow.Commit();
+            }
+
+            UserTypeDeleted.RaiseEvent(new DeleteEventArgs<IUserType>(userType, false), this);
         }
 
         /// <summary>
@@ -237,46 +313,6 @@ namespace Umbraco.Core.Services
             }
         }
 
-        ///// <summary>
-        ///// Creates a new user for logging into the umbraco backoffice
-        ///// </summary>
-        ///// <param name="name"></param>
-        ///// <param name="login"></param>
-        ///// <param name="password"></param>
-        ///// <param name="userType"></param>
-        ///// <param name="email"></param>
-        ///// <returns></returns>
-        //public IMembershipUser CreateMembershipUser(string name, string login, string password, IUserType userType, string email = "")
-        //{
-        //    var uow = _uowProvider.GetUnitOfWork();
-        //    using (var repository = _repositoryFactory.CreateUserRepository(uow))
-        //    {
-        //        var loginExists = uow.Database.ExecuteScalar<int>("SELECT COUNT(id) FROM umbracoUser WHERE userLogin = @Login", new { Login = login }) != 0;
-        //        if (loginExists)
-        //            throw new ArgumentException("Login already exists");
-
-        //        var user = new User(userType)
-        //        {
-        //            DefaultToLiveEditing = false,
-        //            Email = email,
-        //            Language = Umbraco.Core.Configuration.GlobalSettings.DefaultUILanguage,
-        //            Name = name,
-        //            Password = password,
-        //            DefaultPermissions = userType.Permissions,
-        //            Username = login,
-        //            StartContentId = -1,
-        //            StartMediaId = -1,
-        //            NoConsole = false,
-        //            IsApproved = true
-        //        };
-
-        //        repository.AddOrUpdate(user);
-        //        uow.Commit();
-
-        //        return user;
-        //    }
-        //}
-
         #endregion
 
         /// <summary>
@@ -288,5 +324,35 @@ namespace Umbraco.Core.Services
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<IUserService, SaveEventArgs<IUser>> UserSaved;
+
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>
+        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUser>> UserDeleting;
+
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUser>> UserDeleted;
+
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        public static event TypedEventHandler<IUserService, SaveEventArgs<IUserType>> UserTypeSaving;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        public static event TypedEventHandler<IUserService, SaveEventArgs<IUserType>> UserTypeSaved;
+
+        /// <summary>
+        /// Occurs before Delete
+        /// </summary>
+        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUserType>> UserTypeDeleting;
+
+        /// <summary>
+        /// Occurs after Delete
+        /// </summary>
+        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUserType>> UserTypeDeleted;
     }
 }

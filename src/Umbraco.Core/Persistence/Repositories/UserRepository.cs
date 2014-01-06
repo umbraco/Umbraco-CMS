@@ -200,7 +200,18 @@ namespace Umbraco.Core.Persistence.Repositories
         #endregion
 
         #region Implementation of IUserRepository
-        
+
+        public bool Exists(string username)
+        {
+            var sql = new Sql();
+            var escapedUserName = PetaPocoExtensions.EscapeAtSymbols(username);
+            sql.Select("COUNT(*)")
+                .From<UserDto>()
+                .Where<UserDto>(x => x.UserName == escapedUserName);
+
+            return Database.ExecuteScalar<int>(sql) > 0;
+        }
+
         public IEnumerable<IUser> GetUsersAssignedToSection(string sectionAlias)
         {
             //Here we're building up a query that looks like this, a sub query is required because the resulting structure

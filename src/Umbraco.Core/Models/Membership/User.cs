@@ -23,6 +23,8 @@ namespace Umbraco.Core.Models.Membership
     {
         public User(IUserType userType)
         {
+            if (userType == null) throw new ArgumentNullException("userType");
+
             _userType = userType;
             //Groups = new List<object> { userType };
             SessionTimeout = 60;
@@ -30,6 +32,15 @@ namespace Umbraco.Core.Models.Membership
             _addedSections = new List<string>();
             _removedSections = new List<string>();
             _sectionCollection.CollectionChanged += SectionCollectionChanged;
+        }
+
+        public User(string name, string email, string username, string password, IUserType userType)
+            : this(userType)
+        {
+            _name = name;
+            _email = email;
+            _username = username;
+            _password = password;
         }
 
         private readonly IUserType _userType;
