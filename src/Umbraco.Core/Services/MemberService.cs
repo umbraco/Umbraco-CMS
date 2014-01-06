@@ -242,8 +242,6 @@ namespace Umbraco.Core.Services
                 }
 
                 return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Email);
-                
-                //return repository.GetByQuery(query);
             }
         }
 
@@ -276,8 +274,6 @@ namespace Umbraco.Core.Services
                 }
 
                 return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Username);
-
-                //return repository.GetByQuery(query);
             }
         }
 
@@ -532,7 +528,11 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IMember> GetAllMembers(int pageIndex, int pageSize, out int totalRecords)
         {
-            throw new NotImplementedException();
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
+            {
+                return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, member => member.Username);
+            }
         }
 
         public IMember CreateMember(string email, string username, string password, IMemberType memberType)

@@ -465,7 +465,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Gets paged member results
         /// </summary>
-        /// <param name="query"></param>
+        /// <param name="query">
+        /// The where clause, if this is null all records are queried
+        /// </param>
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <param name="totalRecords"></param>
@@ -480,9 +482,18 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var sql = new Sql();
             sql.Select("*").From<MemberDto>();
+
+            Sql resultQuery;
+            if (query != null)
+            {
+                var translator = new SqlTranslator<IMember>(sql, query);
+                resultQuery = translator.Translate();
+            }
+            else
+            {
+                resultQuery = sql;
+            }
             
-            var translator = new SqlTranslator<IMember>(sql, query);
-            var resultQuery = translator.Translate();
 
             //get the referenced column name
             var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);

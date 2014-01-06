@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
 
@@ -29,5 +31,16 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="sectionAlias"></param>
         IEnumerable<IUser> GetUsersAssignedToSection(string sectionAlias);
+
+        /// <summary>
+        /// Gets paged member results
+        /// </summary>
+        /// <param name="query"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="orderBy"></param>
+        /// <returns></returns>
+        IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy);
     }
 }

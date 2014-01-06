@@ -113,6 +113,23 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Get_All_Paged_Members()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var members = MockedMember.CreateSimpleMember(memberType, 10);
+            ServiceContext.MemberService.Save(members);
+
+            int totalRecs;
+            var found = ServiceContext.MemberService.GetAllMembers(0, 2, out totalRecs);
+
+            Assert.AreEqual(2, found.Count());
+            Assert.AreEqual(10, totalRecs);
+            Assert.AreEqual("test0", found.First().Username);
+            Assert.AreEqual("test1", found.Last().Username);
+        }
+
+        [Test]
         public void Find_By_Email_Starts_With()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();

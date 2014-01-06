@@ -214,12 +214,66 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IUser> FindMembersByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            throw new NotImplementedException();
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateUserRepository(uow))
+            {
+                var query = new Query<IUser>();
+
+                switch (matchType)
+                {
+                    case StringPropertyMatchType.Exact:
+                        query.Where(member => member.Email.Equals(emailStringToMatch));
+                        break;
+                    case StringPropertyMatchType.Contains:
+                        query.Where(member => member.Email.Contains(emailStringToMatch));
+                        break;
+                    case StringPropertyMatchType.StartsWith:
+                        query.Where(member => member.Email.StartsWith(emailStringToMatch));
+                        break;
+                    case StringPropertyMatchType.EndsWith:
+                        query.Where(member => member.Email.EndsWith(emailStringToMatch));
+                        break;
+                    case StringPropertyMatchType.Wildcard:
+                        query.Where(member => member.Email.SqlWildcard(emailStringToMatch, TextColumnType.NVarchar));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("matchType");
+                }
+
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Email);
+            }
         }
 
         public IEnumerable<IUser> FindMembersByUsername(string login, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            throw new NotImplementedException();
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateUserRepository(uow))
+            {
+                var query = new Query<IUser>();
+
+                switch (matchType)
+                {
+                    case StringPropertyMatchType.Exact:
+                        query.Where(member => member.Username.Equals(login));
+                        break;
+                    case StringPropertyMatchType.Contains:
+                        query.Where(member => member.Username.Contains(login));
+                        break;
+                    case StringPropertyMatchType.StartsWith:
+                        query.Where(member => member.Username.StartsWith(login));
+                        break;
+                    case StringPropertyMatchType.EndsWith:
+                        query.Where(member => member.Username.EndsWith(login));
+                        break;
+                    case StringPropertyMatchType.Wildcard:
+                        query.Where(member => member.Email.SqlWildcard(login, TextColumnType.NVarchar));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("matchType");
+                }
+
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Username);
+            }
         }
 
         public int GetMemberCount(MemberCountType countType)
@@ -260,7 +314,11 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IUser> GetAllMembers(int pageIndex, int pageSize, out int totalRecords)
         {
-            throw new NotImplementedException();
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateUserRepository(uow))
+            {
+                return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, member => member.Username);
+            }
         }
 
         #endregion
