@@ -585,6 +585,22 @@ namespace umbraco.BusinessLogic
         }
 
         /// <summary>
+        /// Updates the membership provider properties
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <param name="email"></param>
+        /// <param name="disabled"></param>
+        /// <param name="noConsole"></param>        
+        public static void Update(int id, string email, bool disabled, bool noConsole)
+        {
+            SqlHelper.ExecuteNonQuery(@"Update umbracoUser set userEmail=@email, userDisabled=@disabled, userNoConsole=@noconsole where id = @id",
+                SqlHelper.CreateParameter("@email", email),
+                SqlHelper.CreateParameter("@disabled", disabled),
+                SqlHelper.CreateParameter("@noconsole", noConsole),
+                SqlHelper.CreateParameter("@id", id));
+        }
+
+        /// <summary>
         /// Gets the ID from the user with the specified login name and password
         /// </summary>
         /// <param name="lname">The login name.</param>

@@ -300,7 +300,26 @@ namespace umbraco.providers
         /// </returns>
         protected override string PerformGetPassword(string username, string answer)
         {
-            throw new ProviderException("Password Retrieval Not Enabled.");
+            var found = User.GetAllByLoginName(username, false).ToArray();
+            if (found == null || found.Any() == false)
+            {
+                throw new MembershipPasswordException("The supplied user is not found");
+            }
+
+            // check if user is locked out
+            if (found.First().NoConsole)
+            {
+                throw new MembershipPasswordException("The supplied user is locked out");
+            }
+
+            if (RequiresQuestionAndAnswer)
+            {
+                throw new NotImplementedException("Question/answer is not supported with this membership provider");
+            }
+
+            var decodedPassword = DecryptPassword(found.First().GetPassword());
+
+            return decodedPassword;
         }
 
         /// <summary>
@@ -392,7 +411,7 @@ namespace umbraco.providers
             {
                 var user = new User(userName)
                     {
-                        Disabled = false
+                        NoConsole = false
                     };
                 user.Save();
             }
@@ -409,19 +428,19 @@ namespace umbraco.providers
         /// <param name="user">A <see cref="T:System.Web.Security.MembershipUser"></see> object that represents the user to update and the updated information for the user.</param>
         public override void UpdateUser(MembershipUser user)
         {
-            var umbracoUser = user as UsersMembershipUser;
-            var userID = 0;
+            var found = User.GetAllByLoginName(user.UserName, false).ToArray();
+            if (found == null || found.Any() == false)
+                throw new MembershipPasswordException("The supplied user is not found");
 
-            if (int.TryParse(umbracoUser.ProviderUserKey.ToString(), out userID) == false) return;
+            var m = found.First();
 
-            try
-            {
-                User.Update(userID, umbracoUser.FullName, umbracoUser.UserName, umbracoUser.Email, umbracoUser.UserType);
-            }
-            catch (Exception)
-            {
-                throw new ProviderException("User cannot be updated.");
-            }
+            // update approve status            
+            // update lock status
+            // TODO: Update last lockout time            
+            // TODO: update comment
+            User.Update(m.Id, user.Email, user.IsApproved == false, user.IsLockedOut);
+            
+            m.Save();
         }
 
         /// <summary>
