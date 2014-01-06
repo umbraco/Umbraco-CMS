@@ -19,10 +19,12 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IUser BuildEntity(UserDto dto)
         {
+            var guidId = dto.Id.ToGuid();
             var user = new User(_userType)
                 {
                     Id = dto.Id,
-                    //ProfileId = dto.Id,
+                    Key = guidId,
+                    ProviderUserKey = guidId,
                     StartContentId = dto.ContentStartId,
                     StartMediaId = dto.MediaStartId.HasValue ? dto.MediaStartId.Value : -1,
                     Password = dto.Password,

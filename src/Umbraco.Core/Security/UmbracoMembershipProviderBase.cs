@@ -1,20 +1,15 @@
+using System.Text;
 using System.Web.Security;
 
 namespace Umbraco.Core.Security
 {
 
     /// <summary>
-    /// A base membership provider class for umbraco members (not users)
+    /// A base membership provider class for umbraco providers
     /// </summary>
     public abstract class UmbracoMembershipProviderBase : MembershipProviderBase
     {
-        protected UmbracoMembershipProviderBase()
-        {
-            //Set the defaults!
-            DefaultMemberTypeAlias = "Member";
-        }
-
-        public string DefaultMemberTypeAlias { get; protected set; }
+        public abstract string DefaultMemberTypeAlias { get; }
         
         /// <summary>
         /// Adds a new membership user to the data source.
@@ -74,5 +69,13 @@ namespace Umbraco.Core.Security
         /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the information for the newly created user.
         /// </returns>
         protected abstract MembershipUser PerformCreateUser(string memberTypeAlias, string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status);
+
+        public override string ToString()
+        {
+            var result = base.ToString();
+            var sb = new StringBuilder(result);
+            sb.AppendLine("DefaultMemberTypeAlias=" + DefaultMemberTypeAlias);
+            return sb.ToString();
+        }
     }
 }

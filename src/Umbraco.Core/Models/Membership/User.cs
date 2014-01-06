@@ -58,7 +58,7 @@ namespace Umbraco.Core.Models.Membership
         private string _username;
         private string _email;
         private string _password;
-        private object _providerUserKey;
+        private Guid _key;
         private bool _isApproved;
         private bool _isLockedOut;
         private string _language;
@@ -71,7 +71,7 @@ namespace Umbraco.Core.Models.Membership
         private static readonly PropertyInfo AllowedSectionsSelector = ExpressionHelper.GetPropertyInfo<User, IEnumerable<string>>(x => x.AllowedSections);
         private static readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<User, object>(x => x.Id);
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Name);
-        private static readonly PropertyInfo ProviderUserKeySelector = ExpressionHelper.GetPropertyInfo<User, object>(x => x.ProviderUserKey);
+        private static readonly PropertyInfo KeySelector = ExpressionHelper.GetPropertyInfo<User, Guid>(x => x.Key);
         private static readonly PropertyInfo UserTypeKeySelector = ExpressionHelper.GetPropertyInfo<User, Type>(x => x.ProviderUserKeyType);
         
         private static readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Username);
@@ -102,7 +102,22 @@ namespace Umbraco.Core.Models.Membership
             }
         }
 
-        public Guid Key { get; set; }
+        [IgnoreDataMember]
+        public Guid Key
+        {
+            get
+            {
+                return _key;
+            }
+            set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _key = value;
+                    return _key;
+                }, _key, KeySelector);
+            }
+        }
 
         #endregion
 
@@ -111,17 +126,18 @@ namespace Umbraco.Core.Models.Membership
         [IgnoreDataMember]
         public object ProviderUserKey
         {
-            get
-            {
-                return _providerUserKey;
-            }
+            get { return Key; }
             set
             {
-                SetPropertyValueAndDetectChanges(o =>
+                var result = value.TryConvertTo<Guid>();
+                if (result.Success)
                 {
-                    _providerUserKey = value;
-                    return _id;
-                }, _providerUserKey, ProviderUserKeySelector);
+                    Key = result.Result;
+                }
+                else
+                {
+                    throw new NotSupportedException("The User object cannot have a ProviderUserKey of anything other than a GUID");
+                }
             }
         }
 
@@ -198,25 +214,6 @@ namespace Umbraco.Core.Models.Membership
         }
 
         [DataMember]
-        public string PasswordQuestion
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-        [DataMember]
-        public string PasswordAnswer
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-        [DataMember]
-        public string Comments
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
-        
-        [DataMember]
         public bool IsApproved
         {
             get { return _isApproved; }
@@ -242,39 +239,58 @@ namespace Umbraco.Core.Models.Membership
                     return _isLockedOut;
                 }, _isLockedOut, IsLockedOutSelector);
             }
-        }    
+        }
 
-        [DataMember]
+        //TODO: Figure out how to support all of this!
+        [IgnoreDataMember]
+        public string PasswordQuestion
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+        [IgnoreDataMember]
+        public string PasswordAnswer
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+        [IgnoreDataMember]
+        public string Comments
+        {
+            get { throw new NotImplementedException(); }
+            set { throw new NotImplementedException(); }
+        }
+        [IgnoreDataMember]
         public DateTime CreateDate
         {
             get { throw new NotImplementedException(); }
             set { throw new NotImplementedException(); }
         }
-        [DataMember]
+        [IgnoreDataMember]
         public DateTime UpdateDate
         {
             get { throw new NotImplementedException(); }
             set { throw new NotImplementedException(); }
         }
-        [DataMember]
+        [IgnoreDataMember]
         public DateTime LastLoginDate
         {
             get { throw new NotImplementedException(); }
             set { throw new NotImplementedException(); }
         }
-        [DataMember]
+        [IgnoreDataMember]
         public DateTime LastPasswordChangeDate
         {
             get { throw new NotImplementedException(); }
             set { throw new NotImplementedException(); }
         }
-        [DataMember]
+        [IgnoreDataMember]
         public DateTime LastLockoutDate
         {
             get { throw new NotImplementedException(); }
             set { throw new NotImplementedException(); }
         }
-        [DataMember]
+        [IgnoreDataMember]
         public int FailedPasswordAttempts
         {
             get { throw new NotImplementedException(); }

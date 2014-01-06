@@ -14,7 +14,6 @@ namespace Umbraco.Core.Models.Membership
         string PasswordAnswer { get; set; }
         string Comments { get; set; }
         bool IsApproved { get; set; }
-        //bool IsOnline { get; set; }
         bool IsLockedOut { get; set; }
         DateTime LastLoginDate { get; set; }
         DateTime LastPasswordChangeDate { get; set; }

@@ -46,7 +46,8 @@ namespace umbraco.providers.members
         }
 
         #region Fields
-        
+
+        private string _defaultMemberTypeAlias = "Member";
         private string _providerName = Member.UmbracoMemberProviderName;       
 
         #endregion
@@ -117,9 +118,9 @@ namespace umbraco.providers.members
             
             // test for membertype (if not specified, choose the first member type available)
             if (config["defaultMemberTypeAlias"] != null)
-                DefaultMemberTypeAlias = config["defaultMemberTypeAlias"];
+                _defaultMemberTypeAlias = config["defaultMemberTypeAlias"];
             else if (MemberType.GetAll.Length == 1)
-                DefaultMemberTypeAlias = MemberType.GetAll[0].Alias;
+                _defaultMemberTypeAlias = MemberType.GetAll[0].Alias;
             else
                 throw new ProviderException("No default MemberType alias is specified in the web.config string. Please add a 'defaultMemberTypeAlias' to the add element in the provider declaration in web.config");
 
@@ -228,6 +229,11 @@ namespace umbraco.providers.members
             UpdateMemberProperty(m, PasswordRetrievalAnswerPropertyTypeAlias, newPasswordAnswer);
             m.Save();
             return true;
+        }
+
+        public override string DefaultMemberTypeAlias
+        {
+            get { return _defaultMemberTypeAlias; }
         }
 
         /// <summary>

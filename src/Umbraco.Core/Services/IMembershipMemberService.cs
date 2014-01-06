@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
@@ -24,7 +25,7 @@ namespace Umbraco.Core.Services
     /// Idea is to have this is an isolated interface so that it can be easily 'replaced' in the membership provider impl.
     /// </remarks>
     public interface IMembershipMemberService<T> : IService
-        where T: IEntity
+        where T : IMembershipUser
     {
         /// <summary>
         /// Checks if a member with the username exists

@@ -112,7 +112,7 @@ namespace umbraco.providers
         /// </returns>
         protected override bool PerformChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer)
         {
-            throw new Exception("The method or operation is not implemented.");
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -286,7 +286,8 @@ namespace umbraco.providers
         /// </returns>
         public override int GetNumberOfUsersOnline()
         {
-            throw new Exception("The method or operation is not implemented.");
+            var fromDate = DateTime.Now.AddMinutes(-Membership.UserIsOnlineTimeWindow);
+            return Log.Instance.GetLogItems(LogTypes.Login, fromDate).Count;
         }
 
         /// <summary>
@@ -333,7 +334,12 @@ namespace umbraco.providers
         public override MembershipUser GetUser(string username, bool userIsOnline)
         {
             var userId = User.getUserId(username);
-            return (userId != -1) ? ConvertToMembershipUser(new User(userId)) : null;
+
+            var user = new User(userId);
+            //We need to log this since it's the only way we can determine the number of users online
+            Log.Add(LogTypes.Login, user, -1, "User " + username + " has logged in");
+
+            return (userId != -1) ? ConvertToMembershipUser(user) : null;
         }
 
         /// <summary>
@@ -346,7 +352,10 @@ namespace umbraco.providers
         /// </returns>
         public override MembershipUser GetUser(object providerUserKey, bool userIsOnline)
         {
-            return ConvertToMembershipUser(new User(Convert.ToInt32(providerUserKey)));
+            var user = new User(Convert.ToInt32(providerUserKey));
+            //We need to log this since it's the only way we can determine the number of users online
+            Log.Add(LogTypes.Login, user, -1, "User " + user.LoginName + " has logged in");
+            return ConvertToMembershipUser(user);
         }
 
         /// <summary>
@@ -486,6 +495,7 @@ namespace umbraco.providers
 
         #region Helper Methods
        
+
         /// <summary>
         /// Encodes the password.
         /// </summary>

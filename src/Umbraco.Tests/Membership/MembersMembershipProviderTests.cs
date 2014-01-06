@@ -10,9 +10,10 @@ using Umbraco.Web.Security.Providers;
 
 namespace Umbraco.Tests.Membership
 {
-    [TestFixture]
+    [TestFixture, RequiresSTA]
     public class MembersMembershipProviderTests
     {
+       
         //[Test]
         //public void Set_Default_Member_Type_On_Init()
 
@@ -47,7 +48,9 @@ namespace Umbraco.Tests.Membership
                                 createdMember = new Member("test", e, u, p, memberType);
                             })
                         .Returns(() => createdMember);
-            var provider = new MembersMembershipProvider(mServiceMock.Object);
+            var provider = new MembersMembershipProvider(mServiceMock.Object);            
+            provider.Initialize("test", new NameValueCollection());
+            
 
             MembershipCreateStatus status;
             provider.CreateUser("test", "test", "test", "test@test.com", "test", "test", true, "test", out status);
@@ -78,6 +81,8 @@ namespace Umbraco.Tests.Membership
 
             var provider = new MembersMembershipProvider(mServiceMock.Object);
             provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Encrypted" } });
+            
+
             MembershipCreateStatus status;
             provider.CreateUser("test", "test", "test", "test@test.com", "test", "test", true, "test", out status);
 
@@ -108,6 +113,8 @@ namespace Umbraco.Tests.Membership
 
             var provider = new MembersMembershipProvider(mServiceMock.Object);
             provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" }, { "hashAlgorithmType", "HMACSHA256" } });
+            
+
             MembershipCreateStatus status;
             provider.CreateUser("test", "test", "test", "test@test.com", "test", "test", true, "test", out status);
 

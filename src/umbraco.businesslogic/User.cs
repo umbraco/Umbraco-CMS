@@ -599,7 +599,7 @@ namespace umbraco.BusinessLogic
                 SqlHelper.CreateParameter("@noconsole", noConsole),
                 SqlHelper.CreateParameter("@id", id));
         }
-
+        
         /// <summary>
         /// Gets the ID from the user with the specified login name and password
         /// </summary>
