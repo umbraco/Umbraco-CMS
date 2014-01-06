@@ -131,14 +131,14 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
 
                 // Act
-                var resolved = repository.Get((int)user.Id);
+                var resolved = (User)repository.Get((int)user.Id);
 
                 resolved.Name = "New Name";
-                resolved.DefaultPermissions = "ZYX";
+                resolved.DefaultPermissions = new[]{"Z", "Y", "X"};
                 resolved.Language = "fr";
                 resolved.IsApproved = false;
                 resolved.Password = "new";
-                resolved.NoConsole = true;
+                resolved.IsLockedOut = true;
                 resolved.StartContentId = 10;
                 resolved.StartMediaId = 11;
                 resolved.DefaultToLiveEditing = true;
@@ -148,7 +148,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 repository.AddOrUpdate(resolved);
                 unitOfWork.Commit();
-                var updatedItem = repository.Get((int)user.Id);
+                var updatedItem = (User)repository.Get((int)user.Id);
 
                 // Assert
                 Assert.That(updatedItem.Id, Is.EqualTo(resolved.Id));
@@ -157,7 +157,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(updatedItem.Language, Is.EqualTo(resolved.Language));
                 Assert.That(updatedItem.IsApproved, Is.EqualTo(resolved.IsApproved));
                 Assert.That(updatedItem.Password, Is.EqualTo(resolved.Password));
-                Assert.That(updatedItem.NoConsole, Is.EqualTo(resolved.NoConsole));
+                Assert.That(updatedItem.IsLockedOut, Is.EqualTo(resolved.IsLockedOut));
                 Assert.That(updatedItem.StartContentId, Is.EqualTo(resolved.StartContentId));
                 Assert.That(updatedItem.StartMediaId, Is.EqualTo(resolved.StartMediaId));
                 Assert.That(updatedItem.DefaultToLiveEditing, Is.EqualTo(resolved.DefaultToLiveEditing));
@@ -492,10 +492,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(updatedItem.Language, Is.EqualTo(originalUser.Language));
             Assert.That(updatedItem.IsApproved, Is.EqualTo(originalUser.IsApproved));
             Assert.That(updatedItem.Password, Is.EqualTo(originalUser.Password));
-            Assert.That(updatedItem.NoConsole, Is.EqualTo(originalUser.NoConsole));
+            Assert.That(updatedItem.IsLockedOut, Is.EqualTo(originalUser.IsLockedOut));
             Assert.That(updatedItem.StartContentId, Is.EqualTo(originalUser.StartContentId));
             Assert.That(updatedItem.StartMediaId, Is.EqualTo(originalUser.StartMediaId));
-            Assert.That(updatedItem.DefaultToLiveEditing, Is.EqualTo(originalUser.DefaultToLiveEditing));
+            Assert.That(((User)updatedItem).DefaultToLiveEditing, Is.EqualTo(((User)originalUser).DefaultToLiveEditing));
             Assert.That(updatedItem.Email, Is.EqualTo(originalUser.Email));
             Assert.That(updatedItem.Username, Is.EqualTo(originalUser.Username));
             Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(2));

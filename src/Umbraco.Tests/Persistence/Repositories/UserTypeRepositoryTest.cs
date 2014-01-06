@@ -125,7 +125,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Act
                 var resolved = repository.Get(userType.Id);
                 resolved.Name = "New Name";
-                resolved.Permissions = "ZYX";
+                resolved.Permissions = new[]{"Z", "Y", "X"};
                 repository.AddOrUpdate(resolved);
                 unitOfWork.Commit();
                 var updatedItem = repository.Get(userType.Id);

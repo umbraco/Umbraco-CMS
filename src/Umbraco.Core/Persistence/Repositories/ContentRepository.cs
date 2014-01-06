@@ -269,9 +269,9 @@ namespace Umbraco.Core.Persistence.Repositories
             if (parentPermissions.Any())
             {
                 var userPermissions = parentPermissions.Select(
-                    permissionDto => new KeyValuePair<object, string>(
+                    permissionDto => new KeyValuePair<object, IEnumerable<string>>(
                                          permissionDto.UserId,
-                                         permissionDto.Permission));                
+                                         permissionDto.Permission.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture))));                
                 AssignEntityPermissions(entity, userPermissions);
                 //flag the entity's permissions changed flag so we can track those changes.
                 //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 
@@ -18,22 +20,23 @@ namespace Umbraco.Core.Persistence.Factories
         public IUser BuildEntity(UserDto dto)
         {
             var user = new User(_userType)
-                       {
-                           Id = dto.Id,
-                           ProfileId = dto.Id,
-                           StartContentId = dto.ContentStartId,
-                           StartMediaId = dto.MediaStartId.HasValue ? dto.MediaStartId.Value : -1,
-                           Password = dto.Password,
-                           Username = dto.Login,
-                           Name = dto.UserName,
-                           IsLockedOut = dto.Disabled,
-                           IsApproved = dto.Disabled == false,
-                           Email = dto.Email,
-                           Language = dto.UserLanguage,
-                           DefaultToLiveEditing = dto.DefaultToLiveEditing,
-                           NoConsole = dto.NoConsole,
-                           DefaultPermissions = dto.DefaultPermissions
-                       };
+                {
+                    Id = dto.Id,
+                    //ProfileId = dto.Id,
+                    StartContentId = dto.ContentStartId,
+                    StartMediaId = dto.MediaStartId.HasValue ? dto.MediaStartId.Value : -1,
+                    Password = dto.Password,
+                    Username = dto.Login,
+                    Name = dto.UserName,
+                    IsLockedOut = dto.NoConsole,
+                    IsApproved = dto.Disabled == false,
+                    Email = dto.Email,
+                    Language = dto.UserLanguage,
+                    DefaultToLiveEditing = dto.DefaultToLiveEditing,
+                    DefaultPermissions = dto.DefaultPermissions.IsNullOrWhiteSpace()
+                                             ? Enumerable.Empty<string>()
+                                             : dto.DefaultPermissions.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture))
+                };
 
             foreach (var app in dto.User2AppDtos)
             {
@@ -53,16 +56,16 @@ namespace Umbraco.Core.Persistence.Factories
                           {
                               ContentStartId = entity.StartContentId,
                               MediaStartId = entity.StartMediaId,
-                              DefaultToLiveEditing = entity.DefaultToLiveEditing,
+                              DefaultToLiveEditing = ((User)entity).DefaultToLiveEditing,
                               Disabled = entity.IsApproved == false,
                               Email = entity.Email,
                               Login = entity.Username,
-                              NoConsole = entity.NoConsole,
+                              NoConsole = entity.IsLockedOut,
                               Password = entity.Password,
                               UserLanguage = entity.Language,
                               UserName = entity.Name,
-                              Type = short.Parse(entity.UserType.Id.ToString()),
-                              DefaultPermissions = entity.DefaultPermissions,
+                              Type = short.Parse(entity.UserType.Id.ToString(CultureInfo.InvariantCulture)),
+                              DefaultPermissions = entity.DefaultPermissions == null ? "" : string.Join("", entity.DefaultPermissions),
                               User2AppDtos = new List<User2AppDto>()
                           };
 

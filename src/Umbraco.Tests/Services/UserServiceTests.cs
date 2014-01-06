@@ -33,7 +33,7 @@ namespace Umbraco.Tests.Services
             var userType = userService.GetUserTypeByAlias("admin");
 
             // Act
-            var membershipUser = userService.CreateMembershipUser("John Doe", "john@umbraco.io", "12345", userType, "john@umbraco.io");
+            var membershipUser = userService.CreateMember("JohnDoe", "john@umbraco.io", "12345", userType);
 
             // Assert
             Assert.That(membershipUser.HasIdentity, Is.True);
@@ -55,7 +55,7 @@ namespace Umbraco.Tests.Services
             var hash = new HMACSHA1();
             hash.Key = Encoding.Unicode.GetBytes(password);
             var encodedPassword = Convert.ToBase64String(hash.ComputeHash(Encoding.Unicode.GetBytes(password)));
-            var membershipUser = userService.CreateMembershipUser("John Doe", "john@umbraco.io", encodedPassword, userType, "john@umbraco.io");
+            var membershipUser = userService.CreateMember("JohnDoe", "john@umbraco.io", encodedPassword, userType);
 
             // Assert
             Assert.That(membershipUser.HasIdentity, Is.True);
@@ -70,9 +70,9 @@ namespace Umbraco.Tests.Services
         public void Can_Remove_Section_From_All_Assigned_Users()
         {            
             var userType = ServiceContext.UserService.GetUserTypeByAlias("admin");
-            //we know this actually is an IUser so we'll just cast
-            var user1 = (IUser)ServiceContext.UserService.CreateMembershipUser("test1", "test1", "test1", userType, "test1@test.com");
-            var user2 = (IUser)ServiceContext.UserService.CreateMembershipUser("test2", "test2", "test2", userType, "test2@test.com");
+
+            var user1 = ServiceContext.UserService.CreateMember("test1", "test1@test.com", "test1", userType);
+            var user2 = ServiceContext.UserService.CreateMember("test2", "test2@test.com", "test2", userType);
             
             //adds some allowed sections
             user1.AddAllowedSection("test");
@@ -96,7 +96,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var userType = ServiceContext.UserService.GetUserTypeByAlias("admin");
-            var user = (IUser)ServiceContext.UserService.CreateMembershipUser("test1", "test1", "test1", userType, "test1@test.com");
+            var user = ServiceContext.UserService.CreateMember("test1", "test1@test.com", "test1", userType);
 
             // Act
 
@@ -113,7 +113,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var userType = ServiceContext.UserService.GetUserTypeByAlias("admin");
-            var user = (IUser)ServiceContext.UserService.CreateMembershipUser("test1", "test1", "test1", userType, "test1@test.com");
+            var user = (IUser)ServiceContext.UserService.CreateMember("test1", "test1@test.com", "test1", userType);
 
             // Act
 
@@ -130,11 +130,11 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var userType = ServiceContext.UserService.GetUserTypeByAlias("admin");
-            var originalUser = (IUser)ServiceContext.UserService.CreateMembershipUser("test1", "test1", "test1", userType, "test1@test.com");
+            var originalUser = (User)ServiceContext.UserService.CreateMember("test1", "test1@test.com", "test1", userType);
 
             // Act
 
-            var updatedItem = ServiceContext.UserService.GetUserByUserName(originalUser.Username);
+            var updatedItem = (User)ServiceContext.UserService.GetByUsername(originalUser.Username);
 
             // Assert
             Assert.IsNotNull(updatedItem);
@@ -144,7 +144,7 @@ namespace Umbraco.Tests.Services
             Assert.That(updatedItem.Language, Is.EqualTo(originalUser.Language));
             Assert.That(updatedItem.IsApproved, Is.EqualTo(originalUser.IsApproved));
             Assert.That(updatedItem.Password, Is.EqualTo(originalUser.Password));
-            Assert.That(updatedItem.NoConsole, Is.EqualTo(originalUser.NoConsole));
+            Assert.That(updatedItem.IsLockedOut, Is.EqualTo(originalUser.IsLockedOut));
             Assert.That(updatedItem.StartContentId, Is.EqualTo(originalUser.StartContentId));
             Assert.That(updatedItem.StartMediaId, Is.EqualTo(originalUser.StartMediaId));
             Assert.That(updatedItem.DefaultToLiveEditing, Is.EqualTo(originalUser.DefaultToLiveEditing));

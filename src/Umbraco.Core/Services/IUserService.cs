@@ -14,9 +14,10 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the User to retrieve</param>
         /// <returns><see cref="IProfile"/></returns>
         IProfile GetProfileById(int id);
-
         IProfile GetProfileByUserName(string username);
-        IUser GetUserByUserName(string username);
+
+        //IUser GetUserByUserName(string username);
+
         IUser GetUserById(int id);
 
         /// <summary>

@@ -511,6 +511,22 @@ namespace Umbraco.Core.Services
             throw new NotImplementedException();
         }
 
+        public IMember CreateMember(string email, string username, string password, IMemberType memberType)
+        {
+            if (memberType == null) throw new ArgumentNullException("memberType");
+
+            var member = new Member(email, email, username, password, -1, memberType);
+
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
+            {
+                repository.AddOrUpdate(member);
+                uow.Commit();
+            }
+
+            return member;
+        }
+
         /// <summary>
         /// Creates and persists a new Member
         /// </summary>
@@ -531,17 +547,11 @@ namespace Umbraco.Core.Services
             }
 
             if (memberType == null)
-                throw new Exception(string.Format("No MemberType matching the passed in Alias: '{0}' was found", memberTypeAlias));
-
-            var member = new Member(email, email, username, password, -1, memberType);
-
-            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                repository.AddOrUpdate(member);
-                uow.Commit();
+                throw new ArgumentException(string.Format("No MemberType matching the passed in Alias: '{0}' was found", memberTypeAlias));
             }
 
-            return member;
+            return CreateMember(email, username, password, memberTypeAlias);
         }
 
         /// <summary>

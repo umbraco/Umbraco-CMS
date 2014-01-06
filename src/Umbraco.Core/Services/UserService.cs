@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Events;
@@ -33,6 +34,113 @@ namespace Umbraco.Core.Services
             _uowProvider = provider;
         }
 
+        #region Implementation of IMembershipUserService
+
+        public bool Exists(string username)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IUser CreateMember(string username, string email, string password, IUserType userType)
+        {
+            if (userType == null) throw new ArgumentNullException("userType");
+
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateUserRepository(uow))
+            {
+                var loginExists = uow.Database.ExecuteScalar<int>("SELECT COUNT(id) FROM umbracoUser WHERE userLogin = @Login", new { Login = username }) != 0;
+                if (loginExists)
+                    throw new ArgumentException("Login already exists");
+
+                var user = new User(userType)
+                {
+                    DefaultToLiveEditing = false,
+                    Email = email,
+                    Language = Configuration.GlobalSettings.DefaultUILanguage,
+                    Name = username,
+                    Password = password,
+                    DefaultPermissions = userType.Permissions,
+                    Username = username,
+                    StartContentId = -1,
+                    StartMediaId = -1,
+                    IsLockedOut = false,
+                    IsApproved = true
+                };
+
+                repository.AddOrUpdate(user);
+                uow.Commit();
+
+                return user;
+            }
+        }
+
+        public IUser CreateMember(string username, string email, string password, string memberTypeAlias)
+        {
+            var userType = GetUserTypeByAlias(memberTypeAlias);
+            if (userType == null)
+            {
+                throw new ArgumentException("The user type " + memberTypeAlias + " could not be resolved");
+            }
+
+            return CreateMember(username, email, password, userType);
+        }
+
+        public IUser GetById(object id)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IUser GetByEmail(string email)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IUser GetByUsername(string login)
+        {
+            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IUser>.Builder.Where(x => x.Username == login);
+                return repository.GetByQuery(query).FirstOrDefault();
+            }
+        }
+
+        public void Delete(IUser membershipUser)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Save(IUser membershipUser, bool raiseEvents = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void Save(IEnumerable<IUser> members, bool raiseEvents = true)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<IUser> FindMembersByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<IUser> FindMembersByUsername(string login, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+        {
+            throw new NotImplementedException();
+        }
+
+        public int GetMemberCount(MemberCountType countType)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<IUser> GetAllMembers(int pageIndex, int pageSize, out int totalRecords)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+
         #region Implementation of IUserService
 
         /// <summary>
@@ -43,22 +151,13 @@ namespace Umbraco.Core.Services
         public IProfile GetProfileById(int id)
         {
             var user = GetUserById(id);
-            return new Profile(user.Id, user.Name);
+            return user;
         }
 
-        public IProfile GetProfileByUserName(string username)
+        public IProfile GetProfileByUserName(string login)
         {
-            var user = GetUserByUserName(username);
-            return new Profile(user.Id, user.Name);
-        }
-
-        public IUser GetUserByUserName(string username)
-        {
-            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
-            {
-                var query = Query<IUser>.Builder.Where(x => x.Username == username);
-                return repository.GetByQuery(query).FirstOrDefault();
-            }
+            var user = GetByUsername(login);
+            return user;
         }
 
         public IUser GetUserById(int id)
@@ -68,7 +167,6 @@ namespace Umbraco.Core.Services
                 return repository.Get(id);
             }
         }
-
 
         /// <summary>
         /// Gets an IUserType by its Alias
@@ -139,45 +237,45 @@ namespace Umbraco.Core.Services
             }
         }
 
-        /// <summary>
-        /// Creates a new user for logging into the umbraco backoffice
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="login"></param>
-        /// <param name="password"></param>
-        /// <param name="userType"></param>
-        /// <param name="email"></param>
-        /// <returns></returns>
-        public IMembershipUser CreateMembershipUser(string name, string login, string password, IUserType userType, string email = "")
-        {
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateUserRepository(uow))
-            {
-                var loginExists = uow.Database.ExecuteScalar<int>("SELECT COUNT(id) FROM umbracoUser WHERE userLogin = @Login", new { Login = login }) != 0;
-                if (loginExists)
-                    throw new ArgumentException("Login already exists");
+        ///// <summary>
+        ///// Creates a new user for logging into the umbraco backoffice
+        ///// </summary>
+        ///// <param name="name"></param>
+        ///// <param name="login"></param>
+        ///// <param name="password"></param>
+        ///// <param name="userType"></param>
+        ///// <param name="email"></param>
+        ///// <returns></returns>
+        //public IMembershipUser CreateMembershipUser(string name, string login, string password, IUserType userType, string email = "")
+        //{
+        //    var uow = _uowProvider.GetUnitOfWork();
+        //    using (var repository = _repositoryFactory.CreateUserRepository(uow))
+        //    {
+        //        var loginExists = uow.Database.ExecuteScalar<int>("SELECT COUNT(id) FROM umbracoUser WHERE userLogin = @Login", new { Login = login }) != 0;
+        //        if (loginExists)
+        //            throw new ArgumentException("Login already exists");
 
-                var user = new User(userType)
-                {
-                    DefaultToLiveEditing = false,
-                    Email = email,
-                    Language = Umbraco.Core.Configuration.GlobalSettings.DefaultUILanguage,
-                    Name = name,
-                    Password = password,
-                    DefaultPermissions = userType.Permissions,
-                    Username = login,
-                    StartContentId = -1,
-                    StartMediaId = -1,
-                    NoConsole = false,
-                    IsApproved = true
-                };
+        //        var user = new User(userType)
+        //        {
+        //            DefaultToLiveEditing = false,
+        //            Email = email,
+        //            Language = Umbraco.Core.Configuration.GlobalSettings.DefaultUILanguage,
+        //            Name = name,
+        //            Password = password,
+        //            DefaultPermissions = userType.Permissions,
+        //            Username = login,
+        //            StartContentId = -1,
+        //            StartMediaId = -1,
+        //            NoConsole = false,
+        //            IsApproved = true
+        //        };
 
-                repository.AddOrUpdate(user);
-                uow.Commit();
+        //        repository.AddOrUpdate(user);
+        //        uow.Commit();
 
-                return user;
-            }
-        }
+        //        return user;
+        //    }
+        //}
 
         #endregion
 
