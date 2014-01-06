@@ -43,6 +43,30 @@ namespace Umbraco.Core.Services
         #region IMemberService Implementation
 
         /// <summary>
+        /// Get the default member type from the database - first check if the type "Member" is there, if not choose the first one found
+        /// </summary>
+        /// <returns></returns>
+        public string GetDefaultMemberType()
+        {
+            using (var repository = _repositoryFactory.CreateMemberTypeRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var types = repository.GetAll().Select(x => x.Alias).ToArray();
+
+                if (types.Any() == false)
+                {
+                    throw new InvalidOperationException("No member types could be resolved");
+                }
+
+                if (types.InvariantContains("Member"))
+                {
+                    return types.First(x => x.InvariantEquals("Member"));
+                }
+
+                return types.First();
+            }
+        }
+
+        /// <summary>
         /// Checks if a member with the username exists
         /// </summary>
         /// <param name="username"></param>

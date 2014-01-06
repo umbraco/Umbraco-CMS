@@ -25,8 +25,14 @@ namespace Umbraco.Core.Services
     /// Idea is to have this is an isolated interface so that it can be easily 'replaced' in the membership provider impl.
     /// </remarks>
     public interface IMembershipMemberService<T> : IService
-        where T : IMembershipUser
+        where T : class, IMembershipUser
     {
+        /// <summary>
+        /// Returns the default member type alias
+        /// </summary>
+        /// <returns></returns>
+        string GetDefaultMemberType();
+
         /// <summary>
         /// Checks if a member with the username exists
         /// </summary>

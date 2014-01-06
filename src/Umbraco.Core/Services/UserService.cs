@@ -37,6 +37,37 @@ namespace Umbraco.Core.Services
 
         #region Implementation of IMembershipUserService
 
+        /// <summary>
+        /// By default we'll return the 'writer', but we need to check it exists. If it doesn't we'll return the first type that is not an admin, otherwise if there's only one
+        /// we will return that one.
+        /// </summary>
+        /// <returns></returns>
+        public string GetDefaultMemberType()
+        {
+            using (var repository = _repositoryFactory.CreateUserTypeRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var types = repository.GetAll().Select(x => x.Alias).ToArray();
+
+                if (types.Any() == false)
+                {
+                    throw new InvalidOperationException("No member types could be resolved");
+                }
+
+                if (types.InvariantContains("writer"))
+                {
+                    return types.First(x => x.InvariantEquals("writer"));
+                }
+                
+                if (types.Length == 1)
+                {
+                    return types.First();
+                }
+
+                //first that is not admin
+                return types.First(x => x.InvariantEquals("admin") == false);
+            }
+        }
+
         public bool Exists(string username)
         {
             using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))

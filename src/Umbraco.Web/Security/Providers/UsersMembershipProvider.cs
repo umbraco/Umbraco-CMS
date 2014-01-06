@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration.Provider;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web.Security;
@@ -40,7 +41,19 @@ namespace Umbraco.Web.Security.Providers
         {
             base.Initialize(name, config);
 
-            //TODO: need to determine the default member type!
+            // test for membertype (if not specified, choose the first member type available)
+            if (config["defaultUserTypeAlias"] != null)
+            {
+                _defaultMemberTypeAlias = config["defaultUserTypeAlias"];
+            }
+            else
+            {
+                var defaultFromService = MemberService.GetDefaultMemberType();
+                if (defaultFromService.IsNullOrWhiteSpace())
+                {
+                    throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
+                }
+            }    
         }        
 
         public override string DefaultMemberTypeAlias

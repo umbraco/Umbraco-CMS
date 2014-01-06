@@ -155,7 +155,7 @@
     <Compile Include="Cache\ObjectCacheProviderTests.cs" />
     <Compile Include="Cache\RuntimeCacheProviderTests.cs" />
     <Compile Include="Membership\MembershipProviderBaseTests.cs" />
-    <Compile Include="Membership\MembersMembershipProviderTests.cs" />
+    <Compile Include="Membership\UmbracoServiceMembershipProviderTests.cs" />
     <Compile Include="MockTests.cs" />
     <Compile Include="Mvc\UmbracoViewPageTests.cs" />
     <Compile Include="Persistence\Auditing\AuditTests.cs" />

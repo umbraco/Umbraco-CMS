@@ -18,7 +18,7 @@ namespace Umbraco.Web.Security.Providers
     /// </summary>
     internal abstract class UmbracoServiceMembershipProvider<T, TEntity> : UmbracoMembershipProviderBase
         where T : IMembershipMemberService<TEntity>
-        where TEntity : IMembershipUser
+        where TEntity : class, IMembershipUser
     {
 
         protected IMembershipMemberService<TEntity> MemberService { get; private set; }
@@ -51,14 +51,6 @@ namespace Umbraco.Web.Security.Providers
             // Initialize base provider class
             base.Initialize(name, config);
 
-            //// test for membertype (if not specified, choose the first member type available)
-            //if (config["defaultMemberTypeAlias"] != null)
-            //    _defaultMemberTypeAlias = config["defaultMemberTypeAlias"];
-            //else if (MemberType.GetAll.Length == 1)
-            //    _defaultMemberTypeAlias = MemberType.GetAll[0].Alias;
-            //else
-            //    throw new ProviderException("No default MemberType alias is specified in the web.config string. Please add a 'defaultMemberTypeAlias' to the add element in the provider declaration in web.config");
-            
         }
 
         /// <summary>

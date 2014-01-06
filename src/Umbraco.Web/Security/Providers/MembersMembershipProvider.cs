@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Specialized;
+using System.ComponentModel.DataAnnotations;
+using System.Configuration.Provider;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -22,7 +24,8 @@ namespace Umbraco.Web.Security.Providers
         {            
         }
 
-        public MembersMembershipProvider(IMembershipMemberService<IMember> memberService) : base(memberService)
+        public MembersMembershipProvider(IMembershipMemberService<IMember> memberService) 
+            : base(memberService)
         {
         }
 
@@ -38,11 +41,23 @@ namespace Umbraco.Web.Security.Providers
             return entity.AsConcreteMembershipUser(Name);
         }
 
-        public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
+        public override void Initialize(string name, NameValueCollection config)
         {
             base.Initialize(name, config);
 
-            //TODO: need to determine the default member type!
+            // test for membertype (if not specified, choose the first member type available)
+            if (config["defaultMemberTypeAlias"] != null)
+            {
+                _defaultMemberTypeAlias = config["defaultMemberTypeAlias"];
+            }
+            else
+            {
+                _defaultMemberTypeAlias = MemberService.GetDefaultMemberType();
+                if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
+                {
+                    throw new ProviderException("No default MemberType alias is specified in the web.config string. Please add a 'defaultMemberTypeAlias' to the add element in the provider declaration in web.config");
+                }
+            }        
         }
 
         public override string DefaultMemberTypeAlias
