@@ -105,6 +105,60 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Find_By_Email_Ends_With()
+        {
+            var userType = MockedUserType.CreateUserType();
+            ServiceContext.UserService.SaveUserType(userType);
+            var users = MockedUser.CreateUser(userType, 10);
+            ServiceContext.UserService.Save(users);
+            //include this
+            var customUser = MockedUser.CreateUser(userType);
+            customUser.Email = "hello@test.com";
+            ServiceContext.UserService.Save(customUser);
+
+            int totalRecs;
+            var found = ServiceContext.UserService.FindMembersByEmail("test.com", 0, 100, out totalRecs, StringPropertyMatchType.EndsWith);
+
+            Assert.AreEqual(11, found.Count());
+        }
+
+        [Test]
+        public void Find_By_Email_Contains()
+        {
+            var userType = MockedUserType.CreateUserType();
+            ServiceContext.UserService.SaveUserType(userType);
+            var users = MockedUser.CreateUser(userType, 10);
+            ServiceContext.UserService.Save(users);
+            //include this
+            var customUser = MockedUser.CreateUser(userType);
+            customUser.Email = "hello@test.com";
+            ServiceContext.UserService.Save(customUser);
+
+            int totalRecs;
+            var found = ServiceContext.UserService.FindMembersByEmail("test", 0, 100, out totalRecs, StringPropertyMatchType.Contains);
+
+            Assert.AreEqual(11, found.Count());
+        }
+
+        [Test]
+        public void Find_By_Email_Exact()
+        {
+            var userType = MockedUserType.CreateUserType();
+            ServiceContext.UserService.SaveUserType(userType);
+            var users = MockedUser.CreateUser(userType, 10);
+            ServiceContext.UserService.Save(users);
+            //include this
+            var customUser = MockedUser.CreateUser(userType);
+            customUser.Email = "hello@test.com";
+            ServiceContext.UserService.Save(customUser);
+
+            int totalRecs;
+            var found = ServiceContext.UserService.FindMembersByEmail("hello@test.com", 0, 100, out totalRecs, StringPropertyMatchType.Exact);
+
+            Assert.AreEqual(1, found.Count());
+        }
+
+        [Test]
         public void Get_All_Paged_Users()
         {
             var userType = MockedUserType.CreateUserType();
