@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -8,6 +9,13 @@ namespace Umbraco.Core.Persistence.Repositories
         //IProfile GetProfileById(int id);
         //IProfile GetProfileByUserName(string username);
         //IUser GetUserByUserName(string username);
+
+        /// <summary>
+        /// Gets the count of items based on a complex query
+        /// </summary>
+        /// <param name="query"></param>
+        /// <returns></returns>
+        int GetCountByQuery(IQuery<IUser> query);
 
         /// <summary>
         /// Checks if a user with the username exists

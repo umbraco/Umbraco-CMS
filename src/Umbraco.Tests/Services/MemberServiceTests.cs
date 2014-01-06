@@ -322,7 +322,7 @@ namespace Umbraco.Tests.Services
                     Alias = "number",
                     Name = "Number",
                     //NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                    DataTypeDefinitionId = -36
+                    DataTypeDefinitionId = -51
                 }, "Content");
             ServiceContext.MemberTypeService.Save(memberType);
             var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.SetValue("number", i));
@@ -347,7 +347,7 @@ namespace Umbraco.Tests.Services
                 Alias = "number",
                 Name = "Number",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                DataTypeDefinitionId = -36
+                DataTypeDefinitionId = -51
             }, "Content");
             ServiceContext.MemberTypeService.Save(memberType);
             var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.SetValue("number", i));
@@ -372,7 +372,7 @@ namespace Umbraco.Tests.Services
                 Alias = "number",
                 Name = "Number",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                DataTypeDefinitionId = -36
+                DataTypeDefinitionId = -51
             }, "Content");
             ServiceContext.MemberTypeService.Save(memberType);
             var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.SetValue("number", i));
@@ -394,10 +394,10 @@ namespace Umbraco.Tests.Services
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
             memberType.AddPropertyType(new PropertyType(new Guid(), DataTypeDatabaseType.Date)
             {
-                Alias = "date",
-                Name = "Date",
+                Alias = "number",
+                Name = "Number",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                DataTypeDefinitionId = -36
+                DataTypeDefinitionId = -51
             }, "Content");
             ServiceContext.MemberTypeService.Save(memberType);
             var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.SetValue("number", i));
@@ -422,7 +422,7 @@ namespace Umbraco.Tests.Services
                 Alias = "number",
                 Name = "Number",
                 //NOTE: This is what really determines the db type - the above definition doesn't really do anything
-                DataTypeDefinitionId = -36
+                DataTypeDefinitionId = -51
             }, "Content");
             ServiceContext.MemberTypeService.Save(memberType);
             var members = MockedMember.CreateSimpleMember(memberType, 10, (i, member) => member.SetValue("number", i));

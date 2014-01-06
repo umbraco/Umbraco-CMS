@@ -201,6 +201,18 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #region Implementation of IUserRepository
 
+        public int GetCountByQuery(IQuery<IUser> query)
+        {
+            var sqlClause = GetBaseQuery("umbracoUser.id");
+            var translator = new SqlTranslator<IUser>(sqlClause, query);
+            var subquery = translator.Translate();
+            //get the COUNT base query
+            var sql = GetBaseQuery(true)
+                .Append(new Sql("WHERE umbracoUser.id IN (" + subquery.SQL + ")", subquery.Arguments));
+
+            return Database.ExecuteScalar<int>(sql);
+        }
+
         public bool Exists(string username)
         {
             var sql = new Sql();

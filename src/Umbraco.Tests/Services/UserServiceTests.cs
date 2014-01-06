@@ -5,6 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
@@ -101,6 +102,69 @@ namespace Umbraco.Tests.Services
             var found = ServiceContext.UserService.FindMembersByEmail("tes", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
 
             Assert.AreEqual(10, found.Count());
+        }
+
+        [Test]
+        public void Count_All_Users()
+        {
+            var userType = MockedUserType.CreateUserType();
+            ServiceContext.UserService.SaveUserType(userType);
+            var users = MockedUser.CreateUser(userType, 10);
+            ServiceContext.UserService.Save(users);
+            var customUser = MockedUser.CreateUser(userType);
+            ServiceContext.UserService.Save(customUser);
+
+            var found = ServiceContext.UserService.GetMemberCount(MemberCountType.All);
+
+            // + 1 because of the built in admin user
+            Assert.AreEqual(12, found);
+        }
+
+        [Test]
+        public void Count_All_Online_Users()
+        {
+            var userType = MockedUserType.CreateUserType();
+            ServiceContext.UserService.SaveUserType(userType);
+            var users = MockedUser.CreateUser(userType, 10, (i, member) => member.LastLoginDate = DateTime.Now.AddMinutes(i * -2));
+            ServiceContext.UserService.Save(users);
+
+            var customUser = MockedUser.CreateUser(userType);
+            throw new NotImplementedException();
+        }
+
+        [Test]
+        public void Count_All_Locked_Users()
+        {
+            var userType = MockedUserType.CreateUserType();
+            ServiceContext.UserService.SaveUserType(userType);
+            var users = MockedUser.CreateUser(userType, 10, (i, member) => member.IsLockedOut = i % 2 == 0);
+            ServiceContext.UserService.Save(users);
+
+            var customUser = MockedUser.CreateUser(userType);
+            customUser.IsLockedOut = true;
+            ServiceContext.UserService.Save(customUser);
+
+            var found = ServiceContext.UserService.GetMemberCount(MemberCountType.LockedOut);
+
+            Assert.AreEqual(6, found);
+        }
+
+        [Test]
+        public void Count_All_Approved_Users()
+        {
+            var userType = MockedUserType.CreateUserType();
+            ServiceContext.UserService.SaveUserType(userType);
+            var users = MockedUser.CreateUser(userType, 10, (i, member) => member.IsApproved = i % 2 == 0);
+            ServiceContext.UserService.Save(users);
+
+            var customUser = MockedUser.CreateUser(userType);
+            customUser.IsApproved = false;
+            ServiceContext.UserService.Save(customUser);
+
+            var found = ServiceContext.UserService.GetMemberCount(MemberCountType.Approved);
+
+            // + 1 because of the built in admin user
+            Assert.AreEqual(6, found);
         }
 
         [Test]

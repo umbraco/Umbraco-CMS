@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Web.Security;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
@@ -192,7 +193,38 @@ namespace Umbraco.Core.Services
 
         public int GetMemberCount(MemberCountType countType)
         {
-            throw new NotImplementedException();
+            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
+            {
+                IQuery<IUser> query;
+
+                switch (countType)
+                {
+                    case MemberCountType.All:
+                        query = new Query<IUser>();
+                        return repository.Count(query);
+                    case MemberCountType.Online:
+                        throw new NotImplementedException();
+                        //var fromDate = DateTime.Now.AddMinutes(-Membership.UserIsOnlineTimeWindow);
+                        //query =
+                        //    Query<IMember>.Builder.Where(
+                        //        x =>
+                        //        ((Member)x).PropertyTypeAlias == Constants.Conventions.Member.LastLoginDate &&
+                        //        ((Member)x).DateTimePropertyValue > fromDate);
+                        //return repository.GetCountByQuery(query);
+                    case MemberCountType.LockedOut:
+                        query =
+                            Query<IUser>.Builder.Where(
+                                x => x.IsLockedOut);
+                        return repository.GetCountByQuery(query);
+                    case MemberCountType.Approved:
+                        query =
+                            Query<IUser>.Builder.Where(
+                                x => x.IsApproved);
+                        return repository.GetCountByQuery(query);
+                    default:
+                        throw new ArgumentOutOfRangeException("countType");
+                }
+            }
         }
 
         public IEnumerable<IUser> GetAllMembers(int pageIndex, int pageSize, out int totalRecords)
