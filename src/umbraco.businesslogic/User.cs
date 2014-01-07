@@ -584,6 +584,22 @@ namespace umbraco.BusinessLogic
                 SqlHelper.CreateParameter("@id", id));
         }
 
+        public static void Update(int id, string name, string lname, string email, bool disabled, bool noConsole, UserType ut)
+        {
+            if (!ensureUniqueLoginName(lname, User.GetUser(id)))
+                throw new Exception(String.Format("A user with the login '{0}' already exists", lname));
+
+
+            SqlHelper.ExecuteNonQuery(@"Update umbracoUser set userName=@name, userLogin=@lname, userEmail=@email, UserType=@type, userDisabled=@disabled, userNoConsole=@noconsole where id = @id",
+                SqlHelper.CreateParameter("@name", name),
+                SqlHelper.CreateParameter("@lname", lname),
+                SqlHelper.CreateParameter("@email", email),
+                SqlHelper.CreateParameter("@type", ut.Id),
+                SqlHelper.CreateParameter("@disabled", disabled),
+                SqlHelper.CreateParameter("@noconsole", noConsole),
+                SqlHelper.CreateParameter("@id", id));
+        }
+
         /// <summary>
         /// Updates the membership provider properties
         /// </summary>

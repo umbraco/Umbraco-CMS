@@ -443,11 +443,23 @@ namespace umbraco.providers
 
             var m = found.First();
 
-            // update approve status            
-            // update lock status
-            // TODO: Update last lockout time            
-            // TODO: update comment
-            User.Update(m.Id, user.Email, user.IsApproved == false, user.IsLockedOut);
+            
+            var typedUser = user as UsersMembershipUser;
+            if (typedUser == null)
+            {
+                // update approve status            
+                // update lock status
+                // TODO: Update last lockout time            
+                // TODO: update comment
+                User.Update(m.Id, user.Email, user.IsApproved == false, user.IsLockedOut);
+            }
+            else
+            {
+                //This keeps compatibility - even though this logic to update name and user type  should not exist here
+                User.Update(m.Id, typedUser.FullName.Trim(), typedUser.UserName, typedUser.Email, user.IsApproved == false, user.IsLockedOut, typedUser.UserType);
+            }
+
+            
             
             m.Save();
         }

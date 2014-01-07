@@ -12,6 +12,7 @@
 			goodPass: "success",
 			strongPass: "success",
 			baseStyle: "passtestresult",
+			minLength: <%=Provider.MinRequiredPasswordLength %>,
 			userid: "<%=umbraco.BusinessLogic.User.GetCurrent().Name%>",
 			messageloc: 1
 		});
@@ -47,19 +48,24 @@
 					<asp:Label runat="server" AssociatedControlID="password" ID="passwordLabel"><%=umbraco.ui.Text("passwordEnterNew") %>:</asp:Label>
 					<asp:TextBox id="password" TextMode="password" CssClass="textfield" Runat="server"></asp:TextBox>
 					<asp:RequiredFieldValidator runat="server" ControlToValidate="password" ID="passwordvalidator" ValidationGroup="changepass">*</asp:RequiredFieldValidator>
+                    <asp:RegularExpressionValidator ID="NewPasswordLengthValidator" runat="server"
+                        ValidationGroup="changepass"
+                        Display="None"
+                        ControlToValidate="password"
+                        ErrorMessage='<%# "Minimum " + Provider.MinRequiredPasswordLength + " characters" %>'
+                        ValidationExpression='<%# ".{" + Provider.MinRequiredPasswordLength + "}.*" %>' />
 				</span>
 			</li>
 			<li>
 				<span>
 					<asp:Label runat="server" AssociatedControlID="confirmpassword" ID="confirmpasswordlabel"><%=umbraco.ui.Text("passwordConfirm") %>:</asp:Label>
 					<asp:TextBox id="confirmpassword" TextMode="password" CssClass="textfield" Runat="server"></asp:TextBox>
-					<asp:RequiredFieldValidator runat="server" ControlToValidate="confirmpassword" ID="confirmpasswordvalidator" ValidationGroup="changepass">*</asp:RequiredFieldValidator>
 					<asp:CompareValidator ID="CompareValidator1" runat="server" ControlToValidate="confirmpassword" ControlToCompare="password" ValidationGroup="changepass" CssClass="error"><%=umbraco.ui.Text("passwordMismatch") %></asp:CompareValidator>
 				</span>
 			</li>
 		</ol>
 		<p>
-			<asp:Button id="changePassword" Runat="server" Text="Change Password" OnClientClick="showProgress(this,'loadingBar'); return true;" onclick="changePassword_Click" ValidationGroup="changepass"></asp:Button>
+			<asp:Button id="changePassword" Runat="server" Text="Change Password" onclick="changePassword_Click" ValidationGroup="changepass"></asp:Button>
 		</p>
 	</asp:Panel>
 	<asp:Panel ID="passwordChanged" Runat="server" Visible="False">

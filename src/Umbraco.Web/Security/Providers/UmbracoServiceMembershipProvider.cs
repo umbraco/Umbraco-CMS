@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Web.Configuration;
 using System.Web.Security;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
@@ -296,6 +297,10 @@ namespace Umbraco.Web.Security.Providers
 
         internal string EncryptString(string str)
         {
+            if (str.IsNullOrWhiteSpace())
+            {
+                return "";
+            }
             var bytes = Encoding.Unicode.GetBytes(str);
             var password = new byte[bytes.Length];
             Buffer.BlockCopy(bytes, 0, password, 0, bytes.Length);

@@ -241,61 +241,27 @@ namespace Umbraco.Core.Models.Membership
             }
         }
 
-        //TODO: Figure out how to support all of this!
+        //TODO: Figure out how to support all of this! - we cannot have NotImplementedExceptions because these get used by the IMembershipMemberService<IUser> service so
+        // we'll just have them as generic get/set which don't interact with the db.
+
         [IgnoreDataMember]
-        public string PasswordQuestion
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
+        public string PasswordQuestion { get; set; }
         [IgnoreDataMember]
-        public string PasswordAnswer
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
+        public string PasswordAnswer { get; set; }
         [IgnoreDataMember]
-        public string Comments
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
+        public string Comments { get; set; }
         [IgnoreDataMember]
-        public DateTime CreateDate
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
+        public DateTime CreateDate { get; set; }
         [IgnoreDataMember]
-        public DateTime UpdateDate
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
+        public DateTime UpdateDate { get; set; }
         [IgnoreDataMember]
-        public DateTime LastLoginDate
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
+        public DateTime LastLoginDate { get; set; }
         [IgnoreDataMember]
-        public DateTime LastPasswordChangeDate
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
+        public DateTime LastPasswordChangeDate { get; set; }
         [IgnoreDataMember]
-        public DateTime LastLockoutDate
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
+        public DateTime LastLockoutDate { get; set; }
         [IgnoreDataMember]
-        public int FailedPasswordAttempts
-        {
-            get { throw new NotImplementedException(); }
-            set { throw new NotImplementedException(); }
-        }
+        public int FailedPasswordAttempts { get; set; }
         
         #endregion
 
