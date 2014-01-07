@@ -32,8 +32,8 @@ namespace Umbraco.Web.Models.Mapping
 
             //set the display properties after mapping
             display.Alias = originalProp.Alias;
-            display.Description = TabsAndPropertiesResolver.TranslateItem(originalProp.PropertyType.Description);
-            display.Label = TabsAndPropertiesResolver.TranslateItem(originalProp.PropertyType.Name);
+            display.Description = originalProp.PropertyType.Description;
+            display.Label = originalProp.PropertyType.Name;
             display.HideLabel = valEditor.HideLabel;
             
             if (display.PropertyEditor == null)

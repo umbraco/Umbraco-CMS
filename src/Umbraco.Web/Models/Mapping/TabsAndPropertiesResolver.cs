@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
@@ -15,6 +16,7 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class TabsAndPropertiesResolver : ValueResolver<IContentBase, IEnumerable<Tab<ContentPropertyDisplay>>>
     {
+        private ICultureDictionary cultureDictionary;
         protected IEnumerable<string> IgnoreProperties { get; set; }
 
         public TabsAndPropertiesResolver()
@@ -165,6 +167,13 @@ namespace Umbraco.Web.Models.Mapping
                         Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(
                             propsForGroup));
                 }
+
+                // Not sure whether it's a good idea to add this to the ContentPropertyDisplay mapper
+                foreach (var prop in aggregateProperties)
+                {
+                    prop.Label = TranslateItem(prop.Label);
+                    prop.Description = TranslateItem(prop.Description);
+                }
                 
                 //then we'll just use the root group's data to make the composite tab
                 var rootGroup = propertyGroups.Single(x => x.ParentId == null);
@@ -198,48 +207,24 @@ namespace Umbraco.Web.Models.Mapping
             return aggregateTabs;
         }
 
-        internal static string TranslateItem(string text)
+        // This should really be centralized and used anywhere globalization applies.
+        internal string TranslateItem(string text)
         {
-            
             if (!text.StartsWith("#"))
                 return text;
 
             text = text.Substring(1);
+            return CultureDictionary[text].IfNullOrWhiteSpace(text);
+        }
 
-            /*
-             * The below currently doesnt work on my machine, since the dictonary always creates an entry with lang id = 0, but I dont have a lang id zero
-             * so the query always fails, which is odd
-             * */
-            var local = ApplicationContext.Current.Services.LocalizationService;
-            var dic = local.GetDictionaryItemByKey(text);
-            if (dic == null || !dic.Translations.Any())
-                return text;
-
-            /*This code does not work at all with my config, languages doesn't have culturename, at least not lowercase. 
-             * Changing to GetAll() and comparing cultures / parents, since en-uk is "en" for my admin user. 
-             * 
-            var lang = local.GetLanguageByCultureCode(UmbracoContext.Current.Security.CurrentUser.Language);
-            if (lang == null)
-                return tabName;
-            */
-            
-            /* Someone should probably really look into CurrentUser.Language. Lowercase??? en??? */
-            var userCultureCode = UmbracoContext.Current.Security.CurrentUser.Language;
-            if (userCultureCode.Length > 2)
+        private ICultureDictionary CultureDictionary
+        {
+            get
             {
-                var parts = userCultureCode.Split('-', '_');
-                userCultureCode = String.Format("{0}-{1}", parts[0], parts[1].ToUpper());
+                return 
+                    cultureDictionary ?? 
+                    (cultureDictionary = CultureDictionaryFactoryResolver.Current.Factory.CreateDictionary());
             }
-            var userCulture = System.Globalization.CultureInfo.GetCultureInfo(userCultureCode);
-            
-            var lang = local.GetAllLanguages()
-                .FirstOrDefault(l => l.CultureInfo.Equals(userCulture) || l.CultureInfo.Parent.Equals(userCulture));
-            
-            var translation = dic.Translations.Where(x => x.Language == lang).FirstOrDefault();
-            if (translation == null)
-                return text;
-
-            return translation.Value;
         }
     }
 }
