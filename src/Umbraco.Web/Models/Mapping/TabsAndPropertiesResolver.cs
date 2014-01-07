@@ -172,7 +172,7 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         Id = rootGroup.Id,
                         Alias = rootGroup.Name,
-                        Label = TranslateTab(rootGroup.Name),
+                        Label = TranslateItem(rootGroup.Name),
                         Properties = aggregateProperties,
                         IsActive = false
                     });
@@ -198,33 +198,48 @@ namespace Umbraco.Web.Models.Mapping
             return aggregateTabs;
         }
 
-        private string TranslateTab(string tabName)
+        internal static string TranslateItem(string text)
         {
             
-            if (!tabName.StartsWith("#"))
-                return tabName;
+            if (!text.StartsWith("#"))
+                return text;
 
-            return tabName.Substring(1);
+            text = text.Substring(1);
 
             /*
              * The below currently doesnt work on my machine, since the dictonary always creates an entry with lang id = 0, but I dont have a lang id zero
              * so the query always fails, which is odd
-             * 
+             * */
             var local = ApplicationContext.Current.Services.LocalizationService;
-            var dic = local.GetDictionaryItemByKey(tabName);
+            var dic = local.GetDictionaryItemByKey(text);
             if (dic == null || !dic.Translations.Any())
-                return tabName;
+                return text;
 
+            /*This code does not work at all with my config, languages doesn't have culturename, at least not lowercase. 
+             * Changing to GetAll() and comparing cultures / parents, since en-uk is "en" for my admin user. 
+             * 
             var lang = local.GetLanguageByCultureCode(UmbracoContext.Current.Security.CurrentUser.Language);
             if (lang == null)
                 return tabName;
-
-
+            */
+            
+            /* Someone should probably really look into CurrentUser.Language. Lowercase??? en??? */
+            var userCultureCode = UmbracoContext.Current.Security.CurrentUser.Language;
+            if (userCultureCode.Length > 2)
+            {
+                var parts = userCultureCode.Split('-', '_');
+                userCultureCode = String.Format("{0}-{1}", parts[0], parts[1].ToUpper());
+            }
+            var userCulture = System.Globalization.CultureInfo.GetCultureInfo(userCultureCode);
+            
+            var lang = local.GetAllLanguages()
+                .FirstOrDefault(l => l.CultureInfo.Equals(userCulture) || l.CultureInfo.Parent.Equals(userCulture));
+            
             var translation = dic.Translations.Where(x => x.Language == lang).FirstOrDefault();
             if (translation == null)
-                return tabName;
+                return text;
 
-            return translation.Value;*/
+            return translation.Value;
         }
     }
 }
