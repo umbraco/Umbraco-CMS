@@ -591,7 +591,7 @@ namespace umbraco.BusinessLogic
 
         public static void Update(int id, string name, string lname, string email, bool disabled, bool noConsole, UserType ut)
         {
-            if (!ensureUniqueLoginName(lname, User.GetUser(id)))
+            if (!EnsureUniqueLoginName(lname, User.GetUser(id)))
                 throw new Exception(String.Format("A user with the login '{0}' already exists", lname));
 
 
