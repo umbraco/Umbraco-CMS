@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="zh" intName="Chinese (Simple)" localName="中文（简体，中国）" lcid="0804" culture="zh-CN">
   <creator>
     <name>孙柱梁</name>
@@ -8,6 +8,7 @@
     <key alias="assignDomain">管理主机名</key>
     <key alias="auditTrail">跟踪审计</key>
     <key alias="browse">浏览节点</key>
+    <key alias="changeDocType">改变文档类型</key>
     <key alias="copy">复制</key>
     <key alias="create">创建</key>
     <key alias="createPackage">创建扩展包</key>
@@ -36,19 +37,30 @@
     <key alias="update">更新</key>
   </area>
   <area alias="assignDomain">
+    <key alias="permissionDenied">禁止访问</key>
     <key alias="addNew">添加域名</key>
+    <key alias="remove">移除</key>
+    <key alias="invalidNode">错误的节点</key>
+    <key alias="duplicateDomain">域名重复</key>
     <key alias="domain">域名</key>
+    <key alias="language">语言</key>
     <key alias="domainCreated">新域名 '%0%' 已创建</key>
     <key alias="domainDeleted">域名 '%0%' 已删除</key>
     <key alias="domainExists">域名 '%0%' 已使用</key>
     <key alias="domainHelp">
     <![CDATA[例如：example.com、www.example.com、example.com:8080、<br/>
         https://www.example.com/、example.com/en、……使用 * 代表任意域名，<br/>
-	只需要设置语言部分即可。]]>
-	</key>
+        只需要设置语言部分即可。]]>
+        </key>
     <key alias="domainUpdated">域名 '%0%' 已更新</key>
     <key alias="invalidDomain">域名错误</key> 
     <key alias="orEdit">编辑当前域名</key>
+    <key alias="inherit">继承</key>
+    <key alias="setLanguage">语言</key>
+    <key alias="setLanguageHelp">
+      <![CDATA[为当前节点及子节点设置语言，<br /> 也可以从父节点继承。]]>
+    </key>
+    <key alias="setDomains">域名</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">查看</key>
@@ -80,6 +92,26 @@
     <key alias="styleShow">显示样式</key>
     <key alias="tableInsert">插入表格</key>
   </area>
+  <area alias="changeDocType">
+    <key alias="changeDocTypeInstruction">要更改所选节点的文档类型，先在列表中选择合适的文档类型。</key>
+    <key alias="changeDocTypeInstruction2">然后设置当前文档类型到新文档类型的各字段间的对应映射关系并保存。</key>
+    <key alias="contentRepublished">内容已被重新发布</key>    
+    <key alias="currentProperty">当前属性</key>
+    <key alias="currentType">当前类型</key>
+    <key alias="docTypeCannotBeChanged">不能改变文档类型，因为没有可替代的类型。</key>
+    <key alias="docTypeChanged">文档类型已更改</key>    
+    <key alias="mapProperties">要映射的字段</key>
+    <key alias="mapToProperty">映射字段</key>
+    <key alias="newTemplate">新模板</key>
+    <key alias="newType">新类型</key>
+    <key alias="none">无</key>    
+    <key alias="selectedContent">内容</key>
+    <key alias="selectNewDocType">选择新的文档类型</key>
+    <key alias="successMessage">选中文档的类型已被成功更改为[new type]，以下字段被映射：</key>
+    <key alias="to">至</key>
+    <key alias="validationErrorPropertyWithMoreThanOneMapping">不能完成字段映射，因为存在一个字段映射至多字段的问题。</key>
+    <key alias="validDocTypesNote">仅显示可作为替代的文档类型。</key>    
+  </area> 
   <area alias="content">
     <key alias="about">关于本页</key>
     <key alias="alias">别名</key>
@@ -103,6 +135,7 @@
     <key alias="nodeName">页标题</key>
     <key alias="otherElements">属性</key>
     <key alias="parentNotPublished">该文档不可见，因为其上级 '%0%' 未发布。</key>
+    <key alias="parentNotPublishedAnomaly">该文档已发布，但是没有更新至缓存（内部错误）</key>
     <key alias="publish">发布</key>
     <key alias="publishStatus">发布状态</key>
     <key alias="releaseDate">发布于</key>
@@ -116,6 +149,8 @@
     <key alias="updateDate">最近编辑</key>
     <key alias="uploadClear">移除文件</key>
     <key alias="urls">链接到文档</key>
+    <key alias="memberof">会员组成员</key>
+    <key alias="notmemberof">非会员组成员</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">您想在哪里创建 %0%</key>
@@ -217,6 +252,7 @@
     <key alias="errorRegExpWithoutTab">%0% 格式不正确</key>
   </area>
   <area alias="errors">
+    <key alias="dissallowedMediaType">该文件类型已被管理员禁用</key>
     <key alias="codemirroriewarning">注意，尽管配置中允许CodeMirror，但是它在IE上不够稳定，所以无法在IE运行。</key>
     <key alias="contentTypeAliasAndNameNotNull">请为新的属性类型填写名称和别名！</key>
     <key alias="filePermissionsError">权限有问题，访问指定文件或文件夹失败！</key>
@@ -349,7 +385,7 @@
               <p>您可以自行编辑“web.config”文件，键名为 “umbracoDbDSN”</p>
               <p>
              当自行编辑后，单击<strong>重试</strong>按钮<br /><a href="http://umbraco.org/redir/installWebConfig" target="_blank">。
-			            如何编辑web.config</a></p>
+                                    如何编辑web.config</a></p>
     ]]></key>
     <key alias="databaseText"><![CDATA[完成本步，需要配置一个正确的连接字符串（“connection string”）。<br />
       如有必要，请联系您的系统管理员。
@@ -414,7 +450,7 @@
     <key alias="runwayHeader">您刚刚安装了一个干净的系统，要继续吗？</key>
     <key alias="runwayInstalled">“Runway”已安装</key>
     <key alias="runwayInstalledText"><![CDATA[
-		在顶部选择您想要的功能模块<br />
+                在顶部选择您想要的功能模块<br />
       这是我们推荐的模块，您也可以查看 <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">全部模块</a>
     ]]></key>
     <key alias="runwayOnlyProUsers">仅推荐高级用户使用</key>
@@ -482,6 +518,7 @@
     <key alias="noNodeSelected">尚未选择节点，请选择一个节点点击“确定”。</key>
     <key alias="notAllowedByContentType">类型不符不允许选择</key>
     <key alias="notAllowedByPath">该项不能移到其子项</key>
+    <key alias="notAllowedAtRoot">当前节点不能建在根节点下</key>
     <key alias="notValid">您在子项的权限不够，不允许该操作。</key>
     <key alias="relateToOriginal">复本和原本建立关联</key>
   </area>
@@ -498,32 +535,32 @@
     ]]></key>
     <key alias="mailBodyHtml"><![CDATA[<p>%0%：</p>
 
-		  <p>您好！这是一封自动发送的邮件，告诉您任务<strong>'%1%'</strong>已在<a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a>被用户<strong>'%3%'</strong>执行</p>
-		  <div style="margin: 8px 0; padding: 8px; display: block;">
-				<br />
-				<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;发布&nbsp;&nbsp;</a> &nbsp; 
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编辑&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
-				<a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;删除&nbsp;&nbsp;&nbsp;&nbsp;</a>
-				<br />
-		  </div>
-		  <p>
-			  <h3>更新概况：</h3>
-			  <table style="width: 100%;">
-						   %6%
-				</table>
-			 </p>
+                  <p>您好！这是一封自动发送的邮件，告诉您任务<strong>'%1%'</strong>已在<a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a>被用户<strong>'%3%'</strong>执行</p>
+                  <div style="margin: 8px 0; padding: 8px; display: block;">
+                                <br />
+                                <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;发布&nbsp;&nbsp;</a> &nbsp; 
+                                <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编辑&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+                                <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;删除&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                                <br />
+                  </div>
+                  <p>
+                          <h3>更新概况：</h3>
+                          <table style="width: 100%;">
+                                                   %6%
+                                </table>
+                         </p>
 
-		  <div style="margin: 8px 0; padding: 8px; display: block;">
-				<br />
-				<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;发布&nbsp;&nbsp;</a> &nbsp; 
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编辑&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
-				<a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;删除&nbsp;&nbsp;&nbsp;&nbsp;</a>
-				<br />
-		  </div>
+                  <div style="margin: 8px 0; padding: 8px; display: block;">
+                                <br />
+                                <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;发布&nbsp;&nbsp;</a> &nbsp; 
+                                <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;编辑&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+                                <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;删除&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                                <br />
+                  </div>
 
-		  <p>祝您愉快！<br /><br />
-			  该信息由系统自动发送
-		  </p>
+                  <p>祝您愉快！<br /><br />
+                          该信息由系统自动发送
+                  </p>
     ]]></key>
     <key alias="mailSubject">在 %2%，[%0%] 关于 %1% 的通告已执行。</key>
     <key alias="notifications">通知</key>
@@ -558,6 +595,7 @@
     <key alias="packageUpgradeInstructions">更新说明</key>
     <key alias="packageUpgradeText">扩展包有可用的更新，您可以从程序库网站更新。</key>
     <key alias="packageVersion">版本</key>
+    <key alias="packageVersionHistory">版本历史</key>
     <key alias="viewPackageWebsite">访问扩展包网站</key>
   </area>
   <area alias="paste">
@@ -585,6 +623,9 @@
     <key alias="paSimpleHelp">如果您只希望提供一个用户名和密码就能访问</key>
   </area>
   <area alias="publish">
+    <key alias="contentPublishedFailedInvalid">
+      <![CDATA[%0%不能发布，因为%1%字段不合验证规则。]]>
+    </key>
     <key alias="contentPublishedFailedByEvent"><![CDATA[%0% 无法发布，第三方组件造成失败。
     ]]></key>
     <key alias="contentPublishedFailedByParent">
@@ -655,6 +696,7 @@
     <key alias="tab">选项卡</key>
     <key alias="tabname">选项卡标题</key>
     <key alias="tabs">选项卡</key>
+    <key alias="noPropertiesDefinedOnTab">没有字段设置在该标签页</key>
   </area>
   <area alias="sort">
     <key alias="sortDone">排序完成。</key>
@@ -684,6 +726,8 @@
     <key alias="editContentSavedText">请发布以使更改生效</key>
     <key alias="editContentSendToPublish">提交审核</key>
     <key alias="editContentSendToPublishText">更改已提交审核</key>
+    <key alias="editMediaSaved">媒体已保存</key>
+    <key alias="editMediaSavedText">媒体已保存</key>
     <key alias="editMemberSaved">会员已保存</key>
     <key alias="editStylesheetPropertySaved">样式表属性已保存</key>
     <key alias="editStylesheetSaved">样式表已保存</key>
@@ -709,10 +753,10 @@
     <key alias="xsltPermissionErrorText">XSLT无法保存，请检查权限。</key>
     <key alias="xsltSavedHeader">XSLT已保存</key>
     <key alias="xsltSavedText">XSLT无错误</key>
-    <key alias="partialViewSavedHeader">Partial视图已保存</key>
-    <key alias="partialViewSavedText">Partial视图保存，无错误。</key>
-    <key alias="partialViewErrorHeader">Partial视图未保存</key>
-    <key alias="partialViewErrorText">Partial视图因为错误未能保存</key>
+    <key alias="partialViewSavedHeader">片段视图已保存</key>
+    <key alias="partialViewSavedText">片段视图保存，无错误。</key>
+    <key alias="partialViewErrorHeader">片段视图未保存</key>
+    <key alias="partialViewErrorText">片段视图因为错误未能保存</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">使用CSS语法，如：h1、.redHeader、.blueTex。</key>
@@ -863,6 +907,7 @@
     <key alias="newPassword">更改密码</key>
     <key alias="noConsole">禁用后台管理界面</key>
     <key alias="password">密码</key>
+    <key alias="resetPassword">重设密码</key>
     <key alias="passwordChanged">您的密码已更改！</key>
     <key alias="passwordConfirm">重输密码</key>
     <key alias="passwordCurrent">当前密码</key>

@@ -16,7 +16,7 @@ namespace Umbraco.Web
 	/// <summary>
 	/// Extension methods for the cache helper
 	/// </summary>
-	internal static class CacheHelperExtensions
+	public static class CacheHelperExtensions
 	{
 
 		public const string PartialViewCacheKey = "Umbraco.Web.PartialViewCacheKey";

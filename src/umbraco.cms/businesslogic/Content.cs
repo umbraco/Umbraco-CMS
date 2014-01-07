@@ -397,7 +397,7 @@ namespace umbraco.cms.businesslogic
         {
             var props = this.GenericProperties;
             foreach (property.Property p in props)
-                if (p != null)
+                if (p != null && p.Value != null && string.IsNullOrEmpty(p.Value.ToString()) == false)
                     x.AppendChild(p.ToXml(xd));
 
             // attributes

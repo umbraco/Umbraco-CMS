@@ -29,7 +29,7 @@ namespace Umbraco.Web.Strategies.DataTypes
 		{
 			if (UmbracoSettings.ImageAutoFillImageProperties != null)
 			{
-				var property = sender.GenericProperties.FirstOrDefault(x => x.PropertyType.DataTypeDefinition.DataType.Id == new Guid(Constants.PropertyEditors.UploadField));
+				var property = sender.GenericProperties.FirstOrDefault(x =>x.PropertyType.DataTypeDefinition.DataType!=null && x.PropertyType.DataTypeDefinition.DataType.Id == new Guid(Constants.PropertyEditors.UploadField));
 				if (property == null)
 					return;
 

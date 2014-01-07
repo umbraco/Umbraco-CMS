@@ -9,7 +9,8 @@
 <%@ Import Namespace="Umbraco.Web" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="uc1" TagName="quickSearch" Src="Search/QuickSearch.ascx" %>
-<%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Register TagPrefix="cdf" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Register TagPrefix="umbClient" Namespace="Umbraco.Web.UI.Bundles" Assembly="umbraco" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
@@ -18,41 +19,18 @@
     <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible" />
     <link rel="icon" type="image/png" href="<%#umbraco.GlobalSettings.Path + "/Images/PinnedIcons/umb.ico" %>" />
     <cc1:UmbracoClientDependencyLoader runat="server" ID="ClientLoader" />
-    <umb:CssInclude ID="CssInclude1" runat="server" FilePath="css/umbracoGui.css" PathNameAlias="UmbracoRoot" />
-    <umb:CssInclude ID="CssInclude2" runat="server" FilePath="modal/style.css" PathNameAlias="UmbracoClient" />
-    <umb:JsInclude ID="JsInclude1" runat="server" FilePath="Application/NamespaceManager.js"
-        PathNameAlias="UmbracoClient" Priority="0" />
-    <umb:JsInclude ID="JSON2" runat="server" FilePath="ui/json2.js" PathNameAlias="UmbracoClient"
-        Priority="0" />
-    <umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient"
-        Priority="0" />
-    <umb:JsInclude ID="JsInclude3" runat="server" FilePath="ui/jqueryui.js" PathNameAlias="UmbracoClient"
-        Priority="1" />
-    <umb:JsInclude ID="JsInclude14" runat="server" FilePath="Application/jQuery/jquery.ba-bbq.min.js"
-        PathNameAlias="UmbracoClient" Priority="2" />
-    <umb:JsInclude ID="JsInclude5" runat="server" FilePath="Application/UmbracoApplicationActions.js"
-        PathNameAlias="UmbracoClient" Priority="2" />
-    <umb:JsInclude ID="JsInclude6" runat="server" FilePath="Application/UmbracoUtils.js"
-        PathNameAlias="UmbracoClient" Priority="2" />
-    <umb:JsInclude ID="JsInclude13" runat="server" FilePath="Application/HistoryManager.js"
-        PathNameAlias="UmbracoClient" Priority="3" />
-    <umb:JsInclude ID="JsInclude7" runat="server" FilePath="Application/UmbracoClientManager.js"
-        PathNameAlias="UmbracoClient" Priority="4" />
-    <umb:JsInclude ID="JsInclude8" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient"
-        Priority="5" />
-    <umb:JsInclude ID="JsInclude9" runat="server" FilePath="ui/jQueryWresize.js" PathNameAlias="UmbracoClient" />
-    <umb:JsInclude ID="JsInclude10" runat="server" FilePath="js/guiFunctions.js" PathNameAlias="UmbracoRoot" />
-    <umb:JsInclude ID="JsInclude11" runat="server" FilePath="js/language.aspx" PathNameAlias="UmbracoRoot" />
-    <umb:JsInclude ID="JsInclude4" runat="server" FilePath="modal/modal.js" PathNameAlias="UmbracoClient"
-        Priority="10" />
-    <umb:JsInclude ID="JsInclude17" runat="server" FilePath="modal/jquery.simplemodal.1.4.1.custom.js"
-        PathNameAlias="UmbracoClient" Priority="10" />
-    <umb:JsInclude ID="JsInclude12" runat="server" FilePath="js/UmbracoSpeechBubbleBackend.js"
-        PathNameAlias="UmbracoRoot" />
-    <umb:JsInclude ID="JsInclude15" runat="server" FilePath="js/UmbracoSpeechBubbleBackend.js"
-        PathNameAlias="UmbracoRoot" />
-    <umb:JsInclude ID="JsInclude16" runat="server" FilePath="Application/jQuery/jquery.cookie.js"
-        PathNameAlias="UmbracoClient" Priority="1" />
+    
+    <cdf:CssInclude ID="CssInclude1" runat="server" FilePath="css/umbracoGui.css" PathNameAlias="UmbracoRoot" />
+    <cdf:CssInclude ID="CssInclude2" runat="server" FilePath="modal/style.css" PathNameAlias="UmbracoClient" />    
+    
+    <umbClient:JsApplicationLib runat="server"/>
+    <umbClient:JsJQueryCore runat="server"/>
+    <umbClient:JsUmbracoApplicationCore runat="server"/>
+    <umbClient:JsJQueryPlugins runat="server"/>
+    <umbClient:JsUmbracoApplicationUI runat="server"/>
+    
+    <cdf:JsInclude ID="JsInclude11" runat="server" FilePath="js/language.aspx" PathNameAlias="UmbracoRoot" />
+    
     <script type="text/javascript">
         this.name = 'umbracoMain';
     </script>

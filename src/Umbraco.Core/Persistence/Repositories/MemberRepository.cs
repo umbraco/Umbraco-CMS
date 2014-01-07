@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Linq.Expressions;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models.EntityBase;
@@ -9,6 +10,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -446,6 +448,74 @@ namespace Umbraco.Core.Persistence.Repositories
                 .Where<MemberDto>(x => x.LoginName == escapedUserName);
 
             return Database.ExecuteScalar<int>(sql) > 0;
+        }
+
+        public int GetCountByQuery(IQuery<IMember> query)
+        {
+            var sqlSubquery = GetSubquery();
+            var translator = new SqlTranslator<IMember>(sqlSubquery, query);
+            var subquery = translator.Translate();
+            //get the COUNT base query
+            var sql = GetBaseQuery(true)
+                .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments));
+
+            return Database.ExecuteScalar<int>(sql);
+        }
+
+        /// <summary>
+        /// Gets paged member results
+        /// </summary>
+        /// <param name="query">
+        /// The where clause, if this is null all records are queried
+        /// </param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="orderBy"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// The query supplied will ONLY work with data specifically on the cmsMember table because we are using PetaPoco paging (SQL paging)
+        /// </remarks>
+        public IEnumerable<IMember> GetPagedResultsByQuery(IQuery<IMember> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IMember, string>> orderBy)
+        {
+            if (orderBy == null) throw new ArgumentNullException("orderBy");
+
+            var sql = new Sql();
+            sql.Select("*").From<MemberDto>();
+
+            Sql resultQuery;
+            if (query != null)
+            {
+                var translator = new SqlTranslator<IMember>(sql, query);
+                resultQuery = translator.Translate();
+            }
+            else
+            {
+                resultQuery = sql;
+            }
+            
+
+            //get the referenced column name
+            var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
+            //now find the mapped column name
+            var mapper = MappingResolver.Current.ResolveMapperByType(typeof(IMember));
+            var mappedField = mapper.Map(expressionMember.Name);
+            if (mappedField.IsNullOrWhiteSpace())
+            {
+                throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");
+            }
+            //need to ensure the order by is in brackets, see: https://github.com/toptensoftware/PetaPoco/issues/177
+            resultQuery.OrderBy(string.Format("({0})", mappedField));
+
+            var pagedResult = Database.Page<MemberDto>(pageIndex + 1, pageSize, resultQuery);
+
+            totalRecords = Convert.ToInt32(pagedResult.TotalItems);
+
+            //now that we have the member dto's we need to construct true members from the list.
+            var result = GetAll(pagedResult.Items.Select(x => x.NodeId).ToArray());
+            
+            //now we need to ensure this result is also ordered by the same order by clause
+            return result.OrderBy(orderBy.Compile());
         }
 
         private IMember BuildFromDto(List<MemberReadOnlyDto> dtos)

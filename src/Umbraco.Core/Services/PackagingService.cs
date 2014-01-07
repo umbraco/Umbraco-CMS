@@ -130,7 +130,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Part of the export of IContent and IMedia which is shared
+        /// Part of the export of IContent and IMedia and IMember which is shared
         /// </summary>
         /// <param name="contentBase">Base Content or Media to export</param>
         /// <param name="nodeName">Name of the node</param>
@@ -153,8 +153,10 @@ namespace Umbraco.Core.Services
                                    new XAttribute("path", contentBase.Path),
                                    new XAttribute("isDoc", ""));
 
-            foreach (var property in contentBase.Properties.Where(p => p != null))
+            foreach (var property in contentBase.Properties.Where(p => p != null && p.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
+            {
                 xml.Add(property.ToXml());
+            }
 
             return xml;
         }
@@ -584,9 +586,18 @@ namespace Umbraco.Core.Services
             {
                 var id = tab.Element("Id").Value;//Do we need to use this for tracking?
                 var caption = tab.Element("Caption").Value;
+
                 if (contentType.PropertyGroups.Contains(caption) == false)
                 {
                     contentType.AddPropertyGroup(caption);
+
+                    int sortOrder;
+                    if(tab.Element("SortOrder") != null && 
+                        int.TryParse(tab.Element("SortOrder").Value, out sortOrder))
+                    {
+                        // Override the sort order with the imported value
+                        contentType.PropertyGroups[caption].SortOrder = sortOrder;
+                    }
                 }
             }
         }

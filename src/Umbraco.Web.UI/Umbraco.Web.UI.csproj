@@ -434,6 +434,13 @@
     <Compile Include="Umbraco\Create\PartialViewMacro.ascx.designer.cs">
       <DependentUpon>PartialViewMacro.ascx</DependentUpon>
     </Compile>
+    <Compile Include="Umbraco\Create\User.ascx.cs">
+      <DependentUpon>User.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Umbraco\Create\User.ascx.designer.cs">
+      <DependentUpon>User.ascx</DependentUpon>
+    </Compile>
     <Compile Include="Umbraco\Dashboard\ExamineManagement.ascx.cs">
       <DependentUpon>ExamineManagement.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -589,6 +596,7 @@
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
     <Content Include="Umbraco\Create\PartialView.ascx" />
+    <Content Include="Umbraco\Create\User.ascx" />
     <Content Include="Umbraco\Images\PinnedIcons\task_content.ico" />
     <Content Include="Umbraco\Images\PinnedIcons\task_default.ico" />
     <Content Include="Umbraco\Images\PinnedIcons\task_developer.ico" />
@@ -728,6 +736,7 @@
     <Content Include="Umbraco\Plugins\UGoLive\throbber.gif" />
     <Content Include="Umbraco\Plugins\UGoLive\tick.png" />
     <Content Include="Umbraco\Settings\Views\EditView.aspx" />
+    <Content Include="Umbraco_Client\Application\Extensions.js" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.unobtrusive-ajax.min.js" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.min.js" />
     <Content Include="Umbraco_Client\Application\JQuery\jquery.validate.unobtrusive.min.js" />
@@ -1344,10 +1353,19 @@
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracoimg\Langs\zh_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\editor_plugin_src.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Js\umbracolink.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\da_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\de_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\en_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\en_us_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\fi_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\fr_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\he_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\it_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\ja_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\nl_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\no_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\pl_dlg.js" />
+    <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\pt_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\ru_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\sv_dlg.js" />
     <Content Include="Umbraco_Client\Tinymce3\Plugins\Umbracolink\Langs\zh_dlg.js" />

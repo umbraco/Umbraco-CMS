@@ -21,10 +21,15 @@
     <asp:TextBox ID="Login" runat="server" Width="350px" CssClass="bigInput"></asp:TextBox><br />
 </p>
 <p>
-    E-mail:<asp:RequiredFieldValidator ID="emailRequired" ErrorMessage="*" ControlToValidate="Email"
+    E-mail:    
+    <asp:RequiredFieldValidator ID="emailRequired" ErrorMessage="*" ControlToValidate="Email"
         runat="server">*</asp:RequiredFieldValidator>
-        <asp:CustomValidator ID="emailExistsCheck" runat="server" ErrorMessage="*" ControlToValidate="Email" ValidateEmptyText="false" OnServerValidate="EmailExistsCheck"></asp:CustomValidator>
-        <br />
+    <asp:CustomValidator ID="emailExistsCheck" runat="server" ErrorMessage="*" ControlToValidate="Email" ValidateEmptyText="false" OnServerValidate="EmailExistsCheck"></asp:CustomValidator>
+    <asp:CustomValidator runat="server" ID="EmailValidator" OnServerValidate="EmailValidator_OnServerValidate"
+        ControlToValidate="Email" 
+        ErrorMessage="Invalid email address"
+        Display="None"/>
+    <br />
     <asp:TextBox ID="Email" runat="server" Width="350px" CssClass="bigInput"></asp:TextBox><br />
 </p>
 <p>

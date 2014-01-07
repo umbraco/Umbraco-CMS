@@ -314,7 +314,9 @@
     <Compile Include="Routing\ContentLastChanceFinderByNotFoundHandlers.cs" />
     <Compile Include="Models\RegisterModel.cs" />
     <Compile Include="Models\LoginModel.cs" />
+    <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
+    <Compile Include="Security\Providers\UmbracoServiceMembershipProvider.cs" />
     <Compile Include="Security\Providers\UsersMembershipProvider.cs" />
     <Compile Include="Standalone\ServiceContextManager.cs" />
     <Compile Include="Standalone\StandaloneApplication.cs" />
@@ -393,6 +395,12 @@
     <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\RebuildMediaXmlCacheAfterUpgrade.cs" />
+    <Compile Include="UI\Bundles\JsApplicationLib.cs" />
+    <Compile Include="UI\Bundles\JsJQueryCore.cs" />
+    <Compile Include="UI\Bundles\JsJQueryPlugins.cs" />
+    <Compile Include="UI\Bundles\JsUmbracoApplicationCore.cs" />
+    <Compile Include="UI\Bundles\JsUmbracoApplicationUI.cs" />
+    <Compile Include="UI\Bundles\JsUmbracoTree.cs" />
     <Compile Include="UI\CdfLogger.cs" />
     <Compile Include="umbraco.presentation\CompatibilityHelper.cs" />
     <Compile Include="umbraco.presentation\LegacyClasses.cs" />
@@ -401,6 +409,12 @@
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\controls\ContentTypeControlNew.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\dashboard\ChangePassword.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx.cs">
@@ -425,6 +439,7 @@
     <Compile Include="umbraco.presentation\umbraco\members\EditMember.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\plugins\tinymce3\JsonSpellCheckerResult.cs" />
     <Compile Include="umbraco.presentation\umbraco\users\EditUser.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -872,13 +887,6 @@
     <Compile Include="umbraco.presentation\umbraco\controls\Tree\NodeInfo.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx.cs">
-      <DependentUpon>TreeControl.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx.designer.cs">
-      <DependentUpon>TreeControl.ascx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\contentItemTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\contentItemTypeTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\contentTasks.cs" />
@@ -908,13 +916,6 @@
     <Compile Include="umbraco.presentation\umbraco\create\templateTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\userTasks.cs" />
     <Compile Include="umbraco.presentation\umbraco\create\XsltTasks.cs" />
-    <Compile Include="umbraco.presentation\umbraco\dashboard\ChangePassword.ascx.cs">
-      <DependentUpon>ChangePassword.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dashboard\ChangePassword.ascx.designer.cs">
-      <DependentUpon>ChangePassword.ascx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dashboard\DesktopMediaUploader.ascx.cs">
       <DependentUpon>DesktopMediaUploader.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1792,7 +1793,6 @@
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\NewRelationType.aspx" />
     <Content Include="umbraco.presentation\umbraco\developer\RelationTypes\RelationTypesWebService.asmx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\DesktopMediaUploader.ascx" />
-    <Content Include="umbraco.presentation\umbraco\dashboard\ChangePassword.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\DeveloperDashboardIntro.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\DeveloperDashboardVideos.ascx" />
     <Content Include="umbraco.presentation\umbraco\dashboard\FeedProxy.aspx" />
@@ -1832,7 +1832,6 @@
     <Content Include="umbraco.presentation\umbraco\controls\Images\UploadMediaImage.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx" />
     <Content Include="umbraco.presentation\umbraco\actions\delete.aspx" />
     <Content Include="umbraco.presentation\umbraco\actions\editContent.aspx" />
     <Content Include="umbraco.presentation\umbraco\actions\preview.aspx" />

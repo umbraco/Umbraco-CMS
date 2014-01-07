@@ -480,6 +480,8 @@ namespace Umbraco.Core.Services
 		/// <param name="userId">Id of the User moving the Media</param>
 		public void Move(IMedia media, int parentId, int userId = 0)
 		{
+		    if (media == null) throw new ArgumentNullException("media");
+
 		    using (new WriteLock(Locker))
 		    {
 		        //This ensures that the correct method is called if this method is used to Move to recycle bin.
@@ -492,17 +494,22 @@ namespace Umbraco.Core.Services
 		        if (Moving.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, parentId), this))
 		            return;
 
-		        media.ParentId = parentId;
+                media.ParentId = parentId;
+                if (media.Trashed)
+                {
+                    media.ChangeTrashedState(false, parentId);
+                }
 		        Save(media, userId);
 
-		        //Ensure that Path and Level is updated on children
-		        var children = GetChildren(media.Id);
+		        //Ensure that relevant properties are updated on children
+		        var children = GetChildren(media.Id).ToArray();
 		        if (children.Any())
 		        {
 		            var parentPath = media.Path;
 		            var parentLevel = media.Level;
-		            var updatedDescendents = UpdatePathAndLevelOnChildren(children, parentPath, parentLevel);
-		            Save(updatedDescendents, userId);
+		            var parentTrashed = media.Trashed;
+		            var updatedDescendants = UpdatePropertiesOnChildren(children, parentPath, parentLevel, parentTrashed);
+		            Save(updatedDescendants, userId);
 		        }
 
 		        Moved.RaiseEvent(new MoveEventArgs<IMedia>(media, false, parentId), this);
@@ -511,14 +518,16 @@ namespace Umbraco.Core.Services
 		    }
 		}
 
-	    /// <summary>
+        /// <summary>
 	    /// Deletes an <see cref="IMedia"/> object by moving it to the Recycle Bin
 	    /// </summary>
 	    /// <param name="media">The <see cref="IMedia"/> to delete</param>
 	    /// <param name="userId">Id of the User deleting the Media</param>
 	    public void MoveToRecycleBin(IMedia media, int userId = 0)
 	    {
-	        if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, -21), this))
+            if (media == null) throw new ArgumentNullException("media");
+
+            if (Trashing.IsRaisedEventCancelled(new MoveEventArgs<IMedia>(media, -21), this))
 				return;
 
             //Find Descendants, which will be moved to the recycle bin along with the parent/grandparent.
@@ -925,25 +934,31 @@ namespace Umbraco.Core.Services
 
         /// <summary>
         /// Updates the Path and Level on a collection of <see cref="IMedia"/> objects
-        /// based on the Parent's Path and Level.
+        /// based on the Parent's Path and Level. Also change the trashed state if relevant.
         /// </summary>
         /// <param name="children">Collection of <see cref="IMedia"/> objects to update</param>
         /// <param name="parentPath">Path of the Parent media</param>
         /// <param name="parentLevel">Level of the Parent media</param>
+        /// <param name="parentTrashed">Indicates whether the Parent is trashed or not</param>
         /// <returns>Collection of updated <see cref="IMedia"/> objects</returns>
-        private IEnumerable<IMedia> UpdatePathAndLevelOnChildren(IEnumerable<IMedia> children, string parentPath, int parentLevel)
+        private IEnumerable<IMedia> UpdatePropertiesOnChildren(IEnumerable<IMedia> children, string parentPath, int parentLevel, bool parentTrashed)
         {
             var list = new List<IMedia>();
             foreach (var child in children)
             {
                 child.Path = string.Concat(parentPath, ",", child.Id);
                 child.Level = parentLevel + 1;
+                if (parentTrashed != child.Trashed)
+                {
+                    child.ChangeTrashedState(parentTrashed, child.ParentId);
+                }
+                
                 list.Add(child);
 
-                var grandkids = GetChildren(child.Id);
+                var grandkids = GetChildren(child.Id).ToArray();
                 if (grandkids.Any())
                 {
-                    list.AddRange(UpdatePathAndLevelOnChildren(grandkids, child.Path, child.Level));
+                    list.AddRange(UpdatePropertiesOnChildren(grandkids, child.Path, child.Level, child.Trashed));
                 }
             }
             return list;

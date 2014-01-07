@@ -220,6 +220,7 @@ namespace umbraco.BusinessLogic
             return UserType.Alias == "admin";
         }
 
+        [Obsolete("Do not use this method to validate credentials, use the user's membership provider to do authentication. This method will not work if the password format is 'Encrypted'")]
         public bool ValidatePassword(string password)
         {
             var userLogin = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<string>(
@@ -320,6 +321,7 @@ namespace umbraco.BusinessLogic
         /// <param name="lname">The login name.</param>
         /// <param name="passw">The password.</param>
         /// <returns></returns>
+        [Obsolete("Do not use this method to validate credentials, use the user's membership provider to do authentication. This method will not work if the password format is 'Encrypted'")]
         public static bool validateCredentials(string lname, string passw)
         {
             return validateCredentials(lname, passw, true);
@@ -332,6 +334,7 @@ namespace umbraco.BusinessLogic
         /// <param name="passw">The password.</param>
         /// <param name="checkForUmbracoConsoleAccess">if set to <c>true</c> [check for umbraco console access].</param>
         /// <returns></returns>
+        [Obsolete("Do not use this method to validate credentials, use the user's membership provider to do authentication. This method will not work if the password format is 'Encrypted'")]
         public static bool validateCredentials(string lname, string passw, bool checkForUmbracoConsoleAccess)
         {
             string consoleCheckSql = "";
@@ -586,6 +589,38 @@ namespace umbraco.BusinessLogic
                 SqlHelper.CreateParameter("@id", id));
         }
 
+        public static void Update(int id, string name, string lname, string email, bool disabled, bool noConsole, UserType ut)
+        {
+            if (!ensureUniqueLoginName(lname, User.GetUser(id)))
+                throw new Exception(String.Format("A user with the login '{0}' already exists", lname));
+
+
+            SqlHelper.ExecuteNonQuery(@"Update umbracoUser set userName=@name, userLogin=@lname, userEmail=@email, UserType=@type, userDisabled=@disabled, userNoConsole=@noconsole where id = @id",
+                SqlHelper.CreateParameter("@name", name),
+                SqlHelper.CreateParameter("@lname", lname),
+                SqlHelper.CreateParameter("@email", email),
+                SqlHelper.CreateParameter("@type", ut.Id),
+                SqlHelper.CreateParameter("@disabled", disabled),
+                SqlHelper.CreateParameter("@noconsole", noConsole),
+                SqlHelper.CreateParameter("@id", id));
+        }
+
+        /// <summary>
+        /// Updates the membership provider properties
+        /// </summary>
+        /// <param name="id">The id.</param>
+        /// <param name="email"></param>
+        /// <param name="disabled"></param>
+        /// <param name="noConsole"></param>        
+        public static void Update(int id, string email, bool disabled, bool noConsole)
+        {
+            SqlHelper.ExecuteNonQuery(@"Update umbracoUser set userEmail=@email, userDisabled=@disabled, userNoConsole=@noconsole where id = @id",
+                SqlHelper.CreateParameter("@email", email),
+                SqlHelper.CreateParameter("@disabled", disabled),
+                SqlHelper.CreateParameter("@noconsole", noConsole),
+                SqlHelper.CreateParameter("@id", id));
+        }
+        
         /// <summary>
         /// Gets the ID from the user with the specified login name and password
         /// </summary>

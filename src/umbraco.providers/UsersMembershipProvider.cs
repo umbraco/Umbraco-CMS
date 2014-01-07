@@ -22,7 +22,7 @@ namespace umbraco.providers
         /// <summary>
         /// Override to maintain backwards compatibility with 0 required non-alphanumeric chars
         /// </summary>
-        protected override int DefaultMinNonAlphanumericChars
+        public override int DefaultMinNonAlphanumericChars
         {
             get { return 0; }
         }
@@ -30,7 +30,7 @@ namespace umbraco.providers
         /// <summary>
         /// Override to maintain backwards compatibility with only 4 required length
         /// </summary>
-        protected override int DefaultMinPasswordLength
+        public override int DefaultMinPasswordLength
         {
             get { return 4; }
         }
@@ -38,7 +38,7 @@ namespace umbraco.providers
         /// <summary>
         /// Override to maintain backwards compatibility
         /// </summary>
-        protected override bool DefaultUseLegacyEncoding
+        public override bool DefaultUseLegacyEncoding
         {
             get { return true; }
         }
@@ -110,9 +110,9 @@ namespace umbraco.providers
         /// <returns>
         /// true if the password question and answer are updated successfully; otherwise, false.
         /// </returns>
-        public override bool ChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer)
+        protected override bool PerformChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer)
         {
-            throw new Exception("The method or operation is not implemented.");
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -129,15 +129,8 @@ namespace umbraco.providers
         /// <returns>
         /// A <see cref="T:System.Web.Security.MembershipUser"></see> object populated with the information for the newly created user.
         /// </returns>
-        public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
+        protected override MembershipUser PerformCreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
         {
-            var args = new ValidatePasswordEventArgs(username, password, true);
-            OnValidatingPassword(args);
-            if (args.Cancel)
-            {
-                status = MembershipCreateStatus.InvalidPassword;
-                return null;
-            }
 
             // TODO: Does umbraco allow duplicate emails??
             //if (RequiresUniqueEmail && !string.IsNullOrEmpty(GetUserNameByEmail(email)))
@@ -162,7 +155,7 @@ namespace umbraco.providers
                     string salt;
                     var encodedPass = EncryptOrHashNewPassword(password, out salt);
 
-                    User.MakeNew(username, username, FormatPasswordForStorage(encodedPass, salt), ut);
+                    User.MakeNew(username, username, FormatPasswordForStorage(encodedPass, salt), email, ut);
 
                     status = MembershipCreateStatus.Success;
                 }
@@ -293,7 +286,8 @@ namespace umbraco.providers
         /// </returns>
         public override int GetNumberOfUsersOnline()
         {
-            throw new Exception("The method or operation is not implemented.");
+            var fromDate = DateTime.Now.AddMinutes(-Membership.UserIsOnlineTimeWindow);
+            return Log.Instance.GetLogItems(LogTypes.Login, fromDate).Count;
         }
 
         /// <summary>
@@ -305,9 +299,28 @@ namespace umbraco.providers
         /// <returns>
         /// The password for the specified user name.
         /// </returns>
-        public override string GetPassword(string username, string answer)
+        protected override string PerformGetPassword(string username, string answer)
         {
-            throw new ProviderException("Password Retrieval Not Enabled.");
+            var found = User.GetAllByLoginName(username, false).ToArray();
+            if (found == null || found.Any() == false)
+            {
+                throw new MembershipPasswordException("The supplied user is not found");
+            }
+
+            // check if user is locked out
+            if (found.First().NoConsole)
+            {
+                throw new MembershipPasswordException("The supplied user is locked out");
+            }
+
+            if (RequiresQuestionAndAnswer)
+            {
+                throw new NotImplementedException("Question/answer is not supported with this membership provider");
+            }
+
+            var decodedPassword = DecryptPassword(found.First().GetPassword());
+
+            return decodedPassword;
         }
 
         /// <summary>
@@ -321,7 +334,12 @@ namespace umbraco.providers
         public override MembershipUser GetUser(string username, bool userIsOnline)
         {
             var userId = User.getUserId(username);
-            return (userId != -1) ? ConvertToMembershipUser(new User(userId)) : null;
+
+            var user = new User(userId);
+            //We need to log this since it's the only way we can determine the number of users online
+            Log.Add(LogTypes.Login, user, -1, "User " + username + " has logged in");
+
+            return (userId != -1) ? ConvertToMembershipUser(user) : null;
         }
 
         /// <summary>
@@ -334,7 +352,10 @@ namespace umbraco.providers
         /// </returns>
         public override MembershipUser GetUser(object providerUserKey, bool userIsOnline)
         {
-            return ConvertToMembershipUser(new User(Convert.ToInt32(providerUserKey)));
+            var user = new User(Convert.ToInt32(providerUserKey));
+            //We need to log this since it's the only way we can determine the number of users online
+            Log.Add(LogTypes.Login, user, -1, "User " + user.LoginName + " has logged in");
+            return ConvertToMembershipUser(user);
         }
 
         /// <summary>
@@ -346,7 +367,12 @@ namespace umbraco.providers
         /// </returns>
         public override string GetUserNameByEmail(string email)
         {
-            throw new Exception("The method or operation is not implemented.");
+            var found = User.getAllByEmail(email.Trim().ToLower(), true);
+            if (found == null || found.Any() == false)
+            {
+                return null;
+            }
+            return found.First().LoginName;
         }
 
         /// <summary>
@@ -355,13 +381,8 @@ namespace umbraco.providers
         /// <param name="username">The user to reset the password for.</param>
         /// <param name="answer">The password answer for the specified user.</param>
         /// <returns>The new password for the specified user.</returns>
-        public override string ResetPassword(string username, string answer)
-        {
-            if (EnablePasswordReset == false)
-            {
-                throw new NotSupportedException("Password reset is not supported");
-            }
-
+        protected override string PerformResetPassword(string username, string answer, string generatedPassword)
+        {            
             //TODO: This should be here - but how do we update failure count in this provider??
             //if (answer == null && RequiresQuestionAndAnswer)
             //{
@@ -370,18 +391,7 @@ namespace umbraco.providers
             //    throw new ProviderException("Password answer required for password reset.");
             //}
 
-            var newPassword = Membership.GeneratePassword(MinRequiredPasswordLength, MinRequiredNonAlphanumericCharacters);
-
-            var args = new ValidatePasswordEventArgs(username, newPassword, true);
-            OnValidatingPassword(args);
-            if (args.Cancel)
-            {
-                if (args.FailureInformation != null)
-                    throw args.FailureInformation;
-                throw new MembershipPasswordException("Reset password canceled due to password validation failure.");
-            }
-
-            var found = User.GetAllByLoginName(username, false);
+            var found = User.GetAllByLoginName(username, false).ToArray();
             if (found == null || found.Any() == false)
                 throw new MembershipPasswordException("The supplied user is not found");
 
@@ -389,12 +399,12 @@ namespace umbraco.providers
 
             //Yes, it's true, this actually makes a db call to set the password
             string salt;
-            var encPass = EncryptOrHashNewPassword(newPassword, out salt);
+            var encPass = EncryptOrHashNewPassword(generatedPassword, out salt);
             user.Password = FormatPasswordForStorage(encPass, salt);
             //call this just for fun.
             user.Save();
 
-            return newPassword;
+            return generatedPassword;
         }
 
         /// <summary>
@@ -410,7 +420,7 @@ namespace umbraco.providers
             {
                 var user = new User(userName)
                     {
-                        Disabled = false
+                        NoConsole = false
                     };
                 user.Save();
             }
@@ -427,19 +437,31 @@ namespace umbraco.providers
         /// <param name="user">A <see cref="T:System.Web.Security.MembershipUser"></see> object that represents the user to update and the updated information for the user.</param>
         public override void UpdateUser(MembershipUser user)
         {
-            var umbracoUser = user as UsersMembershipUser;
-            var userID = 0;
+            var found = User.GetAllByLoginName(user.UserName, false).ToArray();
+            if (found == null || found.Any() == false)
+                throw new MembershipPasswordException("The supplied user is not found");
 
-            if (int.TryParse(umbracoUser.ProviderUserKey.ToString(), out userID) == false) return;
+            var m = found.First();
 
-            try
+            
+            var typedUser = user as UsersMembershipUser;
+            if (typedUser == null)
             {
-                User.Update(userID, umbracoUser.FullName, umbracoUser.UserName, umbracoUser.Email, umbracoUser.UserType);
+                // update approve status            
+                // update lock status
+                // TODO: Update last lockout time            
+                // TODO: update comment
+                User.Update(m.Id, user.Email, user.IsApproved == false, user.IsLockedOut);
             }
-            catch (Exception)
+            else
             {
-                throw new ProviderException("User cannot be updated.");
+                //This keeps compatibility - even though this logic to update name and user type  should not exist here
+                User.Update(m.Id, typedUser.FullName.Trim(), typedUser.UserName, typedUser.Email, user.IsApproved == false, user.IsLockedOut, typedUser.UserType);
             }
+
+            
+            
+            m.Save();
         }
 
         /// <summary>
@@ -476,7 +498,7 @@ namespace umbraco.providers
                         return true;
                     }
 
-                    return user.ValidatePassword(EncryptOrHashExistingPassword(password));    
+                    return CheckPassword(password, user.Password);
                 }
             }
             return false;
@@ -484,31 +506,7 @@ namespace umbraco.providers
         #endregion
 
         #region Helper Methods
-        /// <summary>
-        /// Checks the password.
-        /// </summary>
-        /// <param name="password">The password.</param>
-        /// <param name="dbPassword">The dbPassword.</param>
-        /// <returns></returns>
-        internal bool CheckPassword(string password, string dbPassword)
-        {
-            string pass1 = password;
-            string pass2 = dbPassword;
-
-            switch (PasswordFormat)
-            {
-                case MembershipPasswordFormat.Encrypted:
-                    pass2 = DecodePassword(dbPassword);
-                    break;
-                case MembershipPasswordFormat.Hashed:
-                    pass1 = EncryptOrHashExistingPassword(password);
-                    break;
-                default:
-                    break;
-            }
-            return (pass1 == pass2) ? true : false;
-        }
-
+       
 
         /// <summary>
         /// Encodes the password.

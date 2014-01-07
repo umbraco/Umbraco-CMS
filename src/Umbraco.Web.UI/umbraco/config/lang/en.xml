@@ -279,6 +279,7 @@
     <key alias="tableSplitNotSplittable">You cannot split a cell that hasn't been merged.</key>
     <key alias="xsltErrorHeader">Error in XSLT source</key>
     <key alias="xsltErrorText">The XSLT has not been saved, because it contained error(s)</key>
+    <key alias="missingPropertyEditorErrorMessage">There is a configuration error with the data type used for this property, please check the data type</key>
   </area>
   <area alias="general">
     <key alias="about">About</key>

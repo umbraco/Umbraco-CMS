@@ -4,17 +4,14 @@ using System.Text;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using ClientDependency.Core;
+using Umbraco.Web.UI.Bundles;
 using umbraco.BasePages;
 using Umbraco.Core.IO;
 
 namespace Umbraco.Web.UI.Controls
 {
     [ClientDependency(ClientDependencyType.Css, "ContextMenu/Css/jquery.contextMenu.css", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Css, "FolderBrowser/Css/folderbrowser.css", "UmbracoClient")]
-    [ClientDependency(ClientDependencyType.Javascript, "ui/jquery.js", "UmbracoClient", Priority = 1)]
-    [ClientDependency(ClientDependencyType.Javascript, "ui/base2.js", "UmbracoClient", Priority = 1)]
-    [ClientDependency(ClientDependencyType.Javascript, "ui/knockout.js", "UmbracoClient", Priority = 3)]
-    [ClientDependency(ClientDependencyType.Javascript, "ui/knockout.mapping.js", "UmbracoClient", Priority = 4)]
+    [ClientDependency(ClientDependencyType.Css, "FolderBrowser/Css/folderbrowser.css", "UmbracoClient")]    
     [ClientDependency(ClientDependencyType.Javascript, "ContextMenu/Js/jquery.contextMenu.js", "UmbracoClient", Priority = 5)]
     [ClientDependency(ClientDependencyType.Javascript, "FileUploader/js/jquery.fileUploader.js", "UmbracoClient", Priority = 6)]
     [ClientDependency(ClientDependencyType.Javascript, "FolderBrowser/js/folderbrowser.js", "UmbracoClient", Priority = 10)]
@@ -68,6 +65,10 @@ namespace Umbraco.Web.UI.Controls
         /// </summary>
         protected override void CreateChildControls()
         {
+            //Ensure the bundles are added
+            Controls.Add(new JsApplicationLib());
+            Controls.Add(new JsJQueryCore());
+
             // Create the panel surround
             Panel = new Panel
             {
