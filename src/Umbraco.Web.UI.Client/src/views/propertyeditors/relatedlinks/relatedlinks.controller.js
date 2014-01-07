@@ -39,10 +39,8 @@
                 $scope.model.value[idx].edit = false;
             };
             
-            $scope.delete = function (idx) {
-               
-                $scope.model.value.splice(idx, 1);
-                
+            $scope.delete = function (idx) {               
+                $scope.model.value.splice(idx, 1);               
             };
 
             $scope.add = function () {
@@ -68,7 +66,7 @@
                             this.internal = $scope.newInternal;
                             this.edit = false;
                             this.isInternal = true;
-                            this.iternalName = $scope.newInternalName;
+                            this.internalName = $scope.newInternalName;
                             this.type = "internal";
                             this.title = $scope.newCaption;
                         };
@@ -88,8 +86,11 @@
                 $event.preventDefault();
             };
             
-            $scope.switchLinkType = function ($event,link) {
-                link.isInternal = !link.isInternal;
+            $scope.switchLinkType = function ($event, link) {
+                link.isInternal = !link.isInternal;                
+                link.type = link.isInternal ? "internal" : "external";
+                if (!link.isInternal)
+                    link.link = $scope.newLink;
                 $event.preventDefault();
             };
             
@@ -97,12 +98,10 @@
                 if ($scope.currentEditLink != null) {
                     $scope.currentEditLink.internal = data.id;
                     $scope.currentEditLink.internalName = data.name;
+                    $scope.currentEditLink.link = data.id;
                 } else {
                     $scope.newInternal = data.id;
                     $scope.newInternalName = data.name;
                 }
-            }
-
-            
-
+            }            
         });
