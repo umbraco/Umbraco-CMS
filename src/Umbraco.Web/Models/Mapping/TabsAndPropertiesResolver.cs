@@ -94,7 +94,7 @@ namespace Umbraco.Web.Models.Mapping
                         {
                             Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                             Label = ui.Text("content", "documentType"),
-                            Value = display.ContentTypeName,
+                            Value = TranslateItem(display.ContentTypeName, CreateDictionary()),
                             View = labelEditor
                         }
                 };
@@ -210,11 +210,17 @@ namespace Umbraco.Web.Models.Mapping
         // This should really be centralized and used anywhere globalization applies.
         internal string TranslateItem(string text)
         {
+            var cultureDictionary = CultureDictionary;
+            return TranslateItem(text, cultureDictionary);
+        }
+
+        private static string TranslateItem(string text, ICultureDictionary cultureDictionary)
+        {
             if (!text.StartsWith("#"))
                 return text;
 
             text = text.Substring(1);
-            return CultureDictionary[text].IfNullOrWhiteSpace(text);
+            return cultureDictionary[text].IfNullOrWhiteSpace(text);
         }
 
         private ICultureDictionary CultureDictionary
@@ -223,8 +229,13 @@ namespace Umbraco.Web.Models.Mapping
             {
                 return 
                     cultureDictionary ?? 
-                    (cultureDictionary = CultureDictionaryFactoryResolver.Current.Factory.CreateDictionary());
+                    (cultureDictionary = CreateDictionary());
             }
+        }
+
+        private static ICultureDictionary CreateDictionary()
+        {
+            return CultureDictionaryFactoryResolver.Current.Factory.CreateDictionary();
         }
     }
 }
