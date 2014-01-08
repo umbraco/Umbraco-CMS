@@ -7,6 +7,7 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers.Entities;
+using umbraco.BusinessLogic.Actions;
 
 namespace Umbraco.Tests.Services
 {
@@ -26,6 +27,68 @@ namespace Umbraco.Tests.Services
         public override void TearDown()
         {
             base.TearDown();
+        }
+
+        [Test]
+        public void UserService_Get_User_Permissions_For_Unassigned_Permission_Nodes()
+        {
+            // Arrange
+            var userService = ServiceContext.UserService;
+            var userType = userService.GetUserTypeByAlias("admin");
+            var user = ServiceContext.UserService.CreateMember("test1", "test1@test.com", "123456", userType);
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+            ServiceContext.ContentTypeService.Save(contentType);
+            var content = new[]
+                {
+                    MockedContent.CreateSimpleContent(contentType),
+                    MockedContent.CreateSimpleContent(contentType),
+                    MockedContent.CreateSimpleContent(contentType)
+                };
+            ServiceContext.ContentService.Save(content);
+
+            // Act
+            var permissions = userService.GetPermissions(user, content.ElementAt(0).Id, content.ElementAt(1).Id, content.ElementAt(2).Id);
+
+            //assert
+            Assert.AreEqual(3, permissions.Count());
+            Assert.AreEqual(17, permissions.ElementAt(0).AssignedPermissions.Count());
+            Assert.AreEqual(17, permissions.ElementAt(1).AssignedPermissions.Count());
+            Assert.AreEqual(17, permissions.ElementAt(2).AssignedPermissions.Count());
+        }
+
+        [Test]
+        public void UserService_Get_User_Permissions_For_Assigned_Permission_Nodes()
+        {
+            // Arrange
+            var userService = ServiceContext.UserService;
+            var userType = userService.GetUserTypeByAlias("admin");
+            var user = ServiceContext.UserService.CreateMember("test1", "test1@test.com", "123456", userType);
+            var contentType = MockedContentTypes.CreateSimpleContentType();
+            ServiceContext.ContentTypeService.Save(contentType);
+            var content = new[]
+                {
+                    MockedContent.CreateSimpleContent(contentType),
+                    MockedContent.CreateSimpleContent(contentType),
+                    MockedContent.CreateSimpleContent(contentType)
+                };
+            ServiceContext.ContentService.Save(content);
+            ((ContentService)ServiceContext.ContentService).AssignContentPermissions(content.ElementAt(0), ActionBrowse.Instance.Letter, new object[] { user.Id });
+            ((ContentService)ServiceContext.ContentService).AssignContentPermissions(content.ElementAt(0), ActionDelete.Instance.Letter, new object[] { user.Id });
+            ((ContentService)ServiceContext.ContentService).AssignContentPermissions(content.ElementAt(0), ActionMove.Instance.Letter, new object[] { user.Id });
+
+            ((ContentService)ServiceContext.ContentService).AssignContentPermissions(content.ElementAt(1), ActionBrowse.Instance.Letter, new object[] { user.Id });
+            ((ContentService)ServiceContext.ContentService).AssignContentPermissions(content.ElementAt(1), ActionDelete.Instance.Letter, new object[] { user.Id });
+
+            ((ContentService)ServiceContext.ContentService).AssignContentPermissions(content.ElementAt(2), ActionBrowse.Instance.Letter, new object[] { user.Id });
+
+            // Act
+            var permissions = userService.GetPermissions(user, content.ElementAt(0).Id, content.ElementAt(1).Id, content.ElementAt(2).Id);
+
+            //assert
+            Assert.AreEqual(3, permissions.Count());
+            Assert.AreEqual(3, permissions.ElementAt(0).AssignedPermissions.Count());
+            Assert.AreEqual(2, permissions.ElementAt(1).AssignedPermissions.Count());
+            Assert.AreEqual(1, permissions.ElementAt(2).AssignedPermissions.Count());
         }
 
         [Test]

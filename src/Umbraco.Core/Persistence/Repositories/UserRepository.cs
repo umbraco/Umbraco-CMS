@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents the UserRepository for doing CRUD operations for <see cref="IUser"/>
     /// </summary>
-    internal class UserRepository : PermissionRepository<int, IUser>, IUserRepository
+    internal class UserRepository : PetaPocoRepositoryBase<int, IUser>, IUserRepository
     {
         private readonly IUserTypeRepository _userTypeRepository;
 
@@ -302,6 +302,18 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //now we need to ensure this result is also ordered by the same order by clause
             return result.OrderBy(orderBy.Compile());
+        }
+
+        /// <summary>
+        /// Returns permissions for a given user for any number of nodes
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="entityIds"></param>
+        /// <returns></returns>        
+        public IEnumerable<EntityPermission> GetUserPermissionsForEntities(object userId, params int[] entityIds)
+        {
+            var repo = new PermissionRepository<IContent>(UnitOfWork);
+            return repo.GetUserPermissionsForEntities(userId, entityIds);
         }
 
         #endregion

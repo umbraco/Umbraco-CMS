@@ -8,10 +8,6 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal interface IUserRepository : IRepositoryQueryable<int, IUser>
     {
-        //IProfile GetProfileById(int id);
-        //IProfile GetProfileByUserName(string username);
-        //IUser GetUserByUserName(string username);
-
         /// <summary>
         /// Gets the count of items based on a complex query
         /// </summary>
@@ -42,5 +38,14 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="orderBy"></param>
         /// <returns></returns>
         IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy);
+
+
+        /// <summary>
+        /// Gets the user permissions for the specified entities
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="entityIds"></param>
+        /// <returns></returns>
+        IEnumerable<EntityPermission> GetUserPermissionsForEntities(object userId, params int[] entityIds);
     }
 }

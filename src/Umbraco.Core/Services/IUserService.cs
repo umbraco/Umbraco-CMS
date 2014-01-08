@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Web;
 using Umbraco.Core.Models.Membership;
 
@@ -50,5 +51,13 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="sectionAlias"></param>
         void DeleteSectionFromAllUsers(string sectionAlias);
+
+        /// <summary>
+        /// Returns a list of the sections that the user is allowed access to
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<string> GetUserSections(IUser user);
+
+        IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds);
     }
 }

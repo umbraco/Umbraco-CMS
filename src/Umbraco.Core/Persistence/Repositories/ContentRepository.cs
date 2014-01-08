@@ -6,6 +6,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
@@ -262,17 +263,19 @@ namespace Umbraco.Core.Persistence.Repositories
 
 
             //Assign the same permissions to it as the parent node
-            // http://issues.umbraco.org/issue/U4-2161            
-            var parentPermissions = GetPermissionsForEntity(entity.ParentId).ToArray();
+            // http://issues.umbraco.org/issue/U4-2161     
+            var permissionsRepo = new PermissionRepository<IContent>(UnitOfWork);
+            var parentPermissions = permissionsRepo.GetPermissionsForEntity(entity.ParentId).ToArray();
             //if there are parent permissions then assign them, otherwise leave null and permissions will become the
             // user's default permissions.
             if (parentPermissions.Any())
             {
-                var userPermissions = parentPermissions.Select(
-                    permissionDto => new KeyValuePair<object, IEnumerable<string>>(
-                                         permissionDto.UserId,
-                                         permissionDto.Permission.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture))));                
-                AssignEntityPermissions(entity, userPermissions);
+                var userPermissions = (
+                    from perm in parentPermissions
+                    from p in perm.AssignedPermissions
+                    select new Tuple<object, string>(perm.UserId, p)).ToList();
+                
+                permissionsRepo.AssignEntityPermissions(entity, userPermissions);
                 //flag the entity's permissions changed flag so we can track those changes.
                 //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.
                 ((Content) entity).PermissionsChanged = true;
@@ -522,6 +525,18 @@ namespace Umbraco.Core.Persistence.Repositories
                 return null;
 
             return GetByVersion(dto.ContentVersionDto.VersionId);
+        }
+
+        public void AssignEntityPermissions(IContent entity, char permission, IEnumerable<object> userIds)
+        {
+            var repo = new PermissionRepository<IContent>(UnitOfWork);
+            repo.AssignEntityPermissions(entity, permission, userIds);
+        }
+
+        public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
+        {
+            var repo = new PermissionRepository<IContent>(UnitOfWork);
+            return repo.GetPermissionsForEntity(entityId);
         }
 
         #endregion

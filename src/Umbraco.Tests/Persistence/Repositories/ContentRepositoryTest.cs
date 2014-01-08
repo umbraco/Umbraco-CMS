@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
 
                 // Act
-                repository.AssignEntityPermissions(parentPage, new[] { "A" }, new object[] { 0 });
+                repository.AssignEntityPermissions(parentPage, 'A', new object[] { 0 });
                 var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
                 repository.AddOrUpdate(childPage);
                 unitOfWork.Commit();
@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 var permissions = repository.GetPermissionsForEntity(childPage.Id);
                 Assert.AreEqual(1, permissions.Count());
-                Assert.AreEqual("A", permissions.Single().Permission);
+                Assert.AreEqual("A", permissions.Single().AssignedPermissions.First());
             }
             
         }

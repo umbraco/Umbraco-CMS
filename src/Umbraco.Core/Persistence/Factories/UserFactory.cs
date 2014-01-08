@@ -35,9 +35,8 @@ namespace Umbraco.Core.Persistence.Factories
                     Email = dto.Email,
                     Language = dto.UserLanguage,
                     DefaultToLiveEditing = dto.DefaultToLiveEditing,
-                    DefaultPermissions = dto.DefaultPermissions.IsNullOrWhiteSpace()
-                                             ? Enumerable.Empty<string>()
-                                             : dto.DefaultPermissions.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture))
+                    //NOTE: The default permission come from the user type's default permissions
+                    DefaultPermissions = _userType.Permissions
                 };
 
             foreach (var app in dto.User2AppDtos)
@@ -67,7 +66,6 @@ namespace Umbraco.Core.Persistence.Factories
                               UserLanguage = entity.Language,
                               UserName = entity.Name,
                               Type = short.Parse(entity.UserType.Id.ToString(CultureInfo.InvariantCulture)),
-                              DefaultPermissions = entity.DefaultPermissions == null ? "" : string.Join("", entity.DefaultPermissions),
                               User2AppDtos = new List<User2AppDto>()
                           };
 
