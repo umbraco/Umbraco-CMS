@@ -334,12 +334,24 @@ namespace umbraco.providers
         public override MembershipUser GetUser(string username, bool userIsOnline)
         {
             var userId = User.getUserId(username);
+            if (userId == -1)
+            {
+                return null;
+            }
 
-            var user = new User(userId);
-            //We need to log this since it's the only way we can determine the number of users online
-            Log.Add(LogTypes.Login, user, -1, "User " + username + " has logged in");
+            try
+            {
+                var user = new User(userId);
 
-            return (userId != -1) ? ConvertToMembershipUser(user) : null;
+                //We need to log this since it's the only way we can determine the number of users online
+                Log.Add(LogTypes.Login, user, -1, "User " + username + " has logged in");
+
+                return (userId != -1) ? ConvertToMembershipUser(user) : null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }            
         }
 
         /// <summary>
