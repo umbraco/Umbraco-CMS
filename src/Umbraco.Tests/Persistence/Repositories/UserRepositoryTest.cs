@@ -485,6 +485,28 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
+        [Test]
+        public void Default_User_Permissions_Based_On_User_Type()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
+
+
+            // Act
+            var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1", "test", "media");
+            repository.AddOrUpdate(user1);
+            unitOfWork.Commit();
+
+            // Assert
+            Assert.AreEqual(3, user1.DefaultPermissions.Count());
+            Assert.AreEqual("A", user1.DefaultPermissions.ElementAt(0));
+            Assert.AreEqual("B", user1.DefaultPermissions.ElementAt(1));
+            Assert.AreEqual("C", user1.DefaultPermissions.ElementAt(2));
+
+        }
+
         private void AssertPropertyValues(IUser updatedItem, IUser originalUser)
         {
             Assert.That(updatedItem.Id, Is.EqualTo(originalUser.Id));
