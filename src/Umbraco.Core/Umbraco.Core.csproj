@@ -345,6 +345,7 @@
     <Compile Include="Persistence\Querying\SqlStringExtensions.cs" />
     <Compile Include="Persistence\Querying\StringPropertyMatchType.cs" />
     <Compile Include="Persistence\Querying\TextColumnType.cs" />
+    <Compile Include="Persistence\Querying\ValuePropertyMatchType.cs" />
     <Compile Include="Persistence\SqlSyntax\MySqlSyntax.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlCeSyntax.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlServerSyntax.cs" />
@@ -426,14 +427,11 @@
     <Compile Include="Models\Media.cs" />
     <Compile Include="Models\MediaType.cs" />
     <Compile Include="Models\Membership\IMembershipUser.cs" />
-    <Compile Include="Models\Membership\IMembershipUserId.cs" />
     <Compile Include="Models\Membership\IProfile.cs" />
     <Compile Include="Models\Membership\IUser.cs" />
     <Compile Include="Models\Membership\IUserType.cs" />
-    <Compile Include="Models\Membership\Profile.cs" />
     <Compile Include="Models\Membership\User.cs" />
     <Compile Include="Models\Membership\UserGroup.cs" />
-    <Compile Include="Models\Membership\UserProfile.cs" />
     <Compile Include="Models\Membership\UserType.cs" />
     <Compile Include="Models\PropertyExtensions.cs" />
     <Compile Include="Models\PublishedItemType.cs" />
@@ -952,6 +950,7 @@
     <Compile Include="Security\AuthenticationExtensions.cs" />
     <Compile Include="Security\MembershipProviderBase.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
+    <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
     <Compile Include="Security\UserData.cs" />
     <Compile Include="Serialization\AbstractSerializationService.cs" />
     <Compile Include="Serialization\Formatter.cs" />
@@ -992,6 +991,7 @@
     <Compile Include="Services\LocalizationService.cs" />
     <Compile Include="Services\MacroService.cs" />
     <Compile Include="Services\MediaService.cs" />
+    <Compile Include="Services\MemberCountType.cs" />
     <Compile Include="Services\MemberService.cs" />
     <Compile Include="Services\MemberTypeService.cs" />
     <Compile Include="Services\RelationService.cs" />

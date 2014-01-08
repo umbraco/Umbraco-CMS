@@ -1,5 +1,7 @@
 using System;
+using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
+using System.Web.UI;
 using System.Xml;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -65,9 +67,19 @@ namespace umbraco.cms.businesslogic.property
 
             //Just to ensure that there is a PropertyType available
             _pt = PropertyType.GetPropertyType(property.PropertyTypeId);
-            if (_pt.DataTypeDefinition.DataType == null)
-                throw new Exception(string.Format("Could not load datatype '{0}'", _pt.DataTypeDefinition.Text));
-            _data = _pt.DataTypeDefinition.DataType.Data;
+
+            //ensure we have data property editor set
+            if (_pt.DataTypeDefinition.DataType != null)
+            {
+                _data = _pt.DataTypeDefinition.DataType.Data;
+            }
+            else
+            {
+                //send back null we will handle it in ContentControl AddControlNew 
+                //and display to use message from the dictionary errors section 
+                _data= new DefaultData(null);
+            }
+            
             _data.PropertyId = Id;
 
             //set the value so it doesn't need to go to the database

@@ -78,7 +78,7 @@ namespace Umbraco.Tests.PublishedCache
             //ensure the StateHelper is using our custom context
             StateHelper.HttpContext = _httpContextFactory.HttpContext;
 
-		    var settings = SettingsForTests.GetMockSettings();
+		    var settings = SettingsForTests.GenerateMockSettings();
 		    var contentMock = Mock.Get(settings.Content);
             contentMock.Setup(x => x.UseLegacyXmlSchema).Returns(false);
 		    SettingsForTests.ConfigureSettings(settings);
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.PublishedCache
 
 	    private void SetupForLegacy()
 		{
-            var settings = SettingsForTests.GetMockSettings();
+            var settings = SettingsForTests.GenerateMockSettings();
 		    var contentMock = Mock.Get(settings.Content);
             contentMock.Setup(x => x.UseLegacyXmlSchema).Returns(true);
             SettingsForTests.ConfigureSettings(settings);

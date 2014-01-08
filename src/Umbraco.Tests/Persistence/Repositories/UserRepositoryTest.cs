@@ -131,15 +131,15 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
 
                 // Act
-                var resolved = repository.Get((int)user.Id);
+                var resolved = (User)repository.Get((int)user.Id);
 
                 resolved.Name = "New Name";
-            //the db column is not used, default permissions are taken from the user type's permissions, this is a getter only
-            //resolved.DefaultPermissions = "ZYX";
+                //the db column is not used, default permissions are taken from the user type's permissions, this is a getter only
+                //resolved.DefaultPermissions = "ZYX";
                 resolved.Language = "fr";
                 resolved.IsApproved = false;
                 resolved.Password = "new";
-                resolved.NoConsole = true;
+                resolved.IsLockedOut = true;
                 resolved.StartContentId = 10;
                 resolved.StartMediaId = 11;
                 resolved.Email = "new@new.com";
@@ -148,16 +148,16 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 repository.AddOrUpdate(resolved);
                 unitOfWork.Commit();
-                var updatedItem = repository.Get((int)user.Id);
+                var updatedItem = (User)repository.Get((int)user.Id);
 
                 // Assert
                 Assert.That(updatedItem.Id, Is.EqualTo(resolved.Id));
                 Assert.That(updatedItem.Name, Is.EqualTo(resolved.Name));
-            //Assert.That(updatedItem.DefaultPermissions, Is.EqualTo(resolved.DefaultPermissions));
+                //Assert.That(updatedItem.DefaultPermissions, Is.EqualTo(resolved.DefaultPermissions));
                 Assert.That(updatedItem.Language, Is.EqualTo(resolved.Language));
                 Assert.That(updatedItem.IsApproved, Is.EqualTo(resolved.IsApproved));
                 Assert.That(updatedItem.Password, Is.EqualTo(resolved.Password));
-                Assert.That(updatedItem.NoConsole, Is.EqualTo(resolved.NoConsole));
+                Assert.That(updatedItem.IsLockedOut, Is.EqualTo(resolved.IsLockedOut));
                 Assert.That(updatedItem.StartContentId, Is.EqualTo(resolved.StartContentId));
                 Assert.That(updatedItem.StartMediaId, Is.EqualTo(resolved.StartMediaId));
                 Assert.That(updatedItem.Email, Is.EqualTo(resolved.Email));
@@ -510,7 +510,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(updatedItem.Language, Is.EqualTo(originalUser.Language));
             Assert.That(updatedItem.IsApproved, Is.EqualTo(originalUser.IsApproved));
             Assert.That(updatedItem.Password, Is.EqualTo(originalUser.Password));
-            Assert.That(updatedItem.NoConsole, Is.EqualTo(originalUser.NoConsole));
+            Assert.That(updatedItem.IsLockedOut, Is.EqualTo(originalUser.IsLockedOut));
             Assert.That(updatedItem.StartContentId, Is.EqualTo(originalUser.StartContentId));
             Assert.That(updatedItem.StartMediaId, Is.EqualTo(originalUser.StartMediaId));
             Assert.That(updatedItem.Email, Is.EqualTo(originalUser.Email));

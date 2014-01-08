@@ -16,7 +16,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             base.TestSetup();
 
-            var settings = SettingsForTests.GetMockSettings();
+            var settings = SettingsForTests.GenerateMockSettings();
             var contentMock = Mock.Get(settings.Content);
             contentMock.Setup(x => x.ForceSafeAliases).Returns(true);
             contentMock.Setup(x => x.UmbracoLibraryCacheDuration).Returns(1800);

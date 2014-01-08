@@ -548,6 +548,7 @@ namespace umbraco.cms.businesslogic.web
                     var tabx = xd.CreateElement("Tab");
                     tabx.AppendChild(XmlHelper.AddTextNode(xd, "Id", propertyTypeGroup.Id.ToString()));
                     tabx.AppendChild(XmlHelper.AddTextNode(xd, "Caption", propertyTypeGroup.Name));
+                    tabx.AppendChild(XmlHelper.AddTextNode(xd, "SortOrder", propertyTypeGroup.SortOrder.ToString()));
                     tabs.AppendChild(tabx);
                 }
             }

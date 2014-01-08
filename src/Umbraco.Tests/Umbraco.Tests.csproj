@@ -170,6 +170,7 @@
     <Compile Include="AngularIntegration\ServerVariablesParserTests.cs" />
     <Compile Include="AttemptTests.cs" />
     <Compile Include="Membership\MembershipProviderBaseTests.cs" />
+    <Compile Include="Membership\UmbracoServiceMembershipProviderTests.cs" />
     <Compile Include="MockTests.cs" />
     <Compile Include="Mvc\UmbracoViewPageTests.cs" />
     <Compile Include="Persistence\Auditing\AuditTests.cs" />
@@ -277,6 +278,7 @@
     <Compile Include="PropertyEditors\EnsureUniqueValuesValidatorTest.cs" />
     <Compile Include="PropertyEditors\LegacyPropertyEditorIdToAliasConverterTests.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueEditorTests.cs" />
+    <Compile Include="PublishedContent\PublishedContentRequestEngineTests.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\CallingMethodTests.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\Subpage.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\Textpage.cs" />

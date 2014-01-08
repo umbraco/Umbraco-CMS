@@ -354,7 +354,6 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="loginName">Member login</param>
         /// <param name="password">Member password</param>
         /// <returns>The member with the credentials - null if none exists</returns>
-        
         public static Member GetMemberFromLoginNameAndPassword(string loginName, string password)
         {
             if (IsMember(loginName))
@@ -376,7 +375,8 @@ namespace umbraco.cms.businesslogic.member
                 return null;
             }
         }
-
+        
+        [Obsolete("This method will not work if the password format is encrypted since the encryption that is performed is not static and a new value will be created each time the same string is encrypted")]
         public static Member GetMemberFromLoginAndEncodedPassword(string loginName, string password)
         {
             var o = SqlHelper.ExecuteScalar<object>(

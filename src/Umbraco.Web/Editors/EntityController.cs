@@ -454,7 +454,8 @@ namespace Umbraco.Web.Editors
 
                 case UmbracoEntityTypes.User:
 
-                    var users = Services.UserService.GetAllUsers();
+                    int total;
+                    var users = Services.UserService.GetAllMembers(0, int.MaxValue, out total);
                     var filteredUsers = ExecutePostFilter(users, postFilter, postFilterParams);
                     return Mapper.Map<IEnumerable<IUser>, IEnumerable<EntityBasic>>(filteredUsers);
 

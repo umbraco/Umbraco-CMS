@@ -273,7 +273,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
 
             //Assign the same permissions to it as the parent node
-            // http://issues.umbraco.org/issue/U4-2161            
+            // http://issues.umbraco.org/issue/U4-2161     
             var permissionsRepo = new PermissionRepository<IContent>(UnitOfWork);
             var parentPermissions = permissionsRepo.GetPermissionsForEntity(entity.ParentId).ToArray();
             //if there are parent permissions then assign them, otherwise leave null and permissions will become the
@@ -284,7 +284,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     from perm in parentPermissions 
                     from p in perm.AssignedPermissions 
                     select new Tuple<object, string>(perm.UserId, p)).ToList();
-
+                
                 permissionsRepo.AssignEntityPermissions(entity, userPermissions);
                 //flag the entity's permissions changed flag so we can track those changes.
                 //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.

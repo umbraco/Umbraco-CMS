@@ -1,4 +1,7 @@
-﻿using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Tests.TestHelpers.Entities
@@ -18,8 +21,8 @@ namespace Umbraco.Tests.TestHelpers.Entities
                     IsApproved = true,
                     Name = "TestUser" + suffix,
                     Password = "testing",
-                    NoConsole = false,
-                    DefaultPermissions = "ABC",
+                    IsLockedOut = false,
+                    DefaultPermissions = new[]{"A", "B", "C"},
                     StartContentId = -1,
                     StartMediaId = -1,
                     Email = "test" + suffix + "@test.com",
@@ -40,6 +43,28 @@ namespace Umbraco.Tests.TestHelpers.Entities
             }
 
             return user;
+        }
+
+        internal static IEnumerable<IUser> CreateUser(IUserType userType, int amount, Action<int, IUser> onCreating = null)
+        {
+            var list = new List<IUser>();
+
+            for (int i = 0; i < amount; i++)
+            {
+                var name = "Member No-" + i;
+                var user = new User(name, "test" + i + "@test.com", "test" + i, "test" + i, userType);
+                
+                if (onCreating != null)
+                {
+                    onCreating(i, user);
+                }
+
+                user.ResetDirtyProperties(false);
+
+                list.Add(user);
+            }
+
+            return list;
         }
     }
 }

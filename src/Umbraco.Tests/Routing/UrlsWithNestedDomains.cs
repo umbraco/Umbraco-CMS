@@ -2,6 +2,7 @@
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache.XmlPublishedCache;
 using umbraco.cms.businesslogic.web;
@@ -23,7 +24,7 @@ namespace Umbraco.Tests.Routing
 		{
             SettingsForTests.UseDirectoryUrls = true;
             SettingsForTests.HideTopLevelNodeFromPath = false; // ignored w/domains            
-            var requestMock = Mock.Get(UmbracoSettings.RequestHandler);
+            var requestMock = Mock.Get(_umbracoSettings.RequestHandler);
             requestMock.Setup(x => x.UseDomainPrefixes).Returns(true);
 
 			InitializeLanguagesAndDomains();
@@ -65,12 +66,18 @@ namespace Umbraco.Tests.Routing
 			//Assert.AreEqual("http://domain1.com/1001-1/1001-1-1", routingContext.NiceUrlProvider.GetNiceUrl(100111, true)); // bad
 		}
 
+        private IUmbracoSettingsSection _umbracoSettings;
+
         public override void Initialize()
         {
             base.Initialize();
 
             // ensure we can create them although the content is not in the database
             TestHelper.DropForeignKeys("umbracoDomains");
+
+            //generate new mock settings and assign so we can configure in individual tests
+            _umbracoSettings = SettingsForTests.GenerateMockSettings();
+            SettingsForTests.ConfigureSettings(_umbracoSettings);
         }
 
         protected override void FreezeResolution()
