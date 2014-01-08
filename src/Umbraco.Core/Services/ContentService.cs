@@ -1368,30 +1368,6 @@ namespace Umbraco.Core.Services
 
         #region Internal Methods
 
-        ///// <summary>
-        ///// Internal method that Publishes a single <see cref="IContent"/> object for legacy purposes.
-        ///// </summary>
-        ///// <param name="content">The <see cref="IContent"/> to publish</param>
-        ///// <param name="userId">Optional Id of the User issueing the publishing</param>
-        ///// <returns>True if publishing succeeded, otherwise False</returns>
-        //internal Attempt<PublishStatus> PublishInternal(IContent content, int userId = 0)
-        //{
-        //    return SaveAndPublishDo(content, userId);
-        //}
-
-        ///// <summary>
-        ///// Internal method that Publishes a <see cref="IContent"/> object and all its children for legacy purposes.
-        ///// </summary>
-        ///// <param name="content">The <see cref="IContent"/> to publish along with its children</param>
-        ///// <param name="userId">Optional Id of the User issueing the publishing</param>
-        ///// <param name="includeUnpublished">If set to true, this will also publish descendants that are completely unpublished, normally this will only publish children that have previously been published</param>
-        ///// <returns>True if publishing succeeded, otherwise False</returns>
-        //internal IEnumerable<Attempt<PublishStatus>> PublishWithChildrenInternal(
-        //    IContent content, int userId = 0, bool includeUnpublished = false)
-        //{
-        //    return PublishWithChildrenDo(content, userId, includeUnpublished);
-        //}
-
         /// <summary>
         /// Gets a collection of <see cref="IContent"/> descendants by the first Parent.
         /// </summary>
