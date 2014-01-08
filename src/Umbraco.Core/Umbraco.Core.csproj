@@ -983,6 +983,7 @@
     <Compile Include="Services\IMembershipMemberService.cs" />
     <Compile Include="Services\IMembershipUserService.cs" />
     <Compile Include="Services\IMemberTypeService.cs" />
+    <Compile Include="Services\IPackagingService.cs" />
     <Compile Include="Services\IRelationService.cs" />
     <Compile Include="Services\ISectionService.cs" />
     <Compile Include="Services\IService.cs" />

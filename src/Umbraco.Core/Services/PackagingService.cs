@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -22,7 +20,7 @@ namespace Umbraco.Core.Services
     /// Represents the Packaging Service, which provides import/export functionality for the Core models of the API
     /// using xml representation. This is primarily used by the Package functionality.
     /// </summary>
-    public class PackagingService : IService
+    public class PackagingService : IPackagingService
     {
         private readonly IContentService _contentService;
         private readonly IContentTypeService _contentTypeService;
@@ -106,7 +104,7 @@ namespace Umbraco.Core.Services
         /// <param name="content">Content to export</param>
         /// <param name="deep">Optional parameter indicating whether to include descendents</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Content object</returns>
-        internal XElement Export(IContent content, bool deep = false)
+        public XElement Export(IContent content, bool deep = false)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
             var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
@@ -937,7 +935,7 @@ namespace Umbraco.Core.Services
         /// <param name="media">Media to export</param>
         /// <param name="deep">Optional parameter indicating whether to include descendents</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Media object</returns>
-        internal XElement Export(IMedia media, bool deep = false)
+        public XElement Export(IMedia media, bool deep = false)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
             var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
