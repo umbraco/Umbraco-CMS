@@ -45,6 +45,30 @@ namespace Umbraco.Core.Services
         #region IMemberService Implementation
 
         /// <summary>
+        /// Get the default member type from the database - first check if the type "Member" is there, if not choose the first one found
+        /// </summary>
+        /// <returns></returns>
+        public string GetDefaultMemberType()
+        {
+            using (var repository = _repositoryFactory.CreateMemberTypeRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var types = repository.GetAll().Select(x => x.Alias).ToArray();
+
+                if (types.Any() == false)
+                {
+                    throw new InvalidOperationException("No member types could be resolved");
+                }
+
+                if (types.InvariantContains("Member"))
+                {
+                    return types.First(x => x.InvariantEquals("Member"));
+                }
+
+                return types.First();
+            }
+        }
+
+        /// <summary>
         /// Checks if a member with the username exists
         /// </summary>
         /// <param name="username"></param>
@@ -220,8 +244,6 @@ namespace Umbraco.Core.Services
                 }
 
                 return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Email);
-                
-                //return repository.GetByQuery(query);
             }
         }
 
@@ -254,8 +276,6 @@ namespace Umbraco.Core.Services
                 }
 
                 return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Username);
-
-                //return repository.GetByQuery(query);
             }
         }
 
@@ -510,7 +530,27 @@ namespace Umbraco.Core.Services
 
         public IEnumerable<IMember> GetAllMembers(int pageIndex, int pageSize, out int totalRecords)
         {
-            throw new NotImplementedException();
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
+            {
+                return repository.GetPagedResultsByQuery(null, pageIndex, pageSize, out totalRecords, member => member.Username);
+            }
+        }
+
+        public IMember CreateMember(string email, string username, string password, IMemberType memberType)
+        {
+            if (memberType == null) throw new ArgumentNullException("memberType");
+
+            var member = new Member(email, email, username, password, -1, memberType);
+
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
+            {
+                repository.AddOrUpdate(member);
+                uow.Commit();
+            }
+
+            return member;
         }
 
         /// <summary>
@@ -533,21 +573,15 @@ namespace Umbraco.Core.Services
             }
 
             if (memberType == null)
-                throw new Exception(string.Format("No MemberType matching the passed in Alias: '{0}' was found", memberTypeAlias));
-
-            var member = new Member(email, email, username, password, -1, memberType);
-
-            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                repository.AddOrUpdate(member);
-                uow.Commit();
+                throw new ArgumentException(string.Format("No MemberType matching the passed in Alias: '{0}' was found", memberTypeAlias));
 
                 //insert the xml
                 var xml = member.ToXml();
                 CreateAndSaveMemberXml(xml, member.Id, uow.Database);
             }
 
-            return member;
+            return CreateMember(email, username, password, memberTypeAlias);
         }
 
         /// <summary>

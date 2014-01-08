@@ -1,66 +1,127 @@
-﻿using System.Web.Security;
+﻿using System;
+using System.Web.Security;
 
 namespace Umbraco.Core.Models.Membership
 {
-    //TODO: THere's still a bunch of properties that don't exist in this use that need to be mapped somehow. 
 
     internal class UmbracoMembershipMember : MembershipUser
     {
-        private readonly IMember _member;
+        private readonly IMembershipUser _member;
+        private readonly string _userName;
+        private readonly object _providerUserKey;
+        private readonly string _passwordQuestion;
+        private readonly bool _isLockedOut;
+        private readonly DateTime _lastLockoutDate;
+        private readonly DateTime _creationDate;
+        private DateTime _lastLoginDate;
+        private readonly DateTime _lastPasswordChangedDate;
+        private readonly string _providerName;
+        private string _email;
+        private string _comment;
+        private bool _isApproved;
+        private DateTime _lastActivityDate;
 
-        public UmbracoMembershipMember(IMember member)
+        //NOTE: We are only overriding the properties that matter, we don't override things like IsOnline since that is handled with the sub-class and the membership providers.
+
+        //NOTE: We are not calling the base constructor which will validate that a provider with the specified name exists which causes issues with unit tests. The ctor
+        // validation for that doesn't need to be there anyways (have checked the source).
+        public UmbracoMembershipMember(IMembershipUser member, string providerName)
         {
-            _member = member;
+            _member = member;            
+            //NOTE: We are copying the values here so that everything is consistent with how the underlying built-in ASP.Net membership user
+            // handles data! We don't want to do anything differently there but since we cannot use their ctor we'll need to handle this logic ourselves.
+            if (member.Username != null)
+                _userName = member.Username.Trim();
+            if (member.Email != null)
+                _email = member.Email.Trim();
+            if (member.PasswordQuestion != null)
+                _passwordQuestion = member.PasswordQuestion.Trim();
+            _providerName = providerName;
+            _providerUserKey = member.ProviderUserKey;            
+            _comment = member.Comments;
+            _isApproved = member.IsApproved;
+            _isLockedOut = member.IsLockedOut;
+            _creationDate = member.CreateDate.ToUniversalTime();            
+            _lastLoginDate = member.LastLoginDate.ToUniversalTime();
+            //TODO: We currently don't really have any place to store this data!!
+            _lastActivityDate = member.LastLoginDate.ToUniversalTime();
+            _lastPasswordChangedDate = member.LastPasswordChangeDate.ToUniversalTime();
+            _lastLockoutDate = member.LastLockoutDate.ToUniversalTime();
         }
 
-        internal IMember Member
+        internal IMembershipUser Member
         {
             get { return _member; }
         }
 
-        public override string Email
+        public override string UserName
         {
-            get { return _member.Email; }
-            set { _member.Email = value; }
+            get { return _userName; }
         }
 
         public override object ProviderUserKey
         {
-            get { return _member.Key; }
+            get { return _providerUserKey; }
         }
 
-        public override System.DateTime CreationDate
+        public override string Email
         {
-            get { return _member.CreateDate; }
+            get { return _email; }
+            set { _email = value; }
         }
 
-        public override string UserName
+        public override string PasswordQuestion
         {
-            get { return _member.Username; }
+            get { return _passwordQuestion; }
         }
 
         public override string Comment
         {
-            get { return _member.Comments; }
-            set { _member.Comments = value; }
+            get { return _comment; }
+            set { _comment = value; }
         }
 
         public override bool IsApproved
         {
-            get { return _member.IsApproved; }
-            set { _member.IsApproved = value; }
+            get { return _isApproved; }
+            set { _isApproved = value; }
         }
 
         public override bool IsLockedOut
         {
-            get { return _member.IsLockedOut; }
+            get { return _isLockedOut; }
         }
 
-        public override System.DateTime LastLoginDate
+        public override DateTime LastLockoutDate
         {
-            get { return _member.LastLoginDate; }
-            set { _member.LastLoginDate = value; }
+            get { return _lastLockoutDate; }
         }
 
+        public override DateTime CreationDate
+        {
+            get { return _creationDate; }
+        }
+
+        public override DateTime LastLoginDate
+        {
+            get { return _lastLoginDate; }
+            set { _lastLoginDate = value; }
+        }
+
+        public override DateTime LastActivityDate
+        {
+            get { return _lastActivityDate; }
+            set { _lastActivityDate = value; }
+        }
+
+        public override DateTime LastPasswordChangedDate
+        {
+            get { return _lastPasswordChangedDate; }
+        }
+
+        public override string ProviderName
+        {
+            get { return _providerName; }
+        }
     }
 }

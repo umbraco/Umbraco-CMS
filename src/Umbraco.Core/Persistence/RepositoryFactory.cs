@@ -137,7 +137,8 @@ namespace Umbraco.Core.Persistence
         {
             return new UserTypeRepository(
                 uow,
-                NullCacheProvider.Current);
+                //There's not many user types but we query on users all the time so the result needs to be cached
+                RuntimeCacheProvider.Current);
         }
 
         internal virtual IUserRepository CreateUserRepository(IDatabaseUnitOfWork uow)

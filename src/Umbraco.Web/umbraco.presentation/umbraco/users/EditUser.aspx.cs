@@ -13,6 +13,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web;
 using Umbraco.Web.Models;
+using Umbraco.Web.Security;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic.Exceptions;
@@ -350,7 +351,7 @@ namespace umbraco.cms.presentation.user
 
             if (!IsPostBack)
             {
-                MembershipUser user = BackOfficeProvider.GetUser(u.LoginName, true);
+                MembershipUser user = BackOfficeProvider.GetUser(u.LoginName, false);
                 uname.Text = u.Name;
                 lname.Text = (user == null) ? u.LoginName : user.UserName;
                 email.Text = (user == null) ? u.Email : user.Email;
@@ -470,7 +471,7 @@ namespace umbraco.cms.presentation.user
             {
                 try
                 {
-                    var membershipUser = BackOfficeProvider.GetUser(u.LoginName, true);
+                    var membershipUser = BackOfficeProvider.GetUser(u.LoginName, false);
                     if (membershipUser == null)
                     {
                         throw new ProviderException("Could not find user in the membership provider with login name " + u.LoginName);
@@ -481,41 +482,23 @@ namespace umbraco.cms.presentation.user
 
                     //perform the changing password logic
                     ChangePassword(passwordChangerControl, membershipUser, passwordChangerValidator);
-                    
-                    // Is it using the default membership provider
-                    if (BackOfficeProvider is UsersMembershipProvider)
-                    {
-                        // Save user in membership provider
-                        UsersMembershipUser umbracoUser = membershipUser as UsersMembershipUser;
-                        umbracoUser.FullName = uname.Text.Trim();
-                        umbracoUser.Language = userLanguage.SelectedValue;
-                        umbracoUser.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
-                        BackOfficeProvider.UpdateUser(umbracoUser);
 
-                        // Save user details
-                        u.Email = email.Text.Trim();
-                        u.Language = userLanguage.SelectedValue;
-                    }
-                    else
-                    {
-                        u.Name = uname.Text.Trim();
-                        u.Language = userLanguage.SelectedValue;
-                        u.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
-                        //SD: This check must be here for some reason but apparently we don't want to try to 
-                        // update when the AD provider is active.
-                        if ((BackOfficeProvider is ActiveDirectoryMembershipProvider) == false)
-                        {
-                            BackOfficeProvider.UpdateUser(membershipUser);
-                        }
-                    }
+                    //update the membership provider
+                    UpdateMembershipProvider(membershipUser);
 
-
+                    //update the Umbraco user properties - even though we are updating some of these properties in the membership provider that is 
+                    // ok since the membership provider might be storing these details someplace totally different! But we want to keep our UI in sync.
+                    u.Name = uname.Text.Trim();
+                    u.Language = userLanguage.SelectedValue;
+                    u.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
+                    u.Email = email.Text.Trim();                    
                     u.LoginName = lname.Text;
-                    //u.StartNodeId = int.Parse(startNode.Value);
-
+                    u.Disabled = Disabled.Checked;
+                    u.DefaultToLiveEditing = DefaultToLiveEditing.Checked;
+                    u.NoConsole = NoConsole.Checked;
 
                     int startNode;
-                    if (!int.TryParse(contentPicker.Value, out startNode))
+                    if (int.TryParse(contentPicker.Value, out startNode) == false)
                     {
                         //set to default if nothing is choosen
                         if (u.StartNodeId > 0)
@@ -523,17 +506,11 @@ namespace umbraco.cms.presentation.user
                         else
                             startNode = -1;
                     }
-                    u.StartNodeId = startNode;
-
-
-                    u.Disabled = Disabled.Checked;
+                    u.StartNodeId = startNode;                                        
                     
-                    u.NoConsole = NoConsole.Checked;
-                    //u.StartMediaId = int.Parse(mediaStartNode.Value);
-
-
+                    
                     int mstartNode;
-                    if (!int.TryParse(mediaPicker.Value, out mstartNode))
+                    if (int.TryParse(mediaPicker.Value, out mstartNode) == false)
                     {
                         //set to default if nothing is choosen
                         if (u.StartMediaId > 0)
@@ -544,7 +521,6 @@ namespace umbraco.cms.presentation.user
                     u.StartMediaId = mstartNode;
 
                     u.clearApplications();
-
                     foreach (ListItem li in lapps.Items)
                     {
                         if (li.Selected) u.addApplication(li.Value);
@@ -595,6 +571,21 @@ namespace umbraco.cms.presentation.user
             else
             {
                 ClientTools.ShowSpeechBubble(speechBubbleIcon.error, ui.Text("speechBubbles", "editUserError", UmbracoUser), "");
+            }
+        }
+
+        private void UpdateMembershipProvider(MembershipUser membershipUser)
+        {
+            //SD: This check must be here for some reason but apparently we don't want to try to 
+            // update when the AD provider is active.
+            if ((BackOfficeProvider is ActiveDirectoryMembershipProvider) == false)
+            {
+                var membershipHelper = new MembershipHelper();
+                //set the writable properties that we are editing
+                membershipHelper.UpdateMember(membershipUser, BackOfficeProvider,
+                                              email.Text.Trim(),
+                                              Disabled.Checked == false,
+                                              NoConsole.Checked);
             }
         }
 

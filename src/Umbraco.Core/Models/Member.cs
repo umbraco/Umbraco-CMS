@@ -388,7 +388,7 @@ namespace Umbraco.Core.Models
         /// membership provider.
         /// </remarks>
         [DataMember]
-        internal virtual object ProviderUserKey
+        public virtual object ProviderUserKey
         {
             get
             {

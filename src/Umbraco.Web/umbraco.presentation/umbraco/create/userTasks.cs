@@ -49,10 +49,14 @@ namespace umbraco
                 }
                 var login = parts[0];
                 var email = parts[1];
-                
 
                 var u = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].CreateUser(
                     login, password, email.Trim().ToLower(), "", "", true, null, out status);
+
+                if (u == null)
+                {
+                    return false;
+                }
 
                 _returnUrl = string.Format("users/EditUser.aspx?id={0}", u.ProviderUserKey);
 

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 
@@ -18,24 +19,26 @@ namespace Umbraco.Core.Persistence.Factories
 
         public IUser BuildEntity(UserDto dto)
         {
+            var guidId = dto.Id.ToGuid();
             var user = new User(_userType)
-                       {
-                           Id = dto.Id,
-                           ProfileId = dto.Id,
-                           StartContentId = dto.ContentStartId,
-                           StartMediaId = dto.MediaStartId.HasValue ? dto.MediaStartId.Value : -1,
-                           Password = dto.Password,
-                           Username = dto.Login,
-                           Name = dto.UserName,
-                           IsLockedOut = dto.Disabled,
-                           IsApproved = dto.Disabled == false,
-                           Email = dto.Email,
-                           Language = dto.UserLanguage,                          
-                           NoConsole = dto.NoConsole,
+                {
+                    Id = dto.Id,
+                    Key = guidId,
+                    ProviderUserKey = guidId,
+                    StartContentId = dto.ContentStartId,
+                    StartMediaId = dto.MediaStartId.HasValue ? dto.MediaStartId.Value : -1,
+                    Password = dto.Password,
+                    Username = dto.Login,
+                    Name = dto.UserName,
+                    IsLockedOut = dto.NoConsole,
+                    IsApproved = dto.Disabled == false,
+                    Email = dto.Email,
+                    Language = dto.UserLanguage,
+                    DefaultPermissions = dto.DefaultPermissions.IsNullOrWhiteSpace()
                            
                            //NOTE: The default permission come from the user type's default permissions
                            DefaultPermissions = _userType.Permissions
-                       };
+                };
 
             foreach (var app in dto.User2AppDtos)
             {
@@ -58,7 +61,7 @@ namespace Umbraco.Core.Persistence.Factories
                               Disabled = entity.IsApproved == false,
                               Email = entity.Email,
                               Login = entity.Username,
-                              NoConsole = entity.NoConsole,
+                              NoConsole = entity.IsLockedOut,
                               Password = entity.Password,
                               UserLanguage = entity.Language,
                               UserName = entity.Name,

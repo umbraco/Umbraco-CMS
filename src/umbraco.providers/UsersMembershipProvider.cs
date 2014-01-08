@@ -112,7 +112,7 @@ namespace umbraco.providers
         /// </returns>
         protected override bool PerformChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion, string newPasswordAnswer)
         {
-            throw new Exception("The method or operation is not implemented.");
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -286,7 +286,8 @@ namespace umbraco.providers
         /// </returns>
         public override int GetNumberOfUsersOnline()
         {
-            throw new Exception("The method or operation is not implemented.");
+            var fromDate = DateTime.Now.AddMinutes(-Membership.UserIsOnlineTimeWindow);
+            return Log.Instance.GetLogItems(LogTypes.Login, fromDate).Count;
         }
 
         /// <summary>
@@ -300,7 +301,26 @@ namespace umbraco.providers
         /// </returns>
         protected override string PerformGetPassword(string username, string answer)
         {
-            throw new ProviderException("Password Retrieval Not Enabled.");
+            var found = User.GetAllByLoginName(username, false).ToArray();
+            if (found == null || found.Any() == false)
+            {
+                throw new MembershipPasswordException("The supplied user is not found");
+            }
+
+            // check if user is locked out
+            if (found.First().NoConsole)
+            {
+                throw new MembershipPasswordException("The supplied user is locked out");
+            }
+
+            if (RequiresQuestionAndAnswer)
+            {
+                throw new NotImplementedException("Question/answer is not supported with this membership provider");
+            }
+
+            var decodedPassword = DecryptPassword(found.First().GetPassword());
+
+            return decodedPassword;
         }
 
         /// <summary>
@@ -314,7 +334,12 @@ namespace umbraco.providers
         public override MembershipUser GetUser(string username, bool userIsOnline)
         {
             var userId = User.getUserId(username);
-            return (userId != -1) ? ConvertToMembershipUser(new User(userId)) : null;
+
+            var user = new User(userId);
+            //We need to log this since it's the only way we can determine the number of users online
+            Log.Add(LogTypes.Login, user, -1, "User " + username + " has logged in");
+
+            return (userId != -1) ? ConvertToMembershipUser(user) : null;
         }
 
         /// <summary>
@@ -327,7 +352,10 @@ namespace umbraco.providers
         /// </returns>
         public override MembershipUser GetUser(object providerUserKey, bool userIsOnline)
         {
-            return ConvertToMembershipUser(new User(Convert.ToInt32(providerUserKey)));
+            var user = new User(Convert.ToInt32(providerUserKey));
+            //We need to log this since it's the only way we can determine the number of users online
+            Log.Add(LogTypes.Login, user, -1, "User " + user.LoginName + " has logged in");
+            return ConvertToMembershipUser(user);
         }
 
         /// <summary>
@@ -392,7 +420,7 @@ namespace umbraco.providers
             {
                 var user = new User(userName)
                     {
-                        Disabled = false
+                        NoConsole = false
                     };
                 user.Save();
             }
@@ -409,19 +437,31 @@ namespace umbraco.providers
         /// <param name="user">A <see cref="T:System.Web.Security.MembershipUser"></see> object that represents the user to update and the updated information for the user.</param>
         public override void UpdateUser(MembershipUser user)
         {
-            var umbracoUser = user as UsersMembershipUser;
-            var userID = 0;
+            var found = User.GetAllByLoginName(user.UserName, false).ToArray();
+            if (found == null || found.Any() == false)
+                throw new MembershipPasswordException("The supplied user is not found");
 
-            if (int.TryParse(umbracoUser.ProviderUserKey.ToString(), out userID) == false) return;
+            var m = found.First();
 
-            try
+            
+            var typedUser = user as UsersMembershipUser;
+            if (typedUser == null)
             {
-                User.Update(userID, umbracoUser.FullName, umbracoUser.UserName, umbracoUser.Email, umbracoUser.UserType);
+                // update approve status            
+                // update lock status
+                // TODO: Update last lockout time            
+                // TODO: update comment
+                User.Update(m.Id, user.Email, user.IsApproved == false, user.IsLockedOut);
             }
-            catch (Exception)
+            else
             {
-                throw new ProviderException("User cannot be updated.");
+                //This keeps compatibility - even though this logic to update name and user type  should not exist here
+                User.Update(m.Id, typedUser.FullName.Trim(), typedUser.UserName, typedUser.Email, user.IsApproved == false, user.IsLockedOut, typedUser.UserType);
             }
+
+            
+            
+            m.Save();
         }
 
         /// <summary>
@@ -467,6 +507,7 @@ namespace umbraco.providers
 
         #region Helper Methods
        
+
         /// <summary>
         /// Encodes the password.
         /// </summary>

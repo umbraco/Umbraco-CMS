@@ -399,9 +399,8 @@ namespace umbraco.cms.businesslogic.template
 
         private static Template MakeNew(string name, BusinessLogic.User u, Template master, string design)
         {
-
             // CMSNode MakeNew(int parentId, Guid objectType, int userId, int level, string text, Guid uniqueID)
-            CMSNode n = CMSNode.MakeNew(-1, ObjectType, u.Id, 1, name, Guid.NewGuid());
+            var node = MakeNew(-1, ObjectType, u.Id, 1, name, Guid.NewGuid());
 
             //ensure unique alias 
             name = helpers.Casing.SafeAlias(name);
@@ -414,35 +413,35 @@ namespace umbraco.cms.businesslogic.template
 
           
             SqlHelper.ExecuteNonQuery("INSERT INTO cmsTemplate (NodeId, Alias, design, master) VALUES (@nodeId, @alias, @design, @master)",
-                                      SqlHelper.CreateParameter("@nodeId", n.Id),
+                                      SqlHelper.CreateParameter("@nodeId", node.Id),
                                       SqlHelper.CreateParameter("@alias", name),
                                       SqlHelper.CreateParameter("@design", ' '),
                                       SqlHelper.CreateParameter("@master", DBNull.Value));
 
-            Template t = new Template(n.Id);
-            NewEventArgs e = new NewEventArgs();
-            t.OnNew(e);
-
+            var template = new Template(node.Id);
             if (master != null)
-                t.MasterTemplate = master.Id;
+                template.MasterTemplate = master.Id;
 
-			switch (DetermineRenderingEngine(t, design))
+			switch (DetermineRenderingEngine(template, design))
 			{
 				case RenderingEngine.Mvc:
-					ViewHelper.CreateViewFile(t);
+					ViewHelper.CreateViewFile(template);
 					break;
 				case RenderingEngine.WebForms:
-					MasterPageHelper.CreateMasterPage(t);
+					MasterPageHelper.CreateMasterPage(template);
 					break;
 			}
 
 			//if a design is supplied ensure it is updated.
-			if (!design.IsNullOrWhiteSpace())
+			if (design.IsNullOrWhiteSpace() == false)
 			{
-				t.ImportDesign(design);
+				template.ImportDesign(design);
 			}
 
-            return t;
+            var e = new NewEventArgs();
+            template.OnNew(e);
+
+            return template;
         }
 
         private static string EnsureUniqueAlias(string alias, int attempts)

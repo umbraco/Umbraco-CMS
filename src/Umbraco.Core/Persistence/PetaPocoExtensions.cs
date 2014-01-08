@@ -340,6 +340,14 @@ namespace Umbraco.Core.Persistence
             creation.UninstallDatabaseSchema();
         }
 
+        internal static void CreateDatabaseSchemaDo(this Database db, bool guardConfiguration)
+        {
+            if (guardConfiguration && ApplicationContext.Current.IsConfigured)
+                throw new Exception("Umbraco is already configured!");
+
+            CreateDatabaseSchemaDo(db);
+        }
+
         internal static void CreateDatabaseSchemaDo(this Database db)
         {
             NewTable += PetaPocoExtensions_NewTable;

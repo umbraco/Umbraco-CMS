@@ -15,9 +15,8 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the User to retrieve</param>
         /// <returns><see cref="IProfile"/></returns>
         IProfile GetProfileById(int id);
-
         IProfile GetProfileByUserName(string username);
-        IUser GetUserByUserName(string username);
+        
         IUser GetUserById(int id);
 
         /// <summary>
@@ -41,11 +40,18 @@ namespace Umbraco.Core.Services
         IUserType GetUserTypeByName(string name);
 
         /// <summary>
-        /// Saves changes to the user object
+        /// Saves an IUserType
         /// </summary>
-        /// <param name="user"></param>
-        void SaveUser(IUser user);
+        /// <param name="userType"></param>
+        /// <param name="raiseEvents"></param>        
+        void SaveUserType(IUserType userType, bool raiseEvents = true);
 
+        /// <summary>
+        /// Deletes an IUserType
+        /// </summary>
+        /// <param name="userType"></param>        
+        void DeleteUserType(IUserType userType);
+        
         /// <summary>
         /// This is useful when an entire section is removed from config
         /// </summary>

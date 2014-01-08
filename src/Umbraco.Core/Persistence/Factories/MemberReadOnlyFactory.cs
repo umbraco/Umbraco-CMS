@@ -25,7 +25,7 @@ namespace Umbraco.Core.Persistence.Factories
                              CreateDate = dto.CreateDate,
                              UpdateDate = dto.UpdateDate,
                              Name = dto.Text,
-                             ProviderUserKey = dto.UniqueId,
+                             ProviderUserKey = dto.UniqueId.Value,
                              Trashed = dto.Trashed,
                              Key = dto.UniqueId.Value,
                              CreatorId = dto.UserId.HasValue ? dto.UserId.Value : 0,

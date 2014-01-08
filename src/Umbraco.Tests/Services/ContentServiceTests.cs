@@ -212,7 +212,7 @@ namespace Umbraco.Tests.Services
                     Username = "test",
                     Password = "test"
                 };
-            ServiceContext.UserService.SaveUser(user);
+            ServiceContext.UserService.Save(user);
             var content = new Content("Test", -1, ServiceContext.ContentTypeService.GetContentType("umbTextpage"));
 
             // Act
