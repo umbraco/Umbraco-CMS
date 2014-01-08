@@ -410,7 +410,6 @@ namespace umbraco.cms.businesslogic.template
 
             if (name.Length > 100)
                 name = name.Substring(0, 95) + "...";
-
           
             SqlHelper.ExecuteNonQuery("INSERT INTO cmsTemplate (NodeId, Alias, design, master) VALUES (@nodeId, @alias, @design, @master)",
                                       SqlHelper.CreateParameter("@nodeId", node.Id),
