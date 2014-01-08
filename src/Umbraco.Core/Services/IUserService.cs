@@ -18,12 +18,6 @@ namespace Umbraco.Core.Services
         IProfile GetProfileByUserName(string username);
         
         IUser GetUserById(int id);
-
-        /// <summary>
-        /// Returns all users
-        /// </summary>
-        /// <returns></returns>
-        IEnumerable<IUser> GetAllUsers();
         
         /// <summary>
         /// Gets an IUserType by its Alias

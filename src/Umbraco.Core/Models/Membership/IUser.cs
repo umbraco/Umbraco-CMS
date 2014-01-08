@@ -20,14 +20,7 @@ namespace Umbraco.Core.Models.Membership
         //bool DefaultToLiveEditing { get; set; }
 
         IUserType UserType { get; }
-        /// <summary>
-        /// The default permissions for the user
-        /// </summary>
-        /// <remarks>
-        /// The default permissions are assigned to the user object based on the user type's default permissions
-        /// </remarks> 
-        string DefaultPermissions { get; }
-
+        
         /// <summary>
         /// The default permission set for the user
         /// </summary>

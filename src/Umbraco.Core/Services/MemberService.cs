@@ -19,7 +19,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Represents the MemberService.
     /// </summary>
-    public class MemberService : IMemberService
+    internal class MemberService : IMemberService
     {
         private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
@@ -548,6 +548,10 @@ namespace Umbraco.Core.Services
             {
                 repository.AddOrUpdate(member);
                 uow.Commit();
+
+                //insert the xml
+                var xml = member.ToXml();
+                CreateAndSaveMemberXml(xml, member.Id, uow.Database);
             }
 
             return member;
@@ -575,10 +579,6 @@ namespace Umbraco.Core.Services
             if (memberType == null)
             {
                 throw new ArgumentException(string.Format("No MemberType matching the passed in Alias: '{0}' was found", memberTypeAlias));
-
-                //insert the xml
-                var xml = member.ToXml();
-                CreateAndSaveMemberXml(xml, member.Id, uow.Database);
             }
 
             return CreateMember(email, username, password, memberTypeAlias);

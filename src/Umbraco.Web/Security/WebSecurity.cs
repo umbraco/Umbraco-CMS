@@ -229,7 +229,7 @@ namespace Umbraco.Web.Security
             }
 
             //regarldess of the membership provider used, see if this user object already exists in the umbraco data
-            var user = _applicationContext.Services.UserService.GetUserByUserName(membershipUser.UserName);
+            var user = _applicationContext.Services.UserService.GetByUsername(membershipUser.UserName);
 
             //we're using the built-in membership provider so the user will already be available
             if (Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider] is UsersMembershipProvider)
@@ -266,12 +266,12 @@ namespace Umbraco.Web.Security
                 Username = membershipUser.UserName,
                 StartContentId = -1,
                 StartMediaId = -1,
-                NoConsole = false,
+                IsLockedOut = false,
                 IsApproved = true
             };
             user.AddAllowedSection("content");
 
-            _applicationContext.Services.UserService.SaveUser(user);
+            _applicationContext.Services.UserService.Save(user);
 
             return user;
         }
@@ -515,7 +515,7 @@ namespace Umbraco.Web.Security
                     var user = CurrentUser;
 
                     // Check for console access
-                    if (user.IsLockedOut || (user.NoConsole && GlobalSettings.RequestIsInUmbracoApplication(_httpContext)))
+                    if (user.IsApproved == false || (user.IsLockedOut && GlobalSettings.RequestIsInUmbracoApplication(_httpContext)))
                     {
                         if (throwExceptions) throw new ArgumentException("You have no priviledges to the umbraco console. Please contact your administrator");
                         return ValidateRequestAttempt.FailedNoPrivileges;
@@ -572,7 +572,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         internal bool UserHasAppAccess(string app, string username)
         {
-            var user = _applicationContext.Services.UserService.GetUserByUserName(username);
+            var user = _applicationContext.Services.UserService.GetByUsername(username);
             if (user == null)
             {
                 return false;

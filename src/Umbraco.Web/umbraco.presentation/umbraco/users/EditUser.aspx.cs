@@ -494,7 +494,6 @@ namespace umbraco.cms.presentation.user
                     u.Email = email.Text.Trim();                    
                     u.LoginName = lname.Text;
                     u.Disabled = Disabled.Checked;
-                    u.DefaultToLiveEditing = DefaultToLiveEditing.Checked;
                     u.NoConsole = NoConsole.Checked;
 
                     int startNode;
