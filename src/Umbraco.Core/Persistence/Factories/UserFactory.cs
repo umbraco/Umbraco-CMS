@@ -34,10 +34,8 @@ namespace Umbraco.Core.Persistence.Factories
                     IsApproved = dto.Disabled == false,
                     Email = dto.Email,
                     Language = dto.UserLanguage,
-                    DefaultPermissions = dto.DefaultPermissions.IsNullOrWhiteSpace()
-                           
-                           //NOTE: The default permission come from the user type's default permissions
-                           DefaultPermissions = _userType.Permissions
+                    //NOTE: The default permission come from the user type's default permissions
+                    DefaultPermissions = _userType.Permissions
                 };
 
             foreach (var app in dto.User2AppDtos)

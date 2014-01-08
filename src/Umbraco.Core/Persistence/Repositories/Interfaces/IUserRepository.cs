@@ -8,10 +8,6 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     internal interface IUserRepository : IRepositoryQueryable<int, IUser>
     {
-        //IProfile GetProfileById(int id);
-        IProfile GetProfileByUserName(string username);
-        IUser GetUserByUserName(string username);
-
         /// <summary>
         /// Gets the count of items based on a complex query
         /// </summary>
