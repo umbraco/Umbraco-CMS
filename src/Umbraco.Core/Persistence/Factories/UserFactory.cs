@@ -24,7 +24,6 @@ namespace Umbraco.Core.Persistence.Factories
                 {
                     Id = dto.Id,
                     Key = guidId,
-                    ProviderUserKey = guidId,
                     StartContentId = dto.ContentStartId,
                     StartMediaId = dto.MediaStartId.HasValue ? dto.MediaStartId.Value : -1,
                     Password = dto.Password,

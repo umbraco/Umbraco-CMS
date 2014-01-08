@@ -71,7 +71,6 @@ namespace Umbraco.Core.Models.Membership
         private static readonly PropertyInfo AllowedSectionsSelector = ExpressionHelper.GetPropertyInfo<User, IEnumerable<string>>(x => x.AllowedSections);
         private static readonly PropertyInfo IdSelector = ExpressionHelper.GetPropertyInfo<User, object>(x => x.Id);
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Name);
-        private static readonly PropertyInfo KeySelector = ExpressionHelper.GetPropertyInfo<User, Guid>(x => x.Key);
         private static readonly PropertyInfo UserTypeKeySelector = ExpressionHelper.GetPropertyInfo<User, Type>(x => x.ProviderUserKeyType);
         
         private static readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Username);
@@ -102,22 +101,9 @@ namespace Umbraco.Core.Models.Membership
             }
         }
 
+        //this doesn't get used
         [IgnoreDataMember]
-        public Guid Key
-        {
-            get
-            {
-                return _key;
-            }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _key = value;
-                    return _key;
-                }, _key, KeySelector);
-            }
-        }
+        public Guid Key { get; set; }
 
         #endregion
 
@@ -126,19 +112,8 @@ namespace Umbraco.Core.Models.Membership
         [IgnoreDataMember]
         public object ProviderUserKey
         {
-            get { return Key; }
-            set
-            {
-                var result = value.TryConvertTo<Guid>();
-                if (result.Success)
-                {
-                    Key = result.Result;
-                }
-                else
-                {
-                    throw new NotSupportedException("The User object cannot have a ProviderUserKey of anything other than a GUID");
-                }
-            }
+            get { return Id; }
+            set { throw new NotSupportedException("Cannot set the provider user key for a user"); }
         }
 
         /// <summary>

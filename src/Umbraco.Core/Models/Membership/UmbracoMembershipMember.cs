@@ -27,7 +27,7 @@ namespace Umbraco.Core.Models.Membership
         // validation for that doesn't need to be there anyways (have checked the source).
         public UmbracoMembershipMember(IMembershipUser member, string providerName)
         {
-            _member = member;            
+            _member = member;
             //NOTE: We are copying the values here so that everything is consistent with how the underlying built-in ASP.Net membership user
             // handles data! We don't want to do anything differently there but since we cannot use their ctor we'll need to handle this logic ourselves.
             if (member.Username != null)
@@ -37,18 +37,18 @@ namespace Umbraco.Core.Models.Membership
             if (member.PasswordQuestion != null)
                 _passwordQuestion = member.PasswordQuestion.Trim();
             _providerName = providerName;
-            _providerUserKey = member.ProviderUserKey;            
+            _providerUserKey = member.ProviderUserKey;
             _comment = member.Comments;
             _isApproved = member.IsApproved;
             _isLockedOut = member.IsLockedOut;
-            _creationDate = member.CreateDate.ToUniversalTime();            
+            _creationDate = member.CreateDate.ToUniversalTime();
             _lastLoginDate = member.LastLoginDate.ToUniversalTime();
             //TODO: We currently don't really have any place to store this data!!
             _lastActivityDate = member.LastLoginDate.ToUniversalTime();
             _lastPasswordChangedDate = member.LastPasswordChangeDate.ToUniversalTime();
             _lastLockoutDate = member.LastLockoutDate.ToUniversalTime();
         }
-
+        
         internal IMembershipUser Member
         {
             get { return _member; }
