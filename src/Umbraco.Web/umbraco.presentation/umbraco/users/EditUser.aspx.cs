@@ -360,7 +360,7 @@ namespace umbraco.cms.presentation.user
 
             if (!IsPostBack)
             {
-                MembershipUser user = BackOfficeProvider.GetUser(u.LoginName, true);
+                MembershipUser user = BackOfficeProvider.GetUser(u.LoginName, false);
                 uname.Text = u.Name;
                 lname.Text = (user == null) ? u.LoginName : user.UserName;
                 email.Text = (user == null) ? u.Email : user.Email;
@@ -480,7 +480,7 @@ namespace umbraco.cms.presentation.user
             {
                 try
                 {
-                    var membershipUser = BackOfficeProvider.GetUser(u.LoginName, true);
+                    var membershipUser = BackOfficeProvider.GetUser(u.LoginName, false);
                     if (membershipUser == null)
                     {
                         throw new ProviderException("Could not find user in the membership provider with login name " + u.LoginName);

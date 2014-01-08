@@ -25,6 +25,7 @@ namespace umbraco.presentation.umbraco.dashboard
 
         protected void changePassword_Click(object sender, EventArgs e)
         {
+            Page.Validate();
             if (Page.IsValid == false) return;
 
             var u = User.GetCurrent();
