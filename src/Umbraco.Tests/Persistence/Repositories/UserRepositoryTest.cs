@@ -498,8 +498,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             unitOfWork.Commit();
 
             // Assert
-            Assert.AreEqual("ABC", user1.DefaultPermissions);
-            
+            Assert.AreEqual(3, user1.DefaultPermissions.Count());
+            Assert.AreEqual("A", user1.DefaultPermissions.ElementAt(0));
+            Assert.AreEqual("B", user1.DefaultPermissions.ElementAt(1));
+            Assert.AreEqual("C", user1.DefaultPermissions.ElementAt(2));
+
         }
 
         private void AssertPropertyValues(IUser updatedItem, IUser originalUser)
