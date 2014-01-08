@@ -5,7 +5,7 @@ using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Services
 {
-    public interface IRelationService
+    public interface IRelationService : IService
     {
         /// <summary>
         /// Gets a <see cref="Relation"/> by its Id

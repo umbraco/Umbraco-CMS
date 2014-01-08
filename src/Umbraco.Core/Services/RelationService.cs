@@ -327,7 +327,7 @@ namespace Umbraco.Core.Services
                 Save(relationType);
 
             var relation = new Relation(parent.Id, child.Id, relationType);
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IRelation>(relation), this))
+            if (SavingRelation.IsRaisedEventCancelled(new SaveEventArgs<IRelation>(relation), this))
                 return relation;
 
             var uow = _uowProvider.GetUnitOfWork();
@@ -337,7 +337,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
 
-            Saved.RaiseEvent(new SaveEventArgs<IRelation>(relation, false), this);
+            RelationSaved.RaiseEvent(new SaveEventArgs<IRelation>(relation, false), this);
             return relation;
         }
 
@@ -355,7 +355,7 @@ namespace Umbraco.Core.Services
                 throw new ArgumentNullException(string.Format("No RelationType with Alias '{0}' exists.", relationTypeAlias));
 
             var relation = new Relation(parent.Id, child.Id, relationType);
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IRelation>(relation), this))
+            if (SavingRelation.IsRaisedEventCancelled(new SaveEventArgs<IRelation>(relation), this))
                 return relation;
 
             var uow = _uowProvider.GetUnitOfWork();
@@ -365,7 +365,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
 
-            Saved.RaiseEvent(new SaveEventArgs<IRelation>(relation, false), this);
+            RelationSaved.RaiseEvent(new SaveEventArgs<IRelation>(relation, false), this);
             return relation;
         }
 
@@ -403,7 +403,7 @@ namespace Umbraco.Core.Services
         /// <param name="relation">Relation to save</param>
         public void Save(IRelation relation)
         {
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IRelation>(relation), this))
+            if (SavingRelation.IsRaisedEventCancelled(new SaveEventArgs<IRelation>(relation), this))
                 return;
 
             var uow = _uowProvider.GetUnitOfWork();
@@ -413,7 +413,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
 
-            Saved.RaiseEvent(new SaveEventArgs<IRelation>(relation, false), this);
+            RelationSaved.RaiseEvent(new SaveEventArgs<IRelation>(relation, false), this);
         }
 
         /// <summary>
@@ -441,7 +441,7 @@ namespace Umbraco.Core.Services
         /// <param name="relation">Relation to Delete</param>
         public void Delete(IRelation relation)
         {
-            if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IRelation>(relation), this))
+            if (DeletingRelation.IsRaisedEventCancelled(new DeleteEventArgs<IRelation>(relation), this))
                 return;
 
             var uow = _uowProvider.GetUnitOfWork();
@@ -451,7 +451,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
 
-            Deleted.RaiseEvent(new DeleteEventArgs<IRelation>(relation, false), this);
+            RelationDeleted.RaiseEvent(new DeleteEventArgs<IRelation>(relation, false), this);
         }
 
         /// <summary>
@@ -493,7 +493,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
 
-            Deleted.RaiseEvent(new DeleteEventArgs<IRelation>(relations, false), this);
+            RelationDeleted.RaiseEvent(new DeleteEventArgs<IRelation>(relations, false), this);
         }
 
         #region Private Methods
@@ -517,22 +517,22 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Deleting a Relation
         /// </summary>		
-        public static event TypedEventHandler<IRelationService, DeleteEventArgs<IRelation>> Deleting;
+        public static event TypedEventHandler<IRelationService, DeleteEventArgs<IRelation>> DeletingRelation;
 
         /// <summary>
         /// Occurs after a Relation is Deleted
         /// </summary>
-        public static event TypedEventHandler<IRelationService, DeleteEventArgs<IRelation>> Deleted;
+        public static event TypedEventHandler<IRelationService, DeleteEventArgs<IRelation>> RelationDeleted;
 
         /// <summary>
         /// Occurs before Saving a Relation
         /// </summary>
-        public static event TypedEventHandler<IRelationService, SaveEventArgs<IRelation>> Saving;
+        public static event TypedEventHandler<IRelationService, SaveEventArgs<IRelation>> SavingRelation;
 
         /// <summary>
         /// Occurs after a Relation is Saved
         /// </summary>
-        public static event TypedEventHandler<IRelationService, SaveEventArgs<IRelation>> Saved;
+        public static event TypedEventHandler<IRelationService, SaveEventArgs<IRelation>> RelationSaved;
 
         /// <summary>
         /// Occurs before Deleting a RelationType
