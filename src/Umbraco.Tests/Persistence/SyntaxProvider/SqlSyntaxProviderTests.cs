@@ -31,6 +31,7 @@ namespace Umbraco.Tests.Persistence.SyntaxProvider
                             .InnerJoin<NodeDto>()
                             .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
                             .Where<NodeDto>(dto => dto.NodeObjectType == mediaObjectType);
+            
             var sql = SqlSyntaxContext.SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
 
             Assert.AreEqual(@"DELETE FROM [cmsContentXml] WHERE [nodeId] IN (SELECT [nodeId] FROM (SELECT DISTINCT cmsContentXml.nodeId

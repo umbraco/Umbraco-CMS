@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using System.Linq;
 
@@ -757,24 +758,36 @@ namespace Umbraco.Core.Services
                 {
                     if (memberTypeIds.Any() == false)
                     {
-                        //Remove all media records from the cmsContentXml table (DO NOT REMOVE Content/Members!)
-                        uow.Database.Execute(@"DELETE FROM cmsContentXml WHERE nodeId IN
-                                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
-                                                    INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
-                                                    WHERE nodeObjectType = @nodeObjectType)",
-                                             new { nodeObjectType = Constants.ObjectTypes.Member });
+                        //Remove all member records from the cmsContentXml table (DO NOT REMOVE Content/Media!)
+                        var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
+                        var subQuery = new Sql()
+                            .Select("DISTINCT cmsContentXml.nodeId")
+                            .From<ContentXmlDto>()
+                            .InnerJoin<NodeDto>()
+                            .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                            .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType);
+
+                        var deleteSql = SqlSyntaxContext.SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                        uow.Database.Execute(deleteSql);
                     }
                     else
                     {
                         foreach (var id in memberTypeIds)
                         {
-                            //first we'll clear out the data from the cmsContentXml table for this type
-                            uow.Database.Execute(@"delete from cmsContentXml where nodeId in 
-                                (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
-                                INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
-                                INNER JOIN cmsContent ON cmsContent.nodeId = umbracoNode.id
-                                WHERE nodeObjectType = @nodeObjectType AND cmsContent.contentType = @contentTypeId)",
-                                                 new { contentTypeId = id, nodeObjectType = Constants.ObjectTypes.Member });
+                            var id1 = id;
+                            var memberObjectType = Guid.Parse(Constants.ObjectTypes.Member);
+                            var subQuery = new Sql()
+                                .Select("DISTINCT cmsContentXml.nodeId")
+                                .From<ContentXmlDto>()
+                                .InnerJoin<NodeDto>()
+                                .On<ContentXmlDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                                .InnerJoin<ContentDto>()
+                                .On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
+                                .Where<NodeDto>(dto => dto.NodeObjectType == memberObjectType)
+                                .Where<ContentDto>(dto => dto.ContentTypeId == id1);
+
+                            var deleteSql = SqlSyntaxContext.SqlSyntaxProvider.GetDeleteSubquery("cmsContentXml", "nodeId", subQuery);
+                            uow.Database.Execute(deleteSql);
                         }
                     }
 
