@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Umbraco.Tests.TestHelpers;
 using umbraco.BusinessLogic;
 using System;
 using System.Linq;
@@ -11,7 +12,7 @@ namespace Umbraco.Tests.BusinessLogic
     ///to contain all ApplicationTest Unit Tests
     ///</summary>
     [TestFixture()]
-    public class ApplicationTest : BaseTest
+    public class ApplicationTest : BaseDatabaseFactoryTest
     {
 
         /// <summary>

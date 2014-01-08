@@ -59,7 +59,7 @@ namespace Umbraco.Tests.Membership
             provider.Initialize("test", new NameValueCollection());
 
             MembershipCreateStatus status;
-            var user = provider.CreateUser("test", "test", "test", "test@test.com", "test", "test", true, "test", out status);
+            var user = provider.CreateUser("test", "test", "testtest$1", "test@test.com", "test", "test", true, "test", out status);
 
             Assert.IsNull(user);
         }
@@ -75,7 +75,7 @@ namespace Umbraco.Tests.Membership
             provider.Initialize("test", new NameValueCollection { { "requiresUniqueEmail", "true" } });
 
             MembershipCreateStatus status;
-            var user = provider.CreateUser("test", "test", "test", "test@test.com", "test", "test", true, "test", out status);
+            var user = provider.CreateUser("test", "test", "testtest$1", "test@test.com", "test", "test", true, "test", out status);
 
             Assert.IsNull(user);
         }
@@ -105,7 +105,7 @@ namespace Umbraco.Tests.Membership
             
 
             MembershipCreateStatus status;
-            provider.CreateUser("test", "test", "test", "test@test.com", "test", "test", true, "test", out status);
+            provider.CreateUser("test", "test", "testtest$1", "test@test.com", "test", "test", true, "test", out status);
 
             Assert.AreNotEqual("test", createdMember.PasswordAnswer);
             Assert.AreEqual(provider.EncryptString("test"), createdMember.PasswordAnswer);
@@ -137,11 +137,11 @@ namespace Umbraco.Tests.Membership
             
 
             MembershipCreateStatus status;
-            provider.CreateUser("test", "test", "test", "test@test.com", "test", "test", true, "test", out status);
+            provider.CreateUser("test", "test", "testtest$1", "test@test.com", "test", "test", true, "test", out status);
 
             Assert.AreNotEqual("test", createdMember.Password);
             var decrypted = provider.DecryptPassword(createdMember.Password);
-            Assert.AreEqual("test", decrypted);
+            Assert.AreEqual("testtest$1", decrypted);
         }
 
         [Test]
@@ -170,13 +170,13 @@ namespace Umbraco.Tests.Membership
             
 
             MembershipCreateStatus status;
-            provider.CreateUser("test", "test", "test", "test@test.com", "test", "test", true, "test", out status);
+            provider.CreateUser("test", "test", "testtest$1", "test@test.com", "test", "test", true, "test", out status);
 
             Assert.AreNotEqual("test", createdMember.Password);
             
             string salt;
             var storedPassword = provider.StoredPassword(createdMember.Password, out salt);
-            var hashedPassword = provider.EncryptOrHashPassword("test", salt);
+            var hashedPassword = provider.EncryptOrHashPassword("testtest$1", salt);
             Assert.AreEqual(hashedPassword, storedPassword);
         }
         
