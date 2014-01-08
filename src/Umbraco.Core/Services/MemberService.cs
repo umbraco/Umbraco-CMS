@@ -546,6 +546,10 @@ namespace Umbraco.Core.Services
             {
                 repository.AddOrUpdate(member);
                 uow.Commit();
+
+                //insert the xml
+                var xml = member.ToXml();
+                CreateAndSaveMemberXml(xml, member.Id, uow.Database);
             }
 
             return member;

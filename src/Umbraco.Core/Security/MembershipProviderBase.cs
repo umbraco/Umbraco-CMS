@@ -390,51 +390,68 @@ namespace Umbraco.Core.Security
         /// </remarks>
         public sealed override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
         {
+            var valStatus = ValidateNewUser(username, password, email, passwordQuestion, passwordAnswer, isApproved, providerUserKey);
+            if (valStatus != MembershipCreateStatus.Success)
+            {
+                status = valStatus;
+                return null;
+            }
+
+            return PerformCreateUser(username, password, email, passwordQuestion, passwordAnswer, isApproved, providerUserKey, out status);
+        }
+
+        /// <summary>
+        /// Performs the validation of the information for creating a new user
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <param name="email"></param>
+        /// <param name="passwordQuestion"></param>
+        /// <param name="passwordAnswer"></param>
+        /// <param name="isApproved"></param>
+        /// <param name="providerUserKey"></param>
+        /// <returns></returns>
+        protected MembershipCreateStatus ValidateNewUser(string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey)
+        {
             var args = new ValidatePasswordEventArgs(username, password, true);
             OnValidatingPassword(args);
             if (args.Cancel)
             {
-                status = MembershipCreateStatus.InvalidPassword;
-                return null;
+                return MembershipCreateStatus.InvalidPassword;
             }
 
             // Validate password
             var passwordValidAttempt = IsPasswordValid(password, MinRequiredNonAlphanumericCharacters, PasswordStrengthRegularExpression, MinRequiredPasswordLength);
             if (passwordValidAttempt.Success == false)
             {
-                status = MembershipCreateStatus.InvalidPassword;
-                return null;
+                return MembershipCreateStatus.InvalidPassword;
             }
 
             // Validate email
             if (IsEmailValid(email) == false)
             {
-                status = MembershipCreateStatus.InvalidEmail;
-                return null;
+                return MembershipCreateStatus.InvalidEmail;
             }
 
             // Make sure username isn't all whitespace
             if (string.IsNullOrWhiteSpace(username.Trim()))
             {
-                status = MembershipCreateStatus.InvalidUserName;
-                return null;
+                return MembershipCreateStatus.InvalidUserName;
             }
 
             // Check password question
             if (string.IsNullOrWhiteSpace(passwordQuestion) && RequiresQuestionAndAnswer)
             {
-                status = MembershipCreateStatus.InvalidQuestion;
-                return null;
+                return MembershipCreateStatus.InvalidQuestion;
             }
 
             // Check password answer
             if (string.IsNullOrWhiteSpace(passwordAnswer) && RequiresQuestionAndAnswer)
             {
-                status = MembershipCreateStatus.InvalidAnswer;
-                return null;
+                return MembershipCreateStatus.InvalidAnswer;
             }
 
-            return PerformCreateUser(username, password, email, passwordQuestion, passwordAnswer, isApproved, providerUserKey, out status);
+            return MembershipCreateStatus.Success;
         }
 
         /// <summary>

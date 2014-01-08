@@ -48,8 +48,13 @@ namespace Umbraco.Core.Security
         public MembershipUser CreateUser(string memberTypeAlias, string username, string password, string email, string passwordQuestion, string passwordAnswer, bool isApproved, object providerUserKey, out MembershipCreateStatus status)
         {
             //do the base validation first
-            base.CreateUser(username, password, email, passwordQuestion, passwordAnswer, isApproved, providerUserKey, out status);
-
+            var valStatus = ValidateNewUser(username, password, email, passwordQuestion, passwordAnswer, isApproved, providerUserKey);
+            if (valStatus != MembershipCreateStatus.Success)
+            {
+                status = valStatus;
+                return null;
+            }
+            
             return PerformCreateUser(memberTypeAlias, username, password, email, passwordQuestion, passwordAnswer, isApproved, providerUserKey, out status);
         }
 
