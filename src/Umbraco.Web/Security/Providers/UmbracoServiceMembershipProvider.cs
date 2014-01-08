@@ -149,8 +149,8 @@ namespace Umbraco.Web.Security.Providers
             var encodedPassword = EncryptOrHashNewPassword(password, out salt);
 
             var member = MemberService.CreateMember(
-                email, 
                 username,
+                email, 
                 FormatPasswordForStorage(encodedPassword, salt), 
                 memberTypeAlias);
             
