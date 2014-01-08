@@ -671,7 +671,7 @@ namespace Umbraco.Core.Models
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         public static XElement ToXml(this IMember member)
         {
-            return ApplicationContext.Current.Services.PackagingService.Export(member);
+            return ((PackagingService)(ApplicationContext.Current.Services.PackagingService)).Export(member);
         }
         
         #endregion

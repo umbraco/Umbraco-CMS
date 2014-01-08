@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -103,9 +104,16 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content">Content to export</param>
         /// <param name="deep">Optional parameter indicating whether to include descendents</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Content object</returns>
-        public XElement Export(IContent content, bool deep = false)
+        public XElement Export(IContent content, bool deep = false, bool raiseEvents = true)
         {
+            if (raiseEvents)
+            {
+                if (ExportingContent.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
+                    return default(XElement);
+            }
+
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
             var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
@@ -123,6 +131,9 @@ namespace Umbraco.Core.Services
                 var currentChildren = descendants.Where(x => x.ParentId == content.Id);
                 AddChildXml(descendants, currentChildren, xml);
             }
+
+            if(raiseEvents)
+                ContentExported.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
 
             return xml;
         }
@@ -187,9 +198,16 @@ namespace Umbraco.Core.Services
         /// <param name="element">Xml to import</param>
         /// <param name="parentId">Optional parent Id for the content being imported</param>
         /// <param name="userId">Optional Id of the user performing the import</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated content</returns>
-        public IEnumerable<IContent> ImportContent(XElement element, int parentId = -1, int userId = 0)
+        public IEnumerable<IContent> ImportContent(XElement element, int parentId = -1, int userId = 0, bool raiseEvents = true)
         {
+            if (raiseEvents)
+            {
+                if (ImportingContent.IsRaisedEventCancelled(new SaveEventArgs<XElement>(element), this))
+                    return Enumerable.Empty<IContent>();
+            }
+
             var name = element.Name.LocalName;
             if (name.Equals("DocumentSet"))
             {
@@ -202,6 +220,8 @@ namespace Umbraco.Core.Services
                 if (contents.Any())
                     _contentService.Save(contents, userId);
 
+                if(raiseEvents)
+                    ContentImported.RaiseEvent(new SaveEventArgs<IContent>(contents, false), this);
                 return contents;
             }
 
@@ -214,6 +234,8 @@ namespace Umbraco.Core.Services
                 if (contents.Any())
                     _contentService.Save(contents, userId);
 
+                if(raiseEvents)
+                    ContentImported.RaiseEvent(new SaveEventArgs<IContent>(contents, false), this);
                 return contents;
             }
 
@@ -344,9 +366,16 @@ namespace Umbraco.Core.Services
         /// Exports an <see cref="IContentType"/> to xml as an <see cref="XElement"/>
         /// </summary>
         /// <param name="contentType">ContentType to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the ContentType item.</returns>
-        public XElement Export(IContentType contentType)
+        public XElement Export(IContentType contentType, bool raiseEvents = true)
         {
+            if (raiseEvents)
+            {
+                if (ExportingContentType.IsRaisedEventCancelled(new SaveEventArgs<IContentType>(contentType), this))
+                    return default(XElement);
+            }
+
             var info = new XElement("Info",
                                     new XElement("Name", contentType.Name),
                                     new XElement("Alias", contentType.Alias),
@@ -407,6 +436,10 @@ namespace Umbraco.Core.Services
                                    structure,
                                    genericProperties,
                                    tabs);
+
+            if (raiseEvents)
+                ContentTypeExported.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
+
             return xml;
         }
 
@@ -415,8 +448,9 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="element">Xml to import</param>
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated ContentTypes</returns>
-        public IEnumerable<IContentType> ImportContentTypes(XElement element, int userId = 0)
+        public IEnumerable<IContentType> ImportContentTypes(XElement element, int userId = 0, bool raiseEvents = true)
         {
             return ImportContentTypes(element, true, userId);
         }
@@ -427,9 +461,16 @@ namespace Umbraco.Core.Services
         /// <param name="element">Xml to import</param>
         /// <param name="importStructure">Boolean indicating whether or not to import the </param>
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated ContentTypes</returns>
-        public IEnumerable<IContentType> ImportContentTypes(XElement element, bool importStructure, int userId = 0)
+        public IEnumerable<IContentType> ImportContentTypes(XElement element, bool importStructure, int userId = 0, bool raiseEvents = true)
         {
+            if (raiseEvents)
+            {
+                if (ImportingContentType.IsRaisedEventCancelled(new SaveEventArgs<XElement>(element), this))
+                    return Enumerable.Empty<IContentType>();
+            }
+
             var name = element.Name.LocalName;
             if (name.Equals("DocumentTypes") == false && name.Equals("DocumentType") == false)
             {
@@ -475,6 +516,9 @@ namespace Umbraco.Core.Services
                 if (updatedContentTypes.Any())
                     _contentTypeService.Save(updatedContentTypes, userId);
             }
+
+            if (raiseEvents)
+                ContentTypeImported.RaiseEvent(new SaveEventArgs<IContentType>(list, false), this);
 
             return list;
         }
@@ -750,7 +794,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="dataTypeDefinitions"></param>
         /// <returns></returns>
-        internal XElement Export(IEnumerable<IDataTypeDefinition >dataTypeDefinitions)
+        internal XElement Export(IEnumerable<IDataTypeDefinition> dataTypeDefinitions)
         {
             var container = new XElement("DataTypes");
             foreach (var d in dataTypeDefinitions)
@@ -794,9 +838,16 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="element">Xml to import</param>
         /// <param name="userId"></param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated DataTypeDefinitions</returns>
-        public IEnumerable<IDataTypeDefinition> ImportDataTypeDefinitions(XElement element, int userId = 0)
+        public IEnumerable<IDataTypeDefinition> ImportDataTypeDefinitions(XElement element, int userId = 0, bool raiseEvents = true)
         {
+            if (raiseEvents)
+            {
+                if (ImportingDataType.IsRaisedEventCancelled(new SaveEventArgs<XElement>(element), this))
+                    return Enumerable.Empty<IDataTypeDefinition>();
+            }
+
             var name = element.Name.LocalName;
             if (name.Equals("DataTypes") == false && name.Equals("DataType") == false)
             {
@@ -859,6 +910,10 @@ namespace Umbraco.Core.Services
 
                 SavePrevaluesFromXml(list, dataTypeElements);
             }
+
+            if (raiseEvents)
+                DataTypeImported.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(list, false), this);
+
             return list;
         }
 
@@ -934,9 +989,16 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="media">Media to export</param>
         /// <param name="deep">Optional parameter indicating whether to include descendents</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Media object</returns>
-        public XElement Export(IMedia media, bool deep = false)
+        public XElement Export(IMedia media, bool deep = false, bool raiseEvents = true)
         {
+            if (raiseEvents)
+            {
+                if (ExportingMedia.IsRaisedEventCancelled(new SaveEventArgs<IMedia>(media), this))
+                    return default(XElement);
+            }
+
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
             var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
 
@@ -954,6 +1016,9 @@ namespace Umbraco.Core.Services
                 var currentChildren = descendants.Where(x => x.ParentId == media.Id);
                 AddChildXml(descendants, currentChildren, xml);
             }
+
+            if(raiseEvents)
+                MediaExported.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
 
             return xml;
         }
@@ -1055,9 +1120,16 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="element">Xml to import</param>
         /// <param name="userId">Optional user id</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated Templates</returns>
-        public IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = 0)
+        public IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = 0, bool raiseEvents = true)
         {
+            if (raiseEvents)
+            {
+                if (ImportingTemplate.IsRaisedEventCancelled(new SaveEventArgs<XElement>(element), this))
+                    return Enumerable.Empty<ITemplate>();
+            }
+
             var name = element.Name.LocalName;
             if (name.Equals("Templates") == false && name.Equals("Template") == false)
             {
@@ -1126,6 +1198,9 @@ namespace Umbraco.Core.Services
             if (templates.Any())
                 _fileService.SaveTemplate(templates, userId);
 
+            if(raiseEvents)
+                TemplateImported.RaiseEvent(new SaveEventArgs<ITemplate>(templates, false), this);
+
             return templates;
         }
 
@@ -1145,6 +1220,78 @@ namespace Umbraco.Core.Services
             return IOHelper.MapPath(SystemDirectories.Masterpages + "/" + alias.Replace(" ", "") + ".master");
         }
 
+        #endregion
+
+        #region Event Handlers
+        /// <summary>
+        /// Occurs before Importing Content
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ImportingContent;
+
+        /// <summary>
+        /// Occurs after Content is Imported and Saved
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IContent>> ContentImported;
+
+        /// <summary>
+        /// Occurs before Exporting Content
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IContent>> ExportingContent;
+
+        /// <summary>
+        /// Occurs after Content is Exported to Xml
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ContentExported;
+
+        /// <summary>
+        /// Occurs before Exporting Media
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IMedia>> ExportingMedia;
+
+        /// <summary>
+        /// Occurs after Media is Exported to Xml
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> MediaExported;
+
+        /// <summary>
+        /// Occurs before Importing ContentType
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ImportingContentType;
+
+        /// <summary>
+        /// Occurs after ContentType is Imported and Saved
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IContentType>> ContentTypeImported;
+
+        /// <summary>
+        /// Occurs before Exporting ContentType
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IContentType>> ExportingContentType;
+
+        /// <summary>
+        /// Occurs after ContentType is Exported to Xml
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ContentTypeExported;
+
+        /// <summary>
+        /// Occurs before Importing DataType
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ImportingDataType;
+
+        /// <summary>
+        /// Occurs after DataType is Imported and Saved
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IDataTypeDefinition>> DataTypeImported;
+
+        /// <summary>
+        /// Occurs before Importing Template
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ImportingTemplate;
+
+        /// <summary>
+        /// Occurs after Template is Imported and Saved
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<ITemplate>> TemplateImported;
         #endregion
     }
 }
