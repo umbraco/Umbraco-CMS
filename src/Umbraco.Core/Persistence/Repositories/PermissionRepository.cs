@@ -110,11 +110,11 @@ namespace Umbraco.Core.Persistence.Repositories
         internal void AssignEntityPermissions(TEntity entity, char permission, IEnumerable<object> userIds)
         {
             var actions = userIds.Select(id => new User2NodePermissionDto
-                {
-                    NodeId = entity.Id,
-                    Permission = permission.ToString(CultureInfo.InvariantCulture),
-                    UserId = (int)id
-                });
+            {
+                NodeId = entity.Id,
+                Permission = permission.ToString(CultureInfo.InvariantCulture),
+                UserId = (int)id
+            });
 
             _unitOfWork.Database.BulkInsertRecords(actions);
         }
@@ -163,14 +163,14 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             _unitOfWork.Database.Update<User2NodePermissionDto>(
                 GenerateReplaceEntityPermissionsSql(
-                new[] {entity.Id}.Concat(getDescendantIds(entity)).ToArray(), 
-                permissions, 
+                new[] { entity.Id }.Concat(getDescendantIds(entity)).ToArray(),
+                permissions,
                 userIds.ToArray()));
         }
 
         internal static string GenerateReplaceEntityPermissionsSql(int entityId, string permissions, object[] userIds)
         {
-            return GenerateReplaceEntityPermissionsSql(new[] {entityId}, permissions, userIds);
+            return GenerateReplaceEntityPermissionsSql(new[] { entityId }, permissions, userIds);
         }
 
         internal static string GenerateReplaceEntityPermissionsSql(int[] entityIds, string permissions, object[] userIds)
@@ -182,7 +182,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //build the nodeIds part of the where clause
             var sqlNodeWhere = BuildOrClause(entityIds, "nodeId");
-            
+
             //build up the userIds part of the where clause
             var userWhereBuilder = BuildOrClause(userIds, "userId");
 
@@ -211,5 +211,6 @@ namespace Umbraco.Core.Persistence.Repositories
             userWhereBuilder.Append(")");
             return userWhereBuilder.ToString();
         }
+
     }
 }

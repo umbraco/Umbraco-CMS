@@ -316,6 +316,18 @@ namespace Umbraco.Core.Persistence.Repositories
             return repo.GetUserPermissionsForEntities(userId, entityIds);
         }
 
+        /// <summary>
+        /// Returns permissions for a given user for any number of nodes
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="entityIds"></param>
+        /// <returns></returns>        
+        public IEnumerable<EntityPermission> GetUserPermissionsForEntities(object userId, params int[] entityIds)
+        {
+            var repo = new PermissionRepository<IContent>(UnitOfWork);
+            return repo.GetUserPermissionsForEntities(userId, entityIds);
+        }
+
         #endregion
 
         private IEnumerable<IUser> ConvertFromDtos(IEnumerable<UserDto> dtos)

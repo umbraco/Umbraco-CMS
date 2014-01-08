@@ -436,6 +436,54 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// Returns the user's applications that they are allowed to access
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public IEnumerable<string> GetUserSections(IUser user)
+        {
+            //TODO: We need to cache this result
+
+            var uow = _uowProvider.GetUnitOfWork();
+            var sql = new Sql();
+            sql.Select("app").From<User2AppDto>()
+                .Where<User2AppDto>(dto => dto.UserId == (int)user.Id);
+            return uow.Database.Fetch<string>(sql);
+        }
+
+        /// <summary>
+        /// Returns permissions for a given user for any number of nodes
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="nodeIds"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// If no permissions are found for a particular entity then the user's default permissions will be applied
+        /// </remarks>
+        public IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateUserRepository(uow))
+            {
+                var explicitPermissions = repository.GetUserPermissionsForEntities(user.Id, nodeIds);
+
+                //if no permissions are assigned to a particular node then we will fill in those permissions with the user's defaults
+                var result = new List<EntityPermission>(explicitPermissions);
+                var missingIds = nodeIds.Except(result.Select(x => x.EntityId));
+                foreach (var id in missingIds)
+                {
+                    result.Add(
+                        new EntityPermission(
+                            user.Id,
+                            id,
+                            user.DefaultPermissions.ToArray()));
+                }
+
+                return result;
+            }
+        }
+
         #endregion
 
         /// <summary>
