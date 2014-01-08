@@ -8,7 +8,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Defines the MemberService, which is an easy access to operations involving (umbraco) members.
     /// </summary>
-    public interface IMemberService : IMembershipMemberService
+    internal interface IMemberService : IMembershipMemberService
     {
         /// <summary>
         /// Checks if a member with the id exists
