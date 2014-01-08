@@ -29,12 +29,14 @@ namespace Umbraco.Web.Strategies.Migrations
 
             if (e.ConfiguredVersion <= target70)
             {
-                
+
+                //This query is structured to work with MySql, SQLCE and SqlServer:
+                // http://issues.umbraco.org/issue/U4-3876
 
                 var sql = @"DELETE FROM cmsContentXml WHERE nodeId IN
-    (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
-        INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
-        WHERE nodeObjectType = 'B796F64C-1F99-4FFB-B886-4BF4BC011A9C' AND " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("path") + " like '%-21%')";
+    (SELECT nodeId FROM (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
+    INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
+    WHERE nodeObjectType = '" + Constants.ObjectTypes.Media +"' AND " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("path") + " LIKE '%-21%') x)";
 
                 var count = e.MigrationContext.Database.Execute(sql);
 
