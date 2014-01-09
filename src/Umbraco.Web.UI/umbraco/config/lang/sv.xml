@@ -4,8 +4,7 @@
     <name>Kalle Ekstrand, Toxic Interactive Solutions AB</name>
     <link>http://www.toxic.se</link>
   </creator>
-  <area alias="actions">
-    <key alias="archiveContourForm">Arkivera formulär</key>
+  <area alias="actions">    
     <key alias="assignDomain">Hantera domännamn</key>
     <key alias="auditTrail">Hantera versioner</key>
     <key alias="browse">Surfa på sidan</key>
@@ -16,10 +15,8 @@
     <key alias="defaultValue">Standardvärde</key>
     <key alias="delete">Ta bort</key>
     <key alias="disable">Avaktivera</key>
-    <key alias="emptyTrashcan">Töm papperskorgen</key>
-    <key alias="exportContourForm">Exportera formulär</key>
+    <key alias="emptyTrashcan">Töm papperskorgen</key>    
     <key alias="exportDocumentType">Exportera dokumenttyp</key>
-    <key alias="importContourForm">Importera formulär</key>
     <key alias="importDocumentType">Importera dokumenttyp</key>
     <key alias="importPackage">Importera paket</key>
     <key alias="liveEdit">Redigera i Canvas</key>
@@ -37,7 +34,6 @@
     <key alias="sort">Sortera</key>
     <key alias="toPublish">Skicka för publicering</key>
     <key alias="translate">Översätt</key>
-    <key alias="unarchiveContourForm">Avarkivera formulär</key>
     <key alias="unpublish">Avpublicera</key>
     <key alias="update">Uppdatera</key>
   </area>
