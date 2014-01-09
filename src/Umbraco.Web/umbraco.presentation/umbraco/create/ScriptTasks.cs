@@ -13,7 +13,7 @@ namespace umbraco
      
         public override bool PerformSave()
         {
-            var scriptFileAr = _alias.Split('\u00A4');
+            var scriptFileAr = Alias.Split('\u00A4');
 
             var relPath = scriptFileAr[0];
             var fileName = scriptFileAr[1];
@@ -30,25 +30,25 @@ namespace umbraco
             var found = ApplicationContext.Current.Services.FileService.GetScriptByName(relPath + fileName + "." + fileType);
             if (found != null)
             {
-                m_returnUrl = string.Format("settings/scripts/editScript.aspx?file={0}{1}.{2}", relPath, fileName, fileType);
+                _returnUrl = string.Format("settings/scripts/editScript.aspx?file={0}{1}.{2}", relPath, fileName, fileType);
                 return true;
             }
 
             ApplicationContext.Current.Services.FileService.SaveScript(new Script(relPath + fileName + "." + fileType));
-            m_returnUrl = string.Format("settings/scripts/editScript.aspx?file={0}{1}.{2}", relPath, fileName, fileType);
+            _returnUrl = string.Format("settings/scripts/editScript.aspx?file={0}{1}.{2}", relPath, fileName, fileType);
             return true;
         }
 
-        public bool Delete()
+        public override bool PerformDelete()
         {
-            if (_alias.Contains(".") == false)
+            if (Alias.Contains(".") == false)
             {
                 //there is no extension so we'll assume it's a folder
-                ApplicationContext.Current.Services.FileService.DeleteScriptFolder(_alias.TrimStart('/'));
+                ApplicationContext.Current.Services.FileService.DeleteScriptFolder(Alias.TrimStart('/'));
             }
             else
             {
-                ApplicationContext.Current.Services.FileService.DeleteScript(_alias.TrimStart('/'));    
+                ApplicationContext.Current.Services.FileService.DeleteScript(Alias.TrimStart('/'));    
             }
 
             return true;
