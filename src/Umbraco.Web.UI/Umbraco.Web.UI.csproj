@@ -115,9 +115,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AutoMapper.3.0.0\lib\net40\AutoMapper.Net4.dll</HintPath>
     </Reference>
-    <Reference Include="ClientDependency.Core, Version=1.7.0.4, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ClientDependency.Core, Version=1.7.1.1, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ClientDependency.1.7.0.4\lib\ClientDependency.Core.dll</HintPath>
+      <HintPath>..\packages\ClientDependency.1.7.1.1\lib\ClientDependency.Core.dll</HintPath>
     </Reference>
     <Reference Include="ClientDependency.Core.Mvc, Version=1.7.0.4, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -460,17 +460,16 @@
     <Compile Include="Umbraco\Create\xslt.ascx.cs">
       <DependentUpon>xslt.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
-      </Compile>
+    </Compile>
     <Compile Include="Umbraco\Create\User.ascx.cs">
       <DependentUpon>User.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Umbraco\Create\xslt.ascx.designer.cs">
       <DependentUpon>xslt.ascx</DependentUpon>
-      </Compile>
+    </Compile>
     <Compile Include="Umbraco\Create\User.ascx.designer.cs">
       <DependentUpon>User.ascx</DependentUpon>
-    
     </Compile>
     <Compile Include="Umbraco\Dashboard\ExamineManagement.ascx.cs">
       <DependentUpon>ExamineManagement.ascx</DependentUpon>

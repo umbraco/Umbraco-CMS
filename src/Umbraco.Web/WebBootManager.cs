@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
+using System.Configuration;
 using System.Linq;
 using System.Web;
+using System.Web.Configuration;
 using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
@@ -72,6 +74,13 @@ namespace Umbraco.Web
             // Backwards compatibility - set the path and URL type for ClientDependency 1.5.1 [LK]
             ClientDependency.Core.CompositeFiles.Providers.XmlFileMapper.FileMapVirtualFolder = "~/App_Data/TEMP/ClientDependency";
             ClientDependency.Core.CompositeFiles.Providers.BaseCompositeFileProcessingProvider.UrlTypeDefault = ClientDependency.Core.CompositeFiles.Providers.CompositeUrlType.Base64QueryStrings;
+
+            var section = ConfigurationManager.GetSection("system.web/httpRuntime") as HttpRuntimeSection;
+            if (section != null)
+            {
+                //set the max url length for CDF to be the smallest of the max query length, max request length
+                ClientDependency.Core.CompositeFiles.CompositeDependencyHandler.MaxHandlerUrlLength = Math.Min(section.MaxQueryStringLength, section.MaxRequestLength);
+            }
 
             //set master controller factory
             ControllerBuilder.Current.SetControllerFactory(
