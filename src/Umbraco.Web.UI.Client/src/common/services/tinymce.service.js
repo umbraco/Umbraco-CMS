@@ -6,7 +6,7 @@
  * @description
  * A service containing all logic for all of the Umbraco TinyMCE plugins
  */
-function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macroResource, macroService, $routeParams, umbRequestHelper) {
+function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macroResource, macroService, $routeParams, umbRequestHelper, angularHelper) {
     return {
 
         /**
@@ -235,7 +235,9 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
 
                 var contentId = $routeParams.id;
 
-                macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.marcoParamsDictionary)
+                //need to wrap in safe apply since this might be occuring outside of angular
+                angularHelper.safeApply($scope, function() {
+                    macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.marcoParamsDictionary)
                     .then(function (htmlResult) {
 
                         $macroDiv.removeClass("loading");
@@ -244,6 +246,8 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                             $ins.html(htmlResult);
                         }
                     });
+                });
+                
             }
             
             /** Adds the button instance */

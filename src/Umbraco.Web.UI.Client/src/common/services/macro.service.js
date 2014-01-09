@@ -55,7 +55,21 @@ function macroService() {
             if (args.marcoParamsDictionary) {
 
                 _.each(args.marcoParamsDictionary, function (val, key) {
-                    var keyVal = key + "=\"" + (val ? val : "") + "\" ";
+                    //check for null
+                    val = val ? val : "";
+                    //need to detect if the val is a string or an object
+                    var keyVal;
+                    if (angular.isString(val)) {
+                        keyVal = key + "=\"" + (val ? val : "") + "\" ";
+                    }
+                    else {
+                        //if it's not a string we'll send it through the json serializer
+                        var json = angular.toJson(val);
+                        //then we need to url encode it so that it's safe
+                        var encoded = encodeURIComponent(json);
+                        keyVal = key + "=\"" + encoded + "\" ";
+                    }
+                    
                     macroString += keyVal;
                 });
 
