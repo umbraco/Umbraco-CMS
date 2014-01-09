@@ -4,6 +4,7 @@ using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
@@ -193,6 +194,26 @@ namespace Umbraco.Core.Services
         public bool ValidateScript(Script script)
         {
             return script.IsValid();
+        }
+
+        public void CreateScriptFolder(string folderPath)
+        {
+            var uow = _fileUowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateScriptRepository(uow))
+            {
+                ((ScriptRepository)repository).AddFolder(folderPath);
+                uow.Commit();
+            }
+        }
+
+        public void DeleteScriptFolder(string folderPath)
+        {
+            var uow = _fileUowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateScriptRepository(uow))
+            {
+                ((ScriptRepository)repository).DeleteFolder(folderPath);
+                uow.Commit();
+            }
         }
 
         /// <summary>

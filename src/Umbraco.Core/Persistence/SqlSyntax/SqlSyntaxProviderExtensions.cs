@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Persistence.SqlSyntax
+﻿namespace Umbraco.Core.Persistence.SqlSyntax
 {
     internal static class SqlSyntaxProviderExtensions
     {

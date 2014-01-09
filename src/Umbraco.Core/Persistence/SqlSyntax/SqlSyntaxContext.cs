@@ -23,5 +23,4 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             set { _sqlSyntaxProvider = value; }
         }
     }
-
 }

@@ -351,6 +351,7 @@
     <Compile Include="Persistence\SqlSyntax\SqlCeSyntax.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlServerSyntax.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlServerVersionName.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderExtensions.cs" />
     <Compile Include="PropertyEditors\PropertyCacheValue.cs" />
     <Compile Include="PropertyEditors\PropertyValueCacheAttribute.cs" />
     <Compile Include="PropertyEditors\PropertyValueTypeAttribute.cs" />
