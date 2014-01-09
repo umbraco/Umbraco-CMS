@@ -398,6 +398,21 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Checks whether two items are related
+        /// </summary>
+        /// <param name="parentId">Id of the Parent relation</param>
+        /// <param name="childId">Id of the Child relation</param>
+        /// <returns>Returns <c>True</c> if any relations exists with the given Ids, otherwise <c>False</c></returns>
+        public bool AreRelated(int parentId, int childId)
+        {
+            using (var repository = _repositoryFactory.CreateRelationRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = new Query<IRelation>().Where(x => x.ParentId == parentId && x.ChildId == childId);
+                return repository.GetByQuery(query).Any();
+            }
+        }
+
+        /// <summary>
         /// Saves a <see cref="Relation"/>
         /// </summary>
         /// <param name="relation">Relation to save</param>

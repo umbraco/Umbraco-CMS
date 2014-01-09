@@ -183,6 +183,14 @@ namespace Umbraco.Core.Services
         bool IsRelated(int id);
 
         /// <summary>
+        /// Checks whether two items are related
+        /// </summary>
+        /// <param name="parentId">Id of the Parent relation</param>
+        /// <param name="childId">Id of the Child relation</param>
+        /// <returns>Returns <c>True</c> if any relations exists with the given Ids, otherwise <c>False</c></returns>
+        bool AreRelated(int parentId, int childId);
+
+        /// <summary>
         /// Saves a <see cref="Relation"/>
         /// </summary>
         /// <param name="relation">Relation to save</param>
