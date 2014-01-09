@@ -782,7 +782,8 @@ namespace umbraco.providers.members
         {
             if (string.IsNullOrEmpty(propertyTypeAlias) == false)
             {
-                if (m.Properties[propertyTypeAlias] != null &&
+                if (m.Properties.Contains(propertyTypeAlias) && 
+                    m.Properties[propertyTypeAlias] != null &&
                     m.Properties[propertyTypeAlias].Value != null)
                 {
                     if (isBool)
