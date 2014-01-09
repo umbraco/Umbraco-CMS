@@ -5,6 +5,8 @@ using Umbraco.Core.CodeAnnotations;
 
 namespace Umbraco.Core.IO
 {
+    //TODO: There is no way to create a directory here without creating a file in a directory and then deleting it
+
 	public interface IFileSystem
     {
         IEnumerable<string> GetDirectories(string path);

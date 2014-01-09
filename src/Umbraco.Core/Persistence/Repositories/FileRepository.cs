@@ -33,6 +33,16 @@ namespace Umbraco.Core.Persistence.Repositories
             get { return _fileSystem; }
         }
 
+        internal virtual void AddFolder(string folderPath)
+        {
+            _work.RegisterAdded(new Folder(folderPath), this);
+        }
+
+        internal virtual void DeleteFolder(string folderPath)
+        {
+            _work.RegisterRemoved(new Folder(folderPath), this);
+        }
+
         #region Implementation of IRepository<TId,TEntity>
 
         public virtual void AddOrUpdate(TEntity entity)
@@ -68,7 +78,16 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void PersistNewItem(IEntity entity)
         {
-            PersistNewItem((TEntity)entity);
+            //special case for folder
+            var folder = entity as Folder;
+            if (folder != null)
+            {
+                PersistNewFolder(folder);
+            }
+            else
+            {
+                PersistNewItem((TEntity)entity);
+            }
         }
 
         public void PersistUpdatedItem(IEntity entity)
@@ -78,23 +97,46 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void PersistDeletedItem(IEntity entity)
         {
-            PersistDeletedItem((TEntity)entity);
+            //special case for folder
+            var folder = entity as Folder;
+            if (folder != null)
+            {
+                PersistDeletedFolder(folder);
+            }
+            else
+            {
+                PersistDeletedItem((TEntity)entity);
+            }
         }
 
         #endregion
 
-        #region Abstract IUnitOfWorkRepository Methods
+        internal virtual void PersistNewFolder(Folder entity)
+        {
+            _fileSystem.CreateFolder(entity.Path);
+        }
 
+        internal virtual void PersistDeletedFolder(Folder entity)
+        {
+            _fileSystem.DeleteDirectory(entity.Path);
+        }
+
+        #region Abstract IUnitOfWorkRepository Methods
+        
         protected virtual void PersistNewItem(TEntity entity)
         {
-            var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content));
-            FileSystem.AddFile(entity.Name, stream, true);
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content)))
+            {
+                FileSystem.AddFile(entity.Path, stream, true);                
+            }
         }
 
         protected virtual void PersistUpdatedItem(TEntity entity)
         {
-            var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content));
-            FileSystem.AddFile(entity.Name, stream, true);
+            using (var stream = new MemoryStream(Encoding.UTF8.GetBytes(entity.Content)))
+            {
+                FileSystem.AddFile(entity.Path, stream, true);    
+            }
         }
 
         protected virtual void PersistDeletedItem(TEntity entity)
