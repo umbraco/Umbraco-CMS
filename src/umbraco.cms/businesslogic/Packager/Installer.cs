@@ -300,36 +300,18 @@ namespace umbraco.cms.businesslogic.packager
                     foreach (var dataTypeDefinition in dataTypeDefinitions)
                     {
                         insPack.Data.DataTypes.Add(dataTypeDefinition.Id.ToString(CultureInfo.InvariantCulture));
-                        //saveNeeded = true;
                     }
                 }
-                /*foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("//DataType"))
-                {
-                    cms.businesslogic.datatype.DataTypeDefinition newDtd = cms.businesslogic.datatype.DataTypeDefinition.Import(n);
-
-                    if (newDtd != null)
-                    {
-                        insPack.Data.DataTypes.Add(newDtd.Id.ToString());
-                        saveNeeded = true;
-                    }
-                }*/
-
-                //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
                 #endregion
 
                 #region Languages
-                foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("//Language"))
+                var languageItemsElement = rootElement.Descendants("Languages").FirstOrDefault();
+                if (languageItemsElement != null)
                 {
-                    language.Language newLang = language.Language.Import(n);
-
-                    if (newLang != null)
-                    {
-                        insPack.Data.Languages.Add(newLang.id.ToString(CultureInfo.InvariantCulture));
-                        //saveNeeded = true;
-                    }
+                    var insertedLanguages = packagingService.ImportLanguages(languageItemsElement);
+                    insPack.Data.Languages.AddRange(insertedLanguages.Select(l => l.Id.ToString()));
                 }
-
-                //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
+                
                 #endregion
 
                 #region Dictionary items
@@ -364,56 +346,8 @@ namespace umbraco.cms.businesslogic.packager
                     foreach (var template in templates)
                     {
                         insPack.Data.Templates.Add(template.Id.ToString(CultureInfo.InvariantCulture));
-                        //saveNeeded = true;
                     }
                 }
-
-                //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
-
-                /*foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Templates/Template"))
-                {
-                    var t = Template.Import(n, currentUser);
-
-                    insPack.Data.Templates.Add(t.Id.ToString());
-
-                    saveNeeded = true;
-                }
-
-                if (saveNeeded) { insPack.Save(); saveNeeded = false; }
-
-
-                //NOTE: SD: I'm pretty sure the only thing the below script does is ensure that the Master template Id is set
-                // in the database, but this is also duplicating the saving of the design content since the above Template.Import
-                // already does this. I've left this for now because I'm not sure the reprocussions of removing it but seems there
-                // is a lot of excess database calls happening here.
-                foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("Templates/Template"))
-                {
-                    string master = xmlHelper.GetNodeValue(n.SelectSingleNode("Master"));
-                    Template t = Template.GetByAlias(xmlHelper.GetNodeValue(n.SelectSingleNode("Alias")));
-                    if (master.Trim() != "")
-                    {
-                        var masterTemplate = Template.GetByAlias(master);
-                        if (masterTemplate != null)
-                        {
-                            t.MasterTemplate = Template.GetByAlias(master).Id;
-                            //SD: This appears to always just save an empty template because the design isn't set yet
-                            // this fixes an issue now that we have MVC because if there is an empty template and MVC is 
-                            // the default, it will create a View not a master page and then the system will try to route via
-                            // MVC which means that the package will not work anymore.
-                            // The code below that imports the templates should suffice because it's actually importing 
-                            // template data not just blank data.
-
-                            //if (UmbracoSettings.UseAspNetMasterPages)
-                            //	t.SaveMasterPageFile(t.Design);
-                        }
-                    }
-                    // Master templates can only be generated when their master is known
-                    if (UmbracoSettings.UseAspNetMasterPages)
-                    {
-                        t.ImportDesign(xmlHelper.GetNodeValue(n.SelectSingleNode("Design")));
-                        t.SaveMasterPageFile(t.Design);
-                    }
-                }*/
                 #endregion
 
                 #region DocumentTypes
@@ -432,44 +366,6 @@ namespace umbraco.cms.businesslogic.packager
                         //saveNeeded = true;
                     }
                 }
-
-                //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
-
-                /*foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("DocumentTypes/DocumentType"))
-                {
-                    ImportDocumentType(n, currentUser, false);
-                    saveNeeded = true;
-                }
-
-                if (saveNeeded) { insPack.Save(); saveNeeded = false; }
-
-
-                // Add documenttype structure
-                foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("DocumentTypes/DocumentType"))
-                {
-                    DocumentType dt = DocumentType.GetByAlias(xmlHelper.GetNodeValue(n.SelectSingleNode("Info/Alias")));
-                    if (dt != null)
-                    {
-                        ArrayList allowed = new ArrayList();
-                        foreach (XmlNode structure in n.SelectNodes("Structure/DocumentType"))
-                        {
-                            DocumentType dtt = DocumentType.GetByAlias(xmlHelper.GetNodeValue(structure));
-                            if (dtt != null)
-                                allowed.Add(dtt.Id);
-                        }
-
-                        int[] adt = new int[allowed.Count];
-                        for (int i = 0; i < allowed.Count; i++)
-                            adt[i] = (int)allowed[i];
-                        dt.AllowedChildContentTypeIDs = adt;
-                        dt.Save();
-                        //PPH we log the document type install here.
-                        insPack.Data.Documenttypes.Add(dt.Id.ToString());
-                        saveNeeded = true;
-                    }
-                }
-
-                if (saveNeeded) { insPack.Save(); saveNeeded = false; }*/
                 #endregion
 
                 #region Stylesheets
@@ -492,10 +388,6 @@ namespace umbraco.cms.businesslogic.packager
                     var firstContentItem = content.First();
                     insPack.Data.ContentNodeId = firstContentItem.Id.ToString(CultureInfo.InvariantCulture);
                 }
-                /*foreach (XmlElement n in _packageConfig.DocumentElement.SelectNodes("Documents/DocumentSet [@importMode = 'root']/*"))
-                {
-                    insPack.Data.ContentNodeId = cms.businesslogic.web.Document.Import(-1, currentUser, n).ToString();
-                }*/
                 #endregion
 
                 #region Package Actions

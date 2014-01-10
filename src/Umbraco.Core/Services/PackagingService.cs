@@ -1195,5 +1195,8 @@ namespace Umbraco.Core.Services
         }
 
         #endregion
+
+        #region Stylesheets
+        #endregion
     }
 }
