@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -837,6 +838,40 @@ namespace Umbraco.Core.Services
         #endregion
 
         #region Dictionary Items
+
+        public XElement Export(IEnumerable<IDictionaryItem> dictionaryItem, bool includeChildren = true)
+        {
+            var xml = new XElement("DictionaryItems");
+            foreach (var item in dictionaryItem)
+            {
+                xml.Add(Export(item, includeChildren));
+            }
+            return xml;
+        }
+
+        private XElement Export(IDictionaryItem dictionaryItem, bool includeChildren)
+        {
+            var xml = new XElement("DictionaryItem", new XAttribute("Key", dictionaryItem.ItemKey));
+            foreach (var translation in dictionaryItem.Translations)
+            {
+                xml.Add(new XElement("Value",
+                    new XAttribute("LanguageId", translation.Language.Id),
+                    new XAttribute("LanguageCultureAlias", translation.Language.IsoCode),
+                    new XCData(translation.Value)));
+            }
+
+            if (includeChildren)
+            {
+                var children = _localizationService.GetDictionaryItemChildren(dictionaryItem.Key);
+                foreach (var child in children)
+                {
+                    xml.Add(Export(child, true));
+                }
+            }
+
+            return xml;
+        }
+
         public IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement dictionaryItemElementList)
         {
             var languages = _localizationService.GetAllLanguages().ToList();
@@ -905,6 +940,7 @@ namespace Umbraco.Core.Services
             var translation = new DictionaryTranslation(language, valueElement.Value);
             translations.Add(translation);
         }
+
         #endregion
 
         #region Files
