@@ -16,7 +16,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Represents the Macro Service, which is an easy access to operations involving <see cref="IMacro"/>
     /// </summary>
-    internal class MacroService : IMacroService
+    public class MacroService : IMacroService
     {
 	    private readonly RepositoryFactory _repositoryFactory;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
