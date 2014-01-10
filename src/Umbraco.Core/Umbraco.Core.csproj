@@ -192,6 +192,7 @@
     <Compile Include="Models\IRelation.cs" />
     <Compile Include="Models\IRelationType.cs" />
     <Compile Include="Models\Membership\EntityPermission.cs" />
+    <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\PreValue.cs" />
     <Compile Include="Models\PreValueCollection.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentExtended.cs" />
@@ -205,6 +206,7 @@
     <Compile Include="Persistence\Querying\StringPropertyMatchType.cs" />
     <Compile Include="Persistence\Querying\TextColumnType.cs" />
     <Compile Include="Persistence\Querying\ValuePropertyMatchType.cs" />
+    <Compile Include="Persistence\Repositories\NotificationsRepository.cs" />
     <Compile Include="Persistence\SqlSyntax\MySqlSyntax.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlCeSyntax.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlServerSyntax.cs" />
@@ -768,6 +770,7 @@
     <Compile Include="Services\IMembershipMemberService.cs" />
     <Compile Include="Services\IMembershipUserService.cs" />
     <Compile Include="Services\IMemberTypeService.cs" />
+    <Compile Include="Services\INotificationService.cs" />
     <Compile Include="Services\IRelationService.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Services\IUserService.cs" />
@@ -776,6 +779,7 @@
     <Compile Include="Services\MemberCountType.cs" />
     <Compile Include="Services\MemberService.cs" />
     <Compile Include="Services\MemberTypeService.cs" />
+    <Compile Include="Services\NotificationService.cs" />
     <Compile Include="Services\RelationService.cs" />
     <Compile Include="Services\ServerRegistrationService.cs" />
     <Compile Include="Services\PackagingService.cs" />
