@@ -1396,5 +1396,8 @@ namespace Umbraco.Core.Services
         /// </summary>
         public static event TypedEventHandler<IPackagingService, SaveEventArgs<ITemplate>> TemplateImported;
         #endregion
+
+        #region Stylesheets
+        #endregion
     }
 }
