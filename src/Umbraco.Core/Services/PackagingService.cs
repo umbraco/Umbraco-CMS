@@ -849,7 +849,7 @@ namespace Umbraco.Core.Services
             return xml;
         }
 
-        private XElement Export(IDictionaryItem dictionaryItem, bool includeChildren)
+        public XElement Export(IDictionaryItem dictionaryItem, bool includeChildren)
         {
             var xml = new XElement("DictionaryItem", new XAttribute("Key", dictionaryItem.ItemKey));
             foreach (var translation in dictionaryItem.Translations)
@@ -947,6 +947,47 @@ namespace Umbraco.Core.Services
         #endregion
 
         #region Languages
+
+        public XElement Export(IEnumerable<ILanguage> languages)
+        {
+            var xml = new XElement("Languages");
+            foreach (var language in languages)
+            {
+                xml.Add(Export(language));
+            }
+            return xml;
+        }
+
+        public XElement Export(ILanguage language)
+        {
+            var xml = new XElement("Language",
+                new XAttribute("Id", language.Id),
+                new XAttribute("CultureAlias", language.IsoCode),
+                new XAttribute("FriendlyName", language.CultureName));
+            return xml;
+        }
+
+        public IEnumerable<ILanguage> ImportLanguages(XElement languageElementList)
+        {
+            var list = new List<ILanguage>();
+            foreach (var languageElement in languageElementList.Elements("Language"))
+            {
+                var isoCode = languageElement.Attribute("CultureAlias").Value;
+                var existingLanguage = _localizationService.GetLanguageByIsoCode(isoCode);
+                if (existingLanguage == null)
+                {
+                    var langauge = new Language(isoCode)
+                                   {
+                                       CultureName = languageElement.Attribute("FriendlyName").Value
+                                   };
+                    _localizationService.Save(langauge);
+                    list.Add(langauge);
+                }
+            }
+
+            return list;
+        }
+
         #endregion
 
         #region Macros

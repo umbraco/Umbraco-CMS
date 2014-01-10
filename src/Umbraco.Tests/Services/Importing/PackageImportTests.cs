@@ -450,6 +450,25 @@ namespace Umbraco.Tests.Services.Importing
             AssertDictionaryItem("Child", expectedNorwegianChildValue, "nb-NO");
         }
 
+        [Test]
+        public void PackagingService_Can_Import_Languages()
+        {
+            // Arrange
+            var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
+            var LanguageItemsElement = newPackageXml.Elements("Languages").First();
+
+            // Act
+            var languages = ServiceContext.PackagingService.ImportLanguages(LanguageItemsElement);
+            var allLanguages = ServiceContext.LocalizationService.GetAllLanguages();
+
+            // Assert
+            Assert.That(languages.Any(x => x.HasIdentity == false), Is.False);
+            foreach (var language in languages)
+            {
+                Assert.That(allLanguages.Any(x => x.IsoCode == language.IsoCode), Is.True);
+            }
+        }
+
         private void AddLanguages()
         {
             var norwegian = new Core.Models.Language("nb-NO");

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Services.Importing;
-using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
@@ -29,7 +26,7 @@ namespace Umbraco.Tests.Services
         public void PackagingService_Can_Export_DictionaryItems()
         {
             // Arrange
-            CreateTestData();
+            CreateDictionaryData();
             var dictionaryItem = ServiceContext.LocalizationService.GetDictionaryItemByKey("Parent");
 
             var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
@@ -42,7 +39,27 @@ namespace Umbraco.Tests.Services
             Assert.That(xml.ToString(), Is.EqualTo(dictionaryItemsElement.ToString()));
         }
 
-        public void CreateTestData()
+        [Test]
+        public void PackagingService_Can_Export_Languages()
+        {
+            // Arrange
+            var languageNbNo = new Language("nb-NO") { CultureName = "Norwegian" };
+            ServiceContext.LocalizationService.Save(languageNbNo);
+
+            var languageEnGb = new Language("en-GB") { CultureName = "English (United Kingdom)" };
+            ServiceContext.LocalizationService.Save(languageEnGb);
+
+            var newPackageXml = XElement.Parse(ImportResources.Dictionary_Package);
+            var languageItemsElement = newPackageXml.Elements("Languages").First();
+
+            // Act
+            var xml = ServiceContext.PackagingService.Export(new[] { languageNbNo, languageEnGb });
+
+            // Assert
+            Assert.That(xml.ToString(), Is.EqualTo(languageItemsElement.ToString()));
+        }
+
+        private void CreateDictionaryData()
         {
             var languageNbNo = new Language("nb-NO") { CultureName = "nb-NO" };
             ServiceContext.LocalizationService.Save(languageNbNo);
