@@ -89,6 +89,32 @@ namespace Umbraco.Tests.Services.Importing {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot; ?&gt;
+        ///&lt;umbPackage&gt;
+        ///  &lt;files /&gt;
+        ///  &lt;info&gt;
+        ///    &lt;package&gt;
+        ///      &lt;name&gt;Dictionary-Package&lt;/name&gt;
+        ///      &lt;version&gt;1.0&lt;/version&gt;
+        ///      &lt;license url=&quot;http://www.opensource.org/licenses/mit-license.php&quot;&gt;MIT license&lt;/license&gt;
+        ///      &lt;url&gt;http://not.available&lt;/url&gt;
+        ///      &lt;requirements&gt;
+        ///        &lt;major&gt;3&lt;/major&gt;
+        ///        &lt;minor&gt;0&lt;/minor&gt;
+        ///        &lt;patch&gt;0&lt;/patch&gt;
+        ///      &lt;/requirements&gt;
+        ///    &lt;/package&gt;
+        ///    &lt;author&gt;
+        ///      &lt;name&gt;Test&lt;/name&gt;
+        ///      &lt;website&gt;http://not.available&lt;/w [rest of string was truncated]&quot;;.
+        /// </summary>
+        internal static string Dictionary_Package {
+            get {
+                return ResourceManager.GetString("Dictionary_Package", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;?xml version=&quot;1.0&quot; encoding=&quot;UTF-8&quot; standalone=&quot;no&quot;?&gt;
         ///&lt;umbPackage&gt;
         ///  &lt;files /&gt;
