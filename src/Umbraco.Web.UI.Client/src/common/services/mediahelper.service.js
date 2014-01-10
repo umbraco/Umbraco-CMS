@@ -19,7 +19,7 @@ function mediaHelper(umbRequestHelper) {
          * @param {object} options.imageOnly Optional, if true then will only return a path if the media item is an image
          */
         getMediaPropertyValue: function (options) {
-            if (!options && !options.mediaModel) {
+            if (!options || !options.mediaModel) {
                 throw "The options objet does not contain the required parameters: mediaModel";
             }
 
@@ -85,7 +85,7 @@ function mediaHelper(umbRequestHelper) {
          * @param {object} options.imageModel The media object to retrieve the image path from
          */
         getImagePropertyValue: function (options) {
-            if (!options && (!options.imageModel || !options.mediaModel)) {
+            if (!options || (!options.imageModel && !options.mediaModel)) {
                 throw "The options objet does not contain the required parameters: imageModel";
             }
 
@@ -110,7 +110,7 @@ function mediaHelper(umbRequestHelper) {
          */
         getThumbnail: function (options) {
 
-            if (!options && !options.imageModel) {
+            if (!options || !options.imageModel) {
                 throw "The options objet does not contain the required parameters: imageModel";
             }
 
@@ -248,7 +248,7 @@ function imageHelper(umbRequestHelper, mediaHelper) {
          * @deprecated
          */
         scaleToMaxSize: function (maxSize, width, height) {
-            return mediaHelper.getThumbnail(maxSize, width, height);
+            return mediaHelper.scaleToMaxSize(maxSize, width, height);
         },
 
         /**
