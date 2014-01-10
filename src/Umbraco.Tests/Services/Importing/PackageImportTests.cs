@@ -251,7 +251,6 @@ namespace Umbraco.Tests.Services.Importing
         private void AssertCheckBoxListTests(string strXml)
         {
             // Arrange
-            string strXml = ImportResources.CheckboxList_Content_Package;
             var xml = XElement.Parse(strXml);
             var dataTypeElement = xml.Descendants("DataTypes").First();
             var docTypesElement = xml.Descendants("DocumentTypes").First();
