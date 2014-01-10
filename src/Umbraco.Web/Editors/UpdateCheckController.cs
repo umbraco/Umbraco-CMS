@@ -8,9 +8,11 @@ using System.Threading.Tasks;
 using System.Web.Http.Filters;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Models;
+using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Editors
 {
+    [PluginController("UmbracoApi")]
     public class UpdateCheckController : UmbracoAuthorizedJsonController
     {
         [UpdateCheckResponseFilter]
