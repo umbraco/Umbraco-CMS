@@ -749,11 +749,11 @@ namespace Umbraco.Core.Services
         #region DataTypes
 
         /// <summary>
-        /// Export a list of data types
+        /// Exports a list of Data Types
         /// </summary>
-        /// <param name="dataTypeDefinitions"></param>
-        /// <returns></returns>
-        internal XElement Export(IEnumerable<IDataTypeDefinition> dataTypeDefinitions)
+        /// <param name="dataTypeDefinitions">List of data types to export</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition objects</returns>
+        public XElement Export(IEnumerable<IDataTypeDefinition> dataTypeDefinitions)
         {
             var container = new XElement("DataTypes");
             foreach (var d in dataTypeDefinitions)
@@ -763,7 +763,12 @@ namespace Umbraco.Core.Services
             return container;
         }
 
-        internal XElement Export(IDataTypeDefinition dataTypeDefinition)
+        /// <summary>
+        /// Exports a single Data Type
+        /// </summary>
+        /// <param name="dataTypeDefinition">Data type to export</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition object</returns>
+        public XElement Export(IDataTypeDefinition dataTypeDefinition)
         {
             var prevalues = new XElement("PreValues");
 
@@ -796,7 +801,7 @@ namespace Umbraco.Core.Services
         /// Imports and saves package xml as <see cref="IDataTypeDefinition"/>
         /// </summary>
         /// <param name="element">Xml to import</param>
-        /// <param name="userId"></param>
+        /// <param name="userId">Optional id of the user</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated DataTypeDefinitions</returns>
         public IEnumerable<IDataTypeDefinition> ImportDataTypeDefinitions(XElement element, int userId = 0, bool raiseEvents = true)
@@ -906,6 +911,12 @@ namespace Umbraco.Core.Services
 
         #region Dictionary Items
 
+        /// <summary>
+        /// Exports a list of <see cref="IDictionaryItem"/> items to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="dictionaryItem">List of dictionary items to export</param>
+        /// <param name="includeChildren">Optional boolean indicating whether or not to include children</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDictionaryItem objects</returns>
         public XElement Export(IEnumerable<IDictionaryItem> dictionaryItem, bool includeChildren = true)
         {
             var xml = new XElement("DictionaryItems");
@@ -916,6 +927,12 @@ namespace Umbraco.Core.Services
             return xml;
         }
 
+        /// <summary>
+        /// Exports a single <see cref="IDictionaryItem"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="dictionaryItem">Dictionary Item to export</param>
+        /// <param name="includeChildren">Optional boolean indicating whether or not to include children</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDictionaryItem object</returns>
         public XElement Export(IDictionaryItem dictionaryItem, bool includeChildren)
         {
             var xml = new XElement("DictionaryItem", new XAttribute("Key", dictionaryItem.ItemKey));
@@ -939,6 +956,11 @@ namespace Umbraco.Core.Services
             return xml;
         }
 
+        /// <summary>
+        /// Imports and saves the 'DictionaryItems' part of the package xml as a list of <see cref="IDictionaryItem"/>
+        /// </summary>
+        /// <param name="dictionaryItemElementList">Xml to import</param>
+        /// <returns>An enumerable list of dictionary items</returns>
         public IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement dictionaryItemElementList)
         {
             var languages = _localizationService.GetAllLanguages().ToList();
@@ -1015,6 +1037,11 @@ namespace Umbraco.Core.Services
 
         #region Languages
 
+        /// <summary>
+        /// Exports a list of <see cref="ILanguage"/> items to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="languages">List of Languages to export</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the ILanguage objects</returns>
         public XElement Export(IEnumerable<ILanguage> languages)
         {
             var xml = new XElement("Languages");
@@ -1025,6 +1052,11 @@ namespace Umbraco.Core.Services
             return xml;
         }
 
+        /// <summary>
+        /// Exports a single <see cref="ILanguage"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="language">Language to export</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the ILanguage object</returns>
         public XElement Export(ILanguage language)
         {
             var xml = new XElement("Language",
@@ -1034,6 +1066,11 @@ namespace Umbraco.Core.Services
             return xml;
         }
 
+        /// <summary>
+        /// Imports and saves the 'Languages' part of a package xml as a list of <see cref="ILanguage"/>
+        /// </summary>
+        /// <param name="languageElementList">Xml to import</param>
+        /// <returns>An enumerable list of generated languages</returns>
         public IEnumerable<ILanguage> ImportLanguages(XElement languageElementList)
         {
             var list = new List<ILanguage>();
@@ -1325,6 +1362,9 @@ namespace Umbraco.Core.Services
 
         #endregion
 
+        #region Stylesheets
+        #endregion
+
         #region Event Handlers
         /// <summary>
         /// Occurs before Importing Content
@@ -1395,9 +1435,6 @@ namespace Umbraco.Core.Services
         /// Occurs after Template is Imported and Saved
         /// </summary>
         public static event TypedEventHandler<IPackagingService, SaveEventArgs<ITemplate>> TemplateImported;
-        #endregion
-
-        #region Stylesheets
         #endregion
     }
 }
