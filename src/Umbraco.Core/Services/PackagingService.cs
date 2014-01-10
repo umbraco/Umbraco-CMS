@@ -837,6 +837,74 @@ namespace Umbraco.Core.Services
         #endregion
 
         #region Dictionary Items
+        public IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement dictionaryItemElementList)
+        {
+            var languages = _localizationService.GetAllLanguages().ToList();
+            return ImportDictionaryItems(dictionaryItemElementList, languages);
+        }
+
+        private IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement dictionaryItemElementList, List<ILanguage> languages)
+        {
+            var items = new List<IDictionaryItem>();
+            foreach (var dictionaryItemElement in dictionaryItemElementList.Elements("DictionaryItem"))
+                items.AddRange(ImportDictionaryItem(dictionaryItemElement, languages));
+            return items;
+        }
+
+        private IEnumerable<IDictionaryItem> ImportDictionaryItem(XElement dictionaryItemElement, List<ILanguage> languages)
+        {
+            var items = new List<IDictionaryItem>();
+
+            IDictionaryItem dictionaryItem;
+            var key = dictionaryItemElement.Attribute("Key").Value;
+            if (_localizationService.DictionaryItemExists(key))
+                dictionaryItem = GetAndUpdateDictionaryItem(key, dictionaryItemElement, languages);
+            else
+                dictionaryItem = CreateNewDictionaryItem(key, dictionaryItemElement, languages);
+            _localizationService.Save(dictionaryItem);
+            items.Add(dictionaryItem);
+            items.AddRange(ImportDictionaryItems(dictionaryItemElement, languages));
+            return items;
+        }
+
+        private IDictionaryItem GetAndUpdateDictionaryItem(string key, XElement dictionaryItemElement, List<ILanguage> languages)
+        {
+            var dictionaryItem = _localizationService.GetDictionaryItemByKey(key);
+            var translations = dictionaryItem.Translations.ToList();
+            foreach (var valueElement in dictionaryItemElement.Elements("Value").Where(v => DictionaryValueIsNew(translations, v)))
+                AddDictionaryTranslation(translations, valueElement, languages);
+            dictionaryItem.Translations = translations;
+            return dictionaryItem;
+        }
+
+        private static DictionaryItem CreateNewDictionaryItem(string key, XElement dictionaryItemElement, List<ILanguage> languages)
+        {
+            var dictionaryItem = new DictionaryItem(key);
+            var translations = new List<IDictionaryTranslation>();
+
+            foreach (var valueElement in dictionaryItemElement.Elements("Value"))
+                AddDictionaryTranslation(translations, valueElement, languages);
+
+            dictionaryItem.Translations = translations;
+            return dictionaryItem;
+        }
+
+        private static bool DictionaryValueIsNew(IEnumerable<IDictionaryTranslation> translations, XElement valueElement)
+        {
+            return translations.All(t =>
+                String.Compare(t.Language.IsoCode, valueElement.Attribute("LanguageCultureAlias").Value, StringComparison.InvariantCultureIgnoreCase) != 0
+                );
+        }
+
+        private static void AddDictionaryTranslation(ICollection<IDictionaryTranslation> translations, XElement valueElement, IEnumerable<ILanguage> languages)
+        {
+            var languageId = valueElement.Attribute("LanguageCultureAlias").Value;
+            var language = languages.SingleOrDefault(l => l.IsoCode == languageId);
+            if (language == null)
+                return;
+            var translation = new DictionaryTranslation(language, valueElement.Value);
+            translations.Add(translation);
+        }
         #endregion
 
         #region Files

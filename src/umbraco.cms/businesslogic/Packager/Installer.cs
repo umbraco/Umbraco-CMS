@@ -333,18 +333,12 @@ namespace umbraco.cms.businesslogic.packager
                 #endregion
 
                 #region Dictionary items
-                foreach (XmlNode n in _packageConfig.DocumentElement.SelectNodes("./DictionaryItems/DictionaryItem"))
+                var dictionaryItemsElement = rootElement.Descendants("DictionaryItems").FirstOrDefault();
+                if (dictionaryItemsElement != null)
                 {
-                    Dictionary.DictionaryItem newDi = Dictionary.DictionaryItem.Import(n);
-
-                    if (newDi != null)
-                    {
-                        insPack.Data.DictionaryItems.Add(newDi.id.ToString());
-                        //saveNeeded = true;
-                    }
+                    var insertedDictionaryItems = packagingService.ImportDictionaryItems(dictionaryItemsElement);
+                    insPack.Data.DictionaryItems.AddRange(insertedDictionaryItems.Select(d => d.Id.ToString()));
                 }
-
-                //if (saveNeeded) { insPack.Save(); saveNeeded = false; }
                 #endregion
 
                 #region Macros

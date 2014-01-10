@@ -180,7 +180,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        [NUnit.Framework.Ignore]
         [Test]
         public void Can_Perform_Update_On_DictionaryRepository()
         {
@@ -207,6 +206,35 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(2));
                 Assert.That(dictionaryItem.Translations.FirstOrDefault().Value, Is.EqualTo("Read even more"));
             }
+        }
+
+        [Test]
+        public void Can_Perform_Update_WithNewTranslation_On_DictionaryRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var languageRepository = new LanguageRepository(unitOfWork);
+            var repository = new DictionaryRepository(unitOfWork, languageRepository);
+
+            var languageNo = new Language("nb-NO") { CultureName = "nb-NO" };
+            ServiceContext.LocalizationService.Save(languageNo);
+
+            // Act
+            var item = repository.Get(1);
+            var translations = item.Translations.ToList();
+            translations.Add(new DictionaryTranslation(languageNo, "Les mer"));
+            item.Translations = translations;
+
+            repository.AddOrUpdate(item);
+            unitOfWork.Commit();
+
+            var dictionaryItem = repository.Get(1);
+
+            // Assert
+            Assert.That(dictionaryItem, Is.Not.Null);
+            Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(3));
+            Assert.That(dictionaryItem.Translations.Single(t => t.Language.IsoCode == "nb-NO").Value, Is.EqualTo("Les mer"));
         }
 
         [Test]
