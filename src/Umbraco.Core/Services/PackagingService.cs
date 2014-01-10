@@ -55,49 +55,7 @@ namespace Umbraco.Core.Services
 
             _importedContentTypes = new Dictionary<string, IContentType>();
         }
-
-        #region Generic export methods
-
-        internal void ExportToFile(string absoluteFilePath, string nodeType, int id)
-        {
-            XElement xml = null;
-
-            if (nodeType.Equals("content", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var content = _contentService.GetById(id);
-                xml = Export(content);
-            }
-
-            if (nodeType.Equals("media", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var media = _mediaService.GetById(id);
-                xml = Export(media);
-            }
-
-            if (nodeType.Equals("contenttype", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var contentType = _contentTypeService.GetContentType(id);
-                xml = Export(contentType);
-            }
-
-            if (nodeType.Equals("mediatype", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var mediaType = _contentTypeService.GetMediaType(id);
-                xml = Export(mediaType);
-            }
-
-            if (nodeType.Equals("datatype", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var dataType = _dataTypeService.GetDataTypeDefinitionById(id);
-                xml = Export(dataType);
-            }
-
-            if (xml != null)
-                xml.Save(absoluteFilePath);
-        }
-
-        #endregion
-
+        
         #region Content
 
         /// <summary>
