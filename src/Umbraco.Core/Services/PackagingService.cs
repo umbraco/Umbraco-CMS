@@ -65,7 +65,7 @@ namespace Umbraco.Core.Services
         /// <param name="content">Content to export</param>
         /// <param name="deep">Optional parameter indicating whether to include descendents</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Content object</returns>
-        internal XElement Export(IContent content, bool deep = false)
+        public XElement Export(IContent content, bool deep = false)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
             var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
@@ -676,7 +676,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="dataTypeDefinitions"></param>
         /// <returns></returns>
-        internal XElement Export(IEnumerable<IDataTypeDefinition >dataTypeDefinitions)
+        public XElement Export(IEnumerable<IDataTypeDefinition >dataTypeDefinitions)
         {
             var container = new XElement("DataTypes");
             foreach (var d in dataTypeDefinitions)
@@ -686,7 +686,7 @@ namespace Umbraco.Core.Services
             return container;
         }
 
-        internal XElement Export(IDataTypeDefinition dataTypeDefinition)
+        public XElement Export(IDataTypeDefinition dataTypeDefinition)
         {
             var prevalues = new XElement("PreValues");
 
