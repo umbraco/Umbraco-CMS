@@ -43,7 +43,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             var repo = new NotificationsRepository(unitOfWork);
 
-            var userDto = new UserDto { ContentStartId = -1, DefaultPermissions = "", Email = "test" , Login = "test" , MediaStartId = -1, Password = "test" , Type = 1, UserName = "test" , UserLanguage = "en" };
+            var userDto = new UserDto { ContentStartId = -1, Email = "test" , Login = "test" , MediaStartId = -1, Password = "test" , Type = 1, UserName = "test" , UserLanguage = "en" };
             unitOfWork.Database.Insert(userDto);
 
             var userNew = Mock.Of<IUser>(e => e.Id == (object)userDto.Id);
@@ -78,7 +78,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             for (var i = 0; i < 10; i++)
             {
-                var userDto = new UserDto { ContentStartId = -1, DefaultPermissions = "", Email = "test" + i, Login = "test" + i, MediaStartId = -1, Password = "test", Type = 1, UserName = "test" + i, UserLanguage = "en" };
+                var userDto = new UserDto { ContentStartId = -1, Email = "test" + i, Login = "test" + i, MediaStartId = -1, Password = "test", Type = 1, UserName = "test" + i, UserLanguage = "en" };
                 unitOfWork.Database.Insert(userDto);
                 var userNew = Mock.Of<IUser>(e => e.Id == (object)userDto.Id);
                 var notification = repo.CreateNotification(userNew, (i % 2 == 0) ? entity1 : entity2, i.ToString(CultureInfo.InvariantCulture));
@@ -105,7 +105,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
             for (var i = 0; i < 10; i++)
             {
-                var userDto = new UserDto { ContentStartId = -1, DefaultPermissions = "", Email = "test" + i, Login = "test" + i, MediaStartId = -1, Password = "test", Type = 1, UserName = "test" + i, UserLanguage = "en" };
+                var userDto = new UserDto { ContentStartId = -1, Email = "test" + i, Login = "test" + i, MediaStartId = -1, Password = "test", Type = 1, UserName = "test" + i, UserLanguage = "en" };
                 unitOfWork.Database.Insert(userDto);
                 var userNew = Mock.Of<IUser>(e => e.Id == (object)userDto.Id);
                 var notification = repo.CreateNotification(userNew, (i % 2 == 0) ? entity1 : entity2, i.ToString(CultureInfo.InvariantCulture));
@@ -123,7 +123,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
             var repo = new NotificationsRepository(unitOfWork);
 
-            var userDto = new UserDto { ContentStartId = -1, DefaultPermissions = "", Email = "test", Login = "test", MediaStartId = -1, Password = "test", Type = 1, UserName = "test", UserLanguage = "en" };
+            var userDto = new UserDto { ContentStartId = -1, Email = "test", Login = "test", MediaStartId = -1, Password = "test", Type = 1, UserName = "test", UserLanguage = "en" };
             unitOfWork.Database.Insert(userDto);
 
             var userNew = Mock.Of<IUser>(e => e.Id == (object)userDto.Id);
