@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Net.Mail;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -47,20 +48,20 @@ namespace umbraco.cms.businesslogic.workflow
         /// <summary>
         /// Sends the notifications for the specified user regarding the specified node and action.
         /// </summary>
-        /// <param name="Node">The node.</param>
+        /// <param name="node">The node.</param>
         /// <param name="user">The user.</param>
-        /// <param name="Action">The action.</param>
-        public static void GetNotifications(CMSNode Node, User user, IAction Action)
+        /// <param name="action">The action.</param>
+        public static void GetNotifications(CMSNode node, User user, IAction action)
         {
             User[] allUsers = User.getAll();
             foreach (User u in allUsers)
             {
                 try
                 {
-                    if (!u.Disabled && u.GetNotifications(Node.Path).IndexOf(Action.Letter.ToString()) > -1)
+                    if (u.Disabled == false && u.GetNotifications(node.Path).IndexOf(action.Letter.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal) > -1)
                     {
-                        LogHelper.Debug<Notification>(string.Format("Notification about {0} sent to {1} ({2})", ui.Text(Action.Alias, u), u.Name, u.Email));
-                        sendNotification(user, u, (Document)Node, Action);
+                        LogHelper.Debug<Notification>(string.Format("Notification about {0} sent to {1} ({2})", ui.Text(action.Alias, u), u.Name, u.Email));
+                        SendNotification(user, u, (Document)node, action);
                     }
                 }
                 catch (Exception notifyExp)
@@ -71,8 +72,7 @@ namespace umbraco.cms.businesslogic.workflow
         }
 
         ///TODO: Include update with html mail notification and document contents
-        private static void sendNotification(User performingUser, User mailingUser, Document documentObject,
-                                             IAction Action)
+        private static void SendNotification(User performingUser, User mailingUser, Document documentObject, IAction action)
         {
             // retrieve previous version of the document
             DocumentVersionList[] versions = documentObject.GetVersions();
@@ -90,14 +90,14 @@ namespace umbraco.cms.businesslogic.workflow
                 string newText = p.Value != null ? p.Value.ToString() : "";
 
                 // replace html with char equivalent
-                ReplaceHTMLSymbols(ref oldText);
-                ReplaceHTMLSymbols(ref newText);
+                ReplaceHtmlSymbols(ref oldText);
+                ReplaceHtmlSymbols(ref newText);
 
                 // make sure to only highlight changes done using TinyMCE editor... other changes will be displayed using default summary
-                ///TODO PPH: Had to change this, as a reference to the editorcontrols is not allowed, so a string comparison is the only way, this should be a DIFF or something instead.. 
+                //TODO PPH: Had to change this, as a reference to the editorcontrols is not allowed, so a string comparison is the only way, this should be a DIFF or something instead.. 
                 if (p.PropertyType.DataTypeDefinition.DataType.ToString() ==
                     "umbraco.editorControls.tinymce.TinyMCEDataType" &&
-                    string.Compare(oldText, newText) != 0)
+                    string.CompareOrdinal(oldText, newText) != 0)
                 {
                     summary.Append("<tr>");
                     summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'> Note: </th>");
@@ -108,7 +108,7 @@ namespace umbraco.cms.businesslogic.workflow
                     summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'> New " +
                                    p.PropertyType.Name + "</th>");
                     summary.Append("<td style='text-align: left; vertical-align: top;'>" +
-                                   replaceLinks(CompareText(oldText, newText, true, false,
+                                   ReplaceLinks(CompareText(oldText, newText, true, false,
                                                             "<span style='background-color:yellow;'>", string.Empty)) +
                                    "</td>");
                     summary.Append("</tr>");
@@ -116,7 +116,7 @@ namespace umbraco.cms.businesslogic.workflow
                     summary.Append("<th style='text-align: left; vertical-align: top; width: 25%;'> Old " +
                                    oldProperty.PropertyType.Name + "</th>");
                     summary.Append("<td style='text-align: left; vertical-align: top;'>" +
-                                   replaceLinks(CompareText(newText, oldText, true, false,
+                                   ReplaceLinks(CompareText(newText, oldText, true, false,
                                                             "<span style='background-color:red;'>", string.Empty)) +
                                    "</td>");
                     summary.Append("</tr>");
@@ -139,12 +139,12 @@ namespace umbraco.cms.businesslogic.workflow
             string[] subjectVars = {
                                        HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + ":" +
                                        HttpContext.Current.Request.Url.Port +
-                                       IOHelper.ResolveUrl(SystemDirectories.Umbraco), ui.Text(Action.Alias)
+                                       IOHelper.ResolveUrl(SystemDirectories.Umbraco), ui.Text(action.Alias)
                                        ,
                                        documentObject.Text
                                    };
             string[] bodyVars = {
-                                    mailingUser.Name, ui.Text(Action.Alias), documentObject.Text, performingUser.Name,
+                                    mailingUser.Name, ui.Text(action.Alias), documentObject.Text, performingUser.Name,
                                     HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + ":" +
                                     HttpContext.Current.Request.Url.Port +
                                     IOHelper.ResolveUrl(SystemDirectories.Umbraco),
@@ -155,8 +155,8 @@ namespace umbraco.cms.businesslogic.workflow
                                                   /*umbraco.library.NiceUrl(documentObject.Id))*/
                                                   documentObject.Id + ".aspx",
                                                   protocol)
-                                    ///TODO: PPH removed the niceURL reference... cms.dll cannot reference the presentation project...
-                                    ///TODO: This should be moved somewhere else..
+                                    //TODO: PPH removed the niceURL reference... cms.dll cannot reference the presentation project...
+                                    //TODO: This should be moved somewhere else..
                                 };
 
             // create the mail message 
@@ -182,7 +182,7 @@ namespace umbraco.cms.businesslogic.workflow
 
             // nh, issue 30724. Due to hardcoded http strings in resource files, we need to check for https replacements here
             // adding the server name to make sure we don't replace external links
-            if (GlobalSettings.UseSSL && !String.IsNullOrEmpty(mail.Body))
+            if (GlobalSettings.UseSSL && string.IsNullOrEmpty(mail.Body) == false)
             {
                 string serverName = HttpContext.Current.Request.ServerVariables["SERVER_NAME"];
                 mail.Body = mail.Body.Replace(
@@ -195,7 +195,7 @@ namespace umbraco.cms.businesslogic.workflow
             sender.Send(mail);
         }
 
-        private static string replaceLinks(string text)
+        private static string ReplaceLinks(string text)
         {
             string domain = GlobalSettings.UseSSL ? "https://" : "http://";
             domain += HttpContext.Current.Request.ServerVariables["SERVER_NAME"] + ":" +
@@ -232,7 +232,7 @@ namespace umbraco.cms.businesslogic.workflow
         /// <summary>
         /// Returns the notifications for a node
         /// </summary>
-        /// <param name="user"></param>
+        /// <param name="node"></param>
         /// <returns></returns>
         public static IEnumerable<Notification> GetNodeNotifications(CMSNode node)
         {
@@ -289,23 +289,23 @@ namespace umbraco.cms.businesslogic.workflow
         /// <summary>
         /// Creates a new notification
         /// </summary>
-        /// <param name="User">The user.</param>
-        /// <param name="Node">The node.</param>
-        /// <param name="ActionLetter">The action letter.</param>
+        /// <param name="user">The user.</param>
+        /// <param name="node">The node.</param>
+        /// <param name="actionLetter">The action letter.</param>
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static void MakeNew(User User, CMSNode Node, char ActionLetter)
+        public static void MakeNew(User user, CMSNode node, char actionLetter)
         {
             bool exists = ApplicationContext.Current.DatabaseContext.Database.ExecuteScalar<int>(
                 "SELECT COUNT(userId) FROM umbracoUser2nodeNotify WHERE userId = @userId AND nodeId = @nodeId AND action = @action", 
-                new { userId = User.Id, nodeId = Node.Id, action = ActionLetter.ToString()}) > 0;
+                new { userId = user.Id, nodeId = node.Id, action = actionLetter.ToString()}) > 0;
 
             if (exists == false)
             {
                 ApplicationContext.Current.DatabaseContext.Database.Insert(new User2NodeNotifyDto
                                                                            {
-                                                                               Action = ActionLetter.ToString(),
-                                                                               NodeId = Node.Id,
-                                                                               UserId = User.Id
+                                                                               Action = actionLetter.ToString(),
+                                                                               NodeId = node.Id,
+                                                                               UserId = user.Id
                                                                            });
             }
         }
@@ -313,25 +313,25 @@ namespace umbraco.cms.businesslogic.workflow
         /// <summary>
         /// Updates the notifications.
         /// </summary>
-        /// <param name="User">The user.</param>
-        /// <param name="Node">The node.</param>
-        /// <param name="Notifications">The notifications.</param>
+        /// <param name="user">The user.</param>
+        /// <param name="node">The node.</param>
+        /// <param name="notifications">The notifications.</param>
         [MethodImpl(MethodImplOptions.Synchronized)]
-        public static void UpdateNotifications(User User, CMSNode Node, string Notifications)
+        public static void UpdateNotifications(User user, CMSNode node, string notifications)
         {
             // delete all settings on the node for this user
-            DeleteNotifications(User, Node);
+            DeleteNotifications(user, node);
 
             // Loop through the permissions and create them
-            foreach (char c in Notifications)
-                MakeNew(User, Node, c);
+            foreach (char c in notifications)
+                MakeNew(user, node, c);
         }
 
         /// <summary>
         /// Replaces the HTML symbols with the character equivalent.
         /// </summary>
         /// <param name="oldString">The old string.</param>
-        private static void ReplaceHTMLSymbols(ref string oldString)
+        private static void ReplaceHtmlSymbols(ref string oldString)
         {
             oldString = oldString.Replace("&nbsp;", " ");
             oldString = oldString.Replace("&rsquo;", "'");
@@ -340,33 +340,7 @@ namespace umbraco.cms.businesslogic.workflow
             oldString = oldString.Replace("&rdquo;", "”");
             oldString = oldString.Replace("&quot;", "\"");
         }
-
-        /// <summary>
-        /// Compares the text.
-        /// </summary>
-        /// <param name="oldText">The old text.</param>
-        /// <param name="newText">The new text.</param>
-        /// <returns></returns>
-        private static string CompareText(string oldText, string newText)
-        {
-            return CompareText(oldText, newText, true, true);
-        }
-
-        /// <summary>
-        /// Compares the text.
-        /// </summary>
-        /// <param name="oldText">The old text.</param>
-        /// <param name="newText">The new text.</param>
-        /// <param name="displayInsertedText">if set to <c>true</c> [display inserted text].</param>
-        /// <param name="displayDeletedText">if set to <c>true</c> [display deleted text].</param>
-        /// <returns></returns>
-        private static string CompareText(string oldText, string newText, bool displayInsertedText,
-                                          bool displayDeletedText)
-        {
-            return CompareText(oldText, newText, displayInsertedText, displayDeletedText,
-                               "<span style='background-color:red;'>", "<span style='background-color:yellow;'>");
-        }
-
+    
         /// <summary>
         /// Compares the text.
         /// </summary>
