@@ -1,0 +1,12 @@
+﻿<div ng-controller="Umbraco.Editors.MultiColorPickerController">
+    <div class="control-group color-picker-preval">
+        <input name="newColor" id="newColor" type="text" ng-model="newColor" val-highlight="hasError" /> <label>{{newColor}}</label>
+        <button class="btn btn-small" ng-click="add($event)">Add</button>
+    </div>
+    <div class="control-group color-picker-preval" ng-repeat="item in model.value">
+
+        <div class="thumbnail span1" bg-color="{{item.value}}" bg-orig="transparent"></div>
+        <pre style="display: inline; margin-right: 20px; margin-left: 10px; ">{{item.value}}</pre>
+        <button class="btn btn-small btn-danger" ng-click="remove(item, $event)">Remove</button>
+    </div>
+</div>

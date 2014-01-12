@@ -11,7 +11,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <returns></returns>
         /// <remarks>
-        /// We are just going to re-use the ValueListPreValueEditor
+        /// ColorListPreValueEditor uses the ValueListPreValueEditor with a custom view and controller.
         /// </remarks>
         protected override PreValueEditor CreatePreValueEditor()
         {
