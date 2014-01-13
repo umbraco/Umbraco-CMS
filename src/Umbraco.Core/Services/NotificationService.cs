@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Net.Mail;
 using System.Text;
+using System.Threading;
 using System.Web;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -53,6 +54,8 @@ namespace Umbraco.Core.Services
                 throw new NotSupportedException();
             }
             var content = (IContent) entity;
+            //we'll lazily get these if we need to send notifications
+            IContent[] allVersions = null;
 
             int totalUsers;
             var allUsers = _userService.GetAllMembers(0, int.MaxValue, out totalUsers);
@@ -63,9 +66,15 @@ namespace Umbraco.Core.Services
                 var notificationForAction = userNotifications.FirstOrDefault(x => x.Action == action);
                 if (notificationForAction != null)
                 {
+                    //lazy load versions if notifications are required
+                    if (allVersions == null)
+                    {
+                        allVersions = _contentService.GetVersions(entity.Id).ToArray();
+                    }
+
                     try
                     {
-                        SendNotification(operatingUser, u, content, actionName, http, createSubject, createBody);
+                        SendNotification(operatingUser, u, content, allVersions, actionName, http, createSubject, createBody);
                         LogHelper.Debug<NotificationService>(string.Format("Notification type: {0} sent to {1} ({2})", action, u.Name, u.Email));
                     }
                     catch (Exception ex)
@@ -101,10 +110,7 @@ namespace Umbraco.Core.Services
         {
             var userNotifications = GetUserNotifications(user).ToArray();
             var pathParts = path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
-            var result = pathParts
-                .Select(part => userNotifications.FirstOrDefault(x => x.EntityId.ToString(CultureInfo.InvariantCulture) == part))
-                .Where(notification => notification != null)
-                .ToList();
+            var result = userNotifications.Where(r => pathParts.InvariantContains(r.EntityId.ToString(CultureInfo.InvariantCulture))).ToList();            
             return result;
         }
 
@@ -175,27 +181,25 @@ namespace Umbraco.Core.Services
         /// <param name="performingUser"></param>
         /// <param name="mailingUser"></param>
         /// <param name="content"></param>
+        /// <param name="allVersions"></param>
         /// <param name="actionName">The action readable name - currently an action is just a single letter, this is the name associated with the letter </param>
         /// <param name="http"></param>
         /// <param name="createSubject">Callback to create the mail subject</param>
         /// <param name="createBody">Callback to create the mail body</param>
-        private void SendNotification(IUser performingUser, IUser mailingUser, IContent content, string actionName, HttpContextBase http, 
+        private void SendNotification(IUser performingUser, IUser mailingUser, IContent content, IContent[] allVersions, string actionName, HttpContextBase http, 
             Func<IUser, string[], string> createSubject,
             Func<IUser, string[], string> createBody)
         {
             if (performingUser == null) throw new ArgumentNullException("performingUser");
             if (mailingUser == null) throw new ArgumentNullException("mailingUser");
             if (content == null) throw new ArgumentNullException("content");
+            if (allVersions == null) throw new ArgumentNullException("allVersions");
             if (http == null) throw new ArgumentNullException("http");
             if (createSubject == null) throw new ArgumentNullException("createSubject");
             if (createBody == null) throw new ArgumentNullException("createBody");
 
-            // retrieve previous version of the document
-            var versions = _contentService.GetVersions(content.Id).ToArray();
-
-            int versionCount = (versions.Length > 1) ? (versions.Length - 2) : (versions.Length - 1);
-            var oldDoc = _contentService.GetByVersion(versions[versionCount].Version);
-            //var oldDoc = new Document(documentObject.Id, versions[versionCount].Version);
+            int versionCount = (allVersions.Length > 1) ? (allVersions.Length - 2) : (allVersions.Length - 1);
+            var oldDoc = _contentService.GetByVersion(allVersions[versionCount].Version);
 
             // build summary
             var summary = new StringBuilder();
@@ -313,9 +317,20 @@ namespace Umbraco.Core.Services
                     string.Format("https://{0}", serverName));
             }
 
-            // send it
-            var sender = new SmtpClient();
-            sender.Send(mail);
+
+            // send it  asynchronously, we don't want to got up all of the request time to send emails!
+            ThreadPool.QueueUserWorkItem(state =>
+                {
+                    try
+                    {
+                        var sender = new SmtpClient();
+                        sender.Send(mail);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogHelper.Error<NotificationService>("An error occurred sending notification", ex);
+                    }
+                });
         }
 
         private static string ReplaceLinks(string text, HttpRequestBase request)
