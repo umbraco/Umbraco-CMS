@@ -327,6 +327,7 @@ namespace Umbraco.Core.Services
                                 sender.Send(mail);
                             }    
                         }
+                        
                     }
                     catch (Exception ex)
                     {
