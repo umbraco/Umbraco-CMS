@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Xml;
+using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
@@ -54,49 +56,7 @@ namespace Umbraco.Core.Services
 
             _importedContentTypes = new Dictionary<string, IContentType>();
         }
-
-        #region Generic export methods
-
-        internal void ExportToFile(string absoluteFilePath, string nodeType, int id)
-        {
-            XElement xml = null;
-
-            if (nodeType.Equals("content", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var content = _contentService.GetById(id);
-                xml = Export(content);
-            }
-
-            if (nodeType.Equals("media", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var media = _mediaService.GetById(id);
-                xml = Export(media);
-            }
-
-            if (nodeType.Equals("contenttype", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var contentType = _contentTypeService.GetContentType(id);
-                xml = Export(contentType);
-            }
-
-            if (nodeType.Equals("mediatype", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var mediaType = _contentTypeService.GetMediaType(id);
-                xml = Export(mediaType);
-            }
-
-            if (nodeType.Equals("datatype", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var dataType = _dataTypeService.GetDataTypeDefinitionById(id);
-                xml = Export(dataType);
-            }
-
-            if (xml != null)
-                xml.Save(absoluteFilePath);
-        }
-
-        #endregion
-
+        
         #region Content
 
         /// <summary>
@@ -790,22 +750,35 @@ namespace Umbraco.Core.Services
         #region DataTypes
 
         /// <summary>
-        /// Export a list of data types
+        /// Exports a list of Data Types
         /// </summary>
-        /// <param name="dataTypeDefinitions"></param>
-        /// <returns></returns>
-        internal XElement Export(IEnumerable<IDataTypeDefinition> dataTypeDefinitions)
+        /// <param name="dataTypeDefinitions">List of data types to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition objects</returns>
+        public XElement Export(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, bool raiseEvents = true)
         {
             var container = new XElement("DataTypes");
-            foreach (var d in dataTypeDefinitions)
+            foreach (var dataTypeDefinition in dataTypeDefinitions)
             {
-                container.Add(Export(d));
+                container.Add(Export(dataTypeDefinition, raiseEvents));
             }
             return container;
         }
 
-        internal XElement Export(IDataTypeDefinition dataTypeDefinition)
+        /// <summary>
+        /// Exports a single Data Type
+        /// </summary>
+        /// <param name="dataTypeDefinition">Data type to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition object</returns>
+        public XElement Export(IDataTypeDefinition dataTypeDefinition, bool raiseEvents = true)
         {
+            if (raiseEvents)
+            {
+                if (ExportingDataType.IsRaisedEventCancelled(new SaveEventArgs<IDataTypeDefinition>(dataTypeDefinition), this))
+                    return default(XElement);
+            }
+
             var prevalues = new XElement("PreValues");
 
             var prevalueList = _dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id)
@@ -830,6 +803,9 @@ namespace Umbraco.Core.Services
             xml.Add(new XAttribute("Definition", dataTypeDefinition.Key));
             xml.Add(new XAttribute("DatabaseType", dataTypeDefinition.DatabaseType.ToString()));
 
+            if (raiseEvents)
+                DataTypeExported.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
+
             return xml;
         }
 
@@ -837,7 +813,7 @@ namespace Umbraco.Core.Services
         /// Imports and saves package xml as <see cref="IDataTypeDefinition"/>
         /// </summary>
         /// <param name="element">Xml to import</param>
-        /// <param name="userId"></param>
+        /// <param name="userId">Optional id of the user</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated DataTypeDefinitions</returns>
         public IEnumerable<IDataTypeDefinition> ImportDataTypeDefinitions(XElement element, int userId = 0, bool raiseEvents = true)
@@ -946,12 +922,232 @@ namespace Umbraco.Core.Services
         #endregion
 
         #region Dictionary Items
+
+        /// <summary>
+        /// Exports a list of <see cref="IDictionaryItem"/> items to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="dictionaryItem">List of dictionary items to export</param>
+        /// <param name="includeChildren">Optional boolean indicating whether or not to include children</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDictionaryItem objects</returns>
+        public XElement Export(IEnumerable<IDictionaryItem> dictionaryItem, bool includeChildren = true, bool raiseEvents = true)
+        {
+            var xml = new XElement("DictionaryItems");
+            foreach (var item in dictionaryItem)
+            {
+                xml.Add(Export(item, includeChildren, raiseEvents));
+            }
+            return xml;
+        }
+
+        /// <summary>
+        /// Exports a single <see cref="IDictionaryItem"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="dictionaryItem">Dictionary Item to export</param>
+        /// <param name="includeChildren">Optional boolean indicating whether or not to include children</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDictionaryItem object</returns>
+        public XElement Export(IDictionaryItem dictionaryItem, bool includeChildren, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (ExportingDictionaryItem.IsRaisedEventCancelled(new SaveEventArgs<IDictionaryItem>(dictionaryItem), this))
+                    return default(XElement);
+            }
+
+            var xml = new XElement("DictionaryItem", new XAttribute("Key", dictionaryItem.ItemKey));
+            foreach (var translation in dictionaryItem.Translations)
+            {
+                xml.Add(new XElement("Value",
+                    new XAttribute("LanguageId", translation.Language.Id),
+                    new XAttribute("LanguageCultureAlias", translation.Language.IsoCode),
+                    new XCData(translation.Value)));
+            }
+
+            if (includeChildren)
+            {
+                var children = _localizationService.GetDictionaryItemChildren(dictionaryItem.Key);
+                foreach (var child in children)
+                {
+                    xml.Add(Export(child, true));
+                }
+            }
+
+            if (raiseEvents)
+                DictionaryItemExported.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
+
+            return xml;
+        }
+
+        /// <summary>
+        /// Imports and saves the 'DictionaryItems' part of the package xml as a list of <see cref="IDictionaryItem"/>
+        /// </summary>
+        /// <param name="dictionaryItemElementList">Xml to import</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns>An enumerable list of dictionary items</returns>
+        public IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement dictionaryItemElementList, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (ImportingDictionaryItem.IsRaisedEventCancelled(new SaveEventArgs<XElement>(dictionaryItemElementList), this))
+                    return Enumerable.Empty<IDictionaryItem>();
+            }
+
+            var languages = _localizationService.GetAllLanguages().ToList();
+            return ImportDictionaryItems(dictionaryItemElementList, languages, raiseEvents);
+        }
+
+        private IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement dictionaryItemElementList, List<ILanguage> languages, bool raiseEvents)
+        {
+            var items = new List<IDictionaryItem>();
+            foreach (var dictionaryItemElement in dictionaryItemElementList.Elements("DictionaryItem"))
+                items.AddRange(ImportDictionaryItem(dictionaryItemElement, languages));
+
+            if (raiseEvents)
+                DictionaryItemImported.RaiseEvent(new SaveEventArgs<IDictionaryItem>(items, false), this);
+
+            return items;
+        }
+
+        private IEnumerable<IDictionaryItem> ImportDictionaryItem(XElement dictionaryItemElement, List<ILanguage> languages)
+        {
+            var items = new List<IDictionaryItem>();
+
+            IDictionaryItem dictionaryItem;
+            var key = dictionaryItemElement.Attribute("Key").Value;
+            if (_localizationService.DictionaryItemExists(key))
+                dictionaryItem = GetAndUpdateDictionaryItem(key, dictionaryItemElement, languages);
+            else
+                dictionaryItem = CreateNewDictionaryItem(key, dictionaryItemElement, languages);
+            _localizationService.Save(dictionaryItem);
+            items.Add(dictionaryItem);
+            items.AddRange(ImportDictionaryItems(dictionaryItemElement, languages, true));
+            return items;
+        }
+
+        private IDictionaryItem GetAndUpdateDictionaryItem(string key, XElement dictionaryItemElement, List<ILanguage> languages)
+        {
+            var dictionaryItem = _localizationService.GetDictionaryItemByKey(key);
+            var translations = dictionaryItem.Translations.ToList();
+            foreach (var valueElement in dictionaryItemElement.Elements("Value").Where(v => DictionaryValueIsNew(translations, v)))
+                AddDictionaryTranslation(translations, valueElement, languages);
+            dictionaryItem.Translations = translations;
+            return dictionaryItem;
+        }
+
+        private static DictionaryItem CreateNewDictionaryItem(string key, XElement dictionaryItemElement, List<ILanguage> languages)
+        {
+            var dictionaryItem = new DictionaryItem(key);
+            var translations = new List<IDictionaryTranslation>();
+
+            foreach (var valueElement in dictionaryItemElement.Elements("Value"))
+                AddDictionaryTranslation(translations, valueElement, languages);
+
+            dictionaryItem.Translations = translations;
+            return dictionaryItem;
+        }
+
+        private static bool DictionaryValueIsNew(IEnumerable<IDictionaryTranslation> translations, XElement valueElement)
+        {
+            return translations.All(t =>
+                String.Compare(t.Language.IsoCode, valueElement.Attribute("LanguageCultureAlias").Value, StringComparison.InvariantCultureIgnoreCase) != 0
+                );
+        }
+
+        private static void AddDictionaryTranslation(ICollection<IDictionaryTranslation> translations, XElement valueElement, IEnumerable<ILanguage> languages)
+        {
+            var languageId = valueElement.Attribute("LanguageCultureAlias").Value;
+            var language = languages.SingleOrDefault(l => l.IsoCode == languageId);
+            if (language == null)
+                return;
+            var translation = new DictionaryTranslation(language, valueElement.Value);
+            translations.Add(translation);
+        }
+
         #endregion
 
         #region Files
         #endregion
 
         #region Languages
+
+        /// <summary>
+        /// Exports a list of <see cref="ILanguage"/> items to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="languages">List of Languages to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the ILanguage objects</returns>
+        public XElement Export(IEnumerable<ILanguage> languages, bool raiseEvents = true)
+        {
+            var xml = new XElement("Languages");
+            foreach (var language in languages)
+            {
+                xml.Add(Export(language, raiseEvents));
+            }
+            return xml;
+        }
+
+        /// <summary>
+        /// Exports a single <see cref="ILanguage"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="language">Language to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the ILanguage object</returns>
+        public XElement Export(ILanguage language, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (ExportingLanguage.IsRaisedEventCancelled(new SaveEventArgs<ILanguage>(language), this))
+                    return default(XElement);
+            }
+
+            var xml = new XElement("Language",
+                new XAttribute("Id", language.Id),
+                new XAttribute("CultureAlias", language.IsoCode),
+                new XAttribute("FriendlyName", language.CultureName));
+
+            if (raiseEvents)
+                LanguageExported.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
+
+            return xml;
+        }
+
+        /// <summary>
+        /// Imports and saves the 'Languages' part of a package xml as a list of <see cref="ILanguage"/>
+        /// </summary>
+        /// <param name="languageElementList">Xml to import</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns>An enumerable list of generated languages</returns>
+        public IEnumerable<ILanguage> ImportLanguages(XElement languageElementList, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (ImportingLanguage.IsRaisedEventCancelled(new SaveEventArgs<XElement>(languageElementList), this))
+                    return Enumerable.Empty<ILanguage>();
+            }
+
+            var list = new List<ILanguage>();
+            foreach (var languageElement in languageElementList.Elements("Language"))
+            {
+                var isoCode = languageElement.Attribute("CultureAlias").Value;
+                var existingLanguage = _localizationService.GetLanguageByIsoCode(isoCode);
+                if (existingLanguage == null)
+                {
+                    var langauge = new Language(isoCode)
+                                   {
+                                       CultureName = languageElement.Attribute("FriendlyName").Value
+                                   };
+                    _localizationService.Save(langauge);
+                    list.Add(langauge);
+                }
+            }
+
+            if (raiseEvents)
+                LanguageImported.RaiseEvent(new SaveEventArgs<ILanguage>(list, false), this);
+
+            return list;
+        }
+
         #endregion
 
         #region Macros
@@ -1222,6 +1418,9 @@ namespace Umbraco.Core.Services
 
         #endregion
 
+        #region Stylesheets
+        #endregion
+
         #region Event Handlers
         /// <summary>
         /// Occurs before Importing Content
@@ -1282,6 +1481,56 @@ namespace Umbraco.Core.Services
         /// Occurs after DataType is Imported and Saved
         /// </summary>
         public static event TypedEventHandler<IPackagingService, SaveEventArgs<IDataTypeDefinition>> DataTypeImported;
+
+        /// <summary>
+        /// Occurs before Exporting DataType
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IDataTypeDefinition>> ExportingDataType;
+
+        /// <summary>
+        /// Occurs after DataType is Exported to Xml
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> DataTypeExported;
+
+        /// <summary>
+        /// Occurs before Importing DictionaryItem
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ImportingDictionaryItem;
+
+        /// <summary>
+        /// Occurs after DictionaryItem is Imported and Saved
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IDictionaryItem>> DictionaryItemImported;
+
+        /// <summary>
+        /// Occurs before Exporting DictionaryItem
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IDictionaryItem>> ExportingDictionaryItem;
+
+        /// <summary>
+        /// Occurs after DictionaryItem is Exported to Xml
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> DictionaryItemExported;
+
+        /// <summary>
+        /// Occurs before Importing Language
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ImportingLanguage;
+
+        /// <summary>
+        /// Occurs after Language is Imported and Saved
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<ILanguage>> LanguageImported;
+
+        /// <summary>
+        /// Occurs before Exporting Language
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<ILanguage>> ExportingLanguage;
+
+        /// <summary>
+        /// Occurs after Language is Exported to Xml
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> LanguageExported;
 
         /// <summary>
         /// Occurs before Importing Template

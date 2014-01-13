@@ -8,6 +8,7 @@ using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using Umbraco.Web;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
 using umbraco.cms.businesslogic.web;
@@ -32,9 +33,9 @@ namespace umbraco.dialogs
                 int docId;
                 if (int.TryParse(Request.QueryString["id"], out docId))
                 {
-                    
-                    //TODO Send to publish!!
-
+                    //send notifications! TODO: This should be put somewhere centralized instead of hard coded directly here
+                    ApplicationContext.Services.NotificationService.SendNotification(
+                        ApplicationContext.Services.ContentService.GetById(docId), ActionToPublish.Instance, ApplicationContext);
                 }
 
             }

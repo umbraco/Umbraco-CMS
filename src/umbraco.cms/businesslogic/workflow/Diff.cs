@@ -18,7 +18,7 @@ namespace umbraco.cms.businesslogic.workflow
     /// Copyright (c) by Matthias Hertel, http://www.mathertel.de
     /// This work is licensed under a BSD style license. See http://www.mathertel.de/License.aspx    
     /// </summary>    
-
+    [Obsolete("This class will be removed from the codebase in the future")]
     public class Diff
     {
 
@@ -489,6 +489,7 @@ namespace umbraco.cms.businesslogic.workflow
 
     /// <summary>Data on one input file being compared.  
     /// </summary>
+    [Obsolete("This class will be removed from the codebase in the future, logic has moved to the Core project")]
     internal class DiffData
     {
 

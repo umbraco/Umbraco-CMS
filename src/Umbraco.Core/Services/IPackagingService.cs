@@ -45,6 +45,22 @@ namespace Umbraco.Core.Services
         IEnumerable<IDataTypeDefinition> ImportDataTypeDefinitions(XElement element, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
+        /// Imports and saves the 'DictionaryItems' part of the package xml as a list of <see cref="IDictionaryItem"/>
+        /// </summary>
+        /// <param name="dictionaryItemElementList">Xml to import</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns>An enumerable list of dictionary items</returns>
+        IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement dictionaryItemElementList, bool raiseEvents = true);
+
+        /// <summary>
+        /// Imports and saves the 'Languages' part of a package xml as a list of <see cref="ILanguage"/>
+        /// </summary>
+        /// <param name="languageElementList">Xml to import</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns>An enumerable list of generated languages</returns>
+        IEnumerable<ILanguage> ImportLanguages(XElement languageElementList, bool raiseEvents = true);
+
+        /// <summary>
         /// Imports and saves package xml as <see cref="ITemplate"/>
         /// </summary>
         /// <param name="element">Xml to import</param>
@@ -78,5 +94,55 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Media object</returns>
         XElement Export(IMedia media, bool deep = false, bool raiseEvents = true);
+
+        /// <summary>
+        /// Exports a list of <see cref="ILanguage"/> items to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="languages">List of Languages to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the Language object</returns>
+        XElement Export(IEnumerable<ILanguage> languages, bool raiseEvents = true);
+
+        /// <summary>
+        /// Exports a single <see cref="ILanguage"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="language">Language to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the Language object</returns>
+        XElement Export(ILanguage language, bool raiseEvents = true);
+        
+        /// <summary>
+        /// Exports a list of <see cref="IDictionaryItem"/> items to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="dictionaryItem">List of dictionary items to export</param>
+        /// <param name="includeChildren">Optional boolean indicating whether or not to include children</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDictionaryItem objects</returns>
+        XElement Export(IEnumerable<IDictionaryItem> dictionaryItem, bool includeChildren = true, bool raiseEvents = true);
+
+        /// <summary>
+        /// Exports a single <see cref="IDictionaryItem"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="dictionaryItem">Dictionary Item to export</param>
+        /// <param name="includeChildren">Optional boolean indicating whether or not to include children</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDictionaryItem object</returns>
+        XElement Export(IDictionaryItem dictionaryItem, bool includeChildren, bool raiseEvents = true);
+
+        /// <summary>
+        /// Exports a list of Data Types
+        /// </summary>
+        /// <param name="dataTypeDefinitions">List of data types to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition objects</returns>
+        XElement Export(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, bool raiseEvents = true);
+
+        /// <summary>
+        /// Exports a single Data Type
+        /// </summary>
+        /// <param name="dataTypeDefinition">Data type to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition object</returns>
+        XElement Export(IDataTypeDefinition dataTypeDefinition, bool raiseEvents = true);
     }
 }

@@ -1,9 +1,13 @@
 using System;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Text;
 using System.Xml;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.EntityBase;
+using Umbraco.Web;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.BusinessLogic.Actions;
@@ -191,22 +195,15 @@ namespace umbraco.presentation.translation
                     if (t != null)
                     {
                         //user auth and content node validation
-                        if (t.Node.Id == int.Parse(taskNode.Attributes.GetNamedItem("id").Value) && (t.User.Id == base.getUser().Id || t.ParentUser.Id == base.getUser().Id))
+                        if (t.Node.Id == int.Parse(taskNode.Attributes.GetNamedItem("id").Value) && (t.User.Id == UmbracoUser.Id || t.ParentUser.Id == UmbracoUser.Id))
                         {
 
                             // update node contents
                             var d = new Document(t.Node.Id);
-                            Document.Import(d.ParentId, getUser(), (XmlElement)taskNode);
+                            Document.Import(d.ParentId, UmbracoUser, (XmlElement)taskNode);
 
-                            /*                            d.Text = taskNode.Attributes.GetNamedItem("nodeName").Value.Trim();
-
-                                                        // update data elements
-                                                        foreach (XmlNode data in taskNode.SelectNodes("data"))
-                                                            if (data.FirstChild != null)
-                                                                d.getProperty(data.Attributes.GetNamedItem("alias").Value).Value = data.FirstChild.Value;
-                                                            else
-                                                                d.getProperty(data.Attributes.GetNamedItem("alias").Value).Value = "";
-                                                        */
+                            //send notifications! TODO: This should be put somewhere centralized instead of hard coded directly here
+                            ApplicationContext.Services.NotificationService.SendNotification(d.Content, ActionTranslate.Instance, ApplicationContext);
 
                             t.Closed = true;
                             t.Save();
