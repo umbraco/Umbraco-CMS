@@ -80,7 +80,7 @@
     <AssemblyOriginatorKeyFile>..\Solution Items\TheFARM-Public.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Examine, Version=0.1.52.2941, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Examine">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Examine.0.1.52.2941\lib\Examine.dll</HintPath>
     </Reference>
