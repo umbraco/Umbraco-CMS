@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Web;
 using System.Xml;
@@ -11,6 +12,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Querying;
 using umbraco.cms.businesslogic.cache;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -63,6 +65,12 @@ namespace umbraco.cms.businesslogic.member
 
         #region Constructors
 
+        internal Member(IMember member)
+            : base(member)
+        {
+            SetupNode(member);
+        }
+
         /// <summary>
         /// Initializes a new instance of the Member class.
         /// </summary>
@@ -103,20 +111,10 @@ namespace umbraco.cms.businesslogic.member
 
         public static IEnumerable<Member> GetAllAsList()
         {
-            var tmp = new List<Member>();
-            using (var dr = SqlHelper.ExecuteReader(
-                                        string.Format(_sQLOptimizedMany.Trim(), "1=1", "umbracoNode.text"),
-                                            SqlHelper.CreateParameter("@nodeObjectType", Member._objectType)))
-            {
-                while (dr.Read())
-                {
-                    var m = new Member(dr.GetInt("id"), true);
-                    m.PopulateMemberFromReader(dr);
-                    tmp.Add(m);
-                }
-            }
-
-            return tmp.ToArray();
+            int totalRecs;
+            return ApplicationContext.Current.Services.MemberService.GetAllMembers(0, int.MaxValue, out totalRecs)
+                .Select(x => new Member(x))
+                .ToArray();
         }
 
         /// <summary>
@@ -149,7 +147,11 @@ namespace umbraco.cms.businesslogic.member
         /// <returns></returns>
         public static Member[] getMemberFromFirstLetter(char letter)
         {
-            return GetMemberByName(letter.ToString(), true);
+            int totalRecs;
+            return ApplicationContext.Current.Services.MemberService.FindMembersByUsername(
+                letter.ToString(CultureInfo.InvariantCulture), 0, int.MaxValue, out totalRecs, StringPropertyMatchType.StartsWith)
+                                     .Select(x => new Member(x))
+                                     .ToArray();
         }
 
         public static Member[] GetMemberByName(string usernameToMatch, bool matchByNameInsteadOfLogin)
@@ -214,7 +216,7 @@ namespace umbraco.cms.businesslogic.member
         {
             if (mbt == null) throw new ArgumentNullException("mbt");
 
-            var loginName = (!string.IsNullOrEmpty(LoginName)) ? LoginName : Name;
+            var loginName = (string.IsNullOrEmpty(LoginName) == false) ? LoginName : Name;
 
             if (string.IsNullOrEmpty(loginName))
                 throw new ArgumentException("The loginname must be different from an empty string", "loginName");
@@ -267,27 +269,12 @@ namespace umbraco.cms.businesslogic.member
         /// <returns>The member with the specified loginname - null if no Member with the login exists</returns>
         public static Member GetMemberFromLoginName(string loginName)
         {
-            if (string.IsNullOrEmpty(loginName))
-                throw new ArgumentException("The username of a Member must be different from an emptry string", "loginName");
-            if (IsMember(loginName))
-            {
-                var o = SqlHelper.ExecuteScalar<object>(
-                    "select nodeID from cmsMember where LoginName = @loginName",
-                    SqlHelper.CreateParameter("@loginName", loginName));
+            Mandate.ParameterNotNullOrEmpty(loginName, "loginName");
 
-                if (o == null)
-                    return null;
+            var found = ApplicationContext.Current.Services.MemberService.GetByUsername(loginName);
+            if (found == null) return null;
 
-                int tmpId;
-                if (!int.TryParse(o.ToString(), out tmpId))
-                    return null;
-
-                return new Member(tmpId);
-            }
-            else
-                HttpContext.Current.Trace.Warn("No member with loginname: " + loginName + " Exists");
-
-            return null;
+            return new Member(found);
         }
 
         /// <summary>
@@ -302,18 +289,10 @@ namespace umbraco.cms.businesslogic.member
             if (string.IsNullOrEmpty(email))
                 return null;
 
-            var o = SqlHelper.ExecuteScalar<object>(
-                "select nodeID from cmsMember where Email = @email",
-                SqlHelper.CreateParameter("@email", email.ToLower()));
+            var found = ApplicationContext.Current.Services.MemberService.GetByEmail(email);
+            if (found == null) return null;
 
-            if (o == null)
-                return null;
-
-            int tmpId;
-            if (!int.TryParse(o.ToString(), out tmpId))
-                return null;
-
-            return new Member(tmpId);
+            return new Member(found);
         }
 
         /// <summary>
@@ -328,21 +307,11 @@ namespace umbraco.cms.businesslogic.member
             if (string.IsNullOrEmpty(email))
                 return null;
 
-            var tmp = new List<Member>();
-            using (var dr = SqlHelper.ExecuteReader(string.Format(_sQLOptimizedMany.Trim(),
-                                        "Email = @email",
-                                        "umbracoNode.text"),
-                                            SqlHelper.CreateParameter("@nodeObjectType", Member._objectType),
-                                            SqlHelper.CreateParameter("@email", email.ToLower())))
-            {
-                while (dr.Read())
-                {
-                    var m = new Member(dr.GetInt("id"), true);
-                    m.PopulateMemberFromReader(dr);
-                    tmp.Add(m);
-                }
-            }
-            return tmp.ToArray();
+            int totalRecs;
+            var found = ApplicationContext.Current.Services.MemberService.FindMembersByEmail(
+                email, 0, int.MaxValue, out totalRecs, StringPropertyMatchType.Exact);
+
+            return found.Select(x => new Member(x)).ToArray();
         }
 
         /// <summary>
@@ -425,16 +394,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="dt">The membertype which are being deleted</param>
         public static void DeleteFromType(MemberType dt)
         {
-            var objs = getContentOfContentType(dt);
-            foreach (var c in objs)
-            {
-                // due to recursive structure document might already been deleted..
-                if (IsNode(c.UniqueId))
-                {
-                    var tmp = new Member(c.UniqueId);
-                    tmp.delete();
-                }
-            }
+            ApplicationContext.Current.Services.MemberService.DeleteMembersOfType(dt.Id);
         }
 
         #endregion
@@ -766,13 +726,7 @@ namespace umbraco.cms.businesslogic.member
         /// <returns></returns>
         public string GetPassword()
         {
-            if (string.IsNullOrEmpty(_password))
-            {
-                _password = SqlHelper.ExecuteScalar<string>(
-                "select Password from cmsMember where nodeId = @id",
-                SqlHelper.CreateParameter("@id", Id));
-            }
-            return _password;
+            return Content.Password;
         }
         
         /// <summary>
@@ -1113,19 +1067,7 @@ namespace umbraco.cms.businesslogic.member
 
             return HttpContext.Current.User.Identity.IsAuthenticated;
         }
-
-
-        /// <summary>
-        /// Make a lookup in the database to verify if a member truely exists
-        /// </summary>
-        /// <param name="nodeId">The node id of the member</param>
-        /// <returns>True is a record exists in db</returns>
-        private static bool MemberExists(int nodeId)
-        {
-            return ApplicationContext.Current.Services.MemberService.Exists(nodeId);
-        }
-
-
+        
         /// <summary>
         /// Gets the current visitors memberid
         /// </summary>

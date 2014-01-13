@@ -298,6 +298,11 @@ namespace Umbraco.Core.Persistence.Repositories
             totalRecords = Convert.ToInt32(pagedResult.TotalItems);
 
             //now that we have the user dto's we need to construct true members from the list.
+            if (totalRecords == 0)
+            {
+                return Enumerable.Empty<IUser>();
+            }
+
             var result = GetAll(pagedResult.Items.Select(x => x.Id).ToArray());
 
             //now we need to ensure this result is also ordered by the same order by clause
