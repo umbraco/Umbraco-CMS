@@ -1021,7 +1021,7 @@ namespace Umbraco.Core.Services
                 dictionaryItem = CreateNewDictionaryItem(key, dictionaryItemElement, languages);
             _localizationService.Save(dictionaryItem);
             items.Add(dictionaryItem);
-            items.AddRange(ImportDictionaryItems(dictionaryItemElement, languages));
+            items.AddRange(ImportDictionaryItems(dictionaryItemElement, languages, true));
             return items;
         }
 

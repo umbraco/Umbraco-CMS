@@ -223,7 +223,7 @@ namespace Umbraco.Core.Services
 
                 // make sure to only highlight changes done using TinyMCE editor... other changes will be displayed using default summary
                 // TODO: We should probably allow more than just tinymce??
-                if ((p.PropertyType.DataTypeId == Guid.Parse(Constants.PropertyEditors.TinyMCEv3) || p.PropertyType.DataTypeId == Guid.Parse(Constants.PropertyEditors.TinyMCE)) 
+                if ((p.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.TinyMCEAlias) 
                     && string.CompareOrdinal(oldText, newText) != 0)
                 {
                     summary.Append("<tr>");
@@ -285,15 +285,13 @@ namespace Umbraco.Core.Services
                                 };
 
             // create the mail message 
-            var mail = new MailMessage(UmbracoSettings.NotificationEmailSender, mailingUser.Email);
+            var mail = new MailMessage(UmbracoConfig.For.UmbracoSettings().Content.NotificationEmailAddress, mailingUser.Email);
 
             // populate the message
             mail.Subject = createSubject(mailingUser, subjectVars);
-            //mail.Subject = ui.Text("notifications", "mailSubject", subjectVars, mailingUser);
-            if (UmbracoSettings.NotificationDisableHtmlEmail)
+            if (UmbracoConfig.For.UmbracoSettings().Content.DisableHtmlEmail)
             {
                 mail.IsBodyHtml = false;
-                //mail.Body = ui.Text("notifications", "mailBody", bodyVars, mailingUser);
                 mail.Body = createBody(mailingUser, bodyVars);
             }
             else
@@ -304,7 +302,6 @@ namespace Umbraco.Core.Services
 </head>
 <body style='font-family: Trebuchet MS, arial, sans-serif; font-color: black;'>
 " + createBody(mailingUser, bodyVars);
-                //ui.Text("notifications", "mailBodyHtml", bodyVars, mailingUser) + "</body></html>";
             }
 
             // nh, issue 30724. Due to hardcoded http strings in resource files, we need to check for https replacements here
