@@ -28,6 +28,7 @@ namespace Umbraco.Core.Services
         //private Lazy<ISectionService> _sectionService;
         //private Lazy<IMacroService> _macroService;
         private Lazy<IMemberTypeService> _memberTypeService;
+        private Lazy<INotificationService> _notificationService;
 
         /// <summary>
         /// public ctor - will generally just be used for unit testing
@@ -98,6 +99,9 @@ namespace Umbraco.Core.Services
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
 
+            if (_notificationService == null)
+                _notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, _userService.Value, _contentService.Value));
+
             if (_serverRegistrationService == null)
                 _serverRegistrationService = new Lazy<ServerRegistrationService>(() => new ServerRegistrationService(provider, repositoryFactory.Value));
 
@@ -146,6 +150,14 @@ namespace Umbraco.Core.Services
             if (_memberTypeService == null)
                 _memberTypeService = new Lazy<IMemberTypeService>(() => new MemberTypeService(provider, repositoryFactory.Value, _memberService.Value));
             
+        }
+
+        /// <summary>
+        /// Gets the <see cref="INotificationService"/>
+        /// </summary>
+        internal INotificationService NotificationService
+        {
+            get { return _notificationService.Value; }
         }
 
         /// <summary>

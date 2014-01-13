@@ -71,7 +71,7 @@ namespace umbraco.cms.businesslogic.workflow
             }
         }
 
-        ///TODO: Include update with html mail notification and document contents
+        //TODO: Include update with html mail notification and document contents
         private static void SendNotification(User performingUser, User mailingUser, Document documentObject, IAction action)
         {
             // retrieve previous version of the document
