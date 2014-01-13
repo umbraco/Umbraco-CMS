@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
+using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
