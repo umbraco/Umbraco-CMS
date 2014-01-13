@@ -320,8 +320,13 @@ namespace Umbraco.Core.Services
                 {
                     try
                     {
-                        var sender = new SmtpClient();
-                        sender.Send(mail);
+                        using (mail)
+                        {
+                            using (var sender = new SmtpClient())
+                            {
+                                sender.Send(mail);
+                            }    
+                        }
                     }
                     catch (Exception ex)
                     {

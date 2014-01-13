@@ -338,6 +338,7 @@
     <Compile Include="Models\TagModel.cs" />
     <Compile Include="Models\UpgradeCheckResponse.cs" />
     <Compile Include="Models\PasswordChangedModel.cs" />
+    <Compile Include="NotificationServiceExtensions.cs" />
     <Compile Include="PropertyEditors\ColorListPreValueEditor.cs" />
     <Compile Include="PropertyEditors\EmailAddressPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ListViewPropertyEditor.cs" />
@@ -407,6 +408,7 @@
     <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Strategies\Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
+    <Compile Include="Strategies\NotificationsHandler.cs" />
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
