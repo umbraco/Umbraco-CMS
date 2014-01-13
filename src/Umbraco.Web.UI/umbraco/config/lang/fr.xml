@@ -549,10 +549,8 @@ Pour gerer votre site, accéder simplement au back office et commencez à contri
 		  par l'utilisateur <strong>'%3%'</strong>
 	  </p>
 		  <div class="buttons">
-				<br />
-				<a class="buttonPublish" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLIER&nbsp;&nbsp;</a> &nbsp; 
+				<br />				
 				<a class="buttonEdit" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDITER&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
-				<a class="buttonDelete" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;SUPPRIMER&nbsp;&nbsp;&nbsp;&nbsp;</a>
 				<br />
 		  </div>
 		  <p>
@@ -564,9 +562,7 @@ Pour gerer votre site, accéder simplement au back office et commencez à contri
 
 		  <div class="buttons">
 				<br />
-				<a class="buttonPublish" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLIER&nbsp;&nbsp;</a> &nbsp; 
 				<a class="buttonEdit" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDITER&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
-				<a class="buttonDelete" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;SUPPRIMER&nbsp;&nbsp;&nbsp;&nbsp;</a>
 				<br />
 		  </div>
 
