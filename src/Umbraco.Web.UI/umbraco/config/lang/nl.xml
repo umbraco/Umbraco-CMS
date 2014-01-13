@@ -437,7 +437,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
       is uitgevoerd op pagina '%2%'
       door gebruiker '%3%'
 
-      Ga naar http://%4%/actions/editContent.aspx?id=%5% om te bewerken.
+      Ga naar http://%4%/#/content/content/edit/%5% om te bewerken.
 
       Een prettige dag!
 
@@ -453,7 +453,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
 		  <div class="buttons">
 				<br />
 				<a class="buttonPublish" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISH&nbsp;&nbsp;</a> &nbsp; 
-				<a class="buttonEdit" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a class="buttonEdit" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
 				<a class="buttonDelete" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;DELETE&nbsp;&nbsp;&nbsp;&nbsp;</a>
 				<br />
 		  </div>
@@ -467,7 +467,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
 		  <div class="buttons">
 				<br />
 				<a class="buttonPublish" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISH&nbsp;&nbsp;</a> &nbsp; 
-				<a class="buttonEdit" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a class="buttonEdit" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
 				<a class="buttonDelete" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;DELETE&nbsp;&nbsp;&nbsp;&nbsp;</a>
 				<br />
 		  </div>

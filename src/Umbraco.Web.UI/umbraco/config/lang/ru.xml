@@ -515,7 +515,7 @@
 		Операция '%1%'
 		была произведена на странице '%2%' пользователем '%3%'.
 
-		Вы можете увидеть изменения и отредактировать, перейдя по ссылке http://%4%/actions/editContent.aspx?id=%5%.
+		Вы можете увидеть изменения и отредактировать, перейдя по ссылке http://%4%/#/content/content/edit/%5%.
 
 		Удачи!
 
@@ -530,7 +530,7 @@
 		<div style="margin: 8px 0; padding: 8px; display: block;">
 			<br />
 			<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;ОПУБЛИКОВАТЬ&nbsp;&nbsp;</a>&nbsp;
-			<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ИЗМЕНИТЬ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
+			<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ИЗМЕНИТЬ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 			<a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;УДАЛИТЬ&nbsp;&nbsp;&nbsp;&nbsp;</a>
 			<br />
 		</div>
@@ -545,7 +545,7 @@
 		<div style="margin: 8px 0; padding: 8px; display: block;">
 			<br />
 			<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;ОПУБЛИКОВАТЬ&nbsp;&nbsp;</a> &nbsp;
-			<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ИЗМЕНИТЬ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
+			<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ИЗМЕНИТЬ&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp;
 			<a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;УДАЛИТЬ&nbsp;&nbsp;&nbsp;&nbsp;</a>
 			<br />
 		</div>

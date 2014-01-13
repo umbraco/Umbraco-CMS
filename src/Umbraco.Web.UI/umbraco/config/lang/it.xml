@@ -458,7 +458,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
       è stata eseguita sulla pagina '%2%'
       dall'utente '%3%'
 
-      Vai al link http://%4%/actions/editContent.aspx?id=%5% per effettuare le modifiche.
+      Vai al link http://%4%/#/content/content/edit/%5% per effettuare le modifiche.
 
       Buona giornata!
 
@@ -474,7 +474,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
 				<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBBLICA&nbsp;&nbsp;</a> &nbsp; 
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MODIFICA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;MODIFICA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
 				<a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;ELIMINA&nbsp;&nbsp;&nbsp;&nbsp;</a>
 				<br />
 		  </div>
@@ -488,7 +488,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
 				<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISH&nbsp;&nbsp;</a> &nbsp; 
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
 				<a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;DELETE&nbsp;&nbsp;&nbsp;&nbsp;</a>
 				<br />
 		  </div>
