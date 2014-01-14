@@ -93,7 +93,7 @@ namespace Umbraco.Core.Services
             }
 
             if(raiseEvents)
-                ContentExported.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
+                ExportedContent.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
 
             return xml;
         }
@@ -181,7 +181,7 @@ namespace Umbraco.Core.Services
                     _contentService.Save(contents, userId);
 
                 if(raiseEvents)
-                    ContentImported.RaiseEvent(new SaveEventArgs<IContent>(contents, false), this);
+                    ImportedContent.RaiseEvent(new SaveEventArgs<IContent>(contents, false), this);
                 return contents;
             }
 
@@ -195,7 +195,7 @@ namespace Umbraco.Core.Services
                     _contentService.Save(contents, userId);
 
                 if(raiseEvents)
-                    ContentImported.RaiseEvent(new SaveEventArgs<IContent>(contents, false), this);
+                    ImportedContent.RaiseEvent(new SaveEventArgs<IContent>(contents, false), this);
                 return contents;
             }
 
@@ -398,7 +398,7 @@ namespace Umbraco.Core.Services
                                    tabs);
 
             if (raiseEvents)
-                ContentTypeExported.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
+                ExportedContentType.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
 
             return xml;
         }
@@ -478,7 +478,7 @@ namespace Umbraco.Core.Services
             }
 
             if (raiseEvents)
-                ContentTypeImported.RaiseEvent(new SaveEventArgs<IContentType>(list, false), this);
+                ImportedContentType.RaiseEvent(new SaveEventArgs<IContentType>(list, false), this);
 
             return list;
         }
@@ -804,7 +804,7 @@ namespace Umbraco.Core.Services
             xml.Add(new XAttribute("DatabaseType", dataTypeDefinition.DatabaseType.ToString()));
 
             if (raiseEvents)
-                DataTypeExported.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
+                ExportedDataType.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
 
             return xml;
         }
@@ -888,7 +888,7 @@ namespace Umbraco.Core.Services
             }
 
             if (raiseEvents)
-                DataTypeImported.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(list, false), this);
+                ImportedDataType.RaiseEvent(new SaveEventArgs<IDataTypeDefinition>(list, false), this);
 
             return list;
         }
@@ -974,7 +974,7 @@ namespace Umbraco.Core.Services
             }
 
             if (raiseEvents)
-                DictionaryItemExported.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
+                ExportedDictionaryItem.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
 
             return xml;
         }
@@ -1004,7 +1004,7 @@ namespace Umbraco.Core.Services
                 items.AddRange(ImportDictionaryItem(dictionaryItemElement, languages, raiseEvents));
 
             if (raiseEvents)
-                DictionaryItemImported.RaiseEvent(new SaveEventArgs<IDictionaryItem>(items, false), this);
+                ImportedDictionaryItem.RaiseEvent(new SaveEventArgs<IDictionaryItem>(items, false), this);
 
             return items;
         }
@@ -1107,7 +1107,7 @@ namespace Umbraco.Core.Services
                 new XAttribute("FriendlyName", language.CultureName));
 
             if (raiseEvents)
-                LanguageExported.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
+                ExportedLanguage.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
 
             return xml;
         }
@@ -1143,7 +1143,7 @@ namespace Umbraco.Core.Services
             }
 
             if (raiseEvents)
-                LanguageImported.RaiseEvent(new SaveEventArgs<ILanguage>(list, false), this);
+                ImportedLanguage.RaiseEvent(new SaveEventArgs<ILanguage>(list, false), this);
 
             return list;
         }
@@ -1214,7 +1214,7 @@ namespace Umbraco.Core.Services
             }
 
             if(raiseEvents)
-                MediaExported.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
+                ExportedMedia.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
 
             return xml;
         }
@@ -1395,7 +1395,7 @@ namespace Umbraco.Core.Services
                 _fileService.SaveTemplate(templates, userId);
 
             if(raiseEvents)
-                TemplateImported.RaiseEvent(new SaveEventArgs<ITemplate>(templates, false), this);
+                ImportedTemplate.RaiseEvent(new SaveEventArgs<ITemplate>(templates, false), this);
 
             return templates;
         }
@@ -1430,7 +1430,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs after Content is Imported and Saved
         /// </summary>
-        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IContent>> ContentImported;
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IContent>> ImportedContent;
 
         /// <summary>
         /// Occurs before Exporting Content
@@ -1440,7 +1440,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs after Content is Exported to Xml
         /// </summary>
-        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ContentExported;
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ExportedContent;
 
         /// <summary>
         /// Occurs before Exporting Media
@@ -1450,7 +1450,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs after Media is Exported to Xml
         /// </summary>
-        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> MediaExported;
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ExportedMedia;
 
         /// <summary>
         /// Occurs before Importing ContentType
@@ -1460,7 +1460,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs after ContentType is Imported and Saved
         /// </summary>
-        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IContentType>> ContentTypeImported;
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IContentType>> ImportedContentType;
 
         /// <summary>
         /// Occurs before Exporting ContentType
@@ -1470,7 +1470,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs after ContentType is Exported to Xml
         /// </summary>
-        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ContentTypeExported;
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ExportedContentType;
 
         /// <summary>
         /// Occurs before Importing DataType
@@ -1480,7 +1480,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs after DataType is Imported and Saved
         /// </summary>
-        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IDataTypeDefinition>> DataTypeImported;
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IDataTypeDefinition>> ImportedDataType;
 
         /// <summary>
         /// Occurs before Exporting DataType
@@ -1490,7 +1490,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs after DataType is Exported to Xml
         /// </summary>
-        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> DataTypeExported;
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ExportedDataType;
 
         /// <summary>
         /// Occurs before Importing DictionaryItem
@@ -1500,7 +1500,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs after DictionaryItem is Imported and Saved
         /// </summary>
-        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IDictionaryItem>> DictionaryItemImported;
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IDictionaryItem>> ImportedDictionaryItem;
 
         /// <summary>
         /// Occurs before Exporting DictionaryItem
@@ -1510,7 +1510,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs after DictionaryItem is Exported to Xml
         /// </summary>
-        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> DictionaryItemExported;
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ExportedDictionaryItem;
 
         /// <summary>
         /// Occurs before Importing Language
@@ -1520,7 +1520,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs after Language is Imported and Saved
         /// </summary>
-        public static event TypedEventHandler<IPackagingService, SaveEventArgs<ILanguage>> LanguageImported;
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<ILanguage>> ImportedLanguage;
 
         /// <summary>
         /// Occurs before Exporting Language
@@ -1530,7 +1530,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs after Language is Exported to Xml
         /// </summary>
-        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> LanguageExported;
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ExportedLanguage;
 
         /// <summary>
         /// Occurs before Importing Template
@@ -1540,7 +1540,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs after Template is Imported and Saved
         /// </summary>
-        public static event TypedEventHandler<IPackagingService, SaveEventArgs<ITemplate>> TemplateImported;
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<ITemplate>> ImportedTemplate;
         #endregion
     }
 }
