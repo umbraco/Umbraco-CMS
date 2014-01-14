@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web;
+using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using Umbraco.Core.Security;
 
 namespace umbraco.presentation.members {
     public partial class ViewMembers : BasePages.UmbracoEnsuredPage {
@@ -20,7 +22,7 @@ namespace umbraco.presentation.members {
         private void bindRp() {
             string _letter = Request.QueryString["letter"];
             if (!string.IsNullOrEmpty(_letter)) {
-                if (cms.businesslogic.member.Member.InUmbracoMemberMode())
+                if (Membership.Provider.IsUmbracoMembershipProvider())
                 {
                     if (_letter == "#")
                     {
@@ -41,7 +43,7 @@ namespace umbraco.presentation.members {
 
         public void bindMember(object sender, RepeaterItemEventArgs e) {
             if (e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem) {
-                if (cms.businesslogic.member.Member.InUmbracoMemberMode())
+                if (Membership.Provider.IsUmbracoMembershipProvider())
                 {
                     cms.businesslogic.member.Member mem = (cms.businesslogic.member.Member)e.Item.DataItem;
                     Literal _name = (Literal)e.Item.FindControl("lt_name");

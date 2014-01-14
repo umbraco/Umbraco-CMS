@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Xml;
 using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.propertytype;
@@ -236,6 +237,7 @@ namespace umbraco.cms.businesslogic.member
         /// </summary>
         /// <param name="Text">The name of the MemberType</param>
         /// <param name="u">Creator of the MemberType</param>
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public static MemberType MakeNew(User u, string Text)
         {
             int ParentId = -1;
@@ -243,7 +245,10 @@ namespace umbraco.cms.businesslogic.member
             Guid uniqueId = Guid.NewGuid();
             CMSNode n = CMSNode.MakeNew(ParentId, _objectType, u.Id, level, Text, uniqueId);
 
-            ContentType.Create(n.Id, Text, "");
+            ContentType.Create(n.Id, Text, "",
+                //don't format the alias if it equals this. See: http://issues.umbraco.org/issue/U4-3968
+                Text != "_umbracoSystemDefaultProtectType");
+            
             MemberType mt = new MemberType(n.Id);
             mt.IconUrl = "member.gif";
             NewEventArgs e = new NewEventArgs();
