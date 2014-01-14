@@ -5,8 +5,10 @@ using System.Data;
 using System.IO;
 using System.Text;
 using System.Web;
+using System.Web.Security;
 using System.Xml;
 using System.Configuration;
+using Umbraco.Core.Security;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic;
@@ -39,7 +41,7 @@ namespace umbraco
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
         {                              
             // only show member types if we're using umbraco members on the website
-            if (Member.InUmbracoMemberMode())
+            if (Membership.Provider.IsUmbracoMembershipProvider())
             {
 				rootNode.NodeType = "init" + TreeAlias;
 				rootNode.NodeID = "init";

@@ -5,8 +5,10 @@ using System.Data;
 using System.IO;
 using System.Text;
 using System.Web;
+using System.Web.Security;
 using System.Xml;
 using System.Configuration;
+using Umbraco.Core.Security;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic;
@@ -156,7 +158,7 @@ function openContentItem(id) {
                     }
                     else
                     {
-                        if (Member.InUmbracoMemberMode())
+                        if (Membership.Provider.IsUmbracoMembershipProvider())
                         {
                             foreach (Member m in Member.getMemberFromFirstLetter(letter.ToCharArray()[0]))
                             {
@@ -220,7 +222,7 @@ function openContentItem(id) {
                 }
 
                 //Add folder named "Others", only supported by umbraco
-                if (Member.InUmbracoMemberMode())
+                if (Membership.Provider.IsUmbracoMembershipProvider())
                 {
                     XmlElement treeElementOther = Tree.CreateElement("tree");
                     treeElementOther.SetAttribute("menu", "");

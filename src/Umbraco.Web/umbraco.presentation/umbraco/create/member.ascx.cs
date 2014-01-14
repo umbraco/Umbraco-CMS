@@ -24,7 +24,7 @@ namespace umbraco.cms.presentation.create.controls
         protected void Page_Load(object sender, System.EventArgs e)
         {
             sbmt.Text = ui.Text("create");
-            if (cms.businesslogic.member.Member.InUmbracoMemberMode())
+            if (Membership.Provider.IsUmbracoMembershipProvider())
             {
                 nameLiteral.Text = ui.Text("name");
                 memberChooser.Attributes.Add("style", "padding-top: 10px");

@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Xml;
 using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.propertytype;
@@ -236,6 +237,7 @@ namespace umbraco.cms.businesslogic.member
         /// </summary>
         /// <param name="Text">The name of the MemberType</param>
         /// <param name="u">Creator of the MemberType</param>
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public static MemberType MakeNew(User u, string Text)
         {
             int ParentId = -1;

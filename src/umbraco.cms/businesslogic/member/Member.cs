@@ -21,6 +21,7 @@ using System.Web.Security;
 using System.Text;
 using System.Security.Cryptography;
 using System.Linq;
+using Umbraco.Core.Security;
 
 namespace umbraco.cms.businesslogic.member
 {
@@ -213,6 +214,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="u">The umbraco usercontext</param>
         /// <param name="Email">The email of the user</param>
         /// <returns>The new member</returns>
+        [MethodImpl(MethodImplOptions.Synchronized)]
         public static Member MakeNew(string Name, string LoginName, string Email, MemberType mbt, User u)
         {
             if (mbt == null) throw new ArgumentNullException("mbt");
@@ -363,9 +365,10 @@ namespace umbraco.cms.businesslogic.member
             return new Member(tmpId);
         }
 
+        [Obsolete("Use MembershipProviderExtensions.IsUmbracoMembershipProvider instead")]
         public static bool InUmbracoMemberMode()
         {
-            return Membership.Provider.Name == UmbracoMemberProviderName;
+            return Membership.Provider.IsUmbracoMembershipProvider();
         }
 
         public static bool IsUsingUmbracoRoles()
