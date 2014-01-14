@@ -741,6 +741,7 @@
     <Compile Include="RenderingEngine.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />
     <Compile Include="Security\MembershipProviderBase.cs" />
+    <Compile Include="Security\MembershipProviderExtensions.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
     <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
     <Compile Include="Security\UserData.cs" />

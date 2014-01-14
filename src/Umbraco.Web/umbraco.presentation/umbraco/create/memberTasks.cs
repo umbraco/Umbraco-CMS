@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Globalization;
 using System.Web.Security;
+using Umbraco.Core.Security;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
 using umbraco.BasePages;
@@ -75,7 +76,7 @@ namespace umbraco
             string email = nameAndMail.Length > 0 ? nameAndMail[1] : "";
             string password = nameAndMail.Length > 1 ? nameAndMail[2] : "";
             string loginName = nameAndMail.Length > 2 ? nameAndMail[3] : "";
-            if (Member.InUmbracoMemberMode() && TypeID != -1)
+            if (Membership.Provider.IsUmbracoMembershipProvider() && TypeID != -1)
             {
                 var dt = new MemberType(TypeID);                
                 var provider = (providers.members.UmbracoMembershipProvider) Membership.Provider;

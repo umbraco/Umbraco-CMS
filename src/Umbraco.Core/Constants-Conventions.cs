@@ -255,6 +255,8 @@ namespace Umbraco.Core
 				/// MemberType alias for default member type.
 				/// </summary>
 				public const string Member = "Member";
+
+                public const string SystemDefaultProtectType = "_umbracoSystemDefaultProtectType";
 			}
 
 			/// <summary>

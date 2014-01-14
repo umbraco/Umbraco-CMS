@@ -20,6 +20,7 @@ using System.Web.Security;
 using System.Text;
 using System.Security.Cryptography;
 using System.Linq;
+using Umbraco.Core.Security;
 
 namespace umbraco.cms.businesslogic.member
 {
@@ -363,9 +364,10 @@ namespace umbraco.cms.businesslogic.member
             return new Member(tmpId);
         }
 
+        [Obsolete("Use MembershipProviderExtensions.IsUmbracoMembershipProvider instead")]
         public static bool InUmbracoMemberMode()
         {
-            return Membership.Provider.Name == UmbracoMemberProviderName;
+            return Membership.Provider.IsUmbracoMembershipProvider();
         }
 
         public static bool IsUsingUmbracoRoles()

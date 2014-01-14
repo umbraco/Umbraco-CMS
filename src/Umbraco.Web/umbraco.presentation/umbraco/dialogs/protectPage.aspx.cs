@@ -3,11 +3,13 @@ using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Windows.Forms.VisualStyles;
+using Umbraco.Core;
 using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.web;
 using umbraco.controls;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
+using Umbraco.Core.Security;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
@@ -183,11 +185,11 @@ namespace umbraco.presentation.umbraco.dialogs
 
                 if (e.CommandName == "simple")
                 {
-                    MembershipUser member = Membership.GetUser(simpleLogin.Text);
+                    var member = Membership.GetUser(simpleLogin.Text);
                     if (member == null)
                     {
                         // this needs to work differently depending on umbraco members or external membership provider
-                        if (!cms.businesslogic.member.Member.InUmbracoMemberMode())
+                        if (Membership.Provider.IsUmbracoMembershipProvider() == false)
                         {
                             member = Membership.CreateUser(simpleLogin.Text, simplePassword.Text);
                         }
@@ -195,19 +197,18 @@ namespace umbraco.presentation.umbraco.dialogs
                         {
                             try
                             {
-                                if (
-                                    cms.businesslogic.member.MemberType.GetByAlias("_umbracoSystemDefaultProtectType") == null)
+                                if (cms.businesslogic.member.MemberType.GetByAlias(Constants.Conventions.MemberTypes.SystemDefaultProtectType) == null)
                                 {
-                                    cms.businesslogic.member.MemberType.MakeNew(BusinessLogic.User.GetUser(0), "_umbracoSystemDefaultProtectType");
+                                    cms.businesslogic.member.MemberType.MakeNew(BusinessLogic.User.GetUser(0), Constants.Conventions.MemberTypes.SystemDefaultProtectType);
                                 }
                             }
                             catch
                             {
-                                cms.businesslogic.member.MemberType.MakeNew(BusinessLogic.User.GetUser(0), "_umbracoSystemDefaultProtectType");
+                                cms.businesslogic.member.MemberType.MakeNew(BusinessLogic.User.GetUser(0), Constants.Conventions.MemberTypes.SystemDefaultProtectType);
                             }
 
                             // create member
-                            Member mem = cms.businesslogic.member.Member.MakeNew(simpleLogin.Text, "", cms.businesslogic.member.MemberType.GetByAlias("_umbracoSystemDefaultProtectType"), base.getUser());
+                            Member mem = cms.businesslogic.member.Member.MakeNew(simpleLogin.Text, "", cms.businesslogic.member.MemberType.GetByAlias(Constants.Conventions.MemberTypes.SystemDefaultProtectType), UmbracoUser);
                             // working around empty password restriction for Umbraco Member Mode
                             mem.Password = simplePassword.Text;
                             member = Membership.GetUser(simpleLogin.Text);
@@ -215,6 +216,8 @@ namespace umbraco.presentation.umbraco.dialogs
                     }
                     else
                     {
+                        //Membership.Provider.ChangePassword(member.UserName, )
+
                         // change password if it's not empty
                         if (string.IsNullOrWhiteSpace(simplePassword.Text) == false)
                         {
@@ -225,11 +228,11 @@ namespace umbraco.presentation.umbraco.dialogs
 
                     // Create or find a memberGroup
                     string simpleRoleName = "__umbracoRole_" + simpleLogin.Text;
-                    if (!Roles.RoleExists(simpleRoleName))
+                    if (Roles.RoleExists(simpleRoleName) == false)
                     {
                         Roles.CreateRole(simpleRoleName);
                     }
-                    if (!Roles.IsUserInRole(member.UserName, simpleRoleName))
+                    if (Roles.IsUserInRole(member.UserName, simpleRoleName) == false)
                     {
                         Roles.AddUserToRole(member.UserName, simpleRoleName);
                     }
@@ -240,13 +243,13 @@ namespace umbraco.presentation.umbraco.dialogs
                 }
                 else if (e.CommandName == "advanced")
                 {
-                    cms.businesslogic.web.Access.ProtectPage(false, pageId, int.Parse(loginPagePicker.Value), int.Parse(errorPagePicker.Value));
+                    Access.ProtectPage(false, pageId, int.Parse(loginPagePicker.Value), int.Parse(errorPagePicker.Value));
 
                     foreach (ListItem li in _memberGroups.Items)
                         if (("," + _memberGroups.Value + ",").IndexOf("," + li.Value + ",") > -1)
-                            cms.businesslogic.web.Access.AddMembershipRoleToDocument(pageId, li.Value);
+                            Access.AddMembershipRoleToDocument(pageId, li.Value);
                         else
-                            cms.businesslogic.web.Access.RemoveMembershipRoleFromDocument(pageId, li.Value);
+                            Access.RemoveMembershipRoleFromDocument(pageId, li.Value);
                 }
 
                 feedback.Text = ui.Text("publicAccess", "paIsProtected", new cms.businesslogic.CMSNode(pageId).Text, null) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";

@@ -5,6 +5,7 @@ using System.Web.UI.Design.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using Umbraco.Core.IO;
+using Umbraco.Core.Security;
 using Umbraco.Web;
 using Umbraco.Web.Security;
 using umbraco.cms.businesslogic.member;
@@ -63,7 +64,7 @@ namespace umbraco.cms.presentation.members
             MemberPasswordTxt.Controls.Add(passwordChanger);
             MemberPasswordTxt.Controls.Add(validatorContainer);
 
-            if (Member.InUmbracoMemberMode())
+            if (Membership.Provider.IsUmbracoMembershipProvider())
             {
                 _document = new Member(int.Parse(Request.QueryString["id"]));
                 _member = Membership.GetUser(_document.LoginName, false);
@@ -163,7 +164,7 @@ namespace umbraco.cms.presentation.members
 
             p.addProperty(ui.Text("membergroup"), _memberGroups);
 
-            if (Member.InUmbracoMemberMode())
+            if (Membership.Provider.IsUmbracoMembershipProvider())
             {
                 _contentControl.tpProp.Controls.Add(p);
                 _contentControl.Save += new System.EventHandler(tmp_save);
@@ -279,7 +280,7 @@ namespace umbraco.cms.presentation.members
             else
             {
                 // hide validation summaries
-                if (Member.InUmbracoMemberMode())
+                if (Membership.Provider.IsUmbracoMembershipProvider())
                 {                    
                     foreach (uicontrols.TabPage tp in _contentControl.GetPanels())
                     {
@@ -295,7 +296,7 @@ namespace umbraco.cms.presentation.members
                 //update the membership provider
                 UpdateMembershipProvider(_member);
 
-                if (Member.InUmbracoMemberMode())
+                if (Membership.Provider.IsUmbracoMembershipProvider())
                 {
                     //Hrm, with the membership provider you cannot change the login name - I guess this will do that 
                     // in the underlying data layer
