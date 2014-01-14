@@ -200,9 +200,16 @@ namespace umbraco.cms.businesslogic
         /// <param name="IconUrl">The Iconurl of Contents of this ContentType</param>
         protected static void Create(int NodeId, string Alias, string IconUrl)
         {
+            Create(NodeId, Alias, IconUrl, true);
+        }
+
+        internal static void Create(int nodeId, string alias, string iconUrl, bool formatAlias)
+        {
             SqlHelper.ExecuteNonQuery(
-                                      "Insert into cmsContentType (nodeId,alias,icon) values (" + NodeId + ",'" + helpers.Casing.SafeAliasWithForcingCheck(Alias) +
-                                      "','" + IconUrl + "')");
+                                      "Insert into cmsContentType (nodeId,alias,icon) values (" + 
+                                      nodeId + ",'" +
+                                      (formatAlias ? helpers.Casing.SafeAliasWithForcingCheck(alias) : alias) +
+                                      "','" + iconUrl + "')");
         }
 
         /// <summary>

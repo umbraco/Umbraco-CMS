@@ -15,6 +15,7 @@ namespace Umbraco.Core.Models
     {
         //Dictionary is divided into string: PropertyTypeAlias, Tuple: MemberCanEdit, VisibleOnProfile, PropertyTypeId
         private IDictionary<string, Tuple<bool, bool, int>> _memberTypePropertyTypes;
+        private string _alias;
 
         public MemberType(int parentId) : base(parentId)
         {
@@ -27,6 +28,29 @@ namespace Umbraco.Core.Models
         }
 
         private static readonly PropertyInfo MemberTypePropertyTypesSelector = ExpressionHelper.GetPropertyInfo<MemberType, IDictionary<string, Tuple<bool, bool, int>>>(x => x.MemberTypePropertyTypes);
+        private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<MemberType, string>(x => x.Alias);
+
+        /// <summary>
+        /// The Alias of the ContentType
+        /// </summary>
+        [DataMember]
+        public override string Alias
+        {
+            get { return _alias; }
+            set
+            {
+                //NOTE: WE are overriding this because we don't want to do a ToSafeAlias when the alias is the special case of
+                // "_umbracoSystemDefaultProtectType" which is used internally, currently there is an issue with the safe alias as it strips
+                // leading underscores which we don't want in this case.
+                // see : http://issues.umbraco.org/issue/U4-3968
+
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _alias = value == "_umbracoSystemDefaultProtectType" ? value : value.ToSafeAlias();
+                    return _alias;
+                }, _alias, AliasSelector);
+            }
+        }
 
         /// <summary>
         /// Gets or Sets a Dictionary of Tuples (MemberCanEdit, VisibleOnProfile, PropertyTypeId) by the PropertyTypes' alias.
