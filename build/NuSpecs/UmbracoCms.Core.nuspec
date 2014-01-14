@@ -26,7 +26,7 @@
             <dependency id="SharpZipLib" version="[0.86.0, 1.0.0)" />
             <dependency id="MySql.Data" version="[6.6.5]" />
             <dependency id="xmlrpcnet" version="[2.5.0, 3.0.0)" />
-            <dependency id="ClientDependency" version="[1.7.0, 2.0.0)" />
+            <!--<dependency id="ClientDependency" version="[1.7.0, 2.0.0)" />-->
             <dependency id="ClientDependency-Mvc" version="[1.7.0, 2.0.0)" />
             <dependency id="AutoMapper" version="[3.0.0, 4.0.0)" />
             <dependency id="Newtonsoft.Json" version="[4.5.11, 5.0.0)" />
@@ -35,6 +35,7 @@
     <files>
         <file src="..\_BuildOutput\WebApp\bin\businesslogic.dll" target="lib\businesslogic.dll" />
         <file src="..\_BuildOutput\WebApp\bin\businesslogic.xml" target="lib\businesslogic.xml" />
+        <file src="..\_BuildOutput\WebApp\bin\ClientDependency.Core.dll" target="lib\ClientDependency.Core.dll" />
         <file src="..\_BuildOutput\WebApp\bin\cms.dll" target="lib\cms.dll" />
         <file src="..\_BuildOutput\WebApp\bin\cms.xml" target="lib\cms.xml" />
         <file src="..\_BuildOutput\WebApp\bin\controls.dll" target="lib\controls.dll" />

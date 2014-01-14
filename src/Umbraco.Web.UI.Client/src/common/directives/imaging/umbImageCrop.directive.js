@@ -1,17 +1,15 @@
 /**
 * @ngdoc directive
-* @name umbraco.directives.directive:umbCropsy
+* @name umbraco.directives.directive:umbImageCrop
 * @restrict E
 * @function
-* @description 
-* Used by editors that require naming an entity. Shows a textbox/headline with a required validator within it's own form.
 **/
 angular.module("umbraco.directives")
-	.directive('umbCropsy', function ($timeout, localizationService, $log) {
+	.directive('umbImageCrop', function ($timeout, localizationService, $log) {
 	    return {
 				restrict: 'E',
 				replace: true,
-				templateUrl: 'views/directives/umb-cropsy.html',
+				templateUrl: 'views/directives/umb-image-crop.html',
 				scope: {
 					src: '@',
 					width: '@',
@@ -27,6 +25,7 @@ angular.module("umbraco.directives")
 					//this will not have an effect on the result, since that is returned in percentage
 					scope.maxHeight = 500;
 					scope.maxWidth = 600;
+					
 					scope.width = 400;
 					scope.height = 320;
 

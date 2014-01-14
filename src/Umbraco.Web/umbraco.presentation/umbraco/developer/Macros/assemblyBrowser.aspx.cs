@@ -44,7 +44,11 @@ namespace umbraco.developer
                 if (Request.QueryString["type"] == null)
                 {
                     isUserControl = true;
-                    var fileName = Request.CleanForXss("fileName");
+                    var fileName = Request.QueryString["fileName"];
+                    //yes this is crap but the ClearnForXss cleans / - so this is a shortcut
+
+                    fileName = fileName.Replace('/', '@').CleanForXss().Replace('@', '/');
+
                     if (!fileName.StartsWith("~"))
                     {
                         if (fileName.StartsWith("/"))
