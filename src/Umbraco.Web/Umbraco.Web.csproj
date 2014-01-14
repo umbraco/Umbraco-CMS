@@ -420,6 +420,9 @@
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\dialogs\ProtectPage.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\emptyTrashcan.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1324,13 +1327,6 @@
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx.designer.cs">
       <DependentUpon>installer.aspx</DependentUpon>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\protectPage.aspx.cs">
-      <DependentUpon>protectPage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\protectPage.aspx.designer.cs">
-      <DependentUpon>protectPage.aspx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\RegexWs.aspx.cs">
       <DependentUpon>RegexWs.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1873,9 +1869,6 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\protectPage.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\RegexWs.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\sendToTranslation.aspx" />
@@ -1921,7 +1914,9 @@
       <SubType>UserControl</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\create\media.ascx" />
-    <Content Include="umbraco.presentation\umbraco\create\member.ascx" />
+    <Content Include="umbraco.presentation\umbraco\create\member.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\create\nodeType.ascx" />
     <Content Include="umbraco.presentation\umbraco\create\simple.ascx" />
     <Content Include="umbraco.presentation\umbraco\create\xslt.ascx" />

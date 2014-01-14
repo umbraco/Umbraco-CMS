@@ -20,5 +20,10 @@ namespace Umbraco.Core.Security
             return (membershipProvider is UmbracoMembershipProviderBase);
         }
 
+        public static UmbracoMembershipProviderBase AsUmbracoMembershipProvider(this MembershipProvider membershipProvider)
+        {
+            return (UmbracoMembershipProviderBase)membershipProvider;
+        }
+
     }
 }
