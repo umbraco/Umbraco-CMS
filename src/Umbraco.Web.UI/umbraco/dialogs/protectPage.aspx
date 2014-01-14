@@ -110,7 +110,7 @@
         <cc1:Pane ID="pane_simple" runat="server" Visible="false" Text="Single user protection">
           <cc1:PropertyPanel ID="PropertyPanel1" runat="server">
           <p> <%= umbraco.ui.Text("publicAccess", "paSetLogin", UmbracoUser)%></p>
-           <asp:CustomValidator runat="server" ID="SimpleLoginNameValidator" Display="Dynamic">
+           <asp:CustomValidator runat="server" ID="SimpleLoginNameValidator" Display="Dynamic" EnableViewState="False">
                <p class="notice" style="padding:5px;">Member name already exists, click <asp:LinkButton runat="server" OnClick="ChangeOnClick">Change</asp:LinkButton> to use a different name or Update to continue</p>
            </asp:CustomValidator>
           </cc1:PropertyPanel>

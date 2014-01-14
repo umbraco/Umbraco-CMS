@@ -208,6 +208,7 @@ namespace umbraco.presentation.umbraco.dialogs
                             {
                                 SimpleLoginNameValidator.IsValid = false;
                                 SimpleLoginNameValidator.ErrorMessage = "Could not create user: " + status;
+                                SimpleLoginNameValidator.Text = "Could not create user: " + status;
                                 return;
                             }
                         }
