@@ -23,7 +23,9 @@ namespace umbraco.cms.presentation.create.controls
         {
             // get all existing languages
 
+            pp1.Text = ui.Text("choose") + " " + ui.Text("language");
             sbmt.Text = ui.Text("create");
+
             SortedList sortedCultures = new SortedList();
             Cultures.Items.Clear();
             Cultures.Items.Add(new ListItem(ui.Text("choose") + "...", ""));

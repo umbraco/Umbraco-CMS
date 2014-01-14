@@ -337,7 +337,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
 
-            RelationSaved.RaiseEvent(new SaveEventArgs<IRelation>(relation, false), this);
+            SavedRelation.RaiseEvent(new SaveEventArgs<IRelation>(relation, false), this);
             return relation;
         }
 
@@ -365,7 +365,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
 
-            RelationSaved.RaiseEvent(new SaveEventArgs<IRelation>(relation, false), this);
+            SavedRelation.RaiseEvent(new SaveEventArgs<IRelation>(relation, false), this);
             return relation;
         }
 
@@ -428,7 +428,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
 
-            RelationSaved.RaiseEvent(new SaveEventArgs<IRelation>(relation, false), this);
+            SavedRelation.RaiseEvent(new SaveEventArgs<IRelation>(relation, false), this);
         }
 
         /// <summary>
@@ -447,7 +447,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
 
-            RelationTypeSaved.RaiseEvent(new SaveEventArgs<IRelationType>(relationType, false), this);
+            SavedRelationType.RaiseEvent(new SaveEventArgs<IRelationType>(relationType, false), this);
         }
 
         /// <summary>
@@ -466,7 +466,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
 
-            RelationDeleted.RaiseEvent(new DeleteEventArgs<IRelation>(relation, false), this);
+            DeletedRelation.RaiseEvent(new DeleteEventArgs<IRelation>(relation, false), this);
         }
 
         /// <summary>
@@ -485,7 +485,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
 
-            RelationTypeDeleted.RaiseEvent(new DeleteEventArgs<IRelationType>(relationType, false), this);
+            DeletedRelationType.RaiseEvent(new DeleteEventArgs<IRelationType>(relationType, false), this);
         }
 
         /// <summary>
@@ -508,7 +508,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
 
-            RelationDeleted.RaiseEvent(new DeleteEventArgs<IRelation>(relations, false), this);
+            DeletedRelation.RaiseEvent(new DeleteEventArgs<IRelation>(relations, false), this);
         }
 
         #region Private Methods
@@ -537,7 +537,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs after a Relation is Deleted
         /// </summary>
-        public static event TypedEventHandler<IRelationService, DeleteEventArgs<IRelation>> RelationDeleted;
+        public static event TypedEventHandler<IRelationService, DeleteEventArgs<IRelation>> DeletedRelation;
 
         /// <summary>
         /// Occurs before Saving a Relation
@@ -547,7 +547,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs after a Relation is Saved
         /// </summary>
-        public static event TypedEventHandler<IRelationService, SaveEventArgs<IRelation>> RelationSaved;
+        public static event TypedEventHandler<IRelationService, SaveEventArgs<IRelation>> SavedRelation;
 
         /// <summary>
         /// Occurs before Deleting a RelationType
@@ -557,7 +557,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs after a RelationType is Deleted
         /// </summary>
-        public static event TypedEventHandler<IRelationService, DeleteEventArgs<IRelationType>> RelationTypeDeleted;
+        public static event TypedEventHandler<IRelationService, DeleteEventArgs<IRelationType>> DeletedRelationType;
 
         /// <summary>
         /// Occurs before Saving a RelationType
@@ -567,7 +567,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs after a RelationType is Saved
         /// </summary>
-        public static event TypedEventHandler<IRelationService, SaveEventArgs<IRelationType>> RelationTypeSaved;
+        public static event TypedEventHandler<IRelationService, SaveEventArgs<IRelationType>> SavedRelationType;
         #endregion
     }
 }

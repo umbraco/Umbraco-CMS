@@ -13,6 +13,7 @@
 			<li>	
 				<i class="icon icon-delete red hover-show pull-right" ng-click="clear()"></i>
 				<i class="icon {{node.icon}} hover-hide"></i>
+				
 				<a href prevent-default ng-click="openContentPicker()" >{{node.name}}</a>
 			</li>
 		</ul>
@@ -26,7 +27,7 @@
 <!--
 				<a href ng-click="showSearch = true"> Or search</a>-->
 			</li>
-
+<!--
 			<li ng-show="showSearch">
 				<input type="text" 
 					ng-model="model.value.query" 
@@ -36,7 +37,7 @@
 					<input type="radio" ng-model="model.value.scope" value="global"> Global 	
 					<input type="radio" ng-model="model.value.scope" value="current"> Current
 					<a href ng-click="showSearch = false"> ...Or pick a node</a>
-			</li>
+			</li>-->
 		</ul>
 	</div>
 </div>
