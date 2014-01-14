@@ -1001,7 +1001,7 @@ namespace Umbraco.Core.Services
         {
             var items = new List<IDictionaryItem>();
             foreach (var dictionaryItemElement in dictionaryItemElementList.Elements("DictionaryItem"))
-                items.AddRange(ImportDictionaryItem(dictionaryItemElement, languages));
+                items.AddRange(ImportDictionaryItem(dictionaryItemElement, languages, raiseEvents));
 
             if (raiseEvents)
                 DictionaryItemImported.RaiseEvent(new SaveEventArgs<IDictionaryItem>(items, false), this);
@@ -1009,7 +1009,7 @@ namespace Umbraco.Core.Services
             return items;
         }
 
-        private IEnumerable<IDictionaryItem> ImportDictionaryItem(XElement dictionaryItemElement, List<ILanguage> languages)
+        private IEnumerable<IDictionaryItem> ImportDictionaryItem(XElement dictionaryItemElement, List<ILanguage> languages, bool raiseEvents)
         {
             var items = new List<IDictionaryItem>();
 
@@ -1021,7 +1021,7 @@ namespace Umbraco.Core.Services
                 dictionaryItem = CreateNewDictionaryItem(key, dictionaryItemElement, languages);
             _localizationService.Save(dictionaryItem);
             items.Add(dictionaryItem);
-            items.AddRange(ImportDictionaryItems(dictionaryItemElement, languages, true));
+            items.AddRange(ImportDictionaryItems(dictionaryItemElement, languages, raiseEvents));
             return items;
         }
 
