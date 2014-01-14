@@ -3,7 +3,7 @@
 angular.module('umbraco')
 .controller("Umbraco.PropertyEditors.ContentPickerController",
 	
-	function($scope, dialogService, entityResource, editorState, $log, iconHelper){
+	function($scope, dialogService, entityResource, $log, iconHelper){
 		$scope.renderModel = [];
 		$scope.ids = $scope.model.value ? $scope.model.value.split(',') : [];
         
@@ -11,8 +11,6 @@ angular.module('umbraco')
 		$scope.cfg = {
 			multiPicker: "0", 
 			entityType: "Document", 
-			filterCssClass: "not-allowed not-published",
-
 			startNode:{
 				type: "content",
 				id: -1
@@ -33,23 +31,11 @@ angular.module('umbraco')
 			$scope.cfg.entityType = "Media";
 		}
 
-		//if we have a query for the startnode, we will use that. 
-		if($scope.cfg.startNode.query){
-			var rootId = -1;
-			if($scope.cfg.startNode.scope === "current"){
-				rootId = editorState.current.id;
-			}
-
-			entityResource.getByQuery($scope.cfg.startNode.query, rootId, "Document").then(function(ent){
-				$scope.cfg.startNodeId = ent.id;	
-			});	
-		}else{
-			$scope.cfg.startNodeId = $scope.cfg.startNode.id;
-		}
-
 		$scope.cfg.callback = populate;
 		$scope.cfg.treeAlias = $scope.cfg.startNode.type;
-		$scope.cfg.section = $scope.cfg.startNode.type;		
+		$scope.cfg.section = $scope.cfg.startNode.type;
+		$scope.cfg.startNodeId = $scope.cfg.startNode.id;
+		$scope.cfg.filterCssClass = "not-allowed not-published";
 		
 		//load current data
 		entityResource.getByIds($scope.ids, $scope.cfg.entityType).then(function(data){
