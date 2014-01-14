@@ -183,7 +183,9 @@ namespace umbraco.presentation.umbraco.dialogs
                 
                 if (e.CommandName == "simple")
                 {
-                    var member = Membership.GetUser(simpleLogin.Text);
+                    var memberLogin = simpleLogin.Visible ? simpleLogin.Text : SimpleLoginLabel.Text;
+
+                    var member = Membership.GetUser(memberLogin);
                     if (member == null)
                     {
                         var tempEmail = "u" + Guid.NewGuid().ToString("N") + "@example.com";
@@ -191,7 +193,7 @@ namespace umbraco.presentation.umbraco.dialogs
                         // this needs to work differently depending on umbraco members or external membership provider
                         if (Membership.Provider.IsUmbracoMembershipProvider() == false)
                         {
-                            member = Membership.CreateUser(simpleLogin.Text, simplePassword.Text, tempEmail);
+                            member = Membership.CreateUser(memberLogin, simplePassword.Text, tempEmail);
                         }
                         else
                         {
@@ -203,7 +205,7 @@ namespace umbraco.presentation.umbraco.dialogs
                             var provider = Membership.Provider.AsUmbracoMembershipProvider();
                             MembershipCreateStatus status;
                             member = provider.CreateUser(Constants.Conventions.MemberTypes.SystemDefaultProtectType,
-                                                simpleLogin.Text, simplePassword.Text, tempEmail, null, null, true, null, out status);
+                                                memberLogin, simplePassword.Text, tempEmail, null, null, true, null, out status);
                             if (status != MembershipCreateStatus.Success)
                             {
                                 SimpleLoginNameValidator.IsValid = false;
@@ -217,14 +219,14 @@ namespace umbraco.presentation.umbraco.dialogs
                     {
                         SimpleLoginNameValidator.IsValid = false;                        
                         SimpleLoginLabel.Visible = true;
-                        SimpleLoginLabel.Text = simpleLogin.Text;
+                        SimpleLoginLabel.Text = memberLogin;
                         simpleLogin.Visible = false;
                         pp_pass.Visible = false;
                         return;
                     }
 
                     // Create or find a memberGroup
-                    string simpleRoleName = "__umbracoRole_" + simpleLogin.Text;
+                    var simpleRoleName = "__umbracoRole_" + member.UserName;
                     if (Roles.RoleExists(simpleRoleName) == false)
                     {
                         Roles.CreateRole(simpleRoleName);
