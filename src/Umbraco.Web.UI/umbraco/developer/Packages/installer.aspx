@@ -260,6 +260,14 @@
         <cc1:Pane ID="pane_optional" runat="server" Visible="false" />
         <cc1:Pane ID="pane_success" runat="server" Text="Package is installed" Visible="false">
             <cc1:PropertyPanel runat="server">
+                
+                <%--This is a hack to fix this currently until we can replace the installer with a native angular editor
+                    http://issues.umbraco.org/issue/U4-4011
+                --%>
+                <script type="text/javascript">
+                    UmbClientMgr.mainWindow().UmbClientMgr._reloadApplicationAssets();
+                </script>
+
                 <p>
                     All items in the package has been installed</p>
                 <p>

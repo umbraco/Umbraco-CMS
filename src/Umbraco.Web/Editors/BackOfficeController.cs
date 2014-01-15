@@ -6,6 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Mvc;
 using System.Web.UI;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -69,6 +70,26 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
+        /// Returns a js array of all of the manifest assets
+        /// </summary>
+        /// <returns></returns>
+        [UmbracoAuthorize(Order = 0)]
+        [HttpGet]
+        public JsonNetResult GetManifestAssetList()
+        {
+            var plugins = new DirectoryInfo(Server.MapPath("~/App_Plugins"));
+            var parser = new ManifestParser(plugins);
+            var initJs = new JsInitialization(parser);
+            var initCss = new CssInitialization(parser);
+            var jsResult = initJs.GetJavascriptInitializationArray(HttpContext, new JArray());
+            var cssResult = initCss.GetStylesheetInitializationArray(HttpContext);
+
+            ManifestParser.MergeJArrays(jsResult, cssResult);
+
+            return new JsonNetResult {Data = jsResult, Formatting = Formatting.Indented};
+        }
+
+        /// <summary>
         /// Returns the JavaScript object representing the static server variables javascript object
         /// </summary>
         /// <returns></returns>
@@ -86,6 +107,7 @@ namespace Umbraco.Web.Editors
                         "umbracoUrls", new Dictionary<string, object>
                             {
                                 {"legacyTreeJs", Url.Action("LegacyTreeJs", "BackOffice")},                    
+                                {"manifestAssetList", Url.Action("GetManifestAssetList", "BackOffice")},
                                 //API URLs
                                 {
                                     "contentApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentController>(

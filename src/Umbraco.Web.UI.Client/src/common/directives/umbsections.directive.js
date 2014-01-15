@@ -65,6 +65,11 @@ function sectionsDirective($timeout, $window, navigationService, treeService, se
 			        scope.currentSection = args.value;
 			    }
 			});
+            
+			eventsService.on("app.reInitialize", function (e, args) {
+                //re-load the sections if we're re-initializing (i.e. package installed)
+			    loadSections();
+			});
 
 			//on page resize
 			window.onresize = calculateHeight;

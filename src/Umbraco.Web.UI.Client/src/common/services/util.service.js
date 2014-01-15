@@ -1,5 +1,21 @@
 /*Contains multiple services for various helper tasks */
 
+function packageHelper(assetsService, treeService, eventsService) {
+
+    return {
+
+        /** Called when a package is installed, this resets a bunch of data and ensures the new package assets are loaded in */
+        packageInstalled: function () {
+            assetsService._reloadApplicationAssets();
+            treeService.clearCache();
+            //send event
+            eventsService.emit("app.reInitialize");
+        }
+
+    };
+}
+angular.module('umbraco.services').factory('packageHelper', packageHelper);
+
 function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, umbRequestHelper) {
     return {
         /** sets the image's url - will check if it is a folder or a real image */
