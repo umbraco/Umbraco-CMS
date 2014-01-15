@@ -16,6 +16,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
     [PropertyValueType(typeof(JToken))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
+    [DefaultPropertyValueConverter(typeof(JsonValueConverter))] //this shadows the JsonValueConverter
     public class RelatedLinksEditorValueConvertor : PropertyValueConverterBase
     {
         public override bool IsConverter(PublishedPropertyType propertyType)
