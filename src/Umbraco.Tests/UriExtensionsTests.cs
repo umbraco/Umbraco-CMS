@@ -23,8 +23,6 @@ namespace Umbraco.Tests
         [TestCase("http://www.domain.com/test/umbraco.aspx", "", false)]
         [TestCase("http://www.domain.com/Umbraco/restServices/blah", "", true)]
         [TestCase("http://www.domain.com/Umbraco/Backoffice/blah", "", true)]
-        [TestCase("http://www.domain.com/Umbraco/umbracoapi/blah", "", true)]
-        [TestCase("http://www.domain.com/Umbraco/umbracotrees/blah", "", true)]
         [TestCase("http://www.domain.com/Umbraco/anything", "", true)]
         [TestCase("http://www.domain.com/Umbraco/anything/", "", true)]
         [TestCase("http://www.domain.com/Umbraco/surface/blah", "", false)]
