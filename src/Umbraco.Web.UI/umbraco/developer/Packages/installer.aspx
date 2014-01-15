@@ -265,7 +265,7 @@
                     http://issues.umbraco.org/issue/U4-4011
                 --%>
                 <script type="text/javascript">
-                    UmbClientMgr.mainWindow().UmbClientMgr._reloadApplicationAssets();
+                    UmbClientMgr.mainWindow().UmbClientMgr._packageInstalled();
                 </script>
 
                 <p>

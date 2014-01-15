@@ -6,10 +6,15 @@ function packageHelper(assetsService, treeService, eventsService) {
 
         /** Called when a package is installed, this resets a bunch of data and ensures the new package assets are loaded in */
         packageInstalled: function () {
-            assetsService._reloadApplicationAssets();
-            treeService.clearCache();
-            //send event
-            eventsService.emit("app.reInitialize");
+            //assetsService._reloadApplicationAssets().then(function() {
+            //    treeService.clearCache();
+            //    //send event
+            //    //eventsService.emit("app.reInitialize");
+
+            //    //TODO: This doesn't work and will end in an infinite browser load loop, we can't really 
+            //    // re-bootstrap anyways since that would be the same as loading the whole browser window.
+            //    //angular.bootstrap(document, ['umbraco']);
+            //});
         }
 
     };

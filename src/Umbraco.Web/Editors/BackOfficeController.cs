@@ -108,6 +108,7 @@ namespace Umbraco.Web.Editors
                             {
                                 {"legacyTreeJs", Url.Action("LegacyTreeJs", "BackOffice")},                    
                                 {"manifestAssetList", Url.Action("GetManifestAssetList", "BackOffice")},
+                                {"serverVarsJs", Url.Action("Application", "BackOffice")},
                                 //API URLs
                                 {
                                     "contentApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentController>(
