@@ -14,7 +14,7 @@ using Umbraco.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
-    [PropertyValueType(typeof(JToken))]
+    [PropertyValueType(typeof(JArray))]
     [PropertyValueCache(PropertyCacheValue.All, PropertyCacheLevel.Content)]
     [DefaultPropertyValueConverter(typeof(JsonValueConverter))] //this shadows the JsonValueConverter
     public class RelatedLinksEditorValueConvertor : PropertyValueConverterBase
@@ -33,7 +33,25 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             {
                 try
                 {
-                    var obj = JsonConvert.DeserializeObject(sourceString);
+                    var obj = JsonConvert.DeserializeObject<JArray>(sourceString);
+                    //update the internal links if we have a context
+                    if (UmbracoContext.Current != null)
+                    {
+                        var helper = new UmbracoHelper(UmbracoContext.Current);
+                        foreach (var a in obj)
+                        {
+                            var type = a.Value<string>("type");
+                            if (type.IsNullOrWhiteSpace() == false)
+                            {
+                                if (type == "internal")
+                                {
+                                    var linkId = a.Value<int>("link");
+                                    var link = helper.NiceUrl(linkId);
+                                    a["link"] = link;
+                                }
+                            }
+                        }    
+                    }
                     return obj;
                 }
                 catch (Exception ex)
