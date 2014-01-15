@@ -9,7 +9,7 @@
         <asp:RequiredFieldValidator ID="RequiredFieldValidator2" ErrorMessage="*" ControlToValidate="FileName" runat="server">*</asp:RequiredFieldValidator>
     </cc1:PropertyPanel>
 
-    <cc1:PropertyPanel runat="server" Text="Choose a template:">
+    <cc1:PropertyPanel runat="server" Text="Choose a snippet:">
         <asp:ListBox ID="PartialViewTemplate" runat="server" CssClass="bigInput input-large-type input-block-level" Rows="1" SelectionMode="Single" />
     </cc1:PropertyPanel>
 
