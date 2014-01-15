@@ -25,6 +25,7 @@ using Examine;
 using Examine.LuceneEngine.SearchCriteria;
 using Examine.SearchCriteria;
 using Umbraco.Web.Dynamics;
+using umbraco;
 
 namespace Umbraco.Web.Editors
 {
@@ -126,6 +127,45 @@ namespace Umbraco.Web.Editors
         public EntityBasic GetByKey(Guid id, UmbracoEntityTypes type)
         {
             return GetResultForKey(id, type);
+        }
+
+        /// <summary>
+        /// Gets an entity by a xpath or css-like query
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
+        public EntityBasic GetByQuery(string query, int rootNodeId, UmbracoEntityTypes type)
+        {
+            
+            //this is css (commented out for now, due to external dependency) 
+            //if (!query.Contains("::") && !query.Contains('/'))
+            //    query = css2xpath.Converter.CSSToXPath(query, "");
+
+                
+            if(rootNodeId < 0){
+                var nodes = global::umbraco.library.GetXmlNodeByXPath(query);
+                var node = uQuery.GetNodesByXPath(query).FirstOrDefault();
+
+                if(node == null)
+                    return null;
+                    
+                return GetById(node.Id, UmbracoEntityTypes.Document);
+            }else{
+                var node = global::umbraco.library.GetXmlNodeById(rootNodeId.ToString());
+                if (node.MoveNext())
+                {
+                    if (node.Current != null)
+                    {
+                        var result = node.Current.Select(query);
+                        //set it to the first node found (if there is one), otherwise to -1
+                        if (result.Current != null)
+                            return GetById(int.Parse(result.Current.GetAttribute("id", string.Empty)), UmbracoEntityTypes.Document);
+                    }
+                }
+            }
+
+            return null;
         }
 
         public EntityBasic GetById(int id, UmbracoEntityTypes type)
