@@ -204,7 +204,7 @@ namespace Umbraco.Web
         internal static bool ShouldAuthenticateRequest(HttpRequestBase request, Uri originalRequestUrl)
         {
             if (//check back office
-                request.Url.IsBackOfficeRequest()
+                request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)
                 //check installer
                 || request.Url.IsInstallerRequest()
                 //detect in preview

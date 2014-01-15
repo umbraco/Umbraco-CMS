@@ -41,7 +41,7 @@
  * </pre>  
  */
 angular.module('umbraco.services')
-.factory('assetsService', function ($q, $log, angularHelper, umbRequestHelper, $rootScope) {
+.factory('assetsService', function ($q, $log, angularHelper, umbRequestHelper, $rootScope, $http) {
 
     var initAssetsLoaded = false;
 
@@ -68,6 +68,31 @@ angular.module('umbraco.services')
             else {
                 deferred.resolve();
             }
+            return deferred.promise;
+        },
+
+        /** Internal method. This is used after installing a package to reload the application assets so we don't have to reload the whole window */
+        _reloadApplicationAssets: function() {
+
+            var deferred = $q.defer();
+
+            umbRequestHelper.resourcePromise(
+                $http.get(umbRequestHelper.getApiUrl("manifestAssetList", "", "")),
+                'Failed to get manifest list').then(function(data) {
+
+                    //ok so we have the list of assets, now we'll use yepnope to go get them. Anything that is already loaded should remain loaded
+                    // and this should just load anything that is newly installed.
+                    
+                    yepnope({
+                        load: data,
+                        complete: function () {
+                            //resolve the promise
+                            deferred.resolve(data);
+                        }
+                    });
+
+                });
+            
             return deferred.promise;
         },
 

@@ -40,6 +40,15 @@ namespace Umbraco.Web.UI.JavaScript
         /// </summary>
         public string GetJavascriptInitialization(HttpContextBase httpContext, JArray umbracoInit, JArray additionalJsFiles = null)
         {
+            var result = GetJavascriptInitializationArray(httpContext, umbracoInit, additionalJsFiles);
+
+            return ParseMain(
+                result.ToString(),
+                IOHelper.ResolveUrl(SystemDirectories.Umbraco));
+        }
+
+        public JArray GetJavascriptInitializationArray(HttpContextBase httpContext, JArray umbracoInit, JArray additionalJsFiles = null)
+        {
             foreach (var m in _parser.GetManifests())
             {
                 ManifestParser.MergeJArrays(umbracoInit, m.JavaScriptInitialize);
@@ -57,9 +66,7 @@ namespace Umbraco.Web.UI.JavaScript
             //now we need to merge in any found cdf declarations on property editors
             ManifestParser.MergeJArrays(umbracoInit, ScanPropertyEditors(ClientDependencyType.Javascript, httpContext));
 
-            return ParseMain(
-                umbracoInit.ToString(),
-                IOHelper.ResolveUrl(SystemDirectories.Umbraco));
+            return umbracoInit;
         }
 
         /// <summary>
