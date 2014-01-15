@@ -132,7 +132,8 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Gets an entity by a xpath or css-like query
         /// </summary>
-        /// <param name="id"></param>
+        /// <param name="query"></param>
+        /// <param name="rootNodeId"></param>
         /// <param name="type"></param>
         /// <returns></returns>
         public EntityBasic GetByQuery(string query, int rootNodeId, UmbracoEntityTypes type)
@@ -143,15 +144,28 @@ namespace Umbraco.Web.Editors
             //    query = css2xpath.Converter.CSSToXPath(query, "");
 
                 
-            if(rootNodeId < 0){
-                var nodes = global::umbraco.library.GetXmlNodeByXPath(query);
-                var node = uQuery.GetNodesByXPath(query).FirstOrDefault();
+            if(rootNodeId < 0)
+            {
+                var node = Umbraco.TypedContentSingleAtXPath(query);
 
                 if(node == null)
                     return null;
                     
                 return GetById(node.Id, UmbracoEntityTypes.Document);
-            }else{
+            }
+            else
+            {
+                //SD: This should be done using UmbracoHelper
+
+                //var node = Umbraco.TypedContent(rootNodeId);
+                //if (node != null)
+                //{
+                //    //TODO: Build an Xpath query based on this node ID and the rest of the query
+                //    // var subQuery = [@id=rootNodeId]/query
+                //    // and then get that node with:
+                //    // var result = Umbraco.TypedContentSingleAtXPath(subQuery);
+                //}
+
                 var node = global::umbraco.library.GetXmlNodeById(rootNodeId.ToString());
                 if (node.MoveNext())
                 {
