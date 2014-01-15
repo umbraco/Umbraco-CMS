@@ -457,6 +457,7 @@
     <Compile Include="umbraco.presentation\umbraco\Trees\TranslateTreeNames.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="UrlHelperRenderExtensions.cs" />
+    <Compile Include="WebApi\IsBackOfficeAttribute.cs" />
     <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerResolver.cs" />

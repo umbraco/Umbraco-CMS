@@ -231,9 +231,15 @@ namespace Umbraco.Web
         private void RouteLocalApiController(Type controller, string umbracoPath)
         {
             var meta = PluginController.GetMetadata(controller);
+
+            //url to match
+            var routePath = meta.IsBackOffice == false
+                                ? umbracoPath + "/Api/" + meta.ControllerName + "/{action}/{id}"
+                                : umbracoPath + "/BackOffice/Api/" + meta.ControllerName + "/{action}/{id}";
+            
             var route = RouteTable.Routes.MapHttpRoute(
                 string.Format("umbraco-{0}-{1}", "api", meta.ControllerName),
-                umbracoPath + "/Api/" + meta.ControllerName + "/{action}/{id}", //url to match
+                routePath, 
                 new {controller = meta.ControllerName, id = UrlParameter.Optional});                
             //web api routes don't set the data tokens object
             if (route.DataTokens == null)

@@ -139,7 +139,7 @@ namespace Umbraco.Web
             if (http.Request.Url.IsClientSideRequest())
                 return;
 
-            if (app.Request.Url.IsBackOfficeRequest() || app.Request.Url.IsInstallerRequest())
+            if (app.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath) || app.Request.Url.IsInstallerRequest())
             {
                 var ticket = http.GetUmbracoAuthTicket();
                 if (ticket != null)
