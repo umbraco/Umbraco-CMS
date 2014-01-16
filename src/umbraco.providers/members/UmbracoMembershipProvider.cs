@@ -693,59 +693,62 @@ namespace umbraco.providers.members
                             if (isLocked)
                             {
                                 LogHelper.Info<UmbracoMembershipProvider>("Cannot validate member " + username + " because they are currently locked out");
-                                m = null;
+                                return false;
                             }
                         }
                     }
                 }
 
                 //check for approve status. If not approved, then set the member property to null
-                if (m != null && CheckApproveStatus(m) == false)
+                if (CheckApproveStatus(m) == false)
                 {
                     LogHelper.Info<UmbracoMembershipProvider>("Cannot validate member " + username + " because they are not approved");
-                    m = null;
+                    return false;
                 }
 
                 // maybe update login date
-                if (m != null && string.IsNullOrEmpty(LastLoginPropertyTypeAlias) == false)
+                if (string.IsNullOrEmpty(LastLoginPropertyTypeAlias) == false)
                 {
                     UpdateMemberProperty(m, LastLoginPropertyTypeAlias, DateTime.Now);
                 }
 
                 // maybe reset password attempts
-                if (m != null && string.IsNullOrEmpty(FailedPasswordAttemptsPropertyTypeAlias) == false)
+                if (string.IsNullOrEmpty(FailedPasswordAttemptsPropertyTypeAlias) == false)
                 {
                     UpdateMemberProperty(m, FailedPasswordAttemptsPropertyTypeAlias, 0);
                 }
 
                 // persist data
-                if (m != null)
-                    m.Save();
+                m.Save();
+
+                return true;
             }
-            else if (string.IsNullOrEmpty(LockPropertyTypeAlias) == false
+
+
+            // update fail rate if it's approved
+            if (string.IsNullOrEmpty(LockPropertyTypeAlias) == false
                 && string.IsNullOrEmpty(FailedPasswordAttemptsPropertyTypeAlias) == false)
-            {
-                var updateMemberDataObject = Member.GetMemberFromLoginName(username);
-                // update fail rate if it's approved
-                if (updateMemberDataObject != null && CheckApproveStatus(updateMemberDataObject))
+            {                                
+                if (CheckApproveStatus(m))
                 {
-                    int failedAttempts = 0;
-                    int.TryParse(GetMemberProperty(updateMemberDataObject, FailedPasswordAttemptsPropertyTypeAlias, false), out failedAttempts);
+                    var failedAttempts = 0;
+                    int.TryParse(GetMemberProperty(m, FailedPasswordAttemptsPropertyTypeAlias, false), out failedAttempts);
                     failedAttempts = failedAttempts + 1;
-                    UpdateMemberProperty(updateMemberDataObject, FailedPasswordAttemptsPropertyTypeAlias, failedAttempts);
+                    UpdateMemberProperty(m, FailedPasswordAttemptsPropertyTypeAlias, failedAttempts);
 
                     // lock user?
                     if (failedAttempts >= MaxInvalidPasswordAttempts)
                     {
-                        UpdateMemberProperty(updateMemberDataObject, LockPropertyTypeAlias, 1);
-                        UpdateMemberProperty(updateMemberDataObject, LastLockedOutPropertyTypeAlias, DateTime.Now);
+                        UpdateMemberProperty(m, LockPropertyTypeAlias, 1);
+                        UpdateMemberProperty(m, LastLockedOutPropertyTypeAlias, DateTime.Now);
                         LogHelper.Info<UmbracoMembershipProvider>("Member " + username + " is now locked out, max invalid password attempts exceeded");
                     }
-                    updateMemberDataObject.Save();
+                    m.Save();
                 }
 
             }
-            return (m != null);
+
+            return false;
         }
 
         private static void UpdateMemberProperty(Member m, string propertyTypeAlias, object propertyValue)
