@@ -2167,13 +2167,13 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="Umbraco\Scripting\templates\cshtml\MultinodeTree-picker.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\EmptyTemplate.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\Empty.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\EditProfile.cshtml" />
-    <Content Include="Umbraco\PartialViewMacros\Templates\EmptyTemplate.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\Empty.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Login.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\LoginStatus.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\RegisterMember.cshtml" />
-    <Content Include="Umbraco\PartialViewMacros\Templates\EmptyTemplate %28ForUseWithCustomViews%29.cshtml">
+    <Content Include="Umbraco\PartialViewMacros\Templates\Empty %28ForUseWithCustomViews%29.cshtml">
       <SubType>Code</SubType>
     </Content>
     <Content Include="Umbraco\PartialViewMacros\Templates\ListAncestorsFromCurrentPage.cshtml" />
@@ -2193,7 +2193,7 @@
     <Content Include="Umbraco\PartialViewMacros\Templates\Navigation.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\SiteMap.cshtml" />
     <Content Include="Umbraco\PartialViews\Templates\Breadcrumb.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\EmptyTemplate %28ForUseWithCustomViews%29.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\Empty %28ForUseWithCustomViews%29.cshtml" />
     <Content Include="Umbraco\PartialViews\Templates\ListAncestorsFromCurrentPage.cshtml" />
     <Content Include="Umbraco\PartialViews\Templates\ListChildPagesFromCurrentPage.cshtml" />
     <Content Include="Umbraco\PartialViews\Templates\ListChildPagesOrderedByDate.cshtml" />

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -24,16 +24,16 @@ namespace Umbraco.Web.UI.Umbraco.Create
             var path = IOHelper.MapPath(SystemDirectories.Umbraco + "/PartialViews/Templates/");
             list.Items.Clear();
 
-            // always add the options of empty templates
-            list.Items.Add(new ListItem("Empty Template", "EmptyTemplate.cshtml"));
-            list.Items.Add(new ListItem("Empty Template (For Use With Custom Views)", "EmptyTemplate (ForUseWithCustomViews).cshtml"));
+            // always add the options of empty snippets
+            list.Items.Add(new ListItem("Empty", "Empty.cshtml"));
+            list.Items.Add(new ListItem("Empty (For Use With Custom Views)", "Empty (ForUseWithCustomViews).cshtml"));
 
             if (System.IO.Directory.Exists(path))
             {
                 const string extension = ".cshtml";
 
-                //Already adding Empty Template as the first item, so don't add it again
-                foreach (var fileInfo in new System.IO.DirectoryInfo(path).GetFiles("*" + extension).Where(f => f.Name.StartsWith("EmptyTemplate") == false))
+                //Already adding Empty as the first item, so don't add it again
+                foreach (var fileInfo in new System.IO.DirectoryInfo(path).GetFiles("*" + extension).Where(f => f.Name.StartsWith("Empty") == false))
                 {
                     var filename = System.IO.Path.GetFileName(fileInfo.FullName);
 
