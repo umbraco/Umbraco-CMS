@@ -3,6 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
 using System.Threading;
 using System.Web;
 using System.Web.SessionState;
@@ -96,7 +97,7 @@ namespace umbraco.presentation.developer.packages
                 else
                 {
                     fb.Style.Add("margin-top", "7px");
-                    fb.type = global::umbraco.uicontrols.Feedback.feedbacktype.error;
+                    fb.type = uicontrols.Feedback.feedbacktype.error;
                     fb.Text = "<strong>No connection to repository.</strong> Runway could not be installed as there was no connection to: '" + _repo.RepositoryUrl + "'";
                     pane_upload.Visible = false;
                 }
@@ -109,7 +110,7 @@ namespace umbraco.presentation.developer.packages
             acceptCheckbox.Attributes.Add("onmouseup", "document.getElementById('" + ButtonInstall.ClientID + "').disabled = false;");
         }
 
-        protected void uploadFile(object sender, System.EventArgs e)
+        protected void uploadFile(object sender, EventArgs e)
         {
             try
             {
@@ -133,7 +134,7 @@ namespace umbraco.presentation.developer.packages
             string memberGuid = _repo.Webservice.authenticate(tb_email.Text, library.md5(tb_password.Text));
 
             //if we auth correctly and get a valid key back, we will fetch the file from the repo webservice.
-            if (!string.IsNullOrEmpty(memberGuid))
+            if (string.IsNullOrEmpty(memberGuid) == false)
             {
                 tempFile.Value = _installer.Import(_repo.fetch(helper.Request("guid"), memberGuid));
                 UpdateSettings();
@@ -230,9 +231,9 @@ namespace umbraco.presentation.developer.packages
                     //making sure that publishing actions performed from the cms layer gets pushed to the presentation
                     library.RefreshContent();
 
-                    if (!string.IsNullOrEmpty(_installer.Control))
+                    if (string.IsNullOrEmpty(_installer.Control) == false)
                     {
-                        Response.Redirect("installer.aspx?installing=customInstaller&dir=" + dir + "&pId=" + packageId.ToString() + "&customControl=" + Server.UrlEncode(_installer.Control) + "&customUrl=" + Server.UrlEncode(_installer.Url));
+                        Response.Redirect("installer.aspx?installing=refresh&dir=" + dir + "&pId=" + packageId.ToString() + "&customControl=" + Server.UrlEncode(_installer.Control) + "&customUrl=" + Server.UrlEncode(_installer.Url));
                     }
                     else
                     {
@@ -242,11 +243,11 @@ namespace umbraco.presentation.developer.packages
                 case "customInstaller":
                     var customControl = Request.GetItemAsString("customControl");
 
-                    if (!customControl.IsNullOrWhiteSpace())
+                    if (customControl.IsNullOrWhiteSpace() == false)
                     {
                         HideAllPanes();
 
-                        _configControl = new System.Web.UI.UserControl().LoadControl(SystemDirectories.Root + customControl);
+                        _configControl = LoadControl(SystemDirectories.Root + customControl);
                         _configControl.ID = "packagerConfigControl";
 
                         pane_optional.Controls.Add(_configControl);
@@ -263,11 +264,11 @@ namespace umbraco.presentation.developer.packages
                     {
                         //if the custom installer control is empty here (though it should never be because we've already checked for it previously)
                         //then we should run the normal FinishedAction
-                        PerformRefreshAction(packageId, dir, Request.GetItemAsString("customUrl"));
+                        PerformFinishedAction(packageId, dir, Request.GetItemAsString("customUrl"));
                     }
                     break;
                 case "refresh":
-                    PerformRefreshAction(packageId, dir, Request.GetItemAsString("customUrl"));
+                    PerformRefreshAction(packageId, dir, Request.GetItemAsString("customUrl"), Request.GetItemAsString("customControl"));
                     break;
                 case "finished":
                     PerformFinishedAction(packageId, dir, Request.GetItemAsString("customUrl"));
@@ -287,7 +288,7 @@ namespace umbraco.presentation.developer.packages
         {
             HideAllPanes();
             //string url = _installer.Url;
-            string packageViewUrl = "installedPackage.aspx?id=" + packageId.ToString();
+            string packageViewUrl = "installedPackage.aspx?id=" + packageId.ToString(CultureInfo.InvariantCulture);
 
             bt_viewInstalledPackage.OnClientClick = "document.location = '" + packageViewUrl + "'; return false;";
 
@@ -306,19 +307,29 @@ namespace umbraco.presentation.developer.packages
         /// <param name="packageId"></param>
         /// <param name="dir"></param>
         /// <param name="url"></param>
-        private void PerformRefreshAction(int packageId, string dir, string url)
+        /// <param name="customControl"></param>
+        private void PerformRefreshAction(int packageId, string dir, string url, string customControl)
         {
             HideAllPanes();
-            
+
             //create the URL to refresh to
             // /umbraco/developer/packages/installer.aspx?installing=finished
             //          &dir=X:\Projects\Umbraco\Umbraco_7.0\src\Umbraco.Web.UI\App_Data\aef8c41f-63a0-494b-a1e2-10d761647033
             //          &pId=3
             //          &customUrl=http:%2f%2four.umbraco.org%2fprojects%2fwebsite-utilities%2fmerchello
 
-            RefreshQueryString = Server.UrlEncode(string.Format(
+            if (customControl.IsNullOrWhiteSpace())
+            {
+                RefreshQueryString = Server.UrlEncode(string.Format(
                 "installing=finished&dir={0}&pId={1}&customUrl={2}",
                 dir, packageId, url));
+            }
+            else
+            {
+                RefreshQueryString = Server.UrlEncode(string.Format(
+                "installing=customInstaller&dir={0}&pId={1}&customUrl={2}&customControl={3}",
+                dir, packageId, url, customControl));
+            }
 
             pane_refresh.Visible = true;
 
