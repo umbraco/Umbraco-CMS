@@ -1,5 +1,7 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
+# Visual Studio 2013
+VisualStudioVersion = 12.0.21005.1
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{2849E9D4-3B4E-40A3-A309-F3CB4F0E125F}"
 	ProjectSection(SolutionItems) = preProject
 		..\build\Build.bat = ..\build\Build.bat
