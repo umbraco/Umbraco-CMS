@@ -259,21 +259,27 @@ namespace Umbraco.Core.Security
         private static void Logout(this HttpContextBase http, string cookieName)
         {
             if (http == null) throw new ArgumentNullException("http");
-            //remove from the request
-            http.Request.Cookies.Remove(cookieName);
+            //clear the preview cookie too
+            var cookies = new[] { cookieName, Constants.Web.PreviewCookieName };
+            foreach (var c in cookies)
+            {
+                //remove from the request
+                http.Request.Cookies.Remove(c);
 
-            //expire from the response
-            var formsCookie = http.Response.Cookies[cookieName];
-            if (formsCookie != null)
-            {
-                //this will expire immediately and be removed from the browser
-                formsCookie.Expires = DateTime.Now.AddYears(-1);
-            }
-            else
-            {
-                //ensure there's def an expired cookie
-                http.Response.Cookies.Add(new HttpCookie(cookieName) { Expires = DateTime.Now.AddYears(-1) });
-            }
+                //expire from the response
+                var formsCookie = http.Response.Cookies[c];
+                if (formsCookie != null)
+                {
+                    //this will expire immediately and be removed from the browser
+                    formsCookie.Expires = DateTime.Now.AddYears(-1);
+                }
+                else
+                {
+                    //ensure there's def an expired cookie
+                    http.Response.Cookies.Add(new HttpCookie(c) { Expires = DateTime.Now.AddYears(-1) });
+                }               
+            }            
+
         }
 
         private static FormsAuthenticationTicket GetAuthTicket(this HttpContextBase http, string cookieName)
