@@ -11,6 +11,12 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (bool) base["removeDoubleDashes"]; }
         }
 
+        [ConfigurationProperty("toAscii", DefaultValue = false)]
+        internal bool ConvertUrlsToAscii
+        {
+            get { return (bool)base["toAscii"]; }
+        }
+
         [ConfigurationCollection(typeof(CharCollection), AddItemName = "char")]
         [ConfigurationProperty("", IsDefaultCollection = true)]
         internal CharCollection CharCollection

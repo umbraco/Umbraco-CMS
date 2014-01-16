@@ -142,7 +142,7 @@ namespace Umbraco.Core.Strings
             {
                 PreFilter = ApplyUrlReplaceCharacters,
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
-                StringType = CleanStringType.Utf8 | CleanStringType.LowerCase,
+                StringType = (UmbracoConfig.For.UmbracoSettings().RequestHandler.ConvertUrlsToAscii ? CleanStringType.Ascii : CleanStringType.Utf8) | CleanStringType.LowerCase,
                 BreakTermsOnUpper = false,
                 Separator = '-'
             }).WithConfig(CleanStringType.FileName, new Config
