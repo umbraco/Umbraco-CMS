@@ -837,6 +837,9 @@
     <Compile Include="Constants-System.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
+    <Compile Include="Constants-Web.cs">
+      <DependentUpon>Constants.cs</DependentUpon>
+    </Compile>
     <Compile Include="UpgradeableReadLock.cs" />
     <Compile Include="DelegateEqualityComparer.cs" />
     <Compile Include="Media\IEmbedProvider.cs" />

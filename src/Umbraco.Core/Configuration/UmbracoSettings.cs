@@ -309,7 +309,7 @@ namespace Umbraco.Core.Configuration
                 {
                     return value;
                 }
-                return "UMB_UCONTEXT";
+                return Constants.Web.AuthCookieName;
             }
         }
 

@@ -2,6 +2,7 @@ using System;
 using System.Reflection;
 using System.Web;
 using System.Web.UI;
+using Umbraco.Core;
 
 namespace umbraco.BusinessLogic
 {
@@ -347,8 +348,8 @@ namespace umbraco.BusinessLogic
              * we currently reproduce this by configuring each cookie with a 30d expires, but does
              * that actually make sense? shouldn't some cookie have _no_ expires?
              */
-            static readonly Cookie _preview = new Cookie("UMB_PREVIEW", 30d); // was "PreviewSet"
-            static readonly Cookie _userContext = new Cookie("UMB_UCONTEXT", 30d); // was "UserContext"
+            static readonly Cookie _preview = new Cookie(Constants.Web.PreviewCookieName, TimeSpan.Zero); // was "PreviewSet"
+            static readonly Cookie _userContext = new Cookie(Constants.Web.AuthCookieName, 30d); // was "UserContext"
             static readonly Cookie _member = new Cookie("UMB_MEMBER", 30d); // was "umbracoMember"
 
             public static Cookie Preview { get { return _preview; } }
@@ -429,7 +430,7 @@ namespace umbraco.BusinessLogic
                 }
                 public void SetValue(string value)
                 {
-                    SetValueWithDate(value, DateTime.Now + _expires);
+                    SetValueWithDate(value, _expires == TimeSpan.Zero ? DateTime.MinValue : DateTime.Now + _expires);
                 }
 
                 public void SetValue(string value, double days)
@@ -439,7 +440,7 @@ namespace umbraco.BusinessLogic
 
                 public void SetValue(string value, TimeSpan expires)
                 {
-                    SetValue(value, DateTime.Now + expires);
+                    SetValue(value, expires == TimeSpan.Zero ? DateTime.MinValue : DateTime.Now + expires);
                 }
 
                 public void SetValue(string value, DateTime expires)
@@ -449,7 +450,7 @@ namespace umbraco.BusinessLogic
 
                 private void SetValueWithDate(string value, DateTime expires)
                 {
-                    HttpCookie cookie = new HttpCookie(_key, value);
+                    var cookie = new HttpCookie(_key, value);
 
                     if (GlobalSettings.UseSSL)
                         cookie.Secure = true;
@@ -457,7 +458,12 @@ namespace umbraco.BusinessLogic
                     //ensure http only, this should only be able to be accessed via the server
                     cookie.HttpOnly = true;
 
-                    cookie.Expires = expires;
+                    //set an expiry date if not min value, otherwise leave it as a session cookie.
+                    if (expires != DateTime.MinValue)
+                    {
+                        cookie.Expires = expires;    
+                    }
+                    
                     ResponseCookie = cookie;
 
                     // original Umbraco code also does this
@@ -471,7 +477,7 @@ namespace umbraco.BusinessLogic
                 {
                     if (RequestCookie != null || ResponseCookie != null)
                     {
-                        HttpCookie cookie = new HttpCookie(_key);
+                        var cookie = new HttpCookie(_key);
                         cookie.Expires = DateTime.Now.AddDays(-1);
                         ResponseCookie = cookie;
                     }
