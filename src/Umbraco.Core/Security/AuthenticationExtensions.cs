@@ -137,12 +137,19 @@ namespace Umbraco.Core.Security
         {
             if (response == null) throw new ArgumentNullException("response");
             //remove the cookie
-            var cookie = new CookieHeaderValue(UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName, "")
+            var authCookie = new CookieHeaderValue(UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName, "")
             {
                 Expires = DateTime.Now.AddYears(-1),                
                 Path = "/"
             };
-            response.Headers.AddCookies(new[] { cookie });
+            //remove the preview cookie too
+            var prevCookie = new CookieHeaderValue(Constants.Web.PreviewCookieName, "")
+            {
+                Expires = DateTime.Now.AddYears(-1),
+                Path = "/"
+            };
+
+            response.Headers.AddCookies(new[] { authCookie, prevCookie });
         }
 
         /// <summary>
