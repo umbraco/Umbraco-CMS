@@ -616,6 +616,7 @@
     <Compile Include="Umbraco\TreeInit.aspx.designer.cs">
       <DependentUpon>treeInit.aspx</DependentUpon>
     </Compile>
+    <Content Include="Umbraco\ClientRedirect.aspx" />
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Logout.aspx" />
     <Content Include="Umbraco\umbraco.aspx" />

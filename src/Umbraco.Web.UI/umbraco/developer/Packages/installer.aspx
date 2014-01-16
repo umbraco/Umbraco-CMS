@@ -1,6 +1,7 @@
-<%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoPage.Master" CodeBehind="installer.aspx.cs"
+<%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoPage.Master"
     AutoEventWireup="True" Inherits="umbraco.presentation.developer.packages.Installer"
     Trace="false" ValidateRequest="false" %>
+<%@ Import Namespace="umbraco" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
@@ -261,11 +262,8 @@
         <cc1:Pane ID="pane_success" runat="server" Text="Package is installed" Visible="false">
             <cc1:PropertyPanel runat="server">
                 
-                <%--This is a hack to fix this currently until we can replace the installer with a native angular editor
-                    http://issues.umbraco.org/issue/U4-4011
-                --%>
                 <script type="text/javascript">
-                    UmbClientMgr.mainWindow().UmbClientMgr._packageInstalled();
+                //UmbClientMgr.mainWindow().UmbClientMgr._packageInstalled();
                 </script>
 
                 <p>
@@ -279,6 +277,35 @@
                     <asp:Button Text="View installed package" ID="bt_viewInstalledPackage" runat="server" />
                     <asp:Literal ID="lit_authorUrl" runat="server" />
                 </p>               
+
+            </cc1:PropertyPanel>
+        </cc1:Pane>
+        <cc1:Pane ID="pane_refresh" runat="server" Text="Browser is reloading" Visible="false">
+            <cc1:PropertyPanel runat="server">
+                
+                <div class="alert alert-block">
+                    Please wait while the browser is reloaded...
+                </div>
+                <script type="text/javascript">
+                    
+                    //This is all a bit zany with double encoding because we have a URL in a hash (#) url part
+                    // but it works and maintains query strings
+                    
+                    var refreshQuery = decodeURIComponent("<%=RefreshQueryString%>");
+                    var umbPath = "<%=GlobalSettings.Path%>";
+                    setTimeout(function () {
+
+                        var mainWindow = UmbClientMgr.mainWindow();
+
+                        var refreshUrl = mainWindow.location.href +
+                            encodeURIComponent(encodeURIComponent("?" + refreshQuery));
+                        
+                        var redirectUrl = umbPath + "/ClientRedirect.aspx?redirectUrl=" + refreshUrl;
+
+                        mainWindow.location.href = redirectUrl;
+
+                    }, 2000);
+                </script>
 
             </cc1:PropertyPanel>
         </cc1:Pane>

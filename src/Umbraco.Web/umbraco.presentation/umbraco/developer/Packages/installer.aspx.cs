@@ -36,6 +36,8 @@ namespace umbraco.presentation.developer.packages
         private readonly cms.businesslogic.packager.Installer _installer = new cms.businesslogic.packager.Installer();
         private string _tempFileName = "";
 
+        protected string RefreshQueryString { get; set; }
+
         protected void Page_Load(object sender, EventArgs e)
         {
             var ex = new Exception();
@@ -234,7 +236,7 @@ namespace umbraco.presentation.developer.packages
                     }
                     else
                     {
-                        Response.Redirect("installer.aspx?installing=finished&dir=" + dir + "&pId=" + packageId.ToString() + "&customUrl=" + Server.UrlEncode(_installer.Url));
+                        Response.Redirect("installer.aspx?installing=refresh&dir=" + dir + "&pId=" + packageId.ToString() + "&customUrl=" + Server.UrlEncode(_installer.Url));
                     }
                     break;
                 case "customInstaller":
@@ -261,8 +263,11 @@ namespace umbraco.presentation.developer.packages
                     {
                         //if the custom installer control is empty here (though it should never be because we've already checked for it previously)
                         //then we should run the normal FinishedAction
-                        PerformFinishedAction(packageId, dir, Request.GetItemAsString("customUrl"));
+                        PerformRefreshAction(packageId, dir, Request.GetItemAsString("customUrl"));
                     }
+                    break;
+                case "refresh":
+                    PerformRefreshAction(packageId, dir, Request.GetItemAsString("customUrl"));
                     break;
                 case "finished":
                     PerformFinishedAction(packageId, dir, Request.GetItemAsString("customUrl"));
@@ -296,15 +301,47 @@ namespace umbraco.presentation.developer.packages
         }
 
         /// <summary>
+        /// Perform the 'Refresh' action of the installer
+        /// </summary>
+        /// <param name="packageId"></param>
+        /// <param name="dir"></param>
+        /// <param name="url"></param>
+        private void PerformRefreshAction(int packageId, string dir, string url)
+        {
+            HideAllPanes();
+            
+            //create the URL to refresh to
+            // /umbraco/developer/packages/installer.aspx?installing=finished
+            //          &dir=X:\Projects\Umbraco\Umbraco_7.0\src\Umbraco.Web.UI\App_Data\aef8c41f-63a0-494b-a1e2-10d761647033
+            //          &pId=3
+            //          &customUrl=http:%2f%2four.umbraco.org%2fprojects%2fwebsite-utilities%2fmerchello
+
+            RefreshQueryString = Server.UrlEncode(string.Format(
+                "installing=finished&dir={0}&pId={1}&customUrl={2}",
+                dir, packageId, url));
+
+            pane_refresh.Visible = true;
+
+            PerformPostInstallCleanup(packageId, dir);
+        }
+
+        /// <summary>
+        /// Runs Post refresh actions such reloading the correct tree nodes, etc...
+        /// </summary>
+        private void PerformPostRefreshAction()
+        {
+            BasePage.Current.ClientTools.ReloadActionNode(true, true);
+        }
+
+        /// <summary>
         /// Runs Post install actions such as clearning any necessary cache, reloading the correct tree nodes, etc...
         /// </summary>
         /// <param name="packageId"></param>
         /// <param name="dir"></param>
         private void PerformPostInstallCleanup(int packageId, string dir)
         {
-            BasePage.Current.ClientTools.ReloadActionNode(true, true);
             _installer.InstallCleanUp(packageId, dir);
-            //clear the tree cache
+            //clear the tree cache - we'll do this here even though the browser will reload, but just in case it doesn't can't hurt.
             ClientTools.ClearClientTreeCache().RefreshTree("packager");
             TreeDefinitionCollection.Instance.ReRegisterTrees();
             BizLogicAction.ReRegisterActionsAndHandlers();
@@ -339,6 +376,7 @@ namespace umbraco.presentation.developer.packages
             pane_installing.Visible = false;
             pane_optional.Visible = false;
             pane_success.Visible = false;
+            pane_refresh.Visible = false;
             pane_upload.Visible = false;
         }
 
@@ -723,6 +761,8 @@ namespace umbraco.presentation.developer.packages
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::umbraco.uicontrols.Pane pane_success;
+
+        protected global::umbraco.uicontrols.Pane pane_refresh;
 
         /// <summary>
         /// bt_viewInstalledPackage control.
