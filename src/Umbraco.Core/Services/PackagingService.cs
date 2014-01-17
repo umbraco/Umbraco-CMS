@@ -28,6 +28,7 @@ namespace Umbraco.Core.Services
         private readonly IContentService _contentService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IMediaService _mediaService;
+        private readonly IMacroService _macroService;
         private readonly IDataTypeService _dataTypeService;
         private readonly IFileService _fileService;
         private readonly ILocalizationService _localizationService;
@@ -39,6 +40,7 @@ namespace Umbraco.Core.Services
         public PackagingService(IContentService contentService,
             IContentTypeService contentTypeService,
             IMediaService mediaService,
+            IMacroService macroService,
             IDataTypeService dataTypeService,
             IFileService fileService,
             ILocalizationService localizationService,
@@ -48,6 +50,7 @@ namespace Umbraco.Core.Services
             _contentService = contentService;
             _contentTypeService = contentTypeService;
             _mediaService = mediaService;
+            _macroService = macroService;
             _dataTypeService = dataTypeService;
             _fileService = fileService;
             _localizationService = localizationService;
@@ -300,7 +303,7 @@ namespace Umbraco.Core.Services
                     if (propertyType != null && propertyType.PropertyEditorAlias == Constants.PropertyEditors.CheckBoxListAlias)
                     {
                         var database = ApplicationContext.Current.DatabaseContext.Database;
-                        var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNo" + "deId = @Id", new { Id = propertyType.DataTypeDefinitionId });
+                        var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = propertyType.DataTypeDefinitionId });
 
                         var propertyValueList = new List<string>();
                         foreach (var preValue in propertyValue.Split(','))
@@ -1116,9 +1119,10 @@ namespace Umbraco.Core.Services
         /// Imports and saves the 'Languages' part of a package xml as a list of <see cref="ILanguage"/>
         /// </summary>
         /// <param name="languageElementList">Xml to import</param>
+        /// <param name="userId">Optional id of the User performing the operation</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumerable list of generated languages</returns>
-        public IEnumerable<ILanguage> ImportLanguages(XElement languageElementList, bool raiseEvents = true)
+        public IEnumerable<ILanguage> ImportLanguages(XElement languageElementList, int userId = 0, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
@@ -1151,6 +1155,135 @@ namespace Umbraco.Core.Services
         #endregion
 
         #region Macros
+
+        /// <summary>
+        /// Imports and saves the 'Macros' part of a package xml as a list of <see cref="IMacro"/>
+        /// </summary>
+        /// <param name="element">Xml to import</param>
+        /// <param name="userId">Optional id of the User performing the operation</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns></returns>
+        public IEnumerable<IMacro> ImportMacros(XElement element, int userId = 0, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (ImportingMacro.IsRaisedEventCancelled(new SaveEventArgs<XElement>(element), this))
+                    return Enumerable.Empty<IMacro>();
+            }
+
+            var name = element.Name.LocalName;
+            if (name.Equals("Macros") == false && name.Equals("macro") == false)
+            {
+                throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called 'Macros' for multiple imports or 'macro' for a single import.");
+            }
+
+            var macros = new List<IMacro>();
+            var macroElements = name.Equals("Macros")
+                                       ? (from doc in element.Elements("macro") select doc).ToList()
+                                       : new List<XElement> { element };
+
+            foreach (var macroElement in macroElements)
+            {
+                var macroName = macroElement.Element("name").Value;
+                var macroAlias = macroElement.Element("alias").Value;
+                var controlType = macroElement.Element("scriptType").Value;
+                var controlAssembly = macroElement.Element("scriptAssembly").Value;
+                var xsltPath = macroElement.Element("xslt").Value;
+                var scriptPath = macroElement.Element("scriptingFile").Value;
+                var useInEditor = macroElement.Element("useInEditor").Value;
+                var cacheDuration = macroElement.Element("refreshRate").Value;
+
+                var macro = new Macro(macroAlias, macroName, controlType, controlAssembly, xsltPath, scriptPath);
+
+                var properties = macroElement.Element("properties");
+                if (properties != null)
+                {
+                    int sortOrder = 0;
+                    foreach (var property in properties.Elements())
+                    {
+                        var propertyName = property.Attribute("name").Value;
+                        var propertyAlias = property.Attribute("alias").Value;
+                        var editorAlias = property.Attribute("propertyType").Value;
+                        var sortOrderAttribute = property.Attribute("sortOrder");
+                        if (sortOrderAttribute != null)
+                        {
+                            sortOrder = int.Parse(sortOrderAttribute.Value);
+                        }
+
+                        macro.Properties.Add(new MacroProperty(propertyAlias, propertyName, sortOrder, editorAlias));
+                        sortOrder++;
+                    }
+                }
+                macros.Add(macro);
+            }
+
+            foreach (var macro in macros)
+            {
+                _macroService.Save(macro, userId);
+            }
+
+            if (raiseEvents)
+                ImportedMacro.RaiseEvent(new SaveEventArgs<IMacro>(macros, false), this);
+
+            return macros;
+        }
+
+        /// <summary>
+        /// Exports a list of <see cref="IMacro"/> items to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="macros">Macros to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IMacro objects</returns>
+        public XElement Export(IEnumerable<IMacro> macros, bool raiseEvents = true)
+        {
+            var xml = new XElement("Macros");
+            foreach (var item in macros)
+            {
+                xml.Add(Export(item, raiseEvents));
+            }
+            return xml;
+        }
+
+        /// <summary>
+        /// Exports a single <see cref="IMacro"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="macro">Macro to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IMacro object</returns>
+        public XElement Export(IMacro macro, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (ExportingMacro.IsRaisedEventCancelled(new SaveEventArgs<IMacro>(macro), this))
+                    return default(XElement);
+            }
+
+            var xml = new XElement("macro");
+            xml.Add(new XElement("name", macro.Name));
+            xml.Add(new XElement("alias", macro.Alias));
+            xml.Add(new XElement("scriptType", macro.ControlType));
+            xml.Add(new XElement("scriptAssembly", macro.ControlAssembly));
+            xml.Add(new XElement("xslt", macro.XsltPath));
+            xml.Add(new XElement("useInEditor", macro.UseInEditor.ToString()));
+            xml.Add(new XElement("refreshRate", macro.CacheDuration.ToString(CultureInfo.InvariantCulture)));
+            xml.Add(new XElement("scriptingFile", macro.ScriptPath));
+
+            var properties = new XElement("properties");
+            foreach (var property in macro.Properties)
+            {
+                properties.Add(new XElement("property", 
+                    new XAttribute("name", property.Name), 
+                    new XAttribute("alias", property.Alias),
+                    new XAttribute("sortOrder", property.SortOrder),
+                    new XAttribute("propertyType", property.EditorAlias)));
+            }
+            xml.Add(properties);
+
+            if (raiseEvents)
+                ExportedMacro.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
+
+            return xml;
+        }
 
         #endregion
 
@@ -1564,6 +1697,26 @@ namespace Umbraco.Core.Services
         /// Occurs after DictionaryItem is Exported to Xml
         /// </summary>
         public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ExportedDictionaryItem;
+
+        /// <summary>
+        /// Occurs before Importing Macro
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ImportingMacro;
+
+        /// <summary>
+        /// Occurs after Macro is Imported and Saved
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IMacro>> ImportedMacro;
+
+        /// <summary>
+        /// Occurs before Exporting Macro
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<IMacro>> ExportingMacro;
+
+        /// <summary>
+        /// Occurs after Macro is Exported to Xml
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ExportedMacro;
 
         /// <summary>
         /// Occurs before Importing Language

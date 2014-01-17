@@ -133,7 +133,7 @@ namespace Umbraco.Core.Services
                 _localizationService = new Lazy<ILocalizationService>(() => new LocalizationService(provider, repositoryFactory.Value));
 
             if (_packagingService == null)
-                _packagingService = new Lazy<IPackagingService>(() => new PackagingService(_contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, repositoryFactory.Value, provider));
+                _packagingService = new Lazy<IPackagingService>(() => new PackagingService(_contentService.Value, _contentTypeService.Value, _mediaService.Value, _macroService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, repositoryFactory.Value, provider));
 
             if (_entityService == null)
                 _entityService = new Lazy<IEntityService>(() => new EntityService(provider, repositoryFactory.Value, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value));
