@@ -1151,6 +1151,7 @@ namespace Umbraco.Core.Services
         #endregion
 
         #region Macros
+
         #endregion
 
         #region Members
@@ -1416,6 +1417,58 @@ namespace Umbraco.Core.Services
             return IOHelper.MapPath(SystemDirectories.Masterpages + "/" + alias.Replace(" ", "") + ".master");
         }
 
+        /// <summary>
+        /// Exports a list of <see cref="ITemplate"/> items to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="templates">List of Templates to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the ITemplate objects</returns>
+        public XElement Export(IEnumerable<ITemplate> templates, bool raiseEvents = true)
+        {
+            var xml = new XElement("Templates");
+            foreach (var item in templates)
+            {
+                xml.Add(Export(item, raiseEvents));
+            }
+            return xml;
+        }
+
+        /// <summary>
+        /// Exports a single <see cref="ITemplate"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="template">Template to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the ITemplate object</returns>
+        public XElement Export(ITemplate template, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (ExportingTemplate.IsRaisedEventCancelled(new SaveEventArgs<ITemplate>(template), this))
+                    return default(XElement);
+            }
+
+            var xml = new XElement("Template");
+            xml.Add(new XElement("Name", template.Name));
+            xml.Add(new XElement("Alias", template.Alias));
+            xml.Add(new XElement("Design", new XCData(template.Content)));
+
+            var concreteTemplate = template as Template;
+            if (concreteTemplate != null)
+            {
+                if (concreteTemplate.MasterTemplateId.IsValueCreated &&
+                    concreteTemplate.MasterTemplateId.Value != default(int))
+                {
+                    xml.Add(new XElement("Master", concreteTemplate.MasterTemplateId.ToString()));
+                    xml.Add(new XElement("MasterAlias", concreteTemplate.MasterTemplateAlias));
+                }
+            }
+
+            if (raiseEvents)
+                ExportedTemplate.RaiseEvent(new SaveEventArgs<XElement>(xml, false), this);
+
+            return xml;
+        }
+
         #endregion
 
         #region Stylesheets
@@ -1541,6 +1594,16 @@ namespace Umbraco.Core.Services
         /// Occurs after Template is Imported and Saved
         /// </summary>
         public static event TypedEventHandler<IPackagingService, SaveEventArgs<ITemplate>> ImportedTemplate;
+
+        /// <summary>
+        /// Occurs before Exporting Template
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<ITemplate>> ExportingTemplate;
+
+        /// <summary>
+        /// Occurs after Template is Exported to Xml
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, SaveEventArgs<XElement>> ExportedTemplate;
         #endregion
     }
 }

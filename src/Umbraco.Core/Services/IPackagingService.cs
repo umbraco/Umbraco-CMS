@@ -144,5 +144,21 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition object</returns>
         XElement Export(IDataTypeDefinition dataTypeDefinition, bool raiseEvents = true);
+
+        /// <summary>
+        /// Exports a list of <see cref="ITemplate"/> items to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="templates">List of Templates to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the ITemplate objects</returns>
+        XElement Export(IEnumerable<ITemplate> templates, bool raiseEvents = true);
+
+        /// <summary>
+        /// Exports a single <see cref="ITemplate"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="template">Template to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the ITemplate object</returns>
+        XElement Export(ITemplate template, bool raiseEvents = true);
     }
 }
