@@ -231,7 +231,7 @@ namespace Umbraco.Core
 		/// <returns>The contains key ignore case.</returns>
 		public static bool ContainsKeyIgnoreCase<TValue>(this IDictionary<string, TValue> dictionary, string key)
 		{
-			return dictionary.Keys.Any(i => i.Equals(key, StringComparison.CurrentCultureIgnoreCase));
+		    return dictionary.Keys.InvariantContains(key);
 		}
 
 		/// <summary>
@@ -257,9 +257,9 @@ namespace Umbraco.Core
 		/// <param name="key">The key.</param>
 		/// <typeparam name="TValue">The type</typeparam>
 		/// <returns>The entry</returns>
-		public static TValue GetEntryIgnoreCase<TValue>(this IDictionary<string, TValue> dictionary, string key)
+		public static TValue GetValueIgnoreCase<TValue>(this IDictionary<string, TValue> dictionary, string key)
 		{
-			return dictionary.GetEntryIgnoreCase(key, default(TValue));
+			return dictionary.GetValueIgnoreCase(key, default(TValue));
 		}
 
 		/// <summary>The get entry ignore case.</summary>
@@ -268,11 +268,11 @@ namespace Umbraco.Core
 		/// <param name="defaultValue">The default value.</param>
 		/// <typeparam name="TValue">The type</typeparam>
 		/// <returns>The entry</returns>
-		public static TValue GetEntryIgnoreCase<TValue>(this IDictionary<string, TValue> dictionary, string key, TValue defaultValue)
+		public static TValue GetValueIgnoreCase<TValue>(this IDictionary<string, TValue> dictionary, string key, TValue defaultValue)
 		{
-			key = dictionary.Keys.Where(i => i.Equals(key, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
+			key = dictionary.Keys.FirstOrDefault(i => i.InvariantEquals(key));
 
-			return !key.IsNullOrWhiteSpace()
+			return key.IsNullOrWhiteSpace() == false
 			       	? dictionary[key]
 			       	: defaultValue;
 		}
