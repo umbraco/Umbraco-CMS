@@ -8,36 +8,8 @@ ECHO Building Umbraco %version%
 
 ReplaceIISExpressPortNumber.exe ..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj %release%
 
-SET nuGetFolder=%CD%\..\src\packages\
-
-ECHO Installing Npm NuGet Package
-..\src\.nuget\NuGet.exe install Npm.js -OutputDirectory %nuGetFolder%
-
-for /f "delims=" %%A in ('dir %nuGetFolder%node.js.* /b') do set "nodePath=%nuGetFolder%%%A\"
-for /f "delims=" %%A in ('dir %nuGetFolder%npm.js.* /b') do set "npmPath=%nuGetFolder%%%A\tools\"
-
-ECHO Temporarily adding Npm and Node to path
-SET oldPath=%PATH%
-
-path=%npmPath%;%nodePath%;%PATH%
-
-SET buildFolder="%CD%"
-
-ECHO Go to Umbraco.Web.UI.Client folder
-CD ..\src\Umbraco.Web.UI.Client\
-
-ECHO Do npm install and the grunt build of Belle
-call npm install
-call npm install -g grunt-cli
-call grunt
-
-ECHO Reset path to what it was before
-path=%oldPath%
-
-ECHO Move back to the build folder
-CD %buildFolder% 
-
 ECHO Installing the Microsoft.Bcl.Build package before anything else, otherwise you'd have to run build.cmd twice
+SET nuGetFolder=%CD%\..\src\packages\
 ..\src\.nuget\NuGet.exe install ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder%
 
 ECHO Performing MSBuild and producing Umbraco binaries zip files
