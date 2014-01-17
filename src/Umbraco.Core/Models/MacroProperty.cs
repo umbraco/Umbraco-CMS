@@ -155,7 +155,6 @@ namespace Umbraco.Core.Models
         /// </remarks>
         [DataMember]
         public string EditorAlias
-
         {
             get { return _editorAlias; }
             set
