@@ -20,7 +20,7 @@ namespace Umbraco.Core.Services
         /// Imports and saves package xml as <see cref="IContentType"/>
         /// </summary>
         /// <param name="element">Xml to import</param>
-        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
+        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin)</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated ContentTypes</returns>
         IEnumerable<IContentType> ImportContentTypes(XElement element, int userId = 0, bool raiseEvents = true);
@@ -30,7 +30,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="element">Xml to import</param>
         /// <param name="importStructure">Boolean indicating whether or not to import the </param>
-        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
+        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin)</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated ContentTypes</returns>
         IEnumerable<IContentType> ImportContentTypes(XElement element, bool importStructure, int userId = 0, bool raiseEvents = true);
@@ -39,7 +39,7 @@ namespace Umbraco.Core.Services
         /// Imports and saves package xml as <see cref="IDataTypeDefinition"/>
         /// </summary>
         /// <param name="element">Xml to import</param>
-        /// <param name="userId"></param>
+        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated DataTypeDefinitions</returns>
         IEnumerable<IDataTypeDefinition> ImportDataTypeDefinitions(XElement element, int userId = 0, bool raiseEvents = true);
@@ -56,15 +56,16 @@ namespace Umbraco.Core.Services
         /// Imports and saves the 'Languages' part of a package xml as a list of <see cref="ILanguage"/>
         /// </summary>
         /// <param name="languageElementList">Xml to import</param>
+        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin)</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumerable list of generated languages</returns>
-        IEnumerable<ILanguage> ImportLanguages(XElement languageElementList, bool raiseEvents = true);
+        IEnumerable<ILanguage> ImportLanguages(XElement languageElementList, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Imports and saves package xml as <see cref="ITemplate"/>
         /// </summary>
         /// <param name="element">Xml to import</param>
-        /// <param name="userId">Optional user id</param>
+        /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin)</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated Templates</returns>
         IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = 0, bool raiseEvents = true);
@@ -74,7 +75,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="contentType">ContentType to export</param>
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
-        /// <returns><see cref="XElement"/> containing the xml representation of the ContentType item.</returns>
+        /// <returns><see cref="XElement"/> containing the xml representation of the ContentType item</returns>
         XElement Export(IContentType contentType, bool raiseEvents = true);
 
         /// <summary>
@@ -144,5 +145,37 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition object</returns>
         XElement Export(IDataTypeDefinition dataTypeDefinition, bool raiseEvents = true);
+
+        /// <summary>
+        /// Exports a list of <see cref="ITemplate"/> items to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="templates">List of Templates to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the ITemplate objects</returns>
+        XElement Export(IEnumerable<ITemplate> templates, bool raiseEvents = true);
+
+        /// <summary>
+        /// Exports a single <see cref="ITemplate"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="template">Template to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the ITemplate object</returns>
+        XElement Export(ITemplate template, bool raiseEvents = true);
+
+        /// <summary>
+        /// Exports a list of <see cref="IMacro"/> items to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="macros">Macros to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IMacro objects</returns>
+        XElement Export(IEnumerable<IMacro> macros, bool raiseEvents = true);
+
+        /// <summary>
+        /// Exports a single <see cref="IMacro"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="macro">Macro to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IMacro object</returns>
+        XElement Export(IMacro macro, bool raiseEvents = true);
     }
 }
