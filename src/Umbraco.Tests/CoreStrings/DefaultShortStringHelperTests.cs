@@ -99,6 +99,26 @@ namespace Umbraco.Tests.CoreStrings
         }
 
         [Test]
+        public void U4_4056()
+        {
+            const string input = "ÆØÅ and æøå and 中文测试 and  אודות האתר and größer БбДдЖж page";
+
+            var helper = new DefaultShortStringHelper().WithDefaultConfig(); // unicode
+            var output = helper.CleanStringForUrlSegment(input);
+            Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page", output);
+
+            helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.UrlSegment, new DefaultShortStringHelper.Config
+                {
+                    IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
+                    StringType = CleanStringType.LowerCase | CleanStringType.Ascii, // ascii
+                    Separator = '-'
+                });
+            output = helper.CleanStringForUrlSegment(input);
+            Assert.AreEqual("aeoa-and-aeoa-and-and-and-grosser-bbddzhzh-page", output);
+        }
+
+        [Test]
         public void CleanStringUnderscoreInTerm()
         {
             var helper = new DefaultShortStringHelper()
