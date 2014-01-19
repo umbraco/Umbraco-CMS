@@ -727,6 +727,11 @@ namespace Umbraco.Core.Services
             return contentType;
         }
 
+        /// <summary>
+        /// Used during Content import to ensure that the ContentType of a content item exists
+        /// </summary>
+        /// <param name="contentTypeAlias"></param>
+        /// <returns></returns>
         private IContentType FindContentTypeByAlias(string contentTypeAlias)
         {
             using (var repository = _repositoryFactory.CreateContentTypeRepository(_uowProvider.GetUnitOfWork()))
