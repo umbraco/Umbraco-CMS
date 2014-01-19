@@ -503,6 +503,29 @@ namespace Umbraco.Tests.Services.Importing
             }
         }
 
+        [Test]
+        public void PackagingService_Can_Import_Macros_With_Properties()
+        {
+            // Arrange
+            string strXml = ImportResources.XsltSearch_Package;
+            var xml = XElement.Parse(strXml);
+            var macrosElement = xml.Descendants("Macros").First();
+            var packagingService = ServiceContext.PackagingService;
+
+            // Act
+            var macros = packagingService.ImportMacros(macrosElement).ToList();
+
+            // Assert
+            Assert.That(macros.Any(), Is.True);
+            Assert.That(macros.First().Properties.Any(), Is.True);
+
+            var allMacros = ServiceContext.MacroService.GetAll().ToList();
+            foreach (var macro in macros)
+            {
+                Assert.That(allMacros.Any(x => x.Alias == macro.Alias), Is.True);
+            }
+        }
+
         private void AddLanguages()
         {
             var norwegian = new Core.Models.Language("nb-NO");
