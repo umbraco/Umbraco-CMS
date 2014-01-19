@@ -1176,45 +1176,11 @@ namespace Umbraco.Core.Services
                 throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called 'Macros' for multiple imports or 'macro' for a single import.");
             }
 
-            var macros = new List<IMacro>();
             var macroElements = name.Equals("Macros")
                                        ? (from doc in element.Elements("macro") select doc).ToList()
                                        : new List<XElement> { element };
 
-            foreach (var macroElement in macroElements)
-            {
-                var macroName = macroElement.Element("name").Value;
-                var macroAlias = macroElement.Element("alias").Value;
-                var controlType = macroElement.Element("scriptType").Value;
-                var controlAssembly = macroElement.Element("scriptAssembly").Value;
-                var xsltPath = macroElement.Element("xslt").Value;
-                var scriptPath = macroElement.Element("scriptingFile").Value;
-                var useInEditor = macroElement.Element("useInEditor").Value;
-                var cacheDuration = macroElement.Element("refreshRate").Value;
-
-                var macro = new Macro(macroAlias, macroName, controlType, controlAssembly, xsltPath, scriptPath);
-
-                var properties = macroElement.Element("properties");
-                if (properties != null)
-                {
-                    int sortOrder = 0;
-                    foreach (var property in properties.Elements())
-                    {
-                        var propertyName = property.Attribute("name").Value;
-                        var propertyAlias = property.Attribute("alias").Value;
-                        var editorAlias = property.Attribute("propertyType").Value;
-                        var sortOrderAttribute = property.Attribute("sortOrder");
-                        if (sortOrderAttribute != null)
-                        {
-                            sortOrder = int.Parse(sortOrderAttribute.Value);
-                        }
-
-                        macro.Properties.Add(new MacroProperty(propertyAlias, propertyName, sortOrder, editorAlias));
-                        sortOrder++;
-                    }
-                }
-                macros.Add(macro);
-            }
+            var macros = macroElements.Select(ParseMacroElement).ToList();
 
             foreach (var macro in macros)
             {
@@ -1225,6 +1191,72 @@ namespace Umbraco.Core.Services
                 ImportedMacro.RaiseEvent(new ImportEventArgs<IMacro>(macros, element, false), this);
 
             return macros;
+        }
+
+        private IMacro ParseMacroElement(XElement macroElement)
+        {
+            var macroName = macroElement.Element("name").Value;
+            var macroAlias = macroElement.Element("alias").Value;
+            var controlType = macroElement.Element("scriptType").Value;
+            var controlAssembly = macroElement.Element("scriptAssembly").Value;
+            var xsltPath = macroElement.Element("xslt").Value;
+            var scriptPath = macroElement.Element("scriptingFile").Value;
+
+            //Following xml elements are treated as nullable properties
+            var useInEditorElement = macroElement.Element("useInEditor");
+            var useInEditor = false;
+            if (useInEditorElement != null && string.IsNullOrEmpty(useInEditorElement.Value) == false)
+            {
+                useInEditor = bool.Parse(useInEditorElement.Value);
+            }
+            var cacheDurationElement = macroElement.Element("refreshRate");
+            var cacheDuration = 0;
+            if (cacheDurationElement != null && string.IsNullOrEmpty(cacheDurationElement.Value) == false)
+            {
+                cacheDuration = int.Parse(cacheDurationElement.Value);
+            }
+            var cacheByMemberElement = macroElement.Element("cacheByMember");
+            var cacheByMember = false;
+            if (cacheByMemberElement != null && string.IsNullOrEmpty(cacheByMemberElement.Value) == false)
+            {
+                cacheByMember = bool.Parse(cacheByMemberElement.Value);
+            }
+            var cacheByPageElement = macroElement.Element("cacheByPage");
+            var cacheByPage = false;
+            if (cacheByPageElement != null && string.IsNullOrEmpty(cacheByPageElement.Value) == false)
+            {
+                cacheByPage = bool.Parse(cacheByPageElement.Value);
+            }
+            var dontRenderElement = macroElement.Element("dontRender");
+            var dontRender = true;
+            if (dontRenderElement != null && string.IsNullOrEmpty(dontRenderElement.Value) == false)
+            {
+                dontRender = bool.Parse(dontRenderElement.Value);
+            }
+
+            var macro = new Macro(macroAlias, macroName, controlType, controlAssembly, xsltPath, scriptPath,
+                cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration);
+
+            var properties = macroElement.Element("properties");
+            if (properties != null)
+            {
+                int sortOrder = 0;
+                foreach (var property in properties.Elements())
+                {
+                    var propertyName = property.Attribute("name").Value;
+                    var propertyAlias = property.Attribute("alias").Value;
+                    var editorAlias = property.Attribute("propertyType").Value;
+                    var sortOrderAttribute = property.Attribute("sortOrder");
+                    if (sortOrderAttribute != null)
+                    {
+                        sortOrder = int.Parse(sortOrderAttribute.Value);
+                    }
+
+                    macro.Properties.Add(new MacroProperty(propertyAlias, propertyName, sortOrder, editorAlias));
+                    sortOrder++;
+                }
+            }
+            return macro;
         }
 
         /// <summary>
@@ -1262,10 +1294,13 @@ namespace Umbraco.Core.Services
             xml.Add(new XElement("alias", macro.Alias));
             xml.Add(new XElement("scriptType", macro.ControlType));
             xml.Add(new XElement("scriptAssembly", macro.ControlAssembly));
+            xml.Add(new XElement("scriptingFile", macro.ScriptPath));
             xml.Add(new XElement("xslt", macro.XsltPath));
             xml.Add(new XElement("useInEditor", macro.UseInEditor.ToString()));
+            xml.Add(new XElement("dontRender", macro.DontRender.ToString()));
             xml.Add(new XElement("refreshRate", macro.CacheDuration.ToString(CultureInfo.InvariantCulture)));
-            xml.Add(new XElement("scriptingFile", macro.ScriptPath));
+            xml.Add(new XElement("cacheByMember", macro.CacheByMember.ToString()));
+            xml.Add(new XElement("cacheByPage", macro.CacheByPage.ToString()));
 
             var properties = new XElement("properties");
             foreach (var property in macro.Properties)
