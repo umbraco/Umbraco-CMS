@@ -287,6 +287,8 @@
     <Compile Include="Events\CancellableObjectEventArgs.cs" />
     <Compile Include="Events\DeleteRevisionsEventArgs.cs" />
     <Compile Include="Events\EventExtensions.cs" />
+    <Compile Include="Events\ExportEventArgs.cs" />
+    <Compile Include="Events\ImportEventArgs.cs" />
     <Compile Include="Events\MigrationEventArgs.cs" />
     <Compile Include="Events\PublishEventArgs.cs" />
     <Compile Include="Events\RecycleBinEventArgs.cs" />
