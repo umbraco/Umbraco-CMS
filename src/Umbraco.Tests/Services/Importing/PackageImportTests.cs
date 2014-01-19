@@ -234,8 +234,7 @@ namespace Umbraco.Tests.Services.Importing
             Assert.That(contents.Any(), Is.True);
             Assert.That(contents.Count(), Is.EqualTo(numberOfDocs));
         }
-
-
+        
         [Test]
         public void PackagingService_Can_Import_CheckboxList_Content_Package_Xml_With_Property_Editor_Aliases()
         {
@@ -479,6 +478,51 @@ namespace Umbraco.Tests.Services.Importing
             foreach (var language in languages)
             {
                 Assert.That(allLanguages.Any(x => x.IsoCode == language.IsoCode), Is.True);
+            }
+        }
+
+        [Test]
+        public void PackagingService_Can_Import_Macros()
+        {
+            // Arrange
+            string strXml = ImportResources.uBlogsy_Package;
+            var xml = XElement.Parse(strXml);
+            var macrosElement = xml.Descendants("Macros").First();
+            var packagingService = ServiceContext.PackagingService;
+
+            // Act
+            var macros = packagingService.ImportMacros(macrosElement).ToList();
+
+            // Assert
+            Assert.That(macros.Any(), Is.True);
+
+            var allMacros = ServiceContext.MacroService.GetAll().ToList();
+            foreach (var macro in macros)
+            {
+                Assert.That(allMacros.Any(x => x.Alias == macro.Alias), Is.True);
+            }
+        }
+
+        [Test]
+        public void PackagingService_Can_Import_Macros_With_Properties()
+        {
+            // Arrange
+            string strXml = ImportResources.XsltSearch_Package;
+            var xml = XElement.Parse(strXml);
+            var macrosElement = xml.Descendants("Macros").First();
+            var packagingService = ServiceContext.PackagingService;
+
+            // Act
+            var macros = packagingService.ImportMacros(macrosElement).ToList();
+
+            // Assert
+            Assert.That(macros.Any(), Is.True);
+            Assert.That(macros.First().Properties.Any(), Is.True);
+
+            var allMacros = ServiceContext.MacroService.GetAll().ToList();
+            foreach (var macro in macros)
+            {
+                Assert.That(allMacros.Any(x => x.Alias == macro.Alias), Is.True);
             }
         }
 

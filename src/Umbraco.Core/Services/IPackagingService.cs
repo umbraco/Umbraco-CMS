@@ -62,6 +62,15 @@ namespace Umbraco.Core.Services
         IEnumerable<ILanguage> ImportLanguages(XElement languageElementList, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
+        /// Imports and saves the 'Macros' part of a package xml as a list of <see cref="IMacro"/>
+        /// </summary>
+        /// <param name="element">Xml to import</param>
+        /// <param name="userId">Optional id of the User performing the operation</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns></returns>
+        IEnumerable<IMacro> ImportMacros(XElement element, int userId = 0, bool raiseEvents = true);
+
+        /// <summary>
         /// Imports and saves package xml as <see cref="ITemplate"/>
         /// </summary>
         /// <param name="element">Xml to import</param>
