@@ -13,7 +13,7 @@ function macroService() {
         /** parses the special macro syntax like <?UMBRACO_MACRO macroAlias="Map" /> and returns an object with the macro alias and it's parameters */
         parseMacroSyntax: function (syntax) {
 
-            var expression = /(<\?UMBRACO_MACRO macroAlias=["'](\w+?)["'].+?)(\/>|>.*?<\/\?UMBRACO_MACRO>)/im;
+            var expression = /(<\?UMBRACO_MACRO macroAlias=["']([\w\.]+?)["'].+?)(\/>|>.*?<\/\?UMBRACO_MACRO>)/im;
             var match = expression.exec(syntax);
             if (!match || match.length < 3) {
                 return null;

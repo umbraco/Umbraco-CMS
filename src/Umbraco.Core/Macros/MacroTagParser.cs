@@ -12,7 +12,7 @@ namespace Umbraco.Core.Macros
 	internal class MacroTagParser
 	{
         private static readonly Regex MacroRteContent = new Regex(@"(<!--\s*?)(<\?UMBRACO_MACRO.*?/>)(\s*?-->)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
-        private static readonly Regex MacroPersistedFormat = new Regex(@"(<\?UMBRACO_MACRO macroAlias=[""'](\w+?)[""'].+?)(?:/>|>.*?</\?UMBRACO_MACRO>)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
+        private static readonly Regex MacroPersistedFormat = new Regex(@"(<\?UMBRACO_MACRO macroAlias=[""']([\w\.]+?)[""'].+?)(?:/>|>.*?</\?UMBRACO_MACRO>)", RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.Singleline);
 
 	    /// <summary>
 	    /// This formats the persisted string to something useful for the rte so that the macro renders properly since we 
@@ -39,8 +39,8 @@ namespace Umbraco.Core.Macros
                     //<div class="umb-macro-holder myMacro mceNonEditable">
                     var alias = match.Groups[2].Value;
                     var sb = new StringBuilder("<div class=\"umb-macro-holder ");
-                    sb.Append(alias);
-                    sb.Append(" mceNonEditable\"");
+                    //sb.Append(alias.ToSafeAlias());
+                    sb.Append("mceNonEditable\"");
                     foreach (var htmlAttribute in htmlAttributes)
                     {
                         sb.Append(" ");
