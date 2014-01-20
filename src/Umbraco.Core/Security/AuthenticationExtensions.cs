@@ -137,12 +137,19 @@ namespace Umbraco.Core.Security
         {
             if (response == null) throw new ArgumentNullException("response");
             //remove the cookie
-            var cookie = new CookieHeaderValue(UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName, "")
+            var authCookie = new CookieHeaderValue(UmbracoConfig.For.UmbracoSettings().Security.AuthCookieName, "")
             {
                 Expires = DateTime.Now.AddYears(-1),                
                 Path = "/"
             };
-            response.Headers.AddCookies(new[] { cookie });
+            //remove the preview cookie too
+            var prevCookie = new CookieHeaderValue(Constants.Web.PreviewCookieName, "")
+            {
+                Expires = DateTime.Now.AddYears(-1),
+                Path = "/"
+            };
+
+            response.Headers.AddCookies(new[] { authCookie, prevCookie });
         }
 
         /// <summary>
@@ -259,21 +266,27 @@ namespace Umbraco.Core.Security
         private static void Logout(this HttpContextBase http, string cookieName)
         {
             if (http == null) throw new ArgumentNullException("http");
-            //remove from the request
-            http.Request.Cookies.Remove(cookieName);
+            //clear the preview cookie too
+            var cookies = new[] { cookieName, Constants.Web.PreviewCookieName };
+            foreach (var c in cookies)
+            {
+                //remove from the request
+                http.Request.Cookies.Remove(c);
 
-            //expire from the response
-            var formsCookie = http.Response.Cookies[cookieName];
-            if (formsCookie != null)
-            {
-                //this will expire immediately and be removed from the browser
-                formsCookie.Expires = DateTime.Now.AddYears(-1);
-            }
-            else
-            {
-                //ensure there's def an expired cookie
-                http.Response.Cookies.Add(new HttpCookie(cookieName) { Expires = DateTime.Now.AddYears(-1) });
-            }
+                //expire from the response
+                var formsCookie = http.Response.Cookies[c];
+                if (formsCookie != null)
+                {
+                    //this will expire immediately and be removed from the browser
+                    formsCookie.Expires = DateTime.Now.AddYears(-1);
+                }
+                else
+                {
+                    //ensure there's def an expired cookie
+                    http.Response.Cookies.Add(new HttpCookie(c) { Expires = DateTime.Now.AddYears(-1) });
+                }               
+            }            
+
         }
 
         private static FormsAuthenticationTicket GetAuthTicket(this HttpContextBase http, string cookieName)

@@ -27,13 +27,20 @@ namespace Umbraco.Web.Mvc
         /// <param name="umbracoTokenValue">The DataToken value to set for the 'umbraco' key, this defaults to 'backoffice' </param>
         /// <param name="routeTokens">By default this value is just {action}/{id} but can be modified for things like web api routes</param>
         /// <param name="isMvc">Default is true for MVC, otherwise false for WebAPI</param>
+        /// <param name="areaPathPrefix">
+        /// If specified will add this string to the path between the umbraco path and the area path name, for example:
+        ///     /umbraco/CUSTOMPATHPREFIX/areaname
+        /// if not specified, will just route like:
+        ///     /umbraco/areaname
+        /// </param>
         /// <remarks>
         /// </remarks>
         internal static Route RouteControllerPlugin(this AreaRegistration area, string controllerName, Type controllerType, RouteCollection routes,
                                                     string controllerSuffixName, string defaultAction, object defaultId,
                                                     string umbracoTokenValue = "backoffice",
                                                     string routeTokens = "{action}/{id}",
-                                                    bool isMvc = true)
+                                                    bool isMvc = true,
+                                                    string areaPathPrefix = "")
         {
             Mandate.ParameterNotNullOrEmpty(controllerName, "controllerName");
             Mandate.ParameterNotNull(controllerSuffixName, "controllerSuffixName");
@@ -44,8 +51,10 @@ namespace Umbraco.Web.Mvc
 
             var umbracoArea = GlobalSettings.UmbracoMvcArea;
 
-            //routes are explicitly name with controller names and IDs
-            var url = umbracoArea + "/" + area.AreaName + "/" + controllerName + "/" + routeTokens;
+            //routes are explicitly named with controller names and IDs
+            var url = umbracoArea + "/" + 
+                (areaPathPrefix.IsNullOrWhiteSpace() ? "" : areaPathPrefix + "/") + 
+                area.AreaName + "/" + controllerName + "/" + routeTokens;
 
             Route controllerPluginRoute;
             //var meta = PluginController.GetMetadata(controllerType);

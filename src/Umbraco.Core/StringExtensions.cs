@@ -1084,7 +1084,7 @@ namespace Umbraco.Core
             var cases2 = cases.ToCleanStringType() & CleanStringType.CaseMask;
             return legacy != null
                        ? legacy.LegacyConvertStringCase(phrase, cases2)
-                       : helper.CleanString(phrase, CleanStringType.Ascii | CleanStringType.Alias | cases2);
+                       : helper.CleanString(phrase, CleanStringType.Ascii | CleanStringType.ConvertCase | cases2);
         }
 
         // the new methods to clean a string (to alias, url segment...)

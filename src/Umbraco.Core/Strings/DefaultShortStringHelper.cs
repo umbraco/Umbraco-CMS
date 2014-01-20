@@ -1,4 +1,8 @@
-﻿using System;
+﻿
+// debugging - define to write cleaning details & steps to console
+#define WRTCONS
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -142,7 +146,7 @@ namespace Umbraco.Core.Strings
             {
                 PreFilter = ApplyUrlReplaceCharacters,
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
-                StringType = CleanStringType.Utf8 | CleanStringType.LowerCase,
+                StringType = (UmbracoConfig.For.UmbracoSettings().RequestHandler.ConvertUrlsToAscii ? CleanStringType.Ascii : CleanStringType.Utf8) | CleanStringType.LowerCase,
                 BreakTermsOnUpper = false,
                 Separator = '-'
             }).WithConfig(CleanStringType.FileName, new Config
@@ -160,6 +164,12 @@ namespace Umbraco.Core.Strings
                     : (char.IsLetterOrDigit(c) || c == '_'), // letter, digit or underscore
                 StringType = CleanStringType.Ascii | CleanStringType.UmbracoCase,
                 BreakTermsOnUpper = false
+            }).WithConfig(CleanStringType.ConvertCase, new Config
+            {
+                PreFilter = null,
+                IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
+                StringType = CleanStringType.Ascii,
+                BreakTermsOnUpper = true
             });
         }
 
@@ -487,6 +497,10 @@ function validateSafeAlias(id, value, immediate, callback) {{
             if (culture == null)
                 throw new ArgumentNullException("culture");
 
+#if WRTCONS
+            Console.WriteLine("STRING TYPE {0}", stringType);
+#endif
+
             // get config
             var config = GetConfig(stringType, culture);
             stringType = config.StringTypeExtend(stringType);
@@ -554,6 +568,9 @@ function validateSafeAlias(id, value, immediate, callback) {{
             var state = StateBreak;
 
             caseType &= CleanStringType.CaseMask;
+#if WRTCONS
+            Console.WriteLine("CASE {0}", caseType);
+#endif
 
             // if we apply global ToUpper or ToLower to text here
             // then we cannot break words on uppercase chars
@@ -579,13 +596,13 @@ function validateSafeAlias(id, value, immediate, callback) {{
                 var isPair = char.IsSurrogate(c);
                 if (isPair)
                     throw new NotSupportedException("Surrogate pairs are not supported.");
-
-                //Console.WriteLine("CHAR '{0}' {1} {2} - {3} - {4}/{5} {6}", 
-                //    c,
-                //    isTerm ? "term" : "!term", isUpper ? "upper" : "!upper", 
-                //    state,
-                //    i, ipos, leading ? "leading" : "!leading");
-
+#if WRTCONS
+                Console.WriteLine("CHAR '{0}' {1} {2} - {3} - {4}/{5} {6}",
+                    c,
+                    isTerm ? "term" : "!term", isUpper ? "upper" : "!upper",
+                    state,
+                    i, ipos, leading ? "leading" : "!leading");
+#endif
                 switch (state)
                 {
                     // within a break
@@ -692,11 +709,12 @@ function validateSafeAlias(id, value, immediate, callback) {{
             CleanStringType caseType, CultureInfo culture, bool isAcronym)
         {
             var term = input.Substring(ipos, len);
-            //Console.WriteLine("TERM \"{0}\" {1} {2}",
-            //    term,
-            //    isAcronym ? "acronym" : "word",
-            //    caseType);
-
+#if WRTCONS
+            Console.WriteLine("TERM \"{0}\" {1} {2}",
+                term,
+                isAcronym ? "acronym" : "word",
+                caseType);
+#endif
             if (isAcronym)
             {
                 if ((caseType == CleanStringType.CamelCase && len <= 2 && opos > 0) ||

@@ -10,20 +10,33 @@ namespace Umbraco.Tests
     [TestFixture]
     public class UriExtensionsTests
     {
-        [TestCase("http://www.domain.com/umbraco", true)]
-        [TestCase("http://www.domain.com/Umbraco/", true)]
-        [TestCase("http://www.domain.com/umbraco/default.aspx", true)]
-        [TestCase("http://www.domain.com/umbraco/test/test", true)]
-        [TestCase("http://www.domain.com/Umbraco/test/test.aspx", true)]
-        [TestCase("http://www.domain.com/umbraco/test/test.js", true)]
-        [TestCase("http://www.domain.com/umbrac", false)]
-        [TestCase("http://www.domain.com/test", false)]
-        [TestCase("http://www.domain.com/test/umbraco", false)]
-        [TestCase("http://www.domain.com/test/umbraco.aspx", false)]
-        public void Is_Back_Office_Request(string input, bool expected)
+        [TestCase("http://www.domain.com/umbraco", "", true)]
+        [TestCase("http://www.domain.com/Umbraco/", "", true)]
+        [TestCase("http://www.domain.com/umbraco/default.aspx", "", true)]
+        [TestCase("http://www.domain.com/umbraco/test/test", "", false)]
+        [TestCase("http://www.domain.com/umbraco/test/test/test", "", false)]
+        [TestCase("http://www.domain.com/Umbraco/test/test.aspx", "", true)]
+        [TestCase("http://www.domain.com/umbraco/test/test.js", "", true)]
+        [TestCase("http://www.domain.com/umbrac", "", false)]
+        [TestCase("http://www.domain.com/test", "", false)]
+        [TestCase("http://www.domain.com/test/umbraco", "", false)]
+        [TestCase("http://www.domain.com/test/umbraco.aspx", "", false)]
+        [TestCase("http://www.domain.com/Umbraco/restServices/blah", "", true)]
+        [TestCase("http://www.domain.com/Umbraco/Backoffice/blah", "", true)]
+        [TestCase("http://www.domain.com/Umbraco/anything", "", true)]
+        [TestCase("http://www.domain.com/Umbraco/anything/", "", true)]
+        [TestCase("http://www.domain.com/Umbraco/surface/blah", "", false)]
+        [TestCase("http://www.domain.com/umbraco/api/blah", "", false)]
+        [TestCase("http://www.domain.com/myvdir/umbraco/api/blah", "myvdir", false)]
+        [TestCase("http://www.domain.com/MyVdir/umbraco/api/blah", "/myvdir", false)]
+        [TestCase("http://www.domain.com/MyVdir/Umbraco/", "myvdir", true)]
+        [TestCase("http://www.domain.com/MyVdir/Umbraco/restServices/blah", "/myvdir", true)]
+        [TestCase("http://www.domain.com/umbraco/webservices/legacyAjaxCalls.asmx/js", "", true)]
+        [TestCase("http://www.domain.com/umbraco/test/legacyAjaxCalls.ashx?some=query&blah=js", "", true)]  
+        public void Is_Back_Office_Request(string input, string virtualPath, bool expected)
         {
-            var source = new Uri(input);            
-            Assert.AreEqual(expected, source.IsBackOfficeRequest());
+            var source = new Uri(input);
+            Assert.AreEqual(expected, source.IsBackOfficeRequest(virtualPath));
         }
 
         [TestCase("http://www.domain.com/install", true)]

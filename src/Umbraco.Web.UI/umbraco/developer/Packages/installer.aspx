@@ -1,6 +1,7 @@
-<%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoPage.Master" CodeBehind="installer.aspx.cs"
+<%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoPage.Master"
     AutoEventWireup="True" Inherits="umbraco.presentation.developer.packages.Installer"
     Trace="false" ValidateRequest="false" %>
+<%@ Import Namespace="umbraco" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
@@ -260,6 +261,7 @@
         <cc1:Pane ID="pane_optional" runat="server" Visible="false" />
         <cc1:Pane ID="pane_success" runat="server" Text="Package is installed" Visible="false">
             <cc1:PropertyPanel runat="server">
+              
                 <p>
                     All items in the package has been installed</p>
                 <p>
@@ -271,6 +273,36 @@
                     <asp:Button Text="View installed package" ID="bt_viewInstalledPackage" runat="server" />
                     <asp:Literal ID="lit_authorUrl" runat="server" />
                 </p>               
+
+            </cc1:PropertyPanel>
+        </cc1:Pane>
+        <cc1:Pane ID="pane_refresh" runat="server" Text="Browser is reloading" Visible="false">
+            <cc1:PropertyPanel runat="server">
+                
+                <div class="alert alert-block">
+                    Please wait while the browser is reloaded...
+                </div>
+                <script type="text/javascript">
+                    
+                    //This is all a bit zany with double encoding because we have a URL in a hash (#) url part
+                    // but it works and maintains query strings
+
+                    var refreshQuery = decodeURIComponent("<%=RefreshQueryString%>");
+                    var umbPath = "<%=GlobalSettings.Path%>";
+                    setTimeout(function () {
+
+                        var mainWindow = UmbClientMgr.mainWindow();
+
+                        var baseUrl = mainWindow.location.href.substr(0, mainWindow.location.href.indexOf("#/developer/framed/"));
+                        var framedUrl = baseUrl + "#/developer/framed/";
+                        var refreshUrl = framedUrl + encodeURIComponent(encodeURIComponent(umbPath + "/developer/packages/installer.aspx?" + refreshQuery));
+
+                        var redirectUrl = umbPath + "/ClientRedirect.aspx?redirectUrl=" + refreshUrl;
+
+                        mainWindow.location.href = redirectUrl;
+
+                    }, 2000);
+                </script>
 
             </cc1:PropertyPanel>
         </cc1:Pane>

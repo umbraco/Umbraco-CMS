@@ -6,8 +6,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Moq;
 using NUnit.Framework;
+using umbraco;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Strings;
 using Umbraco.Core.ObjectResolution;
 using Umbraco.Tests.TestHelpers;
@@ -65,6 +69,13 @@ namespace Umbraco.Tests.CoreStrings
                     PreFilter = WhiteQuotes,
                     IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c),
                     StringType = CleanStringType.UmbracoCase | CleanStringType.Ascii
+                })
+                .WithConfig(CleanStringType.ConvertCase, new DefaultShortStringHelper.Config
+                {
+                    PreFilter = null,
+                    IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
+                    StringType = CleanStringType.Ascii,
+                    BreakTermsOnUpper = true
                 });
 
             ShortStringHelperResolver.Reset();
@@ -96,6 +107,47 @@ namespace Umbraco.Tests.CoreStrings
         {
             s = s.ReplaceMany(new Dictionary<string, string> { { "'", " " }, { "\u8217", " " } });
             return s;
+        }
+
+        [Test]
+        public void U4_4055_4056()
+        {
+            var settings = SettingsForTests.GenerateMockSettings();
+            var contentMock = Mock.Get(settings.RequestHandler);
+            contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
+            contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
+            SettingsForTests.ConfigureSettings(settings);
+
+            const string input = "publishedVersion";
+
+            Assert.AreEqual("PublishedVersion", input.ConvertCase(StringAliasCaseType.PascalCase)); // obsolete, use the one below
+            Assert.AreEqual("PublishedVersion", input.ToCleanString(CleanStringType.ConvertCase | CleanStringType.PascalCase | CleanStringType.Ascii)); // role, case and code
+        }
+
+        [Test]
+        public void U4_4056()
+        {
+            var settings = SettingsForTests.GenerateMockSettings();
+            var contentMock = Mock.Get(settings.RequestHandler);
+            contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
+            contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
+            SettingsForTests.ConfigureSettings(settings);
+
+            const string input = "ÆØÅ and æøå and 中文测试 and  אודות האתר and größer БбДдЖж page";
+
+            var helper = new DefaultShortStringHelper().WithDefaultConfig(); // unicode
+            var output = helper.CleanStringForUrlSegment(input);
+            Assert.AreEqual("æøå-and-æøå-and-中文测试-and-אודות-האתר-and-größer-ббдджж-page", output);
+
+            helper = new DefaultShortStringHelper()
+                .WithConfig(CleanStringType.UrlSegment, new DefaultShortStringHelper.Config
+                {
+                    IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_',
+                    StringType = CleanStringType.LowerCase | CleanStringType.Ascii, // ascii
+                    Separator = '-'
+                });
+            output = helper.CleanStringForUrlSegment(input);
+            Assert.AreEqual("aeoa-and-aeoa-and-and-and-grosser-bbddzhzh-page", output);
         }
 
         [Test]
@@ -361,6 +413,12 @@ namespace Umbraco.Tests.CoreStrings
         [Test]
         public void CleanStringDefaultConfig()
         {
+            var settings = SettingsForTests.GenerateMockSettings();
+            var contentMock = Mock.Get(settings.RequestHandler);
+            contentMock.Setup(x => x.CharCollection).Returns(Enumerable.Empty<IChar>());
+            contentMock.Setup(x => x.ConvertUrlsToAscii).Returns(false);
+            SettingsForTests.ConfigureSettings(settings);
+
             var helper = new DefaultShortStringHelper().WithDefaultConfig();
 
             const string input = "0123 中文测试 中文测试 léger ZÔRG (2) a?? *x";

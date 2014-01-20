@@ -107,7 +107,7 @@ namespace Umbraco.Core.Models
         private bool _dontRender;
         private string _scriptFile;
         private string _scriptAssembly;
-        private string _python;
+        private string _scriptPath;
         private string _xslt;
         private readonly MacroPropertyCollection _properties;
         private readonly List<string> _addedProperties;
@@ -360,14 +360,14 @@ namespace Umbraco.Core.Models
         [DataMember]
         public string ScriptPath
         {
-            get { return _python; }
+            get { return _scriptPath; }
             set
             {
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _python = value;
-                    return _python;
-                }, _python, ScriptPathSelector);
+                    _scriptPath = value;
+                    return _scriptPath;
+                }, _scriptPath, ScriptPathSelector);
             }
         }
 

@@ -1,7 +1,7 @@
 <div ng-controller="Umbraco.PropertyEditors.ContentPickerController" class="umb-editor umb-contentpicker">
 
 	<ul class="unstyled list-icons" 
-		ui-sortable="sortableOptions"
+		ui-sortable
 		ng-model="renderModel">	
 		<li ng-repeat="node in renderModel">
 
@@ -15,12 +15,13 @@
 		</li>
 	</ul>
 
-	<ul class="unstyled list-icons" ng-show="cfg.multiPicker === true || renderModel.length === 0">	
-		<li>
-			<i class="icon icon-add blue"></i>
-			<a href="#" ng-click="openContentPicker()" prevent-default>
-				<localize key="general_add">Add</localize>
-			</a>
-		</li>
-	</ul>
+    <ul class="unstyled list-icons" ng-show="cfg.multiPicker === true || renderModel.length === 0">	
+        <li>
+            <i class="icon icon-add blue"></i>
+            <a href="#" ng-click="openContentPicker()" prevent-default>
+                <localize key="general_add">Add</localize>
+            </a>
+        </li>
+    </ul>
+
 </div>

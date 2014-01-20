@@ -119,8 +119,8 @@ namespace Umbraco.Web.Models.Mapping
                         // only when creating a new member and we want to have a generated password pre-filled.
                         Value = new Dictionary<string, object>
                             {
-                                {"generatedPassword", member.AdditionalData.ContainsKey("GeneratedPassword") ? member.AdditionalData["GeneratedPassword"] : null},
-                                {"newPassword", member.AdditionalData.ContainsKey("NewPassword") ? member.AdditionalData["NewPassword"] : null},
+                                {"generatedPassword", member.GetAdditionalDataValueIgnoreCase("GeneratedPassword", null) },
+                                {"newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null) },
                             },
                         //TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
                         View = "changepassword",

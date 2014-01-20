@@ -152,7 +152,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IUser>.Builder.Where(x => x.Username == login);
+                var query = Query<IUser>.Builder.Where(x => x.Username.Equals(login));
                 return repository.GetByQuery(query).FirstOrDefault();
             }
         }

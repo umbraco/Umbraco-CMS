@@ -22,6 +22,20 @@ describe('macro service tests', function () {
 
 
         });
+
+        it('can parse syntax for macros with aliases containing dots', function () {
+
+            var result = macroService.parseMacroSyntax("<?UMBRACO_MACRO macroAlias='Map.Test' test1=\"asdf\" test2='hello' />");
+
+            expect(result).not.toBeNull();
+            expect(result.macroAlias).toBe("Map.Test");
+            expect(result.marcoParamsDictionary.test1).not.toBeUndefined();
+            expect(result.marcoParamsDictionary.test1).toBe("asdf");
+            expect(result.marcoParamsDictionary.test2).not.toBeUndefined();
+            expect(result.marcoParamsDictionary.test2).toBe("hello");
+
+
+        });
         
         it('can parse syntax for macros with body', function () {
 

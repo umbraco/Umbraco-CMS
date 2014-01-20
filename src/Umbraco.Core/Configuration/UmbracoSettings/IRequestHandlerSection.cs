@@ -10,6 +10,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         bool RemoveDoubleDashes { get; }
 
+        bool ConvertUrlsToAscii { get; }
+
         IEnumerable<IChar> CharCollection { get; }
     }
 }
