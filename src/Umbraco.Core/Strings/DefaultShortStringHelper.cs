@@ -71,6 +71,17 @@ namespace Umbraco.Core.Strings
             }
         }
 
+        private static bool UrlReplacingToAscii
+        {
+            get
+            {
+                var replaceChars = UmbracoSettings.UrlReplaceCharacters;
+                if (replaceChars == null || replaceChars.Attributes == null) return false;
+                var attr = replaceChars.Attributes.GetNamedItem("toAscii");
+                return attr != null && attr.Value == "true";
+            }
+        }
+
         /// <summary>
         /// Returns a new string in which characters have been replaced according to the Umbraco settings UrlReplaceCharacters.
         /// </summary>
@@ -147,7 +158,7 @@ namespace Umbraco.Core.Strings
             {
                 PreFilter = ApplyUrlReplaceCharacters,
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
-                StringType = CleanStringType.Utf8 | CleanStringType.LowerCase,
+                StringType = (UrlReplacingToAscii ? CleanStringType.Ascii : CleanStringType.Utf8) | CleanStringType.LowerCase,
                 BreakTermsOnUpper = false,
                 Separator = '-'
             }).WithConfig(CleanStringType.FileName, new Config
