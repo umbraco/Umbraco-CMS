@@ -61,7 +61,7 @@
   </nodeType>
   <nodeType alias="users">
     <header>User</header>
-    <usercontrol>/create/simple.ascx</usercontrol>
+    <usercontrol>/create/user.ascx</usercontrol>
     <tasks>
       <create assembly="umbraco" type="userTasks" />
       <delete assembly="umbraco" type="userTasks" />
