@@ -261,11 +261,7 @@
         <cc1:Pane ID="pane_optional" runat="server" Visible="false" />
         <cc1:Pane ID="pane_success" runat="server" Text="Package is installed" Visible="false">
             <cc1:PropertyPanel runat="server">
-                
-                <script type="text/javascript">
-                //UmbClientMgr.mainWindow().UmbClientMgr._packageInstalled();
-                </script>
-
+              
                 <p>
                     All items in the package has been installed</p>
                 <p>
@@ -290,16 +286,17 @@
                     
                     //This is all a bit zany with double encoding because we have a URL in a hash (#) url part
                     // but it works and maintains query strings
-                    
+
                     var refreshQuery = decodeURIComponent("<%=RefreshQueryString%>");
                     var umbPath = "<%=GlobalSettings.Path%>";
                     setTimeout(function () {
 
                         var mainWindow = UmbClientMgr.mainWindow();
 
-                        var refreshUrl = mainWindow.location.href +
-                            encodeURIComponent(encodeURIComponent("?" + refreshQuery));
-                        
+                        var baseUrl = mainWindow.location.href.substr(0, mainWindow.location.href.indexOf("#/developer/framed/"));
+                        var framedUrl = baseUrl + "#/developer/framed/";
+                        var refreshUrl = framedUrl + encodeURIComponent(encodeURIComponent(umbPath + "/developer/packages/installer.aspx?" + refreshQuery));
+
                         var redirectUrl = umbPath + "/ClientRedirect.aspx?redirectUrl=" + refreshUrl;
 
                         mainWindow.location.href = redirectUrl;
