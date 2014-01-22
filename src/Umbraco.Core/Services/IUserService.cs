@@ -7,7 +7,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Defines the UserService, which is an easy access to operations involving <see cref="IProfile"/> and eventually Users.
     /// </summary>
-    internal interface IUserService : IMembershipUserService
+    public interface IUserService : IMembershipUserService
     {
         /// <summary>
         /// Gets an IProfile by User Id.

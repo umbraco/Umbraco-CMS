@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models.Membership
     /// <remarks>Will be left internal until a proper Membership implementation is part of the roadmap</remarks>
     public interface IUser : IMembershipUser, IProfile
     {
-        new object Id { get; set; }
+        new int Id { get; set; }
 
         int SessionTimeout { get; set; }
         int StartContentId { get; set; }

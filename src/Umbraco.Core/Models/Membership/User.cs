@@ -19,7 +19,7 @@ namespace Umbraco.Core.Models.Membership
     /// </remarks>
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class User : TracksChangesEntityBase, IUser
+    public class User : TracksChangesEntityBase, IUser
     {
         public User(IUserType userType)
         {
@@ -45,7 +45,7 @@ namespace Umbraco.Core.Models.Membership
 
         private readonly IUserType _userType;
         private bool _hasIdentity;
-        private object _id;
+        private int _id;
         private string _name;
         private Type _userTypeKey;
         private readonly List<string> _addedSections;
@@ -242,6 +242,12 @@ namespace Umbraco.Core.Models.Membership
 
         #region Implementation of IProfile
 
+        object IProfile.Id
+        {
+            get { return Id; }
+            set { Id = (int)value; }
+        }
+
         [DataMember]
         public string Name
         {
@@ -355,7 +361,7 @@ namespace Umbraco.Core.Models.Membership
         }
 
         [DataMember]
-        public object Id
+        public int Id
         {
             get { return _id; }
             set
