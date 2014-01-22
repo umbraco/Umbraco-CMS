@@ -373,7 +373,11 @@ namespace Umbraco.Core.Services
             foreach (var propertyType in contentType.PropertyTypes)
             {
                 var definition = _dataTypeService.GetDataTypeDefinitionById(propertyType.DataTypeDefinitionId);
-                var propertyGroup = contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
+                
+                var propertyGroup = propertyType.PropertyGroupId == null 
+                                                ? null 
+                                                : contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
+                
                 var genericProperty = new XElement("GenericProperty",
                                                    new XElement("Name", propertyType.Name),
                                                    new XElement("Alias", propertyType.Alias),
