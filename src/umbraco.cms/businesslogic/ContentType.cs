@@ -1149,6 +1149,15 @@ namespace umbraco.cms.businesslogic
                     return;
                 }
             }
+            else if (nodeObjectType == new Guid(Constants.ObjectTypes.MemberType))
+            {
+                var memberType = ApplicationContext.Current.Services.MemberTypeService.Get(Id);
+                if (memberType != null)
+                {
+                    PopulateContentTypeFromContentTypeBase(memberType);
+                    return;
+                }
+            }
 
             // TODO: Load master content types
             using (var dr = SqlHelper.ExecuteReader("Select allowAtRoot, isContainer, Alias,icon,thumbnail,description from cmsContentType where nodeid=" + Id)
@@ -1183,9 +1192,8 @@ namespace umbraco.cms.businesslogic
             RemoveFromDataTypeCache(ct.Alias);
 
             // clear anything that uses this as master content type
-            //TODO: Update to load all content types
-            //Should this include "ct.nodeObjectType == media.MediaType._objectType" ?
-            if (ct.nodeObjectType == DocumentType._objectType)
+            if (ct.nodeObjectType == DocumentType._objectType 
+                || ct.nodeObjectType == media.MediaType._objectType)
             {
                 //NOTE Changed from "DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == id)" to loading master contenttypes directly from the db.
                 //Related to http://issues.umbraco.org/issue/U4-1714
