@@ -28,7 +28,7 @@ namespace umbraco.presentation
             Guid pageVersion = new Guid(helper.Request("umbVersionId"));
 
             System.Web.HttpContext.Current.Items["macrosAdded"] = 0;
-            System.Web.HttpContext.Current.Items["pageID"] = pageID.ToString();
+            System.Web.HttpContext.Current.Items["pageID"] = pageID;
 
             // Collect attributes
             Hashtable attributes = new Hashtable();
