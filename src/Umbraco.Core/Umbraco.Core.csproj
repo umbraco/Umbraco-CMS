@@ -189,6 +189,7 @@
     <Compile Include="Models\ContentTypeCompositionBase.cs" />
     <Compile Include="Models\ContentTypeExtensions.cs" />
     <Compile Include="Models\ContentTypeSort.cs" />
+    <Compile Include="Models\EntityExtensions.cs" />
     <Compile Include="Models\IRelation.cs" />
     <Compile Include="Models\IRelationType.cs" />
     <Compile Include="Models\Membership\EntityPermission.cs" />

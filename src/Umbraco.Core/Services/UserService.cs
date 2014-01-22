@@ -75,9 +75,11 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IUser CreateMember(string username, string email, string password, IUserType userType)
+        public IUser CreateMemberWithIdentity(string username, string email, string password, IUserType userType, bool raiseEvents = true)
         {
             if (userType == null) throw new ArgumentNullException("userType");
+
+            //TODO: PUT lock here!!
 
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateUserRepository(uow))
@@ -101,14 +103,23 @@ namespace Umbraco.Core.Services
                     IsApproved = true
                 };
 
+                if (raiseEvents)
+                {
+                    if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(user), this))
+                        return user;
+                }
+
                 repository.AddOrUpdate(user);
                 uow.Commit();
+
+                if (raiseEvents)
+                    SavedUser.RaiseEvent(new SaveEventArgs<IUser>(user, false), this);
 
                 return user;
             }
         }
 
-        public IUser CreateMember(string username, string email, string password, string memberTypeAlias)
+        public IUser CreateMember(string username, string email, string password, string memberTypeAlias, bool raiseEvents = true)
         {
             var userType = GetUserTypeByAlias(memberTypeAlias);
             if (userType == null)
@@ -116,7 +127,7 @@ namespace Umbraco.Core.Services
                 throw new ArgumentException("The user type " + memberTypeAlias + " could not be resolved");
             }
 
-            return CreateMember(username, email, password, userType);
+            return CreateMemberWithIdentity(username, email, password, userType);
         }
 
         public IUser GetById(object id)
@@ -156,7 +167,7 @@ namespace Umbraco.Core.Services
 
         public void Delete(IUser membershipUser)
         {
-            if (UserDeleting.IsRaisedEventCancelled(new DeleteEventArgs<IUser>(membershipUser), this))
+            if (DeletingUser.IsRaisedEventCancelled(new DeleteEventArgs<IUser>(membershipUser), this))
                 return;
 
             var uow = _uowProvider.GetUnitOfWork();
@@ -166,14 +177,14 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
 
-            UserDeleted.RaiseEvent(new DeleteEventArgs<IUser>(membershipUser, false), this);
+            DeletedUser.RaiseEvent(new DeleteEventArgs<IUser>(membershipUser, false), this);
         }
 
         public void Save(IUser membershipUser, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
-                if (UserSaving.IsRaisedEventCancelled(new SaveEventArgs<IUser>(membershipUser), this))
+                if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(membershipUser), this))
                     return;
             }
 
@@ -185,14 +196,14 @@ namespace Umbraco.Core.Services
             }
 
             if (raiseEvents)
-                UserSaved.RaiseEvent(new SaveEventArgs<IUser>(membershipUser, false), this);
+                SavedUser.RaiseEvent(new SaveEventArgs<IUser>(membershipUser, false), this);
         }
 
         public void Save(IEnumerable<IUser> members, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
-                if (UserSaving.IsRaisedEventCancelled(new SaveEventArgs<IUser>(members), this))
+                if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(members), this))
                     return;
             }
 
@@ -208,7 +219,7 @@ namespace Umbraco.Core.Services
             }
 
             if (raiseEvents)
-                UserSaved.RaiseEvent(new SaveEventArgs<IUser>(members, false), this);
+                SavedUser.RaiseEvent(new SaveEventArgs<IUser>(members, false), this);
         }
 
         public IEnumerable<IUser> FindMembersByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
@@ -383,7 +394,7 @@ namespace Umbraco.Core.Services
         {
             if (raiseEvents)
             {
-                if (UserTypeSaving.IsRaisedEventCancelled(new SaveEventArgs<IUserType>(userType), this))
+                if (SavingUserType.IsRaisedEventCancelled(new SaveEventArgs<IUserType>(userType), this))
                     return;
             }
 
@@ -395,12 +406,12 @@ namespace Umbraco.Core.Services
             }
 
             if (raiseEvents)
-                UserTypeSaved.RaiseEvent(new SaveEventArgs<IUserType>(userType, false), this);
+                SavedUserType.RaiseEvent(new SaveEventArgs<IUserType>(userType, false), this);
         }
 
         public void DeleteUserType(IUserType userType)
         {
-            if (UserTypeDeleting.IsRaisedEventCancelled(new DeleteEventArgs<IUserType>(userType), this))
+            if (DeletingUserType.IsRaisedEventCancelled(new DeleteEventArgs<IUserType>(userType), this))
                 return;
 
             var uow = _uowProvider.GetUnitOfWork();
@@ -410,7 +421,7 @@ namespace Umbraco.Core.Services
                 uow.Commit();
             }
 
-            UserTypeDeleted.RaiseEvent(new DeleteEventArgs<IUserType>(userType, false), this);
+            DeletedUserType.RaiseEvent(new DeleteEventArgs<IUserType>(userType, false), this);
         }
 
         /// <summary>
@@ -486,41 +497,41 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        public static event TypedEventHandler<IUserService, SaveEventArgs<IUser>> UserSaving;
+        public static event TypedEventHandler<IUserService, SaveEventArgs<IUser>> SavingUser;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        public static event TypedEventHandler<IUserService, SaveEventArgs<IUser>> UserSaved;
+        public static event TypedEventHandler<IUserService, SaveEventArgs<IUser>> SavedUser;
 
         /// <summary>
         /// Occurs before Delete
         /// </summary>
-        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUser>> UserDeleting;
+        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUser>> DeletingUser;
 
         /// <summary>
         /// Occurs after Delete
         /// </summary>
-        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUser>> UserDeleted;
+        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUser>> DeletedUser;
 
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        public static event TypedEventHandler<IUserService, SaveEventArgs<IUserType>> UserTypeSaving;
+        public static event TypedEventHandler<IUserService, SaveEventArgs<IUserType>> SavingUserType;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        public static event TypedEventHandler<IUserService, SaveEventArgs<IUserType>> UserTypeSaved;
+        public static event TypedEventHandler<IUserService, SaveEventArgs<IUserType>> SavedUserType;
 
         /// <summary>
         /// Occurs before Delete
         /// </summary>
-        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUserType>> UserTypeDeleting;
+        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUserType>> DeletingUserType;
 
         /// <summary>
         /// Occurs after Delete
         /// </summary>
-        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUserType>> UserTypeDeleted;
+        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUserType>> DeletedUserType;
     }
 }

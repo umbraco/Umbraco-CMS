@@ -66,6 +66,17 @@ namespace Umbraco.Core.Services
         void DeleteMembersOfType(int memberTypeId);
 
         /// <summary>
+        /// Find members based on their display name
+        /// </summary>
+        /// <param name="displayNameToMatch"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="matchType"></param>
+        /// <returns></returns>
+        IEnumerable<IMember> FindMembersByDisplayName(string displayNameToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
+
+        /// <summary>
         /// Get members based on a property search
         /// </summary>
         /// <param name="propertyTypeAlias"></param>

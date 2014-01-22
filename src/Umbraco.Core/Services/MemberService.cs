@@ -205,6 +205,38 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IEnumerable<IMember> FindMembersByDisplayName(string displayNameToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
+            {
+                var query = new Query<IMember>();
+
+                switch (matchType)
+                {
+                    case StringPropertyMatchType.Exact:
+                        query.Where(member => member.Name.Equals(displayNameToMatch));
+                        break;
+                    case StringPropertyMatchType.Contains:
+                        query.Where(member => member.Name.Contains(displayNameToMatch));
+                        break;
+                    case StringPropertyMatchType.StartsWith:
+                        query.Where(member => member.Name.StartsWith(displayNameToMatch));
+                        break;
+                    case StringPropertyMatchType.EndsWith:
+                        query.Where(member => member.Name.EndsWith(displayNameToMatch));
+                        break;
+                    case StringPropertyMatchType.Wildcard:
+                        query.Where(member => member.Name.SqlWildcard(displayNameToMatch, TextColumnType.NVarchar));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("matchType");
+                }
+
+                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Name);
+            }
+        }
+
         /// <summary>
         /// Does a search for members that contain the specified string in their email address
         /// </summary>
@@ -536,11 +568,17 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IMember CreateMember(string email, string username, string password, IMemberType memberType)
+        public IMember CreateMemberWithIdentity(string email, string username, string password, IMemberType memberType, bool raiseEvents = true)
         {
             if (memberType == null) throw new ArgumentNullException("memberType");
 
-            var member = new Member(email, email, username, password, -1, memberType);
+            var member = new Member(username, email.ToLower().Trim(), username, password, -1, memberType);
+
+            if (raiseEvents)
+            {
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(member), this))
+                    return member;
+            }
 
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
@@ -553,6 +591,9 @@ namespace Umbraco.Core.Services
                 CreateAndSaveMemberXml(xml, member.Id, uow.Database);
             }
 
+            if (raiseEvents)
+                Saved.RaiseEvent(new SaveEventArgs<IMember>(member, false), this);
+
             return member;
         }
 
@@ -563,8 +604,9 @@ namespace Umbraco.Core.Services
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <param name="memberTypeAlias"></param>
+        /// <param name="raiseEvents"></param>
         /// <returns></returns>
-        public IMember CreateMember(string email, string username, string password, string memberTypeAlias)
+        public IMember CreateMember(string email, string username, string password, string memberTypeAlias, bool raiseEvents = true)
         {
             var uow = _uowProvider.GetUnitOfWork();
             IMemberType memberType;
@@ -580,7 +622,7 @@ namespace Umbraco.Core.Services
                 throw new ArgumentException(string.Format("No MemberType matching the passed in Alias: '{0}' was found", memberTypeAlias));
             }
 
-            return CreateMember(email, username, password, memberTypeAlias);
+            return CreateMemberWithIdentity(email, username, password, memberType, raiseEvents);
         }
 
         /// <summary>

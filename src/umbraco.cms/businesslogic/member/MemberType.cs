@@ -2,26 +2,34 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Xml;
 using Umbraco.Core.Logging;
-using umbraco.cms.businesslogic.propertytype;
 using System.Linq;
 using umbraco.BusinessLogic;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using PropertyType = umbraco.cms.businesslogic.propertytype.PropertyType;
 
 namespace umbraco.cms.businesslogic.member
 {
 	/// MemberType
 	/// 
 	/// Due to the inheritance of the ContentType class, it enables definition of generic datafields on a Members.
-	/// 
+    [Obsolete("Obsolete, Use Umbraco.Core.Models.MemberType", false)]
 	public class MemberType : ContentType
     {
         #region Private Members
 
-        private static Guid _objectType = new Guid(Constants.ObjectTypes.MemberType);
-        
+        internal static readonly Guid ObjectType = new Guid(Constants.ObjectTypes.MemberType);
+        private IMemberType _contentType;
+
         #endregion
 
         #region Constructors
+
+        internal MemberType(IMemberType memberType)
+            : base(memberType)
+        {
+            SetupNode(memberType);
+        }
 
         /// <summary>
 		/// Initializes a new instance of the MemberType class.
@@ -70,7 +78,7 @@ namespace umbraco.cms.businesslogic.member
 		/// <returns>True if the Member can edit the data</returns>
         public bool MemberCanEdit(PropertyType pt)
         {
-            if (propertyTypeRegistered(pt))
+            if (PropertyTypeRegistered(pt))
             {
                 var memberCanEdit = SqlHelper.ExecuteScalar<object>("Select memberCanEdit from cmsMemberType where NodeId = " + this.Id + " And propertytypeId = " + pt.Id);
                 return (Convert.ToBoolean(memberCanEdit));
@@ -85,7 +93,7 @@ namespace umbraco.cms.businesslogic.member
 		/// <returns>True if the data should be displayed on the profilepage</returns>
 		public bool ViewOnProfile(PropertyType pt) 
 		{
-			if(propertyTypeRegistered(pt)) 
+			if(PropertyTypeRegistered(pt)) 
 			{
                 return Convert.ToBoolean(SqlHelper.ExecuteScalar<object>("Select viewOnProfile from cmsMemberType where NodeId = " + this.Id + " And propertytypeId = " + pt.Id));
 			}
@@ -101,7 +109,7 @@ namespace umbraco.cms.businesslogic.member
         {
             int tmpval = 0;
             if (value) tmpval = 1;
-            if (propertyTypeRegistered(pt))
+            if (PropertyTypeRegistered(pt))
                 SqlHelper.ExecuteNonQuery("Update cmsMemberType set memberCanEdit = " + tmpval + " where NodeId = " + this.Id + " And propertytypeId = " + pt.Id);
             else
                 SqlHelper.ExecuteNonQuery("insert into cmsMemberType (NodeId, propertytypeid, memberCanEdit,viewOnProfile) values (" + this.Id + "," + pt.Id + ", " + tmpval + ",0)");
@@ -117,7 +125,7 @@ namespace umbraco.cms.businesslogic.member
 		{
 			int tmpval = 0;
 			if (value) tmpval = 1;
-			if (propertyTypeRegistered(pt))
+			if (PropertyTypeRegistered(pt))
 				SqlHelper.ExecuteNonQuery("Update cmsMemberType set viewOnProfile = " + tmpval + " where NodeId = " + this.Id +" And propertytypeId = "+pt.Id);
 			else
 				SqlHelper.ExecuteNonQuery("insert into cmsMemberType (NodeId, propertytypeid, viewOnProfile) values ("+this.Id+","+pt.Id+", "+tmpval+")");
@@ -132,34 +140,31 @@ namespace umbraco.cms.businesslogic.member
 		/// </summary>
 		public override void delete() 
 		{
-            DeleteEventArgs e = new DeleteEventArgs();
+            var e = new DeleteEventArgs();
 
             FireBeforeDelete(e);
 
-            if (!e.Cancel) {
+            if (e.Cancel == false) {
+
+                ApplicationContext.Current.Services.MemberTypeService.Delete(_contentType);
 
                 // delete all documents of this type
-                Member.DeleteFromType(this);
-
-                // delete membertype specific data
-                SqlHelper.ExecuteNonQuery("Delete from cmsMemberType where nodeId = " + this.Id);
-
-                // Delete contentType
-                base.delete();
                 FireAfterDelete(e);
             }
         }
 
         /// <summary>
-        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
+        /// Used to persist object changes to the database
         /// </summary>
         public override void Save()
         {
-            SaveEventArgs e = new SaveEventArgs();
+            var e = new SaveEventArgs();
             FireBeforeSave(e);
 
-            if (!e.Cancel)
+            if (e.Cancel == false)
             {
+                ApplicationContext.Current.Services.MemberTypeService.Save(_contentType);
+                base.Save();
                 FireAfterSave(e);
             }
         }
@@ -218,18 +223,8 @@ namespace umbraco.cms.businesslogic.member
         /// <returns>The MemberType with the given Alias</returns>
         public new static MemberType GetByAlias(string Alias)
         {
-            try
-            {
-                return
-                    new MemberType(
-                            SqlHelper.ExecuteScalar<int>(@"SELECT nodeid from cmsContentType INNER JOIN umbracoNode on cmsContentType.nodeId = umbracoNode.id WHERE nodeObjectType=@nodeObjectType AND alias=@alias",
-                                SqlHelper.CreateParameter("@nodeObjectType", MemberType._objectType),
-                                SqlHelper.CreateParameter("@alias", Alias)));
-            }
-            catch
-            {
-                return null;
-            }
+            var result = ApplicationContext.Current.Services.MemberTypeService.Get(Alias);
+            return result == null ? null : new MemberType(result);
         }
 
         /// <summary>
@@ -240,21 +235,17 @@ namespace umbraco.cms.businesslogic.member
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static MemberType MakeNew(User u, string Text)
         {
-            int ParentId = -1;
-            int level = 1;
-            Guid uniqueId = Guid.NewGuid();
-            CMSNode n = CMSNode.MakeNew(ParentId, _objectType, u.Id, level, Text, uniqueId);
-
-            ContentType.Create(n.Id, Text, "",
-                //don't format the alias if it equals this. See: http://issues.umbraco.org/issue/U4-3968
-                Text != "_umbracoSystemDefaultProtectType");
-            
-            MemberType mt = new MemberType(n.Id);
-            mt.IconUrl = "member.gif";
-            NewEventArgs e = new NewEventArgs();
-            mt.OnNew(e);
-
-            return mt;
+            var mt = new Umbraco.Core.Models.MemberType(-1)
+            {
+                Level = 1,
+                Name = Text,
+                Icon = "member.gif"
+            };
+            ApplicationContext.Current.Services.MemberTypeService.Save(mt);
+            var legacy = new MemberType(mt);
+            var e = new NewEventArgs();
+            legacy.OnNew(e);
+            return legacy;
         }
 
         /// <summary>
@@ -264,18 +255,23 @@ namespace umbraco.cms.businesslogic.member
         {
             get
             {
-                Guid[] Ids = CMSNode.getAllUniquesFromObjectType(_objectType);
-
-                MemberType[] retVal = new MemberType[Ids.Length];
-                for (int i = 0; i < Ids.Length; i++) retVal[i] = new MemberType(Ids[i]);
-                return retVal;
+                var result = ApplicationContext.Current.Services.MemberTypeService.GetAll();
+                return result.Select(x => new MemberType(x)).ToArray();
             }
         }
         #endregion
 
         #region Private Methods
 
-        private bool propertyTypeRegistered(PropertyType pt)
+        private void SetupNode(IMemberType contentType)
+        {
+            _contentType = contentType;            
+
+            base.PopulateContentTypeFromContentTypeBase(_contentType);
+            base.PopulateCMSNodeFromUmbracoEntity(_contentType, ObjectType);
+        }
+
+        private bool PropertyTypeRegistered(PropertyType pt)
         {
             return (SqlHelper.ExecuteScalar<int>("Select count(pk) as tmp from cmsMemberType where NodeId = " + this.Id + " And propertytypeId = " + pt.Id) > 0);
         }

@@ -11,7 +11,7 @@ namespace Umbraco.Core.Services
     public interface IMembershipUserService : IMembershipMemberService<IUser>
     {
 
-        IUser CreateMember(string username, string email, string password, IUserType userType);
+        IUser CreateMemberWithIdentity(string username, string email, string password, IUserType userType, bool raiseEvents = true);
 
     }
 }

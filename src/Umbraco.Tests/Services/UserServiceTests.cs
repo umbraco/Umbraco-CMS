@@ -35,7 +35,7 @@ namespace Umbraco.Tests.Services
             // Arrange
             var userService = ServiceContext.UserService;
             var userType = userService.GetUserTypeByAlias("admin");
-            var user = ServiceContext.UserService.CreateMember("test1", "test1@test.com", "123456", userType);
+            var user = ServiceContext.UserService.CreateMemberWithIdentity("test1", "test1@test.com", "123456", userType);
             var contentType = MockedContentTypes.CreateSimpleContentType();
             ServiceContext.ContentTypeService.Save(contentType);
             var content = new[]
@@ -62,7 +62,7 @@ namespace Umbraco.Tests.Services
             // Arrange
             var userService = ServiceContext.UserService;
             var userType = userService.GetUserTypeByAlias("admin");
-            var user = ServiceContext.UserService.CreateMember("test1", "test1@test.com", "123456", userType);
+            var user = ServiceContext.UserService.CreateMemberWithIdentity("test1", "test1@test.com", "123456", userType);
             var contentType = MockedContentTypes.CreateSimpleContentType();
             ServiceContext.ContentTypeService.Save(contentType);
             var content = new[]
@@ -96,7 +96,7 @@ namespace Umbraco.Tests.Services
         {
             var userType = MockedUserType.CreateUserType();
             ServiceContext.UserService.SaveUserType(userType);
-            var user = ServiceContext.UserService.CreateMember("JohnDoe", "john@umbraco.io", "12345", userType);
+            var user = ServiceContext.UserService.CreateMemberWithIdentity("JohnDoe", "john@umbraco.io", "12345", userType);
             
             ServiceContext.UserService.Delete(user);
             var deleted = ServiceContext.UserService.GetById(user.Id);
@@ -110,7 +110,7 @@ namespace Umbraco.Tests.Services
         {
             var userType = MockedUserType.CreateUserType();
             ServiceContext.UserService.SaveUserType(userType);
-            var user = ServiceContext.UserService.CreateMember("JohnDoe", "john@umbraco.io", "12345", userType);
+            var user = ServiceContext.UserService.CreateMemberWithIdentity("JohnDoe", "john@umbraco.io", "12345", userType);
 
             Assert.IsTrue(ServiceContext.UserService.Exists("JohnDoe"));
             Assert.IsFalse(ServiceContext.UserService.Exists("notFound"));
@@ -121,7 +121,7 @@ namespace Umbraco.Tests.Services
         {
             var userType = MockedUserType.CreateUserType();
             ServiceContext.UserService.SaveUserType(userType);
-            var user = ServiceContext.UserService.CreateMember("JohnDoe", "john@umbraco.io", "12345", userType);
+            var user = ServiceContext.UserService.CreateMemberWithIdentity("JohnDoe", "john@umbraco.io", "12345", userType);
 
             Assert.IsNotNull(ServiceContext.UserService.GetByEmail(user.Email));
             Assert.IsNull(ServiceContext.UserService.GetByEmail("do@not.find"));
@@ -132,7 +132,7 @@ namespace Umbraco.Tests.Services
         {
             var userType = MockedUserType.CreateUserType();
             ServiceContext.UserService.SaveUserType(userType);
-            var user = ServiceContext.UserService.CreateMember("JohnDoe", "john@umbraco.io", "12345", userType);
+            var user = ServiceContext.UserService.CreateMemberWithIdentity("JohnDoe", "john@umbraco.io", "12345", userType);
 
             Assert.IsNotNull(ServiceContext.UserService.GetByUsername(user.Username));
             Assert.IsNull(ServiceContext.UserService.GetByUsername("notFound"));
@@ -143,7 +143,7 @@ namespace Umbraco.Tests.Services
         {
             var userType = MockedUserType.CreateUserType();
             ServiceContext.UserService.SaveUserType(userType);
-            var user = ServiceContext.UserService.CreateMember("JohnDoe", "john@umbraco.io", "12345", userType);
+            var user = ServiceContext.UserService.CreateMemberWithIdentity("JohnDoe", "john@umbraco.io", "12345", userType);
 
             Assert.IsNotNull(ServiceContext.UserService.GetById(user.Id));
             Assert.IsNull(ServiceContext.UserService.GetById(9876));
@@ -325,7 +325,7 @@ namespace Umbraco.Tests.Services
             var userType = userService.GetUserTypeByAlias("admin");
 
             // Act
-            var membershipUser = userService.CreateMember("JohnDoe", "john@umbraco.io", "12345", userType);
+            var membershipUser = userService.CreateMemberWithIdentity("JohnDoe", "john@umbraco.io", "12345", userType);
 
             // Assert
             Assert.That(membershipUser.HasIdentity, Is.True);
@@ -347,7 +347,7 @@ namespace Umbraco.Tests.Services
             var hash = new HMACSHA1();
             hash.Key = Encoding.Unicode.GetBytes(password);
             var encodedPassword = Convert.ToBase64String(hash.ComputeHash(Encoding.Unicode.GetBytes(password)));
-            var membershipUser = userService.CreateMember("JohnDoe", "john@umbraco.io", encodedPassword, userType);
+            var membershipUser = userService.CreateMemberWithIdentity("JohnDoe", "john@umbraco.io", encodedPassword, userType);
 
             // Assert
             Assert.That(membershipUser.HasIdentity, Is.True);
@@ -363,8 +363,8 @@ namespace Umbraco.Tests.Services
         {            
             var userType = ServiceContext.UserService.GetUserTypeByAlias("admin");
 
-            var user1 = ServiceContext.UserService.CreateMember("test1", "test1@test.com", "test1", userType);
-            var user2 = ServiceContext.UserService.CreateMember("test2", "test2@test.com", "test2", userType);
+            var user1 = ServiceContext.UserService.CreateMemberWithIdentity("test1", "test1@test.com", "test1", userType);
+            var user2 = ServiceContext.UserService.CreateMemberWithIdentity("test2", "test2@test.com", "test2", userType);
             
             //adds some allowed sections
             user1.AddAllowedSection("test");
@@ -388,7 +388,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var userType = ServiceContext.UserService.GetUserTypeByAlias("admin");
-            var user = ServiceContext.UserService.CreateMember("test1", "test1@test.com", "test1", userType);
+            var user = ServiceContext.UserService.CreateMemberWithIdentity("test1", "test1@test.com", "test1", userType);
 
             // Act
 
@@ -405,7 +405,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var userType = ServiceContext.UserService.GetUserTypeByAlias("admin");
-            var user = (IUser)ServiceContext.UserService.CreateMember("test1", "test1@test.com", "test1", userType);
+            var user = (IUser)ServiceContext.UserService.CreateMemberWithIdentity("test1", "test1@test.com", "test1", userType);
 
             // Act
 
@@ -422,7 +422,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var userType = ServiceContext.UserService.GetUserTypeByAlias("admin");
-            var originalUser = (User)ServiceContext.UserService.CreateMember("test1", "test1@test.com", "test1", userType);
+            var originalUser = (User)ServiceContext.UserService.CreateMemberWithIdentity("test1", "test1@test.com", "test1", userType);
 
             // Act
 

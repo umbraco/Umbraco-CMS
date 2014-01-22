@@ -125,6 +125,9 @@ namespace umbraco.cms.businesslogic.member
         public static Member[] getAllOtherMembers()
         {
 
+            //NOTE: This hasn't been ported to the new service layer because it is an edge case, it is only used to render the tree nodes but in v7 we plan on 
+            // changing how the members are shown and not having to worry about letters.
+
             var tmp = new List<Member>();
             using (var dr = SqlHelper.ExecuteReader(
                                         string.Format(_sQLOptimizedMany.Trim(), "LOWER(SUBSTRING(text, 1, 1)) NOT IN ('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z')", "umbracoNode.text"),
@@ -157,26 +160,19 @@ namespace umbraco.cms.businesslogic.member
 
         public static Member[] GetMemberByName(string usernameToMatch, bool matchByNameInsteadOfLogin)
         {
-            string field = matchByNameInsteadOfLogin ? "umbracoNode.text" : "cmsMember.loginName";
-
-            var tmp = new List<Member>();
-            using (var dr = SqlHelper.ExecuteReader(
-                                        string.Format(_sQLOptimizedMany.Trim(),
-                                        string.Format("{0} like @letter", field),
-                                        "umbracoNode.text"),
-                                            SqlHelper.CreateParameter("@nodeObjectType", Member._objectType),
-                                            SqlHelper.CreateParameter("@letter", usernameToMatch + "%")))
+            int totalRecs;
+            if (matchByNameInsteadOfLogin)
             {
-                while (dr.Read())
-                {
-                    var m = new Member(dr.GetInt("id"), true);
-                    m.PopulateMemberFromReader(dr);
-                    tmp.Add(m);
-                }
+                var found = ApplicationContext.Current.Services.MemberService.FindMembersByDisplayName(
+                    usernameToMatch, 0, int.MaxValue, out totalRecs, StringPropertyMatchType.StartsWith);
+                return found.Select(x => new Member(x)).ToArray();
             }
-
-            return tmp.ToArray();
-
+            else
+            {
+                var found = ApplicationContext.Current.Services.MemberService.FindMembersByUsername(
+                    usernameToMatch, 0, int.MaxValue, out totalRecs, StringPropertyMatchType.StartsWith);
+                return found.Select(x => new Member(x)).ToArray();
+            }
         }
 
         /// <summary>
@@ -216,17 +212,16 @@ namespace umbraco.cms.businesslogic.member
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static Member MakeNew(string Name, string LoginName, string Email, MemberType mbt, User u)
         {
-            if (mbt == null) throw new ArgumentNullException("mbt");
-
+            if (mbt == null) throw new ArgumentNullException("mbt");            
             var loginName = (string.IsNullOrEmpty(LoginName) == false) ? LoginName : Name;
-
-            if (string.IsNullOrEmpty(loginName))
-                throw new ArgumentException("The loginname must be different from an empty string", "loginName");
-
+            Mandate.ParameterNotNullOrEmpty(LoginName, "LoginName");
+            
+            //NOTE: This check is ONLY for backwards compatibility, this check shouldn't really be here it is up to the Membership provider
+            // logic to deal with this but it was here before so we can't really change that.
             // Test for e-mail
             if (Email != "" && GetMemberFromEmail(Email) != null && Membership.Providers[UmbracoMemberProviderName].RequiresUniqueEmail)
                 throw new Exception(string.Format("Duplicate Email! A member with the e-mail {0} already exists", Email));
-            else if (GetMemberFromLoginName(loginName) != null)
+            if (GetMemberFromLoginName(loginName) != null)
                 throw new Exception(string.Format("Duplicate User name! A member with the user name {0} already exists", loginName));
 
             // Lowercased to prevent duplicates
@@ -345,7 +340,7 @@ namespace umbraco.cms.businesslogic.member
                 return null;
             }
         }
-        
+
         [Obsolete("This method will not work if the password format is encrypted since the encryption that is performed is not static and a new value will be created each time the same string is encrypted")]
         public static Member GetMemberFromLoginAndEncodedPassword(string loginName, string password)
         {
@@ -442,7 +437,7 @@ namespace umbraco.cms.businesslogic.member
                 }
                 return _password;
 
-            }            
+            }
             set
             {
                 // We need to use the provider for this in order for hashing, etc. support
@@ -570,11 +565,11 @@ namespace umbraco.cms.businesslogic.member
             //If the version is empty we update with the latest version from the current IContent.
             if (Version == Guid.Empty)
                 Version = Content.Version;
-            
+
             _email = Content.Email;
             _loginName = Content.Username;
             _password = Content.Password;
-            
+
         }
 
 
@@ -624,7 +619,7 @@ namespace umbraco.cms.businesslogic.member
                             {
                                 DateTime date;
 
-                                if(DateTime.TryParse(property.Value.ToString(), out date))
+                                if (DateTime.TryParse(property.Value.ToString(), out date))
                                     poco.Date = date;
                             }
                             else if (dbType.Equals("Nvarchar"))
@@ -663,7 +658,7 @@ namespace umbraco.cms.businesslogic.member
                 FireAfterSave(e);
             }
         }
-        
+
         /// <summary>
         /// Xmlrepresentation of a member
         /// </summary>
@@ -731,7 +726,7 @@ namespace umbraco.cms.businesslogic.member
         {
             return Content.Password;
         }
-        
+
         /// <summary>
         /// Adds the member to group with the specified id
         /// </summary>
@@ -874,14 +869,14 @@ namespace umbraco.cms.businesslogic.member
                         GetCacheKey(m.Id),
                         TimeSpan.FromMinutes(30),
                         () =>
-                            {
-                                // Debug information
-                                HttpContext.Current.Trace.Write("member",
-                                                                string.Format("Member added to cache: {0}/{1} ({2})",
-                                                                              m.Text, m.LoginName, m.Id));
+                        {
+                            // Debug information
+                            HttpContext.Current.Trace.Write("member",
+                                                            string.Format("Member added to cache: {0}/{1} ({2})",
+                                                                          m.Text, m.LoginName, m.Id));
 
-                                return m;
-                            });
+                            return m;
+                        });
 
                     m.FireAfterAddToCache(e);
                 }
@@ -923,14 +918,14 @@ namespace umbraco.cms.businesslogic.member
                         GetCacheKey(m.Id),
                         TimeSpan.FromMinutes(30),
                         () =>
-                            {
-                                // Debug information
-                                HttpContext.Current.Trace.Write("member",
-                                                                string.Format("Member added to cache: {0}/{1} ({2})",
-                                                                              m.Text, m.LoginName, m.Id));
+                        {
+                            // Debug information
+                            HttpContext.Current.Trace.Write("member",
+                                                            string.Format("Member added to cache: {0}/{1} ({2})",
+                                                                          m.Text, m.LoginName, m.Id));
 
-                                return m;
-                            });
+                            return m;
+                        });
 
                     m.FireAfterAddToCache(e);
                 }
@@ -1070,7 +1065,7 @@ namespace umbraco.cms.businesslogic.member
 
             return HttpContext.Current.User.Identity.IsAuthenticated;
         }
-        
+
         /// <summary>
         /// Gets the current visitors memberid
         /// </summary>
