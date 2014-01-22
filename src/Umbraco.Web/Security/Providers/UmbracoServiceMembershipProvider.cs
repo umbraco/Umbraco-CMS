@@ -456,9 +456,19 @@ namespace Umbraco.Web.Security.Providers
             if (m == null)
             {
                 throw new ProviderException(string.Format("No member with the username '{0}' found", user.UserName));
-            }                
+            }
 
+            if (RequiresUniqueEmail && user.Email.Trim().IsNullOrWhiteSpace() == false)
+            {
+                int totalRecs;
+                var byEmail = MemberService.FindMembersByEmail(user.Email.Trim(), 0, int.MaxValue, out totalRecs, StringPropertyMatchType.Exact);
+                if (byEmail.Count(x => x.Id != m.Id) > 0)
+                {
+                    throw new ProviderException(string.Format("A member with the email '{0}' already exists", user.Email));
+                }
+            }
             m.Email = user.Email;
+            
             m.IsApproved = user.IsApproved;
             m.IsLockedOut = user.IsLockedOut;
             if (user.IsLockedOut)

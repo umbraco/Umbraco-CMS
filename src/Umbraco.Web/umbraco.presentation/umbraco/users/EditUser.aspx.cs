@@ -340,7 +340,7 @@ namespace umbraco.cms.presentation.user
             channelInfo.HasMenu = true;
             ImageButton save = channelInfo.Menu.NewImageButton();
             save.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
-            save.Click += new ImageClickEventHandler(SaveUser_Click);
+            save.Click += SaveUser_Click;
             save.ID = "save";
             if (!IsPostBack)
             {
@@ -366,17 +366,17 @@ namespace umbraco.cms.presentation.user
                 lname.Text = (user == null) ? u.LoginName : user.UserName;
                 email.Text = (user == null) ? u.Email : user.Email;
 
-                // Prevent users from changing information if logged in through active directory membership provider
-                // active directory-mapped accounts have empty passwords by default... so set update user fields to read only
-                // this will not be a security issue because empty passwords are not allowed in membership provider. 
-                // This might change in version 4.0
-                if (string.IsNullOrEmpty(u.GetPassword()))
-                {
-                    uname.ReadOnly = true;
-                    lname.ReadOnly = true;
-                    email.ReadOnly = true;
-                    passw.Visible = false;
-                }
+                //// Prevent users from changing information if logged in through a custom provider
+                //// custom provider mapped accounts have empty passwords by default... so set update user fields to read only
+                //// this will not be a security issue because empty passwords are not allowed in membership provider. 
+                //// This might change in version 4.0
+                //if (string.IsNullOrEmpty(u.GetPassword()))
+                //{
+                //    uname.ReadOnly = true;
+                //    lname.ReadOnly = true;
+                //    email.ReadOnly = true;
+                //    passw.Visible = false;
+                //}
 
                 contentPicker.Value = u.StartNodeId.ToString(CultureInfo.InvariantCulture);
                 mediaPicker.Value = u.StartMediaId.ToString(CultureInfo.InvariantCulture);
