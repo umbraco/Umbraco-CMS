@@ -1629,7 +1629,7 @@ namespace Umbraco.Core.Services
             xml.Add(new XElement("Design", new XCData(template.Content)));
 
             var concreteTemplate = template as Template;
-            if (concreteTemplate != null)
+            if (concreteTemplate != null && concreteTemplate.MasterTemplateId != null)
             {
                 if (concreteTemplate.MasterTemplateId.IsValueCreated &&
                     concreteTemplate.MasterTemplateId.Value != default(int))
