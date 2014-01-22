@@ -17,7 +17,7 @@ namespace Umbraco.Web.Security.Providers
     /// <summary>
     /// Custom Membership Provider for Umbraco Members (User authentication for Frontend applications NOT umbraco CMS)  
     /// </summary>
-    internal class MembersMembershipProvider : UmbracoServiceMembershipProvider<IMembershipMemberService, IMember>
+    public class MembersMembershipProvider : UmbracoServiceMembershipProvider<IMembershipMemberService, IMember>
     {
         public MembersMembershipProvider()
             : this(ApplicationContext.Current.Services.MemberService)

@@ -17,7 +17,7 @@ namespace Umbraco.Web.Security.Providers
     /// <summary>
     /// Abstract Membership Provider that users any implementation of IMembershipMemberService{TEntity} service
     /// </summary>
-    internal abstract class UmbracoServiceMembershipProvider<T, TEntity> : UmbracoMembershipProviderBase
+    public abstract class UmbracoServiceMembershipProvider<T, TEntity> : UmbracoMembershipProviderBase
         where T : IMembershipMemberService<TEntity>
         where TEntity : class, IMembershipUser
     {

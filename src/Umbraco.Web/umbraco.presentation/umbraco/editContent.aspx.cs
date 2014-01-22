@@ -365,8 +365,6 @@ namespace umbraco.cms.presentation
             _unPublish.Visible = false;
             _documentHasPublishedVersion = false;
 
-            //library.UnPublishSingleNode(_document.Id);
-
             Current.ClientTools.SyncTree(_document.Path, true);
             ClientTools.ShowSpeechBubble(speechBubbleIcon.success, ui.Text("unpublish"), ui.Text("speechBubbles", "contentUnpublished"));
 

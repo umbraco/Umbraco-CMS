@@ -7,7 +7,7 @@ namespace Umbraco.Core.Models.Membership
     /// Defines the interface for a <see cref="User"/>
     /// </summary>
     /// <remarks>Will be left internal until a proper Membership implementation is part of the roadmap</remarks>
-    internal interface IUser : IMembershipUser, IProfile
+    public interface IUser : IMembershipUser, IProfile
     {
         new object Id { get; set; }
 

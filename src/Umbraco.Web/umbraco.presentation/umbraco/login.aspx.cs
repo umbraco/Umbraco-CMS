@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.ComponentModel;
+using System.Configuration.Provider;
 using System.Data;
 using System.Drawing;
 using System.Security;
@@ -17,6 +18,7 @@ using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.web;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Security;
 
 namespace umbraco.cms.presentation
 {
@@ -28,6 +30,19 @@ namespace umbraco.cms.presentation
         [Obsolete("This property is no longer used")]
         protected umbWindow treeWindow;
 
+        private MembershipProvider BackOfficeProvider
+        {
+            get
+            {
+                var provider = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider];
+                if (provider == null)
+                {
+                    throw new ProviderException("The membership provider " + UmbracoSettings.DefaultBackofficeProvider + " was not found");
+                }
+                return provider;
+            }
+        }
+
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
@@ -35,9 +50,9 @@ namespace umbraco.cms.presentation
 
             // validate redirect url
             string redirUrl = Request["redir"];
-            if (!String.IsNullOrEmpty(redirUrl))
+            if (!string.IsNullOrEmpty(redirUrl))
             {
-                validateRedirectUrl(redirUrl);
+                ValidateRedirectUrl(redirUrl);
             }
         }
 
@@ -63,15 +78,18 @@ namespace umbraco.cms.presentation
         }
 
 
-        protected void Button1_Click(object sender, System.EventArgs e)
+        protected void Button1_Click(object sender, EventArgs e)
         {
             // Authenticate users by using the provider specified in umbracoSettings.config
-            if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].ValidateUser(lname.Text, passw.Text))
+            if (BackOfficeProvider.ValidateUser(lname.Text, passw.Text))
             {
-                if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is ActiveDirectoryMembershipProvider)
-                    ActiveDirectoryMapping(lname.Text, Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(lname.Text, false).Email);
+                if (BackOfficeProvider.IsUmbracoUsersProvider() == false)
+                {
+                    CustomProviderMapping(lname.Text, BackOfficeProvider.GetUser(lname.Text, false).Email);
+                }
+                    
 
-                BusinessLogic.User u = new User(lname.Text);
+                var u = new User(lname.Text);
                 doLogin(u);
 
                 // Check if the user should be redirected to live editing
@@ -97,8 +115,7 @@ namespace umbraco.cms.presentation
                 }
                 else if (u.DefaultToLiveEditing)
                 {
-                    throw new UserAuthorizationException(
-    "Canvas editing isn't enabled. It can be enabled via the UmbracoSettings.config");
+                    throw new UserAuthorizationException("Canvas editing isn't enabled. It can be enabled via the UmbracoSettings.config");
                 }
 
                 if (hf_height.Value != "undefined")
@@ -111,7 +128,7 @@ namespace umbraco.cms.presentation
 
                 if (string.IsNullOrEmpty(redirUrl))
                     Response.Redirect("umbraco.aspx");
-                else if (validateRedirectUrl(redirUrl))
+                else if (ValidateRedirectUrl(redirUrl))
                 {
                     Response.Redirect(redirUrl, true);
                 }
@@ -122,9 +139,9 @@ namespace umbraco.cms.presentation
             }
         }
 
-        private bool validateRedirectUrl(string url)
+        private static bool ValidateRedirectUrl(string url)
         {
-            if (!isUrlLocalToHost(url))
+            if (IsUrlLocalToHost(url) == false)
             {
                 LogHelper.Info<login>(String.Format("Security warning: Login redirect was attempted to a site at another domain: '{0}'", url));
 
@@ -137,7 +154,7 @@ namespace umbraco.cms.presentation
             return true;
         }
 
-        private bool isUrlLocalToHost(string url)
+        private static bool IsUrlLocalToHost(string url)
         {
             if (String.IsNullOrEmpty(url))
             {
@@ -158,11 +175,11 @@ namespace umbraco.cms.presentation
         }
 
         /// <summary>
-        /// Maps active directory account to umbraco user account
+        /// Maps a custom provider's information to an umbraco user account
         /// </summary>
         /// <param name="loginName">Name of the login.</param>
         /// <param name="email">Email address of the user</param>
-        private void ActiveDirectoryMapping(string loginName, string email)
+        private static void CustomProviderMapping(string loginName, string email)
         {
             // Password is not copied over because it is stored in active directory for security!
             // The user is create with default access to content and as a writer user type

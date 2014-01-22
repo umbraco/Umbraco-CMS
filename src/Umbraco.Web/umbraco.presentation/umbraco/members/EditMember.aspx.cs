@@ -68,7 +68,7 @@ namespace umbraco.cms.presentation.members
             {
                 _document = new Member(int.Parse(Request.QueryString["id"]));
                 _member = Membership.GetUser(_document.LoginName, false);
-                _contentControl = new ContentControl(_document, controls.ContentControl.publishModes.NoPublish, "TabView1");
+                _contentControl = new ContentControl(_document, ContentControl.publishModes.NoPublish, "TabView1");
                 _contentControl.Width = Unit.Pixel(666);
                 _contentControl.Height = Unit.Pixel(666);
 
@@ -92,13 +92,13 @@ namespace umbraco.cms.presentation.members
                 MemberLoginNameVal.EnableClientScript = false;
                 MemberLoginNameVal.Display = ValidatorDisplay.Dynamic;
 
-                MemberLoginNameExistCheck.ErrorMessage = ui.Text("errorHandling", "errorExistsWithoutTab", "Login Name", BasePages.UmbracoEnsuredPage.CurrentUser);
+                MemberLoginNameExistCheck.ErrorMessage = ui.Text("errorHandling", "errorExistsWithoutTab", "Login Name", CurrentUser);
                 MemberLoginNameExistCheck.EnableClientScript = false;
                 MemberLoginNameExistCheck.ValidateEmptyText = false;
                 MemberLoginNameExistCheck.ControlToValidate = MemberLoginNameTxt.ID;
                 MemberLoginNameExistCheck.ServerValidate += MemberLoginNameExistCheck_ServerValidate;
 
-                MemberEmailExistCheck.ErrorMessage = ui.Text("errorHandling", "errorExistsWithoutTab", "E-mail", BasePages.UmbracoEnsuredPage.CurrentUser);
+                MemberEmailExistCheck.ErrorMessage = ui.Text("errorHandling", "errorExistsWithoutTab", "E-mail", CurrentUser);
                 MemberEmailExistCheck.EnableClientScript = false;
                 MemberEmailExistCheck.ValidateEmptyText = false;
                 MemberEmailExistCheck.ControlToValidate = MemberEmail.ID;
@@ -116,7 +116,7 @@ namespace umbraco.cms.presentation.members
                 var menuSave = m_MemberShipPanel.Menu.NewImageButton();
                 menuSave.ID = m_MemberShipPanel.ID + "_save";
                 menuSave.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
-                menuSave.Click += new ImageClickEventHandler(MenuSaveClick);
+                menuSave.Click += MenuSaveClick;
                 menuSave.AltText = ui.Text("buttons", "save", null);
 
                 _member = Membership.GetUser(Request.QueryString["id"], false);
@@ -167,7 +167,7 @@ namespace umbraco.cms.presentation.members
             if (Membership.Provider.IsUmbracoMembershipProvider())
             {
                 _contentControl.tpProp.Controls.Add(p);
-                _contentControl.Save += new System.EventHandler(tmp_save);
+                _contentControl.Save += tmp_save;
             }
             else
             {
@@ -244,8 +244,7 @@ namespace umbraco.cms.presentation.members
         {
             var membershipHelper = new MembershipHelper();
             //set the writable properties that we are editing
-            membershipHelper.UpdateMember(membershipUser, Membership.Provider,
-                                          MemberEmail.Text.Trim());
+            membershipHelper.UpdateMember(membershipUser, Membership.Provider, MemberEmail.Text.Trim());
         }
 
         private void UpdateRoles(MembershipUser membershipUser)

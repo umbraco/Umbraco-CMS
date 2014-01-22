@@ -5,6 +5,7 @@ using System.Text;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Security.Providers
@@ -12,7 +13,7 @@ namespace Umbraco.Web.Security.Providers
     /// <summary>
     /// Custom Membership Provider for Umbraco Users (User authentication for Umbraco Backend CMS)  
     /// </summary>
-    internal class UsersMembershipProvider : UmbracoServiceMembershipProvider<IMembershipUserService, IUser>
+    public class UsersMembershipProvider : UmbracoServiceMembershipProvider<IMembershipUserService, IUser>, IUsersMembershipProvider
     {
         
         public UsersMembershipProvider()

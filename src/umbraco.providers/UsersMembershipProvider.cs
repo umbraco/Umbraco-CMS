@@ -16,7 +16,7 @@ namespace umbraco.providers
     /// <summary>
     /// Custom Membership Provider for Umbraco Users (User authentication for Umbraco Backend CMS)  
     /// </summary>
-    public class UsersMembershipProvider : MembershipProviderBase
+    public class UsersMembershipProvider : MembershipProviderBase, IUsersMembershipProvider
     {
         
         /// <summary>

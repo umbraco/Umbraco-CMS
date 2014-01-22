@@ -10,6 +10,7 @@ using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using System.Xml;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 using Umbraco.Web;
 using Umbraco.Web.Models;
 using Umbraco.Web.Security;
@@ -36,7 +37,7 @@ namespace umbraco.cms.presentation.user
     {
         public EditUser()
         {
-            CurrentApp = BusinessLogic.DefaultApps.users.ToString();
+            CurrentApp = DefaultApps.users.ToString();
         }
         protected HtmlTable macroProperties;
         protected TextBox uname = new TextBox();
@@ -51,8 +52,8 @@ namespace umbraco.cms.presentation.user
         protected CheckBox DefaultToLiveEditing = new CheckBox();
 
 
-        protected controls.ContentPicker mediaPicker = new umbraco.controls.ContentPicker();
-        protected controls.ContentPicker contentPicker = new umbraco.controls.ContentPicker();
+        protected ContentPicker mediaPicker = new ContentPicker();
+        protected ContentPicker contentPicker = new ContentPicker();
 
         protected TextBox cName = new TextBox();
         protected CheckBox cFulltree = new CheckBox();
@@ -60,8 +61,8 @@ namespace umbraco.cms.presentation.user
         protected DropDownList cDescription = new DropDownList();
         protected DropDownList cCategories = new DropDownList();
         protected DropDownList cExcerpt = new DropDownList();
-        protected controls.ContentPicker cMediaPicker = new umbraco.controls.ContentPicker();
-        protected controls.ContentPicker cContentPicker = new umbraco.controls.ContentPicker();
+        protected ContentPicker cMediaPicker = new ContentPicker();
+        protected ContentPicker cContentPicker = new ContentPicker();
         protected CustomValidator sectionValidator = new CustomValidator();
 
         protected Pane pp = new Pane();
@@ -167,7 +168,7 @@ namespace umbraco.cms.presentation.user
             //This is a hack to allow the admin to change a user's password to whatever they want - this will only work if we are using the
             // default umbraco membership provider. 
             // See the notes below in the ChangePassword method.
-            if (BackOfficeProvider is UsersMembershipProvider)
+            if (BackOfficeProvider.IsUmbracoUsersProvider())
             {
                 passwordChanger.ShowOldPassword = false;
             }
@@ -436,7 +437,7 @@ namespace umbraco.cms.presentation.user
                 var changePasswordModel = passwordChangerControl.ChangingPasswordModel;
 
                 // Is it using the default membership provider
-                if (BackOfficeProvider is UsersMembershipProvider)
+                if (BackOfficeProvider.IsUmbracoUsersProvider())
                 {
                     //This is a total hack so that an admin can change the password without knowing the previous one
                     // we do this by simply passing in the already stored hashed/encrypted password in the database - 
@@ -604,6 +605,6 @@ namespace umbraco.cms.presentation.user
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.TabView UserTabs;
+        protected TabView UserTabs;
     }
 }
