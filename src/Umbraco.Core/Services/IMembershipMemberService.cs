@@ -13,7 +13,7 @@ namespace Umbraco.Core.Services
     /// <remarks>
     /// Idea is to have this is an isolated interface so that it can be easily 'replaced' in the membership provider impl.
     /// </remarks>
-    internal interface IMembershipMemberService : IMembershipMemberService<IMember>
+    public interface IMembershipMemberService : IMembershipMemberService<IMember>
     {
         IMember CreateMember(string email, string username, string password, IMemberType memberType);
     }
@@ -24,7 +24,7 @@ namespace Umbraco.Core.Services
     /// <remarks>
     /// Idea is to have this is an isolated interface so that it can be easily 'replaced' in the membership provider impl.
     /// </remarks>
-    internal interface IMembershipMemberService<T> : IService
+    public interface IMembershipMemberService<T> : IService
         where T : class, IMembershipUser
     {
         /// <summary>

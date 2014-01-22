@@ -249,7 +249,6 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to publish</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        [Obsolete("Use PublishWithStatus instead, that method will provide more detailed information on the outcome")]
         bool Publish(IContent content, int userId = 0);
 
         /// <summary>
