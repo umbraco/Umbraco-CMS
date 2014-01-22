@@ -78,12 +78,7 @@ namespace umbraco.cms.businesslogic.member
 		/// <returns>True if the Member can edit the data</returns>
         public bool MemberCanEdit(PropertyType pt)
         {
-            if (PropertyTypeRegistered(pt))
-            {
-                var memberCanEdit = SqlHelper.ExecuteScalar<object>("Select memberCanEdit from cmsMemberType where NodeId = " + this.Id + " And propertytypeId = " + pt.Id);
-                return (Convert.ToBoolean(memberCanEdit));
-            }
-            return false;
+            return _contentType.MemberCanEditProperty(pt.Alias);
         }
         
 		/// <summary>
@@ -93,11 +88,7 @@ namespace umbraco.cms.businesslogic.member
 		/// <returns>True if the data should be displayed on the profilepage</returns>
 		public bool ViewOnProfile(PropertyType pt) 
 		{
-			if(PropertyTypeRegistered(pt)) 
-			{
-                return Convert.ToBoolean(SqlHelper.ExecuteScalar<object>("Select viewOnProfile from cmsMemberType where NodeId = " + this.Id + " And propertytypeId = " + pt.Id));
-			}
-			return false;
+            return _contentType.MemberCanViewProperty(pt.Alias);
 		}
 		
 		/// <summary>
@@ -106,14 +97,9 @@ namespace umbraco.cms.businesslogic.member
 		/// <param name="pt">PropertyType</param>
 		/// <param name="value">True/False if Members of the type shoúld be able to edit the data</param>
         public void setMemberCanEdit(PropertyType pt, bool value)
-        {
-            int tmpval = 0;
-            if (value) tmpval = 1;
-            if (PropertyTypeRegistered(pt))
-                SqlHelper.ExecuteNonQuery("Update cmsMemberType set memberCanEdit = " + tmpval + " where NodeId = " + this.Id + " And propertytypeId = " + pt.Id);
-            else
-                SqlHelper.ExecuteNonQuery("insert into cmsMemberType (NodeId, propertytypeid, memberCanEdit,viewOnProfile) values (" + this.Id + "," + pt.Id + ", " + tmpval + ",0)");
-
+		{
+		    _contentType.SetMemberCanEditProperty(pt.Alias, value);
+            ApplicationContext.Current.Services.MemberTypeService.Save(_contentType);
         }
         
 		/// <summary>
@@ -123,12 +109,8 @@ namespace umbraco.cms.businesslogic.member
 		/// <param name="value">True/False if the data should be displayed</param>
         public void setMemberViewOnProfile(PropertyType pt, bool value) 
 		{
-			int tmpval = 0;
-			if (value) tmpval = 1;
-			if (PropertyTypeRegistered(pt))
-				SqlHelper.ExecuteNonQuery("Update cmsMemberType set viewOnProfile = " + tmpval + " where NodeId = " + this.Id +" And propertytypeId = "+pt.Id);
-			else
-				SqlHelper.ExecuteNonQuery("insert into cmsMemberType (NodeId, propertytypeid, viewOnProfile) values ("+this.Id+","+pt.Id+", "+tmpval+")");
+            _contentType.SetMemberCanViewProperty(pt.Alias, value);
+            ApplicationContext.Current.Services.MemberTypeService.Save(_contentType);
 		}
 
 		/// <summary>
@@ -269,11 +251,6 @@ namespace umbraco.cms.businesslogic.member
 
             base.PopulateContentTypeFromContentTypeBase(_contentType);
             base.PopulateCMSNodeFromUmbracoEntity(_contentType, ObjectType);
-        }
-
-        private bool PropertyTypeRegistered(PropertyType pt)
-        {
-            return (SqlHelper.ExecuteScalar<int>("Select count(pk) as tmp from cmsMemberType where NodeId = " + this.Id + " And propertytypeId = " + pt.Id) > 0);
         }
 
         #endregion
