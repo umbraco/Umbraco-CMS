@@ -127,14 +127,14 @@ namespace umbraco.presentation.umbracobase.library
                             {
                                 myProperty.Value = value;
                                 retVal = "True";
-                                myMember.XmlGenerate(new XmlDocument());
+                                myMember.Save();                                
                             }
                         }
                         else
                         {
                             myProperty.Value = value;
                             retVal = "True";
-                            myMember.XmlGenerate(new XmlDocument());
+                            myMember.Save();
                         }
 
                     }

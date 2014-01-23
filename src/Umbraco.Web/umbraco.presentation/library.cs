@@ -529,14 +529,14 @@ namespace umbraco
                         string.Format(
                             "{0}_{1}", CacheKeys.MemberLibraryCacheKey, MemberId),
                         TimeSpan.FromSeconds(UmbracoSettings.UmbracoLibraryCacheDuration),
-                        () => getMemberDo(MemberId));
+                        () => GetMemberDo(MemberId));
 
                     if (retVal != null)
                         return retVal.CreateNavigator().Select("/");
                 }
                 else
                 {
-                    return getMemberDo(MemberId).CreateNavigator().Select("/");
+                    return GetMemberDo(MemberId).CreateNavigator().Select("/");
                 }
 
             }
@@ -548,7 +548,7 @@ namespace umbraco
             return xd.CreateNavigator().Select("/");
         }
 
-        private static XmlDocument getMemberDo(int MemberId)
+        private static XmlDocument GetMemberDo(int MemberId)
         {
             Member m = new Member(MemberId);
             XmlDocument mXml = new XmlDocument();

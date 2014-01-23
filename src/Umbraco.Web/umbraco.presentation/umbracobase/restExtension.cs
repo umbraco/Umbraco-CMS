@@ -91,7 +91,7 @@ namespace umbraco.presentation.umbracobase
                         allowed = false;
                     }
                     else //do member authentication stuff... 
-                        allowed = memberAuthentication(baseExt, currentMem);
+                        allowed = MemberAuthentication(baseExt, currentMem);
                 }
             }
             else
@@ -138,7 +138,7 @@ namespace umbraco.presentation.umbracobase
                                     else
                                     {
                                         //do member authentication stuff... 
-                                        allowed = memberAuthentication(attribute, currentMem);
+                                        allowed = MemberAuthentication(attribute, currentMem);
                                     }
                                 }
 
@@ -186,7 +186,7 @@ namespace umbraco.presentation.umbracobase
             }
         }
 
-        private static bool memberAuthentication(RestExtensionMethod baseExt, Member currentMem)
+        private static bool MemberAuthentication(RestExtensionMethod baseExt, Member currentMem)
         {
             //Check group, type and ID
             bool memberAccess = false;
@@ -235,7 +235,7 @@ namespace umbraco.presentation.umbracobase
             return memberAccess;
         }
 
-        private static bool memberAuthentication(XmlNode baseExt, Member currentMem)
+        private static bool MemberAuthentication(XmlNode baseExt, Member currentMem)
         {
             //Check group, type and ID
             bool memberAccess = false;
