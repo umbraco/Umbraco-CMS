@@ -217,11 +217,15 @@ namespace umbraco.cms.businesslogic.member
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static MemberType MakeNew(User u, string Text)
         {
+            var alias = helpers.Casing.SafeAliasWithForcingCheck(Text);
+            //special case, if it stars with an underscore, we have to re-add it for member types
+            if (Text.StartsWith("_")) alias = "_" + alias;
             var mt = new Umbraco.Core.Models.MemberType(-1)
             {
                 Level = 1,
                 Name = Text,
-                Icon = "member.gif"
+                Icon = "member.gif",
+                Alias = alias
             };
             ApplicationContext.Current.Services.MemberTypeService.Save(mt);
             var legacy = new MemberType(mt);

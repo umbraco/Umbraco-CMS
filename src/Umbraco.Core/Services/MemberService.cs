@@ -676,7 +676,7 @@ namespace Umbraco.Core.Services
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<IMember>.Builder.Where(x => x.Username == userName);
+                var query = Query<IMember>.Builder.Where(x => x.Username.Equals(userName));
                 var member = repository.GetByQuery(query).FirstOrDefault();
 
                 return member;
