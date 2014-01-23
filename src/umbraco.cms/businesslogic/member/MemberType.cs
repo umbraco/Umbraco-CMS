@@ -19,7 +19,7 @@ namespace umbraco.cms.businesslogic.member
         #region Private Members
 
         internal static readonly Guid ObjectType = new Guid(Constants.ObjectTypes.MemberType);
-        private IMemberType _contentType;
+        internal IMemberType MemberTypeItem;
 
         #endregion
 
@@ -78,7 +78,7 @@ namespace umbraco.cms.businesslogic.member
 		/// <returns>True if the Member can edit the data</returns>
         public bool MemberCanEdit(PropertyType pt)
         {
-            return _contentType.MemberCanEditProperty(pt.Alias);
+            return MemberTypeItem.MemberCanEditProperty(pt.Alias);
         }
         
 		/// <summary>
@@ -88,7 +88,7 @@ namespace umbraco.cms.businesslogic.member
 		/// <returns>True if the data should be displayed on the profilepage</returns>
 		public bool ViewOnProfile(PropertyType pt) 
 		{
-            return _contentType.MemberCanViewProperty(pt.Alias);
+            return MemberTypeItem.MemberCanViewProperty(pt.Alias);
 		}
 		
 		/// <summary>
@@ -98,8 +98,8 @@ namespace umbraco.cms.businesslogic.member
 		/// <param name="value">True/False if Members of the type shoúld be able to edit the data</param>
         public void setMemberCanEdit(PropertyType pt, bool value)
 		{
-		    _contentType.SetMemberCanEditProperty(pt.Alias, value);
-            ApplicationContext.Current.Services.MemberTypeService.Save(_contentType);
+		    MemberTypeItem.SetMemberCanEditProperty(pt.Alias, value);
+            ApplicationContext.Current.Services.MemberTypeService.Save(MemberTypeItem);
         }
         
 		/// <summary>
@@ -109,8 +109,8 @@ namespace umbraco.cms.businesslogic.member
 		/// <param name="value">True/False if the data should be displayed</param>
         public void setMemberViewOnProfile(PropertyType pt, bool value) 
 		{
-            _contentType.SetMemberCanViewProperty(pt.Alias, value);
-            ApplicationContext.Current.Services.MemberTypeService.Save(_contentType);
+            MemberTypeItem.SetMemberCanViewProperty(pt.Alias, value);
+            ApplicationContext.Current.Services.MemberTypeService.Save(MemberTypeItem);
 		}
 
 		/// <summary>
@@ -128,7 +128,7 @@ namespace umbraco.cms.businesslogic.member
 
             if (e.Cancel == false) {
 
-                ApplicationContext.Current.Services.MemberTypeService.Delete(_contentType);
+                ApplicationContext.Current.Services.MemberTypeService.Delete(MemberTypeItem);
 
                 // delete all documents of this type
                 FireAfterDelete(e);
@@ -145,7 +145,7 @@ namespace umbraco.cms.businesslogic.member
 
             if (e.Cancel == false)
             {
-                ApplicationContext.Current.Services.MemberTypeService.Save(_contentType);
+                ApplicationContext.Current.Services.MemberTypeService.Save(MemberTypeItem);
                 base.Save();
                 FireAfterSave(e);
             }
@@ -247,10 +247,10 @@ namespace umbraco.cms.businesslogic.member
 
         private void SetupNode(IMemberType contentType)
         {
-            _contentType = contentType;            
+            MemberTypeItem = contentType;            
 
-            base.PopulateContentTypeFromContentTypeBase(_contentType);
-            base.PopulateCMSNodeFromUmbracoEntity(_contentType, ObjectType);
+            base.PopulateContentTypeFromContentTypeBase(MemberTypeItem);
+            base.PopulateCMSNodeFromUmbracoEntity(MemberTypeItem, ObjectType);
         }
 
         #endregion

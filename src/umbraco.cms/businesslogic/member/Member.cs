@@ -11,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Querying;
 using umbraco.cms.businesslogic.cache;
@@ -56,12 +57,10 @@ namespace umbraco.cms.businesslogic.member
         #endregion
 
         #region Private members
-        private string _text;
-        private string _email;
-        private string _password;
-        private string _loginName;
+
         private Hashtable _groups = null;
-        protected internal IMember Content;
+        protected internal IMember MemberItem;
+
         #endregion
 
         #region Constructors
@@ -128,20 +127,21 @@ namespace umbraco.cms.businesslogic.member
             //NOTE: This hasn't been ported to the new service layer because it is an edge case, it is only used to render the tree nodes but in v7 we plan on 
             // changing how the members are shown and not having to worry about letters.
 
-            var tmp = new List<Member>();
+            var ids = new List<int>();
             using (var dr = SqlHelper.ExecuteReader(
                                         string.Format(_sQLOptimizedMany.Trim(), "LOWER(SUBSTRING(text, 1, 1)) NOT IN ('a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z')", "umbracoNode.text"),
                                             SqlHelper.CreateParameter("@nodeObjectType", Member._objectType)))
             {
+                
                 while (dr.Read())
                 {
-                    var m = new Member(dr.GetInt("id"), true);
-                    m.PopulateMemberFromReader(dr);
-                    tmp.Add(m);
+                    ids.Add(dr.GetInt("id"));                    
                 }
             }
 
-            return tmp.ToArray();
+            return ApplicationContext.Current.Services.MemberService.GetAllMembers(ids.ToArray())
+                .Select(x => new Member(x))
+                .ToArray();
         }
 
         /// <summary>
@@ -224,37 +224,22 @@ namespace umbraco.cms.businesslogic.member
             if (GetMemberFromLoginName(loginName) != null)
                 throw new Exception(string.Format("Duplicate User name! A member with the user name {0} already exists", loginName));
 
-            // Lowercased to prevent duplicates
-            Email = Email.ToLower();
-            var newId = Guid.NewGuid();
+            var model = ApplicationContext.Current.Services.MemberService.CreateMemberWithIdentity(
+                Email.ToLower(), loginName, "", mbt.MemberTypeItem);
+            model.Name = Name;
 
-            //create the cms node first
-            var newNode = MakeNew(-1, _objectType, u.Id, 1, Name, newId);
+            //The content object will only have the 'WasCancelled' flag set to 'True' if the 'Creating' event has been cancelled, so we return null.
+            if (((Entity)model).WasCancelled)
+                return null;
 
-            //we need to create an empty member and set the underlying text property
-            var tmp = new Member(newId, true);
-            tmp.SetText(Name);
-
-            //create the content data for the new member
-            tmp.CreateContent(mbt);
-
-            // Create member specific data ..
-            SqlHelper.ExecuteNonQuery(
-                "insert into cmsMember (nodeId,Email,LoginName,Password) values (@id,@email,@loginName,'')",
-                SqlHelper.CreateParameter("@id", tmp.Id),
-                SqlHelper.CreateParameter("@loginName", loginName),
-                SqlHelper.CreateParameter("@email", Email));
-
-            //read the whole object from the db
-            var m = new Member(newId);
-
+            var legacy = new Member(model);
             var e = new NewEventArgs();
 
-            m.OnNew(e);
+            legacy.OnNew(e);
+            
+            legacy.Save();
 
-            m.Save();
-
-            return m;
+            return legacy;
         }
 
         /// <summary>
@@ -319,6 +304,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="loginName">Member login</param>
         /// <param name="password">Member password</param>
         /// <returns>The member with the credentials - null if none exists</returns>
+        [Obsolete("Use the MembershipProvider methods to validate a member")]
         public static Member GetMemberFromLoginNameAndPassword(string loginName, string password)
         {
             if (IsMember(loginName))
@@ -399,25 +385,82 @@ namespace umbraco.cms.businesslogic.member
 
         #region Public Properties
 
-        /// <summary>
-        /// The name of the member
-        /// </summary>
+        public override int sortOrder
+        {
+            get
+            {
+                return MemberItem == null ? base.sortOrder : MemberItem.SortOrder;
+            }
+            set
+            {
+                if (MemberItem == null)
+                {
+                    base.sortOrder = value;
+                }
+                else
+                {
+                    MemberItem.SortOrder = value;
+                }
+            }
+        }
+
+        public override int Level
+        {
+            get
+            {
+                return MemberItem == null ? base.Level : MemberItem.Level;
+            }
+            set
+            {
+                if (MemberItem == null)
+                {
+                    base.Level = value;
+                }
+                else
+                {
+                    MemberItem.Level = value;
+                }
+            }
+        }
+
+        public override int ParentId
+        {
+            get
+            {
+                return MemberItem == null ? base.ParentId : MemberItem.ParentId;
+            }
+        }
+
+        public override string Path
+        {
+            get
+            {
+                return MemberItem == null ? base.Path : MemberItem.Path;
+            }
+            set
+            {
+                if (MemberItem == null)
+                {
+                    base.Path = value;
+                }
+                else
+                {
+                    MemberItem.Path = value;
+                }
+            }
+        }
+
+        [Obsolete("Obsolete, Use Name property on Umbraco.Core.Models.Content", false)]
         public override string Text
         {
             get
             {
-                if (string.IsNullOrEmpty(_text))
-                {
-                    _text = SqlHelper.ExecuteScalar<string>(
-                        "select text from umbracoNode where id = @id",
-                        SqlHelper.CreateParameter("@id", Id));
-                }
-                return _text;
+                return MemberItem.Name;
             }
             set
             {
-                _text = value;
-                base.Text = value;
+                value = value.Trim();
+                MemberItem.Name = value;
             }
         }
 
@@ -429,14 +472,7 @@ namespace umbraco.cms.businesslogic.member
         {
             get
             {
-                if (string.IsNullOrEmpty(_password))
-                {
-                    _password = SqlHelper.ExecuteScalar<string>(
-                    "select Password from cmsMember where nodeId = @id",
-                    SqlHelper.CreateParameter("@id", Id));
-                }
-                return _password;
-
+                return MemberItem.Password;
             }
             set
             {
@@ -444,7 +480,7 @@ namespace umbraco.cms.businesslogic.member
                 // To write directly to the db use the ChangePassword method
                 // this is not pretty but nessecary due to a design flaw (the membership provider should have been a part of the cms project)
                 var helper = new MemberShipHelper();
-                ChangePassword(helper.EncodePassword(value, Membership.Provider.PasswordFormat));
+                MemberItem.Password = helper.EncodePassword(value, Membership.Provider.PasswordFormat);
             }
         }
 
@@ -455,13 +491,7 @@ namespace umbraco.cms.businesslogic.member
         {
             get
             {
-                if (string.IsNullOrEmpty(_loginName))
-                {
-                    _loginName = SqlHelper.ExecuteScalar<string>(
-                        "select LoginName from cmsMember where nodeId = @id",
-                        SqlHelper.CreateParameter("@id", Id));
-                }
-                return _loginName;
+                return MemberItem.Username;
             }
             set
             {
@@ -469,11 +499,7 @@ namespace umbraco.cms.businesslogic.member
                     throw new ArgumentException("The loginname must be different from an empty string", "LoginName");
                 if (value.Contains(","))
                     throw new ArgumentException("The parameter 'LoginName' must not contain commas.");
-                SqlHelper.ExecuteNonQuery(
-                    "update cmsMember set LoginName = @loginName where nodeId =  @id",
-                    SqlHelper.CreateParameter("@loginName", value),
-                    SqlHelper.CreateParameter("@id", Id));
-                _loginName = value;
+                MemberItem.Username = value;
             }
         }
 
@@ -497,39 +523,11 @@ namespace umbraco.cms.businesslogic.member
         {
             get
             {
-                if (string.IsNullOrEmpty(_email))
-                {
-                    _email = SqlHelper.ExecuteScalar<string>(
-                       "select Email from cmsMember where nodeId = @id",
-                       SqlHelper.CreateParameter("@id", Id));
-                }
-
-                return string.IsNullOrWhiteSpace(_email) ? _email : _email.ToLower();
+                return MemberItem.Email.IsNullOrWhiteSpace() ? string.Empty : MemberItem.Email.ToLower();
             }
             set
             {
-                var oldEmail = Email;
-                var newEmail = string.IsNullOrWhiteSpace(value) ? value : value.ToLower();
-                var requireUniqueEmail = Membership.Providers[UmbracoMemberProviderName].RequiresUniqueEmail;
-
-                var howManyMembersWithEmail = 0;
-                var membersWithEmail = GetMembersFromEmail(newEmail);
-                if (membersWithEmail != null)
-                    howManyMembersWithEmail = membersWithEmail.Length;
-
-                if (((oldEmail == newEmail && howManyMembersWithEmail > 1) ||
-                    (oldEmail != newEmail && howManyMembersWithEmail > 0))
-                    && requireUniqueEmail)
-                {
-                    // If the value hasn't changed and there are more than 1 member with that email, then throw
-                    // If the value has changed and there are any member with that new email, then throw
-                    throw new Exception(string.Format("Duplicate Email! A member with the e-mail {0} already exists", newEmail));
-                }
-                SqlHelper.ExecuteNonQuery(
-                    "update cmsMember set Email = @email where nodeId = @id",
-                    SqlHelper.CreateParameter("@id", Id), SqlHelper.CreateParameter("@email", newEmail));
-                // Set the backing field to new value
-                _email = newEmail;
+                MemberItem.Email = value == null ? "" : value.ToLower();
             }
         }
         #endregion
@@ -555,21 +553,16 @@ namespace umbraco.cms.businesslogic.member
 
         private void SetupNode(IMember content)
         {
-            Content = content;
+            MemberItem = content;
             //Also need to set the ContentBase item to this one so all the propery values load from it
-            ContentBase = Content;
+            ContentBase = MemberItem;
 
             //Setting private properties from IContentBase replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
-            base.PopulateCMSNodeFromUmbracoEntity(Content, _objectType);
+            base.PopulateCMSNodeFromUmbracoEntity(MemberItem, _objectType);
 
             //If the version is empty we update with the latest version from the current IContent.
             if (Version == Guid.Empty)
-                Version = Content.Version;
-
-            _email = Content.Email;
-            _loginName = Content.Username;
-            _password = Content.Password;
-
+                Version = MemberItem.Version;
         }
 
 
@@ -578,85 +571,124 @@ namespace umbraco.cms.businesslogic.member
         /// </summary>
         public override void Save()
         {
+            //Due to backwards compatibility with this API we need to check for duplicate emails here if required.
+            // This check should not be done here, as this logic is based on the MembershipProvider            
+            var requireUniqueEmail = Membership.Providers[UmbracoMemberProviderName].RequiresUniqueEmail;
+            //check if there's anyone with this email in the db that isn't us
+            if (requireUniqueEmail && GetMembersFromEmail(Email).Any(x => x.Id != Id))
+            {
+                throw new Exception(string.Format("Duplicate Email! A member with the e-mail {0} already exists", Email));
+            }
+
             var e = new SaveEventArgs();
             FireBeforeSave(e);
 
+            foreach (var property in GenericProperties)
+            {
+                MemberItem.SetValue(property.PropertyType.Alias, property.Value);
+            }
+
             if (!e.Cancel)
             {
-                var db = ApplicationContext.Current.DatabaseContext.Database;
-                using (var transaction = db.GetTransaction())
-                {
-                    foreach (var property in GenericProperties)
-                    {
-                        var poco = new PropertyDataDto
-                                       {
-                                           Id = property.Id,
-                                           PropertyTypeId = property.PropertyType.Id,
-                                           NodeId = Id,
-                                           VersionId = property.VersionId
-                                       };
-                        if (property.Value != null)
-                        {
-                            string dbType = property.PropertyType.DataTypeDefinition.DbType;
-                            if (dbType.Equals("Integer"))
-                            {
-                                if (property.Value is bool || property.PropertyType.DataTypeDefinition.DataType.Id == new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a"))
-                                {
-                                    poco.Integer = property.Value != null && string.IsNullOrEmpty(property.Value.ToString())
-                                          ? 0
-                                          : Convert.ToInt32(property.Value);
-                                }
-                                else
-                                {
-                                    int value = 0;
-                                    if (int.TryParse(property.Value.ToString(), out value))
-                                    {
-                                        poco.Integer = value;
-                                    }
-                                }
-                            }
-                            else if (dbType.Equals("Date"))
-                            {
-                                DateTime date;
+                
+                ApplicationContext.Current.Services.MemberService.Save(MemberItem);
 
-                                if (DateTime.TryParse(property.Value.ToString(), out date))
-                                    poco.Date = date;
-                            }
-                            else if (dbType.Equals("Nvarchar"))
-                            {
-                                poco.VarChar = property.Value.ToString();
-                            }
-                            else
-                            {
-                                poco.Text = property.Value.ToString();
-                            }
-                        }
-                        bool isNew = db.IsNew(poco);
-                        if (isNew)
-                        {
-                            db.Insert(poco);
-                        }
-                        else
-                        {
-                            db.Update(poco);
-                        }
-                    }
-                    transaction.Complete();
-                }
+                //base.VersionDate = MemberItem.UpdateDate;
 
-                // re-generate xml
-                var xd = new XmlDocument();
+                base.Save();
+
+                XmlDocument xd = new XmlDocument();
                 XmlGenerate(xd);
 
                 // generate preview for blame history?
                 if (UmbracoSettings.EnableGlobalPreviewStorage)
                 {
-                    // Version as new guid to ensure different versions are generated as members are not versioned currently!
+                    // Version as new guid to ensure different versions are generated as media are not versioned currently!
                     SavePreviewXml(generateXmlWithoutSaving(xd), Guid.NewGuid());
                 }
 
                 FireAfterSave(e);
             }
+
+            //var e = new SaveEventArgs();
+            //FireBeforeSave(e);
+
+            //if (!e.Cancel)
+            //{
+            //    var db = ApplicationContext.Current.DatabaseContext.Database;
+            //    using (var transaction = db.GetTransaction())
+            //    {
+            //        foreach (var property in GenericProperties)
+            //        {
+            //            var poco = new PropertyDataDto
+            //                           {
+            //                               Id = property.Id,
+            //                               PropertyTypeId = property.PropertyType.Id,
+            //                               NodeId = Id,
+            //                               VersionId = property.VersionId
+            //                           };
+            //            if (property.Value != null)
+            //            {
+            //                string dbType = property.PropertyType.DataTypeDefinition.DbType;
+            //                if (dbType.Equals("Integer"))
+            //                {
+            //                    if (property.Value is bool || property.PropertyType.DataTypeDefinition.DataType.Id == new Guid("38b352c1-e9f8-4fd8-9324-9a2eab06d97a"))
+            //                    {
+            //                        poco.Integer = property.Value != null && string.IsNullOrEmpty(property.Value.ToString())
+            //                              ? 0
+            //                              : Convert.ToInt32(property.Value);
+            //                    }
+            //                    else
+            //                    {
+            //                        int value = 0;
+            //                        if (int.TryParse(property.Value.ToString(), out value))
+            //                        {
+            //                            poco.Integer = value;
+            //                        }
+            //                    }
+            //                }
+            //                else if (dbType.Equals("Date"))
+            //                {
+            //                    DateTime date;
+
+            //                    if (DateTime.TryParse(property.Value.ToString(), out date))
+            //                        poco.Date = date;
+            //                }
+            //                else if (dbType.Equals("Nvarchar"))
+            //                {
+            //                    poco.VarChar = property.Value.ToString();
+            //                }
+            //                else
+            //                {
+            //                    poco.Text = property.Value.ToString();
+            //                }
+            //            }
+            //            bool isNew = db.IsNew(poco);
+            //            if (isNew)
+            //            {
+            //                db.Insert(poco);
+            //            }
+            //            else
+            //            {
+            //                db.Update(poco);
+            //            }
+            //        }
+            //        transaction.Complete();
+            //    }
+
+            //    // re-generate xml
+            //    var xd = new XmlDocument();
+            //    XmlGenerate(xd);
+
+            //    // generate preview for blame history?
+            //    if (UmbracoSettings.EnableGlobalPreviewStorage)
+            //    {
+            //        // Version as new guid to ensure different versions are generated as members are not versioned currently!
+            //        SavePreviewXml(generateXmlWithoutSaving(xd), Guid.NewGuid());
+            //    }
+
+            //    FireAfterSave(e);
+            //}
         }
 
         /// <summary>
@@ -679,6 +711,7 @@ namespace umbraco.cms.businesslogic.member
         /// <summary>
         /// Deltes the current member
         /// </summary>
+        [Obsolete("Obsolete, Use Umbraco.Core.Services.MemberService.Delete()", false)]
         public override void delete()
         {
             var e = new DeleteEventArgs();
@@ -686,15 +719,15 @@ namespace umbraco.cms.businesslogic.member
 
             if (!e.Cancel)
             {
-                // delete all relations to groups
-                foreach (int groupId in this.Groups.Keys)
+                if (MemberItem != null)
                 {
-                    RemoveGroup(groupId);
+                    ApplicationContext.Current.Services.MemberService.Delete(MemberItem);
                 }
-
-                // delete memeberspecific data!
-                SqlHelper.ExecuteNonQuery("Delete from cmsMember where nodeId = @id",
-                    SqlHelper.CreateParameter("@id", Id));
+                else
+                {
+                    var member = ApplicationContext.Current.Services.MemberService.GetById(Id);
+                    ApplicationContext.Current.Services.MemberService.Delete(member);
+                }
 
                 // Delete all content and cmsnode specific data!
                 base.delete();
@@ -704,18 +737,13 @@ namespace umbraco.cms.businesslogic.member
         }
 
         /// <summary>
-        /// Sets the password for the user - ensure it is encrypted or hashed based on the active membership provider.
+        /// Sets the password for the user - ensure it is encrypted or hashed based on the active membership provider - you must 
+        /// call Save() after using this method
         /// </summary>
         /// <param name="newPassword"></param>
         public void ChangePassword(string newPassword)
         {
-            SqlHelper.ExecuteNonQuery(
-                    "update cmsMember set Password = @password where nodeId = @id",
-                    SqlHelper.CreateParameter("@password", newPassword),
-                    SqlHelper.CreateParameter("@id", Id));
-
-            //update this object's password
-            _password = newPassword;
+            Password = newPassword;            
         }
 
         /// <summary>
@@ -724,7 +752,7 @@ namespace umbraco.cms.businesslogic.member
         /// <returns></returns>
         public string GetPassword()
         {
-            return Content.Password;
+            return MemberItem.Password;
         }
 
         /// <summary>
@@ -782,24 +810,6 @@ namespace umbraco.cms.businesslogic.member
             node.Attributes.Append(xmlHelper.addAttribute(xd, "loginName", LoginName));
             node.Attributes.Append(xmlHelper.addAttribute(xd, "email", Email));
             return node;
-        }
-
-        protected void PopulateMemberFromReader(IRecordsReader dr)
-        {
-
-            SetupNodeForTree(dr.GetGuid("uniqueId"),
-                _objectType, dr.GetShort("level"),
-                dr.GetInt("parentId"),
-                dr.GetInt("nodeUser"),
-                dr.GetString("path"),
-                dr.GetString("text"),
-                dr.GetDateTime("createDate"), false);
-
-            if (!dr.IsNull("Email"))
-                _email = dr.GetString("Email");
-            _loginName = dr.GetString("LoginName");
-            _password = dr.GetString("Password");
-
         }
 
         #endregion

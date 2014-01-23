@@ -31,6 +31,7 @@ namespace Umbraco.Core.Models
             _contentType = contentType;
         }
 
+        //TODO: Should we just get rid of this one? no reason to have a level set.
         internal Member(string name, string email, string username, string password, int parentId, IMemberType contentType)
             : base(name, parentId, contentType, new PropertyCollection())
         {

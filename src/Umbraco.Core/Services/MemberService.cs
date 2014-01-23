@@ -577,7 +577,10 @@ namespace Umbraco.Core.Services
             if (raiseEvents)
             {
                 if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(member), this))
+                {
+                    member.WasCancelled = true;
                     return member;
+                }
             }
 
             var uow = _uowProvider.GetUnitOfWork();
@@ -709,7 +712,10 @@ namespace Umbraco.Core.Services
             if (raiseEvents)
             {
                 if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(member), this))
+                {
                     return;
+                }
+                    
             }
 
             var uow = _uowProvider.GetUnitOfWork();
