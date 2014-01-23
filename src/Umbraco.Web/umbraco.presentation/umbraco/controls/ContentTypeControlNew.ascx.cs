@@ -292,8 +292,10 @@ namespace umbraco.controls
                     //to avoid the multiple cache flushing when each property is set using the legacy ContentType class,
                     //which has been reduced to the else-clause.
                     //For IContentType and IMediaType the cache will only be flushed upon saving.
-                    if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
-                    {
+                    //if (_contentType.ContentTypeItem is IContentType 
+                    //    || _contentType.ContentTypeItem is IMediaType
+                    //    || _contentType.ContentTypeItem is IMemberType)
+                    //{
                         _contentType.ContentTypeItem.Name = txtName.Text;
                         _contentType.ContentTypeItem.Alias = txtAlias.Text;
                         _contentType.ContentTypeItem.Icon = ddlIcons.SelectedValue;
@@ -331,40 +333,40 @@ namespace umbraco.controls
                         }
 
                         _contentType.Save();
-                    }
-                    else //Legacy approach for supporting MemberType
-                    {
-                        if (asyncState.HasNameChanged())
-                            _contentType.Text = txtName.Text;
+                    //}
+                    //else //Legacy approach for supporting MemberType
+                    //{
+                    //    if (asyncState.HasNameChanged())
+                    //        _contentType.Text = txtName.Text;
 
-                        if (asyncState.HasAliasChanged())
-                            _contentType.Alias = txtAlias.Text;
+                    //    if (asyncState.HasAliasChanged())
+                    //        _contentType.Alias = txtAlias.Text;
 
-                        _contentType.IconUrl = ddlIcons.SelectedValue;
-                        _contentType.Description = description.Text;
-                        _contentType.Thumbnail = ddlThumbnails.SelectedValue;
+                    //    _contentType.IconUrl = ddlIcons.SelectedValue;
+                    //    _contentType.Description = description.Text;
+                    //    _contentType.Thumbnail = ddlThumbnails.SelectedValue;
 
-                        SavePropertyTypesLegacy(asyncState.SaveArgs);
+                    //    SavePropertyTypesLegacy(asyncState.SaveArgs);
 
-                        var tabs = SaveTabs();
-                        foreach (var tab in tabs)
-                        {
-                            _contentType.SetTabName(tab.Item1, tab.Item2);
-                            _contentType.SetTabSortOrder(tab.Item1, tab.Item3);
-                        }
+                    //    var tabs = SaveTabs();
+                    //    foreach (var tab in tabs)
+                    //    {
+                    //        _contentType.SetTabName(tab.Item1, tab.Item2);
+                    //        _contentType.SetTabSortOrder(tab.Item1, tab.Item3);
+                    //    }
 
-                        _contentType.AllowedChildContentTypeIDs = SaveAllowedChildTypes();
-                        _contentType.AllowAtRoot = allowAtRoot.Checked;
+                    //    _contentType.AllowedChildContentTypeIDs = SaveAllowedChildTypes();
+                    //    _contentType.AllowAtRoot = allowAtRoot.Checked;
                     
-                        _contentType.Save();
+                    //    _contentType.Save();
 
-                        // Only if the doctype alias changed, cause a regeneration of the xml cache file since
-                        // the xml element names will need to be updated to reflect the new alias
-                        if (asyncState.HasAliasChanged() || asyncState.HasAnyPropertyAliasChanged(_contentType))
-                        {
-                            _contentType.RebuildXmlStructuresForContent();
-                        }
-                    }
+                    //    // Only if the doctype alias changed, cause a regeneration of the xml cache file since
+                    //    // the xml element names will need to be updated to reflect the new alias
+                    //    if (asyncState.HasAliasChanged() || asyncState.HasAnyPropertyAliasChanged(_contentType))
+                    //    {
+                    //        _contentType.RebuildXmlStructuresForContent();
+                    //    }
+                    //}
 
                     Trace.Write("ContentTypeControlNew", "task completing");
                 };
@@ -1042,8 +1044,10 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                 int propertyId = int.Parse(e.Item.Cells[0].Text);
                 string rawName = string.Empty;
 
-                if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
-                {
+                //if (_contentType.ContentTypeItem is IContentType 
+                //    || _contentType.ContentTypeItem is IMediaType
+                //    || _contentType.ContentTypeItem is IMemberType)
+                //{
                     var propertyType = _contentType.ContentTypeItem.PropertyTypes.FirstOrDefault(x => x.Id == propertyId);
                     if (propertyType != null && string.IsNullOrEmpty(propertyType.Alias) == false)
                     {
@@ -1051,13 +1055,13 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                         _contentType.ContentTypeItem.RemovePropertyType(propertyType.Alias);
                         _contentType.Save();
                     }
-                }
-                else
-                {
-                    cms.businesslogic.propertytype.PropertyType pt = cms.businesslogic.propertytype.PropertyType.GetPropertyType(propertyId);
-                    rawName = pt.GetRawName();
-                    pt.delete();
-                }
+                //}
+                //else
+                //{
+                //    cms.businesslogic.propertytype.PropertyType pt = cms.businesslogic.propertytype.PropertyType.GetPropertyType(propertyId);
+                //    rawName = pt.GetRawName();
+                //    pt.delete();
+                //}
 
                 RaiseBubbleEvent(new object(), new SaveClickEventArgs("Property ´" + rawName + "´ deleted"));
        
@@ -1128,20 +1132,22 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
                     //we need to re-set the UmbracoContext since it will be nulled and our cache handlers need it
                     global::Umbraco.Web.UmbracoContext.Current = asyncState.UmbracoContext;
 
-                    if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
-                    {
+                    //if (_contentType.ContentTypeItem is IContentType 
+                    //    || _contentType.ContentTypeItem is IMediaType
+                    //    || _contentType.ContentTypeItem is IMemberType)
+                    //{
                         _contentType.ContentTypeItem.RemovePropertyType(asyncState.GenericPropertyWrapper.PropertyType.Alias);
                         _contentType.Save();
-                    }
-                    else
-                    {
-                        //if it is not a document type or a media type, then continue to call the legacy delete() method.
-                        //the new API for document type and media type's will ensure that the data is removed correctly and that
-                        //the cache is flushed correctly (using events).  If it is not one of these types, we'll rever to the 
-                        //legacy operation (... like for members i suppose ?)
-                        asyncState.GenericPropertyWrapper.GenricPropertyControl.PropertyType.delete();
+                    //}
+                    //else
+                    //{
+                    //    //if it is not a document type or a media type, then continue to call the legacy delete() method.
+                    //    //the new API for document type and media type's will ensure that the data is removed correctly and that
+                    //    //the cache is flushed correctly (using events).  If it is not one of these types, we'll rever to the 
+                    //    //legacy operation (... like for members i suppose ?)
+                    //    asyncState.GenericPropertyWrapper.GenricPropertyControl.PropertyType.delete();
 
-                    }
+                    //}
 
                     Trace.Write("ContentTypeControlNew", "task completing");
                 };
@@ -1277,15 +1283,17 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         {
             if (txtNewTab.Text.Trim() != "")
             {
-                if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
-                {
+                //if (_contentType.ContentTypeItem is IContentType 
+                //    || _contentType.ContentTypeItem is IMediaType
+                //    || _contentType.ContentTypeItem is IMemberType)
+                //{
                     _contentType.ContentTypeItem.AddPropertyGroup(txtNewTab.Text);
                     _contentType.Save();
-                }
-                else
-                {
-                    _contentType.AddVirtualTab(txtNewTab.Text);
-                }
+                //}
+                //else
+                //{
+                //    _contentType.AddVirtualTab(txtNewTab.Text);
+                //}
 
                 LoadContentType();
 
@@ -1317,15 +1325,17 @@ Umbraco.Controls.TabView.onActiveTabChange(function(tabviewid, tabid, tabs) {
             if (e.CommandName == "Delete")
             {
                 int propertyGroupId = int.Parse(e.Item.Cells[0].Text);
-                if (_contentType.ContentTypeItem is IContentType || _contentType.ContentTypeItem is IMediaType)
-                {
+                //if (_contentType.ContentTypeItem is IContentType 
+                //    || _contentType.ContentTypeItem is IMediaType
+                //    || _contentType.ContentTypeItem is IMemberType)
+                //{
                     var propertyGroup = _contentType.ContentTypeItem.PropertyGroups.FirstOrDefault(x => x.Id == propertyGroupId);
                     if (propertyGroup != null && string.IsNullOrEmpty(propertyGroup.Name) == false)
                     {
                         _contentType.ContentTypeItem.PropertyGroups.Remove(propertyGroup.Name);
                         _contentType.Save();
                     }
-                }
+                //}
 
                 _contentType.DeleteVirtualTab(propertyGroupId);
 

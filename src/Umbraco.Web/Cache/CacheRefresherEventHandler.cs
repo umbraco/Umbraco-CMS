@@ -86,6 +86,8 @@ namespace Umbraco.Web.Cache
             ContentTypeService.SavedMediaType += ContentTypeServiceSavedMediaType;
             ContentTypeService.DeletedContentType += ContentTypeServiceDeletedContentType;
             ContentTypeService.DeletedMediaType += ContentTypeServiceDeletedMediaType;
+            MemberTypeService.Saved += MemberTypeServiceSaved;
+            MemberTypeService.Deleted += MemberTypeServiceDeleted;
 
             //Bind to user events
 
@@ -363,7 +365,7 @@ namespace Umbraco.Web.Cache
         } 
         #endregion
 
-        #region Content/media Type event handlers
+        #region Content/media/member Type event handlers
         /// <summary>
         /// Fires when a media type is deleted
         /// </summary>
@@ -385,6 +387,16 @@ namespace Umbraco.Web.Cache
         }
 
         /// <summary>
+        /// Fires when a member type is deleted
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void MemberTypeServiceDeleted(IMemberTypeService sender, Core.Events.DeleteEventArgs<IMemberType> e)
+        {
+            e.DeletedEntities.ForEach(contentType => DistributedCache.Instance.RemoveMemberTypeCache(contentType));
+        }
+
+        /// <summary>
         /// Fires when a media type is saved
         /// </summary>
         /// <param name="sender"></param>
@@ -402,7 +414,19 @@ namespace Umbraco.Web.Cache
         static void ContentTypeServiceSavedContentType(IContentTypeService sender, Core.Events.SaveEventArgs<IContentType> e)
         {
             e.SavedEntities.ForEach(contentType => DistributedCache.Instance.RefreshContentTypeCache(contentType));
-        } 
+        }
+
+        /// <summary>
+        /// Fires when a member type is saved
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        static void MemberTypeServiceSaved(IMemberTypeService sender, Core.Events.SaveEventArgs<IMemberType> e)
+        {
+            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshMemberTypeCache(x));
+        }
+
+        
         #endregion
         
         #region User event handlers

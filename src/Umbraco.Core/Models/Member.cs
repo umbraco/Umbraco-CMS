@@ -207,13 +207,12 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.IsApproved].Value == null)
-                    return default(bool);
-
-                if (Properties[Constants.Conventions.Member.IsApproved].Value is bool)
-                    return (bool)Properties[Constants.Conventions.Member.IsApproved].Value;
-
-                return (bool)Convert.ChangeType(Properties[Constants.Conventions.Member.IsApproved].Value, typeof(bool));
+                var tryConvert = Properties[Constants.Conventions.Member.IsApproved].Value.TryConvertTo<bool>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(bool);
             }
             set
             {
@@ -233,13 +232,12 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.IsLockedOut].Value == null)
-                    return default(bool);
-
-                if (Properties[Constants.Conventions.Member.IsLockedOut].Value is bool)
-                    return (bool)Properties[Constants.Conventions.Member.IsLockedOut].Value;
-
-                return (bool)Convert.ChangeType(Properties[Constants.Conventions.Member.IsLockedOut].Value, typeof(bool));
+                var tryConvert = Properties[Constants.Conventions.Member.IsLockedOut].Value.TryConvertTo<bool>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(bool);
             }
             set
             {
@@ -259,13 +257,12 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.LastLoginDate].Value == null)
-                    return default(DateTime);
-
-                if (Properties[Constants.Conventions.Member.LastLoginDate].Value is DateTime)
-                    return (DateTime)Properties[Constants.Conventions.Member.LastLoginDate].Value;
-
-                return (DateTime)Convert.ChangeType(Properties[Constants.Conventions.Member.LastLoginDate].Value, typeof(DateTime));
+                var tryConvert = Properties[Constants.Conventions.Member.LastLoginDate].Value.TryConvertTo<DateTime>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(DateTime);
             }
             set
             {
@@ -285,13 +282,12 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value == null)
-                    return default(DateTime);
-
-                if (Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value is DateTime)
-                    return (DateTime)Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value;
-
-                return (DateTime)Convert.ChangeType(Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value, typeof(DateTime));
+                var tryConvert = Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value.TryConvertTo<DateTime>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(DateTime);
             }
             set
             {
@@ -311,13 +307,12 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.LastLockoutDate].Value == null)
-                    return default(DateTime);
-
-                if (Properties[Constants.Conventions.Member.LastLockoutDate].Value is DateTime)
-                    return (DateTime)Properties[Constants.Conventions.Member.LastLockoutDate].Value;
-
-                return (DateTime)Convert.ChangeType(Properties[Constants.Conventions.Member.LastLockoutDate].Value, typeof(DateTime));
+                var tryConvert = Properties[Constants.Conventions.Member.LastLockoutDate].Value.TryConvertTo<DateTime>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(DateTime);
             }
             set
             {
@@ -338,13 +333,12 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value == null)
-                    return default(int);
-
-                if (Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value is int)
-                    return (int)Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value;
-
-                return (int)Convert.ChangeType(Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value, typeof(int));
+                var tryConvert = Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value.TryConvertTo<int>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(int);
             }
             set
             {

@@ -247,6 +247,16 @@ namespace umbraco.cms.businesslogic.member
         }
         #endregion
 
+        #region Protected Methods
+
+        protected override void setupNode()
+        {
+            var memberType = ApplicationContext.Current.Services.MemberTypeService.Get(Id);
+            SetupNode(memberType);
+        }
+
+        #endregion
+
         #region Private Methods
 
         private void SetupNode(IMemberType contentType)
