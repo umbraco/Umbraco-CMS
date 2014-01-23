@@ -10,6 +10,13 @@ namespace Umbraco.Core.Services
     public interface IUserService : IMembershipUserService
     {
         /// <summary>
+        /// To permanently delete the user pass in true, otherwise they will just be disabled
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="deletePermanently"></param>
+        void Delete(IUser user, bool deletePermanently);
+
+        /// <summary>
         /// Gets an IProfile by User Id.
         /// </summary>
         /// <param name="id">Id of the User to retrieve</param>
@@ -35,13 +42,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="sectionAlias"></param>
         void DeleteSectionFromAllUsers(string sectionAlias);
-
-        /// <summary>
-        /// Returns a list of the sections that the user is allowed access to
-        /// </summary>
-        /// <returns></returns>
-        IEnumerable<string> GetUserSections(IUser user);
-
+        
         /// <summary>
         /// Get permissions set for user and specified node ids
         /// </summary>

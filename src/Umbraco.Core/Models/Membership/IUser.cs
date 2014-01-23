@@ -15,7 +15,10 @@ namespace Umbraco.Core.Models.Membership
         int StartMediaId { get; set; }
         string Language { get; set; }
         
-        IUserType UserType { get; }
+        /// <summary>
+        /// Gets/sets the user type for the user
+        /// </summary>
+        IUserType UserType { get; set; }
 
         /// <summary>
         /// The default permission set for the user

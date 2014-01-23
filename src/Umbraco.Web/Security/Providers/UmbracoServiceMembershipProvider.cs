@@ -344,7 +344,12 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         public override MembershipUser GetUser(object providerUserKey, bool userIsOnline)
         {
-            var member = MemberService.GetById(providerUserKey);
+            if ((providerUserKey is int) == false)
+            {
+                return null;
+            }
+
+            var member = MemberService.GetById((int)providerUserKey);
             if (member == null)
             {
                 return null;

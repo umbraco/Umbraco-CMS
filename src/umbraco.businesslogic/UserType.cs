@@ -19,19 +19,19 @@ namespace umbraco.BusinessLogic
     public class UserType
     {
 
-        private Umbraco.Core.Models.Membership.IUserType _userType;
+        internal Umbraco.Core.Models.Membership.IUserType UserTypeItem;
 
         /// <summary>
         /// Creates a new empty instance of a UserType
         /// </summary>
         public UserType()
         {
-            _userType = new Umbraco.Core.Models.Membership.UserType();
+            UserTypeItem = new Umbraco.Core.Models.Membership.UserType();
         }
 
         internal UserType(Umbraco.Core.Models.Membership.IUserType userType)
         {
-            _userType = userType;
+            UserTypeItem = userType;
         }
 
         /// <summary>
@@ -55,8 +55,9 @@ namespace umbraco.BusinessLogic
         /// <param name="name">The name.</param>
         public UserType(int id, string name)
         {
-            _userType.Id = id;
-            _userType.Name = name;
+            UserTypeItem = new Umbraco.Core.Models.Membership.UserType();
+            UserTypeItem.Id = id;
+            UserTypeItem.Name = name;
         }
 
         /// <summary>
@@ -68,10 +69,11 @@ namespace umbraco.BusinessLogic
         /// <param name="alias"></param>
         public UserType(int id, string name, string defaultPermissions, string alias)
         {
-            _userType.Id = id;
-            _userType.Name = name;
-            _userType.Alias = alias;
-            _userType.Permissions = defaultPermissions.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture));
+            UserTypeItem = new Umbraco.Core.Models.Membership.UserType();
+            UserTypeItem.Id = id;
+            UserTypeItem.Name = name;
+            UserTypeItem.Alias = alias;
+            UserTypeItem.Permissions = defaultPermissions.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture));
         }
 
         /// <summary>
@@ -93,8 +95,8 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public string Alias
         {
-            get { return _userType.Alias; }
-            set { _userType.Alias = value; }
+            get { return UserTypeItem.Alias; }
+            set { UserTypeItem.Alias = value; }
         }
 
         /// <summary>
@@ -102,8 +104,8 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public string Name
         {
-            get { return _userType.Name; }
-            set { _userType.Name = value; }
+            get { return UserTypeItem.Name; }
+            set { UserTypeItem.Name = value; }
         }
 
         /// <summary>
@@ -111,7 +113,7 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public int Id
         {
-            get { return _userType.Id; }
+            get { return UserTypeItem.Id; }
         }
 
         /// <summary>
@@ -119,8 +121,8 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public string DefaultPermissions
         {
-            get { return string.Join("", _userType.Permissions); }
-            set { _userType.Permissions = value.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture)); }
+            get { return string.Join("", UserTypeItem.Permissions); }
+            set { UserTypeItem.Permissions = value.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture)); }
         }
 
         /// <summary>
@@ -139,10 +141,10 @@ namespace umbraco.BusinessLogic
         public void Save()
         {
             //ensure that this object has an ID specified (it exists in the database)
-            if (_userType.HasIdentity == false)
+            if (UserTypeItem.HasIdentity == false)
                 throw new Exception("The current UserType object does not exist in the database. New UserTypes should be created with the MakeNew method");
 
-            ApplicationContext.Current.Services.UserService.SaveUserType(_userType);
+            ApplicationContext.Current.Services.UserService.SaveUserType(UserTypeItem);
             
             //raise event
             OnUpdated(this, new EventArgs());
@@ -154,10 +156,10 @@ namespace umbraco.BusinessLogic
         public void Delete()
         {
             //ensure that this object has an ID specified (it exists in the database)
-            if (_userType.HasIdentity == false)
+            if (UserTypeItem.HasIdentity == false)
                 throw new Exception("The current UserType object does not exist in the database. New UserTypes should be created with the MakeNew method");
 
-            ApplicationContext.Current.Services.UserService.DeleteUserType(_userType);
+            ApplicationContext.Current.Services.UserService.DeleteUserType(UserTypeItem);
 
             //raise event
             OnDeleted(this, new EventArgs());
@@ -171,8 +173,8 @@ namespace umbraco.BusinessLogic
         /// and the data was loaded, false if it wasn't</returns>
         public bool LoadByPrimaryKey(int id)
         {
-            _userType = ApplicationContext.Current.Services.UserService.GetUserTypeById(id);
-            return _userType != null;
+            UserTypeItem = ApplicationContext.Current.Services.UserService.GetUserTypeById(id);
+            return UserTypeItem != null;
         }
 
         /// <summary>

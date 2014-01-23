@@ -108,8 +108,8 @@ namespace Umbraco.Tests.Services
             IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             ServiceContext.MemberService.Save(member);
 
-            Assert.IsNotNull(ServiceContext.MemberService.GetById((object)member.Id));
-            Assert.IsNull(ServiceContext.MemberService.GetById((object)9876));
+            Assert.IsNotNull(ServiceContext.MemberService.GetById(member.Id));
+            Assert.IsNull(ServiceContext.MemberService.GetById(9876));
         }
 
         [Test]

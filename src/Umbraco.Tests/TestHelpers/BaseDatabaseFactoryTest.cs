@@ -78,6 +78,8 @@ namespace Umbraco.Tests.TestHelpers
 
             using (DisposableTimer.TraceDuration<BaseDatabaseFactoryTest>("init"))
             {
+                //TODO: Somehow make this faster - takes 5s +
+
                 DatabaseContext.Initialize(dbFactory.ProviderName, dbFactory.ConnectionString);
                 CreateSqlCeDatabase();
                 InitializeDatabase();

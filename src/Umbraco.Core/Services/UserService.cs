@@ -130,19 +130,14 @@ namespace Umbraco.Core.Services
             return CreateMemberWithIdentity(username, email, password, userType);
         }
 
-        public IUser GetById(object id)
+        public IUser GetById(int id)
         {
-            if (id is int)
+            using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
             {
-                using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
-                {
-                    var user = repository.Get((int) id);
+                var user = repository.Get((int)id);
 
-                    return user;
-                }
+                return user;
             }
-
-            return null;
         }
 
         public IUser GetByEmail(string email)
@@ -165,19 +160,51 @@ namespace Umbraco.Core.Services
             }
         }
 
+        /// <summary>
+        /// This disables and renames the user, it does not delete them, use the overload to delete them
+        /// </summary>
+        /// <param name="membershipUser"></param>
         public void Delete(IUser membershipUser)
-        {
-            if (DeletingUser.IsRaisedEventCancelled(new DeleteEventArgs<IUser>(membershipUser), this))
-                return;
-
-            var uow = _uowProvider.GetUnitOfWork();
-            using (var repository = _repositoryFactory.CreateUserRepository(uow))
+        {            
+            //disable
+            membershipUser.IsApproved = false;            
+            //can't rename if it's going to take up too many chars
+            if (membershipUser.Username.Length + 9 <= 125)
             {
-                repository.Delete(membershipUser);
-                uow.Commit();
+                membershipUser.Username = DateTime.Now.ToString("yyyyMMdd") + "_" + membershipUser.Username;
             }
+            Save(membershipUser);
 
-            DeletedUser.RaiseEvent(new DeleteEventArgs<IUser>(membershipUser, false), this);
+            //clear out the user logins!
+            var uow = _uowProvider.GetUnitOfWork();
+            uow.Database.Execute("delete from umbracoUserLogins where userID = @id", new {id = membershipUser.Id});
+        }
+
+        /// <summary>
+        /// To permanently delete the user pass in true, otherwise they will just be disabled
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="deletePermanently"></param>
+        public void Delete(IUser user, bool deletePermanently)
+        {
+            if (deletePermanently == false)
+            {
+                Delete(user);
+            }
+            else
+            {
+                if (DeletingUser.IsRaisedEventCancelled(new DeleteEventArgs<IUser>(user), this))
+                    return;
+
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateUserRepository(uow))
+                {
+                    repository.Delete(user);
+                    uow.Commit();
+                }
+
+                DeletedUser.RaiseEvent(new DeleteEventArgs<IUser>(user, false), this);
+            }
         }
 
         public void Save(IUser membershipUser, bool raiseEvents = true)
@@ -459,22 +486,6 @@ namespace Umbraco.Core.Services
                 }
                 uow.Commit();
             }
-        }
-
-        /// <summary>
-        /// Returns the user's applications that they are allowed to access
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        public IEnumerable<string> GetUserSections(IUser user)
-        {
-            //TODO: We need to cache this result
-
-            var uow = _uowProvider.GetUnitOfWork();
-            var sql = new Sql();
-            sql.Select("app").From<User2AppDto>()
-                .Where<User2AppDto>(dto => dto.UserId == (int)user.Id);
-            return uow.Database.Fetch<string>(sql);
         }
 
         /// <summary>

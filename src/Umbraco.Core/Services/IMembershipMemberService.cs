@@ -51,7 +51,7 @@ namespace Umbraco.Core.Services
         /// <returns></returns>
         T CreateMemberWithIdentity(string username, string email, string password, string memberTypeAlias, bool raiseEvents = true);
 
-        T GetById(object id);
+        T GetById(int id);
 
         /// <summary>
         /// Get a member by email

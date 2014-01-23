@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Mappers;
 
@@ -31,6 +32,7 @@ namespace Umbraco.Core.Models.Membership
             _sectionCollection = new ObservableCollection<string>();
             _addedSections = new List<string>();
             _removedSections = new List<string>();
+            _language = GlobalSettings.DefaultUILanguage;
             _sectionCollection.CollectionChanged += SectionCollectionChanged;
         }
 
@@ -40,10 +42,10 @@ namespace Umbraco.Core.Models.Membership
             _name = name;
             _email = email;
             _username = username;
-            _password = password;
+            _password = password;            
         }
 
-        private readonly IUserType _userType;
+        private IUserType _userType;
         private bool _hasIdentity;
         private int _id;
         private string _name;
@@ -81,6 +83,7 @@ namespace Umbraco.Core.Models.Membership
         private static readonly PropertyInfo DefaultPermissionsSelector = ExpressionHelper.GetPropertyInfo<User, IEnumerable<string>>(x => x.DefaultPermissions);
         private static readonly PropertyInfo DefaultToLiveEditingSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.DefaultToLiveEditing);
         private static readonly PropertyInfo HasIdentitySelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.HasIdentity);
+        private static readonly PropertyInfo UserTypeSelector = ExpressionHelper.GetPropertyInfo<User, IUserType>(x => x.UserType);
 
         #region Implementation of IEntity
 
@@ -419,6 +422,19 @@ namespace Umbraco.Core.Models.Membership
         public IUserType UserType
         {
             get { return _userType; }
+            set
+            {
+                if (value.HasIdentity == false)
+                {
+                    throw new InvalidOperationException("Cannot assign a User Type that has not been persisted");
+                }
+
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _userType = value;
+                    return _userType;
+                }, _userType, UserTypeSelector);
+            }
         }
 
         #endregion

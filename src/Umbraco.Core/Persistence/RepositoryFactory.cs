@@ -124,6 +124,9 @@ namespace Umbraco.Core.Persistence
 
         internal virtual IUserRepository CreateUserRepository(IDatabaseUnitOfWork uow)
         {
+            //TODO: Should we cache users? we did in the legacy API, might be a good idea considering the amount we query for the current user but will
+            // need to check that, in v7 with the new forms auth way we shouldn't be querying for a user a lot of times but now that we're wrapping in v6
+            // we need to ensure that the constant user lookups are cached!
             return new UserRepository(
                 uow,
                 NullCacheProvider.Current,
