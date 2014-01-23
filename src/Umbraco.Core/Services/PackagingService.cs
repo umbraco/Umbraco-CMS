@@ -1244,7 +1244,8 @@ namespace Umbraco.Core.Services
                 dontRender = bool.Parse(dontRenderElement.Value);
             }
 
-            var macro = new Macro(macroAlias, macroName, controlType, controlAssembly, xsltPath, scriptPath,
+            var existingMacro = _macroService.GetByAlias(macroAlias) as Macro; 
+            var macro = existingMacro ?? new Macro(macroAlias, macroName, controlType, controlAssembly, xsltPath, scriptPath,
                 cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration);
 
             var properties = macroElement.Element("properties");
@@ -1262,6 +1263,7 @@ namespace Umbraco.Core.Services
                         sortOrder = int.Parse(sortOrderAttribute.Value);
                     }
 
+                    if (macro.Properties.Any(x => x.Alias == propertyAlias)) continue;
                     macro.Properties.Add(new MacroProperty(propertyAlias, propertyName, sortOrder, editorAlias));
                     sortOrder++;
                 }
