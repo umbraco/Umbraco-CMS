@@ -15,16 +15,58 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the User to retrieve</param>
         /// <returns><see cref="IProfile"/></returns>
         IProfile GetProfileById(int id);
+
+        /// <summary>
+        /// Get profile by username
+        /// </summary>
+        /// <param name="username"></param>
+        /// <returns></returns>
         IProfile GetProfileByUserName(string username);
         
+        /// <summary>
+        /// Get user by Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         IUser GetUserById(int id);
+        
+        /// <summary>
+        /// This is useful when an entire section is removed from config
+        /// </summary>
+        /// <param name="sectionAlias"></param>
+        void DeleteSectionFromAllUsers(string sectionAlias);
 
+        /// <summary>
+        /// Returns a list of the sections that the user is allowed access to
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<string> GetUserSections(IUser user);
+
+        /// <summary>
+        /// Get permissions set for user and specified node ids
+        /// </summary>
+        /// <param name="user"></param>
+        /// <param name="nodeIds"></param>
+        /// <returns></returns>
+        IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds);
+
+        #region User types
+
+        IEnumerable<IUserType> GetAllUserTypes(params int[] ids);
+        
         /// <summary>
         /// Gets an IUserType by its Alias
         /// </summary>
         /// <param name="alias">Alias of the UserType to retrieve</param>
         /// <returns><see cref="IUserType"/></returns>
         IUserType GetUserTypeByAlias(string alias);
+
+        /// <summary>
+        /// Gets an IUserType by its Id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        IUserType GetUserTypeById(int id);
 
         /// <summary>
         /// Gets an IUserType by its Name
@@ -45,19 +87,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="userType"></param>        
         void DeleteUserType(IUserType userType);
-        
-        /// <summary>
-        /// This is useful when an entire section is removed from config
-        /// </summary>
-        /// <param name="sectionAlias"></param>
-        void DeleteSectionFromAllUsers(string sectionAlias);
 
-        /// <summary>
-        /// Returns a list of the sections that the user is allowed access to
-        /// </summary>
-        /// <returns></returns>
-        IEnumerable<string> GetUserSections(IUser user);
-
-        IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds);
+        #endregion
     }
 }

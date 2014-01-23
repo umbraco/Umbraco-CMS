@@ -329,6 +329,7 @@ namespace Umbraco.Tests.Services
 
             // Assert
             Assert.That(membershipUser.HasIdentity, Is.True);
+            Assert.That(membershipUser.Id, Is.GreaterThan(0));
             IUser user = membershipUser as User;
             Assert.That(user, Is.Not.Null);
             Assert.That(user.DefaultPermissions, Is.EqualTo(userType.Permissions));

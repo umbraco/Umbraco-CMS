@@ -31,7 +31,7 @@ namespace umbraco.BusinessLogic
         private bool _userDisabled;
         private bool _defaultToLiveEditing;
 
-        private Hashtable _notifications = new Hashtable();
+        private readonly Hashtable _notifications = new Hashtable();
         private bool _notificationsInitialized = false;
 
         [Obsolete("Obsolete, For querying the database use the new UmbracoDatabase object ApplicationContext.Current.DatabaseContext.Database", false)]
@@ -42,7 +42,7 @@ namespace umbraco.BusinessLogic
 
         internal User(IUser user)
         {
-            _id = (int)user.Id;
+            _id = user.Id;
             _userNoConsole = user.IsLockedOut;
             _userDisabled = user.IsApproved;
             _name = user.Name;

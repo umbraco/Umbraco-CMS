@@ -351,12 +351,21 @@ namespace Umbraco.Core.Services
             var user = GetByUsername(login);
             return user.ProfileData;
         }
-
+        
         public IUser GetUserById(int id)
         {
             using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))
             {
                 return repository.Get(id);
+            }
+        }
+
+        public IEnumerable<IUserType> GetAllUserTypes(params int[] ids)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateUserTypeRepository(uow))
+            {
+                return repository.GetAll(ids);
             }
         }
 
@@ -372,6 +381,14 @@ namespace Umbraco.Core.Services
                 var query = Query<IUserType>.Builder.Where(x => x.Alias == alias);
                 var contents = repository.GetByQuery(query);
                 return contents.SingleOrDefault();
+            }
+        }
+
+        public IUserType GetUserTypeById(int id)
+        {
+            using (var repository = _repositoryFactory.CreateUserTypeRepository(_uowProvider.GetUnitOfWork()))
+            {
+                return repository.Get(id);                
             }
         }
 

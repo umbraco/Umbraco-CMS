@@ -80,23 +80,42 @@ namespace Umbraco.Core.Models.Membership
         private static readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Language);
         private static readonly PropertyInfo DefaultPermissionsSelector = ExpressionHelper.GetPropertyInfo<User, IEnumerable<string>>(x => x.DefaultPermissions);
         private static readonly PropertyInfo DefaultToLiveEditingSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.DefaultToLiveEditing);
+        private static readonly PropertyInfo HasIdentitySelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.HasIdentity);
 
         #region Implementation of IEntity
 
         [IgnoreDataMember]
-        public bool HasIdentity { get { return Id != null || _hasIdentity; } }
-
-        [IgnoreDataMember]
-        int IEntity.Id
+        public bool HasIdentity
         {
             get
             {
-                return int.Parse(Id.ToString());
+                return _hasIdentity;
+            }
+            protected set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _hasIdentity = value;
+                    return _hasIdentity;
+                }, _hasIdentity, HasIdentitySelector);
+            }
+        }
+
+        [DataMember]
+        public int Id
+        {
+            get
+            {
+                return _id;
             }
             set
             {
-                Id = value;
-                _hasIdentity = true;
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _id = value;
+                    HasIdentity = true; //set the has Identity
+                    return _id;
+                }, _id, IdSelector);
             }
         }
 
@@ -351,20 +370,6 @@ namespace Umbraco.Core.Models.Membership
                         _startMediaId = value;
                         return _startMediaId;
                     }, _startMediaId, StartMediaIdSelector);
-            }
-        }
-
-        [DataMember]
-        public int Id
-        {
-            get { return _id; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                    {
-                        _id = value;
-                        return _id;
-                    }, _id, IdSelector);
             }
         }
 
