@@ -119,7 +119,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IUser CreateMember(string username, string email, string password, string memberTypeAlias, bool raiseEvents = true)
+        public IUser CreateMemberWithIdentity(string username, string email, string password, string memberTypeAlias, bool raiseEvents = true)
         {
             var userType = GetUserTypeByAlias(memberTypeAlias);
             if (userType == null)

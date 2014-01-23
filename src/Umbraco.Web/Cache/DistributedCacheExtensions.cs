@@ -255,6 +255,7 @@ namespace Umbraco.Web.Cache
         {
             dc.Remove(new Guid(DistributedCache.MemberCacheRefresherId), memberId);
         } 
+
         #endregion
 
         #region Media Cache

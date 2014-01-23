@@ -78,15 +78,24 @@ namespace umbraco
             string loginName = nameAndMail.Length > 2 ? nameAndMail[3] : "";
             if (Membership.Provider.IsUmbracoMembershipProvider() && TypeID != -1)
             {
-                var dt = new MemberType(TypeID);                
-                var provider = (providers.members.UmbracoMembershipProvider) Membership.Provider;
+                var dt = new MemberType(TypeID);
+                var provider = (UmbracoMembershipProviderBase)Membership.Provider;
                 MembershipCreateStatus status;
+                
+                //First create with the membership provider
                 //TODO: We are not supporting q/a - passing in empty here
                 var created = provider.CreateUser(dt.Alias, 
                     loginName.Replace(" ", "").ToLower(), //dunno why we're doing this but that's how it has been so i'll leave it i guess
                     password, email, "", "", true, Guid.NewGuid(), out status);
+                if (status != MembershipCreateStatus.Success)
+                {
+                    throw new Exception("Error creating Member: " + status);
+                }
 
+                //update the name
                 var member = Member.GetMemberFromLoginName(created.UserName);
+                member.Text = name;
+                member.Save();
 
                 var e = new NewMemberUIEventArgs();
                 this.OnNewMember(e, password, member);
@@ -95,7 +104,7 @@ namespace umbraco
             }
             else
             {
-                var mc = new MembershipCreateStatus();
+                MembershipCreateStatus mc;
                 Membership.CreateUser(name, password, email, "empty", "empty", true, out mc);
                 if (mc != MembershipCreateStatus.Success)
                 {

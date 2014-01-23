@@ -15,7 +15,7 @@ namespace Umbraco.Core.Services
     /// </remarks>
     public interface IMembershipMemberService : IMembershipMemberService<IMember>
     {
-        IMember CreateMemberWithIdentity(string email, string username, string password, IMemberType memberType, bool raiseEvents = true);
+        IMember CreateMemberWithIdentity(string username, string email, string password, IMemberType memberType, bool raiseEvents = true);
     }
 
     /// <summary>
@@ -49,7 +49,7 @@ namespace Umbraco.Core.Services
         /// <param name="memberTypeAlias"></param>
         /// <param name="raiseEvents"></param>
         /// <returns></returns>
-        T CreateMember(string username, string email, string password, string memberTypeAlias, bool raiseEvents = true);
+        T CreateMemberWithIdentity(string username, string email, string password, string memberTypeAlias, bool raiseEvents = true);
 
         T GetById(object id);
 

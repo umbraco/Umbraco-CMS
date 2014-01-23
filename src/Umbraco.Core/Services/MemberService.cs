@@ -568,7 +568,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IMember CreateMemberWithIdentity(string email, string username, string password, IMemberType memberType, bool raiseEvents = true)
+        public IMember CreateMemberWithIdentity(string username, string email, string password, IMemberType memberType, bool raiseEvents = true)
         {
             if (memberType == null) throw new ArgumentNullException("memberType");
 
@@ -609,7 +609,7 @@ namespace Umbraco.Core.Services
         /// <param name="memberTypeAlias"></param>
         /// <param name="raiseEvents"></param>
         /// <returns></returns>
-        public IMember CreateMember(string email, string username, string password, string memberTypeAlias, bool raiseEvents = true)
+        public IMember CreateMemberWithIdentity(string username, string email, string password, string memberTypeAlias, bool raiseEvents = true)
         {
             var uow = _uowProvider.GetUnitOfWork();
             IMemberType memberType;

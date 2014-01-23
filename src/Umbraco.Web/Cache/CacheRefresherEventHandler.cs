@@ -115,8 +115,8 @@ namespace Umbraco.Web.Cache
 
             //Bind to member events
 
-            Member.AfterSave += MemberAfterSave;
-            Member.BeforeDelete += MemberBeforeDelete;
+            MemberService.Saved += MemberServiceSaved;
+            MemberService.Deleted += MemberServiceDeleted;
 
             //Bind to media events
 
@@ -131,6 +131,8 @@ namespace Umbraco.Web.Cache
             ContentService.Created += ContentServiceCreated;
             ContentService.Copied += ContentServiceCopied;
         }
+
+        
 
         #region Content service event handlers
 
@@ -540,37 +542,45 @@ namespace Umbraco.Web.Cache
         #endregion
 
         #region Media event handlers
-        static void MediaServiceTrashing(IMediaService sender, Core.Events.MoveEventArgs<Core.Models.IMedia> e)
+        static void MediaServiceTrashing(IMediaService sender, Core.Events.MoveEventArgs<IMedia> e)
         {
             DistributedCache.Instance.RemoveMediaCache(e.Entity);
         }
 
-        static void MediaServiceMoving(IMediaService sender, Core.Events.MoveEventArgs<Core.Models.IMedia> e)
+        static void MediaServiceMoving(IMediaService sender, Core.Events.MoveEventArgs<IMedia> e)
         {
             DistributedCache.Instance.RefreshMediaCache(e.Entity);
         }
 
-        static void MediaServiceDeleting(IMediaService sender, Core.Events.DeleteEventArgs<Core.Models.IMedia> e)
+        static void MediaServiceDeleting(IMediaService sender, Core.Events.DeleteEventArgs<IMedia> e)
         {
             DistributedCache.Instance.RemoveMediaCache(e.DeletedEntities.ToArray());
         }
 
-        static void MediaServiceSaved(IMediaService sender, Core.Events.SaveEventArgs<Core.Models.IMedia> e)
+        static void MediaServiceSaved(IMediaService sender, Core.Events.SaveEventArgs<IMedia> e)
         {
             DistributedCache.Instance.RefreshMediaCache(e.SavedEntities.ToArray());
         } 
         #endregion
 
         #region Member event handlers
-        static void MemberBeforeDelete(Member sender, DeleteEventArgs e)
+
+        void MemberServiceDeleted(IMemberService sender, Core.Events.DeleteEventArgs<IMember> e)
         {
-            DistributedCache.Instance.RemoveMemberCache(sender.Id);
+            foreach (var m in e.DeletedEntities.ToArray())
+            {
+                DistributedCache.Instance.RemoveMemberCache(m.Id);    
+            }
         }
 
-        static void MemberAfterSave(Member sender, SaveEventArgs e)
+        void MemberServiceSaved(IMemberService sender, Core.Events.SaveEventArgs<IMember> e)
         {
-            DistributedCache.Instance.RefreshMemberCache(sender.Id);
-        } 
+            foreach (var m in e.SavedEntities.ToArray())
+            {
+                DistributedCache.Instance.RefreshMemberCache(m.Id);
+            }
+        }
+
         #endregion
     }
 }
