@@ -228,7 +228,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        PasswordAnswer,
-		                        new PropertyType(new Guid(PropertyEditors.Textbox), DataTypeDatabaseType.Nvarchar)
+		                        new PropertyType(new Guid(PropertyEditors.NoEdit), DataTypeDatabaseType.Nvarchar)
 		                            {
 		                                Alias = PasswordAnswer,
 		                                Name = PasswordAnswerLabel
@@ -236,7 +236,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        PasswordQuestion,
-		                        new PropertyType(new Guid(PropertyEditors.Textbox), DataTypeDatabaseType.Nvarchar)
+		                        new PropertyType(new Guid(PropertyEditors.NoEdit), DataTypeDatabaseType.Nvarchar)
 		                            {
 		                                Alias = PasswordQuestion,
 		                                Name = PasswordQuestionLabel
