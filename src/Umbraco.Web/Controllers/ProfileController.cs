@@ -35,9 +35,7 @@ namespace Umbraco.Web.Controllers
                     }
 
                     member.Save();
-
-                    member.XmlGenerate(new XmlDocument());
-
+                    
                     Member.AddMemberToCache(member);
 
                     Response.Redirect("/");

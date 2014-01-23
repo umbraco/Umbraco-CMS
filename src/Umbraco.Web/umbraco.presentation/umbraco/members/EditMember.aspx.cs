@@ -311,9 +311,7 @@ namespace umbraco.cms.presentation.members
                     {
                         _document.getProperty(item.Key).Value = item.Value.Data.Value;
                     }
-
-                    // refresh cache
-                    _document.XmlGenerate(new System.Xml.XmlDocument());
+                    
                     _document.Save();
                 }
                 else
