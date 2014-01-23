@@ -58,7 +58,6 @@ namespace Umbraco.Core.Models.Membership
         private string _username;
         private string _email;
         private string _password;
-        private Guid _key;
         private bool _isApproved;
         private bool _isLockedOut;
         private string _language;
@@ -239,14 +238,8 @@ namespace Umbraco.Core.Models.Membership
         public int FailedPasswordAttempts { get; set; }
         
         #endregion
-
-        #region Implementation of IProfile
-
-        object IProfile.Id
-        {
-            get { return Id; }
-            set { Id = (int)value; }
-        }
+        
+        #region Implementation of IUser
 
         [DataMember]
         public string Name
@@ -255,16 +248,12 @@ namespace Umbraco.Core.Models.Membership
             set
             {
                 SetPropertyValueAndDetectChanges(o =>
-                    {
-                        _name = value;
-                        return _name;
-                    }, _name, NameSelector);
+                {
+                    _name = value;
+                    return _name;
+                }, _name, NameSelector);
             }
         }
-
-        #endregion
-
-        #region Implementation of IUser
 
         public IEnumerable<string> AllowedSections
         {
@@ -282,6 +271,11 @@ namespace Umbraco.Core.Models.Membership
             {
                 _sectionCollection.Add(sectionAlias);
             }
+        }
+
+        public IProfile ProfileData
+        {
+            get { return new UserProfile(this); }
         }
 
         /// <summary>
@@ -463,6 +457,31 @@ namespace Umbraco.Core.Models.Membership
 
                 //add to the added sections
                 _removedSections.Add(e.OldItems.Cast<string>().First());
+            }
+        }
+
+        /// <summary>
+        /// Internal class used to wrap the user in a profile
+        /// </summary>
+        private class UserProfile : IProfile
+        {
+            private readonly IUser _user;
+
+            public UserProfile(IUser user)
+            {
+                _user = user;
+            }
+
+            public object Id
+            {
+                get { return _user.Id; }
+                set { _user.Id = (int)value; }
+            }
+
+            public string Name
+            {
+                get { return _user.Name; }
+                set { _user.Name = value; }
             }
         }
     }

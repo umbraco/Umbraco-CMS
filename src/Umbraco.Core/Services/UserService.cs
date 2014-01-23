@@ -343,13 +343,13 @@ namespace Umbraco.Core.Services
         public IProfile GetProfileById(int id)
         {
             var user = GetUserById(id);
-            return user;
+            return user.ProfileData;
         }
 
         public IProfile GetProfileByUserName(string login)
         {
             var user = GetByUsername(login);
-            return user;
+            return user.ProfileData;
         }
 
         public IUser GetUserById(int id)
