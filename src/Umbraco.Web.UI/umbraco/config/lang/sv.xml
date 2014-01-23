@@ -5,7 +5,6 @@
     <link>http://www.toxic.se</link>
   </creator>
   <area alias="actions">
-    <key alias="archiveContourForm">Arkivera formulär</key>
     <key alias="assignDomain">Hantera domännamn</key>
     <key alias="auditTrail">Hantera versioner</key>
     <key alias="browse">Surfa på sidan</key>
@@ -17,9 +16,7 @@
     <key alias="delete">Ta bort</key>
     <key alias="disable">Avaktivera</key>
     <key alias="emptyTrashcan">Töm papperskorgen</key>
-    <key alias="exportContourForm">Exportera formulär</key>
     <key alias="exportDocumentType">Exportera dokumenttyp</key>
-    <key alias="importContourForm">Importera formulär</key>
     <key alias="importDocumentType">Importera dokumenttyp</key>
     <key alias="importPackage">Importera paket</key>
     <key alias="liveEdit">Redigera i Canvas</key>
@@ -37,18 +34,17 @@
     <key alias="sort">Sortera</key>
     <key alias="toPublish">Skicka för publicering</key>
     <key alias="translate">Översätt</key>
-    <key alias="unarchiveContourForm">Avarkivera formulär</key>
     <key alias="unpublish">Avpublicera</key>
     <key alias="update">Uppdatera</key>
   </area>
   <area alias="assignDomain">
     <key alias="addNew">Lägg till nytt domännamn</key>
     <key alias="domain">Domännamn</key>
-    <key alias="domainCreated">Har skapat domännamnet '{0}'</key>
-    <key alias="domainDeleted">Har tagit bort domännamnet '{0}'</key>
+    <key alias="domainCreated">Har skapat domännamnet {0}</key>
+    <key alias="domainDeleted">Har tagit bort domännamnet {0}</key>
     <key alias="domainExists">Domänen {0} är redan tillagd</key>
     <key alias="domainHelp">t.ex.: dittdomannamn.se, www.dittdomannamn.se</key>
-    <key alias="domainUpdated">Domännamnet '{0}' har uppdaterats</key>
+    <key alias="domainUpdated">Domännamnet {0} har uppdaterats</key>
     <key alias="duplicateDomain">Domänen är redan tilldelad</key>
     <key alias="inherit">Ärv</key>
     <key alias="invalidDomain">Ogiltigt domännamn</key>
@@ -59,8 +55,10 @@
     <key alias="remove">Ta bort</key>
     <key alias="setDomains">Domäner</key>
     <key alias="setLanguage">Kultur</key>
-    <key alias="setLanguageHelp"><![CDATA[Sätt kulturen för noder under aktuell nod,<br /> eller ärv kulturen från föregående noder. Appliceras även<br />
-     på befintlig nod.]]></key>
+    <key alias="setLanguageHelp">
+      <![CDATA[Sätt kulturen för noder under aktuell nod,<br /> eller ärv kulturen från föregående noder. Appliceras även<br />
+     på befintlig nod.]]>
+    </key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Visar för</key>
@@ -79,7 +77,7 @@
     <key alias="linkInsert">Infoga länk</key>
     <key alias="linkLocal">Infoga intern länk (ankare)</key>
     <key alias="listBullet">Punktlista</key>
-    <key alias="listNumeric">Numerad lista</key>
+    <key alias="listNumeric">Numrerad lista</key>
     <key alias="macroInsert">Infoga macro</key>
     <key alias="pictureInsert">Infoga bild</key>
     <key alias="relations">Ändra relation</key>
@@ -120,7 +118,7 @@
   </area>
   <area alias="content">
     <key alias="about">Om denna sida</key>
-    <key alias="alias">Alternativ länk</key>
+    <key alias="alias">Alias</key>
     <key alias="alternativeTextHelp">(hur skulle du beskriva denna bild för någon över telefon)</key>
     <key alias="alternativeUrls">Alternativa länkar</key>
     <key alias="childItems">Underliggande noder</key>
@@ -145,7 +143,7 @@
     <key alias="nodeName">Sidnamn</key>
     <key alias="notmemberof">Ej medlem av grupp(er)</key>
     <key alias="otherElements">Egenskaper</key>
-    <key alias="parentNotPublished">Detta dokument är publicerat men syns inte eftersom den överordnade sidan '{0}' inte är publicerad</key>
+    <key alias="parentNotPublished">Detta dokument är publicerat men syns inte eftersom den överordnade sidan {0} inte är publicerad</key>
     <key alias="parentNotPublishedAnomaly">Oops: detta dokument är publicerat men finns inte i cacheminnet (internt fel)</key>
     <key alias="publish">Publicera</key>
     <key alias="publishStatus">Publiceringsstatus</key>
@@ -167,7 +165,7 @@
   </area>
   <area alias="create">
     <key alias="chooseNode">Var vill du skapa den nya {0}</key>
-    <key alias="createUnder">Skapa här</key>
+    <key alias="createUnder">Skapa innehåll under</key>
     <key alias="noDocumentTypes"><![CDATA[Det finns inga giltiga dokumenttyper tillgängliga. Du måste aktivera dessa under sektionen inställningar och under <strong>"dokumenttyper"</strong>.]]></key>
     <key alias="noMediaTypes"><![CDATA[Det finns inga giltiga mediatyper tillgängliga. Du måste aktivera dessa under sektionen inställningar och under <strong>"mediatyper"</strong>.]]></key>
     <key alias="updateData">Välj typ och rubrik</key>
@@ -228,7 +226,7 @@
     <key alias="viewCacheItem">Se cachat objekt</key>
   </area>
   <area alias="dictionaryItem">
-    <key alias="description">Redigera de olika översättningarna för ordboksinlägget '{0}' nedan. Du kan lägga till ytterligare språk under 'språk' i menyn till vänster.</key>
+    <key alias="description">Redigera de olika översättningarna för ordboksinlägget {0} nedan. Du kan lägga till ytterligare språk under 'språk' i menyn till vänster.</key>
     <key alias="displayName">Språknamn</key>
   </area>
   <area alias="editcontenttype">
@@ -272,6 +270,7 @@
     <key alias="contentTypeAliasAndNameNotNull">Du måste ange både alias och namn för den nya egenskapstypen!</key>
     <key alias="dissallowedMediaType">Filtypen är icke godkännd av administratören</key>
     <key alias="filePermissionsError">Ett fel upptäcktes i läsningen/skrivningen till den aktuella filen eller mappen</key>
+    <key alias="missingPropertyEditorErrorMessage">Det finns ett konfigurationsfel med datatypen som används för denna egenskapen, vänligen undersök datatypen</key>
     <key alias="missingTitle">Du måste skriva en rubrik</key>
     <key alias="missingType">Du måste välja en typ</key>
     <key alias="pictureResizeBiggerThanOrg">Du kommer att göra bilden större än originalstorleken. Är du säker på att du vill fortsätta?</key>
@@ -417,8 +416,10 @@
     <key alias="permissionsAffectedFolders">Berörda filer och mappar</key>
     <key alias="permissionsAffectedFoldersMoreInfo">Här hittar du mer information om att sätta rättigheter för umbraco</key>
     <key alias="permissionsAffectedFoldersText">Du måste ge ASP.NET ändra rättigheter till följande filer/mappar</key>
-    <key alias="permissionsAlmostPerfect"><![CDATA[<strong>Dina rättighetsinställningar är nästa perfekta!</strong>
-    <br /><br /> Du kan köra umbraco utan problem, men du kommer inte att kunna installera paket vilket är rekommenderat för att kunna utnyttja umbraco fullt ut.]]></key>
+    <key alias="permissionsAlmostPerfect">
+      <![CDATA[<strong>Dina rättighetsinställningar är nästa perfekta!</strong>
+    <br /><br /> Du kan köra umbraco utan problem, men du kommer inte att kunna installera paket vilket är rekommenderat för att kunna utnyttja umbraco fullt ut.]]>
+    </key>
     <key alias="permissionsHowtoResolve">Hur skall man lösa</key>
     <key alias="permissionsHowtoResolveLink">Klicka här för att läsa text-versionen</key>
     <key alias="permissionsHowtoResolveText"><![CDATA[Titta på vår <strong>video-självstudiekurs</strong> om hur du konfigurerar mapp-rättigheter för umbraco eller läs text-versionen.]]></key>
@@ -447,7 +448,7 @@
     <key alias="theEndBrowseSite"><![CDATA[<h3>Besök din nya webbplats</h3> Du installerade Runway, så varför inte se hur din nya webbplats ser ut.]]></key>
     <key alias="theEndFurtherHelp"><![CDATA[<h3>Ytterligare hjälp och information</h3> Få hjälp från våra prisbelönta community, bläddra i dokumentationen eller titta på några gratis videor om hur man bygger en enkel webbplats, hur du använder paket eller en snabbguide till umbracos terminologi]]></key>
     <key alias="theEndHeader">Umbraco {0} är installerat och klart för användning</key>
-    <key alias="theEndInstallFailed"><![CDATA[För att avsluta installationen måste du manuellt redigera <strong>/web.config</strong> filen och ändra AppSettingsnyckeln <strong>umbracoConfigurationStatus</strong> på slutet till <strong>'{0}'</strong>]]></key>
+    <key alias="theEndInstallFailed"><![CDATA[För att avsluta installationen måste du manuellt redigera <strong>/web.config</strong> filen och ändra AppSettingsnyckeln <strong>umbracoConfigurationStatus</strong> på slutet till <strong>{0}</strong>]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Du kan <strong>börja omedelbart</strong> genom att klicka på "Starta Umbraco"-knappen nedan. <br />Om du är en <strong>ny umbraco användare</strong>kan du hitta massor av resurser på våra kom igång sidor.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Starta Umbraco</h3> För att administrera din webbplats öppnar du bara umbraco back office och börjar lägga till innehåll, uppdatera mallar och stilmallar eller lägga till nya funktioner.]]></key>
     <key alias="Unavailable">Anslutningen till databasen misslyckades.</key>
@@ -469,20 +470,20 @@
     <key alias="greeting0">Happy super sunday</key>
     <key alias="greeting1">Happy manic monday</key>
     <key alias="greeting2">Happy tremendous tuesday</key>
-    <key alias="greeting3">Happy wonderful wednesday</key>
+    <key alias="greeting3">Happy wonderfull wednesday</key>
     <key alias="greeting4">Happy thunder thursday</key>
     <key alias="greeting5">Happy friendly friday</key>
     <key alias="greeting6">Happy shiny saturday</key>
     <key alias="instruction">Logga in nedan</key>
-    <key alias="timeout">Sessionen har nått sin maxperiod</key>
+    <key alias="timeout">Sessionen har nått sin maxgräns</key>
   </area>
   <area alias="main">
-    <key alias="dashboard">Redigeringsyta</key>
+    <key alias="dashboard">Översikt</key>
     <key alias="sections">Sektioner</key>
     <key alias="tree">Innehåll</key>
   </area>
   <area alias="media">
-    <key alias="clickToUpload">Klicka här för att ladda upp</key>
+    <key alias="clickToUpload">Klicka för att ladda upp</key>
     <key alias="dropFilesHere">Släpp dina filer här...</key>
   </area>
   <area alias="moveOrCopy">
@@ -502,7 +503,7 @@
   <area alias="notifications">
     <key alias="editNotifications">Inställningar för notifieringar gällande {0}</key>
     <key alias="mailBody">Hej {0} Detta mail skickas till dig automatiskt för att meddela att '{1}' har utförts på sidan '{2}' av användaren '{3}' Gå till http://{4}/actions/editContent.aspx?id={5} för att redigera.</key>
-    <key alias="mailBodyHtml"><![CDATA[<p>Hej {0}</p> <p>Detta mail skickas till dig automatiskt för att meddela att <strong>'{1}'</strong> har utförts på sidan <a href="http://{4}/actions/preview.aspx?id={5}"><strong>'{2}'</strong></a> av användaren <strong>'{3}'</strong> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://{4}/actions/publish.aspx?id={5}">&nbsp;&nbsp;PUBLICERA&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://{4}/actions/editContent.aspx?id={5}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://{4}/actions/delete.aspx?id={5}">&nbsp;&nbsp;&nbsp;&nbsp;TA BORT&nbsp;&nbsp;&nbsp;&nbsp;</a> <br /> </div> <p> <h3>Sammanfattning av uppdateringen:</h3> <table style="width: 100%;"> {6} </table> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://{4}/actions/publish.aspx?id={5}">&nbsp;&nbsp;PUBLICERA&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://{4}/actions/editContent.aspx?id={5}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;REDIGERA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://{4}/actions/delete.aspx?id={5}">&nbsp;&nbsp;&nbsp;&nbsp;TA BORT&nbsp;&nbsp;&nbsp;&nbsp;</a> <br /> </div>]]></key>
+    <key alias="mailBodyHtml"><![CDATA[<p>Hej {0}</p> <p>Detta mail skickas till dig automatiskt för att meddela att <strong>'{1}'</strong> har utförts på sidan <a href="http://{4}/actions/preview.aspx?id={5}"><strong>'{2}'</strong></a> av användaren <strong>'{3}'</strong> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://{4}/actions/editContent.aspx?id={5}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <br /> </div> <p> <h3>Sammanfattning av uppdateringen:</h3> <table style="width: 100%;"> {6} </table> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://{4}/actions/publish.aspx?id={5}">&nbsp;&nbsp;PUBLICERA&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://{4}/actions/editContent.aspx?id={5}">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;REDIGERA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://{4}/actions/delete.aspx?id={5}">&nbsp;&nbsp;&nbsp;&nbsp;TA BORT&nbsp;&nbsp;&nbsp;&nbsp;</a> <br /> </div>]]></key>
     <key alias="mailSubject">[{0}] Meddelande för att informera om att {1} har utförts på {2}</key>
     <key alias="notifications">Notifieringar</key>
   </area>
@@ -565,7 +566,7 @@
     <key alias="paSimpleHelp">Välj detta alternativ om du vill skydda sidan med ett enkelt användarnamn och lösenord. Alla loggar då in med samma inloggningsuppgifter.</key>
   </area>
   <area alias="publish">
-    <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[ {0} kunde inte publiceras på grund av dess tidsinställda publicering.]]></key>
+    <key alias="contentPublishedFailedAwaitingRelease"> {0} kunde inte publiceras på grund av dess tidsinställda publicering.</key>
     <key alias="contentPublishedFailedByEvent">{0} kunde inte publiceras på grund av att ett tredjepartstillägg avbröt publiceringen.</key>
     <key alias="contentPublishedFailedByParent">{0} kan inte publiceras, på grund av att överordnad nod inte är publicerad.</key>
     <key alias="contentPublishedFailedInvalid">{0} kunde inte publiceras på grund av följande orsaker:  {1}  passerade inte valideringen.</key>
@@ -604,11 +605,11 @@
   <area alias="sections">
     <key alias="concierge">Concierge</key>
     <key alias="content">Innehåll</key>
-    <key alias="contour">Umbraco Contour</key>
+    <key alias="contour">Contour</key>
     <key alias="courier">Courier</key>
     <key alias="developer">Utvecklare</key>
     <key alias="help">Hjälp</key>
-    <key alias="installer">Umbraco konfigurationsguide</key>
+    <key alias="installer">Umbraco Configuration Wizard</key>
     <key alias="media">Media</key>
     <key alias="member">Medlemmar</key>
     <key alias="newsletters">Nyhetsbrev</key>
@@ -759,8 +760,8 @@
     <key alias="noTranslators">Hittade inga användare som är översättare. Vänligen skapa en användare som är översättare innan du börjar skicka innehåll för översättning</key>
     <key alias="ownedTasks">Arbetsuppgifter som du har skapat</key>
     <key alias="ownedTasksHelp"><![CDATA[Listan nedan visar sidor <strong>som du har skapat</strong>. För att se en detaljvy med kommentarer, klicka på "Detaljer" eller på sidans namn. Du kan också ladda ned sidan i XML-format genom att klicka på länken "Ladda ned XML".<br/> För att markera ett översättningsjobb som avslutat, gå till detaljvyn och klicka på knappen "Stäng".]]></key>
-    <key alias="pageHasBeenSendToTranslation">Sidan '{0}' har skickats för översättning</key>
-    <key alias="sendToTranslate">Skicka sidan '{0}' för översättning</key>
+    <key alias="pageHasBeenSendToTranslation">Sidan {0} har skickats för översättning</key>
+    <key alias="sendToTranslate">Skicka sidan {0} för översättning</key>
     <key alias="taskAssignedBy">Tilldelat av</key>
     <key alias="taskOpened">Arbetsuppgift öppnad</key>
     <key alias="totalWords">Totalt antal ord</key>
@@ -840,14 +841,14 @@
     <key alias="permissionSelectPages">Välj de sidor vars rättigheter du vill redigera</key>
     <key alias="resetPassword">Återställ lösenord</key>
     <key alias="searchAllChildren">Sök igenom alla undernoder</key>
-    <key alias="sessionExpires">Sessionen går ut om</key>
+    <key alias="sessionExpires">Sessionen går ut</key>
     <key alias="startnode">Startnod i innehåll</key>
     <key alias="username">Användarens namn</key>
     <key alias="userPermissions">Användarrättigheter</key>
     <key alias="usertype">Användartyp</key>
     <key alias="userTypes">Användartyper</key>
     <key alias="writer">Skribent</key>
-    <key alias="yourHistory">Din historik</key>
-    <key alias="yourProfile">Din användarprofil</key>
+    <key alias="yourHistory">Din nuvarande historik</key>
+    <key alias="yourProfile">Din profil</key>
   </area>
 </language>
