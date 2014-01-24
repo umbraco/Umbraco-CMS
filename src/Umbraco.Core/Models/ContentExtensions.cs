@@ -618,7 +618,7 @@ namespace Umbraco.Core.Models
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         internal static XElement ToDeepXml(this IContent content)
         {
-            return ApplicationContext.Current.Services.PackagingService.Export(content, true);
+            return ApplicationContext.Current.Services.PackagingService.Export(content, true, raiseEvents: false);
         }
 
         /// <summary>
@@ -628,7 +628,7 @@ namespace Umbraco.Core.Models
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         public static XElement ToXml(this IContent content)
         {
-            return ApplicationContext.Current.Services.PackagingService.Export(content);
+            return ApplicationContext.Current.Services.PackagingService.Export(content, raiseEvents: false);
         }
 
         /// <summary>
@@ -638,7 +638,7 @@ namespace Umbraco.Core.Models
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         public static XElement ToXml(this IMedia media)
         {
-            return ApplicationContext.Current.Services.PackagingService.Export(media);
+            return ApplicationContext.Current.Services.PackagingService.Export(media, raiseEvents: false);
         }
 
         /// <summary>
@@ -648,7 +648,7 @@ namespace Umbraco.Core.Models
         /// <returns>Xml representation of the passed in <see cref="IMedia"/></returns>
         internal static XElement ToDeepXml(this IMedia media)
         {
-            return ApplicationContext.Current.Services.PackagingService.Export(media, true);
+            return ApplicationContext.Current.Services.PackagingService.Export(media, true, raiseEvents: false);
         }
        
         /// <summary>
