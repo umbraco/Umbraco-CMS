@@ -3,7 +3,7 @@
 angular.module('umbraco')
 .controller("Umbraco.PropertyEditors.ContentPickerController",
 	
-	function($scope, dialogService, entityResource, $log, iconHelper){
+	function($scope, dialogService, entityResource, editorState, $log, iconHelper, $routeParams){
 		$scope.renderModel = [];
 		$scope.ids = $scope.model.value ? $scope.model.value.split(',') : [];
         
@@ -12,6 +12,7 @@ angular.module('umbraco')
 			multiPicker: "0", 
 			entityType: "Document", 
 			startNode:{
+				query: "",
 				type: "content",
 				id: -1
 			}
@@ -31,6 +32,7 @@ angular.module('umbraco')
 			$scope.cfg.entityType = "Media";
 		}
 
+			var rootId = $routeParams.id; 
 		$scope.cfg.callback = populate;
 		$scope.cfg.treeAlias = $scope.cfg.startNode.type;
 		$scope.cfg.section = $scope.cfg.startNode.type;
