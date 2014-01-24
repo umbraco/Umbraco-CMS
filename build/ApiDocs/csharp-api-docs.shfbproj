@@ -16,7 +16,7 @@
     <Name>Documentation</Name>
     <!-- SHFB properties -->
     <FrameworkVersion>.NET Framework 4.5</FrameworkVersion>
-    <OutputPath>.\Help\</OutputPath>
+    <OutputPath>.\Output\</OutputPath>
     <HtmlHelpName>UmbracoClassLibrary</HtmlHelpName>
     <Language>en-US</Language>
     <BuildAssemblerVerbosity>OnlyErrors</BuildAssemblerVerbosity>
@@ -38,10 +38,10 @@
     <VisibleItems>Attributes, InheritedMembers, InheritedFrameworkMembers, Protected, SealedProtected</VisibleItems>
     <ComponentConfigurations />
     <DocumentationSources>
-      <DocumentationSource sourceFile="..\src\Umbraco.Core\Umbraco.Core.csproj" />
-<DocumentationSource sourceFile="..\src\Umbraco.Core\bin\Release\Umbraco.Core.xml" />
-<DocumentationSource sourceFile="..\src\Umbraco.Web\Umbraco.Web.csproj" />
-<DocumentationSource sourceFile="..\src\Umbraco.Web\bin\Release\umbraco.xml" /></DocumentationSources>
+      <DocumentationSource sourceFile="..\..\src\Umbraco.Core\Umbraco.Core.csproj" />
+<DocumentationSource sourceFile="..\..\src\Umbraco.Core\bin\Release\Umbraco.Core.xml" />
+<DocumentationSource sourceFile="..\..\src\Umbraco.Web\Umbraco.Web.csproj" />
+<DocumentationSource sourceFile="..\..\src\Umbraco.Web\bin\Release\umbraco.xml" /></DocumentationSources>
     <WebsiteSdkLinkType>None</WebsiteSdkLinkType>
     <HtmlSdkLinkType>None</HtmlSdkLinkType>
     <IncludeFavorites>False</IncludeFavorites>
