@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.PrevalueEditors.TreeSourceController" class="umb-editor umb-contentpicker">
 
-	<select ng-model="model.value.type">
+	<select ng-model="model.value.type" class="umb-editor">
 		<option value="content">Content</option>
 		<option value="media">Media</option>
 		<option value="member">Members</option>
@@ -18,13 +18,37 @@
 			</li>
 		</ul>
 
-		<ul class="unstyled list-icons" ng-show="multipicker || !node">	
-			<li ng-hide="showSearch">
-				<i class="icon icon-add blue"></i>
-				<a href ng-click="openContentPicker()" prevent-default>
-					<localize key="general_choose">Choose</localize>...
-				</a>
-			</li>
-		</ul>
+			<div ng-show="multipicker || !node">	
+				<span ng-hide="showSearch || model.value.query">
+
+					<i class="icon icon-add blue"></i>
+					<a href ng-click="openContentPicker()" prevent-default>
+						<localize key="general_choose">Choose</localize>...
+					</a>
+					
+					<br/>
+					<a href ng-click="showSearch = true">Enter query</a>
+				</span>
+	
+				<span ng-show="showSearch || model.value.query">
+					<input type="text" 
+						ng-model="model.value.query" 
+						class="umb-editor umb-textstring" 
+						placeholder="Enter query">
+
+						<br/>
+							
+						<small>
+							Available placeholders: <br/>
+							<code>$current</code>: current page or closest found ancestor<br/>
+							<code>$parent</code>: parent page or closest found ancestor<br/>
+							<code>$root</code>: root of the content tree<br/>
+							<code>$site</code>: Ancestor node at level 1 <br/>					
+						</small>
+
+
+						<a href ng-click="showSearch = false; model.value.query = ''; openContentPicker()"> ...Or pick a node</a>
+				</span>
+			</div>
 	</div>
 </div>

@@ -3,7 +3,7 @@
 angular.module('umbraco')
 .controller("Umbraco.PropertyEditors.ContentPickerController",
 	
-	function($scope, dialogService, entityResource, editorState, $log, iconHelper){
+	function($scope, dialogService, entityResource, editorState, $log, iconHelper, $routeParams){
 		$scope.renderModel = [];
 		$scope.ids = $scope.model.value ? $scope.model.value.split(',') : [];
         
@@ -14,6 +14,7 @@ angular.module('umbraco')
 			filterCssClass: "not-allowed not-published",
 
 			startNode:{
+				query: "",
 				type: "content",
 				id: -1
 			}
@@ -35,11 +36,7 @@ angular.module('umbraco')
 
 		//if we have a query for the startnode, we will use that. 
 		if($scope.cfg.startNode.query){
-			var rootId = -1;
-			if($scope.cfg.startNode.scope === "current"){
-				rootId = editorState.current.id;
-			}
-
+			var rootId = $routeParams.id; 
 			entityResource.getByQuery($scope.cfg.startNode.query, rootId, "Document").then(function(ent){
 				$scope.cfg.startNodeId = ent.id;	
 			});	
