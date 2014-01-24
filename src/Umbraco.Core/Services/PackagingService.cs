@@ -1345,7 +1345,6 @@ namespace Umbraco.Core.Services
 
             xml.Add(new XAttribute("loginName", member.Username));
             xml.Add(new XAttribute("email", member.Email));
-            xml.Add(new XAttribute("key", member.Key));
 
             return xml;
         }
