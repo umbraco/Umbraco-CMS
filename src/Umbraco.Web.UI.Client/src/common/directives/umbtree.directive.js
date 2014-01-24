@@ -235,8 +235,9 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
 
                                 //set the root as the current active tree
                                 scope.activeTree = scope.tree.root;
-                                emitEvent("treeLoaded", { tree: scope.tree.root });
-
+                                emitEvent("treeLoaded", { tree: scope.tree });
+                                emitEvent("treeNodeExpanded", { tree: scope.tree, node: scope.tree.root, children: scope.tree.root.children });
+                           
                             }, function(reason) {
                                 scope.loading = false;
                                 notificationsService.error("Tree Error", reason);

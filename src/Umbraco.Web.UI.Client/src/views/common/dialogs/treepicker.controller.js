@@ -40,11 +40,11 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 		//Configures filtering
 		if (dialogOptions.filter) {
 
-			dialogOptions.filterExclude = true;
+			dialogOptions.filterExclude = false;
 			dialogOptions.filterAdvanced = false;
 
 			if(dialogOptions.filter[0] === "!"){
-				dialogOptions.filterExclude = false;
+				dialogOptions.filterExclude = true;
 				dialogOptions.filter = dialogOptions.filter.substring(1);		
 			}
 
@@ -112,8 +112,10 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 				angular.forEach(nodes, function (value, key) {
 
 					var found = a.indexOf(value.metaData.contentType) >= 0;
-					if ((dialogOptions.filterExclude && found) || !found)  {	    	    
-							value.filtered = true;
+
+					if (!dialogOptions.filterExclude && !found || dialogOptions.filterExclude && found){
+						value.filtered = true;
+						
 						if(dialogOptions.filterCssClass){
 							value.cssClasses.push(dialogOptions.filterCssClass);
 						}
