@@ -526,7 +526,7 @@ namespace Umbraco.Core
 			if (type == typeof(bool)) return XmlConvert.ToString((bool)value);
 			if (type == typeof(byte)) return XmlConvert.ToString((byte)value);
 			if (type == typeof(char)) return XmlConvert.ToString((char)value);
-			if (type == typeof(DateTime)) return XmlConvert.ToString((DateTime)value, XmlDateTimeSerializationMode.RoundtripKind);
+			if (type == typeof(DateTime)) return XmlConvert.ToString((DateTime)value, XmlDateTimeSerializationMode.Unspecified);
 			if (type == typeof(DateTimeOffset)) return XmlConvert.ToString((DateTimeOffset)value);
 			if (type == typeof(decimal)) return XmlConvert.ToString((decimal)value);
 			if (type == typeof(double)) return XmlConvert.ToString((double)value);
