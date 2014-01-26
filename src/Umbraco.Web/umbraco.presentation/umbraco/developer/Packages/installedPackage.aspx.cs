@@ -5,6 +5,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.Security;
 using System.Web.UI;
@@ -46,7 +47,13 @@ namespace umbraco.presentation.developer.packages
                 lt_packagename.Text = _pack.Data.Name;
                 lt_packageVersion.Text = _pack.Data.Version;
                 lt_packageAuthor.Text = _pack.Data.Author;
-                lt_readme.Text = library.ReplaceLineBreaks( _pack.Data.Readme );
+
+                // Strip all tags except for pre tags
+                var strippedReadme = Regex.Replace(_pack.Data.Readme, @"</?(?(?=pre)notag|[a-zA-Z0-9]+)(?:\s[a-zA-Z0-9\-]+=?(?:(["",']?).*?\1?)?)*\s*/?>", string.Empty);
+
+                // Replace line breaks with a break tag except when inside a pre tag
+                var breakTag = bool.Parse(Umbraco.Core.Configuration.GlobalSettings.EditXhtmlMode) ? "<br/>\n" : "<br />\n";
+                lt_readme.Text = Regex.Replace(strippedReadme, "\n(?![^<]*</pre>)", breakTag);
 
                 bt_confirmUninstall.Attributes.Add("onClick", "jQuery('#buttons').hide(); jQuery('#loadingbar').show();; return true;");
 

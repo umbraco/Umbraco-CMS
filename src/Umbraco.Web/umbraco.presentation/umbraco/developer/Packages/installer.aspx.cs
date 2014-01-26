@@ -3,6 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Web;
 using System.Web.SessionState;
@@ -190,7 +191,16 @@ namespace umbraco.presentation.developer.packages
             LabelLicense.Text = "<a href=\"" + _installer.LicenseUrl + "\" target=\"_blank\">" + _installer.License + "</a>";
 
             if (_installer.ReadMe != "")
-                readme.Text = "<div style=\"border: 1px solid #999; padding: 5px; overflow: auto; width: 370px; height: 160px;\">" + library.ReplaceLineBreaks(library.StripHtml(_installer.ReadMe)) + "</div>";
+            {
+                // Strip all tags except for pre tags
+                var strippedReadme = Regex.Replace(_installer.ReadMe, @"</?(?(?=pre)notag|[a-zA-Z0-9]+)(?:\s[a-zA-Z0-9\-]+=?(?:(["",']?).*?\1?)?)*\s*/?>", string.Empty);
+
+                // Replace line breaks with a break tag except when inside a pre tag
+                var breakTag = bool.Parse(Umbraco.Core.Configuration.GlobalSettings.EditXhtmlMode) ? "<br/>\n" : "<br />\n";
+                strippedReadme = Regex.Replace(strippedReadme, "\n(?![^<]*</pre>)", breakTag);
+
+                readme.Text = "<div style=\"border: 1px solid #999; padding: 5px; overflow: auto; width: 370px; height: 160px;\">" + strippedReadme + "</div>";
+            }
             else
                 readme.Text = "<span style=\"color: #999\">No information</span><br/>";
         }
