@@ -46,6 +46,6 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="userId"></param>
         /// <param name="entityIds"></param>
         /// <returns></returns>
-        IEnumerable<EntityPermission> GetUserPermissionsForEntities(object userId, params int[] entityIds);
+        IEnumerable<EntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds);
     }
 }

@@ -16,6 +16,7 @@ namespace umbraco.BusinessLogic
     /// <summary>
     /// Represents a umbraco Usertype
     /// </summary>
+    [Obsolete("Use the UserService instead")]
     public class UserType
     {
 

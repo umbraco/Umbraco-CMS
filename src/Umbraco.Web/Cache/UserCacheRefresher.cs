@@ -1,6 +1,8 @@
 ﻿using System;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence.Caching;
 using umbraco.interfaces;
 
 namespace Umbraco.Web.Cache
@@ -27,7 +29,7 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
-            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.UserCacheKey);
+            RuntimeCacheProvider.Current.Clear(typeof(IUser));
             ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.UserPermissionsCacheKey);
             ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.UserContextCacheKey);
         }
@@ -39,7 +41,8 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(int id)
         {
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.UserCacheKey, id));
+            RuntimeCacheProvider.Current.Delete(typeof (IUser), id);
+
             ApplicationContext.Current.ApplicationCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.UserPermissionsCacheKey, id));
 
             //we need to clear all UserContextCacheKey since we cannot invalidate based on ID since the cache is done so based

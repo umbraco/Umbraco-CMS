@@ -1,3 +1,4 @@
+using System;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -10,6 +11,7 @@ namespace Umbraco.Core.Persistence
     public class RepositoryFactory
     {
         private readonly bool _disableAllCache;
+        private readonly CacheHelper _cacheHelper;
 
         public RepositoryFactory()
             : this(false)
@@ -17,9 +19,24 @@ namespace Umbraco.Core.Persistence
             
         }
 
+        public RepositoryFactory(CacheHelper cacheHelper)
+        {
+            if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
+            _disableAllCache = false;
+            _cacheHelper = cacheHelper;
+        }
+
+        public RepositoryFactory(bool disableAllCache, CacheHelper cacheHelper)
+        {
+            if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
+            _disableAllCache = disableAllCache;
+            _cacheHelper = cacheHelper;
+        }
+
         public RepositoryFactory(bool disableAllCache)
         {
             _disableAllCache = disableAllCache;
+            _cacheHelper = disableAllCache ? CacheHelper.CreateDisabledCacheHelper() : ApplicationContext.Current.ApplicationCache;
         }
 
 
@@ -29,7 +46,8 @@ namespace Umbraco.Core.Persistence
                 uow,
                 _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
                 CreateContentTypeRepository(uow),
-                CreateTemplateRepository(uow)) { EnsureUniqueNaming = Umbraco.Core.Configuration.UmbracoSettings.EnsureUniqueNaming };
+                CreateTemplateRepository(uow),
+                _cacheHelper) { EnsureUniqueNaming = Configuration.UmbracoSettings.EnsureUniqueNaming };
         }
 
         public virtual IContentTypeRepository CreateContentTypeRepository(IDatabaseUnitOfWork uow)
@@ -67,7 +85,7 @@ namespace Umbraco.Core.Persistence
             return new MediaRepository(
                 uow,
                 _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
-                CreateMediaTypeRepository(uow)) { EnsureUniqueNaming = Umbraco.Core.Configuration.UmbracoSettings.EnsureUniqueNaming };
+                CreateMediaTypeRepository(uow)) { EnsureUniqueNaming = Configuration.UmbracoSettings.EnsureUniqueNaming };
         }
 
         public virtual IMediaTypeRepository CreateMediaTypeRepository(IDatabaseUnitOfWork uow)
@@ -123,14 +141,13 @@ namespace Umbraco.Core.Persistence
         }
 
         internal virtual IUserRepository CreateUserRepository(IDatabaseUnitOfWork uow)
-        {
-            //TODO: Should we cache users? we did in the legacy API, might be a good idea considering the amount we query for the current user but will
-            // need to check that, in v7 with the new forms auth way we shouldn't be querying for a user a lot of times but now that we're wrapping in v6
-            // we need to ensure that the constant user lookups are cached!
+        {            
             return new UserRepository(
                 uow,
-                NullCacheProvider.Current,
-                CreateUserTypeRepository(uow));
+                //Need to cache users - we look up user information more than anything in the back office!
+                RuntimeCacheProvider.Current,
+                CreateUserTypeRepository(uow),
+                _cacheHelper);
         }
 
         internal virtual IMemberRepository CreateMemberRepository(IDatabaseUnitOfWork uow)

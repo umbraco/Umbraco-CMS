@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Web.Caching;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
@@ -11,6 +13,8 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using CacheKeys = Umbraco.Core.Cache.CacheKeys;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -23,10 +27,12 @@ namespace Umbraco.Core.Persistence.Repositories
         where TEntity : class, IAggregateRoot
     {
         private readonly IDatabaseUnitOfWork _unitOfWork;
+        private readonly CacheHelper _cache;
 
-        internal PermissionRepository(IDatabaseUnitOfWork unitOfWork)
+        internal PermissionRepository(IDatabaseUnitOfWork unitOfWork, CacheHelper cache)
         {
             _unitOfWork = unitOfWork;
+            _cache = cache;
         }
 
         /// <summary>
@@ -35,39 +41,57 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="userId"></param>
         /// <param name="entityIds"></param>
         /// <returns></returns>        
-        internal IEnumerable<EntityPermission> GetUserPermissionsForEntities(object userId, params int[] entityIds)
+        internal IEnumerable<EntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds)
         {
-            var whereBuilder = new StringBuilder();
-
-            //where userId = @userId AND
-            whereBuilder.Append(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("userId"));
-            whereBuilder.Append("=");
-            whereBuilder.Append(userId);
-            whereBuilder.Append(" AND ");
-
-            //where nodeId = @nodeId1 OR nodeId = @nodeId2, etc...
-            whereBuilder.Append("(");
-            for (var index = 0; index < entityIds.Length; index++)
-            {
-                var entityId = entityIds[index];
-                whereBuilder.Append(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("nodeId"));
-                whereBuilder.Append("=");
-                whereBuilder.Append(entityId);
-                if (index < entityIds.Length - 1)
+            var entityIdKey = string.Join(",", entityIds.Select(x => x.ToString(CultureInfo.InvariantCulture)));
+            return _cache.RuntimeCache.GetCacheItem<IEnumerable<EntityPermission>>(
+                string.Format("{0}{1}{2}", CacheKeys.UserPermissionsCacheKey, userId, entityIdKey),
+                () =>
                 {
-                    whereBuilder.Append(" OR ");
-                }
-            }
-            whereBuilder.Append(")");
 
-            var sql = new Sql();
-            sql.Select("*")
-                .From<User2NodePermissionDto>()
-                .Where(whereBuilder.ToString());
+                    var whereBuilder = new StringBuilder();
 
-            //ToArray() to ensure it's all fetched from the db once.
-            var result = _unitOfWork.Database.Fetch<User2NodePermissionDto>(sql).ToArray();
-            return ConvertToPermissionList(result);
+                    //where userId = @userId AND
+                    whereBuilder.Append(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("userId"));
+                    whereBuilder.Append("=");
+                    whereBuilder.Append(userId);
+
+                    if (entityIds.Any())
+                    {
+                        whereBuilder.Append(" AND ");
+
+                        //where nodeId = @nodeId1 OR nodeId = @nodeId2, etc...
+                        whereBuilder.Append("(");
+                        for (var index = 0; index < entityIds.Length; index++)
+                        {
+                            var entityId = entityIds[index];
+                            whereBuilder.Append(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("nodeId"));
+                            whereBuilder.Append("=");
+                            whereBuilder.Append(entityId);
+                            if (index < entityIds.Length - 1)
+                            {
+                                whereBuilder.Append(" OR ");
+                            }
+                        }
+                        whereBuilder.Append(")");
+                    }
+
+                    var sql = new Sql();
+                    sql.Select("*")
+                        .From<User2NodePermissionDto>()
+                        .Where(whereBuilder.ToString());
+
+                    //ToArray() to ensure it's all fetched from the db once.
+                    var result = _unitOfWork.Database.Fetch<User2NodePermissionDto>(sql).ToArray();
+                    return ConvertToPermissionList(result);
+
+                },
+                //Since this cache can be quite large (http://issues.umbraco.org/issue/U4-2161) we will only have this exist in cache for 20 minutes, 
+                // then it will refresh from the database.
+                new TimeSpan(0, 20, 0),
+                //Since this cache can be quite large (http://issues.umbraco.org/issue/U4-2161) we will make this priority below average
+                priority: CacheItemPriority.BelowNormal);
+
         }
 
         /// <summary>

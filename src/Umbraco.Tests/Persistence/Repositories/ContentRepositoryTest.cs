@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -38,7 +39,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);
-            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository);
+            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository, CacheHelper.CreateDisabledCacheHelper());
             return repository;
         }
 

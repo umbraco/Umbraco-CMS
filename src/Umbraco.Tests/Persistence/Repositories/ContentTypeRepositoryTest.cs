@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);
-            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository);
+            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository, CacheHelper.CreateDisabledCacheHelper());
             return repository;
         }
 

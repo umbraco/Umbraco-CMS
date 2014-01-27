@@ -12,6 +12,9 @@ using DeleteEventArgs = umbraco.cms.businesslogic.DeleteEventArgs;
 
 namespace umbraco.BusinessLogic
 {
+
+    //TODO: Wrap this in the new services/repo layer!
+
     /// <summary>
     /// Summary description for Permission.
     /// </summary>

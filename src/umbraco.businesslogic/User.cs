@@ -6,6 +6,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Querying;
 using umbraco.DataLayer;
 using System.Collections.Generic;
@@ -17,22 +18,11 @@ namespace umbraco.BusinessLogic
     /// <summary>
     /// represents a Umbraco back end user
     /// </summary>
+    [Obsolete("Use the UserService instead")]
     public class User
     {
         private IUser _user;
         private int? _lazyId;
-
-        //private int _id;
-        //private bool _isInitialized;
-        //private string _name;
-        //private string _loginname;
-        //private int _startnodeid;
-        //private int _startmediaid;
-        //private string _email;
-        //private string _language = "";
-        //private UserType _usertype;
-        //private bool _userNoConsole;
-        //private bool _userDisabled;
         private bool? _defaultToLiveEditing;
         
         private readonly Hashtable _notifications = new Hashtable();
@@ -47,19 +37,6 @@ namespace umbraco.BusinessLogic
         internal User(IUser user)
         {
             _user = user;
-            //_id = user.Id;
-            //_userNoConsole = user.IsLockedOut;
-            //_userDisabled = user.IsApproved;
-            //_name = user.Name;
-            //_loginname = user.Username;
-            //_email = user.Email;
-            //_language = user.Language;
-            //_startnodeid = user.StartContentId;
-            //_startmediaid = user.StartMediaId;
-            
-            //_usertype = new UserType(_user.UserType);
-
-            //_isInitialized = true;
         }
 
         /// <summary>
@@ -110,11 +87,14 @@ namespace umbraco.BusinessLogic
         }
 
         /// <summary>
-        /// Used to persist object changes to the database. In Version3.0 it's just a stub for future compatibility
+        /// Used to persist object changes to the database.
         /// </summary>
         public void Save()
         {
-            FlushFromCache();
+            if (_lazyId.HasValue) SetupUser(_lazyId.Value);
+
+            ApplicationContext.Current.Services.UserService.Save(_user);
+
             OnSaving(EventArgs.Empty);
         }
 
@@ -378,8 +358,8 @@ namespace umbraco.BusinessLogic
         {
             try
             {
-                if (umbraco.BasePages.BasePage.umbracoUserContextID != "")
-                    return BusinessLogic.User.GetUser(umbraco.BasePages.BasePage.GetUserId(umbraco.BasePages.BasePage.umbracoUserContextID));
+                if (BasePages.BasePage.umbracoUserContextID != "")
+                    return GetUser(BasePages.BasePage.GetUserId(BasePages.BasePage.umbracoUserContextID));
                 else
                     return null;
             }
@@ -619,42 +599,18 @@ namespace umbraco.BusinessLogic
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
 
-            string defaultPermissions = UserType.DefaultPermissions;
+            var defaultPermissions = UserType.DefaultPermissions;
 
-            //TODO: Wrap all this with the new services!
-
-            //get the cached permissions for the user
-            var cachedPermissions = ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                string.Format("{0}{1}", CacheKeys.UserPermissionsCacheKey, _user.Id),
-                //Since this cache can be quite large (http://issues.umbraco.org/issue/U4-2161) we will make this priority below average
-                CacheItemPriority.BelowNormal, 
-                null,
-                //Since this cache can be quite large (http://issues.umbraco.org/issue/U4-2161) we will only have this exist in cache for 20 minutes, 
-                // then it will refresh from the database.
-                new TimeSpan(0, 20, 0),
-                () =>
-                    {
-                        var cruds = new Hashtable();
-                        using (var dr = SqlHelper.ExecuteReader("select * from umbracoUser2NodePermission where userId = @userId order by nodeId", SqlHelper.CreateParameter("@userId", this.Id)))
-                        {
-                            while (dr.Read())
-                            {
-                                if (!cruds.ContainsKey(dr.GetInt("nodeId")))
-                                {
-                                    cruds.Add(dr.GetInt("nodeId"), string.Empty);
-                                }
-                                cruds[dr.GetInt("nodeId")] += dr.GetString("permission");
-                            }
-                        }
-                        return cruds;
-                    });
+            var cachedPermissions = ApplicationContext.Current.Services.UserService.GetPermissions(_user)
+                .ToArray();
 
             // NH 4.7.1 changing default permission behavior to default to User Type permissions IF no specific permissions has been
             // set for the current node
             var nodeId = Path.Contains(",") ? int.Parse(Path.Substring(Path.LastIndexOf(",", StringComparison.Ordinal)+1)) : int.Parse(Path);
-            if (cachedPermissions.ContainsKey(nodeId))
+            if (cachedPermissions.Any(x => x.EntityId == nodeId))
             {
-                return cachedPermissions[int.Parse(Path.Substring(Path.LastIndexOf(",", StringComparison.Ordinal) + 1))].ToString();
+                var found = cachedPermissions.First(x => x.EntityId == nodeId);
+                return string.Join("", found.AssignedPermissions);
             }
 
             // exception to everything. If default cruds is empty and we're on root node; allow browse of root node
@@ -708,21 +664,19 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public void initNotifications()
         {
-            //TODO: Wrap all this with new services!
-
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
 
-            using (IRecordsReader dr = SqlHelper.ExecuteReader("select * from umbracoUser2NodeNotify where userId = @userId order by nodeId", SqlHelper.CreateParameter("@userId", this.Id)))
+            var notifications = ApplicationContext.Current.Services.NotificationService.GetUserNotifications(_user);
+            foreach (var n in notifications.OrderBy(x => x.EntityId))
             {
-                while (dr.Read())
+                int nodeId = n.EntityId;
+                if (_notifications.ContainsKey(nodeId) == false)
                 {
-                    int nodeId = dr.GetInt("nodeId");
-                    if (!_notifications.ContainsKey(nodeId))
-                        _notifications.Add(nodeId, String.Empty);
-
-                    _notifications[nodeId] += dr.GetString("action");
+                    _notifications.Add(nodeId, string.Empty);
                 }
+                _notifications[nodeId] += n.Action;
             }
+
             _notificationsInitialized = true;
         }
 
@@ -858,7 +812,7 @@ namespace umbraco.BusinessLogic
         public void FlushFromCache()
         {
             OnFlushingFromCache(EventArgs.Empty);
-            ApplicationContext.Current.ApplicationCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.UserCacheKey, Id.ToString()));            
+            RuntimeCacheProvider.Current.Clear(typeof (IUser));
         }
 
         /// <summary>
@@ -868,21 +822,12 @@ namespace umbraco.BusinessLogic
         /// <returns></returns>
         public static User GetUser(int id)
         {
-            //TODO: Ref: http://issues.umbraco.org/issue/U4-4123
-
-            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                string.Format("{0}{1}", CacheKeys.UserCacheKey, id.ToString()), () =>
-                    {
-                        try
-                        {
-                            return new User(id);
-                        }
-                        catch (ArgumentException)
-                        {
-                            //no user was found
-                            return null;
-                        }
-                    });
+            var result = ApplicationContext.Current.Services.UserService.GetById(id);
+            if (result == null)
+            {
+                throw new ArgumentException("No user found with id " + id);
+            }
+            return new User(result);
         }
 
 
