@@ -8,7 +8,7 @@
 
 	<br/><br/>
 
-	<div ng-hide="model.value.type === 'member'">
+	<div ng-hide="model.value.type !== 'content'">
 		<ul class="unstyled list-icons" ng-if="node" >	
 			<li>	
 				<i class="icon icon-delete red hover-show pull-right" ng-click="clear()"></i>
