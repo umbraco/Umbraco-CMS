@@ -1,3 +1,5 @@
+using System;
+
 namespace Umbraco.Core.Cache
 {
 
@@ -9,6 +11,7 @@ namespace Umbraco.Core.Cache
         public const string ApplicationTreeCacheKey = "ApplicationTreeCache";
         public const string ApplicationsCacheKey = "ApplicationCache";
 
+        [Obsolete("This is no longer used and will be removed from the codebase in the future")]
         public const string UserTypeCacheKey = "UserTypeCache";
 
         public const string ContentItemCacheKey = "contentItem";

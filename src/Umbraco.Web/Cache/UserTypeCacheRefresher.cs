@@ -1,6 +1,8 @@
 ﻿using System;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence.Caching;
 
 namespace Umbraco.Web.Cache
 {
@@ -26,17 +28,17 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
-            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.UserTypeCacheKey);
+            RuntimeCacheProvider.Current.Clear(typeof (IUserType));
         }
 
         public override void Refresh(int id)
         {
-            Remove(id);
+            RuntimeCacheProvider.Current.Delete(typeof(IUserType), id);
         }
 
         public override void Remove(int id)
         {
-            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.UserTypeCacheKey);
+            RuntimeCacheProvider.Current.Delete(typeof(IUserType), id);
         }
 
     }

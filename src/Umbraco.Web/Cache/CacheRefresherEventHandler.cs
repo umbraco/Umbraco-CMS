@@ -34,9 +34,8 @@ namespace Umbraco.Web.Cache
             Application.New += ApplicationNew;
 
             //bind to user type events
-            UserType.Deleted += UserTypeDeleted;
-            UserType.New += UserTypeNew;
-            UserType.Updated += UserTypeUpdated;
+            UserService.SavedUserType += UserServiceSavedUserType;
+            UserService.DeletedUserType += UserServiceDeletedUserType;
 
             //Bind to dictionary events
             //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
@@ -131,9 +130,7 @@ namespace Umbraco.Web.Cache
             ContentService.Created += ContentServiceCreated;
             ContentService.Copied += ContentServiceCopied;
         }
-
         
-
         #region Content service event handlers
 
         /// <summary>
@@ -199,20 +196,16 @@ namespace Umbraco.Web.Cache
         #endregion
 
         #region UserType event handlers
-        static void UserTypeUpdated(UserType sender, System.EventArgs e)
+        static void UserServiceDeletedUserType(IUserService sender, Core.Events.DeleteEventArgs<Core.Models.Membership.IUserType> e)
         {
-            DistributedCache.Instance.RefreshUserTypeCache(sender.Id);
+            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserTypeCache(x.Id));
         }
 
-        static void UserTypeNew(UserType sender, System.EventArgs e)
+        static void UserServiceSavedUserType(IUserService sender, Core.Events.SaveEventArgs<Core.Models.Membership.IUserType> e)
         {
-            DistributedCache.Instance.RefreshAllUserTypeCache();
+            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshUserTypeCache(x.Id));
         }
-
-        static void UserTypeDeleted(UserType sender, System.EventArgs e)
-        {
-            DistributedCache.Instance.RemoveUserTypeCache(sender.Id);
-        } 
+        
         #endregion
         
         #region Dictionary event handlers
