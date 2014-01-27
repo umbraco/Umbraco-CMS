@@ -138,16 +138,12 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public EntityBasic GetByQuery(string query, int nodeContextId, UmbracoEntityTypes type)
         {
-            
-            //this is css (commented out for now, due to external dependency) 
-            //if (!query.Contains("::") && !query.Contains('/'))
-            //    query = css2xpath.Converter.CSSToXPath(query, "");
-
+          
             if (type != UmbracoEntityTypes.Document)
                 throw new ArgumentException("Get by query is only compatible with enitities of type Document");
 
 
-            var q = parseQuery(query, nodeContextId);
+            var q = ParseXPathQuery(query, nodeContextId);
             var node = Umbraco.TypedContentSingleAtXPath(q);
 
             if (node == null)
@@ -157,8 +153,9 @@ namespace Umbraco.Web.Editors
         }
 
         //PP: wip in progress on the query parser
-        private string parseQuery(string query, int id)
+        private string ParseXPathQuery(string query, int id)
         {
+            //no need to parse it
             if (!query.StartsWith("$"))
                 return query;
 
@@ -169,7 +166,7 @@ namespace Umbraco.Web.Editors
             };
 
             //get nearest published item
-            Func<IEnumerable<string>, int> getClosestPublishedAncestor = delegate(IEnumerable<string> path)
+            Func<IEnumerable<string>, int> getClosestPublishedAncestor = (path => 
             {
                 
                 foreach (var _id in path)
@@ -180,18 +177,18 @@ namespace Umbraco.Web.Editors
                         return item.Id;
                 }
                 return -1;
-            };
+            });
 
             var rootXpath = "descendant::*[@id={0}]";
 
             //parseable items:
             var vars = new Dictionary<string, Func<string, string>>();
-            vars.Add("$current", delegate(string q){
+            vars.Add("$current", q => {
                 var _id = getClosestPublishedAncestor(getPath(id));
                 return q.Replace("$current", string.Format(rootXpath, _id));
             });
 
-            vars.Add("$parent", delegate(string q)
+            vars.Add("$parent", q =>
             {
                 //remove the first item in the array if its the current node
                 //this happens when current is published, but we are looking for its parent specifically
@@ -205,14 +202,14 @@ namespace Umbraco.Web.Editors
             });
 
 
-            vars.Add("$site", delegate(string q)
+            vars.Add("$site", q =>
             {
                 var _id = getClosestPublishedAncestor(getPath(id));
                 return q.Replace("$site", string.Format(rootXpath, _id) + "/ancestor-or-self::*[@level = 1]");
             });
 
 
-            vars.Add("$root", delegate(string q)
+            vars.Add("$root", q =>
             {
                 return q.Replace("$root", string.Empty);
             });
