@@ -88,10 +88,12 @@ namespace umbraco.cms.presentation.Trees
 		{
 			get
 			{
-				string val = (m_params.ContainsKey("id") ? m_params["id"] : "");
-				int sNodeID;
-				if (int.TryParse(HttpContext.Current.Request.QueryString["id"], out sNodeID))
-					return sNodeID;
+				if(m_params.ContainsKey("id"))
+                {
+				    int sNodeID;
+				    if (int.TryParse(m_params["id"], out sNodeID))
+					    return sNodeID;
+                }
 				return -1;
 			}
 		}
