@@ -27,7 +27,7 @@ namespace Umbraco.Core
 		/// <summary>
 		/// Gets the <see cref="ICacheRefresher"/> implementations.
 		/// </summary>
-		public IEnumerable<ICacheRefresher> CacheResolvers
+		public IEnumerable<ICacheRefresher> CacheRefreshers
 		{
 			get
 			{
