@@ -413,6 +413,40 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Checks whether two items are related with a given relation type alias
+        /// </summary>
+        /// <param name="parentId">Id of the Parent relation</param>
+        /// <param name="childId">Id of the Child relation</param>
+        /// <param name="relationTypeAlias">Alias of the relation type</param>
+        /// <returns>Returns <c>True</c> if any relations exists with the given Ids and relation type, otherwise <c>False</c></returns>
+        public bool AreRelated(int parentId, int childId, string relationTypeAlias)
+        {
+            var relType = GetRelationTypeByAlias(relationTypeAlias);
+            if(relType == null)
+                return false;
+
+            return AreRelated(parentId, childId, relType);
+        }
+
+
+        /// <summary>
+        /// Checks whether two items are related with a given relation type
+        /// </summary>
+        /// <param name="parentId">Id of the Parent relation</param>
+        /// <param name="childId">Id of the Child relation</param>
+        /// <param name="relationTypeAlias">Type of relation</param>
+        /// <returns>Returns <c>True</c> if any relations exists with the given Ids and relation type, otherwise <c>False</c></returns>
+        public bool AreRelated(int parentId, int childId, IRelationType relationType)
+        {
+            using (var repository = _repositoryFactory.CreateRelationRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = new Query<IRelation>().Where(x => x.ParentId == parentId && x.ChildId == childId && x.RelationTypeId == relationType.Id);
+                return repository.GetByQuery(query).Any();
+            }
+        }
+
+
+        /// <summary>
         /// Saves a <see cref="Relation"/>
         /// </summary>
         /// <param name="relation">Relation to save</param>
