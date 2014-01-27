@@ -39,8 +39,8 @@ function umbracoMenuActions($q, treeService, $location, navigationService, appSt
             
             //to find a visible tree node, we'll go get the currently loaded root node from appState
             var treeRoot = appState.getTreeState("currentRootNode");
-            if (treeRoot) {
-                var treeNode = treeService.getDescendantNode(treeRoot, args.entity.id, args.treeAlias);
+            if (treeRoot && treeRoot.root) {
+                var treeNode = treeService.getDescendantNode(treeRoot.root, args.entity.id, args.treeAlias);
                 if (treeNode) {
                     treeService.loadNodeChildren({ node: treeNode, section: args.section });
                 }                
