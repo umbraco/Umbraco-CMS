@@ -765,6 +765,64 @@ namespace Umbraco.Core.Services
 
         #endregion
 
+        #region IMembershipRoleService Implementation
+
+        public void AddRole(string roleName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<string> GetAllRoles()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<string> GetAllRoles(int memberId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<string> GetAllRoles(string username)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<IMember> GetMembersInRole(string roleName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool DeleteRole(string roleName, bool throwIfBeingUsed)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AssignRoles(string[] usernames, string[] roleNames)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DissociateRoles(string[] usernames, string[] roleNames)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void AssignRoles(int[] memberIds, string[] roleNames)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DissociateRoles(int[] memberIds, string[] roleNames)
+        {
+            throw new NotImplementedException();
+        } 
+        #endregion
+
         /// <summary>
         /// Rebuilds all xml content in the cmsContentXml table for all media
         /// </summary>
@@ -938,5 +996,6 @@ namespace Umbraco.Core.Services
 
         //    return new Member(name, email, username, password, -1, memType);
         //}
+        
     }
 }

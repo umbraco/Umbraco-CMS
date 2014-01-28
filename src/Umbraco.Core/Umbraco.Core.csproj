@@ -771,6 +771,7 @@
     <Compile Include="Services\IMediaService.cs" />
     <Compile Include="Services\IMemberService.cs" />
     <Compile Include="Services\IMembershipMemberService.cs" />
+    <Compile Include="Services\IMembershipRoleService.cs" />
     <Compile Include="Services\IMembershipUserService.cs" />
     <Compile Include="Services\IMemberTypeService.cs" />
     <Compile Include="Services\INotificationService.cs" />

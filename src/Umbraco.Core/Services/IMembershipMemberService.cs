@@ -6,14 +6,13 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
 {
-
     /// <summary>
     /// Defines part of the MemberService, which is specific to methods used by the membership provider.
     /// </summary>
     /// <remarks>
     /// Idea is to have this is an isolated interface so that it can be easily 'replaced' in the membership provider impl.
     /// </remarks>
-    public interface IMembershipMemberService : IMembershipMemberService<IMember>
+    public interface IMembershipMemberService : IMembershipMemberService<IMember>, IMembershipRoleService<IMember>
     {
         IMember CreateMemberWithIdentity(string username, string email, string password, IMemberType memberType, bool raiseEvents = true);
     }
