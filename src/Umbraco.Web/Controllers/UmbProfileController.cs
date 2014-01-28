@@ -25,38 +25,7 @@ namespace Umbraco.Web.Controllers
                 return CurrentUmbracoPage();
             }
 
-            if (Members.IsLoggedIn() == false)
-            {
-                throw new NotSupportedException("No member is currently logged in");
-            }
-
-            var member = Services.MemberService.GetByUsername(HttpContext.User.Identity.Name);
-            if (member == null)
-            {
-                //this should never happen
-                throw new InvalidOperationException("No member found with username: " + HttpContext.User.Identity.Name);
-            }
-
-            if (model.Name != null)
-            {
-                member.Name = model.Name;
-            }
-            member.Email = model.Email;
-            member.Username = model.Email;
-            if (model.MemberProperties != null)
-            {
-                //TODO: Shouldn't we ensure that none of these properties are flagged as non-editable to the member??
-                foreach (var property in model.MemberProperties.Where(p => p.Value != null))
-                {
-                    if (member.Properties.Contains(property.Alias))
-                    {
-                        member.Properties[property.Alias].Value = property.Value;
-                    }
-                }
-            }
-            Services.MemberService.Save(member);
-            //reset the FormsAuth cookie since the username might have changed
-            FormsAuthentication.SetAuthCookie(member.Username, true);
+            Members.UpdateMemberProfile(model);
 
             //TODO: Why are we redirecting to home again here?? 
             return Redirect("/");

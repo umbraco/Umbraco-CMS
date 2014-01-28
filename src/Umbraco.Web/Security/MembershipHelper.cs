@@ -48,6 +48,47 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
+        /// Updates the currently logged in members profile
+        /// </summary>
+        /// <param name="model"></param>
+        public void UpdateMemberProfile(ProfileModel model)
+        {
+            if (IsLoggedIn() == false)
+            {
+                throw new NotSupportedException("No member is currently logged in");
+            }
+
+            var member = GetCurrentMember();
+            
+            if (model.Name != null)
+            {
+                member.Name = model.Name;
+            }
+            member.Email = model.Email;
+            member.Username = model.Email;
+
+            if (model.MemberProperties != null)
+            {
+                foreach (var property in model.MemberProperties
+                    //ensure the property they are posting exists
+                    .Where(p => member.ContentType.PropertyTypeExists(p.Alias))
+                    .Where(property => member.Properties.Contains(property.Alias))
+                    //needs to be editable
+                    .Where(p => member.ContentType.MemberCanEditProperty(p.Alias))
+                    //needs to have a value
+                    .Where(p => p.Value != null))
+                {
+                    member.Properties[property.Alias].Value = property.Value;
+                }
+            }
+
+            _applicationContext.Services.MemberService.Save(member);
+
+            //reset the FormsAuth cookie since the username might have changed
+            FormsAuthentication.SetAuthCookie(member.Username, true);
+        }
+
+        /// <summary>
         /// Registers a new member
         /// </summary>
         /// <param name="model"></param>
