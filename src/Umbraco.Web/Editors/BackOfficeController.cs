@@ -111,6 +111,10 @@ namespace Umbraco.Web.Editors
                                 {"serverVarsJs", Url.Action("Application", "BackOffice")},
                                 //API URLs
                                 {
+                                    "embedApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
+                                        controller => controller.GetEmbed("",0,0))
+                                },
+                                {
                                     "contentApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentController>(
                                         controller => controller.PostSave(null))
                                 },
