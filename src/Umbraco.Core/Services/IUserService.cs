@@ -47,7 +47,9 @@ namespace Umbraco.Core.Services
         /// Get permissions set for user and specified node ids
         /// </summary>
         /// <param name="user"></param>
-        /// <param name="nodeIds"></param>
+        /// <param name="nodeIds">
+        /// Specifiying nothing will return all user permissions for all nodes
+        /// </param>
         /// <returns></returns>
         IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds);
 

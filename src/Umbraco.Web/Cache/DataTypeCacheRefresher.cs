@@ -5,6 +5,7 @@ using Umbraco.Core.Cache;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence.Caching;
 
 namespace Umbraco.Web.Cache
 {
@@ -114,6 +115,16 @@ namespace Umbraco.Web.Cache
         public override void Refresh(string jsonPayload)
         {
             var payloads = DeserializeFromJsonPayload(jsonPayload);
+
+            //we need to clear the ContentType runtime cache since that is what caches the
+            // db data type to store the value against and anytime a datatype changes, this also might change
+            // we basically need to clear all sorts of runtime caches here because so many things depend upon a data type
+            RuntimeCacheProvider.Current.Clear(typeof(IContent));
+            RuntimeCacheProvider.Current.Clear(typeof (IContentType));
+            RuntimeCacheProvider.Current.Clear(typeof(IMedia));
+            RuntimeCacheProvider.Current.Clear(typeof(IMediaType));
+            RuntimeCacheProvider.Current.Clear(typeof(IMember));
+            RuntimeCacheProvider.Current.Clear(typeof(IMemberType));
 
             payloads.ForEach(payload =>
             {

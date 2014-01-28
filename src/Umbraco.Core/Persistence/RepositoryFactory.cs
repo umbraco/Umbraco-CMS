@@ -54,7 +54,7 @@ namespace Umbraco.Core.Persistence
         {
             return new ContentTypeRepository(
                 uow,
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : InMemoryCacheProvider.Current,
+                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
                 new TemplateRepository(uow, NullCacheProvider.Current));
         }
 
@@ -69,7 +69,7 @@ namespace Umbraco.Core.Persistence
         {
             return new DictionaryRepository(
                 uow,
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : InMemoryCacheProvider.Current,
+                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
                 CreateLanguageRepository(uow));
         }
 
@@ -77,7 +77,7 @@ namespace Umbraco.Core.Persistence
         {
             return new LanguageRepository(
                 uow,
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : InMemoryCacheProvider.Current);
+                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current);
         }
 
         public virtual IMediaRepository CreateMediaRepository(IDatabaseUnitOfWork uow)
@@ -92,7 +92,7 @@ namespace Umbraco.Core.Persistence
         {
             return new MediaTypeRepository(
                 uow,
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : InMemoryCacheProvider.Current);
+                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current);
         }
 
         public virtual IRelationRepository CreateRelationRepository(IDatabaseUnitOfWork uow)
@@ -157,7 +157,7 @@ namespace Umbraco.Core.Persistence
 
         internal virtual IMemberTypeRepository CreateMemberTypeRepository(IDatabaseUnitOfWork uow)
         {
-            return new MemberTypeRepository(uow, _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : InMemoryCacheProvider.Current);
+            return new MemberTypeRepository(uow, _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current);
         }
 
         internal virtual IEntityRepository CreateEntityRepository(IDatabaseUnitOfWork uow)
