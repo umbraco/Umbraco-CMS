@@ -34,7 +34,7 @@ angular.module("umbraco")
 
             //queue rules loading
             angular.forEach(editorConfig.stylesheets, function(val, key){
-                stylesheets.push("/css/" + val + ".css?" + new Date().getTime());
+                stylesheets.push("../css/" + val + ".css?" + new Date().getTime());
                 
                 await.push(stylesheetResource.getRulesByName(val).then(function(rules) {
                     angular.forEach(rules, function(rule) {
@@ -57,8 +57,6 @@ angular.module("umbraco")
                 }));
             });
 
-
-            
 
             //stores a reference to the editor
             var tinyMceEditor = null;
@@ -111,7 +109,7 @@ angular.module("umbraco")
                             $scope.model.value = editor.getContent();
                         });
                     });
-                    
+
                     editor.on('blur', function (e) {
                         angularHelper.safeApply($scope, function () {
                             $scope.model.value = editor.getContent();
