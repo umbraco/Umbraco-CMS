@@ -1,4 +1,6 @@
-﻿using umbraco.cms.businesslogic.member;
+﻿using System.Web;
+using umbraco.cms.businesslogic.member;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Models
 {
@@ -6,17 +8,19 @@ namespace Umbraco.Web.Models
     {
         public LoginStatusModel()
         {
-            //TODO Use new Member API
-            if (Member.IsLoggedOn())
+            if (HttpContext.Current != null 
+                && HttpContext.Current.User != null 
+                && HttpContext.Current.User.Identity.IsAuthenticated)
             {
-                var member = Member.GetCurrentMember();
+                var member = ApplicationContext.Current.Services.MemberService.GetByUsername(
+                    HttpContext.Current.User.Identity.Name);
                 if (member != null)
                 {
-                    this.Name = member.Text;
-                    this.Username = member.LoginName;
+                    this.Name = member.Name;
+                    this.Username = member.Username;
                     this.Email = member.Email;
                     this.IsLoggedIn = true;
-                }
+                }   
             }
         }
 

@@ -625,7 +625,7 @@ namespace Umbraco.Core.Services
                 throw new ArgumentException(string.Format("No MemberType matching the passed in Alias: '{0}' was found", memberTypeAlias));
             }
 
-            return CreateMemberWithIdentity(email, username, password, memberType, raiseEvents);
+            return CreateMemberWithIdentity(username, email, password, memberType, raiseEvents);
         }
 
         /// <summary>
