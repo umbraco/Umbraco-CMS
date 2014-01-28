@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core.Models;
 using Umbraco.Core;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Mvc
 {
@@ -23,6 +24,7 @@ namespace Umbraco.Web.Mvc
         protected SurfaceController(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
+            _membershipHelper = new MembershipHelper(umbracoContext);
         }
 
         /// <summary>
@@ -31,6 +33,17 @@ namespace Umbraco.Web.Mvc
         protected SurfaceController()
             : base(UmbracoContext.Current)
         {
+            _membershipHelper = new MembershipHelper(UmbracoContext.Current);
+        }
+
+        private readonly MembershipHelper _membershipHelper;
+
+        /// <summary>
+        /// Returns the MemberHelper instance
+        /// </summary>
+        public MembershipHelper Members
+        {
+            get { return _membershipHelper; }
         }
 
         /// <summary>

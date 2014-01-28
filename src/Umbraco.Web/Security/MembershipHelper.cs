@@ -5,15 +5,22 @@ using System.Text;
 using System.Web;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Security
 {
-    internal class MembershipHelper
+
+    /// <summary>
+    /// A helper class for handling Members
+    /// </summary>
+    public class MembershipHelper
     {
         private readonly ApplicationContext _applicationContext;
         private readonly HttpContextBase _httpContext;
 
+        #region Constructors
         public MembershipHelper(ApplicationContext applicationContext, HttpContextBase httpContext)
         {
             if (applicationContext == null) throw new ArgumentNullException("applicationContext");
@@ -28,24 +35,130 @@ namespace Umbraco.Web.Security
             _httpContext = umbracoContext.HttpContext;
             _applicationContext = umbracoContext.Application;
         }
+        #endregion
 
-        public LoginStatusModel GetLoginStatusModel()
+        /// <summary>
+        /// Returns the login status model of the currently logged in member, if no member is logged in it returns null;
+        /// </summary>
+        /// <returns></returns>
+        public LoginStatusModel GetCurrentLoginStatus()
         {
-            if (_httpContext.User == null || _httpContext.User.Identity.IsAuthenticated == false) 
+            if (IsLoggedIn() == false)
                 return null;
 
-            var member = _applicationContext.Services.MemberService.GetByUsername(
-                _httpContext.User.Identity.Name);
-
             var model = LoginStatusModel.CreateModel();
-            model.Name = member.Name;
-            model.Username = member.Username;
-            model.Email = member.Email;
+            if (Membership.Provider.IsUmbracoMembershipProvider())
+            {
+                var member = _applicationContext.Services.MemberService.GetByUsername(
+                    _httpContext.User.Identity.Name);
+                //this shouldn't happen
+                if (member == null) return null;
+                model.Name = member.Name;
+                model.Username = member.Username;
+                model.Email = member.Email;
+            }
+            else
+            {
+                var member = Membership.GetUser();
+                //this shouldn't happen
+                if (member == null) return null;
+                model.Name = member.UserName;
+                model.Username = member.UserName;
+                model.Email = member.Email;
+            }
+
             model.IsLoggedIn = true;
             return model;
         }
 
-        public MembershipUser UpdateMember(MembershipUser member, MembershipProvider provider,
+        /// <summary>
+        /// Returns true or false if the currently logged in member is authorized based on the parameters provided
+        /// </summary>
+        /// <param name="allowAll"></param>
+        /// <param name="allowTypes"></param>
+        /// <param name="allowGroups"></param>
+        /// <param name="allowMembers"></param>
+        /// <returns></returns>
+        public bool IsMemberAuthorized(
+            bool allowAll = false,
+            IEnumerable<string> allowTypes = null,
+            IEnumerable<string> allowGroups = null,
+            IEnumerable<int> allowMembers = null)
+        {
+            if (allowAll)
+                return true;
+
+            if (allowTypes == null)
+                allowTypes = Enumerable.Empty<string>();
+            if (allowGroups == null)
+                allowGroups = Enumerable.Empty<string>();
+            if (allowMembers == null)
+                allowMembers = Enumerable.Empty<int>();
+
+            // Allow by default
+            var allowAction = true;
+            
+            if (IsLoggedIn() == false)
+            {
+                // If not logged on, not allowed
+                allowAction = false;
+            }
+            else
+            {
+                string username;
+                if (Membership.Provider.IsUmbracoMembershipProvider())
+                {
+                    var member = GetCurrentMember();
+                    username = member.Username;
+                    // If types defined, check member is of one of those types
+                    var allowTypesList = allowTypes as IList<string> ?? allowTypes.ToList();
+                    if (allowTypesList.Any(allowType => allowType != string.Empty))
+                    {
+                        // Allow only if member's type is in list
+                        allowAction = allowTypesList.Select(x => x.ToLowerInvariant()).Contains(member.ContentType.Alias.ToLowerInvariant());
+                    }
+
+                    // If specific members defined, check member is of one of those
+                    if (allowAction && allowMembers.Any())
+                    {
+                        // Allow only if member's Id is in the list
+                        allowAction = allowMembers.Contains(member.Id);
+                    }
+                }
+                else
+                {
+                    var member = Membership.GetUser();
+                    username = member.UserName;
+                }
+                
+                // If groups defined, check member is of one of those groups
+                var allowGroupsList = allowGroups as IList<string> ?? allowGroups.ToList();
+                if (allowAction && allowGroupsList.Any(allowGroup => allowGroup != string.Empty))
+                {
+                    // Allow only if member is assigned to a group in the list
+                    var groups = Roles.GetRolesForUser(username);
+                    allowAction = allowGroupsList.Select(s => s.ToLowerInvariant()).Intersect(groups.Select(myGroup => myGroup.ToLowerInvariant())).Any();
+                }
+
+                
+            }
+
+            return allowAction;
+        }
+
+        /// <summary>
+        /// Updates a membership user with all of it's writable properties
+        /// </summary>
+        /// <param name="member"></param>
+        /// <param name="provider"></param>
+        /// <param name="email"></param>
+        /// <param name="isApproved"></param>
+        /// <param name="isLocked"></param>
+        /// <param name="lastLoginDate"></param>
+        /// <param name="lastActivityDate"></param>
+        /// <param name="comment"></param>
+        /// <returns></returns>
+        internal MembershipUser UpdateMember(MembershipUser member, MembershipProvider provider,
             string email = null,
             bool? isApproved = null,
             bool? isLocked = null,
@@ -56,11 +169,11 @@ namespace Umbraco.Web.Security
             //set the writable properties
             if (email != null)
             {
-                member.Email = email;    
+                member.Email = email;
             }
             if (isApproved.HasValue)
             {
-                member.IsApproved = isApproved.Value;    
+                member.IsApproved = isApproved.Value;
             }
             if (lastLoginDate.HasValue)
             {
@@ -80,8 +193,8 @@ namespace Umbraco.Web.Security
                 //there is no 'setter' on IsLockedOut but you can ctor a new membership user with it set, so i guess that's what we'll do,
                 // this does mean however if it was a typed membership user object that it will no longer be typed
                 //membershipUser.IsLockedOut = true;
-                member = new MembershipUser(member.ProviderName, member.UserName, 
-                    member.ProviderUserKey, member.Email, member.PasswordQuestion, member.Comment, member.IsApproved, 
+                member = new MembershipUser(member.ProviderName, member.UserName,
+                    member.ProviderUserKey, member.Email, member.PasswordQuestion, member.Comment, member.IsApproved,
                     isLocked.Value,  //new value
                     member.CreationDate, member.LastLoginDate, member.LastActivityDate, member.LastPasswordChangedDate, member.LastLockoutDate);
             }
@@ -91,5 +204,27 @@ namespace Umbraco.Web.Security
             return member;
         }
 
+        /// <summary>
+        /// Returns the currently logged in IMember object - this should never be exposed to the front-end since it's returning a business logic entity!
+        /// </summary>
+        /// <returns></returns>
+        private IMember GetCurrentMember()
+        {
+            if (Membership.Provider.IsUmbracoMembershipProvider() == false)
+            {
+                throw new NotSupportedException("An IMember model can only be retreived when using the built-in Umbraco membership providers");
+            }
+            var member = _applicationContext.Services.MemberService.GetByUsername(_httpContext.User.Identity.Name);
+            return member;
+        }
+
+        /// <summary>
+        /// Check if a member is logged in
+        /// </summary>
+        /// <returns></returns>
+        private bool IsLoggedIn()
+        {
+            return _httpContext.User != null && _httpContext.User.Identity.IsAuthenticated;
+        }
     }
 }

@@ -25,6 +25,7 @@ namespace Umbraco.Web.UI.Controls
             UmbracoContext = umbracoContext;
             InstanceId = Guid.NewGuid();
             Umbraco = new UmbracoHelper(umbracoContext);
+            _membershipHelper = new MembershipHelper(umbracoContext);
         }
 
         /// <summary>
@@ -35,6 +36,8 @@ namespace Umbraco.Web.UI.Controls
         {
         }
 
+        private readonly MembershipHelper _membershipHelper;
+
         /// <summary>
         /// Useful for debugging
         /// </summary>
@@ -44,6 +47,14 @@ namespace Umbraco.Web.UI.Controls
         /// Returns an UmbracoHelper object
         /// </summary>
         public UmbracoHelper Umbraco { get; private set; }
+
+        /// <summary>
+        /// Returns the MemberHelper instance
+        /// </summary>
+        public MembershipHelper Members
+        {
+            get { return _membershipHelper; }
+        }
 
         /// <summary>
         /// Returns the current WebSecurity instance

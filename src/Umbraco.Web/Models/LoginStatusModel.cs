@@ -6,7 +6,7 @@ using Umbraco.Web.Security;
 namespace Umbraco.Web.Models
 {
     /// <summary>
-    /// The model 
+    /// The model representing the status of a logged in member 
     /// </summary>
     public class LoginStatusModel
     {
@@ -25,7 +25,7 @@ namespace Umbraco.Web.Models
             if (doLookup && HttpContext.Current != null && ApplicationContext.Current != null)
             {
                 var helper = new MembershipHelper(ApplicationContext.Current, new HttpContextWrapper(HttpContext.Current));
-                var model = helper.GetLoginStatusModel();
+                var model = helper.GetCurrentLoginStatus();
                 if (model != null)
                 {
                     Name = model.Name;
@@ -46,9 +46,24 @@ namespace Umbraco.Web.Models
             
         }
 
+        /// <summary>
+        /// The name of the member
+        /// </summary>
         public string Name { get; set; }
+
+        /// <summary>
+        /// The username of the member
+        /// </summary>
         public string Username { get; set; }
+
+        /// <summary>
+        /// The email of the member
+        /// </summary>
         public string Email { get; set; }
+
+        /// <summary>
+        /// True, if the member is currently logged in
+        /// </summary>
         public bool IsLoggedIn { get; set; }
     }
 }
