@@ -7,7 +7,7 @@
 @using Umbraco.Web.Controllers
 
 @{
-    var registerModel = new RegisterModel();
+    var registerModel = Members.CreateRegistrationModel();
     
     @*
         Configurable here:
@@ -37,6 +37,9 @@
     
     var success = TempData["FormSuccess"] != null;
 }
+
+@*NOTE: This RenderJsHere code should be put on your main template page where the rest of your script tags are placed*@
+@Html.RenderJsHere()
 
 @if (success) 
 { 
@@ -68,11 +71,11 @@ else
             <br />
         
             @if (registerModel.MemberProperties != null) { 
-                for (var i = 0; i < registerModel.MemberProperties.Count; i++)
+                foreach (var prop in registerModel.MemberProperties)
                 {
-                    @Html.LabelFor(m => registerModel.MemberProperties[i].Value, registerModel.MemberProperties[i].Name)
-                    @Html.EditorFor(m => registerModel.MemberProperties[i].Value)
-                    @Html.HiddenFor(m => registerModel.MemberProperties[i].Alias)
+                    @Html.LabelFor(m => prop.Value, prop.Name)
+                    @Html.EditorFor(m => prop.Value)
+                    @Html.HiddenFor(m => prop.Alias)
                     <br />
                 }
             }
@@ -83,8 +86,6 @@ else
             @Html.HiddenFor(m => registerModel.UsernameIsEmail)
 
             <button>Register</button>
-        </fieldset>  
-    
-        @Html.RenderJsHere()
+        </fieldset>             
     }
 }

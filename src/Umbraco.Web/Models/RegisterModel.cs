@@ -1,39 +1,45 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Web;
 using umbraco.cms.businesslogic.member;
 using Umbraco.Core;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models
 {
     public class RegisterModel
     {
-        public RegisterModel()
+        /// <summary>
+        /// Creates a new empty RegisterModel
+        /// </summary>
+        /// <returns></returns>
+        public static RegisterModel CreateModel()
         {
-            this.MemberTypeAlias = Constants.Conventions.MemberTypes.Member;
+            var model = new RegisterModel(false);
+            return model;
+        }
 
-            this.RedirectOnSucces = false;
+        private RegisterModel(bool doLookup)
+        {
+            MemberTypeAlias = Constants.Conventions.MemberTypes.Member;
+            RedirectOnSucces = false;
+            RedirectUrl = "/";
+            UsernameIsEmail = true;
 
-            this.RedirectUrl = "/";
-
-            this.UsernameIsEmail = true;
-
-            var memberType = MemberType.GetByAlias(this.MemberTypeAlias);
-
-            if (memberType != null)
+            if (doLookup && HttpContext.Current != null && ApplicationContext.Current != null)
             {
-                this.MemberProperties = new List<UmbracoProperty>();
-
-                foreach (var prop in memberType.PropertyTypes.Where(memberType.MemberCanEdit))
-                {
-                    this.MemberProperties.Add(new UmbracoProperty
-                                              {
-                                                  Alias = prop.Alias,
-                                                  Name = prop.Name,
-                                                  Value = string.Empty
-                                              });
-                }
+                var helper = new MembershipHelper(ApplicationContext.Current, new HttpContextWrapper(HttpContext.Current));
+                var model = helper.CreateRegistrationModel(MemberTypeAlias);
+                MemberProperties = model.MemberProperties;
             }
+        }
+
+        [Obsolete("Do not use this ctor as it will perform business logic lookups. Use the MembershipHelper.CreateRegistrationModel or the static RegisterModel.CreateModel() to create an empty model.")]
+        public RegisterModel()
+            : this(true)
+        {   
         }
 
         [Required]
@@ -41,6 +47,9 @@ namespace Umbraco.Web.Models
             ErrorMessage = "Please enter a valid e-mail address")]
         public string Email { get; set; }
 
+        /// <summary>
+        /// Returns the member properties
+        /// </summary>
         public List<UmbracoProperty> MemberProperties { get; set; }
         
         public string MemberTypeAlias { get; set; }

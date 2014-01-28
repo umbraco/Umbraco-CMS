@@ -237,7 +237,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Create the PropertyData for this version - cmsPropertyData
             var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
-            var propertyDataDtos = propertyFactory.BuildDto(((Member)entity).Properties);
+            //Add Properties
+            // - don't try to save the property if it doesn't exist (or doesn't have an ID) on the content type
+            // - this can occur if the member type doesn't contain the built-in properties that the
+            // - member object contains.        
+            var propsToPersist = entity.Properties.Where(x => x.PropertyType.HasIdentity).ToArray();
+            var propertyDataDtos = propertyFactory.BuildDto(propsToPersist);
             var keyDictionary = new Dictionary<int, int>();
 
             //Add Properties
@@ -248,7 +253,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //Update Properties with its newly set Id
-            foreach (var property in ((Member)entity).Properties)
+            foreach (var property in propsToPersist)
             {
                 property.Id = keyDictionary[property.PropertyTypeId];
             }
@@ -331,12 +336,10 @@ namespace Umbraco.Core.Persistence.Repositories
             //Add Properties
             // - don't try to save the property if it doesn't exist (or doesn't have an ID) on the content type
             // - this can occur if the member type doesn't contain the built-in properties that the
-            // - member object contains.
-            var existingProperties = entity.Properties
-                .Where(property => entity.ContentType.PropertyTypes.Any(x => x.Alias == property.Alias && x.HasIdentity))
-                .ToList();
+            // - member object contains.            
+            var propsToPersist = entity.Properties.Where(x => x.PropertyType.HasIdentity).ToArray();
 
-            var propertyDataDtos = propertyFactory.BuildDto(existingProperties);
+            var propertyDataDtos = propertyFactory.BuildDto(propsToPersist);
 
             foreach (var propertyDataDto in propertyDataDtos)
             {

@@ -6,7 +6,7 @@
 @using Umbraco.Web.Controllers
 
 @{
-    var loginStatusModel = new LoginStatusModel();
+    var loginStatusModel = Members.GetCurrentLoginStatus();
 
     Html.EnableClientValidation();
     Html.EnableUnobtrusiveJavaScript();
@@ -15,6 +15,7 @@
     Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.unobtrusive.min.js");
 }
 
+@*NOTE: This RenderJsHere code should be put on your main template page where the rest of your script tags are placed*@
 @Html.RenderJsHere()
 
 @if (loginStatusModel.IsLoggedIn)

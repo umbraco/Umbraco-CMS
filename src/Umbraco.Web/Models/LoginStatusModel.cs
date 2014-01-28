@@ -39,7 +39,7 @@ namespace Umbraco.Web.Models
         /// <summary>
         /// This will construct a new LoginStatusModel and perform a lookup for hte curently logged in member
         /// </summary>
-        [Obsolete("Do not use this ctor as it will perform business logic lookups. Use the MembershipHelper.GetLoginStatusModel or the static LoginStatusModel.CreateModel() to create an empty model.")]
+        [Obsolete("Do not use this ctor as it will perform business logic lookups. Use the MembershipHelper.GetCurrentLoginStatus or the static LoginStatusModel.CreateModel() to create an empty model.")]
         public LoginStatusModel()
             : this(true)
         {

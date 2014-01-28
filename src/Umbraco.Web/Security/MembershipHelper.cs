@@ -38,6 +38,41 @@ namespace Umbraco.Web.Security
         #endregion
 
         /// <summary>
+        /// Creates a model to use for registering new members with custom member properties
+        /// </summary>
+        /// <param name="memberTypeAlias"></param>
+        /// <returns></returns>
+        public RegisterModel CreateRegistrationModel(string memberTypeAlias = null)
+        {
+            if (Membership.Provider.IsUmbracoMembershipProvider())
+            {
+                memberTypeAlias = memberTypeAlias ?? Constants.Conventions.MemberTypes.Member;
+                var memberType = _applicationContext.Services.MemberTypeService.Get(memberTypeAlias);
+                if (memberType == null)
+                    throw new InvalidOperationException("Could not find a member type with alias " + memberTypeAlias);
+
+                var props = memberType.PropertyTypes
+                    .Where(x => memberType.MemberCanEditProperty(x.Alias))
+                    .Select(prop => new UmbracoProperty
+                    {
+                        Alias = prop.Alias,
+                        Name = prop.Name,
+                        Value = string.Empty
+                    }).ToList();
+
+                var model = RegisterModel.CreateModel();
+                model.MemberProperties = props;
+                return model;
+            }
+            else
+            {
+                var model = RegisterModel.CreateModel();
+                model.MemberTypeAlias = string.Empty;
+                return model;
+            }
+        }
+
+        /// <summary>
         /// Returns the login status model of the currently logged in member, if no member is logged in it returns null;
         /// </summary>
         /// <returns></returns>

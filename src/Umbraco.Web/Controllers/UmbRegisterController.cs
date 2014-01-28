@@ -24,7 +24,7 @@ namespace Umbraco.Web.Controllers
             MembershipCreateStatus status;
             var member = Membership.CreateUser(model.Username, model.Password, model.Email,
                 //TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
-                "", "", 
+                null, null, 
                 true, out status);
 
             switch (status)
