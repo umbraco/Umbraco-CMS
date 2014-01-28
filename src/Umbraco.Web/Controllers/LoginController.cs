@@ -20,7 +20,7 @@ namespace Umbraco.Web.Controllers
             //Validate credentials
             if (Membership.ValidateUser(model.Username, model.Password) == false)
             {
-                ModelState.AddModelError("Username", "Invalid username or password");
+                ModelState.AddModelError("loginModel.Username", "Invalid username or password");
                 return CurrentUmbracoPage();
             }
             //Set member online
