@@ -24,7 +24,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                       umbRequestHelper.getApiUrl(
                           "rteApiBaseUrl",
                           "GetConfiguration")),
-                  'Failed to retreive entity data for id '); 
+                  'Failed to retreive tinymce configuration');
         },
 
         /**
