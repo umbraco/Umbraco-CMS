@@ -33,9 +33,11 @@ namespace Umbraco.Web.Cache
             Application.Deleted += ApplicationDeleted;
             Application.New += ApplicationNew;
 
-            //bind to user type events
+            //bind to user / user type events
             UserService.SavedUserType += UserServiceSavedUserType;
             UserService.DeletedUserType += UserServiceDeletedUserType;
+            UserService.SavedUser += UserServiceSavedUser;
+            UserService.DeletedUser += UserServiceDeletedUser;
 
             //Bind to dictionary events
             //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
@@ -88,11 +90,6 @@ namespace Umbraco.Web.Cache
             MemberTypeService.Saved += MemberTypeServiceSaved;
             MemberTypeService.Deleted += MemberTypeServiceDeleted;
 
-            //Bind to user events
-
-            User.Saving += UserSaving;
-            User.Deleting += UserDeleting;
-
             //Bind to permission events
 
             Permission.New += PermissionNew;
@@ -130,7 +127,7 @@ namespace Umbraco.Web.Cache
             ContentService.Created += ContentServiceCreated;
             ContentService.Copied += ContentServiceCopied;
         }
-        
+
         #region Content service event handlers
 
         /// <summary>
@@ -440,17 +437,17 @@ namespace Umbraco.Web.Cache
         {
             InvalidateCacheForPermissionsChange(sender);
         }
+
+        void UserServiceSavedUser(IUserService sender, Core.Events.SaveEventArgs<Core.Models.Membership.IUser> e)
+        {
+            e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshUserCache(x.Id));
+        }
+
+        void UserServiceDeletedUser(IUserService sender, Core.Events.DeleteEventArgs<Core.Models.Membership.IUser> e)
+        {
+            e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserCache(x.Id));
+        }
         
-        static void UserDeleting(User sender, System.EventArgs e)
-        {
-            DistributedCache.Instance.RemoveUserCache(sender.Id);
-        }
-
-        static void UserSaving(User sender, System.EventArgs e)
-        {
-            DistributedCache.Instance.RefreshUserCache(sender.Id);
-        }
-
         private static void InvalidateCacheForPermissionsChange(UserPermission sender)
         {
             if (sender.User != null)

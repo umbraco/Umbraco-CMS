@@ -452,10 +452,7 @@ namespace umbraco.cms.businesslogic.web
                 {
                     throw new ArgumentException("Can't delete a Document Type used as a Master Content Type. Please remove all references first!");
                 }
-
-                // Remove from cache
-                FlushFromCache(Id);
-
+                
                 ApplicationContext.Current.Services.ContentTypeService.Delete(_contentType);
 
                 clearTemplates();
@@ -591,11 +588,6 @@ namespace umbraco.cms.businesslogic.web
                 var current = User.GetCurrent();
                 int userId = current == null ? 0 : current.Id;
                 ApplicationContext.Current.Services.ContentTypeService.Save(_contentType, userId);
-
-                //Ensure that DocumentTypes are reloaded from db by clearing cache.
-                //NOTE Would be nice if we could clear cache by type instead of emptying the entire cache.
-                InMemoryCacheProvider.Current.Clear();
-                RuntimeCacheProvider.Current.Clear();//Runtime cache is used for Content, so we clear that as well
 
                 base.Save();
                 FireAfterSave(e);

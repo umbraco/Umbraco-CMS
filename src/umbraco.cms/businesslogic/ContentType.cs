@@ -30,7 +30,7 @@ namespace umbraco.cms.businesslogic
     /// Besides data definition, the ContentType also defines the sorting and grouping (in tabs) of Properties/Datafields
     /// on the Content and which Content (by ContentType) can be created as child to the Content of the ContentType.
     /// </summary>
-    [Obsolete("Obsolete, Use Umbraco.Core.Models.ContentType or Umbraco.Core.Models.MediaType", false)]
+    [Obsolete("Obsolete, Use Umbraco.Core.Models.ContentType or Umbraco.Core.Models.MediaType or  or Umbraco.Core.Models.MemberType", false)]
     public class ContentType : CMSNode
     {
         #region Constructors

@@ -122,6 +122,9 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
+            RuntimeCacheProvider.Current.Clear(typeof(IContent));
+            RuntimeCacheProvider.Current.Clear(typeof(IContentType));
+
             //all property type cache
             ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.PropertyTypeCacheKey);
             //all content type property cache
@@ -173,7 +176,7 @@ namespace Umbraco.Web.Cache
         /// - RuntimeCacheProvider.Current.Clear(); 
         /// - RoutesCache.Clear();        
         /// </remarks>
-        private static void ClearContentTypeCache(IEnumerable<JsonPayload> payloads)
+        private static void ClearContentTypeCache(JsonPayload[] payloads)
         {
             var needsContentRefresh = false;
             
@@ -203,8 +206,22 @@ namespace Umbraco.Web.Cache
             //clear the cache providers if there were any content types to clear
             if (payloads.Any())
             {
-                InMemoryCacheProvider.Current.Clear();
-                RuntimeCacheProvider.Current.Clear();
+                if (payloads.Any(x => x.Type == typeof (IContentType).Name))
+                {
+                    RuntimeCacheProvider.Current.Clear(typeof(IContent));
+                    RuntimeCacheProvider.Current.Clear(typeof(IContentType));    
+                }
+                if (payloads.Any(x => x.Type == typeof(IMediaType).Name))
+                {
+                    RuntimeCacheProvider.Current.Clear(typeof(IMedia));
+                    RuntimeCacheProvider.Current.Clear(typeof(IMediaType));
+                }
+                if (payloads.Any(x => x.Type == typeof(IMemberType).Name))
+                {
+                    RuntimeCacheProvider.Current.Clear(typeof(IMember));
+                    RuntimeCacheProvider.Current.Clear(typeof(IMemberType));
+                }
+                
 
                 //we only need to do this for IContentType NOT for IMediaType, we don't want to refresh the whole routes
                 //cache if only a media type has changed.
