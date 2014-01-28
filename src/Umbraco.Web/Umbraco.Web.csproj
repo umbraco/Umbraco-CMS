@@ -291,8 +291,8 @@
     <Compile Include="Cache\UserPermissionsCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Configuration\WebRouting.cs" />
-    <Compile Include="Controllers\ProfileController.cs" />
-    <Compile Include="Controllers\LoginStatusController.cs" />
+    <Compile Include="Controllers\UmbProfileController.cs" />
+    <Compile Include="Controllers\UmbLoginStatusController.cs" />
     <Compile Include="Editors\MediaController.cs" />
     <Compile Include="Models\ChangingPasswordModel.cs" />
     <Compile Include="Models\IRenderModel.cs" />
@@ -301,7 +301,7 @@
     <Compile Include="Mvc\UmbracoTemplatePageOfTContent.cs" />
     <Compile Include="Mvc\UmbracoViewPage.cs" />
     <Compile Include="Models\ContentEditing\ContentSortOrder.cs" />
-    <Compile Include="Controllers\RegisterController.cs" />
+    <Compile Include="Controllers\UmbRegisterController.cs" />
     <Compile Include="Models\PasswordChangedModel.cs" />
     <Compile Include="Models\ProfileModel.cs" />
     <Compile Include="Models\LoginStatusModel.cs" />
@@ -454,7 +454,7 @@
     <Compile Include="umbraco.presentation\umbraco\settings\stylesheet\property\EditStyleSheetProperty.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Controllers\LoginController.cs" />
+    <Compile Include="Controllers\UmbLoginController.cs" />
     <Compile Include="umbraco.presentation\umbraco\Trees\TranslateTreeNames.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="UrlHelperRenderExtensions.cs" />

@@ -9,7 +9,7 @@ using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Controllers
 {
-    public class RegisterController : SurfaceController
+    public class UmbRegisterController : SurfaceController
     {
         [HttpPost]
         public ActionResult HandleRegisterMember([Bind(Prefix = "registerModel")]RegisterModel model)

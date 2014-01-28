@@ -10,14 +10,14 @@ using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Controllers
 {
-    public class ProfileController : SurfaceController
+    public class UmbProfileController : SurfaceController
     {
         [HttpPost]
         public ActionResult HandleUpdateProfile([Bind(Prefix = "profileModel")] ProfileModel model)
         {
             if (Membership.Provider.IsUmbracoMembershipProvider() == false)
             {
-                throw new NotSupportedException("Profile editing with the " + typeof (ProfileController) + " is not supported when not using the default Umbraco membership provider");
+                throw new NotSupportedException("Profile editing with the " + typeof(UmbProfileController) + " is not supported when not using the default Umbraco membership provider");
             }
 
             if (ModelState.IsValid == false)

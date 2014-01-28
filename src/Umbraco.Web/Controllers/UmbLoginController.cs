@@ -7,7 +7,7 @@ using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Controllers
 {
-    public class LoginController : SurfaceController
+    public class UmbLoginController : SurfaceController
     {
         [HttpPost]
         public ActionResult HandleLogin([Bind(Prefix="loginModel")]LoginModel model)

@@ -7,7 +7,7 @@ using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Controllers
 {
-    public class LoginStatusController : SurfaceController
+    public class UmbLoginStatusController : SurfaceController
     {
         [HttpPost]
         public ActionResult HandleLogout([Bind(Prefix = "loginStatusModel")]LoginStatusModel model)
