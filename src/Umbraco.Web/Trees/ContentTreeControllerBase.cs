@@ -177,8 +177,8 @@ namespace Umbraco.Web.Trees
             //before we get the children we need to see if this is a container node
             var current = Services.EntityService.Get(int.Parse(id), UmbracoObjectType);
 
-
-            if (queryStrings.Get("isDialog") != "true" && current != null && current.IsContainer())
+            //test if the parent is a listview / container
+            if (current != null && current.IsContainer())
             {
                 //no children!
                 return new TreeNodeCollection();

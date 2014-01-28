@@ -98,8 +98,7 @@ namespace Umbraco.Web.Trees
             {
 
                 //Special check to see if it ia a container, if so then we'll hide children.
-                //we only perform this check for non-dialog trees since pickers needs access to these nodes
-                var isContainer = e.IsContainer() && (queryStrings.Get("isDialog") != "true");
+                var isContainer = e.IsContainer();   // && (queryStrings.Get("isDialog") != "true");
 
                 var node = CreateTreeNode(
                     e.Id.ToInvariantString(),
