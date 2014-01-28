@@ -48,6 +48,57 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
+        /// Registers a new member
+        /// </summary>
+        /// <param name="model"></param>
+        /// <param name="status"></param>
+        /// <param name="logMemberIn">
+        /// true to log the member in upon successful registration
+        /// </param>
+        /// <returns></returns>
+        public MembershipUser RegisterMember(RegisterModel model, out MembershipCreateStatus status, bool logMemberIn = true)
+        {
+            model.Username = (model.UsernameIsEmail || model.Username == null) ? model.Email : model.Username;
+
+            var membershipUser = Membership.CreateUser(model.Username, model.Password, model.Email,
+                //TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
+                null, null,
+                true, out status);
+
+            if (status != MembershipCreateStatus.Success) return null;
+            
+            //update their real name 
+            if (Membership.Provider.IsUmbracoMembershipProvider())
+            {
+                var member = _applicationContext.Services.MemberService.GetByUsername(membershipUser.UserName);
+                member.Name = model.Name;
+
+                if (model.MemberProperties != null)
+                {
+                    foreach (var property in model.MemberProperties.Where(p => p.Value != null)
+                        .Where(property => member.Properties.Contains(property.Alias)))
+                    {
+                        member.Properties[property.Alias].Value = property.Value;
+                    }
+                }
+
+                _applicationContext.Services.MemberService.Save(member);
+            }
+            else
+            {
+                //TODO: Support this scenario!
+            }
+
+            //Set member online
+            Membership.GetUser(model.Username, true);
+
+            //Log them in
+            FormsAuthentication.SetAuthCookie(membershipUser.UserName, true);
+
+            return membershipUser;
+        }
+
+        /// <summary>
         /// A helper method to perform the validation and logging in of a member - this is simply wrapping standard membership provider and asp.net forms auth logic.
         /// </summary>
         /// <param name="username"></param>
@@ -161,15 +212,19 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public LoginStatusModel GetCurrentLoginStatus()
         {
-            if (IsLoggedIn() == false)
-                return null;
-
             var model = LoginStatusModel.CreateModel();
+
+            if (IsLoggedIn() == false)
+            {
+                model.IsLoggedIn = false;
+                return model;
+            }
+            
             if (Membership.Provider.IsUmbracoMembershipProvider())
             {
                 var member = GetCurrentMember();
                 //this shouldn't happen
-                if (member == null) return null;
+                if (member == null) return model;
                 model.Name = member.Name;
                 model.Username = member.Username;
                 model.Email = member.Email;

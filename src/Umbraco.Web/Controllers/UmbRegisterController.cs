@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using System.Web.Security;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.member;
+using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 
@@ -19,32 +20,18 @@ namespace Umbraco.Web.Controllers
                 return CurrentUmbracoPage();
             }
 
-            model.Username = (model.UsernameIsEmail || model.Username == null) ? model.Email : model.Username;
-
             MembershipCreateStatus status;
-            var member = Membership.CreateUser(model.Username, model.Password, model.Email,
-                //TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
-                null, null, 
-                true, out status);
+            var member = Members.RegisterMember(model, out status, model.LoginOnSuccess);
 
             switch (status)
             {
                 case MembershipCreateStatus.Success:
-
-                    //Set member online
-                    Membership.GetUser(model.Username, true);                    
-                    //Log them in
-                    FormsAuthentication.SetAuthCookie(member.UserName, true);
-
                     if (model.RedirectOnSucces)
                     {
                         return Redirect(model.RedirectUrl);
                     }
-
                     TempData.Add("FormSuccess", true);
                     return RedirectToCurrentUmbracoPage();
-
-                    break;
                 case MembershipCreateStatus.InvalidUserName:
                     ModelState.AddModelError((model.UsernameIsEmail || model.Username == null)
                         ? "registerModel.Email"

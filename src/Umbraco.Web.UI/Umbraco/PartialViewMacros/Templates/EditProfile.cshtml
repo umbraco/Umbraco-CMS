@@ -38,11 +38,11 @@
             @Html.ValidationMessageFor(m => profileModel.Email)
             <br />
 
-            @foreach (var prop in profileModel.MemberProperties)
+            @for (var i = 0; i < profileModel.MemberProperties.Count; i++)
             {
-                @Html.LabelFor(m => prop.Value, prop.Name)
-                @Html.EditorFor(m => prop.Value)
-                @Html.HiddenFor(m => prop.Alias)
+                @Html.LabelFor(m => profileModel.MemberProperties[i].Value, profileModel.MemberProperties[i].Name)
+                @Html.EditorFor(m => profileModel.MemberProperties[i].Value)
+                @Html.HiddenFor(m => profileModel.MemberProperties[i].Alias)
                 <br />
             }
        

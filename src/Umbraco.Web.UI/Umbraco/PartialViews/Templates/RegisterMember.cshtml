@@ -71,11 +71,11 @@ else
             <br />
         
             @if (registerModel.MemberProperties != null) {
-                foreach (var prop in registerModel.MemberProperties)
+                for (var i = 0; i < registerModel.MemberProperties.Count; i++)
                 {
-                    @Html.LabelFor(m => prop.Value, prop.Name)
-                    @Html.EditorFor(m => prop.Value)
-                    @Html.HiddenFor(m => prop.Alias)
+                    @Html.LabelFor(m => registerModel.MemberProperties[i].Value, registerModel.MemberProperties[i].Name)
+                    @Html.EditorFor(m => registerModel.MemberProperties[i].Value)
+                    @Html.HiddenFor(m => registerModel.MemberProperties[i].Alias)
                     <br />
                 }
             }
@@ -86,6 +86,6 @@ else
             @Html.HiddenFor(m => registerModel.UsernameIsEmail)
 
             <button>Register</button>
-        </fieldset>  
+        </fieldset>             
     }
 }

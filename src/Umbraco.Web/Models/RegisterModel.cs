@@ -28,6 +28,7 @@ namespace Umbraco.Web.Models
             RedirectUrl = "/";
             UsernameIsEmail = true;
             MemberProperties = new List<UmbracoProperty>();
+            LoginOnSuccess = true;
 
             if (doLookup && HttpContext.Current != null && ApplicationContext.Current != null)
             {
@@ -67,5 +68,11 @@ namespace Umbraco.Web.Models
         public string Username { get; set; }
 
         public bool UsernameIsEmail { get; set; }
+        
+        /// <summary>
+        /// Specifies if the member should be logged in if they are succesfully created
+        /// </summary>
+        public bool LoginOnSuccess { get; set; }
+
     }
 }
