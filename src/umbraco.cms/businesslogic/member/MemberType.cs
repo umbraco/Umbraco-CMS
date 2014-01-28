@@ -13,7 +13,7 @@ namespace umbraco.cms.businesslogic.member
 	/// MemberType
 	/// 
 	/// Due to the inheritance of the ContentType class, it enables definition of generic datafields on a Members.
-    [Obsolete("Obsolete, Use Umbraco.Core.Models.MemberType", false)]
+    [Obsolete("Obsolete, Use the MemberTypeService and Umbraco.Core.Models.MemberType", false)]
 	public class MemberType : ContentType
     {
         #region Private Members

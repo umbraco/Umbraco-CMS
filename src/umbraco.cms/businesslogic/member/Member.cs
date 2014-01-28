@@ -33,6 +33,7 @@ namespace umbraco.cms.businesslogic.member
     /// 
     /// Inherits generic datafields from it's baseclass content.
     /// </summary>
+    [Obsolete("Use the MemberService and the Umbraco.Core.Models.Member models instead")]
     public class Member : Content
     {
         #region Constants and static members
@@ -857,6 +858,7 @@ namespace umbraco.cms.businesslogic.member
         /// Can be used in the runtime
         /// </summary>
         /// <param name="m">The member to log in</param>
+        [Obsolete("Use Membership APIs and FormsAuthentication to handle member login")]
         public static void AddMemberToCache(Member m)
         {
 
@@ -1049,31 +1051,10 @@ namespace umbraco.cms.businesslogic.member
         /// Can be used from the public website
         /// </summary>
         /// <returns>True if the the current visitor is logged in</returns>
+        [Obsolete("Use the standard ASP.Net procedures for hanlding FormsAuthentication, simply check the HttpContext.User and HttpContext.User.Identity.IsAuthenticated to determine if a member is logged in or not")]
         public static bool IsLoggedOn()
         {
-            if (HttpContext.Current.User == null)
-                return false;
-
-
-            //if member is not auth'd , but still might have a umb cookie saying otherwise...
-            if (!HttpContext.Current.User.Identity.IsAuthenticated)
-            {
-                int _currentMemberId = CurrentMemberId();
-
-                //if we have a cookie... 
-                if (_currentMemberId > 0)
-                {
-                    //log in the member so .net knows about the member.. 
-                    FormsAuthentication.SetAuthCookie(new Member(_currentMemberId).LoginName, true);
-
-                    //making sure that the correct status is returned first time around...
-                    return true;
-                }
-
-            }
-
-
-            return HttpContext.Current.User.Identity.IsAuthenticated;
+            return HttpContext.Current.User != null && HttpContext.Current.User.Identity.IsAuthenticated;
         }
 
         /// <summary>

@@ -1,5 +1,6 @@
 ﻿using System.Linq;
 using System.Web.Mvc;
+using System.Web.Security;
 using umbraco.cms.businesslogic.member;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
@@ -11,24 +12,19 @@ namespace Umbraco.Web.Controllers
         [HttpPost]
         public ActionResult HandleLogout([Bind(Prefix = "loginStatusModel")]LoginStatusModel model)
         {
-            // TODO: Use new Member API
-            if (ModelState.IsValid)
+            if (ModelState.IsValid == false)
             {
-                if (Member.IsLoggedOn())
-                {
-                    var member = Member.GetCurrentMember();
-                    if (member != null)
-                    {
-                        var memberId = member.Id;
-                        Member.RemoveMemberFromCache(memberId);
-                        Member.ClearMemberFromClient(memberId);
-                    }
-                }
-
-                return Redirect("/");                
+                return CurrentUmbracoPage();
             }
 
-            return CurrentUmbracoPage();
+            if (HttpContext.User != null && HttpContext.User.Identity.IsAuthenticated)
+            {
+                FormsAuthentication.SignOut();
+            }
+
+            //TODO: Shouldn't we be redirecting to the current page or integrating this with the 
+            // normal Umbraco protection stuff?
+            return Redirect("/");
         }
     }
 }
