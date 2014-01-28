@@ -2,13 +2,12 @@
 
 @using System.Web.Mvc.Html
 @using ClientDependency.Core.Mvc
-@using umbraco.cms.businesslogic.member
 @using Umbraco.Web
 @using Umbraco.Web.Models
 @using Umbraco.Web.Controllers
 
 @{
-    var profileModel = new ProfileModel();
+    var profileModel = Members.CreateProfileModel();
 
     Html.EnableClientValidation();
     Html.EnableUnobtrusiveJavaScript();
@@ -17,10 +16,11 @@
     Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.unobtrusive.min.js");
 }
 
-@if (Member.IsLoggedOn())
-{
-    @Html.RenderJsHere()
+@*NOTE: This RenderJsHere code should be put on your main template page where the rest of your script tags are placed*@
+@Html.RenderJsHere()
 
+@if (Members.IsLoggedIn())
+{
     using (Html.BeginUmbracoForm<UmbProfileController>("HandleUpdateProfile"))
     {
         <fieldset>
@@ -38,11 +38,11 @@
             @Html.ValidationMessageFor(m => profileModel.Email)
             <br />
 
-            @for (var i = 0; i < profileModel.MemberProperties.Count; i++)
+            @foreach (var prop in profileModel.MemberProperties)
             {
-                @Html.LabelFor(m => profileModel.MemberProperties[i].Value, profileModel.MemberProperties[i].Name)
-                @Html.EditorFor(m => profileModel.MemberProperties[i].Value)
-                @Html.HiddenFor(m => profileModel.MemberProperties[i].Alias)
+                @Html.LabelFor(m => prop.Value, prop.Name)
+                @Html.EditorFor(m => prop.Value)
+                @Html.HiddenFor(m => prop.Alias)
                 <br />
             }
        

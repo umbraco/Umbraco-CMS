@@ -17,7 +17,7 @@ namespace Umbraco.Web.Controllers
                 return CurrentUmbracoPage();
             }
 
-            if (HttpContext.User != null && HttpContext.User.Identity.IsAuthenticated)
+            if (Members.IsLoggedIn())
             {
                 FormsAuthentication.SignOut();
             }

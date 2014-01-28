@@ -5,6 +5,7 @@ using System.Text;
 using System.Web;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models;
@@ -36,6 +37,88 @@ namespace Umbraco.Web.Security
             _applicationContext = umbracoContext.Application;
         }
         #endregion
+
+        /// <summary>
+        /// Returns true if the current membership provider is the Umbraco built-in one.
+        /// </summary>
+        /// <returns></returns>
+        public bool IsUmbracoMembershipProviderActive()
+        {
+            return Membership.Provider.IsUmbracoMembershipProvider();
+        }
+
+        /// <summary>
+        /// A helper method to perform the validation and logging in of a member - this is simply wrapping standard membership provider and asp.net forms auth logic.
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        public bool Login(string username, string password)
+        {
+            //Validate credentials
+            if (Membership.ValidateUser(username, password) == false)
+            {
+                return false;
+            }
+            //Set member online
+            var member = Membership.GetUser(username, true);
+            if (member == null)
+            {
+                //this should not happen
+                LogHelper.Warn<MembershipHelper>("The member validated but then no member was returned with the username " + username);                
+                return false;
+            }
+            //Log them in
+            FormsAuthentication.SetAuthCookie(member.UserName, true);
+            return true;
+        }
+
+        /// <summary>
+        /// Creates a new profile model filled in with the current members details if they are logged in.
+        /// </summary>
+        /// <returns></returns>
+        public ProfileModel CreateProfileModel()
+        {
+            if (IsLoggedIn() == false)
+            {
+                return null;
+            }
+
+            if (Membership.Provider.IsUmbracoMembershipProvider())
+            {
+                var member = GetCurrentMember();
+                //this shouldn't happen
+                if (member == null) return null;
+
+                var model = ProfileModel.CreateModel();
+                model.Name = member.Name;
+                model.Email = member.Email;
+
+                var memberType = member.ContentType;
+
+                foreach (var prop in memberType.PropertyTypes.Where(x => memberType.MemberCanEditProperty(x.Alias)))
+                {
+                    var value = string.Empty;
+                    var propValue = member.Properties[prop.Alias];
+                    if (propValue != null)
+                    {
+                        value = propValue.Value.ToString();
+                    }
+
+                    model.MemberProperties.Add(new UmbracoProperty
+                    {
+                        Alias = prop.Alias,
+                        Name = prop.Name,
+                        Value = value
+                    });
+                }
+                return model;
+            }
+
+            //we can try to look up an associated member by the provider user key
+            //TODO: Support this at some point!
+            throw new NotSupportedException("Currently a member profile cannot be edited unless using the built-in Umbraco membership providers");
+        }
 
         /// <summary>
         /// Creates a model to use for registering new members with custom member properties
@@ -84,8 +167,7 @@ namespace Umbraco.Web.Security
             var model = LoginStatusModel.CreateModel();
             if (Membership.Provider.IsUmbracoMembershipProvider())
             {
-                var member = _applicationContext.Services.MemberService.GetByUsername(
-                    _httpContext.User.Identity.Name);
+                var member = GetCurrentMember();
                 //this shouldn't happen
                 if (member == null) return null;
                 model.Name = member.Name;
@@ -104,6 +186,15 @@ namespace Umbraco.Web.Security
 
             model.IsLoggedIn = true;
             return model;
+        }
+
+        /// <summary>
+        /// Check if a member is logged in
+        /// </summary>
+        /// <returns></returns>
+        public bool IsLoggedIn()
+        {
+            return _httpContext.User != null && _httpContext.User.Identity.IsAuthenticated;
         }
 
         /// <summary>
@@ -253,13 +344,5 @@ namespace Umbraco.Web.Security
             return member;
         }
 
-        /// <summary>
-        /// Check if a member is logged in
-        /// </summary>
-        /// <returns></returns>
-        private bool IsLoggedIn()
-        {
-            return _httpContext.User != null && _httpContext.User.Identity.IsAuthenticated;
-        }
     }
 }

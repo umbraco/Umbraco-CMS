@@ -27,6 +27,7 @@ namespace Umbraco.Web.Models
             RedirectOnSucces = false;
             RedirectUrl = "/";
             UsernameIsEmail = true;
+            MemberProperties = new List<UmbracoProperty>();
 
             if (doLookup && HttpContext.Current != null && ApplicationContext.Current != null)
             {

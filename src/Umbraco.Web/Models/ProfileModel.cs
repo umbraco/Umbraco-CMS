@@ -1,47 +1,37 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Web;
 using umbraco.cms.businesslogic.member;
+using Umbraco.Core;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models
 {
     public class ProfileModel
     {
-        public ProfileModel()
+        public static ProfileModel CreateModel()
         {
-            if (Member.IsLoggedOn())
+            var model = new ProfileModel(false);
+            return model;
+        }
+
+        private ProfileModel(bool doLookup)
+        {
+            MemberProperties = new List<UmbracoProperty>();
+            if (doLookup)
             {
-                //TODO Use new Member API
-                var member = Member.GetCurrentMember();
+                var helper = new MembershipHelper(ApplicationContext.Current, new HttpContextWrapper(HttpContext.Current));
+                var model = helper.CreateProfileModel();
+                MemberProperties = model.MemberProperties;
+            }   
+        }
 
-                if (member != null)
-                {
-                    this.Name = member.Text;
-
-                    this.Email = member.Email;
-
-                    this.MemberProperties = new List<UmbracoProperty>();
-
-                    var memberType = MemberType.GetByAlias(member.ContentType.Alias);
-
-                    foreach (var prop in memberType.PropertyTypes.Where(memberType.MemberCanEdit))
-                    {
-                        var value = string.Empty;
-                        var propValue = member.getProperty(prop.Alias);
-                        if (propValue != null)
-                        {
-                            value = propValue.Value.ToString();
-                        }
-
-                        this.MemberProperties.Add(new UmbracoProperty
-                                                  {
-                                                      Alias = prop.Alias,
-                                                      Name = prop.Name,
-                                                      Value = value
-                                                  });
-                    }
-                }
-            }
+        [Obsolete("Do not use this ctor as it will perform business logic lookups. Use the MembershipHelper.CreateProfileModel or the static ProfileModel.CreateModel() to create an empty model.")]
+        public ProfileModel()
+            :this(true)
+        {
         }
 
         [Required]

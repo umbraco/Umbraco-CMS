@@ -17,21 +17,11 @@ namespace Umbraco.Web.Controllers
                 return CurrentUmbracoPage();    
             }
 
-            //Validate credentials
-            if (Membership.ValidateUser(model.Username, model.Password) == false)
+            if (Members.Login(model.Username, model.Password) == false)
             {
                 ModelState.AddModelError("loginModel.Username", "Invalid username or password");
                 return CurrentUmbracoPage();
             }
-            //Set member online
-            var member = Membership.GetUser(model.Username, true);
-            if (member == null)
-            {
-                ModelState.AddModelError("Username", "Member not found");
-                return CurrentUmbracoPage();
-            }
-            //Log them in
-            FormsAuthentication.SetAuthCookie(member.UserName, true);
 
             return Redirect("/");            
         }

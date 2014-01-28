@@ -25,7 +25,7 @@ namespace Umbraco.Web.Controllers
                 return CurrentUmbracoPage();
             }
 
-            if (HttpContext.User == null || HttpContext.User.Identity.IsAuthenticated == false)
+            if (Members.IsLoggedIn() == false)
             {
                 throw new NotSupportedException("No member is currently logged in");
             }
