@@ -2,12 +2,48 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Web;
 using System.Web.Security;
+using Umbraco.Core;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Web.Security
 {
     internal class MembershipHelper
     {
+        private readonly ApplicationContext _applicationContext;
+        private readonly HttpContextBase _httpContext;
+
+        public MembershipHelper(ApplicationContext applicationContext, HttpContextBase httpContext)
+        {
+            if (applicationContext == null) throw new ArgumentNullException("applicationContext");
+            if (httpContext == null) throw new ArgumentNullException("httpContext");
+            _applicationContext = applicationContext;
+            _httpContext = httpContext;
+        }
+
+        public MembershipHelper(UmbracoContext umbracoContext)
+        {
+            if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
+            _httpContext = umbracoContext.HttpContext;
+            _applicationContext = umbracoContext.Application;
+        }
+
+        public LoginStatusModel GetLoginStatusModel()
+        {
+            if (_httpContext.User == null || _httpContext.User.Identity.IsAuthenticated == false) 
+                return null;
+
+            var member = _applicationContext.Services.MemberService.GetByUsername(
+                _httpContext.User.Identity.Name);
+
+            var model = LoginStatusModel.CreateModel();
+            model.Name = member.Name;
+            model.Username = member.Username;
+            model.Email = member.Email;
+            model.IsLoggedIn = true;
+            return model;
+        }
 
         public MembershipUser UpdateMember(MembershipUser member, MembershipProvider provider,
             string email = null,

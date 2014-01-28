@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration.Provider;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.Design.WebControls;
 using System.Web.UI.HtmlControls;
@@ -242,7 +243,7 @@ namespace umbraco.cms.presentation.members
 
         private void UpdateMembershipProvider(MembershipUser membershipUser)
         {
-            var membershipHelper = new MembershipHelper();
+            var membershipHelper = new MembershipHelper(ApplicationContext, new HttpContextWrapper(Context));
             //set the writable properties that we are editing
             membershipHelper.UpdateMember(membershipUser, Membership.Provider, MemberEmail.Text.Trim());
         }

@@ -1,27 +1,49 @@
-﻿using System.Web;
-using umbraco.cms.businesslogic.member;
+﻿using System;
+using System.Web;
 using Umbraco.Core;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models
 {
+    /// <summary>
+    /// The model 
+    /// </summary>
     public class LoginStatusModel
     {
-        public LoginStatusModel()
+        /// <summary>
+        /// Creates a new empty LoginStatusModel
+        /// </summary>
+        /// <returns></returns>
+        public static LoginStatusModel CreateModel()
         {
-            if (HttpContext.Current != null 
-                && HttpContext.Current.User != null 
-                && HttpContext.Current.User.Identity.IsAuthenticated)
+            var model = new LoginStatusModel(false);
+            return model;
+        }
+
+        private LoginStatusModel(bool doLookup)
+        {
+            if (doLookup && HttpContext.Current != null && ApplicationContext.Current != null)
             {
-                var member = ApplicationContext.Current.Services.MemberService.GetByUsername(
-                    HttpContext.Current.User.Identity.Name);
-                if (member != null)
+                var helper = new MembershipHelper(ApplicationContext.Current, new HttpContextWrapper(HttpContext.Current));
+                var model = helper.GetLoginStatusModel();
+                if (model != null)
                 {
-                    this.Name = member.Name;
-                    this.Username = member.Username;
-                    this.Email = member.Email;
-                    this.IsLoggedIn = true;
-                }   
+                    Name = model.Name;
+                    Username = model.Username;
+                    Email = model.Email;
+                    IsLoggedIn = true;
+                }
             }
+        }
+
+        /// <summary>
+        /// This will construct a new LoginStatusModel and perform a lookup for hte curently logged in member
+        /// </summary>
+        [Obsolete("Do not use this ctor as it will perform business logic lookups. Use the MembershipHelper.GetLoginStatusModel or the static LoginStatusModel.CreateModel() to create an empty model.")]
+        public LoginStatusModel()
+            : this(true)
+        {
+            
         }
 
         public string Name { get; set; }
