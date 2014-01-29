@@ -9,12 +9,11 @@ angular.module("umbraco.directives")
 	    return {
 				restrict: 'E',
 				replace: true,
-				templateUrl: 'views/directives/umb-image-crop.html',
+				templateUrl: 'views/directives/imaging/umb-image-crop.html',
 				scope: {
-					src: '@',
-					width: '@',
-					height: '@',
-					presets: '@',
+					src: '=',
+					width: '=',
+					height: '=',
 					crop: "="
 				},
 				link: function(scope, element, attrs) {
@@ -43,6 +42,7 @@ angular.module("umbraco.directives")
 		                    'width': (parseInt(scope.width, 10) + 2 * scope.dimensions.margin) + 'px' 
 		                };
 		            };
+
 
 					//elements
 					var $viewport = element.find(".viewport"); 
@@ -238,6 +238,7 @@ angular.module("umbraco.directives")
 							if(scope.crop && scope.crop.top){
 								calculatePosition(scope.crop);
 							}else{
+								scope.crop = {};
 								fitImage();
 							}
 							
