@@ -6,6 +6,53 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         //check the pre-values for multi-picker
         var multiPicker = $scope.model.config.multiPicker !== '0' ? true : false;
 
+        $scope.cropper = {crop: undefined, image: undefined};
+        
+                //Data sample
+                var __img = {
+                        //image to crop
+                        src: "assets/img/mocks/image.jpg",
+        
+                        //global gravity, used if not crop is specified
+                        gravity: {left: 0.5, top: 0.4},
+        
+                        crops:{
+                           thumbnail: 
+                                {   
+                                    //crop dimensions
+                                    width: "30px",
+                                    height: "40px",
+        
+                                    //crops in percentages
+                                    crop:{ "left": 0.31731772342645215,
+                                        "top": 0.17420325244997603,
+                                        "right": 0.36246473116627076,
+                                        "bottom": 0.30226197981593617
+                                        }
+                                },
+        
+                            banner: 
+                                 {
+                                     width: "200px",
+                                     height: "20px",
+        
+                                     crop:{ "left": 0.31731772342645215,
+                                         "top": 0.17420325244997603,
+                                         "right": 0.36246473116627076,
+                                         "bottom": 0.30226197981593617
+                                         }
+                                 },
+        
+                            highrise: 
+                                 {
+                                     width: "20px", 
+                                     height: "200px"
+                                 },     
+                        }
+                };
+
+
+
         function setupViewModel() {
             $scope.images = [];
             $scope.ids = []; 
@@ -34,10 +81,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
         $scope.edit = function(image){
             $scope.currentImage = image;
-            $scope.currentImage.crop ={};
-            if(!$scope.currentImage.crop){
-                //$scope.currentImage.crop = { "left": 0.31731772342645215, "top": 0.17420325244997603, "right": 0.36246473116627076, "bottom": 0.30226197981593617 };
-            }
+            
+            $scope.cropper.image = __img;
         }
 
         $scope.add = function() {
