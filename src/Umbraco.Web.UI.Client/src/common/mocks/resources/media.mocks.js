@@ -61,8 +61,8 @@ angular.module('umbraco.mocks').
       return {
           register: function() {
             $httpBackend
-	            .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Media/GetById?'))
-		          .respond(returnNodebyId);
+              .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Media/GetById?'))
+              .respond(returnNodebyId);
 
             $httpBackend
               .whenGET(mocksUtils.urlRegex('/umbraco/UmbracoApi/Media/GetByIds?'))
