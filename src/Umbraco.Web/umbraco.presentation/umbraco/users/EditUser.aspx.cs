@@ -119,13 +119,23 @@ namespace umbraco.cms.presentation.user
             {
                 XmlDocument x = new XmlDocument();
                 x.Load(f);
-                ListItem li =
-                    new ListItem(x.DocumentElement.Attributes.GetNamedItem("intName").Value,
-                                 x.DocumentElement.Attributes.GetNamedItem("alias").Value);
-                if (x.DocumentElement.Attributes.GetNamedItem("alias").Value == u.Language)
-                    li.Selected = true;
 
-                userLanguage.Items.Add(li);
+                var alias = x.DocumentElement.Attributes.GetNamedItem("alias").Value;
+
+                //ensure that only unique languages are added
+                if (userLanguage.Items.FindByValue(alias) == null)
+                {
+                    ListItem li =
+                   new ListItem(x.DocumentElement.Attributes.GetNamedItem("intName").Value,
+                                alias);
+
+
+                    if (x.DocumentElement.Attributes.GetNamedItem("alias").Value == u.Language)
+                        li.Selected = true;
+
+                    userLanguage.Items.Add(li);
+                }
+               
             }
 
             // Console access and disabling
@@ -197,10 +207,9 @@ namespace umbraco.cms.presentation.user
             Pane ppNodes = new Pane();
             ppNodes.addProperty(ui.Text("user", "startnode", UmbracoUser), content);
             ppNodes.addProperty(ui.Text("user", "mediastartnode", UmbracoUser), medias);
-
+            
             //Generel umrbaco access
             Pane ppAccess = new Pane();
-            
             ppAccess.addProperty(ui.Text("user", "noConsole", UmbracoUser), NoConsole);
             ppAccess.addProperty(ui.Text("user", "disabled", UmbracoUser), Disabled);
 
@@ -212,11 +221,12 @@ namespace umbraco.cms.presentation.user
             TabPage userInfo = UserTabs.NewTabPage(u.Name);
 
             userInfo.Controls.Add(pp);
-            userInfo.Controls.Add(ppNodes);
+            
             userInfo.Controls.Add(ppAccess);
-            userInfo.Controls.Add(ppModules);
-            userInfo.Style.Add("text-align", "center");
+            userInfo.Controls.Add(ppNodes);
 
+            userInfo.Controls.Add(ppModules);
+            
             userInfo.HasMenu = true;
 
             var save = userInfo.Menu.NewButton();
