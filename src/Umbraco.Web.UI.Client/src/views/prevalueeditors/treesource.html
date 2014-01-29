@@ -1,54 +1,77 @@
 <div ng-controller="Umbraco.PrevalueEditors.TreeSourceController" class="umb-editor umb-contentpicker">
 
-	<select ng-model="model.value.type" class="umb-editor">
+	<select ng-model="model.value.type" class="umb-editor" ng-change="clear()">
 		<option value="content">Content</option>
 		<option value="media">Media</option>
 		<option value="member">Members</option>
 	</select>
 
-	<br/><br/>
+	<ul class="unstyled list-icons" ng-if="node" style="margin-top: 30px">	
+		<li>	
+			<i class="icon icon-delete red hover-show pull-right" ng-click="clear()"></i>
+			<i class="icon {{node.icon}} hover-hide"></i>
+			
+			<a href prevent-default ng-click="openContentPicker()" >{{node.name}}</a>
+		</li>
+	</ul>
 
-	<div ng-hide="model.value.type !== 'content'">
-		<ul class="unstyled list-icons" ng-if="node" >	
-			<li>	
-				<i class="icon icon-delete red hover-show pull-right" ng-click="clear()"></i>
-				<i class="icon {{node.icon}} hover-hide"></i>
-				
-				<a href prevent-default ng-click="openContentPicker()" >{{node.name}}</a>
-			</li>
-		</ul>
-
-			<div ng-show="multipicker || !node">	
-				<span ng-hide="showSearch || model.value.query">
-
+	<div ng-if="!node && model.value.type !== 'member'" style="margin-top: 30px">	
+		<span ng-hide="showSearch || model.value.query">
+			<ul class="unstyled list-icons">	
+				<li>	
 					<i class="icon icon-add blue"></i>
 					<a href ng-click="openContentPicker()" prevent-default>
-						<localize key="general_choose">Choose</localize>...
+						<localize key="general_choose">Choose a root node</localize>...
 					</a>
-					
-					<br/>
-					<a href ng-click="showSearch = true">Enter query</a>
-				</span>
-	
-				<span ng-show="showSearch || model.value.query">
-					<input type="text" 
-						ng-model="model.value.query" 
-						class="umb-editor umb-textstring" 
-						placeholder="Enter query">
+				</li>
+				<li ng-show="model.value.type == 'content'">
+					<i class="icon icon-search"></i>
+					<a href ng-click="showSearch = true">Query for root node with xpath</a>
+				</li>
+			</ul>
+		</span>
 
-						<br/>
-							
-						<small>
-							Available placeholders: <br/>
-							<code>$current</code>: current page or closest found ancestor<br/>
-							<code>$parent</code>: parent page or closest found ancestor<br/>
-							<code>$root</code>: root of the content tree<br/>
-							<code>$site</code>: Ancestor node at level 1 <br/>					
+		<span ng-show="showSearch || model.value.query">
+			
+			<input type="text" 
+				ng-model="model.value.query" 
+				class="umb-editor umb-textstring" 
+				placeholder="Enter xpath query">
+
+				<ul class="unstyled list-icons" style="margin-top: 15px">	
+					<li style="max-width: 600px">	
+						<i class="icon icon-help-alt"></i>
+						<a href ng-click="showHelp = 1" prevent-default>
+							Show xpath query help
+						</a>
+
+						<small ng-if="showHelp">
+							<p>
+								Use Xpath query to set a root node on the tree, either based on a search from the root of the content tree, or by using a context-aware placeholder.
+							</p>
+
+							<p>
+								Placeholders finds the nearest published ID and runs its query from there. so for instance: 
+
+								<pre>$parent/newsArticle</pre>
+
+								Will try to get the parent if available, but will then fall back to the nearest ancestor and query for all news articles there.
+							</p>
+
+							<p>
+								Available placeholders: <br/>
+								<code>$current</code>: current page or closest found ancestor<br/>
+								<code>$parent</code>: parent page or closest found ancestor<br/>
+								<code>$root</code>: root of the content tree<br/>
+								<code>$site</code>: Ancestor node at level 1 <br/>
+							</p>
 						</small>
-
-
-						<a href ng-click="showSearch = false; model.value.query = ''; openContentPicker()"> ...Or pick a node</a>
-				</span>
-			</div>
+					</li>
+					<li>
+						<i class="icon icon-delete red"></i>
+						<a href ng-click="showSearch = false; model.value.query = ''"> Cancel and clear query</a>
+					</li>
+				</ul>
+		</span>
 	</div>
 </div>
