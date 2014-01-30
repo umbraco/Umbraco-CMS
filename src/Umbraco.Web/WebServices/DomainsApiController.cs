@@ -61,12 +61,14 @@ namespace Umbraco.Web.WebServices
 
             // process domains
 
-            foreach (var domain in domains.Where(d => model.Domains.All(m => !m.Name.Equals(d.Name, StringComparison.OrdinalIgnoreCase))))
+            // delete every (non-wildcard) domain, that exists in the DB yet is not in the model
+            foreach (var domain in domains.Where(d => d.IsWildcard == false && model.Domains.All(m => m.Name.Equals(d.Name, StringComparison.OrdinalIgnoreCase) == false)))
                 domain.Delete();
 
             var names = new List<string>();
 
-            foreach (var domainModel in model.Domains.Where(m => !string.IsNullOrWhiteSpace(m.Name)))
+            // create or update domains in the model
+            foreach (var domainModel in model.Domains.Where(m => string.IsNullOrWhiteSpace(m.Name) == false))
             {
                 language = languages.FirstOrDefault(l => l.id == domainModel.Lang);
                 if (language == null)
@@ -87,7 +89,7 @@ namespace Umbraco.Web.WebServices
                     Domain.MakeNew(name, model.NodeId, domainModel.Lang);
             }
 
-            model.Valid = model.Domains.All(m => !m.Duplicate);
+            model.Valid = model.Domains.All(m => m.Duplicate == false);
 
             return model;
         }
