@@ -1,12 +1,16 @@
 <div class="umb-cropper-gravity">
 	<div class="gravity-container">
-		<div class="viewport" ng-style="style()">
-			<img src="{{src}}" />
+		<div class="viewport">
+			<img src="{{src}}" style="max-width: 100%;" />
 
-			<div class="overlay">
+			<div class="overlay" ng-style="style()">
 				<i class="icon-crosshair"></i>
 			</div>
 		</div>
 	</div>
+	
+	{{gravity | json }}
+
+	{{dimensions | json }}
 
 </div>

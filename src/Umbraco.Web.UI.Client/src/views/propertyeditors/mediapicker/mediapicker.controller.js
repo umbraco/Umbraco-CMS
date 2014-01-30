@@ -11,7 +11,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 //Data sample
                 var __img = {
                         //image to crop
-                        src: "assets/img/mocks/image.jpg",
+                        src: "assets/img/mocks/big-image.jpg",
         
                         //global gravity, used if not crop is specified
                         gravity: {left: 0.5, top: 0.4},
@@ -20,8 +20,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                            thumbnail: 
                                 {   
                                     //crop dimensions
-                                    width: "30px",
-                                    height: "40px",
+                                    width: 100,
+                                    height: 100,
         
                                     //crops in percentages
                                     crop:{ "left": 0.31731772342645215,
@@ -33,8 +33,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         
                             banner: 
                                  {
-                                     width: "200px",
-                                     height: "20px",
+                                     width: 340,
+                                     height: 90,
         
                                      crop:{ "left": 0.31731772342645215,
                                          "top": 0.17420325244997603,
@@ -45,8 +45,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         
                             highrise: 
                                  {
-                                     width: "20px", 
-                                     height: "200px"
+                                     width: 90, 
+                                     height: 340
                                  },     
                         }
                 };
@@ -81,7 +81,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
         $scope.edit = function(image){
             $scope.currentImage = image;
-            
             $scope.cropper.image = __img;
         }
 

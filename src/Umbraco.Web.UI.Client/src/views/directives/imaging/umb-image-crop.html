@@ -8,25 +8,8 @@
 
 	<input 
 		type="range" 
-		min="{{minScale}}" 
-		max="{{maxScale}}" 
+		min="{{dimensions.scale.min}}" 
+		max="{{dimensions.scale.max}}" 
 		step="0.01" 
-		ng-model="scale" />
-
-<pre>
-		{{dimensions | json}}
-</pre>
-
-<pre>
-		{{box | json}}
-</pre>
-
-<!--
-	<ul class="crops-preview">
-		<li ng-repeat="preview in previews">
-			<div ng-style="preview.style">
-				<img src="{{preview.src" ng-style="preview.imageStyle">
-			</div> 
-		</li>
-	</ul>	-->
+		ng-model="dimensions.scale.current" />
 </div>

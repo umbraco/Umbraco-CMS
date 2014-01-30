@@ -7,7 +7,8 @@
 * Used by editors that require naming an entity. Shows a textbox/headline with a required validator within it's own form.
 **/
 angular.module("umbraco.directives")
-	.directive('umbImageThumbnail', function ($timeout, localizationService, $log) {
+	.directive('umbImageThumbnail', 
+		function ($timeout, localizationService, cropperHelper, $log) {
 	    return {
 				restrict: 'E',
 				replace: true,

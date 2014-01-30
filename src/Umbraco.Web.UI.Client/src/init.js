@@ -1,6 +1,6 @@
 /** Executed when the application starts, binds to events and set global state */
-app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies',
-    function (userService, $log, $rootScope, $location, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies) {
+app.run(['userService', '$log', '$rootScope', '$location', 'navigationService', 'appState', 'editorState', 'fileManager', 'assetsService', 'eventsService', '$cookies', '$templateCache',
+    function (userService, $log, $rootScope, $location, navigationService, appState, editorState, fileManager, assetsService, eventsService, $cookies, $templateCache) {
 
 
         //This sets the default jquery ajax headers to include our csrf token, we

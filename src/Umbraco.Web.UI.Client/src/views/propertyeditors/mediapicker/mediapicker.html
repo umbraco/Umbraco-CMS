@@ -1,35 +1,38 @@
 <div class="umb-editor umb-mediapicker" ng-controller="Umbraco.PropertyEditors.MediaPickerController">
 
 	<div ng-if="cropper.image">
-		<div ng-if="cropper.crop">
-			<umb-image-crop 
-				 crop="cropper.crop"
-				 gravity="cropper.image.gravity"
+		<div ng-if="cropper.preset">
+			<umb-image-crop
+				 height="{{cropper.preset.height}}"
+				 width= "{{cropper.preset.width}}" 
+				 crop="cropper.preset.crop"
 				 src="cropper.image.src" />	
 		</div>
 
-		<div ng-if="cropper.grav">
+		<div ng-if="cropper.point">
 			<umb-image-gravity 
-				height="'300px'"
-				width= "'480px'"
-				src="cropper.grav.src" 
-				gravity="cropper.grav.gravity" />
+				height="200"
+				width= "380"
+				src="cropper.image.src" 
+				gravity="cropper.point.gravity" />
 		</div>		
 
 		<ul class="umb-sortable-thumbnails">
 			<li class="span2">
 				<img ng-src="{{cropper.image.src}}" 
-					 ng-click="cropper.crop = undefined; cropper.grav = cropper.image" />
+					 ng-click="cropper.crop = undefined; cropper.point = cropper.image" />
+					 original
 			</li>
-			<li ng-repeat="crop in cropper.image.crops">
-				<a href ng-click="cropper.crop = crop; cropper.grav = undefined">
+
+			<li ng-repeat="(key,value) in cropper.image.crops">
+				<a href ng-click="cropper.preset = value; cropper.point = undefined">
 					
 					<umb-image-thumbnail
 						gravity="cropper.image.gravity"
 						crop="cropper.image.crop"
 						src="cropper.image.src"
-						height="crop.height"
-						width="crop.width">
+						height="value.height"
+						width="value.width">
 
 				</a>
 			</li>
@@ -38,7 +41,7 @@
 		
 	<ul ui-sortable="sortableOptions" ng-model="images" class="umb-sortable-thumbnails">
 		<li style="width: 120px; height: 100px; overflow: hidden;" ng-repeat="image in images">
-				<img ng-src="{{image.thumbnail}}" alt="" ng-show="image.src">
+				<img ng-src="{{image.thumbnail}}" ng-click="edit(image)" alt="" ng-show="image.src">
 
 				<span class="icon-holder" ng-hide="image.src">
 					<i class="icon {{image.icon}} large" ></i>
