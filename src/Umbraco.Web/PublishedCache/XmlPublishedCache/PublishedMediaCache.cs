@@ -478,6 +478,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // I'm not sure that _properties contains all properties including those without a value,
             // neither that GetProperty will return a property without a value vs. null... @zpqrtbnk
 
+            // List of properties that will appear in the XML and do not match
+            // anything in the ContentType, so they must be ignored.
+            static readonly string[] IgnoredKeys = { "version", "isDoc", "key" };
+
 			public DictionaryPublishedContent(
 				IDictionary<string, string> valueDictionary, 
 				Func<DictionaryPublishedContent, IPublishedContent> getParent,
@@ -528,8 +532,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				{
 				    IPublishedProperty property = null;
 
-                    // must ignore that one
-				    if (i.Key == "version" || i.Key == "isDoc") continue;
+                    // must ignore those
+				    if (IgnoredKeys.Contains(i.Key)) continue;
 
                     if (i.Key.InvariantStartsWith("__"))
 				    {
@@ -540,6 +544,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     {
                         // use property type to ensure proper conversion
                         var propertyType = _contentType.GetPropertyType(i.Key);
+                        if (propertyType == null)
+                            throw new Exception("Internal error, property '" + i.Key + "' is not a valid property for that type of content.");
                         property = new XmlPublishedProperty(propertyType, false, i.Value); // false :: never preview a media
                     }
 
