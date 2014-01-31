@@ -480,7 +480,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
             // List of properties that will appear in the XML and do not match
             // anything in the ContentType, so they must be ignored.
-            static readonly string[] IgnoredKeys = { "version", "isDoc", "key" };
+            private static readonly string[] IgnoredKeys = { "version", "isDoc", "key" };
 
 			public DictionaryPublishedContent(
 				IDictionary<string, string> valueDictionary, 
