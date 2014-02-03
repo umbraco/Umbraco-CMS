@@ -22,8 +22,8 @@ describe('notification tests', function () {
         notifications.remove(0);
 
         expect(notifications.getCurrent().length).toEqual(3);
-        expect(notifications.getCurrent()[0].headline).toBe("error:");
-        expect(notifications.getCurrent()[1].headline).toBe("warning:");
+        expect(notifications.getCurrent()[0].headline).toBe("error: ");
+        expect(notifications.getCurrent()[1].headline).toBe("warning: ");
         expect(notifications.getCurrent()[2].headline).toBe("warning");
 
         notifications.removeAll();
