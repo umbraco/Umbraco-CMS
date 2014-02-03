@@ -30,7 +30,7 @@ namespace Umbraco.Core.Configuration
 
                     int oldVersion;
                     int.TryParse(versionAttribute.Value, out oldVersion);
-                    var newVersion = oldVersion + 1;
+                    var newVersion = oldVersion + 100;
 
                     versionAttribute.SetValue(newVersion);
                     clientDependencyConfigXml.Save(_fileName, SaveOptions.DisableFormatting);

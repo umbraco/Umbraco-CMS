@@ -104,30 +104,24 @@ namespace Umbraco.Tests
 			}
 		}
 
-		[Test]
-		public virtual void CanConvertStringToDateTime()
+        [TestCase("2012-11-10", true)]
+        [TestCase("2012/11/10", true)]
+        [TestCase("10/11/2012", true)]// assuming your culture uses DD/MM/YYYY
+        [TestCase("11/10/2012", false)]// assuming your culture uses DD/MM/YYYY
+        [TestCase("Sat 10, Nov 2012", true)]
+        [TestCase("Saturday 10, Nov 2012", true)]
+        [TestCase("Sat 10, November 2012", true)]
+        [TestCase("Saturday 10, November 2012", true)]
+        [TestCase("2012-11-10 13:14:15", true)]
+        [TestCase("2012-11-10T13:14:15Z", true)]
+		public virtual void CanConvertStringToDateTime(string date, bool outcome)
 		{
 			var dateTime = new DateTime(2012, 11, 10, 13, 14, 15);
-			var testCases = new Dictionary<string, bool>
-			{
-				{"2012-11-10", true},
-				{"2012/11/10", true},
-				{"10/11/2012", true},   // assuming your culture uses DD/MM/YYYY
-				{"11/10/2012", false},  // assuming your culture uses DD/MM/YYYY
-				{"Sat 10, Nov 2012", true},
-				{"Saturday 10, Nov 2012", true},
-				{"Sat 10, November 2012", true},
-				{"Saturday 10, November 2012", true},
-				{"2012-11-10 13:14:15", true}
-			};
 
-			foreach (var testCase in testCases)
-			{
-				var result = testCase.Key.TryConvertTo<DateTime>();
+            var result = date.TryConvertTo<DateTime>();
 
-				Assert.IsTrue(result.Success, testCase.Key);
-				Assert.AreEqual(DateTime.Equals(dateTime.Date, result.Result.Date), testCase.Value, testCase.Key);
-			}
+            Assert.IsTrue(result.Success, date);
+            Assert.AreEqual(DateTime.Equals(dateTime.Date, result.Result.Date), outcome, date);
 		}
 
         [Test]

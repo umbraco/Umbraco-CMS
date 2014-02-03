@@ -26,13 +26,14 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             if (source == null) return DateTime.MinValue;
 
             // in XML a DateTime is: string - format "yyyy-MM-ddTHH:mm:ss"
+            // Actually, not always sometimes it is formatted in UTC style with 'Z' suffixed on the end but that is due to this bug:
+            // http://issues.umbraco.org/issue/U4-4145, http://issues.umbraco.org/issue/U4-3894
+            // We should just be using TryConvertTo instead.
             var sourceString = source as string;
             if (sourceString != null)
             {
-                DateTime value;
-                return DateTime.TryParseExact(sourceString, "yyyy-MM-ddTHH:mm:ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out value) 
-                    ? value 
-                    : DateTime.MinValue;
+                var attempt = sourceString.TryConvertTo<DateTime>();
+                return attempt.Success == false ? DateTime.MinValue : attempt.Result;
             }
 
             // in the database a DateTime is: DateTime
@@ -47,7 +48,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         public override object ConvertSourceToXPath(PublishedPropertyType propertyType, object source, bool preview)
         {
             // source should come from ConvertSource and be a DateTime already
-            return XmlConvert.ToString((DateTime) source, "yyyy-MM-ddTHH:mm:ss");
+            return XmlConvert.ToString((DateTime)source, XmlDateTimeSerializationMode.Unspecified);
         }
     }
 }
