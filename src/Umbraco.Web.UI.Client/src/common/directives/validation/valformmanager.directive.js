@@ -12,7 +12,7 @@
 * Another thing this directive does is to ensure that any .control-group that contains form elements that are invalid will
 * be marked with the 'error' css class. This ensures that labels included in that control group are styled correctly.
 **/
-function valFormManager(serverValidationManager) {
+function valFormManager(serverValidationManager, $rootScope, $log, notificationsService) {
     return {
         require: "form",
         restrict: "A",
@@ -50,6 +50,25 @@ function valFormManager(serverValidationManager) {
             //listen for the forms saved event
             scope.$on(savedEvent, function (ev, args) {
                 element.removeClass(className);
+            });
+
+
+            var locationEvent = $rootScope.$on('$locationChangeStart', function(event, newUrl){
+                    if (!formCtrl.$dirty) {
+                        return;
+                    }
+                    var path = newUrl.split("#")[1];
+                    var msg = {view: "confirmroutechange", args: {path: path, listener: locationEvent}};
+                    notificationsService.add(msg);
+
+                    event.preventDefault();
+                    return;
+            });
+
+            scope.$on('$destroy', function() {
+                if(locationEvent){
+                    locationEvent();
+                }
             });
         }
     };
