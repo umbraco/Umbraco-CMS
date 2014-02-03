@@ -292,7 +292,20 @@ namespace Umbraco.Core
 			else if (destinationType == typeof(DateTime))
 			{
 				DateTime value;
-				return DateTime.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			    if (DateTime.TryParse(input, out value))
+			    {
+			        switch (value.Kind)
+			        {
+			            case DateTimeKind.Unspecified:
+			            case DateTimeKind.Utc:
+                            return Attempt<object>.Succeed(value);
+			            case DateTimeKind.Local:
+			                return Attempt<object>.Succeed(value.ToUniversalTime());
+			            default:
+			                throw new ArgumentOutOfRangeException();
+			        }
+			    }
+			    return Attempt<object>.Fail();
 			}
 			else if (destinationType == typeof(DateTimeOffset))
 			{
@@ -526,7 +539,7 @@ namespace Umbraco.Core
 			if (type == typeof(bool)) return XmlConvert.ToString((bool)value);
 			if (type == typeof(byte)) return XmlConvert.ToString((byte)value);
 			if (type == typeof(char)) return XmlConvert.ToString((char)value);
-			if (type == typeof(DateTime)) return XmlConvert.ToString((DateTime)value, XmlDateTimeSerializationMode.RoundtripKind);
+            if (type == typeof(DateTime)) return XmlConvert.ToString((DateTime)value, XmlDateTimeSerializationMode.Unspecified);
 			if (type == typeof(DateTimeOffset)) return XmlConvert.ToString((DateTimeOffset)value);
 			if (type == typeof(decimal)) return XmlConvert.ToString((decimal)value);
 			if (type == typeof(double)) return XmlConvert.ToString((double)value);

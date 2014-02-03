@@ -397,7 +397,6 @@
     <Compile Include="PropertyEditors\TagsPropertyEditor.cs" />
     <Compile Include="PropertyEditors\UploadFileTypeValidator.cs" />
     <Compile Include="PropertyEditors\UserPickerPropertyEditor.cs" />
-    <Compile Include="PropertyEditors\ValueConverters\MntpStringValueConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\RelatedLinksEditorValueConvertor.cs" />
     <Compile Include="PropertyEditors\ValueListPreValueEditor.cs" />
     <Compile Include="PropertyEditors\DropDownPropertyEditor.cs" />
