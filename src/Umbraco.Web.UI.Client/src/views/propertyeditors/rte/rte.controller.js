@@ -71,7 +71,7 @@ angular.module("umbraco")
                     //the elements needed
                     $timeout(function () {
                         tinymce.DOM.events.domLoaded = true;
-                        tinymce.init({
+                        tinymce.init(angular.extend({
                             mode: "exact",
                             elements: $scope.model.alias + "_rte",
                             skin: "umbraco",
@@ -124,7 +124,7 @@ angular.module("umbraco")
                                 //Create the insert macro plugin
                                 tinyMceService.createInsertMacro(editor, $scope);
                             }
-                        });
+                        }, tinyMceConfig.customConfig));
                     }, 200);
                 }
                 
