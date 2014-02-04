@@ -39,7 +39,7 @@ angular.module("umbraco.directives.html")
 						}	
 					}
 				}
-
+				
 
 				//initial loading
 				$timeout(function(){	
@@ -50,7 +50,6 @@ angular.module("umbraco.directives.html")
 						var bottom = bar.offsetTop + bar.offsetHeight;
 						return bottom > winHeight;
 					}, function(val) {
-						$log.log("changing");
 						_setClass(bar);
 					});
 
