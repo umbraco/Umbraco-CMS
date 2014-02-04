@@ -4,6 +4,8 @@ angular.module("umbraco").controller("Umbraco.Notifications.ConfirmRouteChangeCo
 
 		$scope.discard = function(not){
 			not.args.listener();
+			
+			$location.search("");
 			$location.path(not.args.path);
 			notificationsService.remove(not);
 		};

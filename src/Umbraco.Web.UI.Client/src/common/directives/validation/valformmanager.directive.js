@@ -49,15 +49,21 @@ function valFormManager(serverValidationManager, $rootScope, $log, notifications
 
             //listen for the forms saved event
             scope.$on(savedEvent, function (ev, args) {
+                //remove validation class
                 element.removeClass(className);
+
+                //clear form state as at this point we retrieve new data from the server
+                //and all validation will have cleared at this point    
+                formCtrl.$setPristine();
             });
 
-
-            var locationEvent = $rootScope.$on('$locationChangeStart', function(event, newUrl){
+            //if we wish to turn of the unsaved changes confirmation msg
+            //this is th place to do it
+            var locationEvent = $rootScope.$on('$locationChangeStart', function(event, url){
                     if (!formCtrl.$dirty) {
                         return;
                     }
-                    var path = newUrl.split("#")[1];
+                    var path = url.split("#")[1];
                     var msg = {view: "confirmroutechange", args: {path: path, listener: locationEvent}};
                     notificationsService.add(msg);
 
