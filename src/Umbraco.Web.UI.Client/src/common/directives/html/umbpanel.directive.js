@@ -4,7 +4,7 @@
 * @restrict E
 **/
 angular.module("umbraco.directives.html")
-	.directive('umbPanel', function($timeout){
+	.directive('umbPanel', function($timeout, $log){
 		return {
 			restrict: 'E',
 			replace: true,
@@ -12,13 +12,10 @@ angular.module("umbraco.directives.html")
 			templateUrl: 'views/directives/html/umb-panel.html',
 			link: function (scope, el, attrs) {
 				
-				function _setClass(resize){
-					var bar = $(".tab-content .active .umb-tab-buttons");
-
-					//incase this runs without any tabs
-					if(bar.length === 0){
-						bar = $(".tab-content .umb-tab-buttons");
-					}
+				
+				function _setClass(bar, resize){
+					
+					bar = $(bar);
 
 					//no need to process
 					if(resize){
@@ -31,7 +28,6 @@ angular.module("umbraco.directives.html")
 					}
 
 					var offset = bar.offset();
-
 					if(offset){
 						var bottom = bar.offset().top + bar.height();
 			            if(bottom > $(window).height()){
@@ -46,17 +42,30 @@ angular.module("umbraco.directives.html")
 
 
 				//initial loading
-				$timeout(function(){
-					$('a[data-toggle="tab"]').on('shown', function (e) {
-						_setClass();	
+				$timeout(function(){	
+					var bar = $(".tab-content .active .umb-tab-buttons")[0] || $(".tab-content .umb-tab-buttons")[0];
+					var winHeight = $(window).height();
+
+					scope.$watch(function () {
+						var bottom = bar.offsetTop + bar.offsetHeight;
+						return bottom > winHeight;
+					}, function(val) {
+						$log.log("changing");
+						_setClass(bar);
 					});
-					_setClass();
+
+
+					$(window).bind("resize", function () {
+					  _setClass(bar, true);
+					  winHeight = $(window).height();
+					});
+
+					$('a[data-toggle="tab"]').on('shown', function (e) {
+						bar = $(".tab-content .active .umb-tab-buttons")[0];
+						_setClass(bar);	
+					});
+
 				}, 1000, false);
-				
-				
-				$(window).bind("resize", function () {
-				  _setClass(true);
-				});	
 			}
 		};
 	});
