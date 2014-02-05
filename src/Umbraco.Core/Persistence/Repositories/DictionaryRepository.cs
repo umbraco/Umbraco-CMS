@@ -50,6 +50,8 @@ namespace Umbraco.Core.Persistence.Repositories
             foreach (var textDto in dto.LanguageTextDtos)
             {
                 var language = _languageRepository.Get(textDto.LanguageId);
+                if (language == null)
+                    continue;
                 var translationFactory = new DictionaryTranslationFactory(dto.UniqueId, language);
                 list.Add(translationFactory.BuildEntity(textDto));
             }

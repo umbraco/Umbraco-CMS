@@ -60,6 +60,22 @@ namespace Umbraco.Tests.Persistence.Repositories
         }
 
         [Test]
+        public void Get_WhenIdDoesntExist_ReturnsNull()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                // Act
+                var language = repository.Get(0);
+
+                // Assert
+                Assert.That(language, Is.Null);
+            }
+        }
+
+        [Test]
         public void Can_Perform_GetAll_On_LanguageRepository()
         {
             // Arrange
