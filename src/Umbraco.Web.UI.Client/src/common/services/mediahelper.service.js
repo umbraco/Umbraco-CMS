@@ -41,7 +41,7 @@ function mediaHelper(umbRequestHelper) {
 
                 //this performs a simple check to see if we have a media file as value
                 //it doesnt catch everything, but better then nothing
-                if (item.value.indexOf(mediaRoot) === 0) {
+                if (angular.isString(item.value) &&  item.value.indexOf(mediaRoot) === 0) {
                     return true;
                 }
 
