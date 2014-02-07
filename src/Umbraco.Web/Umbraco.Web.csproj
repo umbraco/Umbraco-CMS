@@ -342,6 +342,7 @@
     <Compile Include="NotificationServiceExtensions.cs" />
     <Compile Include="PropertyEditors\ColorListPreValueEditor.cs" />
     <Compile Include="PropertyEditors\EmailAddressPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\ImageCropperPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ListViewPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MacroContainerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MarkdownPropertyEditor.cs" />

@@ -139,7 +139,7 @@ namespace Umbraco.Core
             ///// <summary>
             ///// Alias for the Image Cropper datatype.
             ///// </summary>
-            //public const string ImageCropperAlias = "Umbraco.ImageCropper";
+            public const string ImageCropperAlias = "Umbraco.ImageCropper";
 
             /// <summary>
             /// Guid for the Integer datatype.

@@ -16,17 +16,69 @@ angular.module("umbraco.directives")
 				
 				scope: {
 					src: '=',
-					width: '=',
-					height: '=',
-					gravity: "=",
+					width: '@',
+					height: '@',
+					center: "=",
 					crop: "="
 				},
 				
 				link: function(scope, element, attrs) {
-					scope.marginLeft =  0-Math.abs( scope.width * scope.gravity.left);
-					scope.marginTop =  0-Math.abs( scope.width * scope.gravity.top);
-				
+					//// INIT /////
+					var $image = element.find("img");
+					$image.load(function(){
+						$timeout(function(){
+							$image.width("auto");
+							$image.height("auto");
+
+							scope.image = {};
+							scope.image.width = $image[0].width;
+							scope.image.height = $image[0].height;
+
+							setPreviewStyle();	
+						});
+					});
+
+					/// WATCHERS ////
+					scope.$watchCollection('[crop, center]', function(newValues, oldValues){
+							//we have to reinit the whole thing if
+							//one of the external params changes
+							setPreviewStyle();
+					});
+
+					scope.$watch("center", function(){
+						setPreviewStyle();
+					}, true);
 					
+					function setPreviewStyle(){
+						if(scope.crop && scope.image){
+							scope.preview = cropperHelper.convertToStyle(
+												scope.crop, 
+												scope.image,
+												{width: scope.width, height: scope.height},
+												0);
+						}else if(scope.image){
+
+							//returns size fitting the cropper	
+							var p = cropperHelper.calculateAspectRatioFit(
+									scope.image.width, 
+									scope.image.height, 
+									scope.width, 
+									scope.height, 
+									true);
+
+
+							if(scope.center){
+								var xy = cropperHelper.alignToCoordinates(p, scope.center, {width: scope.width, height: scope.height});
+								p.top = xy.top;
+								p.left = xy.left;
+							}else{
+
+							}
+
+							p.position = "absolute";
+							scope.preview = p;
+						}
+					}
 				}
 			};
 		});

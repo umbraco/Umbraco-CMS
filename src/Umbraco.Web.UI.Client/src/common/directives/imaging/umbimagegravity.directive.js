@@ -14,12 +14,11 @@ angular.module("umbraco.directives")
 				templateUrl: 'views/directives/imaging/umb-image-gravity.html',
 				scope: {
 					src: '=',
-					width: "=",
-					height: "=",
-					gravity: "="
+					center: "="
 				},
 				link: function(scope, element, attrs) {
 					
+					//Internal values for keeping track of the dot and the size of the editor
 					scope.dimensions = {
 						width: 0,
 						height: 0,
@@ -33,6 +32,10 @@ angular.module("umbraco.directives")
 					var $overlay = element.find(".overlay");
 					
 					scope.style = function () {
+						if(scope.dimensions.width <= 0){
+							setDimensions();
+						}
+
 						return {
 							'top': scope.dimensions.top + 'px',
 							'left': scope.dimensions.left + 'px' 
@@ -43,25 +46,28 @@ angular.module("umbraco.directives")
 						scope.dimensions.width = $image.width();
 						scope.dimensions.height = $image.height();
 
-						if(scope.gravity){
-							scope.dimensions.left =  scope.gravity.left * scope.dimensions.width -10;
-							scope.dimensions.top =  scope.gravity.top * scope.dimensions.height -10;
+						if(scope.center){
+							scope.dimensions.left =  scope.center.left * scope.dimensions.width -10;
+							scope.dimensions.top =  scope.center.top * scope.dimensions.height -10;
 						}
-					};
+					};	
 
 					var calculateGravity = function(){
-						scope.dimensions.left = $overlay[0].offsetLeft + 10;
-						scope.dimensions.top =  $overlay[0].offsetTop + 10;
+						scope.dimensions.left = $overlay[0].offsetLeft;
+						scope.dimensions.top =  $overlay[0].offsetTop;
 
-						scope.gravity.left =  scope.gravity.left / scope.dimensions.width;
-						scope.gravity.top =  scope.gravity.top / scope.dimensions.height;
+						scope.center.left =  (scope.dimensions.left+10) / scope.dimensions.width;
+						scope.center.top =  (scope.dimensions.top+10) / scope.dimensions.height;
 					};
-
 					
 					//Drag and drop positioning, using jquery ui draggable
+					//TODO ensure that the point doesnt go outside the box
 					$overlay.draggable({
+						containment: "parent",
 						stop: function() {
-							calculateGravity();
+							scope.$apply(function(){
+								calculateGravity();
+							});
 						}
 					});
 
