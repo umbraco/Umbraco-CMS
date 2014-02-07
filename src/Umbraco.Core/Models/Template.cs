@@ -191,5 +191,11 @@ namespace Umbraco.Core.Models
             if (Key == Guid.Empty)
                 Key = Guid.NewGuid();
         }
+
+
+        public void SetMasterTemplate(ITemplate masterTemplate)
+        {
+            MasterTemplateId = new Lazy<int>(() => {return masterTemplate.Id});
+        }
     }
 }
