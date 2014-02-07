@@ -41,8 +41,15 @@ namespace Umbraco.Web.UI.JavaScript
         public string GetJavascriptInitialization(HttpContextBase httpContext, JArray umbracoInit, JArray additionalJsFiles = null)
         {
             var result = GetJavascriptInitializationArray(httpContext, umbracoInit, additionalJsFiles);
+            var noCache = "";
+
+            if (httpContext.IsDebuggingEnabled)
+            {
+                noCache = Resources.JsNoCache;
+            }
 
             return ParseMain(
+                noCache,
                 result.ToString(),
                 IOHelper.ResolveUrl(SystemDirectories.Umbraco));
         }

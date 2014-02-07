@@ -8,6 +8,11 @@
 @inherits System.Web.Mvc.WebViewPage
 @{
     Layout = null;
+
+    var applicationJs = Url.Action("Application", "BackOffice");
+    if (GlobalSettings.DebugMode) {
+        applicationJs = applicationJs + "?umb__rnd=" + System.DateTime.Now.Ticks;
+    }
 }
 
 <!DOCTYPE html>
@@ -56,7 +61,7 @@
 
     @*And finally we can load in our angular app*@
     <script type="text/javascript" src="lib/yepnope/yepnope.min.js"></script>
-    <script type="text/javascript" src="@Url.Action("Application", "BackOffice")"></script>
+    <script type="text/javascript" src="@applicationJs"></script>
 
 </body>
 </html>

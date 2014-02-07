@@ -1,3 +1,16 @@
+//global no-cache filter, this is enabled when we're in debug mode
+//in live mode we use client dependency and don't turn this thing on
+yepnope.addFilter(function (resourceObj) {
+    var url = resourceObj.url;
+    if(url.indexOf("lib/") === 0 || url.indexOf("js/umbraco.") === 0){
+        return resourceObj;
+    }
+
+    resourceObj.url = resourceObj.url + "?umb__rnd=" + (new Date).getTime();
+    return resourceObj;
+});
+
+
 yepnope({
 
   load: [
