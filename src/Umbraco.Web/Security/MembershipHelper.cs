@@ -69,8 +69,12 @@ namespace Umbraco.Web.Security
 
             try
             {
-                //Use the membership provider to change the email since that is configured to do the checks to check for unique emails if that is configured.
-                membershipUser = UpdateMember(membershipUser, Membership.Provider, model.Email);
+                //check if the email needs to change
+                if (model.Email.InvariantEquals(membershipUser.Email) == false)
+                {
+                    //Use the membership provider to change the email since that is configured to do the checks to check for unique emails if that is configured.
+                    membershipUser = UpdateMember(membershipUser, Membership.Provider, model.Email);    
+                }
             }
             catch (Exception ex)
             {
@@ -82,11 +86,10 @@ namespace Umbraco.Web.Security
 
             //NOTE: If changing the username is a requirement, than that needs to be done via the IMember directly since MembershipProvider's natively do 
             // not support changing a username! 
-            if (model.Name != null)
+            if (model.Name != null && member.Name != model.Name)
             {
                 member.Name = model.Name;
             }
-            member.Email = model.Email;
 
             if (model.MemberProperties != null)
             {

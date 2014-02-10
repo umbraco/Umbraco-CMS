@@ -24,7 +24,7 @@
     <fieldset>
         <legend>Login</legend>
         
-        @Html.ValidationSummary(true)
+        @Html.ValidationSummary("loginModel", true)
 
         @Html.LabelFor(m => loginModel.Username)
         @Html.TextBoxFor(m => loginModel.Username)

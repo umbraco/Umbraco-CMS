@@ -64,10 +64,8 @@ namespace Umbraco.Web.Controllers
                 case MembershipCreateStatus.InvalidProviderUserKey:
                 case MembershipCreateStatus.DuplicateProviderUserKey:
                 case MembershipCreateStatus.ProviderError:
-                    ModelState.AddModelError((model.UsernameIsEmail || model.Username == null)
-                        ? "registerModel.Email"
-                        : "registerModel.Username",
-                        "An error occurred creating the member: " + status);
+                    //don't add a field level error, just model level
+                    ModelState.AddModelError("registerModel", "An error occurred creating the member: " + status);
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();

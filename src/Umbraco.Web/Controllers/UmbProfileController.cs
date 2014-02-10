@@ -29,7 +29,8 @@ namespace Umbraco.Web.Controllers
             var updateAttempt = Members.UpdateMemberProfile(model);
             if (updateAttempt.Success == false)
             {
-                ModelState.AddModelError("profileModel.Email", updateAttempt.Exception);
+                //don't add a field level error, just model level
+                ModelState.AddModelError("profileModel", updateAttempt.Exception.Message);
                 return CurrentUmbracoPage();
             }
 

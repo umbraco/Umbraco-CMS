@@ -58,8 +58,8 @@ else
     {
         <fieldset>
             <legend>Register Member</legend>
-
-            @Html.ValidationSummary(true)
+            
+            @Html.ValidationSummary("registerModel", true)
 
             @Html.LabelFor(m => registerModel.Name)
             @Html.TextBoxFor(m => registerModel.Name)

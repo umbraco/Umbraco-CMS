@@ -19,7 +19,8 @@ namespace Umbraco.Web.Controllers
 
             if (Members.Login(model.Username, model.Password) == false)
             {
-                ModelState.AddModelError("loginModel.Username", "Invalid username or password");
+                //don't add a field level error, just model level
+                ModelState.AddModelError("loginModel", "Invalid username or password");
                 return CurrentUmbracoPage();
             }
 
