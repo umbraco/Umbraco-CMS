@@ -46,7 +46,7 @@ namespace Umbraco.Core.Persistence.Factories
                 Text = entity.Name,
                 Trashed = false,
                 UniqueId = entity.Key,
-                UserId = 0
+                UserId = entity.CreatorId
             };
 
             if (entity.HasIdentity)

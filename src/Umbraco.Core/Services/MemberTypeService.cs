@@ -11,7 +11,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    internal class MemberTypeService : ContentTypeServiceBase, IMemberTypeService
+    public class MemberTypeService : ContentTypeServiceBase, IMemberTypeService
     {
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly RepositoryFactory _repositoryFactory;

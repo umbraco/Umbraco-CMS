@@ -11,7 +11,9 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal class MemberGroupRepository : PetaPocoRepositoryBase<int, IMemberGroup>
+
+
+    internal class MemberGroupRepository : PetaPocoRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
     {
         public MemberGroupRepository(IDatabaseUnitOfWork work) : base(work)
         {

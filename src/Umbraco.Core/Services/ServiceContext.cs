@@ -251,7 +251,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the <see cref="UserService"/>
         /// </summary>
-        internal IUserService UserService
+        public IUserService UserService
         {
             get { return _userService.Value; }
         }
@@ -259,7 +259,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the <see cref="MemberService"/>
         /// </summary>
-        internal IMemberService MemberService
+        public IMemberService MemberService
         {
             get { return _memberService.Value; }
         }
@@ -283,7 +283,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the MemberTypeService
         /// </summary>
-        internal IMemberTypeService MemberTypeService
+        public IMemberTypeService MemberTypeService
         {
             get { return _memberTypeService.Value; }
         }

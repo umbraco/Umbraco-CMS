@@ -16,14 +16,7 @@ namespace Umbraco.Core.Services
         /// <param name="id"></param>
         /// <returns></returns>
         bool Exists(int id);
-
-        /// <summary>
-        /// Get a member by its id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        IMember GetById(int id);
-
+        
         /// <summary>
         /// Get a member by the unique key
         /// </summary>

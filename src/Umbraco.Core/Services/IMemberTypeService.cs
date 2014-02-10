@@ -3,7 +3,7 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
 {
-    internal interface IMemberTypeService : IService
+    public interface IMemberTypeService : IService
     { 
         /// <summary>
         /// Gets a list of all available <see cref="IContentType"/> objects
