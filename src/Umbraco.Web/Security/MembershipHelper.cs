@@ -52,21 +52,41 @@ namespace Umbraco.Web.Security
         /// Updates the currently logged in members profile
         /// </summary>
         /// <param name="model"></param>
-        public void UpdateMemberProfile(ProfileModel model)
+        /// <returns>
+        /// The updated MembershipUser object
+        /// </returns>
+        public Attempt<MembershipUser> UpdateMemberProfile(ProfileModel model)
         {
             if (IsLoggedIn() == false)
             {
                 throw new NotSupportedException("No member is currently logged in");
             }
 
-            var member = GetCurrentMember();
+            //get the current membership user
+            var membershipUser = Membership.GetUser();
+            //NOTE: This should never happen since they are logged in
+            if (membershipUser == null) throw new InvalidOperationException("Could not find member with username " + _httpContext.User.Identity.Name);
+
+            try
+            {
+                //Use the membership provider to change the email since that is configured to do the checks to check for unique emails if that is configured.
+                membershipUser = UpdateMember(membershipUser, Membership.Provider, model.Email);
+            }
+            catch (Exception ex)
+            {
+                //This will occur if an email already exists!
+                return Attempt<MembershipUser>.Fail(ex);
+            }
             
+            var member = GetCurrentMember();
+
+            //NOTE: If changing the username is a requirement, than that needs to be done via the IMember directly since MembershipProvider's natively do 
+            // not support changing a username! 
             if (model.Name != null)
             {
                 member.Name = model.Name;
             }
             member.Email = model.Email;
-            member.Username = model.Email;
 
             if (model.MemberProperties != null)
             {
@@ -87,6 +107,8 @@ namespace Umbraco.Web.Security
 
             //reset the FormsAuth cookie since the username might have changed
             FormsAuthentication.SetAuthCookie(member.Username, true);
+
+            return Attempt<MembershipUser>.Succeed(membershipUser);
         }
 
         /// <summary>

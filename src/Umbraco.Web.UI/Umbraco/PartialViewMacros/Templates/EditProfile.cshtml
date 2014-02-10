@@ -21,6 +21,23 @@
 
 @if (Members.IsLoggedIn())
 {
+    Html.EnableClientValidation();
+    Html.EnableUnobtrusiveJavaScript();
+    Html.RequiresJs("/umbraco_client/ui/jquery.js");
+    Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.min.js");
+    Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.unobtrusive.min.js");
+
+    var success = TempData["ProfileUpdateSuccess"] != null;
+    
+    @*NOTE: This RenderJsHere code should be put on your main template page where the rest of your script tags are placed*@
+    @Html.RenderJsHere()
+
+    if (success)
+    {
+        // This message will show if RedirectOnSucces is set to false (default)
+        <p class="alert alert-success">Profile updated</p>
+    }
+    
     using (Html.BeginUmbracoForm<UmbProfileController>("HandleUpdateProfile"))
     {
         <fieldset>
@@ -45,10 +62,8 @@
                 @Html.HiddenFor(m => profileModel.MemberProperties[i].Alias)
                 <br />
             }
-       
-            @Html.HiddenFor(m => profileModel.MemberTypeAlias)
 
             <button>Save</button>
         </fieldset>
-    }
+    }       
 }

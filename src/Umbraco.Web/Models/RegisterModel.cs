@@ -65,8 +65,14 @@ namespace Umbraco.Web.Models
         
         public string RedirectUrl { get; set; }
 
+        /// <summary>
+        /// The username of the model, if UsernameIsEmail is true then this is ignored.
+        /// </summary>
         public string Username { get; set; }
 
+        /// <summary>
+        /// Flag to determine if the username should be the email address, if true then the Username property is ignored
+        /// </summary>
         public bool UsernameIsEmail { get; set; }
         
         /// <summary>

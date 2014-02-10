@@ -25,7 +25,14 @@ namespace Umbraco.Web.Controllers
                 return CurrentUmbracoPage();
             }
 
-            Members.UpdateMemberProfile(model);
+            var updateAttempt = Members.UpdateMemberProfile(model);
+            if (updateAttempt.Success == false)
+            {
+                ModelState.AddModelError("profileModel.Email", updateAttempt.Exception);
+                return CurrentUmbracoPage();
+            }
+
+            TempData.Add("ProfileUpdateSuccess", true);
 
             //TODO: Why are we redirecting to home again here?? 
             return Redirect("/");
