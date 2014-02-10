@@ -40,8 +40,11 @@ namespace umbraco.cms.presentation.members
         protected CustomValidator MemberEmailExistCheck = new CustomValidator();
         protected DualSelectbox _memberGroups = new DualSelectbox();
 
+        private MembershipHelper _membershipHelper;
+
         protected void Page_Load(object sender, EventArgs e)
         {
+            _membershipHelper = new MembershipHelper(UmbracoContext.Current);
 
             // Add password changer
             var passwordChanger = (passwordChanger)LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx");
@@ -223,7 +226,7 @@ namespace umbraco.cms.presentation.members
             
             if (passwordChangerControl.IsChangingPassword)
             {
-                var changePassResult = UmbracoContext.Current.Security.ChangePassword(
+                var changePassResult = _membershipHelper.ChangePassword(
                     membershipUser.UserName, passwordChangerControl.ChangingPasswordModel, Membership.Provider);
 
                 if (changePassResult.Success)

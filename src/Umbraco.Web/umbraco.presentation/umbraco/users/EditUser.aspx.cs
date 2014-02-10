@@ -69,6 +69,8 @@ namespace umbraco.cms.presentation.user
 
         private User u;
 
+        private MembershipHelper _membershipHelper;
+
         private MembershipProvider BackOfficeProvider
         {
             get
@@ -84,7 +86,7 @@ namespace umbraco.cms.presentation.user
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            _membershipHelper = new MembershipHelper(UmbracoContext.Current);
             int UID = int.Parse(Request.QueryString["id"]);
             u = BusinessLogic.User.GetUser(UID);
 
@@ -451,7 +453,7 @@ namespace umbraco.cms.presentation.user
                 }
 
                 //now do the actual change
-                var changePassResult = UmbracoContext.Current.Security.ChangePassword(
+                var changePassResult = _membershipHelper.ChangePassword(
                     membershipUser.UserName, changePasswordModel, BackOfficeProvider);    
 
                 if (changePassResult.Success)
