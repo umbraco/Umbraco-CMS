@@ -190,8 +190,10 @@
     <Compile Include="Models\ContentTypeExtensions.cs" />
     <Compile Include="Models\ContentTypeSort.cs" />
     <Compile Include="Models\EntityExtensions.cs" />
+    <Compile Include="Models\IMemberGroup.cs" />
     <Compile Include="Models\IRelation.cs" />
     <Compile Include="Models\IRelationType.cs" />
+    <Compile Include="Models\MemberGroup.cs" />
     <Compile Include="Models\Membership\EntityPermission.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\PreValue.cs" />
@@ -203,6 +205,7 @@
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
     <Compile Include="Models\TemplateNode.cs" />
+    <Compile Include="Persistence\Factories\MemberGroupFactory.cs" />
     <Compile Include="Persistence\Querying\SqlStringExtensions.cs" />
     <Compile Include="Persistence\Querying\StringPropertyMatchType.cs" />
     <Compile Include="Persistence\Querying\TextColumnType.cs" />
