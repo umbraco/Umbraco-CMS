@@ -1,20 +1,20 @@
 /*Contains multiple services for various helper tasks */
 
-function packageHelper(assetsService, treeService, eventsService) {
+function packageHelper(assetsService, treeService, eventsService, $templateCache) {
 
     return {
 
         /** Called when a package is installed, this resets a bunch of data and ensures the new package assets are loaded in */
         packageInstalled: function () {
-            //assetsService._reloadApplicationAssets().then(function() {
-            //    treeService.clearCache();
-            //    //send event
-            //    //eventsService.emit("app.reInitialize");
 
-            //    //TODO: This doesn't work and will end in an infinite browser load loop, we can't really 
-            //    // re-bootstrap anyways since that would be the same as loading the whole browser window.
-            //    //angular.bootstrap(document, ['umbraco']);
-            //});
+            //clears the tree
+            treeService.clearCache();
+
+            //clears the template cache
+            $templateCache.removeAll();
+
+            //emit event to notify anything else
+            eventsService.emit("app.reInitialize");
         }
 
     };

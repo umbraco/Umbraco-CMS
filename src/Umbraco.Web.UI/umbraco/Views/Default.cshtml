@@ -5,15 +5,9 @@
 @using Umbraco.Web
 @using Umbraco.Web.Editors
 @using umbraco
-@inherits System.Web.Mvc.WebViewPage
-@{
-    Layout = null;
 
-    var applicationJs = Url.Action("Application", "BackOffice");
-    if (GlobalSettings.DebugMode) {
-        applicationJs = applicationJs + "?umb__rnd=" + System.DateTime.Now.Ticks;
-    }
-}
+@inherits System.Web.Mvc.WebViewPage
+
 
 <!DOCTYPE html>
 
@@ -61,7 +55,7 @@
 
     @*And finally we can load in our angular app*@
     <script type="text/javascript" src="lib/yepnope/yepnope.min.js"></script>
-    <script type="text/javascript" src="@applicationJs"></script>
+    <script type="text/javascript" src="@Url.GetUrlWithTimeStamp("Application", "BackOffice")"></script>
 
 </body>
 </html>

@@ -41,17 +41,17 @@ namespace Umbraco.Web.UI.JavaScript
         public string GetJavascriptInitialization(HttpContextBase httpContext, JArray umbracoInit, JArray additionalJsFiles = null)
         {
             var result = GetJavascriptInitializationArray(httpContext, umbracoInit, additionalJsFiles);
-            var noCache = "";
-
+            var noCache = string.Empty;
+          
+            //if debugging, add timestamp, if in production CDF will append CDF version (and should also append umb version)
             if (httpContext.IsDebuggingEnabled)
-            {
                 noCache = Resources.JsNoCache;
-            }
 
-            return ParseMain(
-                noCache,
-                result.ToString(),
-                IOHelper.ResolveUrl(SystemDirectories.Umbraco));
+
+                return ParseMain(
+                    noCache,
+                    result.ToString(),
+                    IOHelper.ResolveUrl(SystemDirectories.Umbraco));
         }
 
         public JArray GetJavascriptInitializationArray(HttpContextBase httpContext, JArray umbracoInit, JArray additionalJsFiles = null)

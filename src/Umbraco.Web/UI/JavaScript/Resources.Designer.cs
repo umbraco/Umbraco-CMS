@@ -89,11 +89,15 @@ namespace Umbraco.Web.UI.JavaScript {
         /// <summary>
         ///   Looks up a localized string similar to yepnope.addFilter(function (resourceObj) {
         ///    var url = resourceObj.url;
+        ///    var _op = &quot;?&quot;;
         ///    if(url.indexOf(&quot;lib/&quot;) === 0 || url.indexOf(&quot;js/umbraco.&quot;) === 0){
         ///        return resourceObj;
         ///    }
+        ///    if(url.indexOf(&quot;?&quot;) &gt; 0){
+        ///    	_op = &quot;&amp;&quot;;
+        ///    }
         ///
-        ///    resourceObj.url = resourceObj.url + &quot;?umb__rnd=&quot; + (new Date).getTime();
+        ///    resourceObj.url = resourceObj.url + _op + &quot;umb__rnd=&quot; + (new Date).getTime();
         ///    return resourceObj;
         ///});.
         /// </summary>
