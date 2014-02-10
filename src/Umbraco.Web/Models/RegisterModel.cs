@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
@@ -54,15 +55,30 @@ namespace Umbraco.Web.Models
         /// </summary>
         public List<UmbracoProperty> MemberProperties { get; set; }
         
+        /// <summary>
+        /// The member type alias to use to register the member
+        /// </summary>
         public string MemberTypeAlias { get; set; }
 
+        /// <summary>
+        /// The members real name
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// The members password
+        /// </summary>
         [Required]
         public string Password { get; set; }
         
+        [ReadOnly(true)]
+        [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
         public bool RedirectOnSucces { get; set; }
         
+        /// <summary>
+        /// The path to redirect to when registration is successful, if not specified then the user will be
+        /// redirected to the current Umbraco page
+        /// </summary>
         public string RedirectUrl { get; set; }
 
         /// <summary>

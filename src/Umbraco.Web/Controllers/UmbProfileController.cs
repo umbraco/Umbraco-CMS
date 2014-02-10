@@ -7,6 +7,7 @@ using umbraco.cms.businesslogic.member;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Core.Security;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Controllers
 {
@@ -32,11 +33,15 @@ namespace Umbraco.Web.Controllers
                 return CurrentUmbracoPage();
             }
 
+            //if there is a specified path to redirect to then use it
+            if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
+            {
+                return Redirect(model.RedirectUrl);
+            }
+
+            //redirect to current page by default
             TempData.Add("ProfileUpdateSuccess", true);
-
-            //TODO: Why are we redirecting to home again here?? 
-            return Redirect("/");
-
+            return RedirectToCurrentUmbracoPage();
         }
     }
 }

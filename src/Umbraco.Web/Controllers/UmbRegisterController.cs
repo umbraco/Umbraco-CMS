@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using System.Web.Security;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.member;
+using Umbraco.Core;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
@@ -26,10 +27,12 @@ namespace Umbraco.Web.Controllers
             switch (status)
             {
                 case MembershipCreateStatus.Success:
-                    if (model.RedirectOnSucces)
+                    //if there is a specified path to redirect to then use it
+                    if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
                     {
                         return Redirect(model.RedirectUrl);
                     }
+                    //redirect to current page by default
                     TempData.Add("FormSuccess", true);
                     return RedirectToCurrentUmbracoPage();
                 case MembershipCreateStatus.InvalidUserName:

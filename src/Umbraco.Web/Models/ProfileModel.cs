@@ -59,5 +59,11 @@ namespace Umbraco.Web.Models
         /// Adding items to this list on the front-end will not add properties to the member in the database.
         /// </remarks>
         public List<UmbracoProperty> MemberProperties { get; set; }
+
+        /// <summary>
+        /// The path to redirect to when update is successful, if not specified then the user will be
+        /// redirected to the current Umbraco page
+        /// </summary>
+        public string RedirectUrl { get; set; }
     }
 }
