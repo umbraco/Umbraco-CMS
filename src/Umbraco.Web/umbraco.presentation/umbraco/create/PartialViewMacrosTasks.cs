@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Text.RegularExpressions;
 using System.Web;
 using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.IO;
@@ -15,6 +17,9 @@ namespace umbraco
     [UmbracoWillObsolete("http://issues.umbraco.org/issue/U4-1373", "This will one day be removed when we overhaul the create process")]
     public class PartialViewMacroTasks : interfaces.ITaskReturnUrl
     {
+        private const string CodeHeader = "@inherits Umbraco.Web.Macros.PartialViewMacroPage";
+        private readonly Regex _headerMatch = new Regex("^@inherits\\s+?.*$", RegexOptions.Multiline | RegexOptions.Compiled);
+
         private string _alias;
         private int _parentId;
         private int _typeId;
@@ -60,7 +65,7 @@ namespace umbraco
 
         public bool Save()
         {
-            var pipesIndex = _alias.IndexOf("|||", System.StringComparison.Ordinal);
+            var pipesIndex = _alias.IndexOf("|||", StringComparison.Ordinal);
             var template = _alias.Substring(0, pipesIndex).Trim();
             var fileName = _alias.Substring(pipesIndex + 3, _alias.Length - pipesIndex - 3) + ".cshtml";
 
@@ -78,8 +83,16 @@ namespace umbraco
             {
                 using (var templateFile = File.OpenText(IOHelper.MapPath(SystemDirectories.Umbraco + "/PartialViewMacros/Templates/" + template)))
                 {
-                    var templateContent = templateFile.ReadToEnd();
-                    sw.Write(templateContent);
+                    var templateContent = templateFile.ReadToEnd().Trim();
+
+                    //strip the @inherits if it's there
+                    templateContent = _headerMatch.Replace(templateContent, string.Empty);
+
+                    sw.Write(
+                        "{0}{1}{2}",
+                        CodeHeader, 
+                        Environment.NewLine, 
+                        templateContent);
                 }
             }
 

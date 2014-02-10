@@ -2167,7 +2167,6 @@
       <SubType>Code</SubType>
     </Content>
     <Content Include="Umbraco\Scripting\templates\cshtml\MultinodeTree-picker.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\Empty.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\EditProfile.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Empty.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Login.cshtml" />
@@ -2192,21 +2191,6 @@
     <Content Include="Umbraco\PartialViewMacros\Templates\MultinodeTree-picker.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Navigation.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\SiteMap.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\Breadcrumb.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\Empty %28ForUseWithCustomViews%29.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\ListAncestorsFromCurrentPage.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\ListChildPagesFromCurrentPage.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\ListChildPagesOrderedByDate.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\ListChildPagesOrderedByName.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\ListChildPagesWithDoctype.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\ListDescendantsFromCurrentPage.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\EditProfile.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\Login.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\LoginStatus.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\RegisterMember.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\MultinodeTree-picker.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\Navigation.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\SiteMap.cshtml" />
     <None Include="Umbraco_client\CodeMirror\js\mode\coffeescript\LICENSE" />
     <None Include="Umbraco_client\CodeMirror\js\mode\pascal\LICENSE" />
     <None Include="Umbraco_client\CodeMirror\js\mode\perl\LICENSE" />
@@ -2664,6 +2648,7 @@
     <Folder Include="MasterPages\" />
     <Folder Include="Media\" />
     <Folder Include="Scripts\" />
+    <Folder Include="Umbraco\PartialViews\Templates\" />
     <Folder Include="Umbraco_Client\FolderBrowser\Images\" />
     <Folder Include="Umbraco_Client\Tags\images\" />
     <Folder Include="UserControls\" />

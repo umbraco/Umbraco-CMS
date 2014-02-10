@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
+using System.Text.RegularExpressions;
 using System.Web;
 using Umbraco.Core.CodeAnnotations;
 using Umbraco.Core.IO;
@@ -15,6 +17,9 @@ namespace umbraco
     [UmbracoWillObsolete("http://issues.umbraco.org/issue/U4-1373", "This will one day be removed when we overhaul the create process")]
     public class PartialViewTasks : interfaces.ITaskReturnUrl
     {
+        private const string CodeHeader = "@inherits Umbraco.Web.Mvc.UmbracoTemplatePage";
+        private readonly Regex _headerMatch = new Regex("^@inherits\\s+?.*$", RegexOptions.Multiline | RegexOptions.Compiled);
+
         private string _alias;
         private int _parentId;
         private int _typeId;
@@ -60,7 +65,7 @@ namespace umbraco
 
         public bool Save()
         {
-            var pipesIndex = _alias.IndexOf("|||", System.StringComparison.Ordinal);
+            var pipesIndex = _alias.IndexOf("|||", StringComparison.Ordinal);
             var template = _alias.Substring(0, pipesIndex).Trim();
             var fileName = _alias.Substring(pipesIndex + 3, _alias.Length - pipesIndex - 3) + ".cshtml";
 
@@ -76,10 +81,24 @@ namespace umbraco
             //create the file
             using (var sw = File.CreateText(fullFilePath))
             {
-                using (var templateFile = File.OpenText(IOHelper.MapPath(SystemDirectories.Umbraco + "/PartialViews/Templates/" + template)))
+                var templatePathAttempt = TryGetTemplatePath(template);
+                if (templatePathAttempt.Success == false)
                 {
-                    var templateContent = templateFile.ReadToEnd();
-                    sw.Write(templateContent);
+                    throw new InvalidOperationException("Could not load template with name " + template);
+                }
+
+                using (var templateFile = File.OpenText(templatePathAttempt.Result))
+                {
+                    var templateContent = templateFile.ReadToEnd().Trim();
+
+                    //strip the @inherits if it's there
+                    templateContent = _headerMatch.Replace(templateContent, string.Empty);
+
+                    sw.Write(
+                        "{0}{1}{2}",
+                        CodeHeader,
+                        Environment.NewLine,
+                        templateContent);
                 }
             }
 
@@ -119,5 +138,26 @@ namespace umbraco
         }
 
         #endregion
+
+        /// <summary>
+        /// Looks first in the Partial View template folder and then in the macro partials template folder if not found
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <returns></returns>
+        private Attempt<string> TryGetTemplatePath(string fileName)
+        {
+            var templatePath = IOHelper.MapPath(SystemDirectories.Umbraco + "/PartialViews/Templates/" + fileName);
+
+            if (File.Exists(templatePath))
+            {
+                return Attempt<string>.Succeed(templatePath);
+            }
+
+            templatePath = IOHelper.MapPath(SystemDirectories.Umbraco + "/PartialViewMacros/Templates/" + fileName);
+
+            return File.Exists(templatePath) 
+                ? Attempt<string>.Succeed(templatePath) 
+                : Attempt<string>.Fail();
+        }
     }
 }
