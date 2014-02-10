@@ -7,12 +7,16 @@
 @using Umbraco.Web.Controllers
 
 @{
+    
+    /*You can specify a custom member type alias in the constructor, the default is 'Member'    
+     * for example, to use 'Custom Member' you'd use this syntax:
+     *      var registerModel = Members.CreateRegistrationModel("Custom Member");
+     */
+    
     var registerModel = Members.CreateRegistrationModel();
     
     @*
-        Configurable here:
-
-        registerModel.MemberTypeAlias   - the default is "Member"
+        Configurable here:           
 
         registerModel.RedirectOnSucces  - the default is false
 
