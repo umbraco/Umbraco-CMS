@@ -427,7 +427,53 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            throw new NotImplementedException();
+            //get the group id
+            var grpQry = new Query<IMemberGroup>().Where(group => group.Name.Equals(roleName));
+            var memberGroup = _memberGroupRepository.GetByQuery(grpQry).FirstOrDefault();
+            if (memberGroup == null) return Enumerable.Empty<IMember>();
+
+            // get the members by username
+            var query = new Query<IMember>();
+            switch (matchType)
+            {
+                case StringPropertyMatchType.Exact:
+                    query.Where(member => member.Username.Equals(usernameToMatch));
+                    break;
+                case StringPropertyMatchType.Contains:
+                    query.Where(member => member.Username.Contains(usernameToMatch));
+                    break;
+                case StringPropertyMatchType.StartsWith:
+                    query.Where(member => member.Username.StartsWith(usernameToMatch));
+                    break;
+                case StringPropertyMatchType.EndsWith:
+                    query.Where(member => member.Username.EndsWith(usernameToMatch));
+                    break;
+                case StringPropertyMatchType.Wildcard:
+                    query.Where(member => member.Username.SqlWildcard(usernameToMatch, TextColumnType.NVarchar));
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("matchType");
+            }
+            var matchedMembers = GetByQuery(query).ToArray();
+
+            var membersInGroup = new List<IMember>();
+            //then we need to filter the matched members that are in the role
+            //since the max sql params are 2100 on sql server, we'll reduce that to be safe for potentially other servers and run the queries in batches
+            var inGroups = matchedMembers.InGroupsOf(1000);
+            foreach (var batch in inGroups)
+            {
+                var memberIdBatch = batch.Select(x => x.Id);
+                var sql = new Sql().Select("*").From<Member2MemberGroupDto>()
+                    .Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id)
+                    .Where("Member IN (@memberIds)", new { memberIds = memberIdBatch });
+                var memberIdsInGroup = Database.Fetch<Member2MemberGroupDto>(sql)
+                    .Select(x => x.Member).ToArray();
+
+                membersInGroup.AddRange(matchedMembers.Where(x => memberIdsInGroup.Contains(x.Id)));
+            }
+
+            return membersInGroup;
+
         }
 
         /// <summary>

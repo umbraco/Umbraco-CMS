@@ -206,7 +206,22 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void DissociateRoles(string[] usernames, string[] roleNames)
         {
-            throw new NotImplementedException();
+            using (var transaction = Database.GetTransaction())
+            {
+                //first get the member ids based on the usernames
+                var memberSql = new Sql();
+                var memberObjectType = new Guid(Constants.ObjectTypes.Member);
+                memberSql.Select("umbracoNode.id")
+                    .From<NodeDto>()
+                    .InnerJoin<MemberDto>()
+                    .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
+                    .Where<NodeDto>(x => x.NodeObjectType == memberObjectType)
+                    .Where("cmsMember.LoginName in (@usernames)", new { usernames = usernames });
+                var memberIds = Database.Fetch<int>(memberSql).ToArray();
+
+                DissociateRolesInternal(memberIds, roleNames);
+                transaction.Complete();
+            }
         }
 
         public void AssignRoles(int[] memberIds, string[] roleNames)
@@ -272,7 +287,24 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public void DissociateRoles(int[] memberIds, string[] roleNames)
         {
-            throw new NotImplementedException();
+            using (var transaction = Database.GetTransaction())
+            {
+                DissociateRolesInternal(memberIds, roleNames);
+                transaction.Complete();
+            }
+        }
+
+        private void DissociateRolesInternal(int[] memberIds, string[] roleNames)
+        {
+            var existingSql = new Sql()
+                    .Select("*")
+                    .From<NodeDto>()
+                    .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId)
+                    .Where("umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
+            var existingRolesIds = Database.Fetch<NodeDto>(existingSql).Select(x => x.NodeId).ToArray();
+
+            Database.Execute("DELETE FROM cmsMember2MemberGroup WHERE Member IN (@memberIds) AND MemberGroup IN (@memberGroups)",
+                new { memberIds = memberIds, memberGroups = existingRolesIds });
         }
 
         private class AssignedRolesDto
