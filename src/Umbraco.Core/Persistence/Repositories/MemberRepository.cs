@@ -23,19 +23,22 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class MemberRepository : VersionableRepositoryBase<int, IMember>, IMemberRepository
     {
         private readonly IMemberTypeRepository _memberTypeRepository;
+        private readonly IMemberGroupRepository _memberGroupRepository;
 
-        public MemberRepository(IDatabaseUnitOfWork work, IMemberTypeRepository memberTypeRepository)
+        public MemberRepository(IDatabaseUnitOfWork work, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository)
             : base(work)
         {
             if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
             _memberTypeRepository = memberTypeRepository;
+            _memberGroupRepository = memberGroupRepository;
         }
 
-        public MemberRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMemberTypeRepository memberTypeRepository)
+        public MemberRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository)
             : base(work, cache)
         {
             if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
             _memberTypeRepository = memberTypeRepository;
+            _memberGroupRepository = memberGroupRepository;
         }
 
         #region Overrides of RepositoryBase<int, IMembershipUser>
@@ -434,9 +437,13 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<IMember> GetByMemberGroup(string groupName)
         {
-            var subquery = GetSubquery().Where<NodeDto>(x => x.Text.Equals(groupName));
+            var grpQry = new Query<IMemberGroup>().Where(group => group.Name.Equals(groupName));
+            var memberGroup = _memberGroupRepository.GetByQuery(grpQry).FirstOrDefault();
+            if (memberGroup == null) return Enumerable.Empty<IMember>();
+            var subQuery = new Sql().Select("Member").From<Member2MemberGroupDto>().Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id);
+
             var sql = GetBaseQuery(false)
-                .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
+                .Append(new Sql("WHERE umbracoNode.id IN (" + subQuery.SQL + ")", subQuery.Arguments))
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
                 .OrderBy<NodeDto>(x => x.SortOrder);
 

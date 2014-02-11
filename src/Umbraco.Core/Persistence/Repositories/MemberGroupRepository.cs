@@ -164,7 +164,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 .InnerJoin<MemberDto>()
                 .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
                 .Where<NodeDto>(x => x.NodeObjectType == memberObjectType)
-                .Where<MemberDto>(x => x.LoginName.Equals(username));
+                .Where<MemberDto>(x => x.LoginName == username);
             var memberIdUsername = Database.Fetch<int?>(memberSql).FirstOrDefault();
             if (memberIdUsername.HasValue == false)
             {
@@ -233,6 +233,8 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 PersistNewItem(new MemberGroup { Name = m });
             }
+            //now go get all the dto's for roles with these role names
+            var rolesForNames = Database.Fetch<NodeDto>(existingSql).ToArray();
 
             //get the groups that are currently assigned to any of these members
 
@@ -262,7 +264,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 var nonAssignedRoles = roleNames.Except(assignedRoles);
                 foreach (var toAssign in nonAssignedRoles)
                 {
-                    var groupId = found.First(x => x.RoleName == toAssign).MemberGroupId;
+                    var groupId = rolesForNames.First(x => x.Text == toAssign).NodeId;
                     Database.Insert(new Member2MemberGroupDto { Member = mId, MemberGroup = groupId });
                 }
             }
