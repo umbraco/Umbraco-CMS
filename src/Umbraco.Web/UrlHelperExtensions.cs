@@ -148,5 +148,29 @@ namespace Umbraco.Web
             return url.Action(actionName, controllerName, routeVals);
         }
 
+
+        /// <summary>
+        /// Return the Url for an action with a cache-bursting hash appended
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="actionName"></param>
+        /// <param name="controllerName"></param>
+        /// <param name="routeVals"></param>
+        /// <returns></returns>
+        public static string GetUrlWithTimeStamp(this UrlHelper url, string actionName, string controllerName, RouteValueDictionary routeVals = null)
+        {
+            var applicationJs = url.Action(actionName, controllerName, routeVals);
+
+           //make a hash of umbraco and client dependency version
+           //in case the user bypasses the installer and just bumps the web.config or clientdep config
+           var umb_rnd = Umbraco.Core.Configuration.GlobalSettings.CurrentVersion + "_" + ClientDependency.Core.Config.ClientDependencySettings.Instance.Version;          
+          
+            //if in debug mode, always burst the cache
+           if (Umbraco.Core.Configuration.GlobalSettings.DebugMode)
+                umb_rnd += "_" + System.DateTime.Now.Ticks;
+
+            applicationJs = applicationJs + "?umb__rnd=" + umb_rnd;
+            return applicationJs;
+        }
     }
 }

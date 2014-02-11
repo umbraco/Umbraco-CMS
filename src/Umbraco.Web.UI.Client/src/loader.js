@@ -1,16 +1,24 @@
+//global no-cache filter, this is enabled when we're in debug mode
+//in live mode we use client dependency and don't turn this thing on
+yepnope.addFilter(function (resourceObj) {
+    var url = resourceObj.url;
+    if(url.indexOf("lib/") === 0 || url.indexOf("js/umbraco.") === 0){
+        return resourceObj;
+    }
+
+    resourceObj.url = resourceObj.url + "?umb__rnd=" + (new Date).getTime();
+    return resourceObj;
+});
+
+
 yepnope({
 
   load: [
     'lib/jquery/jquery-2.0.3.min.js',
 
     /* the jquery ui elements we need */
-    /* NOTE: I've opted not to use the full lib, just the parts we need to save on DL*/
-    'lib/jquery/jquery.ui.core.min.js',
-    'lib/jquery/jquery.ui.widget.min.js',
-
-    'lib/jquery/jquery.ui.mouse.min.js',       
-    'lib/jquery/jquery.ui.sortable.min.js',
-
+    'lib/jquery/jquery-ui-1.10.3.custom.min.js',
+    
     /* 1.1.5 */
     'lib/angular/1.1.5/angular.min.js',
     'lib/angular/1.1.5/angular-cookies.min.js',

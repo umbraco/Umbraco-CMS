@@ -1,0 +1,46 @@
+<div class="umb-editor umb-mediapicker" 
+	ng-controller="Umbraco.PropertyEditors.ImageCropperController">
+	
+	<div ng-if="model.value.src">
+		<div style="border-bottom: 1px solid #f8f8f8; padding-bottom: 10px; margin-bottom: 15px;">
+			<div ng-if="currentCrop">
+				<div>
+					<umb-image-crop
+					 height="{{currentCrop.height}}"
+					 width= "{{currentCrop.width}}" 
+					 crop="currentCrop.crop"
+					 center="model.value.center"
+					 src="model.value.src" />
+				</div>
+				
+				<a href class="btn btn-success" ng-click="done()">Done</a>
+			</div>
+
+			<div ng-if="!currentCrop">
+				<umb-image-gravity 
+					src="model.value.src" 
+					center="model.value.center" />
+			</div>
+		</div>		
+
+		<ul class="umb-sortable-thumbnails">
+			<li class="tipmenu" ng-repeat="(key,value) in model.value.crops">
+				<a href ng-click="crop(value)">
+					<umb-image-thumbnail
+						center="model.value.center"
+						crop="value.crop"
+						src="model.value.src"
+						height="{{value.height}}"
+						width="{{value.width}}" />
+				</a>
+
+				<div class="tooltip bottom" ng-if="value.crop">
+					<div class="tooltip-arrow"></div>
+					<div class="tooltip-inner">
+						<a href ng-click="value.crop = undefined">Reset</a>
+					</div>
+				</div>
+			</li>
+		</ul>
+	</div>
+</div>

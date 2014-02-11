@@ -19,7 +19,7 @@ function mediaHelper(umbRequestHelper) {
          * @param {object} options.imageOnly Optional, if true then will only return a path if the media item is an image
          */
         getMediaPropertyValue: function (options) {
-            return "assets/img/mocks/image.jpg";
+            return "assets/img/mocks/big-image.jpg";
         },
         
         /**
@@ -35,7 +35,7 @@ function mediaHelper(umbRequestHelper) {
          * @param {object} options.imageModel The media object to retrieve the image path from
          */
         getImagePropertyValue: function (options) {
-            return "assets/img/mocks/image.jpg";
+            return "assets/img/mocks/big-image.jpg";
         },
         /**
          * @ngdoc function

@@ -90,17 +90,21 @@ angular.module('umbraco.services')
             var t = timeout || 5000;
             var a = attributes || undefined;
 
-            yepnope.injectCss(path, function () {
-
-             if (!scope) {
-                 deferred.resolve(true);
-             }else{
-                 angularHelper.safeApply(scope, function () {
-                     deferred.resolve(true);
-                 });
-             }
-
-            },a,t);
+            yepnope({
+                 forceCSS: true,
+                 load: path,
+                 timeout: t,
+                 attrs: a,
+                 callback: function (url, result, key) { 
+                   if (!scope) {
+                       deferred.resolve(true);
+                   }else{
+                       angularHelper.safeApply(scope, function () {
+                           deferred.resolve(true);
+                       });
+                   }
+                 }
+               });
 
             return deferred.promise;
         },
@@ -124,6 +128,26 @@ angular.module('umbraco.services')
             var t = timeout || 5000;
             var a = attributes || undefined;
 
+            
+            yepnope({
+              forceJS: true,
+              load: path,
+              timeout: t,
+              attrs: a,
+              callback: function (url, result, key) {
+                
+                if (!scope) {
+                    deferred.resolve(true);
+                }else{
+                    angularHelper.safeApply(scope, function () {
+                        deferred.resolve(true);
+                    });
+                }
+              }
+            });
+
+
+/*
             yepnope.injectJs(path, function () {
 
               if (!scope) {
@@ -135,6 +159,7 @@ angular.module('umbraco.services')
               }
 
             },a,t);
+*/
 
             return deferred.promise;
         },
