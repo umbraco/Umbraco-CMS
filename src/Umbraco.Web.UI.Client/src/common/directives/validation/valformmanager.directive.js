@@ -52,6 +52,8 @@ function valFormManager(serverValidationManager, $rootScope, $log, notifications
                 //remove validation class
                 element.removeClass(className);
 
+                formCtrl.$setPristine();
+
                 //clear form state as at this point we retrieve new data from the server
                 //and all validation will have cleared at this point    
                 formCtrl.$setPristine();
