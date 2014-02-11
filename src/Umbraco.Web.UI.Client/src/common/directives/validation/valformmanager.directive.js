@@ -50,6 +50,8 @@ function valFormManager(serverValidationManager, $rootScope, $log, notifications
             //listen for the forms saved event
             scope.$on(savedEvent, function (ev, args) {
                 element.removeClass(className);
+
+                formCtrl.$setPristine();
             });
 
 
