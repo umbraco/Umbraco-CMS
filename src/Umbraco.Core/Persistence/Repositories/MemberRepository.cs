@@ -422,6 +422,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
+        public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Get all members in a specific group
         /// </summary>
@@ -429,7 +434,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<IMember> GetByMemberGroup(string groupName)
         {
-            var subquery = GetSubquery().Where<NodeDto>(x => x.Text == groupName);
+            var subquery = GetSubquery().Where<NodeDto>(x => x.Text.Equals(groupName));
             var sql = GetBaseQuery(false)
                 .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate)

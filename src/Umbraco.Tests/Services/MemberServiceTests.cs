@@ -26,6 +26,83 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Create_Role()
+        {
+            ServiceContext.MemberService.AddRole("MyTestRole");
+
+            var found = ServiceContext.MemberService.GetAllRoles();
+
+            Assert.AreEqual(1, found.Count());
+            Assert.AreEqual("MyTestRole", found.Single());
+        }
+
+        [Test]
+        public void Can_Create_Duplicate_Role()
+        {
+
+        }
+
+        [Test]
+        public void Can_Get_All_Roles()
+        {
+
+        }
+
+        [Test]
+        public void Can_Get_All_Roles_By_Member_Id()
+        {
+
+        }
+
+        [Test]
+        public void Can_Get_All_Roles_By_Member_Username()
+        {
+
+        }
+
+        [Test]
+        public void Can_Delete_Role()
+        {
+
+        }
+
+        [Test]
+        public void Throws_When_Deleting_Assigned_Role()
+        {
+
+        }
+
+        [Test]
+        public void Find_Members_In_Role()
+        {
+
+        }
+
+        [Test]
+        public void Associate_Members_To_Roles_With_Member_Id()
+        {
+
+        }
+
+        [Test]
+        public void Associate_Members_To_Roles_With_Member_Username()
+        {
+
+        }
+
+        [Test]
+        public void Remove_Members_From_Roles_With_Member_Id()
+        {
+
+        }
+
+        [Test]
+        public void Remove_Members_From_Roles_With_Member_Username()
+        {
+
+        }
+
+        [Test]
         public void Can_Delete_member()
         {
             IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();

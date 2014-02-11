@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using System.Linq;
@@ -769,57 +770,122 @@ namespace Umbraco.Core.Services
 
         public void AddRole(string roleName)
         {
-            throw new NotImplementedException();
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+            {
+                repository.CreateIfNotExists(roleName);
+            }
         }
 
         public IEnumerable<string> GetAllRoles()
         {
-            throw new NotImplementedException();
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+            {
+                var result = repository.GetAll();
+                return result.Select(x => x.Name).Distinct();
+            }
         }
 
         public IEnumerable<string> GetAllRoles(int memberId)
         {
-            throw new NotImplementedException();
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+            {
+                var result = repository.GetMemberGroupsForMember(memberId);
+                return result.Select(x => x.Name).Distinct();
+            }
         }
 
         public IEnumerable<string> GetAllRoles(string username)
         {
-            throw new NotImplementedException();
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+            {
+                var result = repository.GetMemberGroupsForMember(username);
+                return result.Select(x => x.Name).Distinct();
+            }
         }
 
         public IEnumerable<IMember> GetMembersInRole(string roleName)
         {
-            throw new NotImplementedException();
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
+            {
+                return repository.GetByMemberGroup(roleName);                
+            }
         }
 
         public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
-            throw new NotImplementedException();
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
+            {
+                return repository.FindMembersInRole(roleName, usernameToMatch, matchType);
+            }
         }
 
         public bool DeleteRole(string roleName, bool throwIfBeingUsed)
         {
-            throw new NotImplementedException();
+            using (new WriteLock(Locker))
+            {
+                if (throwIfBeingUsed)
+                {
+                    var inRole = GetMembersInRole(roleName);
+                    if (inRole.Any())
+                    {
+                        throw new InvalidOperationException("The role " + roleName + " is currently assigned to members");
+                    }
+                }
+
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+                {
+                    var qry = new Query<IMemberGroup>().Where(g => g.Name == roleName);
+                    var found = repository.GetByQuery(qry).ToArray();
+                    foreach (var memberGroup in found)
+                    {
+                        repository.Delete(memberGroup);
+                    }
+                    return found.Any();
+                }
+            }
         }
 
         public void AssignRoles(string[] usernames, string[] roleNames)
         {
-            throw new NotImplementedException();
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+            {
+                repository.AssignRoles(usernames, roleNames);
+            }
         }
 
         public void DissociateRoles(string[] usernames, string[] roleNames)
         {
-            throw new NotImplementedException();
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+            {
+                repository.DissociateRoles(usernames, roleNames);
+            }
         }
 
         public void AssignRoles(int[] memberIds, string[] roleNames)
         {
-            throw new NotImplementedException();
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+            {
+                repository.AssignRoles(memberIds, roleNames);
+            }
         }
 
         public void DissociateRoles(int[] memberIds, string[] roleNames)
         {
-            throw new NotImplementedException();
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+            {
+                repository.DissociateRoles(memberIds, roleNames);
+            }
         } 
         #endregion
 
