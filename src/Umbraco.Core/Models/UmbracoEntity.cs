@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using Umbraco.Core.Models.EntityBase;
 
@@ -51,6 +52,12 @@ namespace Umbraco.Core.Models
         {
             AdditionalData = new Dictionary<string, object>();
             Trashed = trashed;
+        }
+
+        public UmbracoEntity(int trashed)
+        {
+            AdditionalData = new Dictionary<string, object>();
+            Trashed = trashed == 1;
         }
 
         public int CreatorId
