@@ -1,3 +1,5 @@
+using System.Collections.Specialized;
+using System.Configuration.Provider;
 using System.Linq;
 using System.Web.Security;
 using Umbraco.Core;
@@ -22,7 +24,7 @@ namespace Umbraco.Web.Security.Providers
         }
 
         private string _applicationName;
-
+        
         public override bool IsUserInRole(string username, string roleName)
         {
             return GetRolesForUser(username).Any(x => x == roleName);
@@ -73,10 +75,27 @@ namespace Umbraco.Web.Security.Providers
             return _roleService.FindMembersInRole(roleName, usernameToMatch, StringPropertyMatchType.Wildcard).Select(x => x.Username).ToArray();
         }
 
+        /// <summary>
+        /// The name of the application using the custom role provider.
+        /// </summary>
+        /// <value></value>
+        /// <returns>The name of the application using the custom membership provider.</returns>
         public override string ApplicationName
         {
-            get { return _applicationName; }
-            set { _applicationName = value; }
+            get
+            {
+                return _applicationName;
+            }
+            set
+            {
+                if (string.IsNullOrEmpty(value))
+                    throw new ProviderException("ApplicationName cannot be empty.");
+
+                if (value.Length > 0x100)
+                    throw new ProviderException("Provider application name too long.");
+
+                _applicationName = value;
+            }
         }
     }
 }
