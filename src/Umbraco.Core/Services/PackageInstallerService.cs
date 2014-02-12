@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 using System.Web.Hosting;
-using System.Xml;
 using System.Xml.Linq;
+using System.Xml.XPath;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Packaging;
@@ -55,15 +54,23 @@ namespace Umbraco.Core.Services
 
         public PackageMetaData GetMetaData(string packageFilePath)
         {
-            XmlElement documentElement = GetConfigXmlDocFromPackageFile(packageFilePath);
+            var documentElement = GetConfigXmlDocFromPackageFile(packageFilePath);
 
-            return GetMetaData(documentElement);
+            var rootElement = documentElement.Element("umbPackage");
+            if (rootElement == null) { throw new ArgumentException("xml does not have a root node called \"umbPackage\"", packageFilePath); }
+
+            return GetMetaData(rootElement);
         }
 
         public PackageImportIssues FindPackageImportIssues(string packageFilePath)
         {
-            XmlElement documentElement = GetConfigXmlDocFromPackageFile(packageFilePath);
-            return FindImportIssues(documentElement);
+            var documentElement = GetConfigXmlDocFromPackageFile(packageFilePath);
+
+            var rootElement = documentElement.Element("umbPackage");
+
+            if (rootElement == null) { throw new ArgumentException("File does not have a root node called \"umbPackage\"", packageFilePath); }
+
+            return FindImportIssues(rootElement);
         }
 
 
@@ -93,381 +100,325 @@ namespace Umbraco.Core.Services
         }
 
 
-        private XmlElement GetConfigXmlDocFromPackageFile(string packageFilePath)
+        private XDocument GetConfigXmlDocFromPackageFile(string packageFilePath)
         {
             FileInfo packageFileInfo = GetPackageFileInfo(packageFilePath);
 
             string configXmlContent = _unpackHelper.ReadSingleTextFile(packageFileInfo.FullName, PACKAGE_XML_FILE_NAME);
 
-            var packageConfig = new XmlDocument();
-
-            packageConfig.LoadXml(configXmlContent);
-            XmlElement documentElement = packageConfig.DocumentElement;
-            return documentElement;
+            var packageConfig = XDocument.Parse(configXmlContent);
+            return packageConfig;
         }
 
 
         private PackageInstallationSummary InstallFromDirectory(string packageDir, int userId)
         {
-            XmlElement configXml = GetConfigXmlDocFromPackageDirectory(packageDir);
+            var configXml = GetConfigXmlDocFromPackageDirectory(packageDir);
+            var rootElement = configXml.XPathSelectElement("/umbPackage");
+            if (rootElement == null) { throw new ArgumentException("File does not have a root node called \"umbPackage\"", packageDir); }
+
+            var dataTypes = rootElement.Element("DataTypes");
+            var languages = rootElement.Element("Languages");
+            var dictionaryItems = rootElement.Element("DictionaryItems");
+            var macroes = rootElement.Element("Macros");
+            var files = rootElement.Element("Files");
+            var templates = rootElement.Element("Templates");
+            var documentTypes = rootElement.Element("DocumentTypes");
+            var styleSheets = rootElement.Element("Stylesheets");
+            var documentSet = rootElement.Element("DocumentSet");
+            var actions = rootElement.Element("Actions");
 
             return new PackageInstallationSummary
             {
-                MetaData = GetMetaData(configXml),
-                DataTypesInstalled = InstallDataTypes(configXml, userId),
-                LanguagesInstalled = InstallLanguages(configXml, userId),
-                DictionaryItemsInstalled = InstallDictionaryItems(configXml, userId),
-                MacrosInstalled = InstallMacros(configXml, userId),
-                FilesInstalled = InstallFiles(packageDir, configXml),
-                TemplatesInstalled = InstallTemplats(configXml, userId),
-                DocumentTypesInstalled = InstallDocumentTypes(configXml, userId),
-                StylesheetsInstalled = InstallStylesheets(configXml, userId),
-                DocumentsInstalled = InstallDocuments(configXml, userId),
-                PackageInstallActions = GetInstallActions(configXml),
-                PackageUninstallActions = GetUninstallActions(configXml)
+                MetaData = GetMetaData(rootElement),
+                DataTypesInstalled = dataTypes == null ? Enumerable.Empty<int>() : InstallDataTypes(dataTypes, userId),
+                LanguagesInstalled = languages == null ? Enumerable.Empty<int>() : InstallLanguages(languages, userId),
+                DictionaryItemsInstalled = dictionaryItems == null ? Enumerable.Empty<int>() : InstallDictionaryItems(dictionaryItems, userId),
+                MacrosInstalled = macroes == null ? Enumerable.Empty<int>() : InstallMacros(macroes, userId),
+                FilesInstalled = packageDir == null ? Enumerable.Empty<KeyValuePair<string, bool>>() : InstallFiles(packageDir, files),
+                TemplatesInstalled = templates == null ? Enumerable.Empty<int>() : InstallTemplats(templates, userId),
+                DocumentTypesInstalled = documentTypes == null ? Enumerable.Empty<int>() : InstallDocumentTypes(documentTypes, userId),
+                StylesheetsInstalled = styleSheets == null ? Enumerable.Empty<int>() : InstallStylesheets(styleSheets, userId),
+                DocumentsInstalled = documentSet == null ? Enumerable.Empty<int>() : InstallDocuments(documentSet, userId),
+                PackageInstallActions = actions == null ? Enumerable.Empty<KeyValuePair<string, XElement>>() : GetInstallActions(actions),
+                PackageUninstallActions = actions == null ? string.Empty : GetUninstallActions(actions)
             };
         }
 
-        private static string GetUninstallActions(XmlElement configXml)
+        private static string GetUninstallActions(XElement actionsElement)
         {
-            var actions = new StringBuilder();
             //saving the uninstall actions untill the package is uninstalled.
-            XmlNodeList xmlNodeList = configXml.SelectNodes("Actions/Action [@undo != false()]");
-            if (xmlNodeList != null)
-            {
-                foreach (XmlNode n in xmlNodeList)
+            return actionsElement.Elements("Action").Where(e => e.HasAttributes && e.Attribute("undo") != null && e.Attribute("undo").Value.Equals("false()", StringComparison.InvariantCultureIgnoreCase) == false) // SelectNodes("Actions/Action [@undo != false()]");
+                .Select(m => m.Value).Aggregate((workingSentence, next) => next + workingSentence);
+        }
+
+        private static IEnumerable<KeyValuePair<string, XElement>> GetInstallActions(XElement actionsElement)
+        {
+            if (actionsElement == null) { return Enumerable.Empty<KeyValuePair<string, XElement>>(); }
+
+            if ("Actions".Equals(actionsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"Actions\" as root", "actionsElement"); }
+
+            return actionsElement.Elements("Action")
+                .Where(
+                    e =>
+                        e.HasAttributes &&
+                        (e.Attribute("runat") == null ||
+                         e.Attribute("runat").Value.Equals("uninstall", StringComparison.InvariantCultureIgnoreCase) ==
+                         false)) // .SelectNodes("Actions/Action [@runat != 'uninstall']")
+                .Select(elemet =>
                 {
-                    actions.Append(n.OuterXml);
-                }
-            }
-            return actions.ToString();
+                    var aliasAttr = elemet.Attribute("alias");
+                    if (aliasAttr == null)
+                        throw new ArgumentException("missing alias atribute in alias element", "actionsElement");
+                    return new {elemet, alias = aliasAttr.Value};
+                }).ToDictionary(x => x.alias, x => x.elemet);
         }
 
-        private static Dictionary<string, XmlNode> GetInstallActions(XmlElement configXml)
+        private IEnumerable<int> InstallDocuments(XElement documentsElement, int userId = 0)
         {
-            XmlNodeList xmlNodeList = configXml.SelectNodes("Actions/Action [@runat != 'uninstall']");
-            Dictionary<string, XmlNode> retVal2;
-            if (xmlNodeList != null)
-            {
-                retVal2 = xmlNodeList.OfType<XmlNode>()
-                    .Select(an => new
-                    {
-                        alias =
-                            an.Attributes == null
-                                ? null
-                                : an.Attributes["alias"] == null ? null : an.Attributes["alias"].Value,
-                        node = an
-                    }).Where(x => string.IsNullOrEmpty(x.alias) == false)
-                    .ToDictionary(x => x.alias, x => x.node);
-            }
-            else
-            {
-                retVal2 = new Dictionary<string, XmlNode>();
-            }
-            return retVal2;
+            if ("DocumentSet".Equals(documentsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"DocumentSet\" as root", "documentsElement"); }
+            return _packagingService.ImportContent(documentsElement, -1, userId).Select(c => c.Id);
         }
 
-        private IEnumerable<int> InstallDocuments(XmlElement configXml, int userId = 0)
+        private IEnumerable<int> InstallStylesheets(XElement styleSheetsElement, int userId = 0)
         {
-
-            var rootElement = configXml.GetXElement();
-            var documentElement = rootElement.Descendants("DocumentSet").FirstOrDefault();
-            if (documentElement != null)
-            {
-                IEnumerable<IContent> content = _packagingService.ImportContent(documentElement, -1, userId);
-                return content.Select(c => c.Id);
-
-            }
-            return Enumerable.Empty<int>();
+            if ("Stylesheets".Equals(styleSheetsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"Stylesheets\" as root", "styleSheetsElement"); }
+            return _packagingService.ImportStylesheets(styleSheetsElement, userId).Select(f => f.Id);
         }
 
-        private IEnumerable<int> InstallStylesheets(XmlElement configXml, int userId = 0)
+        private IEnumerable<int> InstallDocumentTypes(XElement documentTypes, int userId = 0)
         {
-            XmlNodeList xmlNodeList = configXml.SelectNodes("Stylesheets/Stylesheet");
-            if (xmlNodeList == null)
+            if ("DocumentTypes".Equals(documentTypes.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false)
             {
-                return Enumerable.Empty<int>();
+                if ("DocumentType".Equals(documentTypes.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false)
+                    throw new ArgumentException("Must be \"DocumentTypes\" as root", "documentTypes");
+
+                documentTypes = new XElement("DocumentTypes", documentTypes);
             }
 
-            var retVal = new List<int>();
-
-            foreach (var element in xmlNodeList.OfType<XmlNode>().Select(n => n.GetXElement()))
-            {
-                retVal.AddRange(_packagingService.ImportStylesheets(element, userId).Select(f => f.Id));
-
-            }
-            return retVal;
+            return _packagingService.ImportContentTypes(documentTypes, userId).Select(ct => ct.Id);
         }
 
-        private IEnumerable<int> InstallDocumentTypes(XmlElement configXml, int userId = 0)
+        private IEnumerable<int> InstallTemplats(XElement templateElement, int userId = 0)
         {
-            XElement rootElement = configXml.GetXElement();
-            //Check whether the root element is a doc type rather then a complete package
-            XElement docTypeElement = rootElement.Name.LocalName.Equals("DocumentType") ||
-                                      rootElement.Name.LocalName.Equals("DocumentTypes")
-                ? rootElement
-                : rootElement.Descendants("DocumentTypes").FirstOrDefault();
-            if (docTypeElement != null)
-            {
-                IEnumerable<IContentType> contentTypes = _packagingService.ImportContentTypes(docTypeElement, userId);
-                return contentTypes.Select(ct => ct.Id);
-            }
-
-            return Enumerable.Empty<int>();
-        }
-
-        private IEnumerable<int> InstallTemplats(XmlElement configXml, int userId = 0)
-        {
-            XElement templateElement = configXml.GetXElement().Descendants("Templates").FirstOrDefault();
-            IEnumerable<ITemplate> templates = _packagingService.ImportTemplates(templateElement, userId);
-            return templates.Select(t => t.Id);
+            if ("Templates".Equals(templateElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"Templates\" as root", "templateElement"); }
+            return _packagingService.ImportTemplates(templateElement, userId).Select(t => t.Id);
         }
 
 
-        private static IEnumerable<KeyValuePair<string, bool>> InstallFiles(string packageDir, XmlElement configXml)
+        private static IEnumerable<KeyValuePair<string, bool>> InstallFiles(string packageDir, XElement filesElement)
         {
+            if ("Files".Equals(filesElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("root element must be \"Files\"", "filesElement"); }
+
             string basePath = HostingEnvironment.ApplicationPhysicalPath;
+            
+            var xmlNodeList = filesElement.Elements("file");
 
-            XmlNodeList xmlNodeList = configXml.SelectNodes("//file");
-
-            var installedFiles = new List<KeyValuePair<string, bool>>();
-            if (xmlNodeList != null)
+            return xmlNodeList.Select(e =>
             {
-                foreach (XmlNode n in xmlNodeList)
+                var orgPathElement = e.Element("orgPath");
+                if (orgPathElement == null) { throw new ArgumentException("Missing element \"orgPath\"", "filesElement"); }
+
+                var guidElement = e.Element("guid");
+                if (guidElement == null) { throw new ArgumentException("Missing element \"guid\"", "filesElement"); }
+
+                var orgNameElement = e.Element("orgName");
+                if (orgNameElement == null) { throw new ArgumentException("Missing element \"orgName\"", "filesElement"); }
+
+
+                var destPath = GetFileName(basePath, orgPathElement.Value);
+                var sourceFile = GetFileName(packageDir, guidElement.Value);
+                var destFile = GetFileName(destPath, orgNameElement.Value);
+
+                if (Directory.Exists(destPath) == false) Directory.CreateDirectory(destPath);
+
+                var existingOverrided = File.Exists(destFile);
+
+                File.Copy(sourceFile, destFile, true);
+                
+                return new KeyValuePair<string, bool>(orgPathElement.Value + "/" + orgNameElement.Value, existingOverrided);
+            });
+        }
+
+        private IEnumerable<int> InstallMacros(XElement macroElements, int userId = 0)
+        {
+            if ("Macros".Equals(macroElements.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"Templates\" as root", "macroElements"); }
+            return _packagingService.ImportMacros(macroElements, userId).Select(m => m.Id);
+        }
+
+        private IEnumerable<int> InstallDictionaryItems(XElement dictionaryItemsElement, int userId = 0)
+        {
+            if ("DictionaryItems".Equals(dictionaryItemsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"Templates\" as root", "dictionaryItemsElement"); }
+            return _packagingService.ImportDictionaryItems(dictionaryItemsElement, userId).Select(di => di.Id);
+        }
+
+        private IEnumerable<int> InstallLanguages(XElement languageElement, int userId = 0)
+        {
+            if ("Languages".Equals(languageElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"Templates\" as root", "languageElement"); }
+            return _packagingService.ImportLanguage(languageElement, userId).Select(l => l.Id);
+        }
+
+        private IEnumerable<int> InstallDataTypes(XElement dataTypeElements, int userId = 0)
+        {
+            if ("DataTypes".Equals(dataTypeElements.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) ==
+                false)
+            {
+
+                if ("DataType".Equals(dataTypeElements.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) ==
+                    false)
                 {
-                    string orgPath = XmlHelper.GetNodeValue(n.SelectSingleNode("orgPath"));
-                    string guid = XmlHelper.GetNodeValue(n.SelectSingleNode("guid"));
-                    string orgName = XmlHelper.GetNodeValue(n.SelectSingleNode("orgName"));
-
-                    String destPath = GetFileName(basePath, orgPath);
-                    String sourceFile = GetFileName(packageDir, guid);
-                    String destFile = GetFileName(destPath, orgName);
-
-                    if (Directory.Exists(destPath) == false) Directory.CreateDirectory(destPath);
-
-                    bool overrideExisting = File.Exists(destFile);
-
-                    File.Copy(sourceFile, destFile, true);
-
-                    installedFiles.Add(new KeyValuePair<string, bool>(orgPath + "/" + orgName, overrideExisting));
+                    throw new ArgumentException("Must be \"Templates\" as root", "dataTypeElements");
                 }
             }
-            return installedFiles;
+            return _packagingService.ImportDataTypeDefinitions(dataTypeElements, userId).Select(e => e.Id);
         }
 
-        private IEnumerable<int> InstallMacros(XmlElement configXml, int userId = 0)
-        {
-            var xmlNodeList = configXml.SelectNodes("//macro");
-            if (xmlNodeList == null)
-            {
-                return Enumerable.Empty<int>();
-            }
-
-            var retVal = new List<int>();
-            foreach (var n in xmlNodeList.OfType<XmlNode>().Select(n => n.GetXElement()))
-            {
-                retVal.AddRange(_packagingService.ImportMacros(n, userId).Select(m => m.Id));
-            }
-
-            return retVal;
-
-        }
-
-        private IEnumerable<int> InstallDictionaryItems(XmlElement configXml, int userId = 0)
-        {
-            var xmlNodeList = configXml.SelectNodes("./DictionaryItems/DictionaryItem");
-            if (xmlNodeList == null) { return Enumerable.Empty<int>(); }
-
-            var retVal = new List<int>();
-            foreach (var n in xmlNodeList.OfType<XmlNode>().Select(n => n.GetXElement()))
-            {
-                retVal.AddRange(_packagingService.ImportDictionaryItems(n, userId).Select(di => di.Id));
-            }
-
-            return retVal;
-        }
-
-        private IEnumerable<int> InstallLanguages(XmlElement configXml, int userId = 0)
-        {
-            XmlNodeList xmlNodeList = configXml.SelectNodes("//Language");
-            if (xmlNodeList == null) { return Enumerable.Empty<int>(); }
-            var retVal = new List<int>();
-            foreach (var n in xmlNodeList.OfType<XmlNode>().Select(n => n.GetXElement()))
-            {
-                retVal.AddRange(_packagingService.ImportLanguage(n, userId).Select(l => l.Id));
-            }
-            return retVal;
-        }
-
-        private IEnumerable<int> InstallDataTypes(XmlElement configXml, int userId = 0)
-        {
-            XElement rootElement = configXml.GetXElement();
-            XElement dataTypeElement = rootElement.Descendants("DataTypes").FirstOrDefault();
-
-            if (dataTypeElement != null)
-            {
-                IEnumerable<IDataTypeDefinition> dataTypeDefinitions =
-                    _packagingService.ImportDataTypeDefinitions(dataTypeElement, userId);
-                return dataTypeDefinitions.Select(dtd => dtd.Id);
-            }
-            return Enumerable.Empty<int>();
-        }
-
-        private static XmlElement GetConfigXmlDocFromPackageDirectory(string packageDir)
+        private static XDocument GetConfigXmlDocFromPackageDirectory(string packageDir)
         {
             string packageXmlPath = Path.Combine(packageDir, PACKAGE_XML_FILE_NAME);
-
-            if (File.Exists(packageXmlPath) == false)
-            {
-                throw new FileNotFoundException("Could not find " + PACKAGE_XML_FILE_NAME + " in package");
-            }
-
-            var packageConfig = new XmlDocument();
-            packageConfig.Load(packageXmlPath);
-
-            if (packageConfig.DocumentElement == null)
-            {
-                throw new Exception("Invalid package.xml could not load XML");
-            }
-
-
-            XmlElement xmlRoot = packageConfig.DocumentElement;
-            return xmlRoot;
+            if (File.Exists(packageXmlPath) == false) { throw new FileNotFoundException("Could not find " + PACKAGE_XML_FILE_NAME + " in package"); }
+            return XDocument.Load(packageXmlPath);
         }
 
 
-        private PackageImportIssues FindImportIssues(XmlElement documentElement)
+        private PackageImportIssues FindImportIssues(XElement rootElement)
         {
-            XmlNodeList fileNotes = documentElement.SelectNodes("//file");
-            XmlNodeList macroNotes = documentElement.SelectNodes("//macro");
-            XmlNodeList templateNotes = documentElement.SelectNodes("Templates/Template");
-            XmlNodeList stylesheetNotes = documentElement.SelectNodes("Stylesheets/Stylesheet");
-
+            var files = rootElement.Element("Files");
+            var styleSheets = rootElement.Element("Stylesheets");
+            var templates = rootElement.Element("Templates");
+            var alias = rootElement.Element("Macros");
             var packageImportIssues = new PackageImportIssues
             {
-                UnsecureFiles = FindUnsecureFiles(fileNotes),
-                ConflictingMacroAliases = FindConflictingMacroAliases(macroNotes),
-                ConflictingTemplateAliases = FindConflictingTemplateAliases(templateNotes),
-                ConflictingStylesheetNames = FindConflictingStylesheetNames(stylesheetNotes)
+                UnsecureFiles = files == null ? Enumerable.Empty<string>() : FindUnsecureFiles(files),
+                ConflictingMacroAliases =  alias == null ? Enumerable.Empty<KeyValuePair<string, string>>() : FindConflictingMacroAliases(alias),
+                ConflictingTemplateAliases = templates == null ?  Enumerable.Empty<KeyValuePair<string, string>>() : FindConflictingTemplateAliases(templates),
+                ConflictingStylesheetNames = styleSheets == null ? Enumerable.Empty<KeyValuePair<string, string>>() : FindConflictingStylesheetNames(styleSheets)
             };
 
             return packageImportIssues;
         }
 
-        private IEnumerable<string> FindUnsecureFiles(XmlNodeList fileNotes)
+        private IEnumerable<string> FindUnsecureFiles(XElement fileElement)
         {
-            return fileNotes == null
-                ? Enumerable.Empty<string>()
-                : fileNotes
-                    .OfType<XmlNode>()
-                    .Where(FileNodeIsUnsecure)
-                    .Select(n => XmlHelper.GetNodeValue(n.SelectSingleNode("orgName")));
-        }
+            if ("Files".Equals(fileElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("the root element must be \"Files\"", "fileElement"); }
 
-        private IEnumerable<KeyValuePair<string, string>> FindConflictingStylesheetNames(XmlNodeList stylesheetNotes)
-        {
-            return stylesheetNotes == null
-                ? Enumerable.Empty<KeyValuePair<string, string>>()
-                : stylesheetNotes.OfType<XmlNode>()
+            return fileElement.Elements("file")
+                .Where(FileNodeIsUnsecure)
                     .Select(n =>
                     {
-                        string name = XmlHelper.GetNodeValue(n.SelectSingleNode("Name"));
+                        var xElement = n.Element("orgName");
+                        if (xElement == null) { throw new ArgumentException("missing a element: orgName", "n"); }
+                        return xElement.Value;
+                    });
+        }
+
+        private IEnumerable<KeyValuePair<string, string>> FindConflictingStylesheetNames(XElement stylesheetNotes)
+        {
+            if ("Stylesheets".Equals(stylesheetNotes.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("the root element must be \"Stylesheets\"", "stylesheetNotes"); }
+
+            return stylesheetNotes.Elements("styleSheet")
+                    .Select(n =>
+                    {
+                        var xElement = n.Element("Name");
+                        if (xElement == null) { throw new ArgumentException("Missing \"Name\" element", "stylesheetNotes"); }
+
+                        string name = xElement.Name.LocalName;
                         Stylesheet existingStilesheet = _fileService.GetStylesheetByName(name);
 
-
-                        // Dont know what to put in here... existing path whas the bedst i culd come up with
+                        // Don't know what to put in here... existing path whas the best i could come up with
                         string existingFilePath = existingStilesheet == null ? null : existingStilesheet.Path;
-
 
                         return new KeyValuePair<string, string>(name, existingFilePath);
                     })
                     .Where(kv => kv.Value != null);
         }
 
-        private IEnumerable<KeyValuePair<string, string>> FindConflictingTemplateAliases(XmlNodeList templateNotes)
+        private IEnumerable<KeyValuePair<string, string>> FindConflictingTemplateAliases(XElement templateNotes)
         {
-            return templateNotes == null
-                ? Enumerable.Empty<KeyValuePair<string, string>>()
-                : templateNotes.OfType<XmlNode>()
+            if ("Templates".Equals(templateNotes.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Node must be a Templates node", "templateNotes"); }
+
+            return templateNotes.Elements("Template")
                     .Select(n =>
                     {
-                        string alias = XmlHelper.GetNodeValue(n.SelectSingleNode("Alias"));
-                        var existingTemplate = _fileService.GetTemplate(alias) as Template;
-
+                        var alias = n.Element("Alias");
+                        if (alias == null) { throw new ArgumentException("missing a alias element", "templateNotes"); }
+                        string aliasStr = alias.Value;
+                        var existingTemplate = _fileService.GetTemplate(aliasStr) as Template;
                         string existingName = existingTemplate == null ? null : existingTemplate.Name;
 
-                        return new KeyValuePair<string, string>(alias, existingName);
+                        return new KeyValuePair<string, string>(aliasStr, existingName);
                     })
                     .Where(kv => kv.Value != null);
         }
 
-        private IEnumerable<KeyValuePair<string, string>> FindConflictingMacroAliases(XmlNodeList macroNotes)
+        private IEnumerable<KeyValuePair<string, string>> FindConflictingMacroAliases(XElement macroNodes)
         {
-            return macroNotes == null
-                ? Enumerable.Empty<KeyValuePair<string, string>>()
-                : macroNotes
-                    .OfType<XmlNode>()
+            return  macroNodes.Elements("macro")
                     .Select(n =>
                     {
-                        string alias = XmlHelper.GetNodeValue(n.SelectSingleNode("alias"));
-                        IMacro macro = _macroService.GetByAlias(alias);
+                        var xElement = n.Element("alias");
+                        if (xElement == null) { throw new ArgumentException("missing a alias element", "macroNodes"); }
+                        string alias = xElement.Value;
+                        IMacro macro = _macroService.GetByAlias(xElement.Value);
                         string eksistingName = macro == null ? null : macro.Name;
 
                         return new KeyValuePair<string, string>(alias, eksistingName);
                     })
-                    .Where(kv => kv.Value != null);
+                    .Where(kv => kv.Key != null && kv.Value != null);
         }
 
 
-        private bool FileNodeIsUnsecure(XmlNode fileNode)
+        private bool FileNodeIsUnsecure(XElement fileNode)
         {
             string basePath = HostingEnvironment.ApplicationPhysicalPath;
-            string destPath = GetFileName(basePath, XmlHelper.GetNodeValue(fileNode.SelectSingleNode("orgPath")));
+            var orgName = fileNode.Element("orgName");
+            if (orgName == null) { throw new ArgumentException("Missing element \"orgName\"", "fileNode"); }
 
+            string destPath = GetFileName(basePath, orgName.Value);
+
+            // Should be done with regex :)
             if (destPath.ToLower().Contains(IOHelper.DirSepChar + "app_code")) return true;
             if (destPath.ToLower().Contains(IOHelper.DirSepChar + "bin")) return true;
 
-            string destFile = GetFileName(destPath, XmlHelper.GetNodeValue(fileNode.SelectSingleNode("orgName")));
-
-            return destFile.EndsWith(".dll", StringComparison.InvariantCultureIgnoreCase);
+            return destPath.EndsWith(".dll", StringComparison.InvariantCultureIgnoreCase);
         }
 
 
-        private PackageMetaData GetMetaData(XmlElement element)
+        private PackageMetaData GetMetaData(XElement xRootElement)
         {
-            XmlNode selectSingleNode = element.SelectSingleNode("/umbPackage/info/package/license");
+            XElement infoElement = xRootElement.Element("info");
+            
+            if (infoElement == null) { throw new ArgumentException("Did not hold a \"info\" element", "xRootElement"); }
 
-            string licenseUrl = string.Empty;
-            if (selectSingleNode != null && selectSingleNode.Attributes != null)
-            {
-                XmlNode attribute = selectSingleNode.Attributes.GetNamedItem("url");
-                licenseUrl = attribute == null ? string.Empty : attribute.Value ?? string.Empty;
-            }
+            var majorElement = infoElement.XPathSelectElement("/package/requirements/major");
+            var minorElement = infoElement.XPathSelectElement("/package/requirements/minor");
+            var patchElement = infoElement.XPathSelectElement("/package/requirements/patch");
+            var nameElement = infoElement.XPathSelectElement("/package/name");
+            var versionElement = infoElement.XPathSelectElement("/package/version");
+            var urlElement = infoElement.XPathSelectElement("/package/url");
+            var licenseElement = infoElement.XPathSelectElement("/package/license");
+            var authorNameElement = infoElement.XPathSelectElement("/author/name");
+            var authorUrlElement = infoElement.XPathSelectElement("/author/website");
+            var readmeElement = infoElement.XPathSelectElement("/readme");
 
-            string reqMajorStr =
-                XmlHelper.GetNodeValue(element.SelectSingleNode("/umbPackage/info/package/requirements/major"));
-            string reqMinorStr =
-                XmlHelper.GetNodeValue(element.SelectSingleNode("/umbPackage/info/package/requirements/minor"));
-            string reqPatchStr =
-                XmlHelper.GetNodeValue(element.SelectSingleNode("/umbPackage/info/package/requirements/patch"));
+            var controlElement = xRootElement.Element("control");
 
             int val;
 
-
             return new PackageMetaData
             {
-                Name = XmlHelper.GetNodeValue(element.SelectSingleNode("/umbPackage/info/package/name")),
-                Version = XmlHelper.GetNodeValue(element.SelectSingleNode("/umbPackage/info/package/version")),
-                Url = XmlHelper.GetNodeValue(element.SelectSingleNode("/umbPackage/info/package/url")),
-                License = XmlHelper.GetNodeValue(element.SelectSingleNode("/umbPackage/info/package/license")),
-                LicenseUrl = licenseUrl,
-                AuthorName = XmlHelper.GetNodeValue(element.SelectSingleNode("/umbPackage/info/author/name")),
-                AuthorUrl = XmlHelper.GetNodeValue(element.SelectSingleNode("/umbPackage/info/author/website")),
-                Readme = XmlHelper.GetNodeValue(element.SelectSingleNode("/umbPackage/info/readme")),
-                ReqMajor = int.TryParse(reqMajorStr, out val) ? val : 0,
-                ReqMinor = int.TryParse(reqMinorStr, out val) ? val : 0,
-                ReqPatch = int.TryParse(reqPatchStr, out val) ? val : 0,
-                Control = XmlHelper.GetNodeValue(element.SelectSingleNode("/umbPackage/control"))
+                Name = nameElement == null ? string.Empty : nameElement.Value,
+                Version = versionElement == null ? string.Empty : versionElement.Value,
+                Url = urlElement == null ? string.Empty : urlElement.Value,
+                License = licenseElement == null ? string.Empty : licenseElement.Value,
+                LicenseUrl = licenseElement == null ? string.Empty : licenseElement.HasAttributes ? licenseElement.AttributeValue<string>("url") : string.Empty,
+                AuthorName = authorNameElement == null ? string.Empty : authorNameElement.Value,
+                AuthorUrl = authorUrlElement == null ? string.Empty : authorUrlElement.Value,
+                Readme = readmeElement == null ? string.Empty : readmeElement.Value,
+                ReqMajor = majorElement == null ? 0 : int.TryParse(majorElement.Value, out val) ? val : 0,
+                ReqMinor = minorElement == null ? 0 : int.TryParse(minorElement.Value, out val) ? val : 0,
+                ReqPatch = patchElement == null ? 0 : int.TryParse(patchElement.Value, out val) ? val : 0,
+                Control = controlElement == null ? string.Empty : controlElement.Value
             };
         }
 
