@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
+using System.Xml.Linq;
 
 namespace Umbraco.Core.Packaging
 {
@@ -15,7 +16,7 @@ namespace Umbraco.Core.Packaging
         public IEnumerable<int> DocumentTypesInstalled { get; set; }
         public IEnumerable<int> StylesheetsInstalled { get; set; }
         public IEnumerable<int> DocumentsInstalled { get; set; }
-        public Dictionary<string, XmlNode> PackageInstallActions { get; set; }
+        public IEnumerable<KeyValuePair<string, XElement>> PackageInstallActions { get; set; }
         public string PackageUninstallActions { get; set; }
     }
 }
