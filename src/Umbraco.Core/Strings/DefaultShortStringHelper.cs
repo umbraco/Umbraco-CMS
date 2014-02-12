@@ -1,6 +1,11 @@
 ﻿
-// debugging - define to write cleaning details & steps to console
-#define WRTCONS
+// debugging
+// define WRTCONS to write cleaning details & steps to console
+// leave it wrapped within #if DEBUG to make sure it does leak
+// into RELEASE, see http://issues.umbraco.org/issue/U4-4199
+#if DEBUG
+#undef WRTCONS
+#endif
 
 using System;
 using System.Collections.Generic;
