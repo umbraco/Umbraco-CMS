@@ -99,11 +99,25 @@ namespace Umbraco.Tests.Services
             ServiceContext.UserService.SaveUserType(userType);
             var user = ServiceContext.UserService.CreateMemberWithIdentity("JohnDoe", "john@umbraco.io", "12345", userType);
             
-            ServiceContext.UserService.Delete(user);
+            ServiceContext.UserService.Delete(user, true);
             var deleted = ServiceContext.UserService.GetById(user.Id);
 
             // Assert
             Assert.That(deleted, Is.Null);
+        }
+
+        [Test]
+        public void Disables_User_Instead_Of_Deleting_If_Flag_Not_Set()
+        {
+            var userType = MockedUserType.CreateUserType();
+            ServiceContext.UserService.SaveUserType(userType);
+            var user = ServiceContext.UserService.CreateMemberWithIdentity("JohnDoe", "john@umbraco.io", "12345", userType);
+
+            ServiceContext.UserService.Delete(user);
+            var deleted = ServiceContext.UserService.GetById(user.Id);
+
+            // Assert
+            Assert.That(deleted, Is.Not.Null);
         }
 
         [Test]
