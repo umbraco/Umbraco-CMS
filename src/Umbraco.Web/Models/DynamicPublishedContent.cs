@@ -355,8 +355,8 @@ namespace Umbraco.Web.Models
 			{
 				//if we cannot get with the current alias, try changing it's case
 				attempt = alias[0].IsUpperCase()
-                    ? getMember(alias.ToCleanString(CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.CamelCase))
-                    : getMember(alias.ToCleanString(CleanStringType.Ascii | CleanStringType.Alias | CleanStringType.PascalCase));
+                    ? getMember(alias.ToCleanString(CleanStringType.Ascii | CleanStringType.ConvertCase | CleanStringType.CamelCase))
+                    : getMember(alias.ToCleanString(CleanStringType.Ascii | CleanStringType.ConvertCase | CleanStringType.PascalCase));
             }
 
 			return !attempt.Success
