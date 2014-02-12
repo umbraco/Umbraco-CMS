@@ -6,10 +6,17 @@ namespace Umbraco.Core.Persistence.Repositories
     public interface IMemberGroupRepository : IRepositoryQueryable<int, IMemberGroup>
     {
         /// <summary>
+        /// Gets a member group by it's name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns></returns>
+        IMemberGroup GetByName(string name);
+
+        /// <summary>
         /// Creates the new member group if it doesn't already exist
         /// </summary>
         /// <param name="roleName"></param>
-        void CreateIfNotExists(string roleName);
+        IMemberGroup CreateIfNotExists(string roleName);
 
         /// <summary>
         /// Returns the member groups for a given member

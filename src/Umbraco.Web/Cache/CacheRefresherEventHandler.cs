@@ -113,6 +113,8 @@ namespace Umbraco.Web.Cache
 
             MemberService.Saved += MemberServiceSaved;
             MemberService.Deleted += MemberServiceDeleted;
+            MemberGroupService.Saved += MemberGroupService_Saved;
+            MemberGroupService.Deleted += MemberGroupService_Deleted;
 
             //Bind to media events
 
@@ -555,7 +557,7 @@ namespace Umbraco.Web.Cache
 
         #region Member event handlers
 
-        void MemberServiceDeleted(IMemberService sender, Core.Events.DeleteEventArgs<IMember> e)
+        static void MemberServiceDeleted(IMemberService sender, Core.Events.DeleteEventArgs<IMember> e)
         {
             foreach (var m in e.DeletedEntities.ToArray())
             {
@@ -563,7 +565,7 @@ namespace Umbraco.Web.Cache
             }
         }
 
-        void MemberServiceSaved(IMemberService sender, Core.Events.SaveEventArgs<IMember> e)
+        static void MemberServiceSaved(IMemberService sender, Core.Events.SaveEventArgs<IMember> e)
         {
             foreach (var m in e.SavedEntities.ToArray())
             {
@@ -571,6 +573,25 @@ namespace Umbraco.Web.Cache
             }
         }
 
+        #endregion
+
+        #region Member group event handlers
+
+        static void MemberGroupService_Deleted(IMemberGroupService sender, Core.Events.DeleteEventArgs<IMemberGroup> e)
+        {
+            foreach (var m in e.DeletedEntities.ToArray())
+            {
+                DistributedCache.Instance.RemoveMemberGroupCache(m.Id);
+            }
+        }
+
+        static void MemberGroupService_Saved(IMemberGroupService sender, Core.Events.SaveEventArgs<IMemberGroup> e)
+        {
+            foreach (var m in e.SavedEntities.ToArray())
+            {
+                DistributedCache.Instance.RemoveMemberGroupCache(m.Id);
+            }
+        } 
         #endregion
     }
 }

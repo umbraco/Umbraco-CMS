@@ -237,7 +237,7 @@ namespace Umbraco.Web.Cache
 
         #region Member cache
         /// <summary>
-        /// Refreshes the cache amongst servers for a member
+        /// Refreshes the cache among servers for a member
         /// </summary>
         /// <param name="dc"></param>
         /// <param name="memberId"></param>
@@ -247,7 +247,7 @@ namespace Umbraco.Web.Cache
         }
 
         /// <summary>
-        /// Removes the cache amongst servers for a member
+        /// Removes the cache among servers for a member
         /// </summary>
         /// <param name="dc"></param>
         /// <param name="memberId"></param>
@@ -255,6 +255,29 @@ namespace Umbraco.Web.Cache
         {
             dc.Remove(new Guid(DistributedCache.MemberCacheRefresherId), memberId);
         } 
+
+        #endregion
+
+        #region Member group cache
+        /// <summary>
+        /// Refreshes the cache among servers for a member group
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="memberGroupId"></param>
+        public static void RefreshMemberGroupCache(this DistributedCache dc, int memberGroupId)
+        {
+            dc.Refresh(new Guid(DistributedCache.MemberGroupCacheRefresherId), memberGroupId);
+        }
+
+        /// <summary>
+        /// Removes the cache among servers for a member group
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="memberGroupId"></param>
+        public static void RemoveMemberGroupCache(this DistributedCache dc, int memberGroupId)
+        {
+            dc.Remove(new Guid(DistributedCache.MemberGroupCacheRefresherId), memberGroupId);
+        }
 
         #endregion
 

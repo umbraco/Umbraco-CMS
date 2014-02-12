@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -9,6 +10,8 @@ using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -16,12 +19,20 @@ namespace Umbraco.Core.Persistence.Repositories
 
     internal class MemberGroupRepository : PetaPocoRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
     {
-        public MemberGroupRepository(IDatabaseUnitOfWork work) : base(work)
+        private readonly CacheHelper _cacheHelper;
+
+        public MemberGroupRepository(IDatabaseUnitOfWork work, CacheHelper cacheHelper) 
+            : base(work)
         {
+            if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
+            _cacheHelper = cacheHelper;
         }
 
-        public MemberGroupRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache) : base(work, cache)
+        public MemberGroupRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, CacheHelper cacheHelper)
+            : base(work, cache)
         {
+            if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
+            _cacheHelper = cacheHelper;
         }
 
         private readonly MemberGroupFactory _modelFactory = new MemberGroupFactory();
@@ -86,6 +97,11 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new[]
                            {
+                               "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
+                               "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
+                               "DELETE FROM umbracoRelation WHERE parentId = @Id",
+                               "DELETE FROM umbracoRelation WHERE childId = @Id",
+                               "DELETE FROM cmsTagRelationship WHERE nodeId = @Id",
                                "DELETE FROM cmsMember2MemberGroup WHERE MemberGroup = @Id",
                                "DELETE FROM umbracoNode WHERE id = @Id"
                            };
@@ -117,26 +133,52 @@ namespace Umbraco.Core.Persistence.Repositories
             var dto = _modelFactory.BuildDto(entity);
 
             Database.Update(dto);
-
+            
             ((ICanBeDirty)entity).ResetDirtyProperties();
         }
 
-        public void CreateIfNotExists(string roleName)
+        public IMemberGroup GetByName(string name)
+        {
+            return _cacheHelper.RuntimeCache.GetCacheItem<IMemberGroup>(
+                string.Format("{0}.{1}", typeof (IMemberGroup).FullName, name),
+                () =>
+                {
+                    var qry = new Query<IMemberGroup>().Where(group => group.Name.Equals(name));
+                    var result = GetByQuery(qry);
+                    return result.FirstOrDefault();
+                },
+                //cache for 5 mins since that is the default in the RuntimeCacheProvider
+                TimeSpan.FromMinutes(5), 
+                //sliding is true
+                true);
+        }
+
+        public IMemberGroup CreateIfNotExists(string roleName)
         {
             using (var transaction = Database.GetTransaction())
             {
                 var qry = new Query<IMemberGroup>().Where(group => group.Name.Equals(roleName));
                 var result = GetByQuery(qry);
 
-                if (result.Any()) return;
+                if (result.Any()) return null;
 
-                PersistNewItem(new MemberGroup
+                var grp = new MemberGroup
                 {
                     Name = roleName
-                });
+                };
+                PersistNewItem(grp);
+
+                if (SavingMemberGroup.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(grp), this))
+                {
+                    return null;
+                }
 
                 transaction.Complete();
-            }            
+
+                SavedMemberGroup.RaiseEvent(new SaveEventArgs<IMemberGroup>(grp), this);
+
+                return grp;
+            }
         }
 
         public IEnumerable<IMemberGroup> GetMemberGroupsForMember(int memberId)
@@ -244,10 +286,18 @@ namespace Umbraco.Core.Persistence.Repositories
                .Where("umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
             var existingRoles = Database.Fetch<NodeDto>(existingSql).Select(x => x.Text);
             var missingRoles = roleNames.Except(existingRoles);
-            foreach (var m in missingRoles)
+            var missingGroups = missingRoles.Select(x => new MemberGroup {Name = x}).ToArray();
+
+            if (SavingMemberGroup.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(missingGroups), this))
             {
-                PersistNewItem(new MemberGroup { Name = m });
+                return;
             }
+            foreach (var m in missingGroups)
+            {
+                PersistNewItem(m);
+            }
+            SavedMemberGroup.RaiseEvent(new SaveEventArgs<IMemberGroup>(missingGroups), this);
+
             //now go get all the dto's for roles with these role names
             var rolesForNames = Database.Fetch<NodeDto>(existingSql).ToArray();
 
@@ -318,5 +368,15 @@ namespace Umbraco.Core.Persistence.Repositories
             [Column("MemberGroup")]
             public int MemberGroupId { get; set; }
         }
+
+        /// <summary>
+        /// Occurs before Save
+        /// </summary>
+        internal static event TypedEventHandler<IMemberGroupRepository, SaveEventArgs<IMemberGroup>> SavingMemberGroup;
+
+        /// <summary>
+        /// Occurs after Save
+        /// </summary>
+        internal static event TypedEventHandler<IMemberGroupRepository, SaveEventArgs<IMemberGroup>> SavedMemberGroup;
     }
 }

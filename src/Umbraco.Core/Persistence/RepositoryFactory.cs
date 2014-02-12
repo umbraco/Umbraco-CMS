@@ -166,7 +166,7 @@ namespace Umbraco.Core.Persistence
 
         internal virtual IMemberGroupRepository CreateMemberGroupRepository(IDatabaseUnitOfWork uow)
         {
-            return new MemberGroupRepository(uow, _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current);
+            return new MemberGroupRepository(uow, _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current, _cacheHelper);
         }
 
         internal virtual IEntityRepository CreateEntityRepository(IDatabaseUnitOfWork uow)

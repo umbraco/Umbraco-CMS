@@ -774,6 +774,7 @@
     <Compile Include="Services\IFileService.cs" />
     <Compile Include="Services\ILocalizationService.cs" />
     <Compile Include="Services\IMediaService.cs" />
+    <Compile Include="Services\IMemberGroupService.cs" />
     <Compile Include="Services\IMemberService.cs" />
     <Compile Include="Services\IMembershipMemberService.cs" />
     <Compile Include="Services\IMembershipRoleService.cs" />
@@ -786,6 +787,7 @@
     <Compile Include="Services\LocalizationService.cs" />
     <Compile Include="Services\MediaService.cs" />
     <Compile Include="Services\MemberCountType.cs" />
+    <Compile Include="Services\MemberGroupService.cs" />
     <Compile Include="Services\MemberService.cs" />
     <Compile Include="Services\MemberTypeService.cs" />
     <Compile Include="Services\NotificationService.cs" />

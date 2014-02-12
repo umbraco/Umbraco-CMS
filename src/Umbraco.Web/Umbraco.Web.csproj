@@ -283,6 +283,7 @@
     <Compile Include="Cache\MacroCacheRefresher.cs" />
     <Compile Include="Cache\MediaCacheRefresher.cs" />
     <Compile Include="Cache\MemberCacheRefresher.cs" />
+    <Compile Include="Cache\MemberGroupCacheRefresher.cs" />
     <Compile Include="Cache\PageCacheRefresher.cs" />
     <Compile Include="Cache\StylesheetCacheRefresher.cs" />
     <Compile Include="Cache\StylesheetPropertyCacheRefresher.cs" />
@@ -396,6 +397,7 @@
     <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\RebuildMediaXmlCacheAfterUpgrade.cs" />
+    <Compile Include="Strategies\PublicAccessEventHandler.cs" />
     <Compile Include="UI\Bundles\JsApplicationLib.cs" />
     <Compile Include="UI\Bundles\JsJQueryCore.cs" />
     <Compile Include="UI\Bundles\JsJQueryPlugins.cs" />

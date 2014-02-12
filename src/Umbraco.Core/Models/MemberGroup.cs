@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
@@ -12,6 +13,11 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class MemberGroup : Entity, IMemberGroup
     {
+        public MemberGroup()
+        {
+            AdditionalData = new Dictionary<string, object>();
+        }
+
         private string _name;
         private int _creatorId;
 
@@ -26,6 +32,14 @@ namespace Umbraco.Core.Models
             {
                 SetPropertyValueAndDetectChanges(o =>
                 {
+                    if (_name != value)
+                    {
+                        //if the name has changed, add the value to the additional data,
+                        //this is required purely for event handlers to know the previous name of the group
+                        //so we can keep the public access up to date.
+                        AdditionalData["previousName"] = _name;
+                    }
+
                     _name = value;
                     return _name;
                 }, _name, NameSelector);
@@ -44,6 +58,8 @@ namespace Umbraco.Core.Models
                 }, _creatorId, CreatorIdSelector);
             }
         }
+
+        public IDictionary<string, object> AdditionalData { get; private set; }
 
         /// <summary>
         /// Method to call when Entity is being saved

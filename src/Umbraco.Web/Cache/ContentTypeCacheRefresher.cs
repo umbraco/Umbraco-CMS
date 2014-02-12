@@ -17,7 +17,7 @@ namespace Umbraco.Web.Cache
 {
 
     /// <summary>
-    /// A cache refresher to ensure content type cache is updated when members change
+    /// A cache refresher to ensure content type cache is updated when content types change - this is applicable to content, media and member types
     /// </summary>
     /// <remarks>
     /// This is not intended to be used directly in your code

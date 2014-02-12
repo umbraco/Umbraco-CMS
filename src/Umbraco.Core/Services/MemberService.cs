@@ -19,26 +19,31 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Represents the MemberService.
     /// </summary>
-    internal class MemberService : IMemberService
+    public class MemberService : IMemberService
     {
         private readonly RepositoryFactory _repositoryFactory;
+        private readonly IMemberGroupService _memberGroupService;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
 
-        public MemberService(RepositoryFactory repositoryFactory)
-            : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
+        public MemberService(RepositoryFactory repositoryFactory, IMemberGroupService memberGroupService)
+            : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory, memberGroupService)
         {
         }
 
-        public MemberService(IDatabaseUnitOfWorkProvider provider)
-            : this(provider, new RepositoryFactory())
+        public MemberService(IDatabaseUnitOfWorkProvider provider, IMemberGroupService memberGroupService)
+            : this(provider, new RepositoryFactory(), memberGroupService)
         {
         }
 
-        public MemberService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
+        public MemberService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IMemberGroupService memberGroupService)
         {
+            if (provider == null) throw new ArgumentNullException("provider");
+            if (repositoryFactory == null) throw new ArgumentNullException("repositoryFactory");
+            if (memberGroupService == null) throw new ArgumentNullException("memberGroupService");
             _repositoryFactory = repositoryFactory;
+            _memberGroupService = memberGroupService;
             _uowProvider = provider;
         }
 
@@ -843,10 +848,11 @@ namespace Umbraco.Core.Services
                 {
                     var qry = new Query<IMemberGroup>().Where(g => g.Name == roleName);
                     var found = repository.GetByQuery(qry).ToArray();
+
                     foreach (var memberGroup in found)
                     {
-                        repository.Delete(memberGroup);
-                    }
+                        _memberGroupService.Delete(memberGroup);                                      
+                    }                    
                     return found.Any();
                 }
             }
@@ -977,8 +983,7 @@ namespace Umbraco.Core.Services
         }
 
         #region Event Handlers
-
-
+        
         /// <summary>
         /// Occurs before Delete
         /// </summary>
@@ -998,7 +1003,7 @@ namespace Umbraco.Core.Services
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saved;
-
+        
         #endregion
 
         ///// <summary>

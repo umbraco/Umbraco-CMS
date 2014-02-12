@@ -27,7 +27,7 @@ namespace Umbraco.Core.Cache
 
         public const string MemberLibraryCacheKey = "UL_GetMember";
         public const string MemberBusinessLogicCacheKey = "MemberCacheItem_";
-
+        
         public const string TemplateFrontEndCacheKey = "template";
         public const string TemplateBusinessLogicCacheKey = "UmbracoTemplateCache";
 
