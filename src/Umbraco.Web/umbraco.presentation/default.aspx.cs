@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Web;
+using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.UI;
 using System.IO;
@@ -29,6 +30,13 @@ namespace umbraco
     /// </remarks>
     public class UmbracoDefault : Page
     {
+        /// <summary>
+        /// Simply used to clear temp data
+        /// </summary>
+        private class TempDataController : Controller
+        {
+        }
+
         private page _upage;
         private PublishedContentRequest _docRequest;
         bool _validateRequest = true;
@@ -85,8 +93,18 @@ namespace umbraco
         {
             using (DisposableTimer.DebugDuration<UmbracoDefault>("Init"))
             {
-
                 base.OnInit(e);
+
+                //This is a special case for webforms since in some cases we may be POSTing to an MVC controller, adding TempData there and then redirecting
+                // to a webforms handler. In that case we need to manually clear out the tempdata ourselves since this is normally the function of the base
+                // MVC controller instance and since that is not executing, we'll deal with that here.
+                //Unfortunately for us though, we can never know which TempDataProvider was used for the previous controller, by default it is the sessionstateprovider
+                // but since the tempdataprovider is not a global mvc thing, it is only a per-controller thing, we can only just assume it will be the sessionstateprovider
+                var provider = new SessionStateTempDataProvider();
+                //We create a custom controller context, the only thing that is referenced from this controller context in the sessionstateprovider is the HttpContext.Session
+                // so we just need to ensure that is set
+                var ctx = new ControllerContext(new HttpContextWrapper(Context), new RouteData(), new TempDataController());
+                provider.LoadTempData(ctx);
 
                 //This is only here for legacy if people arent' using master pages... 
                 //TODO: We need to test that this still works!! Or do we ??
