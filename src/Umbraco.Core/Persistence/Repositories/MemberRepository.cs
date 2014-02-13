@@ -26,8 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ITagsRepository _tagRepository;
         private readonly IMemberGroupRepository _memberGroupRepository;
 
-        public MemberRepository(IDatabaseUnitOfWork work, IMemberTypeRepository memberTypeRepository, ITagsRepository tagRepository)
-        public MemberRepository(IDatabaseUnitOfWork work, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository)
+        public MemberRepository(IDatabaseUnitOfWork work, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagsRepository tagRepository)
             : base(work)
         {
             if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
@@ -37,8 +36,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _memberGroupRepository = memberGroupRepository;
         }
 
-        public MemberRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMemberTypeRepository memberTypeRepository, ITagsRepository tagRepository)
-        public MemberRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository)
+        public MemberRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagsRepository tagRepository)
             : base(work, cache)
         {
             if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");

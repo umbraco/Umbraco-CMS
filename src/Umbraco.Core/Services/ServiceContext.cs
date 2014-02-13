@@ -58,7 +58,7 @@ namespace Umbraco.Core.Services
             IPackagingService packagingService, 
             IEntityService entityService,
             IRelationService relationService,
-            IMemberGroupService memberGroupService/*,
+            IMemberGroupService memberGroupService,
             ISectionService sectionService,
             IApplicationTreeService treeService,
             ITagService tagService)

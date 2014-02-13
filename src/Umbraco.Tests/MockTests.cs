@@ -49,7 +49,7 @@ namespace Umbraco.Tests
                     new Mock<IDatabaseUnitOfWorkProvider>().Object,
                     new RepositoryFactory(true),
                     new Mock<IEntityService>().Object),
-                    new Mock<IMemberGroupService>().Object/*,
+                    new Mock<IMemberGroupService>().Object,
                 new Mock<ISectionService>().Object,
                 new Mock<IApplicationTreeService>().Object,
                 new Mock<ITagService>().Object);
@@ -90,11 +90,12 @@ namespace Umbraco.Tests
                         new Mock<IDatabaseUnitOfWorkProvider>().Object,
                         new RepositoryFactory(true),
                         new Mock<IEntityService>().Object),
+                    new Mock<IMemberGroupService>().Object,
                     new Mock<ISectionService>().Object,
-                    new Mock<IMemberGroupService>().Object),
                     new Mock<IApplicationTreeService>().Object,
                     new Mock<ITagService>().Object),
                 CacheHelper.CreateDisabledCacheHelper());
+            
             Assert.Pass();
         }
         

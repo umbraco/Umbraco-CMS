@@ -265,42 +265,9 @@ namespace Umbraco.Web.Security
             {
                 return true;
             }
-            return CurrentUser.Applications.Any(uApp => uApp.alias == app);
+            return CurrentUser.AllowedSections.Any(uApp => uApp.InvariantEquals(app));
         }
-
-        internal void UpdateLogin(long timeout)
-        {
-            // only call update if more than 1/10 of the timeout has passed
-            if (timeout - (((TicksPrMinute * UmbracoTimeOutInMinutes) * 0.8)) < DateTime.Now.Ticks)
-                SqlHelper.ExecuteNonQuery(
-                    "UPDATE umbracoUserLogins SET timeout = @timeout WHERE contextId = @contextId",
-                    SqlHelper.CreateParameter("@timeout", DateTime.Now.Ticks + (TicksPrMinute * UmbracoTimeOutInMinutes)),
-                    SqlHelper.CreateParameter("@contextId", UmbracoUserContextId));
-        }
-
-        internal long GetTimeout(string umbracoUserContextId)
-        {
-            return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                CacheKeys.UserContextTimeoutCacheKey + umbracoUserContextId,
-                new TimeSpan(0, UmbracoTimeOutInMinutes / 10, 0),
-                () => GetTimeout(true));
-        }
-
-        internal long GetTimeout(bool byPassCache)
-        {
-            if (UmbracoSettings.KeepUserLoggedIn)
-                RenewLoginTimeout();
-
-            if (byPassCache)
-            {
-                return SqlHelper.ExecuteScalar<long>("select timeout from umbracoUserLogins where contextId=@contextId",
-                                                          SqlHelper.CreateParameter("@contextId", new Guid(UmbracoUserContextId))
-                                        );
-            }
-
-            return GetTimeout(UmbracoUserContextId);
-        }
-
+        
         /// <summary>
         /// Gets the user id.
         /// </summary>
@@ -412,7 +379,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         internal bool UserHasAppAccess(string app, IUser user)
         {
-            var apps = _applicationContext.Services.UserService.GetUserSections(user);
+            var apps = user.AllowedSections;
             return apps.Any(uApp => uApp.InvariantEquals(app));
         }
 

@@ -60,12 +60,12 @@ namespace Umbraco.Core.Persistence
         public virtual IContentRepository CreateContentRepository(IDatabaseUnitOfWork uow)
         {
             return new ContentRepository(
-                uow,
+                uow,                
                 _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
                 CreateContentTypeRepository(uow),
                 CreateTemplateRepository(uow),
-                CreateTagsRepository(uow)) { EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming };
-                _cacheHelper) { EnsureUniqueNaming = Configuration.UmbracoSettings.EnsureUniqueNaming };
+                CreateTagsRepository(uow),
+                _cacheHelper) { EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming };
         }
 
         public virtual IContentTypeRepository CreateContentTypeRepository(IDatabaseUnitOfWork uow)
@@ -176,15 +176,12 @@ namespace Umbraco.Core.Persistence
 
         internal virtual IMemberRepository CreateMemberRepository(IDatabaseUnitOfWork uow)
         {
-            return new MemberRepository(uow, 
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current, 
-                CreateMemberTypeRepository(uow),
-                CreateTagsRepository(uow));
             return new MemberRepository(
-                uow, 
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current, 
+                uow,
+                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
                 CreateMemberTypeRepository(uow),
-                CreateMemberGroupRepository(uow));
+                CreateMemberGroupRepository(uow),
+                CreateTagsRepository(uow));
         }
 
         internal virtual IMemberTypeRepository CreateMemberTypeRepository(IDatabaseUnitOfWork uow)

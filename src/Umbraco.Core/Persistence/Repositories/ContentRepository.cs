@@ -26,8 +26,7 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly ITagsRepository _tagRepository;
         private readonly CacheHelper _cacheHelper;
 
-        public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository)
-        public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, CacheHelper cacheHelper)
+        public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository, CacheHelper cacheHelper)
             : base(work)
         {
             if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");
@@ -41,8 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories
 		    EnsureUniqueNaming = true;
         }
 
-        public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository)
-        public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, CacheHelper cacheHelper)
+        public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository, CacheHelper cacheHelper)
             : base(work, cache)
         {
             if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");

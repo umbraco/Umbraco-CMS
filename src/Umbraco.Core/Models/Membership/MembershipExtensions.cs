@@ -36,7 +36,7 @@ namespace Umbraco.Core.Models.Membership
                 {
                     return MembershipScenario.NativeUmbraco;
                 }
-                var memberType = ApplicationContext.Current.Services.MemberTypeService.GetMemberType(Constants.Conventions.MemberTypes.Member);
+                var memberType = ApplicationContext.Current.Services.MemberTypeService.Get(Constants.Conventions.MemberTypes.Member);
                 return memberType != null
                            ? MembershipScenario.CustomProviderWithUmbracoLink
                            : MembershipScenario.StandaloneCustomProvider;

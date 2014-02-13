@@ -606,6 +606,7 @@ namespace umbraco.BusinessLogic
 
             // NH 4.7.1 changing default permission behavior to default to User Type permissions IF no specific permissions has been
             // set for the current node
+            var nodeId = Path.Contains(",") ? int.Parse(Path.Substring(Path.LastIndexOf(",", StringComparison.Ordinal) + 1)) : int.Parse(Path);
             if (cachedPermissions.Any(x => x.EntityId == nodeId))
             {
                 var found = cachedPermissions.First(x => x.EntityId == nodeId);

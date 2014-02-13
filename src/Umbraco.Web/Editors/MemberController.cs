@@ -140,7 +140,7 @@ namespace Umbraco.Web.Editors
                         throw new HttpResponseException(HttpStatusCode.NotFound);
                     }
 
-                    var contentType = Services.MemberTypeService.GetMemberType(contentTypeAlias);
+                    var contentType = Services.MemberTypeService.Get(contentTypeAlias);
                     if (contentType == null)
                     {
                         throw new HttpResponseException(HttpStatusCode.NotFound);
@@ -384,7 +384,7 @@ namespace Umbraco.Web.Editors
                 return null;
             }
 
-            var passwordChangeResult = Security.ChangePassword(membershipUser.UserName, contentItem.Password, Membership.Provider);
+            var passwordChangeResult = Members.ChangePassword(membershipUser.UserName, contentItem.Password, Membership.Provider);
             if (passwordChangeResult.Success)
             {
                 //If the provider has changed some values, these values need to be reflected in the member object 

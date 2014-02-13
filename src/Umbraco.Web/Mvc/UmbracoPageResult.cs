@@ -4,7 +4,6 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core;
-using umbraco.presentation.install.utills;
 
 namespace Umbraco.Web.Mvc
 {
