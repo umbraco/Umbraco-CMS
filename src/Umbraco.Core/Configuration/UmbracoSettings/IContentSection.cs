@@ -4,6 +4,8 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     public interface IContentSection : IUmbracoConfigurationSection
     {
+        IImagingCrops ImageCrops { get; }
+
         string NotificationEmailAddress { get; }
 
         bool DisableHtmlEmail { get; }

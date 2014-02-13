@@ -11,6 +11,25 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             get { return true; }
         }
 
+        [Test]
+        public override void ImageCrops()
+        {
+            Assert.IsFalse(SettingsSection.Content.ImageCrops.SaveFiles);
+        }
+
+        [Test]
+        public override void ImageCropItem()
+        {
+            Assert.AreEqual(0, SettingsSection.Content.ImageCrops.Crops.Count());
+        }
+
+        [Test]
+        public override void ImageCropSizes()
+        {
+            Assert.AreEqual(0, SettingsSection.Content.ImageCrops.Crops.Count());
+        }
+
+        [Test]
         public override void DisableHtmlEmail()
         {
             Assert.IsTrue(SettingsSection.Content.DisableHtmlEmail == false);
@@ -35,11 +54,13 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Assert.IsTrue(SettingsSection.Content.ImageAutoFillProperties.ElementAt(0).ExtensionFieldAlias == "umbracoExtension");
         }
 
+        [Test]
         public override void TidyCharEncoding()
         {
             Assert.IsTrue(SettingsSection.Content.TidyCharEncoding == "UTF8");
         }
 
+        [Test]
         public override void XmlContentCheckForDiskChanges()
         {
             Assert.IsTrue(SettingsSection.Content.XmlContentCheckForDiskChanges == false);

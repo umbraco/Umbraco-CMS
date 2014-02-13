@@ -1,10 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Configuration;
+﻿using System.Configuration;
 
 namespace Umbraco.Core.Configuration.UmbracoSettings
 {
     internal class ContentImagingElement : ConfigurationElement
     {
+        [ConfigurationProperty("crops")]
+        internal ContentImagingCropsElement Crops
+        {
+            get { return (ContentImagingCropsElement)base["crops"]; }
+        }
+
         [ConfigurationProperty("imageFileTypes")]
         internal CommaDelimitedConfigurationElement ImageFileTypes
         {
