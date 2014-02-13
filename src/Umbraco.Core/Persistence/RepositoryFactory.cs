@@ -16,13 +16,14 @@ namespace Umbraco.Core.Persistence
         private readonly CacheHelper _cacheHelper;
         private readonly IUmbracoSettingsSection _settings;
 
+        #region Ctors
         public RepositoryFactory()
             : this(false, UmbracoConfig.For.UmbracoSettings())
         {
-            
         }
 
         public RepositoryFactory(CacheHelper cacheHelper)
+            : this(false, UmbracoConfig.For.UmbracoSettings())
         {
             if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
             _disableAllCache = false;
@@ -30,9 +31,9 @@ namespace Umbraco.Core.Persistence
         }
 
         public RepositoryFactory(bool disableAllCache, CacheHelper cacheHelper)
+            : this(disableAllCache, UmbracoConfig.For.UmbracoSettings())
         {
             if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
-            _disableAllCache = disableAllCache;
             _cacheHelper = cacheHelper;
         }
 
@@ -46,9 +47,16 @@ namespace Umbraco.Core.Persistence
         {
             _disableAllCache = disableAllCache;
             _settings = settings;
-            _cacheHelper = disableAllCache ? CacheHelper.CreateDisabledCacheHelper() : ApplicationContext.Current.ApplicationCache;
-
+            _cacheHelper = _disableAllCache ? CacheHelper.CreateDisabledCacheHelper() : ApplicationContext.Current.ApplicationCache;
         }
+
+        internal RepositoryFactory(bool disableAllCache, IUmbracoSettingsSection settings, CacheHelper cacheHelper)
+        {
+            _disableAllCache = disableAllCache;
+            _settings = settings;
+            _cacheHelper = cacheHelper;
+        } 
+        #endregion
 
         public virtual ITagsRepository CreateTagsRepository(IDatabaseUnitOfWork uow)
         {
