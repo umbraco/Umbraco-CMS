@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Relators;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -17,20 +19,23 @@ namespace Umbraco.Core.Persistence.Repositories
     /// <summary>
     /// Represents the UserRepository for doing CRUD operations for <see cref="IUser"/>
     /// </summary>
-    internal class UserRepository : PermissionRepository<int, IUser>, IUserRepository
+    internal class UserRepository : PetaPocoRepositoryBase<int, IUser>, IUserRepository
     {
         private readonly IUserTypeRepository _userTypeRepository;
+        private readonly CacheHelper _cacheHelper;
 
-        public UserRepository(IDatabaseUnitOfWork work, IUserTypeRepository userTypeRepository)
+        public UserRepository(IDatabaseUnitOfWork work, IUserTypeRepository userTypeRepository, CacheHelper cacheHelper)
             : base(work)
         {
             _userTypeRepository = userTypeRepository;
+            _cacheHelper = cacheHelper;
         }
 
-        public UserRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IUserTypeRepository userTypeRepository)
+        public UserRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IUserTypeRepository userTypeRepository, CacheHelper cacheHelper)
             : base(work, cache)
         {
             _userTypeRepository = userTypeRepository;
+            _cacheHelper = cacheHelper;
         }
 
         #region Overrides of RepositoryBase<int,IUser>
@@ -200,7 +205,30 @@ namespace Umbraco.Core.Persistence.Repositories
         #endregion
 
         #region Implementation of IUserRepository
-        
+
+        public int GetCountByQuery(IQuery<IUser> query)
+        {
+            var sqlClause = GetBaseQuery("umbracoUser.id");
+            var translator = new SqlTranslator<IUser>(sqlClause, query);
+            var subquery = translator.Translate();
+            //get the COUNT base query
+            var sql = GetBaseQuery(true)
+                .Append(new Sql("WHERE umbracoUser.id IN (" + subquery.SQL + ")", subquery.Arguments));
+
+            return Database.ExecuteScalar<int>(sql);
+        }
+
+        public bool Exists(string username)
+        {
+            var sql = new Sql();
+            var escapedUserName = PetaPocoExtensions.EscapeAtSymbols(username);
+            sql.Select("COUNT(*)")
+                .From<UserDto>()
+                .Where<UserDto>(x => x.UserName == escapedUserName);
+
+            return Database.ExecuteScalar<int>(sql) > 0;
+        }
+
         public IEnumerable<IUser> GetUsersAssignedToSection(string sectionAlias)
         {
             //Here we're building up a query that looks like this, a sub query is required because the resulting structure
@@ -222,6 +250,78 @@ namespace Umbraco.Core.Persistence.Repositories
             sql.Where(string.Format("umbracoUser.id IN ({0})", innerSql.SQL));
 
             return ConvertFromDtos(Database.Fetch<UserDto, User2AppDto, UserDto>(new UserSectionRelator().Map, sql));
+        }
+
+        /// <summary>
+        /// Gets paged user results
+        /// </summary>
+        /// <param name="query">
+        /// The where clause, if this is null all records are queried
+        /// </param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="orderBy"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// The query supplied will ONLY work with data specifically on the umbracoUser table because we are using PetaPoco paging (SQL paging)
+        /// </remarks>
+        public IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy)
+        {
+            if (orderBy == null) throw new ArgumentNullException("orderBy");
+
+            var sql = new Sql();
+            sql.Select("*").From<UserDto>();
+
+            Sql resultQuery;
+            if (query != null)
+            {
+                var translator = new SqlTranslator<IUser>(sql, query);
+                resultQuery = translator.Translate();
+            }
+            else
+            {
+                resultQuery = sql;
+            }
+
+            //get the referenced column name
+            var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
+            //now find the mapped column name
+            var mapper = MappingResolver.Current.ResolveMapperByType(typeof(IUser));
+            var mappedField = mapper.Map(expressionMember.Name);
+            if (mappedField.IsNullOrWhiteSpace())
+            {
+                throw new ArgumentException("Could not find a mapping for the column specified in the orderBy clause");
+            }
+            //need to ensure the order by is in brackets, see: https://github.com/toptensoftware/PetaPoco/issues/177
+            resultQuery.OrderBy(string.Format("({0})", mappedField));
+
+            var pagedResult = Database.Page<UserDto>(pageIndex + 1, pageSize, resultQuery);
+
+            totalRecords = Convert.ToInt32(pagedResult.TotalItems);
+
+            //now that we have the user dto's we need to construct true members from the list.
+            if (totalRecords == 0)
+            {
+                return Enumerable.Empty<IUser>();
+            }
+
+            var result = GetAll(pagedResult.Items.Select(x => x.Id).ToArray());
+
+            //now we need to ensure this result is also ordered by the same order by clause
+            return result.OrderBy(orderBy.Compile());
+        }
+
+        /// <summary>
+        /// Returns permissions for a given user for any number of nodes
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="entityIds"></param>
+        /// <returns></returns>        
+        public IEnumerable<EntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds)
+        {
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
+            return repo.GetUserPermissionsForEntities(userId, entityIds);
         }
 
         #endregion

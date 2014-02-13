@@ -10,7 +10,7 @@ namespace Umbraco.Tests.TestHelpers.Entities
                 {
                     Alias = "testUserType" + suffix,
                     Name = "TestUserType" + suffix,
-                    Permissions = "ABC"
+                    Permissions = new[]{"A", "B", "C"}
                 };
         }
     }

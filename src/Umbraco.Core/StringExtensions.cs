@@ -50,6 +50,19 @@ namespace Umbraco.Core
             return mName;
         }
 
+        /// <summary>
+        /// Cleans string to aid in preventing xss attacks.
+        /// </summary>
+        /// <param name="input"></param>
+        /// <returns></returns>
+        internal static string CleanForXss(this string input)
+        {
+            //remove any html
+            input = input.StripHtml();
+            //strip out any potential chars involved with XSS
+            return input.ExceptChars(new HashSet<char>("*?(){}[];:%<>/\\|&'\"".ToCharArray()));
+        }
+
         public static string ExceptChars(this string str, HashSet<char> toExclude)
         {
             var sb = new StringBuilder(str.Length);
@@ -427,6 +440,16 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Converts an integer to an invariant formatted string
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static string ToInvariantString(this int str)
+        {
+            return str.ToString(CultureInfo.InvariantCulture);
+        }
+
+        /// <summary>
         /// Compares 2 strings with invariant culture and case ignored
         /// </summary>
         /// <param name="compare">The compare.</param>
@@ -440,6 +463,11 @@ namespace Umbraco.Core
         public static bool InvariantStartsWith(this string compare, string compareTo)
         {
             return compare.StartsWith(compareTo, StringComparison.InvariantCultureIgnoreCase);
+        }
+
+        public static bool InvariantEndsWith(this string compare, string compareTo)
+        {
+            return compare.EndsWith(compareTo, StringComparison.InvariantCultureIgnoreCase);
         }
 
         public static bool InvariantContains(this string compare, string compareTo)
@@ -788,9 +816,11 @@ namespace Umbraco.Core
                 if (_helper != null)
                     return _helper;
 
-                // there *has* to be a short string helper, even if the resolver has not
-                // been initialized - used the default one with default configuration.
-                _helper = new DefaultShortStringHelper().WithConfig(allowLeadingDigits: true);
+                // we don't want Umbraco to die because the resolver hasn't been initialized
+                // as the ShortStringHelper is too important, so as long as it's not there
+                // already, we use a default one. That should never happen, but...
+                Logging.LogHelper.Warn<IShortStringHelper>("ShortStringHelperResolver.HasCurrent == false, fallback to default.");
+                _helper = new DefaultShortStringHelper().WithDefaultConfig();
                 _helper.Freeze();
                 return _helper;
             }
@@ -842,7 +872,7 @@ namespace Umbraco.Core
         /// This allows you to replace strings like &amp; , etc.. with your replacement character before the automatic
         /// reduction.
         /// </remarks>
-        [UmbracoWillObsolete("This method should be removed. Use ToUrlSegment instead.")]
+        [Obsolete("This method should be removed. Use ToUrlSegment instead.")]
         public static string ToUrlAlias(this string value, IDictionary<string, string> charReplacements, bool replaceDoubleDashes, bool stripNonAscii, bool urlEncode)
         {
             var helper = ShortStringHelper;
@@ -866,7 +896,7 @@ namespace Umbraco.Core
         ///  and <c>UmbracoSettings.RemoveDoubleDashesFromUrlReplacing</c>.</para>
         /// <para>Other helpers may use different parameters.</para>
         /// </remarks>
-        [UmbracoWillObsolete("This method should be removed. Use ToUrlSegment instead.")]
+        [Obsolete("This method should be removed. Use ToUrlSegment instead.")]
         public static string FormatUrl(this string url)
         {
             var helper = ShortStringHelper;
@@ -933,7 +963,7 @@ namespace Umbraco.Core
         /// <param name="removeSpaces">Indicates whether spaces should be removed. THIS PARAMETER IS IGNORED.</param>
         /// <returns>The safe alias.</returns>
         /// <remarks>CamelCase, and remove spaces, whatever the parameters.</remarks>
-        [UmbracoWillObsolete("This method should be removed. Use ToSafeAlias instead.")]
+        [Obsolete("This method should be removed. Use ToSafeAlias instead.")]
         public static string ToUmbracoAlias(this string phrase, StringAliasCaseType caseType = StringAliasCaseType.CamelCase, bool removeSpaces = false)
         {
             var helper = ShortStringHelper;
@@ -978,7 +1008,7 @@ namespace Umbraco.Core
         /// <para>This is the legacy method, so we can't really change it, although it has issues (see unit tests).</para>
         /// <para>It does more than "converting the case", and also remove spaces, etc.</para>
         /// </remarks>
-        [UmbracoWillObsolete("This method should be removed. Use CleanString instead.")]
+        [Obsolete("This method should be removed. Use CleanString instead.")]
         public static string ConvertCase(this string phrase, StringAliasCaseType cases)
         {
             var helper = ShortStringHelper;

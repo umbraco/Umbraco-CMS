@@ -81,7 +81,14 @@ namespace Umbraco.Web
 			if (UmbracoContext.Current.RoutingContext == null)
 				throw new InvalidOperationException("The UmbracoContext.RoutingContext has not been assigned, ProcessRequest cannot proceed unless there is a RoutingContext assigned to the UmbracoContext");
 
-			var umbracoContext = UmbracoContext.Current;		
+			var umbracoContext = UmbracoContext.Current;
+
+            //if it's a back office request then we need to ensure we're configured - otherwise redirect to installer
+            if (httpContext.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)
+                && EnsureIsConfigured(httpContext, umbracoContext.OriginalRequestUrl) == false)
+            {                
+                return;
+            }
 
 			// do not process but remap to handler if it is a base rest request
 			if (BaseRest.BaseRestHandler.IsBaseRestRequest(umbracoContext.OriginalRequestUrl))
@@ -139,7 +146,7 @@ namespace Umbraco.Web
             if (http.Request.Url.IsClientSideRequest())
                 return;
 
-            if (app.Request.Url.IsBackOfficeRequest() || app.Request.Url.IsInstallerRequest())
+            if (app.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath) || app.Request.Url.IsInstallerRequest())
             {
                 var ticket = http.GetUmbracoAuthTicket();
                 if (ticket != null)

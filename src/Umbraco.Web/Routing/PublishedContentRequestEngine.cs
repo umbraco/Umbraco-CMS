@@ -46,7 +46,10 @@ namespace Umbraco.Web.Routing
 		/// <summary>
 		/// Prepares the request.
 		/// </summary>
-		public void PrepareRequest()
+		/// <returns>
+		/// Returns false if the request was not successfully prepared
+		/// </returns>
+		public bool PrepareRequest()
 		{
 			// note - at that point the original legacy module did something do handle IIS custom 404 errors
 			//   ie pages looking like /anything.aspx?404;/path/to/document - I guess the reason was to support
@@ -62,10 +65,12 @@ namespace Umbraco.Web.Routing
 
 			// if request has been flagged to redirect then return
 			// whoever called us is in charge of actually redirecting
-			if (_pcr.IsRedirect)
-				return;
+		    if (_pcr.IsRedirect)
+		    {
+		        return false;
+		    }
 
-			// set the culture on the thread - once, so it's set when running document lookups
+		    // set the culture on the thread - once, so it's set when running document lookups
 			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
 
 			// find the document & template
@@ -84,18 +89,42 @@ namespace Umbraco.Web.Routing
             // we don't take care of anything so if the content has changed, it's up to the user
             // to find out the appropriate template
 
-            // set the culture on the thread -- again, 'cos it might have changed in the event handler
-			Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
+            //complete the PCR and assign the remaining values
+		    return ConfigureRequest();
+		}
 
-			// if request has been flagged to redirect, or has no content to display,
+        /// <summary>
+        /// Called by PrepareRequest once everything has been discovered, resolved and assigned to the PCR. This method
+        /// finalizes the PCR with the values assigned.
+        /// </summary>
+        /// <returns>
+        /// Returns false if the request was not successfully configured
+        /// </returns>
+        /// <remarks>
+        /// This method logic has been put into it's own method in case developers have created a custom PCR or are assigning their own values
+        /// but need to finalize it themselves.
+        /// </remarks>
+        public bool ConfigureRequest()
+        {
+            if (_pcr.HasPublishedContent == false)
+            {
+                return false;
+            }
+
+            // set the culture on the thread -- again, 'cos it might have changed in the event handler
+            Thread.CurrentThread.CurrentUICulture = Thread.CurrentThread.CurrentCulture = _pcr.Culture;
+
+            // if request has been flagged to redirect, or has no content to display,
             // then return - whoever called us is in charge of actually redirecting
-            if (_pcr.IsRedirect || !_pcr.HasPublishedContent)
-				return;
+            if (_pcr.IsRedirect || _pcr.HasPublishedContent == false)
+            {
+                return false;
+            }
 
             // we may be 404 _and_ have a content
 
-			// can't go beyond that point without a PublishedContent to render
-			// it's ok not to have a template, in order to give MVC a chance to hijack routes
+            // can't go beyond that point without a PublishedContent to render
+            // it's ok not to have a template, in order to give MVC a chance to hijack routes
 
             // note - the page() ctor below will cause the "page" to get the value of all its
             // "elements" ie of all the IPublishedContent property. If we use the object value,
@@ -111,7 +140,9 @@ namespace Umbraco.Web.Routing
             // used by many legacy objects
             _routingContext.UmbracoContext.HttpContext.Items["pageID"] = _pcr.PublishedContent.Id;
             _routingContext.UmbracoContext.HttpContext.Items["pageElements"] = _pcr.UmbracoPage.Elements;
-		}
+
+            return true;
+        }
 
 		/// <summary>
 		/// Updates the request when there is no template to render the content.

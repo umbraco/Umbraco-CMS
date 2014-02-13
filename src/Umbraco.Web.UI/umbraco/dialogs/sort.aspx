@@ -2,6 +2,7 @@
 
 <%@ Import Namespace="System.Globalization" %>
 <%@ Import Namespace="Umbraco.Core.IO" %>
+<%@ Import Namespace="Umbraco.Web" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 
@@ -57,7 +58,7 @@
         <br />
         <p>
             <input id="submitButton" type="button" value="<%=umbraco.ui.Text("save") %>" />
-            <em>or </em><a id="closeWindowButton" href="#" style="color: blue"><%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
+            <em>or </em><a id="closeWindowButton" href="#" style="color: blue"><%=umbraco.ui.Text("general", "cancel", UmbracoUser)%></a>
         </p>
     </div>
 
@@ -69,8 +70,8 @@
                 submitButton: jQuery("#submitButton"),
                 closeWindowButton : jQuery("#closeWindowButton"),
                 dateTimeFormat: "<%=CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern%> <%=CultureInfo.CurrentCulture.DateTimeFormat.ShortTimePattern%>",
-                currentId: "<%=umbraco.helper.Request("ID")%>",
-                serviceUrl: "<%= IOHelper.ResolveUrl(SystemDirectories.Umbraco)%>/WebServices/NodeSorter.asmx/UpdateSortOrder?app=<%=umbraco.helper.Request("app")%>"
+                currentId: "<%=Request.CleanForXss("ID")%>",
+                serviceUrl: "<%= IOHelper.ResolveUrl(SystemDirectories.Umbraco)%>/WebServices/NodeSorter.asmx/UpdateSortOrder?app=<%=Request.CleanForXss("app")%>"
             });
 
             sortDialog.init();

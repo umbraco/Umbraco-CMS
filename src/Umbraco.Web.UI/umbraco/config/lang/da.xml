@@ -419,7 +419,7 @@
     <key alias="moveTo">Flyt til</key>
     <key alias="nodeSelected">er blevet valgt som roden for dit nye indhold, klik 'ok' nedenunder.</key>
     <key alias="noNodeSelected">Intet element valgt, vælg et element i listen ovenfor før der klikkes 'fortsæt'</key>
-    <key alias="notAllowedByContentType">Den nuværende node kan ikke ligges under denne pga. dens type</key>
+    <key alias="notAllowedByContentType">Den nuværende node kan ikke lægges under denne pga. sin type</key>
     <key alias="notAllowedByPath">Den nuværende node kan ikke ligge under en af dens undersider</key>
     <key alias="notValid">Denne handling er ikke tilladt fordi du ikke har de fornødne rettigheder på et eller flere af under-dokumenterne</key>
   </area>

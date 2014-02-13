@@ -1,9 +1,9 @@
-<%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master" Codebehind="AssignDomain.aspx.cs" AutoEventWireup="True" Inherits="umbraco.dialogs.AssignDomain" %>
+<%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master" AutoEventWireup="True" Inherits="umbraco.dialogs.AssignDomain" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
 <script type="text/javascript">
-	function doSubmit() {document.Form1["ok"].click()}
+    function doSubmit() { document.Form1["ok"].click(); }
 	var functionsFrame = this;
 	var tabFrame = this;
 	var isDialog = true;
@@ -14,7 +14,6 @@
 </asp:Content>
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
-    <input type="hidden" name="domainId" value="<%=umbraco.helper.Request("editDomain")%>" />
     
     <cc1:Feedback ID="FeedBackMessage" runat="server" />
     

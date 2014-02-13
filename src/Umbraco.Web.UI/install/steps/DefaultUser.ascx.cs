@@ -15,6 +15,19 @@ namespace Umbraco.Web.UI.Install.Steps
     public partial class DefaultUser : StepUserControl
     {
 
+        protected MembershipProvider CurrentProvider
+        {
+            get
+            {
+                var provider = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider];
+                if (provider == null)
+                {
+                    throw new InvalidOperationException("No MembershipProvider found with name " + UmbracoSettings.DefaultBackofficeProvider);
+                }
+                return provider;
+            }
+        }
+
         protected void ChangePasswordClick(object sender, System.EventArgs e)
         {
             Page.Validate();
@@ -22,16 +35,37 @@ namespace Umbraco.Web.UI.Install.Steps
             if (Page.IsValid)
             {
                 var u = User.GetUser(0);
-                var user = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(0, true);
-                user.ChangePassword(u.GetPassword(), tb_password.Text.Trim());
+                var user = CurrentProvider.GetUser(0, true);
+                if (user == null)
+                {
+                    throw new InvalidOperationException("No user found in membership provider with id of 0");
+                }
+
+                //NOTE: This will throw an exception if the membership provider 
+                try
+                {
+                    var success = user.ChangePassword(u.GetPassword(), tb_password.Text.Trim());
+                    if (!success)
+                    {
+                        PasswordValidator.IsValid = false;
+                        PasswordValidator.ErrorMessage = "Password must be at least " + CurrentProvider.MinRequiredPasswordLength + " characters long and contain at least " + CurrentProvider.MinRequiredNonAlphanumericCharacters + " symbols";
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    PasswordValidator.IsValid = false;
+                    PasswordValidator.ErrorMessage = "Password must be at least " + CurrentProvider.MinRequiredPasswordLength + " characters long and contain at least " + CurrentProvider.MinRequiredNonAlphanumericCharacters + " symbols";
+                    return;
+                }
 
                 // Is it using the default membership provider
-                if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is UsersMembershipProvider)
+                if (CurrentProvider is UsersMembershipProvider)
                 {
                     // Save user in membership provider
                     var umbracoUser = user as UsersMembershipUser;
                     umbracoUser.FullName = tb_name.Text.Trim();
-                    Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].UpdateUser(umbracoUser);
+                    CurrentProvider.UpdateUser(umbracoUser);
 
                     // Save user details
                     u.Email = tb_email.Text.Trim();
@@ -39,7 +73,10 @@ namespace Umbraco.Web.UI.Install.Steps
                 else
                 {
                     u.Name = tb_name.Text.Trim();
-                    if (!(Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is ActiveDirectoryMembershipProvider)) Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].UpdateUser(user);
+                    if ((CurrentProvider is ActiveDirectoryMembershipProvider) == false)
+                    {
+                        CurrentProvider.UpdateUser(user);
+                    }
                 }
 
                 // we need to update the login name here as it's set to the old name when saving the user via the membership provider!

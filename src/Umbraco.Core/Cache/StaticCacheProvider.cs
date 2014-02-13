@@ -10,71 +10,64 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// A cache provider that statically caches everything in an in memory dictionary
     /// </summary>
-    internal class StaticCacheProvider : CacheProviderBase
+    internal class StaticCacheProvider : ICacheProvider
     {
-        private readonly ConcurrentDictionary<string, object> _staticCache = new ConcurrentDictionary<string, object>();
+        internal readonly ConcurrentDictionary<string, object> StaticCache = new ConcurrentDictionary<string, object>();
 
-        public override void ClearAllCache()
+        public virtual void ClearAllCache()
         {
-            _staticCache.Clear();
+            StaticCache.Clear();
         }
 
-        public override void ClearCacheItem(string key)
+        public virtual void ClearCacheItem(string key)
         {
             object val;
-            _staticCache.TryRemove(key, out val);
+            StaticCache.TryRemove(key, out val);
         }
 
-        public override void ClearCacheObjectTypes(string typeName)
+        public virtual void ClearCacheObjectTypes(string typeName)
         {
-            _staticCache.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType().ToString().InvariantEquals(typeName));
+            StaticCache.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType().ToString().InvariantEquals(typeName));
         }
 
-        public override void ClearCacheObjectTypes<T>()
-        {
-            var typeOfT = typeof (T);
-            _staticCache.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT);
-        }
-
-        public override void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
+        public virtual void ClearCacheObjectTypes<T>()
         {
             var typeOfT = typeof(T);
-            _staticCache.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT && predicate(kvp.Key, (T)kvp.Value));
+            StaticCache.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT);
         }
 
-        public override void ClearCacheByKeySearch(string keyStartsWith)
+        public virtual void ClearCacheObjectTypes<T>(Func<string, T, bool> predicate)
         {
-            _staticCache.RemoveAll(kvp => kvp.Key.InvariantStartsWith(keyStartsWith));
+            var typeOfT = typeof(T);
+            StaticCache.RemoveAll(kvp => kvp.Value != null && kvp.Value.GetType() == typeOfT && predicate(kvp.Key, (T)kvp.Value));
         }
 
-        public override void ClearCacheByKeyExpression(string regexString)
+        public virtual void ClearCacheByKeySearch(string keyStartsWith)
         {
-            _staticCache.RemoveAll(kvp => Regex.IsMatch(kvp.Key, regexString));
+            StaticCache.RemoveAll(kvp => kvp.Key.InvariantStartsWith(keyStartsWith));
         }
 
-        public override IEnumerable<T> GetCacheItemsByKeySearch<T>(string keyStartsWith)
+        public virtual void ClearCacheByKeyExpression(string regexString)
         {
-            return (from KeyValuePair<string, object> c in _staticCache
+            StaticCache.RemoveAll(kvp => Regex.IsMatch(kvp.Key, regexString)); 
+        }
+
+        public virtual IEnumerable<object> GetCacheItemsByKeySearch(string keyStartsWith)
+        {
+            return (from KeyValuePair<string, object> c in StaticCache
                     where c.Key.InvariantStartsWith(keyStartsWith)
-                    select c.Value.TryConvertTo<T>()
-                    into attempt
-                    where attempt.Success
-                    select attempt.Result).ToList();
+                    select c.Value).ToList();
         }
 
-        public override T GetCacheItem<T>(string cacheKey)
+        public virtual object GetCacheItem(string cacheKey)
         {
-            var result = _staticCache[cacheKey];
-            if (result == null)
-            {
-                return default(T);
-            }
-            return result.TryConvertTo<T>().Result;
+            var result = StaticCache[cacheKey];
+            return result;
         }
 
-        public override T GetCacheItem<T>(string cacheKey, Func<T> getCacheItem)
+        public virtual object GetCacheItem(string cacheKey, Func<object> getCacheItem)
         {
-            return (T)_staticCache.GetOrAdd(cacheKey, key => getCacheItem());
+            return StaticCache.GetOrAdd(cacheKey, key => getCacheItem());
         }
         
     }

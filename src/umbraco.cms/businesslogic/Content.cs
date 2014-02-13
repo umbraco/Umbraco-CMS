@@ -397,7 +397,7 @@ namespace umbraco.cms.businesslogic
         {
             var props = this.GenericProperties;
             foreach (property.Property p in props)
-                if (p != null)
+                if (p != null && p.Value != null && string.IsNullOrEmpty(p.Value.ToString()) == false)
                     x.AppendChild(p.ToXml(xd));
 
             // attributes
@@ -647,7 +647,9 @@ namespace umbraco.cms.businesslogic
 
             if (ContentBase != null)
             {
-                m_LoadedProperties.AddRange(ContentBase.Properties.Select(x => new Property(x)));
+                //NOTE: we will not load any properties where HasIdentity = false - this is because if properties are 
+                // added to the property collection that aren't persisted we'll get ysods
+                m_LoadedProperties.AddRange(ContentBase.Properties.Where(x => x.HasIdentity).Select(x => new Property(x)));
                 return;
             }
 

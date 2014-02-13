@@ -77,6 +77,19 @@ namespace Umbraco.Core.Services
         bool ValidateScript(Script script);
 
         /// <summary>
+        /// Creates a folder for scripts
+        /// </summary>
+        /// <param name="folderPath"></param>
+        /// <returns></returns>
+        void CreateScriptFolder(string folderPath);
+
+        /// <summary>
+        /// Deletes a folder for scripts
+        /// </summary>
+        /// <param name="folderPath"></param>
+        void DeleteScriptFolder(string folderPath);
+
+        /// <summary>
         /// Gets a list of all <see cref="ITemplate"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="ITemplate"/> objects</returns>
@@ -95,6 +108,21 @@ namespace Umbraco.Core.Services
         /// <param name="id">Id of the template</param>
         /// <returns>A <see cref="ITemplate"/> object</returns>
         ITemplate GetTemplate(int id);
+
+        /// <summary>
+        /// Returns a template as a template node which can be traversed (parent, children)
+        /// </summary>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        TemplateNode GetTemplateNode(string alias);
+
+        /// <summary>
+        /// Given a template node in a tree, this will find the template node with the given alias if it is found in the hierarchy, otherwise null
+        /// </summary>
+        /// <param name="anyNode"></param>
+        /// <param name="alias"></param>
+        /// <returns></returns>
+        TemplateNode FindTemplateInTree(TemplateNode anyNode, string alias);
 
         /// <summary>
         /// Saves a <see cref="ITemplate"/>

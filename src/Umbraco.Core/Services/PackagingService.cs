@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -34,17 +35,14 @@ namespace Umbraco.Core.Services
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private Dictionary<string, IContentType> _importedContentTypes;
 
-        //Support recursive locks because some of the methods that require locking call other methods that require locking. 
-        //for example, the Move method needs to be locked but this calls the Save method which also needs to be locked.
-        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 
-        public PackagingService(IContentService contentService, 
-            IContentTypeService contentTypeService, 
-            IMediaService mediaService, 
-            IDataTypeService dataTypeService, 
-            IFileService fileService, 
+        public PackagingService(IContentService contentService,
+            IContentTypeService contentTypeService,
+            IMediaService mediaService,
+            IDataTypeService dataTypeService,
+            IFileService fileService,
             ILocalizationService localizationService,
-            RepositoryFactory repositoryFactory, 
+            RepositoryFactory repositoryFactory,
             IDatabaseUnitOfWorkProvider uowProvider)
         {
             _contentService = contentService;
@@ -58,49 +56,7 @@ namespace Umbraco.Core.Services
 
             _importedContentTypes = new Dictionary<string, IContentType>();
         }
-
-        #region Generic export methods
         
-        internal void ExportToFile(string absoluteFilePath, string nodeType, int id)
-        {
-            XElement xml = null;
-
-            if (nodeType.Equals("content", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var content = _contentService.GetById(id);
-                xml = Export(content);
-            }
-
-            if (nodeType.Equals("media", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var media = _mediaService.GetById(id);
-                xml = Export(media);
-            }
-
-            if (nodeType.Equals("contenttype", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var contentType = _contentTypeService.GetContentType(id);
-                xml = Export(contentType);
-            }
-
-            if (nodeType.Equals("mediatype", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var mediaType = _contentTypeService.GetMediaType(id);
-                xml = Export(mediaType);
-            }
-
-            if (nodeType.Equals("datatype", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var dataType = _dataTypeService.GetDataTypeDefinitionById(id);
-                xml = Export(dataType);
-            }
-
-            if(xml != null)
-                xml.Save(absoluteFilePath);
-        }
-
-        #endregion
-
         #region Content
 
         /// <summary>
@@ -109,7 +65,7 @@ namespace Umbraco.Core.Services
         /// <param name="content">Content to export</param>
         /// <param name="deep">Optional parameter indicating whether to include descendents</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Content object</returns>
-        internal XElement Export(IContent content, bool deep = false)
+        public XElement Export(IContent content, bool deep = false)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
             var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
@@ -133,7 +89,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Part of the export of IContent and IMedia which is shared
+        /// Part of the export of IContent and IMedia and IMember which is shared
         /// </summary>
         /// <param name="contentBase">Base Content or Media to export</param>
         /// <param name="nodeName">Name of the node</param>
@@ -156,8 +112,10 @@ namespace Umbraco.Core.Services
                                    new XAttribute("path", contentBase.Path),
                                    new XAttribute("isDoc", ""));
 
-            foreach (var property in contentBase.Properties.Where(p => p != null))
+            foreach (var property in contentBase.Properties.Where(p => p != null && p.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
+            {
                 xml.Add(property.ToXml());
+            }
 
             return xml;
         }
@@ -297,7 +255,7 @@ namespace Umbraco.Core.Services
             var properties = from property in element.Elements()
                              where property.Attribute("isDoc") == null
                              select property;
-            
+
             IContent content = parent == null
                                    ? new Content(nodeName, parentId, contentType)
                                    {
@@ -328,7 +286,7 @@ namespace Umbraco.Core.Services
                         {
                             propertyValueList.Add(dtos.Single(x => x.Value == preValue).Id.ToString(CultureInfo.InvariantCulture));
                         }
-                        
+
                         propertyValue = string.Join(",", propertyValueList.ToArray());
                     }
 
@@ -359,7 +317,7 @@ namespace Umbraco.Core.Services
                                     new XElement("AllowAtRoot", contentType.AllowedAsRoot.ToString()));
 
             var masterContentType = contentType.CompositionAliases().FirstOrDefault();
-            if(masterContentType != null)
+            if (masterContentType != null)
                 info.Add(new XElement("Master", masterContentType));
 
             var allowedTemplates = new XElement("AllowedTemplates");
@@ -368,7 +326,7 @@ namespace Umbraco.Core.Services
                 allowedTemplates.Add(new XElement("Template", template.Alias));
             }
             info.Add(allowedTemplates);
-            if(contentType.DefaultTemplate != null && contentType.DefaultTemplate.Id != 0)
+            if (contentType.DefaultTemplate != null && contentType.DefaultTemplate.Id != 0)
                 info.Add(new XElement("DefaultTemplate", contentType.DefaultTemplate.Alias));
             else
                 info.Add(new XElement("DefaultTemplate", ""));
@@ -395,7 +353,7 @@ namespace Umbraco.Core.Services
                                                    new XElement("Description", new XCData(propertyType.Description)));
                 genericProperties.Add(genericProperty);
             }
-            
+
             var tabs = new XElement("Tabs");
             foreach (var propertyGroup in contentType.PropertyGroups)
             {
@@ -545,7 +503,7 @@ namespace Umbraco.Core.Services
                     var template = _fileService.GetTemplate(alias.ToSafeAlias());
                     if (template != null)
                     {
-                        if(allowedTemplates.Any(x => x.Id == template.Id)) continue;
+                        if (allowedTemplates.Any(x => x.Id == template.Id)) continue;
                         allowedTemplates.Add(template);
                     }
                     else
@@ -587,9 +545,18 @@ namespace Umbraco.Core.Services
             {
                 var id = tab.Element("Id").Value;//Do we need to use this for tracking?
                 var caption = tab.Element("Caption").Value;
+
                 if (contentType.PropertyGroups.Contains(caption) == false)
                 {
                     contentType.AddPropertyGroup(caption);
+
+                    int sortOrder;
+                    if(tab.Element("SortOrder") != null && 
+                        int.TryParse(tab.Element("SortOrder").Value, out sortOrder))
+                    {
+                        // Override the sort order with the imported value
+                        contentType.PropertyGroups[caption].SortOrder = sortOrder;
+                    }
                 }
             }
         }
@@ -613,7 +580,7 @@ namespace Umbraco.Core.Services
                         dataTypeDefinition = dataTypeDefinitions.First();
                     }
                 }
-
+                
                 // For backwards compatibility, if no datatype with that ID can be found, we're letting this fail silently.
                 // This means that the property will not be created.
                 if (dataTypeDefinition == null)
@@ -704,24 +671,42 @@ namespace Umbraco.Core.Services
 
         #region DataTypes
 
-        internal XElement Export(IDataTypeDefinition dataTypeDefinition)
+        /// <summary>
+        /// Export a list of data types
+        /// </summary>
+        /// <param name="dataTypeDefinitions"></param>
+        /// <returns></returns>
+        public XElement Export(IEnumerable<IDataTypeDefinition >dataTypeDefinitions)
+        {
+            var container = new XElement("DataTypes");
+            foreach (var d in dataTypeDefinitions)
+            {
+                container.Add(Export(d));
+            }
+            return container;
+        }
+
+        public XElement Export(IDataTypeDefinition dataTypeDefinition)
         {
             var prevalues = new XElement("PreValues");
 
-            var prevalueList = ((DataTypeService)_dataTypeService).GetDetailedPreValuesByDataTypeId(dataTypeDefinition.Id);
-            foreach (var tuple in prevalueList)
+            var prevalueList = _dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id)
+                .FormatAsDictionary();
+
+            var sort = 0;
+            foreach (var pv in prevalueList)
             {
                 var prevalue = new XElement("PreValue");
-                prevalue.Add(new XAttribute("Id", tuple.Item1));
-                prevalue.Add(new XAttribute("Value", tuple.Item4));
-                prevalue.Add(new XAttribute("Alias", tuple.Item2));
-                prevalue.Add(new XAttribute("SortOrder", tuple.Item3));
+                prevalue.Add(new XAttribute("Id", pv.Value.Id));
+                prevalue.Add(new XAttribute("Value", pv.Value.Value));
+                prevalue.Add(new XAttribute("Alias", pv.Key));
+                prevalue.Add(new XAttribute("SortOrder", sort));
                 prevalues.Add(prevalue);
+                sort++;
             }
 
             var xml = new XElement("DataType", prevalues);
             xml.Add(new XAttribute("Name", dataTypeDefinition.Name));
-            //The 'ID' when exporting is actually the property editor alias (in pre v7 it was the IDataType GUID id)
             xml.Add(new XAttribute("Id", dataTypeDefinition.ControlId));
             xml.Add(new XAttribute("Definition", dataTypeDefinition.Key));
             xml.Add(new XAttribute("DatabaseType", dataTypeDefinition.DatabaseType.ToString()));
@@ -792,23 +777,203 @@ namespace Umbraco.Core.Services
                 var dataTypeDefinitionName = dataTypeElement.Attribute("Name").Value;
                 var dataTypeDefinition = dataTypes.First(x => x.Name == dataTypeDefinitionName);
 
-                var values = prevaluesElement.Elements("PreValue").Select(prevalue => prevalue.Attribute("Value").Value).ToList();
-                _dataTypeService.SavePreValues(dataTypeDefinition.Id, values);
+                var valuesWithoutKeys = prevaluesElement.Elements("PreValue")
+                                                        .Where(x => ((string) x.Attribute("Alias")).IsNullOrWhiteSpace())
+                                                        .Select(x => x.Attribute("Value").Value);
+
+                var valuesWithKeys = prevaluesElement.Elements("PreValue")
+                                                     .Where(x => ((string) x.Attribute("Alias")).IsNullOrWhiteSpace() == false)
+                                                     .ToDictionary(key => (string) key.Attribute("Alias"), val => new PreValue((string) val.Attribute("Value")));
+                
+                //save the values with keys
+                _dataTypeService.SavePreValues(dataTypeDefinition.Id, valuesWithKeys);
+
+                //save the values without keys (this is legacy)
+                _dataTypeService.SavePreValues(dataTypeDefinition.Id, valuesWithoutKeys);
             }
         }
 
         #endregion
 
         #region Dictionary Items
+
+        public XElement Export(IEnumerable<IDictionaryItem> dictionaryItem, bool includeChildren = true)
+        {
+            var xml = new XElement("DictionaryItems");
+            foreach (var item in dictionaryItem)
+            {
+                xml.Add(Export(item, includeChildren));
+            }
+            return xml;
+        }
+
+        public XElement Export(IDictionaryItem dictionaryItem, bool includeChildren)
+        {
+            var xml = new XElement("DictionaryItem", new XAttribute("Key", dictionaryItem.ItemKey));
+            foreach (var translation in dictionaryItem.Translations)
+            {
+                xml.Add(new XElement("Value",
+                    new XAttribute("LanguageId", translation.Language.Id),
+                    new XAttribute("LanguageCultureAlias", translation.Language.IsoCode),
+                    new XCData(translation.Value)));
+            }
+
+            if (includeChildren)
+            {
+                var children = _localizationService.GetDictionaryItemChildren(dictionaryItem.Key);
+                foreach (var child in children)
+                {
+                    xml.Add(Export(child, true));
+                }
+            }
+
+            return xml;
+        }
+
+        public IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement dictionaryItemElementList)
+        {
+            var languages = _localizationService.GetAllLanguages().ToList();
+            return ImportDictionaryItems(dictionaryItemElementList, languages);
+        }
+
+        private IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement dictionaryItemElementList, List<ILanguage> languages)
+        {
+            var items = new List<IDictionaryItem>();
+            foreach (var dictionaryItemElement in dictionaryItemElementList.Elements("DictionaryItem"))
+                items.AddRange(ImportDictionaryItem(dictionaryItemElement, languages));
+            return items;
+        }
+
+        private IEnumerable<IDictionaryItem> ImportDictionaryItem(XElement dictionaryItemElement, List<ILanguage> languages)
+        {
+            var items = new List<IDictionaryItem>();
+
+            IDictionaryItem dictionaryItem;
+            var key = dictionaryItemElement.Attribute("Key").Value;
+            if (_localizationService.DictionaryItemExists(key))
+                dictionaryItem = GetAndUpdateDictionaryItem(key, dictionaryItemElement, languages);
+            else
+                dictionaryItem = CreateNewDictionaryItem(key, dictionaryItemElement, languages);
+            _localizationService.Save(dictionaryItem);
+            items.Add(dictionaryItem);
+            items.AddRange(ImportDictionaryItems(dictionaryItemElement, languages));
+            return items;
+        }
+
+        private IDictionaryItem GetAndUpdateDictionaryItem(string key, XElement dictionaryItemElement, List<ILanguage> languages)
+        {
+            var dictionaryItem = _localizationService.GetDictionaryItemByKey(key);
+            var translations = dictionaryItem.Translations.ToList();
+            foreach (var valueElement in dictionaryItemElement.Elements("Value").Where(v => DictionaryValueIsNew(translations, v)))
+                AddDictionaryTranslation(translations, valueElement, languages);
+            dictionaryItem.Translations = translations;
+            return dictionaryItem;
+        }
+
+        private static DictionaryItem CreateNewDictionaryItem(string key, XElement dictionaryItemElement, List<ILanguage> languages)
+        {
+            var dictionaryItem = new DictionaryItem(key);
+            var translations = new List<IDictionaryTranslation>();
+
+            foreach (var valueElement in dictionaryItemElement.Elements("Value"))
+                AddDictionaryTranslation(translations, valueElement, languages);
+
+            dictionaryItem.Translations = translations;
+            return dictionaryItem;
+        }
+
+        private static bool DictionaryValueIsNew(IEnumerable<IDictionaryTranslation> translations, XElement valueElement)
+        {
+            return translations.All(t =>
+                String.Compare(t.Language.IsoCode, valueElement.Attribute("LanguageCultureAlias").Value, StringComparison.InvariantCultureIgnoreCase) != 0
+                );
+        }
+
+        private static void AddDictionaryTranslation(ICollection<IDictionaryTranslation> translations, XElement valueElement, IEnumerable<ILanguage> languages)
+        {
+            var languageId = valueElement.Attribute("LanguageCultureAlias").Value;
+            var language = languages.SingleOrDefault(l => l.IsoCode == languageId);
+            if (language == null)
+                return;
+            var translation = new DictionaryTranslation(language, valueElement.Value);
+            translations.Add(translation);
+        }
+
         #endregion
 
         #region Files
         #endregion
 
         #region Languages
+
+        public XElement Export(IEnumerable<ILanguage> languages)
+        {
+            var xml = new XElement("Languages");
+            foreach (var language in languages)
+            {
+                xml.Add(Export(language));
+            }
+            return xml;
+        }
+
+        public XElement Export(ILanguage language)
+        {
+            var xml = new XElement("Language",
+                new XAttribute("Id", language.Id),
+                new XAttribute("CultureAlias", language.IsoCode),
+                new XAttribute("FriendlyName", language.CultureName));
+            return xml;
+        }
+
+        public IEnumerable<ILanguage> ImportLanguages(XElement languageElementList)
+        {
+            var list = new List<ILanguage>();
+            foreach (var languageElement in languageElementList.Elements("Language"))
+            {
+                var isoCode = languageElement.Attribute("CultureAlias").Value;
+                var existingLanguage = _localizationService.GetLanguageByIsoCode(isoCode);
+                if (existingLanguage == null)
+                {
+                    var langauge = new Language(isoCode)
+                                   {
+                                       CultureName = languageElement.Attribute("FriendlyName").Value
+                                   };
+                    _localizationService.Save(langauge);
+                    list.Add(langauge);
+                }
+            }
+
+            return list;
+        }
+
         #endregion
 
         #region Macros
+        #endregion
+
+        #region Members
+
+        /// <summary>
+        /// Exports an <see cref="IMedia"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="member">Member to export</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the Member object</returns>
+        internal XElement Export(IMember member)
+        {
+            //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
+            var nodeName = UmbracoSettings.UseLegacyXmlSchema ? "node" : member.ContentType.Alias.ToSafeAliasWithForcingCheck();
+
+            var xml = Export(member, nodeName);
+            xml.Add(new XAttribute("nodeType", member.ContentType.Id));
+            xml.Add(new XAttribute("nodeTypeAlias", member.ContentType.Alias));
+
+            xml.Add(new XAttribute("loginName", member.Username));
+            xml.Add(new XAttribute("email", member.Email));
+            xml.Add(new XAttribute("key", member.Key));
+
+            return xml;
+        }
+
         #endregion
 
         #region Media
@@ -1071,6 +1236,9 @@ namespace Umbraco.Core.Services
             return IOHelper.MapPath(SystemDirectories.Masterpages + "/" + alias.Replace(" ", "") + ".master");
         }
 
+        #endregion
+
+        #region Stylesheets
         #endregion
     }
 }

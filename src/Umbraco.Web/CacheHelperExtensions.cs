@@ -16,34 +16,8 @@ namespace Umbraco.Web
 	/// <summary>
 	/// Extension methods for the cache helper
 	/// </summary>
-	internal static class CacheHelperExtensions
+	public static class CacheHelperExtensions
 	{
-		/// <summary>
-		/// Application event handler to bind to events to clear the cache for the cache helper extensions
-		/// </summary>		
-		internal sealed class CacheHelperApplicationEventListener : ApplicationEventHandler
-		{
-            protected override void ApplicationInitialized(UmbracoApplicationBase umbracoApplication, ApplicationContext applicationContext)
-			{
-                if (applicationContext != null)
-				{
-					//bind to events to clear the cache, after publish, after media save and after member save
-
-					Document.AfterPublish
-						+= (sender, args) =>
-                           applicationContext.ApplicationCache.ClearPartialViewCache();
-
-					global::umbraco.cms.businesslogic.media.Media.AfterSave
-						+= (sender, args) =>
-                           applicationContext.ApplicationCache.ClearPartialViewCache();
-
-					global::umbraco.cms.businesslogic.member.Member.AfterSave
-						+= (sender, args) =>
-                           applicationContext.ApplicationCache.ClearPartialViewCache();
-				}
-			}
-
-		}
 
 		public const string PartialViewCacheKey = "Umbraco.Web.PartialViewCacheKey";
        

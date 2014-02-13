@@ -361,8 +361,16 @@ namespace Umbraco.Core.Models
             //Check against Regular Expression for Legacy DataTypes - Validation exists and value is not null:
             if(string.IsNullOrEmpty(ValidationRegExp) == false && (value != null && string.IsNullOrEmpty(value.ToString()) == false))
             {
-                var regexPattern = new Regex(ValidationRegExp);
-                return regexPattern.IsMatch(value.ToString());
+                try
+                {
+                    var regexPattern = new Regex(ValidationRegExp);
+                    return regexPattern.IsMatch(value.ToString());
+                }
+                catch 
+                {
+                         throw new Exception(string .Format("Invalid validation expression on property {0}",this.Alias));
+                }
+                
             }
 
             //TODO Add PropertyEditor validation when its relevant to introduce

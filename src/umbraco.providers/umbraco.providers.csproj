@@ -79,9 +79,10 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="members\Helper.cs" />
-    <Compile Include="members\MembersMembershipProvider.cs" />
-    <Compile Include="members\MembersProfileProvider.cs" />
-    <Compile Include="members\MembersRoleProvider.cs" />
+    <Compile Include="members\MembershipEventHandler.cs" />
+    <Compile Include="members\UmbracoMembershipProvider.cs" />
+    <Compile Include="members\UmbracoProfileProvider.cs" />
+    <Compile Include="members\UmbracoRoleProvider.cs" />
     <Compile Include="SecUtility.cs" />
     <Compile Include="UsersMembershipProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

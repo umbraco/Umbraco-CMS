@@ -309,7 +309,7 @@ namespace Umbraco.Core.Configuration
                 {
                     return value;
                 }
-                return "UMB_UCONTEXT";
+                return Constants.Web.AuthCookieName;
             }
         }
 
@@ -855,6 +855,8 @@ namespace Umbraco.Core.Configuration
 		/// <summary>
 		/// Whether to replace double dashes from url (ie my--story----from--dash.aspx caused by multiple url replacement chars
 		/// </summary>
+		// was used by the legacy short string helper, is not used anymore by the new default short string helper
+        // should update documentation
         internal static bool RemoveDoubleDashesFromUrlReplacing
 		{
 			get

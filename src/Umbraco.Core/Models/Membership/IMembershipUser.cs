@@ -4,9 +4,9 @@ using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models.Membership
 {
-    internal interface IMembershipUser : IMembershipUserId, IAggregateRoot
-    {
-        /*new object Id { get; set; }*/
+    public interface IMembershipUser : IAggregateRoot
+    {        
+        object ProviderUserKey { get; set; }
         string Username { get; set; }
         string Email { get; set; }
         string Password { get; set; }
@@ -14,13 +14,22 @@ namespace Umbraco.Core.Models.Membership
         string PasswordAnswer { get; set; }
         string Comments { get; set; }
         bool IsApproved { get; set; }
-        bool IsOnline { get; set; }
         bool IsLockedOut { get; set; }
         DateTime LastLoginDate { get; set; }
         DateTime LastPasswordChangeDate { get; set; }
         DateTime LastLockoutDate { get; set; }
 
-        object ProfileId { get; set; }
-        IEnumerable<object> Groups { get; set; }
+        /// <summary>
+        /// Gets or sets the number of failed password attempts.
+        /// This is the number of times the password was entered incorrectly upon login.
+        /// </summary>
+        /// <remarks>
+        /// Alias: umbracoFailedPasswordAttemptsPropertyTypeAlias
+        /// Part of the standard properties collection.
+        /// </remarks>
+        int FailedPasswordAttempts { get; set; }
+
+        //object ProfileId { get; set; }
+        //IEnumerable<object> Groups { get; set; }
     }
 }

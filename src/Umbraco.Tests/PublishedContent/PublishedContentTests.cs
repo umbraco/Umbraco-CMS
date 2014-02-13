@@ -40,7 +40,7 @@ namespace Umbraco.Tests.PublishedContent
                     .Union(new[] { typeof(PublishedContentTests).Assembly })
             };
 
-            ApplicationContext.Current = new ApplicationContext(false) { IsReady = true };
+            ApplicationContext.Current = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper()) { IsReady = true };
 
             // need to specify a custom callback for unit tests
             // AutoPublishedContentTypes generates properties automatically

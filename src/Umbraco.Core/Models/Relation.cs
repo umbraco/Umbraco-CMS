@@ -11,15 +11,15 @@ namespace Umbraco.Core.Models
     /// </summary>
     [Serializable]
     [DataContract(IsReference = true)]
-    public class Relation : Entity, IAggregateRoot
+    public class Relation : Entity, IAggregateRoot, IRelation
     {
         //NOTE: The datetime column from umbracoRelation is set on CreateDate on the Entity
         private int _parentId;
         private int _childId;
-        private RelationType _relationType;
+        private IRelationType _relationType;
         private string _comment;
 
-        public Relation(int parentId, int childId, RelationType relationType)
+        public Relation(int parentId, int childId, IRelationType relationType)
         {
             _parentId = parentId;
             _childId = childId;
@@ -28,7 +28,7 @@ namespace Umbraco.Core.Models
 
         private static readonly PropertyInfo ParentIdSelector = ExpressionHelper.GetPropertyInfo<Relation, int>(x => x.ParentId);
         private static readonly PropertyInfo ChildIdSelector = ExpressionHelper.GetPropertyInfo<Relation, int>(x => x.ChildId);
-        private static readonly PropertyInfo RelationTypeSelector = ExpressionHelper.GetPropertyInfo<Relation, RelationType>(x => x.RelationType);
+        private static readonly PropertyInfo RelationTypeSelector = ExpressionHelper.GetPropertyInfo<Relation, IRelationType>(x => x.RelationType);
         private static readonly PropertyInfo CommentSelector = ExpressionHelper.GetPropertyInfo<Relation, string>(x => x.Comment);
 
         /// <summary>
@@ -69,7 +69,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the <see cref="RelationType"/> for the Relation
         /// </summary>
         [DataMember]
-        public RelationType RelationType
+        public IRelationType RelationType
         {
             get { return _relationType; }
             set

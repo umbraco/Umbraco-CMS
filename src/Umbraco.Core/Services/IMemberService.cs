@@ -1,41 +1,107 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
 {
     /// <summary>
     /// Defines the MemberService, which is an easy access to operations involving (umbraco) members.
     /// </summary>
-    internal interface IMemberService : IMembershipMemberService
+    public interface IMemberService : IMembershipMemberService
     {
-        IMember GetById(int id);
+        /// <summary>
+        /// Checks if a member with the id exists
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        bool Exists(int id);
+        
+        /// <summary>
+        /// Get a member by the unique key
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         IMember GetByKey(Guid id);
+
+        /// <summary>
+        /// Get all members for the member type alias
+        /// </summary>
+        /// <param name="memberTypeAlias"></param>
+        /// <returns></returns>
         IEnumerable<IMember> GetMembersByMemberType(string memberTypeAlias);
+
+        /// <summary>
+        /// Get all members for the member type id
+        /// </summary>
+        /// <param name="memberTypeId"></param>
+        /// <returns></returns>
+        IEnumerable<IMember> GetMembersByMemberType(int memberTypeId);
+
+        /// <summary>
+        /// Get all members in the member group name specified
+        /// </summary>
+        /// <param name="memberGroupName"></param>
+        /// <returns></returns>
         IEnumerable<IMember> GetMembersByGroup(string memberGroupName);
+
+        /// <summary>
+        /// Get all members with the ids specified
+        /// </summary>
+        /// <param name="ids"></param>
+        /// <returns></returns>
         IEnumerable<IMember> GetAllMembers(params int[] ids);
-    }
+        
+        /// <summary>
+        /// Delete members of the specified member type id
+        /// </summary>
+        /// <param name="memberTypeId"></param>
+        void DeleteMembersOfType(int memberTypeId);
 
-    /// <summary>
-    /// Defines part of the MemberService, which is specific to methods used by the membership provider.
-    /// </summary>
-    /// <remarks>
-    /// Idea is to have this is an isolated interface so that it can be easily 'replaced' in the membership provider impl.
-    /// </remarks>
-    internal interface IMembershipMemberService : IService
-    {
-        IMember CreateMember(string username, string email, string password, string memberTypeAlias, int userId = 0);
+        /// <summary>
+        /// Find members based on their display name
+        /// </summary>
+        /// <param name="displayNameToMatch"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="matchType"></param>
+        /// <returns></returns>
+        IEnumerable<IMember> FindMembersByDisplayName(string displayNameToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
 
-        IMember GetById(object id);
+        /// <summary>
+        /// Get members based on a property search
+        /// </summary>
+        /// <param name="propertyTypeAlias"></param>
+        /// <param name="value"></param>
+        /// <param name="matchType"></param>
+        /// <returns></returns>
+        IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, string value, StringPropertyMatchType matchType = StringPropertyMatchType.Exact);
 
-        IMember GetByEmail(string email);
+        /// <summary>
+        /// Get members based on a property search
+        /// </summary>
+        /// <param name="propertyTypeAlias"></param>
+        /// <param name="value"></param>
+        /// <param name="matchType"></param>
+        /// <returns></returns>
+        IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, int value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
 
-        IMember GetByUsername(string login);
+        /// <summary>
+        /// Get members based on a property search
+        /// </summary>
+        /// <param name="propertyTypeAlias"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, bool value);
 
-        void Delete(IMember membershipUser);
-
-        void Save(IMember membershipUser);
-
-        IEnumerable<IMember> FindMembersByEmail(string emailStringToMatch);
+        /// <summary>
+        /// Get members based on a property search
+        /// </summary>
+        /// <param name="propertyTypeAlias"></param>
+        /// <param name="value"></param>
+        /// <param name="matchType"></param>
+        /// <returns></returns>
+        IEnumerable<IMember> GetMembersByPropertyValue(string propertyTypeAlias, DateTime value, ValuePropertyMatchType matchType = ValuePropertyMatchType.Exact);
     }
 }

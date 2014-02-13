@@ -7,6 +7,7 @@ using umbraco.BusinessLogic;
 
 namespace Umbraco.Web.WebApi
 {
+    [IsBackOffice]
     [UmbracoAuthorize]
     public abstract class UmbracoAuthorizedApiController : UmbracoApiController
     {

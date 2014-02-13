@@ -21,6 +21,7 @@ using umbraco.cms.businesslogic.workflow;
 using umbraco.cms.businesslogic.Tags;
 using File = System.IO.File;
 using Media = umbraco.cms.businesslogic.media.Media;
+using Notification = umbraco.cms.businesslogic.workflow.Notification;
 using Task = umbraco.cms.businesslogic.task.Task;
 
 namespace umbraco.cms.businesslogic
@@ -417,6 +418,11 @@ namespace umbraco.cms.businesslogic
         {
             _id = entity.Id;
             _entity = entity;
+        }
+
+        protected internal CMSNode(IEntity entity)
+        {
+            _id = entity.Id;
         }
 
         #endregion
@@ -1135,6 +1141,13 @@ order by level,sortOrder";
             _createDate = content.CreateDate;
             _isTrashed = content.Trashed;
             _entity = content;
+        }
+
+        internal protected void PopulateCMSNodeFromUmbracoEntity(IAggregateRoot content, Guid objectType)
+        {
+            _uniqueID = content.Key;
+            _nodeObjectType = objectType;            
+            _createDate = content.CreateDate;
         }
 
         #endregion

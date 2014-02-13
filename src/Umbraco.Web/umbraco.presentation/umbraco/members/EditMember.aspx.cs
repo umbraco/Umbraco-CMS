@@ -1,10 +1,17 @@
 ﻿using System;
+using System.Configuration.Provider;
+using System.Web;
 using System.Web.UI;
 using System.Web.UI.Design.WebControls;
+using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
 using Umbraco.Core.IO;
+using Umbraco.Core.Security;
+using Umbraco.Web;
+using Umbraco.Web.Security;
 using umbraco.cms.businesslogic.member;
 using System.Web.Security;
+using umbraco.controls;
 
 namespace umbraco.cms.presentation.members
 {
@@ -21,29 +28,51 @@ namespace umbraco.cms.presentation.members
         protected TextBox documentName;
         private Member _document;
         private MembershipUser _member;
-        controls.ContentControl _contentControl;
+        ContentControl _contentControl;
         protected uicontrols.UmbracoPanel m_MemberShipPanel = new uicontrols.UmbracoPanel();
 
         protected TextBox MemberLoginNameTxt = new TextBox();
         protected RequiredFieldValidator MemberLoginNameVal = new RequiredFieldValidator();
+        protected CustomValidator MemberLoginNameExistCheck = new CustomValidator();
 
         protected PlaceHolder MemberPasswordTxt = new PlaceHolder();
         protected TextBox MemberEmail = new TextBox();
         protected CustomValidator MemberEmailExistCheck = new CustomValidator();
-        protected controls.DualSelectbox _memberGroups = new controls.DualSelectbox();
+        protected DualSelectbox _memberGroups = new DualSelectbox();
 
-        protected override void OnInit(EventArgs e)
+        private MembershipHelper _membershipHelper;
+
+        protected void Page_Load(object sender, EventArgs e)
         {
-            base.OnInit(e);
+            _membershipHelper = new MembershipHelper(UmbracoContext.Current);
 
             // Add password changer
-            MemberPasswordTxt.Controls.Add(new UserControl().LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx"));
+            var passwordChanger = (passwordChanger)LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx");
+            passwordChanger.MembershipProviderName = Membership.Provider.Name;
+            //Add a custom validation message for the password changer
+            var passwordValidation = new CustomValidator
+            {
+                ID = "PasswordChangerValidator"
+            };
+            var validatorContainer = new HtmlGenericControl("div")
+            {
+                Visible = false,
+                EnableViewState = false
+            };
+            validatorContainer.Attributes["class"] = "error";
+            validatorContainer.Style.Add(HtmlTextWriterStyle.MarginTop, "10px");
+            validatorContainer.Style.Add(HtmlTextWriterStyle.Width, "300px");
+            var validatorContainer2 = new HtmlGenericControl("p");
+            validatorContainer.Controls.Add(validatorContainer2);
+            validatorContainer2.Controls.Add(passwordValidation);
+            MemberPasswordTxt.Controls.Add(passwordChanger);
+            MemberPasswordTxt.Controls.Add(validatorContainer);
 
-            if (Member.InUmbracoMemberMode())
+            if (Membership.Provider.IsUmbracoMembershipProvider())
             {
                 _document = new Member(int.Parse(Request.QueryString["id"]));
-                _member = Membership.GetUser(_document.Id);
-                _contentControl = new controls.ContentControl(_document, controls.ContentControl.publishModes.NoPublish, "TabView1");
+                _member = Membership.GetUser(_document.LoginName, false);
+                _contentControl = new ContentControl(_document, ContentControl.publishModes.NoPublish, "TabView1");
                 _contentControl.Width = Unit.Pixel(666);
                 _contentControl.Height = Unit.Pixel(666);
 
@@ -67,12 +96,19 @@ namespace umbraco.cms.presentation.members
                 MemberLoginNameVal.EnableClientScript = false;
                 MemberLoginNameVal.Display = ValidatorDisplay.Dynamic;
 
-                MemberEmailExistCheck.ErrorMessage = ui.Text("errorHandling", "errorExistsWithoutTab", "E-mail", BasePages.UmbracoEnsuredPage.CurrentUser);
+                MemberLoginNameExistCheck.ErrorMessage = ui.Text("errorHandling", "errorExistsWithoutTab", "Login Name", CurrentUser);
+                MemberLoginNameExistCheck.EnableClientScript = false;
+                MemberLoginNameExistCheck.ValidateEmptyText = false;
+                MemberLoginNameExistCheck.ControlToValidate = MemberLoginNameTxt.ID;
+                MemberLoginNameExistCheck.ServerValidate += MemberLoginNameExistCheck_ServerValidate;
+
+                MemberEmailExistCheck.ErrorMessage = ui.Text("errorHandling", "errorExistsWithoutTab", "E-mail", CurrentUser);
                 MemberEmailExistCheck.EnableClientScript = false;
                 MemberEmailExistCheck.ValidateEmptyText = false;
                 MemberEmailExistCheck.ControlToValidate = MemberEmail.ID;
                 MemberEmailExistCheck.ServerValidate += MemberEmailExistCheck_ServerValidate;
 
+                _contentControl.PropertiesPane.addProperty("", MemberLoginNameExistCheck);
                 _contentControl.PropertiesPane.addProperty(ui.Text("login"), ph);
                 _contentControl.PropertiesPane.addProperty(ui.Text("password"), MemberPasswordTxt);
                 _contentControl.PropertiesPane.addProperty("", MemberEmailExistCheck);
@@ -84,10 +120,10 @@ namespace umbraco.cms.presentation.members
                 var menuSave = m_MemberShipPanel.Menu.NewImageButton();
                 menuSave.ID = m_MemberShipPanel.ID + "_save";
                 menuSave.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
-                menuSave.Click += new ImageClickEventHandler(MenuSaveClick);
+                menuSave.Click += MenuSaveClick;
                 menuSave.AltText = ui.Text("buttons", "save", null);
 
-                _member = Membership.GetUser(Request.QueryString["id"]);
+                _member = Membership.GetUser(Request.QueryString["id"], false);
                 MemberLoginNameTxt.Text = _member.UserName;
                 if (IsPostBack == false)
                 {
@@ -98,15 +134,7 @@ namespace umbraco.cms.presentation.members
                 m_MemberShipPanel.Text = ui.Text("edit") + " " + _member.UserName;
                 var props = new uicontrols.Pane();
                 MemberLoginNameTxt.Enabled = false;
-
-                // check for pw support
-                if (Membership.Provider.EnablePasswordRetrieval == false)
-                {
-                    MemberPasswordTxt.Controls.Clear();
-                    MemberPasswordTxt.Controls.Add(
-                        new LiteralControl("<em>" + ui.Text("errorHandling", "errorChangingProviderPassword") + "</em>"));
-                }
-
+                
                 props.Controls.Add(AddProperty(ui.Text("login"), MemberLoginNameTxt));
                 props.Controls.Add(AddProperty(ui.Text("password"), MemberPasswordTxt));
                 props.Controls.Add(AddProperty("Email", MemberEmail));
@@ -140,10 +168,10 @@ namespace umbraco.cms.presentation.members
 
             p.addProperty(ui.Text("membergroup"), _memberGroups);
 
-            if (Member.InUmbracoMemberMode())
+            if (Membership.Provider.IsUmbracoMembershipProvider())
             {
                 _contentControl.tpProp.Controls.Add(p);
-                _contentControl.Save += new System.EventHandler(tmp_save);
+                _contentControl.Save += tmp_save;
             }
             else
             {
@@ -152,12 +180,23 @@ namespace umbraco.cms.presentation.members
 
         }
 
+        void MemberLoginNameExistCheck_ServerValidate(object source, ServerValidateEventArgs args)
+        {
+            var oldLoginName = _document.LoginName.Replace(" ", "").ToLower();
+            var newLoginName = MemberLoginNameTxt.Text.Replace(" ", "").ToLower();
+
+            if (oldLoginName != newLoginName && newLoginName != "" && Member.GetMemberFromLoginName(newLoginName) != null)
+                args.IsValid = false;
+            else
+                args.IsValid = true;
+        }
+
         void MemberEmailExistCheck_ServerValidate(object source, ServerValidateEventArgs args)
         {
             var oldEmail = _document.Email.ToLower();
             var newEmail = MemberEmail.Text.ToLower();
 
-            var requireUniqueEmail = Membership.Providers[Member.UmbracoMemberProviderName].RequiresUniqueEmail;
+            var requireUniqueEmail = Membership.Provider.RequiresUniqueEmail;
 
             var howManyMembersWithEmail = 0;
             var membersWithEmail = Member.GetMembersFromEmail(newEmail);
@@ -181,10 +220,58 @@ namespace umbraco.cms.presentation.members
 
         }
 
+        private void ChangePassword(passwordChanger passwordChangerControl, MembershipUser membershipUser, CustomValidator passwordChangerValidator)
+        {
+            //Change the password            
+            
+            if (passwordChangerControl.IsChangingPassword)
+            {
+                var changePassResult = _membershipHelper.ChangePassword(
+                    membershipUser.UserName, passwordChangerControl.ChangingPasswordModel, Membership.Provider);
+
+                if (changePassResult.Success)
+                {
+                    //if it is successful, we need to show the generated password if there was one, so set
+                    //that back on the control
+                    passwordChangerControl.ChangingPasswordModel.GeneratedPassword = changePassResult.Result.ResetPassword;
+                }
+                else
+                {
+                    passwordChangerValidator.IsValid = false;
+                    passwordChangerValidator.ErrorMessage = changePassResult.Result.ChangeError.ErrorMessage;
+                    MemberPasswordTxt.Controls[1].Visible = true;
+                }
+            }
+        }
+
+        private void UpdateMembershipProvider(MembershipUser membershipUser)
+        {
+            var membershipHelper = new MembershipHelper(ApplicationContext, new HttpContextWrapper(Context));
+            //set the writable properties that we are editing
+            membershipHelper.UpdateMember(membershipUser, Membership.Provider, MemberEmail.Text.Trim());
+        }
+
+        private void UpdateRoles(MembershipUser membershipUser)
+        {
+            // Groups
+            foreach (ListItem li in _memberGroups.Items)
+            {
+                if (("," + _memberGroups.Value + ",").IndexOf("," + li.Value + ",", StringComparison.Ordinal) > -1)
+                {
+                    if (Roles.IsUserInRole(membershipUser.UserName, li.Value) == false)
+                        Roles.AddUserToRole(membershipUser.UserName, li.Value);
+                }
+                else if (Roles.IsUserInRole(membershipUser.UserName, li.Value))
+                {
+                    Roles.RemoveUserFromRole(membershipUser.UserName, li.Value);
+                }
+            }
+        }
+
         protected void tmp_save(object sender, EventArgs e)
         {
             Page.Validate();
-            if (!Page.IsValid)
+            if (Page.IsValid == false)
             {
                 foreach (uicontrols.TabPage tp in _contentControl.GetPanels())
                 {
@@ -195,39 +282,30 @@ namespace umbraco.cms.presentation.members
             }
             else
             {
-
-                if (Page.IsPostBack)
-                {
-                    // hide validation summaries
+                // hide validation summaries
+                if (Membership.Provider.IsUmbracoMembershipProvider())
+                {                    
                     foreach (uicontrols.TabPage tp in _contentControl.GetPanels())
                     {
                         tp.ErrorControl.Visible = false;
                     }
                 }
 
-                if (Member.InUmbracoMemberMode())
+                //Change the password
+                var passwordChangerControl = (passwordChanger)MemberPasswordTxt.Controls[0];
+                var passwordChangerValidator = (CustomValidator)MemberPasswordTxt.Controls[1].Controls[0].Controls[0];
+                ChangePassword(passwordChangerControl, _member, passwordChangerValidator);
+
+                //update the membership provider
+                UpdateMembershipProvider(_member);
+
+                if (Membership.Provider.IsUmbracoMembershipProvider())
                 {
+                    //Hrm, with the membership provider you cannot change the login name - I guess this will do that 
+                    // in the underlying data layer
                     _document.LoginName = MemberLoginNameTxt.Text;
-                    _document.Email = MemberEmail.Text;
 
-                    // Check if password should be changed
-                    string tempPassword = ((controls.passwordChanger)MemberPasswordTxt.Controls[0]).Password;
-                    if (tempPassword.Trim() != "")
-                        _document.Password = tempPassword;
-
-                    // Groups
-                    foreach (ListItem li in _memberGroups.Items)
-                    {
-                        if (("," + _memberGroups.Value + ",").IndexOf("," + li.Value + ",") > -1)
-                        {
-                            if (!Roles.IsUserInRole(_document.LoginName, li.Value))
-                                Roles.AddUserToRole(_document.LoginName, li.Value);
-                        }
-                        else if (Roles.IsUserInRole(_document.LoginName, li.Value))
-                        {
-                            Roles.RemoveUserFromRole(_document.LoginName, li.Value);
-                        }
-                    }
+                    UpdateRoles(_member);
 
                     //The value of the properties has been set on IData through IDataEditor in the ContentControl
                     //so we need to 'retrieve' that value and set it on the property of the new IContent object.
@@ -237,36 +315,15 @@ namespace umbraco.cms.presentation.members
                     {
                         _document.getProperty(item.Key).Value = item.Value.Data.Value;
                     }
-
-                    // refresh cache
-                    _document.XmlGenerate(new System.Xml.XmlDocument());
+                    
                     _document.Save();
                 }
                 else
                 {
-                    _member.Email = MemberEmail.Text;
-                    if (Membership.Provider.EnablePasswordRetrieval)
-                    {
-                        string tempPassword = ((controls.passwordChanger)MemberPasswordTxt.Controls[0]).Password;
-                        if (tempPassword.Trim() != "")
-                            _member.ChangePassword(_member.GetPassword(), tempPassword);
-                    }
-                    Membership.UpdateUser(_member);
-                    // Groups
-                    foreach (ListItem li in _memberGroups.Items)
-                        if (("," + _memberGroups.Value + ",").IndexOf("," + li.Value + ",") > -1)
-                        {
-                            if (!Roles.IsUserInRole(_member.UserName, li.Value))
-                                Roles.AddUserToRole(_member.UserName, li.Value);
-                        }
-                        else if (Roles.IsUserInRole(_member.UserName, li.Value))
-                        {
-                            Roles.RemoveUserFromRole(_member.UserName, li.Value);
-                        }
-
+                    UpdateRoles(_member);
                 }
 
-                ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editMemberSaved", base.getUser()), "");
+                ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editMemberSaved", UmbracoUser), "");
             }
         }
 

@@ -20,7 +20,19 @@ namespace Umbraco.Core.Models
         private object _providerUserKey;
         private Type _userTypeKey;
 
-        public Member(string name, string email, string username, string password, int parentId, IMemberType contentType)
+        /// <summary>
+        /// Constructor for creating a Member object
+        /// </summary>
+        /// <param name="name">Name of the content</param>
+        /// <param name="contentType">ContentType for the current Content object</param>
+        public Member(string name, IMemberType contentType)
+            : base(name, -1, contentType, new PropertyCollection())
+        {
+            _contentType = contentType;
+        }
+
+        //TODO: Should we just get rid of this one? no reason to have a level set.
+        internal Member(string name, string email, string username, string password, int parentId, IMemberType contentType)
             : base(name, parentId, contentType, new PropertyCollection())
         {
             Mandate.ParameterNotNull(contentType, "contentType");
@@ -31,8 +43,8 @@ namespace Umbraco.Core.Models
             _password = password;
         }
 
-        public Member(string name, string email, string username, string password, IContentBase parent, IMemberType contentType)
-            : base(name, parent, contentType, new PropertyCollection())
+        public Member(string name, string email, string username, string password, IMemberType contentType)
+            : this(name, email, username, password, -1, contentType)
         {
             Mandate.ParameterNotNull(contentType, "contentType");
 
@@ -41,6 +53,17 @@ namespace Umbraco.Core.Models
             _username = username;
             _password = password;
         }
+
+        //public Member(string name, string email, string username, string password, IContentBase parent, IMemberType contentType)
+        //    : base(name, parent, contentType, new PropertyCollection())
+        //{
+        //    Mandate.ParameterNotNull(contentType, "contentType");
+
+        //    _contentType = contentType;
+        //    _email = email;
+        //    _username = username;
+        //    _password = password;
+        //}
 
         private static readonly PropertyInfo DefaultContentTypeAliasSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.ContentTypeAlias);
         private static readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<Member, string>(x => x.Username);
@@ -184,13 +207,12 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.IsApproved].Value == null)
-                    return default(bool);
-
-                if (Properties[Constants.Conventions.Member.IsApproved].Value is bool)
-                    return (bool)Properties[Constants.Conventions.Member.IsApproved].Value;
-
-                return (bool)Convert.ChangeType(Properties[Constants.Conventions.Member.IsApproved].Value, typeof(bool));
+                var tryConvert = Properties[Constants.Conventions.Member.IsApproved].Value.TryConvertTo<bool>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(bool);
             }
             set
             {
@@ -210,13 +232,12 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.IsLockedOut].Value == null)
-                    return default(bool);
-
-                if (Properties[Constants.Conventions.Member.IsLockedOut].Value is bool)
-                    return (bool)Properties[Constants.Conventions.Member.IsLockedOut].Value;
-
-                return (bool)Convert.ChangeType(Properties[Constants.Conventions.Member.IsLockedOut].Value, typeof(bool));
+                var tryConvert = Properties[Constants.Conventions.Member.IsLockedOut].Value.TryConvertTo<bool>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(bool);
             }
             set
             {
@@ -236,13 +257,12 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.LastLoginDate].Value == null)
-                    return default(DateTime);
-
-                if (Properties[Constants.Conventions.Member.LastLoginDate].Value is DateTime)
-                    return (DateTime)Properties[Constants.Conventions.Member.LastLoginDate].Value;
-
-                return (DateTime)Convert.ChangeType(Properties[Constants.Conventions.Member.LastLoginDate].Value, typeof(DateTime));
+                var tryConvert = Properties[Constants.Conventions.Member.LastLoginDate].Value.TryConvertTo<DateTime>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(DateTime);
             }
             set
             {
@@ -262,13 +282,12 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value == null)
-                    return default(DateTime);
-
-                if (Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value is DateTime)
-                    return (DateTime)Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value;
-
-                return (DateTime)Convert.ChangeType(Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value, typeof(DateTime));
+                var tryConvert = Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value.TryConvertTo<DateTime>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(DateTime);
             }
             set
             {
@@ -288,13 +307,12 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.LastLockoutDate].Value == null)
-                    return default(DateTime);
-
-                if (Properties[Constants.Conventions.Member.LastLockoutDate].Value is DateTime)
-                    return (DateTime)Properties[Constants.Conventions.Member.LastLockoutDate].Value;
-
-                return (DateTime)Convert.ChangeType(Properties[Constants.Conventions.Member.LastLockoutDate].Value, typeof(DateTime));
+                var tryConvert = Properties[Constants.Conventions.Member.LastLockoutDate].Value.TryConvertTo<DateTime>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(DateTime);
             }
             set
             {
@@ -315,13 +333,12 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value == null)
-                    return default(int);
-
-                if (Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value is int)
-                    return (int)Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value;
-
-                return (int)Convert.ChangeType(Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value, typeof(int));
+                var tryConvert = Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value.TryConvertTo<int>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(int);
             }
             set
             {
@@ -356,7 +373,7 @@ namespace Umbraco.Core.Models
         /// membership provider.
         /// </remarks>
         [DataMember]
-        internal virtual object ProviderUserKey
+        public virtual object ProviderUserKey
         {
             get
             {

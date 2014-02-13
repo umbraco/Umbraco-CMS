@@ -25,19 +25,20 @@ namespace Umbraco.Tests.Persistence
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            RepositoryResolver.Current = new RepositoryResolver(
-                new RepositoryFactory());
-            
+            RepositoryResolver.Current = new RepositoryResolver(new RepositoryFactory(true));
+
+            //disable cache
+            var cacheHelper = CacheHelper.CreateDisabledCacheHelper();
+
             ApplicationContext.Current = new ApplicationContext(
                 //assign the db context
                 new DatabaseContext(new DefaultDatabaseFactory()),
                 //assign the service context
-                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy()),
-                //disable cache
-                false)
-                {
-                    IsReady = true
-                };
+                new ServiceContext(new PetaPocoUnitOfWorkProvider(), new FileUnitOfWorkProvider(), new PublishingStrategy(), cacheHelper),
+                cacheHelper)
+            {
+                IsReady = true
+            };
 
             Resolution.Freeze();
         }

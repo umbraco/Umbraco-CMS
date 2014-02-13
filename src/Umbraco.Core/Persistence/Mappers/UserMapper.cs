@@ -38,7 +38,7 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<User, UserDto>(src => src.StartContentId, dto => dto.ContentStartId);
             CacheMap<User, UserDto>(src => src.DefaultToLiveEditing, dto => dto.DefaultToLiveEditing);
             CacheMap<User, UserDto>(src => src.IsApproved, dto => dto.Disabled);
-            CacheMap<User, UserDto>(src => src.NoConsole, dto => dto.NoConsole);
+            CacheMap<User, UserDto>(src => src.IsLockedOut, dto => dto.NoConsole);
             CacheMap<User, UserDto>(src => src.UserType, dto => dto.Type);
             CacheMap<User, UserDto>(src => src.Language, dto => dto.UserLanguage);
         }

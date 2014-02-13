@@ -1,13 +1,17 @@
-using System;
+﻿using System;
+using System.Globalization;
 using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Windows.Forms.VisualStyles;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
 using umbraco.cms.businesslogic.member;
 using umbraco.cms.businesslogic.web;
 using umbraco.controls;
 using umbraco.cms.helpers;
 using umbraco.BasePages;
+using Umbraco.Core.Security;
 
 namespace umbraco.presentation.umbraco.dialogs
 {
@@ -22,11 +26,16 @@ namespace umbraco.presentation.umbraco.dialogs
 
         }
 
-        protected System.Web.UI.WebControls.Literal jsShowWindow;
+        protected Literal jsShowWindow;
         protected DualSelectbox _memberGroups = new DualSelectbox();
         protected ContentPicker loginPagePicker = new ContentPicker();
         protected ContentPicker errorPagePicker = new ContentPicker();
 
+        override protected void OnInit(EventArgs e)
+        {           
+            base.OnInit(e);
+        }
+        
         protected void selectMode(object sender, EventArgs e)
         {
             p_mode.Visible = false;
@@ -46,11 +55,11 @@ namespace umbraco.presentation.umbraco.dialogs
             }
         }
 
-        protected void Page_Load(object sender, System.EventArgs e)
+        protected void Page_Load(object sender, EventArgs e)
         {
             // Check for editing
             int documentId = int.Parse(helper.Request("nodeId"));
-            cms.businesslogic.web.Document documentObject = new cms.businesslogic.web.Document(documentId);
+            var documentObject = new Document(documentId);
             jsShowWindow.Text = "";
 
             ph_errorpage.Controls.Add(errorPagePicker);
@@ -61,12 +70,12 @@ namespace umbraco.presentation.umbraco.dialogs
             pp_loginPage.Text = ui.Text("paLoginPage");
             pp_errorPage.Text = ui.Text("paErrorPage");
 
-            pane_chooseMode.Text = ui.Text("publicAccess", "paHowWould", base.getUser());
-            pane_pages.Text = ui.Text("publicAccess", "paSelectPages", base.getUser());
-            pane_simple.Text = ui.Text("publicAccess", "paSimple", base.getUser());
-            pane_advanced.Text = ui.Text("publicAccess", "paAdvanced", base.getUser());
+            pane_chooseMode.Text = ui.Text("publicAccess", "paHowWould", UmbracoUser);
+            pane_pages.Text = ui.Text("publicAccess", "paSelectPages", UmbracoUser);
+            pane_simple.Text = ui.Text("publicAccess", "paSimple", UmbracoUser);
+            pane_advanced.Text = ui.Text("publicAccess", "paAdvanced", UmbracoUser);
 
-            if (!IsPostBack)
+            if (IsPostBack == false)
             {
                 if (Access.IsProtected(documentId, documentObject.Path) && Access.GetProtectionType(documentId) != ProtectionType.NotProtected)
                 {
@@ -78,23 +87,27 @@ namespace umbraco.presentation.umbraco.dialogs
                     int loginPage = Access.GetLoginPage(documentObject.Path);
                     try
                     {
-                        Document loginPageObj = new Document(loginPage);
+                        var loginPageObj = new Document(loginPage);
                         if (loginPageObj != null)
                         {
-                            loginPagePicker.Value = loginPage.ToString();
+                            loginPagePicker.Value = loginPage.ToString(CultureInfo.InvariantCulture);
                         }
-                        Document errorPageObj = new Document(errorPage);
-                        errorPagePicker.Value = errorPage.ToString();
+                        var errorPageObj = new Document(errorPage);
+                        errorPagePicker.Value = errorPage.ToString(CultureInfo.InvariantCulture);
                     }
-                    catch
+                    catch (Exception ex)
                     {
+                        LogHelper.Error<protectPage>("An error occurred initializing the protect page editor", ex);
                     }
 
                     if (Access.GetProtectionType(documentId) == ProtectionType.Simple)
                     {
-                        MembershipUser m = Access.GetAccessingMembershipUser(documentId);
-                        simpleLogin.Text = m.UserName;
+                        MembershipUser m = Access.GetAccessingMembershipUser(documentId);                        
                         pane_simple.Visible = true;
+                        pp_pass.Visible = false;
+                        simpleLogin.Visible = false;
+                        SimpleLoginLabel.Visible = true;
+                        SimpleLoginLabel.Text = m.UserName;
                         pane_advanced.Visible = false;
                         bt_protect.CommandName = "simple";
 
@@ -114,17 +127,17 @@ namespace umbraco.presentation.umbraco.dialogs
             // Load up membergrouops
             _memberGroups.ID = "Membergroups";
             _memberGroups.Width = 175;
-            string selectedGroups = "";
-            string[] _roles = Roles.GetAllRoles();
+            var selectedGroups = "";
+            var roles = Roles.GetAllRoles();
 
-            if (_roles.Length > 0)
+            if (roles.Length > 0)
             {
-                foreach (string role in _roles)
+                foreach (string role in roles)
                 {
                     ListItem li = new ListItem(role, role);
-                    if (!IsPostBack)
+                    if (IsPostBack == false)
                     {
-                        if (cms.businesslogic.web.Access.IsProtectedByMembershipRole(int.Parse(helper.Request("nodeid")), role))
+                        if (Access.IsProtectedByMembershipRole(int.Parse(helper.Request("nodeid")), role))
                             selectedGroups += role + ",";
                     }
                     _memberGroups.Items.Add(li);
@@ -145,25 +158,13 @@ namespace umbraco.presentation.umbraco.dialogs
             // Put user code to initialize the page here
         }
 
-        #region Web Form Designer generated code
-        override protected void OnInit(EventArgs e)
+        protected void ChangeOnClick(object sender, EventArgs e)
         {
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
-            base.OnInit(e);
+            SimpleLoginNameValidator.IsValid = true;
+            SimpleLoginLabel.Visible = false;
+            simpleLogin.Visible = true;
+            pp_pass.Visible = true;
         }
-
-        /// <summary>
-        /// Required method for Designer support - do not modify
-        /// the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-
-        }
-        #endregion
 
         protected void protect_Click(object sender, CommandEventArgs e)
         {
@@ -173,63 +174,64 @@ namespace umbraco.presentation.umbraco.dialogs
             if (string.IsNullOrEmpty(loginPagePicker.Value))
                 cv_loginPage.IsValid = false;
 
+            //reset
+            SimpleLoginNameValidator.IsValid = true;
 
             if (Page.IsValid)
             {
                 int pageId = int.Parse(helper.Request("nodeId"));
-                p_buttons.Visible = false;
-                pane_advanced.Visible = false;
-                pane_simple.Visible = false;
-
+                
                 if (e.CommandName == "simple")
                 {
-                    MembershipUser member = Membership.GetUser(simpleLogin.Text);
+                    var memberLogin = simpleLogin.Visible ? simpleLogin.Text : SimpleLoginLabel.Text;
+
+                    var member = Membership.GetUser(memberLogin);
                     if (member == null)
                     {
+                        var tempEmail = "u" + Guid.NewGuid().ToString("N") + "@example.com";
+
                         // this needs to work differently depending on umbraco members or external membership provider
-                        if (!cms.businesslogic.member.Member.InUmbracoMemberMode())
+                        if (Membership.Provider.IsUmbracoMembershipProvider() == false)
                         {
-                            member = Membership.CreateUser(simpleLogin.Text, simplePassword.Text);
+                            member = Membership.CreateUser(memberLogin, simplePassword.Text, tempEmail);
                         }
                         else
                         {
-                            try
+                            //if it's the umbraco membership provider, then we need to tell it what member type to create it with
+                            if (MemberType.GetByAlias(Constants.Conventions.MemberTypes.SystemDefaultProtectType) == null)
                             {
-                                if (
-                                    cms.businesslogic.member.MemberType.GetByAlias("_umbracoSystemDefaultProtectType") == null)
-                                {
-                                    cms.businesslogic.member.MemberType.MakeNew(BusinessLogic.User.GetUser(0), "_umbracoSystemDefaultProtectType");
-                                }
+                                MemberType.MakeNew(BusinessLogic.User.GetUser(0), Constants.Conventions.MemberTypes.SystemDefaultProtectType);
                             }
-                            catch
+                            var provider = Membership.Provider.AsUmbracoMembershipProvider();
+                            MembershipCreateStatus status;
+                            member = provider.CreateUser(Constants.Conventions.MemberTypes.SystemDefaultProtectType,
+                                                memberLogin, simplePassword.Text, tempEmail, null, null, true, null, out status);
+                            if (status != MembershipCreateStatus.Success)
                             {
-                                cms.businesslogic.member.MemberType.MakeNew(BusinessLogic.User.GetUser(0), "_umbracoSystemDefaultProtectType");
+                                SimpleLoginNameValidator.IsValid = false;
+                                SimpleLoginNameValidator.ErrorMessage = "Could not create user: " + status;
+                                SimpleLoginNameValidator.Text = "Could not create user: " + status;
+                                return;
                             }
-
-                            // create member
-                            Member mem = cms.businesslogic.member.Member.MakeNew(simpleLogin.Text, "", cms.businesslogic.member.MemberType.GetByAlias("_umbracoSystemDefaultProtectType"), base.getUser());
-                            // working around empty password restriction for Umbraco Member Mode
-                            mem.Password = simplePassword.Text;
-                            member = Membership.GetUser(simpleLogin.Text);
                         }
                     }
-                    else
+                    else if (pp_pass.Visible)
                     {
-                        // change password if it's not empty
-                        if (string.IsNullOrWhiteSpace(simplePassword.Text) == false)
-                        {
-                            var mem = Member.GetMemberFromLoginName(simpleLogin.Text);
-                            mem.Password = simplePassword.Text;
-                        }
+                        SimpleLoginNameValidator.IsValid = false;                        
+                        SimpleLoginLabel.Visible = true;
+                        SimpleLoginLabel.Text = memberLogin;
+                        simpleLogin.Visible = false;
+                        pp_pass.Visible = false;
+                        return;
                     }
 
                     // Create or find a memberGroup
-                    string simpleRoleName = "__umbracoRole_" + simpleLogin.Text;
-                    if (!Roles.RoleExists(simpleRoleName))
+                    var simpleRoleName = "__umbracoRole_" + member.UserName;
+                    if (Roles.RoleExists(simpleRoleName) == false)
                     {
                         Roles.CreateRole(simpleRoleName);
                     }
-                    if (!Roles.IsUserInRole(member.UserName, simpleRoleName))
+                    if (Roles.IsUserInRole(member.UserName, simpleRoleName) == false)
                     {
                         Roles.AddUserToRole(member.UserName, simpleRoleName);
                     }
@@ -240,16 +242,20 @@ namespace umbraco.presentation.umbraco.dialogs
                 }
                 else if (e.CommandName == "advanced")
                 {
-                    cms.businesslogic.web.Access.ProtectPage(false, pageId, int.Parse(loginPagePicker.Value), int.Parse(errorPagePicker.Value));
+                    Access.ProtectPage(false, pageId, int.Parse(loginPagePicker.Value), int.Parse(errorPagePicker.Value));
 
                     foreach (ListItem li in _memberGroups.Items)
-                        if (("," + _memberGroups.Value + ",").IndexOf("," + li.Value + ",") > -1)
-                            cms.businesslogic.web.Access.AddMembershipRoleToDocument(pageId, li.Value);
+                        if (("," + _memberGroups.Value + ",").IndexOf("," + li.Value + ",", StringComparison.Ordinal) > -1)
+                            Access.AddMembershipRoleToDocument(pageId, li.Value);
                         else
-                            cms.businesslogic.web.Access.RemoveMembershipRoleFromDocument(pageId, li.Value);
+                            Access.RemoveMembershipRoleFromDocument(pageId, li.Value);
                 }
 
                 feedback.Text = ui.Text("publicAccess", "paIsProtected", new cms.businesslogic.CMSNode(pageId).Text, null) + "</p><p><a href='#' onclick='" + ClientTools.Scripts.CloseModalWindow() + "'>" + ui.Text("closeThisWindow") + "</a>";
+
+                p_buttons.Visible = false;
+                pane_advanced.Visible = false;
+                pane_simple.Visible = false;
 
                 ClientTools.ReloadActionNode(true, false);
 
@@ -273,5 +279,289 @@ namespace umbraco.presentation.umbraco.dialogs
 
             feedback.type = global::umbraco.uicontrols.Feedback.feedbacktype.success;
         }
+
+        protected CustomValidator SimpleLoginNameValidator;
+        protected Label SimpleLoginLabel;
+
+        /// <summary>
+        /// tempFile control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden tempFile;
+
+        /// <summary>
+        /// feedback control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Feedback feedback;
+
+        /// <summary>
+        /// p_mode control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel p_mode;
+
+        /// <summary>
+        /// pane_chooseMode control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane pane_chooseMode;
+
+        /// <summary>
+        /// rb_simple control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton rb_simple;
+
+        /// <summary>
+        /// rb_advanced control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.RadioButton rb_advanced;
+
+        /// <summary>
+        /// p_noGroupsFound control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel p_noGroupsFound;
+
+        /// <summary>
+        /// bt_selectMode control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button bt_selectMode;
+
+        /// <summary>
+        /// pane_simple control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane pane_simple;
+
+        /// <summary>
+        /// PropertyPanel1 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel1;
+
+        /// <summary>
+        /// pp_login control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_login;
+
+        /// <summary>
+        /// simpleLogin control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox simpleLogin;
+
+        /// <summary>
+        /// pp_pass control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_pass;
+
+        /// <summary>
+        /// simplePassword control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.TextBox simplePassword;
+
+        /// <summary>
+        /// pane_advanced control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane pane_advanced;
+
+        /// <summary>
+        /// PropertyPanel3 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel3;
+
+        /// <summary>
+        /// PropertyPanel2 control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel PropertyPanel2;
+
+        /// <summary>
+        /// groupsSelector control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder groupsSelector;
+
+        /// <summary>
+        /// p_buttons control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Panel p_buttons;
+
+        /// <summary>
+        /// pane_pages control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.Pane pane_pages;
+
+        /// <summary>
+        /// pp_loginPage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_loginPage;
+
+        /// <summary>
+        /// ph_loginpage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder ph_loginpage;
+
+        /// <summary>
+        /// cv_loginPage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CustomValidator cv_loginPage;
+
+        /// <summary>
+        /// pp_errorPage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::umbraco.uicontrols.PropertyPanel pp_errorPage;
+
+        /// <summary>
+        /// ph_errorpage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder ph_errorpage;
+
+        /// <summary>
+        /// cv_errorPage control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CustomValidator cv_errorPage;
+
+        /// <summary>
+        /// bt_protect control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button bt_protect;
+
+        /// <summary>
+        /// bt_buttonRemoveProtection control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.Button bt_buttonRemoveProtection;
+
+        /// <summary>
+        /// errorId control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden errorId;
+
+        /// <summary>
+        /// loginId control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.HtmlControls.HtmlInputHidden loginId;
+
+        /// <summary>
+        /// js control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.PlaceHolder js;
+
+        
     }
 }

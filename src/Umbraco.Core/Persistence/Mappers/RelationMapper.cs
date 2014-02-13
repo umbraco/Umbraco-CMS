@@ -10,6 +10,7 @@ namespace Umbraco.Core.Persistence.Mappers
     /// Represents a <see cref="Relation"/> to DTO mapper used to translate the properties of the public api 
     /// implementation to that of the database's DTO as sql: [tableName].[columnName].
     /// </summary>
+    [MapperFor(typeof(IRelation))]
     [MapperFor(typeof(Relation))]
     public sealed class RelationMapper : BaseMapper
     {
@@ -38,7 +39,7 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<Relation, RelationDto>(src => src.ParentId, dto => dto.ParentId);
             CacheMap<Relation, RelationDto>(src => src.RelationTypeId, dto => dto.RelationType);
         }
-        
+
         #endregion
     }
 }

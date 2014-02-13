@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
@@ -38,6 +39,7 @@ namespace Umbraco.Core
 		private bool _isComplete = false;
         private readonly UmbracoApplicationBase _umbracoApplication;
 		protected ApplicationContext ApplicationContext { get; private set; }
+        protected CacheHelper ApplicationCache { get; set; }
 
 	    protected UmbracoApplicationBase UmbracoApplication
 	    {
@@ -57,16 +59,19 @@ namespace Umbraco.Core
 
 	        InitializeProfilerResolver();
 
+            CreateApplicationCache();
+
             _timer = DisposableTimer.DebugDuration<CoreBootManager>("Umbraco application starting", "Umbraco application startup complete");
 
 			//create database and service contexts for the app context
 			var dbFactory = new DefaultDatabaseFactory(GlobalSettings.UmbracoConnectionName);
 		    Database.Mapper = new PetaPocoMapper();
 			var dbContext = new DatabaseContext(dbFactory);
-			var serviceContext = new ServiceContext(
-				new PetaPocoUnitOfWorkProvider(dbFactory), 
-				new FileUnitOfWorkProvider(), 
-				new PublishingStrategy());
+            var serviceContext = new ServiceContext(
+                new PetaPocoUnitOfWorkProvider(dbFactory),
+                new FileUnitOfWorkProvider(),
+                new PublishingStrategy(),
+                ApplicationCache);
 
             CreateApplicationContext(dbContext, serviceContext);
 
@@ -94,7 +99,21 @@ namespace Umbraco.Core
         protected virtual void CreateApplicationContext(DatabaseContext dbContext, ServiceContext serviceContext)
         {
             //create the ApplicationContext
-            ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext);
+            ApplicationContext = ApplicationContext.Current = new ApplicationContext(dbContext, serviceContext, ApplicationCache);
+        }
+
+        /// <summary>
+        /// Creates and assigns the ApplicationCache based on a new instance of System.Web.Caching.Cache
+        /// </summary>
+        protected virtual void CreateApplicationCache()
+        {
+            var cacheHelper = new CacheHelper(
+                        new ObjectCacheRuntimeCacheProvider(),
+                        new StaticCacheProvider(),
+                //we have no request based cache when not running in web-based context
+                        new NullCacheProvider());
+
+            ApplicationCache = cacheHelper;
         }
 
         /// <summary>
@@ -231,7 +250,7 @@ namespace Umbraco.Core
                 () => PluginManager.Current.ResolveAssignedMapperTypes());
 
 			RepositoryResolver.Current = new RepositoryResolver(
-				new RepositoryFactory());
+                new RepositoryFactory(ApplicationCache));
 
 		    SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
                 new[] { typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqlServerSyntaxProvider) })
@@ -266,17 +285,10 @@ namespace Umbraco.Core
             PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
                 PluginManager.Current.ResolveTypes<IPropertyValueConverter>());
 
-            // use the new DefaultShortStringHelper but sort-of remain compatible
-            // - use UmbracoSettings UrlReplaceCharacters
-            // - allow underscores in terms, allow leading digits
+            // use the new DefaultShortStringHelper
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(
-                new DefaultShortStringHelper()
-                    .WithConfig(CleanStringType.Url, DefaultShortStringHelper.ApplyUrlReplaceCharacters, 
-                        allowUnderscoreInTerm: true, allowLeadingDigits: true));
-
-            // that was the old one
-            //ShortStringHelperResolver.Current = new ShortStringHelperResolver(
-            //    new LegacyShortStringHelper());
+                //new LegacyShortStringHelper());
+                new DefaultShortStringHelper().WithDefaultConfig());
 
 		    UrlSegmentProviderResolver.Current = new UrlSegmentProviderResolver(
 		        typeof (DefaultUrlSegmentProvider));

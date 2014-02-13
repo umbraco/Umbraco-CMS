@@ -1,6 +1,7 @@
-<%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master" CodeBehind="create.aspx.cs"
+<%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master" 
     AutoEventWireup="True" Inherits="umbraco.dialogs.create" %>
 
+<%@ Import Namespace="Umbraco.Web" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register Src="../controls/Tree/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
 <asp:Content ContentPlaceHolderID="head" runat="server">
@@ -20,10 +21,10 @@
 			document.getElementById("ok").disabled = false;
 			// Get node name by xmlrequest
 			if (id > 0) {
-			    umbraco.presentation.webservices.CMSNode.GetNodeName('<%=umbraco.BasePages.BasePage.umbracoUserContextID%>', id, updateName);
+			    umbraco.presentation.webservices.CMSNode.GetNodeName('<%=umbracoUserContextID%>', id, updateName);
 				}
 			else			
-				pageName.html("<p><strong><%=umbraco.ui.Text(umbraco.helper.Request("app"))%></strong> <%= umbraco.ui.Text("moveOrCopy","nodeSelected") %></p>");
+				pageName.html("<p><strong><%=umbraco.ui.Text(App)%></strong> <%= umbraco.ui.Text("moveOrCopy","nodeSelected") %></p>");
 				pageNameHolder.attr("class","success");
 		}
 		
@@ -33,17 +34,17 @@
 		}
 		
 		function onNodeSelectionConfirmed() {
-		    document.location.href = 'create.aspx?nodeType=<%=umbraco.helper.Request("nodeType")%>&app=<%=umbraco.helper.Request("app")%>&nodeId=' + document.getElementById('nodeId').value
+		    document.location.href = 'create.aspx?nodeType=<%=Request.CleanForXss("nodeType")%>&app=<%=App%>&nodeId=' + document.getElementById('nodeId').value
 		}
 	
     </script>
 
 </asp:Content>
 <asp:Content ContentPlaceHolderID="body" runat="server">
-    <input type="hidden" id="nodeId" name="nodeId" value="<%=umbraco.helper.Request("nodeId")%>" />
+    <input type="hidden" id="nodeId" name="nodeId" value="<%=Request.CleanForXss("nodeId")%>" />
     <input type="hidden" id="path" name="path" value="" runat="server" />
     <cc1:Pane ID="pane_chooseNode" runat="server" Style="overflow: auto; height: 250px;">
-        <umbraco:TreeControl runat="server" ID="JTree" App='<%#umbraco.helper.Request("app") %>'
+        <umbraco:TreeControl runat="server" ID="JTree" App='<%#App %>'
             IsDialog="true" DialogMode="id" ShowContextMenu="false" FunctionToCall="dialogHandler"
             Height="230"></umbraco:TreeControl>
     </cc1:Pane>

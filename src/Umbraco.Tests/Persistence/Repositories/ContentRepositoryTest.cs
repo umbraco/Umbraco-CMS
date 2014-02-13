@@ -39,7 +39,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);
-            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository);
+            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository, CacheHelper.CreateDisabledCacheHelper());
             return repository;
         }
 
@@ -69,7 +69,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
 
                 // Act
-                repository.AssignEntityPermissions(parentPage, "A", new object[] { 0 });
+                repository.AssignEntityPermissions(parentPage, 'A', new object[] { 0 });
                 var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
                 repository.AddOrUpdate(childPage);
                 unitOfWork.Commit();
@@ -77,7 +77,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 var permissions = repository.GetPermissionsForEntity(childPage.Id);
                 Assert.AreEqual(1, permissions.Count());
-                Assert.AreEqual("A", permissions.Single().Permission);
+                Assert.AreEqual("A", permissions.Single().AssignedPermissions.First());
             }
             
         }
@@ -224,7 +224,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
                 // Act
-                var content = repository.Get(1048);
+                var content = repository.Get(NodeDto.NodeIdSeed + 3);
                 bool dirty = ((Content)content).IsDirty();
 
                 // Assert
@@ -242,11 +242,11 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
                 // Act
-                var content = repository.Get(1047);
+                var content = repository.Get(NodeDto.NodeIdSeed + 2);
                 content.Name = "About 2";
                 repository.AddOrUpdate(content);
                 unitOfWork.Commit();
-                var updatedContent = repository.Get(1047);
+                var updatedContent = repository.Get(NodeDto.NodeIdSeed + 2);
 
                 // Assert
                 Assert.That(updatedContent.Id, Is.EqualTo(content.Id));
@@ -264,8 +264,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentType = contentTypeRepository.Get(1045);
-                var content = new Content("Textpage 2 Child Node", 1048, contentType);
+                var contentType = contentTypeRepository.Get(NodeDto.NodeIdSeed);
+                var content = new Content("Textpage 2 Child Node", NodeDto.NodeIdSeed + 3, contentType);
                 content.CreatorId = 0;
                 content.WriterId = 0;
 
@@ -295,17 +295,17 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
                 // Act
-                var content = repository.Get(1048);
+                var content = repository.Get(NodeDto.NodeIdSeed + 3);
 
                 // Assert
-                Assert.That(content.Id, Is.EqualTo(1048));
+                Assert.That(content.Id, Is.EqualTo(NodeDto.NodeIdSeed + 3));
                 Assert.That(content.CreateDate, Is.GreaterThan(DateTime.MinValue));
                 Assert.That(content.UpdateDate, Is.GreaterThan(DateTime.MinValue));
                 Assert.That(content.ParentId, Is.Not.EqualTo(0));
                 Assert.That(content.Name, Is.EqualTo("Text Page 2"));
                 Assert.That(content.SortOrder, Is.EqualTo(1));
                 Assert.That(content.Version, Is.Not.EqualTo(Guid.Empty));
-                Assert.That(content.ContentTypeId, Is.EqualTo(1045));
+                Assert.That(content.ContentTypeId, Is.EqualTo(NodeDto.NodeIdSeed));
                 Assert.That(content.Path, Is.Not.Empty);
                 Assert.That(content.Properties.Any(), Is.True);
             }
@@ -339,7 +339,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
                 // Act
-                var contents = repository.GetAll(1047, 1048);
+                var contents = repository.GetAll(NodeDto.NodeIdSeed + 2, NodeDto.NodeIdSeed + 3);
 
                 // Assert
                 Assert.That(contents, Is.Not.Null);
@@ -379,7 +379,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
                 // Act
-                var exists = repository.Exists(1046);
+                var exists = repository.Exists(NodeDto.NodeIdSeed + 1);
 
                 // Assert
                 Assert.That(exists, Is.True);
@@ -417,9 +417,9 @@ namespace Umbraco.Tests.Persistence.Repositories
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
                 // Act
-                var textpage = repository.Get(1046);
-                var subpage = repository.Get(1047);
-                var trashed = repository.Get(1049);
+                var textpage = repository.Get(NodeDto.NodeIdSeed + 1);
+                var subpage = repository.Get(NodeDto.NodeIdSeed + 2);
+                var trashed = repository.Get(NodeDto.NodeIdSeed + 4);
 
                 // Assert
                 Assert.That(textpage.Key.ToString().ToUpper(), Is.EqualTo("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
@@ -443,7 +443,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Assert
                 Assert.That(content, Is.Not.Null);
-                Assert.That(content.Id, Is.EqualTo(1046));
+                Assert.That(content.Id, Is.EqualTo(NodeDto.NodeIdSeed + 1));
             }           
 
         }
@@ -457,7 +457,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
-                var content = repository.Get(1047);
+                var content = repository.Get(NodeDto.NodeIdSeed + 2);
 
                 // Act
                 content.Language = "da-DK";
@@ -465,9 +465,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 repository.AddOrUpdate(content);
                 unitOfWork.Commit();
 
-                var latest = repository.Get(1047);
-                var english = repository.GetByLanguage(1047, "en-US");
-                var danish = repository.GetByLanguage(1047, "da-DK");
+                var latest = repository.Get(NodeDto.NodeIdSeed + 2);
+                var english = repository.GetByLanguage(NodeDto.NodeIdSeed + 2, "en-US");
+                var danish = repository.GetByLanguage(NodeDto.NodeIdSeed + 2, "da-DK");
 
                 // Assert
                 Assert.That(latest.Name, Is.EqualTo("Tekst Side 1"));
@@ -478,26 +478,26 @@ namespace Umbraco.Tests.Persistence.Repositories
 
         public void CreateTestData()
         {
-            //Create and Save ContentType "umbTextpage" -> 1045
+            //Create and Save ContentType "umbTextpage" -> NodeDto.NodeIdSeed
             ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
             contentType.Key = new Guid("1D3A8E6E-2EA9-4CC1-B229-1AEE19821522");
             ServiceContext.ContentTypeService.Save(contentType);
 
-            //Create and Save Content "Homepage" based on "umbTextpage" -> 1046
+            //Create and Save Content "Homepage" based on "umbTextpage" -> NodeDto.NodeIdSeed + 1
             Content textpage = MockedContent.CreateSimpleContent(contentType);
             textpage.Key = new Guid("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0");
             ServiceContext.ContentService.Save(textpage, 0);
 
-            //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1047
+            //Create and Save Content "Text Page 1" based on "umbTextpage" -> NodeDto.NodeIdSeed + 2
             Content subpage = MockedContent.CreateSimpleContent(contentType, "Text Page 1", textpage.Id);
             subpage.Key = new Guid("FF11402B-7E53-4654-81A7-462AC2108059");
             ServiceContext.ContentService.Save(subpage, 0);
 
-            //Create and Save Content "Text Page 1" based on "umbTextpage" -> 1048
+            //Create and Save Content "Text Page 1" based on "umbTextpage" -> NodeDto.NodeIdSeed + 3
             Content subpage2 = MockedContent.CreateSimpleContent(contentType, "Text Page 2", textpage.Id);
             ServiceContext.ContentService.Save(subpage2, 0);
 
-            //Create and Save Content "Text Page Deleted" based on "umbTextpage" -> 1049
+            //Create and Save Content "Text Page Deleted" based on "umbTextpage" -> NodeDto.NodeIdSeed + 4
             Content trashed = MockedContent.CreateSimpleContent(contentType, "Text Page Deleted", -20);
             trashed.Trashed = true;
             ServiceContext.ContentService.Save(trashed, 0);

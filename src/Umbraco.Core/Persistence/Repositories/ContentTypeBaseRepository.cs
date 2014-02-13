@@ -54,21 +54,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 yield return dto.ContentTypeNodeId;
             }
         }
-
-        /// <summary>
-        /// We need to override this method to ensure that any content cache is cleared
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <remarks>
-        /// see: http://issues.umbraco.org/issue/U4-1963
-        /// </remarks>
-        public override void PersistUpdatedItem(IEntity entity)
-        {
-            InMemoryCacheProvider.Current.Clear(typeof(IContent));
-            RuntimeCacheProvider.Current.Clear(typeof(IContent));
-            base.PersistUpdatedItem(entity);
-        }
-
+        
         protected void PersistNewBaseContentType(ContentTypeDto dto, IContentTypeComposition entity)
         {
             //Logic for setting Path, Level and SortOrder

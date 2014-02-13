@@ -116,14 +116,20 @@
     <Compile Include="Auditing\IAuditWriteProvider.cs" />
     <Compile Include="CacheHelper.cs" />
     <Compile Include="Cache\CacheKeys.cs" />
-    <Compile Include="Cache\CacheProviderBase.cs" />
+    <Compile Include="Cache\CacheProviderExtensions.cs" />
     <Compile Include="Cache\CacheRefresherBase.cs" />
     <Compile Include="Cache\CacheRefresherEventArgs.cs" />
-    <Compile Include="Cache\RuntimeCacheProviderBase.cs" />
+    <Compile Include="Cache\DictionaryCacheProviderBase.cs" />
+    <Compile Include="Cache\DictionaryCacheWrapper.cs" />
+    <Compile Include="Cache\DictionaryItemWrapper.cs" />
+    <Compile Include="Cache\HttpRequestCacheProvider.cs" />
     <Compile Include="Cache\HttpRuntimeCacheProvider.cs" />
+    <Compile Include="Cache\ICacheProvider.cs" />
     <Compile Include="Cache\IJsonCacheRefresher.cs" />
+    <Compile Include="Cache\IRuntimeCacheProvider.cs" />
     <Compile Include="Cache\JsonCacheRefresherBase.cs" />
     <Compile Include="Cache\NullCacheProvider.cs" />
+    <Compile Include="Cache\ObjectCacheRuntimeCacheProvider.cs" />
     <Compile Include="Cache\StaticCacheProvider.cs" />
     <Compile Include="Cache\TypedCacheRefresherBase.cs" />
     <Compile Include="CodeAnnotations\FriendlyNameAttribute.cs" />
@@ -186,6 +192,15 @@
     <Compile Include="Models\ContentTypeCompositionBase.cs" />
     <Compile Include="Models\ContentTypeExtensions.cs" />
     <Compile Include="Models\ContentTypeSort.cs" />
+    <Compile Include="Models\EntityExtensions.cs" />
+    <Compile Include="Models\IMemberGroup.cs" />
+    <Compile Include="Models\IRelation.cs" />
+    <Compile Include="Models\IRelationType.cs" />
+    <Compile Include="Models\MemberGroup.cs" />
+    <Compile Include="Models\Membership\EntityPermission.cs" />
+    <Compile Include="Models\Notification.cs" />
+    <Compile Include="Models\PreValue.cs" />
+    <Compile Include="Models\PreValueCollection.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentExtended.cs" />
     <Compile Include="Models\PublishedContent\PublishedPropertyBase.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryImpl.cs" />
@@ -194,6 +209,20 @@
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
     <Compile Include="Packaging\PackageImportIssues.cs" />
     <Compile Include="Packaging\UnpackHelper.cs" />
+    <Compile Include="Models\TemplateNode.cs" />
+    <Compile Include="Persistence\Factories\MemberGroupFactory.cs" />
+    <Compile Include="Persistence\Mappers\MemberGroupMapper.cs" />
+    <Compile Include="Persistence\Querying\SqlStringExtensions.cs" />
+    <Compile Include="Persistence\Querying\StringPropertyMatchType.cs" />
+    <Compile Include="Persistence\Querying\TextColumnType.cs" />
+    <Compile Include="Persistence\Querying\ValuePropertyMatchType.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IMemberGroupRepository.cs" />
+    <Compile Include="Persistence\Repositories\NotificationsRepository.cs" />
+    <Compile Include="Persistence\SqlSyntax\MySqlSyntax.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlCeSyntax.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlServerSyntax.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlServerVersionName.cs" />
+    <Compile Include="Persistence\SqlSyntax\SqlSyntaxProviderExtensions.cs" />
     <Compile Include="PropertyEditors\PropertyCacheValue.cs" />
     <Compile Include="PropertyEditors\PropertyValueCacheAttribute.cs" />
     <Compile Include="PropertyEditors\PropertyValueTypeAttribute.cs" />
@@ -252,14 +281,11 @@
     <Compile Include="Models\Media.cs" />
     <Compile Include="Models\MediaType.cs" />
     <Compile Include="Models\Membership\IMembershipUser.cs" />
-    <Compile Include="Models\Membership\IMembershipUserId.cs" />
     <Compile Include="Models\Membership\IProfile.cs" />
     <Compile Include="Models\Membership\IUser.cs" />
     <Compile Include="Models\Membership\IUserType.cs" />
-    <Compile Include="Models\Membership\Profile.cs" />
     <Compile Include="Models\Membership\User.cs" />
     <Compile Include="Models\Membership\UserGroup.cs" />
-    <Compile Include="Models\Membership\UserProfile.cs" />
     <Compile Include="Models\Membership\UserType.cs" />
     <Compile Include="Models\PropertyExtensions.cs" />
     <Compile Include="Models\PropertyTypeExtensions.cs" />
@@ -725,7 +751,11 @@
     <Compile Include="Publishing\PublishStatusType.cs" />
     <Compile Include="RenderingEngine.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />
+    <Compile Include="Security\IUsersMembershipProvider.cs" />
+    <Compile Include="Security\MembershipProviderBase.cs" />
+    <Compile Include="Security\MembershipProviderExtensions.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
+    <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
     <Compile Include="Security\UserData.cs" />
     <Compile Include="Serialization\AbstractSerializationService.cs" />
     <Compile Include="Serialization\Formatter.cs" />
@@ -739,6 +769,7 @@
     <Compile Include="Models\IMacroPropertyType.cs" />
     <Compile Include="Services\ContentService.cs" />
     <Compile Include="Services\ContentTypeService.cs" />
+    <Compile Include="Services\ContentTypeServiceBase.cs" />
     <Compile Include="Services\DataTypeService.cs" />
     <Compile Include="Services\EntityService.cs" />
     <Compile Include="Services\FileService.cs" />
@@ -751,30 +782,40 @@
     <Compile Include="Models\IMacro.cs" />
     <Compile Include="Services\IMacroService.cs" />
     <Compile Include="Services\IMediaService.cs" />
+    <Compile Include="Services\IMemberGroupService.cs" />
     <Compile Include="Services\IMemberService.cs" />
+    <Compile Include="Services\IMembershipMemberService.cs" />
+    <Compile Include="Services\IMembershipRoleService.cs" />
     <Compile Include="Services\IMembershipUserService.cs" />
     <Compile Include="Services\IMemberTypeService.cs" />
     <Compile Include="Services\IPackageInstallerService.cs" />
     <Compile Include="Services\IPackagingService.cs" />
+    <Compile Include="Services\INotificationService.cs" />
+    <Compile Include="Services\IRelationService.cs" />
     <Compile Include="Services\IService.cs" />
     <Compile Include="Packaging\IUnpackHelper.cs" />
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\LocalizationService.cs" />
     <Compile Include="Services\MediaService.cs" />
+    <Compile Include="Services\MemberCountType.cs" />
+    <Compile Include="Services\MemberGroupService.cs" />
     <Compile Include="Services\MemberService.cs" />
     <Compile Include="Services\MemberTypeService.cs" />
     <Compile Include="Packaging\PackageInstallationSummary.cs" />
     <Compile Include="Services\PackageInstallerService.cs" />
     <Compile Include="Packaging\PackageMetaData.cs" />
+    <Compile Include="Services\NotificationService.cs" />
     <Compile Include="Services\RelationService.cs" />
     <Compile Include="Services\ServerRegistrationService.cs" />
     <Compile Include="Services\PackagingService.cs" />
     <Compile Include="Services\ServiceContext.cs" />
     <Compile Include="Services\UserService.cs" />
+    <Compile Include="Services\UserServiceExtensions.cs" />
     <Compile Include="Standalone\ServiceContextManager.cs" />
     <Compile Include="Standalone\StandaloneCoreApplication.cs" />
     <Compile Include="Standalone\StandaloneCoreBootManager.cs" />
     <Compile Include="Strings\ContentBaseExtensions.cs" />
+    <Compile Include="Strings\Diff.cs" />
     <Compile Include="TopologicalSorter.cs" />
     <Compile Include="Strings\DefaultUrlSegmentProvider.cs" />
     <Compile Include="Strings\IUrlSegmentProvider.cs" />
@@ -819,6 +860,9 @@
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
     <Compile Include="Constants-System.cs">
+      <DependentUpon>Constants.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Constants-Web.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
     <Compile Include="UpgradeableReadLock.cs" />

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -21,5 +22,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="query">Query to execute against published versions</param>
         /// <returns>An enumerable list of <see cref="IContent"/></returns>
         IEnumerable<IContent> GetByPublishedVersion(IQuery<IContent> query);
+
+        void AssignEntityPermissions(IContent entity, char permission, IEnumerable<object> userIds);
+
+        IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId);
     }
 }

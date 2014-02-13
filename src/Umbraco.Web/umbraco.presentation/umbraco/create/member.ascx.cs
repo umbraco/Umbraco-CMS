@@ -1,3 +1,5 @@
+using Umbraco.Core.Security;
+
 namespace umbraco.cms.presentation.create.controls
 {
     using System;
@@ -21,7 +23,7 @@ namespace umbraco.cms.presentation.create.controls
         protected void Page_Load(object sender, System.EventArgs e)
         {
             sbmt.Text = ui.Text("create");
-            if (cms.businesslogic.member.Member.InUmbracoMemberMode())
+            if (Membership.Provider.IsUmbracoMembershipProvider())
             {
                 nameLiteral.Text = ui.Text("name");
                 memberChooser.Attributes.Add("style", "padding-top: 10px");
@@ -60,26 +62,6 @@ namespace umbraco.cms.presentation.create.controls
 
 
         }
-
-        #region Web Form Designer generated code
-        override protected void OnInit(EventArgs e)
-        {
-            //
-            // CODEGEN: This call is required by the ASP.NET Web Form Designer.
-            //
-            InitializeComponent();
-            base.OnInit(e);
-        }
-
-        /// <summary>
-        ///		Required method for Designer support - do not modify
-        ///		the contents of this method with the code editor.
-        /// </summary>
-        private void InitializeComponent()
-        {
-
-        }
-        #endregion
 
         protected void sbmt_Click(object sender, System.EventArgs e)
         {
@@ -127,6 +109,11 @@ namespace umbraco.cms.presentation.create.controls
                 e.IsValid = false;
             else
                 e.IsValid = true;
+        }
+
+        protected void EmailValidator_OnServerValidate(object source, ServerValidateEventArgs args)
+        {
+            args.IsValid = MembershipProviderBase.IsEmailValid(args.Value);
         }
     }
 }

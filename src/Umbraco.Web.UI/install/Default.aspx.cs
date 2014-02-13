@@ -64,10 +64,16 @@ namespace Umbraco.Web.UI.Install
             if (string.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus) == false)
             {
                 var result = Security.ValidateCurrentUser(new HttpContextWrapper(Context));
-                
-                if (result == ValidateRequestAttempt.FailedTimedOut || result == ValidateRequestAttempt.FailedNoPrivileges)
+
+                switch (result)
                 {
-                    Response.Redirect(SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl));
+                    case ValidateRequestAttempt.FailedNoPrivileges:
+                    case ValidateRequestAttempt.FailedTimedOut:
+                    case ValidateRequestAttempt.FailedNoContextId:
+                        Response.Redirect(
+                            //We must add the token to prevent CSRF attacks since the logout occurs on a GET not a POST
+                        SystemDirectories.Umbraco + "/logout.aspx?redir=" + Server.UrlEncode(Request.RawUrl) + "&t=" + Security.UmbracoUserContextId);
+                        break;
                 }
             }
 

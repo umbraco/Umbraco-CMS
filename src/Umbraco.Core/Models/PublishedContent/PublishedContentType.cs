@@ -102,7 +102,7 @@ namespace Umbraco.Core.Models.PublishedContent
             Logging.LogHelper.Debug<PublishedContentType>("Clear all.");
             // ok and faster to do it by types, assuming noone else caches PublishedContentType instances
             //ApplicationContext.Current.ApplicationCache.ClearStaticCacheByKeySearch("PublishedContentType_");
-            ApplicationContext.Current.ApplicationCache.ClearStaticCacheObjectTypes<PublishedContentType>();
+            ApplicationContext.Current.ApplicationCache.StaticCache.ClearCacheObjectTypes<PublishedContentType>();
         }
 
         internal static void ClearContentType(int id)
@@ -110,7 +110,7 @@ namespace Umbraco.Core.Models.PublishedContent
             Logging.LogHelper.Debug<PublishedContentType>("Clear content type w/id {0}.", () => id);
             // requires a predicate because the key does not contain the ID
             // faster than key strings comparisons anyway
-            ApplicationContext.Current.ApplicationCache.ClearStaticCacheObjectTypes<PublishedContentType>(
+            ApplicationContext.Current.ApplicationCache.StaticCache.ClearCacheObjectTypes<PublishedContentType>(
                 (key, value) => value.Id == id);
         }
 
@@ -121,7 +121,7 @@ namespace Umbraco.Core.Models.PublishedContent
             // properties ie both its own properties and those that were inherited (it's based upon an
             // IContentTypeComposition) and so every PublishedContentType having a property based upon
             // the cleared data type, be it local or inherited, will be cleared.
-            ApplicationContext.Current.ApplicationCache.ClearStaticCacheObjectTypes<PublishedContentType>(
+            ApplicationContext.Current.ApplicationCache.StaticCache.ClearCacheObjectTypes<PublishedContentType>(
                 (key, value) => value.PropertyTypes.Any(x => x.DataTypeId == id));
         }
 
@@ -130,7 +130,7 @@ namespace Umbraco.Core.Models.PublishedContent
             var key = string.Format("PublishedContentType_{0}_{1}",
                 itemType == PublishedItemType.Content ? "content" : "media", alias.ToLowerInvariant());
 
-            var type = ApplicationContext.Current.ApplicationCache.GetStaticCacheItem(key,
+            var type = ApplicationContext.Current.ApplicationCache.StaticCache.GetCacheItem<PublishedContentType>(key,
                 () => CreatePublishedContentType(itemType, alias));
 
             return type;
@@ -142,8 +142,8 @@ namespace Umbraco.Core.Models.PublishedContent
                 return GetPublishedContentTypeCallback(alias);
 
             var contentType = itemType == PublishedItemType.Content
-                ? (IContentTypeComposition) ApplicationContext.Current.Services.ContentTypeService.GetContentType(alias)
-                : (IContentTypeComposition) ApplicationContext.Current.Services.ContentTypeService.GetMediaType(alias);
+                ? (IContentTypeComposition)ApplicationContext.Current.Services.ContentTypeService.GetContentType(alias)
+                : (IContentTypeComposition)ApplicationContext.Current.Services.ContentTypeService.GetMediaType(alias);
 
             if (contentType == null)
                 throw new Exception(string.Format("ContentTypeService failed to find a {0} type with alias \"{1}\".",
@@ -161,7 +161,7 @@ namespace Umbraco.Core.Models.PublishedContent
             {
                 // see note above
                 //ClearAll();
-                ApplicationContext.Current.ApplicationCache.ClearStaticCacheByKeySearch("PublishedContentType_");
+                ApplicationContext.Current.ApplicationCache.StaticCache.ClearCacheByKeySearch("PublishedContentType_");
 
                 _getPublishedContentTypeCallBack = value;
             }

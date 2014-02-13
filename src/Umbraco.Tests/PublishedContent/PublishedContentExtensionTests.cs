@@ -18,19 +18,7 @@ namespace Umbraco.Tests.PublishedContent
 
 		protected override DatabaseBehavior DatabaseTestBehavior
 		{
-			get { return DatabaseBehavior.NewDbFileAndSchemaPerFixture; }
-		}
-
-		[SetUp]
-		public override void Initialize()
-		{
-			base.Initialize();
-		}
-
-		[TearDown]
-		public override void TearDown()
-		{
-			base.TearDown();
+            get { return DatabaseBehavior.NewSchemaPerFixture; }
 		}
 
 		protected override string GetXmlContent(int templateId)
@@ -38,7 +26,6 @@ namespace Umbraco.Tests.PublishedContent
 			return xmlContent;
 		}
 
-        [Ignore]
 		[Test]
 		public void IsDocumentType_NonRecursive_ActualType_ReturnsTrue()
 		{
@@ -48,7 +35,6 @@ namespace Umbraco.Tests.PublishedContent
             Assert.That(publishedContent.IsDocumentType("inherited", false));
 		}
 
-        [Ignore]
 		[Test]
 		public void IsDocumentType_NonRecursive_BaseType_ReturnsFalse()
 		{
@@ -58,7 +44,6 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.That(publishedContent.IsDocumentType("base", false), Is.False);
 		}
 
-        [Ignore]
 		[Test]
 		public void IsDocumentType_Recursive_ActualType_ReturnsTrue()
 		{
@@ -68,7 +53,6 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.That(publishedContent.IsDocumentType("inherited", true));
 		}
 
-        [Ignore]
 		[Test]
 		public void IsDocumentType_Recursive_BaseType_ReturnsTrue()
 		{
@@ -78,7 +62,6 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.That(publishedContent.IsDocumentType("base", true));
 		}
         
-        [Ignore]
 		[Test]
 		public void IsDocumentType_Recursive_InvalidBaseType_ReturnsFalse()
 		{

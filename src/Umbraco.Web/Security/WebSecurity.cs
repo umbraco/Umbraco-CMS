@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 using System.Web.Security;
@@ -7,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Security;
+using Umbraco.Web.Models;
 using umbraco;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -18,7 +20,7 @@ using UmbracoSettings = Umbraco.Core.Configuration.UmbracoSettings;
 namespace Umbraco.Web.Security
 {
     /// <summary>
-    /// A utility class used for dealing with security in Umbraco
+    /// A utility class used for dealing with USER security in Umbraco
     /// </summary>
     public class WebSecurity
     {
@@ -30,60 +32,19 @@ namespace Umbraco.Web.Security
         /// <param name="allowGroups"></param>
         /// <param name="allowMembers"></param>
         /// <returns></returns>
+        [Obsolete("Use MembershipHelper.IsMemberAuthorized instead")]
         public bool IsMemberAuthorized(
             bool allowAll = false,
             IEnumerable<string> allowTypes = null,
             IEnumerable<string> allowGroups = null,
             IEnumerable<int> allowMembers = null)
         {
-            if (allowAll)
-                return true;
-
-            if (allowTypes == null)
-                allowTypes = Enumerable.Empty<string>();
-            if (allowGroups == null)
-                allowGroups = Enumerable.Empty<string>();
-            if (allowMembers == null)
-                allowMembers = Enumerable.Empty<int>();
-            
-            // Allow by default
-            var allowAction = true;
-            
-            // Get member details
-            var member = Member.GetCurrentMember();
-            if (member == null)
+            if (HttpContext.Current == null || ApplicationContext.Current == null)
             {
-                // If not logged on, not allowed
-                allowAction = false;
+                return false;
             }
-            else
-            {
-                // If types defined, check member is of one of those types
-                var allowTypesList = allowTypes as IList<string> ?? allowTypes.ToList();
-                if (allowTypesList.Any(allowType => allowType != string.Empty))
-                {
-                    // Allow only if member's type is in list
-                    allowAction = allowTypesList.Select(x => x.ToLowerInvariant()).Contains(member.ContentType.Alias.ToLowerInvariant());
-                }
-
-                // If groups defined, check member is of one of those groups
-                var allowGroupsList = allowGroups as IList<string> ?? allowGroups.ToList();
-                if (allowAction && allowGroupsList.Any(allowGroup => allowGroup != string.Empty))
-                {
-                    // Allow only if member is assigned to a group in the list
-                    var groups = Roles.GetRolesForUser(member.LoginName);
-                    allowAction = allowGroupsList.Select(s => s.ToLowerInvariant()).Intersect(groups.Select(myGroup => myGroup.ToLowerInvariant())).Any();
-                }
-
-                // If specific members defined, check member is of one of those
-                if (allowAction && allowMembers.Any())
-                {
-                    // Allow only if member's Id is in the list
-                    allowAction = allowMembers.Contains(member.Id);
-                }
-            }
-
-            return allowAction;
+            var helper = new MembershipHelper(ApplicationContext.Current, new HttpContextWrapper(HttpContext.Current));
+            return helper.IsMemberAuthorized(allowAll, allowTypes, allowGroups, allowMembers);
         }
 
         /// <summary>
@@ -177,7 +138,7 @@ namespace Umbraco.Web.Security
             var membershipProvider = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider];
             return membershipProvider != null && membershipProvider.ValidateUser(username, password);
         }
-
+        
         /// <summary>
         /// Validates the user node tree permissions.
         /// </summary>

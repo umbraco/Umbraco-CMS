@@ -45,3 +45,6 @@ using System.Security.Permissions;
 [assembly: InternalsVisibleTo("Umbraco.Belle")]
 [assembly: InternalsVisibleTo("Umbraco.VisualStudio")]
 [assembly: InternalsVisibleTo("umbraco.providers")]
+
+//allow this to be mocked in our unit tests
+[assembly: InternalsVisibleTo("DynamicProxyGenAssembly2")]

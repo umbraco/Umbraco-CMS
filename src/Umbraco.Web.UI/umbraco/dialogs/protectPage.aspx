@@ -1,6 +1,5 @@
-<%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master" Codebehind="protectPage.aspx.cs" AutoEventWireup="True" Inherits="umbraco.presentation.umbraco.dialogs.protectPage" %>
+<%@ Page Language="c#" MasterPageFile="../masterpages/umbracoDialog.Master" AutoEventWireup="True" Inherits="umbraco.presentation.umbraco.dialogs.protectPage" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
-
 
 <asp:Content ContentPlaceHolderID="head" runat="server">
   <script type="text/javascript">
@@ -96,7 +95,7 @@
             
             <asp:panel runat="server" Visible="false" ID="p_noGroupsFound" CssClass="error">
               <p>
-               <%= umbraco.ui.Text("publicAccess", "paAdvancedNoGroups", base.getUser())%>
+               <%= umbraco.ui.Text("publicAccess", "paAdvancedNoGroups", UmbracoUser)%>
               </p>
             </asp:panel>
             
@@ -110,19 +109,23 @@
          
         <cc1:Pane ID="pane_simple" runat="server" Visible="false" Text="Single user protection">
           <cc1:PropertyPanel ID="PropertyPanel1" runat="server">
-          <p> <%= umbraco.ui.Text("publicAccess", "paSetLogin", base.getUser())%></p>
+          <p> <%= umbraco.ui.Text("publicAccess", "paSetLogin", UmbracoUser)%></p>
+           <asp:CustomValidator runat="server" ID="SimpleLoginNameValidator" Display="Dynamic" EnableViewState="False">
+               <p class="notice" style="padding:5px;">Member name already exists, click <asp:LinkButton runat="server" OnClick="ChangeOnClick">Change</asp:LinkButton> to use a different name or Update to continue</p>
+           </asp:CustomValidator>
           </cc1:PropertyPanel>
           <cc1:PropertyPanel Text="Login" ID="pp_login" runat="server">
               <asp:TextBox ID="simpleLogin" runat="server" Width="150px"></asp:TextBox>
-          </cc1:PropertyPanel>
+              <asp:Label runat="server" ID="SimpleLoginLabel" Visible="False"></asp:Label>                                          
+          </cc1:PropertyPanel>          
           <cc1:PropertyPanel Text="Password" ID="pp_pass" runat="server">
-              <asp:TextBox ID="simplePassword" runat="server" Width="150px"></asp:TextBox>
+              <asp:TextBox ID="simplePassword" runat="server" Width="150px"></asp:TextBox>              
           </cc1:PropertyPanel>
         </cc1:Pane>
         
         <cc1:Pane ID="pane_advanced" runat="server" Visible="false" Text="Role based protection">
           <cc1:PropertyPanel ID="PropertyPanel3" runat="server">
-          <p> <%= umbraco.ui.Text("publicAccess", "paSelectRoles", base.getUser())%></p>
+          <p> <%= umbraco.ui.Text("publicAccess", "paSelectRoles", UmbracoUser)%></p>
           </cc1:PropertyPanel>
             <cc1:PropertyPanel ID="PropertyPanel2" runat="server">
               <asp:PlaceHolder ID="groupsSelector" runat="server"></asp:PlaceHolder>

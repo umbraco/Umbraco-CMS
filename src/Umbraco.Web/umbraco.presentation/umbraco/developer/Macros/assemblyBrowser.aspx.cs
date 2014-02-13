@@ -12,6 +12,7 @@ using System.Web.UI.HtmlControls;
 using System.Reflection;
 using System.Collections.Specialized;
 using Umbraco.Core.IO;
+using Umbraco.Web;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.macro;
 using System.Collections.Generic;
@@ -40,7 +41,7 @@ namespace umbraco.developer
                 if (Request.QueryString["type"] == null)
                 {
                     isUserControl = true;
-                    var fileName = Request.QueryString["fileName"];
+                    var fileName = Request.CleanForXss("fileName");
                     if (!fileName.StartsWith("~"))
                     {
                         if (fileName.StartsWith("/"))

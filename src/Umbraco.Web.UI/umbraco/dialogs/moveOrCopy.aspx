@@ -1,5 +1,6 @@
 <%@ Page Language="c#" CodeBehind="moveOrCopy.aspx.cs" MasterPageFile="../masterpages/umbracoDialog.Master" AutoEventWireup="True" Inherits="Umbraco.Web.UI.Umbraco.Dialogs.MoveOrCopy" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
+<%@ Import Namespace="Umbraco.Web" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register Src="../controls/Tree/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
 
@@ -13,11 +14,11 @@
 				
 				// Get node name by xmlrequest
 				if (id > 0)
-						umbraco.presentation.webservices.CMSNode.GetNodeName('<%=umbraco.BasePages.BasePage.umbracoUserContextID%>', id, updateName);
+						umbraco.presentation.webservices.CMSNode.GetNodeName('<%=umbracoUserContextID%>', id, updateName);
 				else{
-					//document.getElementById("pageNameContent").innerHTML = "'<strong><%=umbraco.ui.Text(umbraco.helper.Request("app"))%></strong>' <%= umbraco.ui.Text("moveOrCopy","nodeSelected") %>";
+					//document.getElementById("pageNameContent").innerHTML = "'<strong><%=umbraco.ui.Text(Request.CleanForXss("app"))%></strong>' <%= umbraco.ui.Text("moveOrCopy","nodeSelected") %>";
 			    
-					jQuery("#pageNameContent").html("<strong><%=umbraco.ui.Text(umbraco.helper.Request("app"))%></strong> <%= umbraco.ui.Text("moveOrCopy","nodeSelected") %>");
+					jQuery("#pageNameContent").html("<strong><%=umbraco.ui.Text(Request.CleanForXss("app"))%></strong> <%= umbraco.ui.Text("moveOrCopy","nodeSelected") %>");
 					jQuery("#pageNameHolder").attr("class","success");
 			  }
 			}
@@ -58,7 +59,7 @@
 	<cc1:Feedback ID="feedback" runat="server" />
 	<cc1:Pane ID="pane_form" runat="server" Visible="false">
 		<cc1:PropertyPanel runat="server" Style="overflow: auto; height: 220px;position: relative;">
-			<umbraco:TreeControl runat="server" ID="JTree" App='<%#umbraco.helper.Request("app") %>'
+			<umbraco:TreeControl runat="server" ID="JTree" App='<%#Request.CleanForXss("app") %>'
                 IsDialog="true" DialogMode="id" ShowContextMenu="false" FunctionToCall="dialogHandler"
                 Height="200"></umbraco:TreeControl>
 		</cc1:PropertyPanel>
@@ -82,10 +83,10 @@
 	</cc1:Pane>
 	<asp:Panel ID="panel_buttons" runat="server">
 		<p>
-			<asp:Button ID="ok" runat="server" CssClass="guiInputButton" OnClick="HandleMoveOrCopy"></asp:Button>
+			<asp:Button ID="ok" runat="server" CssClass="guiInputButton" OnClick="HandleMoveOrCopy" UseSubmitBehavior="false" OnClientClick="this.disabled = 'disabled';"></asp:Button>
 			&nbsp; <em>
-				<%=umbraco.ui.Text("general", "or", this.getUser())%></em> &nbsp; <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()">
-					<%=umbraco.ui.Text("general", "cancel", this.getUser())%></a>
+				<%=umbraco.ui.Text("general", "or", UmbracoUser)%></em> &nbsp; <a href="#" style="color: blue" onclick="UmbClientMgr.closeModalWindow()">
+					<%=umbraco.ui.Text("general", "cancel", UmbracoUser)%></a>
 		</p>
 	</asp:Panel>
 </asp:Content>

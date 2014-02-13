@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
@@ -31,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private UserRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out UserTypeRepository userTypeRepository)
         {
             userTypeRepository = new UserTypeRepository(unitOfWork, NullCacheProvider.Current);
-            var repository = new UserRepository(unitOfWork, NullCacheProvider.Current, userTypeRepository);
+            var repository = new UserRepository(unitOfWork, NullCacheProvider.Current, userTypeRepository, CacheHelper.CreateDisabledCacheHelper());
             return repository;
         }
 
@@ -131,14 +132,15 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
 
                 // Act
-                var resolved = repository.Get((int)user.Id);
+                var resolved = (User)repository.Get((int)user.Id);
 
                 resolved.Name = "New Name";
-                resolved.DefaultPermissions = "ZYX";
+                //the db column is not used, default permissions are taken from the user type's permissions, this is a getter only
+                //resolved.DefaultPermissions = "ZYX";
                 resolved.Language = "fr";
                 resolved.IsApproved = false;
                 resolved.Password = "new";
-                resolved.NoConsole = true;
+                resolved.IsLockedOut = true;
                 resolved.StartContentId = 10;
                 resolved.StartMediaId = 11;
                 resolved.DefaultToLiveEditing = true;
@@ -148,16 +150,16 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 repository.AddOrUpdate(resolved);
                 unitOfWork.Commit();
-                var updatedItem = repository.Get((int)user.Id);
+                var updatedItem = (User)repository.Get((int)user.Id);
 
                 // Assert
                 Assert.That(updatedItem.Id, Is.EqualTo(resolved.Id));
                 Assert.That(updatedItem.Name, Is.EqualTo(resolved.Name));
-                Assert.That(updatedItem.DefaultPermissions, Is.EqualTo(resolved.DefaultPermissions));
+                //Assert.That(updatedItem.DefaultPermissions, Is.EqualTo(resolved.DefaultPermissions));
                 Assert.That(updatedItem.Language, Is.EqualTo(resolved.Language));
                 Assert.That(updatedItem.IsApproved, Is.EqualTo(resolved.IsApproved));
                 Assert.That(updatedItem.Password, Is.EqualTo(resolved.Password));
-                Assert.That(updatedItem.NoConsole, Is.EqualTo(resolved.NoConsole));
+                Assert.That(updatedItem.IsLockedOut, Is.EqualTo(resolved.IsLockedOut));
                 Assert.That(updatedItem.StartContentId, Is.EqualTo(resolved.StartContentId));
                 Assert.That(updatedItem.StartMediaId, Is.EqualTo(resolved.StartMediaId));
                 Assert.That(updatedItem.DefaultToLiveEditing, Is.EqualTo(resolved.DefaultToLiveEditing));
@@ -484,6 +486,28 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
+        [Test]
+        public void Default_User_Permissions_Based_On_User_Type()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var repository = RepositoryResolver.Current.ResolveByType<IUserRepository>(unitOfWork);
+
+
+            // Act
+            var user1 = MockedUser.CreateUser(CreateAndCommitUserType(), "1", "test", "media");
+            repository.AddOrUpdate(user1);
+            unitOfWork.Commit();
+
+            // Assert
+            Assert.AreEqual(3, user1.DefaultPermissions.Count());
+            Assert.AreEqual("A", user1.DefaultPermissions.ElementAt(0));
+            Assert.AreEqual("B", user1.DefaultPermissions.ElementAt(1));
+            Assert.AreEqual("C", user1.DefaultPermissions.ElementAt(2));
+
+        }
+
         private void AssertPropertyValues(IUser updatedItem, IUser originalUser)
         {
             Assert.That(updatedItem.Id, Is.EqualTo(originalUser.Id));
@@ -492,10 +516,10 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(updatedItem.Language, Is.EqualTo(originalUser.Language));
             Assert.That(updatedItem.IsApproved, Is.EqualTo(originalUser.IsApproved));
             Assert.That(updatedItem.Password, Is.EqualTo(originalUser.Password));
-            Assert.That(updatedItem.NoConsole, Is.EqualTo(originalUser.NoConsole));
+            Assert.That(updatedItem.IsLockedOut, Is.EqualTo(originalUser.IsLockedOut));
             Assert.That(updatedItem.StartContentId, Is.EqualTo(originalUser.StartContentId));
             Assert.That(updatedItem.StartMediaId, Is.EqualTo(originalUser.StartMediaId));
-            Assert.That(updatedItem.DefaultToLiveEditing, Is.EqualTo(originalUser.DefaultToLiveEditing));
+            Assert.That(((User)updatedItem).DefaultToLiveEditing, Is.EqualTo(((User)originalUser).DefaultToLiveEditing));
             Assert.That(updatedItem.Email, Is.EqualTo(originalUser.Email));
             Assert.That(updatedItem.Username, Is.EqualTo(originalUser.Username));
             Assert.That(updatedItem.AllowedSections.Count(), Is.EqualTo(2));

@@ -3,6 +3,8 @@ using System.Collections;
 using System.Text;
 using System.Text.RegularExpressions;
 
+//TODO: We've alraedy moved most of this logic to Core.Strings - need to review this as it has slightly more functionality but should be moved to core and obsoleted!
+
 namespace umbraco.cms.businesslogic.utilities {
         /// <summary>
         /// This Class implements the Difference Algorithm published in

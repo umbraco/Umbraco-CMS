@@ -7,27 +7,33 @@
 @using Umbraco.Web.Controllers
 
 @{
-    var registerModel = new RegisterModel();
     
-    @*
-        Configurable here:
+    /* 
+     * You can specify a custom member type alias in the constructor, the default is 'Member'    
+     * for example, to use 'Custom Member' you'd use this syntax:
+     * 
+     *      var registerModel = Members.CreateRegistrationModel("Custom Member");
 
-        registerModel.MemberTypeAlias   - the default is "Member"
-
-        registerModel.RedirectOnSucces  - the default is false
-
-        registerModel.RedirectUrl       - what page do we go to if the registration was successful? 
-                                          the default is "/" unless RedirectOnSuccess is set to false
-
-        registerModel.UsernameIsEmail   - the default is true
-                                          if you want the username to be different from the email
-                                          address, set this to true and add a new Username field in
-                                          the form below
-
-                                          @Html.LabelFor(m => registerModel.Username)
-                                          @Html.TextBoxFor(m => registerModel.Username)
-                                          @Html.ValidationMessageFor(m => registerModel.Username)
-    *@
+     */
+    
+    var registerModel = Members.CreateRegistrationModel();
+    
+    /* 
+     * Configurable here:           
+     * 
+     * registerModel.RedirectUrl       - Optional. What path to redirect to if registration is successful. 
+     *                                   By default the member will be redirected to the current umbraco page 
+     *                                   unless this is specified.
+     * 
+     * registerModel.UsernameIsEmail   - the default is true
+     *                                   if you want the username to be different from the email
+     *                                   address, set this to true and add a new Username field in
+     *                                   the form below
+     *
+     *                                   @Html.LabelFor(m => registerModel.Username)
+     *                                   @Html.TextBoxFor(m => registerModel.Username)
+     *                                   @Html.ValidationMessageFor(m => registerModel.Username)
+     */
   
     Html.EnableClientValidation();
     Html.EnableUnobtrusiveJavaScript();
@@ -38,6 +44,9 @@
     var success = TempData["FormSuccess"] != null;
 }
 
+@*NOTE: This RenderJsHere code should be put on your main template page where the rest of your script tags are placed*@
+@Html.RenderJsHere()
+
 @if (success) 
 { 
     // This message will show if RedirectOnSucces is set to false (default)
@@ -45,12 +54,12 @@
 } 
 else 
 {   
-    using (Html.BeginUmbracoForm<RegisterController>("HandleRegisterMember"))
+    using (Html.BeginUmbracoForm<UmbRegisterController>("HandleRegisterMember"))
     {
         <fieldset>
             <legend>Register Member</legend>
-
-            @Html.ValidationSummary(true)
+            
+            @Html.ValidationSummary("registerModel", true)
 
             @Html.LabelFor(m => registerModel.Name)
             @Html.TextBoxFor(m => registerModel.Name)
@@ -67,7 +76,7 @@ else
             @Html.ValidationMessageFor(m => registerModel.Password)
             <br />
         
-            @if (registerModel.MemberProperties != null) { 
+            @if (registerModel.MemberProperties != null) {
                 for (var i = 0; i < registerModel.MemberProperties.Count; i++)
                 {
                     @Html.LabelFor(m => registerModel.MemberProperties[i].Value, registerModel.MemberProperties[i].Name)
@@ -78,13 +87,10 @@ else
             }
 
             @Html.HiddenFor(m => registerModel.MemberTypeAlias)
-            @Html.HiddenFor(m => registerModel.RedirectOnSucces)
             @Html.HiddenFor(m => registerModel.RedirectUrl)      
             @Html.HiddenFor(m => registerModel.UsernameIsEmail)
 
             <button>Register</button>
-        </fieldset>  
-    
-        @Html.RenderJsHere()
+        </fieldset>             
     }
 }

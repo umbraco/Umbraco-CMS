@@ -9,6 +9,8 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IMediaService : IService
     {
+        IEnumerable<IMedia> GetByIds(IEnumerable<int> ids);
+
         /// <summary>
         /// Creates an <see cref="IMedia"/> object using the alias of the <see cref="IMediaType"/>
         /// that this Media should based on.
@@ -193,7 +195,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="mediaPath">Path of the media item to retreive (for example: /media/1024/koala_403x328.jpg)</param>
         /// <returns><see cref="IMedia"/></returns>
-        IMedia GetMediaByPath(string mediaPath);        
+        IMedia GetMediaByPath(string mediaPath);
 
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects, which are ancestors of the current media.

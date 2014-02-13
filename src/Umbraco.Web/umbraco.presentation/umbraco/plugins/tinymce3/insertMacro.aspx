@@ -4,6 +4,7 @@
 <%@ Register TagPrefix="ui" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <%@ Register TagPrefix="asp" Namespace="System.Web.UI" Assembly="System.Web" %>
+<%@ Register TagPrefix="umbClient" Namespace="Umbraco.Web.UI.Bundles" %>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head runat="server">
@@ -11,8 +12,11 @@
     <base target="_self" />
 
     <ui:UmbracoClientDependencyLoader runat="server" ID="ClientLoader" />
-    <umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient"
-        Priority="0" />
+    
+    <umbClient:JsApplicationLib runat="server" />
+    <umbClient:JsJQueryCore runat="server" />
+    <umbClient:JsUmbracoApplicationCore runat="server" />
+
     <umb:JsInclude ID="JsInclude8" runat="server" FilePath="ui/default.js" PathNameAlias="UmbracoClient"
         Priority="4" />
     <umb:JsInclude ID="JsInclude1" runat="server" FilePath="tinymce3/tiny_mce_popup.js"

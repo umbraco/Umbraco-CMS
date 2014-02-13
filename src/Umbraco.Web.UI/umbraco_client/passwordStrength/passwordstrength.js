@@ -47,7 +47,8 @@
             strongPass: 'strongPass', //optional
             baseStyle: 'testresult', //optional
             userid: '', 			//required override
-            messageloc: 1				//before == 0 or after == 1
+            messageloc: 1,				//before == 0 or after == 1
+            minLength: 7
         };
         var opts = $.extend(defaults, options);
 
@@ -75,8 +76,8 @@
             $.fn.teststrength = function (password, username, option) {
                 var score = 0;
 
-                //password < 4
-                if (password.length < 4) { this.resultStyle = option.shortPass; return $(this).shortPass; }
+                //password < minLength
+                if (password.length < option.minLength) { this.resultStyle = option.shortPass; return $(this).shortPass; }
 
                 //password == user name
                 if (password.toLowerCase() == username.toLowerCase()) { this.resultStyle = option.badPass; return $(this).samePassword; }

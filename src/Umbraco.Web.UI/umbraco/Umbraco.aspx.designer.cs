@@ -8,10 +8,9 @@
 //------------------------------------------------------------------------------
 
 namespace Umbraco.Web.UI.Umbraco {
-
-
-    public partial class Umbraco
-    {
+    
+    
+    public partial class Umbraco {
         
         /// <summary>
         /// ClientLoader control.
@@ -41,114 +40,6 @@ namespace Umbraco.Web.UI.Umbraco {
         protected global::ClientDependency.Core.Controls.CssInclude CssInclude2;
         
         /// <summary>
-        /// JsInclude1 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude1;
-        
-        /// <summary>
-        /// JSON2 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JSON2;
-        
-        /// <summary>
-        /// JsInclude2 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude2;
-        
-        /// <summary>
-        /// JsInclude3 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude3;
-        
-        /// <summary>
-        /// JsInclude14 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude14;
-        
-        /// <summary>
-        /// JsInclude5 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude5;
-        
-        /// <summary>
-        /// JsInclude6 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude6;
-        
-        /// <summary>
-        /// JsInclude13 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude13;
-        
-        /// <summary>
-        /// JsInclude7 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude7;
-        
-        /// <summary>
-        /// JsInclude8 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude8;
-        
-        /// <summary>
-        /// JsInclude9 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude9;
-        
-        /// <summary>
-        /// JsInclude10 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude10;
-        
-        /// <summary>
         /// JsInclude11 control.
         /// </summary>
         /// <remarks>
@@ -156,51 +47,6 @@ namespace Umbraco.Web.UI.Umbraco {
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::ClientDependency.Core.Controls.JsInclude JsInclude11;
-        
-        /// <summary>
-        /// JsInclude4 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude4;
-        
-        /// <summary>
-        /// JsInclude17 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude17;
-        
-        /// <summary>
-        /// JsInclude12 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude12;
-        
-        /// <summary>
-        /// JsInclude15 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude15;
-        
-        /// <summary>
-        /// JsInclude16 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude16;
         
         /// <summary>
         /// Form1 control.

@@ -155,7 +155,7 @@ namespace umbraco.cms.businesslogic.web
         private User _creator;
         private User _writer;
         private int? _writerId;
-        private bool _optimizedMode;
+        private readonly bool _optimizedMode;
         protected internal IContent Content;
 
         /// <summary>
@@ -1291,7 +1291,7 @@ namespace umbraco.cms.businesslogic.web
         public override void XmlPopulate(XmlDocument xd, ref XmlNode x, bool Deep)
         {
             string urlName = this.Content.GetUrlSegment().ToLower();
-            foreach (Property p in GenericProperties.Where(p => p != null))
+            foreach (Property p in GenericProperties.Where(p => p != null && p.Value != null && string.IsNullOrEmpty(p.Value.ToString()) == false))
                 x.AppendChild(p.ToXml(xd));
 
             // attributes
@@ -1428,6 +1428,9 @@ namespace umbraco.cms.businesslogic.web
         private void SetupNode(IContent content)
         {
             Content = content;
+            //Also need to set the ContentBase item to this one so all the propery values load from it
+            ContentBase = Content;
+
             //Setting private properties from IContentBase replacing CMSNode.setupNode() / CMSNode.PopulateCMSNodeFromReader()
             base.PopulateCMSNodeFromUmbracoEntity(Content, _objectType);
 

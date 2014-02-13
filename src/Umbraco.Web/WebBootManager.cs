@@ -116,7 +116,6 @@ namespace Umbraco.Web
         protected override void InitializeApplicationEventsResolver()
         {
             base.InitializeApplicationEventsResolver();
-            ApplicationEventsResolver.Current.AddType<CacheHelperExtensions.CacheHelperApplicationEventListener>();
             ApplicationEventsResolver.Current.AddType<LegacyScheduledTasks>();
             //We need to remove these types because we've obsoleted them and we don't want them executing:
             ApplicationEventsResolver.Current.RemoveType<global::umbraco.LibraryCacheRefresher>();
@@ -130,13 +129,7 @@ namespace Umbraco.Web
         public override IBootManager Complete(Action<ApplicationContext> afterComplete)
         {
 			//Wrap viewengines in the profiling engine
-	        IViewEngine[] engines = ViewEngines.Engines.Select(e => e).ToArray();
-			ViewEngines.Engines.Clear();
-	        foreach (var engine in engines)
-	        {
-		        var wrappedEngine = engine is ProfilingViewEngine ? engine : new ProfilingViewEngine(engine);
-		        ViewEngines.Engines.Add(wrappedEngine);
-	        }
+	        WrapViewEngines(ViewEngines.Engines);
 
 	        //set routes
             CreateRoutes();
@@ -147,6 +140,28 @@ namespace Umbraco.Web
             ApplicationEventsResolver.Current.InstantiateLegacyStartupHandlers();
 
             return this;
+        }
+
+		internal static void WrapViewEngines(IList<IViewEngine> viewEngines)
+	    {
+			if (viewEngines == null || viewEngines.Count == 0) return;
+
+			var originalEngines = viewEngines.Select(e => e).ToArray();
+			viewEngines.Clear();
+			foreach (var engine in originalEngines)
+			{
+				var wrappedEngine = engine is ProfilingViewEngine ? engine : new ProfilingViewEngine(engine);
+				viewEngines.Add(wrappedEngine);
+			}
+	    }
+
+	    /// <summary>
+        /// Creates the application cache based on the HttpRuntime cache
+        /// </summary>
+        protected override void CreateApplicationCache()
+        {
+            //create a web-based cache helper
+            ApplicationCache = new CacheHelper();
         }
 
         /// <summary>
@@ -216,9 +231,15 @@ namespace Umbraco.Web
         private void RouteLocalApiController(Type controller, string umbracoPath)
         {
             var meta = PluginController.GetMetadata(controller);
+
+            //url to match
+            var routePath = meta.IsBackOffice == false
+                                ? umbracoPath + "/Api/" + meta.ControllerName + "/{action}/{id}"
+                                : umbracoPath + "/BackOffice/Api/" + meta.ControllerName + "/{action}/{id}";
+            
             var route = RouteTable.Routes.MapHttpRoute(
                 string.Format("umbraco-{0}-{1}", "api", meta.ControllerName),
-                umbracoPath + "/Api/" + meta.ControllerName + "/{action}/{id}", //url to match
+                routePath, 
                 new {controller = meta.ControllerName, id = UrlParameter.Optional});                
             //web api routes don't set the data tokens object
             if (route.DataTokens == null)

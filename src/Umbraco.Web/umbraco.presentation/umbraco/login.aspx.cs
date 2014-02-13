@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.ComponentModel;
+using System.Configuration.Provider;
 using System.Data;
 using System.Drawing;
 using System.Security;
@@ -10,13 +11,17 @@ using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using Umbraco.Core.Logging;
-using umbraco.BusinessLogic;
 using System.Web.Security;
 using umbraco.businesslogic.Exceptions;
 using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.web;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
+using Umbraco.Core.Services;
+using Umbraco.Web;
+using User = umbraco.BusinessLogic.User;
 
 namespace umbraco.cms.presentation
 {
@@ -28,6 +33,19 @@ namespace umbraco.cms.presentation
         [Obsolete("This property is no longer used")]
         protected umbWindow treeWindow;
 
+        private MembershipProvider BackOfficeProvider
+        {
+            get
+            {
+                var provider = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider];
+                if (provider == null)
+                {
+                    throw new ProviderException("The membership provider " + UmbracoSettings.DefaultBackofficeProvider + " was not found");
+                }
+                return provider;
+            }
+        }
+
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
@@ -35,9 +53,9 @@ namespace umbraco.cms.presentation
 
             // validate redirect url
             string redirUrl = Request["redir"];
-            if (!String.IsNullOrEmpty(redirUrl))
+            if (!string.IsNullOrEmpty(redirUrl))
             {
-                validateRedirectUrl(redirUrl);
+                ValidateRedirectUrl(redirUrl);
             }
         }
 
@@ -63,43 +81,56 @@ namespace umbraco.cms.presentation
         }
 
 
-        protected void Button1_Click(object sender, System.EventArgs e)
+        protected void Button1_Click(object sender, EventArgs e)
         {
             // Authenticate users by using the provider specified in umbracoSettings.config
-            if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].ValidateUser(lname.Text, passw.Text))
+            if (BackOfficeProvider.ValidateUser(lname.Text, passw.Text))
             {
-                if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is ActiveDirectoryMembershipProvider)
-                    ActiveDirectoryMapping(lname.Text, Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(lname.Text, false).Email);
-
-                BusinessLogic.User u = new User(lname.Text);
-                doLogin(u);
+                IUser user;
+                if (BackOfficeProvider.IsUmbracoUsersProvider() == false)
+                {
+                    user = ApplicationContext.Services.UserService.CreateUserMappingForCustomProvider(
+                        BackOfficeProvider.GetUser(lname.Text, false));
+                }
+                else
+                {
+                    user = ApplicationContext.Services.UserService.GetByUsername(lname.Text);
+                    if (user == null)
+                    {
+                        throw new InvalidOperationException("No IUser found with username " + lname.Text);
+                    }
+                }
+                
+                //do the login
+                UmbracoContext.Current.Security.PerformLogin(user.Id);
 
                 // Check if the user should be redirected to live editing
-                if (UmbracoSettings.EnableCanvasEditing && u.DefaultToLiveEditing)
+                if (UmbracoSettings.EnableCanvasEditing)
                 {
-                    int startNode = u.StartNodeId;
-                    // If the startnode is -1 (access to all content), we'll redirect to the top root node
-                    if (startNode == -1)
+                    //if live editing is enabled, we have to check if we need to redirect there but it is not supported
+                    // on the new IUser so we need to get the legacy user object to check
+                    var u = new User(user.Id);
+                    if (u.DefaultToLiveEditing)
                     {
-                        if (Document.CountLeafNodes(-1, Document._objectType) > 0)
+                        var startNode = u.StartNodeId;
+                        // If the startnode is -1 (access to all content), we'll redirect to the top root node
+                        if (startNode == -1)
                         {
-                            //get the first document
-                            var firstNodeId = Document.TopMostNodeIds(Document._objectType).First();
-                            startNode = new Document(firstNodeId).Id;
+                            if (Document.CountLeafNodes(-1, Document._objectType) > 0)
+                            {
+                                //get the first document
+                                var firstNodeId = Document.TopMostNodeIds(Document._objectType).First();
+                                startNode = new Document(firstNodeId).Id;
+                            }
+                            else
+                            {
+                                throw new Exception("There's currently no content to edit. Please contact your system administrator");
+                            }
                         }
-                        else
-                        {
-                            throw new Exception("There's currently no content to edit. Please contact your system administrator");
-                        }
+                        var redir = String.Format("{0}/canvas.aspx?redir=/{1}.aspx", SystemDirectories.Umbraco, startNode);
+                        Response.Redirect(redir, true);
                     }
-                    string redir = String.Format("{0}/canvas.aspx?redir=/{1}.aspx", SystemDirectories.Umbraco, startNode);
-                    Response.Redirect(redir, true);
-                }
-                else if (u.DefaultToLiveEditing)
-                {
-                    throw new UserAuthorizationException(
-    "Canvas editing isn't enabled. It can be enabled via the UmbracoSettings.config");
-                }
+                }                
 
                 if (hf_height.Value != "undefined")
                 {
@@ -111,7 +142,7 @@ namespace umbraco.cms.presentation
 
                 if (string.IsNullOrEmpty(redirUrl))
                     Response.Redirect("umbraco.aspx");
-                else if (validateRedirectUrl(redirUrl))
+                else if (ValidateRedirectUrl(redirUrl))
                 {
                     Response.Redirect(redirUrl, true);
                 }
@@ -122,9 +153,9 @@ namespace umbraco.cms.presentation
             }
         }
 
-        private bool validateRedirectUrl(string url)
+        private static bool ValidateRedirectUrl(string url)
         {
-            if (!isUrlLocalToHost(url))
+            if (IsUrlLocalToHost(url) == false)
             {
                 LogHelper.Info<login>(String.Format("Security warning: Login redirect was attempted to a site at another domain: '{0}'", url));
 
@@ -137,7 +168,7 @@ namespace umbraco.cms.presentation
             return true;
         }
 
-        private bool isUrlLocalToHost(string url)
+        private static bool IsUrlLocalToHost(string url)
         {
             if (String.IsNullOrEmpty(url))
             {
@@ -156,24 +187,7 @@ namespace umbraco.cms.presentation
                            && Uri.IsWellFormedUriString(url, UriKind.Relative);
             return isLocal;
         }
-
-        /// <summary>
-        /// Maps active directory account to umbraco user account
-        /// </summary>
-        /// <param name="loginName">Name of the login.</param>
-        /// <param name="email">Email address of the user</param>
-        private void ActiveDirectoryMapping(string loginName, string email)
-        {
-            // Password is not copied over because it is stored in active directory for security!
-            // The user is create with default access to content and as a writer user type
-            if (BusinessLogic.User.getUserId(loginName) == -1)
-            {
-                BusinessLogic.User.MakeNew(loginName, loginName, string.Empty, email ?? "", UserType.GetUserType(2));
-                var u = new User(loginName);
-                u.addApplication(Constants.Applications.Content);
-            }
-        }
-
+        
         /// <summary>
         /// ClientLoader control.
         /// </summary>

@@ -3,6 +3,7 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Reflection;
 using System.Web;
 using System.Web.SessionState;
@@ -12,6 +13,9 @@ using System.Web.UI.HtmlControls;
 using System.IO;
 using System.Xml;
 using System.Xml.XPath;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
+using Umbraco.Web;
 using umbraco.uicontrols;
 using Umbraco.Core.IO;
 using umbraco.cms.helpers;
@@ -24,19 +28,51 @@ namespace umbraco.cms.presentation
     /// </summary>
     public partial class dashboard : BasePages.UmbracoEnsuredPage
     {
+        private string _section;
 
-
-        private string _section = "";
-
-        protected void Page_Load(object sender, System.EventArgs e)
+        protected string Section
         {
-            // Put user code to initialize the page here
-            Panel2.Text = ui.Text("dashboard", "welcome", base.getUser()) + " " + this.getUser().Name;
+            get
+            {
+                if (_section == null)
+                {
+                    var qry = Request.CleanForXss("app");
+                    // Load dashboard content
+                    if (qry.IsNullOrWhiteSpace() == false)
+                    {
+                        //validate the app
+                        if (BusinessLogic.Application.getAll().Any(x => x.alias.InvariantEquals(qry)) == false)
+                        {
+                            LogHelper.Warn<dashboard>("A requested app: " + Request.GetItemAsString("app") + " was not found");
+                            _section = "default";
+                        }
+                        else
+                        {
+                            _section = qry;
+                        }
+                    }
+                    else if (UmbracoUser.Applications.Length > 0)
+                    {
+                        _section = "default";
+                    }
+                    else
+                    {
+                        _section = UmbracoUser.Applications[0].alias;
+                    }
+                }
+                return _section;
+            }
         }
 
-        private Control CreateDashBoardWrapperControl(Control control)
+        protected void Page_Load(object sender, EventArgs e)
         {
-            PlaceHolder placeHolder = new PlaceHolder();
+            // Put user code to initialize the page here
+            Panel2.Text = ui.Text("dashboard", "welcome", UmbracoUser) + " " + UmbracoUser.Name;
+        }
+
+        private static Control CreateDashBoardWrapperControl(Control control)
+        {
+            var placeHolder = new PlaceHolder();
             placeHolder.Controls.Add(new LiteralControl("<br/><fieldSet style=\"padding: 5px\">"));
             placeHolder.Controls.Add(control);
             placeHolder.Controls.Add(new LiteralControl("</fieldSet>"));
@@ -47,79 +83,77 @@ namespace umbraco.cms.presentation
         {
 
             base.OnInit(e);
-            // Load dashboard content
-            if (helper.Request("app") != "")
-                _section = helper.Request("app");
-            else if (getUser().Applications.Length > 0)
-                _section = "default";
-            else
-                _section = getUser().Applications[0].alias;
-
-            XmlDocument dashBoardXml = new XmlDocument();
+           
+            var dashBoardXml = new XmlDocument();
             dashBoardXml.Load(IOHelper.MapPath(SystemFiles.DashboardConfig));
 
             // test for new tab interface
-            foreach (XmlNode section in dashBoardXml.DocumentElement.SelectNodes("//section [areas/area = '" + _section.ToLower() + "']"))
+            if (dashBoardXml.DocumentElement == null) return;
+            var nodeList = dashBoardXml.DocumentElement.SelectNodes("//section [areas/area = '" + Section.ToLower() + "']");
+            if (nodeList == null) return;
+
+            foreach (XmlNode section in nodeList)
             {
-                if (section != null && validateAccess(section))
+                if (section != null && ValidateAccess(section))
                 {
                     Panel2.Visible = false;
                     dashboardTabs.Visible = true;
 
-                    foreach (XmlNode entry in section.SelectNodes("./tab"))
+                    var xmlNodeList = section.SelectNodes("./tab");
+                    if (xmlNodeList != null)
                     {
-                        if (validateAccess(entry))
+                        foreach (XmlNode entry in xmlNodeList)
                         {
-                            TabPage tab = dashboardTabs.NewTabPage(entry.Attributes.GetNamedItem("caption").Value);
+                            if (ValidateAccess(entry) == false) continue;
+                            if (entry.Attributes == null) continue;
+                            var tab = dashboardTabs.NewTabPage(entry.Attributes.GetNamedItem("caption").Value);
                             tab.HasMenu = true;
                             tab.Style.Add("padding", "0 10px");
 
-                            foreach (XmlNode uc in entry.SelectNodes("./control"))
+                            var selectNodes = entry.SelectNodes("./control");
+                            if (selectNodes == null) continue;
+
+                            foreach (XmlNode uc in selectNodes)
                             {
-                                if (validateAccess(uc))
+                                if (ValidateAccess(uc) == false) continue;
+
+                                var control = GetFirstText(uc).Trim(' ', '\r', '\n');
+                                var path = IOHelper.FindFile(control);
+
+                                try
                                 {
-                                    string control = getFirstText(uc).Trim(' ', '\r', '\n');
-                                    string path = IOHelper.FindFile(control);
+                                    var c = LoadControl(path);
 
-
-                                    try
+                                    // set properties
+                                    var type = c.GetType();
+                                    if (uc.Attributes != null)
                                     {
-                                        Control c = LoadControl(path);
-
-                                        // set properties
-                                        Type type = c.GetType();
-                                        if (type != null)
+                                        foreach (XmlAttribute att in uc.Attributes)
                                         {
-                                            foreach (XmlAttribute att in uc.Attributes)
+                                            var attributeName = att.Name;
+                                            var attributeValue = ParseControlValues(att.Value).ToString();
+                                            // parse special type of values
+
+                                            var prop = type.GetProperty(attributeName);
+                                            if (prop == null)
                                             {
-                                                string attributeName = att.Name;
-                                                string attributeValue = parseControlValues(att.Value).ToString();
-                                                // parse special type of values
-
-
-                                                PropertyInfo prop = type.GetProperty(attributeName);
-                                                if (prop == null)
-                                                {
-                                                    continue;
-                                                }
-
-                                                prop.SetValue(c, Convert.ChangeType(attributeValue, prop.PropertyType),
-                                                              null);
-
+                                                continue;
                                             }
-                                        }
 
-                                        //resolving files from dashboard config which probably does not map to a virtual fi
-                                        tab.Controls.Add(AddPanel(uc, c));
+                                            prop.SetValue(c, Convert.ChangeType(attributeValue, prop.PropertyType), null);
+
+                                        }
                                     }
-                                    catch (Exception ee)
-                                    {
-                                        tab.Controls.Add(
-                                            new LiteralControl(
-                                                "<p class=\"umbracoErrorMessage\">Could not load control: '" + path +
-                                                "'. <br/><span class=\"guiDialogTiny\"><strong>Error message:</strong> " +
-                                                ee.ToString() + "</span></p>"));
-                                    }
+                                    //resolving files from dashboard config which probably does not map to a virtual fi
+                                    tab.Controls.Add(AddPanel(uc, c));
+                                }
+                                catch (Exception ee)
+                                {
+                                    tab.Controls.Add(
+                                        new LiteralControl(
+                                            "<p class=\"umbracoErrorMessage\">Could not load control: '" + path +
+                                            "'. <br/><span class=\"guiDialogTiny\"><strong>Error message:</strong> " +
+                                            ee + "</span></p>"));
                                 }
                             }
                         }
@@ -127,44 +161,45 @@ namespace umbraco.cms.presentation
                 }
                 else
                 {
-
-
-                    foreach (
-                        XmlNode entry in dashBoardXml.SelectNodes("//entry [@section='" + _section.ToLower() + "']"))
+                    var xmlNodeList = dashBoardXml.SelectNodes("//entry [@section='" + Section.ToLower() + "']");
+                    if (xmlNodeList != null)
                     {
-                        PlaceHolder placeHolder = new PlaceHolder();
-                        if (entry == null || entry.FirstChild == null)
+                        foreach (XmlNode entry in xmlNodeList)
                         {
-                            placeHolder.Controls.Add(
-                                CreateDashBoardWrapperControl(new LiteralControl("Error loading DashBoard Content")));
-                        }
-                        else
-                        {
-                            string path = IOHelper.FindFile(entry.FirstChild.Value);
+                            var placeHolder = new PlaceHolder();
+                            if (entry == null || entry.FirstChild == null)
+                            {
+                                placeHolder.Controls.Add(
+                                    CreateDashBoardWrapperControl(new LiteralControl("Error loading DashBoard Content")));
+                            }
+                            else
+                            {
+                                var path = IOHelper.FindFile(entry.FirstChild.Value);
 
-                            try
-                            {
-                                placeHolder.Controls.Add(CreateDashBoardWrapperControl(LoadControl(path)));
+                                try
+                                {
+                                    placeHolder.Controls.Add(CreateDashBoardWrapperControl(LoadControl(path)));
+                                }
+                                catch (Exception err)
+                                {
+                                    Trace.Warn("Dashboard", string.Format("error loading control '{0}'",
+                                                                          path), err);
+                                    placeHolder.Controls.Clear();
+                                    placeHolder.Controls.Add(CreateDashBoardWrapperControl(new LiteralControl(string.Format(
+                                        "Error loading DashBoard Content '{0}'; {1}", path,
+                                        err.Message))));
+                                }
                             }
-                            catch (Exception err)
-                            {
-                                Trace.Warn("Dashboard", string.Format("error loading control '{0}'",
-                                                                      path), err);
-                                placeHolder.Controls.Clear();
-                                placeHolder.Controls.Add(CreateDashBoardWrapperControl(new LiteralControl(string.Format(
-                                    "Error loading DashBoard Content '{0}'; {1}", path,
-                                    err.Message))));
-                            }
+                            dashBoardContent.Controls.Add(placeHolder);
                         }
-                        dashBoardContent.Controls.Add(placeHolder);
                     }
                 }
             }
         }
 
-        private object parseControlValues(string value)
+        private static object ParseControlValues(string value)
         {
-            if (!String.IsNullOrEmpty(value))
+            if (string.IsNullOrEmpty(value) == false)
             {
                 if (value.StartsWith("[#"))
                 {
@@ -190,18 +225,18 @@ namespace umbraco.cms.presentation
             return value;
         }
 
-        private Control AddPanel(XmlNode node, Control c)
+        private static Control AddPanel(XmlNode node, Control c)
         {
-            LiteralControl hide = AddShowOnceLink(node);
+            var hide = AddShowOnceLink(node);
             if (node.Attributes.GetNamedItem("addPanel") != null &&
                 node.Attributes.GetNamedItem("addPanel").Value == "true")
             {
-                Pane p = new Pane();
-                PropertyPanel pp = new PropertyPanel();
+                var p = new Pane();
+                var pp = new PropertyPanel();
                 if (node.Attributes.GetNamedItem("panelCaption") != null &&
-                    !String.IsNullOrEmpty(node.Attributes.GetNamedItem("panelCaption").Value))
+                    string.IsNullOrEmpty(node.Attributes.GetNamedItem("panelCaption").Value) == false)
                 {
-                    string panelCaption = node.Attributes.GetNamedItem("panelCaption").Value;
+                    var panelCaption = node.Attributes.GetNamedItem("panelCaption").Value;
                     if (panelCaption.StartsWith("#"))
                     {
                         panelCaption = ui.Text(panelCaption.Substring(1));
@@ -209,7 +244,7 @@ namespace umbraco.cms.presentation
                     pp.Text = panelCaption;
                 }
                 // check for hide in the future link
-                if (!String.IsNullOrEmpty(hide.Text))
+                if (string.IsNullOrEmpty(hide.Text) == false)
                 {
                     pp.Controls.Add(hide);
                 }
@@ -218,47 +253,46 @@ namespace umbraco.cms.presentation
                 return p;
             }
 
-            if (!String.IsNullOrEmpty(hide.Text))
+            if (string.IsNullOrEmpty(hide.Text) == false)
             {
-                PlaceHolder ph = new PlaceHolder();
+                var ph = new PlaceHolder();
                 ph.Controls.Add(hide);
                 ph.Controls.Add(c);
                 return ph;
             }
-            else
-            {
-                return c;
-            }
+            return c;
         }
 
-        private LiteralControl AddShowOnceLink(XmlNode node)
+        private static LiteralControl AddShowOnceLink(XmlNode node)
         {
-            LiteralControl onceLink = new LiteralControl();
+            var onceLink = new LiteralControl();
             if (node.Attributes.GetNamedItem("showOnce") != null &&
                 node.Attributes.GetNamedItem("showOnce").Value.ToLower() == "true")
             {
-                onceLink.Text = "<a class=\"dashboardHideLink\" onclick=\"if(confirm('Are you sure you want remove this dashboard item?')){jQuery.cookie('" + generateCookieKey(node) + "','true'); jQuery(this).closest('.propertypane').fadeOut();return false;}\">" + ui.Text("dashboard", "dontShowAgain") + "</a>";
+                onceLink.Text = "<a class=\"dashboardHideLink\" onclick=\"if(confirm('Are you sure you want remove this dashboard item?')){jQuery.cookie('" + GenerateCookieKey(node) + "','true'); jQuery(this).closest('.propertypane').fadeOut();return false;}\">" + ui.Text("dashboard", "dontShowAgain") + "</a>";
             }
             return onceLink;
         }
 
-        private string getFirstText(XmlNode node)
+        private static string GetFirstText(XmlNode node)
         {
             foreach (XmlNode n in node.ChildNodes)
             {
                 if (n.NodeType == XmlNodeType.Text)
+                {
                     return n.Value;
+                }
             }
 
             return "";
         }
 
-        private string generateCookieKey(XmlNode node)
+        private static string GenerateCookieKey(XmlNode node)
         {
-            string key = String.Empty;
+            var key = String.Empty;
             if (node.Name.ToLower() == "control")
             {
-                key = node.FirstChild.Value + "_" + generateCookieKey(node.ParentNode);
+                key = node.FirstChild.Value + "_" + GenerateCookieKey(node.ParentNode);
             }
             else if (node.Name.ToLower() == "tab")
             {
@@ -268,11 +302,11 @@ namespace umbraco.cms.presentation
             return Casing.SafeAlias(key.ToLower());
         }
 
-        private bool validateAccess(XmlNode node)
+        private static bool ValidateAccess(XmlNode node)
         {
             // check if this area should be shown at all
-            string onlyOnceValue = StateHelper.GetCookieValue(generateCookieKey(node));
-            if (!String.IsNullOrEmpty(onlyOnceValue))
+            var onlyOnceValue = StateHelper.GetCookieValue(GenerateCookieKey(node));
+            if (string.IsNullOrEmpty(onlyOnceValue) == false)
             {
                 return false;
             }
@@ -282,13 +316,13 @@ namespace umbraco.cms.presentation
             {
                 return true;
             }
-            else if (node != null)
+            if (node != null)
             {
-                XmlNode accessRules = node.SelectSingleNode("access");
-                bool retVal = true;
+                var accessRules = node.SelectSingleNode("access");
+                var retVal = true;
                 if (accessRules != null && accessRules.HasChildNodes)
                 {
-                    string currentUserType = CurrentUser.UserType.Alias.ToLowerInvariant();
+                    var currentUserType = CurrentUser.UserType.Alias.ToLowerInvariant();
                     
                     //Update access rules so we'll be comparing lower case to lower case always
 
@@ -304,14 +338,14 @@ namespace umbraco.cms.presentation
                         grant.InnerText = grant.InnerText.ToLowerInvariant();
                     }
 
-                    string allowedSections = ",";
-                    foreach (BusinessLogic.Application app in CurrentUser.Applications)
+                    var allowedSections = ",";
+                    foreach (Application app in CurrentUser.Applications)
                     {
                         allowedSections += app.alias.ToLower() + ",";
                     }
-                    XmlNodeList grantedTypes = accessRules.SelectNodes("grant");
-                    XmlNodeList grantedBySectionTypes = accessRules.SelectNodes("grantBySection");
-                    XmlNodeList deniedTypes = accessRules.SelectNodes("deny");
+                    var grantedTypes = accessRules.SelectNodes("grant");
+                    var grantedBySectionTypes = accessRules.SelectNodes("grantBySection");
+                    var deniedTypes = accessRules.SelectNodes("deny");
 
                     // if there's a grant type, everyone who's not granted is automatically denied
                     if (grantedTypes.Count > 0 || grantedBySectionTypes.Count > 0)

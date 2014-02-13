@@ -89,6 +89,10 @@ namespace umbraco.dialogs
                         currContent = Services.MediaService.GetById(Request.GetItemAs<int>("id"));
                     }
 
+                    // Preselect the parent of the seslected item.
+                    if (currContent.ParentId > 0)
+                        JTree.SelectedNodePath = currContent.Path.Substring(0, currContent.Path.LastIndexOf(','));
+
                     var validAction = true;
                     if (CurrentApp == Constants.Applications.Content && Umbraco.Core.Models.ContentExtensions.HasChildren(currContent, Services))
                     {
@@ -146,8 +150,9 @@ namespace umbraco.dialogs
             var contentType = contentTypeService.GetContentType(
                 int.Parse(Request.GetItemAsString("id")));
 
-            var alias = rename.Text.Replace("'", "''");
+            var alias = rename.Text.Trim().Replace("'", "''");
             var clone = ((Umbraco.Core.Models.ContentType) contentType).Clone(alias);
+			clone.Name = rename.Text.Trim();
             contentTypeService.Save(clone);
 
             var returnUrl = string.Format("{0}/settings/editNodeTypeNew.aspx?id={1}", SystemDirectories.Umbraco, clone.Id);

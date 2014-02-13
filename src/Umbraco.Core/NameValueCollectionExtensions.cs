@@ -13,5 +13,23 @@ namespace Umbraco.Core
 		{
 			return collection.Keys.Cast<object>().Any(k => (string) k == key);
 		}
+
+        public static T GetValue<T>(this NameValueCollection collection, string key, T defaultIfNotFound)
+        {
+            if (collection.ContainsKey(key) == false)
+            {
+                return defaultIfNotFound;
+            }
+
+            var val = collection[key];
+            if (val == null)
+            {
+                return defaultIfNotFound;
+            }
+
+            var result = val.TryConvertTo<T>();
+            
+            return result.Success ? result.Result : defaultIfNotFound;
+        }
 	}
 }
