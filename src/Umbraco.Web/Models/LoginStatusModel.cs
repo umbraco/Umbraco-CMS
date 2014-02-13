@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 using System.Web;
 using Umbraco.Core;
 using Umbraco.Web.Security;
@@ -49,6 +50,7 @@ namespace Umbraco.Web.Models
         /// <summary>
         /// The name of the member
         /// </summary>
+        [Required]
         public string Name { get; set; }
 
         /// <summary>
@@ -59,6 +61,7 @@ namespace Umbraco.Web.Models
         /// <summary>
         /// The email of the member
         /// </summary>
+        [Required]
         public string Email { get; set; }
 
         /// <summary>

@@ -76,6 +76,20 @@ namespace Umbraco.Web.Mvc
         }
 
         /// <summary>
+        /// Redirects to the currently rendered Umbraco URL
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// this is useful if you need to redirect 
+        /// to the current page but the current page is actually a rewritten URL normally done with something like 
+        /// Server.Transfer.
+        /// </remarks>
+        protected RedirectToUmbracoUrlResult RedirectToCurrentUmbracoUrl()
+        {
+            return new RedirectToUmbracoUrlResult(UmbracoContext);
+        }
+
+        /// <summary>
         /// Returns the currently rendered Umbraco page
         /// </summary>
         /// <returns></returns>

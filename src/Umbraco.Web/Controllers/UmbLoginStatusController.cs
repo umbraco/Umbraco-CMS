@@ -4,13 +4,14 @@ using System.Web.Security;
 using umbraco.cms.businesslogic.member;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Controllers
 {
     public class UmbLoginStatusController : SurfaceController
     {
         [HttpPost]
-        public ActionResult HandleLogout([Bind(Prefix = "loginStatusModel")]LoginStatusModel model)
+        public ActionResult HandleLogout([Bind(Prefix = "logoutModel")]PostRedirectModel model)
         {
             if (ModelState.IsValid == false)
             {
@@ -22,9 +23,15 @@ namespace Umbraco.Web.Controllers
                 FormsAuthentication.SignOut();
             }
 
-            //TODO: Shouldn't we be redirecting to the current page or integrating this with the 
-            // normal Umbraco protection stuff?
-            return Redirect("/");
+            //if there is a specified path to redirect to then use it
+            if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
+            {
+                return Redirect(model.RedirectUrl);
+            }
+
+            //redirect to current page by default
+            TempData.Add("LogoutSuccess", true);
+            return RedirectToCurrentUmbracoPage();
         }
     }
 }

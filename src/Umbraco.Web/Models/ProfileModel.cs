@@ -10,7 +10,7 @@ using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models
 {
-    public class ProfileModel
+    public class ProfileModel : PostRedirectModel
     {
         public static ProfileModel CreateModel()
         {
@@ -60,10 +60,5 @@ namespace Umbraco.Web.Models
         /// </remarks>
         public List<UmbracoProperty> MemberProperties { get; set; }
 
-        /// <summary>
-        /// The path to redirect to when update is successful, if not specified then the user will be
-        /// redirected to the current Umbraco page
-        /// </summary>
-        public string RedirectUrl { get; set; }
     }
 }
