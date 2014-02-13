@@ -133,10 +133,6 @@ namespace umbraco.cms.businesslogic.media
                 int userId = current == null ? 0 : current.Id;
                 ApplicationContext.Current.Services.ContentTypeService.Save(_mediaType, userId);
 
-                //Ensure that MediaTypes are reloaded from db by clearing cache
-                InMemoryCacheProvider.Current.Clear();
-                RuntimeCacheProvider.Current.Clear();
-
                 base.Save();
 
                 FireAfterSave(e);

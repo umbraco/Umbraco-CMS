@@ -1,4 +1,5 @@
 using Umbraco.Core.Configuration;
+using System;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Repositories;
@@ -12,12 +13,27 @@ namespace Umbraco.Core.Persistence
     public class RepositoryFactory
     {
         private readonly bool _disableAllCache;
+        private readonly CacheHelper _cacheHelper;
         private readonly IUmbracoSettingsSection _settings;
 
         public RepositoryFactory()
             : this(false, UmbracoConfig.For.UmbracoSettings())
         {
             
+        }
+
+        public RepositoryFactory(CacheHelper cacheHelper)
+        {
+            if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
+            _disableAllCache = false;
+            _cacheHelper = cacheHelper;
+        }
+
+        public RepositoryFactory(bool disableAllCache, CacheHelper cacheHelper)
+        {
+            if (cacheHelper == null) throw new ArgumentNullException("cacheHelper");
+            _disableAllCache = disableAllCache;
+            _cacheHelper = cacheHelper;
         }
 
         public RepositoryFactory(bool disableAllCache)
@@ -30,6 +46,7 @@ namespace Umbraco.Core.Persistence
         {
             _disableAllCache = disableAllCache;
             _settings = settings;
+            _cacheHelper = disableAllCache ? CacheHelper.CreateDisabledCacheHelper() : ApplicationContext.Current.ApplicationCache;
 
         }
 
@@ -48,13 +65,14 @@ namespace Umbraco.Core.Persistence
                 CreateContentTypeRepository(uow),
                 CreateTemplateRepository(uow),
                 CreateTagsRepository(uow)) { EnsureUniqueNaming = _settings.Content.EnsureUniqueNaming };
+                _cacheHelper) { EnsureUniqueNaming = Configuration.UmbracoSettings.EnsureUniqueNaming };
         }
 
         public virtual IContentTypeRepository CreateContentTypeRepository(IDatabaseUnitOfWork uow)
         {
             return new ContentTypeRepository(
                 uow,
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : InMemoryCacheProvider.Current,
+                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
                 new TemplateRepository(uow, NullCacheProvider.Current));
         }
 
@@ -69,7 +87,7 @@ namespace Umbraco.Core.Persistence
         {
             return new DictionaryRepository(
                 uow,
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : InMemoryCacheProvider.Current,
+                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
                 CreateLanguageRepository(uow));
         }
 
@@ -77,7 +95,7 @@ namespace Umbraco.Core.Persistence
         {
             return new LanguageRepository(
                 uow,
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : InMemoryCacheProvider.Current);
+                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current);
         }
 
         public virtual IMediaRepository CreateMediaRepository(IDatabaseUnitOfWork uow)
@@ -93,7 +111,7 @@ namespace Umbraco.Core.Persistence
         {
             return new MediaTypeRepository(
                 uow,
-                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : InMemoryCacheProvider.Current);
+                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current);
         }
 
         public virtual IRelationRepository CreateRelationRepository(IDatabaseUnitOfWork uow)
@@ -142,11 +160,13 @@ namespace Umbraco.Core.Persistence
         }
 
         internal virtual IUserRepository CreateUserRepository(IDatabaseUnitOfWork uow)
-        {
+        {            
             return new UserRepository(
                 uow,
-                NullCacheProvider.Current,
-                CreateUserTypeRepository(uow));
+                //Need to cache users - we look up user information more than anything in the back office!
+                RuntimeCacheProvider.Current,
+                CreateUserTypeRepository(uow),
+                _cacheHelper);
         }
 
         internal virtual IMacroRepository CreateMacroRepository(IDatabaseUnitOfWork uow)
@@ -160,11 +180,21 @@ namespace Umbraco.Core.Persistence
                 _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current, 
                 CreateMemberTypeRepository(uow),
                 CreateTagsRepository(uow));
+            return new MemberRepository(
+                uow, 
+                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current, 
+                CreateMemberTypeRepository(uow),
+                CreateMemberGroupRepository(uow));
         }
 
         internal virtual IMemberTypeRepository CreateMemberTypeRepository(IDatabaseUnitOfWork uow)
         {
-            return new MemberTypeRepository(uow, _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : InMemoryCacheProvider.Current);
+            return new MemberTypeRepository(uow, _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current);
+        }
+
+        internal virtual IMemberGroupRepository CreateMemberGroupRepository(IDatabaseUnitOfWork uow)
+        {
+            return new MemberGroupRepository(uow, _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current, _cacheHelper);
         }
 
         internal virtual IEntityRepository CreateEntityRepository(IDatabaseUnitOfWork uow)

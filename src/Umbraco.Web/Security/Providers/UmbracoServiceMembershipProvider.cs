@@ -17,7 +17,7 @@ namespace Umbraco.Web.Security.Providers
     /// <summary>
     /// Abstract Membership Provider that users any implementation of IMembershipMemberService{TEntity} service
     /// </summary>
-    internal abstract class UmbracoServiceMembershipProvider<T, TEntity> : UmbracoMembershipProviderBase
+    public abstract class UmbracoServiceMembershipProvider<T, TEntity> : UmbracoMembershipProviderBase
         where T : IMembershipMemberService<TEntity>
         where TEntity : class, IMembershipUser
     {
@@ -148,7 +148,7 @@ namespace Umbraco.Web.Security.Providers
             string salt;
             var encodedPassword = EncryptOrHashNewPassword(password, out salt);
 
-            var member = MemberService.CreateMember(
+            var member = MemberService.CreateMemberWithIdentity(
                 username,
                 email, 
                 FormatPasswordForStorage(encodedPassword, salt), 
@@ -344,7 +344,12 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         public override MembershipUser GetUser(object providerUserKey, bool userIsOnline)
         {
-            var member = MemberService.GetById(providerUserKey);
+            if ((providerUserKey is int) == false)
+            {
+                return null;
+            }
+
+            var member = MemberService.GetById((int)providerUserKey);
             if (member == null)
             {
                 return null;
@@ -456,9 +461,19 @@ namespace Umbraco.Web.Security.Providers
             if (m == null)
             {
                 throw new ProviderException(string.Format("No member with the username '{0}' found", user.UserName));
-            }                
+            }
 
+            if (RequiresUniqueEmail && user.Email.Trim().IsNullOrWhiteSpace() == false)
+            {
+                int totalRecs;
+                var byEmail = MemberService.FindMembersByEmail(user.Email.Trim(), 0, int.MaxValue, out totalRecs, StringPropertyMatchType.Exact);
+                if (byEmail.Count(x => x.Id != m.Id) > 0)
+                {
+                    throw new ProviderException(string.Format("A member with the email '{0}' already exists", user.Email));
+                }
+            }
             m.Email = user.Email;
+            
             m.IsApproved = user.IsApproved;
             m.IsLockedOut = user.IsLockedOut;
             if (user.IsLockedOut)

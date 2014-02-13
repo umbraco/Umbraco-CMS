@@ -11,7 +11,7 @@ using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Services
 {
-    internal class MemberTypeService : ContentTypeServiceBase, IMemberTypeService
+    public class MemberTypeService : ContentTypeServiceBase, IMemberTypeService
     {
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
         private readonly RepositoryFactory _repositoryFactory;
@@ -36,7 +36,7 @@ namespace Umbraco.Core.Services
             _memberService = memberService;
         }
 
-        public IEnumerable<IMemberType> GetAllMemberTypes(params int[] ids)
+        public IEnumerable<IMemberType> GetAll(params int[] ids)
         {
             using (var repository = _repositoryFactory.CreateMemberTypeRepository(_uowProvider.GetUnitOfWork()))
             {
@@ -49,7 +49,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="id">Id of the <see cref="IMemberType"/> to retrieve</param>
         /// <returns><see cref="IMemberType"/></returns>
-        public IMemberType GetMemberType(int id)
+        public IMemberType Get(int id)
         {
             using (var repository = _repositoryFactory.CreateMemberTypeRepository(_uowProvider.GetUnitOfWork()))
             {
@@ -62,7 +62,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="alias">Alias of the <see cref="IMemberType"/> to retrieve</param>
         /// <returns><see cref="IMemberType"/></returns>
-        public IMemberType GetMemberType(string alias)
+        public IMemberType Get(string alias)
         {
             using (var repository = _repositoryFactory.CreateMemberTypeRepository(_uowProvider.GetUnitOfWork()))
             {
@@ -75,7 +75,7 @@ namespace Umbraco.Core.Services
 
         public void Save(IMemberType memberType, int userId = 0)
         {
-            if (SavingMemberType.IsRaisedEventCancelled(new SaveEventArgs<IMemberType>(memberType), this))
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberType>(memberType), this))
                 return;
 
             using (new WriteLock(Locker))
@@ -91,14 +91,14 @@ namespace Umbraco.Core.Services
 
                 UpdateContentXmlStructure(memberType);
             }
-            SavedMemberType.RaiseEvent(new SaveEventArgs<IMemberType>(memberType, false), this);
+            Saved.RaiseEvent(new SaveEventArgs<IMemberType>(memberType, false), this);
         }
 
         public void Save(IEnumerable<IMemberType> memberTypes, int userId = 0)
         {
             var asArray = memberTypes.ToArray();
 
-            if (SavingMemberType.IsRaisedEventCancelled(new SaveEventArgs<IMemberType>(asArray), this))
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberType>(asArray), this))
                 return;
 
             using (new WriteLock(Locker))
@@ -118,12 +118,12 @@ namespace Umbraco.Core.Services
 
                 UpdateContentXmlStructure(asArray.Cast<IContentTypeBase>().ToArray());
             }
-            SavedMemberType.RaiseEvent(new SaveEventArgs<IMemberType>(asArray, false), this);
+            Saved.RaiseEvent(new SaveEventArgs<IMemberType>(asArray, false), this);
         }
 
         public void Delete(IMemberType memberType, int userId = 0)
         {
-            if (DeletingMemberType.IsRaisedEventCancelled(new DeleteEventArgs<IMemberType>(memberType), this))
+            if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberType>(memberType), this))
                 return;
 
             using (new WriteLock(Locker))
@@ -136,7 +136,7 @@ namespace Umbraco.Core.Services
                     repository.Delete(memberType);
                     uow.Commit();
 
-                    DeletedMemberType.RaiseEvent(new DeleteEventArgs<IMemberType>(memberType, false), this);
+                    Deleted.RaiseEvent(new DeleteEventArgs<IMemberType>(memberType, false), this);
                 }
             }
         }
@@ -145,7 +145,7 @@ namespace Umbraco.Core.Services
         {
             var asArray = memberTypes.ToArray();
 
-            if (DeletingMemberType.IsRaisedEventCancelled(new DeleteEventArgs<IMemberType>(asArray), this))
+            if (Deleting.IsRaisedEventCancelled(new DeleteEventArgs<IMemberType>(asArray), this))
                 return;
 
             using (new WriteLock(Locker))
@@ -165,7 +165,7 @@ namespace Umbraco.Core.Services
 
                     uow.Commit();
 
-                    DeletedMemberType.RaiseEvent(new DeleteEventArgs<IMemberType>(asArray, false), this);
+                    Deleted.RaiseEvent(new DeleteEventArgs<IMemberType>(asArray, false), this);
                 }                
             }
         }
@@ -195,21 +195,21 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Save
         /// </summary>
-        public static event TypedEventHandler<IMemberTypeService, SaveEventArgs<IMemberType>> SavingMemberType;
+        public static event TypedEventHandler<IMemberTypeService, SaveEventArgs<IMemberType>> Saving;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
-        public static event TypedEventHandler<IMemberTypeService, SaveEventArgs<IMemberType>> SavedMemberType;
+        public static event TypedEventHandler<IMemberTypeService, SaveEventArgs<IMemberType>> Saved;
 
         /// <summary>
         /// Occurs before Delete
         /// </summary>
-        public static event TypedEventHandler<IMemberTypeService, DeleteEventArgs<IMemberType>> DeletingMemberType;
+        public static event TypedEventHandler<IMemberTypeService, DeleteEventArgs<IMemberType>> Deleting;
 
         /// <summary>
         /// Occurs after Delete
         /// </summary>
-        public static event TypedEventHandler<IMemberTypeService, DeleteEventArgs<IMemberType>> DeletedMemberType;
+        public static event TypedEventHandler<IMemberTypeService, DeleteEventArgs<IMemberType>> Deleted;
     }
 }

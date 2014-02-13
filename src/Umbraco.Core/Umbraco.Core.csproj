@@ -337,9 +337,12 @@
     <Compile Include="Models\ContentTypeCompositionBase.cs" />
     <Compile Include="Models\ContentTypeExtensions.cs" />
     <Compile Include="Models\ContentTypeSort.cs" />
+    <Compile Include="Models\EntityExtensions.cs" />
+    <Compile Include="Models\IMemberGroup.cs" />
     <Compile Include="Models\IRelation.cs" />
     <Compile Include="Models\IRelationType.cs" />
     <Compile Include="Models\Membership\MembershipScenario.cs" />
+    <Compile Include="Models\MemberGroup.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentExtended.cs" />
     <Compile Include="Models\PublishedContent\PublishedPropertyBase.cs" />
@@ -351,6 +354,8 @@
     <Compile Include="Models\TemplateNode.cs" />
     <Compile Include="Models\UmbracoEntityExtensions.cs" />
     <Compile Include="Packaging\PackageBinaryInspector.cs" />
+    <Compile Include="Persistence\Factories\MemberGroupFactory.cs" />
+    <Compile Include="Persistence\Mappers\MemberGroupMapper.cs" />
     <Compile Include="PropertyEditors\DefaultPropertyValueConverterAttribute.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\UpdateRelatedLinksData.cs" />
     <Compile Include="PropertyEditors\IValueEditor.cs" />
@@ -358,6 +363,7 @@
     <Compile Include="Persistence\Querying\StringPropertyMatchType.cs" />
     <Compile Include="Persistence\Querying\TextColumnType.cs" />
     <Compile Include="Persistence\Querying\ValuePropertyMatchType.cs" />
+    <Compile Include="Persistence\Repositories\Interfaces\IMemberGroupRepository.cs" />
     <Compile Include="Persistence\Repositories\NotificationsRepository.cs" />
     <Compile Include="Persistence\SqlSyntax\MySqlSyntax.cs" />
     <Compile Include="Persistence\SqlSyntax\SqlCeSyntax.cs" />
@@ -963,6 +969,7 @@
     <Compile Include="RenderingEngine.cs" />
     <Compile Include="Models\Section.cs" />
     <Compile Include="Security\AuthenticationExtensions.cs" />
+    <Compile Include="Security\IUsersMembershipProvider.cs" />
     <Compile Include="Security\MembershipProviderBase.cs" />
     <Compile Include="Security\MembershipProviderExtensions.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
@@ -995,8 +1002,10 @@
     <Compile Include="Services\ILocalizationService.cs" />
     <Compile Include="Services\IMacroService.cs" />
     <Compile Include="Services\IMediaService.cs" />
+    <Compile Include="Services\IMemberGroupService.cs" />
     <Compile Include="Services\IMemberService.cs" />
     <Compile Include="Services\IMembershipMemberService.cs" />
+    <Compile Include="Services\IMembershipRoleService.cs" />
     <Compile Include="Services\IMembershipUserService.cs" />
     <Compile Include="Services\IMemberTypeService.cs" />
     <Compile Include="Services\IPackagingService.cs" />
@@ -1010,6 +1019,7 @@
     <Compile Include="Services\MacroService.cs" />
     <Compile Include="Services\MediaService.cs" />
     <Compile Include="Services\MemberCountType.cs" />
+    <Compile Include="Services\MemberGroupService.cs" />
     <Compile Include="Services\MemberService.cs" />
     <Compile Include="Services\MemberTypeService.cs" />
     <Compile Include="Services\NotificationService.cs" />
@@ -1020,6 +1030,7 @@
     <Compile Include="Services\ServiceContext.cs" />
     <Compile Include="Services\TagService.cs" />
     <Compile Include="Services\UserService.cs" />
+    <Compile Include="Services\UserServiceExtensions.cs" />
     <Compile Include="Standalone\ServiceContextManager.cs" />
     <Compile Include="Standalone\StandaloneCoreApplication.cs" />
     <Compile Include="Standalone\StandaloneCoreBootManager.cs" />

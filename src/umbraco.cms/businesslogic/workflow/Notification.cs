@@ -18,6 +18,8 @@ using Umbraco.Core.IO;
 
 namespace umbraco.cms.businesslogic.workflow
 {
+    //TODO: Update this to wrap new services/repo!
+
     /// <summary>
     /// Notifications are a part of the umbraco workflow.
     /// A notification is created every time an action on a node occurs and a umbraco user has subscribed to this specific action on this specific node.

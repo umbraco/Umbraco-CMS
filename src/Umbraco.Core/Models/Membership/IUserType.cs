@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.Mappers;
 namespace Umbraco.Core.Models.Membership
 {
 
-    internal interface IUserType : IAggregateRoot
+    public interface IUserType : IAggregateRoot
     {
         /// <summary>
         /// The user type alias

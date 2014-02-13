@@ -11,6 +11,8 @@ namespace Umbraco.Web.UI.Umbraco.Create
 {
 	public partial class PartialViewMacro : UserControl
 	{
+        
+
 		protected override void OnLoad(EventArgs e)
 		{
 			base.OnLoad(e);

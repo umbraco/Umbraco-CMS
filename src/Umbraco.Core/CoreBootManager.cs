@@ -287,7 +287,7 @@ namespace Umbraco.Core
                 () => PluginManager.Current.ResolveAssignedMapperTypes());
 
 			RepositoryResolver.Current = new RepositoryResolver(
-				new RepositoryFactory());
+                new RepositoryFactory(ApplicationCache));
 
 		    SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
                 new[] { typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqlServerSyntaxProvider) })

@@ -2,6 +2,7 @@
 <%@ Register TagPrefix="umb" Namespace="ClientDependency.Core.Controls" Assembly="ClientDependency.Core" %>
 <%@ Register TagPrefix="ui" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <%@ Register Src="../../controls/Tree/TreeControl.ascx" TagName="TreeControl" TagPrefix="umbraco" %>
+<%@ Register TagPrefix="umbClient" Namespace="Umbraco.Web.UI.Bundles" Assembly="umbraco" %>
 
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
@@ -14,14 +15,18 @@
 
     <ui:UmbracoClientDependencyLoader runat="server" id="ClientLoader" />
 	
-	<umb:JsInclude ID="JsInclude2" runat="server" FilePath="ui/jquery.js" PathNameAlias="UmbracoClient" Priority="0" />
+	
+    <umbClient:JsApplicationLib runat="server" />
+    <umbClient:JsJQueryCore runat="server" />
+    <umbClient:JsUmbracoApplicationCore runat="server" />
+
 	<umb:JsInclude ID="JsInclude1" runat="server" FilePath="tinymce3/tiny_mce_popup.js" PathNameAlias="UmbracoClient" Priority="100" />
 	<umb:JsInclude ID="JsInclude3" runat="server" FilePath="tinymce3/plugins/umbracolink/js/umbracolink.js" PathNameAlias="UmbracoClient" Priority="101" />
 	<umb:JsInclude ID="JsInclude4" runat="server" FilePath="tinymce3/utils/form_utils.js" PathNameAlias="UmbracoClient" Priority="102" />
     <umb:JsInclude ID="JsInclude5" runat="server" FilePath="tinymce3/utils/validate.js" PathNameAlias="UmbracoClient" Priority="103" />
    
 
-    <script type="text/javascript" language="javascript">
+    <script type="text/javascript">
         var currentLink = "";
 
         function dialogHandler(id) {

@@ -6,16 +6,15 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
 {
-
     /// <summary>
     /// Defines part of the MemberService, which is specific to methods used by the membership provider.
     /// </summary>
     /// <remarks>
     /// Idea is to have this is an isolated interface so that it can be easily 'replaced' in the membership provider impl.
     /// </remarks>
-    internal interface IMembershipMemberService : IMembershipMemberService<IMember>
+    public interface IMembershipMemberService : IMembershipMemberService<IMember>, IMembershipRoleService<IMember>
     {
-        IMember CreateMember(string email, string username, string password, IMemberType memberType);
+        IMember CreateMemberWithIdentity(string username, string email, string password, IMemberType memberType, bool raiseEvents = true);
     }
 
     /// <summary>
@@ -24,7 +23,7 @@ namespace Umbraco.Core.Services
     /// <remarks>
     /// Idea is to have this is an isolated interface so that it can be easily 'replaced' in the membership provider impl.
     /// </remarks>
-    internal interface IMembershipMemberService<T> : IService
+    public interface IMembershipMemberService<T> : IService
         where T : class, IMembershipUser
     {
         /// <summary>
@@ -47,10 +46,11 @@ namespace Umbraco.Core.Services
         /// <param name="email"></param>
         /// <param name="password"></param>
         /// <param name="memberTypeAlias"></param>
+        /// <param name="raiseEvents"></param>
         /// <returns></returns>
-        T CreateMember(string username, string email, string password, string memberTypeAlias);
+        T CreateMemberWithIdentity(string username, string email, string password, string memberTypeAlias, bool raiseEvents = true);
 
-        T GetById(object id);
+        T GetById(int id);
 
         /// <summary>
         /// Get a member by email

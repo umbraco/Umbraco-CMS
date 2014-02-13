@@ -30,7 +30,7 @@ namespace umbraco.cms.businesslogic
     /// Besides data definition, the ContentType also defines the sorting and grouping (in tabs) of Properties/Datafields
     /// on the Content and which Content (by ContentType) can be created as child to the Content of the ContentType.
     /// </summary>
-    [Obsolete("Obsolete, Use Umbraco.Core.Models.ContentType or Umbraco.Core.Models.MediaType", false)]
+    [Obsolete("Obsolete, Use Umbraco.Core.Models.ContentType or Umbraco.Core.Models.MediaType or  or Umbraco.Core.Models.MemberType", false)]
     public class ContentType : CMSNode
     {
         #region Constructors
@@ -1149,6 +1149,15 @@ namespace umbraco.cms.businesslogic
                     return;
                 }
             }
+            else if (nodeObjectType == new Guid(Constants.ObjectTypes.MemberType))
+            {
+                var memberType = ApplicationContext.Current.Services.MemberTypeService.Get(Id);
+                if (memberType != null)
+                {
+                    PopulateContentTypeFromContentTypeBase(memberType);
+                    return;
+                }
+            }
 
             // TODO: Load master content types
             using (var dr = SqlHelper.ExecuteReader("Select allowAtRoot, isContainer, Alias,icon,thumbnail,description from cmsContentType where nodeid=" + Id)
@@ -1183,9 +1192,8 @@ namespace umbraco.cms.businesslogic
             RemoveFromDataTypeCache(ct.Alias);
 
             // clear anything that uses this as master content type
-            //TODO: Update to load all content types
-            //Should this include "ct.nodeObjectType == media.MediaType._objectType" ?
-            if (ct.nodeObjectType == DocumentType._objectType)
+            if (ct.nodeObjectType == DocumentType._objectType 
+                || ct.nodeObjectType == media.MediaType._objectType)
             {
                 //NOTE Changed from "DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == id)" to loading master contenttypes directly from the db.
                 //Related to http://issues.umbraco.org/issue/U4-1714

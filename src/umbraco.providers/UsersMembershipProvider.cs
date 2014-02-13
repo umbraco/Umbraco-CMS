@@ -16,7 +16,8 @@ namespace umbraco.providers
     /// <summary>
     /// Custom Membership Provider for Umbraco Users (User authentication for Umbraco Backend CMS)  
     /// </summary>
-    public class UsersMembershipProvider : MembershipProviderBase
+    [Obsolete("This has been superceded by Umbraco.Web.Security.Providers.UsersMembershipProvider")]
+    public class UsersMembershipProvider : MembershipProviderBase, IUsersMembershipProvider
     {
         
         /// <summary>
@@ -42,7 +43,15 @@ namespace umbraco.providers
         {
             get { return true; }
         }
-        
+
+        /// <summary>
+        /// For backwards compatibility, this provider supports this option
+        /// </summary>
+        public override bool AllowManuallyChangingPassword
+        {
+            get { return true; }
+        }
+
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config) 
         {
             if (config == null) throw new ArgumentNullException("config");
@@ -62,42 +71,23 @@ namespace umbraco.providers
         /// <returns>
         /// true if the password was updated successfully; otherwise, false.
         /// </returns>
-        /// <remarks>
-        /// During installation the application will not be configured, if this is the case and the 'default' password 
-        /// is stored in the database then we will validate the user - this will allow for an admin password reset if required
-        /// </remarks>
         protected override bool PerformChangePassword(string username, string oldPassword, string newPassword)
         {
+            //NOTE: due to backwards compatibilty reasons (and UX reasons), this provider doesn't care about the old password and 
+            // allows simply setting the password manually so we don't really care about the old password.
+            // This is allowed based on the overridden AllowManuallyChangingPassword option.
 
+            var user = new User(username);
+            //encrypt/hash the new one
+            string salt;
+            var encodedPassword = EncryptOrHashNewPassword(newPassword, out salt);
 
-            if (ApplicationContext.Current.IsConfigured == false && oldPassword == "default"
-                || ValidateUser(username, oldPassword))
-            {
-                var args = new ValidatePasswordEventArgs(username, newPassword, false);
-                OnValidatingPassword(args);
+            //Yes, it's true, this actually makes a db call to set the password
+            user.Password = FormatPasswordForStorage(encodedPassword, salt);
+            //call this just for fun.
+            user.Save();
 
-                if (args.Cancel)
-                {
-                    if (args.FailureInformation != null)
-                        throw args.FailureInformation;
-                    throw new MembershipPasswordException("Change password canceled due to password validation failure.");
-                }
-
-                var user = new User(username);
-                //encrypt/hash the new one
-                string salt;
-                var encodedPassword = EncryptOrHashNewPassword(newPassword, out salt);
-
-                //Yes, it's true, this actually makes a db call to set the password
-                user.Password = FormatPasswordForStorage(encodedPassword, salt);
-                //call this just for fun.
-                user.Save();
-
-                return true;    
-            }
-
-            return false;
-
+            return true;    
         }
 
         /// <summary>
@@ -451,10 +441,19 @@ namespace umbraco.providers
         {
             var found = User.GetAllByLoginName(user.UserName, false).ToArray();
             if (found == null || found.Any() == false)
-                throw new MembershipPasswordException("The supplied user is not found");
+            {
+                throw new ProviderException("The supplied user is not found");
+            }
 
             var m = found.First();
-
+            if (RequiresUniqueEmail && user.Email.Trim().IsNullOrWhiteSpace() == false)
+            {
+                var byEmail = User.getAllByEmail(user.Email, true);
+                if (byEmail.Count(x => x.Id != m.Id) > 0)
+                {
+                    throw new ProviderException(string.Format("A member with the email '{0}' already exists", user.Email));
+                }
+            }
             
             var typedUser = user as UsersMembershipUser;
             if (typedUser == null)
@@ -470,8 +469,6 @@ namespace umbraco.providers
                 //This keeps compatibility - even though this logic to update name and user type  should not exist here
                 User.Update(m.Id, typedUser.FullName.Trim(), typedUser.UserName, typedUser.Email, user.IsApproved == false, user.IsLockedOut, typedUser.UserType);
             }
-
-            
             
             m.Save();
         }

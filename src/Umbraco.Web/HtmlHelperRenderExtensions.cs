@@ -182,7 +182,14 @@ namespace Umbraco.Web
             if (!metaData.AreaName.IsNullOrWhiteSpace())
             {
                 //set the area to the plugin area
-                routeVals.Add("area", metaData.AreaName);
+                if (routeVals.ContainsKey("area"))
+                {
+                    routeVals["area"] = metaData.AreaName;
+                }
+                else
+                {
+                    routeVals.Add("area", metaData.AreaName);    
+                }
             }
 
             return htmlHelper.Action(actionName, metaData.ControllerName, routeVals);

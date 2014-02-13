@@ -9,6 +9,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Mvc
 {
@@ -84,6 +85,7 @@ namespace Umbraco.Web.Mvc
         }
 
         private UmbracoHelper _helper;
+        private MembershipHelper _membershipHelper;
 
         /// <summary>
         /// Gets an UmbracoHelper
@@ -107,6 +109,14 @@ namespace Umbraco.Web.Mvc
                 }
                 return _helper;
             }
+        }
+
+        /// <summary>
+        /// Returns the MemberHelper instance
+        /// </summary>
+        public MembershipHelper Members
+        {
+            get { return _membershipHelper ?? (_membershipHelper = new MembershipHelper(UmbracoContext)); }
         }
 
         /// <summary>

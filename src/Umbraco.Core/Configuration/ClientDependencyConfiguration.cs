@@ -28,9 +28,9 @@ namespace Umbraco.Core.Configuration
 
                     var versionAttribute = clientDependencyConfigXml.Root.Attribute("version");
 
-                    int oldVersion;
-                    int.TryParse(versionAttribute.Value, out oldVersion);
-                    var newVersion = oldVersion + 100;
+                    //Set the new version to the hashcode of now
+                    var oldVersion = versionAttribute.Value;
+                    var newVersion = DateTime.UtcNow.GetHashCode();
 
                     versionAttribute.SetValue(newVersion);
                     clientDependencyConfigXml.Save(_fileName, SaveOptions.DisableFormatting);

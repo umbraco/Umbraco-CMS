@@ -283,6 +283,7 @@
     <Compile Include="Cache\MacroCacheRefresher.cs" />
     <Compile Include="Cache\MediaCacheRefresher.cs" />
     <Compile Include="Cache\MemberCacheRefresher.cs" />
+    <Compile Include="Cache\MemberGroupCacheRefresher.cs" />
     <Compile Include="Cache\PageCacheRefresher.cs" />
     <Compile Include="Cache\StylesheetCacheRefresher.cs" />
     <Compile Include="Cache\StylesheetPropertyCacheRefresher.cs" />
@@ -291,8 +292,8 @@
     <Compile Include="Cache\UserPermissionsCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
     <Compile Include="Editors\AuthenticationController.cs" />
-    <Compile Include="Editors\ContentController.cs" />
     <Compile Include="Controllers\UmbProfileController.cs" />
+    <Compile Include="Editors\ContentController.cs" />
     <Compile Include="Controllers\UmbLoginStatusController.cs" />
     <Compile Include="Editors\ContentPostValidateAttribute.cs" />
     <Compile Include="Editors\DashboardController.cs" />
@@ -304,6 +305,7 @@
     <Compile Include="Models\ContentEditing\EntityTypeSearchResult.cs" />
     <Compile Include="Models\ContentEditing\ListViewAwareContentItemDisplayBase.cs" />
     <Compile Include="Models\IRenderModel.cs" />
+    <Compile Include="Models\PostRedirectModel.cs" />
     <Compile Include="Models\RenderModelOfTContent.cs" />
     <Compile Include="Mvc\JsonNetResult.cs" />
     <Compile Include="Mvc\MinifyJavaScriptResultAttribute.cs" />
@@ -540,6 +542,7 @@
     <Compile Include="Trees\ApplicationTreeController.cs" />
     <Compile Include="Editors\BackOfficeController.cs" />
     <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
+    <Compile Include="Security\Providers\MembersRoleProvider.cs" />
     <Compile Include="Security\Providers\UmbracoServiceMembershipProvider.cs" />
     <Compile Include="Security\Providers\UsersMembershipProvider.cs" />
     <Compile Include="Trees\ContentTreeController.cs" />
@@ -632,6 +635,7 @@
     </Compile>
     <Compile Include="UI\JavaScript\ServerVariablesParser.cs" />
     <Compile Include="Strategies\Migrations\RebuildMediaXmlCacheAfterUpgrade.cs" />
+    <Compile Include="Strategies\PublicAccessEventHandler.cs" />
     <Compile Include="UI\Bundles\JsApplicationLib.cs" />
     <Compile Include="UI\Bundles\JsJQueryCore.cs" />
     <Compile Include="UI\Bundles\JsJQueryPlugins.cs" />

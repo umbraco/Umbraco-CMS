@@ -3,6 +3,7 @@ using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Services;
@@ -23,6 +24,264 @@ namespace Umbraco.Tests.Services
         public override void TearDown()
         {
             base.TearDown();
+        }
+
+        [Test]
+        public void Can_Create_Role()
+        {
+            ServiceContext.MemberService.AddRole("MyTestRole");
+
+            var found = ServiceContext.MemberService.GetAllRoles();
+
+            Assert.AreEqual(1, found.Count());
+            Assert.AreEqual("MyTestRole", found.Single());
+        }
+
+        [Test]
+        public void Can_Create_Duplicate_Role()
+        {
+            ServiceContext.MemberService.AddRole("MyTestRole");
+            ServiceContext.MemberService.AddRole("MyTestRole");
+
+            var found = ServiceContext.MemberService.GetAllRoles();
+
+            Assert.AreEqual(1, found.Count());
+            Assert.AreEqual("MyTestRole", found.Single());
+        }
+
+        [Test]
+        public void Can_Get_All_Roles()
+        {
+            ServiceContext.MemberService.AddRole("MyTestRole1");
+            ServiceContext.MemberService.AddRole("MyTestRole2");
+            ServiceContext.MemberService.AddRole("MyTestRole3");
+
+            var found = ServiceContext.MemberService.GetAllRoles();
+
+            Assert.AreEqual(3, found.Count());
+        }
+
+        [Test]
+        public void Can_Get_All_Roles_By_Member_Id()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
+            ServiceContext.MemberService.Save(member);
+
+            ServiceContext.MemberService.AddRole("MyTestRole1");
+            ServiceContext.MemberService.AddRole("MyTestRole2");
+            ServiceContext.MemberService.AddRole("MyTestRole3");
+            ServiceContext.MemberService.AssignRoles(new[] { member.Id }, new[] { "MyTestRole1", "MyTestRole2" });
+
+            var memberRoles = ServiceContext.MemberService.GetAllRoles(member.Id);
+
+            Assert.AreEqual(2, memberRoles.Count());
+
+        }
+
+        [Test]
+        public void Can_Get_All_Roles_By_Member_Username()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
+            ServiceContext.MemberService.Save(member);
+
+            ServiceContext.MemberService.AddRole("MyTestRole1");
+            ServiceContext.MemberService.AddRole("MyTestRole2");
+            ServiceContext.MemberService.AddRole("MyTestRole3");
+            ServiceContext.MemberService.AssignRoles(new[] { member.Id }, new[] { "MyTestRole1", "MyTestRole2" });
+
+            var memberRoles = ServiceContext.MemberService.GetAllRoles("test");
+
+            Assert.AreEqual(2, memberRoles.Count());
+        }
+
+        [Test]
+        public void Can_Delete_Role()
+        {
+            ServiceContext.MemberService.AddRole("MyTestRole1");
+
+            ServiceContext.MemberService.DeleteRole("MyTestRole1", false);
+
+            var memberRoles = ServiceContext.MemberService.GetAllRoles();
+
+            Assert.AreEqual(0, memberRoles.Count());
+        }
+
+        [Test]
+        public void Throws_When_Deleting_Assigned_Role()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
+            ServiceContext.MemberService.Save(member);
+
+            ServiceContext.MemberService.AddRole("MyTestRole1");            
+            ServiceContext.MemberService.AssignRoles(new[] { member.Id }, new[] { "MyTestRole1", "MyTestRole2" });
+
+            Assert.Throws<InvalidOperationException>(() => ServiceContext.MemberService.DeleteRole("MyTestRole1", true));
+        }
+
+        [Test]
+        public void Can_Get_Members_In_Role()
+        {
+            ServiceContext.MemberService.AddRole("MyTestRole1");
+            var roleId = DatabaseContext.Database.ExecuteScalar<int>("SELECT id from umbracoNode where [text] = 'MyTestRole1'");
+
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var member1 = MockedMember.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
+            ServiceContext.MemberService.Save(member1);
+            var member2 = MockedMember.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
+            ServiceContext.MemberService.Save(member2);
+
+            DatabaseContext.Database.Insert(new Member2MemberGroupDto {MemberGroup = roleId, Member = member1.Id});
+            DatabaseContext.Database.Insert(new Member2MemberGroupDto { MemberGroup = roleId, Member = member2.Id });
+
+            var membersInRole = ServiceContext.MemberService.GetMembersInRole("MyTestRole1");
+            Assert.AreEqual(2, membersInRole.Count());
+        }
+
+        [TestCase("MyTestRole1", "test1", StringPropertyMatchType.StartsWith, 1)]
+        [TestCase("MyTestRole1", "test", StringPropertyMatchType.StartsWith, 3)]
+        [TestCase("MyTestRole1", "test1", StringPropertyMatchType.Exact, 1)]
+        [TestCase("MyTestRole1", "test", StringPropertyMatchType.Exact, 0)]
+        [TestCase("MyTestRole1", "st2", StringPropertyMatchType.EndsWith, 1)]
+        [TestCase("MyTestRole1", "test%", StringPropertyMatchType.Wildcard, 3)]
+        public void Find_Members_In_Role(string roleName1, string usernameToMatch, StringPropertyMatchType matchType, int resultCount)
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var member1 = MockedMember.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
+            ServiceContext.MemberService.Save(member1);
+            var member2 = MockedMember.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
+            ServiceContext.MemberService.Save(member2);
+            var member3 = MockedMember.CreateSimpleMember(memberType, "test3", "test3@test.com", "pass", "test3");
+            ServiceContext.MemberService.Save(member3);
+
+            ServiceContext.MemberService.AssignRoles(new[] { member1.Id, member2.Id, member3.Id }, new[] { roleName1 });
+
+            var result = ServiceContext.MemberService.FindMembersInRole(roleName1, usernameToMatch, matchType);
+            Assert.AreEqual(resultCount, result.Count());
+        }
+
+        [Test]
+        public void Associate_Members_To_Roles_With_Member_Id()
+        {
+            ServiceContext.MemberService.AddRole("MyTestRole1");
+
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var member1 = MockedMember.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
+            ServiceContext.MemberService.Save(member1);
+            var member2 = MockedMember.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
+            ServiceContext.MemberService.Save(member2);
+
+            ServiceContext.MemberService.AssignRoles(new[] { member1.Id, member2.Id }, new[] { "MyTestRole1" });
+
+            var membersInRole = ServiceContext.MemberService.GetMembersInRole("MyTestRole1");
+
+            Assert.AreEqual(2, membersInRole.Count());
+        }
+
+        [Test]
+        public void Associate_Members_To_Roles_With_Member_Username()
+        {
+            ServiceContext.MemberService.AddRole("MyTestRole1");
+
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var member1 = MockedMember.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
+            ServiceContext.MemberService.Save(member1);
+            var member2 = MockedMember.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
+            ServiceContext.MemberService.Save(member2);
+
+            ServiceContext.MemberService.AssignRoles(new[] { member1.Username, member2.Username }, new[] { "MyTestRole1" });
+
+            var membersInRole = ServiceContext.MemberService.GetMembersInRole("MyTestRole1");
+
+            Assert.AreEqual(2, membersInRole.Count());
+        }
+
+        [Test]
+        public void Associate_Members_To_Roles_With_Member_Username_Containing_At_Symbols()
+        {
+            ServiceContext.MemberService.AddRole("MyTestRole1");
+
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var member1 = MockedMember.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1@test.com");
+            ServiceContext.MemberService.Save(member1);
+            var member2 = MockedMember.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2@test.com");
+            ServiceContext.MemberService.Save(member2);
+
+            ServiceContext.MemberService.AssignRoles(new[] { member1.Username, member2.Username }, new[] { "MyTestRole1" });
+
+            var membersInRole = ServiceContext.MemberService.GetMembersInRole("MyTestRole1");
+
+            Assert.AreEqual(2, membersInRole.Count());
+        }
+
+        [Test]
+        public void Associate_Members_To_Roles_With_New_Role()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var member1 = MockedMember.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
+            ServiceContext.MemberService.Save(member1);
+            var member2 = MockedMember.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
+            ServiceContext.MemberService.Save(member2);
+
+            //implicitly create the role
+            ServiceContext.MemberService.AssignRoles(new[] { member1.Username, member2.Username }, new[] { "MyTestRole1" });
+
+            var membersInRole = ServiceContext.MemberService.GetMembersInRole("MyTestRole1");
+
+            Assert.AreEqual(2, membersInRole.Count());
+        }
+
+        [Test]
+        public void Remove_Members_From_Roles_With_Member_Id()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var member1 = MockedMember.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
+            ServiceContext.MemberService.Save(member1);
+            var member2 = MockedMember.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
+            ServiceContext.MemberService.Save(member2);
+
+            ServiceContext.MemberService.AssignRoles(new[] { member1.Id, member2.Id }, new[] { "MyTestRole1", "MyTestRole2" });
+
+            ServiceContext.MemberService.DissociateRoles(new[] {member1.Id }, new[] {"MyTestRole1"});
+            ServiceContext.MemberService.DissociateRoles(new[] { member1.Id, member2.Id }, new[] { "MyTestRole2" });
+
+            var membersInRole = ServiceContext.MemberService.GetMembersInRole("MyTestRole1");
+            Assert.AreEqual(1, membersInRole.Count());
+            membersInRole = ServiceContext.MemberService.GetMembersInRole("MyTestRole2");
+            Assert.AreEqual(0, membersInRole.Count());
+        }
+
+        [Test]
+        public void Remove_Members_From_Roles_With_Member_Username()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var member1 = MockedMember.CreateSimpleMember(memberType, "test1", "test1@test.com", "pass", "test1");
+            ServiceContext.MemberService.Save(member1);
+            var member2 = MockedMember.CreateSimpleMember(memberType, "test2", "test2@test.com", "pass", "test2");
+            ServiceContext.MemberService.Save(member2);
+
+            ServiceContext.MemberService.AssignRoles(new[] { member1.Username, member2.Username }, new[] { "MyTestRole1", "MyTestRole2" });
+
+            ServiceContext.MemberService.DissociateRoles(new[] { member1.Username }, new[] { "MyTestRole1" });
+            ServiceContext.MemberService.DissociateRoles(new[] { member1.Username, member2.Username }, new[] { "MyTestRole2" });
+
+            var membersInRole = ServiceContext.MemberService.GetMembersInRole("MyTestRole1");
+            Assert.AreEqual(1, membersInRole.Count());
+            membersInRole = ServiceContext.MemberService.GetMembersInRole("MyTestRole2");
+            Assert.AreEqual(0, membersInRole.Count());
         }
 
         [Test]
@@ -108,8 +367,8 @@ namespace Umbraco.Tests.Services
             IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
             ServiceContext.MemberService.Save(member);
 
-            Assert.IsNotNull(ServiceContext.MemberService.GetById((object)member.Id));
-            Assert.IsNull(ServiceContext.MemberService.GetById((object)9876));
+            Assert.IsNotNull(ServiceContext.MemberService.GetById(member.Id));
+            Assert.IsNull(ServiceContext.MemberService.GetById(9876));
         }
 
         [Test]

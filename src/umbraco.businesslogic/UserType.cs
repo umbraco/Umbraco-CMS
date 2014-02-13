@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Web;
 using System.Web.Caching;
@@ -14,13 +16,24 @@ namespace umbraco.BusinessLogic
     /// <summary>
     /// Represents a umbraco Usertype
     /// </summary>
+    [Obsolete("Use the UserService instead")]
     public class UserType
     {
+
+        internal Umbraco.Core.Models.Membership.IUserType UserTypeItem;
 
         /// <summary>
         /// Creates a new empty instance of a UserType
         /// </summary>
-        public UserType() { }
+        public UserType()
+        {
+            UserTypeItem = new Umbraco.Core.Models.Membership.UserType();
+        }
+
+        internal UserType(Umbraco.Core.Models.Membership.IUserType userType)
+        {
+            UserTypeItem = userType;
+        }
 
         /// <summary>
         /// Creates a new instance of a UserType and attempts to 
@@ -43,8 +56,9 @@ namespace umbraco.BusinessLogic
         /// <param name="name">The name.</param>
         public UserType(int id, string name)
         {
-            _id = id;
-            _name = name;
+            UserTypeItem = new Umbraco.Core.Models.Membership.UserType();
+            UserTypeItem.Id = id;
+            UserTypeItem.Name = name;
         }
 
         /// <summary>
@@ -56,17 +70,12 @@ namespace umbraco.BusinessLogic
         /// <param name="alias"></param>
         public UserType(int id, string name, string defaultPermissions, string alias)
         {
-            _name = name;
-            _id = id;
-            _defaultPermissions = defaultPermissions;
-            _alias = alias;
+            UserTypeItem = new Umbraco.Core.Models.Membership.UserType();
+            UserTypeItem.Id = id;
+            UserTypeItem.Name = name;
+            UserTypeItem.Alias = alias;
+            UserTypeItem.Permissions = defaultPermissions.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture));
         }
-
-        
-        private int _id;
-        private string _name;
-        private string _defaultPermissions;
-        private string _alias;
 
         /// <summary>
         /// The cache storage for all user types
@@ -75,40 +84,20 @@ namespace umbraco.BusinessLogic
         {
             get
             {
-                return ApplicationContext.Current.ApplicationCache.GetCacheItem(
-                    CacheKeys.UserTypeCacheKey,
-                    () =>
-                        {
-                            var tmp = new List<UserType>();
-                            using (var dr = SqlHelper.ExecuteReader("select id, userTypeName, userTypeAlias, userTypeDefaultPermissions from umbracoUserType"))
-                            {
-                                while (dr.Read())
-                                {
-                                    tmp.Add(new UserType(
-                                                dr.GetShort("id"),
-                                                dr.GetString("userTypeName"),
-                                                dr.GetString("userTypeDefaultPermissions"),
-                                                dr.GetString("userTypeAlias")));
-                                }
-                            }
-                            return tmp;
-                        });
+                return ApplicationContext.Current.Services.UserService.GetAllUserTypes()
+                    .Select(x => new UserType(x))
+                    .ToList();
             }
         }
-
-        private static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
-        }
-
+        
         #region Public Properties
         /// <summary>
         /// Gets or sets the user type alias.
         /// </summary>
         public string Alias
         {
-            get { return _alias; }
-            set { _alias = value; }
+            get { return UserTypeItem.Alias; }
+            set { UserTypeItem.Alias = value; }
         }
 
         /// <summary>
@@ -116,8 +105,8 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public string Name
         {
-            get { return _name; }
-            set { _name = value; }
+            get { return UserTypeItem.Name; }
+            set { UserTypeItem.Name = value; }
         }
 
         /// <summary>
@@ -125,7 +114,7 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public int Id
         {
-            get { return _id; }
+            get { return UserTypeItem.Id; }
         }
 
         /// <summary>
@@ -133,8 +122,8 @@ namespace umbraco.BusinessLogic
         /// </summary>
         public string DefaultPermissions
         {
-            get { return _defaultPermissions; }
-            set { _defaultPermissions = value; }
+            get { return string.Join("", UserTypeItem.Permissions); }
+            set { UserTypeItem.Permissions = value.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture)); }
         }
 
         /// <summary>
@@ -153,19 +142,11 @@ namespace umbraco.BusinessLogic
         public void Save()
         {
             //ensure that this object has an ID specified (it exists in the database)
-            if (_id <= 0)
+            if (UserTypeItem.HasIdentity == false)
                 throw new Exception("The current UserType object does not exist in the database. New UserTypes should be created with the MakeNew method");
 
-            SqlHelper.ExecuteNonQuery(@"
-				update umbracoUserType set
-				userTypeAlias=@alias,userTypeName=@name,userTypeDefaultPermissions=@permissions
-                where id=@id",
-                                      SqlHelper.CreateParameter("@alias", _alias),
-                                      SqlHelper.CreateParameter("@name", _name),
-                                      SqlHelper.CreateParameter("@permissions", _defaultPermissions),
-                                      SqlHelper.CreateParameter("@id", _id)
-                );
-
+            ApplicationContext.Current.Services.UserService.SaveUserType(UserTypeItem);
+            
             //raise event
             OnUpdated(this, new EventArgs());
         }
@@ -176,10 +157,10 @@ namespace umbraco.BusinessLogic
         public void Delete()
         {
             //ensure that this object has an ID specified (it exists in the database)
-            if (_id <= 0)
+            if (UserTypeItem.HasIdentity == false)
                 throw new Exception("The current UserType object does not exist in the database. New UserTypes should be created with the MakeNew method");
 
-            SqlHelper.ExecuteNonQuery(@"delete from umbracoUserType where id=@id", SqlHelper.CreateParameter("@id", _id));
+            ApplicationContext.Current.Services.UserService.DeleteUserType(UserTypeItem);
 
             //raise event
             OnDeleted(this, new EventArgs());
@@ -193,16 +174,8 @@ namespace umbraco.BusinessLogic
         /// and the data was loaded, false if it wasn't</returns>
         public bool LoadByPrimaryKey(int id)
         {
-            var userType = GetUserType(id);
-            if (userType == null)
-                return false;
-
-            _id = userType.Id;
-            _alias = userType.Alias;
-            _defaultPermissions = userType.DefaultPermissions;
-            _name = userType.Name;
-
-            return true;
+            UserTypeItem = ApplicationContext.Current.Services.UserService.GetUserTypeById(id);
+            return UserTypeItem != null;
         }
 
         /// <summary>
@@ -221,37 +194,20 @@ namespace umbraco.BusinessLogic
             if (existing != null)
                 throw new Exception("The UserType alias specified already exists");
 
-            SqlHelper.ExecuteNonQuery(@"
-				insert into umbracoUserType 
-				(userTypeAlias,userTypeName,userTypeDefaultPermissions) 
-				values (@alias,@name,@permissions)",
-                SqlHelper.CreateParameter("@alias", alias),
-                SqlHelper.CreateParameter("@name", name),
-                SqlHelper.CreateParameter("@permissions", defaultPermissions));
-            
-            //get it's id
-            var newId = SqlHelper.ExecuteScalar<int>("SELECT MAX(id) FROM umbracoUserType WHERE userTypeAlias=@alias", SqlHelper.CreateParameter("@alias", alias));
-
-            //load the instance and return it
-            using (var dr = SqlHelper.ExecuteReader(
-                "select id, userTypeName, userTypeAlias, userTypeDefaultPermissions from umbracoUserType where id=@id", 
-                SqlHelper.CreateParameter("@id", newId)))
+            var userType = new Umbraco.Core.Models.Membership.UserType
             {
-                if (dr.Read())
-                {
-                    var ut = new UserType(
-                        dr.GetShort("id"),
-                        dr.GetString("userTypeName"),
-                        dr.GetString("userTypeDefaultPermissions"),
-                        dr.GetString("userTypeAlias"));
+                Alias = alias,
+                Name = name,
+                Permissions = defaultPermissions.ToCharArray().Select(x => x.ToString(CultureInfo.InvariantCulture))
+            };
+            ApplicationContext.Current.Services.UserService.SaveUserType(userType);
 
-                    //raise event
-                    OnNew(ut, new EventArgs());
+            var legacy = new UserType(userType);
+            
+            //raise event
+            OnNew(legacy, new EventArgs());
 
-                    return ut;
-                }
-                throw new InvalidOperationException("Could not read the new User Type with id of " + newId);
-            }
+            return legacy;
         }
 
         /// <summary>

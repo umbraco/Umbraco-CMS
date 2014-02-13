@@ -94,8 +94,8 @@ namespace Umbraco.Tests.Membership
             mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
             mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Member");
             mServiceMock.Setup(
-                service => service.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                        .Callback((string u, string e, string p, string m) =>
+                service => service.CreateMemberWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                        .Callback((string u, string e, string p, string m, bool b) =>
                             {
                                 createdMember = new Member("test", e, u, p, memberType);
                             })
@@ -125,8 +125,8 @@ namespace Umbraco.Tests.Membership
             mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
             mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Member");
             mServiceMock.Setup(
-                service => service.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                        .Callback((string u, string e, string p, string m) =>
+                service => service.CreateMemberWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                        .Callback((string u, string e, string p, string m, bool b) =>
                             {
                                 createdMember = new Member("test", e, u, p, memberType);
                             })
@@ -158,8 +158,8 @@ namespace Umbraco.Tests.Membership
             mServiceMock.Setup(service => service.GetByEmail("test@test.com")).Returns(() => null);
             mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Member");
             mServiceMock.Setup(
-                service => service.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                        .Callback((string u, string e, string p, string m) =>
+                service => service.CreateMemberWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<bool>()))
+                        .Callback((string u, string e, string p, string m, bool b) =>
                         {
                             createdMember = new Member("test", e, u, p, memberType);
                         })

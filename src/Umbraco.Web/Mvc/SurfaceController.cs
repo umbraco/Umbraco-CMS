@@ -4,6 +4,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using Umbraco.Core.Models;
 using Umbraco.Core;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Mvc
 {
@@ -23,6 +24,7 @@ namespace Umbraco.Web.Mvc
         protected SurfaceController(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
+            _membershipHelper = new MembershipHelper(umbracoContext);
         }
 
         /// <summary>
@@ -31,6 +33,17 @@ namespace Umbraco.Web.Mvc
         protected SurfaceController()
             : base(UmbracoContext.Current)
         {
+            _membershipHelper = new MembershipHelper(UmbracoContext.Current);
+        }
+
+        private readonly MembershipHelper _membershipHelper;
+
+        /// <summary>
+        /// Returns the MemberHelper instance
+        /// </summary>
+        public MembershipHelper Members
+        {
+            get { return _membershipHelper; }
         }
 
         /// <summary>
@@ -60,6 +73,20 @@ namespace Umbraco.Web.Mvc
         protected RedirectToUmbracoPageResult RedirectToCurrentUmbracoPage()
         {
             return new RedirectToUmbracoPageResult(CurrentPage, UmbracoContext);
+        }
+
+        /// <summary>
+        /// Redirects to the currently rendered Umbraco URL
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// this is useful if you need to redirect 
+        /// to the current page but the current page is actually a rewritten URL normally done with something like 
+        /// Server.Transfer.
+        /// </remarks>
+        protected RedirectToUmbracoUrlResult RedirectToCurrentUmbracoUrl()
+        {
+            return new RedirectToUmbracoUrlResult(UmbracoContext);
         }
 
         /// <summary>

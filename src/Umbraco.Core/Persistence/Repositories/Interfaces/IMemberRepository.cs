@@ -10,6 +10,15 @@ namespace Umbraco.Core.Persistence.Repositories
     internal interface IMemberRepository : IRepositoryVersionable<int, IMember>
     {
         /// <summary>
+        /// Finds members in a given role
+        /// </summary>
+        /// <param name="roleName"></param>
+        /// <param name="usernameToMatch"></param>
+        /// <param name="matchType"></param>
+        /// <returns></returns>
+        IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
+
+        /// <summary>
         /// Get all members in a specific group
         /// </summary>
         /// <param name="groupName"></param>

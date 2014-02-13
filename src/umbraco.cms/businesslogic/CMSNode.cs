@@ -421,6 +421,11 @@ namespace umbraco.cms.businesslogic
             _entity = entity;
         }
 
+        protected internal CMSNode(IEntity entity)
+        {
+            _id = entity.Id;
+        }
+
         #endregion
 
         #region Public Methods
@@ -1137,6 +1142,13 @@ order by level,sortOrder";
             _createDate = content.CreateDate;
             _isTrashed = content.Trashed;
             _entity = content;
+        }
+
+        internal protected void PopulateCMSNodeFromUmbracoEntity(IAggregateRoot content, Guid objectType)
+        {
+            _uniqueID = content.Key;
+            _nodeObjectType = objectType;            
+            _createDate = content.CreateDate;
         }
 
         #endregion

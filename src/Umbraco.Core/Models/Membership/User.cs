@@ -5,6 +5,7 @@ using System.Collections.Specialized;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Mappers;
 
@@ -19,7 +20,7 @@ namespace Umbraco.Core.Models.Membership
     /// </remarks>
     [Serializable]
     [DataContract(IsReference = true)]
-    internal class User : TracksChangesEntityBase, IUser
+    public class User : TracksChangesEntityBase, IUser
     {
         public User(IUserType userType)
         {
@@ -31,6 +32,7 @@ namespace Umbraco.Core.Models.Membership
             _sectionCollection = new ObservableCollection<string>();
             _addedSections = new List<string>();
             _removedSections = new List<string>();
+            _language = GlobalSettings.DefaultUILanguage;
             _sectionCollection.CollectionChanged += SectionCollectionChanged;
         }
 
@@ -40,12 +42,12 @@ namespace Umbraco.Core.Models.Membership
             _name = name;
             _email = email;
             _username = username;
-            _password = password;
+            _password = password;            
         }
 
-        private readonly IUserType _userType;
+        private IUserType _userType;
         private bool _hasIdentity;
-        private object _id;
+        private int _id;
         private string _name;
         private Type _userTypeKey;
         private readonly List<string> _addedSections;
@@ -58,7 +60,6 @@ namespace Umbraco.Core.Models.Membership
         private string _username;
         private string _email;
         private string _password;
-        private Guid _key;
         private bool _isApproved;
         private bool _isLockedOut;
         private string _language;
@@ -81,23 +82,43 @@ namespace Umbraco.Core.Models.Membership
         private static readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Language);
         private static readonly PropertyInfo DefaultPermissionsSelector = ExpressionHelper.GetPropertyInfo<User, IEnumerable<string>>(x => x.DefaultPermissions);
         private static readonly PropertyInfo DefaultToLiveEditingSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.DefaultToLiveEditing);
+        private static readonly PropertyInfo HasIdentitySelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.HasIdentity);
+        private static readonly PropertyInfo UserTypeSelector = ExpressionHelper.GetPropertyInfo<User, IUserType>(x => x.UserType);
 
         #region Implementation of IEntity
 
         [IgnoreDataMember]
-        public bool HasIdentity { get { return Id != null || _hasIdentity; } }
-
-        [IgnoreDataMember]
-        int IEntity.Id
+        public bool HasIdentity
         {
             get
             {
-                return int.Parse(Id.ToString());
+                return _hasIdentity;
+            }
+            protected set
+            {
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _hasIdentity = value;
+                    return _hasIdentity;
+                }, _hasIdentity, HasIdentitySelector);
+            }
+        }
+
+        [DataMember]
+        public int Id
+        {
+            get
+            {
+                return _id;
             }
             set
             {
-                Id = value;
-                _hasIdentity = true;
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _id = value;
+                    HasIdentity = true; //set the has Identity
+                    return _id;
+                }, _id, IdSelector);
             }
         }
 
@@ -239,8 +260,8 @@ namespace Umbraco.Core.Models.Membership
         public int FailedPasswordAttempts { get; set; }
         
         #endregion
-
-        #region Implementation of IProfile
+        
+        #region Implementation of IUser
 
         [DataMember]
         public string Name
@@ -249,16 +270,12 @@ namespace Umbraco.Core.Models.Membership
             set
             {
                 SetPropertyValueAndDetectChanges(o =>
-                    {
-                        _name = value;
-                        return _name;
-                    }, _name, NameSelector);
+                {
+                    _name = value;
+                    return _name;
+                }, _name, NameSelector);
             }
         }
-
-        #endregion
-
-        #region Implementation of IUser
 
         public IEnumerable<string> AllowedSections
         {
@@ -276,6 +293,11 @@ namespace Umbraco.Core.Models.Membership
             {
                 _sectionCollection.Add(sectionAlias);
             }
+        }
+
+        public IProfile ProfileData
+        {
+            get { return new UserProfile(this); }
         }
 
         /// <summary>
@@ -355,20 +377,6 @@ namespace Umbraco.Core.Models.Membership
         }
 
         [DataMember]
-        public object Id
-        {
-            get { return _id; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                    {
-                        _id = value;
-                        return _id;
-                    }, _id, IdSelector);
-            }
-        }
-
-        [DataMember]
         public string Language
         {
             get { return _language; }
@@ -414,6 +422,19 @@ namespace Umbraco.Core.Models.Membership
         public IUserType UserType
         {
             get { return _userType; }
+            set
+            {
+                if (value.HasIdentity == false)
+                {
+                    throw new InvalidOperationException("Cannot assign a User Type that has not been persisted");
+                }
+
+                SetPropertyValueAndDetectChanges(o =>
+                {
+                    _userType = value;
+                    return _userType;
+                }, _userType, UserTypeSelector);
+            }
         }
 
         #endregion
@@ -457,6 +478,31 @@ namespace Umbraco.Core.Models.Membership
 
                 //add to the added sections
                 _removedSections.Add(e.OldItems.Cast<string>().First());
+            }
+        }
+
+        /// <summary>
+        /// Internal class used to wrap the user in a profile
+        /// </summary>
+        private class UserProfile : IProfile
+        {
+            private readonly IUser _user;
+
+            public UserProfile(IUser user)
+            {
+                _user = user;
+            }
+
+            public object Id
+            {
+                get { return _user.Id; }
+                set { _user.Id = (int)value; }
+            }
+
+            public string Name
+            {
+                get { return _user.Name; }
+                set { _user.Name = value; }
             }
         }
     }

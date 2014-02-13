@@ -1,39 +1,48 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Web;
 using umbraco.cms.businesslogic.member;
 using Umbraco.Core;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models
 {
-    public class RegisterModel
+    public class RegisterModel : PostRedirectModel
     {
-        public RegisterModel()
+        /// <summary>
+        /// Creates a new empty RegisterModel
+        /// </summary>
+        /// <returns></returns>
+        public static RegisterModel CreateModel()
         {
-            this.MemberTypeAlias = Constants.Conventions.MemberTypes.Member;
+            var model = new RegisterModel(false);
+            return model;
+        }
 
-            this.RedirectOnSucces = false;
+        private RegisterModel(bool doLookup)
+        {
+            MemberTypeAlias = Constants.Conventions.MemberTypes.Member;
+            RedirectOnSucces = false;
+            RedirectUrl = "/";
+            UsernameIsEmail = true;
+            MemberProperties = new List<UmbracoProperty>();
+            LoginOnSuccess = true;
 
-            this.RedirectUrl = "/";
-
-            this.UsernameIsEmail = true;
-
-            var memberType = MemberType.GetByAlias(this.MemberTypeAlias);
-
-            if (memberType != null)
+            if (doLookup && HttpContext.Current != null && ApplicationContext.Current != null)
             {
-                this.MemberProperties = new List<UmbracoProperty>();
-
-                foreach (var prop in memberType.PropertyTypes.Where(memberType.MemberCanEdit))
-                {
-                    this.MemberProperties.Add(new UmbracoProperty
-                                              {
-                                                  Alias = prop.Alias,
-                                                  Name = prop.Name,
-                                                  Value = string.Empty
-                                              });
-                }
+                var helper = new MembershipHelper(ApplicationContext.Current, new HttpContextWrapper(HttpContext.Current));
+                var model = helper.CreateRegistrationModel(MemberTypeAlias);
+                MemberProperties = model.MemberProperties;
             }
+        }
+
+        [Obsolete("Do not use this ctor as it will perform business logic lookups. Use the MembershipHelper.CreateRegistrationModel or the static RegisterModel.CreateModel() to create an empty model.")]
+        public RegisterModel()
+            : this(true)
+        {   
         }
 
         [Required]
@@ -41,21 +50,45 @@ namespace Umbraco.Web.Models
             ErrorMessage = "Please enter a valid e-mail address")]
         public string Email { get; set; }
 
+        /// <summary>
+        /// Returns the member properties
+        /// </summary>
         public List<UmbracoProperty> MemberProperties { get; set; }
         
+        /// <summary>
+        /// The member type alias to use to register the member
+        /// </summary>
         public string MemberTypeAlias { get; set; }
 
+        /// <summary>
+        /// The members real name
+        /// </summary>
         public string Name { get; set; }
 
+        /// <summary>
+        /// The members password
+        /// </summary>
         [Required]
         public string Password { get; set; }
         
+        [ReadOnly(true)]
+        [Obsolete("This is no longer used and will be removed from the codebase in future versions")]
         public bool RedirectOnSucces { get; set; }
-        
-        public string RedirectUrl { get; set; }
-
+ 
+        /// <summary>
+        /// The username of the model, if UsernameIsEmail is true then this is ignored.
+        /// </summary>
         public string Username { get; set; }
 
+        /// <summary>
+        /// Flag to determine if the username should be the email address, if true then the Username property is ignored
+        /// </summary>
         public bool UsernameIsEmail { get; set; }
+        
+        /// <summary>
+        /// Specifies if the member should be logged in if they are succesfully created
+        /// </summary>
+        public bool LoginOnSuccess { get; set; }
+
     }
 }

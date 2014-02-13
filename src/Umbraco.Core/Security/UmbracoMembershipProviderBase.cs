@@ -3,7 +3,6 @@ using System.Web.Security;
 
 namespace Umbraco.Core.Security
 {
-
     /// <summary>
     /// A base membership provider class for umbraco providers
     /// </summary>

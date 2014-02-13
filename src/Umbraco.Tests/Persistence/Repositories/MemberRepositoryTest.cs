@@ -29,11 +29,13 @@ namespace Umbraco.Tests.Persistence.Repositories
             base.TearDown();
         }
 
-        private MemberRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MemberTypeRepository memberTypeRepository)
+        private MemberRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out MemberTypeRepository memberTypeRepository, out MemberGroupRepository memberGroupRepository)
         {
             memberTypeRepository = new MemberTypeRepository(unitOfWork, NullCacheProvider.Current);
             var tagRepo = new TagsRepository(unitOfWork, NullCacheProvider.Current);
             var repository = new MemberRepository(unitOfWork, NullCacheProvider.Current, memberTypeRepository, tagRepo);
+            memberGroupRepository = new MemberGroupRepository(unitOfWork, NullCacheProvider.Current, CacheHelper.CreateDisabledCacheHelper());
+            var repository = new MemberRepository(unitOfWork, NullCacheProvider.Current, memberTypeRepository, memberGroupRepository);
             return repository;
         }
 
@@ -57,7 +59,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            MemberGroupRepository memberGroupRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
             {
                 var member = CreateTestMember();
 
@@ -74,7 +77,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            MemberGroupRepository memberGroupRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
             {
                 var type = CreateTestMemberType();
                 var m1 = CreateTestMember(type, "Test 1", "test1@test.com", "pass1", "test1");
@@ -95,7 +99,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            MemberGroupRepository memberGroupRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
             {
                 var type = CreateTestMemberType();
                 for (var i = 0; i < 5; i++)
@@ -119,7 +124,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            MemberGroupRepository memberGroupRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
             {
                 var key = Guid.NewGuid();
                 var member = CreateTestMember(key: key);
@@ -141,7 +147,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            MemberGroupRepository memberGroupRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
             {
 
                 // Act
@@ -162,7 +169,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            MemberGroupRepository memberGroupRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
             {
 
                 // Act
@@ -181,7 +189,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            MemberGroupRepository memberGroupRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
             {
                 var member = CreateTestMember();
 
@@ -203,7 +212,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            MemberGroupRepository memberGroupRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
             {
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
                 memberTypeRepository.AddOrUpdate(memberType);
@@ -229,7 +239,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            MemberGroupRepository memberGroupRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
             {
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
                 memberTypeRepository.AddOrUpdate(memberType);
@@ -257,7 +268,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            MemberGroupRepository memberGroupRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
             {
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
                 memberTypeRepository.AddOrUpdate(memberType);
@@ -303,7 +315,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            MemberGroupRepository memberGroupRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
             {
                 if (memberType == null)
                 {
@@ -325,7 +338,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
             MemberTypeRepository memberTypeRepository;
-            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository))
+            MemberGroupRepository memberGroupRepository;
+            using (var repository = CreateRepository(unitOfWork, out memberTypeRepository, out memberGroupRepository))
             {
                 var memberType = MockedContentTypes.CreateSimpleMemberType();
                 memberTypeRepository.AddOrUpdate(memberType);

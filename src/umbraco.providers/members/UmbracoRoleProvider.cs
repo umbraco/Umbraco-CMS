@@ -16,11 +16,15 @@ using System.Collections;
 
 namespace umbraco.providers.members 
 {
+    /// <summary>
+    /// A role provider for members
+    /// </summary>
+    [Obsolete("This has been superceded by Umbraco.Web.Security.Providers.MembersRoleProvider")]
     public class UmbracoRoleProvider : RoleProvider 
     {
 
         #region
-        private string _ApplicationName = Member.UmbracoRoleProviderName;
+        private string _applicationName = Member.UmbracoRoleProviderName;
         #endregion
 
         #region Properties
@@ -31,7 +35,7 @@ namespace umbraco.providers.members
         /// <returns>The name of the application to store and retrieve role information for.</returns>
         public override string ApplicationName {
             get {
-                return _ApplicationName;
+                return _applicationName;
             }
             set {
                 if (string.IsNullOrEmpty(value))
@@ -40,7 +44,7 @@ namespace umbraco.providers.members
                 if (value.Length > 0x100)
                     throw new ProviderException("Provider application name too long.");
 
-                _ApplicationName = value;
+                _applicationName = value;
             }
         }
         #endregion
@@ -70,9 +74,9 @@ namespace umbraco.providers.members
             // Initialize the abstract base class.
             base.Initialize(name, config);
 
-            this._ApplicationName = config["applicationName"];
-            if (string.IsNullOrEmpty(this._ApplicationName))
-                this._ApplicationName = SecUtility.GetDefaultAppName();
+            this._applicationName = config["applicationName"];
+            if (string.IsNullOrEmpty(this._applicationName))
+                this._applicationName = SecUtility.GetDefaultAppName();
         }
         #endregion
 

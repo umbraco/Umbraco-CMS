@@ -31,6 +31,7 @@ namespace Umbraco.Core.Models
             _contentType = contentType;
         }
 
+        //TODO: Should we just get rid of this one? no reason to have a level set.
         internal Member(string name, string email, string username, string password, int parentId, IMemberType contentType)
             : base(name, parentId, contentType, new PropertyCollection())
         {
@@ -210,14 +211,13 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.IsApproved].Value == null)
-                    return default(bool);
-
-                if (Properties[Constants.Conventions.Member.IsApproved].Value is bool)
-                    return (bool)Properties[Constants.Conventions.Member.IsApproved].Value;
-
+                var tryConvert = Properties[Constants.Conventions.Member.IsApproved].Value.TryConvertTo<bool>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(bool);
                 //TODO: Use TryConvertTo<T> instead
-                return (bool)Convert.ChangeType(Properties[Constants.Conventions.Member.IsApproved].Value, typeof(bool));
             }
             set
             {
@@ -237,14 +237,13 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.IsLockedOut].Value == null)
-                    return default(bool);
-
-                if (Properties[Constants.Conventions.Member.IsLockedOut].Value is bool)
-                    return (bool)Properties[Constants.Conventions.Member.IsLockedOut].Value;
-
+                var tryConvert = Properties[Constants.Conventions.Member.IsLockedOut].Value.TryConvertTo<bool>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(bool);
                 //TODO: Use TryConvertTo<T> instead
-                return (bool)Convert.ChangeType(Properties[Constants.Conventions.Member.IsLockedOut].Value, typeof(bool));
             }
             set
             {
@@ -264,14 +263,13 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.LastLoginDate].Value == null)
-                    return default(DateTime);
-
-                if (Properties[Constants.Conventions.Member.LastLoginDate].Value is DateTime)
-                    return (DateTime)Properties[Constants.Conventions.Member.LastLoginDate].Value;
-
+                var tryConvert = Properties[Constants.Conventions.Member.LastLoginDate].Value.TryConvertTo<DateTime>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(DateTime);
                 //TODO: Use TryConvertTo<T> instead
-                return (DateTime)Convert.ChangeType(Properties[Constants.Conventions.Member.LastLoginDate].Value, typeof(DateTime));
             }
             set
             {
@@ -291,14 +289,13 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value == null)
-                    return default(DateTime);
-
-                if (Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value is DateTime)
-                    return (DateTime)Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value;
-
+                var tryConvert = Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value.TryConvertTo<DateTime>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(DateTime);
                 //TODO: Use TryConvertTo<T> instead
-                return (DateTime)Convert.ChangeType(Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value, typeof(DateTime));
             }
             set
             {
@@ -318,14 +315,13 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.LastLockoutDate].Value == null)
-                    return default(DateTime);
-
-                if (Properties[Constants.Conventions.Member.LastLockoutDate].Value is DateTime)
-                    return (DateTime)Properties[Constants.Conventions.Member.LastLockoutDate].Value;
-
+                var tryConvert = Properties[Constants.Conventions.Member.LastLockoutDate].Value.TryConvertTo<DateTime>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(DateTime);
                 //TODO: Use TryConvertTo<T> instead
-                return (DateTime)Convert.ChangeType(Properties[Constants.Conventions.Member.LastLockoutDate].Value, typeof(DateTime));
             }
             set
             {
@@ -346,14 +342,13 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value == null)
-                    return default(int);
-
-                if (Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value is int)
-                    return (int)Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value;
-
+                var tryConvert = Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value.TryConvertTo<int>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(int);
                 //TODO: Use TryConvertTo<T> instead
-                return (int)Convert.ChangeType(Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value, typeof(int));
             }
             set
             {

@@ -58,7 +58,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         public void AddOrUpdate(TEntity entity)
         {
-            if (!entity.HasIdentity)
+            if (entity.HasIdentity == false)
             {
                 _work.RegisterAdded(entity, this);
             }
@@ -104,7 +104,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 //on initial construction we don't want to have dirty properties tracked
                 // http://issues.umbraco.org/issue/U4-1946
-                TracksChangesEntityBase asEntity = entity as TracksChangesEntityBase;
+                var asEntity = entity as TracksChangesEntityBase;
                 if (asEntity != null)
                 {
                     asEntity.ResetDirtyProperties(false);
@@ -135,13 +135,16 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             if (ids.Any())
             {
-                var entities = _cache.GetByIds(typeof(TEntity), ids.Select(id => id is int ? ConvertIdToGuid(id) : ConvertStringIdToGuid(id.ToString())).ToList());
+                var entities = _cache.GetByIds(
+                    typeof (TEntity), ids.Select(id => id is int ? ConvertIdToGuid(id) : ConvertStringIdToGuid(id.ToString())).ToList())
+                    .ToArray();
+
                 if (ids.Count().Equals(entities.Count()) && entities.Any(x => x == null) == false)
                     return entities.Select(x => (TEntity)x);
             }
             else
             {
-                var allEntities = _cache.GetAllByType(typeof(TEntity));
+                var allEntities = _cache.GetAllByType(typeof (TEntity)).ToArray();
                 
                 if (allEntities.Any())
                 {
@@ -154,7 +157,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            var entityCollection = PerformGetAll(ids);
+            var entityCollection = PerformGetAll(ids).ToArray();
 
             foreach (var entity in entityCollection)
             {

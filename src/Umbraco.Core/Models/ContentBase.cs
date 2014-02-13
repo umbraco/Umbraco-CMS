@@ -306,10 +306,8 @@ namespace Umbraco.Core.Models
         /// <returns><see cref="Property"/> Value as a <see cref="TPassType"/></returns>
         public virtual TPassType GetValue<TPassType>(string propertyTypeAlias)
         {
-            if (Properties[propertyTypeAlias].Value is TPassType)
-                return (TPassType)Properties[propertyTypeAlias].Value;
-
-            return (TPassType)Convert.ChangeType(Properties[propertyTypeAlias].Value, typeof(TPassType));
+            var convertAttempt = Properties[propertyTypeAlias].Value.TryConvertTo<TPassType>();
+            return convertAttempt.Success ? convertAttempt.Result : default(TPassType);
         }
 
         /// <summary>

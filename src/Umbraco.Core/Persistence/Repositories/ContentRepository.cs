@@ -24,8 +24,10 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly ITemplateRepository _templateRepository;
         private readonly ITagsRepository _tagRepository;
+        private readonly CacheHelper _cacheHelper;
 
         public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository)
+        public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, CacheHelper cacheHelper)
             : base(work)
         {
             if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");
@@ -34,11 +36,13 @@ namespace Umbraco.Core.Persistence.Repositories
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
 		    _tagRepository = tagRepository;
+            _cacheHelper = cacheHelper;
 
 		    EnsureUniqueNaming = true;
         }
 
         public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository)
+        public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, CacheHelper cacheHelper)
             : base(work, cache)
         {
             if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");
@@ -47,6 +51,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
             _tagRepository = tagRepository;
+            _cacheHelper = cacheHelper;
 
             EnsureUniqueNaming = true;
         }
@@ -274,7 +279,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Assign the same permissions to it as the parent node
             // http://issues.umbraco.org/issue/U4-2161     
-            var permissionsRepo = new PermissionRepository<IContent>(UnitOfWork);
+            var permissionsRepo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
             var parentPermissions = permissionsRepo.GetPermissionsForEntity(entity.ParentId).ToArray();
             //if there are parent permissions then assign them, otherwise leave null and permissions will become the
             // user's default permissions.
@@ -557,13 +562,13 @@ namespace Umbraco.Core.Persistence.Repositories
         
         public void AssignEntityPermissions(IContent entity, char permission, IEnumerable<object> userIds)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
             repo.AssignEntityPermissions(entity, permission, userIds);
         }
 
         public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
             return repo.GetPermissionsForEntity(entityId);
         }
 

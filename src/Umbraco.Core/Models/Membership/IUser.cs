@@ -7,19 +7,18 @@ namespace Umbraco.Core.Models.Membership
     /// Defines the interface for a <see cref="User"/>
     /// </summary>
     /// <remarks>Will be left internal until a proper Membership implementation is part of the roadmap</remarks>
-    internal interface IUser : IMembershipUser, IProfile
+    public interface IUser : IMembershipUser
     {
-        new object Id { get; set; }
-
+        string Name { get; set; }
         int SessionTimeout { get; set; }
         int StartContentId { get; set; }
         int StartMediaId { get; set; }
         string Language { get; set; }
         
-        //NOTE: I have removed this because it is obsolete in v7 and we are basically removing live editing for now
-        //bool DefaultToLiveEditing { get; set; }
-
-        IUserType UserType { get; }
+        /// <summary>
+        /// Gets/sets the user type for the user
+        /// </summary>
+        IUserType UserType { get; set; }
         
         /// <summary>
         /// The default permission set for the user
@@ -32,5 +31,10 @@ namespace Umbraco.Core.Models.Membership
         IEnumerable<string> AllowedSections { get; }
         void RemoveAllowedSection(string sectionAlias);
         void AddAllowedSection(string sectionAlias);
+
+        /// <summary>
+        /// Exposes the basic profile data
+        /// </summary>
+        IProfile ProfileData { get; }
     }
 }

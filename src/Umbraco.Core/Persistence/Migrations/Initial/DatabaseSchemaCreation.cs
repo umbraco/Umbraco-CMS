@@ -79,7 +79,10 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
                 try
                 {
-                    _database.DropTable(tableName);
+                    if (_database.TableExist(tableName))
+                    {
+                        _database.DropTable(tableName);    
+                    }
                 }
                 catch (Exception ex)
                 {
