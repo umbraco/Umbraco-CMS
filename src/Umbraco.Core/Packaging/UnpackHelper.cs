@@ -21,21 +21,24 @@ namespace Umbraco.Core.Packaging
             {
                 using (var zipStream = new ZipInputStream(fs))
                 {
-                    ZipEntry theEntry;
-                    while ((theEntry = zipStream.GetNextEntry()) != null)
+                    ZipEntry zipEntry;
+                    while ((zipEntry = zipStream.GetNextEntry()) != null)
                     {
-                        if (theEntry.Name.EndsWith(fileToRead, StringComparison.CurrentCultureIgnoreCase))
+                        if (zipEntry.Name.EndsWith(fileToRead, StringComparison.CurrentCultureIgnoreCase))
                         {
                             using (var reader = new StreamReader(zipStream))
                             {
                                 return reader.ReadToEnd();
                             }
                         }
-                    };
+                    }
+
+                    zipStream.Close();
                 }
+                fs.Close();
             }
 
-            throw new FileNotFoundException("Could not find file in package file " + sourcefilePath, fileToRead);
+            throw new FileNotFoundException(string.Format("Could not find file in package file {0}", sourcefilePath), fileToRead);
         }
 
         public void UnPack(string sourcefilePath, string destinationDirectory)
@@ -43,32 +46,30 @@ namespace Umbraco.Core.Packaging
             // Unzip
             using (var fs = File.OpenRead(sourcefilePath))
             {
-                using (var s = new ZipInputStream(fs))
+                using (var zipInputStream = new ZipInputStream(fs))
                 {
-                    ZipEntry theEntry;
-                    while ((theEntry = s.GetNextEntry()) != null)
+                    ZipEntry zipEntry;
+                    while ((zipEntry = zipInputStream.GetNextEntry()) != null)
                     {
-                        string fileName = Path.GetFileName(theEntry.Name);
-                        if (fileName == String.Empty) continue;
+                        string fileName = Path.GetFileName(zipEntry.Name);
+                        if (string.IsNullOrEmpty(fileName)) continue;
 
-                        using ( var streamWriter = File.Create(destinationDirectory + Path.DirectorySeparatorChar + fileName)) 
+                        using ( var streamWriter = File.Create(Path.Combine(destinationDirectory, fileName))) 
                         {
                             var data = new byte[2048];
-                            while (true)
+                            int size;
+                            while ((size = zipInputStream.Read(data, 0, data.Length)) > 0)
                             {
-                                var size = s.Read(data, 0, data.Length);
-                                if (size > 0)
-                                {
-                                    streamWriter.Write(data, 0, size);
-                                }
-                                else
-                                {
-                                    break;
-                                }
+                                streamWriter.Write(data, 0, size);
                             }
+
+                            streamWriter.Close();
                         }
                     }
+
+                    zipInputStream.Close();
                 }
+                fs.Close();
             }
         }
     }

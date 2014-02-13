@@ -15,6 +15,8 @@ namespace Umbraco.Core.Services
 {
     public class PackageInstallerService : IPackageInstallerService
     {
+        
+
         #region consts
         private const string UMBPACKAGE_NODENAME = "umbPackage";
         private const string DATA_TYPES_NODENAME = "DataTypes";
@@ -58,23 +60,16 @@ namespace Umbraco.Core.Services
 
         #endregion
 
-        private readonly IFileService _fileService;
-        private readonly IMacroService _macroService;
+        private readonly IPackageValidationHelper _packageValidationHelper;
         private readonly IPackagingService _packagingService;
         private readonly IUnpackHelper _unpackHelper;
 
 
-        public PackageInstallerService(IPackagingService packagingService, IMacroService macroService,
-            IFileService fileService, IUnpackHelper unpackHelper)
+        public PackageInstallerService(IPackagingService packagingService, IUnpackHelper unpackHelper, IPackageValidationHelper packageValidationHelper)
         {
-            if (packagingService != null) _packagingService = packagingService;
-            else throw new ArgumentNullException("packagingService");
-            if (unpackHelper != null) _unpackHelper = unpackHelper;
-            else throw new ArgumentNullException("unpackHelper");
-            if (fileService != null) _fileService = fileService;
-            else throw new ArgumentNullException("fileService");
-            if (macroService != null) _macroService = macroService;
-            else throw new ArgumentNullException("macroService");
+            if (packageValidationHelper != null) _packageValidationHelper = packageValidationHelper; else throw new ArgumentNullException("packageValidationHelper");
+            if (packagingService != null) _packagingService = packagingService; else throw new ArgumentNullException("packagingService");
+            if (unpackHelper != null) _unpackHelper = unpackHelper; else throw new ArgumentNullException("unpackHelper");
         }
 
 
@@ -361,13 +356,15 @@ namespace Umbraco.Core.Services
                         var xElement = n.Element(NAME_NODENAME);
                         if (xElement == null) { throw new ArgumentException("Missing \"" + NAME_NODENAME + "\" element", "stylesheetNotes"); }
 
-                        string name = xElement.Name.LocalName;
-                        Stylesheet existingStilesheet = _fileService.GetStylesheetByName(name);
+                        string name = xElement.Value;
 
-                        // Don't know what to put in here... existing path whas the best i could come up with
-                        string existingFilePath = existingStilesheet == null ? null : existingStilesheet.Path;
-
-                        return new KeyValuePair<string, string>(name, existingFilePath);
+                        Stylesheet existingStyleSheet;
+                        if (_packageValidationHelper.StylesheetExists(name, out existingStyleSheet))
+                        {
+                            // Don't know what to put in here... existing path was the best i could come up with
+                            return new KeyValuePair<string, string>(name, existingStyleSheet.Path);
+                        }
+                        return new KeyValuePair<string, string>(name, null);
                     })
                     .Where(kv => kv.Value != null);
         }
@@ -382,10 +379,15 @@ namespace Umbraco.Core.Services
                         var alias = n.Element(ALIAS_NODENAME);
                         if (alias == null) { throw new ArgumentException("missing a \"" + ALIAS_NODENAME + "\" element", "templateNotes"); }
                         string aliasStr = alias.Value;
-                        var existingTemplate = _fileService.GetTemplate(aliasStr) as Template;
-                        string existingName = existingTemplate == null ? null : existingTemplate.Name;
 
-                        return new KeyValuePair<string, string>(aliasStr, existingName);
+                        ITemplate existingTemplate;
+
+                        if (_packageValidationHelper.TemplateExists(aliasStr, out existingTemplate))
+                        {
+                            return new KeyValuePair<string, string>(aliasStr, existingTemplate.Name);
+                        }
+
+                        return new KeyValuePair<string, string>(aliasStr, null);
                     })
                     .Where(kv => kv.Value != null);
         }
@@ -398,10 +400,14 @@ namespace Umbraco.Core.Services
                         var xElement = n.Element(ALIAS_NODENAME);
                         if (xElement == null) { throw new ArgumentException("missing a \"" + ALIAS_NODENAME + "\" element", "macroNodes"); }
                         string alias = xElement.Value;
-                        var macro = _macroService.GetByAlias(xElement.Value);
-                        string eksistingName = macro == null ? null : macro.Name;
 
-                        return new KeyValuePair<string, string>(alias, eksistingName);
+                        IMacro existingMacro;
+                        if (_packageValidationHelper.MacroExists(alias, out existingMacro))
+                        {
+                            return new KeyValuePair<string, string>(alias, existingMacro.Name);
+                        }
+                        
+                        return new KeyValuePair<string, string>(alias, null);
                     })
                     .Where(kv => kv.Key != null && kv.Value != null);
         }
