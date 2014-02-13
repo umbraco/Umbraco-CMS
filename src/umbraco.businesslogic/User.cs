@@ -162,7 +162,7 @@ namespace umbraco.BusinessLogic
             }
             set
             {
-                _user.Language = value;
+                _user.Password = value;
             }
         }
 
