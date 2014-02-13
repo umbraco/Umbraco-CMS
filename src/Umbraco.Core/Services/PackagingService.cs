@@ -373,7 +373,11 @@ namespace Umbraco.Core.Services
             foreach (var propertyType in contentType.PropertyTypes)
             {
                 var definition = _dataTypeService.GetDataTypeDefinitionById(propertyType.DataTypeDefinitionId);
-                var propertyGroup = contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
+                
+                var propertyGroup = propertyType.PropertyGroupId == null 
+                                                ? null 
+                                                : contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
+                
                 var genericProperty = new XElement("GenericProperty",
                                                    new XElement("Name", propertyType.Name),
                                                    new XElement("Alias", propertyType.Alias),
@@ -841,7 +845,7 @@ namespace Umbraco.Core.Services
             var dataTypes = new Dictionary<string, IDataTypeDefinition>();
             var dataTypeElements = name.Equals("DataTypes")
                                        ? (from doc in element.Elements("DataType") select doc).ToList()
-                                       : new List<XElement> { element.Element("DataType") };
+                                       : new List<XElement> { element };
 
             foreach (var dataTypeElement in dataTypeElements)
             {
@@ -1240,7 +1244,8 @@ namespace Umbraco.Core.Services
                 dontRender = bool.Parse(dontRenderElement.Value);
             }
 
-            var macro = new Macro(macroAlias, macroName, controlType, controlAssembly, xsltPath, scriptPath,
+            var existingMacro = _macroService.GetByAlias(macroAlias) as Macro; 
+            var macro = existingMacro ?? new Macro(macroAlias, macroName, controlType, controlAssembly, xsltPath, scriptPath,
                 cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration);
 
             var properties = macroElement.Element("properties");
@@ -1258,6 +1263,7 @@ namespace Umbraco.Core.Services
                         sortOrder = int.Parse(sortOrderAttribute.Value);
                     }
 
+                    if (macro.Properties.Any(x => x.Alias == propertyAlias)) continue;
                     macro.Properties.Add(new MacroProperty(propertyAlias, propertyName, sortOrder, editorAlias));
                     sortOrder++;
                 }
@@ -1625,7 +1631,7 @@ namespace Umbraco.Core.Services
             xml.Add(new XElement("Design", new XCData(template.Content)));
 
             var concreteTemplate = template as Template;
-            if (concreteTemplate != null)
+            if (concreteTemplate != null && concreteTemplate.MasterTemplateId != null)
             {
                 if (concreteTemplate.MasterTemplateId.IsValueCreated &&
                     concreteTemplate.MasterTemplateId.Value != default(int))
