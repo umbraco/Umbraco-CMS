@@ -512,6 +512,7 @@
     <EmbeddedResource Include="Services\Importing\ImportResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="UmbracoExamine\TestFiles.resx">
       <Generator>ResXFileCodeGenerator</Generator>

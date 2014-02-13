@@ -780,6 +780,7 @@
     <Compile Include="Services\IFileService.cs" />
     <Compile Include="Services\ILocalizationService.cs" />
     <Compile Include="Models\IMacro.cs" />
+    <Compile Include="Services\IMacroProperty.cs" />
     <Compile Include="Services\IMacroService.cs" />
     <Compile Include="Services\IMediaService.cs" />
     <Compile Include="Services\IMemberGroupService.cs" />

@@ -15,7 +15,7 @@ namespace Umbraco.Core.Packaging
             return tempDir;
         }
 
-        public string ReadSingleTextFile(string sourcefilePath, string fileToRead)
+        public string ReadTextFileFromArchive(string sourcefilePath, string fileToRead)
         {
             using (var fs = File.OpenRead(sourcefilePath))
             {
