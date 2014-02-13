@@ -169,7 +169,7 @@ namespace Umbraco.Web.Security
             {
                 return true;
             }
-            return CurrentUser.Applications.Any(uApp => uApp.alias == app);
+            return CurrentUser.Applications.Any(uApp => uApp.alias.InvariantEquals(app));
         }
 
         internal void UpdateLogin(long timeout)
