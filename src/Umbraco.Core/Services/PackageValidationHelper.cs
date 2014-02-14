@@ -20,7 +20,7 @@ namespace Umbraco.Core.Services
 
         public bool StylesheetExists(string styleSheetName, out Stylesheet existingStyleSheet)
         {
-            existingStyleSheet = _fileService.GetStylesheets(styleSheetName).SingleOrDefault();
+            existingStyleSheet = _fileService.GetStylesheetByName(styleSheetName);
             return existingStyleSheet != null;
         }
 

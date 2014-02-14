@@ -15,8 +15,6 @@ namespace Umbraco.Core.Services
 {
     public class PackageInstallerService : IPackageInstallerService
     {
-        
-
         #region consts
         private const string UMBPACKAGE_NODENAME = "umbPackage";
         private const string DATA_TYPES_NODENAME = "DataTypes";
