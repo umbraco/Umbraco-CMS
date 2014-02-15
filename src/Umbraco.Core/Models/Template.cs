@@ -187,7 +187,7 @@ namespace Umbraco.Core.Models
 
         public void SetMasterTemplate(ITemplate masterTemplate)
         {
-            MasterTemplateId = new Lazy<int>(() => {return masterTemplate.Id});
+            MasterTemplateId = new Lazy<int>(() => { return masterTemplate.Id; });
         }
     }
 }
