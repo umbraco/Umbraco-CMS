@@ -30,7 +30,7 @@ namespace umbraco.providers.members
     /// Custom Membership Provider for Umbraco Members (User authentication for Frontend applications NOT umbraco CMS)  
     /// </summary>
     [Obsolete("This has been superceded by Umbraco.Web.Security.Providers.MembersMembershipProvider")]
-    public class UmbracoMembershipProvider : UmbracoMembershipProviderBase
+    public class UmbracoMembershipProvider : UmbracoMembershipProviderBase, IUmbracoContentTypeMembershipProvider
     {
         public UmbracoMembershipProvider()
 

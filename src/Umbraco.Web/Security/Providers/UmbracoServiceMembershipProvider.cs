@@ -14,6 +14,8 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Security.Providers
 {
+    
+
     /// <summary>
     /// Abstract Membership Provider that users any implementation of IMembershipMemberService{TEntity} service
     /// </summary>
