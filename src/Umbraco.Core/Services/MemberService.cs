@@ -642,16 +642,17 @@ namespace Umbraco.Core.Services
         /// </remarks>
         /// <param name="id"></param>
         /// <returns></returns>
-        public IMember GetById(object id)
+        public IMember GetByProviderKey(object id)
         {
-            if (id is int)
-            {
-                return GetById((int)id);
-            }
-
-            if (id is Guid)
+            var asGuid = id.TryConvertTo<Guid>();
+            if (asGuid.Success)
             {
                 return GetByKey((Guid)id);
+            }
+            var asInt = id.TryConvertTo<int>();
+            if (asInt.Success)
+            {
+                return GetById((int)id);
             }
 
             return null;

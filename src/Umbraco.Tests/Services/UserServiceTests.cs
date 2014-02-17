@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Services
             var user = ServiceContext.UserService.CreateMemberWithIdentity("JohnDoe", "john@umbraco.io", "12345", userType);
             
             ServiceContext.UserService.Delete(user, true);
-            var deleted = ServiceContext.UserService.GetById(user.Id);
+            var deleted = ServiceContext.UserService.GetUserById(user.Id);
 
             // Assert
             Assert.That(deleted, Is.Null);
@@ -114,7 +114,7 @@ namespace Umbraco.Tests.Services
             var user = ServiceContext.UserService.CreateMemberWithIdentity("JohnDoe", "john@umbraco.io", "12345", userType);
 
             ServiceContext.UserService.Delete(user);
-            var deleted = ServiceContext.UserService.GetById(user.Id);
+            var deleted = ServiceContext.UserService.GetUserById(user.Id);
 
             // Assert
             Assert.That(deleted, Is.Not.Null);
@@ -160,8 +160,8 @@ namespace Umbraco.Tests.Services
             ServiceContext.UserService.SaveUserType(userType);
             var user = ServiceContext.UserService.CreateMemberWithIdentity("JohnDoe", "john@umbraco.io", "12345", userType);
 
-            Assert.IsNotNull(ServiceContext.UserService.GetById(user.Id));
-            Assert.IsNull(ServiceContext.UserService.GetById(9876));
+            Assert.IsNotNull(ServiceContext.UserService.GetUserById(user.Id));
+            Assert.IsNull(ServiceContext.UserService.GetUserById(9876));
         }
 
         [Test]

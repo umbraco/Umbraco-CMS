@@ -25,6 +25,13 @@ namespace Umbraco.Core.Services
         IMember GetByKey(Guid id);
 
         /// <summary>
+        /// Gets a member by it's id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        IMember GetById(int id);
+
+        /// <summary>
         /// Get all members for the member type alias
         /// </summary>
         /// <param name="memberTypeAlias"></param>
