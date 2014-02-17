@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Web.Security;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Security;
 using Umbraco.Web.Install;
 using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
@@ -60,7 +61,7 @@ namespace Umbraco.Web.UI.Install.Steps
                 }
 
                 // Is it using the default membership provider
-                if (CurrentProvider is UsersMembershipProvider)
+                if (CurrentProvider.IsUmbracoUsersProvider())
                 {
                     // Save user in membership provider
                     var umbracoUser = user as UsersMembershipUser;

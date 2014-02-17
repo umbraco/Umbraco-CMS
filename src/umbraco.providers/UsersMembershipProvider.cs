@@ -494,19 +494,6 @@ namespace umbraco.providers
                         return false;
                     }
 
-                    //Due to the way this legacy provider worked, when it 'validated' a password passed in, it would allow 
-                    // having the already hashed/encrypted password checked directly - this is bad but hey, we gotta support legacy
-                    // don't we.
-
-                    //So, first we'll check if the user object's db stored password (already hashed/encrypted in the db) matches the password that
-                    // has been passed in, if so then we will confirm that it is valid. If it doesn't we'll attempt to hash/encrypt the passed in 
-                    // password and then validate it - the way it is supposed to be done.
-                    
-                    if (user.Password == password)
-                    {
-                        return true;
-                    }
-
                     return CheckPassword(password, user.Password);
                 }
             }
