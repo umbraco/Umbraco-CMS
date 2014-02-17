@@ -17,6 +17,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.Models.ContentEditing;
@@ -556,6 +557,10 @@ namespace Umbraco.Web.Editors
                     {
                         //Go and re-fetch the persisted item
                         contentItem.PersistedContent = Services.MemberService.GetByUsername(contentItem.Username.Trim());
+                        if (contentItem.PersistedContent == null)
+                        {
+                            throw new EntityNotFoundException("The member was successfully created but the entity could not be resolved with the username " + contentItem.Username.Trim());
+                        }
                         //remap the values to save
                         MapPropertyValues(contentItem);
                     }
