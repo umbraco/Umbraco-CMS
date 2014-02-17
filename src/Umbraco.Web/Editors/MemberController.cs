@@ -18,6 +18,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.Models.ContentEditing;
@@ -95,23 +96,23 @@ namespace Umbraco.Web.Editors
                     return Mapper.Map<IMember, MemberDisplay>(foundMember);
                 case MembershipScenario.CustomProviderWithUmbracoLink:
 
-                //TODO: Support editing custom properties for members with a custom membership provider here.
+                    //TODO: Support editing custom properties for members with a custom membership provider here.
 
-                //foundMember = Services.MemberService.GetByKey(key);
-                //if (foundMember == null)
-                //{
-                //    HandleContentNotFound(key);
-                //}
-                //foundMembershipMember = Membership.GetUser(key, false);
-                //if (foundMembershipMember == null)
-                //{
-                //    HandleContentNotFound(key);
-                //}
+                    //foundMember = Services.MemberService.GetByKey(key);
+                    //if (foundMember == null)
+                    //{
+                    //    HandleContentNotFound(key);
+                    //}
+                    //foundMembershipMember = Membership.GetUser(key, false);
+                    //if (foundMembershipMember == null)
+                    //{
+                    //    HandleContentNotFound(key);
+                    //}
 
-                //display = Mapper.Map<MembershipUser, MemberDisplay>(foundMembershipMember);
-                ////map the name over
-                //display.Name = foundMember.Name;
-                //return display;
+                    //display = Mapper.Map<MembershipUser, MemberDisplay>(foundMembershipMember);
+                    ////map the name over
+                    //display.Name = foundMember.Name;
+                    //return display;
 
                 case MembershipScenario.StandaloneCustomProvider:
                 default:
@@ -151,7 +152,7 @@ namespace Umbraco.Web.Editors
                     emptyContent.AdditionalData["NewPassword"] = Membership.GeneratePassword(Membership.MinRequiredPasswordLength, Membership.MinRequiredNonAlphanumericCharacters);
                     return Mapper.Map<IMember, MemberDisplay>(emptyContent);
                 case MembershipScenario.CustomProviderWithUmbracoLink:
-                //TODO: Support editing custom properties for members with a custom membership provider here.
+                    //TODO: Support editing custom properties for members with a custom membership provider here.
 
                 case MembershipScenario.StandaloneCustomProvider:
                 default:
@@ -487,7 +488,7 @@ namespace Umbraco.Web.Editors
             {
                 case MembershipScenario.NativeUmbraco:
                     //We are using the umbraco membership provider, create the member using the membership provider first.
-                    var umbracoMembershipProvider = (global::umbraco.providers.members.UmbracoMembershipProvider)Membership.Provider;
+                    var umbracoMembershipProvider = (UmbracoMembershipProviderBase)Membership.Provider;
                     //TODO: We are not supporting q/a - passing in empty here
                     membershipUser = umbracoMembershipProvider.CreateUser(
                         contentItem.ContentTypeAlias, contentItem.Username,

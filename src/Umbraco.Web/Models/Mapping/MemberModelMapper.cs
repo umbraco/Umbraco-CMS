@@ -10,6 +10,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco;
 using System.Linq;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -249,7 +250,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 var result = base.ResolveCore(content).ToArray();
 
-                if (Membership.Provider.Name != Constants.Conventions.Member.UmbracoMemberProviderName)
+                if (Membership.Provider.IsUmbracoMembershipProvider() == false)
                 {
                     //it's a generic provider so update the locked out property based on our know constant alias
                     var isLockedOutProperty = result.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
@@ -263,7 +264,7 @@ namespace Umbraco.Web.Models.Mapping
                 }
                 else
                 {
-                    var umbracoProvider = (global::umbraco.providers.members.UmbracoMembershipProvider)Membership.Provider;
+                    var umbracoProvider = (IUmbracoContentTypeMembershipProvider)Membership.Provider;
 
                     //This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
                     // if we just had all of the membeship provider fields on the member table :(
@@ -311,7 +312,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             protected override IDictionary<string, string> ResolveCore(IMember source)
             {
-                if (Membership.Provider.Name != Constants.Conventions.Member.UmbracoMemberProviderName)
+                if (Membership.Provider.IsUmbracoMembershipProvider() == false)
                 {
                     return new Dictionary<string, string>
                     {
@@ -322,7 +323,7 @@ namespace Umbraco.Web.Models.Mapping
                 }
                 else
                 {
-                    var umbracoProvider = (global::umbraco.providers.members.UmbracoMembershipProvider)Membership.Provider;
+                    var umbracoProvider = (IUmbracoContentTypeMembershipProvider)Membership.Provider;
 
                     return new Dictionary<string, string>
                     {
