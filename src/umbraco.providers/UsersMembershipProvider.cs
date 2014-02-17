@@ -42,7 +42,15 @@ namespace umbraco.providers
         {
             get { return true; }
         }
-        
+
+        /// <summary>
+        /// For backwards compatibility, this provider supports this option
+        /// </summary>
+        public override bool AllowManuallyChangingPassword
+        {
+            get { return true; }
+        }
+
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config) 
         {
             if (config == null) throw new ArgumentNullException("config");
@@ -68,35 +76,31 @@ namespace umbraco.providers
         /// </remarks>
         protected override bool PerformChangePassword(string username, string oldPassword, string newPassword)
         {
+            //NOTE: due to backwards compatibilty reasons (and UX reasons), this provider doesn't care about the old password and 
+            // allows simply setting the password manually so we don't really care about the old password.
+            // This is allowed based on the overridden AllowManuallyChangingPassword option.
 
+            var args = new ValidatePasswordEventArgs(username, newPassword, false);
+            OnValidatingPassword(args);
 
-            if (ApplicationContext.Current.IsConfigured == false && oldPassword == "default"
-                || ValidateUser(username, oldPassword))
+            if (args.Cancel)
             {
-                var args = new ValidatePasswordEventArgs(username, newPassword, false);
-                OnValidatingPassword(args);
-
-                if (args.Cancel)
-                {
-                    if (args.FailureInformation != null)
-                        throw args.FailureInformation;
-                    throw new MembershipPasswordException("Change password canceled due to password validation failure.");
-                }
-
-                var user = new User(username);
-                //encrypt/hash the new one
-                string salt;
-                var encodedPassword = EncryptOrHashNewPassword(newPassword, out salt);
-
-                //Yes, it's true, this actually makes a db call to set the password
-                user.Password = FormatPasswordForStorage(encodedPassword, salt);
-                //call this just for fun.
-                user.Save();
-
-                return true;    
+                if (args.FailureInformation != null)
+                    throw args.FailureInformation;
+                throw new MembershipPasswordException("Change password canceled due to password validation failure.");
             }
 
-            return false;
+            var user = new User(username);
+            //encrypt/hash the new one
+            string salt;
+            var encodedPassword = EncryptOrHashNewPassword(newPassword, out salt);
+
+            //Yes, it's true, this actually makes a db call to set the password
+            user.Password = FormatPasswordForStorage(encodedPassword, salt);
+            //call this just for fun.
+            user.Save();
+
+            return true; 
 
         }
 

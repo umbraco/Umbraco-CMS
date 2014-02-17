@@ -158,15 +158,7 @@ namespace umbraco.cms.presentation.user
             // Add password changer
             var passwordChanger = (passwordChanger) LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx");
             passwordChanger.MembershipProviderName = UmbracoSettings.DefaultBackofficeProvider;
-            
-            //This is a hack to allow the admin to change a user's password to whatever they want - this will only work if we are using the
-            // default umbraco membership provider. 
-            // See the notes below in the ChangePassword method.
-            if (BackOfficeProvider is UsersMembershipProvider)
-            {
-                passwordChanger.ShowOldPassword = false;
-            }
-
+    
             //Add a custom validation message for the password changer
             var passwordValidation = new CustomValidator
                 {
@@ -425,21 +417,7 @@ namespace umbraco.cms.presentation.user
                 }
 
                 var changePasswordModel = passwordChangerControl.ChangingPasswordModel;
-
-                // Is it using the default membership provider
-                if (BackOfficeProvider is UsersMembershipProvider)
-                {
-                    //This is a total hack so that an admin can change the password without knowing the previous one
-                    // we do this by simply passing in the already stored hashed/encrypted password in the database - 
-                    // this shouldn't be allowed but to maintain backwards compatibility we need to do this because
-                    // this logic was previously allowed.
-
-                    //For this editor, we set the passwordChanger.ShowOldPassword = false so that the old password
-                    // field doesn't appear because we know we are going to manually set it here.
-                    // We'll change the model to have the already encrypted password stored in the db and that will continue to validate.
-                    changePasswordModel.OldPassword = u.Password;
-                }
-
+                
                 //now do the actual change
                 var changePassResult = UmbracoContext.Current.Security.ChangePassword(
                     membershipUser.UserName, changePasswordModel, BackOfficeProvider);    
