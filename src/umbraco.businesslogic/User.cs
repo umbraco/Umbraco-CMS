@@ -79,7 +79,7 @@ namespace umbraco.BusinessLogic
 
         private void SetupUser(int ID)
         {
-            _user = ApplicationContext.Current.Services.UserService.GetById(ID);
+            _user = ApplicationContext.Current.Services.UserService.GetUserById(ID);
             if (_user == null)
             {
                 throw new ArgumentException("No User exists with ID " + ID);
@@ -496,7 +496,7 @@ namespace umbraco.BusinessLogic
             if (EnsureUniqueLoginName(lname, GetUser(id)) == false)
                 throw new Exception(String.Format("A user with the login '{0}' already exists", lname));
 
-            var found = ApplicationContext.Current.Services.UserService.GetById(id);
+            var found = ApplicationContext.Current.Services.UserService.GetUserById(id);
             if (found == null) return;
             found.Name = name;
             found.Username = lname;
@@ -510,7 +510,7 @@ namespace umbraco.BusinessLogic
             if (EnsureUniqueLoginName(lname, GetUser(id)) == false)
                 throw new Exception(String.Format("A user with the login '{0}' already exists", lname));
 
-            var found = ApplicationContext.Current.Services.UserService.GetById(id);
+            var found = ApplicationContext.Current.Services.UserService.GetUserById(id);
             if (found == null) return;
             found.Name = name;
             found.Username = lname;
@@ -530,7 +530,7 @@ namespace umbraco.BusinessLogic
         /// <param name="noConsole"></param>        
         public static void Update(int id, string email, bool disabled, bool noConsole)
         {
-            var found = ApplicationContext.Current.Services.UserService.GetById(id);
+            var found = ApplicationContext.Current.Services.UserService.GetUserById(id);
             if (found == null) return;
             
             found.Email = email;            
@@ -804,7 +804,7 @@ namespace umbraco.BusinessLogic
         [Obsolete("The legacy user object should no longer be used, use the WebSecurity class to access the current user or the UserService to retreive a user by id")]
         public static User GetUser(int id)
         {
-            var result = ApplicationContext.Current.Services.UserService.GetById(id);
+            var result = ApplicationContext.Current.Services.UserService.GetUserById(id);
             if (result == null)
             {
                 throw new ArgumentException("No user found with id " + id);

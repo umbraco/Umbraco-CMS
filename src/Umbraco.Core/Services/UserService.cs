@@ -142,6 +142,17 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IUser GetByProviderKey(object id)
+        {
+            var asInt = id.TryConvertTo<int>();
+            if (asInt.Success)
+            {
+                return GetById((int)id);
+            }
+
+            return null;
+        }
+
         public IUser GetByEmail(string email)
         {
             using (var repository = _repositoryFactory.CreateUserRepository(_uowProvider.GetUnitOfWork()))

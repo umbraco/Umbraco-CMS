@@ -78,7 +78,7 @@ namespace umbraco.cms.businesslogic.workflow
         private static void SendNotification(User performingUser, User mailingUser, Document documentObject, IAction action)
         {
             var nService = ApplicationContext.Current.Services.NotificationService;
-            var pUser = ApplicationContext.Current.Services.UserService.GetById(performingUser.Id);
+            var pUser = ApplicationContext.Current.Services.UserService.GetUserById(performingUser.Id);
 
             nService.SendNotifications(
                 pUser, documentObject.Content, action.Letter.ToString(CultureInfo.InvariantCulture), ui.Text(action.Alias), 
