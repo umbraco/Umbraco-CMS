@@ -11,16 +11,10 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return (string)base["mediaTypeAlias"]; }
         }
 
-        [ConfigurationProperty("focalPointProperty", IsRequired = true)]
+        [ConfigurationProperty("focalPointProperty", IsRequired = false)]
         public string FocalPointProperty
         {
             get { return (string)base["focalPointProperty"]; }
-        }
-
-        [ConfigurationProperty("fileProperty", IsRequired = true)]
-        public string FileProperty
-        {
-            get { return (string)base["fileProperty"]; }
         }
 
         [ConfigurationCollection(typeof(ContentImagingCropSizeCollection))]

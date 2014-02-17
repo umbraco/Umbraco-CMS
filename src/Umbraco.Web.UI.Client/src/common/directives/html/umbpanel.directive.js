@@ -47,6 +47,10 @@ angular.module("umbraco.directives.html")
 					var winHeight = $(window).height();
 
 					scope.$watch(function () {
+						if(!bar){
+							bar = $(".tab-content .active .umb-tab-buttons")[0] || $(".tab-content .umb-tab-buttons")[0];
+						}
+						
 						var bottom = bar.offsetTop + bar.offsetHeight;
 						return bottom > winHeight;
 					}, function(val) {

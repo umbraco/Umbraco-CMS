@@ -183,6 +183,11 @@ namespace Umbraco.Web.Editors
                                         controller => controller.GetConfiguration())
                                 },
                                 {
+                                    "imageCropperApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ImageCropperPreValueController>(
+                                        controller => controller.GetConfiguration(string.Empty))
+                                },
+
+                                {
                                     "stylesheetApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<StylesheetController>(
                                         controller => controller.GetAll())
                                 },

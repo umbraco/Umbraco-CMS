@@ -1,21 +1,23 @@
 // Animations
 // -------------------------
 
-.fade-hide, .fade-show {
+.fade-hide, .fade-show , .fade-leave, .fade-enter {
 	-webkit-transition: all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.3s;
 	-moz-transition: all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.3s;
 	-o-transition: all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.3s;
 	transition: all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.3s;
 }
-.fade-hide {
+.fade-enter {
 	opacity: 1;
 }
+
 .fade-hide.fade-hide-active {
 	opacity: 0;
 }
-.fade-show {
+.fade-leave {
 	opacity: 0;
 }
+
 .fade-show.fade-show-active {
 	opacity: 1;
 }
@@ -63,6 +65,7 @@
     display: block;
     position: relative;    
 } 
+
 @-webkit-keyframes leave {
     to {
         opacity: 0;

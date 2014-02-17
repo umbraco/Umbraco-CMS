@@ -60,14 +60,28 @@ angular.module("umbraco.directives")
 						scope.center.top =  (scope.dimensions.top+10) / scope.dimensions.height;
 					};
 					
+					var lazyEndEvent = _.debounce(function(){
+						scope.$apply(function(){
+							scope.$emit("imageFocalPointStop");
+						});
+					}, 2000);
+					
+
 					//Drag and drop positioning, using jquery ui draggable
 					//TODO ensure that the point doesnt go outside the box
 					$overlay.draggable({
 						containment: "parent",
+						start: function(){
+							scope.$apply(function(){
+								scope.$emit("imageFocalPointStart");
+							});
+						},
 						stop: function() {
 							scope.$apply(function(){
 								calculateGravity();
 							});
+
+							lazyEndEvent();
 						}
 					});
 

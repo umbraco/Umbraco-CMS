@@ -175,13 +175,7 @@ angular.module("umbraco.directives")
 						scope.dimensions.image.left = left;
 						scope.dimensions.image.top = top;
 					};	
-
 					
-
-
-					
-
-
 					//sets scope.crop to the recalculated % based crop	
 					var calculateCropBox = function(){
 						scope.crop = cropperHelper.pixelsToCoordinates(scope.dimensions.image, scope.dimensions.cropper.width, scope.dimensions.cropper.height, scope.dimensions.margin);	
