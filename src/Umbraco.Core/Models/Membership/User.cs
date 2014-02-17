@@ -36,6 +36,8 @@ namespace Umbraco.Core.Models.Membership
             _sectionCollection.CollectionChanged += SectionCollectionChanged;
             _isApproved = true;
             _isLockedOut = false;
+            _startContentId = -1;
+            _startMediaId = -1;
         }
 
         public User(string name, string email, string username, string password, IUserType userType)
@@ -47,6 +49,8 @@ namespace Umbraco.Core.Models.Membership
             _password = password;
             _isApproved = true;
             _isLockedOut = false;
+            _startContentId = -1;
+            _startMediaId = -1;
         }
 
         private IUserType _userType;
