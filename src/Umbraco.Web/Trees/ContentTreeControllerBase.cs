@@ -8,6 +8,7 @@ using System.Web.Http;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Persistence;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
@@ -88,6 +89,10 @@ namespace Umbraco.Web.Trees
             {
                 //just return their single start node, it will show up under the 'Content' label
                 var startNode = Services.EntityService.Get(UserStartNode, UmbracoObjectType);
+                if (startNode == null)
+                {
+                    throw new EntityNotFoundException(UserStartNode, "User's start content node could not be found");
+                }
                 return new[] { startNode };
             }
 

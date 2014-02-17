@@ -51,7 +51,7 @@ namespace Umbraco.Core.Services
 
                 if (types.Any() == false)
                 {
-                    throw new InvalidOperationException("No member types could be resolved");
+                    throw new EntityNotFoundException("No member types could be resolved");
                 }
 
                 if (types.InvariantContains("writer"))
@@ -126,7 +126,7 @@ namespace Umbraco.Core.Services
             var userType = GetUserTypeByAlias(memberTypeAlias);
             if (userType == null)
             {
-                throw new ArgumentException("The user type " + memberTypeAlias + " could not be resolved");
+                throw new EntityNotFoundException("The user type " + memberTypeAlias + " could not be resolved");
             }
 
             return CreateMemberWithIdentity(username, email, password, userType);
