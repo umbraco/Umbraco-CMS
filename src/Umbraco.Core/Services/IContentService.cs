@@ -11,7 +11,20 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentService : IService
     {
-        
+        /// <summary>
+        /// Assigns a single permission to the current content item for the specified user ids
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="permission"></param>
+        /// <param name="userIds"></param>
+        void AssignContentPermissions(IContent entity, char permission, IEnumerable<int> userIds);
+
+        /// <summary>
+        /// Gets the list of permissions for the content item
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        IEnumerable<EntityPermission> GetPermissionsForEntity(IContent content);
 
         bool SendToPublication(IContent content, int userId = 0);
 

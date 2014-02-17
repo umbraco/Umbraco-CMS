@@ -25,6 +25,11 @@ namespace Umbraco.Core.Persistence.Repositories
 
         void AssignEntityPermissions(IContent entity, char permission, IEnumerable<int> userIds);
 
+        /// <summary>
+        /// Gets the list of permissions for the content item
+        /// </summary>
+        /// <param name="entityId"></param>
+        /// <returns></returns>
         IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId);
     }
 }

@@ -59,14 +59,32 @@ namespace Umbraco.Core.Services
             _repositoryFactory = repositoryFactory;
         }
 
-        //TODO: There are various ways to expose permission setting on this service, we just need to list out the different ways we'll need to 
-        // be able to acheive this for the core, for now this is here so I can run a unit test.
-        internal void AssignContentPermissions(IContent entity, char permission, IEnumerable<int> userIds)
+        /// <summary>
+        /// Assigns a single permission to the current content item for the specified user ids
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="permission"></param>
+        /// <param name="userIds"></param>
+        public void AssignContentPermissions(IContent entity, char permission, IEnumerable<int> userIds)
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateContentRepository(uow))
             {
                 repository.AssignEntityPermissions(entity, permission, userIds);
+            }
+        }
+
+        /// <summary>
+        /// Gets the list of permissions for the content item
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public IEnumerable<EntityPermission> GetPermissionsForEntity(IContent content)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {
+                return repository.GetPermissionsForEntity(content.Id);
             }
         }
 
