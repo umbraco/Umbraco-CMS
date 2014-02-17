@@ -8,8 +8,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
 
         string FocalPointProperty { get; }
 
-        string FileProperty { get; }
-
         IEnumerable<IImagingCropSize> CropSizes { get; }
     }
 }

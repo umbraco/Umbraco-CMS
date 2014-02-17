@@ -23,12 +23,10 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         {
             Assert.AreEqual("image", SettingsSection.Content.ImageCrops.Crops.First().MediaTypeAlias);
             Assert.AreEqual("umbracoFocalPoint", SettingsSection.Content.ImageCrops.Crops.First().FocalPointProperty);
-            Assert.AreEqual("umbracoFile", SettingsSection.Content.ImageCrops.Crops.First().FileProperty);
             Assert.AreEqual(3, SettingsSection.Content.ImageCrops.Crops.First().CropSizes.Count());
 
             Assert.AreEqual("custom", SettingsSection.Content.ImageCrops.Crops.Last().MediaTypeAlias);
             Assert.AreEqual("customPoint", SettingsSection.Content.ImageCrops.Crops.Last().FocalPointProperty);
-            Assert.AreEqual("customFile", SettingsSection.Content.ImageCrops.Crops.Last().FileProperty);
             Assert.AreEqual(2, SettingsSection.Content.ImageCrops.Crops.Last().CropSizes.Count());
         }
 

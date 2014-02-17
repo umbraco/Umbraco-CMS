@@ -304,6 +304,7 @@
     <Compile Include="Editors\ImagesController.cs" />
     <Compile Include="Models\ContentEditing\EntityTypeSearchResult.cs" />
     <Compile Include="Models\ContentEditing\ListViewAwareContentItemDisplayBase.cs" />
+    <Compile Include="Models\ImageCropData.cs" />
     <Compile Include="Models\IRenderModel.cs" />
     <Compile Include="Models\PostRedirectModel.cs" />
     <Compile Include="Models\RenderModelOfTContent.cs" />
@@ -344,7 +345,11 @@
     <Compile Include="NotificationServiceExtensions.cs" />
     <Compile Include="PropertyEditors\ColorListPreValueEditor.cs" />
     <Compile Include="PropertyEditors\EmailAddressPropertyEditor.cs" />
+    <Compile Include="ImageCropperBaseExtensions.cs" />
+    <Compile Include="PropertyEditors\ImageCropperPrevalueController.cs" />
     <Compile Include="PropertyEditors\ImageCropperPropertyEditor.cs" />
+    <Compile Include="PropertyEditors\ImageCropperPropertyEditorHelper.cs" />
+    <Compile Include="PropertyEditors\ImageCropperPropertyValueEditor.cs" />
     <Compile Include="PropertyEditors\ListViewPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MacroContainerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\MarkdownPropertyEditor.cs" />
@@ -408,6 +413,7 @@
     <Compile Include="PropertyEditors\LabelPropertyEditor.cs" />
     <Compile Include="PropertyEditors\PropertyValueEditorWrapper.cs" />
     <Compile Include="PublishedContentQuery.cs" />
+    <Compile Include="ImageCropperTemplateExtensions.cs" />
     <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Strategies\Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />

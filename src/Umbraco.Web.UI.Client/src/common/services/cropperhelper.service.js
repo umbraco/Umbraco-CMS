@@ -1,10 +1,31 @@
 /**
 * @ngdoc service
-* @name umbraco.services.mediaHelper
-* @description A helper object used for dealing with media items
+* @name umbraco.services.cropperHelper
+* @description A helper object used for dealing with image cropper data
 **/
-function cropperHelper(umbRequestHelper) {
+function cropperHelper(umbRequestHelper, $http) {
 	var service = {
+
+		/**
+		* @ngdoc method
+		* @name umbraco.services.cropperHelper#configuration
+		* @methodOf umbraco.services.cropperHelper
+		*
+		* @description
+		* Returns a collection of plugins available to the tinyMCE editor
+		*
+		*/
+		configuration: function (mediaTypeAlias) {
+			return umbRequestHelper.resourcePromise(
+				$http.get(
+					umbRequestHelper.getApiUrl(
+						"imageCropperApiBaseUrl",
+						"GetConfiguration",
+						[{ mediaTypeAlias: mediaTypeAlias}])),
+				'Failed to retreive tinymce configuration');
+		},
+
+
 		//utill for getting either min/max aspect ratio to scale image after
 		calculateAspectRatioFit : function(srcWidth, srcHeight, maxWidth, maxHeight, maximize) {
 			var ratio = [maxWidth / srcWidth, maxHeight / srcHeight ];
@@ -31,10 +52,10 @@ function cropperHelper(umbRequestHelper) {
 			var coordinates_px = service.coordinatesToPixels(coordinates, originalSize, offset);
 			var _offset = offset || 0;
 
-			var x = coordinates.x1 + Math.abs(coordinates.x2);
-			var left_of_x =  originalSize.width - (originalSize.width * x);
+			var x = 1 - (coordinates.x1 + Math.abs(coordinates.x2));
+			var left_of_x =  originalSize.width * x;
 			var ratio = viewPort.width / left_of_x;
-			
+
 			var style = {
 				position: "absolute",
 				top:  -(coordinates_px.y1*ratio)+ _offset,
@@ -69,8 +90,9 @@ function cropperHelper(umbRequestHelper) {
 			var x1_px = Math.abs(image.left-offset);
 			var y1_px = Math.abs(image.top-offset);
 
-			var x2_px = (x1_px + width) - image.width;
-			var y2_px = (y1_px + height) - image.height;
+			var x2_px = image.width - (x1_px + width);
+			var y2_px = image.height - (y1_px + height);
+
 
 			//crop coordinates in %
 			var crop = {};

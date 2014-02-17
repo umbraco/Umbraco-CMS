@@ -33,6 +33,10 @@
     bottom: 90px;
 }
 
+.umb-panel.editor-breadcrumb .umb-panel-body, .umb-panel.editor-breadcrumb .umb-bottom-bar,{
+    bottom: 40px !Important;
+}
+
 .umb-panel-header .umb-headline, .umb-panel-header h1 {
   font-size: 18px;
   border: none;
@@ -155,7 +159,7 @@
     bottom: 0px;
     left: 100px;
     right: 20px;
-  };
+};
 
 @media (min-width: 1101px) {
     .umb-bottom-bar {left: 460px;}
@@ -165,6 +169,63 @@
 .umb-tab-pane.with-buttons{padding-bottom: 80px}
 
 .tab-content{overflow: visible; }
+
+.umb-panel-footer-nav{
+    position: absolute;
+    bottom: 0px;
+    height: 30px;
+    left: 0px;
+    right: 0px;
+    background: @grayLighter;
+    border-top: @grayLight 1px solid;
+    display: block;
+    margin: 0;
+}
+
+.umb-panel-footer-nav li a {
+  border-radius: 0;
+  display: block;
+  float: left;
+  height: 30px;
+  background: @grayLighter;
+  text-align: center;
+  padding: 8px 0px 8px 30px;
+  position: relative;
+  margin: 0 1px 0 0; 
+  text-decoration: none;
+  color: @gray;
+  font-size: 11px;
+}
+
+.umb-panel-footer-nav li a:after {
+  content: "";  
+  border-top: 16px solid transparent;
+  border-bottom: 16px solid transparent;
+  border-left: 16px solid @grayLighter;
+  position: absolute; right: -16px; top: 0;
+  z-index: 1;
+}
+      
+.umb-panel-footer-nav li a:before {
+  content: "";  
+  border-top: 16px solid transparent;
+  border-bottom: 16px solid transparent;
+  border-left: 16px solid @grayLight;
+  position: absolute; left: 0; top: 0;
+}
+
+.umb-panel-footer-nav li:first-child a{
+  padding-left: 20px; 
+}
+
+.umb-panel-footer-nav li:first-child a:before {
+  display: none; 
+}
+
+.umb-panel-footer-nav li:last-child a:after {
+  display: none; 
+}
+
 
 
  // Utility classes
