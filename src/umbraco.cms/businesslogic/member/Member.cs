@@ -216,7 +216,6 @@ namespace umbraco.cms.businesslogic.member
         {
             if (mbt == null) throw new ArgumentNullException("mbt");            
             var loginName = (string.IsNullOrEmpty(LoginName) == false) ? LoginName : Name;
-            Mandate.ParameterNotNullOrEmpty(LoginName, "LoginName");
             
             //NOTE: This check is ONLY for backwards compatibility, this check shouldn't really be here it is up to the Membership provider
             // logic to deal with this but it was here before so we can't really change that.
