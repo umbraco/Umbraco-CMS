@@ -530,6 +530,12 @@ namespace Umbraco.Core.Persistence.Repositories
             return GetByVersion(dto.ContentVersionDto.VersionId);
         }
 
+        /// <summary>
+        /// Assigns one permission to an entity for multiple users
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="permission"></param>
+        /// <param name="userIds"></param>
         public void AssignEntityPermissions(IContent entity, char permission, IEnumerable<int> userIds)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);

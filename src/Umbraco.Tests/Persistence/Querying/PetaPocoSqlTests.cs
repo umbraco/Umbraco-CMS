@@ -12,25 +12,6 @@ namespace Umbraco.Tests.Persistence.Querying
     [TestFixture]
     public class PetaPocoSqlTests : BaseUsingSqlCeSyntax
     {
-        [Test]
-        public void Generate_Replace_Entity_Permissions_Test()
-        {
-            // Act
-            var sql = PermissionRepository<IContent>.GenerateReplaceEntityPermissionsSql(123, "A", new int[] {10, 11, 12});
-
-            // Assert
-            Assert.AreEqual(@"SET [permission]='A' WHERE (([nodeId]=123) AND ([userId]=10 OR [userId]=11 OR [userId]=12))", sql);
-        }
-
-        [Test]
-        public void Generate_Replace_Entity_Permissions_With_Descendants_Test()
-        {
-            // Act
-            var sql = PermissionRepository<IContent>.GenerateReplaceEntityPermissionsSql(new[] { 123, 456 }, "A", new int[] { 10, 11, 12 });
-
-            // Assert
-            Assert.AreEqual(@"SET [permission]='A' WHERE (([nodeId]=123 OR [nodeId]=456) AND ([userId]=10 OR [userId]=11 OR [userId]=12))", sql);
-        }
 
         [Test]
         public void Can_Select_From_With_Type()

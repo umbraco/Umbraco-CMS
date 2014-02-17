@@ -1511,6 +1511,8 @@ namespace Umbraco.Core.Services
 
                     //bulk insert it into the database
                     uow.Database.BulkInsertRecords(xmlItems, tr);
+
+                    tr.Complete();    
                 }
 
                 Audit.Add(AuditTypes.Publish, "RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);

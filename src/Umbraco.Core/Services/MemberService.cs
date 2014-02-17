@@ -972,6 +972,8 @@ namespace Umbraco.Core.Services
 
                     //bulk insert it into the database
                     uow.Database.BulkInsertRecords(xmlItems, tr);
+
+                    tr.Complete();    
                 }
             }
         }

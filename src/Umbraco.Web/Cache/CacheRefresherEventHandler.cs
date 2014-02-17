@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Services;
 using umbraco;
 using umbraco.BusinessLogic;
@@ -11,6 +14,7 @@ using umbraco.cms.businesslogic.member;
 using System.Linq;
 using umbraco.cms.businesslogic.web;
 using Content = Umbraco.Core.Models.Content;
+using DeleteEventArgs = umbraco.cms.businesslogic.DeleteEventArgs;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
 using Member = umbraco.cms.businesslogic.member.Member;
 using Template = umbraco.cms.businesslogic.template.Template;
@@ -95,6 +99,7 @@ namespace Umbraco.Web.Cache
             Permission.New += PermissionNew;
             Permission.Updated += PermissionUpdated;
             Permission.Deleted += PermissionDeleted;
+            PermissionRepository<IContent>.AssignedPermissions += CacheRefresherEventHandler_AssignedPermissions;
 
             //Bind to template events
             //NOTE: we need to bind to legacy and new API events currently: http://issues.umbraco.org/issue/U4-1979
@@ -423,7 +428,13 @@ namespace Umbraco.Web.Cache
         
         #endregion
         
-        #region User event handlers
+        #region User/permissions event handlers
+
+        static void CacheRefresherEventHandler_AssignedPermissions(PermissionRepository<IContent> sender, SaveEventArgs<EntityPermission> e)
+        {
+            var userIds = e.SavedEntities.Select(x => x.UserId).Distinct();
+            userIds.ForEach(x => DistributedCache.Instance.RefreshUserPermissionsCache(x));
+        }
 
         static void PermissionDeleted(UserPermission sender, DeleteEventArgs e)
         {
