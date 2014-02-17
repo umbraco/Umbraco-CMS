@@ -5,14 +5,14 @@
     /// </summary>
     public class EntityPermission
     {
-        public EntityPermission(object userId, int entityId, string[] assignedPermissions)
+        public EntityPermission(int userId, int entityId, string[] assignedPermissions)
         {
             UserId = userId;
             EntityId = entityId;
             AssignedPermissions = assignedPermissions;
         }
 
-        public object UserId { get; private set; }
+        public int UserId { get; private set; }
         public int EntityId { get; private set; }
 
         /// <summary>

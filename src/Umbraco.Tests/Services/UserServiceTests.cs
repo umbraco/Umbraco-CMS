@@ -73,14 +73,14 @@ namespace Umbraco.Tests.Services
                     MockedContent.CreateSimpleContent(contentType)
                 };
             ServiceContext.ContentService.Save(content);
-            ((ContentService)ServiceContext.ContentService).AssignContentPermissions(content.ElementAt(0), ActionBrowse.Instance.Letter, new object[] { user.Id });
-            ((ContentService)ServiceContext.ContentService).AssignContentPermissions(content.ElementAt(0), ActionDelete.Instance.Letter, new object[] { user.Id });
-            ((ContentService)ServiceContext.ContentService).AssignContentPermissions(content.ElementAt(0), ActionMove.Instance.Letter, new object[] { user.Id });
+            ((ContentService)ServiceContext.ContentService).AssignContentPermissions(content.ElementAt(0), ActionBrowse.Instance.Letter, new int[] { user.Id });
+            ((ContentService)ServiceContext.ContentService).AssignContentPermissions(content.ElementAt(0), ActionDelete.Instance.Letter, new int[] { user.Id });
+            ((ContentService)ServiceContext.ContentService).AssignContentPermissions(content.ElementAt(0), ActionMove.Instance.Letter, new int[] { user.Id });
 
-            ((ContentService)ServiceContext.ContentService).AssignContentPermissions(content.ElementAt(1), ActionBrowse.Instance.Letter, new object[] { user.Id });
-            ((ContentService)ServiceContext.ContentService).AssignContentPermissions(content.ElementAt(1), ActionDelete.Instance.Letter, new object[] { user.Id });
+            ((ContentService)ServiceContext.ContentService).AssignContentPermissions(content.ElementAt(1), ActionBrowse.Instance.Letter, new int[] { user.Id });
+            ((ContentService)ServiceContext.ContentService).AssignContentPermissions(content.ElementAt(1), ActionDelete.Instance.Letter, new int[] { user.Id });
 
-            ((ContentService)ServiceContext.ContentService).AssignContentPermissions(content.ElementAt(2), ActionBrowse.Instance.Letter, new object[] { user.Id });
+            ((ContentService)ServiceContext.ContentService).AssignContentPermissions(content.ElementAt(2), ActionBrowse.Instance.Letter, new int[] { user.Id });
 
             // Act
             var permissions = userService.GetPermissions(user, content.ElementAt(0).Id, content.ElementAt(1).Id, content.ElementAt(2).Id);
@@ -148,6 +148,17 @@ namespace Umbraco.Tests.Services
             var userType = MockedUserType.CreateUserType();
             ServiceContext.UserService.SaveUserType(userType);
             var user = ServiceContext.UserService.CreateMemberWithIdentity("JohnDoe", "john@umbraco.io", "12345", userType);
+
+            Assert.IsNotNull(ServiceContext.UserService.GetByUsername(user.Username));
+            Assert.IsNull(ServiceContext.UserService.GetByUsername("notFound"));
+        }
+
+        [Test]
+        public void Get_By_Username_With_Backslash()
+        {
+            var userType = MockedUserType.CreateUserType();
+            ServiceContext.UserService.SaveUserType(userType);
+            var user = ServiceContext.UserService.CreateMemberWithIdentity("mydomain\\JohnDoe", "john@umbraco.io", "12345", userType);
 
             Assert.IsNotNull(ServiceContext.UserService.GetByUsername(user.Username));
             Assert.IsNull(ServiceContext.UserService.GetByUsername("notFound"));

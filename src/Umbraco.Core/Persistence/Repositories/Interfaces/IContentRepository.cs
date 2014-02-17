@@ -23,7 +23,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns>An enumerable list of <see cref="IContent"/></returns>
         IEnumerable<IContent> GetByPublishedVersion(IQuery<IContent> query);
 
-        void AssignEntityPermissions(IContent entity, char permission, IEnumerable<object> userIds);
+        void AssignEntityPermissions(IContent entity, char permission, IEnumerable<int> userIds);
 
         IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId);
     }
