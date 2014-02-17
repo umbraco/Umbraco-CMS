@@ -4,6 +4,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using umbraco;
+using Umbraco.Core.Persistence.Caching;
 using umbraco.interfaces;
 using System.Linq;
 using Macro = umbraco.cms.businesslogic.macro.Macro;
@@ -174,6 +175,8 @@ namespace Umbraco.Web.Cache
                     prefix =>
                     ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(prefix));
 
+            RuntimeCacheProvider.Current.Clear(typeof (IMacro));
+
             base.RefreshAll();
         }
 
@@ -186,6 +189,8 @@ namespace Umbraco.Web.Cache
                 GetCacheKeysForAlias(payload.Alias).ForEach(
                     alias =>
                     ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(alias));
+
+                RuntimeCacheProvider.Current.Delete(typeof(IMacro), payload.Id);
             });
 
             base.Refresh(jsonPayload);
