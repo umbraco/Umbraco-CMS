@@ -34,6 +34,8 @@ namespace Umbraco.Core.Models.Membership
             _removedSections = new List<string>();
             _language = GlobalSettings.DefaultUILanguage;
             _sectionCollection.CollectionChanged += SectionCollectionChanged;
+            _isApproved = true;
+            _isLockedOut = false;
         }
 
         public User(string name, string email, string username, string password, IUserType userType)
@@ -42,7 +44,9 @@ namespace Umbraco.Core.Models.Membership
             _name = name;
             _email = email;
             _username = username;
-            _password = password;            
+            _password = password;
+            _isApproved = true;
+            _isLockedOut = false;
         }
 
         private IUserType _userType;
