@@ -11,6 +11,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     /// </summary>
     public interface ISqlSyntaxProvider
     {
+        string EscapeString(string val);
+
         string GetStringColumnEqualComparison(string column, string value, TextColumnType columnType);
         string GetStringColumnStartsWithComparison(string column, string value, TextColumnType columnType);
         string GetStringColumnEndsWithComparison(string column, string value, TextColumnType columnType);
