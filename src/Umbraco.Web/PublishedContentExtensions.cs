@@ -83,7 +83,7 @@ namespace Umbraco.Web
                         throw new InvalidOperationException("Cannot resolve a Url for a content item when UmbracoContext.Current is null.");
                     if (UmbracoContext.Current.UrlProvider == null)
                         throw new InvalidOperationException("Cannot resolve a Url for a content item when UmbracoContext.Current.UrlProvider is null.");
-                    return UmbracoContext.Current.UrlProvider.GetUrl(content.Id);
+                    return UmbracoContext.Current.UrlProvider.GetUrl(content.Id, true);
                 case PublishedItemType.Media:
                     throw new NotSupportedException("AbsoluteUrl is not supported for media types.");
                 default:
