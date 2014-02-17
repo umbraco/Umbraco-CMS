@@ -168,6 +168,17 @@ namespace umbraco.BusinessLogic
         /// <value>The type.</value>
         public string Type { get; set; }
 
+        private Type _runtimeType;
+
+        /// <summary>
+        /// Returns the CLR type based on it's assembly name stored in the config
+        /// </summary>
+        /// <returns></returns>
+        internal Type GetRuntimeType()
+        {
+            return _runtimeType ?? (_runtimeType = System.Type.GetType(Type));
+        }
+
         /// <summary>
         /// Gets or sets the default tree action.
         /// </summary>

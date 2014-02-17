@@ -177,7 +177,7 @@ namespace umbraco.cms.presentation.Trees
 								// tree type contains a comma (meaning it is assembly qualified)
 								if (tree.AssemblyName.IsNullOrWhiteSpace() || tree.Type.Contains(","))
 								{									
-									return tree.Type == type.GetFullNameWithAssembly();
+									return tree.GetRuntimeType() == type;
 								}
 
 								//otherwise match using legacy match rules
