@@ -243,6 +243,10 @@ namespace Umbraco.Core.Persistence.Querying
                 args.RemoveAt(0);
             }
 
+            //TODO: We should probably add the same logic we've done for ModelToSqlExpressionHelper with checking for:
+            // InvariantStartsWith, InvariantEndsWith, SqlWildcard, etc...
+            // since we should be able to easily handle that with the Poco objects too.
+
             switch (m.Method.Name)
             {
                 case "ToUpper":

@@ -34,7 +34,7 @@ namespace Umbraco.Core
     /// it will use the cached resolved plugins that it has already found which means that no assembly scanning is necessary. This leads
     /// to much faster startup times.
     /// </remarks>
-    internal class PluginManager
+    public class PluginManager
     {
         private readonly ApplicationContext _appContext;
         private const string CacheKey = "umbraco-plugins.list";
@@ -107,7 +107,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// The setter is generally only used for unit tests
         /// </remarks>
-        internal static PluginManager Current
+        public static PluginManager Current
         {
             get
             {
@@ -783,6 +783,7 @@ namespace Umbraco.Core
             UpdateCachedPluginsFile<T>(typeList.GetTypes(), resolutionKind);
         }
 
+        #region Public Methods
         /// <summary>
         /// Generic method to find the specified type and cache the result
         /// </summary>
@@ -802,7 +803,7 @@ namespace Umbraco.Core
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="TAttribute"></typeparam>
         /// <returns></returns>
-        internal IEnumerable<Type> ResolveTypesWithAttribute<T, TAttribute>(bool cacheResult = true)
+        public IEnumerable<Type> ResolveTypesWithAttribute<T, TAttribute>(bool cacheResult = true)
             where TAttribute : Attribute
         {
             return ResolveTypes<T>(
@@ -816,14 +817,15 @@ namespace Umbraco.Core
         /// </summary>
         /// <typeparam name="TAttribute"></typeparam>
         /// <returns></returns>
-        internal IEnumerable<Type> ResolveAttributedTypes<TAttribute>(bool cacheResult = true)
+        public IEnumerable<Type> ResolveAttributedTypes<TAttribute>(bool cacheResult = true)
             where TAttribute : Attribute
         {
             return ResolveTypes<TAttribute>(
                 () => TypeFinder.FindClassesWithAttribute<TAttribute>(AssembliesToScan),
                 TypeResolutionKind.FindAttributedTypes,
                 cacheResult);
-        }
+        } 
+        #endregion
 
         /// <summary>
         /// Used for unit tests

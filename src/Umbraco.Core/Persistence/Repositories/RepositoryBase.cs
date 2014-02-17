@@ -157,7 +157,10 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
 
-            var entityCollection = PerformGetAll(ids).ToArray();
+            var entityCollection = PerformGetAll(ids)
+                //ensure we don't include any null refs in the returned collection!
+                .WhereNotNull()
+                .ToArray();
 
             foreach (var entity in entityCollection)
             {
@@ -178,7 +181,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<TEntity> GetByQuery(IQuery<TEntity> query)
         {
-            return PerformGetByQuery(query);
+            return PerformGetByQuery(query)
+                //ensure we don't include any null refs in the returned collection!
+                .WhereNotNull();
         }
 
         protected abstract bool PerformExists(TId id);

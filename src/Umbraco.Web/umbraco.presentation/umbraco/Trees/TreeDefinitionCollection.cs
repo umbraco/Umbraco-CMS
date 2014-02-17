@@ -178,15 +178,8 @@ namespace umbraco.cms.presentation.Trees
 				                // tree type contains a comma (meaning it is assembly qualified)
 				                if (tree.AssemblyName.IsNullOrWhiteSpace() || tree.Type.Contains(","))
 				                {
-				                    var clrType = Type.GetType(tree.Type);
-				                    if (clrType == null)
-				                    {
-				                        LogHelper.Warn<TreeDefinitionCollection>("The tree definition: " + tree.Type + " could not be resolved to a .Net object type");
-				                        return false;
-				                    }
-
-				                    return clrType == type;
-				                }
+									return tree.GetRuntimeType() == type;
+								}
 
 				                //otherwise match using legacy match rules
 				                return (string.Format("{0}.{1}", tree.AssemblyName, tree.Type).InvariantEquals(type.FullName));

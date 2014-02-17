@@ -131,7 +131,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         /// <param name="permission"></param>
         /// <param name="userIds"></param>
-        internal void AssignEntityPermissions(TEntity entity, char permission, IEnumerable<object> userIds)
+        internal void AssignEntityPermissions(TEntity entity, char permission, IEnumerable<int> userIds)
         {
             var actions = userIds.Select(id => new User2NodePermissionDto
             {
@@ -150,13 +150,13 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="userPermissions">
         /// A key/value pair list containing a userId and a permission to assign
         /// </param>
-        internal void AssignEntityPermissions(TEntity entity, IEnumerable<Tuple<object, string>> userPermissions)
+        internal void AssignEntityPermissions(TEntity entity, IEnumerable<Tuple<int, string>> userPermissions)
         {
             var actions = userPermissions.Select(p => new User2NodePermissionDto
             {
                 NodeId = entity.Id,
                 Permission = p.Item2,
-                UserId = (int)p.Item1
+                UserId = p.Item1
             });
 
             _unitOfWork.Database.BulkInsertRecords(actions);
@@ -168,7 +168,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         /// <param name="permissions"></param>
         /// <param name="userIds"></param>
-        internal void ReplaceEntityPermissions(TEntity entity, string permissions, IEnumerable<object> userIds)
+        internal void ReplaceEntityPermissions(TEntity entity, string permissions, IEnumerable<int> userIds)
         {
             _unitOfWork.Database.Update<User2NodePermissionDto>(
                 GenerateReplaceEntityPermissionsSql(entity.Id, permissions, userIds.ToArray()));
@@ -183,7 +183,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// A callback to get the descendant Ids of the current entity
         /// </param>
         /// <param name="userIds"></param>
-        internal void ReplaceEntityPermissions(TEntity entity, string permissions, Func<IEntity, IEnumerable<int>> getDescendantIds, IEnumerable<object> userIds)
+        internal void ReplaceEntityPermissions(TEntity entity, string permissions, Func<IEntity, IEnumerable<int>> getDescendantIds, IEnumerable<int> userIds)
         {
             _unitOfWork.Database.Update<User2NodePermissionDto>(
                 GenerateReplaceEntityPermissionsSql(
@@ -192,12 +192,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 userIds.ToArray()));
         }
 
-        internal static string GenerateReplaceEntityPermissionsSql(int entityId, string permissions, object[] userIds)
+        internal static string GenerateReplaceEntityPermissionsSql(int entityId, string permissions, int[] userIds)
         {
             return GenerateReplaceEntityPermissionsSql(new[] { entityId }, permissions, userIds);
         }
 
-        internal static string GenerateReplaceEntityPermissionsSql(int[] entityIds, string permissions, object[] userIds)
+        internal static string GenerateReplaceEntityPermissionsSql(int[] entityIds, string permissions, int[] userIds)
         {
             //create the "SET" clause of the update statement
             var sqlSet = string.Format("SET {0}={1}",
