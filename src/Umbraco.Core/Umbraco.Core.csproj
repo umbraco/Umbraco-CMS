@@ -751,6 +751,7 @@
     <Compile Include="Security\MembershipProviderExtensions.cs" />
     <Compile Include="Security\UmbracoBackOfficeIdentity.cs" />
     <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
+    <Compile Include="Security\UmbracoMembersMembershipProviderBase.cs" />
     <Compile Include="Security\UserData.cs" />
     <Compile Include="Serialization\AbstractSerializationService.cs" />
     <Compile Include="Serialization\Formatter.cs" />
