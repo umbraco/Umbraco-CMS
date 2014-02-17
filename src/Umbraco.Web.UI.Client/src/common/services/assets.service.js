@@ -128,7 +128,8 @@ angular.module('umbraco.services')
             var t = timeout || 5000;
             var a = attributes || undefined;
 
-            
+
+/*            
             yepnope({
               forceJS: true,
               load: path,
@@ -145,9 +146,9 @@ angular.module('umbraco.services')
                 }
               }
             });
+*/
 
 
-/*
             yepnope.injectJs(path, function () {
 
               if (!scope) {
@@ -159,7 +160,7 @@ angular.module('umbraco.services')
               }
 
             },a,t);
-*/
+
 
             return deferred.promise;
         },
