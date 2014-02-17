@@ -789,7 +789,7 @@ namespace Umbraco.Core
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        internal IEnumerable<Type> ResolveTypes<T>(bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
+        public IEnumerable<Type> ResolveTypes<T>(bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
         {
             return ResolveTypes<T>(
                 () => TypeFinder.FindClassesOfType<T>(specificAssemblies ?? AssembliesToScan),
@@ -803,11 +803,11 @@ namespace Umbraco.Core
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="TAttribute"></typeparam>
         /// <returns></returns>
-        public IEnumerable<Type> ResolveTypesWithAttribute<T, TAttribute>(bool cacheResult = true)
+        public IEnumerable<Type> ResolveTypesWithAttribute<T, TAttribute>(bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
             where TAttribute : Attribute
         {
             return ResolveTypes<T>(
-                () => TypeFinder.FindClassesOfTypeWithAttribute<T, TAttribute>(AssembliesToScan),
+                () => TypeFinder.FindClassesOfTypeWithAttribute<T, TAttribute>(specificAssemblies ?? AssembliesToScan),
                 TypeResolutionKind.FindTypesWithAttribute,
                 cacheResult);
         }
@@ -817,11 +817,11 @@ namespace Umbraco.Core
         /// </summary>
         /// <typeparam name="TAttribute"></typeparam>
         /// <returns></returns>
-        public IEnumerable<Type> ResolveAttributedTypes<TAttribute>(bool cacheResult = true)
+        public IEnumerable<Type> ResolveAttributedTypes<TAttribute>(bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
             where TAttribute : Attribute
         {
             return ResolveTypes<TAttribute>(
-                () => TypeFinder.FindClassesWithAttribute<TAttribute>(AssembliesToScan),
+                () => TypeFinder.FindClassesWithAttribute<TAttribute>(specificAssemblies ?? AssembliesToScan),
                 TypeResolutionKind.FindAttributedTypes,
                 cacheResult);
         } 
