@@ -400,6 +400,21 @@ namespace Umbraco.Core.Services
             }
         }
         
+        /// <summary>
+        /// Assigns the same permission set for a single user to any number of entities
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="permissions"></param>
+        /// <param name="entityIds"></param>
+        public void AssignUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateUserRepository(uow))
+            {
+                repository.AssignUserPermissions(userId, permissions, entityIds);
+            }
+        }
+
         public IEnumerable<IUserType> GetAllUserTypes(params int[] ids)
         {
             var uow = _uowProvider.GetUnitOfWork();

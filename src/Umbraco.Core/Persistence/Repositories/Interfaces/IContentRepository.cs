@@ -23,6 +23,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns>An enumerable list of <see cref="IContent"/></returns>
         IEnumerable<IContent> GetByPublishedVersion(IQuery<IContent> query);
 
+        /// <summary>
+        /// Assigns a single permission to the current content item for the specified user ids
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="permission"></param>
+        /// <param name="userIds"></param>
         void AssignEntityPermissions(IContent entity, char permission, IEnumerable<int> userIds);
 
         /// <summary>
