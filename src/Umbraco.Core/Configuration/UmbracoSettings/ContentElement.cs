@@ -280,11 +280,6 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             }
         }
 
-        IImagingCrops IContentSection.ImageCrops
-        {
-            get { return Imaging.Crops; }
-        }
-
         string IContentSection.NotificationEmailAddress
         {
             get { return Notifications.NotificationEmailAddress; }

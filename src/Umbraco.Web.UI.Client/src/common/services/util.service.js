@@ -21,15 +21,18 @@ function packageHelper(assetsService, treeService, eventsService, $templateCache
 }
 angular.module('umbraco.services').factory('packageHelper', packageHelper);
 
-function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, umbRequestHelper) {
+function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, mediaHelper, umbRequestHelper) {
     return {
         /** sets the image's url - will check if it is a folder or a real image */
         setImageUrl: function(img) {
             //get the image property (if one exists)
-            var imageProp = imageHelper.getImagePropertyValue({ imageModel: img });
-            if (!imageProp) {
+            //var imageProp = imageHelper.getImagePropertyValue({ imageModel: img });
+            img.thumbnail = mediaHelper.resolveFile(img);
+            if (!img.thumbnail){
                 img.thumbnail = "none";
             }
+
+            /*
             else {
 
                 //get the proxy url for big thumbnails (this ensures one is always generated)
@@ -38,7 +41,7 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, um
                     "GetBigThumbnail",
                     [{ mediaId: img.id }]);
                 img.thumbnail = thumbnailUrl;
-            }
+            }*/
         },
 
         /** sets the images original size properties - will check if it is a folder and if so will just make it square */

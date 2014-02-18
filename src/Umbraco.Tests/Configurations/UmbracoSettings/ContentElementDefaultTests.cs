@@ -12,24 +12,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         }
 
         [Test]
-        public override void ImageCrops()
-        {
-            Assert.IsFalse(SettingsSection.Content.ImageCrops.SaveFiles);
-        }
-
-        [Test]
-        public override void ImageCropItem()
-        {
-            Assert.AreEqual(0, SettingsSection.Content.ImageCrops.Crops.Count());
-        }
-
-        [Test]
-        public override void ImageCropSizes()
-        {
-            Assert.AreEqual(0, SettingsSection.Content.ImageCrops.Crops.Count());
-        }
-
-        [Test]
         public override void DisableHtmlEmail()
         {
             Assert.IsTrue(SettingsSection.Content.DisableHtmlEmail == false);
