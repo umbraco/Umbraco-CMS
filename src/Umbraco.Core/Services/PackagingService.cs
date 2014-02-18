@@ -733,7 +733,7 @@ namespace Umbraco.Core.Services
             var dataTypes = new Dictionary<string, IDataTypeDefinition>();
             var dataTypeElements = name.Equals("DataTypes")
                                        ? (from doc in element.Elements("DataType") select doc).ToList()
-                                       : new List<XElement> { element.Element("DataType") };
+                                       : new List<XElement> { element };
 
             foreach (var dataTypeElement in dataTypeElements)
             {
