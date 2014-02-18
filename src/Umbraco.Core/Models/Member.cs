@@ -141,12 +141,22 @@ namespace Umbraco.Core.Models
         {
             get
             {
+                if (Properties.Contains(Constants.Conventions.Member.PasswordQuestion) == false)
+                {
+                    return default(string);
+                }
+
                 return Properties[Constants.Conventions.Member.PasswordQuestion].Value == null
                     ? string.Empty
                     : Properties[Constants.Conventions.Member.PasswordQuestion].Value.ToString();
             }
             set
             {
+                if (Properties.Contains(Constants.Conventions.Member.PasswordQuestion) == false)
+                {
+                    return;
+                }
+
                 Properties[Constants.Conventions.Member.PasswordQuestion].Value = value;
             }
         }
@@ -163,12 +173,22 @@ namespace Umbraco.Core.Models
         {
             get
             {
+                if (Properties.Contains(Constants.Conventions.Member.PasswordAnswer) == false)
+                {
+                    return default(string);
+                }
+
                 return Properties[Constants.Conventions.Member.PasswordAnswer].Value == null
                     ? string.Empty
                     : Properties[Constants.Conventions.Member.PasswordAnswer].Value.ToString();
             }
             set
             {
+                if (Properties.Contains(Constants.Conventions.Member.PasswordAnswer) == false)
+                {
+                    return;
+                }
+
                 Properties[Constants.Conventions.Member.PasswordAnswer].Value = value;
             }
         }
@@ -185,12 +205,22 @@ namespace Umbraco.Core.Models
         {
             get
             {
+                if (Properties.Contains(Constants.Conventions.Member.Comments) == false)
+                {
+                    return default(string);
+                }
+
                 return Properties[Constants.Conventions.Member.Comments].Value == null
                     ? string.Empty
                     : Properties[Constants.Conventions.Member.Comments].Value.ToString();
             }
             set
             {
+                if (Properties.Contains(Constants.Conventions.Member.Comments) == false)
+                {
+                    return;
+                }
+
                 Properties[Constants.Conventions.Member.Comments].Value = value;
             }
         }
@@ -207,6 +237,12 @@ namespace Umbraco.Core.Models
         {
             get
             {
+                if (Properties.Contains(Constants.Conventions.Member.IsApproved) == false)
+                {
+                    //I guess we'll leave them approved by default!
+                    return true;
+                }
+
                 var tryConvert = Properties[Constants.Conventions.Member.IsApproved].Value.TryConvertTo<bool>();
                 if (tryConvert.Success)
                 {
@@ -216,6 +252,11 @@ namespace Umbraco.Core.Models
             }
             set
             {
+                if (Properties.Contains(Constants.Conventions.Member.IsApproved) == false)
+                {
+                    return;
+                }
+
                 Properties[Constants.Conventions.Member.IsApproved].Value = value;
             }
         }
@@ -232,6 +273,12 @@ namespace Umbraco.Core.Models
         {
             get
             {
+                if (Properties.Contains(Constants.Conventions.Member.IsLockedOut) == false)
+                {
+                    //I guess we'll not lock them out by default!
+                    return false;
+                }
+
                 var tryConvert = Properties[Constants.Conventions.Member.IsLockedOut].Value.TryConvertTo<bool>();
                 if (tryConvert.Success)
                 {
@@ -241,6 +288,11 @@ namespace Umbraco.Core.Models
             }
             set
             {
+                if (Properties.Contains(Constants.Conventions.Member.IsLockedOut) == false)
+                {
+                    return;
+                }
+
                 Properties[Constants.Conventions.Member.IsLockedOut].Value = value;
             }
         }
@@ -257,6 +309,11 @@ namespace Umbraco.Core.Models
         {
             get
             {
+                if (Properties.Contains(Constants.Conventions.Member.LastLoginDate) == false)
+                {
+                    return default(DateTime);
+                }
+
                 var tryConvert = Properties[Constants.Conventions.Member.LastLoginDate].Value.TryConvertTo<DateTime>();
                 if (tryConvert.Success)
                 {
@@ -266,6 +323,11 @@ namespace Umbraco.Core.Models
             }
             set
             {
+                if (Properties.Contains(Constants.Conventions.Member.LastLoginDate) == false)
+                {
+                    return;
+                }
+
                 Properties[Constants.Conventions.Member.LastLoginDate].Value = value;
             }
         }
@@ -282,6 +344,11 @@ namespace Umbraco.Core.Models
         {
             get
             {
+                if (Properties.Contains(Constants.Conventions.Member.LastPasswordChangeDate) == false)
+                {
+                    return default(DateTime);
+                }
+
                 var tryConvert = Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value.TryConvertTo<DateTime>();
                 if (tryConvert.Success)
                 {
@@ -291,6 +358,11 @@ namespace Umbraco.Core.Models
             }
             set
             {
+                if (Properties.Contains(Constants.Conventions.Member.LastPasswordChangeDate) == false)
+                {
+                    return;
+                }
+
                 Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value = value;
             }
         }
@@ -307,6 +379,11 @@ namespace Umbraco.Core.Models
         {
             get
             {
+                if (Properties.Contains(Constants.Conventions.Member.LastLockoutDate) == false)
+                {
+                    return default(DateTime);
+                }
+
                 var tryConvert = Properties[Constants.Conventions.Member.LastLockoutDate].Value.TryConvertTo<DateTime>();
                 if (tryConvert.Success)
                 {
@@ -316,6 +393,11 @@ namespace Umbraco.Core.Models
             }
             set
             {
+                if (Properties.Contains(Constants.Conventions.Member.LastLockoutDate) == false)
+                {
+                    return;
+                }
+
                 Properties[Constants.Conventions.Member.LastLockoutDate].Value = value;
             }
         }
@@ -333,6 +415,11 @@ namespace Umbraco.Core.Models
         {
             get
             {
+                if (Properties.Contains(Constants.Conventions.Member.FailedPasswordAttempts) == false)
+                {
+                    return 0;
+                }
+
                 var tryConvert = Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value.TryConvertTo<int>();
                 if (tryConvert.Success)
                 {
@@ -342,7 +429,12 @@ namespace Umbraco.Core.Models
             }
             set
             {
-                Properties[Constants.Conventions.Member.LastLockoutDate].Value = value;
+                if (Properties.Contains(Constants.Conventions.Member.FailedPasswordAttempts) == false)
+                {
+                    return;
+                }
+
+                Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value = value;
             }
         }
 
