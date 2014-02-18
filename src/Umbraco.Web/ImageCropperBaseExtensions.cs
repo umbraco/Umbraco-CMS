@@ -34,7 +34,6 @@ namespace Umbraco.Web
             return ic;
         }
 
-
         internal static ImageCropDataSet SerializeToCropDataSet(this string json)
         {
             var imageCrops = new ImageCropDataSet();
@@ -44,9 +43,9 @@ namespace Umbraco.Web
                 {
                     imageCrops = JsonConvert.DeserializeObject<ImageCropDataSet>(json);
                 }
-                catch
+                catch(Exception ex)
                 {
-
+                    var e = ex;
                 }
             }
 
@@ -105,8 +104,8 @@ namespace Umbraco.Web
                     if (allTheCrops != null && allTheCrops.Crops.Any())
                     {
                         var crop = cropAlias != null
-                                       ? allTheCrops.Crops[cropAlias]
-                                       : allTheCrops.Crops.First().Value;
+                                       ? allTheCrops.Crops.First(x => x.Alias ==cropAlias)
+                                       : allTheCrops.Crops.First();
                         if (crop != null)
                         {
                             return true;
@@ -131,8 +130,8 @@ namespace Umbraco.Web
                     if (allTheCrops != null && allTheCrops.Crops.Any())
                     {
                         var crop = cropAlias != null
-                                       ? allTheCrops.Crops[cropAlias]
-                                       : allTheCrops.Crops.First().Value;
+                                       ? allTheCrops.Crops.First(x => x.Alias ==cropAlias)
+                                       : allTheCrops.Crops.First();
                         if (crop != null)
                         {
                             return true;

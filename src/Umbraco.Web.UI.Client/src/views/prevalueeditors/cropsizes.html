@@ -1,0 +1,58 @@
+<div ng-controller="Umbraco.PrevalueEditors.CropSizesController" class="umb-editor umb-cropsizes">
+
+	<div class="control-group">  
+	    <div class="row">
+	      <div class="span3">
+	      	<label>Alias</label>
+	      	<input name="newItem.alias" type="text" 
+	      		ng-model="newItem.alias" val-highlight="hasError" />
+	      </div>
+
+	      <div class="span3">
+	      	<label>Height</label>
+	      	<input name="newItem.height" type="number" 
+	      		ng-model="newItem.height" val-highlight="hasError" />
+	      </div>
+
+	      <div class="span3">
+	      	<label>Width</label>
+	      	<input name="newItem.width" type="number" 
+	      		ng-model="newItem.width" val-highlight="hasError" />
+	      </div>
+
+	      <div class="span3">
+	      	<button class="btn btn-small" ng-click="add($event)">Add</button>
+	      </div>
+	    </div>	    
+	</div>
+
+	<div class="control-group">
+		<div class="row" ng-repeat="item in model.value">
+		  <div class="span3">
+		  	<label>Alias</label>
+		  	<input name="newItem.alias" type="text" 
+		  			ng-model="item.alias" 
+		  			required val-highlight="hasError" />
+		  </div>
+
+		  <div class="span3">
+		  	<label>Height</label>
+		  	<input name="newItem.height" type="number" 
+		  			  			ng-model="item.height" 
+		  			  			required val-highlight="hasError" />
+		  </div>
+
+		  <div class="span3">
+		  	<label>Width</label>
+		  	<input name="newItem.width" type="number" 
+		  			  			  			ng-model="item.width" 
+		  			  			  			required val-highlight="hasError" />
+		  </div>
+
+		  <div class="span3">
+		  	<button class="btn btn-small btn-danger" ng-click="remove(item, $event)">Remove</button>
+		  </div>
+		</div>
+	</div>
+
+</div>

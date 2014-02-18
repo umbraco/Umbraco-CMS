@@ -21,6 +21,10 @@ namespace Umbraco.Web.Models.ContentEditing
         [Required(AllowEmptyStrings = false)]
         public string Alias { get; set; }
 
+        [DataMember(Name = "editor", IsRequired = false)]
+        public string Editor { get; set; }
+
+
         /// <summary>
         /// Used internally during model mapping
         /// </summary>
