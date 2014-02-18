@@ -327,5 +327,10 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             // add message to check with their hosting provider
             return supportsCaseInsensitiveQueries;
         }
+
+        public override string EscapeString(string val)
+        {
+            return PetaPocoExtensions.EscapeAtSymbols(MySql.Data.MySqlClient.MySqlHelper.EscapeString(val));
+        }
     }
 }

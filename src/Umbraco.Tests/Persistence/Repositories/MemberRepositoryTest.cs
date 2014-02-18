@@ -224,10 +224,17 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 var sut = repository.Get(member.Id);
 
-                Assert.That(sut.ContentType.PropertyGroups.Count(), Is.EqualTo(1));
+                Assert.That(sut.ContentType.PropertyGroups.Count(), Is.EqualTo(2));
                 Assert.That(sut.ContentType.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
                 Assert.That(sut.Properties.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
                 Assert.That(sut.Properties.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
+                var grp = sut.PropertyGroups.FirstOrDefault(x => x.Name == Constants.Conventions.Member.StandardPropertiesGroupName);
+                Assert.IsNotNull(grp);
+                var aliases = Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
+                foreach (var p in sut.PropertyTypes.Where(x => aliases.Contains(x.Alias)))
+                {
+                    Assert.AreEqual(grp.Id, p.PropertyGroupId.Value);
+                }
             }
         }
 

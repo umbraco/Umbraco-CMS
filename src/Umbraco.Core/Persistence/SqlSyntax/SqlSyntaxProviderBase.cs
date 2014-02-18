@@ -103,6 +103,11 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             DbTypeMap.Set<byte[]>(DbType.Binary, BlobColumnDefinition);
         }
 
+        public virtual string EscapeString(string val)
+        {
+            return PetaPocoExtensions.EscapeAtSymbols(val.Replace("'", "''"));
+        }
+
         public virtual string GetStringColumnEqualComparison(string column, string value, TextColumnType columnType)
         {
             //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
