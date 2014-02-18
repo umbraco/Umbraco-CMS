@@ -180,6 +180,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             PersistNewBaseContentType(dto, entity);
 
+            EnsureCorrectDbTypeForBuiltInProperties(entity);
+
             //Handles the MemberTypeDto (cmsMemberType table)
             var memberTypeDtos = factory.BuildMemberTypeDtos(entity);
             foreach (var memberTypeDto in memberTypeDtos)
@@ -213,6 +215,8 @@ namespace Umbraco.Core.Persistence.Repositories
 
             PersistUpdatedBaseContentType(dto, entity);
 
+            EnsureCorrectDbTypeForBuiltInProperties(entity);
+
             //Remove existing entries before inserting new ones
             Database.Delete<MemberTypeDto>("WHERE NodeId = @Id", new {Id = entity.Id});
 
@@ -228,13 +232,53 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
-        private IEnumerable<IMemberType> BuildFromDtos(List<MemberTypeReadOnlyDto> dtos)
+        /// <summary>
+        /// now we need to ensure that all the built-in membership provider properties have their correct db types
+        /// assigned, no matter what the underlying data type is
+        /// </summary>
+        /// <param name="memberType"></param>
+        private static void EnsureCorrectDbTypeForBuiltInProperties(IContentTypeBase memberType)
+        {
+            foreach (var propertyType in memberType.PropertyTypes)
+            {
+                propertyType.DataTypeDatabaseType = GetDbTypeForProperty(propertyType.Alias, propertyType.DataTypeDatabaseType);
+            }
+        }
+
+        /// <summary>
+        /// Builds a collection of entities from a collection of Dtos
+        /// </summary>
+        /// <param name="dtos"></param>
+        /// <returns></returns>
+        private static IEnumerable<IMemberType> BuildFromDtos(List<MemberTypeReadOnlyDto> dtos)
         {
             if (dtos == null || dtos.Any() == false)
                 return Enumerable.Empty<IMemberType>();
 
             var factory = new MemberTypeReadOnlyFactory();
             return dtos.Select(factory.BuildEntity);
+        }
+
+        /// <summary>
+        /// If this is one of our internal properties - we will manually assign the data type since they must 
+        /// always correspond to the correct db type no matter what the backing data type is assigned.
+        /// </summary>
+        /// <param name="propAlias"></param>
+        /// <param name="dbType"></param>
+        /// <returns></returns>
+        internal static DataTypeDatabaseType GetDbTypeForProperty(string propAlias, DataTypeDatabaseType dbType)
+        {
+            var stdProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+            var aliases = stdProps.Select(x => x.Key).ToArray();
+
+            //check if it is built in
+            if (aliases.Contains(propAlias))
+            {
+                //return the pre-determined db type for this property
+                return stdProps.Single(x => x.Key == propAlias).Value.DataTypeDatabaseType;
+            }
+
+            return dbType;
         }
     }
 }

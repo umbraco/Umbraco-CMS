@@ -185,7 +185,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        FailedPasswordAttempts,
-		                        new PropertyType(new Guid(PropertyEditors.Integer), DataTypeDatabaseType.Integer)
+		                        new PropertyType(new Guid(PropertyEditors.Textbox), DataTypeDatabaseType.Integer)
 		                            {
 		                                Alias = FailedPasswordAttempts,
 		                                Name = FailedPasswordAttemptsLabel
@@ -209,7 +209,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        LastLockoutDate,
-		                        new PropertyType(new Guid(PropertyEditors.Date), DataTypeDatabaseType.Date)
+		                        new PropertyType(new Guid(PropertyEditors.NoEdit), DataTypeDatabaseType.Date)
 		                            {
 		                                Alias = LastLockoutDate,
 		                                Name = LastLockoutDateLabel
@@ -217,7 +217,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        LastLoginDate,
-		                        new PropertyType(new Guid(PropertyEditors.Date), DataTypeDatabaseType.Date)
+		                        new PropertyType(new Guid(PropertyEditors.NoEdit), DataTypeDatabaseType.Date)
 		                            {
 		                                Alias = LastLoginDate,
 		                                Name = LastLoginDateLabel
@@ -225,7 +225,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        LastPasswordChangeDate,
-		                        new PropertyType(new Guid(PropertyEditors.Date), DataTypeDatabaseType.Date)
+		                        new PropertyType(new Guid(PropertyEditors.NoEdit), DataTypeDatabaseType.Date)
 		                            {
 		                                Alias = LastPasswordChangeDate,
 		                                Name = LastPasswordChangeDateLabel

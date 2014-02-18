@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.Repositories;
 
 namespace Umbraco.Core.Persistence.Factories
 {
@@ -87,8 +88,11 @@ namespace Umbraco.Core.Persistence.Factories
                         new Tuple<bool, bool, int>(typeDto.CanEdit, typeDto.ViewOnProfile, typeDto.Id.Value));
 
                     var tempGroupDto = groupDto;
-                    var propertyType = new PropertyType(typeDto.ControlId,
-                                                             typeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
+
+                    var propertyType = new PropertyType(typeDto.ControlId, 
+                        //ensures that any built-in membership properties have their correct dbtype assigned no matter
+                        //what the underlying data type is
+                        MemberTypeRepository.GetDbTypeForProperty(typeDto.Alias, typeDto.DbType.EnumParse<DataTypeDatabaseType>(true)))
                     {
                         Alias = typeDto.Alias,
                         DataTypeDefinitionId = typeDto.DataTypeId,
@@ -116,6 +120,8 @@ namespace Umbraco.Core.Persistence.Factories
 
             return propertyGroups;
         }
+
+        
 
         private List<PropertyType> GetPropertyTypes(MemberTypeReadOnlyDto dto, MemberType memberType)
         {
