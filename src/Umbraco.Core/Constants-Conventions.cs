@@ -185,7 +185,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        FailedPasswordAttempts,
-		                        new PropertyType(new Guid(PropertyEditors.Textbox), DataTypeDatabaseType.Integer)
+		                        new PropertyType(new Guid(PropertyEditors.NoEdit), DataTypeDatabaseType.Integer)
 		                            {
 		                                Alias = FailedPasswordAttempts,
 		                                Name = FailedPasswordAttemptsLabel
