@@ -254,11 +254,11 @@ namespace Umbraco.Core.Persistence.Querying
                 case "ToLower":
                     return string.Format("lower({0})", r);
                 case "StartsWith":
-                    return string.Format("upper({0}) like '{1}%'", r, EscapeParam(RemoveQuote(args[0].ToString().ToUpper())));
+                    return string.Format("upper({0}) like '{1}%'", r, RemoveQuote(args[0].ToString().ToUpper()));
                 case "EndsWith":
-                    return string.Format("upper({0}) like '%{1}'", r, EscapeParam(RemoveQuote(args[0].ToString()).ToUpper()));
+                    return string.Format("upper({0}) like '%{1}'", r, RemoveQuote(args[0].ToString()).ToUpper());
                 case "Contains":
-                    return string.Format("upper({0}) like '%{1}%'", r, EscapeParam(RemoveQuote(args[0].ToString()).ToUpper()));
+                    return string.Format("upper({0}) like '%{1}%'", r, RemoveQuote(args[0].ToString()).ToUpper());
                 case "Substring":
                     var startIndex = Int32.Parse(args[0].ToString()) + 1;
                     if (args.Count == 2)

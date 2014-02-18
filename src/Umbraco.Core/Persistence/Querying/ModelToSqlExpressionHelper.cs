@@ -232,15 +232,15 @@ namespace Umbraco.Core.Persistence.Querying
             switch (verb)
             {
                 case "SqlWildcard":
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnWildcardComparison(col, EscapeParam(RemoveQuote(val)), columnType);
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnWildcardComparison(col, RemoveQuote(val), columnType);
                 case "Equals":
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnEqualComparison(col, EscapeParam(RemoveQuote(val)), columnType);
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnEqualComparison(col, RemoveQuote(val), columnType);
                 case "StartsWith":
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnStartsWithComparison(col, EscapeParam(RemoveQuote(val)), columnType);                   
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnStartsWithComparison(col, RemoveQuote(val), columnType);                   
                 case "EndsWith":
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnEndsWithComparison(col, EscapeParam(RemoveQuote(val)), columnType);
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnEndsWithComparison(col, RemoveQuote(val), columnType);
                 case "Contains":
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnContainsComparison(col, EscapeParam(RemoveQuote(val)), columnType);
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnContainsComparison(col, RemoveQuote(val), columnType);
                 case "InvariantEquals":
                 case "SqlEquals":
                     //recurse
