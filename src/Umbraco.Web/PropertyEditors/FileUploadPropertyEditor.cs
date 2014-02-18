@@ -74,16 +74,25 @@ namespace Umbraco.Web.PropertyEditors
 
                 if (uploadFieldConfigNode != null)
                 {
+                    
                     //now we need to check if there is a value
                     if (p.Value is string && ((string) p.Value).IsNullOrWhiteSpace() == false)
                     {
-                        //there might be multiple, we can only process the first one!
-                        var split = ((string) p.Value).Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
-                        if (split.Any())
+                        if (!p.Value.ToString().IsJson())
                         {
-                            var fullPath = mediaFileSystem.GetFullPath(mediaFileSystem.GetRelativePath(split[0]));
-                            var umbracoFile = new UmbracoMediaFile(fullPath);
-                            FillProperties(uploadFieldConfigNode, model, umbracoFile);
+                            //there might be multiple, we can only process the first one!
+                            var split = ((string)p.Value).Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                            if (split.Any())
+                            {
+                                var fullPath = mediaFileSystem.GetFullPath(mediaFileSystem.GetRelativePath(split[0]));
+                                var umbracoFile = new UmbracoMediaFile(fullPath);
+                                FillProperties(uploadFieldConfigNode, model, umbracoFile);
+                            }
+                        }
+                        else
+                        {
+                            //for now I'm just resetting this
+                            ResetProperties(uploadFieldConfigNode, model);
                         }
                     }
                     else
