@@ -78,7 +78,7 @@ namespace Umbraco.Web.PropertyEditors
                     //now we need to check if there is a value
                     if (p.Value is string && ((string) p.Value).IsNullOrWhiteSpace() == false)
                     {
-                        if (!p.Value.ToString().IsJson())
+                        if (!p.Value.ToString().DetectIsJson())
                         {
                             //there might be multiple, we can only process the first one!
                             var split = ((string)p.Value).Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);

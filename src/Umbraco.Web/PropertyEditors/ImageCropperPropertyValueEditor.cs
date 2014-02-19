@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
@@ -117,6 +119,24 @@ namespace Umbraco.Web.PropertyEditors
             }
 
             return editorValue.Value.ToString();
+        }
+        
+        
+
+        public override string ConvertDbToString(Property property, PropertyType propertyType, Core.Services.IDataTypeService dataTypeService)
+        {
+            if(property.Value == null || string.IsNullOrEmpty(property.Value.ToString()))
+               return null;
+
+            //if we dont have a json structure, we will get it from the property type
+            var val = property.Value.ToString();
+            if (val.DetectIsJson())
+                return val;
+
+            var config = dataTypeService.GetPreValuesByDataTypeId(propertyType.DataTypeDefinitionId).FirstOrDefault();
+            var crops = !string.IsNullOrEmpty(config) ? config : "[]";
+            var newVal = "{src: '" + val + "', crops: " + crops + "}"; 
+            return newVal;
         }
     }
 

@@ -18,6 +18,63 @@ namespace Umbraco.Web.Models
 
         [DataMember(Name = "crops")]
         public IEnumerable<ImageCropData> Crops { get; set; }
+
+
+        public string GetCropUrl(string alias)
+        {
+
+            var crop = Crops.FirstOrDefault(x => x.Alias == alias);
+            if(crop == null)
+                return null;
+
+
+
+            StringBuilder sb = new StringBuilder();
+            if (crop.Coordinates != null)
+            {
+                sb.Append("?crop=");
+                sb.Append(crop.Coordinates.X1).Append(",");
+                sb.Append(crop.Coordinates.Y1).Append(",");
+                sb.Append(crop.Coordinates.X2).Append(",");
+                sb.Append(crop.Coordinates.Y2);
+                sb.Append("&cropmode=percentage");
+            }
+            else
+            {
+                if (HasFocalPoint())
+                {
+
+                }
+                else
+                {
+                    sb.Append("?anchor=center");
+                    sb.Append("&mode=crop");
+                }
+
+
+            }
+
+            sb.Append("&width=").Append(crop.Width);
+            sb.Append("&height=").Append(crop.Height);
+            sb.Append("&rnd=").Append(DateTime.Now.Ticks);
+            return sb.ToString();
+
+        }
+
+        public bool HasFocalPoint()
+        {
+            return (FocalPoint != null && FocalPoint.Top != 0.5m && FocalPoint.Top != 0.5m);
+        }
+
+        public bool HasCrop(string alias)
+        {
+            return Crops.Any(x => x.Alias == alias);
+        }
+
+        public bool HasImage()
+        {
+            return string.IsNullOrEmpty(Src);
+        }
     }   
 
     [DataContract(Name = "imageCropFocalPoint")]
@@ -64,31 +121,6 @@ namespace Umbraco.Web.Models
 
         [DataMember(Name = "coordinates")]
         public ImageCropCoordinates Coordinates { get; set; }
-
-        public string ToUrl()
-        {
-            StringBuilder sb = new StringBuilder();
-            if (Coordinates != null)
-            {
-                sb.Append("?crop=");
-                sb.Append(Coordinates.X1).Append(",");
-                sb.Append(Coordinates.Y1).Append(",");
-                sb.Append(Coordinates.X2).Append(",");
-                sb.Append(Coordinates.Y2);
-                sb.Append("&cropmode=percentage");
-            }
-            else
-            {
-                sb.Append("?anchor=center");
-                sb.Append("&mode=crop");
-            }
-
-            sb.Append("&width=").Append(Width);
-            sb.Append("&height=").Append(Height);
-            sb.Append("&rnd=").Append(DateTime.Now.Ticks);
-            return sb.ToString();
-
-        }
     }
 
 }
