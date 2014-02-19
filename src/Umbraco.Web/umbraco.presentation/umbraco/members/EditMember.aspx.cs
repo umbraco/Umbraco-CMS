@@ -71,6 +71,7 @@ namespace umbraco.cms.presentation.members
             if (Membership.Provider.IsUmbracoMembershipProvider())
             {
                 _document = new Member(int.Parse(Request.QueryString["id"]));
+                
                 _member = Membership.GetUser(_document.LoginName, false);
                 _contentControl = new ContentControl(_document, ContentControl.publishModes.NoPublish, "TabView1");
                 _contentControl.Width = Unit.Pixel(666);

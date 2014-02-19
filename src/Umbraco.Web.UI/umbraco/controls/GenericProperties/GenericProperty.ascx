@@ -8,8 +8,9 @@
 			style="padding: 0px; display: block; margin: 0px;">
 	
 			<h3 style="padding: 0px; margin: 0px;">
+			
 			<asp:ImageButton ID="DeleteButton2" Runat="server"></asp:ImageButton>
-			 
+			
 			<a href="javascript:expandCollapse('<%=this.ClientID%>');"><img src="<%= Umbraco.Core.IO.IOHelper.ResolveUrl( Umbraco.Core.IO.SystemDirectories.Umbraco )%>/images/expand.png" style="FLOAT: right"/>
 			  <asp:Literal ID="FullHeader" Runat="server"></asp:Literal>
 			</a>
@@ -20,7 +21,7 @@
 			<div id="edit<%=this.ClientID%>"  style="DISPLAY: none;">
 			
 			<h3 style="padding: 0px; margin: 0px;">
-			  <asp:ImageButton ID="DeleteButton" Runat="server"></asp:ImageButton>
+			  <asp:ImageButton ID="DeleteButton" Runat="server" Visible='<%#AllowPropertyEdit %>'></asp:ImageButton>
 			  <a href="javascript:expandCollapse('<%=this.ClientID%>');"><img src="<%= Umbraco.Core.IO.IOHelper.ResolveUrl(  Umbraco.Core.IO.SystemDirectories.Umbraco )%>/images/collapse.png" id="<%=this.ClientID%>_fold" style="FLOAT: right"  />
 			  Edit "<asp:Literal ID="Header" Runat="server"></asp:Literal>"</a>
 			</h3>
@@ -31,7 +32,8 @@
         </cc1:PropertyPanel>
         
         <cc1:PropertyPanel ID="PropertyPanel2" runat="server" Text="Alias">
-         <asp:TextBox id="tbAlias" runat="server" CssClass="propertyFormInput"></asp:TextBox>
+            <asp:TextBox id="tbAlias" runat="server" CssClass="propertyFormInput" ></asp:TextBox>
+            <asp:Label ID="lblAlias" runat="server" ></asp:Label>
         </cc1:PropertyPanel>
         
         <cc1:PropertyPanel ID="PropertyPanel3" runat="server" Text="Type">
@@ -42,7 +44,7 @@
           <asp:DropDownList id="ddlTab" runat="server" CssClass="propertyFormInput"></asp:DropDownList>
         </cc1:PropertyPanel>
         
-        <cc1:PropertyPanel ID="PropertyPanel5" runat="server" Text="Mandatory">
+        <cc1:PropertyPanel ID="PropertyPanel5" runat="server" Text="Mandatory" >
           <asp:CheckBox id="checkMandatory" runat="server"></asp:CheckBox>
         </cc1:PropertyPanel>
         

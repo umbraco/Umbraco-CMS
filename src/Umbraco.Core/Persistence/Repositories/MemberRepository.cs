@@ -600,6 +600,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new MemberReadOnlyFactory(memberTypes);
             var member = factory.BuildEntity(dto);
 
+            member.Properties = GetPropertyCollection(dto.NodeId, dto.VersionId, member.ContentType, dto.CreateDate, dto.UpdateDate);
+
             return member;
         }
 
@@ -613,8 +615,15 @@ namespace Umbraco.Core.Persistence.Repositories
             var memberTypeList = _memberTypeRepository.GetAll();
             memberTypeList.ForEach(x => memberTypes.Add(x.Alias, x));
 
+            var entities = new List<IMember>();
             var factory = new MemberReadOnlyFactory(memberTypes);
-            return dtos.Select(factory.BuildEntity);
+            foreach (var dto in dtos)
+            {
+                var entity = factory.BuildEntity(dto);
+                entity.Properties = GetPropertyCollection(dto.NodeId, dto.VersionId, entity.ContentType, dto.CreateDate, dto.UpdateDate);
+                entities.Add(entity);
+            }
+            return entities;
         }
     }
 }

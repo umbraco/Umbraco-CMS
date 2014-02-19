@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -304,6 +305,10 @@ namespace Umbraco.Core.Persistence.Repositories
                     var datatype = Database.FirstOrDefault<DataTypeDto>("WHERE controlId = @Id", new { Id = propertyType.DataTypeId });
                     propertyType.DataTypeDefinitionId = datatype.DataTypeId;
                 }
+
+                //validate the alias! 
+                ValidateAlias(propertyType);
+
                 var propertyTypeDto = propertyGroupFactory.BuildPropertyTypeDto(tabId, propertyType);
                 int typePrimaryKey = propertyType.HasIdentity
                                          ? Database.Update(propertyTypeDto)
@@ -380,6 +385,40 @@ namespace Umbraco.Core.Persistence.Repositories
             Parallel.ForEach(list, currentFile => currentFile.ResetDirtyProperties(false));
 
             return new PropertyTypeCollection(list);
+        }
+
+        protected void ValidateAlias(PropertyType pt)
+        {
+            Mandate.That<InvalidOperationException>(string.IsNullOrEmpty(pt.Alias) == false,
+                                    () =>
+                                    {
+                                        var message =
+                                            string.Format(
+                                                "{0} '{1}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                                                "Property Type",
+                                                pt.Name);
+                                        var exception = new InvalidOperationException(message);
+
+                                        LogHelper.Error<ContentTypeBaseRepository<TId, TEntity>>(message, exception);
+                                        throw exception;
+                                    });
+        }
+
+        protected void ValidateAlias(TEntity entity)
+        {
+            Mandate.That<InvalidOperationException>(string.IsNullOrEmpty(entity.Alias) == false,
+                                    () =>
+                                    {
+                                        var message =
+                                            string.Format(
+                                                "{0} '{1}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                                                typeof(TEntity).Name,
+                                                entity.Name);
+                                        var exception = new InvalidOperationException(message);
+
+                                        LogHelper.Error<ContentTypeBaseRepository<TId, TEntity>>(message, exception);
+                                        throw exception;
+                                    });
         }
     }
 }
