@@ -146,7 +146,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var propertyFactory = new PropertyFactory(contentType, versionId, id, createDate, updateDate);
             var properties = propertyFactory.BuildEntity(propertyDataDtos).ToArray();
 
-            var newProperties = properties.Where(x => x.HasIdentity == false);
+            var newProperties = properties.Where(x => x.HasIdentity == false && x.PropertyType.HasIdentity);
             foreach (var property in newProperties)
             {
                 var propertyDataDto = new PropertyDataDto { NodeId = id, PropertyTypeId = property.PropertyTypeId, VersionId = versionId };
