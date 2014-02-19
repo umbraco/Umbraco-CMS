@@ -21,7 +21,7 @@
 			<div id="edit<%=this.ClientID%>"  style="DISPLAY: none;">
 			
 			<h3 style="padding: 0px; margin: 0px;">
-			  <asp:ImageButton ID="DeleteButton" Runat="server" Visible='<%#AllowPropertyEdit %>'></asp:ImageButton>
+			  <asp:ImageButton ID="DeleteButton" Runat="server" ></asp:ImageButton>
 			  <a href="javascript:expandCollapse('<%=this.ClientID%>');"><img src="<%= Umbraco.Core.IO.IOHelper.ResolveUrl(  Umbraco.Core.IO.SystemDirectories.Umbraco )%>/images/collapse.png" id="<%=this.ClientID%>_fold" style="FLOAT: right"  />
 			  Edit "<asp:Literal ID="Header" Runat="server"></asp:Literal>"</a>
 			</h3>

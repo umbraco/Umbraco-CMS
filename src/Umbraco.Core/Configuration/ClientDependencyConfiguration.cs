@@ -30,7 +30,7 @@ namespace Umbraco.Core.Configuration
 
                     //Set the new version to the hashcode of now
                     var oldVersion = versionAttribute.Value;
-                    var newVersion = DateTime.UtcNow.GetHashCode();
+                    var newVersion = Math.Abs(DateTime.UtcNow.GetHashCode());
 
                     versionAttribute.SetValue(newVersion);
                     clientDependencyConfigXml.Save(_fileName, SaveOptions.DisableFormatting);
