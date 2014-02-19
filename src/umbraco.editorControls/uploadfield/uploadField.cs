@@ -132,7 +132,7 @@ namespace umbraco.editorControls
                 {
                     try
                     {
-                        var bytesControl = FindControlRecursive<noEdit>(Page, "prop_" + prop);
+                        var bytesControl = Page.FindControlRecursive<noEdit>("prop_" + prop);
                         if (bytesControl != null)
                         {
                             bytesControl.RefreshLabel(string.Empty);
@@ -184,7 +184,7 @@ namespace umbraco.editorControls
 
         private static void UpdateLabelValue(string propAlias, string controlId, Page controlPage, Content content)
         {
-            var extensionControl = FindControlRecursive<noEdit>(controlPage, controlId);
+            var extensionControl = controlPage.FindControlRecursive<noEdit>(controlId);
             if (extensionControl != null)
             {
                 if (content.getProperty(propAlias) != null && content.getProperty(propAlias).Value != null)
@@ -261,41 +261,7 @@ namespace umbraco.editorControls
                 }
             }
         }
-
-        /// <summary>
-        /// Recursively finds a control with the specified identifier.
-        /// </summary>
-        /// <typeparam name="T">
-        /// The type of control to be found.
-        /// </typeparam>
-        /// <param name="parent">
-        /// The parent control from which the search will start.
-        /// </param>
-        /// <param name="id">
-        /// The identifier of the control to be found.
-        /// </param>
-        /// <returns>
-        /// The control with the specified identifier, otherwise <see langword="null"/> if the control 
-        /// is not found.
-        /// </returns>
-        private static T FindControlRecursive<T>(Control parent, string id) where T : Control
-        {
-            if ((parent is T) && (parent.ID == id))
-            {
-                return (T) parent;
-            }
-
-            foreach (Control control in parent.Controls)
-            {
-                var foundControl = FindControlRecursive<T>(control, id);
-                if (foundControl != null)
-                {
-                    return foundControl;
-                }
-            }
-            return default(T);
-        }
-
+        
         /// <summary> 
         /// Render this control to the output parameter specified.
         /// </summary>
