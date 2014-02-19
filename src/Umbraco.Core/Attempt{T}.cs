@@ -160,5 +160,15 @@ namespace Umbraco.Core
         {
             return new Attempt<T>(condition, result, null);
         }
+
+        /// <summary>
+        /// Implicity operator to check if the attempt was successful without having to access the 'success' property
+        /// </summary>
+        /// <param name="a"></param>
+        /// <returns></returns>
+        public static implicit operator bool(Attempt<T> a)
+        {
+            return a.Success;
+        }
     }
 }
