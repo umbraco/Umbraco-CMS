@@ -144,20 +144,19 @@ namespace umbraco.controls.GenericProperties
                 lblAlias.Text = PropertyType.Alias;
 				FullHeader.Text = PropertyType.GetRawName() + " (" + PropertyType.Alias + "), Type: " + PropertyType.DataTypeDefinition.Text;;
 				Header.Text = PropertyType.GetRawName();
-				DeleteButton.Visible = true;
+				
                 DeleteButton.CssClass = "delete-button";
                 DeleteButton.Attributes.Add("onclick", "return confirm('" + ui.Text("areyousure", CurrentUser) + "');");
 				
                 DeleteButton2.CssClass = "delete-button";
-                
                 DeleteButton2.Attributes.Add("onclick", "return confirm('" + ui.Text("areyousure", CurrentUser) + "');");
-                DeleteButton2.Visible = true;
 
-                //DeleteButton2.Visible = AllowPropertyEdit;
-                //tbAlias.Visible = AllowPropertyEdit;
-                //lblAlias.Visible = AllowPropertyEdit == false;
-                //PropertyPanel5.Visible = AllowPropertyEdit;
-                //PropertyPanel6.Visible = AllowPropertyEdit;
+                DeleteButton.Visible = AllowPropertyEdit;
+                DeleteButton2.Visible = AllowPropertyEdit;
+                tbAlias.Visible = AllowPropertyEdit;
+                lblAlias.Visible = AllowPropertyEdit == false;
+                PropertyPanel5.Visible = AllowPropertyEdit;
+                PropertyPanel6.Visible = AllowPropertyEdit;
 			} 
 			else 
 			{
