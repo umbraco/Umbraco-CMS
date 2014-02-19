@@ -14,6 +14,7 @@ namespace Umbraco.Web
         //this only takes the crop json into account
         public static string Crop(this IPublishedContent mediaItem, string propertyAlias, string cropAlias)
         {
+            mediaItem.HasProperty(propertyAlias);
             var property = mediaItem.GetPropertyValue<string>(propertyAlias);
 
             if (string.IsNullOrEmpty(property))
