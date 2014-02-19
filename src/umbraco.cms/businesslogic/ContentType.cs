@@ -175,7 +175,7 @@ namespace umbraco.cms.businesslogic
         public static ContentType GetContentType(int id)
         {
             return ApplicationContext.Current.ApplicationCache.GetCacheItem
-                (string.Format("UmbracoContentType{0}", id),
+                (string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, id),
                  TimeSpan.FromMinutes(30),
                  () => new ContentType(id));
         }

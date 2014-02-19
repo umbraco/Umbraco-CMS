@@ -158,6 +158,7 @@ namespace umbraco.controls.GenericProperties
                 lblAlias.Visible = AllowPropertyEdit == false;
                 PropertyPanel5.Visible = AllowPropertyEdit;
                 PropertyPanel6.Visible = AllowPropertyEdit;
+                PropertyPanel3.Visible = AllowPropertyEdit;
 			} 
 			else 
 			{
