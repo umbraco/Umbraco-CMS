@@ -52,6 +52,36 @@ namespace Umbraco.Web.Models
         [Obsolete("This is not used and will be removed from the codebase in future versions")]
         public string MemberTypeAlias { get; set; }
 
+        [ReadOnly(true)]
+        public string UserName { get; set; }
+
+        [ReadOnly(true)]
+        public string PasswordQuestion { get; set; }
+
+        [ReadOnly(true)]
+        public string Comment { get; set; }
+
+        [ReadOnly(true)]
+        public bool IsApproved { get; set; }
+
+        [ReadOnly(true)]
+        public bool IsLockedOut { get; set; }
+
+        [ReadOnly(true)]
+        public DateTime LastLockoutDate { get; set; }
+
+        [ReadOnly(true)]
+        public DateTime CreationDate { get; set; }
+
+        [ReadOnly(true)]
+        public DateTime LastLoginDate { get; set; }
+
+        [ReadOnly(true)]
+        public DateTime LastActivityDate { get; set; }
+
+        [ReadOnly(true)]
+        public DateTime LastPasswordChangedDate { get; set; }
+
         /// <summary>
         /// The list of member properties
         /// </summary>
