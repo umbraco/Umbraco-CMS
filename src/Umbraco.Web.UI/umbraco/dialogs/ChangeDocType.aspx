@@ -15,6 +15,7 @@
     
     #propertyMapping tbody tr td{border-bottom:1px solid #efefef}
     #propertyMapping td{padding: 4px; ;}  
+    body.umbracoDialog { overflow: scroll; }
     </style>
 
 </asp:Content>
