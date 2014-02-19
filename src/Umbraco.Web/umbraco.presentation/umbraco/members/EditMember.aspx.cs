@@ -1,12 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Configuration.Provider;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.Design.WebControls;
 using System.Web.UI.HtmlControls;
 using System.Web.UI.WebControls;
+using Umbraco.Core;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Security;
+using umbraco.interfaces;
 using Umbraco.Web;
 using Umbraco.Web.Security;
 using umbraco.cms.businesslogic.member;
@@ -26,8 +31,8 @@ namespace umbraco.cms.presentation.members
         }
         protected uicontrols.TabView TabView1;
         protected TextBox documentName;
-        private Member _document;
-        private MembershipUser _member;
+        private Member _memberEntity;
+        private MembershipUser _membershipUser;
         ContentControl _contentControl;
         protected uicontrols.UmbracoPanel m_MemberShipPanel = new uicontrols.UmbracoPanel();
 
@@ -42,7 +47,7 @@ namespace umbraco.cms.presentation.members
 
         private MembershipHelper _membershipHelper;
 
-        protected void Page_Load(object sender, EventArgs e)
+        protected override void OnLoad(EventArgs e)        
         {
             _membershipHelper = new MembershipHelper(UmbracoContext.Current);
 
@@ -70,10 +75,10 @@ namespace umbraco.cms.presentation.members
 
             if (Membership.Provider.IsUmbracoMembershipProvider())
             {
-                _document = new Member(int.Parse(Request.QueryString["id"]));
+                _memberEntity = new Member(int.Parse(Request.QueryString["id"]));
                 
-                _member = Membership.GetUser(_document.LoginName, false);
-                _contentControl = new ContentControl(_document, ContentControl.publishModes.NoPublish, "TabView1");
+                _membershipUser = Membership.GetUser(_memberEntity.LoginName, false);
+                _contentControl = new ContentControl(_memberEntity, ContentControl.publishModes.NoPublish, "TabView1");
                 _contentControl.Width = Unit.Pixel(666);
                 _contentControl.Height = Unit.Pixel(666);
 
@@ -82,10 +87,13 @@ namespace umbraco.cms.presentation.members
 
                 plc.Controls.Add(_contentControl);
 
+                //once we add the content control, the controls are created, here we need to handle the islockedout property
+                HandleIsLockedOutProperty(_membershipUser.IsLockedOut);
+
                 if (!IsPostBack)
                 {
-                    MemberLoginNameTxt.Text = _document.LoginName;
-                    MemberEmail.Text = _document.Email;
+                    MemberLoginNameTxt.Text = _memberEntity.LoginName;
+                    MemberEmail.Text = _memberEntity.Email;
                 }
                 var ph = new PlaceHolder();
                 MemberLoginNameTxt.ID = "loginname";
@@ -124,15 +132,15 @@ namespace umbraco.cms.presentation.members
                 menuSave.Click += MenuSaveClick;
                 menuSave.AltText = ui.Text("buttons", "save", null);
 
-                _member = Membership.GetUser(Request.QueryString["id"], false);
-                MemberLoginNameTxt.Text = _member.UserName;
+                _membershipUser = Membership.GetUser(Request.QueryString["id"], false);
+                MemberLoginNameTxt.Text = _membershipUser.UserName;
                 if (IsPostBack == false)
                 {
-                    MemberEmail.Text = _member.Email;
+                    MemberEmail.Text = _membershipUser.Email;
                 }
 
                 m_MemberShipPanel.Width = 300;
-                m_MemberShipPanel.Text = ui.Text("edit") + " " + _member.UserName;
+                m_MemberShipPanel.Text = ui.Text("edit") + " " + _membershipUser.UserName;
                 var props = new uicontrols.Pane();
                 MemberLoginNameTxt.Enabled = false;
                 
@@ -157,7 +165,7 @@ namespace umbraco.cms.presentation.members
                     if (IsPostBack == false)
                     {
 
-                        if (Roles.IsUserInRole(_member.UserName, role))
+                        if (Roles.IsUserInRole(_membershipUser.UserName, role))
                         {
                             selectedMembers += role + ",";
                         }
@@ -183,7 +191,7 @@ namespace umbraco.cms.presentation.members
 
         void MemberLoginNameExistCheck_ServerValidate(object source, ServerValidateEventArgs args)
         {
-            var oldLoginName = _document.LoginName.Replace(" ", "").ToLower();
+            var oldLoginName = _memberEntity.LoginName.Replace(" ", "").ToLower();
             var newLoginName = MemberLoginNameTxt.Text.Replace(" ", "").ToLower();
 
             if (oldLoginName != newLoginName && newLoginName != "" && Member.GetMemberFromLoginName(newLoginName) != null)
@@ -194,7 +202,7 @@ namespace umbraco.cms.presentation.members
 
         void MemberEmailExistCheck_ServerValidate(object source, ServerValidateEventArgs args)
         {
-            var oldEmail = _document.Email.ToLower();
+            var oldEmail = _memberEntity.Email.ToLower();
             var newEmail = MemberEmail.Text.ToLower();
 
             var requireUniqueEmail = Membership.Provider.RequiresUniqueEmail;
@@ -221,6 +229,30 @@ namespace umbraco.cms.presentation.members
 
         }
 
+        /// <summary>
+        /// This is a special case, we're going to check for the is locked out property, if it is found
+        /// and they are not locked out, we'll remove the check box since an admin can't actually lock a member out,
+        /// they lock themselves out. All an admin can do is disable a member. So this will swap the check box for a 'No' label.
+        /// </summary>
+        private void HandleIsLockedOutProperty(bool isLockedOut)
+        {
+            var lockedOutCtrl = _contentControl.FindControlRecursive<CheckBox>("prop_" + Constants.Conventions.Member.IsLockedOut);
+            if (lockedOutCtrl != null)
+            {
+                var noLabel = lockedOutCtrl.Parent.FindControl("NoLabel");
+                if (noLabel == null)
+                {
+                    noLabel = new Label() { Text = ui.Text("general", "no"), Visible = false, ID = "NoLabel" };
+                    lockedOutCtrl.Parent.Controls.Add(noLabel);
+                }
+                if (isLockedOut == false)
+                {
+                    lockedOutCtrl.Visible = false;
+                    noLabel.Visible = true;
+                }
+            }
+        }
+
         private void ChangePassword(passwordChanger passwordChangerControl, MembershipUser membershipUser, CustomValidator passwordChangerValidator)
         {
             //Change the password            
@@ -245,11 +277,47 @@ namespace umbraco.cms.presentation.members
             }
         }
 
-        private void UpdateMembershipProvider(MembershipUser membershipUser)
+        private bool UpdateWithMembershipProvider(MembershipUser membershipUser, string email, IDataType isApprovedDt, IDataType commentsDt, bool performUnlock)
         {
             var membershipHelper = new MembershipHelper(ApplicationContext, new HttpContextWrapper(Context));
             //set the writable properties that we are editing
-            membershipHelper.UpdateMember(membershipUser, Membership.Provider, MemberEmail.Text.Trim());
+            
+            bool? isApproved = null;
+            if (isApprovedDt != null)
+            {
+                var tryApproved = isApprovedDt.Data.Value.TryConvertTo<bool>();
+                if (tryApproved)
+                {
+                    isApproved = tryApproved.Result;
+                }
+            }
+
+            string comments = null;
+            if (commentsDt != null)
+            {
+                var tryComments = commentsDt.Data.Value.TryConvertTo<string>();
+                if (tryComments)
+                {
+                    comments = tryComments.Result;
+                }
+            }
+
+            var unlockSuccess = false;
+            if (performUnlock)
+            {
+                unlockSuccess = Membership.Provider.UnlockUser(membershipUser.UserName);
+                if (unlockSuccess == false)
+                {
+                    LogHelper.Warn<EditMember>("Could not unlock the member " + membershipUser.UserName);
+                }
+                else
+                {
+                    HandleIsLockedOutProperty(false);
+                }
+            }
+
+            return membershipHelper.UpdateMember(membershipUser, Membership.Provider, email, isApproved, comment: comments).Success
+                || unlockSuccess;
         }
 
         private void UpdateRoles(MembershipUser membershipUser)
@@ -284,44 +352,81 @@ namespace umbraco.cms.presentation.members
             else
             {
                 // hide validation summaries
+
                 if (Membership.Provider.IsUmbracoMembershipProvider())
-                {                    
+                {
                     foreach (uicontrols.TabPage tp in _contentControl.GetPanels())
                     {
                         tp.ErrorControl.Visible = false;
                     }
+
+                    var memberTypeProvider = (IUmbracoContentTypeMembershipProvider) Membership.Provider;
+                    
+                    //update the membership provider                    
+                    var commentsProp = _contentControl.DataTypes.GetValue(memberTypeProvider.CommentPropertyTypeAlias);
+                    var approvedProp = _contentControl.DataTypes.GetValue(memberTypeProvider.ApprovedPropertyTypeAlias);
+                    var lockedProp = _contentControl.DataTypes.GetValue(memberTypeProvider.LockPropertyTypeAlias);
+                    var doUnlock = false;
+                    if (lockedProp != null)
+                    {
+                        var tryGetLockedVal = lockedProp.Data.Value.TryConvertTo<bool>();
+                        if (tryGetLockedVal)
+                        {
+                            doUnlock = _membershipUser.IsLockedOut && tryGetLockedVal.Result == false;                            
+                        }
+                    }
+
+                    if (UpdateWithMembershipProvider(_membershipUser,
+                        MemberEmail.Text.Trim(),
+                        approvedProp,
+                        commentsProp,
+                        doUnlock))
+                    {
+                        //if an update was required we need to re-fetch the member
+                        _memberEntity = new Member(_memberEntity.Id);
+                    }
+
+                }
+                else
+                {
+                    UpdateWithMembershipProvider(_membershipUser,
+                        MemberEmail.Text.Trim(),                        
+                        null, null,
+                        false);
                 }
 
                 //Change the password
                 var passwordChangerControl = (passwordChanger)MemberPasswordTxt.Controls[0];
                 var passwordChangerValidator = (CustomValidator)MemberPasswordTxt.Controls[1].Controls[0].Controls[0];
-                ChangePassword(passwordChangerControl, _member, passwordChangerValidator);
-
-                //update the membership provider
-                UpdateMembershipProvider(_member);
+                ChangePassword(passwordChangerControl, _membershipUser, passwordChangerValidator);
 
                 if (Membership.Provider.IsUmbracoMembershipProvider())
                 {
                     //Hrm, with the membership provider you cannot change the login name - I guess this will do that 
                     // in the underlying data layer
-                    _document.LoginName = MemberLoginNameTxt.Text;
+                    _memberEntity.LoginName = MemberLoginNameTxt.Text;
 
-                    UpdateRoles(_member);
+                    UpdateRoles(_membershipUser);
+
+                    //filter out all of the membership provider built-in properties, these should only be saved via the membership
+                    // providers, not directly to our services
+                    var builtInAliases = Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
+                    var filteredProperties = _contentControl.DataTypes.Where(x => builtInAliases.Contains(x.Key) == false);
 
                     //The value of the properties has been set on IData through IDataEditor in the ContentControl
                     //so we need to 'retrieve' that value and set it on the property of the new IContent object.
                     //NOTE This is a workaround for the legacy approach to saving values through the DataType instead of the Property 
                     //- (The DataType shouldn't be responsible for saving the value - especically directly to the db).
-                    foreach (var item in _contentControl.DataTypes)
+                    foreach (var item in filteredProperties)
                     {
-                        _document.getProperty(item.Key).Value = item.Value.Data.Value;
+                        _memberEntity.getProperty(item.Key).Value = item.Value.Data.Value;
                     }
                     
-                    _document.Save();
+                    _memberEntity.Save();
                 }
                 else
                 {
-                    UpdateRoles(_member);
+                    UpdateRoles(_membershipUser);
                 }
 
                 ClientTools.ShowSpeechBubble(speechBubbleIcon.save, ui.Text("speechBubbles", "editMemberSaved", UmbracoUser), "");
