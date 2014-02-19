@@ -36,6 +36,7 @@ namespace Umbraco.Core.Persistence.Factories
             memberType.PropertyGroups = propertyTypeGroupCollection;
 
             var propertyTypes = GetPropertyTypes(dto, memberType);
+
             //By Convention we add 9 stnd PropertyTypes - This is only here to support loading of types that didn't have these conventions before.
             var standardPropertyTypes = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
             foreach (var standardPropertyType in standardPropertyTypes)
@@ -47,7 +48,7 @@ namespace Umbraco.Core.Persistence.Factories
 
                 //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType
                 memberType.MemberTypePropertyTypes.Add(standardPropertyType.Key,
-                    new Tuple<bool, bool, int>(false, false, default(int)));
+                    new MemberTypePropertyProfileAccess(false, false));
             }
             memberType.PropertyTypes = propertyTypes;
 
@@ -85,7 +86,7 @@ namespace Umbraco.Core.Persistence.Factories
                 {
                     //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType
                     memberType.MemberTypePropertyTypes.Add(typeDto.Alias,
-                        new Tuple<bool, bool, int>(typeDto.CanEdit, typeDto.ViewOnProfile, typeDto.Id.Value));
+                        new MemberTypePropertyProfileAccess(typeDto.ViewOnProfile, typeDto.CanEdit));
 
                     var tempGroupDto = groupDto;
 
@@ -131,7 +132,7 @@ namespace Umbraco.Core.Persistence.Factories
             {
                 //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType
                 memberType.MemberTypePropertyTypes.Add(propertyType.Alias,
-                    new Tuple<bool, bool, int>(propertyType.CanEdit, propertyType.ViewOnProfile, propertyType.Id.Value));
+                    new MemberTypePropertyProfileAccess(propertyType.ViewOnProfile, propertyType.CanEdit));
                 //PropertyType Collection
                 propertyTypes.Add(new PropertyType(propertyType.ControlId,
                     propertyType.DbType.EnumParse<DataTypeDatabaseType>(true))

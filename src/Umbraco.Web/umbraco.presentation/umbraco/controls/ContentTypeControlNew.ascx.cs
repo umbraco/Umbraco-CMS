@@ -70,6 +70,9 @@ namespace umbraco.controls
         //the async delete property task
         private Action<DeleteAsyncState> _asyncDeleteTask;
 
+        internal event SavingContentTypeEventHandler SavingContentType;
+        internal delegate void SavingContentTypeEventHandler(ContentType e);
+
         override protected void OnInit(EventArgs e)
         {
             base.OnInit(e);
@@ -242,6 +245,7 @@ namespace umbraco.controls
             // we need to re-bind the alias as the SafeAlias method can have changed it
             txtAlias.Text = _contentType.Alias;
 
+            //Notify the parent control
             RaiseBubbleEvent(new object(), state.SaveArgs);
 
             if (state.HasNameChanged())
@@ -323,6 +327,11 @@ namespace umbraco.controls
                         {
                             var result = DocumentTypeCallback(documentType);
                         }
+                    }
+
+                    if (SavingContentType != null)
+                    {
+                        SavingContentType(_contentType);
                     }
 
                     _contentType.Save();

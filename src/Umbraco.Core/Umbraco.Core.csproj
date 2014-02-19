@@ -199,6 +199,7 @@
     <Compile Include="Models\IRelationType.cs" />
     <Compile Include="Models\MemberGroup.cs" />
     <Compile Include="Models\Membership\EntityPermission.cs" />
+    <Compile Include="Models\MemberTypePropertyProfileAccess.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\PreValue.cs" />
     <Compile Include="Models\PreValueCollection.cs" />
