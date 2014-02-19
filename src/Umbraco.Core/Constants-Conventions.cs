@@ -190,7 +190,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        FailedPasswordAttempts,
-		                        new PropertyType(PropertyEditors.IntegerAlias, DataTypeDatabaseType.Integer)
+		                        new PropertyType(PropertyEditors.NoEditAlias, DataTypeDatabaseType.Integer)
 		                            {
 		                                Alias = FailedPasswordAttempts,
 		                                Name = FailedPasswordAttemptsLabel
@@ -214,7 +214,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        LastLockoutDate,
-		                        new PropertyType(PropertyEditors.DateAlias, DataTypeDatabaseType.Date)
+		                        new PropertyType(PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date)
 		                            {
 		                                Alias = LastLockoutDate,
 		                                Name = LastLockoutDateLabel
@@ -222,7 +222,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        LastLoginDate,
-		                        new PropertyType(PropertyEditors.DateAlias, DataTypeDatabaseType.Date)
+		                        new PropertyType(PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date)
 		                            {
 		                                Alias = LastLoginDate,
 		                                Name = LastLoginDateLabel
@@ -230,7 +230,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        LastPasswordChangeDate,
-		                        new PropertyType(PropertyEditors.DateAlias, DataTypeDatabaseType.Date)
+		                        new PropertyType(PropertyEditors.NoEditAlias, DataTypeDatabaseType.Date)
 		                            {
 		                                Alias = LastPasswordChangeDate,
 		                                Name = LastPasswordChangeDateLabel
@@ -238,7 +238,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        PasswordAnswer,
-		                        new PropertyType(PropertyEditors.TextboxAlias, DataTypeDatabaseType.Nvarchar)
+		                        new PropertyType(PropertyEditors.NoEditAlias, DataTypeDatabaseType.Nvarchar)
 		                            {
 		                                Alias = PasswordAnswer,
 		                                Name = PasswordAnswerLabel
@@ -246,7 +246,7 @@ namespace Umbraco.Core
 		                    },
 		                    {
 		                        PasswordQuestion,
-		                        new PropertyType(PropertyEditors.TextboxAlias, DataTypeDatabaseType.Nvarchar)
+		                        new PropertyType(PropertyEditors.NoEditAlias, DataTypeDatabaseType.Nvarchar)
 		                            {
 		                                Alias = PasswordQuestion,
 		                                Name = PasswordQuestionLabel
