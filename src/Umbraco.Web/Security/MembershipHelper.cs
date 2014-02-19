@@ -204,13 +204,25 @@ namespace Umbraco.Web.Security
 
             if (Membership.Provider.IsUmbracoMembershipProvider())
             {
+                var membershipUser = Membership.GetUser();
                 var member = GetCurrentMember();
                 //this shouldn't happen
                 if (member == null) return null;
 
                 var model = ProfileModel.CreateModel();
                 model.Name = member.Name;
-                model.Email = member.Email;
+
+                model.Email = membershipUser.Email;
+                model.UserName = membershipUser.UserName;
+                model.PasswordQuestion = membershipUser.PasswordQuestion;
+                model.Comment = membershipUser.Comment;
+                model.IsApproved = membershipUser.IsApproved;
+                model.IsLockedOut = membershipUser.IsLockedOut;
+                model.LastLockoutDate = membershipUser.LastLockoutDate;
+                model.CreationDate = membershipUser.CreationDate;
+                model.LastLoginDate = membershipUser.LastLoginDate;
+                model.LastActivityDate = membershipUser.LastActivityDate;
+                model.LastPasswordChangedDate = membershipUser.LastPasswordChangedDate;
 
                 var memberType = member.ContentType;
 

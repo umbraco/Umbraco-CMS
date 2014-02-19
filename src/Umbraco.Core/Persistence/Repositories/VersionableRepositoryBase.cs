@@ -5,6 +5,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
+using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -119,6 +120,43 @@ namespace Umbraco.Core.Persistence.Repositories
                         tagProp.TagSupport.Behavior == PropertyTagBehavior.Replace);
                 }
             }
+        }
+        
+        /// <summary>
+        /// This is a fix for U4-1407 - when property types are added to a content type - the property of the entity are not actually created
+        /// and we get YSODs
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="versionId"></param>
+        /// <param name="contentType"></param>
+        /// <param name="createDate"></param>
+        /// <param name="updateDate"></param>
+        /// <returns></returns>
+        protected PropertyCollection GetPropertyCollection(int id, Guid versionId, IContentTypeComposition contentType, DateTime createDate, DateTime updateDate)
+        {
+            var sql = new Sql();
+            sql.Select("*")
+                .From<PropertyDataDto>()
+                .InnerJoin<PropertyTypeDto>()
+                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
+                .Where<PropertyDataDto>(x => x.NodeId == id)
+                .Where<PropertyDataDto>(x => x.VersionId == versionId);
+
+            var propertyDataDtos = Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql);
+            var propertyFactory = new PropertyFactory(contentType, versionId, id, createDate, updateDate);
+            var properties = propertyFactory.BuildEntity(propertyDataDtos).ToArray();
+
+            var newProperties = properties.Where(x => x.HasIdentity == false);
+            foreach (var property in newProperties)
+            {
+                var propertyDataDto = new PropertyDataDto { NodeId = id, PropertyTypeId = property.PropertyTypeId, VersionId = versionId };
+                int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
+
+                property.Version = versionId;
+                property.Id = primaryKey;
+            }
+
+            return new PropertyCollection(properties);
         }
     }
 }

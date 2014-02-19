@@ -905,5 +905,24 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(5, found);
         }
 
+        [Test]
+        public void Setting_Property_On_Built_In_Member_Property_When_Property_Doesnt_Exist_On_Type_Is_Ok()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();            
+            ServiceContext.MemberTypeService.Save(memberType);
+            memberType.RemovePropertyType(Constants.Conventions.Member.Comments);
+            ServiceContext.MemberTypeService.Save(memberType);
+            Assert.IsFalse(memberType.PropertyTypes.Any(x => x.Alias == Constants.Conventions.Member.Comments));
+
+            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            //this should not throw an exception
+            customMember.Comments = "hello world";
+            ServiceContext.MemberService.Save(customMember);
+
+            var found = ServiceContext.MemberService.GetById(customMember.Id);
+            
+            Assert.AreEqual(string.Empty, found.Comments);
+        }
+
     }
 }

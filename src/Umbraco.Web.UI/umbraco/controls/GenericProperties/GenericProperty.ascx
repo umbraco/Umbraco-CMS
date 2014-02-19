@@ -12,6 +12,7 @@
                 </asp:LinkButton>
 
                 <a href="javascript:expandCollapse('<%=this.ClientID%>');">
+			
 
                     <i class="toggle-button btn btn-mini icon-navigation-down"></i>
                     <asp:Literal ID="FullHeader" runat="server"></asp:Literal>
@@ -38,6 +39,7 @@
 
         <cc1:PropertyPanel ID="PropertyPanel2" runat="server" Text="Alias">
                     <asp:TextBox ID="tbAlias" runat="server" CssClass="propertyFormInput prop-alias"></asp:TextBox>
+            <asp:Label ID="lblAlias" runat="server" ></asp:Label>
                 </cc1:PropertyPanel>
 
         <cc1:PropertyPanel ID="PropertyPanel3" runat="server" Text="Type">
@@ -48,7 +50,7 @@
                     <asp:DropDownList ID="ddlTab" runat="server" CssClass="propertyFormInput"></asp:DropDownList>
                 </cc1:PropertyPanel>
 
-        <cc1:PropertyPanel ID="PropertyPanel5" runat="server" Text="Mandatory">
+        <cc1:PropertyPanel ID="PropertyPanel5" runat="server" Text="Mandatory" >
                     <asp:CheckBox ID="checkMandatory" runat="server"></asp:CheckBox>
                 </cc1:PropertyPanel>
 

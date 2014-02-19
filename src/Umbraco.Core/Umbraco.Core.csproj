@@ -340,6 +340,7 @@
     <Compile Include="Models\IRelationType.cs" />
     <Compile Include="Models\Membership\MembershipScenario.cs" />
     <Compile Include="Models\MemberGroup.cs" />
+    <Compile Include="Models\MemberTypePropertyProfileAccess.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentExtended.cs" />
     <Compile Include="Models\PublishedContent\PublishedPropertyBase.cs" />
