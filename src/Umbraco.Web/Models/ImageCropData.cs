@@ -13,17 +13,11 @@ namespace Umbraco.Web.Models
         [DataMember(Name="src")]
         public string Src { get; set;}
 
-        [DataMember(Name = "imagePropertyAlias")]
-        public string ImagePropertyAlias { get; set; }
-
-        [DataMember(Name = "focalPointPropertyAlias")]
-        public string FocalPointPropertyAlias { get; set; }
-
         [DataMember(Name = "focalPoint")]
         public ImageCropFocalPoint FocalPoint { get; set; }
 
         [DataMember(Name = "crops")]
-        public IDictionary<string, ImageCropData> Crops { get; set; }
+        public IEnumerable<ImageCropData> Crops { get; set; }
     }   
 
     [DataContract(Name = "imageCropFocalPoint")]
@@ -59,8 +53,8 @@ namespace Umbraco.Web.Models
         [DataMember(Name = "alias")]
         public string Alias { get; set; }
 
-        [DataMember(Name = "name")]
-        public string Name { get; set; }
+        //[DataMember(Name = "name")]
+        //public string Name { get; set; }
 
         [DataMember(Name = "width")]
         public int Width { get; set; }

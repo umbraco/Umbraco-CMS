@@ -203,14 +203,6 @@
     <Compile Include="Configuration\UmbracoSettings\ContentError404Collection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentErrorPageElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentErrorsElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ContentImagingCropCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ContentImagingCropElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ContentImagingCropsElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ContentImagingCropSizeCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ContentImagingCropSizeElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IImagingCrop.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IImagingCrops.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IImagingCropSize.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillPropertiesCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillUploadFieldElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentImagingElement.cs" />

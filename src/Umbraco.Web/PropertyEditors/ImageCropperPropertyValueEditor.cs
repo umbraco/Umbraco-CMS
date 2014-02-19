@@ -23,6 +23,7 @@ namespace Umbraco.Web.PropertyEditors
 
         }
 
+
         /// <summary>
         /// Overrides the deserialize value so that we can save the file accordingly
         /// </summary>
@@ -62,7 +63,7 @@ namespace Umbraco.Web.PropertyEditors
 
             //compare old and new src path
             //if not alike, that means we have a new file, or delete the current one... 
-            if (oldFile != newFile)
+            if (string.IsNullOrEmpty(newFile) || editorValue.AdditionalData.ContainsKey("files"))
             {
                 var fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
 
@@ -118,4 +119,6 @@ namespace Umbraco.Web.PropertyEditors
             return editorValue.Value.ToString();
         }
     }
+
+        
 }

@@ -124,6 +124,7 @@
   <data name="JsNoCache" xml:space="preserve">
     <value>yepnope.addFilter(function (resourceObj) {
     var url = resourceObj.url;
+    var rnd = ##rnd##;
     var _op = "?";
     if(url.indexOf("lib/") === 0 || url.indexOf("js/umbraco.") === 0){
         return resourceObj;
@@ -132,7 +133,7 @@
     	_op = "&amp;";
     }
 
-    resourceObj.url = resourceObj.url + _op + "umb__rnd=" + (new Date).getTime();
+    resourceObj.url = resourceObj.url + _op + "umb__rnd=" + rnd;
     return resourceObj;
 });</value>
   </data>

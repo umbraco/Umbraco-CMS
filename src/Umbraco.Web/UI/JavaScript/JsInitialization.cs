@@ -41,13 +41,21 @@ namespace Umbraco.Web.UI.JavaScript
         public string GetJavascriptInitialization(HttpContextBase httpContext, JArray umbracoInit, JArray additionalJsFiles = null)
         {
             var result = GetJavascriptInitializationArray(httpContext, umbracoInit, additionalJsFiles);
-            var noCache = string.Empty;
-          
-            //if debugging, add timestamp, if in production CDF will append CDF version (and should also append umb version)
+            var noCache = Resources.JsNoCache;
+            
+
+
+            //if debugging, add timestamp, if in production we tell yepNope to append umb+cdf version
+            //this is needed even tho cdf does this on its serverside merged js
+            //as assetsService.load() also need to append these versions to ensure cache bursting on updates + pack installs
             if (httpContext.IsDebuggingEnabled)
-                noCache = Resources.JsNoCache;
-
-
+                noCache = noCache.Replace("##rnd##", "(new Date).getTime()");
+            else
+            {
+                var version = "'" + Umbraco.Core.Configuration.UmbracoVersion.Current.ToString() + "." + ClientDependency.Core.Config.ClientDependencySettings.Instance.Version + "'";
+                noCache = noCache.Replace("##rnd##", version);    
+            }
+                
                 return ParseMain(
                     noCache,
                     result.ToString(),

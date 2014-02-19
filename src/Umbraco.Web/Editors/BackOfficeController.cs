@@ -183,11 +183,6 @@ namespace Umbraco.Web.Editors
                                         controller => controller.GetConfiguration())
                                 },
                                 {
-                                    "imageCropperApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ImageCropperPreValueController>(
-                                        controller => controller.GetConfiguration(string.Empty))
-                                },
-
-                                {
                                     "stylesheetApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<StylesheetController>(
                                         controller => controller.GetAll())
                                 },
@@ -261,7 +256,7 @@ namespace Umbraco.Web.Editors
                             : string.Format("{0}-{1}", UmbracoVersion.Current.ToString(3), UmbracoVersion.CurrentComment);
 
             app.Add("version", version);
-
+            app.Add("cdf", ClientDependency.Core.Config.ClientDependencySettings.Instance.Version);
             return app;
         }
         

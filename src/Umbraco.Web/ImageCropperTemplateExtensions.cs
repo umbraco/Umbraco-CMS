@@ -10,11 +10,7 @@ namespace Umbraco.Web
 {
     public static class ImageCropperTemplateExtensions
     {
-        public static bool HasCrop(this IPublishedContent publishedContent, string propertyAlias, string cropAlias)
-        {
-            return ImageCropperPropertyEditorHelper.GetCrop(publishedContent.ContentType.Alias, cropAlias) != null;
-        }
-
+        
         //this only takes the crop json into account
         public static string Crop(this IPublishedContent mediaItem, string propertyAlias, string cropAlias)
         {
@@ -26,7 +22,7 @@ namespace Umbraco.Web
             if (property.IsJson())
             {
                 var cropDataSet = property.SerializeToCropDataSet();
-                var currentCrop = cropDataSet.Crops[cropAlias];
+                var currentCrop = cropDataSet.Crops.First(x => x.Alias ==cropAlias);
                 return cropDataSet.Src + currentCrop.ToUrl();
             }
             else
@@ -38,10 +34,7 @@ namespace Umbraco.Web
         }
 
 
-
-
-
-      public static string Crop(
+       public static string Crop(
             this IPublishedContent mediaItem,
             int? width = null,
             int? height = null,
@@ -72,7 +65,7 @@ namespace Umbraco.Web
             Mode? mode = null,
             Anchor? anchor = null,
             string imageCropperValue = null,
-            string imageCropperCropId = null,
+            string cropAlias = null,
             string furtherOptions = null,
             bool slimmage = false)
         {
@@ -86,9 +79,9 @@ namespace Umbraco.Web
                     var allTheCrops = imageCropperValue.SerializeToCropDataSet();
                     if (allTheCrops != null && allTheCrops.Crops.Any())
                     {
-                        var crop = imageCropperCropId != null
-                                       ? allTheCrops.Crops[imageCropperCropId]
-                                       : allTheCrops.Crops.First().Value;
+                        var crop = cropAlias != null
+                                       ? allTheCrops.Crops.First(x => x.Alias ==cropAlias)
+                                       : allTheCrops.Crops.First();
                         if (crop != null)
                         {
                             imageResizerUrl.Append(crop.ToUrl());

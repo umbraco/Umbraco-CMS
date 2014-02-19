@@ -346,7 +346,6 @@
     <Compile Include="PropertyEditors\ColorListPreValueEditor.cs" />
     <Compile Include="PropertyEditors\EmailAddressPropertyEditor.cs" />
     <Compile Include="ImageCropperBaseExtensions.cs" />
-    <Compile Include="PropertyEditors\ImageCropperPrevalueController.cs" />
     <Compile Include="PropertyEditors\ImageCropperPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ImageCropperPropertyEditorHelper.cs" />
     <Compile Include="PropertyEditors\ImageCropperPropertyValueEditor.cs" />
