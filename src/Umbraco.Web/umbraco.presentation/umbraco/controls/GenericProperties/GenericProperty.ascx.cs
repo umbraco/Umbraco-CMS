@@ -268,7 +268,6 @@ namespace umbraco.controls.GenericProperties
         {
 			Delete(this,new EventArgs());
         }
-		#endregion
 
 	}
 }
