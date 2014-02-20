@@ -101,29 +101,6 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Checks if it is a back office login or logout request
-        /// </summary>
-        /// <param name="url"></param>
-        /// <param name="applicationPath"></param>
-        /// <returns></returns>
-        internal static bool IsBackOfficeLoginRequest(this Uri url, string applicationPath)
-        {
-            applicationPath = applicationPath ?? string.Empty;
-
-            var fullUrlPath = url.AbsolutePath.TrimStart(new[] { '/' });
-            var appPath = applicationPath.TrimStart(new[] { '/' });
-            var urlPath = fullUrlPath.TrimStart(appPath).EnsureStartsWith('/');
-            
-            if (urlPath.InvariantStartsWith(GlobalSettings.Path.EnsureStartsWith('/') + "/login.aspx")
-                || urlPath.InvariantStartsWith(GlobalSettings.Path.EnsureStartsWith('/') + "/logout.aspx"))
-            {
-                return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
         /// Checks if the current uri is an install request
         /// </summary>
         /// <param name="url"></param>
@@ -137,6 +114,23 @@ namespace Umbraco.Core
 
             //check if this is in the umbraco back office
             return afterAuthority.InvariantStartsWith(IOHelper.ResolveUrl("~/install").TrimStart("/"));
+        }
+
+        /// <summary>
+        /// Checks if the uri is a request for the default back office page
+        /// </summary>
+        /// <param name="url"></param>
+        /// <returns></returns>
+        internal static bool IsDefaultBackOfficeRequest(this Uri url)
+        {
+            if (url.AbsolutePath.InvariantEquals(GlobalSettings.Path.TrimEnd("/"))
+                || url.AbsolutePath.InvariantEquals(GlobalSettings.Path.EnsureEndsWith('/'))
+                || url.AbsolutePath.InvariantStartsWith(GlobalSettings.Path.EnsureEndsWith('/') + "Default.aspx")
+                || url.AbsolutePath.InvariantStartsWith(GlobalSettings.Path.EnsureEndsWith('/') + "Umbraco.aspx"))
+            {
+                return true;
+            }
+            return false;
         }
 
         /// <summary>

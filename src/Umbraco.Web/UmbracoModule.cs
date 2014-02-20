@@ -83,16 +83,10 @@ namespace Umbraco.Web
 
 			var umbracoContext = UmbracoContext.Current;
 
-            //if it's a back office login request, do not continue
-		    if (httpContext.Request.Url.IsBackOfficeLoginRequest(HttpRuntime.AppDomainAppVirtualPath))
-		    {
-		        return;
-		    }
-
             //if it's a back office request then we need to ensure we're configured - otherwise redirect to installer
-            if (httpContext.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)
+            if (httpContext.Request.Url.IsDefaultBackOfficeRequest()
                 && EnsureIsConfigured(httpContext, umbracoContext.OriginalRequestUrl) == false)
-            {                
+            {
                 return;
             }
 
