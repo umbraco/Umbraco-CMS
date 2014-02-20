@@ -920,8 +920,8 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             var found = ServiceContext.MemberService.GetById(customMember.Id);
-            
-            Assert.AreEqual(string.Empty, found.Comments);
+
+            Assert.IsTrue(found.Comments.IsNullOrWhiteSpace());
         }
 
     }
