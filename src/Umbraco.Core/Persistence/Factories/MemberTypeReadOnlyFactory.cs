@@ -58,6 +58,7 @@ namespace Umbraco.Core.Persistence.Factories
         private PropertyGroupCollection GetPropertyTypeGroupCollection(MemberTypeReadOnlyDto dto, MemberType memberType)
         {
             var propertyGroups = new PropertyGroupCollection();
+            var standardProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
             foreach (var groupDto in dto.PropertyTypeGroups.Where(x => x.Id.HasValue))
             {
                 var group = new PropertyGroup();
@@ -94,7 +95,7 @@ namespace Umbraco.Core.Persistence.Factories
                     var propertyType = new PropertyType(typeDto.PropertyEditorAlias, 
                         //ensures that any built-in membership properties have their correct dbtype assigned no matter
                         //what the underlying data type is
-                        MemberTypeRepository.GetDbTypeForProperty(typeDto.Alias, typeDto.DbType.EnumParse<DataTypeDatabaseType>(true)))
+                        MemberTypeRepository.GetDbTypeForProperty(typeDto.Alias, typeDto.DbType.EnumParse<DataTypeDatabaseType>(true), standardProps))
                     {
                         Alias = typeDto.Alias,
                         DataTypeDefinitionId = typeDto.DataTypeId,

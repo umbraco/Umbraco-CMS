@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Web.UI;
 using System.Web.UI.WebControls;
-
+using Umbraco.Core;
 using umbraco.interfaces;
 using umbraco.BusinessLogic;
 using umbraco.DataLayer;
@@ -177,7 +177,7 @@ namespace umbraco.cms.businesslogic.datatype
             foreach (KeyValuePair<string, DataEditorSettingType> k in dtSettings)
             {
                 var result = k.Value.Validate();
-                Label lbl = FindControlRecursive<Label>(this, "lbl" + k.Key);
+                Label lbl = this.FindControlRecursive<Label>("lbl" + k.Key);
                 if (result == null && lbl != null)
                 {
                     if (lbl != null)
@@ -328,24 +328,6 @@ namespace umbraco.cms.businesslogic.datatype
                 this.Controls.Add(panel);
             }
             
-        }
-
-        private static T FindControlRecursive<T>(Control parent, string id) where T : Control
-        {
-            if ((parent is T) && (parent.ID == id))
-            {
-                return (T)parent;
-            }
-
-            foreach (Control control in parent.Controls)
-            {
-                T foundControl = FindControlRecursive<T>(control, id);
-                if (foundControl != null)
-                {
-                    return foundControl;
-                }
-            }
-            return default(T);
         }
     }
 

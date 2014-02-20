@@ -562,8 +562,7 @@ namespace umbraco.cms.presentation.user
                 //set the writable properties that we are editing
                 membershipHelper.UpdateMember(membershipUser, BackOfficeProvider,
                                               email.Text.Trim(),
-                                              Disabled.Checked == false,
-                                              NoConsole.Checked);
+                                              Disabled.Checked == false);
             }
         }
 

@@ -252,7 +252,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 if (Membership.Provider.IsUmbracoMembershipProvider() == false)
                 {
-                    //it's a generic provider so update the locked out property based on our know constant alias
+                    //it's a generic provider so update the locked out property based on our known constant alias
                     var isLockedOutProperty = result.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
                     if (isLockedOutProperty != null && isLockedOutProperty.Value.ToString() != "1")
                     {

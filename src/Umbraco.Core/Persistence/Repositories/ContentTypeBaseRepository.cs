@@ -303,8 +303,21 @@ namespace Umbraco.Core.Persistence.Repositories
                 //If the Id of the DataType is not set, we resolve it from the db by its PropertyEditorAlias
                 if (propertyType.DataTypeDefinitionId == 0 || propertyType.DataTypeDefinitionId == default(int))
                 {
-                    var datatype = Database.FirstOrDefault<DataTypeDto>("WHERE propertyEditorAlias = @alias", new { alias = propertyType.PropertyEditorAlias });
-                    propertyType.DataTypeDefinitionId = datatype.DataTypeId;
+                    //we cannot try to assign a data type of it's an empty guid
+                    if (propertyType.DataTypeId != Guid.Empty)
+                    {
+                        var sql = new Sql()
+                            .Select("*")
+                            .From<DataTypeDto>()
+                            .Where("controlId = @Id", new { Id = propertyType.DataTypeId })
+                            .OrderBy<DataTypeDto>(typeDto => typeDto.DataTypeId);
+                        var datatype = Database.FirstOrDefault<DataTypeDto>(sql);
+                        //we cannot assign a data type if one was not found
+                        if (datatype != null)
+                        {
+                            propertyType.DataTypeDefinitionId = datatype.DataTypeId;        
+                        }
+                    }
                 }
 
                 //validate the alias! 

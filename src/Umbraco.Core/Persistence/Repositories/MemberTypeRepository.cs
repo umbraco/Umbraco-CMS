@@ -179,10 +179,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new MemberTypeFactory(NodeObjectTypeId);
             var dto = factory.BuildDto(entity);
 
-            PersistNewBaseContentType(dto, entity);
-
             EnsureCorrectDbTypeForBuiltInProperties(entity);
 
+            PersistNewBaseContentType(dto, entity);
+            
             //Handles the MemberTypeDto (cmsMemberType table)
             var memberTypeDtos = factory.BuildMemberTypeDtos(entity);
             foreach (var memberTypeDto in memberTypeDtos)
@@ -216,9 +216,9 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new MemberTypeFactory(NodeObjectTypeId);
             var dto = factory.BuildDto(entity);
 
-            PersistUpdatedBaseContentType(dto, entity);
-
             EnsureCorrectDbTypeForBuiltInProperties(entity);
+
+            PersistUpdatedBaseContentType(dto, entity);
 
             //Remove existing entries before inserting new ones
             Database.Delete<MemberTypeDto>("WHERE NodeId = @Id", new {Id = entity.Id});
@@ -236,15 +236,19 @@ namespace Umbraco.Core.Persistence.Repositories
         #endregion
 
         /// <summary>
-        /// now we need to ensure that all the built-in membership provider properties have their correct db types
-        /// assigned, no matter what the underlying data type is
+        /// Ensure that all the built-in membership provider properties have their correct db types
+        /// and property editors assigned.
         /// </summary>
         /// <param name="memberType"></param>
         private static void EnsureCorrectDbTypeForBuiltInProperties(IContentTypeBase memberType)
         {
+            var stdProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
             foreach (var propertyType in memberType.PropertyTypes)
             {
-                propertyType.DataTypeDatabaseType = GetDbTypeForProperty(propertyType.Alias, propertyType.DataTypeDatabaseType);
+                propertyType.DataTypeDatabaseType = GetDbTypeForProperty(propertyType.Alias, propertyType.DataTypeDatabaseType, stdProps);
+                //this reset's it's current data type reference which will be re-assigned based on the property editor assigned on the next line
+                propertyType.DataTypeDefinitionId = 0;
+                propertyType.DataTypeId = GetPropertyEditorForProperty(propertyType.Alias, propertyType.DataTypeId, stdProps);
             }
         }
 
@@ -268,20 +272,40 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="propAlias"></param>
         /// <param name="dbType"></param>
+        /// <param name="standardProps"></param>
         /// <returns></returns>
-        internal static DataTypeDatabaseType GetDbTypeForProperty(string propAlias, DataTypeDatabaseType dbType)
+        internal static DataTypeDatabaseType GetDbTypeForProperty(
+            string propAlias, 
+            DataTypeDatabaseType dbType,
+            Dictionary<string, PropertyType> standardProps)
         {
-            var stdProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
-            var aliases = stdProps.Select(x => x.Key).ToArray();
+            var aliases = standardProps.Select(x => x.Key).ToArray();
 
             //check if it is built in
             if (aliases.Contains(propAlias))
             {
                 //return the pre-determined db type for this property
-                return stdProps.Single(x => x.Key == propAlias).Value.DataTypeDatabaseType;
+                return standardProps.Single(x => x.Key == propAlias).Value.DataTypeDatabaseType;
             }
 
             return dbType;
+        }
+
+        internal static Guid GetPropertyEditorForProperty(
+            string propAlias, 
+            Guid propertyEditor,
+            Dictionary<string, PropertyType> standardProps)
+        {
+            var aliases = standardProps.Select(x => x.Key).ToArray();
+
+            //check if it is built in
+            if (aliases.Contains(propAlias))
+            {
+                //return the pre-determined db type for this property
+                return standardProps.Single(x => x.Key == propAlias).Value.DataTypeId;
+            }
+
+            return propertyEditor;
         }
     }
 }
