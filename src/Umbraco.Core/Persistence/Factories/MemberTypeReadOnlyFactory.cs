@@ -94,7 +94,10 @@ namespace Umbraco.Core.Persistence.Factories
                     var propertyType = new PropertyType(typeDto.ControlId, 
                         //ensures that any built-in membership properties have their correct dbtype assigned no matter
                         //what the underlying data type is
-                        MemberTypeRepository.GetDbTypeForProperty(typeDto.Alias, typeDto.DbType.EnumParse<DataTypeDatabaseType>(true), standardProps))
+                        MemberTypeRepository.GetDbTypeForBuiltInProperty(
+                            typeDto.Alias, 
+                            typeDto.DbType.EnumParse<DataTypeDatabaseType>(true), 
+                            standardProps).Result)
                     {
                         Alias = typeDto.Alias,
                         DataTypeDefinitionId = typeDto.DataTypeId,

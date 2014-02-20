@@ -145,8 +145,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //If the Id of the DataType is not set, we resolve it from the db by its ControlId
                 if (propertyType.DataTypeDefinitionId == 0 || propertyType.DataTypeDefinitionId == default(int))
                 {
-                    var datatype = Database.FirstOrDefault<DataTypeDto>("WHERE controlId = @Id", new { Id = propertyType.DataTypeId });
-                    propertyType.DataTypeDefinitionId = datatype.DataTypeId;
+                    AssignDataTypeFromPropertyEditor(propertyType);
                 }
                 var propertyTypeDto = propertyFactory.BuildPropertyTypeDto(tabId, propertyType);
                 int typePrimaryKey = Convert.ToInt32(Database.Insert(propertyTypeDto));
@@ -299,24 +298,11 @@ namespace Umbraco.Core.Persistence.Repositories
             foreach (var propertyType in entity.PropertyTypes)
             {
                 var tabId = propertyType.PropertyGroupId != null ? propertyType.PropertyGroupId.Value : default(int);
+                
                 //If the Id of the DataType is not set, we resolve it from the db by its ControlId
                 if (propertyType.DataTypeDefinitionId == 0 || propertyType.DataTypeDefinitionId == default(int))
                 {
-                    //we cannot try to assign a data type of it's an empty guid
-                    if (propertyType.DataTypeId != Guid.Empty)
-                    {
-                        var sql = new Sql()
-                            .Select("*")
-                            .From<DataTypeDto>()
-                            .Where("controlId = @Id", new { Id = propertyType.DataTypeId })
-                            .OrderBy<DataTypeDto>(typeDto => typeDto.DataTypeId);
-                        var datatype = Database.FirstOrDefault<DataTypeDto>(sql);
-                        //we cannot assign a data type if one was not found
-                        if (datatype != null)
-                        {
-                            propertyType.DataTypeDefinitionId = datatype.DataTypeId;        
-                        }
-                    }
+                    AssignDataTypeFromPropertyEditor(propertyType);
                 }
 
                 //validate the alias! 
@@ -432,6 +418,33 @@ namespace Umbraco.Core.Persistence.Repositories
                                         LogHelper.Error<ContentTypeBaseRepository<TId, TEntity>>(message, exception);
                                         throw exception;
                                     });
+        }
+
+        /// <summary>
+        /// Try to set the data type id based on its ControlId
+        /// </summary>
+        /// <param name="propertyType"></param>
+        private void AssignDataTypeFromPropertyEditor(PropertyType propertyType)
+        {
+            //we cannot try to assign a data type of it's an empty guid
+            if (propertyType.DataTypeId != Guid.Empty)
+            {
+                var sql = new Sql()
+                    .Select("*")
+                    .From<DataTypeDto>()
+                    .Where("controlId = @Id", new { Id = propertyType.DataTypeId })
+                    .OrderBy<DataTypeDto>(typeDto => typeDto.DataTypeId);
+                var datatype = Database.FirstOrDefault<DataTypeDto>(sql);
+                //we cannot assign a data type if one was not found
+                if (datatype != null)
+                {
+                    propertyType.DataTypeDefinitionId = datatype.DataTypeId;
+                }
+                else
+                {
+                    LogHelper.Warn<ContentTypeBaseRepository<TId, TEntity>>("Could not assign a data type for the property type " + propertyType.Alias + " since no data type was found with a property editor " + propertyType.DataTypeId);
+                }
+            }
         }
     }
 }
