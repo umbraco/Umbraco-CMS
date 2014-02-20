@@ -59,6 +59,7 @@ namespace umbraco.cms.businesslogic
         /// <param name="icon"></param>
         /// <param name="thumbnail"></param>
         /// <param name="masterContentType"></param>
+        /// <param name="isContainer"></param>
         /// <remarks>
         /// This is like creating a ContentType node using optimized mode but this lets you set
         /// all of the properties that are initialized normally from the database.
