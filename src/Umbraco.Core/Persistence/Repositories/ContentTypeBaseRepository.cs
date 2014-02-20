@@ -426,13 +426,13 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="propertyType"></param>
         private void AssignDataTypeFromPropertyEditor(PropertyType propertyType)
         {
-            //we cannot try to assign a data type of it's an empty guid
-            if (propertyType.DataTypeId != Guid.Empty)
+            //we cannot try to assign a data type of it's empty
+            if (propertyType.PropertyEditorAlias.IsNullOrWhiteSpace() == false)
             {
                 var sql = new Sql()
                     .Select("*")
                     .From<DataTypeDto>()
-                    .Where("controlId = @Id", new { Id = propertyType.DataTypeId })
+                    .Where("propertyEditorAlias = @propertyEditorAlias", new { propertyEditorAlias = propertyType.PropertyEditorAlias })
                     .OrderBy<DataTypeDto>(typeDto => typeDto.DataTypeId);
                 var datatype = Database.FirstOrDefault<DataTypeDto>(sql);
                 //we cannot assign a data type if one was not found
@@ -442,7 +442,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
                 else
                 {
-                    LogHelper.Warn<ContentTypeBaseRepository<TId, TEntity>>("Could not assign a data type for the property type " + propertyType.Alias + " since no data type was found with a property editor " + propertyType.DataTypeId);
+                    LogHelper.Warn<ContentTypeBaseRepository<TId, TEntity>>("Could not assign a data type for the property type " + propertyType.Alias + " since no data type was found with a property editor " + propertyType.PropertyEditorAlias);
                 }
             }
         }
