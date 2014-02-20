@@ -83,6 +83,12 @@ namespace Umbraco.Web
 
 			var umbracoContext = UmbracoContext.Current;
 
+            //if it's a back office login request, do not continue
+		    if (httpContext.Request.Url.IsBackOfficeLoginRequest(HttpRuntime.AppDomainAppVirtualPath))
+		    {
+		        return;
+		    }
+
             //if it's a back office request then we need to ensure we're configured - otherwise redirect to installer
             if (httpContext.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath)
                 && EnsureIsConfigured(httpContext, umbracoContext.OriginalRequestUrl) == false)
@@ -386,7 +392,7 @@ namespace Umbraco.Web
 
             LogHelper.Warn<UmbracoModule>("Umbraco is not configured");
 
-			var installPath = UriUtility.ToAbsolute(Core.IO.SystemDirectories.Install);
+			var installPath = UriUtility.ToAbsolute(SystemDirectories.Install);
 			var installUrl = string.Format("{0}/default.aspx?redir=true&url={1}", installPath, HttpUtility.UrlEncode(uri.ToString()));
 			httpContext.Response.Redirect(installUrl, true);
 			return false;

@@ -101,6 +101,29 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Checks if it is a back office login or logout request
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="applicationPath"></param>
+        /// <returns></returns>
+        internal static bool IsBackOfficeLoginRequest(this Uri url, string applicationPath)
+        {
+            applicationPath = applicationPath ?? string.Empty;
+
+            var fullUrlPath = url.AbsolutePath.TrimStart(new[] { '/' });
+            var appPath = applicationPath.TrimStart(new[] { '/' });
+            var urlPath = fullUrlPath.TrimStart(appPath).EnsureStartsWith('/');
+            
+            if (urlPath.InvariantStartsWith(GlobalSettings.Path.EnsureStartsWith('/') + "/login.aspx")
+                || urlPath.InvariantStartsWith(GlobalSettings.Path.EnsureStartsWith('/') + "/logout.aspx"))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Checks if the current uri is an install request
         /// </summary>
         /// <param name="url"></param>
