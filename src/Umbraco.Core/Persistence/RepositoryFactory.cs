@@ -132,25 +132,25 @@ namespace Umbraco.Core.Persistence
                 NullCacheProvider.Current);
         }
 
-        internal virtual IUserTypeRepository CreateUserTypeRepository(IDatabaseUnitOfWork uow)
+        public virtual IUserTypeRepository CreateUserTypeRepository(IDatabaseUnitOfWork uow)
         {
             return new UserTypeRepository(
                 uow,
                 //There's not many user types but we query on users all the time so the result needs to be cached
-                RuntimeCacheProvider.Current);
+                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current);
         }
 
-        internal virtual IUserRepository CreateUserRepository(IDatabaseUnitOfWork uow)
+        public virtual IUserRepository CreateUserRepository(IDatabaseUnitOfWork uow)
         {            
             return new UserRepository(
                 uow,
                 //Need to cache users - we look up user information more than anything in the back office!
-                RuntimeCacheProvider.Current,
+                _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current,
                 CreateUserTypeRepository(uow),
                 _cacheHelper);
         }
 
-        internal virtual IMemberRepository CreateMemberRepository(IDatabaseUnitOfWork uow)
+        public virtual IMemberRepository CreateMemberRepository(IDatabaseUnitOfWork uow)
         {
             return new MemberRepository(
                 uow, 
@@ -159,17 +159,17 @@ namespace Umbraco.Core.Persistence
                 CreateMemberGroupRepository(uow));
         }
 
-        internal virtual IMemberTypeRepository CreateMemberTypeRepository(IDatabaseUnitOfWork uow)
+        public virtual IMemberTypeRepository CreateMemberTypeRepository(IDatabaseUnitOfWork uow)
         {
             return new MemberTypeRepository(uow, _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current);
         }
 
-        internal virtual IMemberGroupRepository CreateMemberGroupRepository(IDatabaseUnitOfWork uow)
+        public virtual IMemberGroupRepository CreateMemberGroupRepository(IDatabaseUnitOfWork uow)
         {
             return new MemberGroupRepository(uow, _disableAllCache ? (IRepositoryCacheProvider)NullCacheProvider.Current : RuntimeCacheProvider.Current, _cacheHelper);
         }
 
-        internal virtual IEntityRepository CreateEntityRepository(IDatabaseUnitOfWork uow)
+        public virtual IEntityRepository CreateEntityRepository(IDatabaseUnitOfWork uow)
         {
             return new EntityRepository(uow);
         }

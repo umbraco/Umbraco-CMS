@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal interface IUserRepository : IRepositoryQueryable<int, IUser>
+    public interface IUserRepository : IRepositoryQueryable<int, IUser>
     {
         /// <summary>
         /// Gets the count of items based on a complex query

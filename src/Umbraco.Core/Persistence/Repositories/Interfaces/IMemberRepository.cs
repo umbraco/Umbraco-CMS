@@ -7,7 +7,7 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal interface IMemberRepository : IRepositoryVersionable<int, IMember>
+    public interface IMemberRepository : IRepositoryVersionable<int, IMember>
     {
         /// <summary>
         /// Finds members in a given role
