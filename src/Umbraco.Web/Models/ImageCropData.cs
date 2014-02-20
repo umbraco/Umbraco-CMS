@@ -43,14 +43,14 @@ namespace Umbraco.Web.Models
             {
                 if (HasFocalPoint())
                 {
-
+                    sb.Append("?center=" + FocalPoint.Top + "," + FocalPoint.Left);
+                    sb.Append("&mode=crop");
                 }
                 else
                 {
                     sb.Append("?anchor=center");
                     sb.Append("&mode=crop");
                 }
-
 
             }
 

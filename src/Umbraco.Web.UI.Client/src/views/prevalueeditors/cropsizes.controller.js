@@ -1,8 +1,6 @@
 angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesController",
 	function ($scope, $timeout) {
 
-		$scope.newItem = {};
-
 		if(!$scope.model.value){
 			$scope.model.value = [];
 		}
@@ -14,8 +12,12 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesControlle
 			});
 		};
 
-		$scope.add = function (evt) {
+		$scope.edit = function(item, evt) {
+			evt.preventDefault();
+			$scope.newItem = item;
+		};
 
+		$scope.add = function (evt) {
 			evt.preventDefault();
 
 			if ($scope.newItem) {
@@ -26,9 +28,10 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesControlle
 					$scope.hasError = false;
 					return;
 				}
-		}
-
+			
+			$scope.newItem = undefined;
 			//there was an error, do the highlight (will be set back by the directive)
 			$scope.hasError = true;
+			}
 		};
     });
