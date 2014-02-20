@@ -69,7 +69,7 @@ namespace umbraco.BusinessLogic.Actions
             get
             {
 
-                return ".sprChangeDocType";
+                return "axis-rotation-2";
             }
         }
 
