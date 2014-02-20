@@ -6,6 +6,9 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         //check the pre-values for multi-picker
         var multiPicker = $scope.model.config.multiPicker !== '0' ? true : false;
 
+        if (!$scope.model.config.startNodeId)
+            $scope.model.config.startNodeId = "-1";
+
         $scope.cropper = {crop: undefined, image: undefined};
         
                 //Data sample
@@ -86,6 +89,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
         $scope.add = function() {
             dialogService.mediaPicker({
+                startNodeId: $scope.model.config.startNodeId,
                 multiPicker: multiPicker,
                 callback: function(data) {
                     

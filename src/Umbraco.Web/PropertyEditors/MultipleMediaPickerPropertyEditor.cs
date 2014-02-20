@@ -19,6 +19,9 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class MediaPickerPreValueEditor : PreValueEditor
         {
+			[PreValueField("startNodeId", "Start node", "mediapicker")]
+			public bool StartNodeId { get; set; }
+
             [PreValueField("multiPicker", "Pick multiple items", "boolean")]
             public bool MultiPicker { get; set; }
         }
