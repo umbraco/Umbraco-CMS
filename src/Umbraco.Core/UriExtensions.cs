@@ -135,24 +135,7 @@ namespace Umbraco.Core
             }
             return false;
         }
-
-        /// <summary>
-        /// Checks if the uri is a request for the default back office page
-        /// </summary>
-        /// <param name="url"></param>
-        /// <returns></returns>
-        internal static bool IsDefaultBackOfficeRequest(this Uri url)
-        {
-            if (url.AbsolutePath.InvariantEquals(GlobalSettings.Path.TrimEnd("/"))
-                || url.AbsolutePath.InvariantEquals(GlobalSettings.Path.EnsureEndsWith('/'))
-                || url.AbsolutePath.InvariantStartsWith(GlobalSettings.Path.EnsureEndsWith('/') + "Default.aspx")
-                || url.AbsolutePath.InvariantStartsWith(GlobalSettings.Path.EnsureEndsWith('/') + "Umbraco.aspx"))
-            {
-                return true;
-            }
-            return false;
-        }
-
+        
         /// <summary>
         /// This is a performance tweak to check if this is a .css, .js or .ico, .jpg, .jpeg, .png, .gif file request since
         /// .Net will pass these requests through to the module when in integrated mode.
