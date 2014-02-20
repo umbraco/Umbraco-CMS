@@ -111,7 +111,7 @@
     </Reference>
     <Reference Include="Examine">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.53.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.55.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>

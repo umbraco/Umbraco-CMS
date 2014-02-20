@@ -103,7 +103,7 @@
     </Reference>
     <Reference Include="Examine">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.53.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.55.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.6.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -1890,6 +1890,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\plugins\tinymce3\tinymce3tinymceCompress.aspx" />
+    <None Include="app.config" />
     <None Include="Mvc\web.config.template" />
     <None Include="packages.config" />
     <None Include="Web References\org.umbraco.update\UpgradeResult1.datasource">

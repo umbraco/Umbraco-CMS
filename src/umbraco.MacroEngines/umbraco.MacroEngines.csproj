@@ -44,7 +44,7 @@
   <ItemGroup>
     <Reference Include="Examine">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.53.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.55.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="HtmlAgilityPack, Version=1.4.6.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
