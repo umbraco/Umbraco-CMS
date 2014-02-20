@@ -576,37 +576,37 @@ namespace Umbraco.Web.Security
             DateTime? lastActivityDate = null,
             string comment = null)
         {
-            var needsUpdating = false;
+            var needsUpdating = new List<bool>();
 
             //set the writable properties
             if (email != null)
             {
-                needsUpdating = member.Email != email;
+                needsUpdating.Add(member.Email != email);
                 member.Email = email;
             }
             if (isApproved.HasValue)
             {
-                needsUpdating = member.IsApproved != isApproved.Value;
+                needsUpdating.Add(member.IsApproved != isApproved.Value);
                 member.IsApproved = isApproved.Value;
             }
             if (lastLoginDate.HasValue)
             {
-                needsUpdating = member.LastLoginDate != lastLoginDate.Value;
+                needsUpdating.Add(member.LastLoginDate != lastLoginDate.Value);
                 member.LastLoginDate = lastLoginDate.Value;
             }
             if (lastActivityDate.HasValue)
             {
-                needsUpdating = member.LastActivityDate != lastActivityDate.Value;
+                needsUpdating.Add(member.LastActivityDate != lastActivityDate.Value);
                 member.LastActivityDate = lastActivityDate.Value;
             }
             if (comment != null)
             {
-                needsUpdating = member.Comment != comment;
+                needsUpdating.Add(member.Comment != comment);
                 member.Comment = comment;
             }
 
             //Don't persist anything if nothing has changed
-            if (needsUpdating)
+            if (needsUpdating.Any(x => x == true))
             {
                 provider.UpdateUser(member);
                 return Attempt<MembershipUser>.Succeed(member);
