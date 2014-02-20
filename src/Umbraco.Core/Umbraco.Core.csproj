@@ -194,7 +194,9 @@
     <Compile Include="Models\ContentTypeCompositionBase.cs" />
     <Compile Include="Models\ContentTypeExtensions.cs" />
     <Compile Include="Models\ContentTypeSort.cs" />
+    <Compile Include="Models\EntityBase\IDeepCloneable.cs" />
     <Compile Include="Models\EntityExtensions.cs" />
+    <Compile Include="Models\Folder.cs" />
     <Compile Include="Models\IMemberGroup.cs" />
     <Compile Include="Models\IRelation.cs" />
     <Compile Include="Models\IRelationType.cs" />

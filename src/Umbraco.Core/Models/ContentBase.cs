@@ -15,10 +15,13 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Represents an abstract class for base Content properties and methods
     /// </summary>
+    [Serializable]
+    [DataContract(IsReference = true)]
     [DebuggerDisplay("Id: {Id}, Name: {Name}, ContentType: {ContentTypeBase.Alias}")]
     public abstract class ContentBase : Entity, IContentBase
     {
         protected IContentTypeComposition ContentTypeBase;
+        
         private Lazy<int> _parentId;
         private string _name;//NOTE Once localization is introduced this will be the localized Name of the Content/Media.
         private int _sortOrder;
@@ -257,6 +260,7 @@ namespace Umbraco.Core.Models
         }
 
         private readonly IDictionary<string, object> _additionalData;
+
         /// <summary>
         /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
         /// </summary>
@@ -464,6 +468,23 @@ namespace Umbraco.Core.Models
             {
                 prop.ResetDirtyProperties(rememberPreviouslyChangedProperties);
             }
+        }
+        
+        public override T DeepClone<T>()
+        {
+            var clone = base.DeepClone<T>();
+
+            //cast to this object to set the complex properties
+            var asContentBase = (IContentBase)clone;
+            asContentBase.Properties = Properties.DeepClone<PropertyCollection>();
+
+            var tracksChanges = clone as TracksChangesEntityBase;
+            if (tracksChanges != null)
+            {
+                tracksChanges.ResetDirtyProperties(true);    
+            }
+
+            return clone;
         }
     }
 }

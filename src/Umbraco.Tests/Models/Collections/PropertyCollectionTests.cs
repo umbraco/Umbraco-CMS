@@ -419,5 +419,10 @@ namespace Umbraco.Tests.Models.Collections
                 _hash = !HasIdentity ? new int?(base.GetHashCode()) : new int?(Id.GetHashCode() * 397 ^ GetType().GetHashCode());
             return _hash.Value;
         }*/
+        
+        public T DeepClone<T>() where T : IDeepCloneable
+        {
+            return (T)this.MemberwiseClone();
+        }
     }
 }

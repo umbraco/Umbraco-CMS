@@ -120,13 +120,15 @@ namespace Umbraco.Tests.Models
             content.Key = new Guid("29181B97-CB8F-403F-86DE-5FEB497F4800");
 
             // Act
-            var clone = content.Clone();
+            var clone = content.DeepClone<IContent>();
 
             // Assert
             Assert.AreNotSame(clone, content);
             Assert.AreNotSame(clone.Id, content.Id);
             Assert.AreNotSame(clone.Version, content.Version);
             Assert.That(clone.HasIdentity, Is.False);
+
+            Assert.AreNotSame(content.Properties, clone.Properties);
         }
 
         /*[Test]

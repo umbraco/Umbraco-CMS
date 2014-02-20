@@ -386,14 +386,6 @@ namespace Umbraco.Core.Models
             return true;
         }
 
-        internal PropertyType Clone()
-        {
-            var clone = (PropertyType) this.MemberwiseClone();
-            clone.ResetIdentity();
-            clone.ResetDirtyProperties(false);
-            return clone;
-        }
-
         public bool Equals(PropertyType other)
         {
             //Check whether the compared object is null. 
@@ -416,6 +408,36 @@ namespace Umbraco.Core.Models
 
             //Calculate the hash code for the product. 
             return hashName ^ hashAlias;
+        }
+
+        //TODO: Remove this
+        internal PropertyType Clone()
+        {
+            var clone = (PropertyType)this.MemberwiseClone();
+            clone.ResetIdentity();
+            clone.ResetDirtyProperties(false);
+            return clone;
+        }
+
+        public override T DeepClone<T>()
+        {
+            var clone = base.DeepClone<T>();
+
+            var asPropertyType = (PropertyType)(object)clone;
+
+            if (PropertyGroupId != null)
+            {
+                var propGroupId = PropertyGroupId.Value;
+                asPropertyType._propertyGroupId = new Lazy<int>(() => propGroupId);    
+            }
+
+            var tracksChanges = clone as TracksChangesEntityBase;
+            if (tracksChanges != null)
+            {
+                tracksChanges.ResetDirtyProperties(true);
+            }
+
+            return clone;
         }
     }
 }

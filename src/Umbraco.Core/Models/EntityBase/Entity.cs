@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Reflection;
 using System.Runtime.Serialization;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.Text;
 
 namespace Umbraco.Core.Models.EntityBase
 {
@@ -226,5 +229,60 @@ namespace Umbraco.Core.Models.EntityBase
                 _hash = !HasIdentity ? new int?(base.GetHashCode()) : new int?(Id.GetHashCode() * 397 ^ GetType().GetHashCode());
             return _hash.Value;
         }
+
+        public virtual T DeepClone<T>() where T : IDeepCloneable
+        {
+            //Memberwise clone on Entity will work since it doesn't have any deep elements
+            // for any sub class this will work for standard properties as well that aren't complex object's themselves.
+            var clone = MemberwiseClone();
+            ((TracksChangesEntityBase)clone).ResetDirtyProperties(true);
+            return (T)clone;
+
+            //Using data contract serializer - has issues
+
+            //var s = Serialize(this);
+            //var d = Deserialize(s, this.GetType());
+            //return d;
+
+            //Using binary serializer - has issues
+
+            //using (var memoryStream = new MemoryStream(10))
+            //{
+            //IFormatter formatter = new BinaryFormatter();
+            //formatter.Serialize(memoryStream, this);
+            //memoryStream.Seek(0, SeekOrigin.Begin);
+            //return formatter.Deserialize(memoryStream);
+            //}
+        }
+
+        // serialize/deserialize with data contracts: 
+
+        //public static string Serialize(object obj)
+        //{
+        //    using (var memoryStream = new MemoryStream())
+        //    using (var reader = new StreamReader(memoryStream))
+        //    {
+        //        var serializer = new DataContractSerializer(obj.GetType());
+        //        serializer.WriteObject(memoryStream, obj);
+        //        memoryStream.Position = 0;
+        //        return reader.ReadToEnd();
+        //    }
+        //}
+
+        //public static object Deserialize(string xml, Type toType)
+        //{
+        //    using (Stream stream = new MemoryStream())
+        //    {
+        //        using (var writer = new StreamWriter(stream, Encoding.UTF8))
+        //        {
+        //            writer.Write(xml);
+        //            //byte[] data = Encoding.UTF8.GetBytes(xml);
+        //            //stream.Write(data, 0, data.Length);
+        //            stream.Position = 0;
+        //            var deserializer = new DataContractSerializer(toType);
+        //            return deserializer.ReadObject(stream);
+        //        }
+        //    }
+        //}
     }
 }

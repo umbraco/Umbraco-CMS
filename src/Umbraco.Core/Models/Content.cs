@@ -232,6 +232,7 @@ namespace Umbraco.Core.Models
         /// <remarks>
         /// This Property is kept internal until localization is introduced.
         /// </remarks>
+        [DataMember]
         internal string NodeName
         {
             get { return _nodeName; }
@@ -248,6 +249,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Used internally to track if permissions have been changed during the saving process for this entity
         /// </summary>
+        [IgnoreDataMember]
         internal bool PermissionsChanged
         {
             get { return _permissionsChanged; }
@@ -314,6 +316,7 @@ namespace Umbraco.Core.Models
             PublishedState = state;
         }
 
+        [DataMember]
         internal PublishedState PublishedState { get; set; }
 
         /// <summary>
@@ -333,25 +336,25 @@ namespace Umbraco.Core.Models
             }
         }
 
-        /// <summary>
-        /// Creates a clone of the current entity
-        /// </summary>
-        /// <returns></returns>
-        public IContent Clone()
-        {
-            var clone = (Content)this.MemberwiseClone();
-            clone.Key = Guid.Empty;
-            clone.Version = Guid.NewGuid();
-            clone.ResetIdentity();
+        ///// <summary>
+        ///// Creates a clone of the current entity
+        ///// </summary>
+        ///// <returns></returns>
+        //public IContent Clone()
+        //{
+        //    var clone = (Content)this.MemberwiseClone();
+        //    clone.Key = Guid.Empty;
+        //    clone.Version = Guid.NewGuid();
+        //    clone.ResetIdentity();
 
-            foreach (var property in clone.Properties)
-            {
-                property.ResetIdentity();
-                property.Version = clone.Version;
-            }
+        //    foreach (var property in clone.Properties)
+        //    {
+        //        property.ResetIdentity();
+        //        property.Version = clone.Version;
+        //    }
 
-            return clone;
-        }
+        //    return clone;
+        //}
 
         /// <summary>
         /// Indicates whether a specific property on the current <see cref="IContent"/> entity is dirty.
@@ -431,6 +434,44 @@ namespace Umbraco.Core.Models
         {
             base.UpdatingEntity();
             Version = Guid.NewGuid();
+        }
+
+        /// <summary>
+        /// TODO: Remove this as it's really only a shallow clone and not thread safe
+        /// Creates a clone of the current entity
+        /// </summary>
+        /// <returns></returns>
+        public IContent Clone()
+        {
+            var clone = (Content)this.MemberwiseClone();
+            clone.Key = Guid.Empty;
+            clone.Version = Guid.NewGuid();
+            clone.ResetIdentity();
+
+            foreach (var property in clone.Properties)
+            {
+                property.ResetIdentity();
+                property.Version = clone.Version;
+            }
+
+            return clone;
+        }
+
+        public override T DeepClone<T>()
+        {
+            var clone = base.DeepClone<T>();
+
+            var asContent = (Content)(object)clone;
+            if (Template != null)
+            {
+                asContent.Template = Template.DeepClone<ITemplate>();    
+            }
+            
+            asContent._contentType = ContentType.DeepClone<IContentType>();
+            asContent.ResetDirtyProperties(true);
+
+            return clone;
+
         }
     }
 }

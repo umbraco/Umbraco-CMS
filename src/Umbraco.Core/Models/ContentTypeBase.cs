@@ -319,7 +319,7 @@ namespace Umbraco.Core.Models
             }
         }
 
-        private readonly IDictionary<string, object> _additionalData;
+        private IDictionary<string, object> _additionalData;
         /// <summary>
         /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
         /// </summary>
@@ -576,6 +576,22 @@ namespace Umbraco.Core.Models
             {
                 propertyType.ResetDirtyProperties();
             }
+        }
+
+        public override T DeepClone<T>()
+        {
+            var clone = base.DeepClone<T>();
+
+            var contentType = (ContentTypeBase)(object)clone;
+            contentType._additionalData = new Dictionary<string, object>();
+            contentType._additionalData.MergeLeft(_additionalData);
+            contentType.AllowedContentTypes = AllowedContentTypes.Select(x => x.DeepClone<ContentTypeSort>()).ToList();
+            contentType.PropertyGroups = PropertyGroups.DeepClone<PropertyGroupCollection>();
+            contentType.PropertyTypes = PropertyTypes.Select(x => x.DeepClone<PropertyType>()).ToList();
+
+            contentType.ResetDirtyProperties(true);
+
+            return clone;
         }
     }
 }

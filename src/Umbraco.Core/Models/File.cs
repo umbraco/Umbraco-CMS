@@ -6,16 +6,6 @@ using Umbraco.Core.Models.EntityBase;
 
 namespace Umbraco.Core.Models
 {
-    internal sealed class Folder : Entity
-    {
-        public Folder(string folderPath)
-        {
-            Path = folderPath;
-        }
-
-        public string Path { get; set; }
-    }
-
     /// <summary>
     /// Represents an abstract file which provides basic functionality for a File with an Alias and Name
     /// </summary>
@@ -114,5 +104,22 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <returns>True if file is valid, otherwise false</returns>
         public abstract bool IsValid();
+
+        public override T DeepClone<T>()
+        {
+            var clone = base.DeepClone<T>();
+
+            var asFile = (File)(object)clone;
+            asFile._alias = Alias;
+            asFile._name = Name;
+
+            var tracksChanges = clone as TracksChangesEntityBase;
+            if (tracksChanges != null)
+            {
+                tracksChanges.ResetDirtyProperties(true);
+            }
+
+            return clone;
+        }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -28,6 +28,9 @@ namespace Umbraco.Core.Persistence.Caching
     /// Also note that we don't always keep checking if HttpContext.Current == null and instead check for _memoryCache != null. This is because
     /// when there are async requests being made even in the context of a web request, the HttpContext.Current will be null but the HttpRuntime.Cache will
     /// always be available.
+    /// 
+    /// TODO: Each item that get's added to this cache will be a clone of the original with it's dirty properties reset, and every item that is resolved from the cache
+    /// is a clone of the item that is in there, otherwise we end up with thread safety issues since multiple thread would be working on the exact same entity at the same time.
     /// 
     /// </remarks>
     internal sealed class RuntimeCacheProvider : IRepositoryCacheProvider

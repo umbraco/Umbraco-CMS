@@ -6,7 +6,7 @@ namespace Umbraco.Core.Models
     /// <summary>
     /// Represents a POCO for setting sort order on a ContentType reference
     /// </summary>
-    public class ContentTypeSort : IValueObject
+    public class ContentTypeSort : IValueObject, IDeepCloneable
     {
         public ContentTypeSort()
         {
@@ -33,5 +33,14 @@ namespace Umbraco.Core.Models
         /// Gets or sets the Alias of the ContentType
         /// </summary>
         public string Alias { get; set; }
+
+
+        public T DeepClone<T>() where T: IDeepCloneable
+        {
+            var clone = (ContentTypeSort)MemberwiseClone();
+            var id = Id.Value;
+            clone.Id = new Lazy<int>(() => id);
+            return (T)(IDeepCloneable)clone;
+        }
     }
 }
