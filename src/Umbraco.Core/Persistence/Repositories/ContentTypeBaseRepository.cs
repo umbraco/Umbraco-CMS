@@ -309,7 +309,7 @@ namespace Umbraco.Core.Persistence.Repositories
                         var sql = new Sql()
                             .Select("*")
                             .From<DataTypeDto>()
-                            .Where("controlId = @Id", new { Id = propertyType.DataTypeId })
+                            .Where("propertyEditorAlias = @propertyEditorAlias", new { propertyEditorAlias = propertyType.PropertyEditorAlias })
                             .OrderBy<DataTypeDto>(typeDto => typeDto.DataTypeId);
                         var datatype = Database.FirstOrDefault<DataTypeDto>(sql);
                         //we cannot assign a data type if one was not found
