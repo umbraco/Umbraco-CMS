@@ -11,6 +11,8 @@ namespace Umbraco.Core.Persistence.Factories
     {
         public IMemberType BuildEntity(MemberTypeReadOnlyDto dto)
         {
+            var standardPropertyTypes = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+            
             var memberType = new MemberType(dto.ParentId)
                              {
                                  Alias = dto.Alias,
@@ -32,13 +34,12 @@ namespace Umbraco.Core.Persistence.Factories
                                  AllowedContentTypes = Enumerable.Empty<ContentTypeSort>()
                              };
 
-            var propertyTypeGroupCollection = GetPropertyTypeGroupCollection(dto, memberType);
+            var propertyTypeGroupCollection = GetPropertyTypeGroupCollection(dto, memberType, standardPropertyTypes);
             memberType.PropertyGroups = propertyTypeGroupCollection;
 
-            var propertyTypes = GetPropertyTypes(dto, memberType);
+            var propertyTypes = GetPropertyTypes(dto, memberType, standardPropertyTypes);
 
-            //By Convention we add 9 stnd PropertyTypes - This is only here to support loading of types that didn't have these conventions before.
-            var standardPropertyTypes = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+            //By Convention we add 9 stnd PropertyTypes - This is only here to support loading of types that didn't have these conventions before.            
             foreach (var standardPropertyType in standardPropertyTypes)
             {
                 if(dto.PropertyTypes.Any(x => x.Alias.Equals(standardPropertyType.Key))) continue;
@@ -55,10 +56,10 @@ namespace Umbraco.Core.Persistence.Factories
             return memberType;
         }
 
-        private PropertyGroupCollection GetPropertyTypeGroupCollection(MemberTypeReadOnlyDto dto, MemberType memberType)
+        private PropertyGroupCollection GetPropertyTypeGroupCollection(MemberTypeReadOnlyDto dto, MemberType memberType, Dictionary<string, PropertyType> standardProps)
         {
-            var propertyGroups = new PropertyGroupCollection();
-            var standardProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+            var propertyGroups = new PropertyGroupCollection();            
+            
             foreach (var groupDto in dto.PropertyTypeGroups.Where(x => x.Id.HasValue))
             {
                 var group = new PropertyGroup();
@@ -92,13 +93,19 @@ namespace Umbraco.Core.Persistence.Factories
 
                     var tempGroupDto = groupDto;
 
-                    var propertyType = new PropertyType(typeDto.PropertyEditorAlias, 
-                        //ensures that any built-in membership properties have their correct dbtype assigned no matter
-                        //what the underlying data type is
-                        MemberTypeRepository.GetDbTypeForBuiltInProperty(
-                            typeDto.Alias, 
-                            typeDto.DbType.EnumParse<DataTypeDatabaseType>(true), 
-                            standardProps).Result)
+                    //ensures that any built-in membership properties have their correct dbtype assigned no matter
+                    //what the underlying data type is
+                    var propDbType = MemberTypeRepository.GetDbTypeForBuiltInProperty(
+                        typeDto.Alias,
+                        typeDto.DbType.EnumParse<DataTypeDatabaseType>(true),
+                        standardProps);
+                    
+                    var propertyType = new PropertyType(
+                        typeDto.ControlId,
+                        propDbType.Result,
+                        //This flag tells the property type that it has an explicit dbtype and that it cannot be changed
+                        // which is what we want for the built-in properties.
+                        propDbType.Success)
                     {
                         Alias = typeDto.Alias,
                         DataTypeDefinitionId = typeDto.DataTypeId,
@@ -127,34 +134,47 @@ namespace Umbraco.Core.Persistence.Factories
             return propertyGroups;
         }
 
-        
 
-        private List<PropertyType> GetPropertyTypes(MemberTypeReadOnlyDto dto, MemberType memberType)
+
+        private List<PropertyType> GetPropertyTypes(MemberTypeReadOnlyDto dto, MemberType memberType, Dictionary<string, PropertyType> standardProps)
         {
             //Find PropertyTypes that does not belong to a PropertyTypeGroup
             var propertyTypes = new List<PropertyType>();
-            foreach (var propertyType in dto.PropertyTypes.Where(x => (x.PropertyTypeGroupId.HasValue == false || x.PropertyTypeGroupId.Value == 0) && x.Id.HasValue))
+            foreach (var typeDto in dto.PropertyTypes.Where(x => (x.PropertyTypeGroupId.HasValue == false || x.PropertyTypeGroupId.Value == 0) && x.Id.HasValue))
             {
                 //Internal dictionary for adding "MemberCanEdit" and "VisibleOnProfile" properties to each PropertyType
-                memberType.MemberTypePropertyTypes.Add(propertyType.Alias,
-                    new MemberTypePropertyProfileAccess(propertyType.ViewOnProfile, propertyType.CanEdit));
-                //PropertyType Collection
-                propertyTypes.Add(new PropertyType(propertyType.PropertyEditorAlias,
-                    propertyType.DbType.EnumParse<DataTypeDatabaseType>(true))
-                                  {
-                                      Alias = propertyType.Alias,
-                                      DataTypeDefinitionId = propertyType.DataTypeId,
-                                      Description = propertyType.Description,
-                                      HelpText = propertyType.HelpText,
-                                      Id = propertyType.Id.Value,
-                                      Mandatory = propertyType.Mandatory,
-                                      Name = propertyType.Name,
-                                      SortOrder = propertyType.SortOrder,
-                                      ValidationRegExp = propertyType.ValidationRegExp,
-                                      PropertyGroupId = new Lazy<int>(() => default(int)),
-                                      CreateDate = dto.CreateDate,
-                                      UpdateDate = dto.CreateDate
-                                  });
+                memberType.MemberTypePropertyTypes.Add(typeDto.Alias,
+                    new MemberTypePropertyProfileAccess(typeDto.ViewOnProfile, typeDto.CanEdit));
+
+                //ensures that any built-in membership properties have their correct dbtype assigned no matter
+                //what the underlying data type is
+                var propDbType = MemberTypeRepository.GetDbTypeForBuiltInProperty(
+                    typeDto.Alias,
+                    typeDto.DbType.EnumParse<DataTypeDatabaseType>(true),
+                    standardProps);
+
+                var propertyType = new PropertyType(
+                    typeDto.ControlId,
+                    propDbType.Result,
+                    //This flag tells the property type that it has an explicit dbtype and that it cannot be changed
+                    // which is what we want for the built-in properties.
+                    propDbType.Success)
+                {
+                    Alias = typeDto.Alias,
+                    DataTypeDefinitionId = typeDto.DataTypeId,
+                    Description = typeDto.Description,
+                    HelpText = typeDto.HelpText,
+                    Id = typeDto.Id.Value,
+                    Mandatory = typeDto.Mandatory,
+                    Name = typeDto.Name,
+                    SortOrder = typeDto.SortOrder,
+                    ValidationRegExp = typeDto.ValidationRegExp,
+                    PropertyGroupId = new Lazy<int>(() => default(int)),
+                    CreateDate = dto.CreateDate,
+                    UpdateDate = dto.CreateDate
+                };
+                
+                propertyTypes.Add(propertyType);
             }
             return propertyTypes;
         }

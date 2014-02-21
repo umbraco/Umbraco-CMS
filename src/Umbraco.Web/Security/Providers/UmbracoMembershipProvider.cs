@@ -19,14 +19,14 @@ namespace Umbraco.Web.Security.Providers
     /// <summary>
     /// Abstract Membership Provider that users any implementation of IMembershipMemberService{TEntity} service
     /// </summary>
-    public abstract class UmbracoServiceMembershipProvider<T, TEntity> : UmbracoMembershipProviderBase
+    public abstract class UmbracoMembershipProvider<T, TEntity> : UmbracoMembershipProviderBase
         where T : IMembershipMemberService<TEntity>
         where TEntity : class, IMembershipUser
     {
 
         protected IMembershipMemberService<TEntity> MemberService { get; private set; }
         
-        protected UmbracoServiceMembershipProvider(IMembershipMemberService<TEntity> memberService)
+        protected UmbracoMembershipProvider(IMembershipMemberService<TEntity> memberService)
         {
             MemberService = memberService;
         }
@@ -134,7 +134,7 @@ namespace Umbraco.Web.Security.Providers
             if (MemberService.Exists(username))
             {
                 status = MembershipCreateStatus.DuplicateUserName;
-                LogHelper.Warn<UmbracoServiceMembershipProvider<T, TEntity>>("Cannot create member as username already exists: " + username);
+                LogHelper.Warn<UmbracoMembershipProvider<T, TEntity>>("Cannot create member as username already exists: " + username);
                 return null;
             }
 
@@ -142,7 +142,7 @@ namespace Umbraco.Web.Security.Providers
             if (MemberService.GetByEmail(email) != null && RequiresUniqueEmail)
             {
                 status = MembershipCreateStatus.DuplicateEmail;
-                LogHelper.Warn<UmbracoServiceMembershipProvider<T, TEntity>>(
+                LogHelper.Warn<UmbracoMembershipProvider<T, TEntity>>(
                     "Cannot create member as a member with the same email address exists: " + email);
                 return null;
             }
@@ -150,7 +150,7 @@ namespace Umbraco.Web.Security.Providers
             string salt;
             var encodedPassword = EncryptOrHashNewPassword(password, out salt);
 
-            var member = MemberService.CreateMemberWithIdentity(
+            var member = MemberService.CreateWithIdentity(
                 username,
                 email, 
                 FormatPasswordForStorage(encodedPassword, salt), 
@@ -199,7 +199,7 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            var byEmail = MemberService.FindMembersByEmail(emailToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
+            var byEmail = MemberService.FindByEmail(emailToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
             
             var collection = new MembershipUserCollection();
             foreach (var m in byEmail)
@@ -221,7 +221,7 @@ namespace Umbraco.Web.Security.Providers
         /// </returns>
         public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            var byEmail = MemberService.FindMembersByUsername(usernameToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
+            var byEmail = MemberService.FindByUsername(usernameToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
 
             var collection = new MembershipUserCollection();
             foreach (var m in byEmail)
@@ -244,7 +244,7 @@ namespace Umbraco.Web.Security.Providers
         {
             var membersList = new MembershipUserCollection();
 
-            var pagedMembers = MemberService.GetAllMembers(pageIndex, pageSize, out totalRecords);
+            var pagedMembers = MemberService.GetAll(pageIndex, pageSize, out totalRecords);
             
             foreach (var m in pagedMembers)
             {
@@ -266,7 +266,7 @@ namespace Umbraco.Web.Security.Providers
         /// </remarks>
         public override int GetNumberOfUsersOnline()
         {
-            return MemberService.GetMemberCount(MemberCountType.Online);
+            return MemberService.GetCount(MemberCountType.Online);
         }
 
         /// <summary>
@@ -463,7 +463,7 @@ namespace Umbraco.Web.Security.Providers
             if (RequiresUniqueEmail && user.Email.Trim().IsNullOrWhiteSpace() == false)
             {
                 int totalRecs;
-                var byEmail = MemberService.FindMembersByEmail(user.Email.Trim(), 0, int.MaxValue, out totalRecs, StringPropertyMatchType.Exact);
+                var byEmail = MemberService.FindByEmail(user.Email.Trim(), 0, int.MaxValue, out totalRecs, StringPropertyMatchType.Exact);
                 if (byEmail.Count(x => x.Id != m.Id) > 0)
                 {
                     throw new ProviderException(string.Format("A member with the email '{0}' already exists", user.Email));
@@ -498,12 +498,12 @@ namespace Umbraco.Web.Security.Providers
 
             if (member.IsApproved == false)
             {
-                LogHelper.Info<UmbracoServiceMembershipProvider<T, TEntity>>("Cannot validate member " + username + " because they are not approved");
+                LogHelper.Info<UmbracoMembershipProvider<T, TEntity>>("Cannot validate member " + username + " because they are not approved");
                 return false;
             }
             if (member.IsLockedOut)
             {
-                LogHelper.Info<UmbracoServiceMembershipProvider<T, TEntity>>("Cannot validate member " + username + " because they are currently locked out");
+                LogHelper.Info<UmbracoMembershipProvider<T, TEntity>>("Cannot validate member " + username + " because they are currently locked out");
                 return false;
             }
 
@@ -521,7 +521,7 @@ namespace Umbraco.Web.Security.Providers
                 {
                     member.IsLockedOut = true;
                     member.LastLockoutDate = DateTime.Now;
-                    LogHelper.Info<UmbracoServiceMembershipProvider<T, TEntity>>("Member " + username + " is now locked out, max invalid password attempts exceeded");
+                    LogHelper.Info<UmbracoMembershipProvider<T, TEntity>>("Member " + username + " is now locked out, max invalid password attempts exceeded");
                 }
             }
             else

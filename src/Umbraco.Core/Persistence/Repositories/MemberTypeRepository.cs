@@ -18,17 +18,17 @@ namespace Umbraco.Core.Persistence.Repositories
     /// </summary>
     internal class MemberTypeRepository : ContentTypeBaseRepository<int, IMemberType>, IMemberTypeRepository
     {
-         public MemberTypeRepository(IDatabaseUnitOfWork work)
+        public MemberTypeRepository(IDatabaseUnitOfWork work)
             : base(work)
         {
         }
 
-         public MemberTypeRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
+        public MemberTypeRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache)
             : base(work, cache)
         {
         }
 
-         #region Overrides of RepositoryBase<int, IMemberType>
+        #region Overrides of RepositoryBase<int, IMemberType>
 
         protected override IMemberType PerformGet(int id)
         {
@@ -40,13 +40,13 @@ namespace Umbraco.Core.Persistence.Repositories
                 Database.Fetch<MemberTypeReadOnlyDto, PropertyTypeReadOnlyDto, PropertyTypeGroupReadOnlyDto, MemberTypeReadOnlyDto>(
                     new PropertyTypePropertyGroupRelator().Map, sql);
 
-             if (dtos == null || dtos.Any() == false)
-                 return null;
+            if (dtos == null || dtos.Any() == false)
+                return null;
 
-             var factory = new MemberTypeReadOnlyFactory();
-             var member = factory.BuildEntity(dtos.First());
+            var factory = new MemberTypeReadOnlyFactory();
+            var member = factory.BuildEntity(dtos.First());
 
-             return member;
+            return member;
         }
 
         protected override IEnumerable<IMemberType> PerformGetAll(params int[] ids)
@@ -99,7 +99,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 return sql;
             }
 
-            sql.Select("umbracoNode.*", "cmsContentType.*", "cmsPropertyType.id AS PropertyTypeId", "cmsPropertyType.Alias", 
+            sql.Select("umbracoNode.*", "cmsContentType.*", "cmsPropertyType.id AS PropertyTypeId", "cmsPropertyType.Alias",
                 "cmsPropertyType.Name", "cmsPropertyType.Description", "cmsPropertyType.helpText", "cmsPropertyType.mandatory",
                 "cmsPropertyType.validationRegExp", "cmsPropertyType.dataTypeId", "cmsPropertyType.sortOrder AS PropertyTypeSortOrder",
                 "cmsPropertyType.propertyTypeGroupId AS PropertyTypesGroupId", "cmsMemberType.memberCanEdit", "cmsMemberType.viewOnProfile",
@@ -179,10 +179,10 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new MemberTypeFactory(NodeObjectTypeId);
             var dto = factory.BuildDto(entity);
 
-            EnsureCorrectDbTypeForBuiltInProperties(entity);
+            EnsureExplicitDataTypeForBuiltInProperties(entity);
 
             PersistNewBaseContentType(dto, entity);
-            
+
             //Handles the MemberTypeDto (cmsMemberType table)
             var memberTypeDtos = factory.BuildMemberTypeDtos(entity);
             foreach (var memberTypeDto in memberTypeDtos)
@@ -216,12 +216,12 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new MemberTypeFactory(NodeObjectTypeId);
             var dto = factory.BuildDto(entity);
 
-            EnsureCorrectDbTypeForBuiltInProperties(entity);
+            EnsureExplicitDataTypeForBuiltInProperties(entity);
 
             PersistUpdatedBaseContentType(dto, entity);
 
             //Remove existing entries before inserting new ones
-            Database.Delete<MemberTypeDto>("WHERE NodeId = @Id", new {Id = entity.Id});
+            Database.Delete<MemberTypeDto>("WHERE NodeId = @Id", new { Id = entity.Id });
 
             //Handles the MemberTypeDto (cmsMemberType table)
             var memberTypeDtos = factory.BuildMemberTypeDtos(entity);
@@ -236,11 +236,29 @@ namespace Umbraco.Core.Persistence.Repositories
         #endregion
 
         /// <summary>
-        /// Ensure that all the built-in membership provider properties have their correct db types
-        /// and property editors assigned.
+        /// Override so we can specify explicit db type's on any property types that are built-in.
+        /// </summary>
+        /// <param name="dataTypeId"></param>
+        /// <param name="dbType"></param>
+        /// <param name="propertyTypeAlias"></param>
+        /// <returns></returns>
+        protected override PropertyType CreatePropertyType(Guid dataTypeId, DataTypeDatabaseType dbType, string propertyTypeAlias)
+        {
+            //custom property type constructor logic to set explicit dbtype's for built in properties
+            var stdProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+            var propDbType = GetDbTypeForBuiltInProperty(propertyTypeAlias, dbType, stdProps);
+            return new PropertyType(dataTypeId, propDbType.Result,
+                //This flag tells the property type that it has an explicit dbtype and that it cannot be changed
+                // which is what we want for the built-in properties.
+                propDbType.Success);
+        }
+
+        /// <summary>
+        /// Ensure that all the built-in membership provider properties have their correct data type
+        /// and property editors assigned. This occurs prior to saving so that the correct values are persisted.
         /// </summary>
         /// <param name="memberType"></param>
-        private static void EnsureCorrectDbTypeForBuiltInProperties(IContentTypeBase memberType)
+        private static void EnsureExplicitDataTypeForBuiltInProperties(IContentTypeBase memberType)
         {
             var stdProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
             foreach (var propertyType in memberType.PropertyTypes)
@@ -248,7 +266,6 @@ namespace Umbraco.Core.Persistence.Repositories
                 var dbTypeAttempt = GetDbTypeForBuiltInProperty(propertyType.Alias, propertyType.DataTypeDatabaseType, stdProps);
                 if (dbTypeAttempt)
                 {
-                    propertyType.DataTypeDatabaseType = dbTypeAttempt.Result;
                     //this reset's it's current data type reference which will be re-assigned based on the property editor assigned on the next line
                     propertyType.DataTypeDefinitionId = 0;
                     propertyType.DataTypeId = GetPropertyEditorForBuiltInProperty(propertyType.Alias, propertyType.DataTypeId, stdProps).Result;
@@ -281,7 +298,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Successful attempt if it was a built in property
         /// </returns>
         internal static Attempt<DataTypeDatabaseType> GetDbTypeForBuiltInProperty(
-            string propAlias, 
+            string propAlias,
             DataTypeDatabaseType dbType,
             Dictionary<string, PropertyType> standardProps)
         {
@@ -307,7 +324,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// Successful attempt if it was a built in property
         /// </returns>
         internal static Attempt<Guid> GetPropertyEditorForBuiltInProperty(
-            string propAlias, 
+            string propAlias,
             Guid propertyEditor,
             Dictionary<string, PropertyType> standardProps)
         {
