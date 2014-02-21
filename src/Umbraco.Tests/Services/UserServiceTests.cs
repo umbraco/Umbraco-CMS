@@ -188,7 +188,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.UserService.Save(customUser);
 
             int totalRecs;
-            var found = ServiceContext.UserService.FindMembersByEmail("tes", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
+            var found = ServiceContext.UserService.FindByEmail("tes", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
 
             Assert.AreEqual(10, found.Count());
         }
@@ -206,7 +206,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.UserService.Save(customUser);
 
             int totalRecs;
-            var found = ServiceContext.UserService.FindMembersByEmail("test.com", 0, 100, out totalRecs, StringPropertyMatchType.EndsWith);
+            var found = ServiceContext.UserService.FindByEmail("test.com", 0, 100, out totalRecs, StringPropertyMatchType.EndsWith);
 
             Assert.AreEqual(11, found.Count());
         }
@@ -224,7 +224,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.UserService.Save(customUser);
 
             int totalRecs;
-            var found = ServiceContext.UserService.FindMembersByEmail("test", 0, 100, out totalRecs, StringPropertyMatchType.Contains);
+            var found = ServiceContext.UserService.FindByEmail("test", 0, 100, out totalRecs, StringPropertyMatchType.Contains);
 
             Assert.AreEqual(11, found.Count());
         }
@@ -242,7 +242,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.UserService.Save(customUser);
 
             int totalRecs;
-            var found = ServiceContext.UserService.FindMembersByEmail("hello@test.com", 0, 100, out totalRecs, StringPropertyMatchType.Exact);
+            var found = ServiceContext.UserService.FindByEmail("hello@test.com", 0, 100, out totalRecs, StringPropertyMatchType.Exact);
 
             Assert.AreEqual(1, found.Count());
         }
@@ -256,7 +256,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.UserService.Save(users);
 
             int totalRecs;
-            var found = ServiceContext.UserService.GetAllMembers(0, 2, out totalRecs);
+            var found = ServiceContext.UserService.GetAll(0, 2, out totalRecs);
 
             Assert.AreEqual(2, found.Count());
             // + 1 because of the built in admin user
@@ -275,7 +275,7 @@ namespace Umbraco.Tests.Services
             var customUser = MockedUser.CreateUser(userType);
             ServiceContext.UserService.Save(customUser);
 
-            var found = ServiceContext.UserService.GetMemberCount(MemberCountType.All);
+            var found = ServiceContext.UserService.GetCount(MemberCountType.All);
 
             // + 1 because of the built in admin user
             Assert.AreEqual(12, found);
@@ -306,7 +306,7 @@ namespace Umbraco.Tests.Services
             customUser.IsLockedOut = true;
             ServiceContext.UserService.Save(customUser);
 
-            var found = ServiceContext.UserService.GetMemberCount(MemberCountType.LockedOut);
+            var found = ServiceContext.UserService.GetCount(MemberCountType.LockedOut);
 
             Assert.AreEqual(6, found);
         }
@@ -323,7 +323,7 @@ namespace Umbraco.Tests.Services
             customUser.IsApproved = false;
             ServiceContext.UserService.Save(customUser);
 
-            var found = ServiceContext.UserService.GetMemberCount(MemberCountType.Approved);
+            var found = ServiceContext.UserService.GetCount(MemberCountType.Approved);
 
             // + 1 because of the built in admin user
             Assert.AreEqual(6, found);

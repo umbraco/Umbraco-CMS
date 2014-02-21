@@ -58,7 +58,7 @@ namespace Umbraco.Core.Services
             IContent[] allVersions = null;
 
             int totalUsers;
-            var allUsers = _userService.GetAllMembers(0, int.MaxValue, out totalUsers);
+            var allUsers = _userService.GetAll(0, int.MaxValue, out totalUsers);
             foreach (var u in allUsers)
             {
                 if (u.IsApproved == false) continue;

@@ -360,7 +360,7 @@ namespace umbraco.cms.presentation.members
                         tp.ErrorControl.Visible = false;
                     }
 
-                    var memberTypeProvider = (IUmbracoContentTypeMembershipProvider) Membership.Provider;
+                    var memberTypeProvider = (IUmbracoMemberTypeMembershipProvider) Membership.Provider;
                     
                     //update the membership provider                    
                     var commentsProp = _contentControl.DataTypes.GetValue(memberTypeProvider.CommentPropertyTypeAlias);

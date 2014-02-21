@@ -113,7 +113,7 @@ namespace umbraco.cms.businesslogic.member
         public static IEnumerable<Member> GetAllAsList()
         {
             int totalRecs;
-            return ApplicationContext.Current.Services.MemberService.GetAllMembers(0, int.MaxValue, out totalRecs)
+            return ApplicationContext.Current.Services.MemberService.GetAll(0, int.MaxValue, out totalRecs)
                 .Select(x => new Member(x))
                 .ToArray();
         }
@@ -153,7 +153,7 @@ namespace umbraco.cms.businesslogic.member
         public static Member[] getMemberFromFirstLetter(char letter)
         {
             int totalRecs;
-            return ApplicationContext.Current.Services.MemberService.FindMembersByUsername(
+            return ApplicationContext.Current.Services.MemberService.FindByUsername(
                 letter.ToString(CultureInfo.InvariantCulture), 0, int.MaxValue, out totalRecs, StringPropertyMatchType.StartsWith)
                                      .Select(x => new Member(x))
                                      .ToArray();
@@ -170,7 +170,7 @@ namespace umbraco.cms.businesslogic.member
             }
             else
             {
-                var found = ApplicationContext.Current.Services.MemberService.FindMembersByUsername(
+                var found = ApplicationContext.Current.Services.MemberService.FindByUsername(
                     usernameToMatch, 0, int.MaxValue, out totalRecs, StringPropertyMatchType.StartsWith);
                 return found.Select(x => new Member(x)).ToArray();
             }
@@ -290,7 +290,7 @@ namespace umbraco.cms.businesslogic.member
                 return null;
 
             int totalRecs;
-            var found = ApplicationContext.Current.Services.MemberService.FindMembersByEmail(
+            var found = ApplicationContext.Current.Services.MemberService.FindByEmail(
                 email, 0, int.MaxValue, out totalRecs, StringPropertyMatchType.Exact);
 
             return found.Select(x => new Member(x)).ToArray();

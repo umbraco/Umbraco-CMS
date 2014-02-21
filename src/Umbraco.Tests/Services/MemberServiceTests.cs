@@ -381,7 +381,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(members);
 
             int totalRecs;
-            var found = ServiceContext.MemberService.GetAllMembers(0, 2, out totalRecs);
+            var found = ServiceContext.MemberService.GetAll(0, 2, out totalRecs);
 
             Assert.AreEqual(2, found.Count());
             Assert.AreEqual(10, totalRecs);
@@ -401,7 +401,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             int totalRecs;
-            var found = ServiceContext.MemberService.FindMembersByEmail("tes", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
+            var found = ServiceContext.MemberService.FindByEmail("tes", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
 
             Assert.AreEqual(10, found.Count());
         }
@@ -418,7 +418,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             int totalRecs;
-            var found = ServiceContext.MemberService.FindMembersByEmail("test.com", 0, 100, out totalRecs, StringPropertyMatchType.EndsWith);
+            var found = ServiceContext.MemberService.FindByEmail("test.com", 0, 100, out totalRecs, StringPropertyMatchType.EndsWith);
 
             Assert.AreEqual(11, found.Count());
         }
@@ -435,7 +435,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             int totalRecs;
-            var found = ServiceContext.MemberService.FindMembersByEmail("test", 0, 100, out totalRecs, StringPropertyMatchType.Contains);
+            var found = ServiceContext.MemberService.FindByEmail("test", 0, 100, out totalRecs, StringPropertyMatchType.Contains);
 
             Assert.AreEqual(11, found.Count());
         }
@@ -452,7 +452,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             int totalRecs;
-            var found = ServiceContext.MemberService.FindMembersByEmail("hello@test.com", 0, 100, out totalRecs, StringPropertyMatchType.Exact);
+            var found = ServiceContext.MemberService.FindByEmail("hello@test.com", 0, 100, out totalRecs, StringPropertyMatchType.Exact);
 
             Assert.AreEqual(1, found.Count());
         }
@@ -469,7 +469,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             int totalRecs;
-            var found = ServiceContext.MemberService.FindMembersByUsername("tes", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
+            var found = ServiceContext.MemberService.FindByUsername("tes", 0, 100, out totalRecs, StringPropertyMatchType.StartsWith);
 
             Assert.AreEqual(10, found.Count());
         }
@@ -486,7 +486,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             int totalRecs;
-            var found = ServiceContext.MemberService.FindMembersByUsername("llo", 0, 100, out totalRecs, StringPropertyMatchType.EndsWith);
+            var found = ServiceContext.MemberService.FindByUsername("llo", 0, 100, out totalRecs, StringPropertyMatchType.EndsWith);
 
             Assert.AreEqual(1, found.Count());
         }
@@ -503,7 +503,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             int totalRecs;
-            var found = ServiceContext.MemberService.FindMembersByUsername("test", 0, 100, out totalRecs, StringPropertyMatchType.Contains);
+            var found = ServiceContext.MemberService.FindByUsername("test", 0, 100, out totalRecs, StringPropertyMatchType.Contains);
 
             Assert.AreEqual(11, found.Count());
         }
@@ -520,7 +520,7 @@ namespace Umbraco.Tests.Services
             ServiceContext.MemberService.Save(customMember);
 
             int totalRecs;
-            var found = ServiceContext.MemberService.FindMembersByUsername("hello", 0, 100, out totalRecs, StringPropertyMatchType.Exact);
+            var found = ServiceContext.MemberService.FindByUsername("hello", 0, 100, out totalRecs, StringPropertyMatchType.Exact);
 
             Assert.AreEqual(1, found.Count());
         }
@@ -850,7 +850,7 @@ namespace Umbraco.Tests.Services
             var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
             ServiceContext.MemberService.Save(customMember);
 
-            var found = ServiceContext.MemberService.GetMemberCount(MemberCountType.All);
+            var found = ServiceContext.MemberService.GetCount(MemberCountType.All);
 
             Assert.AreEqual(11, found);
         }
@@ -867,7 +867,7 @@ namespace Umbraco.Tests.Services
             customMember.SetValue(Constants.Conventions.Member.LastLoginDate, DateTime.Now);
             ServiceContext.MemberService.Save(customMember);
 
-            var found = ServiceContext.MemberService.GetMemberCount(MemberCountType.Online);
+            var found = ServiceContext.MemberService.GetCount(MemberCountType.Online);
 
             Assert.AreEqual(9, found);
         }
@@ -884,7 +884,7 @@ namespace Umbraco.Tests.Services
             customMember.SetValue(Constants.Conventions.Member.IsLockedOut, true);
             ServiceContext.MemberService.Save(customMember);
 
-            var found = ServiceContext.MemberService.GetMemberCount(MemberCountType.LockedOut);
+            var found = ServiceContext.MemberService.GetCount(MemberCountType.LockedOut);
 
             Assert.AreEqual(6, found);
         }
@@ -901,7 +901,7 @@ namespace Umbraco.Tests.Services
             customMember.SetValue(Constants.Conventions.Member.IsApproved, false);
             ServiceContext.MemberService.Save(customMember);
 
-            var found = ServiceContext.MemberService.GetMemberCount(MemberCountType.Approved);
+            var found = ServiceContext.MemberService.GetCount(MemberCountType.Approved);
 
             Assert.AreEqual(5, found);
         }

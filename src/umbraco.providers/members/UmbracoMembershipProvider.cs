@@ -30,7 +30,7 @@ namespace umbraco.providers.members
     /// Custom Membership Provider for Umbraco Members (User authentication for Frontend applications NOT umbraco CMS)  
     /// </summary>
     [Obsolete("This has been superceded by Umbraco.Web.Security.Providers.MembersMembershipProvider")]
-    public class UmbracoMembershipProvider : UmbracoMembershipProviderBase, IUmbracoContentTypeMembershipProvider
+    public class UmbracoMembershipProvider : UmbracoMembershipProviderBase, IUmbracoMemberTypeMembershipProvider
     {
         public UmbracoMembershipProvider()
         {
@@ -350,7 +350,7 @@ namespace umbraco.providers.members
         /// </returns>
         public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            var byEmail = ApplicationContext.Current.Services.MemberService.FindMembersByEmail(emailToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
+            var byEmail = ApplicationContext.Current.Services.MemberService.FindByEmail(emailToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
             
             var collection = new MembershipUserCollection();                        
             foreach (var m in byEmail)
@@ -372,7 +372,7 @@ namespace umbraco.providers.members
         /// </returns>
         public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords)
         {
-            var byEmail = ApplicationContext.Current.Services.MemberService.FindMembersByUsername(usernameToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
+            var byEmail = ApplicationContext.Current.Services.MemberService.FindByUsername(usernameToMatch, pageIndex, pageSize, out totalRecords, StringPropertyMatchType.Wildcard).ToArray();
             
             var collection = new MembershipUserCollection();            
             foreach (var m in byEmail)
@@ -395,7 +395,7 @@ namespace umbraco.providers.members
         {
             var membersList = new MembershipUserCollection();
 
-            var pagedMembers = ApplicationContext.Current.Services.MemberService.GetAllMembers(pageIndex, pageSize, out totalRecords);
+            var pagedMembers = ApplicationContext.Current.Services.MemberService.GetAll(pageIndex, pageSize, out totalRecords);
 
             foreach (var m in pagedMembers)
             {
@@ -412,7 +412,7 @@ namespace umbraco.providers.members
         /// </returns>
         public override int GetNumberOfUsersOnline()
         {
-            return ApplicationContext.Current.Services.MemberService.GetMemberCount(MemberCountType.Online);
+            return ApplicationContext.Current.Services.MemberService.GetCount(MemberCountType.Online);
         }
 
         /// <summary>

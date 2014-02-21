@@ -341,7 +341,7 @@ namespace umbraco.BusinessLogic
         public static User[] getAll()
         {
             int totalRecs;
-            var users = ApplicationContext.Current.Services.UserService.GetAllMembers(
+            var users = ApplicationContext.Current.Services.UserService.GetAll(
                 0, int.MaxValue, out totalRecs);
 
             return users.Select(x => new User(x))
@@ -390,14 +390,14 @@ namespace umbraco.BusinessLogic
             int totalRecs;
             if (useExactMatch)
             {
-                return ApplicationContext.Current.Services.UserService.FindMembersByEmail(
+                return ApplicationContext.Current.Services.UserService.FindByEmail(
                     email, 0, int.MaxValue, out totalRecs, StringPropertyMatchType.Exact)
                     .Select(x => new User(x))
                     .ToArray();
             }
             else
             {
-                return ApplicationContext.Current.Services.UserService.FindMembersByEmail(
+                return ApplicationContext.Current.Services.UserService.FindByEmail(
                     string.Format("%{0}%", email), 0, int.MaxValue, out totalRecs, StringPropertyMatchType.Wildcard)
                     .Select(x => new User(x))
                     .ToArray();
@@ -430,14 +430,14 @@ namespace umbraco.BusinessLogic
             int totalRecs;
             if (partialMatch)
             {
-                return ApplicationContext.Current.Services.UserService.FindMembersByUsername(
+                return ApplicationContext.Current.Services.UserService.FindByUsername(
                     string.Format("%{0}%", login), 0, int.MaxValue, out totalRecs, StringPropertyMatchType.Wildcard)
                     .Select(x => new User(x))
                     .ToArray();
             }
             else
             {
-                return ApplicationContext.Current.Services.UserService.FindMembersByUsername(
+                return ApplicationContext.Current.Services.UserService.FindByUsername(
                     login, 0, int.MaxValue, out totalRecs, StringPropertyMatchType.Exact)
                     .Select(x => new User(x))
                     .ToArray();

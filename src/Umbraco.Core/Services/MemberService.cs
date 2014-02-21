@@ -252,7 +252,7 @@ namespace Umbraco.Core.Services
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        public IEnumerable<IMember> FindMembersByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+        public IEnumerable<IMember> FindByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
@@ -284,7 +284,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IEnumerable<IMember> FindMembersByUsername(string login, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+        public IEnumerable<IMember> FindByUsername(string login, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
@@ -525,7 +525,7 @@ namespace Umbraco.Core.Services
         /// that have their last active date within the Membership.UserIsOnlineTimeWindow (which is in minutes). It isn't exact science
         /// but that is how MS have made theirs so we'll follow that principal.
         /// </remarks>
-        public int GetMemberCount(MemberCountType countType)
+        public int GetCount(MemberCountType countType)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
             {
@@ -565,7 +565,7 @@ namespace Umbraco.Core.Services
 
         }
 
-        public IEnumerable<IMember> GetAllMembers(int pageIndex, int pageSize, out int totalRecords)
+        public IEnumerable<IMember> GetAll(int pageIndex, int pageSize, out int totalRecords)
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
@@ -615,7 +615,7 @@ namespace Umbraco.Core.Services
         /// <param name="memberTypeAlias"></param>
         /// <param name="raiseEvents"></param>
         /// <returns></returns>
-        public IMember CreateMemberWithIdentity(string username, string email, string password, string memberTypeAlias, bool raiseEvents = true)
+        public IMember CreateWithIdentity(string username, string email, string password, string memberTypeAlias, bool raiseEvents = true)
         {
             var uow = _uowProvider.GetUnitOfWork();
             IMemberType memberType;
@@ -712,13 +712,13 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Saves an updated Member
         /// </summary>
-        /// <param name="member"></param>
+        /// <param name="entity"></param>
         /// <param name="raiseEvents"></param>
-        public void Save(IMember member, bool raiseEvents = true)
+        public void Save(IMember entity, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(member), this))
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(entity), this))
                 {
                     return;
                 }
@@ -728,22 +728,22 @@ namespace Umbraco.Core.Services
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                repository.AddOrUpdate(member);
+                repository.AddOrUpdate(entity);
                 uow.Commit();
 
-                var xml = member.ToXml();
-                CreateAndSaveMemberXml(xml, member.Id, uow.Database);
+                var xml = entity.ToXml();
+                CreateAndSaveMemberXml(xml, entity.Id, uow.Database);
             }
 
             if (raiseEvents)
-                Saved.RaiseEvent(new SaveEventArgs<IMember>(member, false), this);
+                Saved.RaiseEvent(new SaveEventArgs<IMember>(entity, false), this);
         }
 
-        public void Save(IEnumerable<IMember> members, bool raiseEvents = true)
+        public void Save(IEnumerable<IMember> entities, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(members), this))
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(entities), this))
                     return;
             }
             using (new WriteLock(Locker))
@@ -751,7 +751,7 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateMemberRepository(uow))
                 {
-                    foreach (var member in members)
+                    foreach (var member in entities)
                     {
                         repository.AddOrUpdate(member);
                     }
@@ -759,14 +759,14 @@ namespace Umbraco.Core.Services
                     //commit the whole lot in one go
                     uow.Commit();
 
-                    foreach (var member in members)
+                    foreach (var member in entities)
                     {
                         CreateAndSaveMemberXml(member.ToXml(), member.Id, uow.Database);
                     }
                 }
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IMember>(members, false), this);
+                    Saved.RaiseEvent(new SaveEventArgs<IMember>(entities, false), this);
             }
         }
 
