@@ -3,12 +3,14 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.cms.businesslogic.propertytype;
+using Umbraco.Core;
 
 namespace umbraco.developer
 {
@@ -34,16 +36,20 @@ namespace umbraco.developer
 
             // generic properties
             string existingGenProps = ",";
-            foreach (PropertyType pt in PropertyType.GetAll())
+		    var exclude = Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
+            foreach (PropertyType pt in PropertyType.GetAll().Where(x => exclude.Contains(x.Alias) == false))
+		    {
                 if (!existingGenProps.Contains("," + pt.Alias + ","))
                 {
-                    if(UmbracoSettings.UseLegacyXmlSchema)
+                    if (UmbracoSettings.UseLegacyXmlSchema)
                         preValuesSource.Add(string.Format("data [@alias = '{0}']", pt.Alias));
                     else
                         preValuesSource.Add(pt.Alias);
 
                     existingGenProps += pt.Alias + ",";
                 }
+		    }
+                
 
             preValuesSource.Sort();
 		    preValues.DataSource = preValuesSource;
@@ -56,24 +62,5 @@ namespace umbraco.developer
                 valueOf.Text = Request.QueryString["value"];
 		}
 
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
-		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{    
-
-		}
-		#endregion
 	}
 }
