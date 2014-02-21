@@ -1240,6 +1240,16 @@ namespace Umbraco.Web
 
 		#endregion
 
+        #region Prevalues
+
+        public string GetPreValueAsString(int id)
+        {
+            var ds = UmbracoContext.Application.Services.DataTypeService;
+            return ds.GetPreValueAsString(id);
+        }
+
+        #endregion
+
         /// <summary>
         /// This is used in methods like BeginUmbracoForm and SurfaceAction to generate an encrypted string which gets submitted in a request for which
         /// Umbraco can decrypt during the routing process in order to delegate the request to a specific MVC Controller.
