@@ -119,6 +119,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="userId"></param>
         /// <param name="permissions"></param>
         /// <param name="entityIds"></param>
+        /// <remarks>
+        /// This will first clear the permissions for this user and entities and recreate them
+        /// </remarks>
         public void AssignUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
         {
             var db = _unitOfWork.Database;
@@ -158,14 +161,15 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="permission"></param>
         /// <param name="userIds"></param>
         /// <remarks>
-        /// This will first clear the permissions for this entity then re-create them
+        /// This does not replace permissions, just adds one if it doesn't exist
         /// </remarks>
         public void AssignEntityPermissions(TEntity entity, char permission, IEnumerable<int> userIds)
         {
             var db = _unitOfWork.Database;
             using (var trans = db.GetTransaction())
             {
-                db.Execute("DELETE FROM umbracoUser2NodePermission WHERE nodeId=@nodeId", new {nodeId = entity.Id});
+                db.Execute("DELETE FROM umbracoUser2NodePermission WHERE nodeId=@nodeId AND permission=@permission",
+                    new { nodeId = entity.Id, permission = permission.ToString(CultureInfo.InvariantCulture) });
 
                 var actions = userIds.Select(id => new User2NodePermissionDto
                 {

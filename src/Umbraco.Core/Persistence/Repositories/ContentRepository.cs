@@ -536,6 +536,9 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         /// <param name="permission"></param>
         /// <param name="userIds"></param>
+        /// <remarks>
+        /// This does not replace permissions, just adds one if it doesn't exist
+        /// </remarks>
         public void AssignEntityPermissions(IContent entity, char permission, IEnumerable<int> userIds)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
