@@ -101,7 +101,7 @@ namespace Umbraco.Core.Persistence.Factories
                         standardProps);
                     
                     var propertyType = new PropertyType(
-                        typeDto.ControlId,
+                        typeDto.PropertyEditorAlias,
                         propDbType.Result,
                         //This flag tells the property type that it has an explicit dbtype and that it cannot be changed
                         // which is what we want for the built-in properties.
@@ -154,7 +154,7 @@ namespace Umbraco.Core.Persistence.Factories
                     standardProps);
 
                 var propertyType = new PropertyType(
-                    typeDto.ControlId,
+                    typeDto.PropertyEditorAlias,
                     propDbType.Result,
                     //This flag tells the property type that it has an explicit dbtype and that it cannot be changed
                     // which is what we want for the built-in properties.

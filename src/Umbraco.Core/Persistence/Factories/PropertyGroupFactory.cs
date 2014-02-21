@@ -12,15 +12,15 @@ namespace Umbraco.Core.Persistence.Factories
         private readonly DateTime _createDate;
         private readonly DateTime _updateDate;
         //a callback to create a property type which can be injected via a contructor
-        private readonly Func<Guid, DataTypeDatabaseType, string, PropertyType> _propertyTypeCtor;
+        private readonly Func<string, DataTypeDatabaseType, string, PropertyType> _propertyTypeCtor;
 
         public PropertyGroupFactory(int id)
         {
             _id = id;
-            _propertyTypeCtor = (guid, dbType, alias) => new PropertyType(guid, dbType);
+            _propertyTypeCtor = (propertyEditorAlias, dbType, alias) => new PropertyType(propertyEditorAlias, dbType);
         }
-        
-        public PropertyGroupFactory(int id, DateTime createDate, DateTime updateDate, Func<Guid, DataTypeDatabaseType, string, PropertyType> propertyTypeCtor)
+
+        public PropertyGroupFactory(int id, DateTime createDate, DateTime updateDate, Func<string, DataTypeDatabaseType, string, PropertyType> propertyTypeCtor)
         {
             _id = id;
             _createDate = createDate;
@@ -59,7 +59,7 @@ namespace Umbraco.Core.Persistence.Factories
                 foreach (var typeDto in typeDtos)
                 {
                     var tempGroupDto = groupDto;
-                    var propertyType = _propertyTypeCtor(typeDto.DataTypeDto.ControlId,
+                    var propertyType = _propertyTypeCtor(typeDto.DataTypeDto.PropertyEditorAlias,
                         typeDto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true),
                         typeDto.Alias);
 

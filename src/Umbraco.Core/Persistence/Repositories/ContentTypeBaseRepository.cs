@@ -56,9 +56,9 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
         
-        protected virtual PropertyType CreatePropertyType(Guid dataTypeId, DataTypeDatabaseType dbType, string propertyTypeAlias)
+        protected virtual PropertyType CreatePropertyType(string propertyEditorAlias, DataTypeDatabaseType dbType, string propertyTypeAlias)
         {
-            return new PropertyType(dataTypeId, dbType);
+            return new PropertyType(propertyEditorAlias, dbType);
         }
 
         protected void PersistNewBaseContentType(ContentTypeDto dto, IContentTypeComposition entity)
@@ -369,7 +369,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var list = new List<PropertyType>();
             foreach (var dto in dtos.Where(x => (x.PropertyTypeGroupId > 0) == false))
             {
-                var propType = CreatePropertyType(dto.DataTypeDto.ControlId, dto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true), dto.Alias);
+                var propType = CreatePropertyType(dto.DataTypeDto.PropertyEditorAlias, dto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true), dto.Alias);
                 propType.Alias = dto.Alias;
                 propType.DataTypeDefinitionId = dto.DataTypeId;
                 propType.Description = dto.Description;

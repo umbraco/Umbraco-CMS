@@ -264,7 +264,7 @@ namespace Umbraco.Web.Models.Mapping
                 }
                 else
                 {
-                    var umbracoProvider = (IUmbracoContentTypeMembershipProvider)Membership.Provider;
+                    var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)Membership.Provider;
 
                     //This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
                     // if we just had all of the membeship provider fields on the member table :(
@@ -323,7 +323,7 @@ namespace Umbraco.Web.Models.Mapping
                 }
                 else
                 {
-                    var umbracoProvider = (IUmbracoContentTypeMembershipProvider)Membership.Provider;
+                    var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)Membership.Provider;
 
                     return new Dictionary<string, string>
                     {

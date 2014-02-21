@@ -33,13 +33,12 @@ namespace Umbraco.Core.Models
             if(dataTypeDefinition.HasIdentity)
                 _dataTypeDefinitionId = dataTypeDefinition.Id;
 
-            PropertyEditorAlias = dataTypeDefinition.PropertyEditorAlias;
-            _dataTypeId = dataTypeDefinition.ControlId;
+            _propertyEditorAlias = dataTypeDefinition.PropertyEditorAlias;
             _dataTypeDatabaseType = dataTypeDefinition.DatabaseType;
         }
         
         internal PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType)
-            : this(dataTypeControlId, dataTypeDatabaseType, false)
+            : this(propertyEditorAlias, dataTypeDatabaseType, false)
         {
             PropertyEditorAlias = propertyEditorAlias;
         }
@@ -47,13 +46,13 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Used internally to assign an explicity database type for this property type regardless of what the underlying data type/property editor is.
         /// </summary>
-        /// <param name="dataTypeControlId"></param>
+        /// <param name="propertyEditorAlias"></param>
         /// <param name="dataTypeDatabaseType"></param>
         /// <param name="isExplicitDbType"></param>
-        internal PropertyType(Guid dataTypeControlId, DataTypeDatabaseType dataTypeDatabaseType, bool isExplicitDbType)
+        internal PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType, bool isExplicitDbType)
         {
             _isExplicitDbType = isExplicitDbType;
-            _dataTypeId = dataTypeControlId;
+            _propertyEditorAlias = propertyEditorAlias;
             _dataTypeDatabaseType = dataTypeDatabaseType;
         }
 

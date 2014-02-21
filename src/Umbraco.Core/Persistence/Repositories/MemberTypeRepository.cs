@@ -238,16 +238,16 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <summary>
         /// Override so we can specify explicit db type's on any property types that are built-in.
         /// </summary>
-        /// <param name="dataTypeId"></param>
+        /// <param name="propertyEditorAlias"></param>
         /// <param name="dbType"></param>
         /// <param name="propertyTypeAlias"></param>
         /// <returns></returns>
-        protected override PropertyType CreatePropertyType(Guid dataTypeId, DataTypeDatabaseType dbType, string propertyTypeAlias)
+        protected override PropertyType CreatePropertyType(string propertyEditorAlias, DataTypeDatabaseType dbType, string propertyTypeAlias)
         {
             //custom property type constructor logic to set explicit dbtype's for built in properties
             var stdProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
             var propDbType = GetDbTypeForBuiltInProperty(propertyTypeAlias, dbType, stdProps);
-            return new PropertyType(dataTypeId, propDbType.Result,
+            return new PropertyType(propertyEditorAlias, propDbType.Result,
                 //This flag tells the property type that it has an explicit dbtype and that it cannot be changed
                 // which is what we want for the built-in properties.
                 propDbType.Success);
