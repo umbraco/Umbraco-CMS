@@ -208,7 +208,9 @@ namespace Umbraco.Core.Persistence.Repositories
                     UserId = p.Item1
                 }).ToArray();
 
-                _unitOfWork.Database.BulkInsertRecords(actions);
+                _unitOfWork.Database.BulkInsertRecords(actions, trans);
+
+                trans.Complete();
 
                 //Raise the event
                 AssignedPermissions.RaiseEvent(

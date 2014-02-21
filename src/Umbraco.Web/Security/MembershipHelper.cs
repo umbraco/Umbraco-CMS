@@ -227,7 +227,10 @@ namespace Umbraco.Web.Security
 
                 var memberType = member.ContentType;
 
-                foreach (var prop in memberType.PropertyTypes.Where(x => memberType.MemberCanEditProperty(x.Alias)))
+                var builtIns = Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
+
+                foreach (var prop in memberType.PropertyTypes
+                    .Where(x => builtIns.Contains(x.Alias) == false && memberType.MemberCanEditProperty(x.Alias)))
                 {
                     var value = string.Empty;
                     var propValue = member.Properties[prop.Alias];

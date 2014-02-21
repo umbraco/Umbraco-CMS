@@ -56,6 +56,11 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
         
+        protected virtual PropertyType CreatePropertyType(Guid dataTypeId, DataTypeDatabaseType dbType, string propertyTypeAlias)
+        {
+            return new PropertyType(dataTypeId, dbType);
+        }
+
         protected void PersistNewBaseContentType(ContentTypeDto dto, IContentTypeComposition entity)
         {
             //Logic for setting Path, Level and SortOrder
@@ -344,7 +349,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
 
-            var propertyGroupFactory = new PropertyGroupFactory(id, createDate, updateDate);
+            var propertyGroupFactory = new PropertyGroupFactory(id, createDate, updateDate, CreatePropertyType);
             var propertyGroups = propertyGroupFactory.BuildEntity(dtos);
             return new PropertyGroupCollection(propertyGroups);
         }
@@ -361,25 +366,23 @@ namespace Umbraco.Core.Persistence.Repositories
             var dtos = Database.Fetch<PropertyTypeDto, DataTypeDto>(sql);
 
             //TODO Move this to a PropertyTypeFactory
-            var list = (from dto in dtos
-                        where (dto.PropertyTypeGroupId > 0) == false
-                        select
-                            new PropertyType(dto.DataTypeDto.ControlId,
-                                             dto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
-                                {
-                                    Alias = dto.Alias,
-                                    DataTypeDefinitionId = dto.DataTypeId,
-                                    Description = dto.Description,
-                                    Id = dto.Id,
-                                    Name = dto.Name,
-                                    HelpText = dto.HelpText,
-                                    Mandatory = dto.Mandatory,
-                                    SortOrder = dto.SortOrder,
-                                    ValidationRegExp = dto.ValidationRegExp,
-                                    CreateDate = createDate,
-                                    UpdateDate = updateDate
-                                }).ToList();
-
+            var list = new List<PropertyType>();
+            foreach (var dto in dtos.Where(x => (x.PropertyTypeGroupId > 0) == false))
+            {
+                var propType = CreatePropertyType(dto.DataTypeDto.ControlId, dto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true), dto.Alias);
+                propType.Alias = dto.Alias;
+                propType.DataTypeDefinitionId = dto.DataTypeId;
+                propType.Description = dto.Description;
+                propType.Id = dto.Id;
+                propType.Name = dto.Name;
+                propType.HelpText = dto.HelpText;
+                propType.Mandatory = dto.Mandatory;
+                propType.SortOrder = dto.SortOrder;
+                propType.ValidationRegExp = dto.ValidationRegExp;
+                propType.CreateDate = createDate;
+                propType.UpdateDate = updateDate;
+                list.Add(propType);
+            }
             //Reset dirty properties
             Parallel.ForEach(list, currentFile => currentFile.ResetDirtyProperties(false));
 

@@ -61,7 +61,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var standardProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
 
                 Assert.That(sut, Is.Not.Null);
-                Assert.That(sut.PropertyGroups.Count(), Is.EqualTo(1));
+                Assert.That(sut.PropertyGroups.Count(), Is.EqualTo(2));
                 Assert.That(sut.PropertyTypes.Count(), Is.EqualTo(3 + standardProps.Count));
 
                 Assert.That(sut.PropertyGroups.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
@@ -149,7 +149,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 memberType = repository.Get(memberType.Id);
 
                 Assert.That(memberType.PropertyTypes.Count(), Is.EqualTo(3 + Constants.Conventions.Member.GetStandardPropertyTypeStubs().Count));
-                Assert.That(memberType.PropertyGroups.Count(), Is.EqualTo(1));
+                Assert.That(memberType.PropertyGroups.Count(), Is.EqualTo(2));
             }
         }
 

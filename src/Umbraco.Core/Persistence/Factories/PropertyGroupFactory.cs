@@ -11,17 +11,21 @@ namespace Umbraco.Core.Persistence.Factories
         private readonly int _id;
         private readonly DateTime _createDate;
         private readonly DateTime _updateDate;
+        //a callback to create a property type which can be injected via a contructor
+        private readonly Func<Guid, DataTypeDatabaseType, string, PropertyType> _propertyTypeCtor;
 
         public PropertyGroupFactory(int id)
         {
             _id = id;
+            _propertyTypeCtor = (guid, dbType, alias) => new PropertyType(guid, dbType);
         }
-
-        public PropertyGroupFactory(int id, DateTime createDate, DateTime updateDate)
+        
+        public PropertyGroupFactory(int id, DateTime createDate, DateTime updateDate, Func<Guid, DataTypeDatabaseType, string, PropertyType> propertyTypeCtor)
         {
             _id = id;
             _createDate = createDate;
             _updateDate = updateDate;
+            _propertyTypeCtor = propertyTypeCtor;
         }
 
         #region Implementation of IEntityFactory<IEnumerable<PropertyGroup>,IEnumerable<TabDto>>
@@ -55,22 +59,23 @@ namespace Umbraco.Core.Persistence.Factories
                 foreach (var typeDto in typeDtos)
                 {
                     var tempGroupDto = groupDto;
-                    var propertyType = new PropertyType(typeDto.DataTypeDto.ControlId,
-                                                             typeDto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
-                                                {
-                                                    Alias = typeDto.Alias,
-                                                    DataTypeDefinitionId = typeDto.DataTypeId,
-                                                    Description = typeDto.Description,
-                                                    Id = typeDto.Id,
-                                                    Name = typeDto.Name,
-                                                    HelpText = typeDto.HelpText,
-                                                    Mandatory = typeDto.Mandatory,
-                                                    SortOrder = typeDto.SortOrder,
-                                                    ValidationRegExp = typeDto.ValidationRegExp,
-                                                    PropertyGroupId = new Lazy<int>(() => tempGroupDto.Id),
-                                                    CreateDate = _createDate,
-                                                    UpdateDate = _updateDate
-                                                };
+                    var propertyType = _propertyTypeCtor(typeDto.DataTypeDto.ControlId,
+                        typeDto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true),
+                        typeDto.Alias);
+
+                    propertyType.Alias = typeDto.Alias;
+                    propertyType.DataTypeDefinitionId = typeDto.DataTypeId;
+                    propertyType.Description = typeDto.Description;
+                    propertyType.Id = typeDto.Id;
+                    propertyType.Name = typeDto.Name;
+                    propertyType.HelpText = typeDto.HelpText;
+                    propertyType.Mandatory = typeDto.Mandatory;
+                    propertyType.SortOrder = typeDto.SortOrder;
+                    propertyType.ValidationRegExp = typeDto.ValidationRegExp;
+                    propertyType.PropertyGroupId = new Lazy<int>(() => tempGroupDto.Id);
+                    propertyType.CreateDate = _createDate;
+                    propertyType.UpdateDate = _updateDate;
+
                     //on initial construction we don't want to have dirty properties tracked
                     // http://issues.umbraco.org/issue/U4-1946
                     propertyType.ResetDirtyProperties(false);
