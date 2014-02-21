@@ -38,8 +38,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="orderBy"></param>
         /// <returns></returns>
         IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy);
-
-
+        
         /// <summary>
         /// Gets the user permissions for the specified entities
         /// </summary>
@@ -49,11 +48,11 @@ namespace Umbraco.Core.Persistence.Repositories
         IEnumerable<EntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds);
 
         /// <summary>
-        /// Assigns the same permission set for a single user to any number of entities
+        /// Replaces the same permission set for a single user to any number of entities
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="permissions"></param>
         /// <param name="entityIds"></param>
-        void AssignUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds);
+        void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds);
     }
 }

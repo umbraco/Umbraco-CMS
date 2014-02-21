@@ -278,7 +278,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     from p in perm.AssignedPermissions
                     select new Tuple<int, string>(perm.UserId, p)).ToList();
                 
-                permissionsRepo.AssignEntityPermissions(entity, userPermissions);
+                permissionsRepo.ReplaceEntityPermissions(entity, userPermissions);
                 //flag the entity's permissions changed flag so we can track those changes.
                 //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.
                 ((Content) entity).PermissionsChanged = true;
@@ -531,18 +531,15 @@ namespace Umbraco.Core.Persistence.Repositories
         }
 
         /// <summary>
-        /// Assigns one permission to an entity for multiple users
+        /// Assigns a single permission to the current content item for the specified user ids
         /// </summary>
         /// <param name="entity"></param>
         /// <param name="permission"></param>
-        /// <param name="userIds"></param>
-        /// <remarks>
-        /// This does not replace permissions, just adds one if it doesn't exist
-        /// </remarks>
-        public void AssignEntityPermissions(IContent entity, char permission, IEnumerable<int> userIds)
+        /// <param name="userIds"></param>        
+        public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> userIds)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
-            repo.AssignEntityPermissions(entity, permission, userIds);
+            repo.AssignEntityPermission(entity, permission, userIds);
         }
 
         public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)

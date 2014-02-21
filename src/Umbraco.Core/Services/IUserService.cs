@@ -54,12 +54,12 @@ namespace Umbraco.Core.Services
         IEnumerable<EntityPermission> GetPermissions(IUser user, params int[] nodeIds);
 
         /// <summary>
-        /// Assigns the same permission set for a single user to any number of entities
+        /// Replaces the same permission set for a single user to any number of entities
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="permissions"></param>
         /// <param name="entityIds"></param>
-        void AssignUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds);
+        void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds);
 
         #region User types
 

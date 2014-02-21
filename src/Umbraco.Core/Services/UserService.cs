@@ -399,17 +399,17 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Assigns the same permission set for a single user to any number of entities
+        /// Replaces the same permission set for a single user to any number of entities
         /// </summary>
         /// <param name="userId"></param>
         /// <param name="permissions"></param>
         /// <param name="entityIds"></param>
-        public void AssignUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
+        public void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateUserRepository(uow))
             {
-                repository.AssignUserPermissions(userId, permissions, entityIds);
+                repository.ReplaceUserPermissions(userId, permissions, entityIds);
             }
         }
 

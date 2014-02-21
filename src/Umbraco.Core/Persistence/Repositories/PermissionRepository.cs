@@ -122,7 +122,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <remarks>
         /// This will first clear the permissions for this user and entities and recreate them
         /// </remarks>
-        public void AssignUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
+        public void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
         {
             var db = _unitOfWork.Database;
             using (var trans = db.GetTransaction())
@@ -160,16 +160,18 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         /// <param name="permission"></param>
         /// <param name="userIds"></param>
-        /// <remarks>
-        /// This does not replace permissions, just adds one if it doesn't exist
-        /// </remarks>
-        public void AssignEntityPermissions(TEntity entity, char permission, IEnumerable<int> userIds)
+        public void AssignEntityPermission(TEntity entity, char permission, IEnumerable<int> userIds)
         {
             var db = _unitOfWork.Database;
             using (var trans = db.GetTransaction())
             {
-                db.Execute("DELETE FROM umbracoUser2NodePermission WHERE nodeId=@nodeId AND permission=@permission",
-                    new { nodeId = entity.Id, permission = permission.ToString(CultureInfo.InvariantCulture) });
+                db.Execute("DELETE FROM umbracoUser2NodePermission WHERE nodeId=@nodeId AND permission=@permission AND userId in (@userIds)",
+                    new
+                    {
+                        nodeId = entity.Id, 
+                        permission = permission.ToString(CultureInfo.InvariantCulture),
+                        userIds = userIds
+                    });
 
                 var actions = userIds.Select(id => new User2NodePermissionDto
                 {
@@ -198,7 +200,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <remarks>
         /// This will first clear the permissions for this entity then re-create them
         /// </remarks>
-        public void AssignEntityPermissions(TEntity entity, IEnumerable<Tuple<int, string>> userPermissions)
+        public void ReplaceEntityPermissions(TEntity entity, IEnumerable<Tuple<int, string>> userPermissions)
         {
             var db = _unitOfWork.Database;
             using (var trans = db.GetTransaction())

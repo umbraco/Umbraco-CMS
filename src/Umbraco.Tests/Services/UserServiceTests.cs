@@ -73,14 +73,14 @@ namespace Umbraco.Tests.Services
                     MockedContent.CreateSimpleContent(contentType)
                 };
             ServiceContext.ContentService.Save(content);
-            ServiceContext.ContentService.AssignContentPermissions(content.ElementAt(0), ActionBrowse.Instance.Letter, new int[] { user.Id });
-            ServiceContext.ContentService.AssignContentPermissions(content.ElementAt(0), ActionDelete.Instance.Letter, new int[] { user.Id });
-            ServiceContext.ContentService.AssignContentPermissions(content.ElementAt(0), ActionMove.Instance.Letter, new int[] { user.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(0), ActionBrowse.Instance.Letter, new int[] { user.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(0), ActionDelete.Instance.Letter, new int[] { user.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(0), ActionMove.Instance.Letter, new int[] { user.Id });
 
-            ServiceContext.ContentService.AssignContentPermissions(content.ElementAt(1), ActionBrowse.Instance.Letter, new int[] { user.Id });
-            ServiceContext.ContentService.AssignContentPermissions(content.ElementAt(1), ActionDelete.Instance.Letter, new int[] { user.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(1), ActionBrowse.Instance.Letter, new int[] { user.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(1), ActionDelete.Instance.Letter, new int[] { user.Id });
 
-            ServiceContext.ContentService.AssignContentPermissions(content.ElementAt(2), ActionBrowse.Instance.Letter, new int[] { user.Id });
+            ServiceContext.ContentService.AssignContentPermission(content.ElementAt(2), ActionBrowse.Instance.Letter, new int[] { user.Id });
 
             // Act
             var permissions = userService.GetPermissions(user, content.ElementAt(0).Id, content.ElementAt(1).Id, content.ElementAt(2).Id);

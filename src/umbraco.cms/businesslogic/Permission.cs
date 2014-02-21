@@ -191,7 +191,7 @@ namespace umbraco.BusinessLogic
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static void UpdateCruds(User user, CMSNode node, string permissions)
         {
-            ApplicationContext.Current.Services.UserService.AssignUserPermissions(
+            ApplicationContext.Current.Services.UserService.ReplaceUserPermissions(
                 user.Id, 
                 permissions.ToCharArray(), 
                 node.Id);
