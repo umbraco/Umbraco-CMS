@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Web.Security;
 using System.Xml.Linq;
+using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -574,6 +575,24 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IMember CreateMember(string username, string email, string password, string memberTypeAlias)
+        {
+            var memberTypeService = ApplicationContext.Current.Services.MemberTypeService;
+            var memberType = memberTypeService.Get(memberTypeAlias);
+
+            var member = new Member(username, email.ToLower().Trim(), username, password, -1, memberType);
+
+            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMember>(member, memberTypeAlias, -1), this))
+            {
+                member.WasCancelled = true;
+                return member;
+            }
+
+            Created.RaiseEvent(new NewEventArgs<IMember>(member, false, memberTypeAlias, -1), this);
+
+            return member;
+        }
+
         public IMember CreateMemberWithIdentity(string username, string email, string password, IMemberType memberType, bool raiseEvents = true)
         {
             if (memberType == null) throw new ArgumentNullException("memberType");
@@ -708,7 +727,7 @@ namespace Umbraco.Core.Services
 
             Deleted.RaiseEvent(new DeleteEventArgs<IMember>(member, false), this);
         }
-
+        
         /// <summary>
         /// Saves an updated Member
         /// </summary>
@@ -722,7 +741,7 @@ namespace Umbraco.Core.Services
                 {
                     return;
                 }
-                    
+
             }
 
             var uow = _uowProvider.GetUnitOfWork();
@@ -818,7 +837,7 @@ namespace Umbraco.Core.Services
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                return repository.GetByMemberGroup(roleName);                
+                return repository.GetByMemberGroup(roleName);
             }
         }
 
@@ -852,8 +871,8 @@ namespace Umbraco.Core.Services
 
                     foreach (var memberGroup in found)
                     {
-                        _memberGroupService.Delete(memberGroup);                                      
-                    }                    
+                        _memberGroupService.Delete(memberGroup);
+                    }
                     return found.Any();
                 }
             }
@@ -893,7 +912,7 @@ namespace Umbraco.Core.Services
             {
                 repository.DissociateRoles(memberIds, roleNames);
             }
-        } 
+        }
         #endregion
 
         /// <summary>
@@ -973,7 +992,7 @@ namespace Umbraco.Core.Services
                     //bulk insert it into the database
                     uow.Database.BulkInsertRecords(xmlItems, tr);
 
-                    tr.Complete();    
+                    tr.Complete();
                 }
             }
         }
@@ -986,7 +1005,7 @@ namespace Umbraco.Core.Services
         }
 
         #region Event Handlers
-        
+
         /// <summary>
         /// Occurs before Delete
         /// </summary>
@@ -1003,10 +1022,24 @@ namespace Umbraco.Core.Services
         public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saving;
 
         /// <summary>
+        /// Occurs before Create
+        /// </summary>
+        public static event TypedEventHandler<IMemberService, NewEventArgs<IMember>> Creating;
+
+        /// <summary>
+        /// Occurs after Create
+        /// </summary>
+        /// <remarks>
+        /// Please note that the Member object has been created, but might not have been saved
+        /// so it does not have an identity yet (meaning no Id has been set).
+        /// </remarks>
+        public static event TypedEventHandler<IMemberService, NewEventArgs<IMember>> Created;
+
+        /// <summary>
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saved;
-        
+
         #endregion
 
         ///// <summary>
@@ -1070,6 +1103,6 @@ namespace Umbraco.Core.Services
 
         //    return new Member(name, email, username, password, -1, memType);
         //}
-        
+
     }
 }
