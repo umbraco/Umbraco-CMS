@@ -85,7 +85,7 @@ namespace Umbraco.Core
 
 				/// <summary>
 				/// MediaType alias for a folder.
-				/// </summary>
+                /// </summary>
 				public const string Folder = "Folder";
 
 				/// <summary>
@@ -94,9 +94,19 @@ namespace Umbraco.Core
 				public const string Image = "Image";
 			}
 
+
+            /// <summary>
+            /// Constants for Umbraco user
+            /// </summary>
+		    public static class User
+		    {
+                public static readonly string UmbracoUsersProviderName = "UsersMembershipProvider";
+		    }
+
 		    /// <summary>
 		    /// Constants for Umbraco Member property aliases.
 		    /// </summary>
+		    
 		    public static class Member
 		    {
                 public static readonly string UmbracoMemberProviderName = "UmbracoMembershipProvider";

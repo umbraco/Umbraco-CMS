@@ -30,7 +30,7 @@ namespace Umbraco.Web.Security.Providers
 
         public override string ProviderName 
         {
-            get { return "UsersMembershipProvider"; }
+            get { return Constants.Conventions.User.UmbracoUsersProviderName; }
         }
 
         /// <summary>

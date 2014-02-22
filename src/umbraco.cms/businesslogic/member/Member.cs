@@ -11,6 +11,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Css;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Querying;
@@ -227,6 +228,7 @@ namespace umbraco.cms.businesslogic.member
             var model = ApplicationContext.Current.Services.MemberService.CreateMemberWithIdentity(
                 loginName, Email.ToLower(), "", mbt.MemberTypeItem);
             model.Name = Name;
+            model.IsApproved = true;
 
             //The content object will only have the 'WasCancelled' flag set to 'True' if the 'Creating' event has been cancelled, so we return null.
             if (((Entity)model).WasCancelled)
@@ -575,7 +577,8 @@ namespace umbraco.cms.businesslogic.member
             // This check should not be done here, as this logic is based on the MembershipProvider            
             var requireUniqueEmail = Membership.Providers[UmbracoMemberProviderName].RequiresUniqueEmail;
             //check if there's anyone with this email in the db that isn't us
-            if (requireUniqueEmail && GetMembersFromEmail(Email).Any(x => x.Id != Id))
+            var membersFromEmail = GetMembersFromEmail(Email);
+            if (requireUniqueEmail && membersFromEmail != null && membersFromEmail.Any(x => x.Id != Id))
             {
                 throw new Exception(string.Format("Duplicate Email! A member with the e-mail {0} already exists", Email));
             }

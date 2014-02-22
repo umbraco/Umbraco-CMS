@@ -7,6 +7,7 @@ using System.Web.Configuration;
 using System.Web.Routing;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.XPath;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 
@@ -255,7 +256,38 @@ namespace Umbraco.Core.Configuration
                 SaveSetting("umbracoConfigurationStatus", value);
             }
         }
-
+        
+        /// <summary>
+        /// Gets or sets the Umbraco members membership providers' useLegacyEncoding state. This will return a boolean
+        /// </summary>
+        /// <value>The useLegacyEncoding status.</value>
+        public static bool UmbracoMembershipProviderLegacyEncoding
+        {
+            get
+            {
+                return ConfiguredMembershipProvidersLegacyEncoding(Constants.Conventions.Member.UmbracoMemberProviderName);
+            }
+            set
+            {
+                SetMembershipProvidersLegacyEncoding(Constants.Conventions.Member.UmbracoMemberProviderName, value);
+            }
+        }
+        
+        /// <summary>
+        /// Gets or sets the Umbraco users membership providers' useLegacyEncoding state. This will return a boolean
+        /// </summary>
+        /// <value>The useLegacyEncoding status.</value>
+        public static bool UmbracoUsersMembershipProviderLegacyEncoding
+        {
+            get
+            {
+                return ConfiguredMembershipProvidersLegacyEncoding(Constants.Conventions.User.UmbracoUsersProviderName);
+            }
+            set
+            {
+                SetMembershipProvidersLegacyEncoding(Constants.Conventions.User.UmbracoUsersProviderName, value);
+            }
+        }
 		
         /// <summary>
         /// Saves a setting into the configuration file.
@@ -313,6 +345,43 @@ namespace Umbraco.Core.Configuration
 
             var fileName = System.IO.Path.Combine(vDir, "web.config");
             return fileName;
+        }
+
+        private static void SetMembershipProvidersLegacyEncoding(string providerName, bool useLegacyEncoding)
+        {
+            var webConfigFilename = GetFullWebConfigFileName();
+            var webConfigXml = XDocument.Load(webConfigFilename, LoadOptions.PreserveWhitespace);
+
+            var membershipConfigs = webConfigXml.XPathSelectElements("configuration/system.web/membership/providers/add").ToList();
+
+            if (membershipConfigs.Any() == false) 
+                return;
+
+            var provider = membershipConfigs.SingleOrDefault(c => c.Attribute("name") != null && c.Attribute("name").Value == providerName);
+
+            if (provider == null) 
+                return;
+
+            provider.SetAttributeValue("useLegacyEncoding", useLegacyEncoding);
+            
+            webConfigXml.Save(webConfigFilename, SaveOptions.DisableFormatting);
+        }
+        
+        private static bool ConfiguredMembershipProvidersLegacyEncoding(string providerName)
+        {
+            var webConfigFilename = GetFullWebConfigFileName();
+            var webConfigXml = XDocument.Load(webConfigFilename, LoadOptions.PreserveWhitespace);
+
+            var membershipConfigs = webConfigXml.XPathSelectElements("configuration/system.web/membership/providers/add").ToList();
+
+            var provider = membershipConfigs.SingleOrDefault(c => c.Attribute("name") != null && c.Attribute("name").Value == providerName);
+            
+            var useLegacyEncodingAttribute = provider.Attribute("useLegacyEncoding");
+            
+            bool useLegacyEncoding;
+            bool.TryParse(useLegacyEncodingAttribute.Value, out useLegacyEncoding);
+
+            return useLegacyEncoding;
         }
 
         /// <summary>
