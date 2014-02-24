@@ -4,11 +4,12 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Umbraco.Web.Models
 {
     [DataContract(Name="imageCropDataSet")]
-    public class ImageCropDataSet
+    public class ImageCropDataSet : IHtmlString
     {
         [DataMember(Name="src")]
         public string Src { get; set;}
@@ -74,6 +75,11 @@ namespace Umbraco.Web.Models
         public bool HasImage()
         {
             return string.IsNullOrEmpty(Src);
+        }
+
+        public string ToHtmlString()
+        {
+            return this.Src;
         }
     }   
 
