@@ -14,6 +14,7 @@ namespace Umbraco.Core.Services
     /// </remarks>
     public interface IMembershipMemberService : IMembershipMemberService<IMember>, IMembershipRoleService<IMember>
     {
+        IMember CreateMember(string username, string email, string password, string memberType);
         IMember CreateMemberWithIdentity(string username, string email, string password, IMemberType memberType, bool raiseEvents = true);
     }
 
@@ -67,7 +68,7 @@ namespace Umbraco.Core.Services
         T GetByUsername(string login);
 
         void Delete(T membershipUser);
-
+        
         void Save(T entity, bool raiseEvents = true);
 
         void Save(IEnumerable<T> entities, bool raiseEvents = true);

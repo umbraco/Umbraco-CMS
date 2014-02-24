@@ -1042,7 +1042,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Create
         /// </summary>
-		[Obsolete("This event should not be used, it was originally created for backwards compatibility for the legacy API. To modify a new document before it is saved use the Saving event")]
+        [Obsolete("Use the Created event instead, the Creating and Created events both offer the same functionality, Creating event has been deprecated.")]
         public static event TypedEventHandler<IMediaService, NewEventArgs<IMedia>> Creating;
 
         /// <summary>
@@ -1052,7 +1052,6 @@ namespace Umbraco.Core.Services
         /// Please note that the Media object has been created, but not saved
         /// so it does not have an identity yet (meaning no Id has been set).
         /// </remarks>
-        [Obsolete("This event should not be used, it was originally created for backwards compatibility for the legacy API. To modify a new document before it is saved use the Saving event")]
         public static event TypedEventHandler<IMediaService, NewEventArgs<IMedia>> Created;
 
         /// <summary>

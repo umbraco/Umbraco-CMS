@@ -1,9 +1,7 @@
 ﻿using System;
-using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Services;
 using umbraco.interfaces;
 
 namespace Umbraco.Web.Strategies.Migrations
@@ -29,7 +27,7 @@ namespace Umbraco.Web.Strategies.Migrations
 
             if (e.ConfiguredVersion <= target70)
             {
-
+                var sql = @"DELETE FROM cmsContentXml WHERE nodeId IN
                 //This query is structured to work with MySql, SQLCE and SqlServer:
                 // http://issues.umbraco.org/issue/U4-3876
 
@@ -41,9 +39,7 @@ namespace Umbraco.Web.Strategies.Migrations
                 var count = e.MigrationContext.Database.Execute(sql);
 
                 LogHelper.Info<ClearMediaXmlCacheForDeletedItemsAfterUpgrade>("Cleared " + count + " items from the media xml cache that were trashed and not meant to be there");
-
             }
-
         }
     }
 }
