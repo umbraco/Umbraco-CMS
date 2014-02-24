@@ -7,7 +7,6 @@
 	Settings section).
 *@
 
-
 @{    
 	@*Build a query and return the visible items *@
     var selection= CurrentPage.Textpages.Where("Visible");
@@ -17,7 +16,6 @@
        var selection= Model.Textpages.Where("shouldBeFeatured == true").Where("Visible");
     *@
 }
-
 
 @*Determine if there are any nodes in the selection, then render list *@
 @if(selection.Any()){

@@ -3,7 +3,6 @@
 @using System.Web.Mvc.Html
 @using ClientDependency.Core.Mvc
 @using Umbraco.Web
-@using Umbraco.Web.Models
 @using Umbraco.Web.Controllers
 
 @{
@@ -16,7 +15,6 @@
     Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.unobtrusive.min.js");
 
     var success = TempData["ProfileUpdateSuccess"] != null;
-
 }
 
 @*NOTE: This RenderJsHere code should be put on your main template page where the rest of your script tags are placed*@
@@ -26,7 +24,7 @@
 {   
     if (success)
     {
-        // This message will show if RedirectOnSucces is set to false (default)
+        @* This message will show if RedirectOnSucces is set to false (default) *@
         <p>Profile updated</p>
     }
     
