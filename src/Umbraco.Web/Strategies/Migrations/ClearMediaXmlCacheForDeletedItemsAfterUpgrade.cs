@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence.Migrations;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -28,9 +29,9 @@ namespace Umbraco.Web.Strategies.Migrations
             if (e.ConfiguredVersion <= target70)
             {
                 var sql = @"DELETE FROM cmsContentXml WHERE nodeId IN
-    (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
-        INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
-        WHERE nodeObjectType = 'B796F64C-1F99-4FFB-B886-4BF4BC011A9C' AND " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("path") + " like '%-21%')";
+    (SELECT nodeId FROM (SELECT DISTINCT cmsContentXml.nodeId FROM cmsContentXml 
+    INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
+    WHERE nodeObjectType = '" + Constants.ObjectTypes.Media + "' AND " + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("path") + " LIKE '%-21%') x)";
 
                 var count = e.MigrationContext.Database.Execute(sql);
 
