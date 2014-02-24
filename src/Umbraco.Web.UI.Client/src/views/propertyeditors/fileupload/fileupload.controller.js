@@ -126,7 +126,7 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
 angular.module("umbraco")
     .controller('Umbraco.PropertyEditors.FileUploadController', fileUploadController)
     .run(function(mediaHelper){
-        mediaHelper.registerFileResolver("Umbraco.FileUpload", function(property){
+        mediaHelper.registerFileResolver("Umbraco.UploadField", function(property){
                 return property.value;
         });
     });
