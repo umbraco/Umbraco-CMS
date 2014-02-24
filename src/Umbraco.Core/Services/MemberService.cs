@@ -582,12 +582,6 @@ namespace Umbraco.Core.Services
 
             var member = new Member(username, email.ToLower().Trim(), username, password, -1, memberType);
 
-            if (Creating.IsRaisedEventCancelled(new NewEventArgs<IMember>(member, memberTypeAlias, -1), this))
-            {
-                member.WasCancelled = true;
-                return member;
-            }
-
             Created.RaiseEvent(new NewEventArgs<IMember>(member, false, memberTypeAlias, -1), this);
 
             return member;
@@ -1020,12 +1014,7 @@ namespace Umbraco.Core.Services
         /// Occurs before Save
         /// </summary>
         public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saving;
-
-        /// <summary>
-        /// Occurs before Create
-        /// </summary>
-        public static event TypedEventHandler<IMemberService, NewEventArgs<IMember>> Creating;
-
+        
         /// <summary>
         /// Occurs after Create
         /// </summary>

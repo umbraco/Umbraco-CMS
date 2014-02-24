@@ -1042,6 +1042,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Create
         /// </summary>
+        [Obsolete("Use the Created event instead, the Creating and Created events both offer the same functionality, Creating event has been deprecated.")]
         public static event TypedEventHandler<IMediaService, NewEventArgs<IMedia>> Creating;
 
         /// <summary>
