@@ -31,6 +31,7 @@ namespace Umbraco.Core.Models
             : base(name, -1, contentType, new PropertyCollection())
         {
             _contentType = contentType;
+            IsApproved = true;
         }
 
         //TODO: Should we just get rid of this one? no reason to have a level set.
@@ -43,6 +44,7 @@ namespace Umbraco.Core.Models
             _email = email;
             _username = username;
             _password = password;
+            IsApproved = true;
         }
 
         public Member(string name, string email, string username, string password, IMemberType contentType)
@@ -54,6 +56,7 @@ namespace Umbraco.Core.Models
             _email = email;
             _username = username;
             _password = password;
+            IsApproved = true;
         }
 
         //public Member(string name, string email, string username, string password, IContentBase parent, IMemberType contentType)
@@ -230,7 +233,9 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.IsApproved, "IsApproved", true);
+                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.IsApproved, "IsApproved", 
+                    //This is the default value if the prop is not found
+                    true);
                 if (a.Success == false) return a.Result;
 
                 var tryConvert = Properties[Constants.Conventions.Member.IsApproved].Value.TryConvertTo<bool>();
@@ -238,7 +243,8 @@ namespace Umbraco.Core.Models
                 {
                     return tryConvert.Result;
                 }
-                return default(bool);
+                //if the property exists but it cannot be converted, we will assume true
+                return true;
             }
             set
             {
@@ -270,7 +276,7 @@ namespace Umbraco.Core.Models
                 {
                     return tryConvert.Result;
                 }
-                return default(bool);
+                return false;
             }
             set
             {

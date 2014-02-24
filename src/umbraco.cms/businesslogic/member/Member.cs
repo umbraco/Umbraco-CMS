@@ -228,9 +228,8 @@ namespace umbraco.cms.businesslogic.member
             var model = ApplicationContext.Current.Services.MemberService.CreateMemberWithIdentity(
                 loginName, Email.ToLower(), "", mbt.MemberTypeItem);
             model.Name = Name;
-            model.IsApproved = true;
 
-            //The content object will only have the 'WasCancelled' flag set to 'True' if the 'Creating' event has been cancelled, so we return null.
+            //The content object will only have the 'WasCancelled' flag set to 'True' if the 'Saving' event has been cancelled, so we return null.
             if (((Entity)model).WasCancelled)
                 return null;
 
