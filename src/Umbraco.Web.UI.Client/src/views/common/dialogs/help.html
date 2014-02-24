@@ -1,7 +1,14 @@
 <div class="umb-panel" ng-controller="Umbraco.Dialogs.HelpController">
-	<div class="umb-panel-header">
-		<h1 class="headline">Help</h1>
-	</div>
+    <div class="umb-panel-header">
+        <div class="umb-el-wrap umb-panel-buttons">
+            <div class="btn-toolbar umb-btn-toolbar">
+                <button ng-click="logout()" hotkey="ctrl+shift+l" class="btn btn-warning">
+                    <localize key="general_logout">Log out</localize>
+                </button>
+            </div>
+        </div>
+        <h1 class="headline">Help</h1>
+    </div>
 	
 	<div class="umb-panel-body umb-scrollable">
 		<div class="tab-content umb-control-group">
@@ -54,5 +61,5 @@
 			</div>
 		</div>
 	</div>
-	<small style="color: #d9d9d9; position: absolute; bottom: 5px; right: 20px">{{version}}</small>
+	<small class="umb-version">{{version}}</small>
 </div>
