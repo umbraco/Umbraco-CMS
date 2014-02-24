@@ -205,13 +205,12 @@ namespace Umbraco.Core.Persistence.Querying
         {
             if (c.Value == null)
                 return "null";
-            else if (c.Value.GetType() == typeof(bool))
+            if (c.Value is bool)
             {
                 object o = GetQuotedValue(c.Value, c.Value.GetType());
                 return string.Format("({0}={1})", GetQuotedTrueValue(), o);
             }
-            else
-                return GetQuotedValue(c.Value, c.Value.GetType());
+            return GetQuotedValue(c.Value, c.Value.GetType());
         }
 
         protected virtual string VisitUnary(UnaryExpression u)
@@ -233,15 +232,15 @@ namespace Umbraco.Core.Persistence.Querying
             switch (verb)
             {
                 case "SqlWildcard":
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnWildcardComparison(col, EscapeAtArgument(RemoveQuote(val)), columnType);
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnWildcardComparison(col, RemoveQuote(val), columnType);
                 case "Equals":
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnEqualComparison(col, EscapeAtArgument(RemoveQuote(val)), columnType);
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnEqualComparison(col, RemoveQuote(val), columnType);
                 case "StartsWith":
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnStartsWithComparison(col, EscapeAtArgument(RemoveQuote(val)), columnType);                   
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnStartsWithComparison(col, RemoveQuote(val), columnType);                   
                 case "EndsWith":
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnEndsWithComparison(col, EscapeAtArgument(RemoveQuote(val)), columnType);
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnEndsWithComparison(col, RemoveQuote(val), columnType);
                 case "Contains":
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnContainsComparison(col, EscapeAtArgument(RemoveQuote(val)), columnType);
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnContainsComparison(col, RemoveQuote(val), columnType);
                 case "InvariantEquals":
                 case "SqlEquals":
                     //recurse

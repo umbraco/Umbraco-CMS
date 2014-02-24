@@ -52,8 +52,12 @@ namespace Umbraco.Web.Cache
                     Alias = contentType.Alias,
                     Id = contentType.Id,
                     PropertyTypeIds = contentType.PropertyTypes.Select(x => x.Id).ToArray(),
-                    //either IContentType or IMediaType
-                    Type = (contentType is IContentType) ? typeof(IContentType).Name : typeof(IMediaType).Name,
+                    //either IContentType or IMediaType or IMemberType
+                    Type = (contentType is IContentType) 
+                        ? typeof(IContentType).Name 
+                        : (contentType is IMediaType)
+                        ? typeof(IMediaType).Name
+                        : typeof(IMemberType).Name,
                     DescendantPayloads = contentType.Descendants().Select(x => FromContentType(x)).ToArray(),
                     WasDeleted = isDeleted
                 };

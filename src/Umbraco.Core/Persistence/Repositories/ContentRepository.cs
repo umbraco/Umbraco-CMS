@@ -288,7 +288,7 @@ namespace Umbraco.Core.Persistence.Repositories
                     from p in perm.AssignedPermissions 
                     select new Tuple<int, string>(perm.UserId, p)).ToList();
                 
-                permissionsRepo.AssignEntityPermissions(entity, userPermissions);
+                permissionsRepo.ReplaceEntityPermissions(entity, userPermissions);
                 //flag the entity's permissions changed flag so we can track those changes.
                 //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.
                 ((Content) entity).PermissionsChanged = true;
@@ -558,10 +558,16 @@ namespace Umbraco.Core.Persistence.Repositories
             return GetByVersion(dto.ContentVersionDto.VersionId);
         }
         
-        public void AssignEntityPermissions(IContent entity, char permission, IEnumerable<int> userIds)
+        /// <summary>
+        /// Assigns a single permission to the current content item for the specified user ids
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="permission"></param>
+        /// <param name="userIds"></param>        
+        public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> userIds)
         {
             var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
-            repo.AssignEntityPermissions(entity, permission, userIds);
+            repo.AssignEntityPermission(entity, permission, userIds);
         }
 
         public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
@@ -597,33 +603,6 @@ namespace Umbraco.Core.Persistence.Repositories
             // http://issues.umbraco.org/issue/U4-1946
             ((Entity)content).ResetDirtyProperties(false);
             return content;
-        }
-
-        private PropertyCollection GetPropertyCollection(int id, Guid versionId, IContentType contentType, DateTime createDate, DateTime updateDate)
-        {
-            var sql = new Sql();
-            sql.Select("*")
-                .From<PropertyDataDto>()
-                .InnerJoin<PropertyTypeDto>()
-                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                .Where<PropertyDataDto>(x => x.NodeId == id)
-                .Where<PropertyDataDto>(x => x.VersionId == versionId);
-
-            var propertyDataDtos = Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql);
-            var propertyFactory = new PropertyFactory(contentType, versionId, id, createDate, updateDate);
-            var properties = propertyFactory.BuildEntity(propertyDataDtos);
-
-            var newProperties = properties.Where(x => x.HasIdentity == false);
-            foreach (var property in newProperties)
-            {
-                var propertyDataDto = new PropertyDataDto{ NodeId = id, PropertyTypeId = property.PropertyTypeId, VersionId = versionId };
-                int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
-
-                property.Version = versionId;
-                property.Id = primaryKey;
-            }
-
-            return new PropertyCollection(properties);
         }
 
         private string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)

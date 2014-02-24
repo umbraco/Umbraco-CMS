@@ -324,6 +324,18 @@ namespace Umbraco.Core.Persistence.Repositories
             return repo.GetUserPermissionsForEntities(userId, entityIds);
         }
 
+        /// <summary>
+        /// Replaces the same permission set for a single user to any number of entities
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="permissions"></param>
+        /// <param name="entityIds"></param>
+        public void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
+        {
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
+            repo.ReplaceUserPermissions(userId, permissions, entityIds);
+        }
+
         #endregion
 
         private IEnumerable<IUser> ConvertFromDtos(IEnumerable<UserDto> dtos)

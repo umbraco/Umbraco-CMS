@@ -65,12 +65,12 @@ namespace Umbraco.Core.Services
         /// <param name="entity"></param>
         /// <param name="permission"></param>
         /// <param name="userIds"></param>
-        public void AssignContentPermissions(IContent entity, char permission, IEnumerable<int> userIds)
+        public void AssignContentPermission(IContent entity, char permission, IEnumerable<int> userIds)
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateContentRepository(uow))
             {
-                repository.AssignEntityPermissions(entity, permission, userIds);
+                repository.AssignEntityPermission(entity, permission, userIds);
             }
         }
 
@@ -1477,6 +1477,8 @@ namespace Umbraco.Core.Services
 
                     //bulk insert it into the database
                     uow.Database.BulkInsertRecords(xmlItems, tr);
+
+                    tr.Complete();    
                 }
 
                 Audit.Add(AuditTypes.Publish, "RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);

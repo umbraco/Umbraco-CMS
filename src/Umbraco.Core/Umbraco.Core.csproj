@@ -58,10 +58,15 @@
     <Reference Include="MiniProfiler">
       <HintPath>..\packages\MiniProfiler.2.1.0\lib\net40\MiniProfiler.dll</HintPath>
     </Reference>
-    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+    <Reference Include="MySql.Data">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\MySql.Data.6.6.5\lib\net40\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Newtonsoft.Json.4.5.11\lib\net40\Newtonsoft.Json.dll</HintPath>
     </Reference>
+
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Configuration" />
@@ -198,14 +203,6 @@
     <Compile Include="Configuration\UmbracoSettings\ContentError404Collection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentErrorPageElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentErrorsElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ContentImagingCropCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ContentImagingCropElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ContentImagingCropsElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ContentImagingCropSizeCollection.cs" />
-    <Compile Include="Configuration\UmbracoSettings\ContentImagingCropSizeElement.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IImagingCrop.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IImagingCrops.cs" />
-    <Compile Include="Configuration\UmbracoSettings\IImagingCropSize.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillPropertiesCollection.cs" />
     <Compile Include="Configuration\UmbracoSettings\ImagingAutoFillUploadFieldElement.cs" />
     <Compile Include="Configuration\UmbracoSettings\ContentImagingElement.cs" />
@@ -278,6 +275,7 @@
     <Compile Include="Configuration\UmbracoVersion.cs" />
     <Compile Include="Attempt.cs" />
     <Compile Include="Constants-Examine.cs" />
+    <Compile Include="ControlExtensions.cs" />
     <Compile Include="CoreBootManager.cs" />
     <Compile Include="DatabaseContext.cs" />
     <Compile Include="DataTableExtensions.cs" />
@@ -343,6 +341,7 @@
     <Compile Include="Models\IRelationType.cs" />
     <Compile Include="Models\Membership\MembershipScenario.cs" />
     <Compile Include="Models\MemberGroup.cs" />
+    <Compile Include="Models\MemberTypePropertyProfileAccess.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="Models\PublishedContent\IPublishedContentExtended.cs" />
     <Compile Include="Models\PublishedContent\PublishedPropertyBase.cs" />

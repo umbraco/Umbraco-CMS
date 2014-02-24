@@ -6,11 +6,13 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Web.Caching;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Services;
 using CacheKeys = Umbraco.Core.Cache.CacheKeys;
 using Umbraco.Core.Cache;
 
@@ -38,7 +40,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="userId"></param>
         /// <param name="entityIds"></param>
         /// <returns></returns>        
-        internal IEnumerable<EntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds)
+        public IEnumerable<EntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds)
         {
             var entityIdKey = string.Join(",", entityIds.Select(x => x.ToString(CultureInfo.InvariantCulture)));
             return _cache.RuntimeCache.GetCacheItem<IEnumerable<EntityPermission>>(
@@ -96,7 +98,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="entityId"></param>
         /// <returns></returns>
-        internal IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
+        public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
         {
             var sql = new Sql();
             sql.Select("*")
@@ -109,7 +111,118 @@ namespace Umbraco.Core.Persistence.Repositories
             return ConvertToPermissionList(result);
         }
 
-        private IEnumerable<EntityPermission> ConvertToPermissionList(IEnumerable<User2NodePermissionDto> result)
+        /// <summary>
+        /// Assigns the same permission set for a single user to any number of entities
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="permissions"></param>
+        /// <param name="entityIds"></param>
+        /// <remarks>
+        /// This will first clear the permissions for this user and entities and recreate them
+        /// </remarks>
+        public void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
+        {
+            var db = _unitOfWork.Database;
+            using (var trans = db.GetTransaction())
+            {
+                db.Execute("DELETE FROM umbracoUser2NodePermission WHERE userId=@userId AND nodeId in (@nodeIds)",
+                    new {userId = userId, nodeIds = entityIds});
+
+                var toInsert = new List<User2NodePermissionDto>();
+                foreach (var p in permissions)
+                {
+                    foreach (var e in entityIds)
+                    {
+                        toInsert.Add(new User2NodePermissionDto
+                        {
+                            NodeId = e,
+                            Permission = p.ToString(CultureInfo.InvariantCulture),
+                            UserId = userId
+                        });
+                    }
+                }
+
+                _unitOfWork.Database.BulkInsertRecords(toInsert, trans);
+
+                trans.Complete();
+
+                //Raise the event
+                AssignedPermissions.RaiseEvent(
+                    new SaveEventArgs<EntityPermission>(ConvertToPermissionList(toInsert), false), this);
+            }
+        } 
+
+        /// <summary>
+        /// Assigns one permission to an entity for multiple users
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="permission"></param>
+        /// <param name="userIds"></param>
+        public void AssignEntityPermission(TEntity entity, char permission, IEnumerable<int> userIds)
+        {
+            var db = _unitOfWork.Database;
+            using (var trans = db.GetTransaction())
+            {
+                db.Execute("DELETE FROM umbracoUser2NodePermission WHERE nodeId=@nodeId AND permission=@permission AND userId in (@userIds)",
+                    new
+                    {
+                        nodeId = entity.Id, 
+                        permission = permission.ToString(CultureInfo.InvariantCulture),
+                        userIds = userIds
+                    });
+
+                var actions = userIds.Select(id => new User2NodePermissionDto
+                {
+                    NodeId = entity.Id,
+                    Permission = permission.ToString(CultureInfo.InvariantCulture),
+                    UserId = id
+                }).ToArray();
+
+                _unitOfWork.Database.BulkInsertRecords(actions, trans);
+
+                trans.Complete();
+
+                //Raise the event
+                AssignedPermissions.RaiseEvent(
+                    new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false), this);
+            }
+        }
+
+        /// <summary>
+        /// Assigns permissions to an entity for multiple users/permission entries
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="userPermissions">
+        /// A key/value pair list containing a userId and a permission to assign
+        /// </param>
+        /// <remarks>
+        /// This will first clear the permissions for this entity then re-create them
+        /// </remarks>
+        public void ReplaceEntityPermissions(TEntity entity, IEnumerable<Tuple<int, string>> userPermissions)
+        {
+            var db = _unitOfWork.Database;
+            using (var trans = db.GetTransaction())
+            {
+                db.Execute("DELETE FROM umbracoUser2NodePermission WHERE nodeId=@nodeId", new { nodeId = entity.Id });
+
+                var actions = userPermissions.Select(p => new User2NodePermissionDto
+                {
+                    NodeId = entity.Id,
+                    Permission = p.Item2,
+                    UserId = p.Item1
+                }).ToArray();
+
+                _unitOfWork.Database.BulkInsertRecords(actions, trans);
+
+                trans.Complete();
+
+                //Raise the event
+                AssignedPermissions.RaiseEvent(
+                    new SaveEventArgs<EntityPermission>(ConvertToPermissionList(actions), false), this);
+            }            
+        }
+
+        private static IEnumerable<EntityPermission> ConvertToPermissionList(IEnumerable<User2NodePermissionDto> result)
         {
             var permissions = new List<EntityPermission>();
             var nodePermissions = result.GroupBy(x => x.NodeId);
@@ -123,118 +236,8 @@ namespace Umbraco.Core.Persistence.Repositories
                 }
             }
             return permissions;
-        } 
-
-        /// <summary>
-        /// Assigns one permission to an entity for multiple users
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="permission"></param>
-        /// <param name="userIds"></param>
-        internal void AssignEntityPermissions(TEntity entity, char permission, IEnumerable<int> userIds)
-        {
-            var actions = userIds.Select(id => new User2NodePermissionDto
-            {
-                NodeId = entity.Id,
-                Permission = permission.ToString(CultureInfo.InvariantCulture),
-                UserId = (int)id
-            });
-
-            _unitOfWork.Database.BulkInsertRecords(actions);
         }
 
-        /// <summary>
-        /// Assigns permissions to an entity for multiple users/permission entries
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="userPermissions">
-        /// A key/value pair list containing a userId and a permission to assign
-        /// </param>
-        internal void AssignEntityPermissions(TEntity entity, IEnumerable<Tuple<int, string>> userPermissions)
-        {
-            var actions = userPermissions.Select(p => new User2NodePermissionDto
-            {
-                NodeId = entity.Id,
-                Permission = p.Item2,
-                UserId = p.Item1
-            });
-
-            _unitOfWork.Database.BulkInsertRecords(actions);
-        }
-
-        /// <summary>
-        /// Replace permissions for an entity for multiple users
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="permissions"></param>
-        /// <param name="userIds"></param>
-        internal void ReplaceEntityPermissions(TEntity entity, string permissions, IEnumerable<int> userIds)
-        {
-            _unitOfWork.Database.Update<User2NodePermissionDto>(
-                GenerateReplaceEntityPermissionsSql(entity.Id, permissions, userIds.ToArray()));
-        }
-
-        /// <summary>
-        /// An overload to replace entity permissions and all replace all descendant permissions
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <param name="permissions"></param>
-        /// <param name="getDescendantIds">
-        /// A callback to get the descendant Ids of the current entity
-        /// </param>
-        /// <param name="userIds"></param>
-        internal void ReplaceEntityPermissions(TEntity entity, string permissions, Func<IEntity, IEnumerable<int>> getDescendantIds, IEnumerable<int> userIds)
-        {
-            _unitOfWork.Database.Update<User2NodePermissionDto>(
-                GenerateReplaceEntityPermissionsSql(
-                new[] { entity.Id }.Concat(getDescendantIds(entity)).ToArray(),
-                permissions,
-                userIds.ToArray()));
-        }
-
-        internal static string GenerateReplaceEntityPermissionsSql(int entityId, string permissions, int[] userIds)
-        {
-            return GenerateReplaceEntityPermissionsSql(new[] { entityId }, permissions, userIds);
-        }
-
-        internal static string GenerateReplaceEntityPermissionsSql(int[] entityIds, string permissions, int[] userIds)
-        {
-            //create the "SET" clause of the update statement
-            var sqlSet = string.Format("SET {0}={1}",
-                                    SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("permission"),
-                                    SqlSyntaxContext.SqlSyntaxProvider.GetQuotedValue(permissions));
-
-            //build the nodeIds part of the where clause
-            var sqlNodeWhere = BuildOrClause(entityIds, "nodeId");
-
-            //build up the userIds part of the where clause
-            var userWhereBuilder = BuildOrClause(userIds, "userId");
-
-            var sqlWhere = new Sql();
-            sqlWhere.Where(string.Format("{0} AND {1}", sqlNodeWhere, userWhereBuilder));
-
-            return string.Format("{0} {1}", sqlSet, sqlWhere.SQL);
-        }
-
-        private static string BuildOrClause<T>(IEnumerable<T> ids, string colName)
-        {
-            var asArray = ids.ToArray();
-            var userWhereBuilder = new StringBuilder();
-            userWhereBuilder.Append("(");
-            for (var index = 0; index < asArray.Length; index++)
-            {
-                var userId = asArray[index];
-                userWhereBuilder.Append(SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName(colName));
-                userWhereBuilder.Append("=");
-                userWhereBuilder.Append(userId);
-                if (index < asArray.Length - 1)
-                {
-                    userWhereBuilder.Append(" OR ");
-                }
-            }
-            userWhereBuilder.Append(")");
-            return userWhereBuilder.ToString();
-        }
-
+        public static event TypedEventHandler<PermissionRepository<TEntity>, SaveEventArgs<EntityPermission>> AssignedPermissions;
     }
 }

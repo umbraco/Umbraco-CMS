@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -13,16 +15,11 @@ namespace Umbraco.Web
 {
     internal static class ImageCropperBaseExtensions
     {
-        internal static bool IsJson(this string input)
-        {
-            input = input.Trim();
-            return input.StartsWith("{") && input.EndsWith("}") || input.StartsWith("[") && input.EndsWith("]");
-        }
-
+       
         internal static ImageCropData GetImageCrop(this string json, string id)
         {
             var ic = new ImageCropData();
-            if (IsJson(json))
+            if (json.DetectIsJson())
             {
                 try
                 {
@@ -34,19 +31,18 @@ namespace Umbraco.Web
             return ic;
         }
 
-
         internal static ImageCropDataSet SerializeToCropDataSet(this string json)
         {
             var imageCrops = new ImageCropDataSet();
-            if (IsJson(json))
+            if (json.DetectIsJson())
             {
                 try
                 {
                     imageCrops = JsonConvert.DeserializeObject<ImageCropDataSet>(json);
                 }
-                catch
+                catch(Exception ex)
                 {
-
+                    var e = ex;
                 }
             }
 
@@ -59,11 +55,12 @@ namespace Umbraco.Web
         {
             try
             {
+               
                 if (propertyAlias != null && publishedContent.HasProperty(propertyAlias)
                     && publishedContent.HasValue(propertyAlias))
                 {
                     var propertyAliasValue = publishedContent.GetPropertyValue<string>(propertyAlias);
-                    if (propertyAliasValue.IsJson() && propertyAliasValue.Length <= 2)
+                    if (propertyAliasValue.DetectIsJson() && propertyAliasValue.Length <= 2)
                     {
                         return false;
                     }
@@ -79,7 +76,7 @@ namespace Umbraco.Web
                 if (cropsProperty != null && !string.IsNullOrEmpty(cropsProperty.Value.ToString()))
                 {
                     var propertyAliasValue = cropsProperty.Value.ToString();
-                    if (propertyAliasValue.IsJson() && propertyAliasValue.Length <= 2)
+                    if (propertyAliasValue.DetectIsJson() && propertyAliasValue.Length <= 2)
                     {
                         return false;
                     }
@@ -97,7 +94,7 @@ namespace Umbraco.Web
                     && publishedContent.HasValue(propertyAlias))
                 {
                     var propertyAliasValue = publishedContent.GetPropertyValue<string>(propertyAlias);
-                    if (propertyAliasValue.IsJson() && propertyAliasValue.Length <= 2)
+                    if (propertyAliasValue.DetectIsJson() && propertyAliasValue.Length <= 2)
                     {
                         return false;
                     }
@@ -105,8 +102,8 @@ namespace Umbraco.Web
                     if (allTheCrops != null && allTheCrops.Crops.Any())
                     {
                         var crop = cropAlias != null
-                                       ? allTheCrops.Crops[cropAlias]
-                                       : allTheCrops.Crops.First().Value;
+                                       ? allTheCrops.Crops.First(x => x.Alias ==cropAlias)
+                                       : allTheCrops.Crops.First();
                         if (crop != null)
                         {
                             return true;
@@ -123,7 +120,7 @@ namespace Umbraco.Web
                 if (cropsProperty != null && !string.IsNullOrEmpty(cropsProperty.Value.ToString()))
                 {
                     var propertyAliasValue = cropsProperty.Value.ToString();
-                    if (propertyAliasValue.IsJson() && propertyAliasValue.Length <= 2)
+                    if (propertyAliasValue.DetectIsJson() && propertyAliasValue.Length <= 2)
                     {
                         return false;
                     }
@@ -131,8 +128,8 @@ namespace Umbraco.Web
                     if (allTheCrops != null && allTheCrops.Crops.Any())
                     {
                         var crop = cropAlias != null
-                                       ? allTheCrops.Crops[cropAlias]
-                                       : allTheCrops.Crops.First().Value;
+                                       ? allTheCrops.Crops.First(x => x.Alias ==cropAlias)
+                                       : allTheCrops.Crops.First();
                         if (crop != null)
                         {
                             return true;

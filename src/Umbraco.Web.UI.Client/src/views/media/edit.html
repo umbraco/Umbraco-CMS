@@ -3,7 +3,7 @@
       ng-show="loaded" 
       ng-submit="save()"
       val-form-manager>
-    <umb-panel>  
+    <umb-panel ng-class="'editor-breadcrumb'">  
         <umb-header tabs="content.tabs">
             
             <div class="span7">
@@ -48,5 +48,12 @@
 
             </umb-tab>
         </umb-tab-view>
+
+        <ul class="umb-panel-footer-nav nav nav-pills" ng-if="content.parentId">
+            <li ng-repeat="ancestor in ancestors">
+                <a href="#/media/media/edit/{{ancestor.id}}">{{ancestor.name}}</a>
+            </li>
+            <li></li>
+        </ul>
     </umb-panel>
 </form>

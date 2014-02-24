@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Web.PropertyEditors;
 
@@ -10,38 +11,29 @@ namespace Umbraco.Web
 {
     public static class ImageCropperTemplateExtensions
     {
-        public static bool HasCrop(this IPublishedContent publishedContent, string propertyAlias, string cropAlias)
-        {
-            return ImageCropperPropertyEditorHelper.GetCrop(publishedContent.ContentType.Alias, cropAlias) != null;
-        }
-
+        
         //this only takes the crop json into account
         public static string Crop(this IPublishedContent mediaItem, string propertyAlias, string cropAlias)
         {
+            mediaItem.HasProperty(propertyAlias);
             var property = mediaItem.GetPropertyValue<string>(propertyAlias);
 
             if (string.IsNullOrEmpty(property))
                 return string.Empty;
 
-            if (property.IsJson())
+            if (property.DetectIsJson())
             {
                 var cropDataSet = property.SerializeToCropDataSet();
-                var currentCrop = cropDataSet.Crops[cropAlias];
-                return cropDataSet.Src + currentCrop.ToUrl();
+                return cropDataSet.Src + cropDataSet.GetCropUrl(cropAlias);
             }
             else
             {
-                //must be a string
-                var cropData = ImageCropperPropertyEditorHelper.GetCrop(mediaItem.ContentType.Alias, cropAlias);
-                return property + cropData.ToUrl();
+                return property;
             }
         }
 
 
-
-
-
-      public static string Crop(
+       public static string Crop(
             this IPublishedContent mediaItem,
             int? width = null,
             int? height = null,
@@ -72,7 +64,7 @@ namespace Umbraco.Web
             Mode? mode = null,
             Anchor? anchor = null,
             string imageCropperValue = null,
-            string imageCropperCropId = null,
+            string cropAlias = null,
             string furtherOptions = null,
             bool slimmage = false)
         {
@@ -81,18 +73,14 @@ namespace Umbraco.Web
                 var imageResizerUrl = new StringBuilder();
                 imageResizerUrl.Append(imageUrl);
 
-                if (!string.IsNullOrEmpty(imageCropperValue) && imageCropperValue.IsJson())
+                if (!string.IsNullOrEmpty(imageCropperValue) && imageCropperValue.DetectIsJson())
                 {
                     var allTheCrops = imageCropperValue.SerializeToCropDataSet();
                     if (allTheCrops != null && allTheCrops.Crops.Any())
                     {
-                        var crop = imageCropperCropId != null
-                                       ? allTheCrops.Crops[imageCropperCropId]
-                                       : allTheCrops.Crops.First().Value;
-                        if (crop != null)
-                        {
-                            imageResizerUrl.Append(crop.ToUrl());
-                        }
+
+                        if(allTheCrops.HasCrop(cropAlias))
+                            imageResizerUrl.Append(allTheCrops.GetCropUrl(cropAlias));
                     }
                 }
                 else

@@ -135,7 +135,7 @@ namespace Umbraco.Core
             }
             return false;
         }
-
+        
         /// <summary>
         /// This is a performance tweak to check if this is a .css, .js or .ico, .jpg, .jpeg, .png, .gif file request since
         /// .Net will pass these requests through to the module when in integrated mode.

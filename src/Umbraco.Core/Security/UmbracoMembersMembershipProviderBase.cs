@@ -6,7 +6,7 @@ namespace Umbraco.Core.Security
     /// An interface for exposing the content type properties for storing membership data in when
     /// a membership provider's data is backed by an Umbraco content type. 
     /// </summary>
-    public interface IUmbracoContentTypeMembershipProvider
+    public interface IUmbracoMemberTypeMembershipProvider
     {
 
         string LockPropertyTypeAlias { get;  }

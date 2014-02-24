@@ -229,6 +229,8 @@ namespace Umbraco.Tests.Services
 
 
                         DatabaseContext.Database.BulkInsertRecords(xmlItems, tr);
+
+                        tr.Complete();
                     }
                 }
             }

@@ -177,7 +177,10 @@ function umbTreeDirective($compile, $log, $q, $rootScope, treeService, notificat
                     function doLoad(tree) {
                         var childrenAndSelf = [tree].concat(tree.children);
                         scope.activeTree = _.find(childrenAndSelf, function (node) {
-                             return node.metaData.treeAlias === treeAlias;
+                            if(node && node.metaData){
+                                return node.metaData.treeAlias === treeAlias;
+                            }
+                            return false;
                         });
                         
                         if (!scope.activeTree) {

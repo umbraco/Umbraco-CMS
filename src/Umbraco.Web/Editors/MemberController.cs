@@ -326,24 +326,25 @@ namespace Umbraco.Web.Editors
             var shouldReFetchMember = false;
 
             //Update the membership user if it has changed
-            if (HasMembershipUserChanged(membershipUser, contentItem))
+            try
             {
-                membershipUser.Email = contentItem.Email.Trim();
-                membershipUser.IsApproved = contentItem.IsApproved;
-                membershipUser.Comment = contentItem.Comments;
-                try
+                var requiredUpdating = Members.UpdateMember(membershipUser, Membership.Provider,
+                    contentItem.Email.Trim(),
+                    contentItem.IsApproved,
+                    comment: contentItem.Comments);
+
+                if (requiredUpdating.Success)
                 {
-                    Membership.Provider.UpdateUser(membershipUser);
                     //re-map these values 
                     shouldReFetchMember = true;
                 }
-                catch (Exception ex)
-                {
-                    LogHelper.WarnWithException<MemberController>("Could not update member, the provider returned an error", ex);
-                    ModelState.AddPropertyError(
-                        //specify 'default' just so that it shows up as a notification - is not assigned to a property
-                        new ValidationResult("Could not update member, the provider returned an error: " + ex.Message + " (see log for full details)"), "default");
-                }
+            }
+            catch (Exception ex)
+            {
+                LogHelper.WarnWithException<MemberController>("Could not update member, the provider returned an error", ex);
+                ModelState.AddPropertyError(
+                    //specify 'default' just so that it shows up as a notification - is not assigned to a property
+                    new ValidationResult("Could not update member, the provider returned an error: " + ex.Message + " (see log for full details)"), "default");
             }
 
             //if they were locked but now they are trying to be unlocked
@@ -436,26 +437,6 @@ namespace Umbraco.Web.Editors
                     MapPropertyValues(contentItem);
                     break;
             }
-        }
-
-        /// <summary>
-        /// Quick check to see if the 'normal' settable properties for the membership provider have changed
-        /// </summary>
-        /// <param name="membershipUser"></param>
-        /// <param name="contentItem"></param>
-        /// <returns></returns>
-        /// <remarks>
-        /// By 'normal' we mean that they can simply be set on the membership user and don't require method calls like ChangePassword or UnlockUser
-        /// </remarks>
-        private bool HasMembershipUserChanged(MembershipUser membershipUser, MemberSave contentItem)
-        {
-            if (contentItem.Email.Trim().InvariantEquals(membershipUser.Email) == false
-                || contentItem.IsApproved != membershipUser.IsApproved
-                || contentItem.Comments != membershipUser.Comment)
-            {
-                return true;
-            }
-            return false;
         }
 
         /// <summary>

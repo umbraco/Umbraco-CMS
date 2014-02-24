@@ -21,7 +21,7 @@ namespace Umbraco.Tests.PropertyEditors
         //[TestCase("Sat 10, November 2012", true)]
         //[TestCase("Saturday 10, November 2012", true)]
         //[TestCase("2012-11-10 13:14:15", true)]
-        [TestCase("2012-11-10 13:14:15", false)]
+        [TestCase("2012-11-10 13:14:15", true)]
         [TestCase("2012-11-10T13:14:15", true)]
         [TestCase("", false)]
 		public void CanConvertDatePickerPropertyEditor(string date, bool expected)

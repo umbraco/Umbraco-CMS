@@ -48,7 +48,7 @@ namespace Umbraco.Core.Services
         /// <param name="memberTypeAlias"></param>
         /// <param name="raiseEvents"></param>
         /// <returns></returns>
-        T CreateMemberWithIdentity(string username, string email, string password, string memberTypeAlias, bool raiseEvents = true);
+        T CreateWithIdentity(string username, string email, string password, string memberTypeAlias, bool raiseEvents = true);
 
         /// <summary>
         /// Gets the member by the provider key
@@ -68,19 +68,19 @@ namespace Umbraco.Core.Services
 
         void Delete(T membershipUser);
 
-        void Save(T membershipUser, bool raiseEvents = true);
+        void Save(T entity, bool raiseEvents = true);
 
-        void Save(IEnumerable<T> members, bool raiseEvents = true);
+        void Save(IEnumerable<T> entities, bool raiseEvents = true);
 
-        IEnumerable<T> FindMembersByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
+        IEnumerable<T> FindByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
 
-        IEnumerable<T> FindMembersByUsername(string login, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
+        IEnumerable<T> FindByUsername(string login, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
 
         /// <summary>
         /// Gets the total number of members based on the count type
         /// </summary>
         /// <returns></returns>
-        int GetMemberCount(MemberCountType countType);
+        int GetCount(MemberCountType countType);
 
         /// <summary>
         /// Gets a list of paged member data
@@ -89,6 +89,6 @@ namespace Umbraco.Core.Services
         /// <param name="pageSize"></param>
         /// <param name="totalRecords"></param>
         /// <returns></returns>
-        IEnumerable<T> GetAllMembers(int pageIndex, int pageSize, out int totalRecords);
+        IEnumerable<T> GetAll(int pageIndex, int pageSize, out int totalRecords);
     }
 }

@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
-    internal interface IUserRepository : IRepositoryQueryable<int, IUser>
+    public interface IUserRepository : IRepositoryQueryable<int, IUser>
     {
         /// <summary>
         /// Gets the count of items based on a complex query
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="orderBy"></param>
         /// <returns></returns>
         IEnumerable<IUser> GetPagedResultsByQuery(IQuery<IUser> query, int pageIndex, int pageSize, out int totalRecords, Expression<Func<IUser, string>> orderBy);
-
+        
         
         /// <summary>
         /// Gets the user permissions for the specified entities
@@ -48,5 +48,12 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         IEnumerable<EntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds);
 
+        /// <summary>
+        /// Replaces the same permission set for a single user to any number of entities
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="permissions"></param>
+        /// <param name="entityIds"></param>
+        void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds);
     }
 }

@@ -172,14 +172,6 @@ namespace umbraco.cms.presentation.user
             var passwordChanger = (passwordChanger) LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx");
             passwordChanger.MembershipProviderName = UmbracoSettings.DefaultBackofficeProvider;
             
-            //This is a hack to allow the admin to change a user's password to whatever they want - this will only work if we are using the
-            // default umbraco membership provider. 
-            // See the notes below in the ChangePassword method.
-            if (BackOfficeProvider.IsUmbracoUsersProvider())
-            {
-                passwordChanger.ShowOldPassword = false;
-            }
-
             //Add a custom validation message for the password changer
             var passwordValidation = new CustomValidator
                 {
@@ -369,18 +361,6 @@ namespace umbraco.cms.presentation.user
                 lname.Text = (user == null) ? u.LoginName : user.UserName;
                 email.Text = (user == null) ? u.Email : user.Email;
 
-                //// Prevent users from changing information if logged in through a custom provider
-                //// custom provider mapped accounts have empty passwords by default... so set update user fields to read only
-                //// this will not be a security issue because empty passwords are not allowed in membership provider. 
-                //// This might change in version 4.0
-                //if (string.IsNullOrEmpty(u.GetPassword()))
-                //{
-                //    uname.ReadOnly = true;
-                //    lname.ReadOnly = true;
-                //    email.ReadOnly = true;
-                //    passw.Visible = false;
-                //}
-
                 contentPicker.Value = u.StartNodeId.ToString(CultureInfo.InvariantCulture);
                 mediaPicker.Value = u.StartMediaId.ToString(CultureInfo.InvariantCulture);
 
@@ -438,20 +418,6 @@ namespace umbraco.cms.presentation.user
                 }
 
                 var changePasswordModel = passwordChangerControl.ChangingPasswordModel;
-
-                // Is it using the default membership provider
-                if (BackOfficeProvider.IsUmbracoUsersProvider())
-                {
-                    //This is a total hack so that an admin can change the password without knowing the previous one
-                    // we do this by simply passing in the already stored hashed/encrypted password in the database - 
-                    // this shouldn't be allowed but to maintain backwards compatibility we need to do this because
-                    // this logic was previously allowed.
-
-                    //For this editor, we set the passwordChanger.ShowOldPassword = false so that the old password
-                    // field doesn't appear because we know we are going to manually set it here.
-                    // We'll change the model to have the already encrypted password stored in the db and that will continue to validate.
-                    changePasswordModel.OldPassword = u.Password;
-                }
 
                 //now do the actual change
                 var changePassResult = _membershipHelper.ChangePassword(
@@ -596,8 +562,7 @@ namespace umbraco.cms.presentation.user
                 //set the writable properties that we are editing
                 membershipHelper.UpdateMember(membershipUser, BackOfficeProvider,
                                               email.Text.Trim(),
-                                              Disabled.Checked == false,
-                                              NoConsole.Checked);
+                                              Disabled.Checked == false);
             }
         }
 

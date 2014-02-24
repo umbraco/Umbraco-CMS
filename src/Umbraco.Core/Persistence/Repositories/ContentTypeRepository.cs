@@ -229,18 +229,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(IContentType entity)
         {
-            Mandate.That<Exception>(string.IsNullOrEmpty(entity.Alias) == false,
-                                    () =>
-                                        {
-                                            var message =
-                                                string.Format(
-                                                    "ContentType '{0}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
-                                                    entity.Name);
-                                            var exception = new Exception(message);
-
-                                            LogHelper.Error<ContentTypeRepository>(message, exception);
-                                            throw exception;
-                                        });
+            ValidateAlias(entity);
 
             //Updates Modified date
             ((ContentType)entity).UpdatingEntity();

@@ -66,6 +66,10 @@ function valFormManager(serverValidationManager, $rootScope, $log, notifications
                         return;
                     }
                     var path = url.split("#")[1];
+                    if(path.indexOf("%253") || path.indexOf("%252")){
+                        path = decodeURIComponent(path);
+                    }
+                    
                     var msg = {view: "confirmroutechange", args: {path: path, listener: locationEvent}};
                     notificationsService.add(msg);
 

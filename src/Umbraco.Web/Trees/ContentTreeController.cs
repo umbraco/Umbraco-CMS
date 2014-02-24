@@ -236,6 +236,7 @@ namespace Umbraco.Web.Trees
             //need to ensure some of these are converted to the legacy system - until we upgrade them all to be angularized.
             menu.Items.Add<ActionMove>(ui.Text("actions", ActionMove.Instance.Alias), true);
             menu.Items.Add<ActionCopy>(ui.Text("actions", ActionCopy.Instance.Alias));
+            menu.Items.Add<ActionChangeDocType>(ui.Text("actions", ActionChangeDocType.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
 
             menu.Items.Add<ActionSort>(ui.Text("actions", ActionSort.Instance.Alias), true).ConvertLegacyMenuItem(item, "content", "content");
 

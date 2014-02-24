@@ -74,57 +74,9 @@ namespace Umbraco.Web.PropertyEditors
 
                 if (uploadFieldConfigNode != null)
                 {
-                    //now we need to check if there is a value
-                    if (p.Value is string && ((string) p.Value).IsNullOrWhiteSpace() == false)
-                    {
-                        //there might be multiple, we can only process the first one!
-                        var split = ((string) p.Value).Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
-                        if (split.Any())
-                        {
-                            var fullPath = mediaFileSystem.GetFullPath(mediaFileSystem.GetRelativePath(split[0]));
-                            var umbracoFile = new UmbracoMediaFile(fullPath);
-                            FillProperties(uploadFieldConfigNode, model, umbracoFile);
-                        }
-                    }
-                    else
-                    {
-                        //there's no value so need to reset to zero
-                        ResetProperties(uploadFieldConfigNode, model);
-                    }
+                    model.PopulateFileMetaDataProperties(uploadFieldConfigNode, p.Value);
                 }
             }            
-        }
-
-        private static void ResetProperties(IImagingAutoFillUploadField uploadFieldConfigNode, IContentBase content)
-        {
-            if (content.Properties.Contains(uploadFieldConfigNode.WidthFieldAlias))
-                content.Properties[uploadFieldConfigNode.WidthFieldAlias].Value = string.Empty;
-            
-            if (content.Properties.Contains(uploadFieldConfigNode.HeightFieldAlias))
-                content.Properties[uploadFieldConfigNode.HeightFieldAlias].Value = string.Empty;
-
-            if (content.Properties.Contains(uploadFieldConfigNode.LengthFieldAlias))
-                content.Properties[uploadFieldConfigNode.LengthFieldAlias].Value = string.Empty;
-
-            if (content.Properties.Contains(uploadFieldConfigNode.ExtensionFieldAlias))
-                content.Properties[uploadFieldConfigNode.ExtensionFieldAlias].Value = string.Empty;
-        }
-
-        private static void FillProperties(IImagingAutoFillUploadField uploadFieldConfigNode, IContentBase content, UmbracoMediaFile um)
-        {
-            var size = um.SupportsResizing ? (Size?)um.GetDimensions() : null;
-
-            if (content.Properties.Contains(uploadFieldConfigNode.WidthFieldAlias))
-                content.Properties[uploadFieldConfigNode.WidthFieldAlias].Value = size.HasValue ? size.Value.Width.ToInvariantString() : string.Empty;
-
-            if (content.Properties.Contains(uploadFieldConfigNode.HeightFieldAlias))
-                content.Properties[uploadFieldConfigNode.HeightFieldAlias].Value = size.HasValue ? size.Value.Height.ToInvariantString() : string.Empty;
-
-            if (content.Properties.Contains(uploadFieldConfigNode.LengthFieldAlias))
-                content.Properties[uploadFieldConfigNode.LengthFieldAlias].Value = um.Length;
-
-            if (content.Properties.Contains(uploadFieldConfigNode.ExtensionFieldAlias))
-                content.Properties[uploadFieldConfigNode.ExtensionFieldAlias].Value = um.Extension;
         }
 
         /// <summary>

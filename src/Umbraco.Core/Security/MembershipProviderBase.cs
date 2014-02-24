@@ -711,11 +711,6 @@ namespace Umbraco.Core.Security
                     var decrypted = DecryptPassword(dbPassword);
                     return decrypted == password;
                 case MembershipPasswordFormat.Hashed:
-
-                    //only triggered when we set the initial installer password
-                    if (dbPassword == "default" && password == dbPassword)
-                        return true;
-
                     string salt;
                     var storedHashedPass = StoredPassword(dbPassword, out salt);
                     var hashed = EncryptOrHashPassword(password, salt);

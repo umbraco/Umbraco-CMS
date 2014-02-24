@@ -3,12 +3,15 @@ using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Linq;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using Umbraco.Core.Configuration;
+using Umbraco.Core;
+using Umbraco.Core.Persistence.SqlSyntax;
 using umbraco.DataLayer;
 
 namespace umbraco.dialogs
@@ -56,7 +59,13 @@ namespace umbraco.dialogs
 			}
 			else
 			{
-				fieldSql = "select distinct alias from cmsPropertyType order by alias";
+                //exclude built-in memberhip properties from showing up here
+			    var exclude = Constants.Conventions.Member.GetStandardPropertyTypeStubs()
+                    .Select(x => SqlSyntaxContext.SqlSyntaxProvider.GetQuotedValue(x.Key)).ToArray();
+
+				fieldSql = string.Format(
+                    "select distinct alias from cmsPropertyType where alias not in ({0}) order by alias",
+                    string.Join(",", exclude));
 				pp_insertField.Text = ui.Text("templateEditor", "chooseField");
 			}
 
@@ -96,24 +105,6 @@ namespace umbraco.dialogs
 
 		}
 
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
-
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
-		}
-		#endregion
 
 		/// <summary>
 		/// JsInclude1 control.

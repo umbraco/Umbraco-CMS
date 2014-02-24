@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Rdbms;
@@ -55,6 +56,11 @@ namespace Umbraco.Core.Persistence.Repositories
             }
         }
         
+        protected virtual PropertyType CreatePropertyType(string propertyEditorAlias, DataTypeDatabaseType dbType, string propertyTypeAlias)
+        {
+            return new PropertyType(propertyEditorAlias, dbType);
+        }
+
         protected void PersistNewBaseContentType(ContentTypeDto dto, IContentTypeComposition entity)
         {
             //Logic for setting Path, Level and SortOrder
@@ -144,8 +150,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 //If the Id of the DataType is not set, we resolve it from the db by its PropertyEditorAlias
                 if (propertyType.DataTypeDefinitionId == 0 || propertyType.DataTypeDefinitionId == default(int))
                 {
-                    var datatype = Database.FirstOrDefault<DataTypeDto>("WHERE propertyEditorAlias = @alias", new { alias = propertyType.PropertyEditorAlias });
-                    propertyType.DataTypeDefinitionId = datatype.DataTypeId;
+                    AssignDataTypeFromPropertyEditor(propertyType);
                 }
                 var propertyTypeDto = propertyFactory.BuildPropertyTypeDto(tabId, propertyType);
                 int typePrimaryKey = Convert.ToInt32(Database.Insert(propertyTypeDto));
@@ -302,9 +307,12 @@ namespace Umbraco.Core.Persistence.Repositories
                 //If the Id of the DataType is not set, we resolve it from the db by its PropertyEditorAlias
                 if (propertyType.DataTypeDefinitionId == 0 || propertyType.DataTypeDefinitionId == default(int))
                 {
-                    var datatype = Database.FirstOrDefault<DataTypeDto>("WHERE propertyEditorAlias = @alias", new { alias = propertyType.PropertyEditorAlias });
-                    propertyType.DataTypeDefinitionId = datatype.DataTypeId;
+                    AssignDataTypeFromPropertyEditor(propertyType);
                 }
+
+                //validate the alias! 
+                ValidateAlias(propertyType);
+
                 var propertyTypeDto = propertyGroupFactory.BuildPropertyTypeDto(tabId, propertyType);
                 int typePrimaryKey = propertyType.HasIdentity
                                          ? Database.Update(propertyTypeDto)
@@ -341,7 +349,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             var dtos = Database.Fetch<PropertyTypeGroupDto, PropertyTypeDto, DataTypeDto, PropertyTypeGroupDto>(new GroupPropertyTypeRelator().Map, sql);
 
-            var propertyGroupFactory = new PropertyGroupFactory(id, createDate, updateDate);
+            var propertyGroupFactory = new PropertyGroupFactory(id, createDate, updateDate, CreatePropertyType);
             var propertyGroups = propertyGroupFactory.BuildEntity(dtos);
             return new PropertyGroupCollection(propertyGroups);
         }
@@ -358,29 +366,88 @@ namespace Umbraco.Core.Persistence.Repositories
             var dtos = Database.Fetch<PropertyTypeDto, DataTypeDto>(sql);
 
             //TODO Move this to a PropertyTypeFactory
-            var list = (from dto in dtos
-                        where (dto.PropertyTypeGroupId > 0) == false
-                        select
-                            new PropertyType(dto.DataTypeDto.PropertyEditorAlias,
-                                             dto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true))
-                                {
-                                    Alias = dto.Alias,
-                                    DataTypeDefinitionId = dto.DataTypeId,
-                                    Description = dto.Description,
-                                    Id = dto.Id,
-                                    Name = dto.Name,
-                                    HelpText = dto.HelpText,
-                                    Mandatory = dto.Mandatory,
-                                    SortOrder = dto.SortOrder,
-                                    ValidationRegExp = dto.ValidationRegExp,
-                                    CreateDate = createDate,
-                                    UpdateDate = updateDate
-                                }).ToList();
-
+            var list = new List<PropertyType>();
+            foreach (var dto in dtos.Where(x => (x.PropertyTypeGroupId > 0) == false))
+            {
+                var propType = CreatePropertyType(dto.DataTypeDto.PropertyEditorAlias, dto.DataTypeDto.DbType.EnumParse<DataTypeDatabaseType>(true), dto.Alias);
+                propType.Alias = dto.Alias;
+                propType.DataTypeDefinitionId = dto.DataTypeId;
+                propType.Description = dto.Description;
+                propType.Id = dto.Id;
+                propType.Name = dto.Name;
+                propType.HelpText = dto.HelpText;
+                propType.Mandatory = dto.Mandatory;
+                propType.SortOrder = dto.SortOrder;
+                propType.ValidationRegExp = dto.ValidationRegExp;
+                propType.CreateDate = createDate;
+                propType.UpdateDate = updateDate;
+                list.Add(propType);
+            }
             //Reset dirty properties
             Parallel.ForEach(list, currentFile => currentFile.ResetDirtyProperties(false));
 
             return new PropertyTypeCollection(list);
+        }
+
+        protected void ValidateAlias(PropertyType pt)
+        {
+            Mandate.That<InvalidOperationException>(string.IsNullOrEmpty(pt.Alias) == false,
+                                    () =>
+                                    {
+                                        var message =
+                                            string.Format(
+                                                "{0} '{1}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                                                "Property Type",
+                                                pt.Name);
+                                        var exception = new InvalidOperationException(message);
+
+                                        LogHelper.Error<ContentTypeBaseRepository<TId, TEntity>>(message, exception);
+                                        throw exception;
+                                    });
+        }
+
+        protected void ValidateAlias(TEntity entity)
+        {
+            Mandate.That<InvalidOperationException>(string.IsNullOrEmpty(entity.Alias) == false,
+                                    () =>
+                                    {
+                                        var message =
+                                            string.Format(
+                                                "{0} '{1}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                                                typeof(TEntity).Name,
+                                                entity.Name);
+                                        var exception = new InvalidOperationException(message);
+
+                                        LogHelper.Error<ContentTypeBaseRepository<TId, TEntity>>(message, exception);
+                                        throw exception;
+                                    });
+        }
+
+        /// <summary>
+        /// Try to set the data type id based on its ControlId
+        /// </summary>
+        /// <param name="propertyType"></param>
+        private void AssignDataTypeFromPropertyEditor(PropertyType propertyType)
+        {
+            //we cannot try to assign a data type of it's empty
+            if (propertyType.PropertyEditorAlias.IsNullOrWhiteSpace() == false)
+            {
+                var sql = new Sql()
+                    .Select("*")
+                    .From<DataTypeDto>()
+                    .Where("propertyEditorAlias = @propertyEditorAlias", new { propertyEditorAlias = propertyType.PropertyEditorAlias })
+                    .OrderBy<DataTypeDto>(typeDto => typeDto.DataTypeId);
+                var datatype = Database.FirstOrDefault<DataTypeDto>(sql);
+                //we cannot assign a data type if one was not found
+                if (datatype != null)
+                {
+                    propertyType.DataTypeDefinitionId = datatype.DataTypeId;
+                }
+                else
+                {
+                    LogHelper.Warn<ContentTypeBaseRepository<TId, TEntity>>("Could not assign a data type for the property type " + propertyType.Alias + " since no data type was found with a property editor " + propertyType.PropertyEditorAlias);
+                }
+            }
         }
     }
 }

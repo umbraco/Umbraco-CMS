@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Web.Security;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 using Umbraco.Web.Install;
 using Umbraco.Web.Security;
 using umbraco.BusinessLogic;
@@ -28,24 +30,24 @@ namespace Umbraco.Web.UI.Install.Steps
             }
         }
 
-        protected void ChangePasswordClick(object sender, System.EventArgs e)
+        protected void ChangePasswordClick(object sender, EventArgs e)
         {
             Page.Validate();
 
             if (Page.IsValid)
             {
-                var u = User.GetUser(0);
-                var user = CurrentProvider.GetUser(0, true);
-                if (user == null)
+                var user = User.GetUser(0);
+                
+                var membershipUser = CurrentProvider.GetUser(0, true);
+                if (membershipUser == null)
                 {
                     throw new InvalidOperationException("No user found in membership provider with id of 0");
                 }
-
-                //NOTE: This will throw an exception if the membership provider 
+                
                 try
                 {
-                    var success = user.ChangePassword(u.GetPassword(), tb_password.Text.Trim());
-                    if (!success)
+                    var success = membershipUser.ChangePassword(user.GetPassword(), tb_password.Text.Trim());
+                    if (success == false)
                     {
                         PasswordValidator.IsValid = false;
                         PasswordValidator.ErrorMessage = "Password must be at least " + CurrentProvider.MinRequiredPasswordLength + " characters long and contain at least " + CurrentProvider.MinRequiredNonAlphanumericCharacters + " symbols";
@@ -59,30 +61,11 @@ namespace Umbraco.Web.UI.Install.Steps
                     return;
                 }
 
-                // Is it using the default membership provider
-                if (CurrentProvider is UsersMembershipProvider)
-                {
-                    // Save user in membership provider
-                    var umbracoUser = user as UsersMembershipUser;
-                    umbracoUser.FullName = tb_name.Text.Trim();
-                    CurrentProvider.UpdateUser(umbracoUser);
-
-                    // Save user details
-                    u.Email = tb_email.Text.Trim();
-                }
-                else
-                {
-                    u.Name = tb_name.Text.Trim();
-                    if ((CurrentProvider is ActiveDirectoryMembershipProvider) == false)
-                    {
-                        CurrentProvider.UpdateUser(user);
-                    }
-                }
-
-                // we need to update the login name here as it's set to the old name when saving the user via the membership provider!
-                u.LoginName = tb_login.Text;
-
-                u.Save();
+                user.Email = tb_email.Text.Trim();
+                user.Name = tb_name.Text.Trim();
+                user.LoginName = tb_login.Text;
+                
+                user.Save();
 
                 if (cb_newsletter.Checked)
                 {
@@ -92,14 +75,16 @@ namespace Umbraco.Web.UI.Install.Steps
                         var values = new NameValueCollection {{"name", tb_name.Text}, {"email", tb_email.Text}};
 
                         client.UploadValues("http://umbraco.org/base/Ecom/SubmitEmail/installer.aspx", values);
-
                     }
-                    catch { /* fail in silence */ }
+                    catch (Exception ex)
+                    {
+                        LogHelper.Error<DefaultUser>("An error occurred subscribing user to newsletter", ex);
+                    }
                 }
 
 
                 if (String.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus))
-                    UmbracoContext.Current.Security.PerformLogin(u.Id);
+                    UmbracoContext.Current.Security.PerformLogin(user.Id);
 
                 InstallHelper.RedirectToNextStep(Page, GetCurrentStep());
             }

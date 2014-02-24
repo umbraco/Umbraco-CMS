@@ -8,6 +8,7 @@ using System.Collections;
 using System.Web.UI.WebControls;
 using System.Data.SqlClient;
 using System.Data;
+using Umbraco.Core;
 using Umbraco.Web;
 using Umbraco.Web.Security;
 using umbraco;
@@ -27,17 +28,11 @@ namespace umbraco.cms.presentation.user
     /// </summary>    
     public class UserPermissions
     {
-
-        User m_user;
+        readonly User _user;
 
         public UserPermissions(User user)
         {
-            m_user = user;
-        }
-
-        private static ISqlHelper SqlHelper
-        {
-            get { return Application.SqlHelper; }
+            _user = user;
         }
 
         /// <summary>
@@ -70,31 +65,32 @@ namespace umbraco.cms.presentation.user
             //get the complete list of node ids that this change will affect
             var allNodes = new List<int>();
             if (replaceChildren)
+            {
                 foreach (var nodeId in nodeIDs)
                 {
                     allNodes.Add(nodeId);
                     allNodes.AddRange(FindChildNodes(nodeId));
                 }
+            }
             else
+            {
                 allNodes.AddRange(nodeIDs);
-
-            //First remove all permissions for all nodes in question       
-            Permission.DeletePermissions(m_user.Id, allNodes.ToArray());
+            }
 
             //if permissions are to be assigned, then assign them
             if (permissions.Count > 0)
             {
-                foreach (var oPer in permissions)
-                {
-                    InsertPermissions(allNodes.ToArray(), oPer);
-                }
+                ApplicationContext.Current.Services.UserService.ReplaceUserPermissions(
+                    _user.Id, permissions.Select(x => x.Letter), allNodes.ToArray());
             }
             else
             {
                 //If there are NO permissions for this node, we need to assign the ActionNull permission otherwise
                 //the node will inherit from it's parent.
-                InsertPermissions(nodeIDs, ActionNull.Instance);
+                ApplicationContext.Current.Services.UserService.ReplaceUserPermissions(
+                    _user.Id, new[] { ActionNull.Instance.Letter }, allNodes.ToArray());
             }            
+
         }
 
         /// <summary>
@@ -108,7 +104,7 @@ namespace umbraco.cms.presentation.user
             if (path != "")
             {
                 //get the user and their permissions
-                string permissions = m_user.GetPermissions(path);
+                string permissions = _user.GetPermissions(path);
                 return umbraco.BusinessLogic.Actions.Action.FromString(permissions);
             }
             return null;
@@ -149,11 +145,5 @@ namespace umbraco.cms.presentation.user
             }
             return nodeIds;
         }
-
-        private void InsertPermissions(IEnumerable<int> nodeIDs, IAction permission)
-        {
-            Permission.MakeNew(m_user, nodeIDs.Select(x => new CMSNode(x)), permission.Letter, true);
-        }
-        
     }
 }

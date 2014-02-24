@@ -73,7 +73,8 @@ namespace Umbraco.Web.Security
                 if (model.Email.InvariantEquals(membershipUser.Email) == false)
                 {
                     //Use the membership provider to change the email since that is configured to do the checks to check for unique emails if that is configured.
-                    membershipUser = UpdateMember(membershipUser, Membership.Provider, model.Email);    
+                    var requiresUpdating = UpdateMember(membershipUser, Membership.Provider, model.Email);
+                    membershipUser = requiresUpdating.Result;
                 }
             }
             catch (Exception ex)
@@ -204,17 +205,32 @@ namespace Umbraco.Web.Security
 
             if (Membership.Provider.IsUmbracoMembershipProvider())
             {
+                var membershipUser = Membership.GetUser();
                 var member = GetCurrentMember();
                 //this shouldn't happen
                 if (member == null) return null;
 
                 var model = ProfileModel.CreateModel();
                 model.Name = member.Name;
-                model.Email = member.Email;
+
+                model.Email = membershipUser.Email;
+                model.UserName = membershipUser.UserName;
+                model.PasswordQuestion = membershipUser.PasswordQuestion;
+                model.Comment = membershipUser.Comment;
+                model.IsApproved = membershipUser.IsApproved;
+                model.IsLockedOut = membershipUser.IsLockedOut;
+                model.LastLockoutDate = membershipUser.LastLockoutDate;
+                model.CreationDate = membershipUser.CreationDate;
+                model.LastLoginDate = membershipUser.LastLoginDate;
+                model.LastActivityDate = membershipUser.LastActivityDate;
+                model.LastPasswordChangedDate = membershipUser.LastPasswordChangedDate;
 
                 var memberType = member.ContentType;
 
-                foreach (var prop in memberType.PropertyTypes.Where(x => memberType.MemberCanEditProperty(x.Alias)))
+                var builtIns = Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
+
+                foreach (var prop in memberType.PropertyTypes
+                    .Where(x => builtIns.Contains(x.Alias) == false && memberType.MemberCanEditProperty(x.Alias)))
                 {
                     var value = string.Empty;
                     var propValue = member.Properties[prop.Alias];
@@ -542,8 +558,7 @@ namespace Umbraco.Web.Security
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex2.Message + " (see log for full details)", new[] { "value" }) });
             }
         }
-
-
+        
         /// <summary>
         /// Updates a membership user with all of it's writable properties
         /// </summary>
@@ -551,55 +566,56 @@ namespace Umbraco.Web.Security
         /// <param name="provider"></param>
         /// <param name="email"></param>
         /// <param name="isApproved"></param>
-        /// <param name="isLocked"></param>
         /// <param name="lastLoginDate"></param>
         /// <param name="lastActivityDate"></param>
         /// <param name="comment"></param>
-        /// <returns></returns>
-        internal MembershipUser UpdateMember(MembershipUser member, MembershipProvider provider,
+        /// <returns>
+        /// Returns successful if the membershipuser required updating, otherwise returns failed if it didn't require updating.
+        /// </returns>
+        internal Attempt<MembershipUser> UpdateMember(MembershipUser member, MembershipProvider provider,
             string email = null,
             bool? isApproved = null,
-            bool? isLocked = null,
             DateTime? lastLoginDate = null,
             DateTime? lastActivityDate = null,
             string comment = null)
         {
+            var needsUpdating = new List<bool>();
+
             //set the writable properties
             if (email != null)
             {
+                needsUpdating.Add(member.Email != email);
                 member.Email = email;
             }
             if (isApproved.HasValue)
             {
+                needsUpdating.Add(member.IsApproved != isApproved.Value);
                 member.IsApproved = isApproved.Value;
             }
             if (lastLoginDate.HasValue)
             {
+                needsUpdating.Add(member.LastLoginDate != lastLoginDate.Value);
                 member.LastLoginDate = lastLoginDate.Value;
             }
             if (lastActivityDate.HasValue)
             {
+                needsUpdating.Add(member.LastActivityDate != lastActivityDate.Value);
                 member.LastActivityDate = lastActivityDate.Value;
             }
             if (comment != null)
             {
+                needsUpdating.Add(member.Comment != comment);
                 member.Comment = comment;
             }
 
-            if (isLocked.HasValue)
+            //Don't persist anything if nothing has changed
+            if (needsUpdating.Any(x => x == true))
             {
-                //there is no 'setter' on IsLockedOut but you can ctor a new membership user with it set, so i guess that's what we'll do,
-                // this does mean however if it was a typed membership user object that it will no longer be typed
-                //membershipUser.IsLockedOut = true;
-                member = new MembershipUser(member.ProviderName, member.UserName,
-                    member.ProviderUserKey, member.Email, member.PasswordQuestion, member.Comment, member.IsApproved,
-                    isLocked.Value,  //new value
-                    member.CreationDate, member.LastLoginDate, member.LastActivityDate, member.LastPasswordChangedDate, member.LastLockoutDate);
+                provider.UpdateUser(member);
+                return Attempt<MembershipUser>.Succeed(member);
             }
 
-            provider.UpdateUser(member);
-
-            return member;
+            return Attempt<MembershipUser>.Fail(member);
         }
 
         /// <summary>

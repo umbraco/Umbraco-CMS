@@ -98,8 +98,7 @@ namespace umbraco.cms.businesslogic.member
 		/// <param name="value">True/False if Members of the type shoúld be able to edit the data</param>
         public void setMemberCanEdit(PropertyType pt, bool value)
 		{
-		    MemberTypeItem.SetMemberCanEditProperty(pt.Alias, value);
-            ApplicationContext.Current.Services.MemberTypeService.Save(MemberTypeItem);
+		    MemberTypeItem.SetMemberCanEditProperty(pt.Alias, value);            
         }
         
 		/// <summary>
@@ -109,8 +108,7 @@ namespace umbraco.cms.businesslogic.member
 		/// <param name="value">True/False if the data should be displayed</param>
         public void setMemberViewOnProfile(PropertyType pt, bool value) 
 		{
-            MemberTypeItem.SetMemberCanViewProperty(pt.Alias, value);
-            ApplicationContext.Current.Services.MemberTypeService.Save(MemberTypeItem);
+            MemberTypeItem.SetMemberCanViewProperty(pt.Alias, value);            
 		}
 
 		/// <summary>

@@ -12,59 +12,6 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
     public class ContentElementTests : UmbracoSettingsTests
     {
         [Test]
-        public virtual void ImageCrops()
-        {
-            Assert.AreEqual(true, SettingsSection.Content.ImageCrops.SaveFiles);
-            Assert.AreEqual(2, SettingsSection.Content.ImageCrops.Crops.Count());
-        }
-
-        [Test]
-        public virtual void ImageCropItem()
-        {
-            Assert.AreEqual("image", SettingsSection.Content.ImageCrops.Crops.First().MediaTypeAlias);
-            Assert.AreEqual("umbracoFocalPoint", SettingsSection.Content.ImageCrops.Crops.First().FocalPointProperty);
-            Assert.AreEqual(3, SettingsSection.Content.ImageCrops.Crops.First().CropSizes.Count());
-
-            Assert.AreEqual("custom", SettingsSection.Content.ImageCrops.Crops.Last().MediaTypeAlias);
-            Assert.AreEqual("customPoint", SettingsSection.Content.ImageCrops.Crops.Last().FocalPointProperty);
-            Assert.AreEqual(2, SettingsSection.Content.ImageCrops.Crops.Last().CropSizes.Count());
-        }
-
-        [Test]
-        public virtual void ImageCropSizes()
-        {
-            var toVerify1 = new List<Tuple<string, int, int>>
-            {
-                new Tuple<string, int, int>("thumb", 100, 100),
-                new Tuple<string, int, int>("portrait", 320, 400),
-                new Tuple<string, int, int>("banner", 620, 140),
-            };
-            var toVerify2 = new List<Tuple<string, int, int>>
-            {
-                new Tuple<string, int, int>("thumb", 100, 100),
-                new Tuple<string, int, int>("banner", 600, 100),
-            };
-
-            for (var i = 0; i < SettingsSection.Content.ImageCrops.Crops.First().CropSizes.Count(); i++)
-            {
-                var size = SettingsSection.Content.ImageCrops.Crops.First().CropSizes.ElementAt(i);
-                var verify = toVerify1[i];
-                Assert.AreEqual(verify.Item1, size.Alias);
-                Assert.AreEqual(verify.Item2, size.Width);
-                Assert.AreEqual(verify.Item3, size.Height);
-            }
-            for (var i = 0; i < SettingsSection.Content.ImageCrops.Crops.Last().CropSizes.Count(); i++)
-            {
-                var size = SettingsSection.Content.ImageCrops.Crops.Last().CropSizes.ElementAt(i);
-                var verify = toVerify2[i];
-                Assert.AreEqual(verify.Item1, size.Alias);
-                Assert.AreEqual(verify.Item2, size.Width);
-                Assert.AreEqual(verify.Item3, size.Height);
-            }
-            
-        }
-
-        [Test]
         public void EmailAddress()
         {
             Assert.IsTrue(SettingsSection.Content.NotificationEmailAddress == "robot@umbraco.dk");

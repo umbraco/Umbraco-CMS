@@ -1,14 +1,18 @@
 using System;
-using System.Collections;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Globalization;
+using System.Linq;
 using System.Web;
 using System.Web.SessionState;
 using System.Web.UI;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
+using ClientDependency.Core;
+using umbraco.cms.businesslogic.member;
 using umbraco.cms.presentation.Trees;
+using umbraco.controls;
 
 namespace umbraco.cms.presentation.members
 {
@@ -20,46 +24,55 @@ namespace umbraco.cms.presentation.members
             CurrentApp = BusinessLogic.DefaultApps.member.ToString();
 
 	    }
-		protected System.Web.UI.WebControls.PlaceHolder plc;
-		private cms.businesslogic.member.MemberType dt;
+		protected PlaceHolder plc;
+		private businesslogic.member.MemberType _memberType;
 
-		private System.Collections.ArrayList ExtraPropertyTypeInfos = new System.Collections.ArrayList();
-		protected global::umbraco.controls.ContentTypeControlNew ContentTypeControlNew1;
+	    protected ContentTypeControlNew ContentTypeControlNew1;
 
-		protected void Page_Load(object sender, System.EventArgs e)
-		{
-			dt = new cms.businesslogic.member.MemberType(int.Parse(Request.QueryString["id"]));
-			setupExtraEditorControls();
-			ContentTypeControlNew1.InfoTabPage.Controls.Add(Pane1andmore);
+	    protected override void OnInit(EventArgs e)
+	    {
+	        base.OnInit(e);
 
-			if (!IsPostBack)
-			{
-				ClientTools
-					.SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadMemberTypes>().Tree.Alias)
-					.SyncTree(dt.Id.ToString(), false);
-			}
+            ContentTypeControlNew1.SavingContentType += ContentTypeControlNew1_SavingContentType;
+	    }
 
-		}
+	    protected override void OnLoad(EventArgs e)
+	    {
+	        base.OnLoad(e);
+
+            _memberType = new businesslogic.member.MemberType(int.Parse(Request.QueryString["id"]));
+            SetupExtraEditorControls();
+            ContentTypeControlNew1.InfoTabPage.Controls.Add(Pane1andmore);
+
+            if (!IsPostBack)
+            {
+                ClientTools
+                    .SetActiveTreeType(TreeDefinitionCollection.Instance.FindTree<loadMemberTypes>().Tree.Alias)
+                    .SyncTree(_memberType.Id.ToString(CultureInfo.InvariantCulture), false);
+            }
+	    }
+
 		protected override bool OnBubbleEvent(object source, EventArgs args)
 		{
-			bool handled = false;
-			if (args is controls.SaveClickEventArgs) 
+			var handled = false;
+		    var eventArgs = args as SaveClickEventArgs;
+		    if (eventArgs != null) 
 			{
-				controls.SaveClickEventArgs e = (controls.SaveClickEventArgs) args;
+				var e = eventArgs;
 				if (e.Message == "Saved") 
 				{
-					saveExtras();
+                    SetupExtraEditorControls();
 				
                     ClientTools
                         .ShowSpeechBubble(speechBubbleIcon.save, "Membertype saved", "")
-                        .SyncTree(dt.Id.ToString(), true);					
+                        .SyncTree(_memberType.Id.ToString(CultureInfo.InvariantCulture), true);					
                     
 				} 
 				else 
 				{
                     ClientTools
                         .ShowSpeechBubble(e.IconType, e.Message, "")
-                        .SyncTree(dt.Id.ToString(), true);
+                        .SyncTree(_memberType.Id.ToString(CultureInfo.InvariantCulture), true);
                     
 				}
 				handled = true;
@@ -67,68 +80,59 @@ namespace umbraco.cms.presentation.members
 			
 			return handled;
 		}
-		private void setupExtraEditorControls(){
-			DataTable dt1 = new DataTable();
-			dt1.Columns.Add("id");
-			dt1.Columns.Add("name");
-			dt1.Columns.Add("canedit");
-			dt1.Columns.Add("canview");
 
-			foreach (cms.businesslogic.propertytype.PropertyType pt in dt.PropertyTypes) 
-			{
-				DataRow dr = dt1.NewRow();
-				dr["name"] = pt.Name;
-				dr["id"] = pt.Id;
-				dt1.Rows.Add(dr);
-			}
-			dgEditExtras.DataSource = dt1;
-			dgEditExtras.DataBind();			
-		}
+	    private void SetupExtraEditorControls()
+	    {
+	        var dt1 = new DataTable();
+	        dt1.Columns.Add("id");
+	        dt1.Columns.Add("name");
+	        dt1.Columns.Add("canedit");
+	        dt1.Columns.Add("canview");
 
-		protected void saveExtras() {
-			foreach (DataGridItem dgi in dgEditExtras.Items) {
-				if(dgi.ItemType == ListItemType.Item || dgi.ItemType == ListItemType.AlternatingItem) 
-				{
-					cms.businesslogic.propertytype.PropertyType pt = cms.businesslogic.propertytype.PropertyType.GetPropertyType(int.Parse(dgi.Cells[0].Text));
-					dt.setMemberCanEdit(pt,((CheckBox)dgi.FindControl("ckbMemberCanEdit")).Checked);
-					dt.setMemberViewOnProfile(pt,((CheckBox)dgi.FindControl("ckbMemberCanView")).Checked);
-                    dt.Save();
-				}
-			}
-		
-		}
-		protected void dgEditExtras_itemdatabound(object sender,DataGridItemEventArgs e) 
+            //filter out the 'built-in' property types as we don't want to display these options for them
+	        var builtIns = Umbraco.Core.Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
+	        var propTypes = _memberType.PropertyTypes.Where(x => builtIns.Contains(x.Alias) == false);
+
+            foreach (var pt in propTypes)
+	        {
+	            var dr = dt1.NewRow();
+	            dr["name"] = pt.Name;
+	            dr["id"] = pt.Id;
+	            dt1.Rows.Add(dr);
+	        }
+	        dgEditExtras.DataSource = dt1;
+	        dgEditExtras.DataBind();
+	    }
+
+        /// <summary>
+        /// Executes some code before the member type is saved, this allows us to save the member can edit/member can view information
+        /// before the Save() command is executed.
+        /// </summary>
+        /// <param name="e"></param>
+        void ContentTypeControlNew1_SavingContentType(businesslogic.ContentType e)
+        {
+            var mt = e as MemberType;
+            if (mt == null) return; //This should not happen!
+            foreach (DataGridItem dgi in dgEditExtras.Items)
+            {
+                if (dgi.ItemType == ListItemType.Item || dgi.ItemType == ListItemType.AlternatingItem)
+                {
+                    var pt = cms.businesslogic.propertytype.PropertyType.GetPropertyType(int.Parse(dgi.Cells[0].Text));
+                    mt.setMemberCanEdit(pt, ((CheckBox)dgi.FindControl("ckbMemberCanEdit")).Checked);
+                    mt.setMemberViewOnProfile(pt, ((CheckBox)dgi.FindControl("ckbMemberCanView")).Checked);
+                }
+            }
+        }
+
+	    protected void dgEditExtras_itemdatabound(object sender,DataGridItemEventArgs e) 
 		{
 			if(e.Item.ItemType == ListItemType.Item || e.Item.ItemType == ListItemType.AlternatingItem) 
 			{
-				cms.businesslogic.propertytype.PropertyType pt = cms.businesslogic.propertytype.PropertyType.GetPropertyType(int.Parse(((DataRowView)e.Item.DataItem).Row["id"].ToString()));
-				((CheckBox)e.Item.FindControl("ckbMemberCanEdit")).Checked = dt.MemberCanEdit(pt);
-				((CheckBox)e.Item.FindControl("ckbMemberCanView")).Checked = dt.ViewOnProfile(pt);
+				var pt = cms.businesslogic.propertytype.PropertyType.GetPropertyType(int.Parse(((DataRowView)e.Item.DataItem).Row["id"].ToString()));
+				((CheckBox)e.Item.FindControl("ckbMemberCanEdit")).Checked = _memberType.MemberCanEdit(pt);
+				((CheckBox)e.Item.FindControl("ckbMemberCanView")).Checked = _memberType.ViewOnProfile(pt);
 			}
 		}
-
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-
-            InitializeComponent();
-            base.OnInit(e);
-
-			
-		}
-		
-		/// <summary>
-		/// Required method for Designer support - do not modify
-		/// the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{   
-
-		}
-		#endregion
 
 	}
 

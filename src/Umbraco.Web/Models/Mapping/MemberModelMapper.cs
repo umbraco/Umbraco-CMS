@@ -252,7 +252,7 @@ namespace Umbraco.Web.Models.Mapping
 
                 if (Membership.Provider.IsUmbracoMembershipProvider() == false)
                 {
-                    //it's a generic provider so update the locked out property based on our know constant alias
+                    //it's a generic provider so update the locked out property based on our known constant alias
                     var isLockedOutProperty = result.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
                     if (isLockedOutProperty != null && isLockedOutProperty.Value.ToString() != "1")
                     {
@@ -264,7 +264,7 @@ namespace Umbraco.Web.Models.Mapping
                 }
                 else
                 {
-                    var umbracoProvider = (IUmbracoContentTypeMembershipProvider)Membership.Provider;
+                    var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)Membership.Provider;
 
                     //This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
                     // if we just had all of the membeship provider fields on the member table :(
@@ -323,7 +323,7 @@ namespace Umbraco.Web.Models.Mapping
                 }
                 else
                 {
-                    var umbracoProvider = (IUmbracoContentTypeMembershipProvider)Membership.Provider;
+                    var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)Membership.Provider;
 
                     return new Dictionary<string, string>
                     {

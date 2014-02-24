@@ -59,6 +59,7 @@ namespace umbraco.cms.businesslogic
         /// <param name="icon"></param>
         /// <param name="thumbnail"></param>
         /// <param name="masterContentType"></param>
+        /// <param name="isContainer"></param>
         /// <remarks>
         /// This is like creating a ContentType node using optimized mode but this lets you set
         /// all of the properties that are initialized normally from the database.
@@ -175,7 +176,7 @@ namespace umbraco.cms.businesslogic
         public static ContentType GetContentType(int id)
         {
             return ApplicationContext.Current.ApplicationCache.GetCacheItem
-                (string.Format("UmbracoContentType{0}", id),
+                (string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, id),
                  TimeSpan.FromMinutes(30),
                  () => new ContentType(id));
         }
