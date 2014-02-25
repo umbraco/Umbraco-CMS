@@ -40,6 +40,8 @@ namespace Umbraco.Web.Security.Providers
         }
 
         private string _defaultMemberTypeAlias = "Member";
+        private volatile bool _hasDefaultMember = false;
+        private static readonly object Locker = new object();
 
         public override string ProviderName
         {
@@ -77,20 +79,35 @@ namespace Umbraco.Web.Security.Providers
             if (config["defaultMemberTypeAlias"] != null)
             {
                 _defaultMemberTypeAlias = config["defaultMemberTypeAlias"];
-            }
-            else
-            {
-                _defaultMemberTypeAlias = MemberService.GetDefaultMemberType();
                 if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
                 {
-                    throw new ProviderException("No default MemberType alias is specified in the web.config string. Please add a 'defaultMemberTypeAlias' to the add element in the provider declaration in web.config");
+                    throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
                 }
+                _hasDefaultMember = true;
             }
         }
 
         public override string DefaultMemberTypeAlias
         {
-            get { return _defaultMemberTypeAlias; }
+            get
+            {
+                if (_hasDefaultMember == false)
+                {
+                    lock (Locker)
+                    {
+                        if (_hasDefaultMember == false)
+                        {
+                            _defaultMemberTypeAlias = MemberService.GetDefaultMemberType();
+                            if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
+                            {
+                                throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
+                            }
+                            _hasDefaultMember = true;
+                        }
+                    }
+                }
+                return _defaultMemberTypeAlias;
+            }
         }
     }
 }
