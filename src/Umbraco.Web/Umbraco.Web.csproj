@@ -302,6 +302,11 @@
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\EntityControllerActionSelector.cs" />
     <Compile Include="Editors\ImagesController.cs" />
+    <Compile Include="Install\UmbracoInstallArea.cs" />
+    <Compile Include="Install\Controllers\InstallApiController.cs" />
+    <Compile Include="Install\Controllers\InstallController.cs" />
+    <Compile Include="Install\InstallAuthorizeAttribute.cs" />
+    <Compile Include="Install\Models\InstallStatus.cs" />
     <Compile Include="MediaPropertyExtensions.cs" />
     <Compile Include="Models\ContentEditing\EntityTypeSearchResult.cs" />
     <Compile Include="Models\ContentEditing\ListViewAwareContentItemDisplayBase.cs" />
@@ -579,7 +584,7 @@
     <Compile Include="Install\FilePermissionHelper.cs" />
     <Compile Include="Install\InstallerStep.cs" />
     <Compile Include="Install\InstallHelper.cs" />
-    <Compile Include="Install\InstallPackageController.cs" />
+    <Compile Include="Install\Controllers\InstallPackageController.cs" />
     <Compile Include="Install\InstallStepCollection.cs" />
     <Compile Include="Install\ProgressResult.cs" />
     <Compile Include="Install\Steps\Database.cs" />
@@ -591,7 +596,7 @@
     <Compile Include="Install\Steps\TheEnd.cs" />
     <Compile Include="Install\Steps\WebPi.cs" />
     <Compile Include="Install\Steps\Welcome.cs" />
-    <Compile Include="Install\UmbracoInstallAuthorizeAttribute.cs" />
+    <Compile Include="Install\HttpInstallAuthorizeAttribute.cs" />
     <Compile Include="Macros\PartialViewMacroController.cs" />
     <Compile Include="Macros\PartialViewMacroEngine.cs" />
     <Compile Include="Macros\PartialViewMacroPage.cs" />
@@ -2067,6 +2072,7 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
