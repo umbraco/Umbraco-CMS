@@ -24,34 +24,36 @@ namespace Umbraco.Web.Install
                 steps.AddRange(new InstallSetupStep[]
                 {
                     new FilePermissionsStep()
-                    {
-                        Name = "Permissions",                        
+                    {           
                         ServerOrder = 0,
                     },
                     new UserStep(umbracoContext.Application)
                     {
-                        Name = "User",
-                        ServerOrder = 2,
+                        ServerOrder = 4,
                     },
                     new DatabaseConfigureStep(umbracoContext.Application)
                     {
-                        Name = "Database",
                         ServerOrder = 1,
+                    },
+                    new DatabaseInstallStep(umbracoContext.Application)
+                    {
+                        ServerOrder = 2,
+                    },
+                    new DatabaseUpgradeStep(umbracoContext.Application)
+                    {
+                        ServerOrder = 3,
                     },
                     new StarterKitDownloadStep()
                     {
-                        Name = "StarterKitDownload",
-                        ServerOrder = 3,
+                        ServerOrder = 5,
                     },
                     new StarterKitInstallStep(umbracoContext.Application, umbracoContext.HttpContext)
                     {
-                        Name = "StarterKitInstall",
-                        ServerOrder = 4,
+                        ServerOrder = 6,
                     },
                     new StarterKitCleanupStep()
                     {
-                        Name = "StarterKitCleanup",
-                        ServerOrder = 5,
+                        ServerOrder = 7,
                     }
                 });
                 return steps;

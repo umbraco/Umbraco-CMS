@@ -7,6 +7,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
+    [InstallSetupStep("StarterKitInstall", "")]
     internal class StarterKitInstallStep : InstallSetupStep<object>
     {
         private readonly ApplicationContext _applicationContext;
@@ -46,9 +47,5 @@ namespace Umbraco.Web.Install.InstallSteps
             installer.InstallBusinessLogic(manifestId, packageFile);            
         }
 
-        public override string View
-        {
-            get { return string.Empty; }
-        }
     }
 }

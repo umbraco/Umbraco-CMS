@@ -11,6 +11,18 @@ namespace Umbraco.Web.Install.Models
     [DataContract(Name = "step", Namespace = "")]
     public abstract class InstallSetupStep<T> : InstallSetupStep
     {
+        protected InstallSetupStep()
+        {
+            var att = GetType().GetCustomAttribute<InstallSetupStepAttribute>(false);
+            if (att == null)
+            {
+                throw new InvalidOperationException("Each step must be attributed");
+            }
+            _attribute = att;
+        }
+
+        private readonly InstallSetupStepAttribute _attribute;
+
         /// <summary>
         /// Defines the step model type on the server side so we can bind it
         /// </summary>
@@ -27,18 +39,32 @@ namespace Umbraco.Web.Install.Models
         {
             get { return View.IsNullOrWhiteSpace() == false; }
         }
-        //[IgnoreDataMember]
-        //public Func<T, IDictionary<string, object>> ExecuteCallback { get; set; }
+
+        public override string View
+        {
+            get { return _attribute.View; }
+        }
     }
 
     [DataContract(Name = "step", Namespace = "")]
     public abstract class InstallSetupStep
     {
+        protected InstallSetupStep()
+        {
+            var att = GetType().GetCustomAttribute<InstallSetupStepAttribute>(false);
+            if (att == null)
+            {
+                throw new InvalidOperationException("Each step must be attributed");
+            }
+            Name = att.Name;
+            View = att.View;
+        }
+
         [DataMember(Name = "name")]
-        public string Name { get; set; }
+        public string Name { get; private set; }
 
         [DataMember(Name = "view")]
-        public abstract string View { get; }
+        public virtual string View { get; private set; }
 
         /// <summary>
         /// Defines what order this step needs to execute on the server side since the 

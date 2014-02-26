@@ -7,6 +7,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
+    [InstallSetupStep("StarterKitCleanup", "")]
     internal class StarterKitCleanupStep : InstallSetupStep<object>
     {
         public override IDictionary<string, object> Execute(object model)
@@ -36,9 +37,5 @@ namespace Umbraco.Web.Install.InstallSteps
             library.RefreshContent();
         }
 
-        public override string View
-        {
-            get { return string.Empty; }
-        }
     }
 }

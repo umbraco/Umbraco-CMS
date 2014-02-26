@@ -7,6 +7,8 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
+
+    [InstallSetupStep("User", "user")]
     internal class UserStep : InstallSetupStep<UserModel>
     {
         private readonly ApplicationContext _applicationContext;
@@ -65,9 +67,5 @@ namespace Umbraco.Web.Install.InstallSteps
             return null;
         }
 
-        public override string View
-        {
-            get { return "user"; }
-        }
     }
 }

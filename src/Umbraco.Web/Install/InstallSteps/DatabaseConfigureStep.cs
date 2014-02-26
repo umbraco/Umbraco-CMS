@@ -1,35 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    //internal class DatabaseInstallStep : IInstallStep<object>
-    //{
-    //    private readonly ApplicationContext _applicationContext;
-
-    //    public DatabaseInstallStep(ApplicationContext applicationContext)
-    //    {
-    //        _applicationContext = applicationContext;
-    //    }
-
-    //    public IDictionary<string, object> Setup(object model)
-    //    {
-    //        if (CheckConnection(database) == false)
-    //        {
-    //            throw new InvalidOperationException("Could not connect to the database");
-    //        }
-    //        ConfigureConnection(database);
-    //        return null;
-    //    }
-    //}
-
+    [InstallSetupStep("DatabaseConfigure", "database")]
     internal class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
     {
         private readonly ApplicationContext _applicationContext;
@@ -106,7 +90,48 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override string View
         {
-            get { return "database"; }
+            get { return ShouldDisplayView() ? base.View : ""; }
+        }
+
+        private bool ShouldDisplayView()
+        {
+            //If the connection string is already present in web.config we don't need to show the settings page and we jump to installing/upgrading.
+            var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
+
+            var dbIsSqlCe = false;
+            if (databaseSettings != null && databaseSettings.ProviderName != null)
+                dbIsSqlCe = databaseSettings.ProviderName == "System.Data.SqlServerCe.4.0";
+            var sqlCeDatabaseExists = false;
+            if (dbIsSqlCe)
+            {
+                var datasource = databaseSettings.ConnectionString.Replace("|DataDirectory|", AppDomain.CurrentDomain.GetData("DataDirectory").ToString());
+                var filePath = datasource.Replace("Data Source=", string.Empty);
+                sqlCeDatabaseExists = File.Exists(filePath);
+            }
+
+            // Either the connection details are not fully specified or it's a SQL CE database that doesn't exist yet
+            if (databaseSettings == null
+                || string.IsNullOrWhiteSpace(databaseSettings.ConnectionString) || string.IsNullOrWhiteSpace(databaseSettings.ProviderName)
+                || (dbIsSqlCe && sqlCeDatabaseExists == false))
+            {
+                return true;
+            }
+            else
+            {
+                //Since a connection string was present we verify whether this is an upgrade or an empty db
+                var result = ApplicationContext.Current.DatabaseContext.ValidateDatabaseSchema();
+                var determinedVersion = result.DetermineInstalledVersion();
+                if (determinedVersion.Equals(new Version(0, 0, 0)))
+                {
+                    //Fresh install
+                    return false;
+                }
+                else
+                {
+                    //Upgrade
+                    return false;
+                }
+            }
         }
     }
 }

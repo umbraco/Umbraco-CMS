@@ -6,6 +6,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
+    [InstallSetupStep("StarterKitDownload", "starterKit")]
     internal class StarterKitDownloadStep : InstallSetupStep<Guid>
     {
         private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
@@ -52,9 +53,5 @@ namespace Umbraco.Web.Install.InstallSteps
             
         }
 
-        public override string View
-        {
-            get { return "starterKit"; }
-        }
     }
 }

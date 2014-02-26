@@ -8,6 +8,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
+    [InstallSetupStep("Permissions", "")]
     internal class FilePermissionsStep : InstallSetupStep<object>
     {
         public override IDictionary<string, object> Execute(object model)
@@ -123,9 +124,5 @@ namespace Umbraco.Web.Install.InstallSteps
             }
         }
 
-        public override string View
-        {
-            get { return string.Empty; }
-        }
     }
 }
