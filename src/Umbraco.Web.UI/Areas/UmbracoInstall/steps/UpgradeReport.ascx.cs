@@ -44,7 +44,7 @@ namespace Umbraco.Web.UI.Install.Steps
         {
             if (ToggleView.ActiveViewIndex == 1)
             {
-                GotoNextStep(sender, e);
+                //GotoNextStep(sender, e);
             }
             else
             {

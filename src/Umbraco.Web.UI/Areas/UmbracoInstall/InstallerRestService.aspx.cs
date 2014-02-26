@@ -31,7 +31,7 @@ namespace Umbraco.Web.UI.Install
             if (feed == "progress")
             {
                 Response.ContentType = "application/json";
-                Response.Write(InstallHelper.GetProgress());
+                //Response.Write(InstallHelper.GetProgress());
             }
             else
             {

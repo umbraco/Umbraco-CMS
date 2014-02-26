@@ -17,8 +17,8 @@ namespace Umbraco.Web.UI.Install
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
-            rp_steps.DataSource = InstallHelper.InstallerSteps.Values;
-            rp_steps.DataBind();
+            //rp_steps.DataSource = InstallHelper.InstallerSteps.Values;
+            //rp_steps.DataBind();
         }
 
         private void LoadContent(InstallerStep currentStep)
@@ -75,11 +75,11 @@ namespace Umbraco.Web.UI.Install
                 }
             }
 
-            var s = string.IsNullOrEmpty(_installStep)
-                        ? InstallHelper.InstallerSteps["welcome"]
-                        : InstallHelper.InstallerSteps[_installStep];
+            //var s = string.IsNullOrEmpty(_installStep)
+            //            ? InstallHelper.InstallerSteps["welcome"]
+            //            : InstallHelper.InstallerSteps[_installStep];
 
-            LoadContent(s);
+            //LoadContent(s);
         }
         
 	}

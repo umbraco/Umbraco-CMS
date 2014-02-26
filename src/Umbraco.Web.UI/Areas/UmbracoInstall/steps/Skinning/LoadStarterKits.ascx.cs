@@ -57,7 +57,7 @@ namespace Umbraco.Web.UI.Install.Steps.Skinning
 		protected void NextStep(object sender, EventArgs e)
 		{
             var p = (Default)this.Page;
-			InstallHelper.RedirectToNextStep(Page, Request.GetItemAsString("installStep"));
+            //InstallHelper.RedirectToNextStep(Page, Request.GetItemAsString("installStep"));
 		}
 
 		protected override void OnInit(EventArgs e)
@@ -70,7 +70,7 @@ namespace Umbraco.Web.UI.Install.Steps.Skinning
             }
 
 			//clear progressbar cache
-            InstallHelper.ClearProgress();
+            //InstallHelper.ClearProgress();
 
 			if (_repo.HasConnection())
 			{
@@ -97,7 +97,7 @@ namespace Umbraco.Web.UI.Install.Steps.Skinning
 
 		protected void GotoLastStep(object sender, EventArgs e)
 		{
-            InstallHelper.RedirectToLastStep(Page);
+            //InstallHelper.RedirectToLastStep(Page);
 		}
 
     }

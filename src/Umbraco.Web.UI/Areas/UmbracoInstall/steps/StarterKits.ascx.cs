@@ -11,8 +11,8 @@ namespace Umbraco.Web.UI.Install.Steps
 
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (InstalledPackage.GetAllInstalledPackages().Count > 0)
-                GotoNextStep(sender, e);
+            //if (InstalledPackage.GetAllInstalledPackages().Count > 0)
+            //    GotoNextStep(sender, e);
 
             ShowStarterKits();
         }
