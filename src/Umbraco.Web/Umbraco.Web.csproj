@@ -308,6 +308,7 @@
     <Compile Include="Install\InstallSteps\DatabaseInstallStep.cs" />
     <Compile Include="Install\InstallSteps\DatabaseUpgradeStep.cs" />
     <Compile Include="Install\InstallSteps\FilePermissionsStep.cs" />
+    <Compile Include="Install\InstallSteps\SetUmbracoVersionStep.cs" />
     <Compile Include="Install\InstallSteps\StarterKitCleanupStep.cs" />
     <Compile Include="Install\InstallSteps\StarterKitDownloadStep.cs" />
     <Compile Include="Install\InstallSteps\StarterKitInstallStep.cs" />
