@@ -302,6 +302,7 @@
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\EntityControllerActionSelector.cs" />
     <Compile Include="Editors\ImagesController.cs" />
+    <Compile Include="Install\InstallStatusTracker.cs" />
     <Compile Include="Install\UmbracoInstallArea.cs" />
     <Compile Include="Install\Controllers\InstallApiController.cs" />
     <Compile Include="Install\Controllers\InstallController.cs" />

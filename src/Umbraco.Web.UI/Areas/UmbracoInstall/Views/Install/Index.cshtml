@@ -1,4 +1,6 @@
-﻿@{
+﻿@using Umbraco.Web
+@using Umbraco.Web.Install.Controllers
+@{
     Layout = null;
 }
 
@@ -12,5 +14,13 @@
     <div>
         Hello world
     </div>
+    <script type="text/javascript">
+        var Umbraco = {};
+        Umbraco.Sys = {};
+        Umbraco.Sys.ServerVariables = {
+            "loginApiBaaseUrl": "@(Url.GetUmbracoApiServiceBaseUrl<InstallApiController>(controller => controller.GetStatus()))",
+            "defaultStarterKit": Guid.NewGuid()
+        };
+    </script>
 </body>
 </html>
