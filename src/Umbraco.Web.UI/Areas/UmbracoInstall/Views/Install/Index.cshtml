@@ -18,8 +18,8 @@
         var Umbraco = {};
         Umbraco.Sys = {};
         Umbraco.Sys.ServerVariables = {
-            "loginApiBaaseUrl": "@(Url.GetUmbracoApiServiceBaseUrl<InstallApiController>(controller => controller.GetStatus()))",
-            "defaultStarterKit": Guid.NewGuid()
+            "installApiBaseUrl": "@ViewBag.InstallApiBaseUrl",
+            "defaultStarterKit": "@ViewBag.DefaultPackageId"
         };
     </script>
 </body>

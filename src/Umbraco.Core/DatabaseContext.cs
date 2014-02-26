@@ -113,18 +113,25 @@ namespace Umbraco.Core
         public void ConfigureEmbeddedDatabaseConnection()
         {
             const string providerName = "System.Data.SqlServerCe.4.0";
-            const string connectionString = @"Data Source=|DataDirectory|\Umbraco.sdf;Flush Interval=1;";
 
+            var connectionString = GetEmbeddedDatabaseConnectionString();
             SaveConnectionString(connectionString, providerName);
 
             var path = Path.Combine(GlobalSettings.FullpathToRoot, "App_Data", "Umbraco.sdf");
             if (File.Exists(path) == false)
             {
-                var engine = new SqlCeEngine(connectionString);
-                engine.CreateDatabase();
+                using (var engine = new SqlCeEngine(connectionString))
+                {
+                    engine.CreateDatabase();    
+                }
             }
 
             Initialize(providerName);
+        }
+
+        public string GetEmbeddedDatabaseConnectionString()
+        {
+            return @"Data Source=|DataDirectory|\Umbraco.sdf;Flush Interval=1;";
         }
 
         /// <summary>
@@ -149,25 +156,27 @@ namespace Umbraco.Core
         /// <param name="password">Database Password</param>
         /// <param name="databaseProvider">Type of the provider to be used (Sql, Sql Azure, Sql Ce, MySql)</param>
         public void ConfigureDatabaseConnection(string server, string databaseName, string user, string password, string databaseProvider)
-        {
-            string connectionString;
-            string providerName = "System.Data.SqlClient";
-            if (databaseProvider.ToLower().Contains("mysql"))
-            {
-                providerName = "MySql.Data.MySqlClient";
-                connectionString = string.Format("Server={0}; Database={1};Uid={2};Pwd={3}", server, databaseName, user, password);
-            }
-            else if (databaseProvider.ToLower().Contains("azure"))
-            {
-                connectionString = BuildAzureConnectionString(server, databaseName, user, password);
-            }
-            else
-            {
-                connectionString = string.Format("server={0};database={1};user id={2};password={3}", server, databaseName, user, password);
-            }
+        {            
+            string providerName;
+            var connectionString = GetDatabaseConnectionString(server, databaseName, user, password, databaseProvider, out providerName);
 
             SaveConnectionString(connectionString, providerName);
             Initialize(providerName);
+        }
+
+        public string GetDatabaseConnectionString(string server, string databaseName, string user, string password, string databaseProvider, out string providerName)
+        {
+            providerName = "System.Data.SqlClient";
+            if (databaseProvider.ToLower().Contains("mysql"))
+            {
+                providerName = "MySql.Data.MySqlClient";
+                return string.Format("Server={0}; Database={1};Uid={2};Pwd={3}", server, databaseName, user, password);
+            }
+            if (databaseProvider.ToLower().Contains("azure"))
+            {
+                return BuildAzureConnectionString(server, databaseName, user, password);
+            }
+            return string.Format("server={0};database={1};user id={2};password={3}", server, databaseName, user, password);
         }
 
         /// <summary>
@@ -178,10 +187,14 @@ namespace Umbraco.Core
         public void ConfigureIntegratedSecurityDatabaseConnection(string server, string databaseName)
         {
             const string providerName = "System.Data.SqlClient";
-            string connectionString = String.Format("Server={0};Database={1};Integrated Security=true", server, databaseName);
-
+            var connectionString = GetIntegratedSecurityDatabaseConnectionString(server, databaseName);
             SaveConnectionString(connectionString, providerName);
             Initialize(providerName);
+        }
+
+        public string GetIntegratedSecurityDatabaseConnectionString(string server, string databaseName)
+        {
+            return String.Format("Server={0};Database={1};Integrated Security=true", server, databaseName);            
         }
 
         internal string BuildAzureConnectionString(string server, string databaseName, string user, string password)

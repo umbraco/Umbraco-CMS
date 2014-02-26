@@ -40,8 +40,10 @@ namespace SqlCE4Umbraco
             var localConnection = new SqlCeConnection(ConnectionString);
             if (!System.IO.File.Exists(ReplaceDataDirectory(localConnection.Database)))
             {
-                var sqlCeEngine = new SqlCeEngine(ConnectionString);
-                sqlCeEngine.CreateDatabase();
+                using (var sqlCeEngine = new SqlCeEngine(ConnectionString))
+                {
+                    sqlCeEngine.CreateDatabase();    
+                }
             }
         }
 

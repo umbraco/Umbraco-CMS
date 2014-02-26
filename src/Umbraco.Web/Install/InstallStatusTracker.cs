@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Umbraco.Core.IO;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install
@@ -14,24 +18,78 @@ namespace Umbraco.Web.Install
     internal static class InstallStatusTracker
     {
 
-        private static ConcurrentDictionary<string, bool> _steps = new ConcurrentDictionary<string, bool>();
+        private static ConcurrentDictionary<string, InstallTrackingItem> _steps = new ConcurrentDictionary<string, InstallTrackingItem>();
 
-        public static void Initialize(IEnumerable<InstallStep> steps)
+        private static string GetFile()
         {
-            foreach (var step in steps)
+            var file = IOHelper.MapPath("~/App_Data/TEMP/Install/"
+                                        + "status"
+                                        //+ dt.ToString("yyyyMMddHHmmss")
+                                        + ".txt");
+            return file;
+        }
+
+        public static void Reset()
+        {
+            _steps = new ConcurrentDictionary<string, InstallTrackingItem>();
+            File.Delete(GetFile());
+        }
+
+        public static IDictionary<string, InstallTrackingItem> Initialize(IEnumerable<InstallSetupStep> steps)
+        {
+            //if there are no steps in memory
+            if (_steps.Count == 0)
             {
-                _steps.TryAdd(step.Name, step.IsComplete);
+                //check if we have our persisted file and read it
+                var file = GetFile();
+                if (File.Exists(file))
+                {
+                    var deserialized = JsonConvert.DeserializeObject<IDictionary<string, InstallTrackingItem>>(
+                        File.ReadAllText(file));
+                    foreach (var item in deserialized)
+                    {
+                        _steps.TryAdd(item.Key, item.Value);
+                    }
+                }
+                else
+                {
+                    //otherwise just create the steps in memory (brand new install)
+                    foreach (var step in steps)
+                    {
+                        _steps.TryAdd(step.Name, new InstallTrackingItem());                        
+                    }
+                    //save the file
+                    var serialized = JsonConvert.SerializeObject(new Dictionary<string, InstallTrackingItem>(_steps));
+                    Directory.CreateDirectory(Path.GetDirectoryName(file));
+                    File.WriteAllText(file, serialized);
+                }
             }
+
+            return new Dictionary<string, InstallTrackingItem>(_steps);
         }
 
-        public static void SetComplete(string name)
+        public static void SetComplete(string name, IDictionary<string, object> additionalData = null)
         {
-            _steps.TryUpdate(name, true, true);
+            var trackingItem = new InstallTrackingItem()
+            {
+                IsComplete = true
+            };
+            if (additionalData != null)
+            {
+                trackingItem.AdditionalData = additionalData;
+            }
+
+            _steps[name] = trackingItem;
+
+            //save the file
+            var file = GetFile();
+            var serialized = JsonConvert.SerializeObject(new Dictionary<string, InstallTrackingItem>(_steps));
+            File.WriteAllText(file, serialized);
         }
 
-        public static IDictionary<string, bool> GetStatus()
+        public static IDictionary<string, InstallTrackingItem> GetStatus()
         {
-            return new Dictionary<string, bool>(_steps);
+            return new Dictionary<string, InstallTrackingItem>(_steps);
         } 
     }
 }

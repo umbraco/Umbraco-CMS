@@ -38,6 +38,7 @@ namespace Umbraco.Web.Install
             {
                 apiRoute.DataTokens = new RouteValueDictionary();
             }
+            apiRoute.DataTokens.Add("area", "Install");
             apiRoute.DataTokens.Add("Namespaces", new[] { typeof(InstallApiController).Namespace }); //look in this namespace to create the controller
             apiRoute.DataTokens.Add("UseNamespaceFallback", false); //Don't look anywhere else except this namespace!
         }
