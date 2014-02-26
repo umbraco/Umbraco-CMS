@@ -6,13 +6,14 @@ module.exports = function (grunt) {
   
   //run by the watch task
   grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','copy:vs','karma:unit']);
-  grunt.registerTask('watch-less', ['recess:build','copy:assets','copy:vs']);
+  grunt.registerTask('watch-less', ['recess:build','recess:installer','copy:assets','copy:vs']);
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
   grunt.registerTask('watch-packages', ['copy:packages']);
+  grunt.registerTask('watch-installer', ['concat:install','concat:installJs','copy:installer']);
   grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
   //triggered from grunt dev or grunt
-  grunt.registerTask('build', ['clean','concat','recess:min','copy']);
+  grunt.registerTask('build', ['clean','concat','recess:min','recess:installer','copy']);
   
   //utillity tasks
   grunt.registerTask('docs', ['ngdocs']);
@@ -68,7 +69,7 @@ module.exports = function (grunt) {
       specs: ['test/**/*.spec.js'],
       scenarios: ['test/**/*.scenario.js'],
       samples: ['sample files/*.js'],
-      html: ['src/index.html'],
+      html: ['src/index.html','src/install.html'],
 
       everything:['src/**/*.*', 'test/**/*.*', 'docs/**/*.*'],
 
@@ -86,6 +87,11 @@ module.exports = function (grunt) {
       assets: {
         files: [{ dest: '<%= distdir %>/assets', src : '**', expand: true, cwd: 'src/assets/' }]
       },
+
+      installer: {
+        files: [{ dest: '<%= distdir %>/views/install', src : '*.html', expand: true, cwd: 'src/installer/steps' }]
+      },
+
       vendor: {
         files: [{ dest: '<%= distdir %>/lib', src : '**', expand: true, cwd: 'lib/' }]
       },
@@ -130,8 +136,24 @@ module.exports = function (grunt) {
             process: true
           }
         },
+        install: {
+          src: ['src/installer/installer.html'],
+          dest: '<%= distdir %>/installer.html',
+          options: {
+            process: true
+          }
+        },
+
+        installJs: {
+          src: ['src/installer/**/*.js'],
+          dest: '<%= distdir %>/js/umbraco.installer.js',
+          options: {
+              banner: "<%= banner %>\n(function() { \n\n angular.module('umbraco.install', []); \n",
+              footer: "\n\n})();"
+          }
+        },
         controllers: {
-          src:['src/views/**/*.controller.js'],
+          src:['src/controllers/**/*.controller.js','src/views/**/*.controller.js'],
           dest: '<%= distdir %>/js/umbraco.controllers.js',
           options: {
               banner: "<%= banner %>\n(function() { \n\n",
@@ -208,6 +230,14 @@ module.exports = function (grunt) {
           compile: true
         }
       },
+      installer: {
+        files: {
+          '<%= distdir %>/assets/css/installer.css':
+          ['src/less/installer.less'] },
+        options: {
+          compile: true
+        }
+      },
       min: {
         files: {
           '<%= distdir %>/assets/css/<%= pkg.name %>.css': ['<%= src.less %>']
@@ -218,7 +248,6 @@ module.exports = function (grunt) {
         }
       }
     },
-
 
 
     watch:{
@@ -236,6 +265,10 @@ module.exports = function (grunt) {
       test: {
           files: ['test/**/*.js'],
           tasks: ['watch-test', 'timestamp'],
+      },
+      installer: {
+          files: ['src/installer/**/*.*'],
+          tasks: ['watch-installer', 'timestamp'],
       },
       html: {
         files: ['src/views/**/*.html', 'src/*.html'],
@@ -333,6 +366,5 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-connect');
 
   grunt.loadNpmTasks('grunt-ngdocs');
-  grunt.loadNpmTasks('grunt-ngmin');
 
 };

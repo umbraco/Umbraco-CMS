@@ -5,7 +5,7 @@ describe('edit content controller tests', function () {
     beforeEach(module('umbraco'));
 
     //inject the contentMocks service
-    beforeEach(inject(function ($rootScope, $controller, angularHelper, $httpBackend, contentMocks, mocksUtils) {
+    beforeEach(inject(function ($rootScope, $controller, angularHelper, $httpBackend, contentMocks, entityMocks, mocksUtils) {
 
         //for these tests we don't want any authorization to occur
         mocksUtils.disableAuth();
@@ -16,6 +16,7 @@ describe('edit content controller tests', function () {
         //have the contentMocks register its expect urls on the httpbackend
         //see /mocks/content.mocks.js for how its setup
         contentMocks.register();
+        entityMocks.register();
 
         //this controller requires an angular form controller applied to it
         scope.contentForm = angularHelper.getNullForm("contentForm");

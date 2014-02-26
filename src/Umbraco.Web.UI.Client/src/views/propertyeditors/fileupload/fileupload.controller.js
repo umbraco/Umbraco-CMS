@@ -13,7 +13,11 @@
  *  for the editors to check if the value has changed and to re-bind the property if that is true.
  * 
 */
-function fileUploadController($scope, $element, $compile, imageHelper, fileManager, umbRequestHelper) {
+function fileUploadController($scope, $element, $compile, imageHelper, fileManager, umbRequestHelper, mediaHelper) {
+
+    mediaHelper.registerFileResolver("Umbraco.UploadField", function(property){
+            return property.value;
+    });
 
     /** Clears the file collections when content is saving (if we need to clear) or after saved */
     function clearFiles() {        
@@ -124,10 +128,4 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
     });
 };
 angular.module("umbraco")
-    .controller('Umbraco.PropertyEditors.FileUploadController', fileUploadController)
-    .run(function(mediaHelper){
-        mediaHelper.registerFileResolver("Umbraco.UploadField", function(property){
-                return property.value;
-        });
-    });
-
+    .controller('Umbraco.PropertyEditors.FileUploadController', fileUploadController);
