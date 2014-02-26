@@ -961,5 +961,19 @@ namespace Umbraco.Tests.Services
             Assert.IsNull(colResult.First().VarChar);
         }
 
+        [Test]
+        public void New_Member_Approved_By_Default()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+
+            var customMember = MockedMember.CreateSimpleMember(memberType, "hello", "hello@test.com", "hello", "hello");
+            ServiceContext.MemberService.Save(customMember);
+
+            var found = ServiceContext.MemberService.GetById(customMember.Id);
+
+            Assert.IsTrue(found.IsApproved);
+        }
+
     }
 }

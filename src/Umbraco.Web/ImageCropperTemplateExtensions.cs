@@ -13,7 +13,7 @@ namespace Umbraco.Web
     {
         
         //this only takes the crop json into account
-        public static string Crop(this IPublishedContent mediaItem, string propertyAlias, string cropAlias)
+        public static string GetCropUrl(this IPublishedContent mediaItem, string propertyAlias, string cropAlias)
         {
             mediaItem.HasProperty(propertyAlias);
             var property = mediaItem.GetPropertyValue<string>(propertyAlias);
@@ -33,7 +33,7 @@ namespace Umbraco.Web
         }
 
 
-       public static string Crop(
+       public static string GetCropUrl(
             this IPublishedContent mediaItem,
             int? width = null,
             int? height = null,
@@ -52,11 +52,11 @@ namespace Umbraco.Web
                 imageCropperValue = mediaItem.GetPropertyValueHack(imageCropperAlias);
             }
 
-            return mediaItem != null ? Crop(mediaItem.Url, width, height, quality, mode, anchor, imageCropperValue, imageCropperCropId, furtherOptions, slimmage) : string.Empty;
+            return mediaItem != null ? GetCropUrl(mediaItem.Url, width, height, quality, mode, anchor, imageCropperValue, imageCropperCropId, furtherOptions, slimmage) : string.Empty;
         }
 
 
-        public static string Crop(
+        public static string GetCropUrl(
             this string imageUrl,
             int? width = null,
             int? height = null,

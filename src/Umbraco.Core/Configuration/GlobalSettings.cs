@@ -6,10 +6,13 @@ using System.Web;
 using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Web.Routing;
+using System.Web.Security;
 using System.Xml;
 using System.Xml.Linq;
+using System.Xml.XPath;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Configuration
 {
@@ -259,7 +262,38 @@ namespace Umbraco.Core.Configuration
                 SaveSetting("umbracoConfigurationStatus", value);
             }
         }
-
+        
+        /// <summary>
+        /// Gets or sets the Umbraco members membership providers' useLegacyEncoding state. This will return a boolean
+        /// </summary>
+        /// <value>The useLegacyEncoding status.</value>
+        public static bool UmbracoMembershipProviderLegacyEncoding
+        {
+            get
+            {
+                return IsConfiguredMembershipProviderUsingLegacyEncoding(Constants.Conventions.Member.UmbracoMemberProviderName);
+            }
+            set
+            {
+                SetMembershipProvidersLegacyEncoding(Constants.Conventions.Member.UmbracoMemberProviderName, value);
+            }
+        }
+        
+        /// <summary>
+        /// Gets or sets the Umbraco users membership providers' useLegacyEncoding state. This will return a boolean
+        /// </summary>
+        /// <value>The useLegacyEncoding status.</value>
+        public static bool UmbracoUsersMembershipProviderLegacyEncoding
+        {
+            get
+            {
+                return IsConfiguredMembershipProviderUsingLegacyEncoding(Constants.Conventions.User.UmbracoUsersProviderName);
+            }
+            set
+            {
+                SetMembershipProvidersLegacyEncoding(Constants.Conventions.User.UmbracoUsersProviderName, value);
+            }
+        }
 		
         /// <summary>
         /// Saves a setting into the configuration file.
@@ -301,7 +335,51 @@ namespace Umbraco.Core.Configuration
                 setting.Remove();
                 xml.Save(fileName, SaveOptions.DisableFormatting);
                 ConfigurationManager.RefreshSection("appSettings");
+            }        
+        }
+
+        private static void SetMembershipProvidersLegacyEncoding(string providerName, bool useLegacyEncoding)
+        {
+            //check if this can even be configured.
+            var membershipProvider = Membership.Providers[providerName] as MembershipProviderBase;
+            if (membershipProvider == null)
+            {
+                return;
             }
+            if (membershipProvider.GetType().Namespace == "umbraco.providers.members")
+            {
+                //its the legacy one, this cannot be changed
+                return;
+            }
+
+            var webConfigFilename = IOHelper.MapPath(string.Format("{0}/web.config", SystemDirectories.Root));
+            var webConfigXml = XDocument.Load(webConfigFilename, LoadOptions.PreserveWhitespace);
+
+            var membershipConfigs = webConfigXml.XPathSelectElements("configuration/system.web/membership/providers/add").ToList();
+
+            if (membershipConfigs.Any() == false) 
+                return;
+
+            var provider = membershipConfigs.SingleOrDefault(c => c.Attribute("name") != null && c.Attribute("name").Value == providerName);
+
+            if (provider == null) 
+                return;
+
+            provider.SetAttributeValue("useLegacyEncoding", useLegacyEncoding);
+            
+            webConfigXml.Save(webConfigFilename, SaveOptions.DisableFormatting);
+        }
+
+        private static bool IsConfiguredMembershipProviderUsingLegacyEncoding(string providerName)
+        {
+            //check if this can even be configured.
+            var membershipProvider = Membership.Providers[providerName] as MembershipProviderBase;
+            if (membershipProvider == null)
+            {
+                return false;
+            }
+
+            return membershipProvider.UseLegacyEncoding;            
         }
 
         /// <summary>

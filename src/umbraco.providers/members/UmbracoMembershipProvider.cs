@@ -111,7 +111,7 @@ namespace umbraco.providers.members
             // Intialize values from web.config
             if (config == null) throw new ArgumentNullException("config");
 
-            if (string.IsNullOrEmpty(name)) name = "UmbracoMembershipProvider";
+            if (string.IsNullOrEmpty(name)) name = Constants.Conventions.Member.UmbracoMemberProviderName;
             
             base.Initialize(name, config);
             

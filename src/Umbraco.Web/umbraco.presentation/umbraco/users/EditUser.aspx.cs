@@ -235,6 +235,7 @@ namespace umbraco.cms.presentation.user
             sectionValidator.ControlToValidate = lapps.ID;
             sectionValidator.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", ui.Text("user", "modules", UmbracoUser), UmbracoUser);
             sectionValidator.CssClass = "error";
+            sectionValidator.Style.Add("color", "red"); 
 
             SetupForm();
             SetupChannel();
