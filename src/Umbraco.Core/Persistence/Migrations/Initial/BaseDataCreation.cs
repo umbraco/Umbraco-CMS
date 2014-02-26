@@ -199,7 +199,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         private void CreateUmbracoLanguageData()
         {
-            _database.Insert("umbracoLanguage", "id", false, new LanguageDto { Id = 1, IsoCode = "en-US", CultureName = "en-US" });
+            _database.Insert("umbracoLanguage", "id", false, new LanguageDto { Id = 1, IsoCode = "en-GB", CultureName = "en-GB" });
         }
 
         private void CreateCmsContentTypeAllowedContentTypeData()
