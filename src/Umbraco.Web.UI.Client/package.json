@@ -42,7 +42,6 @@
     "karma-coffee-preprocessor": "0.0.1",
     "karma": "~0.9",
     "karma-phantomjs-launcher": "0.0.2",
-    "grunt-ngdocs": "~0.1.2",
-    "grunt-ngmin": "0.0.3"
+    "grunt-ngdocs": "~0.1.2"
   }
 }
