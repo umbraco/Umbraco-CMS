@@ -8,6 +8,7 @@
     <key alias="assignDomain">Tilføj domæne</key>
     <key alias="auditTrail">Revisions spor</key>
     <key alias="browse">Gennemse elementer</key>
+   	<key alias="changeDocType">Skift dokument type</key>
     <key alias="copy">Kopier</key>
     <key alias="create">Opret</key>
     <key alias="createPackage">Opret pakke</key>
@@ -15,8 +16,6 @@
     <key alias="disable">Deaktivér</key>
     <key alias="emptyTrashcan">Tøm papirkurv</key>
     <key alias="exportDocumentType">Eksportér Dokumenttype</key>
-    <key alias="exportDocumentTypeAsCode">Eksportér til .NET</key>
-    <key alias="exportDocumentTypeAsCode-Full">Eksportér til .NET</key>
     <key alias="importDocumentType">Importér Dokumenttype</key>
     <key alias="importPackage">Importér pakke</key>
     <key alias="liveEdit">Redigér i Canvas</key>
@@ -35,21 +34,39 @@
     <key alias="toPublish">Send til udgivelse</key>
     <key alias="translate">Oversæt</key>
     <key alias="update">Opdatér</key>
+	<key alias="defaultValue">Standard værdi</key>
+
   </area>
   <area alias="assignDomain">
+	<key alias="permissionDenied">Adgang nægtet.</key>
     <key alias="addNew">Tilføj nyt domæne</key>
+	<key alias="remove">fjern</key>
+	<key alias="invalidNode">Ugyldigt element.</key>
+	<key alias="invalidDomain">Ugyldigt domæne format.</key>
+	<key alias="duplicateDomain">Domæne er allerede tilknyttet.</key>
     <key alias="domain">Domæne</key>
+	<key alias="language">Sprog</key>
     <key alias="domainCreated">Domænet '%0%' er nu oprettet og tilknyttet siden</key>
     <key alias="domainDeleted">Domænet '%0%' er nu slettet</key>
     <key alias="domainExists">Domænet '%0%' er oprettet</key>
-    <key alias="domainHelp">f.eks. ditdomaene.com, www.ditdomaene.com</key>
+    <key alias="domainHelp"><![CDATA[Gyldige domænenavne: "example.com", "www.example.com", "example.com:8080" eller
+        "https://www.example.com/".<br /><br />Niveau-1 stier i domæner understøttes, f.eks. "example.com/en". Det bør dog undgås, da det er bedre kultur-indstillingerne i stedet for.]]></key>
     <key alias="domainUpdated">Domænet '%0%' er nu opdateret</key>
-    <key alias="orEdit">eller rediger nuværende domæner</key>
+    <key alias="orEdit">Rediger nuværende domæner</key>
+	<key alias="inherit">Nedarv</key>
+    <key alias="setLanguage">Kultur</key>
+    <key alias="setLanguageHelp"><![CDATA[Vælg kulturen for noder der findes under den nuværende node,<br /> eller nedarv kulturen fra ovenstående noder. Gælder også<br />
+      den nuværende node, med mindre et domæne længere nede i hierakiet overskriver indstillingerne.]]></key>
+    <key alias="setDomains">Domæner</key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">For</key>
   </area>
   <area alias="buttons">
+    <key alias="select">Vælg</key>
+    <key alias="selectCurrentFolder">Vælg nuværnede mappe</key>
+    <key alias="somethingElse">Flere muligheder...</key>
+
     <key alias="bold">Fed</key>
     <key alias="deindent">Fortryd indryk afsnit</key>
     <key alias="formFieldInsert">Indsæt formularfelt</key>
@@ -70,12 +87,31 @@
     <key alias="save">Gem</key>
     <key alias="saveAndPublish">Gem og udgiv</key>
     <key alias="saveToPublish">Gem og send til udgivelse</key>
-    <key alias="select">Vælg</key>
-    <key alias="somethingElse">Flere muligheder...</key>
     <key alias="showPage">Se siden</key>
+	<key alias="showPageDisabled">Det er ikke muligt at se siden, fordi der ikke er en skabelon tilknyttet.</key>
     <key alias="styleChoose">Vælg formattering</key>
     <key alias="styleShow">Vis koder</key>
     <key alias="tableInsert">Indsæt tabel</key>
+  </area>
+  <area alias="changeDocType">
+    <key alias="changeDocTypeInstruction">For at ændre sidens dokument type, skal der vælges en gyldig type fra listen.</key>
+    <key alias="changeDocTypeInstruction2">Dernæst skal du bekræfte dig valg og/eller overføre indholdet fra den nuværende type, til den nye. Klik derefter på "Gem".</key>
+    <key alias="contentRepublished">Indholdet er genudgivet.</key>
+    <key alias="currentProperty">Nuværende egenskab</key>
+    <key alias="currentType">Nuværende type</key>
+    <key alias="docTypeCannotBeChanged">Dokument typen kan ikke ændres, da der ikke findes nogle alternativer til den.</key>
+    <key alias="docTypeChanged">Dokument type ændret.</key>
+    <key alias="mapProperties">Overfør indhold/værdier</key>
+    <key alias="mapToProperty">Overfør til felt</key>
+    <key alias="newTemplate">Ny skabelon</key>
+    <key alias="newType">Ny type</key>
+    <key alias="none">ingen</key>
+    <key alias="selectedContent">Indhold</key>
+    <key alias="selectNewDocType">Vælg ny dokument type</key>
+    <key alias="successMessage">Dokument typen er blevet ændret til [new type] og følgende indhold er overflyttet:</key>
+    <key alias="to">til</key>
+    <key alias="validationErrorPropertyWithMoreThanOneMapping">Kunne ikke gennemføre indholds-overførsel da et eller flere felter har mere end én værdi.</key>
+    <key alias="validDocTypesNote">Der vises kun gyldige alternative dokument typer.</key>
   </area>
   <area alias="content">
     <key alias="about">Om siden</key>
@@ -102,9 +138,11 @@
     <key alias="nodeName">Sidetitel</key>
     <key alias="otherElements">Egenskaber</key>
     <key alias="parentNotPublished">Dette dokument er udgivet, men ikke synligt da den overliggende side '%0%' ikke er udgivet!</key>
+	<key alias="parentNotPublishedAnomaly">Ups!: Dokumentet er udgivet, men findes ikke i cache. (Intern fejl).</key>
     <key alias="publish">Udgivet</key>
     <key alias="publishStatus">Udgivelses status</key>
     <key alias="releaseDate">Udgivelsesdato</key>
+	<key alias="unpublishDate">Data for afpublicering</key>
     <key alias="removeDate">Fjern dato</key>
     <key alias="sortDone">Sorteringrækkefølgen er opdateret</key>
     <key alias="sortHelp">For at sortere, træk siderne eller klik på en af kolonnehovederne. Du kan vælge flere sider ved at holde "shift" eller "control" nede mens du vælger.</key>
@@ -116,7 +154,8 @@
     <key alias="updateDateDesc" version="7.0">Tidspunkt for seneste redigering</key>
     <key alias="uploadClear">Fjern fil</key>
     <key alias="urls">Link til dokument</key>
-
+    <key alias="memberof">Medlem af gruppe(r)</key>
+    <key alias="notmemberof">Ikke medlem af gruppe(r)</key>
     <key alias="childItems" version="7.0">Undersider</key>
     <key alias="target" version="7.0">Åben i vindue</key>
   </area>
@@ -179,7 +218,7 @@
     <key alias="removeMacro">Fjern makro</key>
     <key alias="requiredField">Obligatorisk</key>
     <key alias="sitereindexed">Sitet er genindekseret</key>
-    <key alias="siterepublished">Siten er nu genudgivet</key>
+    <key alias="siterepublished">Sitet er nu genudgivet</key>
     <key alias="siterepublishHelp">Websitets cache vil blive genopfrisket. Alt udgivet indhold vil blive opdateret, mens upubliceret indhold vil forblive upubliceret.</key>
     <key alias="tableColumns">Antal kolonner</key>
     <key alias="tableRows">Antal rækker</key>
@@ -190,8 +229,16 @@
     <key alias="viewCacheItem">Se Cache Item</key>
   </area>
   <area alias="dictionaryItem">
-    <key alias="description">Rediger de forskellige sprogversioner for ordbogselementet '%0%' herunder. Du tilføjer flere sprog under 'sprog' i menuen til venstre </key>
+    <key alias="description"><![CDATA[Rediger de forskellige sprogversioner for ordbogselementet '<em>%0%</em>' herunder. <br />Du tilføjer flere sprog under 'sprog' i menuen til venstre]]></key>
     <key alias="displayName">Kulturnavn</key>
+  </area>
+  <area alias="placeholders">
+    <key alias="username">Indtast dit brugernavn</key>
+    <key alias="password">Indtast dit kodeord</key>
+    <key alias="nameentity">Navngiv %0%...</key>
+    <key alias="entername">Indtast navn...</key>
+    <key alias="search">Søg...</key>
+    <key alias="filter">Filtrér...</key>
   </area>
   <area alias="editcontenttype">
     <key alias="allowedchildnodetypes">Tilladte typer</key>
@@ -201,6 +248,7 @@
     <key alias="newtab">Ny fane</key>
     <key alias="tab">Fane</key>
     <key alias="thumbnail">Thumbnail</key>
+	<key alias="hasListView">Aktivér listevisning</key>
   </area>
   <area alias="editdatatype">
     <key alias="addPrevalue">Tilføj førværdi</key>
@@ -229,6 +277,7 @@
     <key alias="errorRegExpWithoutTab">%0% er ikke i et korrekt format</key>
   </area>
   <area alias="errors">
+	<key alias="dissallowedMediaType">Administrator har ikke tilladt den valgte type</key>
     <key alias="codemirroriewarning">OBS! Selvom CodeMirror er slået til i konfigurationen, så er den deaktiveret i Internet Explorer fordi den ikke er stabil nok.</key>
     <key alias="contentTypeAliasAndNameNotNull">Du skal udfylde både Alias &amp; Navn på den nye egenskabstype!</key>
     <key alias="filePermissionsError">Der mangler læse/skrive rettigheder til bestemte filer og mapper</key>
@@ -244,15 +293,7 @@
     <key alias="tableSplitNotSplittable">Du kan ikke opdele en celle, som ikke allerede er delt.</key>
     <key alias="xsltErrorHeader">Fejl i XSLT kode</key>
     <key alias="xsltErrorText">Din XSLT er ikke opdateret, da det indeholdt en fejl</key>
-  </area>
-
-  <area alias="placeholders">
-    <key alias="username">Indtast dit brugernavn</key>
-    <key alias="password">Indtast dit kodeord</key>
-    <key alias="nameentity">Navngiv %0%...</key>
-    <key alias="entername">Indtast navn...</key>
-    <key alias="search">Søg...</key>
-    <key alias="filter">Filtre...</key>
+    <key alias="missingPropertyEditorErrorMessage">Der er en konfigurationsfejl i datatypen der bruges på dette felt. Kontroller venligst datatypen.</key>
   </area>
 
   <area alias="general">
@@ -327,6 +368,7 @@
     <key alias="remaining">Mangler</key>
     <key alias="rename">Omdøb</key>
     <key alias="renew">Forny</key>
+    <key alias="required" version="7.0">Påkrævet</key>
     <key alias="retry">Prøv igen</key>
     <key alias="rights">Rettigheder</key>
     <key alias="search">Søg</key>
@@ -349,6 +391,9 @@
     <key alias="welcome">Velkommen...</key>
     <key alias="width">Bredde</key>
     <key alias="yes">Ja</key>
+    <key alias="folder">Mappe</key>
+
+    <key alias="searchResults">Søgeresultater</key>
   </area>
   <area alias="graphicheadline">
     <key alias="backgroundcolor">Baggrundsfarve</key>
@@ -424,8 +469,8 @@
     <key alias="welcomeIntro"><![CDATA[Denne guide vil bringe dig gennem konfigurationsprocessen af <strong>Umbraco %0%</strong> for en frisk installation eller for en opgradering fra version 3.0.<br/><br/>Tryk på <strong>Næste</strong> for at begynde på guiden.]]></key>
   </area>
   <area alias="language">
-    <key alias="cultureCode">Culture Code</key>
-    <key alias="displayName">Culture Name</key>
+    <key alias="cultureCode">Kultur kode</key>
+    <key alias="displayName">Kultur navn</key>
   </area>
   <area alias="lockout">
     <key alias="lockoutWillOccur">Du har været inaktiv, og du vil blive logget ud om</key>
@@ -463,7 +508,9 @@
     <key alias="noNodeSelected">Intet element valgt, vælg et element i listen ovenfor før der klikkes 'fortsæt'</key>
     <key alias="notAllowedByContentType">Den nuværende node kan ikke lægges under denne pga. sin type</key>
     <key alias="notAllowedByPath">Den nuværende node kan ikke ligge under en af dens undersider</key>
+    <key alias="notAllowedAtRoot">Den nuværende node kan ikke ligge under roden.</key>
     <key alias="notValid">Denne handling er ikke tilladt fordi du ikke har de fornødne rettigheder på et eller flere af under-dokumenterne</key>
+	<key alias="relateToOriginal">Relatér kopierede elementer til originalen.</key>
   </area>
   <area alias="notifications">
     <key alias="editNotifications">Rediger dine notificeringer for %0%</key>
@@ -494,6 +541,7 @@ Mange hilsner fra umbraco robotten
     <key alias="packageName">Pakkenavn</key>
     <key alias="packageNoItemsHeader">Pakken indeholder ingen elementer</key>
     <key alias="packageNoItemsText"><![CDATA[Denne pakkefil indeholder ingen elementer som kan af-installeres.<br/><br/>Du kan roligt fjerne denne fra systemet ved at klikke på "Fjern pakke" nedenfor.]]></key>
+
     <key alias="packageNoUpgrades">Ingen opdateringer tilgængelige</key>
     <key alias="packageOptions">Pakkevalg</key>
     <key alias="packageReadme">Pakke læs mig</key>
@@ -509,6 +557,7 @@ Mange hilsner fra umbraco robotten
     <key alias="packageUpgradeInstructions">Opdateringsinstrukser</key>
     <key alias="packageUpgradeText">Der er en tilgængelig opdatering til denne pakke. Du kan downloade den direkte fra umbracos pakke opbevaringsbase.</key>
     <key alias="packageVersion">Pakke version</key>
+	<key alias="packageVersionHistory">Package version history</key>
     <key alias="viewPackageWebsite">Se pakkeudviklerens website</key>
   </area>
   <area alias="paste">
@@ -592,10 +641,15 @@ Mange hilsner fra umbraco robotten
     <key alias="nodetype">Nodetype</key>
     <key alias="objecttype">Type</key>
     <key alias="stylesheet">Stylesheet</key>
+	<key alias="script">Script</key>
     <key alias="stylesheet editor egenskab">Stylesheetegenskab</key>
     <key alias="tab">Faneblad</key>
     <key alias="tabname">Titel på faneblad</key>
     <key alias="tabs">Faneblade</key>
+    <key alias="contentTypeEnabled">Master indholdstype aktiveret</key>
+    <key alias="contentTypeUses">Denne indholdstype bruger</key>
+    <key alias="asAContentMasterType">som Master indholdstype. Faner fra Master indholdstyper vises ikke og kan kun redigeres på Master indholdstypen.</key>
+    <key alias="noPropertiesDefinedOnTab">Ingen egenskaber er tilføjet på denne fane. Klik på "Tilføj ny egenskab" for at oprette en ny egenskab.</key>
   </area>
   <area alias="sort">
     <key alias="sortDone">Sortering udført</key>
@@ -624,12 +678,15 @@ Mange hilsner fra umbraco robotten
     <key alias="editContentSavedText">Husk at publicere for at gøre det synligt for besøgende</key>
     <key alias="editContentSendToPublish">Send til Godkendelse</key>
     <key alias="editContentSendToPublishText">Rettelser er blevet sendt til godkendelse</key>
+    <key alias="editMediaSaved">Medie gemt</key>
+    <key alias="editMediaSavedText">Medie gemt uden fejl</key>
     <key alias="editMemberSaved">Medlem gemt</key>
     <key alias="editStylesheetPropertySaved">Stylesheetegenskab gemt</key>
     <key alias="editStylesheetSaved">Stylesheet gemt</key>
     <key alias="editTemplateSaved">Template gemt</key>
     <key alias="editUserError">Der er opstået en fejl under redigering</key>
     <key alias="editUserSaved">Bruger gemt</key>
+    <key alias="editUserTypeSaved">Bruger type gemt</key>
     <key alias="fileErrorHeader">Fil ikke gemt</key>
     <key alias="fileErrorText">Filen kunne ikke gemmes. Tjek filrettighederne</key>
     <key alias="fileSavedHeader">Fil gemt</key>
@@ -648,6 +705,11 @@ Mange hilsner fra umbraco robotten
     <key alias="xsltPermissionErrorText">XSLT kunne ikke gemmes, check filrettigheder</key>
     <key alias="xsltSavedHeader">XSLT gemt</key>
     <key alias="xsltSavedText">Der var ingen fejl i din XSLT!</key>
+    <key alias="contentUnpublished">Indhold afpublisceret</key>
+    <key alias="partialViewSavedHeader">Partial view gemt</key>
+    <key alias="partialViewSavedText">Partial view gemt uden fejl!</key>
+    <key alias="partialViewErrorHeader">Partial view ikke gemt</key>
+    <key alias="partialViewErrorText">Der opstod en fejl ved forsøg på at gemme filen.</key>
   </area>
   <area alias="stylesheet">
     <key alias="aliasHelp">Bruger CSS-syntax f.eks. h1, .redheader, .blueTex</key>
@@ -672,9 +734,11 @@ Mange hilsner fra umbraco robotten
     <key alias="alternativeField">Alternativt felt</key>
     <key alias="alternativeText">Alternativ tekst</key>
     <key alias="casing">Casing</key>
+	<key alias="encoding">Encoding</key>
     <key alias="chooseField">Felt som skal indsættes</key>
     <key alias="convertLineBreaks">Konvertér linieskift</key>
     <key alias="convertLineBreaksHelp">Erstatter et linieskift med html-tag'et &amp;lt;br&amp;gt;</key>
+    <key alias="customFields">Egne felter</key>
     <key alias="dateOnly">Ja, kun dato</key>
     <key alias="formatAsDate">Formatér som dato</key>
     <key alias="htmlEncode">HTML indkod</key>
@@ -688,6 +752,7 @@ Mange hilsner fra umbraco robotten
     <key alias="recursive">Rekursivt</key>
     <key alias="removeParagraph">Fjern paragraf-tags</key>
     <key alias="removeParagraphHelp">Fjerner eventuelle &amp;lt;P&amp;gt; omkring teksten</key>
+	<key alias="standardFields">Standard Felter</key>
     <key alias="uppercase">Uppercase</key>
     <key alias="urlEncode">URL encode</key>
     <key alias="urlEncodeHelp">Hvis indholdet af felterne skal sendes til en url, skal denne slåes til så specialtegn formateres</key>
