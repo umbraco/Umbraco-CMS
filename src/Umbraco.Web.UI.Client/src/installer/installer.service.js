@@ -12,7 +12,6 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 		status : _status,
 		getSteps : function(){
 			var deferred = $q.defer();
-
 			var s =  [
 				{
 					name: "User",
@@ -39,6 +38,7 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 		},
 
 		init : function(){
+
 			if(!_status.all){
 				service.getSteps().then(function(steps){
 					service.status.steps = steps;
@@ -46,6 +46,7 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 					service.gotoStep(0);
 				});
 			}
+
 		},
 
 		gotoStep : function(index){

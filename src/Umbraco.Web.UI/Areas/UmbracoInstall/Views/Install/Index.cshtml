@@ -3,6 +3,42 @@
 @{
     Layout = null;
 }
+<!doctype html>
+<html lang="en">
+<head>
+    <base href="@ViewBag.UmbracoBaseFolder/" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Install Umbraco</title>
+    <link rel="stylesheet" href="assets/css/installer.css" />
+</head>
+
+    
+<body ng-class="{touch:touchDevice}" ng-controller="Umbraco.InstallerController" id="umbracoInstallPageBody">
+
+    <img src="assets/img/application/logo_white.png" id="logo" />
+
+    <div class="umb-loader" id="loader" ng-if="installer.loading"></div>
+    
+    <div id="installer" class="absolute-center clearfix" ng-if="installer.current">
+        <div ng-include="installer.current.view"></div>
+    </div>
+
+    <script type="text/javascript">
+        var Umbraco = {};
+        Umbraco.Sys = {};
+        Umbraco.Sys.ServerVariables = {
+            "installApiBaseUrl": "@ViewBag.InstallApiBaseUrl",
+            "defaultStarterKit": "@ViewBag.DefaultPackageId"
+        };
+    </script>
+    <script src="lib/yepnope/yepnope.min.js"></script>
+    <script src="js/install.loader.js"></script>
+</body>
+</html>
+
+
 
 <!DOCTYPE html>
 
@@ -12,15 +48,8 @@
 </head>
 <body>
     <div>
-        Hello world
+        Hello @ViewBag.UmbracoBaseFolder
     </div>
-    <script type="text/javascript">
-        var Umbraco = {};
-        Umbraco.Sys = {};
-        Umbraco.Sys.ServerVariables = {
-            "installApiBaseUrl": "@ViewBag.InstallApiBaseUrl",
-            "defaultStarterKit": "@ViewBag.DefaultPackageId"
-        };
-    </script>
+    
 </body>
 </html>
