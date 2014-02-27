@@ -10,11 +10,13 @@ namespace Umbraco.Web.Install.InstallSteps
     [InstallSetupStep("StarterKitInstall", "")]
     internal class StarterKitInstallStep : InstallSetupStep<object>
     {
+        private readonly InstallStatus _status;
         private readonly ApplicationContext _applicationContext;
         private readonly HttpContextBase _httContext;
 
-        public StarterKitInstallStep(ApplicationContext applicationContext, HttpContextBase httContext)
+        public StarterKitInstallStep(InstallStatus status, ApplicationContext applicationContext, HttpContextBase httContext)
         {
+            _status = status;
             _applicationContext = applicationContext;
             _httContext = httContext;
         }
@@ -22,6 +24,8 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override IDictionary<string, object> Execute(object model)
         {
+            if (_status != InstallStatus.NewInstall) return null;
+
             var installSteps = InstallStatusTracker.GetStatus();            
             //this step relies on the preious one completed - because it has stored some information we need
             if (installSteps.Any(x => x.Key == "StarterKitDownload") == false)            

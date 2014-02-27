@@ -35,6 +35,16 @@ namespace Umbraco.Web.Install.Controllers
             // It's not considered an upgrade if the ConfigurationStatus is missing or empty.
             if (string.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus) == false)
             {
+                Version current;
+                if (Version.TryParse(GlobalSettings.ConfigurationStatus, out current))
+                {
+                    //check if we are on the current version, and not let the installer execute
+                    if (current == UmbracoVersion.Current)
+                    {
+                        return Redirect(SystemDirectories.Umbraco.EnsureEndsWith('/'));
+                    }    
+                }
+
                 var result = _umbracoContext.Security.ValidateCurrentUser(false);
 
                 switch (result)

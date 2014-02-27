@@ -19,72 +19,64 @@ namespace Umbraco.Web.Install
         {
             //TODO: Add UserToken step to save our user token with Mother
 
-            var steps = new List<InstallSetupStep>();
-            if (status == InstallStatus.NewInstall)
+            var steps = new List<InstallSetupStep>(new InstallSetupStep[]
             {
-                //The step order returned here is how they will appear on the front-end
-                steps.AddRange(new InstallSetupStep[]
+                new FilePermissionsStep()
                 {
-                    new FilePermissionsStep()
-                    {           
-                        ServerOrder = 0,
-                    },
-                    new UserStep(umbracoContext.Application)
-                    {
-                        ServerOrder = 4,
-                    },
-                    new DatabaseConfigureStep(umbracoContext.Application)
-                    {
-                        ServerOrder = 1,
-                    },
-                    new DatabaseInstallStep(umbracoContext.Application)
-                    {
-                        ServerOrder = 2,
-                    },
-                    new DatabaseUpgradeStep(umbracoContext.Application)
-                    {
-                        ServerOrder = 3,
-                    },
-                    new StarterKitDownloadStep()
-                    {
-                        ServerOrder = 5,
-                    },
-                    new StarterKitInstallStep(umbracoContext.Application, umbracoContext.HttpContext)
-                    {
-                        ServerOrder = 6,
-                    },
-                    new StarterKitCleanupStep()
-                    {
-                        ServerOrder = 7,
-                    },
-                    new SetUmbracoVersionStep(umbracoContext.Application, umbracoContext.HttpContext) {
-                        ServerOrder = 8
-                    }
-                });
-                return steps;
-            }
-            else
-            {
-                //TODO: Add steps for upgrades
-            }
-            return null;
-        }
-
-        public static bool IsNewInstall
-        {
-            get
-            {
-                var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
-                if (databaseSettings != null && (
-                    databaseSettings.ConnectionString.Trim() == string.Empty
-                    && databaseSettings.ProviderName.Trim() == string.Empty
-                    && GlobalSettings.ConfigurationStatus == string.Empty))
+                    ServerOrder = 0,
+                },
+                new UserStep(umbracoContext.Application, status)
                 {
-                    return true;
+                    ServerOrder = 4,
+                },
+                new DatabaseConfigureStep(umbracoContext.Application)
+                {
+                    ServerOrder = 1,
+                },
+                new DatabaseInstallStep(umbracoContext.Application)
+                {
+                    ServerOrder = 2,
+                },
+                new DatabaseUpgradeStep(umbracoContext.Application)
+                {
+                    ServerOrder = 3,
+                },
+                new StarterKitDownloadStep(status)
+                {
+                    ServerOrder = 5,
+                },
+                new StarterKitInstallStep(status, umbracoContext.Application, umbracoContext.HttpContext)
+                {
+                    ServerOrder = 6,
+                },
+                new StarterKitCleanupStep(status)
+                {
+                    ServerOrder = 7,
+                },
+                new SetUmbracoVersionStep(umbracoContext.Application, umbracoContext.HttpContext)
+                {
+                    ServerOrder = 8
                 }
+            });
 
-                return false;
-            }
+            return steps;
         }
+
+        //public static bool IsNewInstall
+        //{
+        //    get
+        //    {
+        //        var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
+        //        if (databaseSettings != null && (
+        //            databaseSettings.ConnectionString.Trim() == string.Empty
+        //            && databaseSettings.ProviderName.Trim() == string.Empty
+        //            && GlobalSettings.ConfigurationStatus == string.Empty))
+        //        {
+        //            return true;
+        //        }
+
+        //        return false;
+        //    }
+        //}
     }
 }

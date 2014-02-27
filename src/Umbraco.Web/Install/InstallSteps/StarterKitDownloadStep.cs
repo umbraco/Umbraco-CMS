@@ -9,10 +9,19 @@ namespace Umbraco.Web.Install.InstallSteps
     [InstallSetupStep("StarterKitDownload", "starterKit")]
     internal class StarterKitDownloadStep : InstallSetupStep<Guid>
     {
+        private readonly InstallStatus _status;
+
+        public StarterKitDownloadStep(InstallStatus status)
+        {
+            _status = status;
+        }
+
         private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
 
         public override IDictionary<string, object> Execute(Guid starterKitId)
         {
+            if (_status != InstallStatus.NewInstall) return null;
+
             var result = DownloadPackageFiles(starterKitId);
 
             return new Dictionary<string, object>

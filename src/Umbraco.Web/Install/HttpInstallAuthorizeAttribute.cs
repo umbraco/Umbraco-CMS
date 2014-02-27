@@ -65,16 +65,6 @@ namespace Umbraco.Web.Install
                 return false;
             }
 	    }
-        
-        ///// <summary>
-        ///// Override to throw exception instead of returning 401 result
-        ///// </summary>
-        ///// <param name="filterContext"></param>
-        //protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
-        //{
-        //    //they aren't authorized but the app has installed
-        //    throw new HttpException((int)global::System.Net.HttpStatusCode.Unauthorized, "You must login to view this resource.");
-        //}
-
+       
 	}
 }

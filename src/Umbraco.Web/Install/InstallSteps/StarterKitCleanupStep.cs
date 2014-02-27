@@ -10,8 +10,17 @@ namespace Umbraco.Web.Install.InstallSteps
     [InstallSetupStep("StarterKitCleanup", "")]
     internal class StarterKitCleanupStep : InstallSetupStep<object>
     {
+        private readonly InstallStatus _status;
+
+        public StarterKitCleanupStep(InstallStatus status)
+        {
+            _status = status;
+        }
+
         public override IDictionary<string, object> Execute(object model)
         {
+            if (_status != InstallStatus.NewInstall) return null;
+
             var installSteps = InstallStatusTracker.GetStatus();
             //this step relies on the preious one completed - because it has stored some information we need
             if (installSteps.Any(x => x.Key == "StarterKitDownload") == false)

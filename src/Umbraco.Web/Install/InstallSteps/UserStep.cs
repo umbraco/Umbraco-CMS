@@ -12,10 +12,12 @@ namespace Umbraco.Web.Install.InstallSteps
     internal class UserStep : InstallSetupStep<UserModel>
     {
         private readonly ApplicationContext _applicationContext;
+        private readonly InstallStatus _status;
 
-        public UserStep(ApplicationContext applicationContext)
+        public UserStep(ApplicationContext applicationContext, InstallStatus status)
         {
             _applicationContext = applicationContext;
+            _status = status;
         }
 
         private MembershipProvider CurrentProvider
@@ -67,5 +69,9 @@ namespace Umbraco.Web.Install.InstallSteps
             return null;
         }
 
+        public override string View
+        {
+            get { return _status == InstallStatus.NewInstall ? base.View : string.Empty; }
+        }
     }
 }

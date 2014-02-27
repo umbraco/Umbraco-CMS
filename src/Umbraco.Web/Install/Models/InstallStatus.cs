@@ -18,9 +18,9 @@ namespace Umbraco.Web.Install.Models
         /// </summary>
         UpgradeWithoutToken,
 
-        /// <summary>
-        /// Used if the user presses f5 and is in the middle of an install
-        /// </summary>
-        InProgress
+        ///// <summary>
+        ///// Used if the user presses f5 and is in the middle of an install
+        ///// </summary>
+        //InProgress
     }
 }

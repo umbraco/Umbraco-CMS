@@ -2,6 +2,8 @@
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Web.Security;
 using umbraco.BasePages;
 
@@ -74,13 +76,12 @@ namespace Umbraco.Web.Install
         }
 
         /// <summary>
-        /// Override to throw exception instead of returning 401 result
+        /// Override to redirect instead of throwing an exception
         /// </summary>
         /// <param name="filterContext"></param>
         protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
         {
-            //they aren't authorized but the app has installed
-            throw new HttpException((int)global::System.Net.HttpStatusCode.Unauthorized, "You must login to view this resource.");
+            filterContext.Result = new RedirectResult(SystemDirectories.Umbraco.EnsureEndsWith('/'));           
         }
 
     }
