@@ -51,16 +51,36 @@ angular.module("umbraco").controller("Umbraco.Editors.MultiValuesController",
             $scope.hasError = true;            
         };
 
-        $scope.move = function (index, direction, evt) {
-            evt.preventDefault();
+        $scope.sortableOptions = {
+            axis: 'y',
+            containment: 'parent',
+            cursor: 'move',
+            items: '> div.control-group',
+            tolerance: 'pointer',
+            update: function (e, ui) {
+                // Get the new and old index for the moved element (using the text as the identifier, so 
+                // we'd have a problem if two prevalues were the same, but that would be unlikely)
+                var newIndex = ui.item.index();
+                var movedPrevalueText = $('input[type="text"]', ui.item).val();
+                var originalIndex = getElementIndexByPrevalueText(movedPrevalueText);
 
-            if ((index == 0 && direction == -1) || (index == $scope.model.value.length - 1 && direction == 1)) {
-                return;
+                // Move the element in the model
+                if (originalIndex > -1) {
+                    var movedElement = $scope.model.value[originalIndex];
+                    $scope.model.value.splice(originalIndex, 1);
+                    $scope.model.value.splice(newIndex, 0, movedElement);
+                }
+            }
+        };
+
+        function getElementIndexByPrevalueText(value) {
+            for (var i = 0; i < $scope.model.value.length; i++) {
+                if ($scope.model.value[i].value === value) {
+                    return i;
+                }
             }
 
-            var temp = $scope.model.value[index];
-            $scope.model.value[index] = $scope.model.value[index + direction];
-            $scope.model.value[index + direction] = temp;
-        };
+            return -1;
+        }
 
     });
