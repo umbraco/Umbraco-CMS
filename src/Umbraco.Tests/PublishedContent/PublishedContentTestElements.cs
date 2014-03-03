@@ -99,6 +99,12 @@ namespace Umbraco.Tests.PublishedContent
         {
             return _content.Count > 0;
         }
+
+        public IPublishedContent CreateFragment(string contentTypeAlias, IDictionary<string, object> dataValues,
+            bool isPreviewing, bool managed)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     class SolidPublishedContent : IPublishedContent
