@@ -31,18 +31,19 @@
 						<small class="inline-help">Atleast 8 characters long</small>
 					</div>
 				</div>
+
+				<div class="control-group" ng-class="{disabled:myForm.$invalid}">	
+					<div class="controls">
+
+						<input type="submit" ng-disabled="myForm.$invalid"  value="Install" class="btn btn-success" />
+						
+						<a href class="btn btn-link" ng-disabled="myForm.$invalid" ng-click="validateAndForward()">Customize</a>
+					</div>
+				</div>
+
 			</div>	
 		</div>
-
-		<div class="span2" ng-class="{disabled:myForm.$invalid}">
-			<input type="submit" ng-disabled="myForm.$invalid"  value="Install" class="btn btn-success" />
-			<br/>
-			<small><a href ng-disabled="myForm.$invalid" ng-click="validateAndInstall()">Customize</a></small>
-		</div>
-
 	</div>
-
-	
 </form>
 
 </div>

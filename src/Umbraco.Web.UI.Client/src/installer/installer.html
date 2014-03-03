@@ -14,16 +14,12 @@
     <img src="assets/img/application/logo_white.png" id="logo" />
 
     <div class="umb-loader" id="loader" ></div>
-    
-    <pre>
-        {{installer | json}}
-    </pre>
-
 
     <div id="installer" class="absolute-center clearfix" ng-if="installer.current">
         <div ng-include="installer.current.view"></div>
     </div>
 
+<div id="overlay"></div>
 
     <script src="lib/yepnope/yepnope.min.js"></script>
     <script src="js/install.loader.js"></script>

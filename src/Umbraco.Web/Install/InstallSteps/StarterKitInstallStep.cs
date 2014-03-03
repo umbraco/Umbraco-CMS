@@ -7,7 +7,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("StarterKitInstall", "")]
+    [InstallSetupStep("StarterKitInstall", "", "Installing a starter website to help you get off to a great start")]
     internal class StarterKitInstallStep : InstallSetupStep<object>
     {
         private readonly InstallStatus _status;

@@ -319,6 +319,7 @@
     <Compile Include="Install\Models\InstallSetupStep.cs" />
     <Compile Include="Install\Models\InstallSetupStepAttribute.cs" />
     <Compile Include="Install\Models\InstallTrackingItem.cs" />
+    <Compile Include="Install\Models\Package.cs" />
     <Compile Include="Install\Models\UserModel.cs" />
     <Compile Include="Install\UmbracoInstallArea.cs" />
     <Compile Include="Install\Controllers\InstallApiController.cs" />

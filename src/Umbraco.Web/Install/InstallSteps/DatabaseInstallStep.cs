@@ -8,7 +8,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("DatabaseInstall", "")]
+    [InstallSetupStep("DatabaseInstall", "", "Installing database tables and default system data")]
     internal class DatabaseInstallStep : InstallSetupStep<object>
     {
         private readonly ApplicationContext _applicationContext;

@@ -8,7 +8,7 @@ using Umbraco.Web.Install.Models;
 namespace Umbraco.Web.Install.InstallSteps
 {
 
-    [InstallSetupStep("User", "user")]
+    [InstallSetupStep("User", "user", "Saving your user credentials")]
     internal class UserStep : InstallSetupStep<UserModel>
     {
         private readonly ApplicationContext _applicationContext;

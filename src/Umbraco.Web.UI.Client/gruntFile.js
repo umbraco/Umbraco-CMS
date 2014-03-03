@@ -89,7 +89,7 @@ module.exports = function (grunt) {
       },
 
       installer: {
-        files: [{ dest: '<%= distdir %>/views/install', src : '*.html', expand: true, cwd: 'src/installer/steps' }]
+        files: [{ dest: '<%= distdir %>/views/install', src : '**/*.html', expand: true, cwd: 'src/installer/steps' }]
       },
 
       vendor: {

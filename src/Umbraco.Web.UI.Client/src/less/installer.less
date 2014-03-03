@@ -10,6 +10,13 @@
 @import "../../lib/bootstrap/less/grid.less";
 @import "../../lib/bootstrap/less/layouts.less";
 
+@import "../../lib/bootstrap/less/thumbnails.less";
+@import "../../lib/bootstrap/less/media.less";
+
+
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
 
 
 html { 
@@ -39,13 +46,30 @@ body {
 	position: absolute;
 	top: 20px;
 	left: 20px;
-	opacity: 0.8
+	opacity: 0.8;
+  z-index: 777;
 }
 
 #installer{
 	margin: auto;
-	background: rgba(255, 255, 255, 1);
-	height: 400px;
+	background: white;
+	min-height: 400px;
+  min-width: 500px;
+  max-width: 700px;
+  
+  height: 500px;
+
+  padding: 40px;
+}
+
+#overlay{
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background: @blackLight;
+  z-index: 666;
 }
 
 input.ng-dirty.ng-invalid{border-color: #b94a48; color: #b94a48;}
@@ -66,8 +90,29 @@ input.ng-dirty.ng-invalid{border-color: #b94a48; color: #b94a48;}
   top: 0; left: 0; bottom: 0; right: 0;
 }
 
+
+.fade-hide, .fade-show {
+    -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+    -moz-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+    -o-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+    transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+}
+.fade-hide {
+    opacity:1;
+}
+.fade-hide.fade-hide-active {
+    opacity:0;
+}
+.fade-show {
+    opacity:0;
+}
+.fade-show.fade-show-active {
+    opacity:1;
+}
+
+
 .umb-loader{
-background-color: @blue;
+background-color: white;
 margin-top:0;
 margin-left:-100%;
 -moz-animation-name:bounce_loadingProgressG;
@@ -150,5 +195,9 @@ height:1px;
 
 //loader defaults
 .umb-loader{
-	height: 10px; margin: 10px 10px 10px 10px;
+	height: 5px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
 }

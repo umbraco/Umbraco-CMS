@@ -7,7 +7,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("StarterKitCleanup", "")]
+    [InstallSetupStep("StarterKitCleanup", "", "Cleaning up temporary files")]
     internal class StarterKitCleanupStep : InstallSetupStep<object>
     {
         private readonly InstallStatus _status;

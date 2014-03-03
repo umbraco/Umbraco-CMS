@@ -4,9 +4,10 @@ angular.module("umbraco.install").controller("Umbraco.Install.UserController", f
 			installerService.install();
 	};
 
-
 	$scope.validateAndForward = function(){
-			installerService.forward();
+			if(this.myForm.$valid){
+				installerService.forward();
+			}
 	};
 	
 });

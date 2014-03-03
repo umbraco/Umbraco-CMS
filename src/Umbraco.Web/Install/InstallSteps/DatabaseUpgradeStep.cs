@@ -7,7 +7,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("DatabaseUpgrade", "")]
+    [InstallSetupStep("DatabaseUpgrade", "", "Upgrading your database to the latest version")]
     internal class DatabaseUpgradeStep : InstallSetupStep<object>
     {
         private readonly ApplicationContext _applicationContext;

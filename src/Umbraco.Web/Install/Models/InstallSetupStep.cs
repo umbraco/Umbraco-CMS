@@ -58,6 +58,7 @@ namespace Umbraco.Web.Install.Models
             }
             Name = att.Name;
             View = att.View;
+            Description = att.Description;
         }
 
         [DataMember(Name = "name")]
@@ -65,6 +66,9 @@ namespace Umbraco.Web.Install.Models
 
         [DataMember(Name = "view")]
         public virtual string View { get; private set; }
+
+        [DataMember(Name = "description")]
+        public string Description { get; private set; }
 
         /// <summary>
         /// Defines what order this step needs to execute on the server side since the 
