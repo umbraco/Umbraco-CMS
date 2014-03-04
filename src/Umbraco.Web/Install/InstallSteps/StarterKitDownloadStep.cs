@@ -1,26 +1,28 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web;
+using umbraco.cms.businesslogic.packager;
 using Umbraco.Core;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("StarterKitDownload", "starterKit", 30, "Downloading a starter website from our.umbraco.org, hold tight, this could take a little while")]
+    [InstallSetupStep(InstallationType.NewInstall,
+        "StarterKitDownload", "starterKit", 30, "Downloading a starter website from our.umbraco.org, hold tight, this could take a little while")]
     internal class StarterKitDownloadStep : InstallSetupStep<Guid>
     {
-        private readonly InstallStatusType _status;
+        private readonly ApplicationContext _applicationContext;
 
-        public StarterKitDownloadStep(InstallStatusType status)
+        public StarterKitDownloadStep(ApplicationContext applicationContext)
         {
-            _status = status;
+            _applicationContext = applicationContext;
         }
 
         private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
 
         public override InstallSetupResult Execute(Guid starterKitId)
         {
-            if (_status != InstallStatusType.NewInstall) return null;
 
             var result = DownloadPackageFiles(starterKitId);
 
@@ -42,7 +44,7 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 throw new InvalidOperationException("Cannot connect to repository");                
             }
-            var installer = new global::umbraco.cms.businesslogic.packager.Installer();
+            var installer = new Installer();
 
             var tempFile = installer.Import(repo.fetch(kitGuid.ToString()));
             installer.LoadConfig(tempFile);
@@ -56,7 +58,7 @@ namespace Umbraco.Web.Install.InstallSteps
         private void InstallPackageFiles(int manifestId, string packageFile)
         {
             packageFile = HttpUtility.UrlDecode(packageFile);
-            var installer = new global::umbraco.cms.businesslogic.packager.Installer();
+            var installer = new Installer();
             installer.LoadConfig(packageFile);
             installer.InstallFiles(manifestId, packageFile);
             
@@ -64,7 +66,13 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override bool RequiresExecution()
         {
-            return _status == InstallStatusType.NewInstall;
+            if (InstalledPackage.GetAllInstalledPackages().Count > 0)
+                return false;
+
+            if (_applicationContext.Services.ContentService.GetRootContent().Any())
+                return false;
+
+            return true;
         }
     }
 }

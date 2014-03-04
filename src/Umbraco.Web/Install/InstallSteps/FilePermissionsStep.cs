@@ -8,7 +8,8 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("Permissions", 0, "Ensuring your file permissions are set correctly")]
+    [InstallSetupStep(InstallationType.NewInstall | InstallationType.Upgrade,
+        "Permissions", 0, "Ensuring your file permissions are set correctly")]
     internal class FilePermissionsStep : InstallSetupStep<object>
     {
         public override InstallSetupResult Execute(object model)

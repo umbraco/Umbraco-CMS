@@ -33,11 +33,36 @@ namespace Umbraco.Web.Install
         public static void Reset()
         {
             _steps = new ConcurrentHashSet<InstallTrackingItem>();
+            ClearFiles();
+        }
+
+        public static void ClearFiles()
+        {
             var files = Directory.GetFiles(IOHelper.MapPath("~/App_Data/TEMP/Install/"));
             foreach (var f in files)
             {
                 File.Delete(f);
             }
+        }
+
+        public static IEnumerable<InstallTrackingItem> InitializeFromFile(Guid installId)
+        {
+            //check if we have our persisted file and read it
+            var file = GetFile(installId);
+            if (File.Exists(file))
+            {
+                var deserialized = JsonConvert.DeserializeObject<IEnumerable<InstallTrackingItem>>(
+                    File.ReadAllText(file));
+                foreach (var item in deserialized)
+                {
+                    _steps.Add(item);
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException("Cannot initialize from file, the installation file with id " + installId + " does not exist");
+            }
+            return new List<InstallTrackingItem>(_steps);
         }
 
         public static IEnumerable<InstallTrackingItem> Initialize(Guid installId, IEnumerable<InstallSetupStep> steps)
@@ -58,12 +83,28 @@ namespace Umbraco.Web.Install
                 }
                 else
                 {
+                    ClearFiles();
+
                     //otherwise just create the steps in memory (brand new install)
                     foreach (var step in steps.OrderBy(x => x.ServerOrder))
                     {
-                        _steps.Add(new InstallTrackingItem(step.Name, step.ServerOrder)); 
+                        _steps.Add(new InstallTrackingItem(step.Name, step.ServerOrder));
                     }
                     //save the file
+                    var serialized = JsonConvert.SerializeObject(new List<InstallTrackingItem>(_steps));
+                    Directory.CreateDirectory(Path.GetDirectoryName(file));
+                    File.WriteAllText(file, serialized);
+                }
+            }
+            else
+            {
+                //ensure that the file exists with the current install id
+                var file = GetFile(installId);
+                if (File.Exists(file) == false)
+                {
+                    ClearFiles();
+
+                    //save the correct file
                     var serialized = JsonConvert.SerializeObject(new List<InstallTrackingItem>(_steps));
                     Directory.CreateDirectory(Path.GetDirectoryName(file));
                     File.WriteAllText(file, serialized);

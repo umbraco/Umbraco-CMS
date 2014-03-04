@@ -13,15 +13,12 @@ namespace Umbraco.Web.Install.Models
         public InstallSetup()
         {
             Steps = new List<InstallSetupStep>();
-            InstallationId = Guid.NewGuid();
+            InstallId = Guid.NewGuid();
         }
 
         [DataMember(Name = "installId")]
-        public Guid InstallationId { get; private set; }
-
-        [DataMember(Name = "status")]
-        public InstallStatusType Status { get; set; }
-
+        public Guid InstallId { get; private set; }
+        
         [DataMember(Name = "steps")]
         public IEnumerable<InstallSetupStep> Steps { get; set; } 
 

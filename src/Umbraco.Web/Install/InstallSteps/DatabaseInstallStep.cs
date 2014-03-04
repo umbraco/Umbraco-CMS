@@ -8,7 +8,8 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("DatabaseInstall", 11, "Installing database tables and default system data")]
+    [InstallSetupStep(InstallationType.NewInstall | InstallationType.Upgrade,
+        "DatabaseInstall", 11, "Installing database tables and default system data")]
     internal class DatabaseInstallStep : InstallSetupStep<object>
     {
         private readonly ApplicationContext _applicationContext;
@@ -24,12 +25,18 @@ namespace Umbraco.Web.Install.InstallSteps
             if (result.RequiresUpgrade == false)
             {
                 HandleConnectionStrings();
+                return null;
+            }
+            else
+            {
+                //upgrade is required so set the flag for the next step
+
                 return new InstallSetupResult(new Dictionary<string, object>
                 {
                     {"upgrade", true}
                 });
-            }   
-            return null;
+            }
+            
         }
 
         internal static void HandleConnectionStrings()

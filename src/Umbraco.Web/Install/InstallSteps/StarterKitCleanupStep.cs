@@ -3,30 +3,26 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using umbraco;
+using umbraco.cms.businesslogic.packager;
+using Umbraco.Core;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("StarterKitCleanup", 32, "Cleaning up temporary files")]
+    [InstallSetupStep(InstallationType.NewInstall, 
+        "StarterKitCleanup", 32, "Cleaning up temporary files")]
     internal class StarterKitCleanupStep : InstallSetupStep<object>
     {
-        private readonly InstallStatusType _status;
+        private readonly ApplicationContext _applicationContext;
 
-        public StarterKitCleanupStep(InstallStatusType status)
+        public StarterKitCleanupStep(ApplicationContext applicationContext)
         {
-            _status = status;
+            _applicationContext = applicationContext;
         }
 
         public override InstallSetupResult Execute(object model)
         {
-            if (_status != InstallStatusType.NewInstall) return null;
-
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
-            //this step relies on the preious one completed - because it has stored some information we need
-            if (installSteps.Any(x => x.Name == "StarterKitDownload") == false)
-            {
-                throw new InvalidOperationException("Could not find previous step: StarterKitDownload of the installation, package install cannot continue");
-            }
             var previousStep = installSteps.Single(x => x.Name == "StarterKitDownload");
             var manifestId = Convert.ToInt32(previousStep.AdditionalData["manifestId"]);
             var packageFile = (string)previousStep.AdditionalData["packageFile"];
@@ -39,7 +35,7 @@ namespace Umbraco.Web.Install.InstallSteps
         private void CleanupInstallation(int manifestId, string packageFile)
         {
             packageFile = HttpUtility.UrlDecode(packageFile);
-            var installer = new global::umbraco.cms.businesslogic.packager.Installer();
+            var installer = new Installer();
             installer.LoadConfig(packageFile);
             installer.InstallCleanUp(manifestId, packageFile);
 
@@ -48,7 +44,20 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override bool RequiresExecution()
         {
-            return _status == InstallStatusType.NewInstall;
+            if (InstalledPackage.GetAllInstalledPackages().Count > 0)
+                return false;
+
+            if (_applicationContext.Services.ContentService.GetRootContent().Any())
+                return false;
+
+            var installSteps = InstallStatusTracker.GetStatus().ToArray();
+            //this step relies on the preious one completed - because it has stored some information we need
+            if (installSteps.Any(x => x.Name == "StarterKitDownload") == false)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

@@ -9,24 +9,19 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("MajorVersion7UpgradeReport", 1, "Checking for compatibility issues with upgrade")]
+    [InstallSetupStep(InstallationType.Upgrade,
+        "MajorVersion7UpgradeReport", 1, "Checking for compatibility issues with upgrade")]
     internal class MajorVersion7UpgradeReport : InstallSetupStep<object>
     {
         private readonly ApplicationContext _applicationContext;
-        private readonly InstallStatusType _status;
 
-        public MajorVersion7UpgradeReport(ApplicationContext applicationContext, InstallStatusType status)
+        public MajorVersion7UpgradeReport(ApplicationContext applicationContext)
         {
             _applicationContext = applicationContext;
-            _status = status;
         }
 
         public override InstallSetupResult Execute(object model)
         {
-            if (_status == InstallStatusType.NewInstall)
-            {
-                return null;
-            }
             //we cannot run this step if the db is not configured.
             if (_applicationContext.DatabaseContext.IsDatabaseConfigured == false)
             {
@@ -35,10 +30,11 @@ namespace Umbraco.Web.Install.InstallSteps
 
             return new InstallSetupResult("version7upgradereport", CreateReport());
         }
-        
+
         public override bool RequiresExecution()
         {
-            if (_status == InstallStatusType.NewInstall)
+            //if it's configured, then no need to run
+            if (_applicationContext.IsConfigured)
             {
                 return false;
             }

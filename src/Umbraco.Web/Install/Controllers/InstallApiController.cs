@@ -58,17 +58,19 @@ namespace Umbraco.Web.Install.Controllers
         /// <returns></returns>
         public InstallSetup GetSetup()
         {
-            var setup = new InstallSetup()
-            {
-                Status = InstallHelper.GetStatus()
-            };
-
+            var setup = new InstallSetup();
+            
             //TODO: Check for user/site token
 
             var steps = new List<InstallSetupStep>();
 
-            steps.AddRange(InstallHelper.GetSteps().Where(x => x.RequiresExecution()));
+            var installSteps = InstallHelper.GetStepsForCurrentInstallType().ToArray();
+
+            //only get the steps that are targetting the current install type
+            steps.AddRange(installSteps);
             setup.Steps = steps;
+
+            InstallStatusTracker.Initialize(setup.InstallId, installSteps);
 
             return setup;
         }
@@ -113,9 +115,10 @@ namespace Umbraco.Web.Install.Controllers
             if (installModel == null) throw new ArgumentNullException("installModel");
 
             var status = InstallStatusTracker.GetStatus().ToArray();
+            //there won't be any statuses returned if the app pool has restarted so we need to re-read from file.
             if (status.Any() == false)
             {
-                status = InstallStatusTracker.Initialize(installModel.InstallId, InstallHelper.GetSteps()).ToArray();
+                status = InstallStatusTracker.InitializeFromFile(installModel.InstallId).ToArray();
             }
 
             foreach (var stepStatus in status)
@@ -123,7 +126,7 @@ namespace Umbraco.Web.Install.Controllers
                 //if it is not complete, then we need to execute it
                 if (stepStatus.IsComplete == false)
                 {
-                    var step = InstallHelper.GetSteps().Single(x => x.Name == stepStatus.Name);
+                    var step = InstallHelper.GetAllSteps().Single(x => x.Name == stepStatus.Name);
 
                     JToken instruction = null;
                     if (step.HasUIElement)

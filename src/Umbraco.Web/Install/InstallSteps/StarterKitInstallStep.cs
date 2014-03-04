@@ -2,21 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using umbraco.cms.businesslogic.packager;
 using Umbraco.Core;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("StarterKitInstall", 31, "Installing a starter website to help you get off to a great start")]
+    [InstallSetupStep(InstallationType.NewInstall,
+        "StarterKitInstall", 31, "Installing a starter website to help you get off to a great start")]
     internal class StarterKitInstallStep : InstallSetupStep<object>
     {
-        private readonly InstallStatusType _status;
         private readonly ApplicationContext _applicationContext;
         private readonly HttpContextBase _httContext;
 
-        public StarterKitInstallStep(InstallStatusType status, ApplicationContext applicationContext, HttpContextBase httContext)
+        public StarterKitInstallStep(ApplicationContext applicationContext, HttpContextBase httContext)
         {
-            _status = status;
             _applicationContext = applicationContext;
             _httContext = httContext;
         }
@@ -24,14 +24,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override InstallSetupResult Execute(object model)
         {
-            if (_status != InstallStatusType.NewInstall) return null;
-
-            var installSteps = InstallStatusTracker.GetStatus().ToArray();
-            //this step relies on the preious one completed - because it has stored some information we need
-            if (installSteps.Any(x => x.Name == "StarterKitDownload") == false)            
-            {
-                throw new InvalidOperationException("Could not find previous step: StarterKitDownload of the installation, package install cannot continue");
-            }
+            var installSteps = InstallStatusTracker.GetStatus().ToArray();            
             var previousStep = installSteps.Single(x => x.Name == "StarterKitDownload");
             var manifestId = Convert.ToInt32(previousStep.AdditionalData["manifestId"]);
             var packageFile = (string)previousStep.AdditionalData["packageFile"];
@@ -46,14 +39,27 @@ namespace Umbraco.Web.Install.InstallSteps
         private void InstallBusinessLogic(int manifestId, string packageFile)
         {
             packageFile = HttpUtility.UrlDecode(packageFile);
-            var installer = new global::umbraco.cms.businesslogic.packager.Installer();
+            var installer = new Installer();
             installer.LoadConfig(packageFile);
             installer.InstallBusinessLogic(manifestId, packageFile);            
         }
 
         public override bool RequiresExecution()
         {
-            return _status == InstallStatusType.NewInstall;
+            if (InstalledPackage.GetAllInstalledPackages().Count > 0)
+                return false;
+
+            if (_applicationContext.Services.ContentService.GetRootContent().Any())
+                return false;
+
+            var installSteps = InstallStatusTracker.GetStatus().ToArray();
+            //this step relies on the preious one completed - because it has stored some information we need
+            if (installSteps.Any(x => x.Name == "StarterKitDownload") == false)
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

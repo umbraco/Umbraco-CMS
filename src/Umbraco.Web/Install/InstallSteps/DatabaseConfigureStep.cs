@@ -13,7 +13,8 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("DatabaseConfigure", "database", 10, "Configuring your database connection")]
+    [InstallSetupStep(InstallationType.NewInstall,
+        "DatabaseConfigure", "database", 10, "Configuring your database connection")]
     internal class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
     {
         private readonly ApplicationContext _applicationContext;
@@ -95,8 +96,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override bool RequiresExecution()
         {
-            //TODO: We need to determine if we should run this based on whether the conn string is configured already
-            return true;
+            return ShouldDisplayView();
         }
 
         private bool ShouldDisplayView()
@@ -104,40 +104,23 @@ namespace Umbraco.Web.Install.InstallSteps
             //If the connection string is already present in web.config we don't need to show the settings page and we jump to installing/upgrading.
             var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
 
-            var dbIsSqlCe = false;
-            if (databaseSettings != null && databaseSettings.ProviderName != null)
-                dbIsSqlCe = databaseSettings.ProviderName == "System.Data.SqlServerCe.4.0";
-            var sqlCeDatabaseExists = false;
-            if (dbIsSqlCe)
+            if (_applicationContext.DatabaseContext.IsConnectionStringConfigured(databaseSettings))
             {
-                var datasource = databaseSettings.ConnectionString.Replace("|DataDirectory|", AppDomain.CurrentDomain.GetData("DataDirectory").ToString());
-                var filePath = datasource.Replace("Data Source=", string.Empty);
-                sqlCeDatabaseExists = File.Exists(filePath);
+                try
+                {
+                    //Since a connection string was present we verify the db can connect and query
+                    var result = _applicationContext.DatabaseContext.ValidateDatabaseSchema();
+                    result.DetermineInstalledVersion();
+                    return false;
+                }
+                catch (Exception)
+                {
+                    //something went wrong, could not connect so probably need to reconfigure
+                    return true;
+                }
             }
 
-            // Either the connection details are not fully specified or it's a SQL CE database that doesn't exist yet
-            if (databaseSettings == null
-                || string.IsNullOrWhiteSpace(databaseSettings.ConnectionString) || string.IsNullOrWhiteSpace(databaseSettings.ProviderName)
-                || (dbIsSqlCe && sqlCeDatabaseExists == false))
-            {
-                return true;
-            }
-            else
-            {
-                //Since a connection string was present we verify whether this is an upgrade or an empty db
-                var result = ApplicationContext.Current.DatabaseContext.ValidateDatabaseSchema();
-                var determinedVersion = result.DetermineInstalledVersion();
-                if (determinedVersion.Equals(new Version(0, 0, 0)))
-                {
-                    //Fresh install
-                    return false;
-                }
-                else
-                {
-                    //Upgrade
-                    return false;
-                }
-            }
+            return true;
         }
     }
 }

@@ -313,9 +313,11 @@
     <Compile Include="Install\InstallSteps\StarterKitCleanupStep.cs" />
     <Compile Include="Install\InstallSteps\StarterKitDownloadStep.cs" />
     <Compile Include="Install\InstallSteps\StarterKitInstallStep.cs" />
+    <Compile Include="Install\InstallSteps\Upgrade.cs" />
     <Compile Include="Install\InstallSteps\UserStep.cs" />
     <Compile Include="Install\Models\DatabaseModel.cs" />
     <Compile Include="Install\Models\DatabaseType.cs" />
+    <Compile Include="Install\Models\InstallationType.cs" />
     <Compile Include="Install\Models\InstallInstructions.cs" />
     <Compile Include="Install\Models\InstallSetup.cs" />
     <Compile Include="Install\Models\InstallSetupResult.cs" />
@@ -328,7 +330,6 @@
     <Compile Include="Install\Controllers\InstallApiController.cs" />
     <Compile Include="Install\Controllers\InstallController.cs" />
     <Compile Include="Install\InstallAuthorizeAttribute.cs" />
-    <Compile Include="Install\Models\InstallStatusType.cs" />
     <Compile Include="MediaPropertyExtensions.cs" />
     <Compile Include="Models\ContentEditing\EntityTypeSearchResult.cs" />
     <Compile Include="Models\ContentEditing\ListViewAwareContentItemDisplayBase.cs" />

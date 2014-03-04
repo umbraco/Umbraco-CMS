@@ -41,6 +41,7 @@ namespace Umbraco.Web.Install.Models
             View = att.View;
             ServerOrder = att.ServerOrder;
             Description = att.Description;
+            InstallTypeTarget = att.InstallTypeTarget;
         }
 
         [DataMember(Name = "name")]
@@ -51,9 +52,12 @@ namespace Umbraco.Web.Install.Models
 
         [DataMember(Name = "description")]
         public string Description { get; private set; }
+
+        [IgnoreDataMember]
+        public InstallationType InstallTypeTarget { get; private set; }
         
         /// <summary>
-        /// Determines if this step needs to execute given it's ctor arguments
+        /// Determines if this step needs to execute based on the current state of the application and/or install process
         /// </summary>
         /// <returns></returns>
         public abstract bool RequiresExecution();

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
@@ -8,16 +9,15 @@ using Umbraco.Web.Install.Models;
 namespace Umbraco.Web.Install.InstallSteps
 {
 
-    [InstallSetupStep("User", "user", 20, "Saving your user credentials")]
+    [InstallSetupStep(InstallationType.NewInstall,
+        "User", "user", 20, "Saving your user credentials")]
     internal class UserStep : InstallSetupStep<UserModel>
     {
         private readonly ApplicationContext _applicationContext;
-        private readonly InstallStatusType _status;
 
-        public UserStep(ApplicationContext applicationContext, InstallStatusType status)
+        public UserStep(ApplicationContext applicationContext)
         {
             _applicationContext = applicationContext;
-            _status = status;
         }
 
         private MembershipProvider CurrentProvider
@@ -71,12 +71,34 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override string View
         {
-            get { return _status == InstallStatusType.NewInstall ? base.View : string.Empty; }
+            get { return RequiresExecution() ? base.View : string.Empty; }
         }
 
         public override bool RequiresExecution()
         {
-            return _status == InstallStatusType.NewInstall;
+            //if there's already a version then there should def be a user
+            if (GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace() == false) return false;
+
+            //now we have to check if this is really a new install, the db might be configured and might contain data
+            var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
+
+            if (_applicationContext.DatabaseContext.IsConnectionStringConfigured(databaseSettings)
+                && _applicationContext.DatabaseContext.IsDatabaseConfigured)
+            {
+                //check if we have the default user configured already
+                var result = _applicationContext.DatabaseContext.Database.ExecuteScalar<int>(
+                    "SELECT COUNT(*) FROM umbracoUser WHERE id=0 AND userPassword='default'");
+                if (result == 1)
+                {
+                    //the user has not been configured
+                    return true;
+                }
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
     }
 }

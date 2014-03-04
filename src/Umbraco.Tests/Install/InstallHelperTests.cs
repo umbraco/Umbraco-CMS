@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence;
 using Umbraco.Web;
 using Umbraco.Web.Install;
 using Umbraco.Web.Install.Controllers;
@@ -78,6 +79,7 @@ namespace Umbraco.Tests.Install
         {
             var appCtx = new ApplicationContext(CacheHelper.CreateDisabledCacheHelper());
             ApplicationContext.EnsureContext(appCtx, true);
+            appCtx.DatabaseContext = new DatabaseContext(Mock.Of<IDatabaseFactory>());
 
             var umbCtx = UmbracoContext.EnsureContext(
                 new Mock<HttpContextBase>().Object,
@@ -88,8 +90,8 @@ namespace Umbraco.Tests.Install
 
             var steps = helper.GetSteps().ToArray();
 
-            //for upgrades 5, don't require execution (the db context is not configured so the upgrade report will not execute either)
-            Assert.AreEqual(5, steps.Count(x => x.RequiresExecution() == false));
+            //for upgrades 4, don't require execution 
+            Assert.AreEqual(4, steps.Count(x => x.RequiresExecution() == false));
 
         }
 
