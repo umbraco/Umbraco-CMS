@@ -63,13 +63,10 @@
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
   </area>
-
-  
   <area alias="buttons">
     <key alias="select">Select</key>
     <key alias="selectCurrentFolder">Select current folder</key>
     <key alias="somethingElse">Do something else</key>
-    
     <key alias="bold">Bold</key>
     <key alias="deindent">Cancel Paragraph Indent</key>
     <key alias="formFieldInsert">Insert form field</key>
@@ -160,7 +157,6 @@
     <key alias="urls">Link to document</key>
     <key alias="memberof">Member of group(s)</key>
     <key alias="notmemberof">Not a member of group(s)</key>
-    
     <key alias="childItems" version="7.0">Child items</key>
     <key alias="target" version="7.0">Target</key>
   </area>
@@ -172,9 +168,7 @@
     <key alias="chooseNode">Where do you want to create the new %0%</key>
     <key alias="createUnder">Create an item under</key>
     <key alias="updateData">Choose a type and a title</key>
-
     <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
-
     <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
   </area>
   <area alias="dashboard">
@@ -248,7 +242,6 @@
     <key alias="search">Type to search...</key>
     <key alias="filter">Type to filter...</key>
   </area>
-
   <area alias="editcontenttype">
     <key alias="allowedchildnodetypes">Allowed child nodetypes</key>
     <key alias="create">Create</key>
@@ -401,7 +394,6 @@
     <key alias="width">Width</key>
     <key alias="yes">Yes</key>
     <key alias="folder">Folder</key>
-
     <key alias="searchResults">Search results</key>
   </area>
   <area alias="graphicheadline">
@@ -549,12 +541,9 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="greeting4">Happy thunder thursday</key>
     <key alias="greeting5">Happy friendly friday</key>
     <key alias="greeting6">Happy shiny saturday</key>
-    
     <key alias="instruction">log in below</key>
     <key alias="timeout">Session timed out</key>
-
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
-   
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>
@@ -677,11 +666,9 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="paSimpleHelp">If you just want to setup simple protection using a single login and password</key>
   </area>
   <area alias="publish">
-    <key alias="contentPublishedFailedAwaitingRelease">
-      <![CDATA[
+    <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[
       %0% could not be published because the item is scheduled for release.
-    ]]>
-    </key>
+    ]]></key>
     <key alias="contentPublishedFailedInvalid"><![CDATA[
       %0% could not be published because these properties:  %1%  did not pass validation rules.
     ]]></key>
@@ -741,7 +728,6 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="statistics">Statistics</key>
     <key alias="translation">Translation</key>
     <key alias="users">Users</key>
-
     <key alias="help" version="7.0">Help</key>
   </area>
   <area alias="settings">
@@ -993,7 +979,6 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="usertype">User type</key>
     <key alias="userTypes">User types</key>
     <key alias="writer">Writer</key>
-
     <key alias="yourProfile" version="7.0">Your profile</key>
     <key alias="yourHistory" version="7.0">Your recent history</key>
     <key alias="sessionExpires" version="7.0">Session expires in</key>

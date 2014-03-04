@@ -16,4 +16,8 @@ angular.module("umbraco.install").controller("Umbraco.InstallerController",
 	$scope.install = function(){
 		installerService.install();
 	};
+
+	$scope.gotoStep = function(step){
+		installerService.gotoNamedStep(step);
+	};
 });

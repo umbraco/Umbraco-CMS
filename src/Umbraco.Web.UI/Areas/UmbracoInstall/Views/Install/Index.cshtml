@@ -13,22 +13,25 @@
     <title>Install Umbraco</title>
     <link rel="stylesheet" href="assets/css/installer.css" />
 </head>
-    
+
 <body ng-class="{touch:touchDevice}" ng-controller="Umbraco.InstallerController" id="umbracoInstallPageBody">
 
     <img src="assets/img/application/logo_white.png" id="logo" />
 
-    @*<div class="umb-loader" id="loader" ng-if="installer.loading"></div>*@
+    <div class="umb-loader-container">
+        <div class="umb-loader" id="loader" ng-if="installer.loading"></div>
+    </div>
     
-    <div id="overlay" ng-animate="'fade'" ng-show="installer.done"></div>
+    <div id="overlay"  ng-cloak ng-animate="'fade'" ng-show="installer.done"></div>
 
     <div id="installer" class="absolute-center clearfix"
-        ng-cloak 
-        ng-animate="'fade'" 
-        ng-show="installer.installing">
+        ng-cloak
+        ng-animate="'fade'"
+        ng-show="installer.configuring">
         <div ng-if="installer.current" ng-include="installer.current.view"></div>
-        <h2 ng-animate="'fade'" ng-show="installer.feedback">{{installer.feedback}}...</h2>
     </div>
+
+    <h2 ng-cloak ng-animate="'fade'" id="feedback" class="absolute-center clearfix" ng-show="installer.feedback">{{installer.feedback}}</h2>
 
     <script type="text/javascript">
         var Umbraco = {};
