@@ -13,7 +13,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("DatabaseConfigure", "database")]
+    [InstallSetupStep("DatabaseConfigure", "database", 3)]
     internal class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
     {
         private readonly ApplicationContext _applicationContext;
@@ -23,7 +23,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _applicationContext = applicationContext;
         }
 
-        public override IDictionary<string, object> Execute(DatabaseModel database)
+        public override InstallSetupResult Execute(DatabaseModel database)
         {
             if (CheckConnection(database) == false)
             {
@@ -91,6 +91,12 @@ namespace Umbraco.Web.Install.InstallSteps
         public override string View
         {
             get { return ShouldDisplayView() ? base.View : ""; }
+        }
+
+        public override bool RequiresExecution()
+        {
+            //TODO: We need to determine if we should run this based on whether the conn string is configured already
+            return true;
         }
 
         private bool ShouldDisplayView()

@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Install.Models
 {
+   
     /// <summary>
     /// Model containing all the install steps for setting up the UI
     /// </summary>
@@ -15,7 +16,7 @@ namespace Umbraco.Web.Install.Models
         }
 
         [DataMember(Name = "status")]
-        public InstallStatus Status { get; set; }
+        public InstallStatusType Status { get; set; }
 
         [DataMember(Name = "steps")]
         public IEnumerable<InstallSetupStep> Steps { get; set; } 

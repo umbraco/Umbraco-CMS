@@ -8,10 +8,10 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("Permissions", "")]
+    [InstallSetupStep("Permissions", 0)]
     internal class FilePermissionsStep : InstallSetupStep<object>
     {
-        public override IDictionary<string, object> Execute(object model)
+        public override InstallSetupResult Execute(object model)
         {
             //first validate file permissions
             var permissionsOk = true;
@@ -124,5 +124,9 @@ namespace Umbraco.Web.Install.InstallSteps
             }
         }
 
+        public override bool RequiresExecution()
+        {
+            return true;
+        }
     }
 }

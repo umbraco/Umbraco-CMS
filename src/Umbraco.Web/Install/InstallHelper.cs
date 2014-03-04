@@ -2,66 +2,64 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Linq;
+using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.UI;
+
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Install.InstallSteps;
 using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install
 {
-    internal static class InstallHelper
+    internal class InstallHelper
     {
+        private readonly UmbracoContext _umbContext;
+        private readonly InstallStatusType _status;
 
-        public static IEnumerable<InstallSetupStep> GetSteps(
-            UmbracoContext umbracoContext,
-            InstallStatus status)
+        internal InstallHelper(UmbracoContext umbContext)
+            : this(umbContext, GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace()
+                ? InstallStatusType.NewInstall
+                : InstallStatusType.Upgrade)
         {
-            //TODO: Add UserToken step to save our user token with Mother
-
-            var steps = new List<InstallSetupStep>(new InstallSetupStep[]
-            {
-                new FilePermissionsStep()
-                {
-                    ServerOrder = 0,
-                },
-                new UserStep(umbracoContext.Application, status)
-                {
-                    ServerOrder = 4,
-                },
-                new DatabaseConfigureStep(umbracoContext.Application)
-                {
-                    ServerOrder = 1,
-                },
-                new DatabaseInstallStep(umbracoContext.Application)
-                {
-                    ServerOrder = 2,
-                },
-                new DatabaseUpgradeStep(umbracoContext.Application)
-                {
-                    ServerOrder = 3,
-                },
-                new StarterKitDownloadStep(status)
-                {
-                    ServerOrder = 5,
-                },
-                new StarterKitInstallStep(status, umbracoContext.Application, umbracoContext.HttpContext)
-                {
-                    ServerOrder = 6,
-                },
-                new StarterKitCleanupStep(status)
-                {
-                    ServerOrder = 7,
-                },
-                new SetUmbracoVersionStep(umbracoContext.Application, umbracoContext.HttpContext)
-                {
-                    ServerOrder = 8
-                }
-            });
-
-            return steps;
         }
 
+        internal InstallHelper(UmbracoContext umbContext, InstallStatusType status)
+        {
+            _umbContext = umbContext;
+            _status = status;
+        }
+
+        public InstallStatusType GetStatus()
+        {
+            return _status;
+        }
+
+        /// <summary>
+        /// Get the installer steps
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// The step order returned here is how they will appear on the front-end
+        /// </remarks>
+        public IEnumerable<InstallSetupStep> GetSteps()
+        {
+            return new List<InstallSetupStep>
+            {
+                new FilePermissionsStep(),
+                new UserStep(_umbContext.Application, _status),
+                new DatabaseConfigureStep(_umbContext.Application),
+                new DatabaseInstallStep(_umbContext.Application),
+                new DatabaseUpgradeStep(_umbContext.Application, _status),
+                new StarterKitDownloadStep(_status),
+                new StarterKitInstallStep(_status, _umbContext.Application, _umbContext.HttpContext),
+                new StarterKitCleanupStep(_status),
+                new SetUmbracoVersionStep(_umbContext.Application, _umbContext.HttpContext),
+            };
+        }
+        
         //public static bool IsNewInstall
         //{
         //    get

@@ -308,6 +308,7 @@
     <Compile Include="Install\InstallSteps\DatabaseInstallStep.cs" />
     <Compile Include="Install\InstallSteps\DatabaseUpgradeStep.cs" />
     <Compile Include="Install\InstallSteps\FilePermissionsStep.cs" />
+    <Compile Include="Install\InstallSteps\MajorVersion7UpgradeReport.cs" />
     <Compile Include="Install\InstallSteps\SetUmbracoVersionStep.cs" />
     <Compile Include="Install\InstallSteps\StarterKitCleanupStep.cs" />
     <Compile Include="Install\InstallSteps\StarterKitDownloadStep.cs" />
@@ -316,6 +317,7 @@
     <Compile Include="Install\Models\DatabaseModel.cs" />
     <Compile Include="Install\Models\DatabaseType.cs" />
     <Compile Include="Install\Models\InstallSetup.cs" />
+    <Compile Include="Install\Models\InstallSetupResult.cs" />
     <Compile Include="Install\Models\InstallSetupStep.cs" />
     <Compile Include="Install\Models\InstallSetupStepAttribute.cs" />
     <Compile Include="Install\Models\InstallTrackingItem.cs" />
@@ -324,7 +326,7 @@
     <Compile Include="Install\Controllers\InstallApiController.cs" />
     <Compile Include="Install\Controllers\InstallController.cs" />
     <Compile Include="Install\InstallAuthorizeAttribute.cs" />
-    <Compile Include="Install\Models\InstallStatus.cs" />
+    <Compile Include="Install\Models\InstallStatusType.cs" />
     <Compile Include="MediaPropertyExtensions.cs" />
     <Compile Include="Models\ContentEditing\EntityTypeSearchResult.cs" />
     <Compile Include="Models\ContentEditing\ListViewAwareContentItemDisplayBase.cs" />

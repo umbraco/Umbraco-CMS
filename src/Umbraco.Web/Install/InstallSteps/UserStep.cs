@@ -8,13 +8,13 @@ using Umbraco.Web.Install.Models;
 namespace Umbraco.Web.Install.InstallSteps
 {
 
-    [InstallSetupStep("User", "user")]
+    [InstallSetupStep("User", "user", 4)]
     internal class UserStep : InstallSetupStep<UserModel>
     {
         private readonly ApplicationContext _applicationContext;
-        private readonly InstallStatus _status;
+        private readonly InstallStatusType _status;
 
-        public UserStep(ApplicationContext applicationContext, InstallStatus status)
+        public UserStep(ApplicationContext applicationContext, InstallStatusType status)
         {
             _applicationContext = applicationContext;
             _status = status;
@@ -33,7 +33,7 @@ namespace Umbraco.Web.Install.InstallSteps
             }
         }
 
-        public override IDictionary<string, object> Execute(UserModel user)
+        public override InstallSetupResult Execute(UserModel user)
         {
             var admin = _applicationContext.Services.UserService.GetUserById(0);
             if (admin == null)
@@ -71,7 +71,12 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override string View
         {
-            get { return _status == InstallStatus.NewInstall ? base.View : string.Empty; }
+            get { return _status == InstallStatusType.NewInstall ? base.View : string.Empty; }
+        }
+
+        public override bool RequiresExecution()
+        {
+            return _status == InstallStatusType.NewInstall;
         }
     }
 }

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Umbraco.Web.Install.Models
 {
-    public enum InstallStatus
+    public enum InstallStatusType
     {
         NewInstall,
         Upgrade,
@@ -23,4 +23,5 @@ namespace Umbraco.Web.Install.Models
         ///// </summary>
         //InProgress
     }
+
 }

@@ -7,14 +7,14 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("StarterKitInstall", "")]
+    [InstallSetupStep("StarterKitInstall", 7)]
     internal class StarterKitInstallStep : InstallSetupStep<object>
     {
-        private readonly InstallStatus _status;
+        private readonly InstallStatusType _status;
         private readonly ApplicationContext _applicationContext;
         private readonly HttpContextBase _httContext;
 
-        public StarterKitInstallStep(InstallStatus status, ApplicationContext applicationContext, HttpContextBase httContext)
+        public StarterKitInstallStep(InstallStatusType status, ApplicationContext applicationContext, HttpContextBase httContext)
         {
             _status = status;
             _applicationContext = applicationContext;
@@ -22,9 +22,9 @@ namespace Umbraco.Web.Install.InstallSteps
         }
 
 
-        public override IDictionary<string, object> Execute(object model)
+        public override InstallSetupResult Execute(object model)
         {
-            if (_status != InstallStatus.NewInstall) return null;
+            if (_status != InstallStatusType.NewInstall) return null;
 
             var installSteps = InstallStatusTracker.GetStatus();            
             //this step relies on the preious one completed - because it has stored some information we need
@@ -51,5 +51,9 @@ namespace Umbraco.Web.Install.InstallSteps
             installer.InstallBusinessLogic(manifestId, packageFile);            
         }
 
+        public override bool RequiresExecution()
+        {
+            return _status == InstallStatusType.NewInstall;
+        }
     }
 }

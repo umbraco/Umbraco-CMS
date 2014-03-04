@@ -7,19 +7,19 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("StarterKitCleanup", "")]
+    [InstallSetupStep("StarterKitCleanup", 8)]
     internal class StarterKitCleanupStep : InstallSetupStep<object>
     {
-        private readonly InstallStatus _status;
+        private readonly InstallStatusType _status;
 
-        public StarterKitCleanupStep(InstallStatus status)
+        public StarterKitCleanupStep(InstallStatusType status)
         {
             _status = status;
         }
 
-        public override IDictionary<string, object> Execute(object model)
+        public override InstallSetupResult Execute(object model)
         {
-            if (_status != InstallStatus.NewInstall) return null;
+            if (_status != InstallStatusType.NewInstall) return null;
 
             var installSteps = InstallStatusTracker.GetStatus();
             //this step relies on the preious one completed - because it has stored some information we need
@@ -46,5 +46,9 @@ namespace Umbraco.Web.Install.InstallSteps
             library.RefreshContent();
         }
 
+        public override bool RequiresExecution()
+        {
+            return _status == InstallStatusType.NewInstall;
+        }
     }
 }

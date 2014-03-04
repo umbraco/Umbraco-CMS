@@ -216,7 +216,7 @@ namespace Umbraco.Web
             IPublishedCaches publishedCaches,
             WebSecurity webSecurity,
             bool? preview = null)
-            : this(httpContext, applicationContext, new Lazy<IPublishedCaches>(() => publishedCaches), preview)
+            : this(httpContext, applicationContext, new Lazy<IPublishedCaches>(() => publishedCaches), webSecurity, preview)
         {
         }
 
@@ -226,11 +226,13 @@ namespace Umbraco.Web
         /// <param name="httpContext"></param>
         /// <param name="applicationContext"> </param>
         /// <param name="publishedCaches">The published caches.</param>
+        /// <param name="webSecurity"></param>
         /// <param name="preview">An optional value overriding detection of preview mode.</param>
         internal UmbracoContext(
 			HttpContextBase httpContext, 
 			ApplicationContext applicationContext,
             Lazy<IPublishedCaches> publishedCaches,
+            WebSecurity webSecurity,
             bool? preview = null)
         {
             //This ensures the dispose method is called when the request terminates, though

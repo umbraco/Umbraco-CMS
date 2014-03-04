@@ -8,7 +8,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("DatabaseInstall", "")]
+    [InstallSetupStep("DatabaseInstall", 4)]
     internal class DatabaseInstallStep : InstallSetupStep<object>
     {
         private readonly ApplicationContext _applicationContext;
@@ -18,16 +18,16 @@ namespace Umbraco.Web.Install.InstallSteps
             _applicationContext = applicationContext;
         }
 
-        public override IDictionary<string, object> Execute(object model)
+        public override InstallSetupResult Execute(object model)
         {
             var result = _applicationContext.DatabaseContext.CreateDatabaseSchemaAndData();
             if (result.RequiresUpgrade == false)
             {
                 HandleConnectionStrings();
-                return new Dictionary<string, object>
+                return new InstallSetupResult(new Dictionary<string, object>
                 {
                     {"upgrade", true}
-                };
+                });
             }   
             return null;
         }
@@ -45,6 +45,11 @@ namespace Umbraco.Web.Install.InstallSteps
                 LogHelper.Error<DatabaseInstallStep>("", ex);
                 throw ex;
             }
+        }
+
+        public override bool RequiresExecution()
+        {
+            return true;
         }
     }
 }

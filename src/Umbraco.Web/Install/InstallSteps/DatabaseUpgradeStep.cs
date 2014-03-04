@@ -7,18 +7,22 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("DatabaseUpgrade", "")]
+    [InstallSetupStep("DatabaseUpgrade", 5)]
     internal class DatabaseUpgradeStep : InstallSetupStep<object>
     {
         private readonly ApplicationContext _applicationContext;
+        private readonly InstallStatusType _status;
 
-        public DatabaseUpgradeStep(ApplicationContext applicationContext)
+        public DatabaseUpgradeStep(ApplicationContext applicationContext, InstallStatusType status)
         {
             _applicationContext = applicationContext;
+            _status = status;
         }
 
-        public override IDictionary<string, object> Execute(object model)
+        public override InstallSetupResult Execute(object model)
         {
+            if (_status == InstallStatusType.NewInstall) return null;
+
             var installSteps = InstallStatusTracker.GetStatus();
             //this step relies on the preious one completed - because it has stored some information we need
             if (installSteps.Any(x => x.Key == "DatabaseConfigure") == false)
@@ -40,5 +44,9 @@ namespace Umbraco.Web.Install.InstallSteps
             return null;
         }
 
+        public override bool RequiresExecution()
+        {
+            return _status != InstallStatusType.NewInstall;
+        }
     }
 }

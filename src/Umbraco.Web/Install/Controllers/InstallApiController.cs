@@ -48,31 +48,21 @@ namespace Umbraco.Web.Install.Controllers
         /// <returns></returns>
         public InstallSetup GetSetup()
         {
-            var status = new InstallSetup()
+            var helper = new InstallHelper(UmbracoContext);
+
+            var setup = new InstallSetup()
             {
-                Status = GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace()
-                    ? InstallStatus.NewInstall
-                    : InstallStatus.Upgrade
+                Status = helper.GetStatus()
             };
 
             //TODO: Check for user/site token
 
             var steps = new List<InstallSetupStep>();
 
-            if (status.Status == InstallStatus.NewInstall)
-            {
-                //The step order returned here is how they will appear on the front-end
-                steps.AddRange(InstallHelper.GetSteps(UmbracoContext, status.Status));
-                status.Steps = steps;
+            steps.AddRange(helper.GetSteps());
+            setup.Steps = steps;
 
-                //TODO: In case someone presses f5 during install, we will attempt to resume, in order to do this??
-            }
-            else
-            {
-                //TODO: Add steps for upgrades
-            }
-
-            return status;
+            return setup;
         }
 
         /// <summary>
@@ -117,7 +107,7 @@ namespace Umbraco.Web.Install.Controllers
                 if (stepStatus.Value.IsComplete == false)
                 {
                     JToken instruction = null;
-                    if (step.View.IsNullOrWhiteSpace() == false)
+                    if (step.HasUIElement)
                     {
                         //Since this is a UI instruction, we will extract the model from it
                         if (instructions.Any(x => x.Key == step.Name) == false)
@@ -126,13 +116,19 @@ namespace Umbraco.Web.Install.Controllers
                         }
                         instruction = instructions[step.Name];   
                     }
-                    
+
+                    //If this step doesn't require execution then continue to the next one.
+                    if (step.RequiresExecution() == false)
+                    {
+                        continue;
+                    }
+
                     try
                     {
                         var setupData = ExecuteStep(step, instruction);
 
                         //update the status
-                        InstallStatusTracker.SetComplete(step.Name, setupData);
+                        InstallStatusTracker.SetComplete(step.Name, setupData.SavedStepData);
                         return Json(new
                         {
                             complete = false,
@@ -155,7 +151,7 @@ namespace Umbraco.Web.Install.Controllers
             return Json(new { complete = true }, HttpStatusCode.OK);
         }
 
-        internal IDictionary<string, object> ExecuteStep(InstallSetupStep step, JToken instruction)
+        internal InstallSetupResult ExecuteStep(InstallSetupStep step, JToken instruction)
         {
             var model = instruction == null ? null : instruction.ToObject(step.StepType);
             var genericStepType = typeof(InstallSetupStep<>);
@@ -164,7 +160,7 @@ namespace Umbraco.Web.Install.Controllers
             try
             {
                 var method = typedStepType.GetMethods().Single(x => x.Name == "Execute");
-                return (IDictionary<string, object>)method.Invoke(step, new object[] { model });
+                return (InstallSetupResult)method.Invoke(step, new object[] { model });
             }
             catch (Exception ex)
             {
@@ -172,7 +168,7 @@ namespace Umbraco.Web.Install.Controllers
                 throw;
             }
         }
-
+        
         private HttpResponseMessage Json(object jsonObject, HttpStatusCode status)
         {
             var response = Request.CreateResponse(status);

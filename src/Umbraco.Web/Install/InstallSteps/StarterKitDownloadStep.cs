@@ -6,29 +6,29 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("StarterKitDownload", "starterKit")]
+    [InstallSetupStep("StarterKitDownload", "starterKit", 6)]
     internal class StarterKitDownloadStep : InstallSetupStep<Guid>
     {
-        private readonly InstallStatus _status;
+        private readonly InstallStatusType _status;
 
-        public StarterKitDownloadStep(InstallStatus status)
+        public StarterKitDownloadStep(InstallStatusType status)
         {
             _status = status;
         }
 
         private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
 
-        public override IDictionary<string, object> Execute(Guid starterKitId)
+        public override InstallSetupResult Execute(Guid starterKitId)
         {
-            if (_status != InstallStatus.NewInstall) return null;
+            if (_status != InstallStatusType.NewInstall) return null;
 
             var result = DownloadPackageFiles(starterKitId);
 
-            return new Dictionary<string, object>
+            return new InstallSetupResult(new Dictionary<string, object>
             {
                 {"manifestId", result.Item2},
                 {"packageFile", result.Item1}
-            };
+            });
         }
 
         private Tuple<string, int> DownloadPackageFiles(Guid kitGuid)
@@ -62,5 +62,9 @@ namespace Umbraco.Web.Install.InstallSteps
             
         }
 
+        public override bool RequiresExecution()
+        {
+            return _status == InstallStatusType.NewInstall;
+        }
     }
 }

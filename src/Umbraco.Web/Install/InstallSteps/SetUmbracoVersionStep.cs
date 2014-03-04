@@ -10,7 +10,7 @@ using GlobalSettings = umbraco.GlobalSettings;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("UmbracoVersion", "")]
+    [InstallSetupStep("UmbracoVersion", 9)]
     internal class SetUmbracoVersionStep : InstallSetupStep<object>
     {
         private readonly ApplicationContext _applicationContext;
@@ -22,7 +22,7 @@ namespace Umbraco.Web.Install.InstallSteps
             _httpContext = httpContext;
         }
 
-        public override IDictionary<string, object> Execute(object model)
+        public override InstallSetupResult Execute(object model)
         {
             // Update configurationStatus
             try
@@ -47,6 +47,11 @@ namespace Umbraco.Web.Install.InstallSteps
             //var security = new WebSecurity(new HttpContextWrapper(Context), ApplicationContext.Current);
             //security.ClearCurrentLogin();
             return null;
+        }
+
+        public override bool RequiresExecution()
+        {
+            return true;
         }
     }
 }
