@@ -3,18 +3,18 @@ module.exports = function (grunt) {
   // Default task.
   grunt.registerTask('default', ['jshint:dev','build','karma:unit']);
   grunt.registerTask('dev', ['jshint:dev', 'build', 'webserver', 'open:dev', 'watch']);
-  
+
   //run by the watch task
   grunt.registerTask('watch-js', ['jshint:dev','concat','copy:app','copy:mocks','copy:packages','copy:vs','karma:unit']);
   grunt.registerTask('watch-less', ['recess:build','recess:installer','copy:assets','copy:vs']);
   grunt.registerTask('watch-html', ['copy:views', 'copy:vs']);
   grunt.registerTask('watch-packages', ['copy:packages']);
-  grunt.registerTask('watch-installer', ['concat:install','concat:installJs','copy:installer']);
+  grunt.registerTask('watch-installer', ['concat:install','concat:installJs','copy:installer', 'copy:vs']);
   grunt.registerTask('watch-test', ['jshint:dev', 'karma:unit']);
 
   //triggered from grunt dev or grunt
   grunt.registerTask('build', ['clean','concat','recess:min','recess:installer','copy']);
-  
+
   //utillity tasks
   grunt.registerTask('docs', ['ngdocs']);
   grunt.registerTask('webserver', ['connect:devserver']);
@@ -220,7 +220,7 @@ module.exports = function (grunt) {
         }
       }
     },
-    
+
     recess: {
       build: {
         files: {
@@ -321,7 +321,7 @@ module.exports = function (grunt) {
              //NOTE: we ignore tabs vs spaces because enforcing that causes lots of errors depending on the text editor being used
            smarttabs: true,
            globals:{}
-         } 
+         }
       },
       build:{
          files:['<%= src.prod %>'],
@@ -345,13 +345,13 @@ module.exports = function (grunt) {
            smarttabs: true,
            globalstrict:true,
            globals:{$:false, jQuery:false,define:false,require:false,window:false}
-         } 
+         }
       }
     }
   });
-  
 
-  
+
+
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-clean');
@@ -361,7 +361,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-recess');
 
   grunt.loadNpmTasks('grunt-karma');
-  
+
   grunt.loadNpmTasks('grunt-open');
   grunt.loadNpmTasks('grunt-contrib-connect');
 

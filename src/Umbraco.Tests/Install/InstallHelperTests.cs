@@ -34,9 +34,9 @@ namespace Umbraco.Tests.Install
                 appCtx,
                 true);
 
-            var helper = new InstallHelper(umbCtx, InstallStatusType.NewInstall);
+            var helper = new InstallHelper(umbCtx);
 
-            var steps = helper.GetSteps().ToArray();
+            var steps = helper.GetAllSteps().ToArray();
 
             var expected = new[]
             {
@@ -65,9 +65,9 @@ namespace Umbraco.Tests.Install
                 appCtx,
                 true);
 
-            var helper = new InstallHelper(umbCtx, InstallStatusType.NewInstall);
+            var helper = new InstallHelper(umbCtx);
 
-            var steps = helper.GetSteps().ToArray();
+            var steps = helper.GetAllSteps().ToArray();
             
             //for new installs 2, don't require execution
             Assert.AreEqual(2, steps.Count(x => x.RequiresExecution() == false));
@@ -86,9 +86,9 @@ namespace Umbraco.Tests.Install
                 appCtx,
                 true);
 
-            var helper = new InstallHelper(umbCtx, InstallStatusType.Upgrade);
-
-            var steps = helper.GetSteps().ToArray();
+            var helper = new InstallHelper(umbCtx);
+           
+            var steps = helper.GetAllSteps().ToArray();
 
             //for upgrades 4, don't require execution 
             Assert.AreEqual(4, steps.Count(x => x.RequiresExecution() == false));

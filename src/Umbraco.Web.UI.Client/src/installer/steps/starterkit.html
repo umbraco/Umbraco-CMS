@@ -1,8 +1,9 @@
 <div ng-controller="Umbraco.Installer.PackagesController">
 	<h1>Install a starter website</h1>
+
 	<p>
-		Installing a starter website helps you learn how Umbraco works, and gives you a solid 
-		a simple foundation to build ontop of. 	
+		Installing a starter website helps you learn how Umbraco works, and gives you a solid
+		and simple foundation to build on top of.
 	</p>
 
 	<ul class="thumbnails">
@@ -10,8 +11,9 @@
 	    	<a href ng-click="installer.current.model = package.id; install()" class="thumbnail">
 	      		<img ng-src="http://our.umbraco.org{{package.thumbnail}}" alt="{{package.name}}">
 	    	</a>
-	  	</li>
+	  </li>
 	</ul>
 
-	<a href ng-click="forward()" class="btn btn-link">No thanks, I do not want to install a starter website</a> 
+
+	<a href ng-click="install()" class="btn btn-link">No thanks, I do not want to install a starter website</a>
 </div>

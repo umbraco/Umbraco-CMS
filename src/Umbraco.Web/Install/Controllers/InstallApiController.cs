@@ -180,18 +180,28 @@ namespace Umbraco.Web.Install.Controllers
                             ex = ex.InnerException;
                         }
 
+                        //return custom view if we have an install exception
                         var installException = ex as InstallException;
                         if (installException != null)
                         {
                             return Json(new
                             {
+                                step = step.Name,
                                 view = installException.View,
                                 model = installException.ViewModel,
                                 message = installException.Message
                             }, HttpStatusCode.BadRequest);
                         }
 
-                        return Request.CreateValidationErrorResponse("An error occurred executing the step: " + step.Name + ". Error: " + ex.Message);
+                        //return standard view + step and message to display generic message
+                        return Json(new
+                        {
+                            step = step.Name,
+                            view = "error",
+                            message = ex.Message
+                        }, HttpStatusCode.BadRequest);
+
+                        //return Request.CreateValidationErrorResponse("An error occurred executing the step: " + step.Name + ". Error: " + ex.Message);
                     }
                 }
             }
