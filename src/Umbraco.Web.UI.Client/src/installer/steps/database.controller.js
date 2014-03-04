@@ -1,3 +1,7 @@
-angular.module("umbraco.install").controller("Umbraco.Installer.DataBaseController", function(){
-	alert("we are in your database");
+angular.module("umbraco.install").controller("Umbraco.Installer.DataBaseController", function($scope, installerService){
+	$scope.validateAndForward = function(){
+		if(this.myForm.$valid){
+			installerService.forward();
+		}
+	};
 });

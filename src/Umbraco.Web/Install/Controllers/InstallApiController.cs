@@ -83,6 +83,19 @@ namespace Umbraco.Web.Install.Controllers
             throw new NotImplementedException();
         }
 
+        public IEnumerable<Package> GetPackages()
+        {
+            var r = new org.umbraco.our.Repository();
+            var modules = r.Modules();
+
+            List<Package> retval = new List<Package>();
+
+            foreach (var package in modules)
+                retval.Add(new Package() { Id = package.RepoGuid, Name = package.Text, Thumbnail = package.Thumbnail });
+
+            return retval;
+        }
+
         /// <summary>
         /// Does the install
         /// </summary>
@@ -106,6 +119,7 @@ namespace Umbraco.Web.Install.Controllers
                 //if it is not complete, then we need to execute it
                 if (stepStatus.Value.IsComplete == false)
                 {
+                    
                     JToken instruction = null;
                     if (step.HasUIElement)
                     {
@@ -129,10 +143,11 @@ namespace Umbraco.Web.Install.Controllers
 
                         //update the status
                         InstallStatusTracker.SetComplete(step.Name, setupData.SavedStepData);
+
                         return Json(new
                         {
                             complete = false,
-                            stepCompleted = step.Name
+                            stepCompleted = step.Name                     
                         }, HttpStatusCode.OK);
                     }
                     catch (InstallException iex)

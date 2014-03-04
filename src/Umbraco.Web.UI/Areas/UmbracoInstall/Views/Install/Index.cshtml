@@ -13,7 +13,6 @@
     <title>Install Umbraco</title>
     <link rel="stylesheet" href="assets/css/installer.css" />
 </head>
-
     
 <body ng-class="{touch:touchDevice}" ng-controller="Umbraco.InstallerController" id="umbracoInstallPageBody">
 
@@ -21,8 +20,14 @@
 
     <div class="umb-loader" id="loader" ng-if="installer.loading"></div>
     
-    <div id="installer" class="absolute-center clearfix" ng-if="installer.current">
-        <div ng-include="installer.current.view"></div>
+    <div id="overlay" ng-animate="'fade'" ng-show="installer.done"></div>
+
+    <div id="installer" class="absolute-center clearfix"
+        ng-cloak 
+        ng-animate="'fade'" 
+        ng-show="installer.installing">
+        <div ng-if="installer.current" ng-include="installer.current.view"></div>
+        <h2 ng-animate="'fade'" ng-show="installer.feedback">{{installer.feedback}}...</h2>
     </div>
 
     <script type="text/javascript">
@@ -30,26 +35,11 @@
         Umbraco.Sys = {};
         Umbraco.Sys.ServerVariables = {
             "installApiBaseUrl": "@ViewBag.InstallApiBaseUrl",
-            "defaultStarterKit": "@ViewBag.DefaultPackageId"
+            "defaultStarterKit": "@ViewBag.DefaultPackageId",
+            "umbracoBaseUrl": "@ViewBag.UmbracoBaseFolder"
         };
     </script>
     <script src="lib/yepnope/yepnope.min.js"></script>
     <script src="js/install.loader.js"></script>
-</body>
-</html>
-
-
-
-<!DOCTYPE html>
-
-<html>
-<head>
-    <title></title>
-</head>
-<body>
-    <div>
-        Hello @ViewBag.UmbracoBaseFolder
-    </div>
-    
 </body>
 </html>

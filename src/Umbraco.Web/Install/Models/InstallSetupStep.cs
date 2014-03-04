@@ -40,6 +40,7 @@ namespace Umbraco.Web.Install.Models
             Name = att.Name;
             View = att.View;
             ServerOrder = att.ServerOrder;
+            Description = att.Description;
         }
 
         [DataMember(Name = "name")]
@@ -47,6 +48,9 @@ namespace Umbraco.Web.Install.Models
 
         [DataMember(Name = "view")]
         public virtual string View { get; private set; }
+
+        [DataMember(Name = "description")]
+        public string Description { get; private set; }
         
         /// <summary>
         /// Determines if this step needs to execute given it's ctor arguments
