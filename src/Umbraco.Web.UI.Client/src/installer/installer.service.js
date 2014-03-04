@@ -16,6 +16,18 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
         }		
 	};
 
+    /* 
+        Returns the description for the step at a given index based on the order of the serverOrder of steps
+        Since they don't execute on the server in the order that they are displayed in the UI.
+    */
+	function getDescriptionForStepAtIndex(steps, index) {
+	    var sorted = _.sortBy(steps, "serverOrder");
+	    if (sorted[index]) {
+	        return sorted[index].description;
+	    }
+	    return null;
+	}
+
 	var service = {
 
 		status : _status,
@@ -105,7 +117,7 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 			service.status.loading = true;
 
 			var feedback = 0;
-			service.status.feedback = service.status.steps[0].description;
+			service.status.feedback = getDescriptionForStepAtIndex(service.status.steps, 0);
 
 			function processInstallStep(){
 				$http.post(Umbraco.Sys.ServerVariables.installApiBaseUrl + "PostPerformInstall", 
@@ -113,9 +125,9 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 						if(!response.data.complete){
 							feedback++;
 
-							var step = service.status.steps[feedback];
-							if(step){
-								service.status.feedback = step.description;
+							var desc = getDescriptionForStepAtIndex(service.status.steps, feedback);							
+							if (desc) {
+							    service.status.feedback = desc;
 							}
 
 							processInstallStep();
