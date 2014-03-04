@@ -88,8 +88,8 @@ namespace Umbraco.Tests.Install
 
             var steps = helper.GetSteps().ToArray();
 
-            //for new installs 4, don't require execution
-            Assert.AreEqual(4, steps.Count(x => x.RequiresExecution() == false));
+            //for upgrades 5, don't require execution (the db context is not configured so the upgrade report will not execute either)
+            Assert.AreEqual(5, steps.Count(x => x.RequiresExecution() == false));
 
         }
 

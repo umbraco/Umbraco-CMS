@@ -43,9 +43,17 @@ namespace Umbraco.Web.Install.InstallSteps
                 return false;
             }
 
-            //we cannot run this step if the db is not configured.
-            if (_applicationContext.DatabaseContext.IsDatabaseConfigured == false)
+            try
             {
+                //we cannot run this step if the db is not configured.
+                if (_applicationContext.DatabaseContext.IsDatabaseConfigured == false)
+                {
+                    return false;
+                }
+            }
+            catch (InvalidOperationException)
+            {
+                //if there is no db context
                 return false;
             }
 

@@ -50,6 +50,7 @@ namespace Umbraco.Web.Install
             {
                 new FilePermissionsStep(),
                 new UserStep(_umbContext.Application, _status),
+                new MajorVersion7UpgradeReport(_umbContext.Application, _status),
                 new DatabaseConfigureStep(_umbContext.Application),
                 new DatabaseInstallStep(_umbContext.Application),
                 new DatabaseUpgradeStep(_umbContext.Application, _status),

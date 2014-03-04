@@ -120,10 +120,15 @@ namespace Umbraco.Core
             var path = Path.Combine(GlobalSettings.FullpathToRoot, "App_Data", "Umbraco.sdf");
             if (File.Exists(path) == false)
             {
-                using (var engine = new SqlCeEngine(connectionString))
-                {
-                    engine.CreateDatabase();    
-                }
+                var engine = new SqlCeEngine(connectionString);
+                engine.CreateDatabase();
+
+                // SD: Pretty sure this should be in a using clause but i don't want to cause unknown side-effects here
+                // since it's been like this for quite some time
+                //using (var engine = new SqlCeEngine(connectionString))
+                //{
+                //    engine.CreateDatabase();    
+                //}
             }
 
             Initialize(providerName);
