@@ -2,11 +2,13 @@ using System.Collections.Generic;
 
 namespace Umbraco.Web.Install.Models
 {
+    /// <summary>
+    /// The object returned from each installation step
+    /// </summary>
     public class InstallSetupResult
     {
         public InstallSetupResult()
-        {
-            
+        {            
         }
 
         public InstallSetupResult(IDictionary<string, object> savedStepData, string view, object viewModel = null)

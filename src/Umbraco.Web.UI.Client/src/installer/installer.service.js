@@ -28,6 +28,14 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 	    return null;
 	}
 
+    /* Returns the description for the given step name */ 
+	function getDescriptionForStepName(steps, name) {
+	    var found = _.find(steps, function(i) {
+	        return i.name == name;
+	    });
+	    return (found) ? found.description : null;
+	}
+
 	var service = {
 
 		status : _status,
@@ -125,7 +133,7 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 						if(!response.data.complete){
 							feedback++;
 
-							var desc = getDescriptionForStepAtIndex(service.status.steps, feedback);							
+							var desc = getDescriptionForStepName(service.status.steps, response.data.nextStep);
 							if (desc) {
 							    service.status.feedback = desc;
 							}

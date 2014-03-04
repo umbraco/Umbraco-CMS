@@ -59,7 +59,7 @@ namespace Umbraco.Web.Install.Controllers
         public InstallSetup GetSetup()
         {
             var setup = new InstallSetup();
-            
+
             //TODO: Check for user/site token
 
             var steps = new List<InstallSetupStep>();
@@ -97,11 +97,11 @@ namespace Umbraco.Web.Install.Controllers
         {
             var r = new org.umbraco.our.Repository();
             var modules = r.Modules();
-            
+
             return modules.Select(package => new Package()
             {
-                Id = package.RepoGuid, 
-                Name = package.Text, 
+                Id = package.RepoGuid,
+                Name = package.Text,
                 Thumbnail = package.Thumbnail
             });
         }
@@ -110,7 +110,7 @@ namespace Umbraco.Web.Install.Controllers
         /// Does the install
         /// </summary>
         /// <returns></returns>
-        public HttpResponseMessage PostPerformInstall(InstallInstructions installModel)
+        public InstallProgressResultModel PostPerformInstall(InstallInstructions installModel)
         {
             if (installModel == null) throw new ArgumentNullException("installModel");
 
@@ -121,8 +121,87 @@ namespace Umbraco.Web.Install.Controllers
                 status = InstallStatusTracker.InitializeFromFile(installModel.InstallId).ToArray();
             }
 
-            foreach (var stepStatus in status)
+            //var queue = new Queue<InstallTrackingItem>(status);
+            //while (queue.Count > 0)
+            //{
+            //    var stepStatus = queue.Dequeue();
+
+            //    //if it is not complete, then we need to execute it
+            //    if (stepStatus.IsComplete == false)
+            //    {
+            //        var step = InstallHelper.GetAllSteps().Single(x => x.Name == stepStatus.Name);
+
+            //        JToken instruction = null;
+            //        if (step.HasUIElement)
+            //        {
+            //            //Since this is a UI instruction, we will extract the model from it
+            //            if (installModel.Instructions.Any(x => x.Key == step.Name) == false)
+            //            {
+            //                throw new HttpResponseException(Request.CreateValidationErrorResponse("No instruction defined for step: " + step.Name));
+            //            }
+            //            instruction = installModel.Instructions[step.Name];
+            //        }
+
+            //        //If this step doesn't require execution then continue to the next one.
+            //        if (step.RequiresExecution() == false)
+            //        {
+            //            //set this as complete and continue
+            //            InstallStatusTracker.SetComplete(installModel.InstallId, stepStatus.Name, null);
+            //            continue;
+            //        }
+
+            //        try
+            //        {
+            //            var setupData = ExecuteStep(step, instruction);
+
+            //            //update the status
+            //            InstallStatusTracker.SetComplete(installModel.InstallId, step.Name, setupData != null ? setupData.SavedStepData : null);
+
+            //            //get the next step if there is one
+
+            //            var nextStep = "";
+            //            if ((index + 1) < status.Length)
+            //            {
+
+            //                nextStep = status[index + 1].Name;
+            //            }
+
+            //            //check if there's a custom view to return for this step
+            //            if (setupData != null && setupData.View.IsNullOrWhiteSpace() == false)
+            //            {
+            //                return new InstallProgressResultModel(false, step.Name, nextStep, setupData.View, setupData.ViewModel);
+            //            }
+
+            //            return new InstallProgressResultModel(false, step.Name, nextStep);
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            if (ex is TargetInvocationException && ex.InnerException != null)
+            //            {
+            //                ex = ex.InnerException;
+            //            }
+
+            //            var installException = ex as InstallException;
+            //            if (installException != null)
+            //            {
+            //                throw new HttpResponseException(Request.CreateValidationErrorResponse(new
+            //                {
+            //                    view = installException.View,
+            //                    model = installException.ViewModel,
+            //                    message = installException.Message
+            //                }));
+            //            }
+
+            //            throw new HttpResponseException(
+            //                Request.CreateValidationErrorResponse("An error occurred executing the step: " + step.Name + ". Error: " + ex.Message));
+            //        }
+            //    }
+
+            //}
+
+            for (var index = 0; index < status.Length; index++)
             {
+                var stepStatus = status[index];
                 //if it is not complete, then we need to execute it
                 if (stepStatus.IsComplete == false)
                 {
@@ -134,7 +213,7 @@ namespace Umbraco.Web.Install.Controllers
                         //Since this is a UI instruction, we will extract the model from it
                         if (installModel.Instructions.Any(x => x.Key == step.Name) == false)
                         {
-                            return Request.CreateValidationErrorResponse("No instruction defined for step: " + step.Name);
+                            throw new HttpResponseException(Request.CreateValidationErrorResponse("No instruction defined for step: " + step.Name));
                         }
                         instruction = installModel.Instructions[step.Name];
                     }
@@ -143,7 +222,7 @@ namespace Umbraco.Web.Install.Controllers
                     if (step.RequiresExecution() == false)
                     {
                         //set this as complete and continue
-                        InstallStatusTracker.SetComplete(installModel.InstallId, step.Name, null);
+                        InstallStatusTracker.SetComplete(installModel.InstallId, stepStatus.Name, null);
                         continue;
                     }
 
@@ -154,24 +233,21 @@ namespace Umbraco.Web.Install.Controllers
                         //update the status
                         InstallStatusTracker.SetComplete(installModel.InstallId, step.Name, setupData != null ? setupData.SavedStepData : null);
 
+                        //get the next step if there is one
+                        var nextStep = "";
+                        if ((index + 1) < status.Length)
+                        {
+
+                            nextStep = status[index + 1].Name;
+                        }
+
                         //check if there's a custom view to return for this step
                         if (setupData != null && setupData.View.IsNullOrWhiteSpace() == false)
                         {
-                            return Json(new
-                            {
-                                complete = false,
-                                stepCompleted = step.Name,
-                                view = setupData.View,
-                                model = setupData.ViewModel
-                            }, HttpStatusCode.OK);
+                            return new InstallProgressResultModel(false, step.Name, nextStep, setupData.View, setupData.ViewModel);
                         }
 
-                        return Json(new
-                        {
-                            complete = false,
-                            stepCompleted = step.Name
-                        }, HttpStatusCode.OK);
-
+                        return new InstallProgressResultModel(false, step.Name, nextStep);
                     }
                     catch (Exception ex)
                     {
@@ -183,23 +259,30 @@ namespace Umbraco.Web.Install.Controllers
                         var installException = ex as InstallException;
                         if (installException != null)
                         {
-                            return Json(new
+                            throw new HttpResponseException(Request.CreateValidationErrorResponse(new
                             {
                                 view = installException.View,
                                 model = installException.ViewModel,
                                 message = installException.Message
-                            }, HttpStatusCode.BadRequest);
+                            }));
                         }
 
-                        return Request.CreateValidationErrorResponse("An error occurred executing the step: " + step.Name + ". Error: " + ex.Message);
+                        throw new HttpResponseException(
+                            Request.CreateValidationErrorResponse("An error occurred executing the step: " + step.Name + ". Error: " + ex.Message));
                     }
                 }
             }
 
             InstallStatusTracker.Reset();
+            return new InstallProgressResultModel(true, "", "");
 
-            return Json(new { complete = true }, HttpStatusCode.OK);
+            //return Json(new { complete = true }, HttpStatusCode.OK);
         }
+
+        //private InstallSetupStep IterateNextRequiredStep(Queue<InstallTrackingItem> queue)
+        //{
+        //    var step = InstallHelper.GetAllSteps().Single(x => x.Name == stepStatus.Name);
+        //}
 
         internal InstallSetupResult ExecuteStep(InstallSetupStep step, JToken instruction)
         {
@@ -221,7 +304,7 @@ namespace Umbraco.Web.Install.Controllers
                 }
             }
         }
-        
+
         private HttpResponseMessage Json(object jsonObject, HttpStatusCode status)
         {
             var response = Request.CreateResponse(status);
@@ -229,6 +312,6 @@ namespace Umbraco.Web.Install.Controllers
             response.Content = new StringContent(json.ToString(), Encoding.UTF8, "application/json");
             return response;
         }
-        
+
     }
 }
