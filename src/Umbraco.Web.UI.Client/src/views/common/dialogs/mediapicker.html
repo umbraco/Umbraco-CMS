@@ -26,7 +26,7 @@ data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupl
 
 		<div class="row">
 			<ul class="breadcrumb span12">
-				<li><a href ng-click="gotoFolder()" prevent-default>Media</a> / </li>
+				<li ng-hide="startNodeId != -1"><a href ng-click="gotoFolder()" prevent-default>Media</a> / </li>
 				
 				<li ng-repeat="item in path">
 					<a href ng-click="gotoFolder(item)" prevent-default>{{item.name}}</a> / 
