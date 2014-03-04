@@ -12,17 +12,19 @@ namespace Umbraco.Web.Install
     internal class InstallException : Exception
     {
         private readonly string _message;
-        public object Result { get; set; }
+        public string View { get; private set; }
+        public object ViewModel { get; private set; }
 
         public override string Message
         {
             get { return _message; }
         }
 
-        public InstallException(string message, object result)
+        public InstallException(string message, string view, object viewModel)
         {
             _message = message;
-            Result = result;
+            View = view;
+            ViewModel = viewModel;
         }
     }
 }

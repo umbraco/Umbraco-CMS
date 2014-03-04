@@ -83,7 +83,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             if (permissionsOk == false)
             {
-                throw new InstallException("Permission check failed", new { view = "permissionsReport", errors = report });    
+                throw new InstallException("Permission check failed", "permissionsReport", new { errors = report });    
             }
             
             return null;

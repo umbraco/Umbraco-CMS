@@ -1,9 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Umbraco.Web.Install.Models
 {
-   
     /// <summary>
     /// Model containing all the install steps for setting up the UI
     /// </summary>
@@ -13,7 +13,11 @@ namespace Umbraco.Web.Install.Models
         public InstallSetup()
         {
             Steps = new List<InstallSetupStep>();
+            InstallationId = Guid.NewGuid();
         }
+
+        [DataMember(Name = "installId")]
+        public Guid InstallationId { get; private set; }
 
         [DataMember(Name = "status")]
         public InstallStatusType Status { get; set; }

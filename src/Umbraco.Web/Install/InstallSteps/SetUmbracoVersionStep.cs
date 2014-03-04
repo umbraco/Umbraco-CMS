@@ -10,7 +10,7 @@ using GlobalSettings = umbraco.GlobalSettings;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("UmbracoVersion", 9, "Wrapping up the system configuration")]
+    [InstallSetupStep("UmbracoVersion", 50, "Wrapping up the system configuration")]
     internal class SetUmbracoVersionStep : InstallSetupStep<object>
     {
         private readonly ApplicationContext _applicationContext;

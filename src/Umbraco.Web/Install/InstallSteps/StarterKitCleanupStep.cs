@@ -7,7 +7,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("StarterKitCleanup", 8, "Cleaning up temporary files")]
+    [InstallSetupStep("StarterKitCleanup", 32, "Cleaning up temporary files")]
     internal class StarterKitCleanupStep : InstallSetupStep<object>
     {
         private readonly InstallStatusType _status;
@@ -21,13 +21,13 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             if (_status != InstallStatusType.NewInstall) return null;
 
-            var installSteps = InstallStatusTracker.GetStatus();
+            var installSteps = InstallStatusTracker.GetStatus().ToArray();
             //this step relies on the preious one completed - because it has stored some information we need
-            if (installSteps.Any(x => x.Key == "StarterKitDownload") == false)
+            if (installSteps.Any(x => x.Name == "StarterKitDownload") == false)
             {
                 throw new InvalidOperationException("Could not find previous step: StarterKitDownload of the installation, package install cannot continue");
             }
-            var previousStep = installSteps["StarterKitDownload"];
+            var previousStep = installSteps.Single(x => x.Name == "StarterKitDownload");
             var manifestId = Convert.ToInt32(previousStep.AdditionalData["manifestId"]);
             var packageFile = (string)previousStep.AdditionalData["packageFile"];
 

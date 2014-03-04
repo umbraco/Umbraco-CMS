@@ -316,6 +316,7 @@
     <Compile Include="Install\InstallSteps\UserStep.cs" />
     <Compile Include="Install\Models\DatabaseModel.cs" />
     <Compile Include="Install\Models\DatabaseType.cs" />
+    <Compile Include="Install\Models\InstallInstructions.cs" />
     <Compile Include="Install\Models\InstallSetup.cs" />
     <Compile Include="Install\Models\InstallSetupResult.cs" />
     <Compile Include="Install\Models\InstallSetupStep.cs" />

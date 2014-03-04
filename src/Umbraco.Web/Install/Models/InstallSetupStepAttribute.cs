@@ -17,6 +17,7 @@ namespace Umbraco.Web.Install.Models
             Name = name;
             View = string.Empty;
             ServerOrder = serverOrder;
+            Description = description;
         }
 
         public string Name { get; private set; }

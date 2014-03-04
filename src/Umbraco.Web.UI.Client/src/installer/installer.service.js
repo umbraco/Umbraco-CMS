@@ -9,8 +9,11 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 
 
 	var _installerModel = {
-		DatabaseConfigure: {dbType: 0},
-		StarterKitDownload: "69e44beb-15ff-4cee-8b64-0a7dae498657"
+	    installId: undefined,
+        instructions: {
+            DatabaseConfigure: { dbType: 0 },
+            StarterKitDownload: Umbraco.Sys.ServerVariables.defaultStarterKit
+        }		
 	};
 
 	var service = {
@@ -31,6 +34,7 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 				service.getSteps().then(function(response){
 					service.status.steps = response.data.steps;
 					service.status.index = 0;
+					_installerModel.installId = response.data.installId;
 					service.findNextStep();
 					
 					$timeout(function(){
@@ -57,8 +61,8 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 		},
 
 		findNextStep : function(){
-			var step = _.find(service.status.steps, function(step, index){ 
-				if(step.view && index >= service.status.index){
+			var step = _.find(service.status.steps, function(s, index){ 
+				if(s.view && index >= service.status.index){
 					service.status.index = index;
 					return true;
 				}
@@ -80,7 +84,7 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 		}, 
 
 		storeCurrentStep : function(){
-			_installerModel[service.status.current.name] = service.status.current.model;
+			_installerModel.instructions[service.status.current.name] = service.status.current.model;
 		},
 
 		forward : function(){
@@ -100,16 +104,16 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 			service.status.feedback = [];
 			service.status.loading = true;
 
-			var _feedback = 0;
+			var feedback = 0;
 			service.status.feedback = service.status.steps[0].description;
 
 			function processInstallStep(){
 				$http.post(Umbraco.Sys.ServerVariables.installApiBaseUrl + "PostPerformInstall", 
 					_installerModel).then(function(response){
 						if(!response.data.complete){
-							_feedback++;
+							feedback++;
 
-							var step = service.status.steps[_feedback];
+							var step = service.status.steps[feedback];
 							if(step){
 								service.status.feedback = step.description;
 							}

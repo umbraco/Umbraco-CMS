@@ -7,7 +7,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("DatabaseUpgrade", 5, "Upgrading your database to the latest version")]
+    [InstallSetupStep("DatabaseUpgrade", 12, "Upgrading your database to the latest version")]
     internal class DatabaseUpgradeStep : InstallSetupStep<object>
     {
         private readonly ApplicationContext _applicationContext;
@@ -23,13 +23,13 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             if (_status == InstallStatusType.NewInstall) return null;
 
-            var installSteps = InstallStatusTracker.GetStatus();
+            var installSteps = InstallStatusTracker.GetStatus().ToArray();
             //this step relies on the preious one completed - because it has stored some information we need
-            if (installSteps.Any(x => x.Key == "DatabaseConfigure") == false)
+            if (installSteps.Any(x => x.Name == "DatabaseConfigure") == false)
             {
                 throw new InvalidOperationException("Could not find previous step: DatabaseConfigure of the installation, package install cannot continue");
             }
-            var previousStep = installSteps["DatabaseConfigure"];
+            var previousStep = installSteps.Single(x => x.Name == "DatabaseConfigure");
             var upgrade = previousStep.AdditionalData.ContainsKey("upgrade");
 
             if (upgrade)

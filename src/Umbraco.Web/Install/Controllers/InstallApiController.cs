@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Text;
 using System.Web.Http;
 using Newtonsoft.Json;
@@ -42,24 +43,31 @@ namespace Umbraco.Web.Install.Controllers
             get { return UmbracoContext.Application; }
         }
 
+        private InstallHelper _helper;
+        internal InstallHelper InstallHelper
+        {
+            get
+            {
+                return _helper ?? (_helper = new InstallHelper(UmbracoContext));
+            }
+        }
+
         /// <summary>
         /// Gets the install setup
         /// </summary>
         /// <returns></returns>
         public InstallSetup GetSetup()
         {
-            var helper = new InstallHelper(UmbracoContext);
-
             var setup = new InstallSetup()
             {
-                Status = helper.GetStatus()
+                Status = InstallHelper.GetStatus()
             };
 
             //TODO: Check for user/site token
 
             var steps = new List<InstallSetupStep>();
 
-            steps.AddRange(helper.GetSteps());
+            steps.AddRange(InstallHelper.GetSteps().Where(x => x.RequiresExecution()));
             setup.Steps = steps;
 
             return setup;
@@ -87,53 +95,52 @@ namespace Umbraco.Web.Install.Controllers
         {
             var r = new org.umbraco.our.Repository();
             var modules = r.Modules();
-
-            List<Package> retval = new List<Package>();
-
-            foreach (var package in modules)
-                retval.Add(new Package() { Id = package.RepoGuid, Name = package.Text, Thumbnail = package.Thumbnail });
-
-            return retval;
+            
+            return modules.Select(package => new Package()
+            {
+                Id = package.RepoGuid, 
+                Name = package.Text, 
+                Thumbnail = package.Thumbnail
+            });
         }
 
         /// <summary>
         /// Does the install
         /// </summary>
         /// <returns></returns>
-        public HttpResponseMessage PostPerformInstall(IDictionary<string, JToken> instructions)
+        public HttpResponseMessage PostPerformInstall(InstallInstructions installModel)
         {
-            if (instructions == null) throw new ArgumentNullException("instructions");
+            if (installModel == null) throw new ArgumentNullException("installModel");
 
-            var steps = GetSetup().Steps.OrderBy(x => x.ServerOrder).ToArray();
-
-            var status = InstallStatusTracker.GetStatus();
-            if (status.Count == 0)
+            var status = InstallStatusTracker.GetStatus().ToArray();
+            if (status.Any() == false)
             {
-                status = InstallStatusTracker.Initialize(steps);
+                status = InstallStatusTracker.Initialize(installModel.InstallId, InstallHelper.GetSteps()).ToArray();
             }
 
-            foreach (var step in steps)
+            foreach (var stepStatus in status)
             {
-                var step1 = step;
-                var stepStatus = status.Single(x => x.Key == step1.Name);
                 //if it is not complete, then we need to execute it
-                if (stepStatus.Value.IsComplete == false)
+                if (stepStatus.IsComplete == false)
                 {
-                    
+                    var step = InstallHelper.GetSteps().Single(x => x.Name == stepStatus.Name);
+
                     JToken instruction = null;
                     if (step.HasUIElement)
                     {
                         //Since this is a UI instruction, we will extract the model from it
-                        if (instructions.Any(x => x.Key == step.Name) == false)
+                        if (installModel.Instructions.Any(x => x.Key == step.Name) == false)
                         {
                             return Request.CreateValidationErrorResponse("No instruction defined for step: " + step.Name);
                         }
-                        instruction = instructions[step.Name];   
+                        instruction = installModel.Instructions[step.Name];
                     }
 
                     //If this step doesn't require execution then continue to the next one.
                     if (step.RequiresExecution() == false)
                     {
+                        //set this as complete and continue
+                        InstallStatusTracker.SetComplete(installModel.InstallId, step.Name, null);
                         continue;
                     }
 
@@ -142,20 +149,45 @@ namespace Umbraco.Web.Install.Controllers
                         var setupData = ExecuteStep(step, instruction);
 
                         //update the status
-                        InstallStatusTracker.SetComplete(step.Name, setupData.SavedStepData);
+                        InstallStatusTracker.SetComplete(installModel.InstallId, step.Name, setupData != null ? setupData.SavedStepData : null);
+
+                        //check if there's a custom view to return for this step
+                        if (setupData != null && setupData.View.IsNullOrWhiteSpace() == false)
+                        {
+                            return Json(new
+                            {
+                                complete = false,
+                                stepCompleted = step.Name,
+                                view = setupData.View,
+                                model = setupData.ViewModel
+                            }, HttpStatusCode.OK);
+                        }
 
                         return Json(new
                         {
                             complete = false,
-                            stepCompleted = step.Name                     
+                            stepCompleted = step.Name
                         }, HttpStatusCode.OK);
-                    }
-                    catch (InstallException iex)
-                    {
-                        return Json(iex.Result, HttpStatusCode.BadRequest);
+
                     }
                     catch (Exception ex)
                     {
+                        if (ex is TargetInvocationException && ex.InnerException != null)
+                        {
+                            ex = ex.InnerException;
+                        }
+
+                        var installException = ex as InstallException;
+                        if (installException != null)
+                        {
+                            return Json(new
+                            {
+                                view = installException.View,
+                                model = installException.ViewModel,
+                                message = installException.Message
+                            }, HttpStatusCode.BadRequest);
+                        }
+
                         return Request.CreateValidationErrorResponse("An error occurred executing the step: " + step.Name + ". Error: " + ex.Message);
                     }
                 }
@@ -168,19 +200,22 @@ namespace Umbraco.Web.Install.Controllers
 
         internal InstallSetupResult ExecuteStep(InstallSetupStep step, JToken instruction)
         {
-            var model = instruction == null ? null : instruction.ToObject(step.StepType);
-            var genericStepType = typeof(InstallSetupStep<>);
-            Type[] typeArgs = { step.StepType };
-            var typedStepType = genericStepType.MakeGenericType(typeArgs);
-            try
+            using (DisposableTimer.TraceDuration<InstallApiController>("Executing installation step: " + step.Name, "Step completed"))
             {
-                var method = typedStepType.GetMethods().Single(x => x.Name == "Execute");
-                return (InstallSetupResult)method.Invoke(step, new object[] { model });
-            }
-            catch (Exception ex)
-            {
-                LogHelper.Error<InstallApiController>("Installation step " + step.Name + " failed.", ex);
-                throw;
+                var model = instruction == null ? null : instruction.ToObject(step.StepType);
+                var genericStepType = typeof(InstallSetupStep<>);
+                Type[] typeArgs = { step.StepType };
+                var typedStepType = genericStepType.MakeGenericType(typeArgs);
+                try
+                {
+                    var method = typedStepType.GetMethods().Single(x => x.Name == "Execute");
+                    return (InstallSetupResult)method.Invoke(step, new object[] { model });
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<InstallApiController>("Installation step " + step.Name + " failed.", ex);
+                    throw;
+                }
             }
         }
         

@@ -62,7 +62,7 @@ namespace Umbraco.Web.Install.Models
         /// Defines what order this step needs to execute on the server side since the 
         /// steps might be shown out of order on the front-end
         /// </summary>
-        [IgnoreDataMember]
+        [DataMember(Name = "serverOrder")]
         public int ServerOrder { get; private set; }
 
         /// <summary>
