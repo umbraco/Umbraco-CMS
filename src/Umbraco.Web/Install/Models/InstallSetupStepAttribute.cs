@@ -4,7 +4,7 @@ namespace Umbraco.Web.Install.Models
 {
     public sealed class InstallSetupStepAttribute : Attribute
     {
-        public InstallSetupStepAttribute(string name, string view, int serverOrder)
+        public InstallSetupStepAttribute(string name, string view, int serverOrder, string description)
         {
             Name = name;
             View = view;
@@ -12,7 +12,7 @@ namespace Umbraco.Web.Install.Models
             Description = description;
         }
 
-        public InstallSetupStepAttribute(string name, int serverOrder)
+        public InstallSetupStepAttribute(string name, int serverOrder, string description)
         {
             Name = name;
             View = string.Empty;

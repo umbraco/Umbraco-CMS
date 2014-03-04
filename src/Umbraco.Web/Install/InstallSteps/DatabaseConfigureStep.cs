@@ -13,7 +13,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-    [InstallSetupStep("DatabaseConfigure", "database", 3)]
+    [InstallSetupStep("DatabaseConfigure", "database", 3, "Configuring your database connection")]
     internal class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
     {
         private readonly ApplicationContext _applicationContext;
