@@ -14,7 +14,8 @@ using Umbraco.Web.Install.Models;
 namespace Umbraco.Web.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.NewInstall,
-        "DatabaseConfigure", "database", 10, "Configuring your database connection")]
+        "DatabaseConfigure", "database", 10, "Configuring your database connection",
+        PerformsAppRestart = true)]
     internal class DatabaseConfigureStep : InstallSetupStep<DatabaseModel>
     {
         private readonly ApplicationContext _applicationContext;

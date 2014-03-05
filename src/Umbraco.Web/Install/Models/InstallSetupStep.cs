@@ -42,6 +42,7 @@ namespace Umbraco.Web.Install.Models
             ServerOrder = att.ServerOrder;
             Description = att.Description;
             InstallTypeTarget = att.InstallTypeTarget;
+            PerformsAppRestart = att.PerformsAppRestart;
         }
 
         [DataMember(Name = "name")]
@@ -55,6 +56,9 @@ namespace Umbraco.Web.Install.Models
 
         [IgnoreDataMember]
         public InstallationType InstallTypeTarget { get; private set; }
+
+        [IgnoreDataMember]
+        public bool PerformsAppRestart { get; private set; }
         
         /// <summary>
         /// Determines if this step needs to execute based on the current state of the application and/or install process

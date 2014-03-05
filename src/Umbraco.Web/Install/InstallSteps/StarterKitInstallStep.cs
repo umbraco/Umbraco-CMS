@@ -9,7 +9,8 @@ using Umbraco.Web.Install.Models;
 namespace Umbraco.Web.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.NewInstall,
-        "StarterKitInstall", 31, "Installing a starter website to help you get off to a great start")]
+        "StarterKitInstall", 31, "Installing a starter website to help you get off to a great start",
+        PerformsAppRestart = true)]
     internal class StarterKitInstallStep : InstallSetupStep<object>
     {
         private readonly ApplicationContext _applicationContext;
@@ -45,13 +46,7 @@ namespace Umbraco.Web.Install.InstallSteps
         }
 
         public override bool RequiresExecution()
-        {
-            if (InstalledPackage.GetAllInstalledPackages().Count > 0)
-                return false;
-
-            if (_applicationContext.Services.ContentService.GetRootContent().Any())
-                return false;
-
+        {            
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
             //this step relies on the preious one completed - because it has stored some information we need
             if (installSteps.Any(x => x.Name == "StarterKitDownload") == false)

@@ -171,15 +171,17 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 
 								//turn off loading bar and feedback
 								service.switchToConfiguration();
-							}else{
-								var desc = getDescriptionForStepAtIndex(service.status.steps, feedback);
+							}
+							else {
+							    var desc = getDescriptionForStepName(service.status.steps, response.data.nextStep);
 								if (desc) {
-										service.status.feedback = desc;
+									service.status.feedback = desc;
 								}
 
 								processInstallStep();
 							}
-						}else{
+						}
+						else {
 							service.status.done = true;
 							service.status.feedback = "Redirecting you to Umbraco, please wait";
 							service.status.loading = false;

@@ -121,179 +121,120 @@ namespace Umbraco.Web.Install.Controllers
                 status = InstallStatusTracker.InitializeFromFile(installModel.InstallId).ToArray();
             }
 
-            //var queue = new Queue<InstallTrackingItem>(status);
-            //while (queue.Count > 0)
-            //{
-            //    var stepStatus = queue.Dequeue();
-
-            //    //if it is not complete, then we need to execute it
-            //    if (stepStatus.IsComplete == false)
-            //    {
-            //        var step = InstallHelper.GetAllSteps().Single(x => x.Name == stepStatus.Name);
-
-            //        JToken instruction = null;
-            //        if (step.HasUIElement)
-            //        {
-            //            //Since this is a UI instruction, we will extract the model from it
-            //            if (installModel.Instructions.Any(x => x.Key == step.Name) == false)
-            //            {
-            //                throw new HttpResponseException(Request.CreateValidationErrorResponse("No instruction defined for step: " + step.Name));
-            //            }
-            //            instruction = installModel.Instructions[step.Name];
-            //        }
-
-            //        //If this step doesn't require execution then continue to the next one.
-            //        if (step.RequiresExecution() == false)
-            //        {
-            //            //set this as complete and continue
-            //            InstallStatusTracker.SetComplete(installModel.InstallId, stepStatus.Name, null);
-            //            continue;
-            //        }
-
-            //        try
-            //        {
-            //            var setupData = ExecuteStep(step, instruction);
-
-            //            //update the status
-            //            InstallStatusTracker.SetComplete(installModel.InstallId, step.Name, setupData != null ? setupData.SavedStepData : null);
-
-            //            //get the next step if there is one
-
-            //            var nextStep = "";
-            //            if ((index + 1) < status.Length)
-            //            {
-
-            //                nextStep = status[index + 1].Name;
-            //            }
-
-            //            //check if there's a custom view to return for this step
-            //            if (setupData != null && setupData.View.IsNullOrWhiteSpace() == false)
-            //            {
-            //                return new InstallProgressResultModel(false, step.Name, nextStep, setupData.View, setupData.ViewModel);
-            //            }
-
-            //            return new InstallProgressResultModel(false, step.Name, nextStep);
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            if (ex is TargetInvocationException && ex.InnerException != null)
-            //            {
-            //                ex = ex.InnerException;
-            //            }
-
-            //            var installException = ex as InstallException;
-            //            if (installException != null)
-            //            {
-            //                throw new HttpResponseException(Request.CreateValidationErrorResponse(new
-            //                {
-            //                    view = installException.View,
-            //                    model = installException.ViewModel,
-            //                    message = installException.Message
-            //                }));
-            //            }
-
-            //            throw new HttpResponseException(
-            //                Request.CreateValidationErrorResponse("An error occurred executing the step: " + step.Name + ". Error: " + ex.Message));
-            //        }
-            //    }
-
-            //}
-
-            for (var index = 0; index < status.Length; index++)
+            //create a new queue of the non-finished ones
+            var queue = new Queue<InstallTrackingItem>(status.Where(x => x.IsComplete == false));
+            while (queue.Count > 0)
             {
-                var stepStatus = status[index];
-                //if it is not complete, then we need to execute it
-                if (stepStatus.IsComplete == false)
+                var stepStatus = queue.Dequeue();
+                
+                var step = InstallHelper.GetAllSteps().Single(x => x.Name == stepStatus.Name);
+
+                JToken instruction = null;
+                if (step.HasUIElement)
                 {
-                    var step = InstallHelper.GetAllSteps().Single(x => x.Name == stepStatus.Name);
-
-                    JToken instruction = null;
-                    if (step.HasUIElement)
+                    //Since this is a UI instruction, we will extract the model from it
+                    if (installModel.Instructions.Any(x => x.Key == step.Name) == false)
                     {
-                        //Since this is a UI instruction, we will extract the model from it
-                        if (installModel.Instructions.Any(x => x.Key == step.Name) == false)
-                        {
-                            throw new HttpResponseException(Request.CreateValidationErrorResponse("No instruction defined for step: " + step.Name));
-                        }
-                        instruction = installModel.Instructions[step.Name];
+                        throw new HttpResponseException(Request.CreateValidationErrorResponse("No instruction defined for step: " + step.Name));
+                    }
+                    instruction = installModel.Instructions[step.Name];
+                }
+
+                //If this step doesn't require execution then continue to the next one, this is just a fail-safe check.
+                if (step.RequiresExecution() == false)
+                {
+                    //set this as complete and continue
+                    InstallStatusTracker.SetComplete(installModel.InstallId, stepStatus.Name, null);
+                    continue;
+                }
+
+                try
+                {
+                    var setupData = ExecuteStep(step, instruction);
+
+                    //update the status
+                    InstallStatusTracker.SetComplete(installModel.InstallId, step.Name, setupData != null ? setupData.SavedStepData : null);
+
+                    //Determine's the next step in the queue and dequeue's any items that don't need to execute
+                    var nextStep = IterateNextRequiredStep(step, queue, installModel.InstallId);
+                    
+                    //check if there's a custom view to return for this step
+                    if (setupData != null && setupData.View.IsNullOrWhiteSpace() == false)
+                    {
+                        return new InstallProgressResultModel(false, step.Name, nextStep, setupData.View, setupData.ViewModel);
                     }
 
-                    //If this step doesn't require execution then continue to the next one.
-                    if (step.RequiresExecution() == false)
+                    return new InstallProgressResultModel(false, step.Name, nextStep);
+                }
+                catch (Exception ex)
+                {
+                    if (ex is TargetInvocationException && ex.InnerException != null)
                     {
-                        //set this as complete and continue
-                        InstallStatusTracker.SetComplete(installModel.InstallId, stepStatus.Name, null);
-                        continue;
+                        ex = ex.InnerException;
                     }
 
-                    try
+                    var installException = ex as InstallException;
+                    if (installException != null)
                     {
-                        var setupData = ExecuteStep(step, instruction);
-
-                        //update the status
-                        InstallStatusTracker.SetComplete(installModel.InstallId, step.Name, setupData != null ? setupData.SavedStepData : null);
-
-                        //get the next step if there is one
-                        var nextStep = "";
-                        if ((index + 1) < status.Length)
+                        throw new HttpResponseException(Request.CreateValidationErrorResponse(new
                         {
-
-                            nextStep = status[index + 1].Name;
-                        }
-
-                        //check if there's a custom view to return for this step
-                        if (setupData != null && setupData.View.IsNullOrWhiteSpace() == false)
-                        {
-                            return new InstallProgressResultModel(false, step.Name, nextStep, setupData.View, setupData.ViewModel);
-                        }
-
-                        return new InstallProgressResultModel(false, step.Name, nextStep);
+                            view = installException.View,
+                            model = installException.ViewModel,
+                            message = installException.Message
+                        }));
                     }
-                    catch (Exception ex)
+
+                    throw new HttpResponseException(Request.CreateValidationErrorResponse(new
                     {
-                        if (ex is TargetInvocationException && ex.InnerException != null)
-                        {
-                            ex = ex.InnerException;
-                        }
-
-                        //return custom view if we have an install exception
-                        var installException = ex as InstallException;
-                        if (installException != null)
-                        {
-                            throw new HttpResponseException(Request.CreateValidationErrorResponse(new
-                            {
-                                step = step.Name,
-                                view = installException.View,
-                                model = installException.ViewModel,
-                                message = installException.Message
-                            }));
-                        }
-
-                        throw new HttpResponseException(
-                            Request.CreateValidationErrorResponse("An error occurred executing the step: " + step.Name + ". Error: " + ex.Message));
-                        //return standard view + step and message to display generic message
-                        return Json(new
-                        {
-                            step = step.Name,
-                            view = "error",
-                            message = ex.Message
-                        }, HttpStatusCode.BadRequest);
-
-                        //return Request.CreateValidationErrorResponse("An error occurred executing the step: " + step.Name + ". Error: " + ex.Message);
-                    }
+                        step = step.Name,
+                        view = "error",
+                        message = ex.Message
+                    }));
                 }
             }
 
             InstallStatusTracker.Reset();
             return new InstallProgressResultModel(true, "", "");
-
-            //return Json(new { complete = true }, HttpStatusCode.OK);
         }
 
-        //private InstallSetupStep IterateNextRequiredStep(Queue<InstallTrackingItem> queue)
-        //{
-        //    var step = InstallHelper.GetAllSteps().Single(x => x.Name == stepStatus.Name);
-        //}
+        /// <summary>
+        /// We'll peek ahead and check if it's RequiresExecution is returning true. If it
+        /// is not, we'll dequeue that step and peek ahead again (recurse)
+        /// </summary>
+        /// <param name="current"></param>
+        /// <param name="queue"></param>
+        /// <param name="installId"></param>
+        /// <returns></returns>
+        private string IterateNextRequiredStep(InstallSetupStep current, Queue<InstallTrackingItem> queue, Guid installId)
+        {
+            if (queue.Count > 0)
+            {
+                var next = queue.Peek();
+                var step = InstallHelper.GetAllSteps().Single(x => x.Name == next.Name);
+                
+                //If the current step restarts the app pool then we must simply return the next one in the queue, 
+                // we cannot peek ahead as the next step might rely on the app restart and therefore RequiresExecution 
+                // will rely on that too.
+                //Otherwise if it requires execution then of course return it.
+                if (current.PerformsAppRestart || step.RequiresExecution())
+                {                    
+                    return step.Name;
+                }
+                
+                //this step no longer requires execution, this could be due to a new config change during installation,
+                // so we'll dequeue this one from the queue and recurse
+                queue.Dequeue();
+
+                //set this as complete
+                InstallStatusTracker.SetComplete(installId, step.Name, null);
+
+                //recurse
+                return IterateNextRequiredStep(step, queue, installId);
+            }
+
+            //there is no more steps
+            return string.Empty;
+        }
 
         internal InstallSetupResult ExecuteStep(InstallSetupStep step, JToken instruction)
         {
