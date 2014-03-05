@@ -27,6 +27,12 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override InstallSetupResult Execute(DatabaseModel database)
         {
+            //if the database model is null then we will apply the defaults
+            if (database == null)
+            {
+                database = new DatabaseModel();
+            }
+
             if (CheckConnection(database) == false)
             {
                 throw new InvalidOperationException("Could not connect to the database");

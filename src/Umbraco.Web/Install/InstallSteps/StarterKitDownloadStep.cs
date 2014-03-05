@@ -10,7 +10,7 @@ namespace Umbraco.Web.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.NewInstall,
         "StarterKitDownload", "starterKit", 30, "Downloading a starter website from our.umbraco.org, hold tight, this could take a little while")]
-    internal class StarterKitDownloadStep : InstallSetupStep<Guid>
+    internal class StarterKitDownloadStep : InstallSetupStep<Guid?>
     {
         private readonly ApplicationContext _applicationContext;
 
@@ -21,10 +21,19 @@ namespace Umbraco.Web.Install.InstallSteps
 
         private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
 
-        public override InstallSetupResult Execute(Guid starterKitId)
+        public override InstallSetupResult Execute(Guid? starterKitId)
         {
+            //if there is no value assigned then use the default starter kit
+            if (starterKitId.HasValue == false)
+            {
+                //get a default package GUID (currently the first one found)
+                var r = new org.umbraco.our.Repository();
+                var modules = r.Modules();
+                var defaultPackageId = modules.First().RepoGuid;
+                starterKitId = defaultPackageId;
+            }
 
-            var result = DownloadPackageFiles(starterKitId);
+            var result = DownloadPackageFiles(starterKitId.Value);
 
             return new InstallSetupResult(new Dictionary<string, object>
             {

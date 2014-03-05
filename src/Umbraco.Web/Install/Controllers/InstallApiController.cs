@@ -130,13 +130,9 @@ namespace Umbraco.Web.Install.Controllers
                 var step = InstallHelper.GetAllSteps().Single(x => x.Name == stepStatus.Name);
 
                 JToken instruction = null;
-                if (step.HasUIElement)
+                //If this step has any instructions then extract them
+                if (installModel.Instructions.Any(x => x.Key == step.Name))
                 {
-                    //Since this is a UI instruction, we will extract the model from it
-                    if (installModel.Instructions.Any(x => x.Key == step.Name) == false)
-                    {
-                        throw new HttpResponseException(Request.CreateValidationErrorResponse("No instruction defined for step: " + step.Name));
-                    }
                     instruction = installModel.Instructions[step.Name];
                 }
 

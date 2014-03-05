@@ -5,6 +5,12 @@ namespace Umbraco.Web.Install.Models
     [DataContract(Name = "database", Namespace = "")]
     public class DatabaseModel
     {
+        public DatabaseModel()
+        {
+            //defaults
+            DatabaseType = DatabaseType.SqlCe;
+        }
+
         [DataMember(Name = "dbType")]
         public DatabaseType DatabaseType { get; set; }
 

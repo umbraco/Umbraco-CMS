@@ -11,8 +11,6 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 	var _installerModel = {
 	    installId: undefined,
         instructions: {
-            DatabaseConfigure: { dbType: 0 },
-            StarterKitDownload: Umbraco.Sys.ServerVariables.defaultStarterKit
         }
 	};
 

@@ -54,13 +54,7 @@ namespace Umbraco.Web.Install.Controllers
                     case ValidateRequestAttempt.FailedNoContextId:
                         return Redirect(SystemDirectories.Umbraco + "/AuthorizeUpgrade?redir=" + Server.UrlEncode(Request.RawUrl));                        
                 }
-            }
-
-            //get a package GUID
-            var r = new org.umbraco.our.Repository();
-            var modules = r.Modules();
-            var defaultPackageId = modules.First().RepoGuid;
-            ViewBag.DefaultPackageId = defaultPackageId;
+            }            
 
             //gen the install base url
             ViewBag.InstallApiBaseUrl = Url.GetUmbracoApiService("GetSetup", "InstallApi", "install").TrimEnd("GetSetup");
