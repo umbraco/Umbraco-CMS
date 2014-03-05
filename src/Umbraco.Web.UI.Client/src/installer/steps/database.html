@@ -110,12 +110,21 @@
 			  </div>
 		</div>
 
-
 		<div class="row">
 			<div class="control-group" ng-class="{disabled:myForm.$invalid}">
 				<div class="controls">
-					<input type="submit" ng-disabled="myForm.$invalid"  value="Continue" class="btn btn-success" />
-				</div>
+					<input type="submit" ng-disabled="myForm.$invalid || checking"  
+						value="Continue" class="btn btn-success" />
+
+                    <span class="inline-help" ng-if="checking" ng-animate="'fade'">
+                    	Validating your database connection
+                    </span>
+
+					<span class="inline-help error" ng-if="invalidDbDns" ng-animate="'fade'">
+						Could not connect to the database, please correct your connection details
+					</span>
+
+                </div>
 			</div>
 		</div>
 

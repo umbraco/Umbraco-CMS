@@ -10,7 +10,7 @@ using Umbraco.Web.Install.Models;
 namespace Umbraco.Web.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.Upgrade,
-        "MajorVersion7UpgradeReport", 1, "Checking for compatibility issues with upgrade")]
+        "MajorVersion7UpgradeReport", 1, "")]
     internal class MajorVersion7UpgradeReport : InstallSetupStep<object>
     {
         private readonly ApplicationContext _applicationContext;

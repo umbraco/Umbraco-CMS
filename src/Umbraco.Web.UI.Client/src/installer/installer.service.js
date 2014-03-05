@@ -1,18 +1,27 @@
-angular.module("umbraco.install").factory('installerService', function($q, $timeout, $http, $location){
+angular.module("umbraco.install").factory('installerService', function($rootScope, $q, $timeout, $http, $location, $log){
 
 	var _status = {
 		index: 0,
 		current: undefined,
 		steps: undefined,
-		loading: true
+		loading: true,
+		progress: "100%"
 	};
 
-
+	var factTimer = undefined;
 	var _installerModel = {
 	    installId: undefined,
         instructions: {
         }
 	};
+
+	//add to umbraco installer facts here
+	var facts = ['Umbraco was founded in 2005',
+				'Over 200.000 websites are currently powered by Umbraco',
+				'On an average day, more then 1000 people download Umbraco',
+				'<a target="_blank" href="http://umbraco.tv">umbraco.tv</a> is the premier source of Umbraco video tutorials to get you started',
+				'<a target="_blank" href="http://our.umbraco.org">our.umbraco.org</a> is the home of the friendly Umbraco community, and excellent resource for any Umbraco developer'
+				 ];
 
     /**
         Returns the description for the step at a given index based on the order of the serverOrder of steps
@@ -25,7 +34,6 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 	    }
 	    return null;
 	}
-
     /* Returns the description for the given step name */ 
 	function getDescriptionForStepName(steps, name) {
 	    var found = _.find(steps, function(i) {
@@ -34,6 +42,21 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 	    return (found) ? found.description : null;
 	}
 
+	//calculates the offset of the progressbar on the installaer
+	function calculateProgress(steps, next) {
+		var pct = "100%";
+		var f = _.find(steps, function(item, index) {
+			if(item.name == next){
+				pct = Math.floor((index / steps.length * 100)) + "%";
+				return true;
+			}else{
+				return false;
+			}
+		});
+	    return  pct;
+	}
+
+	//helpful defaults for the view loading
 	function resolveView(view){
 
 		if(view.indexOf(".html") < 0){
@@ -49,15 +72,7 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 	var service = {
 
 		status : _status,
-
-		getPackages : function(){
-			return $http.get(Umbraco.Sys.ServerVariables.installApiBaseUrl + "GetPackages");
-		},
-
-		getSteps : function(){
-			return $http.get(Umbraco.Sys.ServerVariables.installApiBaseUrl + "GetSetup");
-		},
-
+		//loads the needed steps and sets the intial state
 		init : function(){
 			service.status.loading = true;
 			if(!_status.all){
@@ -73,6 +88,15 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 					}, 2000);
 				});
 			}
+		},
+
+		//loads available packages from our.umbraco.org
+		getPackages : function(){
+			return $http.get(Umbraco.Sys.ServerVariables.installApiBaseUrl + "GetPackages");
+		},
+
+		getSteps : function(){
+			return $http.get(Umbraco.Sys.ServerVariables.installApiBaseUrl + "GetSetup");
 		},
 
 		gotoStep : function(index){
@@ -170,19 +194,21 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 		},
 
 		install : function(){
-			var feedback = 0;
 			service.storeCurrentStep();
 			service.switchToFeedback();
+
 			service.status.feedback = getDescriptionForStepAtIndex(service.status.steps, 0);
+			service.status.progress = 0;
 
 			function processInstallStep(){
 				$http.post(Umbraco.Sys.ServerVariables.installApiBaseUrl + "PostPerformInstall",
 					_installerModel).then(function(response){
 						if(!response.data.complete){
-							feedback++;
+							
+							//progress feedback
+							service.status.progress = calculateProgress(service.status.steps, response.data.nextStep);
 
 							if(response.data.view){
-
 								//set the current view and model to whatever the process returns, the view is responsible for retriggering install();
 								var v = resolveView(response.data.view);
 								service.status.current = {view: v, model: response.data.model};
@@ -200,9 +226,6 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 							}
 						}
 						else {
-							service.status.done = true;
-							service.status.feedback = "Redirecting you to Umbraco, please wait";
-							service.status.loading = false;
 							service.complete();
 						}
 					}, function(err){
@@ -217,19 +240,47 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 			processInstallStep();
 		},
 
+		randomFact : function(){
+			$rootScope.$apply(function(){
+				service.status.fact = facts[ _.random( facts.length-1) ];
+			});
+		},
+
 		switchToFeedback : function(){
 			service.status.current = undefined;
 			service.status.loading = true;
 			service.status.configuring = false;
+
+			//initial fact
+			service.randomFact();
+
+			//timed facts
+			factTimer = window.setInterval(function(){
+				service.randomFact();
+			},6000);
 		},
 
 		switchToConfiguration : function(){
 			service.status.loading = false;
 			service.status.configuring = true;
 			service.status.feedback = undefined;
+
+			if(factTimer){
+				clearInterval(factTimer);
+			}
 		},
 
 		complete : function(){
+
+			service.status.progress = "100%";	
+			service.status.done = true;
+			service.status.feedback = "Redirecting you to Umbraco, please wait";
+			service.status.loading = false;
+
+			if(factTimer){
+				clearInterval(factTimer);
+			}
+
 			$timeout(function(){
 				window.location.href = Umbraco.Sys.ServerVariables.umbracoBaseUrl;
 			}, 1500);

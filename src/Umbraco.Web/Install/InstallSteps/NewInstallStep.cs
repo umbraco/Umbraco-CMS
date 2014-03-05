@@ -17,7 +17,7 @@ namespace Umbraco.Web.Install.InstallSteps
     /// display a simple continue installation view.
     /// </remarks>
     [InstallSetupStep(InstallationType.NewInstall,
-        "User", 20, "Saving your user credentials")]
+        "User", 20, "")]
     internal class NewInstallStep : InstallSetupStep<UserModel>
     {
         private readonly ApplicationContext _applicationContext;
