@@ -307,8 +307,14 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Areas\UmbracoInstall\default_old.aspx.cs">
-      <DependentUpon>default_old.aspx</DependentUpon>
+    <Compile Include="Areas\UmbracoInstall\Legacy\LoadStarterKits.ascx.cs">
+      <DependentUpon>loadStarterKits.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Areas\UmbracoInstall\Legacy\LoadStarterKits.ascx.designer.cs">
+      <DependentUpon>loadStarterKits.ascx</DependentUpon>
+    </Compile>
+    <Compile Include="Areas\UmbracoInstall\Legacy\StepUserControl.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Config\splashes\NoNodes.aspx.cs">
@@ -319,95 +325,12 @@
       <DependentUpon>noNodes.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Areas\UmbracoInstall\default_old.aspx.designer.cs">
-      <DependentUpon>default_old.aspx</DependentUpon>
-    </Compile>
     <Compile Include="Areas\UmbracoInstall\InstallerRestService.aspx.cs">
       <DependentUpon>InstallerRestService.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="Areas\UmbracoInstall\InstallerRestService.aspx.designer.cs">
       <DependentUpon>InstallerRestService.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\Database.ascx.cs">
-      <DependentUpon>database.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\Database.ascx.designer.cs">
-      <DependentUpon>database.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\DefaultUser.ascx.cs">
-      <DependentUpon>defaultUser.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\DefaultUser.ascx.designer.cs">
-      <DependentUpon>defaultUser.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\License.ascx.cs">
-      <DependentUpon>license.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\License.ascx.designer.cs">
-      <DependentUpon>license.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\Renaming.ascx.cs">
-      <DependentUpon>renaming.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\Renaming.ascx.designer.cs">
-      <DependentUpon>renaming.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\RenderingEngine.ascx.cs">
-      <DependentUpon>RenderingEngine.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\RenderingEngine.ascx.designer.cs">
-      <DependentUpon>RenderingEngine.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\Skinning\LoadStarterKits.ascx.cs">
-      <DependentUpon>loadStarterKits.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\Skinning\LoadStarterKits.ascx.designer.cs">
-      <DependentUpon>loadStarterKits.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\StarterKits.ascx.cs">
-      <DependentUpon>StarterKits.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\StarterKits.ascx.designer.cs">
-      <DependentUpon>StarterKits.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\StepUserControl.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\TheEnd.ascx.cs">
-      <DependentUpon>theend.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\TheEnd.ascx.designer.cs">
-      <DependentUpon>theend.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\UpgradeReport.ascx.cs">
-      <DependentUpon>UpgradeReport.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\UpgradeReport.ascx.designer.cs">
-      <DependentUpon>UpgradeReport.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\ValidatePermissions.ascx.cs">
-      <DependentUpon>validatePermissions.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\ValidatePermissions.ascx.designer.cs">
-      <DependentUpon>validatePermissions.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\Welcome.ascx.cs">
-      <DependentUpon>welcome.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Steps\Welcome.ascx.designer.cs">
-      <DependentUpon>welcome.ascx</DependentUpon>
     </Compile>
     <Compile Include="Areas\UmbracoInstall\Title.ascx.cs">
       <DependentUpon>Title.ascx</DependentUpon>
@@ -630,6 +553,7 @@
     <Compile Include="Umbraco\TreeInit.aspx.designer.cs">
       <DependentUpon>treeInit.aspx</DependentUpon>
     </Compile>
+    <Content Include="Areas\UmbracoInstall\Legacy\loadStarterKits.ascx" />
     <Content Include="Umbraco\ClientRedirect.aspx" />
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Logout.aspx" />
@@ -651,7 +575,6 @@
     </Compile>
     <Content Include="Config\Splashes\booting.aspx" />
     <Content Include="Config\Splashes\noNodes.aspx" />
-    <Content Include="Areas\UmbracoInstall\Steps\UpgradeReport.ascx" />
     <Content Include="Umbraco\Dashboard\UserControlProxy.aspx" />
     <Content Include="Umbraco\Create\PartialView.ascx" />
     <Content Include="Umbraco\Create\User.ascx" />
@@ -742,7 +665,6 @@
       <DependentUpon>UI.xml</DependentUpon>
     </None>
     <Content Include="Global.asax" />
-    <Content Include="Areas\UmbracoInstall\Steps\RenderingEngine.ascx" />
     <Content Include="Umbraco\Config\Lang\en_us.xml" />
     <Content Include="Umbraco\Config\Lang\he.xml" />
     <Content Include="Umbraco\Config\Lang\ja.xml" />
@@ -1754,10 +1676,6 @@
     <Content Include="Umbraco_Client\Installer\Js\jquery.1.4.4.js" />
     <Content Include="Umbraco_Client\Installer\Js\jquery.main.js" />
     <Content Include="Umbraco_Client\Installer\Js\jquery.ui.selectmenu.js" />
-    <Content Include="Areas\UmbracoInstall\Steps\database.ascx" />
-    <Content Include="Areas\UmbracoInstall\Steps\renaming.ascx" />
-    <Content Include="Areas\UmbracoInstall\Steps\StarterKits.ascx" />
-    <Content Include="Areas\UmbracoInstall\Steps\Skinning\loadStarterKits.ascx" />
     <Content Include="Areas\UmbracoInstall\Title.ascx" />
     <Content Include="Areas\UmbracoInstall\InstallerRestService.aspx" />
     <Content Include="Umbraco\Config\Lang\ko.xml" />
@@ -1897,8 +1815,6 @@
     <Content Include="Umbraco_Client\Tree\Themes\Default\icons.png" />
     <Content Include="Umbraco_Client\Tree\Themes\Umbraco\icons.png" />
     <Content Include="default.aspx" />
-    <Content Include="Areas\UmbracoInstall\default_old.aspx" />
-    <Content Include="Areas\UmbracoInstall\Steps\license.ascx" />
     <Content Include="Umbraco\Actions\delete.aspx" />
     <Content Include="Umbraco\Actions\editContent.aspx" />
     <Content Include="Umbraco\Actions\preview.aspx" />
@@ -2089,18 +2005,6 @@
     <Content Include="Umbraco\Images\Editor\underline_tw.gif" />
     <Content Include="Umbraco\Images\Editor\unlink.gif" />
     <Content Include="Umbraco\Images\Editor\visualaid.gif" />
-    <Content Include="Areas\UmbracoInstall\Steps\defaultUser.ascx">
-      <SubType>UserControl</SubType>
-    </Content>
-    <Content Include="Areas\UmbracoInstall\Steps\theend.ascx">
-      <SubType>UserControl</SubType>
-    </Content>
-    <Content Include="Areas\UmbracoInstall\Steps\validatePermissions.ascx">
-      <SubType>UserControl</SubType>
-    </Content>
-    <Content Include="Areas\UmbracoInstall\Steps\welcome.ascx">
-      <SubType>UserControl</SubType>
-    </Content>
     <Content Include="Umbraco\Config\Create\UI.xml" />
     <Content Include="Umbraco\Config\Lang\en.xml">
       <SubType>Designer</SubType>

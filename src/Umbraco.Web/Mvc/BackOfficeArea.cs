@@ -36,8 +36,15 @@ namespace Umbraco.Web.Mvc
                         id = @"[a-zA-Z]*"
                     },
                 new[] {typeof (BackOfficeController).Namespace});
-            
-            
+
+            //TODO: We can remove this when we re-build the back office package installer
+            //Create the install routes
+            context.MapRoute(
+                "Umbraco_install_packages",
+                "Install/PackageInstaller/{action}/{id}",
+                new { controller = "InstallPackage", action = "Index", id = UrlParameter.Optional },
+                new[] { typeof(InstallPackageController).Namespace });
+
             //Create the REST/web/script service routes
             context.MapRoute(
                 "Umbraco_web_services",

@@ -20,6 +20,7 @@ namespace Umbraco.Web.Install.Controllers
 	/// is a bit of a mess currently.
 	/// </remarks>
 	[HttpInstallAuthorize]
+    [Obsolete("This is only used for the legacy way of installing starter kits in the back office")]
     public class InstallPackageController : ApiController
 	{
 		private readonly ApplicationContext _applicationContext;
