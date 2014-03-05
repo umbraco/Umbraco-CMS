@@ -73,6 +73,11 @@ namespace Umbraco.Web.Install.InstallSteps
             
         }
 
+        public override string View
+        {
+            get { return (InstalledPackage.GetAllInstalledPackages().Count > 0) ? string.Empty : base.View; }
+        }
+
         public override bool RequiresExecution()
         {
             if (InstalledPackage.GetAllInstalledPackages().Count > 0)
