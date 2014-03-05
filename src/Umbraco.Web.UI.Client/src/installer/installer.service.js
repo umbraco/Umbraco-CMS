@@ -90,12 +90,13 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 			service.retrieveCurrentStep();
 		},
 
-		gotoNamedStep : function(step){
+		gotoNamedStep : function(stepName){
 				var step = _.find(service.status.steps, function(s, index){
-					if(s.view && s.name === step){
+				    if (s.view && s.name === stepName) {
 						service.status.index = index;
 						return true;
-					}
+				    }
+				    return false;
 				});
 
 				step.view = resolveView(step.view);
@@ -112,6 +113,7 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 					service.status.index = index;
 					return true;
 				}
+			    return false;
 			});
 
 			if(step.view.indexOf(".html") < 0){
