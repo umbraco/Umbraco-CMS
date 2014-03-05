@@ -37,7 +37,6 @@ namespace Umbraco.Web.Mvc
                     },
                 new[] {typeof (BackOfficeController).Namespace});
             
-            
             //Create the REST/web/script service routes
             context.MapRoute(
                 "Umbraco_web_services",

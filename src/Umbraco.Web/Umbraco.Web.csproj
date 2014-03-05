@@ -269,6 +269,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ApplicationContextExtensions.cs" />
+    <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
     <Compile Include="Cache\ApplicationCacheRefresher.cs" />
     <Compile Include="Cache\ApplicationTreeCacheRefresher.cs" />
@@ -316,10 +317,12 @@
     <Compile Include="Install\InstallSteps\StarterKitInstallStep.cs" />
     <Compile Include="Install\InstallSteps\UpgradeStep.cs" />
     <Compile Include="Install\InstallSteps\NewInstallStep.cs" />
+    <Compile Include="Install\Controllers\InstallPackageController.cs" />
     <Compile Include="Install\Models\DatabaseModel.cs" />
     <Compile Include="Install\Models\DatabaseType.cs" />
     <Compile Include="Install\Models\InstallationType.cs" />
     <Compile Include="Install\Models\InstallInstructions.cs" />
+    <Compile Include="Install\Models\InstallPackageModel.cs" />
     <Compile Include="Install\Models\InstallProgressResultModel.cs" />
     <Compile Include="Install\Models\InstallSetup.cs" />
     <Compile Include="Install\Models\InstallSetupResult.cs" />
@@ -401,7 +404,6 @@
     <Compile Include="Editors\MediaPostValidateAttribute.cs" />
     <Compile Include="Editors\MemberController.cs" />
     <Compile Include="Editors\CurrentUserController.cs" />
-    <Compile Include="Install\Legacy\MajorUpgradeReport.cs" />
     <Compile Include="Models\ContentEditing\DashboardControl.cs" />
     <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\DataTypeSave.cs" />
@@ -484,6 +486,7 @@
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
     <Compile Include="WebApi\AngularJsonMediaTypeFormatter.cs" />
+    <Compile Include="WebApi\AngularJsonOnlyConfigurationAttribute.cs" />
     <Compile Include="WebApi\Binders\MemberBinder.cs" />
     <Compile Include="WebApi\Filters\AngularAntiForgeryHelper.cs" />
     <Compile Include="WebApi\Filters\ClearAngularAntiForgeryTokenAttribute.cs" />
@@ -607,20 +610,7 @@
     <Compile Include="HttpRequestExtensions.cs" />
     <Compile Include="HttpUrlHelperExtensions.cs" />
     <Compile Include="Install\FilePermissionHelper.cs" />
-    <Compile Include="Install\Legacy\InstallerStep.cs" />
     <Compile Include="Install\InstallHelper.cs" />
-    <Compile Include="Install\Legacy\InstallPackageController.cs" />
-    <Compile Include="Install\Legacy\InstallStepCollection.cs" />
-    <Compile Include="Install\Legacy\ProgressResult.cs" />
-    <Compile Include="Install\Legacy\Database.cs" />
-    <Compile Include="Install\Legacy\DefaultUser.cs" />
-    <Compile Include="Install\Legacy\FilePermissions.cs" />
-    <Compile Include="Install\Legacy\License.cs" />
-    <Compile Include="Install\Legacy\RenderingEngine.cs" />
-    <Compile Include="Install\Legacy\Skinning.cs" />
-    <Compile Include="Install\Legacy\TheEnd.cs" />
-    <Compile Include="Install\Legacy\WebPi.cs" />
-    <Compile Include="Install\Legacy\Welcome.cs" />
     <Compile Include="Install\HttpInstallAuthorizeAttribute.cs" />
     <Compile Include="Macros\PartialViewMacroController.cs" />
     <Compile Include="Macros\PartialViewMacroEngine.cs" />

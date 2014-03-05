@@ -169,7 +169,6 @@
     <Compile Include="AngularIntegration\JsInitializationTests.cs" />
     <Compile Include="AngularIntegration\ServerVariablesParserTests.cs" />
     <Compile Include="AttemptTests.cs" />
-    <Compile Include="Install\InstallHelperTests.cs" />
     <Compile Include="Membership\MembershipProviderBaseTests.cs" />
     <Compile Include="Membership\UmbracoServiceMembershipProviderTests.cs" />
     <Compile Include="MockTests.cs" />
@@ -652,7 +651,9 @@
     <Content Include="Services\Importing\uBlogsy-Package.xml" />
     <Content Include="Services\Importing\XsltSearch-Package.xml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Install\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\amd64\*.* "$(TargetDir)amd64\" /Y /F /E /D

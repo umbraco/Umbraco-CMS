@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.UI;
 using Umbraco.Core.Logging;
 using Umbraco.Web.Install;
 
@@ -11,7 +12,7 @@ namespace Umbraco.Web.UI.Install.Steps.Skinning
 {
     public delegate void StarterKitInstalledEventHandler();
 
-    public partial class LoadStarterKits : StepUserControl
+    public partial class LoadStarterKits : UserControl
     {
         /// <summary>
         /// Returns the string for the package installer web service base url
@@ -25,7 +26,8 @@ namespace Umbraco.Web.UI.Install.Steps.Skinning
             //Get the URL for the package install service base url
             var umbracoPath = Core.Configuration.GlobalSettings.UmbracoMvcArea;
             var urlHelper = new UrlHelper(Context.Request.RequestContext);
-            PackageInstallServiceBaseUrl = urlHelper.Action("Index", "InstallPackage", new { area = umbracoPath });
+            //PackageInstallServiceBaseUrl = urlHelper.Action("Index", "InstallPackage", new { area = "UmbracoInstall" });
+            PackageInstallServiceBaseUrl = urlHelper.GetUmbracoApiService("Index", "InstallPackage", "UmbracoInstall");
         }
 
         /// <summary>
@@ -54,11 +56,11 @@ namespace Umbraco.Web.UI.Install.Steps.Skinning
 
 		}
 
-		protected void NextStep(object sender, EventArgs e)
-		{
-            var p = (Default)this.Page;
-            //InstallHelper.RedirectToNextStep(Page, Request.GetItemAsString("installStep"));
-		}
+        //protected void NextStep(object sender, EventArgs e)
+        //{
+        //    var p = (Default)this.Page;
+        //    //InstallHelper.RedirectToNextStep(Page, Request.GetItemAsString("installStep"));
+        //}
 
 		protected override void OnInit(EventArgs e)
 		{

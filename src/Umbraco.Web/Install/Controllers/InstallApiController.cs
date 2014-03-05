@@ -87,6 +87,8 @@ namespace Umbraco.Web.Install.Controllers
         /// <returns></returns>
         public HttpResponseMessage PostCheckDbConnection()
         {
+            //TODO: Look into using SqlExtensions.IsConnectionAvailable which i started making for this
+
             throw new NotImplementedException();
         }
 
