@@ -17,7 +17,7 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             //first validate file permissions
             var permissionsOk = true;
-            var report = new List<string>();
+            var reportParts = new Dictionary<string, List<string>>();
 
             // Test default dir permissions
             foreach (var dir in FilePermissionHelper.PermissionDirs)
@@ -25,8 +25,9 @@ namespace Umbraco.Web.Install.InstallSteps
                 var result = SaveAndDeleteFile(IOHelper.MapPath(dir + "/configWizardPermissionTest.txt"));
                 if (!result)
                 {
+                    var report = reportParts.GetOrCreate("Folder creation failed");
                     permissionsOk = false;
-                    report.Add("Directory: ./" + dir);
+                    report.Add(dir);
                 }
             }
 
@@ -36,8 +37,9 @@ namespace Umbraco.Web.Install.InstallSteps
                 var result = OpenFileForWrite(IOHelper.MapPath(file));
                 if (!result)
                 {
+                    var report = reportParts.GetOrCreate("File writing failed");
                     permissionsOk = false;
-                    report.Add("File: " + file);
+                    report.Add(file);
                 }
             }
 
@@ -49,8 +51,9 @@ namespace Umbraco.Web.Install.InstallSteps
                     SaveAndDeleteFile(IOHelper.MapPath(dir + "/configWizardPermissionTest.txt"));
                 if (!result)
                 {
+                    var report = reportParts.GetOrCreate("File writing for packages failed");
                     permissionsOk = false;
-                    report.Add("Directory: " + dir);
+                    report.Add(dir);
                 }
             }
 
@@ -67,7 +70,8 @@ namespace Umbraco.Web.Install.InstallSteps
                 if (tempFile.Substring(0, 1) == "/")
                     tempFile = tempFile.Substring(1, tempFile.Length - 1);
 
-                report.Add(string.Format("File ./{0}. Error: {1}", tempFile, ee));
+                var report = reportParts.GetOrCreate("Cache file writing failed");
+                report.Add(tempFile);
             }
 
             // Test creation of folders
@@ -80,12 +84,14 @@ namespace Umbraco.Web.Install.InstallSteps
             catch
             {
                 permissionsOk = false;
-                report.Add("Folder creation failed");
+                var report = reportParts.GetOrCreate("Media folder creation failed");
+                report.Add("Could not create sub folders in " + SystemDirectories.Media);
             }
+
 
             if (permissionsOk == false)
             {
-                throw new InstallException("Permission check failed", "permissionsReport", new { errors = report });    
+                throw new InstallException("Permission check failed", "permissionsreport", new { errors = reportParts });    
             }
             
             return null;
