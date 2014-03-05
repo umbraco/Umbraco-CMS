@@ -22,13 +22,8 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override InstallSetupResult Execute(object model)
         {
-            var installSteps = InstallStatusTracker.GetStatus().ToArray();
-            //this step relies on the preious one completed - because it has stored some information we need
-            if (installSteps.Any(x => x.Name == "DatabaseConfigure") == false)
-            {
-                throw new InvalidOperationException("Could not find previous step: DatabaseConfigure of the installation, package install cannot continue");
-            }
-            var previousStep = installSteps.Single(x => x.Name == "DatabaseConfigure");
+            var installSteps = InstallStatusTracker.GetStatus().ToArray();            
+            var previousStep = installSteps.Single(x => x.Name == "DatabaseInstall");
             var upgrade = previousStep.AdditionalData.ContainsKey("upgrade");
 
             if (upgrade)
@@ -50,31 +45,30 @@ namespace Umbraco.Web.Install.InstallSteps
             {
                 return false;
             }
+
+            var installSteps = InstallStatusTracker.GetStatus().ToArray();
+            //this step relies on the preious one completed - because it has stored some information we need
+            if (installSteps.Any(x => x.Name == "DatabaseInstall" && x.AdditionalData.ContainsKey("upgrade")) == false)
+            {
+                return false;
+            }
             
             var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
 
             if (_applicationContext.DatabaseContext.IsConnectionStringConfigured(databaseSettings))
             {
-                try
-                {
-                    //Since a connection string was present we verify whether this is an upgrade or an empty db
-                    var result = _applicationContext.DatabaseContext.ValidateDatabaseSchema();
+                //Since a connection string was present we verify whether this is an upgrade or an empty db
+                var result = _applicationContext.DatabaseContext.ValidateDatabaseSchema();
 
-                    var determinedVersion = result.DetermineInstalledVersion();
-                    if (determinedVersion.Equals(new Version(0, 0, 0)))
-                    {
-                        //Fresh install
-                        return false;
-                    }
-
-                    //Upgrade
-                    return true;
-                }
-                catch (Exception)
+                var determinedVersion = result.DetermineInstalledVersion();
+                if (determinedVersion.Equals(new Version(0, 0, 0)))
                 {
-                    //something went wrong, could not connect so probably need to reconfigure
+                    //Fresh install
                     return false;
                 }
+
+                //Upgrade
+                return true;
             }
 
             //no connection string configured, probably a fresh install
