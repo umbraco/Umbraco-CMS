@@ -1,11 +1,11 @@
-angular.module("umbraco.install").controller("Umbraco.Installer.PackagesController", function($scope, installerService){
-		
-	installerService.getPackages().then(function(response){
-		$scope.packages = response.data;
-	});
+angular.module("umbraco.install").controller("Umbraco.Installer.PackagesController", function ($scope, installerService) {
 
-	$scope.setPackageAndContinue = function(package){
-		
-		installerService.install();
-	};
+    installerService.getPackages().then(function (response) {
+        $scope.packages = response.data;
+    });
+
+    $scope.setPackageAndContinue = function (pck) {
+        installerService.forward();
+    };
+
 });

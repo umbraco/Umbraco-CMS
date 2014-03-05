@@ -14,7 +14,7 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
         }
 	};
 
-    /*
+    /**
         Returns the description for the step at a given index based on the order of the serverOrder of steps
         Since they don't execute on the server in the order that they are displayed in the UI.
     */
@@ -105,6 +105,10 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 				service.status.current = step;
 		},
 
+	    /** 
+            Finds the next step containing a view. If one is found it stores it as the current step 
+            and retreives the step information and returns it, otherwise returns null .
+        */
 		findNextStep : function(){
 			var step = _.find(service.status.steps, function(s, index){
 				if(s.view && index >= service.status.index){
@@ -114,20 +118,29 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 			    return false;
 			});
 
-			if(step.view.indexOf(".html") < 0){
-				step.view = step.view + ".html";
-			}
+            if (step) {
+                if (step.view.indexOf(".html") < 0) {
+                    step.view = step.view + ".html";
+                }
 
-			if(step.view.indexOf("/") < 0){
-				step.view = "views/install/" + step.view;
-			}
+                if (step.view.indexOf("/") < 0) {
+                    step.view = "views/install/" + step.view;
+                }
 
-			if(!step.model){
-				step.model = {};
-			}
+                if (!step.model) {
+                    step.model = {};
+                }
 
-			service.status.current = step;
-			service.retrieveCurrentStep();
+                service.status.current = step;
+                service.retrieveCurrentStep();
+
+                //returns the next found step
+                return step;
+            }
+            else {
+                //there are no more steps found containing a view so return null
+                return null;
+            }
 		},
 
 		storeCurrentStep : function(){
@@ -136,14 +149,19 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 
 		retrieveCurrentStep : function(){
 			if(_installerModel.instructions[service.status.current.name]){
-					service.status.current.model = _installerModel.instructions[service.status.current.name];
+				service.status.current.model = _installerModel.instructions[service.status.current.name];
 			}
 		},
 
+        /** Moves the installer forward to the next view, if there are not more views than the installation will commence */
 		forward : function(){
 			service.storeCurrentStep();
 			service.status.index++;
-			service.findNextStep();
+			var found = service.findNextStep();
+            if (!found) {
+                //no more steps were found so start the installation process
+                service.install();
+            }
 		},
 
 		backwards : function(){
