@@ -7,9 +7,9 @@ namespace Umbraco.Web.Install.InstallSteps
     /// </summary>
     [InstallSetupStep(InstallationType.Upgrade,
         "Upgrade", "upgrade", 1, "Upgrading umbraco")]
-    internal class Upgrade : InstallSetupStep<object>
+    internal class UpgradeStep : InstallSetupStep<object>
     {
-        public override bool RequiresExecution()
+        public override bool RequiresExecution(object model)
         {
             return true;
         }

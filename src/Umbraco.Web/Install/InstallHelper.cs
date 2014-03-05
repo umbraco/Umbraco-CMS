@@ -37,8 +37,8 @@ namespace Umbraco.Web.Install
         {
             return new List<InstallSetupStep>
             {                
-                new UserStep(_umbContext.Application),
-                new Upgrade(),
+                new NewInstallStep(_umbContext.Application),
+                new UpgradeStep(),
                 new FilePermissionsStep(),
                 new MajorVersion7UpgradeReport(_umbContext.Application),
                 new DatabaseConfigureStep(_umbContext.Application),
@@ -62,13 +62,13 @@ namespace Umbraco.Web.Install
 
         public InstallationType GetInstallationType()
         {
-            return _installationType ?? (_installationType = IsNewInstall ? InstallationType.NewInstall : InstallationType.Upgrade).Value;
+            return _installationType ?? (_installationType = IsBrandNewInstall ? InstallationType.NewInstall : InstallationType.Upgrade).Value;
         }
 
         /// <summary>
         /// Checks if this is a brand new install meaning that there is no configured version and there is no configured database connection
         /// </summary>
-        private bool IsNewInstall
+        private bool IsBrandNewInstall
         {
             get
             {
@@ -79,6 +79,34 @@ namespace Umbraco.Web.Install
                     //no version or conn string configured, must be a brand new install
                     return true;
                 }
+                
+                //now we have to check if this is really a new install, the db might be configured and might contain data
+
+                if (_umbContext.Application.DatabaseContext.IsConnectionStringConfigured(databaseSettings) == false
+                    || _umbContext.Application.DatabaseContext.IsDatabaseConfigured == false)
+                {
+                    return true;
+                }
+
+                //check if we have the default user configured already
+                var result = _umbContext.Application.DatabaseContext.Database.ExecuteScalar<int>(
+                    "SELECT COUNT(*) FROM umbracoUser WHERE id=0 AND userPassword='default'");
+                if (result == 1)
+                {
+                    //the user has not been configured
+                    return true;
+                }
+
+//                //check if there are any content types configured, if there isn't then we will consider this a new install
+//                result = _umbContext.Application.DatabaseContext.Database.ExecuteScalar<int>(
+//                    @"SELECT COUNT(*) FROM cmsContentType 
+//                        INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id
+//                        WHERE umbracoNode.nodeObjectType = @contentType", new {contentType = Constants.ObjectTypes.DocumentType});
+//                if (result == 0)
+//                {
+//                    //no content types have been created
+//                    return true;
+//                }
 
                 return false;
             }

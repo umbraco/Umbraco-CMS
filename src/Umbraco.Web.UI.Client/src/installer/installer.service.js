@@ -89,20 +89,20 @@ angular.module("umbraco.install").factory('installerService', function($q, $time
 		},
 
 		gotoNamedStep : function(stepName){
-				var step = _.find(service.status.steps, function(s, index){
-				    if (s.view && s.name === stepName) {
-						service.status.index = index;
-						return true;
-				    }
-				    return false;
-				});
-
-				step.view = resolveView(step.view);
-				if(!step.model){
-					step.model = {};
+			var step = _.find(service.status.steps, function(s, index){
+				if (s.view && s.name === stepName) {
+					service.status.index = index;
+					return true;
 				}
-				service.retrieveCurrentStep();
-				service.status.current = step;
+				return false;
+			});
+
+			step.view = resolveView(step.view);
+			if(!step.model){
+				step.model = {};
+			}
+			service.retrieveCurrentStep();
+			service.status.current = step;
 		},
 
 	    /** 

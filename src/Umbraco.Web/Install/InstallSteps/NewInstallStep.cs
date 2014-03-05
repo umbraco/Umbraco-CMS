@@ -8,14 +8,21 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
-
+    /// <summary>
+    /// This is the first UI step for a brand new install
+    /// </summary>
+    /// <remarks>
+    /// By default this will show the user view which is the most basic information to configure a new install, but if an install get's interupted because of an 
+    /// error, etc... and the end-user refreshes the installer then we cannot show the user screen because they've already entered that information so instead we'll    
+    /// display a simple continue installation view.
+    /// </remarks>
     [InstallSetupStep(InstallationType.NewInstall,
-        "User", "user", 20, "Saving your user credentials")]
-    internal class UserStep : InstallSetupStep<UserModel>
+        "User", 20, "Saving your user credentials")]
+    internal class NewInstallStep : InstallSetupStep<UserModel>
     {
         private readonly ApplicationContext _applicationContext;
 
-        public UserStep(ApplicationContext applicationContext)
+        public NewInstallStep(ApplicationContext applicationContext)
         {
             _applicationContext = applicationContext;
         }
@@ -71,10 +78,14 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override string View
         {
-            get { return RequiresExecution() ? base.View : string.Empty; }
+            get { return RequiresExecution(null)
+                //the user UI
+                ? "user" 
+                //the continue install UI
+                : "continueinstall"; }
         }
 
-        public override bool RequiresExecution()
+        public override bool RequiresExecution(UserModel model)
         {
             //if there's already a version then there should def be a user
             if (GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace() == false) return false;

@@ -1,7 +1,9 @@
 <div class="error">
-  <h1>Error during installation</h1>
+    <h1>Error during installation</h1>
 
-  <p class="message">{{installer.current.model.message}}</p>
+    <p class="message">{{installer.current.model.message}}</p>
 
-  <button class="btn btn-success" ng-click="gotoStep(installer.current.model.step)">Go back</button>
+    <p><small>See log for full details</small></p>
+
+    <button class="btn btn-success" ng-click="restart()">Go back</button>
 </div>

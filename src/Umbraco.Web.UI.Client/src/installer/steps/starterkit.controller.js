@@ -4,7 +4,8 @@ angular.module("umbraco.install").controller("Umbraco.Installer.PackagesControll
         $scope.packages = response.data;
     });
 
-    $scope.setPackageAndContinue = function (pck) {
+    $scope.setPackageAndContinue = function (pckId) {
+        installerService.status.current.model = pckId;
         installerService.forward();
     };
 

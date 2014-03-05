@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Install
 
             var expected = new[]
             {
-                typeof (FilePermissionsStep), typeof (UserStep), typeof(MajorVersion7UpgradeReport), typeof (DatabaseConfigureStep), typeof (DatabaseInstallStep),
+                typeof (FilePermissionsStep), typeof (NewInstallStep), typeof(MajorVersion7UpgradeReport), typeof (DatabaseConfigureStep), typeof (DatabaseInstallStep),
                 typeof (DatabaseUpgradeStep), typeof (StarterKitDownloadStep), typeof (StarterKitInstallStep), typeof (StarterKitCleanupStep),
                 typeof (SetUmbracoVersionStep)
             };

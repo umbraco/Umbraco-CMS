@@ -25,6 +25,12 @@ namespace Umbraco.Web.Install.Models
         /// <param name="model"></param>
         /// <returns></returns>
         public abstract InstallSetupResult Execute(T model);
+
+        /// <summary>
+        /// Determines if this step needs to execute based on the current state of the application and/or install process
+        /// </summary>
+        /// <returns></returns>
+        public abstract bool RequiresExecution(T model);
     }
 
     [DataContract(Name = "step", Namespace = "")]
@@ -60,12 +66,6 @@ namespace Umbraco.Web.Install.Models
         [IgnoreDataMember]
         public bool PerformsAppRestart { get; private set; }
         
-        /// <summary>
-        /// Determines if this step needs to execute based on the current state of the application and/or install process
-        /// </summary>
-        /// <returns></returns>
-        public abstract bool RequiresExecution();
-
         /// <summary>
         /// Defines what order this step needs to execute on the server side since the 
         /// steps might be shown out of order on the front-end

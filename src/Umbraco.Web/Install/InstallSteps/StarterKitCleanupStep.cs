@@ -42,7 +42,7 @@ namespace Umbraco.Web.Install.InstallSteps
             library.RefreshContent();
         }
 
-        public override bool RequiresExecution()
+        public override bool RequiresExecution(object model)
         {
             var installSteps = InstallStatusTracker.GetStatus().ToArray();
             //this step relies on the preious one completed - because it has stored some information we need

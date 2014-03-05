@@ -135,9 +135,9 @@ namespace Umbraco.Web.Install.Controllers
                 {
                     instruction = installModel.Instructions[step.Name];
                 }
-
+                
                 //If this step doesn't require execution then continue to the next one, this is just a fail-safe check.
-                if (step.RequiresExecution() == false)
+                if (StepRequiresExecution(step, instruction) == false)
                 {
                     //set this as complete and continue
                     InstallStatusTracker.SetComplete(installModel.InstallId, stepStatus.Name, null);
@@ -152,7 +152,7 @@ namespace Umbraco.Web.Install.Controllers
                     InstallStatusTracker.SetComplete(installModel.InstallId, step.Name, setupData != null ? setupData.SavedStepData : null);
 
                     //Determine's the next step in the queue and dequeue's any items that don't need to execute
-                    var nextStep = IterateNextRequiredStep(step, queue, installModel.InstallId);
+                    var nextStep = IterateNextRequiredStep(step, queue, installModel.InstallId, installModel);
                     
                     //check if there's a custom view to return for this step
                     if (setupData != null && setupData.View.IsNullOrWhiteSpace() == false)
@@ -164,6 +164,9 @@ namespace Umbraco.Web.Install.Controllers
                 }
                 catch (Exception ex)
                 {
+
+                    LogHelper.Error<InstallApiController>("An error occurred during installation step " + step.Name, ex);
+
                     if (ex is TargetInvocationException && ex.InnerException != null)
                     {
                         ex = ex.InnerException;
@@ -200,23 +203,36 @@ namespace Umbraco.Web.Install.Controllers
         /// <param name="current"></param>
         /// <param name="queue"></param>
         /// <param name="installId"></param>
+        /// <param name="installModel"></param>
         /// <returns></returns>
-        private string IterateNextRequiredStep(InstallSetupStep current, Queue<InstallTrackingItem> queue, Guid installId)
+        private string IterateNextRequiredStep(InstallSetupStep current, Queue<InstallTrackingItem> queue, Guid installId, InstallInstructions installModel)
         {
             if (queue.Count > 0)
             {
                 var next = queue.Peek();
                 var step = InstallHelper.GetAllSteps().Single(x => x.Name == next.Name);
-                
+
                 //If the current step restarts the app pool then we must simply return the next one in the queue, 
                 // we cannot peek ahead as the next step might rely on the app restart and therefore RequiresExecution 
-                // will rely on that too.
-                //Otherwise if it requires execution then of course return it.
-                if (current.PerformsAppRestart || step.RequiresExecution())
+                // will rely on that too.                
+                if (current.PerformsAppRestart)
                 {                    
                     return step.Name;
                 }
-                
+
+                JToken instruction = null;
+                //If this step has any instructions then extract them
+                if (installModel.Instructions.Any(x => x.Key == step.Name))
+                {
+                    instruction = installModel.Instructions[step.Name];
+                }
+
+                //if the step requires execution then return it's name
+                if (StepRequiresExecution(step, instruction))
+                {
+                    return step.Name;
+                }
+
                 //this step no longer requires execution, this could be due to a new config change during installation,
                 // so we'll dequeue this one from the queue and recurse
                 queue.Dequeue();
@@ -225,11 +241,35 @@ namespace Umbraco.Web.Install.Controllers
                 InstallStatusTracker.SetComplete(installId, step.Name, null);
 
                 //recurse
-                return IterateNextRequiredStep(step, queue, installId);
+                return IterateNextRequiredStep(step, queue, installId, installModel);
             }
 
             //there is no more steps
             return string.Empty;
+        }
+
+        /// <summary>
+        /// Check if the step requires execution
+        /// </summary>
+        /// <param name="step"></param>
+        /// <param name="instruction"></param>
+        /// <returns></returns>
+        internal bool StepRequiresExecution(InstallSetupStep step, JToken instruction)
+        {
+            var model = instruction == null ? null : instruction.ToObject(step.StepType);
+            var genericStepType = typeof(InstallSetupStep<>);
+            Type[] typeArgs = { step.StepType };
+            var typedStepType = genericStepType.MakeGenericType(typeArgs);
+            try
+            {
+                var method = typedStepType.GetMethods().Single(x => x.Name == "RequiresExecution");
+                return (bool)method.Invoke(step, new object[] { model });
+            }
+            catch (Exception ex)
+            {
+                LogHelper.Error<InstallApiController>("Checking if step requires execution (" + step.Name + ") failed.", ex);
+                throw;
+            }
         }
 
         internal InstallSetupResult ExecuteStep(InstallSetupStep step, JToken instruction)

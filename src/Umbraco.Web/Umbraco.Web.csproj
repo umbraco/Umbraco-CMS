@@ -313,8 +313,8 @@
     <Compile Include="Install\InstallSteps\StarterKitCleanupStep.cs" />
     <Compile Include="Install\InstallSteps\StarterKitDownloadStep.cs" />
     <Compile Include="Install\InstallSteps\StarterKitInstallStep.cs" />
-    <Compile Include="Install\InstallSteps\Upgrade.cs" />
-    <Compile Include="Install\InstallSteps\UserStep.cs" />
+    <Compile Include="Install\InstallSteps\UpgradeStep.cs" />
+    <Compile Include="Install\InstallSteps\NewInstallStep.cs" />
     <Compile Include="Install\Models\DatabaseModel.cs" />
     <Compile Include="Install\Models\DatabaseType.cs" />
     <Compile Include="Install\Models\InstallationType.cs" />

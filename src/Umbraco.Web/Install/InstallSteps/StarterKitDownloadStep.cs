@@ -32,6 +32,12 @@ namespace Umbraco.Web.Install.InstallSteps
                 var defaultPackageId = modules.First().RepoGuid;
                 starterKitId = defaultPackageId;
             }
+            else if (starterKitId.Value == Guid.Empty)
+            {
+                //if the startkit id is an empty GUID then it means the user has decided not to install one
+                // so we'll just exit
+                return null;
+            }
 
             var result = DownloadPackageFiles(starterKitId.Value);
 
@@ -78,8 +84,14 @@ namespace Umbraco.Web.Install.InstallSteps
             get { return (InstalledPackage.GetAllInstalledPackages().Count > 0) ? string.Empty : base.View; }
         }
 
-        public override bool RequiresExecution()
+        public override bool RequiresExecution(Guid? model)
         {
+            //Don't execute if it's an empty GUID - meaning the user has chosen not to install one
+            if (model.HasValue && model.Value == Guid.Empty)
+            {
+                return false;
+            }
+
             if (InstalledPackage.GetAllInstalledPackages().Count > 0)
                 return false;
 

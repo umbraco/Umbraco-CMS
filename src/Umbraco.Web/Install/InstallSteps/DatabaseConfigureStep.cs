@@ -101,7 +101,7 @@ namespace Umbraco.Web.Install.InstallSteps
             get { return ShouldDisplayView() ? base.View : ""; }
         }
 
-        public override bool RequiresExecution()
+        public override bool RequiresExecution(DatabaseModel model)
         {
             return ShouldDisplayView();
         }

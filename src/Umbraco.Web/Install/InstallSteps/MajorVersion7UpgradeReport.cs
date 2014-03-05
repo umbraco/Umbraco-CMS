@@ -31,7 +31,7 @@ namespace Umbraco.Web.Install.InstallSteps
             return new InstallSetupResult("version7upgradereport", CreateReport());
         }
 
-        public override bool RequiresExecution()
+        public override bool RequiresExecution(object model)
         {
             //if it's configured, then no need to run
             if (_applicationContext.IsConfigured)

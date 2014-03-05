@@ -54,7 +54,7 @@ namespace Umbraco.Web.Install.InstallSteps
             }
         }
 
-        public override bool RequiresExecution()
+        public override bool RequiresExecution(object model)
         {
             return true;
         }

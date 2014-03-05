@@ -38,7 +38,7 @@ namespace Umbraco.Web.Install.InstallSteps
             return null;
         }
 
-        public override bool RequiresExecution()
+        public override bool RequiresExecution(object model)
         {
             //if it's properly configured (i.e. the versions match) then no upgrade necessary
             if (_applicationContext.IsConfigured)
