@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace Umbraco.Core.Persistence
 {
+    //TODO: check if any of this works and for what databse types it works for: 
+    // ref: http://stackoverflow.com/questions/16171144/how-to-check-for-database-availability
+
     internal static class SqlExtensions
     {
         public static bool IsConnectionAvailable(string connString)
