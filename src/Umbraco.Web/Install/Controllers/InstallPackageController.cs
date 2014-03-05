@@ -8,6 +8,7 @@ using System.Web.Http;
 using Newtonsoft.Json.Linq;
 using umbraco;
 using Umbraco.Core;
+using Umbraco.Web.Install.Models;
 using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Install.Controllers
@@ -20,6 +21,7 @@ namespace Umbraco.Web.Install.Controllers
 	/// is a bit of a mess currently.
 	/// </remarks>
 	[HttpInstallAuthorize]
+    [AngularJsonOnlyConfiguration]
     [Obsolete("This is only used for the legacy way of installing starter kits in the back office")]
     public class InstallPackageController : ApiController
 	{
@@ -42,37 +44,38 @@ namespace Umbraco.Web.Install.Controllers
 		/// Empty action, useful for retrieving the base url for this controller
 		/// </summary>
 		/// <returns></returns>
+		[HttpGet]
         public HttpResponseMessage Index()
 		{
 			throw new NotImplementedException();
 		}
 
-		/// <summary>
-		/// Connects to the repo, downloads the package and creates the manifest
-		/// </summary>
-		/// <param name="kitGuid"></param>
-		/// <returns></returns>
-		[HttpPost]
-        public HttpResponseMessage DownloadPackageFiles(Guid kitGuid)
+        /// <summary>
+        /// Connects to the repo, downloads the package and creates the manifest
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        [HttpPost]
+        public HttpResponseMessage DownloadPackageFiles(InstallPackageModel model)
 		{
 			var repo = global::umbraco.cms.businesslogic.packager.repositories.Repository.getByGuid(RepoGuid);
             if (repo == null)
             {
                 return Json(
                     new {success = false, error = "No repository found with id " + RepoGuid},
-                    HttpStatusCode.BadGateway);
+                    HttpStatusCode.OK);
             }
 			if (repo.HasConnection() == false)
 			{
                 return Json(
                     new { success = false, error = "cannot_connect" },
-                    HttpStatusCode.BadGateway);
+                    HttpStatusCode.OK);
 			}
 			var installer = new global::umbraco.cms.businesslogic.packager.Installer();
 
-			var tempFile = installer.Import(repo.fetch(kitGuid.ToString()));
+			var tempFile = installer.Import(repo.fetch(model.KitGuid.ToString()));
 			installer.LoadConfig(tempFile);
-			var pId = installer.CreateManifest(tempFile, kitGuid.ToString(), RepoGuid);
+            var pId = installer.CreateManifest(tempFile, model.KitGuid.ToString(), RepoGuid);
 			return Json(new
 				{
 					success = true,
@@ -88,17 +91,17 @@ namespace Umbraco.Web.Install.Controllers
 		/// </summary>
 		/// <returns></returns>
 		[HttpPost]
-        public HttpResponseMessage InstallPackageFiles(Guid kitGuid, int manifestId, string packageFile)
+        public HttpResponseMessage InstallPackageFiles(InstallPackageModel model)
 		{
-			packageFile = HttpUtility.UrlDecode(packageFile);
+            model.PackageFile = HttpUtility.UrlDecode(model.PackageFile);
 			var installer = new global::umbraco.cms.businesslogic.packager.Installer();
-			installer.LoadConfig(packageFile);
-			installer.InstallFiles(manifestId, packageFile);
+            installer.LoadConfig(model.PackageFile);
+            installer.InstallFiles(model.ManifestId, model.PackageFile);
 			return Json(new
 				{
 					success = true,
-					manifestId,
-					packageFile,
+                    model.ManifestId,
+                    model.PackageFile,
 					percentage = 20,
 					message = "Installing starter kit files"
 				}, HttpStatusCode.OK);
@@ -134,7 +137,8 @@ namespace Umbraco.Web.Install.Controllers
 
 			return Json(new
 				{					
-					percentage = 30
+					percentage = 30,
+                    success = true,
 				}, HttpStatusCode.OK);
 		}
 
@@ -143,17 +147,17 @@ namespace Umbraco.Web.Install.Controllers
 		/// </summary>
 		/// <returns></returns>
 		[HttpPost]
-        public HttpResponseMessage InstallBusinessLogic(Guid kitGuid, int manifestId, string packageFile)
+        public HttpResponseMessage InstallBusinessLogic(InstallPackageModel model)
 		{
-			packageFile = HttpUtility.UrlDecode(packageFile);
+            model.PackageFile = HttpUtility.UrlDecode(model.PackageFile);
 			var installer = new global::umbraco.cms.businesslogic.packager.Installer();
-			installer.LoadConfig(packageFile);
-			installer.InstallBusinessLogic(manifestId, packageFile);
+            installer.LoadConfig(model.PackageFile);
+            installer.InstallBusinessLogic(model.ManifestId, model.PackageFile);
 			return Json(new
 			{
 				success = true,
-				manifestId,
-				packageFile,
+                model.ManifestId,
+                model.PackageFile,
 				percentage = 70,
 				message = "Installing starter kit files"
 			}, HttpStatusCode.OK);
@@ -164,20 +168,20 @@ namespace Umbraco.Web.Install.Controllers
 		/// </summary>
 		/// <returns></returns>
 		[HttpPost]
-        public HttpResponseMessage CleanupInstallation(Guid kitGuid, int manifestId, string packageFile)
+        public HttpResponseMessage CleanupInstallation(InstallPackageModel model)
 		{
-			packageFile = HttpUtility.UrlDecode(packageFile);
+            model.PackageFile = HttpUtility.UrlDecode(model.PackageFile);
 			var installer = new global::umbraco.cms.businesslogic.packager.Installer();
-			installer.LoadConfig(packageFile);
-			installer.InstallCleanUp(manifestId, packageFile);
+            installer.LoadConfig(model.PackageFile);
+            installer.InstallCleanUp(model.ManifestId, model.PackageFile);
 
 			library.RefreshContent();
 
 			return Json(new
 			{
 				success = true,
-				manifestId,
-				packageFile,
+                model.ManifestId,
+                model.PackageFile,
 				percentage = 100,
 				message = "Starter kit has been installed"
 			}, HttpStatusCode.OK);

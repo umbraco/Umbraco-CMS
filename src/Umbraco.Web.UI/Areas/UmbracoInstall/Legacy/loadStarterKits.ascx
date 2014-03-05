@@ -55,9 +55,9 @@
         </itemtemplate>
         <footertemplate>
                 </ul>
-            <asp:LinkButton runat="server" ID="declineStarterKits" CssClass="declineKit" OnClientClick="return confirm('Are you sure you do not want to install a starter kit?');" OnClick="NextStep">
+            <%--<asp:LinkButton runat="server" ID="declineStarterKits" CssClass="declineKit" OnClientClick="return confirm('Are you sure you do not want to install a starter kit?');" OnClick="NextStep">
                     No thanks, do not install a starterkit!
-            </asp:LinkButton>
+            </asp:LinkButton>--%>
         </footertemplate>
     </asp:Repeater>
 

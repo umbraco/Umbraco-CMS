@@ -314,9 +314,6 @@
     <Compile Include="Areas\UmbracoInstall\Legacy\LoadStarterKits.ascx.designer.cs">
       <DependentUpon>loadStarterKits.ascx</DependentUpon>
     </Compile>
-    <Compile Include="Areas\UmbracoInstall\Legacy\StepUserControl.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
     <Compile Include="Config\splashes\NoNodes.aspx.cs">
       <DependentUpon>noNodes.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -324,20 +321,6 @@
     <Compile Include="Config\splashes\NoNodes.aspx.designer.cs">
       <DependentUpon>noNodes.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\InstallerRestService.aspx.cs">
-      <DependentUpon>InstallerRestService.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\InstallerRestService.aspx.designer.cs">
-      <DependentUpon>InstallerRestService.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Title.ascx.cs">
-      <DependentUpon>Title.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="Areas\UmbracoInstall\Title.ascx.designer.cs">
-      <DependentUpon>Title.ascx</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Settings.Designer.cs">
@@ -1676,8 +1659,6 @@
     <Content Include="Umbraco_Client\Installer\Js\jquery.1.4.4.js" />
     <Content Include="Umbraco_Client\Installer\Js\jquery.main.js" />
     <Content Include="Umbraco_Client\Installer\Js\jquery.ui.selectmenu.js" />
-    <Content Include="Areas\UmbracoInstall\Title.ascx" />
-    <Content Include="Areas\UmbracoInstall\InstallerRestService.aspx" />
     <Content Include="Umbraco\Config\Lang\ko.xml" />
     <Content Include="Umbraco\Dashboard\FeedProxy.aspx" />
     <Content Include="Umbraco\Developer\Packages\StarterKits.aspx" />

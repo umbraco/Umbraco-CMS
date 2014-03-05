@@ -62,7 +62,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
 
         private void ShowStarterKits()
         {
-            if (Directory.Exists(Server.MapPath(SystemDirectories.Install)) == false)
+            if (Directory.Exists(Server.MapPath("~/Areas/UmbracoInstall/Legacy")) == false)
             {
                 InstallationDirectoryNotAvailable.Visible = true;
                 StarterKitNotInstalled.Visible = false;
@@ -71,7 +71,7 @@ namespace Umbraco.Web.UI.Umbraco.Developer.Packages
             }
 
 
-            var starterkitsctrl = (LoadStarterKits)LoadControl(SystemDirectories.Install + "/steps/Skinning/loadStarterKits.ascx");
+            var starterkitsctrl = (LoadStarterKits)LoadControl("~/Areas/UmbracoInstall/Legacy/loadStarterKits.ascx");
             
             ph_starterkits.Controls.Add(starterkitsctrl);
 

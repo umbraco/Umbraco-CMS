@@ -28,19 +28,20 @@ namespace Umbraco.Web.Install
                 "Install",
                 new { controller = "Install", action = "Index", id = UrlParameter.Optional },
                 new[] { typeof(InstallController).Namespace });
-            
-            var apiRoute = context.Routes.MapHttpRoute(
+
+            //TODO: We can remove this when we re-build the back office package installer
+            //Create the install routes
+            context.MapHttpRoute(
+                "Umbraco_install_packages",
+                "Install/PackageInstaller/{action}/{id}",
+                new { controller = "InstallPackage", action = "Index", id = UrlParameter.Optional },
+                new[] { typeof(InstallPackageController).Namespace });
+
+            context.MapHttpRoute(
                 "umbraco-install-api",
                 "install/api/{action}/{id}",
-                new { controller = "InstallApi", action = "Status", id = RouteParameter.Optional });
-            //web api routes don't set the data tokens object
-            if (apiRoute.DataTokens == null)
-            {
-                apiRoute.DataTokens = new RouteValueDictionary();
-            }
-            apiRoute.DataTokens.Add("area", "Install");
-            apiRoute.DataTokens.Add("Namespaces", new[] { typeof(InstallApiController).Namespace }); //look in this namespace to create the controller
-            apiRoute.DataTokens.Add("UseNamespaceFallback", false); //Don't look anywhere else except this namespace!
+                new {controller = "InstallApi", action = "Status", id = RouteParameter.Optional},
+                new[] {typeof (InstallApiController).Namespace});
         }
 
         public override string AreaName

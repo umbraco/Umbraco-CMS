@@ -201,27 +201,15 @@ namespace Umbraco.Web
             defaultRoute.RouteHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory());
 
             //register install routes
-            RouteInstallArea();
+            RouteTable.Routes.RegisterArea<UmbracoInstallArea>();
 
             //register all back office routes
-            RouteBackOfficeArea();
+            RouteTable.Routes.RegisterArea<BackOfficeArea>();
 
             //plugin controllers must come first because the next route will catch many things
             RoutePluginControllers();
         }
-
-        private void RouteInstallArea()
-        {
-            var installArea = new UmbracoInstallArea();
-            RouteTable.Routes.RegisterArea(installArea);
-        }
-
-        private void RouteBackOfficeArea()
-        {
-            var backOfficeArea = new BackOfficeArea();
-            RouteTable.Routes.RegisterArea(backOfficeArea);
-        }
-
+        
         private void RoutePluginControllers()
         {
             var umbracoPath = GlobalSettings.UmbracoMvcArea;
@@ -271,14 +259,13 @@ namespace Umbraco.Web
             var route = RouteTable.Routes.MapHttpRoute(
                 string.Format("umbraco-{0}-{1}", "api", meta.ControllerName),
                 routePath,
-                new { controller = meta.ControllerName, id = UrlParameter.Optional });
+                new { controller = meta.ControllerName, id = UrlParameter.Optional },
+                new[] { meta.ControllerNamespace });
             //web api routes don't set the data tokens object
             if (route.DataTokens == null)
             {
                 route.DataTokens = new RouteValueDictionary();
             }
-            route.DataTokens.Add("Namespaces", new[] { meta.ControllerNamespace }); //look in this namespace to create the controller
-            route.DataTokens.Add("UseNamespaceFallback", false); //Don't look anywhere else except this namespace!
             route.DataTokens.Add("umbraco", "api"); //ensure the umbraco token is set
         }
         private void RouteLocalSurfaceController(Type controller, string umbracoPath)

@@ -26,7 +26,8 @@ namespace Umbraco.Web.UI.Install.Steps.Skinning
             //Get the URL for the package install service base url
             var umbracoPath = Core.Configuration.GlobalSettings.UmbracoMvcArea;
             var urlHelper = new UrlHelper(Context.Request.RequestContext);
-            PackageInstallServiceBaseUrl = urlHelper.Action("Index", "InstallPackage", new { area = umbracoPath });
+            //PackageInstallServiceBaseUrl = urlHelper.Action("Index", "InstallPackage", new { area = "UmbracoInstall" });
+            PackageInstallServiceBaseUrl = urlHelper.GetUmbracoApiService("Index", "InstallPackage", "UmbracoInstall");
         }
 
         /// <summary>
