@@ -658,7 +658,6 @@
     <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="Standalone\WriteableConfigSystem.cs" />
-    <Compile Include="Strategies\LegacyActionHandlerEventHandler.cs" />
     <Compile Include="UI\JavaScript\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

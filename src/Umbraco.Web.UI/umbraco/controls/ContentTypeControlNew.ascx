@@ -27,11 +27,11 @@
       HeaderStyle-Font-Bold="True" AutoGenerateColumns="False" CssClass="tabs-table">
       <Columns>
         <asp:BoundColumn DataField="id" Visible="False"></asp:BoundColumn>
-        <asp:TemplateColumn HeaderText="Name">
+        <asp:TemplateColumn HeaderText="Name & sort order">
           <ItemTemplate>
             <i class="icon-navigation handle"></i>
             <asp:TextBox ID="txtTab" runat="server" Value='<%#DataBinder.Eval(Container.DataItem,"name")%>'></asp:TextBox>
-            <asp:TextBox ID="txtSortOrder" runat="server" CssClass="sort-order" Value='<%#DataBinder.Eval(Container.DataItem,"order") %>'></asp:TextBox>
+            <asp:TextBox ID="txtSortOrder" runat="server" CssClass="sort-order" style="width:40px;background-color:#f2f2f2;" Value='<%#DataBinder.Eval(Container.DataItem,"order") %>'></asp:TextBox>
           </ItemTemplate>
         </asp:TemplateColumn>
         <asp:ButtonColumn ButtonType="PushButton" Text="Delete" CommandName="Delete"></asp:ButtonColumn>

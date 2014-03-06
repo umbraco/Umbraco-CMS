@@ -61,10 +61,7 @@ namespace Umbraco.Web.Search
             CacheRefresherBase<PageCacheRefresher>.CacheUpdated += PublishedPageCacheRefresherCacheUpdated;
             CacheRefresherBase<MediaCacheRefresher>.CacheUpdated += MediaCacheRefresherCacheUpdated;
             CacheRefresherBase<MemberCacheRefresher>.CacheUpdated += MemberCacheRefresherCacheUpdated;
-            //TODO: Remove the legacy event handlers once we proxy the legacy members stuff through the new services
-            MemberService.Saved += MemberServiceSaved;
-            MemberService.Deleted += MemberServiceDeleted;
-   
+            
 			var contentIndexer = ExamineManager.Instance.IndexProviderCollection["InternalIndexer"] as UmbracoContentIndexer;
 			if (contentIndexer != null)
 			{
