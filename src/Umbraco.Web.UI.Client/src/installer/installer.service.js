@@ -69,6 +69,23 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 		return view;
 	}
 
+    /** Have put this here because we are not referencing our other modules */
+	function safeApply (scope, fn) {
+	    if (scope.$$phase || scope.$root.$$phase) {
+	        if (angular.isFunction(fn)) {
+	            fn();
+	        }
+	    }
+	    else {
+	        if (angular.isFunction(fn)) {
+	            scope.$apply(fn);
+	        }
+	        else {
+	            scope.$apply();
+	        }
+	    }
+	}
+
 	var service = {
 
 		status : _status,
@@ -240,10 +257,10 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 			processInstallStep();
 		},
 
-		randomFact : function(){
-			$rootScope.$apply(function(){
-				service.status.fact = facts[ _.random( facts.length-1) ];
-			});
+		randomFact: function () {
+		    safeApply($rootScope, function() {
+		        service.status.fact = facts[_.random(facts.length - 1)];
+		    });
 		},
 
 		switchToFeedback : function(){
