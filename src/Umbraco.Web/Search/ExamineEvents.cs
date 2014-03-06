@@ -60,10 +60,8 @@ namespace Umbraco.Web.Search
             CacheRefresherBase<UnpublishedPageCacheRefresher>.CacheUpdated += UnpublishedPageCacheRefresherCacheUpdated;
             CacheRefresherBase<PageCacheRefresher>.CacheUpdated += PublishedPageCacheRefresherCacheUpdated;
             CacheRefresherBase<MediaCacheRefresher>.CacheUpdated += MediaCacheRefresherCacheUpdated;
+            CacheRefresherBase<MemberCacheRefresher>.CacheUpdated += MemberCacheRefresherCacheUpdated;
    
-			Member.AfterSave += MemberAfterSave;
-			Member.AfterDelete += MemberAfterDelete;
-
 			var contentIndexer = ExamineManager.Instance.IndexProviderCollection["InternalIndexer"] as UmbracoContentIndexer;
 			if (contentIndexer != null)
 			{
@@ -76,11 +74,55 @@ namespace Umbraco.Web.Search
 			}
 		}
 
-        /// <summary>
+        [SecuritySafeCritical]
+	    static void MemberCacheRefresherCacheUpdated(MemberCacheRefresher sender, CacheRefresherEventArgs e)
+	    {
+            switch (e.MessageType)
+            {
+                case MessageType.RefreshById:
+                    var c1 = ApplicationContext.Current.Services.MemberService.GetById((int)e.MessageObject);
+                    if (c1 != null)
+                    {
+                        ReIndexForMember(c1);
+                    }
+                    break;
+                case MessageType.RemoveById:
+
+                    // This is triggered when the item is permanently deleted
+
+                    DeleteIndexForEntity((int)e.MessageObject, false);
+                    break;
+                case MessageType.RefreshByInstance:
+                    var c3 = e.MessageObject as IMember;
+                    if (c3 != null)
+                    {
+                        ReIndexForMember(c3);
+                    }
+                    break;
+                case MessageType.RemoveByInstance:
+
+                    // This is triggered when the item is permanently deleted
+
+                    var c4 = e.MessageObject as IMember;
+                    if (c4 != null)
+                    {
+                        DeleteIndexForEntity(c4.Id, false);
+                    }
+                    break;
+                case MessageType.RefreshAll:
+                case MessageType.RefreshByJson:
+                default:
+                    //We don't support these, these message types will not fire for unpublished content
+                    break;
+            }
+	    }
+
+	    /// <summary>
         /// Handles index management for all media events - basically handling saving/copying/trashing/deleting
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        [SecuritySafeCritical]
 	    static void MediaCacheRefresherCacheUpdated(MediaCacheRefresher sender, CacheRefresherEventArgs e)
         {
             switch (e.MessageType)
@@ -265,24 +307,13 @@ namespace Umbraco.Web.Search
         }
 
 		[SecuritySafeCritical]
-		private static void MemberAfterSave(Member sender, SaveEventArgs e)
+        private static void ReIndexForMember(IMember member)
 		{
-			//ensure that only the providers are flagged to listen execute
-			var xml = ExamineXmlExtensions.ToXElement(sender.ToXml(new System.Xml.XmlDocument(), false));
-			var providers = ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
-				.Where(x => x.EnableDefaultEventHandler);
-			ExamineManager.Instance.ReIndexNode(xml, IndexTypes.Member, providers);
-		}
-
-		[SecuritySafeCritical]
-		private static void MemberAfterDelete(Member sender, DeleteEventArgs e)
-		{
-			var nodeId = sender.Id.ToString();
-
-			//ensure that only the providers are flagged to listen execute
-			ExamineManager.Instance.DeleteFromIndex(nodeId,
-				ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
-					.Where(x => x.EnableDefaultEventHandler));
+		    ExamineManager.Instance.ReIndexNode(
+		        member.ToXml(), IndexTypes.Member,
+		        ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
+                    //ensure that only the providers are flagged to listen execute
+		            .Where(x => x.EnableDefaultEventHandler));
 		}
 
 		/// <summary>
@@ -310,14 +341,14 @@ namespace Umbraco.Web.Search
         private static void ReIndexForMedia(IMedia sender, bool isMediaPublished)
         {
             ExamineManager.Instance.ReIndexNode(
-                sender.ToXml(), "media",
+                sender.ToXml(), IndexTypes.Media,
                 ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
 
-                //Index this item for all indexers if the media is not trashed, otherwise if the item is trashed
-                // then only index this for indexers supporting unpublished media
+                    //Index this item for all indexers if the media is not trashed, otherwise if the item is trashed
+                    // then only index this for indexers supporting unpublished media
 
-                .Where(x => isMediaPublished || (x.SupportUnpublishedContent))
-                .Where(x => x.EnableDefaultEventHandler));
+                    .Where(x => isMediaPublished || (x.SupportUnpublishedContent))
+                    .Where(x => x.EnableDefaultEventHandler));
         }
 
 	    /// <summary>
@@ -351,17 +382,17 @@ namespace Umbraco.Web.Search
 	    /// </param>
         [SecuritySafeCritical]
 	    private static void ReIndexForContent(IContent sender, bool isContentPublished)
-        {            
-            ExamineManager.Instance.ReIndexNode(
-                sender.ToXml(), "content",
-                ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
+	    {
+	        ExamineManager.Instance.ReIndexNode(
+	            sender.ToXml(), IndexTypes.Content,
+	            ExamineManager.Instance.IndexProviderCollection.OfType<BaseUmbracoIndexer>()
                     
-                    //Index this item for all indexers if the content is published, otherwise if the item is not published
-                    // then only index this for indexers supporting unpublished content
+	                //Index this item for all indexers if the content is published, otherwise if the item is not published
+	                // then only index this for indexers supporting unpublished content
 
-                    .Where(x => isContentPublished || (x.SupportUnpublishedContent))
-                    .Where(x => x.EnableDefaultEventHandler));
-        }
+	                .Where(x => isContentPublished || (x.SupportUnpublishedContent))
+	                .Where(x => x.EnableDefaultEventHandler));
+	    }
 
 		/// <summary>
 		/// Converts a content node to XDocument
