@@ -57,6 +57,12 @@ namespace Umbraco.Web.Install.Models
         [DataMember(Name = "view")]
         public virtual string View { get; private set; }
 
+        /// <summary>
+        /// The view model used to render the view, by default is null but can be populated
+        /// </summary>
+        [DataMember(Name = "model")]
+        public virtual object ViewModel { get; private set; }
+
         [DataMember(Name = "description")]
         public string Description { get; private set; }
 

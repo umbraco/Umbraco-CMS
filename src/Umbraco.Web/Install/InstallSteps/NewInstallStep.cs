@@ -72,8 +72,23 @@ namespace Umbraco.Web.Install.InstallSteps
             admin.Username = user.Email.Trim();
 
             _applicationContext.Services.UserService.Save(admin);
-
+            
             return null;
+        }
+
+        /// <summary>
+        /// Return a custom view model for this step
+        /// </summary>
+        public override object ViewModel
+        {
+            get
+            {
+                return new
+                {
+                    minCharLength = Membership.Providers[Constants.Conventions.User.UmbracoUsersProviderName].MinRequiredPasswordLength,
+                    minNonAlphaNumericLength = Membership.Providers[Constants.Conventions.User.UmbracoUsersProviderName].MinRequiredNonAlphanumericCharacters
+                };
+            }
         }
 
         public override string View
