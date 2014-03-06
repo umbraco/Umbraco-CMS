@@ -10,7 +10,7 @@ namespace Umbraco.Web.Standalone
     // see http://stackoverflow.com/questions/15653621/how-to-update-add-modify-delete-keys-in-appsettings-section-of-web-config-at-r
     // see http://www.codeproject.com/Articles/69364/Override-Configuration-Manager
 
-    public sealed class WriteableConfigSystem : IInternalConfigSystem
+    internal sealed class WriteableConfigSystem : IInternalConfigSystem
     {
         private static readonly ReaderWriterLockSlim RwLock = new ReaderWriterLockSlim();
         private static WriteableConfigSystem _installed;
