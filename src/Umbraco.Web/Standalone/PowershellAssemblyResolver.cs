@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace Umbraco.Web.Standalone
 {
-    public static class PowershellAssemblyResolver
+    internal static class PowershellAssemblyResolver
     {
         private static readonly Dictionary<string, string> Assemblies;
         private static readonly object Locko = new object();
