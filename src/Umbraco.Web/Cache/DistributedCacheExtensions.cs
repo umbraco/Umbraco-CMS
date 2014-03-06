@@ -256,11 +256,33 @@ namespace Umbraco.Web.Cache
         #endregion
 
         #region Member cache
+
+        /// <summary>
+        /// Refreshes the cache among servers for a member
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="members"></param>
+        public static void RefreshMemberCache(this DistributedCache dc, params IMember[] members)
+        {
+            dc.Refresh(new Guid(DistributedCache.MemberCacheRefresherId), x => x.Id, members);
+        }
+
+        /// <summary>
+        /// Removes the cache among servers for a member
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="members"></param>
+        public static void RemoveMemberCache(this DistributedCache dc, params IMember[] members)
+        {
+            dc.Remove(new Guid(DistributedCache.MemberCacheRefresherId), x => x.Id, members);
+        } 
+
         /// <summary>
         /// Refreshes the cache among servers for a member
         /// </summary>
         /// <param name="dc"></param>
         /// <param name="memberId"></param>
+        [Obsolete("Use the RefreshMemberCache with strongly typed IMember objects instead")]
         public static void RefreshMemberCache(this DistributedCache dc, int memberId)
         {
             dc.Refresh(new Guid(DistributedCache.MemberCacheRefresherId), memberId);
@@ -271,6 +293,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <param name="dc"></param>
         /// <param name="memberId"></param>
+        [Obsolete("Use the RemoveMemberCache with strongly typed IMember objects instead")]
         public static void RemoveMemberCache(this DistributedCache dc, int memberId)
         {
             dc.Remove(new Guid(DistributedCache.MemberCacheRefresherId), memberId);

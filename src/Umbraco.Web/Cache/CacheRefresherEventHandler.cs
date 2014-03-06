@@ -596,22 +596,22 @@ namespace Umbraco.Web.Cache
         #endregion
 
         #region Media event handlers
-        static void MediaServiceTrashing(IMediaService sender, Core.Events.MoveEventArgs<IMedia> e)
+        static void MediaServiceTrashing(IMediaService sender, MoveEventArgs<IMedia> e)
         {
             DistributedCache.Instance.RemoveMediaCache(false, e.Entity);
         }
 
-        static void MediaServiceMoving(IMediaService sender, Core.Events.MoveEventArgs<IMedia> e)
+        static void MediaServiceMoving(IMediaService sender, MoveEventArgs<IMedia> e)
         {
             DistributedCache.Instance.RefreshMediaCache(e.Entity);
         }
 
-        static void MediaServiceDeleting(IMediaService sender, Core.Events.DeleteEventArgs<IMedia> e)
+        static void MediaServiceDeleting(IMediaService sender, DeleteEventArgs<IMedia> e)
         {
             DistributedCache.Instance.RemoveMediaCache(true, e.DeletedEntities.ToArray());
         }
 
-        static void MediaServiceSaved(IMediaService sender, Core.Events.SaveEventArgs<IMedia> e)
+        static void MediaServiceSaved(IMediaService sender, SaveEventArgs<IMedia> e)
         {
             DistributedCache.Instance.RefreshMediaCache(e.SavedEntities.ToArray());
         } 
@@ -619,27 +619,21 @@ namespace Umbraco.Web.Cache
 
         #region Member event handlers
 
-        static void MemberServiceDeleted(IMemberService sender, Core.Events.DeleteEventArgs<IMember> e)
+        static void MemberServiceDeleted(IMemberService sender, DeleteEventArgs<IMember> e)
         {
-            foreach (var m in e.DeletedEntities.ToArray())
-            {
-                DistributedCache.Instance.RemoveMemberCache(m.Id);    
-            }
+            DistributedCache.Instance.RemoveMemberCache(e.DeletedEntities.ToArray());    
         }
 
-        static void MemberServiceSaved(IMemberService sender, Core.Events.SaveEventArgs<IMember> e)
+        static void MemberServiceSaved(IMemberService sender, SaveEventArgs<IMember> e)
         {
-            foreach (var m in e.SavedEntities.ToArray())
-            {
-                DistributedCache.Instance.RefreshMemberCache(m.Id);
-            }
+            DistributedCache.Instance.RefreshMemberCache(e.SavedEntities.ToArray());
         }
 
         #endregion
 
         #region Member group event handlers
 
-        static void MemberGroupService_Deleted(IMemberGroupService sender, Core.Events.DeleteEventArgs<IMemberGroup> e)
+        static void MemberGroupService_Deleted(IMemberGroupService sender, DeleteEventArgs<IMemberGroup> e)
         {
             foreach (var m in e.DeletedEntities.ToArray())
             {
@@ -647,7 +641,7 @@ namespace Umbraco.Web.Cache
             }
         }
 
-        static void MemberGroupService_Saved(IMemberGroupService sender, Core.Events.SaveEventArgs<IMemberGroup> e)
+        static void MemberGroupService_Saved(IMemberGroupService sender, SaveEventArgs<IMemberGroup> e)
         {
             foreach (var m in e.SavedEntities.ToArray())
             {

@@ -75,7 +75,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IUser CreateMemberWithIdentity(string username, string email, string password, IUserType userType, bool raiseEvents = true)
+        public IUser CreateUserWithIdentity(string username, string email, string password, IUserType userType)
         {
             if (userType == null) throw new ArgumentNullException("userType");
 
@@ -103,23 +103,19 @@ namespace Umbraco.Core.Services
                     IsApproved = true
                 };
 
-                if (raiseEvents)
-                {
-                    if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(user), this))
-                        return user;
-                }
+                if (SavingUser.IsRaisedEventCancelled(new SaveEventArgs<IUser>(user), this))
+                    return user;
 
                 repository.AddOrUpdate(user);
                 uow.Commit();
 
-                if (raiseEvents)
-                    SavedUser.RaiseEvent(new SaveEventArgs<IUser>(user, false), this);
+                SavedUser.RaiseEvent(new SaveEventArgs<IUser>(user, false), this);
 
                 return user;
             }
         }
 
-        public IUser CreateWithIdentity(string username, string email, string password, string memberTypeAlias, bool raiseEvents = true)
+        IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string password, string memberTypeAlias)
         {
             var userType = GetUserTypeByAlias(memberTypeAlias);
             if (userType == null)
@@ -127,7 +123,7 @@ namespace Umbraco.Core.Services
                 throw new ArgumentException("The user type " + memberTypeAlias + " could not be resolved");
             }
 
-            return CreateMemberWithIdentity(username, email, password, userType);
+            return CreateUserWithIdentity(username, email, password, userType);
         }
 
         public IUser GetById(int id)
