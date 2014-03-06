@@ -116,16 +116,13 @@
 					<input type="submit" ng-disabled="myForm.$invalid || checking"  
 						value="Continue" class="btn btn-success" />
                     
-                    <br/>
+					    <span class="inline-help" ng-if="checking" ng-animate="'fade'">
+	                    	Validating your database connection...
+	                    </span>
 
-				    <span class="inline-help" ng-if="checking" ng-animate="'fade'">
-                    	Validating your database connection
-                    </span>
-
-					<span class="inline-help error" ng-if="invalidDbDns" ng-animate="'fade'">
-						Could not connect to the database, please correct your connection details
-					</span>
-
+						<span class="inline-help error" ng-if="invalidDbDns" ng-animate="'fade'">
+							Could not connect to database
+						</span>
                 </div>
 			</div>
 		</div>

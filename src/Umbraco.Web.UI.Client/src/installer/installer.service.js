@@ -59,7 +59,7 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 		var pct = "100%";
 		var f = _.find(steps, function(item, index) {
 			if(item.name == next){
-				pct = Math.floor((index / steps.length * 100)) + "%";
+				pct = Math.floor((index+1 / steps.length * 100)) + "%";
 				return true;
 			}else{
 				return false;
@@ -250,7 +250,6 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 								if (desc) {
 									service.status.feedback = desc;
 								}
-
 								processInstallStep();
 							}
 						}
@@ -293,6 +292,7 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 			service.status.loading = false;
 			service.status.configuring = true;
 			service.status.feedback = undefined;
+			service.status.fact = undefined;
 
 			if(factTimer){
 				clearInterval(factTimer);
