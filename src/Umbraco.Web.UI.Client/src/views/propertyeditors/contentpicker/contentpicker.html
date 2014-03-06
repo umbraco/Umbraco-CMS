@@ -23,4 +23,11 @@
             </a>
         </li>
     </ul>
+
+    <div ng-if="model.config.minNumber && model.config.minNumber > renderModel.length">
+    	You need to add atleast {{model.config.minNumber-renderModel.length}} items
+    </div>
+    <div ng-if="model.config.maxNumber && model.config.maxNumber < renderModel.length">
+    	You can only have {{model.config.maxNumber}} items selected
+    </div>
 </div>

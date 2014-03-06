@@ -1,75 +1,115 @@
-﻿using System.Web.Script.Serialization;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Configuration;
+using System.Linq;
+using System.Web;
+using System.Web.Script.Serialization;
 using System.Web.UI;
+
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Persistence;
+using Umbraco.Web.Install.InstallSteps;
+using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install
 {
-    internal static class InstallHelper
+    internal class InstallHelper
     {
+        private readonly UmbracoContext _umbContext;
+        private InstallationType? _installationType;
 
-        private static readonly InstallerStepCollection Steps = new InstallerStepCollection
-            {
-                new Steps.Welcome(),
-                new Steps.License(),
-                new Steps.FilePermissions(),
-                new Steps.MajorUpgradeReport(),
-                new Steps.Database(),
-                new Steps.DefaultUser(),
-                //new Steps.RenderingEngine(),
-                new Steps.Skinning(),
-                new Steps.WebPi(),
-                new Steps.TheEnd()
+        internal InstallHelper(UmbracoContext umbContext)
+        {
+            _umbContext = umbContext;            
+        }
+
+
+        /// <summary>
+        /// Get the installer steps
+        /// </summary>
+        /// <returns></returns>
+        /// <remarks>
+        /// The step order returned here is how they will appear on the front-end if they have views assigned
+        /// </remarks>
+        public IEnumerable<InstallSetupStep> GetAllSteps()
+        {
+            return new List<InstallSetupStep>
+            {                
+                new NewInstallStep(_umbContext.Application),
+                new UpgradeStep(),
+                new FilePermissionsStep(),
+                new MajorVersion7UpgradeReport(_umbContext.Application),
+                new DatabaseConfigureStep(_umbContext.Application),
+                new DatabaseInstallStep(_umbContext.Application),
+                new DatabaseUpgradeStep(_umbContext.Application),
+                new StarterKitDownloadStep(_umbContext.Application),
+                new StarterKitInstallStep(_umbContext.Application, _umbContext.HttpContext),
+                new StarterKitCleanupStep(_umbContext.Application),
+                new SetUmbracoVersionStep(_umbContext.Application, _umbContext.HttpContext),
             };
-
-        internal static InstallerStepCollection InstallerSteps
-        {
-            get { return Steps; }
         }
 
-        public static void RedirectToNextStep(Page page, string currentStep)
+        /// <summary>
+        /// Returns the steps that are used only for the current installation type
+        /// </summary>
+        /// <returns></returns>
+        public IEnumerable<InstallSetupStep> GetStepsForCurrentInstallType()
         {
-            var s = InstallerSteps.GotoNextStep(currentStep);
-            page.Response.Redirect("?installStep=" + s.Alias);
+            return GetAllSteps().Where(x => x.InstallTypeTarget.HasFlag(GetInstallationType()));
         }
 
-        public static void RedirectToLastStep(Page page)
+        public InstallationType GetInstallationType()
         {
-            var s = InstallerSteps.Get("theend");
-            page.Response.Redirect("?installStep=" + s.Alias);
+            return _installationType ?? (_installationType = IsBrandNewInstall ? InstallationType.NewInstall : InstallationType.Upgrade).Value;
         }
 
-
-        private static int _percentage = -1;
-        public static int Percentage 
-        { 
-            get { return _percentage; } 
-            set { _percentage = value; } 
-        }
-
-        public static string Description { get; set; }
-        public static string Error { get; set; }
-
-
-        public static void ClearProgress()
+        /// <summary>
+        /// Checks if this is a brand new install meaning that there is no configured version and there is no configured database connection
+        /// </summary>
+        private bool IsBrandNewInstall
         {
-            Percentage = -1;
-            Description = string.Empty;
-            Error = string.Empty;
-        }
+            get
+            {
+                var databaseSettings = ConfigurationManager.ConnectionStrings[GlobalSettings.UmbracoConnectionName];
+                if (GlobalSettings.ConfigurationStatus.IsNullOrWhiteSpace()
+                    && _umbContext.Application.DatabaseContext.IsConnectionStringConfigured(databaseSettings) == false)
+                {
+                    //no version or conn string configured, must be a brand new install
+                    return true;
+                }
+                
+                //now we have to check if this is really a new install, the db might be configured and might contain data
 
-        public static void SetProgress(int percent, string description, string error)
-        {
-            if (percent > 0)
-                Percentage = percent;
+                if (_umbContext.Application.DatabaseContext.IsConnectionStringConfigured(databaseSettings) == false
+                    || _umbContext.Application.DatabaseContext.IsDatabaseConfigured == false)
+                {
+                    return true;
+                }
 
-            Description = description;
-            Error = error;
-        }
+                //check if we have the default user configured already
+                var result = _umbContext.Application.DatabaseContext.Database.ExecuteScalar<int>(
+                    "SELECT COUNT(*) FROM umbracoUser WHERE id=0 AND userPassword='default'");
+                if (result == 1)
+                {
+                    //the user has not been configured
+                    return true;
+                }
 
-        public static string GetProgress()
-        {
-            var pr = new ProgressResult(Percentage, Description, Error);
-            var js = new JavaScriptSerializer();
-            return js.Serialize(pr);
+//                //check if there are any content types configured, if there isn't then we will consider this a new install
+//                result = _umbContext.Application.DatabaseContext.Database.ExecuteScalar<int>(
+//                    @"SELECT COUNT(*) FROM cmsContentType 
+//                        INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id
+//                        WHERE umbracoNode.nodeObjectType = @contentType", new {contentType = Constants.ObjectTypes.DocumentType});
+//                if (result == 0)
+//                {
+//                    //no content types have been created
+//                    return true;
+//                }
+
+                return false;
+            }
         }
     }
 }

@@ -116,7 +116,6 @@ namespace Umbraco.Tests
             Assert.AreNotEqual(appCtx, result);
         }
 
-        [NUnit.Framework.Ignore("Need to fix more stuff up, this is ignore because an exception occurs because it wants to ensure we have a resolver initialized - need to make that process better for testability")]
         [Test]
         public void Can_Get_Umbraco_Context()
         {
