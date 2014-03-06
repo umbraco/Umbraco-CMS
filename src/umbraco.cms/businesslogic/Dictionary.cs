@@ -532,5 +532,24 @@ namespace umbraco.cms.businesslogic
             }
             #endregion
         }
+
+        // zb023 - utility method
+        public static string ReplaceKey(string text)
+        {
+            if (text.StartsWith("#") == false)
+                return text;
+
+            var lang = Language.GetByCultureCode(Thread.CurrentThread.CurrentCulture.Name);
+            
+            if (lang == null)
+                return "[" + text + "]";
+
+            if (DictionaryItem.hasKey(text.Substring(1, text.Length - 1)) == false) 
+                return "[" + text + "]";
+
+            var di = new DictionaryItem(text.Substring(1, text.Length - 1));
+            return di.Value(lang.id);
+        }
+    
     }
 }
