@@ -5,7 +5,7 @@ describe('edit media controller tests', function () {
     beforeEach(module('umbraco'));
 
     //inject the contentMocks service
-
+    beforeEach(inject(function ($rootScope, $controller, angularHelper, $httpBackend, mediaMocks, entityMocks, mocksUtils) {
         //for these tests we don't want any authorization to occur
         mocksUtils.disableAuth();
 
