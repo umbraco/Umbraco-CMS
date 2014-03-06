@@ -589,19 +589,16 @@ namespace Umbraco.Core.Services
             return member;
         }
 
-        public IMember CreateMemberWithIdentity(string username, string email, string password, IMemberType memberType, bool raiseEvents = true)
+        public IMember CreateMemberWithIdentity(string username, string email, string password, IMemberType memberType)
         {
             if (memberType == null) throw new ArgumentNullException("memberType");
 
             var member = new Member(username, email.ToLower().Trim(), username, password, -1, memberType);
 
-            if (raiseEvents)
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(member), this))
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(member), this))
-                {
-                    member.WasCancelled = true;
-                    return member;
-                }
+                member.WasCancelled = true;
+                return member;
             }
 
             var uow = _uowProvider.GetUnitOfWork();
@@ -615,12 +612,12 @@ namespace Umbraco.Core.Services
                 CreateAndSaveMemberXml(xml, member.Id, uow.Database);
             }
 
-            if (raiseEvents)
-                Saved.RaiseEvent(new SaveEventArgs<IMember>(member, false), this);
+            Saved.RaiseEvent(new SaveEventArgs<IMember>(member, false), this);
+            Created.RaiseEvent(new NewEventArgs<IMember>(member, false, memberType.Alias, -1), this);
 
             return member;
         }
-
+        
         /// <summary>
         /// Creates and persists a new Member
         /// </summary>
@@ -628,9 +625,8 @@ namespace Umbraco.Core.Services
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <param name="memberTypeAlias"></param>
-        /// <param name="raiseEvents"></param>
         /// <returns></returns>
-        public IMember CreateWithIdentity(string username, string email, string password, string memberTypeAlias, bool raiseEvents = true)
+        IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string password, string memberTypeAlias)
         {
             var uow = _uowProvider.GetUnitOfWork();
             IMemberType memberType;
@@ -646,7 +642,7 @@ namespace Umbraco.Core.Services
                 throw new ArgumentException(string.Format("No MemberType matching the passed in Alias: '{0}' was found", memberTypeAlias));
             }
 
-            return CreateMemberWithIdentity(username, email, password, memberType, raiseEvents);
+            return CreateMemberWithIdentity(username, email, password, memberType);
         }
 
         /// <summary>
