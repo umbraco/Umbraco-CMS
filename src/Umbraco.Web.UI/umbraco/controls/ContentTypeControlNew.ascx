@@ -105,10 +105,26 @@
         <asp:Literal runat="server" ID="checkTxtAliasJs" />
     });
 
-    jQuery(document).ready(function () {
+    $(document).ready(function () {
+
+        $("table.tabs-table tr.propertyContent input.sort-order").keydown(function(e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                // Allow: Ctrl+A
+                (e.keyCode == 65 && e.ctrlKey === true) || 
+                // Allow: home, end, left, right
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
 
         // Make each tr of the tabs table sortable (prevent dragging of header row, and set up a callback for when row dragged)
-        jQuery("table.tabs-table tbody").sortable({
+        $("table.tabs-table tbody").sortable({
             containment: 'parent',
             cancel: '.propertyHeader, input',
             tolerance: 'pointer',
@@ -119,8 +135,8 @@
 
         // Fired after row dragged; go through each tr and save position to the hidden sort order field
         function saveOrder() {
-            jQuery("table.tabs-table tbody tr.propertyContent").each(function (index) {
-                jQuery("input.sort-order", this).val(index + 1);
+            $("table.tabs-table tbody tr.propertyContent").each(function (index) {
+                $("input.sort-order", this).val(index + 1);
             });
         }
 

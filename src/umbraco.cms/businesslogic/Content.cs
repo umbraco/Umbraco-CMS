@@ -39,13 +39,18 @@ namespace umbraco.cms.businesslogic
         private bool _versionDateInitialized;
         private string _contentTypeIcon;
         private ContentType _contentType;
-        private Properties m_LoadedProperties = null;
+        private Properties _loadedProperties = null;
         protected internal IContentBase ContentBase;
 
         #endregion
 
         #region Constructors
-      
+
+        protected internal Content(int id, Guid version)
+            : base(id, new object[] { version })
+        {
+        }
+
         public Content(int id) : base(id) { }
 
         protected Content(int id, bool noSetup) : base(id, noSetup) { }
@@ -223,7 +228,7 @@ namespace umbraco.cms.businesslogic
             get
             {
                 EnsureProperties();
-                return m_LoadedProperties;
+                return _loadedProperties;
             }
         }
 
@@ -236,7 +241,7 @@ namespace umbraco.cms.businesslogic
             get
             {
                 EnsureProperties();
-                return m_LoadedProperties.ToArray();
+                return _loadedProperties.ToArray();
             }
         }
 
@@ -288,7 +293,7 @@ namespace umbraco.cms.businesslogic
         {
             EnsureProperties();
 
-            return m_LoadedProperties.SingleOrDefault(x => x.PropertyType.Alias == alias);
+            return _loadedProperties.SingleOrDefault(x => x.PropertyType.Alias == alias);
         }
 
         /// <summary>
@@ -300,7 +305,7 @@ namespace umbraco.cms.businesslogic
         {
             EnsureProperties();
 
-            return m_LoadedProperties.SingleOrDefault(x => x.PropertyType.Id == pt.Id);
+            return _loadedProperties.SingleOrDefault(x => x.PropertyType.Id == pt.Id);
         }
 
         /// <summary>
@@ -463,6 +468,21 @@ namespace umbraco.cms.businesslogic
         #region Protected Methods
 
         /// <summary>
+        /// This is purely for a hackity hack hack hack in order to make the new Document(id, version) constructor work because
+        /// the Version property needs to be set on the object before setupNode is called, otherwise it never works!
+        /// </summary>
+        /// <param name="ctorArgs"></param>
+        internal override void PreSetupNode(params object[] ctorArgs)
+        {
+            //we know that there is one ctor arg and it is a GUID since we are only calling the base
+            // ctor with this overload for one purpose.
+            var version = (Guid) ctorArgs[0];
+            _version = version;
+
+            base.PreSetupNode(ctorArgs);
+        }
+
+        /// <summary>
         /// Sets up the ContentType property for this content item and sets the addition content properties manually.
         /// If the ContentType property is not already set, then this will get the ContentType from Cache.
         /// </summary>
@@ -616,7 +636,7 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         private void ClearLoadedProperties()
         {
-            m_LoadedProperties = null;
+            _loadedProperties = null;
         }
 
         /// <summary>
@@ -624,7 +644,7 @@ namespace umbraco.cms.businesslogic
         /// </summary>
         private void EnsureProperties()
         {
-            if (m_LoadedProperties == null)
+            if (_loadedProperties == null)
             {
                 InitializeProperties();
             }
@@ -643,13 +663,13 @@ namespace umbraco.cms.businesslogic
         /// </remarks>
         private void InitializeProperties()
         {
-            m_LoadedProperties = new Properties();
+            _loadedProperties = new Properties();
 
             if (ContentBase != null)
             {
                 //NOTE: we will not load any properties where HasIdentity = false - this is because if properties are 
                 // added to the property collection that aren't persisted we'll get ysods
-                m_LoadedProperties.AddRange(ContentBase.Properties.Where(x => x.HasIdentity).Select(x => new Property(x)));
+                _loadedProperties.AddRange(ContentBase.Properties.Where(x => x.HasIdentity).Select(x => new Property(x)));
                 return;
             }
 
@@ -658,7 +678,7 @@ namespace umbraco.cms.businesslogic
 
             //Create anonymous typed list with 2 props, Id and PropertyTypeId of type Int.
             //This will still be an empty list since the props list is empty.
-            var propData = m_LoadedProperties.Select(x => new { Id = 0, PropertyTypeId = 0 }).ToList();
+            var propData = _loadedProperties.Select(x => new { Id = 0, PropertyTypeId = 0 }).ToList();
 
             string sql = @"select id, propertyTypeId from cmsPropertyData where versionId=@versionId";
 
@@ -697,7 +717,7 @@ namespace umbraco.cms.businesslogic
                     continue; //this remains from old code... not sure why we would do this?
                 }
 
-                m_LoadedProperties.Add(p);
+                _loadedProperties.Add(p);
             }
         }
 
