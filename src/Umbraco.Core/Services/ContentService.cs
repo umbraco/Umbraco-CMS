@@ -176,7 +176,15 @@ namespace Umbraco.Core.Services
             var contentType = FindContentTypeByAlias(contentTypeAlias);
             var content = new Content(name, parentId, contentType);
 
+            //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
+            // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
+            {
+                content.WasCancelled = true;
+                return content;
+            }
+
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
             {
                 content.WasCancelled = true;
                 return content;
@@ -190,6 +198,8 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(content);
                 uow.Commit();
             }
+
+            Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
 
             Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId), this);
 
@@ -216,7 +226,15 @@ namespace Umbraco.Core.Services
             var contentType = FindContentTypeByAlias(contentTypeAlias);
             var content = new Content(name, parent, contentType);
 
+            //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
+            // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parent), this))
+            {
+                content.WasCancelled = true;
+                return content;
+            }
+
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
             {
                 content.WasCancelled = true;
                 return content;
@@ -230,6 +248,8 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(content);
                 uow.Commit();
             }
+
+            Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
 
             Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parent), this);
 
