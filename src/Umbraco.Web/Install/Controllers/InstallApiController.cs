@@ -80,27 +80,7 @@ namespace Umbraco.Web.Install.Controllers
 
             return setup;
         }
-
-        /// <summary>
-        /// Checks if the db can be connected to
-        /// </summary>
-        /// <returns></returns>
-        public HttpResponseMessage PostCheckDbConnection()
-        {
-            //TODO: Look into using SqlExtensions.IsConnectionAvailable which i started making for this
-
-            throw new NotImplementedException();
-        }
-
-        /// <summary>
-        /// Checks if the db credentials are correct
-        /// </summary>
-        /// <returns></returns>
-        public HttpResponseMessage PostCheckDbCredentials()
-        {
-            throw new NotImplementedException();
-        }
-
+        
         public IEnumerable<Package> GetPackages()
         {
             var r = new org.umbraco.our.Repository();
