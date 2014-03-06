@@ -401,6 +401,7 @@
     <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
     <Compile Include="Standalone\WriteableConfigSystem.cs" />
+    <Compile Include="Strategies\LegacyActionHandlerEventHandler.cs" />
     <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\RebuildMediaXmlCacheAfterUpgrade.cs" />
     <Compile Include="Strategies\PublicAccessEventHandler.cs" />
