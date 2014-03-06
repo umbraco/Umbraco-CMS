@@ -15,8 +15,8 @@
 */
 function fileUploadController($scope, $element, $compile, imageHelper, fileManager, umbRequestHelper, mediaHelper) {
 
-    mediaHelper.registerFileResolver("Umbraco.UploadField", function (property) {
-        return property.value;
+    mediaHelper.registerFileResolver("Umbraco.UploadField", function(property){
+            return property.value;
     });
 
     /** Clears the file collections when content is saving (if we need to clear) or after saved */

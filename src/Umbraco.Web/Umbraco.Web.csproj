@@ -289,6 +289,7 @@
     <Compile Include="Cache\StylesheetCacheRefresher.cs" />
     <Compile Include="Cache\StylesheetPropertyCacheRefresher.cs" />
     <Compile Include="Cache\TemplateCacheRefresher.cs" />
+    <Compile Include="Cache\UnpublishedPageCacheRefresher.cs" />
     <Compile Include="Cache\UserCacheRefresher.cs" />
     <Compile Include="Cache\UserPermissionsCacheRefresher.cs" />
     <Compile Include="Cache\UserTypeCacheRefresher.cs" />
@@ -341,6 +342,8 @@
     <Compile Include="Models\ImageCropData.cs" />
     <Compile Include="Models\IRenderModel.cs" />
     <Compile Include="Models\PostRedirectModel.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\PublishedFragment.cs" />
+    <Compile Include="PublishedCache\XmlPublishedCache\PublishedFragmentProperty.cs" />
     <Compile Include="Models\RenderModelOfTContent.cs" />
     <Compile Include="Mvc\JsonNetResult.cs" />
     <Compile Include="Mvc\MinifyJavaScriptResultAttribute.cs" />
@@ -584,6 +587,7 @@
     <Compile Include="Security\Providers\UmbracoMembershipProvider.cs" />
     <Compile Include="Security\Providers\UsersMembershipProvider.cs" />
     <Compile Include="Trees\ContentTreeController.cs" />
+    <Compile Include="Standalone\PowershellAssemblyResolver.cs" />
     <Compile Include="Trees\TreeRenderingEventArgs.cs" />
     <Compile Include="Trees\UrlHelperExtensions.cs" />
     <Compile Include="UI\JavaScript\JsInitialization.cs" />
@@ -653,6 +657,7 @@
     <Compile Include="Search\LuceneIndexerExtensions.cs" />
     <Compile Include="Security\ValidateRequestAttempt.cs" />
     <Compile Include="Security\WebSecurity.cs" />
+    <Compile Include="Standalone\WriteableConfigSystem.cs" />
     <Compile Include="UI\JavaScript\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

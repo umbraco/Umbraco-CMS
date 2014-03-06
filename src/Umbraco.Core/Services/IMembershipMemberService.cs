@@ -15,7 +15,7 @@ namespace Umbraco.Core.Services
     public interface IMembershipMemberService : IMembershipMemberService<IMember>, IMembershipRoleService<IMember>
     {
         IMember CreateMember(string username, string email, string password, string memberType);
-        IMember CreateMemberWithIdentity(string username, string email, string password, IMemberType memberType, bool raiseEvents = true);
+        IMember CreateMemberWithIdentity(string username, string email, string password, IMemberType memberType);
     }
 
     /// <summary>
@@ -47,9 +47,8 @@ namespace Umbraco.Core.Services
         /// <param name="email"></param>
         /// <param name="password"></param>
         /// <param name="memberTypeAlias"></param>
-        /// <param name="raiseEvents"></param>
         /// <returns></returns>
-        T CreateWithIdentity(string username, string email, string password, string memberTypeAlias, bool raiseEvents = true);
+        T CreateWithIdentity(string username, string email, string password, string memberTypeAlias);
 
         /// <summary>
         /// Gets the member by the provider key

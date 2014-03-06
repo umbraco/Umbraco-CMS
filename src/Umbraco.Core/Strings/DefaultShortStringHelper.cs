@@ -97,6 +97,11 @@ namespace Umbraco.Core.Strings
             return InvalidFileNameChars.Contains(c) == false;
         }
 
+        public static string CutMaxLength(string text, int length)
+        {
+            return text.Length <= length ? text : text.Substring(0, length);
+        }
+
         #endregion
 
         #region Configuration
@@ -150,6 +155,7 @@ namespace Umbraco.Core.Strings
             return WithConfig(CleanStringType.UrlSegment, new Config
             {
                 PreFilter = ApplyUrlReplaceCharacters,
+                PostFilter = x => CutMaxLength(x, 240),
                 IsTerm = (c, leading) => char.IsLetterOrDigit(c) || c == '_', // letter, digit or underscore
                 StringType = (UmbracoConfig.For.UmbracoSettings().RequestHandler.ConvertUrlsToAscii ? CleanStringType.Ascii : CleanStringType.Utf8) | CleanStringType.LowerCase,
                 BreakTermsOnUpper = false,
@@ -184,6 +190,7 @@ namespace Umbraco.Core.Strings
             {
                 StringType = CleanStringType.Utf8 | CleanStringType.Unchanged;
                 PreFilter = null;
+                PostFilter = null;
                 IsTerm = (c, leading) => leading ? char.IsLetter(c) : char.IsLetterOrDigit(c);
                 BreakTermsOnUpper = false;
                 CutAcronymOnNonUpper = false;
@@ -196,6 +203,7 @@ namespace Umbraco.Core.Strings
                 return new Config
                 {
                     PreFilter = PreFilter,
+                    PostFilter =  PostFilter,
                     IsTerm = IsTerm,
                     StringType = StringType,
                     BreakTermsOnUpper = BreakTermsOnUpper,
@@ -206,6 +214,7 @@ namespace Umbraco.Core.Strings
             }
 
             public Func<string, string> PreFilter { get; set; }
+            public Func<string, string> PostFilter { get; set; }
             public Func<char, bool, bool> IsTerm { get; set; }
 
             public CleanStringType StringType { get; set; }
@@ -536,6 +545,10 @@ function validateSafeAlias(id, value, immediate, callback) {{
             // clean
             text = CleanCodeString(text, stringType, separator.Value, culture, config);
 
+            // apply post-filter
+            if (config.PostFilter != null)
+                text = config.PostFilter(text);
+            
             return text;
         }
 

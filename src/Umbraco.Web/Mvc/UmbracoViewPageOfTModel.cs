@@ -141,6 +141,7 @@ namespace Umbraco.Web.Mvc
         // maps model
         protected override void SetViewData(ViewDataDictionary viewData)
         {
+            // if view data contains no model, nothing to do
             var source = viewData.Model;
             if (source == null)
             {
@@ -148,6 +149,8 @@ namespace Umbraco.Web.Mvc
                 return;
             }
 
+            // get the type of the view data model (what we have)
+            // get the type of this view model (what we want)
             var sourceType = source.GetType();
             var targetType = typeof (TModel);
 
@@ -160,13 +163,15 @@ namespace Umbraco.Web.Mvc
 
             // try to grab the content
             // if no content is found, return, nothing we can do
-            var sourceContent = source as IPublishedContent;
+            var sourceContent = source as IPublishedContent; // check if what we have is an IPublishedContent
             if (sourceContent == null && sourceType.Implements<IRenderModel>())
             {
+                // else check if it's an IRenderModel => get the content
                 sourceContent = ((IRenderModel)source).Content;
             }
             if (sourceContent == null)
             {
+                // else check if we can convert it to a content
                 var attempt = source.TryConvertTo<IPublishedContent>();
                 if (attempt.Success) sourceContent = attempt.Result;
             }

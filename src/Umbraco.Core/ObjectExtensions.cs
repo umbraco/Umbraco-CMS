@@ -246,12 +246,14 @@ namespace Umbraco.Core
 			    else if (destinationType == typeof(Double))
 			    {
 			        Double value;
-			        return Double.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			        var input2 = NormalizeNumberDecimalSeparator(input);
+			        return Double.TryParse(input2, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
 			    }
 			    else if (destinationType == typeof(Single))
 			    {
 			        Single value;
-			        return Single.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+                    var input2 = NormalizeNumberDecimalSeparator(input);
+                    return Single.TryParse(input2, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
 			    }
 			    else if (destinationType == typeof(Char))
 			    {
@@ -320,7 +322,8 @@ namespace Umbraco.Core
 			else if (destinationType == typeof(Decimal))
 			{
 				Decimal value;
-				return Decimal.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+                var input2 = NormalizeNumberDecimalSeparator(input);
+                return Decimal.TryParse(input2, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
 			}
 			else if (destinationType == typeof(Version))
 			{
@@ -331,6 +334,14 @@ namespace Umbraco.Core
 
 			return null; // we can't decide...
 		}
+
+        private readonly static char[] NumberDecimalSeparatorsToNormalize = new[] {'.', ','};
+
+	    private static string NormalizeNumberDecimalSeparator(string s)
+	    {
+	        var normalized = System.Threading.Thread.CurrentThread.CurrentUICulture.NumberFormat.NumberDecimalSeparator[0];
+            return s.ReplaceMany(NumberDecimalSeparatorsToNormalize, normalized);
+	    }
 
 		internal static void CheckThrowObjectDisposed(this IDisposable disposable, bool isDisposed, string objectname)
 		{

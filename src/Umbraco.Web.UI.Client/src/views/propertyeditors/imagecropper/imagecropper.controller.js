@@ -1,10 +1,10 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco')   
-    
+
     .controller("Umbraco.PropertyEditors.ImageCropperController",
-    function($rootScope, $routeParams, $scope, $log, mediaHelper, cropperHelper, $timeout, editorState, umbRequestHelper, fileManager) {
-        
+    function ($rootScope, $routeParams, $scope, $log, mediaHelper, cropperHelper, $timeout, editorState, umbRequestHelper, fileManager) {
+
         var config = $scope.model.config;
         mediaHelper.registerFileResolver("Umbraco.ImageCropper", function (property) {
             if (property.value.src) {

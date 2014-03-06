@@ -379,6 +379,19 @@ namespace umbraco.cms.businesslogic
         }
 
         /// <summary>
+        /// This is purely for a hackity hack hack hack in order to make the new Document(id, version) constructor work because
+        /// the Version property needs to be set on the object before setupNode is called, otherwise it never works! this allows
+        /// inheritors to set default data before setupNode() is called.
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="ctorArgs"></param>
+        internal CMSNode(int id, object[] ctorArgs)
+        {
+            _id = id;
+            PreSetupNode(ctorArgs);
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="CMSNode"/> class.
         /// </summary>
         /// <param name="id">The id.</param>
@@ -1015,6 +1028,18 @@ order by level,sortOrder";
 
             if (_entity != null)
                 _entity.Name = txt;
+        }
+
+        /// <summary>
+        /// This is purely for a hackity hack hack hack in order to make the new Document(id, version) constructor work because
+        /// the Version property needs to be set on the object before setupNode is called, otherwise it never works!
+        /// </summary>
+        /// <param name="ctorArgs"></param>
+        internal virtual void PreSetupNode(params object[] ctorArgs)
+        {
+            //if people want to override then awesome but then we call setupNode so they need to ensure
+            // to call base.PreSetupNode
+            setupNode();
         }
 
         /// <summary>

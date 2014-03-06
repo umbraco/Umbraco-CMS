@@ -59,7 +59,15 @@ namespace Umbraco.Web.Standalone
                     if (noerr) return;
                     throw new InvalidOperationException("Application has already started.");
                 }
-                Application_Start(this, EventArgs.Empty);
+                try
+                {
+                    Application_Start(this, EventArgs.Empty);
+                }
+                catch
+                {
+                    TerminateInternal();
+                    throw;
+                }
                 _started = true;
             }
         }
@@ -74,14 +82,24 @@ namespace Umbraco.Web.Standalone
                     throw new InvalidOperationException("Application has already been terminated.");
                 }
 
+                TerminateInternal();
+            }
+        }
+
+        private void TerminateInternal()
+        {
+            if (ApplicationContext.Current != null)
+            {
                 ApplicationContext.Current.DisposeIfDisposable(); // should reset resolution, clear caches & resolvers...
                 ApplicationContext.Current = null;
+            }
+            if (UmbracoContext.Current != null)
+            {
                 UmbracoContext.Current.DisposeIfDisposable(); // dunno
                 UmbracoContext.Current = null;
-
-                _started = false;
-                _application = null;
             }
+            _started = false;
+            _application = null;
         }
 
         #endregion

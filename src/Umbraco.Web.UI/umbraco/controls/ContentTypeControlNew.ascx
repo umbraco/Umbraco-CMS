@@ -27,11 +27,11 @@
       HeaderStyle-Font-Bold="True" AutoGenerateColumns="False" CssClass="tabs-table">
       <Columns>
         <asp:BoundColumn DataField="id" Visible="False"></asp:BoundColumn>
-        <asp:TemplateColumn HeaderText="Name">
+        <asp:TemplateColumn HeaderText="Name & sort order">
           <ItemTemplate>
             <i class="icon-navigation handle"></i>
             <asp:TextBox ID="txtTab" runat="server" Value='<%#DataBinder.Eval(Container.DataItem,"name")%>'></asp:TextBox>
-            <asp:TextBox ID="txtSortOrder" runat="server" CssClass="sort-order" Value='<%#DataBinder.Eval(Container.DataItem,"order") %>'></asp:TextBox>
+            <asp:TextBox ID="txtSortOrder" runat="server" CssClass="sort-order" style="width:40px;background-color:#f2f2f2;" Value='<%#DataBinder.Eval(Container.DataItem,"order") %>'></asp:TextBox>
           </ItemTemplate>
         </asp:TemplateColumn>
         <asp:ButtonColumn ButtonType="PushButton" Text="Delete" CommandName="Delete"></asp:ButtonColumn>
@@ -126,9 +126,26 @@
             
             return false;
         });
+        
+        $("table.tabs-table tr.propertyContent input.sort-order").keydown(function(e) {
+            // Allow: backspace, delete, tab, escape, enter and .
+            if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 190]) !== -1 ||
+                // Allow: Ctrl+A
+                (e.keyCode == 65 && e.ctrlKey === true) || 
+                // Allow: home, end, left, right
+                (e.keyCode >= 35 && e.keyCode <= 39)) {
+                // let it happen, don't do anything
+                return;
+            }
+            // Ensure that it is a number and stop the keypress
+            if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+                e.preventDefault();
+            }
+        });
+
 
         // Make each tr of the tabs table sortable (prevent dragging of header row, and set up a callback for when row dragged)
-        jQuery("table.tabs-table tbody").sortable({
+        $("table.tabs-table tbody").sortable({
             containment: 'parent',
             cancel: '.propertyHeader, input',
             tolerance: 'pointer',
@@ -139,8 +156,8 @@
 
         // Fired after row dragged; go through each tr and save position to the hidden sort order field
         function saveOrder() {
-            jQuery("table.tabs-table tbody tr.propertyContent").each(function (index) {
-                jQuery("input.sort-order", this).val(index + 1);
+            $("table.tabs-table tbody tr.propertyContent").each(function (index) {
+                $("input.sort-order", this).val(index + 1);
             });
         }
 

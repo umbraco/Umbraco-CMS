@@ -131,6 +131,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {            
             var list = new List<string>
                            {
+                               "DELETE FROM cmsTask WHERE userId = @Id",
+                               "DELETE FROM cmsTask WHERE parentUserId = @Id",
                                "DELETE FROM umbracoUser2NodePermission WHERE userId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE userId = @Id",
                                "DELETE FROM umbracoUserLogins WHERE userId = @Id",

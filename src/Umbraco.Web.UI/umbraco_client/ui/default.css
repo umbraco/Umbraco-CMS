@@ -751,7 +751,12 @@ table.tabs-table tr.propertyContent td
 }
 table.tabs-table input[type=text] { width: 200px;  }
 table.tabs-table input[type=submit] { text-align: right;  }
-table.tabs-table tr.propertyContent input.sort-order {display: none;}
+
+table.tabs-table tr.propertyContent input.sort-order {
+    width: 20px;
+    background-color: lightgray;
+    padding: 0px 5px 0px 5px;
+}
 
 li.no-properties-on-tab {background: none; background-color: #fff; cursor: default; }
 
