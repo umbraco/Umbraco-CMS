@@ -40,8 +40,7 @@ namespace Umbraco.Web.Search
 		/// <param name="applicationContext"></param>
 		/// <remarks>
 		/// We need to do this on the Started event as to guarantee that all resolvers are setup properly.
-		/// </remarks>
-		
+		/// </remarks>		
 		protected override void ApplicationStarted(UmbracoApplicationBase httpApplication, ApplicationContext applicationContext)
 		{            
             LogHelper.Info<ExamineEvents>("Initializing Examine and binding to business logic events");
@@ -334,8 +333,7 @@ namespace Umbraco.Web.Search
 										));
 			}
 		}
-
-        [SecuritySafeCritical]
+        
         private static void ReIndexForMedia(IMedia sender, bool isMediaPublished)
         {
             ExamineManager.Instance.ReIndexNode(
@@ -357,7 +355,6 @@ namespace Umbraco.Web.Search
 	    /// If true, indicates that we will only delete this item from indexes that don't support unpublished content.
 	    /// If false it will delete this from all indexes regardless.
 	    /// </param>
-        [SecuritySafeCritical]
 	    private static void DeleteIndexForEntity(int entityId, bool keepIfUnpublished)
 	    {
 	        ExamineManager.Instance.DeleteFromIndex(
@@ -378,7 +375,6 @@ namespace Umbraco.Web.Search
 	    /// <param name="isContentPublished">
 	    /// Value indicating whether the item is published or not
 	    /// </param>
-        [SecuritySafeCritical]
 	    private static void ReIndexForContent(IContent sender, bool isContentPublished)
 	    {
 	        ExamineManager.Instance.ReIndexNode(
@@ -397,8 +393,7 @@ namespace Umbraco.Web.Search
 		/// </summary>
 		/// <param name="node"></param>
 		/// <param name="cacheOnly">true if data is going to be returned from cache</param>
-		/// <returns></returns>
-		
+		/// <returns></returns>		
         [Obsolete("This method is no longer used and will be removed from the core in future versions, the cacheOnly parameter has no effect. Use the other ToXDocument overload instead")]
 		public static XDocument ToXDocument(Content node, bool cacheOnly)
 		{			
@@ -409,8 +404,7 @@ namespace Umbraco.Web.Search
 		/// Converts a content node to Xml
 		/// </summary>
 		/// <param name="node"></param>
-		/// <returns></returns>
-		
+		/// <returns></returns>		
 		private static XDocument ToXDocument(Content node)
 		{
             if (TypeHelper.IsTypeAssignableFrom<Document>(node))

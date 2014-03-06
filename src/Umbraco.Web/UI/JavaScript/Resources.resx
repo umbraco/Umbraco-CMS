@@ -121,21 +121,8 @@
   <data name="JsInitialize" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>jsinitialize.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;utf-8</value>
   </data>
-  <data name="JsNoCache" xml:space="preserve">
-    <value>yepnope.addFilter(function (resourceObj) {
-    var url = resourceObj.url;
-    var rnd = ##rnd##;
-    var _op = "?";
-    if(url.indexOf("lib/") === 0 || url.indexOf("js/umbraco.") === 0){
-        return resourceObj;
-    }
-    if(url.indexOf("?") &gt; 0){
-    	_op = "&amp;";
-    }
-
-    resourceObj.url = resourceObj.url + _op + "umb__rnd=" + rnd;
-    return resourceObj;
-});</value>
+  <data name="JsNoCache" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>jsnocache.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
   </data>
   <data name="Main" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>Main.js;System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089;Windows-1252</value>
