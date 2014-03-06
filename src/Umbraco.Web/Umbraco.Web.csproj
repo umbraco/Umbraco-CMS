@@ -269,6 +269,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="ApplicationContextExtensions.cs" />
+    <Compile Include="AreaRegistrationContextExtensions.cs" />
     <Compile Include="CacheHelperExtensions.cs" />
     <Compile Include="Cache\ApplicationCacheRefresher.cs" />
     <Compile Include="Cache\ApplicationTreeCacheRefresher.cs" />
@@ -302,6 +303,38 @@
     <Compile Include="Editors\DataTypeValidateAttribute.cs" />
     <Compile Include="Editors\EntityControllerActionSelector.cs" />
     <Compile Include="Editors\ImagesController.cs" />
+    <Compile Include="Install\DatabaseHelper.cs" />
+    <Compile Include="Install\InstallException.cs" />
+    <Compile Include="Install\InstallStatusTracker.cs" />
+    <Compile Include="Install\InstallSteps\DatabaseConfigureStep.cs" />
+    <Compile Include="Install\InstallSteps\DatabaseInstallStep.cs" />
+    <Compile Include="Install\InstallSteps\DatabaseUpgradeStep.cs" />
+    <Compile Include="Install\InstallSteps\FilePermissionsStep.cs" />
+    <Compile Include="Install\InstallSteps\MajorVersion7UpgradeReport.cs" />
+    <Compile Include="Install\InstallSteps\SetUmbracoVersionStep.cs" />
+    <Compile Include="Install\InstallSteps\StarterKitCleanupStep.cs" />
+    <Compile Include="Install\InstallSteps\StarterKitDownloadStep.cs" />
+    <Compile Include="Install\InstallSteps\StarterKitInstallStep.cs" />
+    <Compile Include="Install\InstallSteps\UpgradeStep.cs" />
+    <Compile Include="Install\InstallSteps\NewInstallStep.cs" />
+    <Compile Include="Install\Controllers\InstallPackageController.cs" />
+    <Compile Include="Install\Models\DatabaseModel.cs" />
+    <Compile Include="Install\Models\DatabaseType.cs" />
+    <Compile Include="Install\Models\InstallationType.cs" />
+    <Compile Include="Install\Models\InstallInstructions.cs" />
+    <Compile Include="Install\Models\InstallPackageModel.cs" />
+    <Compile Include="Install\Models\InstallProgressResultModel.cs" />
+    <Compile Include="Install\Models\InstallSetup.cs" />
+    <Compile Include="Install\Models\InstallSetupResult.cs" />
+    <Compile Include="Install\Models\InstallSetupStep.cs" />
+    <Compile Include="Install\Models\InstallSetupStepAttribute.cs" />
+    <Compile Include="Install\Models\InstallTrackingItem.cs" />
+    <Compile Include="Install\Models\Package.cs" />
+    <Compile Include="Install\Models\UserModel.cs" />
+    <Compile Include="Install\UmbracoInstallArea.cs" />
+    <Compile Include="Install\Controllers\InstallApiController.cs" />
+    <Compile Include="Install\Controllers\InstallController.cs" />
+    <Compile Include="Install\InstallAuthorizeAttribute.cs" />
     <Compile Include="MediaPropertyExtensions.cs" />
     <Compile Include="Models\ContentEditing\EntityTypeSearchResult.cs" />
     <Compile Include="Models\ContentEditing\ListViewAwareContentItemDisplayBase.cs" />
@@ -371,7 +404,6 @@
     <Compile Include="Editors\MediaPostValidateAttribute.cs" />
     <Compile Include="Editors\MemberController.cs" />
     <Compile Include="Editors\CurrentUserController.cs" />
-    <Compile Include="Install\Steps\MajorUpgradeReport.cs" />
     <Compile Include="Models\ContentEditing\DashboardControl.cs" />
     <Compile Include="Models\ContentEditing\DataTypeDisplay.cs" />
     <Compile Include="Models\ContentEditing\DataTypeSave.cs" />
@@ -454,6 +486,7 @@
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
     <Compile Include="WebApi\AngularJsonMediaTypeFormatter.cs" />
+    <Compile Include="WebApi\AngularJsonOnlyConfigurationAttribute.cs" />
     <Compile Include="WebApi\Binders\MemberBinder.cs" />
     <Compile Include="WebApi\Filters\AngularAntiForgeryHelper.cs" />
     <Compile Include="WebApi\Filters\ClearAngularAntiForgeryTokenAttribute.cs" />
@@ -577,21 +610,8 @@
     <Compile Include="HttpRequestExtensions.cs" />
     <Compile Include="HttpUrlHelperExtensions.cs" />
     <Compile Include="Install\FilePermissionHelper.cs" />
-    <Compile Include="Install\InstallerStep.cs" />
     <Compile Include="Install\InstallHelper.cs" />
-    <Compile Include="Install\InstallPackageController.cs" />
-    <Compile Include="Install\InstallStepCollection.cs" />
-    <Compile Include="Install\ProgressResult.cs" />
-    <Compile Include="Install\Steps\Database.cs" />
-    <Compile Include="Install\Steps\DefaultUser.cs" />
-    <Compile Include="Install\Steps\FilePermissions.cs" />
-    <Compile Include="Install\Steps\License.cs" />
-    <Compile Include="Install\Steps\RenderingEngine.cs" />
-    <Compile Include="Install\Steps\Skinning.cs" />
-    <Compile Include="Install\Steps\TheEnd.cs" />
-    <Compile Include="Install\Steps\WebPi.cs" />
-    <Compile Include="Install\Steps\Welcome.cs" />
-    <Compile Include="Install\UmbracoInstallAuthorizeAttribute.cs" />
+    <Compile Include="Install\HttpInstallAuthorizeAttribute.cs" />
     <Compile Include="Macros\PartialViewMacroController.cs" />
     <Compile Include="Macros\PartialViewMacroEngine.cs" />
     <Compile Include="Macros\PartialViewMacroPage.cs" />
@@ -2064,9 +2084,7 @@
       <CachedSettingsPropName>umbraco_org_umbraco_update_CheckForUpgrade</CachedSettingsPropName>
     </WebReferenceUrl>
   </ItemGroup>
-  <ItemGroup>
-    <WCFMetadata Include="Service References\" />
-  </ItemGroup>
+  <ItemGroup />
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">11.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>

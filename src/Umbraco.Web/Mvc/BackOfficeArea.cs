@@ -4,6 +4,7 @@ using System.Web.Routing;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Install;
+using Umbraco.Web.Install.Controllers;
 
 namespace Umbraco.Web.Mvc
 {
@@ -35,13 +36,6 @@ namespace Umbraco.Web.Mvc
                         id = @"[a-zA-Z]*"
                     },
                 new[] {typeof (BackOfficeController).Namespace});
-
-            //Create the install routes
-            context.MapRoute(
-                "Umbraco_install_packages",
-                "Install/PackageInstaller/{action}/{id}",
-                new {controller = "InstallPackage", action = "Index", id = UrlParameter.Optional},
-                new[] {typeof (InstallPackageController).Namespace});
             
             //Create the REST/web/script service routes
             context.MapRoute(

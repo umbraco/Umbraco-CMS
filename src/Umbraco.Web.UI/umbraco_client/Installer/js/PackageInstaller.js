@@ -165,13 +165,7 @@
                         self._setProgress(r.percentage, r.message);
                         //install business logic
                         self.installBusinessLogic();
-                    }
-                    else if (r && !r.success) {
-                        //hasn't completed restarted, re-poll in 2 seconds
-                        setTimeout(function() {
-                            self.pollForRestart();
-                        }, 2000);
-                    }
+                    }                    
                     else {
                         self._showServerError("The server did not respond");
                     }
@@ -186,7 +180,7 @@
                 data: "{'kitGuid': '" + self._packageId + "', 'manifestId': '" + self._manifestId + "', 'packageFile': '" + encodeURIComponent(self._packageFile) + "'}",
                 url: self._opts.baseUrl + '/InstallBusinessLogic',
                 success: function (r) {
-                    if (r && r.success) {
+                    if (r) {
                         //set the progress
                         self._setProgress(r.percentage, r.message);
                         //cleanup install
@@ -206,7 +200,7 @@
                 data: "{'kitGuid': '" + self._packageId + "', 'manifestId': '" + self._manifestId + "', 'packageFile': '" + encodeURIComponent(self._packageFile) + "'}",
                 url: self._opts.baseUrl + '/CleanupInstallation',
                 success: function (r) {
-                    if (r && r.success) {
+                    if (r) {
                         //set the progress
                         self._setProgress(r.percentage, r.message);
                         //installation complete!
