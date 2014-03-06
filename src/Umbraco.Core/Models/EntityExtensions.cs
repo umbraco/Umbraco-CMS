@@ -23,5 +23,5 @@ namespace Umbraco.Core.Models
             var dirty = (IRememberBeingDirty)entity;
             return dirty.WasPropertyDirty("Id");
         }
-    }
+        }
 }
