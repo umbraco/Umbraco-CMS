@@ -37,11 +37,19 @@ namespace Umbraco.Web.Install
         }
 
         public static void ClearFiles()
-        {
-            var files = Directory.GetFiles(IOHelper.MapPath("~/App_Data/TEMP/Install/"));
-            foreach (var f in files)
+        {   
+            var dir = IOHelper.MapPath("~/App_Data/TEMP/Install/");
+            if (Directory.Exists(dir))
             {
-                File.Delete(f);
+                var files = Directory.GetFiles(dir);
+                foreach (var f in files)
+                {
+                    File.Delete(f);
+                }
+            }
+            else
+            {
+                Directory.CreateDirectory(dir);
             }
         }
 

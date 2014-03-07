@@ -1,6 +1,16 @@
 angular.module("umbraco.install").controller("Umbraco.Installer.DataBaseController", function($scope, $http, installerService){
 	
 	$scope.checking = false;
+	$scope.dbs = [
+					{name: 'Embedded database SQL MEH', id: 0},
+					{name: 'Microsft SQL Server', id: 1},
+					{name: 'MySQL', id: 2},
+					{name: 'Custom connection-string', id: -1}];
+
+	if(installerService.status.current.model.dbType === undefined){
+		installerService.status.current.model.dbType = 0;
+	}
+	
     $scope.validateAndForward = function(){
 		if(!$scope.checking && this.myForm.$valid){
 		 	$scope.checking = true;

@@ -29,7 +29,7 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 					"'Umbraco-spotting' is the game of spotting big brands running Umbraco",
 					"Atleast 2 people have the Umbraco logo tattooed on them",
 					"'Umbraco' is the danish name for an allen key",
-					"Has been around since 2005, that's a looong time in IT",
+					"Umbraco has been around since 2005, that's a looong time in IT",
 					"More than 400 people from all over the world meet each year in Denmark in June for our annual conference <a target='_blank' href='http://codegarden14.com'>CodeGarden</a>", 
 					"While you install Umbraco someone else on the other side of the planet probably does it too",
 					"You can extend Umbraco without modifying the source code and using either javascript or c#"
