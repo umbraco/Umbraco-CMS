@@ -745,7 +745,7 @@ namespace umbraco.cms.businesslogic.member
         /// <param name="newPassword"></param>
         public void ChangePassword(string newPassword)
         {
-            Password = newPassword;            
+            MemberItem.Password = newPassword;            
         }
 
         /// <summary>
