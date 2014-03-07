@@ -6,27 +6,16 @@
 	</p>
 
 	<form name="myForm" class="form-horizontal" novalidate ng-submit="validateAndForward();">
-
-
 		<div class="control-group">
 			<legend>What type of database do you use?</legend>
 			<label class="control-label" for="dbType">Database type</label>
 			    <div class="controls">
-			    	<select name="dbType" ng-model="installer.current.model.dbType" required>
-			    		<optgroup>
-			    			<option value="0">Embedded database SQL CE</option>
-			    			<option value="1">Microsft SQL Server</option>
-			    			<option value="2">MySQL</option>
-			    		</optgroup>
-			    		<optgroup>
-			    			<option value="-1">Custom connection-string</option>
-			    		</optgroup>
+			    	<select name="dbType" ng-options="db.id as db.name for db in dbs"  ng-model="installer.current.model.dbType" required>
 			    	</select>
 				</div>
 		</div>
 
-
-		<div ng-if="installer.current.model.dbType == 0">
+		<div class="controls" ng-if="installer.current.model.dbType == 0">
 				<p>Great!, no need to configure anything then, you simply click the <strong>continue</strong> button below to continue to the next step</p>
 		</div>
 
