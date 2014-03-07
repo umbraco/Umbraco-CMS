@@ -355,6 +355,7 @@
     <Compile Include="Persistence\EntityNotFoundException.cs" />
     <Compile Include="Persistence\Factories\MemberGroupFactory.cs" />
     <Compile Include="Persistence\Mappers\MemberGroupMapper.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSevenOne\UpdateToNewMemberPropertyAliases.cs" />
     <Compile Include="Persistence\SqlExtensions.cs" />
     <Compile Include="PropertyEditors\DefaultPropertyValueConverterAttribute.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSeven\UpdateRelatedLinksData.cs" />

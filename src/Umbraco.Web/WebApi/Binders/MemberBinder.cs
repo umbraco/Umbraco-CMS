@@ -138,7 +138,7 @@ namespace Umbraco.Web.WebApi.Binders
 
                 //If the default Member type exists, we'll use that to create the IMember - that way we can associate the custom membership
                 // provider to our data - eventually we can support editing custom properties with a custom provider.
-                var memberType = ApplicationContext.Services.MemberTypeService.Get(Constants.Conventions.MemberTypes.Member);
+                var memberType = ApplicationContext.Services.MemberTypeService.Get(Constants.Conventions.MemberTypes.DefaultAlias);
                 if (memberType != null)
                 {
                     FilterContentTypeProperties(memberType, memberType.PropertyTypes.Select(x => x.Alias).ToArray());

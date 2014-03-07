@@ -530,13 +530,13 @@ function umbDataFormatter() {
                         //we know the current property matches an alias, now we need to determine which membership provider property it was for
                         // by looking at the key
                         switch (foundAlias[0]) {
-                            case "umbracoLockPropertyTypeAlias":
+                            case "umbracoMemberLockedOut":
                                 saveModel.isLockedOut = prop.value.toString() === "1" ? true : false;
                                 break;
-                            case "umbracoApprovePropertyTypeAlias":
+                            case "umbracoMemberApproved":
                                 saveModel.isApproved = prop.value.toString() === "1" ? true : false;
                                 break;
-                            case "umbracoCommentPropertyTypeAlias":
+                            case "umbracoMemberComments":
                                 saveModel.comments = prop.value;
                                 break;
                         }

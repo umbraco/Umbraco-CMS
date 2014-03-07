@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models
 
         private RegisterModel(bool doLookup)
         {
-            MemberTypeAlias = Constants.Conventions.MemberTypes.Member;
+            MemberTypeAlias = Constants.Conventions.MemberTypes.DefaultAlias;
             RedirectOnSucces = false;
             RedirectUrl = "/";
             UsernameIsEmail = true;
