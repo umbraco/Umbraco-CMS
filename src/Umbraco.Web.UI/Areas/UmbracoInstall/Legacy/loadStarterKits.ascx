@@ -40,18 +40,18 @@
             <ul class="thumbnails">
         </headertemplate>
         <itemtemplate>
-            <li class="add-<%# ((Package)Container.DataItem).Text.Replace(" ","").ToLower() %>">
-                <div class="image">
-
-
-                    <div class="overlay"><a href="#" class="single-tab selectStarterKit" data-name="<%# ((Package)Container.DataItem).Text %>" title="Install <%# ((Package)Container.DataItem).Text %>" data-repoid="<%# ((Package)Container.DataItem).RepoGuid %>">Install <%# ((Package)Container.DataItem).Text %></a></div>
+            <li class="span4 add-<%# ((Package)Container.DataItem).Text.Replace(" ","").ToLower() %>">
+                <div class="thumbnail" style="margin-right: 10px; height: 260px">
                     <img src="http://our.umbraco.org<%# ((Package)Container.DataItem).Thumbnail %>" alt="<%# ((Package)Container.DataItem).Text %>">
-
-                    <a class="zoom-in" title="Enlarge <%# ((Package)Container.DataItem).Text %>" href="#<%# ((Package)Container.DataItem).Text %>">Open</a>
+                    
+                    <h4><%# ((Package)Container.DataItem).Text %></h4>
+                    <%# ((Package)Container.DataItem).Description %>
+                    
+                    <a href="#" class="btn btn-success single-tab selectStarterKit" data-name="<%# ((Package)Container.DataItem).Text %>" title="Install <%# ((Package)Container.DataItem).Text %>" data-repoid="<%# ((Package)Container.DataItem).RepoGuid %>">
+                        Install 
+                    </a>
                 </div>
             </li>
-            <div id="<%# ((Package)Container.DataItem).Text %>" class="lb"><a href="#top"><img src="http://our.umbraco.org<%# ((Package)Container.DataItem).Thumbnail %>" alt="oh man" /></a></div>
-
         </itemtemplate>
         <footertemplate>
                 </ul>
