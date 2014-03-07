@@ -2,13 +2,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.UI;
-
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Install.InstallSteps;
 using Umbraco.Web.Install.Models;
@@ -63,6 +64,12 @@ namespace Umbraco.Web.Install
         public InstallationType GetInstallationType()
         {
             return _installationType ?? (_installationType = IsBrandNewInstall ? InstallationType.NewInstall : InstallationType.Upgrade).Value;
+        }
+
+        internal void DeleteLegacyInstaller()
+        {
+            if(Directory.Exists( IOHelper.MapPath( SystemDirectories.Install )))
+                Directory.Move(IOHelper.MapPath(SystemDirectories.Install), IOHelper.MapPath("~/app_data/temp/install_backup"));
         }
 
         /// <summary>
