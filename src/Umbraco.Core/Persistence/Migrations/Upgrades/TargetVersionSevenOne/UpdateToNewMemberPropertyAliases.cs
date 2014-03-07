@@ -78,7 +78,7 @@ WHERE umbracoNode.nodeObjectType = @objectType";
                     }
                     catch (Exception ex)
                     {
-                        LogHelper.Error<UpdateRelatedLinksData>("Exception was thrown when trying to upgrade old member aliases to the new ones", ex);
+                        LogHelper.Error<UpdateToNewMemberPropertyAliases>("Exception was thrown when trying to upgrade old member aliases to the new ones", ex);
                         throw;
                     }                    
                 }
