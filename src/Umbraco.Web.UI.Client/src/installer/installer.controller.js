@@ -30,3 +30,8 @@ angular.module("umbraco.install").controller("Umbraco.InstallerController",
 	    installerService.gotoStep(0);
 	};
 });
+
+//this ensure that we start with a clean slate on every install and upgrade
+angular.module("umbraco.install").run(function($templateCache){
+	$templateCache.removeAll();
+});
