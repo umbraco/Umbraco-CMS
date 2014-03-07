@@ -3,37 +3,34 @@
 @using System.Web.Mvc.Html
 @using ClientDependency.Core.Mvc
 @using Umbraco.Web
-@using Umbraco.Web.Models
 @using Umbraco.Web.Controllers
 
 @{
+    @*
+        You can specify a custom member type alias in the constructor, the default is 'Member'    
+        for example, to use 'Custom Member' you'd use this syntax:
     
-    /* 
-     * You can specify a custom member type alias in the constructor, the default is 'Member'    
-     * for example, to use 'Custom Member' you'd use this syntax:
-     * 
-     *      var registerModel = Members.CreateRegistrationModel("Custom Member");
-
-     */
+        var registerModel = Members.CreateRegistrationModel("Custom Member");
+    *@
     
     var registerModel = Members.CreateRegistrationModel();
     
-    /* 
-     * Configurable here:           
-     * 
-     * registerModel.RedirectUrl       - Optional. What path to redirect to if registration is successful. 
-     *                                   By default the member will be redirected to the current umbraco page 
-     *                                   unless this is specified.
-     * 
-     * registerModel.UsernameIsEmail   - the default is true
-     *                                   if you want the username to be different from the email
-     *                                   address, set this to true and add a new Username field in
-     *                                   the form below
-     *
-     *                                   @Html.LabelFor(m => registerModel.Username)
-     *                                   @Html.TextBoxFor(m => registerModel.Username)
-     *                                   @Html.ValidationMessageFor(m => registerModel.Username)
-     */
+    @*
+        Configurable here:           
+    
+        registerModel.RedirectUrl       - Optional. What path to redirect to if registration is successful. 
+                                          By default the member will be redirected to the current umbraco page 
+                                          unless this is specified.
+    
+        registerModel.UsernameIsEmail   - the default is true
+                                          if you want the username to be different from the email
+                                          address, set this to true and add a new Username field in
+                                          the form below
+    
+                                          @Html.LabelFor(m => registerModel.Username)
+                                          @Html.TextBoxFor(m => registerModel.Username)
+                                          @Html.ValidationMessageFor(m => registerModel.Username)
+    *@
   
     Html.EnableClientValidation();
     Html.EnableUnobtrusiveJavaScript();
@@ -49,16 +46,16 @@
 
 @if (success) 
 { 
-    // This message will show if RedirectOnSucces is set to false (default)
+    @* This message will show if RedirectOnSucces is set to false (default) *@
     <p>Registration succeeeded.</p>
-} 
-else 
-{   
+}
+else
+{
     using (Html.BeginUmbracoForm<UmbRegisterController>("HandleRegisterMember"))
     {
         <fieldset>
             <legend>Register Member</legend>
-            
+
             @Html.ValidationSummary("registerModel", true)
 
             @Html.LabelFor(m => registerModel.Name)
@@ -75,8 +72,9 @@ else
             @Html.PasswordFor(m => registerModel.Password)
             @Html.ValidationMessageFor(m => registerModel.Password)
             <br />
-        
-            @if (registerModel.MemberProperties != null) {
+
+            @if (registerModel.MemberProperties != null)
+            {
                 for (var i = 0; i < registerModel.MemberProperties.Count; i++)
                 {
                     @Html.LabelFor(m => registerModel.MemberProperties[i].Value, registerModel.MemberProperties[i].Name)
@@ -87,10 +85,10 @@ else
             }
 
             @Html.HiddenFor(m => registerModel.MemberTypeAlias)
-            @Html.HiddenFor(m => registerModel.RedirectUrl)      
+            @Html.HiddenFor(m => registerModel.RedirectUrl)
             @Html.HiddenFor(m => registerModel.UsernameIsEmail)
 
             <button>Register</button>
-        </fieldset>             
+        </fieldset>
     }
 }
