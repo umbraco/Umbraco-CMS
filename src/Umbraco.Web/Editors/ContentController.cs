@@ -273,6 +273,7 @@ namespace Umbraco.Web.Editors
             }
             else if (contentItem.Action == ContentSaveAction.SendPublish || contentItem.Action == ContentSaveAction.SendPublishNew)
             {
+                Services.ContentService.Save(contentItem.PersistedContent, (int)Security.CurrentUser.Id);
                 Services.ContentService.SendToPublication(contentItem.PersistedContent, UmbracoUser.Id);
             }
             else
