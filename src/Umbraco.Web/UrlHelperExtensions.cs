@@ -1,10 +1,13 @@
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Management.Instrumentation;
 using System.Web.Mvc;
 using System.Web.Routing;
+using ClientDependency.Core.Config;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebServices;
@@ -150,27 +153,45 @@ namespace Umbraco.Web
 
 
         /// <summary>
-        /// Return the Url for an action with a cache-bursting hash appended
+        /// Return the Url for an action with a cache-busting hash appended
         /// </summary>
         /// <param name="url"></param>
         /// <param name="actionName"></param>
         /// <param name="controllerName"></param>
         /// <param name="routeVals"></param>
         /// <returns></returns>
-        public static string GetUrlWithTimeStamp(this UrlHelper url, string actionName, string controllerName, RouteValueDictionary routeVals = null)
+        public static string GetUrlWithCacheBust(this UrlHelper url, string actionName, string controllerName, RouteValueDictionary routeVals = null)
         {
-            var applicationJs = url.Action(actionName, controllerName, routeVals);
-
-           //make a hash of umbraco and client dependency version
-           //in case the user bypasses the installer and just bumps the web.config or clientdep config
-           var umb_rnd = Umbraco.Core.Configuration.GlobalSettings.CurrentVersion + "_" + ClientDependency.Core.Config.ClientDependencySettings.Instance.Version;          
-          
-            //if in debug mode, always burst the cache
-           if (Umbraco.Core.Configuration.GlobalSettings.DebugMode)
-                umb_rnd += "_" + System.DateTime.Now.Ticks;
-
-            applicationJs = applicationJs + "?umb__rnd=" + umb_rnd;
+            var applicationJs = url.Action(actionName, controllerName, routeVals);          
+            applicationJs = applicationJs + "?umb__rnd=" + GetCacheBustHash();
             return applicationJs;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public static string GetCacheBustHash()
+        {
+            //make a hash of umbraco and client dependency version
+            //in case the user bypasses the installer and just bumps the web.config or clientdep config
+            
+            var versionHash = new HashCodeCombiner();
+
+            //if in debug mode, always burst the cache
+            if (GlobalSettings.DebugMode)
+            {
+                versionHash.AddCaseInsensitiveString(DateTime.Now.Ticks.ToString(CultureInfo.InvariantCulture));
+            }
+            else
+            {
+                //create a unique hash code of the current umb version and the current cdf version
+                
+                versionHash.AddCaseInsensitiveString(UmbracoVersion.Current.ToString());
+                versionHash.AddCaseInsensitiveString(ClientDependencySettings.Instance.Version.ToString(CultureInfo.InvariantCulture));                
+            }
+
+            return versionHash.GetCombinedHashCode();
         }
     }
 }

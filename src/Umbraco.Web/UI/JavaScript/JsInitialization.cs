@@ -55,11 +55,8 @@ namespace Umbraco.Web.UI.JavaScript
             else
             {
                 //create a unique hash code of the current umb version and the current cdf version
-                var versionHash = new HashCodeCombiner();
-                versionHash.AddCaseInsensitiveString(UmbracoVersion.Current.ToString());
-                versionHash.AddCaseInsensitiveString(ClientDependencySettings.Instance.Version.ToString(CultureInfo.InvariantCulture));
-
-                var version = "'" + versionHash.GetCombinedHashCode() + "'";
+                var versionHash = UrlHelperExtensions.GetCacheBustHash();
+                var version = "'" + versionHash + "'";
                 noCache = noCache.Replace("##rnd##", version);    
             }
                 
