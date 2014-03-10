@@ -263,7 +263,7 @@ namespace Umbraco.Web.Security
         {
             if (Membership.Provider.IsUmbracoMembershipProvider())
             {
-                memberTypeAlias = memberTypeAlias ?? Constants.Conventions.MemberTypes.Member;
+                memberTypeAlias = memberTypeAlias ?? Constants.Conventions.MemberTypes.DefaultAlias;
                 var memberType = _applicationContext.Services.MemberTypeService.Get(memberTypeAlias);
                 if (memberType == null)
                     throw new InvalidOperationException("Could not find a member type with alias " + memberTypeAlias);

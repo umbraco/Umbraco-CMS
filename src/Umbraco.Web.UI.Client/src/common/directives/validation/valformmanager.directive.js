@@ -52,8 +52,6 @@ function valFormManager(serverValidationManager, $rootScope, $log, notifications
                 //remove validation class
                 element.removeClass(className);
 
-                formCtrl.$setPristine();
-
                 //clear form state as at this point we retrieve new data from the server
                 //and all validation will have cleared at this point    
                 formCtrl.$setPristine();
@@ -65,6 +63,7 @@ function valFormManager(serverValidationManager, $rootScope, $log, notifications
                     if (!formCtrl.$dirty) {
                         return;
                     }
+                    
                     var path = url.split("#")[1];
                     if(path.indexOf("%253") || path.indexOf("%252")){
                         path = decodeURIComponent(path);

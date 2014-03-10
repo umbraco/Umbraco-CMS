@@ -1,10 +1,14 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Web;
 using ClientDependency.Core;
+using ClientDependency.Core.Config;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Manifest;
 using System.Linq;
@@ -42,8 +46,6 @@ namespace Umbraco.Web.UI.JavaScript
         {
             var result = GetJavascriptInitializationArray(httpContext, umbracoInit, additionalJsFiles);
             var noCache = Resources.JsNoCache;
-            
-
 
             //if debugging, add timestamp, if in production we tell yepNope to append umb+cdf version
             //this is needed even tho cdf does this on its serverside merged js
@@ -52,7 +54,9 @@ namespace Umbraco.Web.UI.JavaScript
                 noCache = noCache.Replace("##rnd##", "(new Date).getTime()");
             else
             {
-                var version = "'" + Umbraco.Core.Configuration.UmbracoVersion.Current.ToString() + "." + ClientDependency.Core.Config.ClientDependencySettings.Instance.Version + "'";
+                //create a unique hash code of the current umb version and the current cdf version
+                var versionHash = UrlHelperExtensions.GetCacheBustHash();
+                var version = "'" + versionHash + "'";
                 noCache = noCache.Replace("##rnd##", version);    
             }
                 

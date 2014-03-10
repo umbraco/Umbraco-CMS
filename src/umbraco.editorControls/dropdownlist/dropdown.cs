@@ -60,7 +60,7 @@ namespace umbraco.editorControls
             {
                 foreach (object key in _prevalues.Keys)
                 {
-                    this.Items.Add(new ListItem(dropdown.DictionaryReplace(_prevalues[key].ToString()), key.ToString()));
+                    this.Items.Add(new ListItem(Dictionary.ReplaceKey(_prevalues[key].ToString()), key.ToString()));
                 }
 
             }
@@ -68,7 +68,7 @@ namespace umbraco.editorControls
             {
                 foreach (KeyValuePair<int, String> item in Prevalues)
                 {
-                    this.Items.Add(new ListItem(dropdown.DictionaryReplace(item.Value), item.Key.ToString()));
+                    this.Items.Add(new ListItem(Dictionary.ReplaceKey(item.Value), item.Key.ToString()));
                 }
             }
 
@@ -77,26 +77,5 @@ namespace umbraco.editorControls
 			if (_data != null && _data.Value != null)
 				this.SelectedValue = _data.Value.ToString();			
 		}
-
-		static string DictionaryReplace(string text)
-		{
-			if (!text.StartsWith("#"))
-				return text;
-			else
-			{
-				Language lang = Language.GetByCultureCode(System.Threading.Thread.CurrentThread.CurrentCulture.Name);
-				if (lang != null)
-				{
-					if (Dictionary.DictionaryItem.hasKey(text.Substring(1, text.Length - 1)))
-					{
-						Dictionary.DictionaryItem di = new Dictionary.DictionaryItem(text.Substring(1, text.Length - 1));
-						return di.Value(lang.id);
-					}
-				}
-
-				return "[" + text + "]";
-			}
-		}
-
 	}
 }

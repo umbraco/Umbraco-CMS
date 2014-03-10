@@ -134,19 +134,30 @@ namespace Umbraco.Web.Cache
             MediaService.Moving += MediaServiceMoving;
             MediaService.Trashing += MediaServiceTrashing;
 
-            ContentService.Created += ContentServiceCreated;
+            //Bind to content events - this is for unpublished content syncing across servers (primarily for examine)
+
+            ContentService.Saved += ContentServiceSaved;
+            ContentService.Deleted += ContentServiceDeleted;
             ContentService.Copied += ContentServiceCopied;
+            //NOTE: we do not listen for the trashed event because there is no cache to update for content in that case since
+            // the unpublishing event handles that, and for examine with unpublished content indexes, we want to keep that data 
+            // in the index, it's not until it's complete deleted that we want to remove it.
         }
+
+        
 
         #region Content service event handlers
 
         /// <summary>
-        /// When an entity is copied new permissions may be assigned to it based on it's parent, if that is the 
-        /// case then we need to clear all user permissions cache.
+        /// Handles cache refreshgi for when content is copied
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<IContent> e)
+        /// <remarks>
+        /// When an entity is copied new permissions may be assigned to it based on it's parent, if that is the 
+        /// case then we need to clear all user permissions cache.
+        /// </remarks>
+        static void ContentServiceCopied(IContentService sender, CopyEventArgs<IContent> e)
         {
             //check if permissions have changed
             var permissionsChanged = ((Content)e.Copy).WasPropertyDirty("PermissionsChanged");
@@ -154,23 +165,63 @@ namespace Umbraco.Web.Cache
             {
                 DistributedCache.Instance.RefreshAllUserPermissionsCache();
             }
+
+            //run the un-published cache refresher
+            DistributedCache.Instance.RefreshUnpublishedPageCache(e.Copy);
         }
 
         /// <summary>
-        /// When an entity is created new permissions may be assigned to it based on it's parent, if that is the 
-        /// case then we need to clear all user permissions cache.
+        /// Handles cache refreshing for when content is deleted (not unpublished)
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        static void ContentServiceCreated(IContentService sender, Core.Events.NewEventArgs<IContent> e)
+        static void ContentServiceDeleted(IContentService sender, DeleteEventArgs<IContent> e)
         {
-            //check if permissions have changed
-            var permissionsChanged = ((Content)e.Entity).WasPropertyDirty("PermissionsChanged");
-            if (permissionsChanged)
+            DistributedCache.Instance.RemoveUnpublishedPageCache(e.DeletedEntities.ToArray());
+        }
+
+        /// <summary>
+        /// Handles cache refreshing for when content is saved (not published)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <remarks>
+        /// When an entity is saved we need to notify other servers about the change in order for the Examine indexes to 
+        /// stay up-to-date for unpublished content.
+        /// 
+        /// When an entity is created new permissions may be assigned to it based on it's parent, if that is the 
+        /// case then we need to clear all user permissions cache.
+        /// </remarks>
+        static void ContentServiceSaved(IContentService sender, SaveEventArgs<IContent> e)
+        {
+            var clearUserPermissions = false;
+            e.SavedEntities.ForEach(x =>
+            {
+                //check if it is new
+                if (x.IsNewEntity())
+                {
+                    //check if permissions have changed
+                    var permissionsChanged = ((Content)x).WasPropertyDirty("PermissionsChanged");
+                    if (permissionsChanged)
+                    {
+                        clearUserPermissions = true;                        
+                    }    
+                }
+            });
+
+            if (clearUserPermissions)
             {
                 DistributedCache.Instance.RefreshAllUserPermissionsCache();
             }
-        } 
+
+            //filter out the entities that have only been saved (not newly published) since
+            // newly published ones will be synced with the published page cache refresher
+            var unpublished = e.SavedEntities.Where(x => x.JustPublished() == false);
+            //run the un-published cache refresher
+            DistributedCache.Instance.RefreshUnpublishedPageCache(unpublished.ToArray());
+        }
+
+
         #endregion
 
         #region ApplicationTree event handlers
@@ -454,12 +505,12 @@ namespace Umbraco.Web.Cache
             InvalidateCacheForPermissionsChange(sender);
         }
 
-        void UserServiceSavedUser(IUserService sender, Core.Events.SaveEventArgs<Core.Models.Membership.IUser> e)
+        static void UserServiceSavedUser(IUserService sender, SaveEventArgs<IUser> e)
         {
             e.SavedEntities.ForEach(x => DistributedCache.Instance.RefreshUserCache(x.Id));
         }
 
-        void UserServiceDeletedUser(IUserService sender, Core.Events.DeleteEventArgs<Core.Models.Membership.IUser> e)
+        static void UserServiceDeletedUser(IUserService sender, DeleteEventArgs<IUser> e)
         {
             e.DeletedEntities.ForEach(x => DistributedCache.Instance.RemoveUserCache(x.Id));
         }
@@ -565,22 +616,22 @@ namespace Umbraco.Web.Cache
         #endregion
 
         #region Media event handlers
-        static void MediaServiceTrashing(IMediaService sender, Core.Events.MoveEventArgs<IMedia> e)
+        static void MediaServiceTrashing(IMediaService sender, MoveEventArgs<IMedia> e)
         {
-            DistributedCache.Instance.RemoveMediaCache(e.Entity);
+            DistributedCache.Instance.RemoveMediaCache(false, e.Entity);
         }
 
-        static void MediaServiceMoving(IMediaService sender, Core.Events.MoveEventArgs<IMedia> e)
+        static void MediaServiceMoving(IMediaService sender, MoveEventArgs<IMedia> e)
         {
             DistributedCache.Instance.RefreshMediaCache(e.Entity);
         }
 
-        static void MediaServiceDeleting(IMediaService sender, Core.Events.DeleteEventArgs<IMedia> e)
+        static void MediaServiceDeleting(IMediaService sender, DeleteEventArgs<IMedia> e)
         {
-            DistributedCache.Instance.RemoveMediaCache(e.DeletedEntities.ToArray());
+            DistributedCache.Instance.RemoveMediaCache(true, e.DeletedEntities.ToArray());
         }
 
-        static void MediaServiceSaved(IMediaService sender, Core.Events.SaveEventArgs<IMedia> e)
+        static void MediaServiceSaved(IMediaService sender, SaveEventArgs<IMedia> e)
         {
             DistributedCache.Instance.RefreshMediaCache(e.SavedEntities.ToArray());
         } 
@@ -588,27 +639,21 @@ namespace Umbraco.Web.Cache
 
         #region Member event handlers
 
-        static void MemberServiceDeleted(IMemberService sender, Core.Events.DeleteEventArgs<IMember> e)
+        static void MemberServiceDeleted(IMemberService sender, DeleteEventArgs<IMember> e)
         {
-            foreach (var m in e.DeletedEntities.ToArray())
-            {
-                DistributedCache.Instance.RemoveMemberCache(m.Id);    
-            }
+            DistributedCache.Instance.RemoveMemberCache(e.DeletedEntities.ToArray());    
         }
 
-        static void MemberServiceSaved(IMemberService sender, Core.Events.SaveEventArgs<IMember> e)
+        static void MemberServiceSaved(IMemberService sender, SaveEventArgs<IMember> e)
         {
-            foreach (var m in e.SavedEntities.ToArray())
-            {
-                DistributedCache.Instance.RefreshMemberCache(m.Id);
-            }
+            DistributedCache.Instance.RefreshMemberCache(e.SavedEntities.ToArray());
         }
 
         #endregion
 
         #region Member group event handlers
 
-        static void MemberGroupService_Deleted(IMemberGroupService sender, Core.Events.DeleteEventArgs<IMemberGroup> e)
+        static void MemberGroupService_Deleted(IMemberGroupService sender, DeleteEventArgs<IMemberGroup> e)
         {
             foreach (var m in e.DeletedEntities.ToArray())
             {
@@ -616,7 +661,7 @@ namespace Umbraco.Web.Cache
             }
         }
 
-        static void MemberGroupService_Saved(IMemberGroupService sender, Core.Events.SaveEventArgs<IMemberGroup> e)
+        static void MemberGroupService_Saved(IMemberGroupService sender, SaveEventArgs<IMemberGroup> e)
         {
             foreach (var m in e.SavedEntities.ToArray())
             {

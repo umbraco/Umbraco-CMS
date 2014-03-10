@@ -142,7 +142,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the Password Question
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoPasswordRetrievalQuestionPropertyTypeAlias
+        /// Alias: umbracoMemberPasswordRetrievalQuestion
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -171,7 +171,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the Password Answer
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoPasswordRetrievalAnswerPropertyTypeAlias
+        /// Alias: umbracoMemberPasswordRetrievalAnswer
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -200,7 +200,7 @@ namespace Umbraco.Core.Models
         /// Gets or set the comments for the member
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoCommentPropertyTypeAlias
+        /// Alias: umbracoMemberComments
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -229,7 +229,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets a boolean indicating whether the Member is approved
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoApprovePropertyTypeAlias
+        /// Alias: umbracoMemberApproved
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -264,7 +264,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets a boolean indicating whether the Member is locked out
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoLockPropertyTypeAlias
+        /// Alias: umbracoMemberLockedOut
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -297,7 +297,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the date for last login
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoLastLoginPropertyTypeAlias
+        /// Alias: umbracoMemberLastLogin
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -330,7 +330,7 @@ namespace Umbraco.Core.Models
         /// Gest or sets the date for last password change
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoMemberLastPasswordChange
+        /// Alias: umbracoMemberLastPasswordChangeDate
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -363,7 +363,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the date for when Member was locked out
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoMemberLastLockout
+        /// Alias: umbracoMemberLastLockoutDate
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -397,7 +397,7 @@ namespace Umbraco.Core.Models
         /// This is the number of times the password was entered incorrectly upon login.
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoFailedPasswordAttemptsPropertyTypeAlias
+        /// Alias: umbracoMemberFailedPasswordAttempts
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]

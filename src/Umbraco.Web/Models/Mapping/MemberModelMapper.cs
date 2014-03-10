@@ -298,7 +298,7 @@ namespace Umbraco.Web.Models.Mapping
                 {
                     return MembershipScenario.NativeUmbraco;
                 }
-                var memberType = _memberTypeService.Value.Get(Constants.Conventions.MemberTypes.Member);
+                var memberType = _memberTypeService.Value.Get(Constants.Conventions.MemberTypes.DefaultAlias);
                 return memberType != null
                            ? MembershipScenario.CustomProviderWithUmbracoLink
                            : MembershipScenario.StandaloneCustomProvider;

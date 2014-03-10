@@ -13,10 +13,10 @@
  *  for the editors to check if the value has changed and to re-bind the property if that is true.
  * 
 */
-function fileUploadController($scope, $element, $compile, imageHelper, fileManager, umbRequestHelper) {
+function fileUploadController($scope, $element, $compile, imageHelper, fileManager, umbRequestHelper, mediaHelper) {
 
     /** Clears the file collections when content is saving (if we need to clear) or after saved */
-    function clearFiles() {        
+    function clearFiles() {
         //clear the files collection (we don't want to upload any!)
         fileManager.setFiles($scope.model.alias, []);
         //clear the current files
@@ -24,12 +24,11 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
     }
 
     /** this method is used to initialize the data and to re-initialize it if the server value is changed */
-    function initialize(index)
-    {
+    function initialize(index) {
         if (!index) {
             index = 1;
         }
-        
+
         //this is used in order to tell the umb-single-file-upload directive to 
         //rebuild the html input control (and thus clearing the selected file) since
         //that is the only way to manipulate the html for the file input control.
@@ -55,7 +54,7 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
         }
 
         _.each($scope.persistedFiles, function (file) {
-            
+
             var thumbnailUrl = umbRequestHelper.getApiUrl(
                         "imagesApiBaseUrl",
                         "GetBigThumbnail",
@@ -72,7 +71,7 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
     //listen for clear files changes to set our model to be sent up to the server
     $scope.$watch("clearFiles", function (isCleared) {
         if (isCleared == true) {
-            $scope.model.value = {clearFiles: true};
+            $scope.model.value = { clearFiles: true };
             clearFiles();
         }
         else {
@@ -102,9 +101,9 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
             $scope.model.value = { selectedFiles: newVal.trimEnd(",") };
         });
     });
-    
+
     //listen for when the model value has changed
-    $scope.$watch("model.value", function(newVal, oldVal) {
+    $scope.$watch("model.value", function (newVal, oldVal) {
         //cannot just check for !newVal because it might be an empty string which we 
         //want to look for.
         if (newVal !== null && newVal !== undefined && newVal !== oldVal) {
@@ -112,7 +111,7 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
             // since we only want to do that if the server has changed the value, not if this controller
             // has changed the value. There's only 2 scenarios where we change the value internall so 
             // we know what those values can be, if they are not either of them, then we'll re-initialize.
-            
+
             if (newVal.clearFiles !== true && newVal !== $scope.originalValue && !newVal.selectedFiles) {
                 initialize($scope.rebuildInput.index + 1);
             }
@@ -130,4 +129,3 @@ angular.module("umbraco")
                 return property.value;
         });
     });
-

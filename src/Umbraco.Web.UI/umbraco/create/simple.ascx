@@ -1,4 +1,4 @@
-<%@ Control Language="c#" AutoEventWireup="True" Codebehind="simple.ascx.cs" Inherits="umbraco.cms.presentation.create.controls.simple" TargetSchema="http://schemas.microsoft.com/intellisense/ie5" %>
+<%@ Control Language="c#" AutoEventWireup="True" Inherits="umbraco.cms.presentation.create.controls.simple" TargetSchema="http://schemas.microsoft.com/intellisense/ie5" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
 
@@ -13,9 +13,10 @@
      <asp:Button id="sbmt" Runat="server" CssClass="btn btn-primary" onclick="sbmt_Click"></asp:Button>
 </cc1:Pane>
 
+    
 
 <!-- added to support missing postback on enter in IE -->
 <asp:TextBox runat="server" style="visibility:hidden;display:none;" ID="Textbox1"/>
+<asp:CustomValidator runat="server" ID="CustomValidation" ForeColor="red" style="display:block;"></asp:CustomValidator>
 <input type="hidden" name="nodeType">
-
 

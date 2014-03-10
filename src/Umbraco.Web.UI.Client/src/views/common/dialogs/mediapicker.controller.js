@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Dialogs.MediaPickerController",
-        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, imageHelper, eventsService, treeService, $cookies) {
+        function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, eventsService, treeService, $cookies) {
 
             var dialogOptions = $scope.$parent.dialogOptions;
             $scope.onlyImages = dialogOptions.onlyImages;
@@ -14,6 +14,12 @@ angular.module("umbraco")
                     currentFolder: -1
                 }
             };
+
+            //preload selected item
+            $scope.target = undefined;
+            if(dialogOptions.currentTarget){
+                $scope.target = dialogOptions.currentTarget;
+            }
 
             $scope.submitFolder = function(e) {
                 if (e.keyCode === 13) {
@@ -57,6 +63,7 @@ angular.module("umbraco")
                     .then(function(data) {
 
                         $scope.images = [];
+
                         $scope.searchTerm = "";
                         if(data.items){
                              $scope.images = data.items;
@@ -64,9 +71,9 @@ angular.module("umbraco")
                        
 
                         //update the thumbnail property
-                        _.each($scope.images, function(img) {
-                            img.thumbnail = imageHelper.getThumbnail({ imageModel: img, scope: $scope });
-                        });
+                        //_.each($scope.images, function(img) {
+                        //    img.thumbnail = imageHelper.getThumbnail({ imageModel: img, scope: $scope });
+                        //});
 
                         //reject all images that have an empty thumbnail - this can occur if there's an image item
                         // that doesn't have an uploaded image.
@@ -79,10 +86,8 @@ angular.module("umbraco")
                     });
 
                 $scope.options.formData.currentFolder = folder.id;
-                $scope.currentFolder = folder;   
-                
+                $scope.currentFolder = folder;      
             };
-
 
             $scope.$on('fileuploadstop', function(event, files) {
                 $scope.gotoFolder($scope.currentFolder);
@@ -100,11 +105,25 @@ angular.module("umbraco")
                         $scope.select(image);
                         image.cssclass = ($scope.dialogData.selection.indexOf(image) > -1) ? "selected" : "";
                     }else {
-                        $scope.submit(image);
+
+                        $scope.target= {};
+                        $scope.target.id = image.id;
+                        $scope.target.name = image.name;
+                        $scope.target.url = mediaHelper.resolveFile(image); // getMediaPropertyValue({mediaModel: image});
+
+                        //$scope.submit(image);
                     }
                 }
 
                 
+            };
+
+            $scope.exitDetails = function(){
+                if(!$scope.currentFolder){
+                    $scope.gotoFolder();
+                }
+
+                $scope.target = undefined;
             };
 
             $scope.selectFolder= function(folder) {
@@ -132,5 +151,8 @@ angular.module("umbraco")
             };
 
             //default root item
-            $scope.gotoFolder();
+            if(!$scope.target){
+                $scope.gotoFolder();    
+            }
+            
         });

@@ -24,6 +24,8 @@ namespace Umbraco.Web
 
         private bool _replacing;
         private bool? _previewing;
+        private Lazy<ContextualPublishedContentCache> _contentCache;
+        private Lazy<ContextualPublishedMediaCache> _mediaCache;
 
         /// <summary>
         /// Used if not running in a web application (no real HttpContext)
@@ -175,22 +177,22 @@ namespace Umbraco.Web
             var umbracoContext = new UmbracoContext(
                 httpContext,
                 applicationContext,
-                PublishedCachesResolver.Current.Caches,
+                new Lazy<IPublishedCaches>(() => PublishedCachesResolver.Current.Caches, false),
                 webSecurity,
                 preview);
-
-            // create the nice urls provider
-            // there's one per request because there are some behavior parameters that can be changed
-            var urlProvider = new UrlProvider(
-                umbracoContext,
-                UrlProviderResolver.Current.Providers);
 
             // create the RoutingContext, and assign
             var routingContext = new RoutingContext(
                 umbracoContext,
-                ContentFinderResolver.Current.Finders,
-                ContentLastChanceFinderResolver.Current.Finder,
-                urlProvider);
+                new Lazy<IEnumerable<IContentFinder>>(() => ContentFinderResolver.Current.Finders),
+                new Lazy<IContentFinder>(() => ContentLastChanceFinderResolver.Current.Finder),
+                // create the nice urls provider
+                // there's one per request because there are some behavior parameters that can be changed
+                new Lazy<UrlProvider>(
+                    () => new UrlProvider(
+                        umbracoContext,
+                        UrlProviderResolver.Current.Providers),
+                    false));
 
             //assign the routing context back
             umbracoContext.RoutingContext = routingContext;
@@ -214,6 +216,24 @@ namespace Umbraco.Web
             IPublishedCaches publishedCaches,
             WebSecurity webSecurity,
             bool? preview = null)
+            : this(httpContext, applicationContext, new Lazy<IPublishedCaches>(() => publishedCaches), webSecurity, preview)
+        {
+        }
+
+        /// <summary>
+        /// Creates a new Umbraco context.
+        /// </summary>
+        /// <param name="httpContext"></param>
+        /// <param name="applicationContext"> </param>
+        /// <param name="publishedCaches">The published caches.</param>
+        /// <param name="webSecurity"></param>
+        /// <param name="preview">An optional value overriding detection of preview mode.</param>
+        internal UmbracoContext(
+			HttpContextBase httpContext, 
+			ApplicationContext applicationContext,
+            Lazy<IPublishedCaches> publishedCaches,
+            WebSecurity webSecurity,
+            bool? preview = null)
         {
             //This ensures the dispose method is called when the request terminates, though
             // we also ensure this happens in the Umbraco module because the UmbracoContext is added to the
@@ -230,8 +250,8 @@ namespace Umbraco.Web
             Application = applicationContext;
             Security = webSecurity;
 
-            ContentCache = publishedCaches.CreateContextualContentCache(this);
-            MediaCache = publishedCaches.CreateContextualMediaCache(this);
+            _contentCache = new Lazy<ContextualPublishedContentCache>(() => publishedCaches.Value.CreateContextualContentCache(this));
+            _mediaCache = new Lazy<ContextualPublishedMediaCache>(() => publishedCaches.Value.CreateContextualMediaCache(this));
             _previewing = preview;
             
             // set the urls...
@@ -331,17 +351,23 @@ namespace Umbraco.Web
         /// <summary>
         /// Gets or sets the published content cache.
         /// </summary>
-        public ContextualPublishedContentCache ContentCache { get; private set; }
+        public ContextualPublishedContentCache ContentCache
+        {
+            get { return _contentCache.Value; }
+        }
 
         /// <summary>
         /// Gets or sets the published media cache.
         /// </summary>
-        public ContextualPublishedMediaCache MediaCache { get; private set; }
+        public ContextualPublishedMediaCache MediaCache
+        {
+            get { return _mediaCache.Value; }
+        }
 
         /// <summary>
-		/// Boolean value indicating whether the current request is a front-end umbraco request
-		/// </summary>
-		public bool IsFrontEndUmbracoRequest
+        /// Boolean value indicating whether the current request is a front-end umbraco request
+        /// </summary>
+        public bool IsFrontEndUmbracoRequest
 		{
 			get { return PublishedContentRequest != null; }
 		}

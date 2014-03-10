@@ -24,7 +24,7 @@ namespace Umbraco.Core.Models.Membership
         /// This is the number of times the password was entered incorrectly upon login.
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoFailedPasswordAttemptsPropertyTypeAlias
+        /// Alias: umbracoMemberFailedPasswordAttempts
         /// Part of the standard properties collection.
         /// </remarks>
         int FailedPasswordAttempts { get; set; }

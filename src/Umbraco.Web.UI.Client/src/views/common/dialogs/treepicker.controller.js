@@ -127,13 +127,6 @@ angular.module("umbraco").controller("Umbraco.Dialogs.TreePickerController",
 
 
 	$scope.multiSubmit = function (result) {
-
-		if(dialogOptions.minNumber || dialogOptions.maxNumber){
-			if(dialogOptions.minNumber > result.length || dialogOptions.maxNumber < result.length){
-				return;
-			}
-		}
-
 		entityResource.getByIds(result, $scope.entityType).then(function (ents) {
 			$scope.submit(ents);
 		});
