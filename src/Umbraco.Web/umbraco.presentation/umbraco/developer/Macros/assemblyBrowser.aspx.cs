@@ -41,7 +41,7 @@ namespace umbraco.developer
                 if (Request.QueryString["type"] == null)
                 {
                     isUserControl = true;
-                    var fileName = Request.CleanForXss("fileName");
+                    var fileName = Request.GetItemAsString("fileName");
                     if (!fileName.StartsWith("~"))
                     {
                         if (fileName.StartsWith("/"))
@@ -109,7 +109,7 @@ namespace umbraco.developer
             }
             catch (Exception err)
             {
-                AssemblyName.Text = "Error reading " + Request["fileName"];
+                AssemblyName.Text = "Error reading " + Request.CleanForXss("fileName");
                 Button1.Visible = false;
                 ChooseProperties.Controls.Add(new LiteralControl("<p class=\"guiDialogNormal\" style=\"color: red;\">" + err.ToString() + "</p><p/><p class=\"guiDialogNormal\">"));
             }
