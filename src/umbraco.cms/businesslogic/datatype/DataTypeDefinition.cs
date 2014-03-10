@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
+using System.Data;
 using System.Linq;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Persistence.SqlSyntax;
 using umbraco.DataLayer;
 using System.Xml;
 using umbraco.cms.businesslogic.media;
@@ -237,10 +239,17 @@ namespace umbraco.cms.businesslogic.datatype
         /// <returns></returns>
         public static DataTypeDefinition MakeNew(BusinessLogic.User u, string Text, Guid UniqueId)
         {
+            //Cannot add a duplicate data type
+            var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
+INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
+WHERE umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + "= @name", new { name = Text });
+            if (exists > 0)
+            {
+                throw new DuplicateNameException("A data type with the name " + Text + " already exists");
+            }
 
             int newId = CMSNode.MakeNew(-1, _objectType, u.Id, 1, Text, UniqueId).Id;
-            cms.businesslogic.datatype.controls.Factory f = new cms.businesslogic.datatype.controls.Factory();
-
+            
             // initial control id changed to empty to ensure that it'll always work no matter if 3rd party configurators fail
             // ref: http://umbraco.codeplex.com/workitem/29788
             Guid FirstcontrolId = Guid.Empty;
