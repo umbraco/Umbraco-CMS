@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -12,6 +13,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Binders;
 using Umbraco.Web.WebApi.Filters;
 using umbraco;
@@ -139,8 +141,16 @@ namespace Umbraco.Web.Editors
                 preValDictionary,
                 currVal);
 
-            //save the data type
-            dtService.SaveDataTypeAndPreValues(dataType.PersistedDataType, formattedVal, (int)Security.CurrentUser.Id);
+            try
+            {
+                //save the data type
+                dtService.SaveDataTypeAndPreValues(dataType.PersistedDataType, formattedVal, (int)Security.CurrentUser.Id);
+            }
+            catch (DuplicateNameException ex)
+            {
+                ModelState.AddModelError("Name", ex.Message);
+                throw new HttpResponseException(Request.CreateValidationErrorResponse(ModelState));
+            }
 
             var display = Mapper.Map<IDataTypeDefinition, DataTypeDisplay>(dataType.PersistedDataType);
             display.AddSuccessNotification(ui.Text("speechBubbles", "dataTypeSaved"), "");
