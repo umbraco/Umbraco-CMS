@@ -95,6 +95,11 @@ angular.module("umbraco")
                     //set the reference
                     tinyMceEditor = editor;
 
+                    //enable browser based spell checking
+                    editor.on('init', function(e) {
+                        editor.getBody().setAttribute('spellcheck', true);
+                    });
+
                     //We need to listen on multiple things here because of the nature of tinymce, it doesn't 
                     //fire events when you think!
                     //The change event doesn't fire when content changes, only when cursor points are changed and undo points
@@ -140,7 +145,7 @@ angular.module("umbraco")
                     $timeout(function () {
                         tinymce.DOM.events.domLoaded = true;
                         tinymce.init(baseLineConfigObj);
-                    }, 200);
+                    }, 200, false);
                 }
                 
 
