@@ -28,11 +28,13 @@ namespace umbraco.cms.businesslogic.macro
 
 		internal static void EnsureInitialize()
 		{
-			if (_isInitialized)
-				return;
-
-			using (new WriteLock(Lock))
+			using (var lck = new UpgradeableReadLock(Lock))
 			{
+                if (_isInitialized)
+                    return;
+
+                lck.UpgradeToWriteLock();
+
 				AllEngines.Clear();
 
 				AllEngines.AddRange(
