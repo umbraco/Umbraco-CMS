@@ -1,19 +1,11 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco')   
-
     .controller("Umbraco.PropertyEditors.ImageCropperController",
     function ($rootScope, $routeParams, $scope, $log, mediaHelper, cropperHelper, $timeout, editorState, umbRequestHelper, fileManager) {
 
         var config = $scope.model.config;
-        mediaHelper.registerFileResolver("Umbraco.ImageCropper", function (property) {
-            if (property.value.src) {
-                return property.value.src;
-            } else if (angular.isString(property.value)) {
-                return property.value;
-            }
-        });
-
+        
         //move previously saved value to the editor
         if ($scope.model.value) {
             //backwards compat with the old file upload (incase some-one swaps them..)
@@ -102,4 +94,13 @@ angular.module('umbraco')
                 reader.readAsDataURL(args.files[0]);
             }
         });
+    })
+    .run(function(mediaHelper){
+        mediaHelper.registerFileResolver("Umbraco.ImageCropper", function (property) {
+                    if (property.value.src) {
+                        return property.value.src;
+                    } else if (angular.isString(property.value)) {
+                        return property.value;
+                    }
+                });
     });

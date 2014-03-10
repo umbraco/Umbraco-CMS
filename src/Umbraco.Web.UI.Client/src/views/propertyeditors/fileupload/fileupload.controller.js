@@ -15,10 +15,6 @@
 */
 function fileUploadController($scope, $element, $compile, imageHelper, fileManager, umbRequestHelper, mediaHelper) {
 
-    mediaHelper.registerFileResolver("Umbraco.UploadField", function(property){
-            return property.value;
-    });
-
     /** Clears the file collections when content is saving (if we need to clear) or after saved */
     function clearFiles() {
         //clear the files collection (we don't want to upload any!)
@@ -127,4 +123,9 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
     });
 };
 angular.module("umbraco")
-    .controller('Umbraco.PropertyEditors.FileUploadController', fileUploadController);
+    .controller('Umbraco.PropertyEditors.FileUploadController', fileUploadController)
+    .run(function(mediaHelper){
+        mediaHelper.registerFileResolver("Umbraco.UploadField", function(property){
+                return property.value;
+        });
+    });

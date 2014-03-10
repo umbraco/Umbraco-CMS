@@ -103,6 +103,9 @@ namespace Umbraco.Web
             renderer.Initialize("Umbraco.DependencyPathRenderer", new NameValueCollection { { "compositeFileHandlerPath", "~/DependencyHandler.axd" } });
             ClientDependencySettings.Instance.MvcRendererCollection.Add(renderer);
 
+            InstallHelper insHelper = new InstallHelper(UmbracoContext.Current);
+            insHelper.DeleteLegacyInstaller();
+
             return this;
         }
 
