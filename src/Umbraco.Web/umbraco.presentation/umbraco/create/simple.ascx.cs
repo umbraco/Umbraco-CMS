@@ -52,7 +52,7 @@ namespace umbraco.cms.presentation.create.controls
                 }
                 catch (Exception ex)
                 {
-                    CustomValidation.ErrorMessage = ex.Message;
+                    CustomValidation.ErrorMessage = "* " + ex.Message;
                     CustomValidation.IsValid = false;
                 }
             }

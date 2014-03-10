@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Relators;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -63,6 +65,17 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected void PersistNewBaseContentType(ContentTypeDto dto, IContentTypeComposition entity)
         {
+            //Cannot add a duplicate content type type
+            var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsContentType
+INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id
+WHERE cmsContentType." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("alias") + @"= @alias
+AND umbracoNode.nodeObjectType = @objectType",
+                new { alias = entity.Alias, objectType = NodeObjectTypeId });
+            if (exists > 0)
+            {
+                throw new DuplicateNameException("An item with the alias " + entity.Alias + " already exists");
+            }
+
             //Logic for setting Path, Level and SortOrder
             var parent = Database.First<NodeDto>("WHERE id = @ParentId", new { ParentId = entity.ParentId });
             int level = parent.Level + 1;
@@ -165,6 +178,19 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected void PersistUpdatedBaseContentType(ContentTypeDto dto, IContentTypeComposition entity)
         {
+
+            //Cannot update to a duplicate alias
+            var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsContentType
+INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id
+WHERE cmsContentType." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("alias") + @"= @alias
+AND umbracoNode.nodeObjectType = @objectType
+AND umbracoNode.id <> @id",
+                new { id = dto.NodeId, alias = entity.Alias, objectType = NodeObjectTypeId });
+            if (exists > 0)
+            {
+                throw new DuplicateNameException("An item with the alias " + entity.Alias + " already exists");
+            }
+
             var propertyGroupFactory = new PropertyGroupFactory(entity.Id);
 
             var nodeDto = dto.NodeDto;

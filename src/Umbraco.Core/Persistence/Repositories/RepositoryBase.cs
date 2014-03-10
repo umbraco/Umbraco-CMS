@@ -223,8 +223,19 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         public virtual void PersistNewItem(IEntity entity)
         {
-            PersistNewItem((TEntity)entity);
-            _cache.Save(typeof(TEntity), entity);
+            try
+            {
+                PersistNewItem((TEntity)entity);
+                _cache.Save(typeof(TEntity), entity);
+            }
+            catch (Exception)
+            {
+                //if an exception is thrown we need to remove the entry from cache, this is ONLY a work around because of the way
+                // that we cache entities: http://issues.umbraco.org/issue/U4-4259
+                _cache.Delete(typeof (TEntity), entity);
+                throw;
+            }
+            
         }
 
         /// <summary>
@@ -233,8 +244,19 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entity"></param>
         public virtual void PersistUpdatedItem(IEntity entity)
         {
-            PersistUpdatedItem((TEntity)entity);
-            _cache.Save(typeof(TEntity), entity);
+            try
+            {
+                PersistUpdatedItem((TEntity)entity);
+                _cache.Save(typeof(TEntity), entity);
+            }
+            catch (Exception)
+            {
+                //if an exception is thrown we need to remove the entry from cache, this is ONLY a work around because of the way
+                // that we cache entities: http://issues.umbraco.org/issue/U4-4259
+                _cache.Delete(typeof (TEntity), entity);
+                throw;
+            }
+            
         }
 
         /// <summary>

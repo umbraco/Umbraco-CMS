@@ -334,7 +334,17 @@ namespace umbraco.controls
                         SavingContentType(_contentType);
                     }
 
-                    _contentType.Save();
+                    try
+                    {
+                        _contentType.Save();
+                    }
+                    catch (DuplicateNameException ex)
+                    {
+                        DuplicateAliasValidator.IsValid = false;
+                        asyncState.SaveArgs.IconType = BasePage.speechBubbleIcon.error;
+                        asyncState.SaveArgs.Message = ex.Message;
+                        return;
+                    }
 
                     Trace.Write("ContentTypeControlNew", "task completing");
                 };
@@ -1602,5 +1612,14 @@ jQuery(document).ready(function() {{ refreshDropDowns(); }});
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
         protected global::System.Web.UI.WebControls.Literal checkTxtAliasJs;
+
+        /// <summary>
+        /// DuplicateAliasValidator control.
+        /// </summary>
+        /// <remarks>
+        /// Auto-generated field.
+        /// To modify move field declaration from designer file to code-behind file.
+        /// </remarks>
+        protected global::System.Web.UI.WebControls.CustomValidator DuplicateAliasValidator;
     }
 }

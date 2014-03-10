@@ -686,6 +686,9 @@
     <Compile Include="umbraco.presentation\umbraco\create\simple.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\developer\DataTypes\editDatatype.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>

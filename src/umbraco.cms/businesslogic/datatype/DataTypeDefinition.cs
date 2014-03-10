@@ -34,6 +34,7 @@ namespace umbraco.cms.businesslogic.datatype
         private string _propertyEditorAlias;
 
         private static readonly Guid ObjectType = new Guid(Constants.ObjectTypes.DataType);
+        private string _text1;
 
         #endregion
 
@@ -54,6 +55,13 @@ namespace umbraco.cms.businesslogic.datatype
         #endregion
 
         #region Public Properties
+
+        public override string Text
+        {
+            get { return _text1 ?? (_text1 = base.Text); }
+            set { _text1 = value; }
+        }
+
         /// <summary>
         /// The associated datatype, which delivers the methods for editing data, editing prevalues see: umbraco.interfaces.IDataType
         /// </summary>
@@ -148,6 +156,23 @@ namespace umbraco.cms.businesslogic.datatype
         /// </summary>
         public override void Save()
         {
+            //Cannot change to a duplicate alias
+            var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
+INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
+WHERE umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + @"= @name
+AND umbracoNode.id <> @id",
+                    new { id = this.Id, name = this.Text });
+            if (exists > 0)
+            {
+                ApplicationContext.Current.ApplicationCache.RuntimeCache.ClearCacheItem(
+                    string.Format("{0}{1}", CacheKeys.DataTypeCacheKey, this.Id));
+
+                throw new DuplicateNameException("A data type with the name " + this.Text + " already exists");
+            }
+
+            //this actually does the persisting.
+            base.Text = _text1;
+
             OnSaving(EventArgs.Empty);
         }
 
