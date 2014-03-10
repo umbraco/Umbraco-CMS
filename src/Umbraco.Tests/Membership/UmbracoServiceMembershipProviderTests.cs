@@ -95,7 +95,7 @@ namespace Umbraco.Tests.Membership
             mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Member");
             mServiceMock.Setup(
                 service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                        .Callback((string u, string e, string p, string m, bool b) =>
+                        .Callback((string u, string e, string p, string m) =>
                             {
                                 createdMember = new Member("test", e, u, p, memberType);
                             })
@@ -126,7 +126,7 @@ namespace Umbraco.Tests.Membership
             mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Member");
             mServiceMock.Setup(
                 service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                        .Callback((string u, string e, string p, string m, bool b) =>
+                        .Callback((string u, string e, string p, string m) =>
                             {
                                 createdMember = new Member("test", e, u, p, memberType);
                             })
@@ -159,7 +159,7 @@ namespace Umbraco.Tests.Membership
             mServiceMock.Setup(service => service.GetDefaultMemberType()).Returns("Member");
             mServiceMock.Setup(
                 service => service.CreateWithIdentity(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-                        .Callback((string u, string e, string p, string m, bool b) =>
+                        .Callback((string u, string e, string p, string m) =>
                         {
                             createdMember = new Member("test", e, u, p, memberType);
                         })
