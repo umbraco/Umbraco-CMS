@@ -49,7 +49,8 @@
     
     <cc2:PropertyPanel ID="pp_alias" runat="server" Text="Alias">
          <asp:TextBox ID="txtAlias" CssClass="guiInputText guiInputStandardSize" runat="server"></asp:TextBox>
-         <asp:RequiredFieldValidator ControlToValidate="txtAlias" runat="server" ErrorMessage="Alias cannot be empty!"></asp:RequiredFieldValidator>
+         <asp:RequiredFieldValidator Display="Dynamic" ControlToValidate="txtAlias" runat="server" ErrorMessage="Alias cannot be empty!"></asp:RequiredFieldValidator>
+        <asp:CustomValidator Display="Dynamic" runat="server" ID="DuplicateAliasValidator" ErrorMessage="A type with this alias already exists"></asp:CustomValidator>
     </cc2:PropertyPanel>
   </cc2:Pane>
   

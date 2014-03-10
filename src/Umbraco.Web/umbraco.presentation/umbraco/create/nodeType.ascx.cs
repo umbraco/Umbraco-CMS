@@ -1,4 +1,6 @@
+using System.Globalization;
 using Umbraco.Core;
+using Umbraco.Web;
 
 namespace umbraco.cms.presentation.create.controls
 {
@@ -19,20 +21,20 @@ namespace umbraco.cms.presentation.create.controls
 	{
 
 
-		protected void Page_Load(object sender, System.EventArgs e)
+		protected void Page_Load(object sender, EventArgs e)
 		{
 			sbmt.Text = ui.Text("create");
             if (!IsPostBack)
             {
-                string nodeId = umbraco.helper.Request("nodeId");
+                string nodeId = Request.GetItemAsString("nodeId");
                 if (String.IsNullOrEmpty(nodeId) || nodeId == "init")
                 {
                     masterType.Attributes.Add("style", "width: 350px;");
                     masterType.Items.Add(new ListItem(ui.Text("none") + "...", "0"));
-                    foreach (cms.businesslogic.web.DocumentType dt in cms.businesslogic.web.DocumentType.GetAllAsList())
+                    foreach (DocumentType dt in DocumentType.GetAllAsList())
                     {
                         //                    if (dt.MasterContentType == 0)
-                        masterType.Items.Add(new ListItem(dt.Text, dt.Id.ToString()));
+                        masterType.Items.Add(new ListItem(dt.Text, dt.Id.ToString(CultureInfo.InvariantCulture)));
                     }
                 }
                 else
@@ -56,7 +58,7 @@ namespace umbraco.cms.presentation.create.controls
                 e.IsValid = false;
         }
 
-		protected void sbmt_Click(object sender, System.EventArgs e)
+		protected void sbmt_Click(object sender, EventArgs e)
 		{
 			if (Page.IsValid) 
 			{
@@ -65,10 +67,10 @@ namespace umbraco.cms.presentation.create.controls
 					createTemplateVal = 1;
 
                 // check master type
-                string masterTypeVal = String.IsNullOrEmpty(umbraco.helper.Request("nodeId")) || umbraco.helper.Request("nodeId") == "init" ? masterType.SelectedValue : umbraco.helper.Request("nodeId");
+                string masterTypeVal = String.IsNullOrEmpty(Request.GetItemAsString("nodeId")) || Request.GetItemAsString("nodeId") == "init" ? masterType.SelectedValue : Request.GetItemAsString("nodeId");
 
 				string returnUrl = umbraco.presentation.create.dialogHandler_temp.Create(
-					umbraco.helper.Request("nodeType"),
+                    Request.GetItemAsString("nodeType"),
                     int.Parse(masterTypeVal),
 					createTemplateVal,
 					rename.Text);
@@ -81,24 +83,5 @@ namespace umbraco.cms.presentation.create.controls
 			}
 		
 		}
-		#region Web Form Designer generated code
-		override protected void OnInit(EventArgs e)
-		{
-			//
-			// CODEGEN: This call is required by the ASP.NET Web Form Designer.
-			//
-			InitializeComponent();
-			base.OnInit(e);
-		}
-		
-		/// <summary>
-		///		Required method for Designer support - do not modify
-		///		the contents of this method with the code editor.
-		/// </summary>
-		private void InitializeComponent()
-		{
-
-		}
-		#endregion
 	}
 }

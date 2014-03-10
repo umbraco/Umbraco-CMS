@@ -6,7 +6,7 @@
 <asp:TextBox id="rename" CssClass="bigInput" Runat="server" width="350px"></asp:TextBox>
 <!-- added to support missing postback on enter in IE -->
 <asp:TextBox runat="server" style="visibility:hidden;display:none;" ID="Textbox1"/>
-<asp:CustomValidator runat="server" ID="CustomValidation" style="color:#8a1f11;display:block;"></asp:CustomValidator>
+<asp:CustomValidator runat="server" ID="CustomValidation" ForeColor="red" style="display:block;"></asp:CustomValidator>
 </div>
 
 <div style="padding-top: 25px;">

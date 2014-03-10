@@ -165,6 +165,18 @@ WHERE umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("te
 
         protected override void PersistUpdatedItem(IDataTypeDefinition entity)
         {
+
+            //Cannot change to a duplicate alias
+            var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
+INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
+WHERE umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + @"= @name
+AND umbracoNode.id <> @id", 
+                    new { id = entity.Id, name = entity.Name });
+            if (exists > 0)
+            {
+                throw new DuplicateNameException("A data type with the name " + entity.Name + " already exists");
+            }
+
             //Updates Modified date and Version Guid
             ((DataTypeDefinition)entity).UpdatingEntity();
 

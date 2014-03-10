@@ -8,6 +8,7 @@
         <cc1:Pane ID="pane_control" runat="server">
             <cc1:PropertyPanel ID="pp_name" runat="server">
                 <asp:TextBox ID="txtName" runat="server"></asp:TextBox>
+                <asp:CustomValidator Display="Dynamic" runat="server" ID="DuplicateNameValidator" ErrorMessage="A data type with this name already exists"></asp:CustomValidator>
             </cc1:PropertyPanel>
             <cc1:PropertyPanel ID="pp_renderControl" runat="server">
                 <asp:DropDownList ID="ddlRenderControl" runat="server" />
