@@ -196,7 +196,7 @@ namespace Umbraco.Web.Security
         /// Creates a new profile model filled in with the current members details if they are logged in.
         /// </summary>
         /// <returns></returns>
-        public ProfileModel CreateProfileModel()
+        public ProfileModel GetCurrentMemberProfile()
         {
             if (IsLoggedIn() == false)
             {

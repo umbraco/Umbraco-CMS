@@ -24,7 +24,7 @@ namespace Umbraco.Web.Models
             if (doLookup)
             {
                 var helper = new MembershipHelper(ApplicationContext.Current, new HttpContextWrapper(HttpContext.Current));
-                var model = helper.CreateProfileModel();
+                var model = helper.GetCurrentMemberProfile();
                 MemberProperties = model.MemberProperties;
             }   
         }
