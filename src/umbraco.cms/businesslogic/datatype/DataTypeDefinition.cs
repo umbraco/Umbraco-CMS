@@ -1,9 +1,11 @@
 using System;
 using System.Collections;
 using System.Globalization;
+using System.Data;
 using System.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.PropertyEditors;
 using umbraco.DataLayer;
 using System.Xml;
@@ -265,6 +267,14 @@ namespace umbraco.cms.businesslogic.datatype
         /// <returns></returns>
         public static DataTypeDefinition MakeNew(BusinessLogic.User u, string Text, Guid UniqueId)
         {
+            //Cannot add a duplicate data type
+            var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
+INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
+WHERE umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + "= @name", new { name = Text });
+            if (exists > 0)
+            {
+                throw new DuplicateNameException("A data type with the name " + Text + " already exists");
+            }
 
             var newId = MakeNew(-1, ObjectType, u.Id, 1, Text, UniqueId).Id;
 

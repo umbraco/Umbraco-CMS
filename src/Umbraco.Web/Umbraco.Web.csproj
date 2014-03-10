@@ -683,6 +683,9 @@
     <Compile Include="umbraco.presentation\umbraco\controls\Tree\TreeControl.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\create\simple.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -1273,13 +1276,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\script.ascx.designer.cs">
       <DependentUpon>script.ascx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\simple.ascx.cs">
-      <DependentUpon>simple.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\simple.ascx.designer.cs">
-      <DependentUpon>simple.ascx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\languageTasks.cs">
       <SubType>Code</SubType>
@@ -1958,9 +1954,7 @@
       <SubType>ASPXCodeBehind</SubType>
     </Content>
     <Content Include="umbraco.presentation\umbraco\create\nodeType.ascx" />
-    <Content Include="umbraco.presentation\umbraco\create\simple.ascx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
+
     <Content Include="umbraco.presentation\umbraco\dashboard\LatestEdits.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
