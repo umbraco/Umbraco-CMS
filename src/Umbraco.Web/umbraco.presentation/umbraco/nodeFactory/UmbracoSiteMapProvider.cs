@@ -14,125 +14,150 @@ using System.Configuration.Provider;
 using System.Collections;
 #endregion
 
-namespace umbraco.presentation.nodeFactory {
-    public sealed class UmbracoSiteMapProvider : System.Web.StaticSiteMapProvider {
+namespace umbraco.presentation.nodeFactory
+{
+    public sealed class UmbracoSiteMapProvider : StaticSiteMapProvider
+    {
 
-        private SiteMapNode m_root;
-        private Dictionary<string, SiteMapNode> m_nodes = new Dictionary<string, SiteMapNode>(16);
-        private string m_defaultDescriptionAlias = "";
-        private bool m_enableSecurityTrimming;
+        private SiteMapNode _root;
+        private readonly Dictionary<string, SiteMapNode> _nodes = new Dictionary<string, SiteMapNode>(16);
+        private string _defaultDescriptionAlias = "";
+        private bool _enableSecurityTrimming;
 
-        public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config) {
-
+        public override void Initialize(string name, NameValueCollection config)
+        {
             if (config == null)
                 throw new ArgumentNullException("Config is null");
 
-            if (String.IsNullOrEmpty(name))
+            if (string.IsNullOrEmpty(name))
                 name = "UmbracoSiteMapProvider";
 
-            if (!String.IsNullOrEmpty(config["defaultDescriptionAlias"])) {
-                m_defaultDescriptionAlias = config["defaultDescriptionAlias"].ToString();
+            if (string.IsNullOrEmpty(config["defaultDescriptionAlias"]) == false)
+            {
+                _defaultDescriptionAlias = config["defaultDescriptionAlias"];
                 config.Remove("defaultDescriptionAlias");
             }
-            if (config["securityTrimmingEnabled"] != null) {
-                m_enableSecurityTrimming = bool.Parse(config["securityTrimmingEnabled"]);
+            if (config["securityTrimmingEnabled"] != null)
+            {
+                _enableSecurityTrimming = bool.Parse(config["securityTrimmingEnabled"]);
             }
 
             base.Initialize(name, config);
 
             // Throw an exception if unrecognized attributes remain
-            if (config.Count > 0) {
+            if (config.Count > 0)
+            {
                 string attr = config.GetKey(0);
-                if (!String.IsNullOrEmpty(attr))
+                if (string.IsNullOrEmpty(attr) == false)
                     throw new ProviderException
-                    (String.Format("Unrecognized attribute: {0}", attr));
+                    (string.Format("Unrecognized attribute: {0}", attr));
             }
 
         }
 
+        public override SiteMapNode BuildSiteMap()
+        {
+            lock (this)
+            {
+                if (_root != null)
+                    return _root;
 
-
-        public override System.Web.SiteMapNode BuildSiteMap() {
-            lock (this) {
-                if (m_root != null)
-                    return m_root;
-
-                m_root = createNode("-1", "root", "umbraco root", "/", null);
-                try {
-                    AddNode(m_root, null);
-                } catch (Exception ex) {
+                _root = CreateNode("-1", "root", "umbraco root", "/", null);
+                try
+                {
+                    AddNode(_root, null);
+                }
+                catch (Exception ex)
+                {
                     LogHelper.Error<UmbracoSiteMapProvider>("Error adding to SiteMapProvider", ex);
                 }
 
-                loadNodes(m_root.Key, m_root);
+                LoadNodes(_root.Key, _root);
             }
 
-            return m_root;
+            return _root;
         }
 
-        public void UpdateNode(NodeFactory.Node node) {
-            lock (this) {
+        public void UpdateNode(NodeFactory.Node node)
+        {
+            lock (this)
+            {
                 // validate sitemap
                 BuildSiteMap();
 
                 SiteMapNode n;
-                if (!m_nodes.ContainsKey(node.Id.ToString())) {
-                    n = createNode(node.Id.ToString(),
+                if (_nodes.ContainsKey(node.Id.ToString()) == false)
+                {
+                    n = CreateNode(node.Id.ToString(),
                         node.Name,
-                        node.GetProperty(m_defaultDescriptionAlias) != null ? node.GetProperty(m_defaultDescriptionAlias).Value : "",
+                        node.GetProperty(_defaultDescriptionAlias) != null ? node.GetProperty(_defaultDescriptionAlias).Value : "",
                         node.Url,
-                        findRoles(node.Id, node.Path));
+                        FindRoles(node.Id, node.Path));
                     string parentNode = node.Parent == null ? "-1" : node.Parent.Id.ToString();
 
-                    try {
-                        AddNode(n, m_nodes[parentNode]);
-                    } catch (Exception ex) {
+                    try
+                    {
+                        AddNode(n, _nodes[parentNode]);
+                    }
+                    catch (Exception ex)
+                    {
                         LogHelper.Error<UmbracoSiteMapProvider>(String.Format("Error adding node with url '{0}' and Id {1} to SiteMapProvider", node.Name, node.Id), ex);
                     }
-                } else {
-                    n = m_nodes[node.Id.ToString()];
+                }
+                else
+                {
+                    n = _nodes[node.Id.ToString()];
                     n.Url = node.Url;
-                    n.Description = node.GetProperty(m_defaultDescriptionAlias) != null ? node.GetProperty(m_defaultDescriptionAlias).Value : "";
+                    n.Description = node.GetProperty(_defaultDescriptionAlias) != null ? node.GetProperty(_defaultDescriptionAlias).Value : "";
                     n.Title = node.Name;
-                    n.Roles = findRoles(node.Id, node.Path).Split(",".ToCharArray());
+                    n.Roles = FindRoles(node.Id, node.Path).Split(",".ToCharArray());
                 }
             }
         }
 
-        public void RemoveNode(int nodeId) {
-            lock (this) {
-                if (m_nodes.ContainsKey(nodeId.ToString()))
-                    RemoveNode(m_nodes[nodeId.ToString()]);
+        public void RemoveNode(int nodeId)
+        {
+            lock (this)
+            {
+                if (_nodes.ContainsKey(nodeId.ToString()))
+                    RemoveNode(_nodes[nodeId.ToString()]);
             }
         }
 
-        private void loadNodes(string parentId, SiteMapNode parentNode) {
-            lock (this) {
+        private void LoadNodes(string parentId, SiteMapNode parentNode)
+        {
+            lock (this)
+            {
                 NodeFactory.Node n = new NodeFactory.Node(int.Parse(parentId));
                 foreach (NodeFactory.Node child in n.Children)
                 {
 
-                    string roles = findRoles(child.Id, child.Path);
-                    SiteMapNode childNode = createNode(
+                    string roles = FindRoles(child.Id, child.Path);
+                    SiteMapNode childNode = CreateNode(
                         child.Id.ToString(),
                         child.Name,
-                        child.GetProperty(m_defaultDescriptionAlias) != null ? child.GetProperty(m_defaultDescriptionAlias).Value : "",
+                        child.GetProperty(_defaultDescriptionAlias) != null ? child.GetProperty(_defaultDescriptionAlias).Value : "",
                         child.Url,
                         roles);
-                    try {
+                    try
+                    {
                         AddNode(childNode, parentNode);
-                    } catch (Exception ex) {
+                    }
+                    catch (Exception ex)
+                    {
                         LogHelper.Error<UmbracoSiteMapProvider>(string.Format("Error adding node {0} to SiteMapProvider in loadNodes()", child.Id), ex);
                     }
-                    loadNodes(child.Id.ToString(), childNode);
+                    LoadNodes(child.Id.ToString(), childNode);
                 }
             }
         }
 
-        private string findRoles(int nodeId, string nodePath) {
+        private string FindRoles(int nodeId, string nodePath)
+        {
             // check for roles
             string roles = "";
-            if (m_enableSecurityTrimming && !String.IsNullOrEmpty(nodePath) && nodePath.Length > 0) {
+            if (_enableSecurityTrimming && !string.IsNullOrEmpty(nodePath) && nodePath.Length > 0)
+            {
                 string[] roleArray = cms.businesslogic.web.Access.GetAccessingMembershipRoles(nodeId, nodePath);
                 if (roleArray != null)
                     roles = String.Join(",", roleArray);
@@ -142,13 +167,15 @@ namespace umbraco.presentation.nodeFactory {
             return roles;
         }
 
-        protected override SiteMapNode GetRootNodeCore() {
+        protected override SiteMapNode GetRootNodeCore()
+        {
             BuildSiteMap();
-            return m_root;
+            return _root;
         }
 
-        public override bool IsAccessibleToUser(HttpContext context, SiteMapNode node) {
-            if (!m_enableSecurityTrimming)
+        public override bool IsAccessibleToUser(HttpContext context, SiteMapNode node)
+        {
+            if (!_enableSecurityTrimming)
                 return true;
 
             if (node.Roles == null || node.Roles.Count == -1)
@@ -164,9 +191,11 @@ namespace umbraco.presentation.nodeFactory {
             return false;
         }
 
-        private SiteMapNode createNode(string id, string name, string description, string url, string roles) {
-            lock (this) {
-                if (m_nodes.ContainsKey(id))
+        private SiteMapNode CreateNode(string id, string name, string description, string url, string roles)
+        {
+            lock (this)
+            {
+                if (_nodes.ContainsKey(id))
                     throw new ProviderException(String.Format("A node with id '{0}' already exists", id));
                 // Get title, URL, description, and roles from the DataReader
 
@@ -178,21 +207,11 @@ namespace umbraco.presentation.nodeFactory {
                 // Create a SiteMapNode
                 SiteMapNode node = new SiteMapNode(this, id, url, name, description, rolelist, null, null, null);
 
-                m_nodes.Add(id, node);
+                _nodes.Add(id, node);
 
                 // Return the node
                 return node;
             }
-        }
-
-
-        private SiteMapNode GetParentNode(string id) {
-
-            // Make sure the parent ID is valid
-            if (!m_nodes.ContainsKey(id))
-                throw new ProviderException(String.Format("No parent with id '{0}' is found", id));
-            // Return the parent SiteMapNode
-            return m_nodes[id];
         }
     }
 }

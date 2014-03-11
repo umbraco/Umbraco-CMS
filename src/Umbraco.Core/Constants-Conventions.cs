@@ -136,28 +136,28 @@ namespace Umbraco.Core
                 /// </summary>
                 public const string Comments = "umbracoMemberComments";
 
-		        public const string CommentsLabel = "Comments";
+                public const string CommentsLabel = "Comments";
 
                 /// <summary>
                 /// Property alias for the Approved boolean of a Member
                 /// </summary>
                 public const string IsApproved = "umbracoMemberApproved";
 
-		        public const string IsApprovedLabel = "Is Approved";
+                public const string IsApprovedLabel = "Is Approved";
 
                 /// <summary>
                 /// Property alias for the Locked out boolean of a Member
                 /// </summary>
                 public const string IsLockedOut = "umbracoMemberLockedOut";
 
-		        public const string IsLockedOutLabel = "Is Locked Out";
+                public const string IsLockedOutLabel = "Is Locked Out";
 
                 /// <summary>
                 /// Property alias for the last date the Member logged in
                 /// </summary>
                 public const string LastLoginDate = "umbracoMemberLastLogin";
 
-		        public const string LastLoginDateLabel = "Last Login Date";
+                public const string LastLoginDateLabel = "Last Login Date";
 
                 /// <summary>
                 /// Property alias for the last date a Member changed its password

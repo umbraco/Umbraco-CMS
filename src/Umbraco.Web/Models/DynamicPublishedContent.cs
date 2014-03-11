@@ -332,7 +332,7 @@ namespace Umbraco.Web.Models
 
             var attempt = content.GetType().GetMemberIgnoreCase(content, alias);
 
-			return !attempt.Success
+			return attempt.Success == false || attempt.Result == null
 				? null
 				: new PropertyResult(alias, attempt.Result, PropertyResultType.ReflectedProperty);
 		}
