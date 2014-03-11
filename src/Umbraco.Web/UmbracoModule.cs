@@ -383,9 +383,7 @@ namespace Umbraco.Web
 		        return true;
 
             LogHelper.Warn<UmbracoModule>("Umbraco has no content");
-
-			httpContext.Response.StatusCode = 503;
-
+            
 			const string noContentUrl = "~/config/splashes/noNodes.aspx";
 			httpContext.RewritePath(UriUtility.ToAbsolute(noContentUrl));
 
