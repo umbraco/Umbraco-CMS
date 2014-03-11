@@ -105,9 +105,12 @@ namespace Umbraco.Web.Cache
 
             payloads.ForEach(payload =>
             {
-                ApplicationContext.Current.ApplicationCache.RuntimeCache
-                    .ClearCacheByKeySearch(string.Format("{0}.{1}", typeof(IMemberGroup).FullName, payload.Name));
-                RuntimeCacheProvider.Current.Delete(typeof(IMemberGroup), payload.Id);
+                if (payload != null)
+                {
+                    ApplicationContext.Current.ApplicationCache.RuntimeCache
+                        .ClearCacheByKeySearch(string.Format("{0}.{1}", typeof(IMemberGroup).FullName, payload.Name));
+                    RuntimeCacheProvider.Current.Delete(typeof(IMemberGroup), payload.Id);   
+                }                
             });
             
         }
