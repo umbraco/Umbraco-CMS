@@ -6,7 +6,7 @@
 @using Umbraco.Web.Controllers
 
 @{
-    var profileModel = Members.CreateProfileModel();
+    var profileModel = Members.GetCurrentMemberProfileModel();
 
     Html.EnableClientValidation();
     Html.EnableUnobtrusiveJavaScript();

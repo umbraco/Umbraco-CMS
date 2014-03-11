@@ -17,6 +17,7 @@ using Umbraco.Core.Xml;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 using Umbraco.Web.Templates;
 using umbraco;
 using System.Collections.Generic;
@@ -35,7 +36,8 @@ namespace Umbraco.Web
 	{
 		private readonly UmbracoContext _umbracoContext;
 		private readonly IPublishedContent _currentPage;
-
+        private readonly MembershipHelper _membershipHelper;
+        
 		/// <summary>
 		/// Custom constructor setting the current page to the parameter passed in
 		/// </summary>
@@ -46,6 +48,7 @@ namespace Umbraco.Web
 		{			
 			if (content == null) throw new ArgumentNullException("content");
 			_currentPage = content;
+		    _membershipHelper = new MembershipHelper(_umbracoContext);
 		}
 
 		/// <summary>
@@ -57,6 +60,7 @@ namespace Umbraco.Web
 			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
 			if (umbracoContext.RoutingContext == null) throw new NullReferenceException("The RoutingContext on the UmbracoContext cannot be null");
 			_umbracoContext = umbracoContext;
+            _membershipHelper = new MembershipHelper(_umbracoContext);
 			if (_umbracoContext.IsFrontEndUmbracoRequest)
 			{
 				_currentPage = _umbracoContext.PublishedContentRequest.PublishedContent;
@@ -405,7 +409,7 @@ namespace Umbraco.Web
 		{
 			if (IsProtected(nodeId, path))
 			{
-				return Member.IsLoggedOn() && Access.HasAccess(nodeId, path, Membership.GetUser());
+                return _membershipHelper.IsLoggedIn() && Access.HasAccess(nodeId, path, Membership.GetUser());
 			}
 			return true;
 		}
@@ -416,11 +420,7 @@ namespace Umbraco.Web
 		/// <returns>True is the current user is logged in</returns>
 		public bool MemberIsLoggedOn()
 		{
-			/*
-			   MembershipUser u = Membership.GetUser();
-			   return u != null;           
-			*/
-			return Member.IsLoggedOn();
+		    return _membershipHelper.IsLoggedIn();
 		} 
 
 		#endregion
@@ -482,9 +482,51 @@ namespace Umbraco.Web
 
 		#endregion
 
-		#region Content
+        #region Members
 
-		public IPublishedContent TypedContent(object id)
+        public IPublishedContent TypedMember(object id)
+        {
+            var asInt = id.TryConvertTo<int>();
+            return asInt ? _membershipHelper.GetById(asInt.Result) : _membershipHelper.GetByProviderKey(id);
+        }
+
+        public IPublishedContent TypedMember(int id)
+        {
+            return _membershipHelper.GetById(id);
+        }
+
+        public IPublishedContent TypedMember(string id)
+        {
+            var asInt = id.TryConvertTo<int>();
+            return asInt ? _membershipHelper.GetById(asInt.Result) : _membershipHelper.GetByProviderKey(id);
+        }
+
+        public dynamic Member(object id)
+        {
+            var asInt = id.TryConvertTo<int>();
+            return asInt
+                ? _membershipHelper.GetById(asInt.Result).AsDynamic()
+                : _membershipHelper.GetByProviderKey(id).AsDynamic();
+        }
+
+        public dynamic Member(int id)
+        {
+            return _membershipHelper.GetById(id).AsDynamic();
+        }
+
+        public dynamic Member(string id)
+        {
+            var asInt = id.TryConvertTo<int>();
+            return asInt
+                ? _membershipHelper.GetById(asInt.Result).AsDynamic()
+                : _membershipHelper.GetByProviderKey(id).AsDynamic();
+        }
+
+        #endregion
+
+        #region Content
+
+        public IPublishedContent TypedContent(object id)
 		{
             return TypedDocumentById(id, _umbracoContext.ContentCache);
 		}

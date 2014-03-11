@@ -299,6 +299,8 @@
     <Compile Include="Models\ChangingPasswordModel.cs" />
     <Compile Include="Models\IRenderModel.cs" />
     <Compile Include="Models\PostRedirectModel.cs" />
+    <Compile Include="PublishedCache\MemberPublishedContent.cs" />
+    <Compile Include="PublishedCache\RawValueProperty.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedFragment.cs" />
     <Compile Include="PublishedCache\XmlPublishedCache\PublishedFragmentProperty.cs" />
     <Compile Include="Models\RenderModelOfTContent.cs" />

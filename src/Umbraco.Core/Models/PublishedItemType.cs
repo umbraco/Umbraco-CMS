@@ -13,6 +13,11 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// A media.
         /// </summary>
-		Media
+		Media,
+
+        /// <summary>
+        /// A member.
+        /// </summary>
+        Member
 	}
 }
