@@ -801,7 +801,7 @@ namespace Umbraco.Core.Services
             {
                 var prevalue = new XElement("PreValue");
                 prevalue.Add(new XAttribute("Id", pv.Value.Id));
-                prevalue.Add(new XAttribute("Value", pv.Value.Value));
+                prevalue.Add(new XAttribute("Value", pv.Value.Value == null ? "" : pv.Value.Value));
                 prevalue.Add(new XAttribute("Alias", pv.Key));
                 prevalue.Add(new XAttribute("SortOrder", sort));
                 prevalues.Add(prevalue);
