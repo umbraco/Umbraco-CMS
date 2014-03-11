@@ -76,7 +76,7 @@ namespace Umbraco.Tests.Membership
 
             var d = mpc.AsDynamic();
 
-            Assert.AreEqual("test comment", d.Comment);
+            Assert.AreEqual("test comment", d.Comments);
             Assert.AreEqual(date, d.CreationDate);
             Assert.AreEqual("test@email.com", d.Email);
             Assert.AreEqual(true, d.IsApproved);
@@ -117,7 +117,7 @@ namespace Umbraco.Tests.Membership
 
             var d = mpc.AsDynamic();
 
-            Assert.AreEqual("test comment", d.comment);
+            Assert.AreEqual("test comment", d.comments);
             Assert.AreEqual(date, d.creationDate);
             Assert.AreEqual("test@email.com", d.email);
             Assert.AreEqual(true, d.isApproved);

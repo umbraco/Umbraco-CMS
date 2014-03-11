@@ -37,7 +37,7 @@ namespace Umbraco.Tests.Models
         public void Can_Generate_Xml_Representation_Of_Media()
         {
             // Arrange
-            var mediaType = MockedContentTypes.CreateImageMediaType();
+            var mediaType = MockedContentTypes.CreateImageMediaType("image2");
             ServiceContext.ContentTypeService.Save(mediaType);
 
             var media = MockedMedia.CreateMediaImage(mediaType, -1);
