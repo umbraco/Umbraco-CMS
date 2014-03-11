@@ -4,14 +4,23 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Xml;
+using System.Xml.Linq;
 using umbraco.cms.businesslogic.member;
 using Umbraco.Core;
+using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Models
 {
+    /// <summary>
+    /// A readonly member profile model
+    /// </summary>
     public class ProfileModel : PostRedirectModel
     {
+
         public static ProfileModel CreateModel()
         {
             var model = new ProfileModel(false);
@@ -24,7 +33,7 @@ namespace Umbraco.Web.Models
             if (doLookup)
             {
                 var helper = new MembershipHelper(ApplicationContext.Current, new HttpContextWrapper(HttpContext.Current));
-                var model = helper.GetCurrentMemberProfile();
+                var model = helper.GetCurrentMemberProfileModel();
                 MemberProperties = model.MemberProperties;
             }   
         }
@@ -49,7 +58,6 @@ namespace Umbraco.Web.Models
         /// The member's member type alias
         /// </summary>        
         [ReadOnly(true)]
-        [Obsolete("This is not used and will be removed from the codebase in future versions")]
         public string MemberTypeAlias { get; set; }
 
         [ReadOnly(true)]
@@ -88,7 +96,7 @@ namespace Umbraco.Web.Models
         /// <remarks>
         /// Adding items to this list on the front-end will not add properties to the member in the database.
         /// </remarks>
-        public List<UmbracoProperty> MemberProperties { get; set; }
-
+        public List<UmbracoProperty> MemberProperties { get; set; }   
+       
     }
 }

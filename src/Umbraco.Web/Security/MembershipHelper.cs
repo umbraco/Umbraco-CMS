@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Web.Models;
+using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Security
 {
@@ -192,11 +193,61 @@ namespace Umbraco.Web.Security
             return true;
         }
 
+        #region Querying for front-end
+
+        public IPublishedContent GetByProviderKey(object key)
+        {
+            if (Membership.Provider.IsUmbracoMembershipProvider() == false)
+            {
+                throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
+            }
+
+            var result = _applicationContext.Services.MemberService.GetByProviderKey(key);
+            return result == null ? null : new MemberPublishedContent(result, Membership.GetUser(result.Username));
+        }
+
+        public IPublishedContent GetById(int memberId)
+        {
+            if (Membership.Provider.IsUmbracoMembershipProvider() == false)
+            {
+                throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
+            }
+
+            var result = _applicationContext.Services.MemberService.GetById(memberId);
+            return result == null ? null : new MemberPublishedContent(result, Membership.GetUser(result.Username));
+        }
+
+        public IPublishedContent GetByUsername(string username)
+        {
+            if (Membership.Provider.IsUmbracoMembershipProvider() == false)
+            {
+                throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
+            }
+
+            var result = _applicationContext.Services.MemberService.GetByUsername(username);
+            return result == null ? null : new MemberPublishedContent(result, Membership.GetUser(result.Username));
+        }
+
+        public IPublishedContent GetByEmail(string email)
+        {
+            if (Membership.Provider.IsUmbracoMembershipProvider() == false)
+            {
+                throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
+            }
+
+            var result = _applicationContext.Services.MemberService.GetByEmail(email);
+            return result == null ? null : new MemberPublishedContent(result, Membership.GetUser(result.Username));
+        }
+        
+        #endregion
+
+        #region Model Creation methods for member data editing on the front-end
         /// <summary>
-        /// Creates a new profile model filled in with the current members details if they are logged in.
+        /// Creates a new profile model filled in with the current members details if they are logged in which allows for editing
+        /// profile properties
         /// </summary>
         /// <returns></returns>
-        public ProfileModel GetCurrentMemberProfile()
+        public ProfileModel GetCurrentMemberProfileModel()
         {
             if (IsLoggedIn() == false)
             {
@@ -212,6 +263,7 @@ namespace Umbraco.Web.Security
 
                 var model = ProfileModel.CreateModel();
                 model.Name = member.Name;
+                model.MemberTypeAlias = member.ContentTypeAlias;
 
                 model.Email = membershipUser.Email;
                 model.UserName = membershipUser.UserName;
@@ -224,6 +276,7 @@ namespace Umbraco.Web.Security
                 model.LastLoginDate = membershipUser.LastLoginDate;
                 model.LastActivityDate = membershipUser.LastActivityDate;
                 model.LastPasswordChangedDate = membershipUser.LastPasswordChangedDate;
+
 
                 var memberType = member.ContentType;
 
@@ -287,7 +340,8 @@ namespace Umbraco.Web.Security
                 model.MemberTypeAlias = string.Empty;
                 return model;
             }
-        }
+        } 
+        #endregion
 
         /// <summary>
         /// Returns the login status model of the currently logged in member, if no member is logged in it returns null;

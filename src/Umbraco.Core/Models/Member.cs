@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models
     public class Member : ContentBase, IMember
     {
         private readonly IMemberType _contentType;
-        private string _contentTypeAlias;
+        private readonly string _contentTypeAlias;
         private string _username;
         private string _email;
         private string _password;
@@ -30,6 +30,7 @@ namespace Umbraco.Core.Models
         public Member(string name, IMemberType contentType)
             : base(name, -1, contentType, new PropertyCollection())
         {
+            _contentTypeAlias = contentType.Alias;
             _contentType = contentType;
             IsApproved = true;
         }
@@ -40,6 +41,7 @@ namespace Umbraco.Core.Models
         {
             Mandate.ParameterNotNull(contentType, "contentType");
 
+            _contentTypeAlias = contentType.Alias;
             _contentType = contentType;
             _email = email;
             _username = username;
@@ -52,6 +54,7 @@ namespace Umbraco.Core.Models
         {
             Mandate.ParameterNotNull(contentType, "contentType");
 
+            _contentTypeAlias = contentType.Alias;
             _contentType = contentType;
             _email = email;
             _username = username;
@@ -433,14 +436,6 @@ namespace Umbraco.Core.Models
         public virtual string ContentTypeAlias
         {
             get { return _contentTypeAlias; }
-            internal set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _contentTypeAlias = value;
-                    return _contentTypeAlias;
-                }, _contentTypeAlias, DefaultContentTypeAliasSelector);
-            }
         }
 
         /// <summary>

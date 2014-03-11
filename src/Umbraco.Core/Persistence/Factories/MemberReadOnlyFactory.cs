@@ -33,7 +33,6 @@ namespace Umbraco.Core.Persistence.Factories
                              Path = dto.Path,
                              SortOrder = dto.SortOrder,
                              Version = dto.VersionId,
-                             ContentTypeAlias = dto.ContentTypeAlias,
                              Properties = new PropertyCollection(properties)
                          };
 

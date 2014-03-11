@@ -657,36 +657,8 @@ namespace umbraco.MacroEngines
 
         private object GetReflectedProperty(string alias)
         {
-            Func<string, Attempt<object>> getMember =
-                    memberAlias =>
-                    {
-                        try
-                        {
-                            return Attempt<object>.Succeed(
-                                                       n.GetType().InvokeMember(memberAlias,
-                                                                                System.Reflection.BindingFlags.GetProperty |
-                                                                                System.Reflection.BindingFlags.Instance |
-                                                                                System.Reflection.BindingFlags.Public,
-                                                                                null,
-                                                                                n,
-                                                                                null));
-                        }
-                        catch (MissingMethodException ex)
-                        {
-                            return Attempt<object>.Fail(ex);
-                        }
-                    };
-
-            //try with the current casing
-            var attempt = getMember(alias);
-            if (!attempt.Success)
-            {
-                //if we cannot get with the current alias, try changing it's case
-                attempt = alias[0].IsUpperCase()
-                    ? getMember(alias.ToCleanString(CleanStringType.Ascii | CleanStringType.ConvertCase | CleanStringType.CamelCase))
-                    : getMember(alias.ToCleanString(CleanStringType.Ascii | CleanStringType.ConvertCase | CleanStringType.PascalCase));
-            }
-
+            var attempt = n.GetType().GetMemberIgnoreCase(n, alias);
+            
             return attempt.Success ? attempt.Result : null;
         }
 
