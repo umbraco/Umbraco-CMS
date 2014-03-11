@@ -80,6 +80,7 @@ namespace Umbraco.Web
         {
             if (content == null) throw new ArgumentNullException("content");
             if (query == null) throw new ArgumentNullException("query");
+            _membershipHelper = new MembershipHelper(_umbracoContext);
             _currentPage = content;
             _query = query;
         }
@@ -118,6 +119,7 @@ namespace Umbraco.Web
         {
             if (query == null) throw new ArgumentNullException("query");
             _query = query;
+            _membershipHelper = new MembershipHelper(_umbracoContext);
         }
 
         /// <summary>

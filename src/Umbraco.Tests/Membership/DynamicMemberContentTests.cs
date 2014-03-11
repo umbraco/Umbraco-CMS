@@ -41,9 +41,9 @@ namespace Umbraco.Tests.Membership
             var propertyTypes = new[]
                 {
                     // AutoPublishedContentType will auto-generate other properties
-                    new PublishedPropertyType("title", 0, Guid.Empty), 
-                    new PublishedPropertyType("bodyText", 0, Guid.Empty), 
-                    new PublishedPropertyType("author", 0, Guid.Empty)
+                    new PublishedPropertyType("title", 0, "?"), 
+                    new PublishedPropertyType("bodyText", 0, "?"), 
+                    new PublishedPropertyType("author", 0, "?")
                 };
             var type = new AutoPublishedContentType(0, "anything", propertyTypes);
             PublishedContentType.GetPublishedContentTypeCallback = (alias) => type;
