@@ -39,7 +39,7 @@ namespace Umbraco.Web.PublishedCache
                 var val = _member.Properties.Any(x => x.Alias == propType.PropertyTypeAlias) == false
                     ? string.Empty 
                     : _member.Properties[propType.PropertyTypeAlias].Value;
-                _properties.Add(new RawValueProperty(propType, val));
+                _properties.Add(new RawValueProperty(propType, val ?? string.Empty));
             }
         }
 
@@ -56,7 +56,7 @@ namespace Umbraco.Web.PublishedCache
         {
             get { return _membershipUser.PasswordQuestion; }
         }
-        public string Comment
+        public string Comments
         {
             get { return _membershipUser.Comment; }
         }
