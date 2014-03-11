@@ -318,11 +318,9 @@ namespace Umbraco.Core
             PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
 				PluginManager.Current.ResolvePropertyEditorValueConverters());
 
-			//add the internal ones, these are not public currently so need to add them manually
-            PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
-                PluginManager.Current.ResolvePropertyValueConverters());
-				// fixme - why not use the following syntax?
-                //PluginManager.Current.ResolveTypes<IPropertyValueConverter>());
+			// need to filter out the ones we dont want!!
+		    PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
+		        PluginManager.Current.ResolveTypes<IPropertyValueConverter>());                
 
             // use the new DefaultShortStringHelper
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(
