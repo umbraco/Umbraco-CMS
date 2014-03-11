@@ -197,24 +197,44 @@ namespace Umbraco.Web.Security
 
         public IPublishedContent GetByProviderKey(object key)
         {
+            if (Membership.Provider.IsUmbracoMembershipProvider() == false)
+            {
+                throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
+            }
+
             var result = _applicationContext.Services.MemberService.GetByProviderKey(key);
             return result == null ? null : new MemberPublishedContent(result, Membership.GetUser(result.Username));
         }
 
         public IPublishedContent GetById(int memberId)
         {
+            if (Membership.Provider.IsUmbracoMembershipProvider() == false)
+            {
+                throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
+            }
+
             var result = _applicationContext.Services.MemberService.GetById(memberId);
             return result == null ? null : new MemberPublishedContent(result, Membership.GetUser(result.Username));
         }
 
         public IPublishedContent GetByUsername(string username)
         {
+            if (Membership.Provider.IsUmbracoMembershipProvider() == false)
+            {
+                throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
+            }
+
             var result = _applicationContext.Services.MemberService.GetByUsername(username);
             return result == null ? null : new MemberPublishedContent(result, Membership.GetUser(result.Username));
         }
 
         public IPublishedContent GetByEmail(string email)
         {
+            if (Membership.Provider.IsUmbracoMembershipProvider() == false)
+            {
+                throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
+            }
+
             var result = _applicationContext.Services.MemberService.GetByEmail(email);
             return result == null ? null : new MemberPublishedContent(result, Membership.GetUser(result.Username));
         }
