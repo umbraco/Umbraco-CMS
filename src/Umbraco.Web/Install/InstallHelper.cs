@@ -23,7 +23,7 @@ namespace Umbraco.Web.Install
 
         internal InstallHelper(UmbracoContext umbContext)
         {
-            _umbContext = umbContext;            
+            _umbContext = umbContext;
         }
 
 
@@ -68,8 +68,11 @@ namespace Umbraco.Web.Install
 
         internal void DeleteLegacyInstaller()
         {
-            if(Directory.Exists( IOHelper.MapPath( SystemDirectories.Install )))
+            if (Directory.Exists(IOHelper.MapPath(SystemDirectories.Install)))
                 Directory.Move(IOHelper.MapPath(SystemDirectories.Install), IOHelper.MapPath("~/app_data/temp/install_backup"));
+
+            if (Directory.Exists(IOHelper.MapPath("~/Areas/UmbracoInstall")))
+                Directory.Delete(IOHelper.MapPath("~/Areas/UmbracoInstall"));
         }
 
         /// <summary>
@@ -86,7 +89,7 @@ namespace Umbraco.Web.Install
                     //no version or conn string configured, must be a brand new install
                     return true;
                 }
-                
+
                 //now we have to check if this is really a new install, the db might be configured and might contain data
 
                 if (_umbContext.Application.DatabaseContext.IsConnectionStringConfigured(databaseSettings) == false
@@ -104,16 +107,16 @@ namespace Umbraco.Web.Install
                     return true;
                 }
 
-//                //check if there are any content types configured, if there isn't then we will consider this a new install
-//                result = _umbContext.Application.DatabaseContext.Database.ExecuteScalar<int>(
-//                    @"SELECT COUNT(*) FROM cmsContentType 
-//                        INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id
-//                        WHERE umbracoNode.nodeObjectType = @contentType", new {contentType = Constants.ObjectTypes.DocumentType});
-//                if (result == 0)
-//                {
-//                    //no content types have been created
-//                    return true;
-//                }
+                //                //check if there are any content types configured, if there isn't then we will consider this a new install
+                //                result = _umbContext.Application.DatabaseContext.Database.ExecuteScalar<int>(
+                //                    @"SELECT COUNT(*) FROM cmsContentType 
+                //                        INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id
+                //                        WHERE umbracoNode.nodeObjectType = @contentType", new {contentType = Constants.ObjectTypes.DocumentType});
+                //                if (result == 0)
+                //                {
+                //                    //no content types have been created
+                //                    return true;
+                //                }
 
                 return false;
             }

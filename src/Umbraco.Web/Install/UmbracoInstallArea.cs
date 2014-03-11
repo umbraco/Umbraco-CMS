@@ -1,6 +1,10 @@
-﻿using System.Web.Http;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Web.Http;
 using System.Web.Mvc;
 using System.Web.Routing;
+using Microsoft.Web.Mvc;
+using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Install.Controllers;
@@ -40,8 +44,8 @@ namespace Umbraco.Web.Install
             context.MapHttpRoute(
                 "umbraco-install-api",
                 "install/api/{action}/{id}",
-                new {controller = "InstallApi", action = "Status", id = RouteParameter.Optional},
-                new[] {typeof (InstallApiController).Namespace});
+                new { controller = "InstallApi", action = "Status", id = RouteParameter.Optional },
+                new[] { typeof(InstallApiController).Namespace });
         }
 
         public override string AreaName

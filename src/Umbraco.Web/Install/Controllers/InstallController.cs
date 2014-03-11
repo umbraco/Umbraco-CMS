@@ -11,6 +11,12 @@ using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Install.Controllers
 {
+    /// <summary>
+    /// The MVC Installation controller
+    /// </summary>
+    /// <remarks>
+    /// NOTE: All views must have their full paths as we do not have a custom view engine for the installation views!
+    /// </remarks>
     [InstallAuthorizeAttribute]
     public class InstallController : Controller
     {
@@ -62,7 +68,8 @@ namespace Umbraco.Web.Install.Controllers
             //get the base umbraco folder
             ViewBag.UmbracoBaseFolder = IOHelper.ResolveUrl(SystemDirectories.Umbraco);
 
-            return View();
+            //always ensure full path (see NOTE in the class remarks)
+            return View(GlobalSettings.Path.EnsureEndsWith('/') + "install/views/index.cshtml");
         }
 
     }

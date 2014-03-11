@@ -307,11 +307,11 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Areas\UmbracoInstall\Legacy\LoadStarterKits.ascx.cs">
+    <Compile Include="Umbraco\Install\Legacy\LoadStarterKits.ascx.cs">
       <DependentUpon>loadStarterKits.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Areas\UmbracoInstall\Legacy\LoadStarterKits.ascx.designer.cs">
+    <Compile Include="Umbraco\Install\Legacy\LoadStarterKits.ascx.designer.cs">
       <DependentUpon>loadStarterKits.ascx</DependentUpon>
     </Compile>
     <Compile Include="Config\splashes\NoNodes.aspx.cs">
@@ -536,7 +536,7 @@
     <Compile Include="Umbraco\TreeInit.aspx.designer.cs">
       <DependentUpon>treeInit.aspx</DependentUpon>
     </Compile>
-    <Content Include="Areas\UmbracoInstall\Legacy\loadStarterKits.ascx" />
+    <Content Include="Umbraco\Install\Legacy\loadStarterKits.ascx" />
     <Content Include="Umbraco\ClientRedirect.aspx" />
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Logout.aspx" />
@@ -573,7 +573,7 @@
       <SubType>
       </SubType>
     </Content>
-    <Content Include="Areas\UmbracoInstall\Views\Web.config" />
+    <Content Include="Umbraco\Install\Views\Web.config" />
     <None Include="Config\404handlers.Release.config">
       <DependentUpon>404handlers.config</DependentUpon>
     </None>
@@ -636,7 +636,7 @@
     <Content Include="MacroScripts\Web.config">
       <SubType>Designer</SubType>
     </Content>
-    <Content Include="Areas\UmbracoInstall\Views\Install\Index.cshtml" />
+    <Content Include="Umbraco\Install\Views\Index.cshtml" />
     <None Include="packages.config">
       <SubType>Designer</SubType>
     </None>
@@ -2502,7 +2502,6 @@
     <Folder Include="App_Code\" />
     <Folder Include="App_Data\" />
     <Folder Include="App_Plugins\" />
-    <Folder Include="Areas\UmbracoInstall\Views\Shared\" />
     <Folder Include="Css\" />
     <Folder Include="MasterPages\" />
     <Folder Include="Media\" />
