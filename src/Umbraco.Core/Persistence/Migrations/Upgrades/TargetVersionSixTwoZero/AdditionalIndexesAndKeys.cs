@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.Migrations.Initial;
 
@@ -12,10 +13,24 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
             var dbSchema = new DatabaseSchemaCreation(Context.Database);
             var schemaResult = dbSchema.ValidateSchema();
 
-            Create.Index("IX_umbracoNodeTrashed").OnTable("umbracoNode").OnColumn("trashed").Ascending().WithOptions().NonClustered();
-            Create.Index("IX_cmsContentVersion_ContentId").OnTable("cmsContentVersion").OnColumn("ContentId").Ascending().WithOptions().NonClustered();
-            Create.Index("IX_cmsDocument_published").OnTable("cmsDocument").OnColumn("published").Ascending().WithOptions().NonClustered();
-            Create.Index("IX_cmsDocument_newest").OnTable("cmsDocument").OnColumn("newest").Ascending().WithOptions().NonClustered();
+            //do not create any indexes if they already exist in the database
+
+            if (schemaResult.DbIndexDefinitions.Any(x => x.IndexName == "IX_umbracoNodeTrashed") == false)
+            {
+                Create.Index("IX_umbracoNodeTrashed").OnTable("umbracoNode").OnColumn("trashed").Ascending().WithOptions().NonClustered();    
+            }
+            if (schemaResult.DbIndexDefinitions.Any(x => x.IndexName == "IX_cmsContentVersion_ContentId") == false)
+            {
+                Create.Index("IX_cmsContentVersion_ContentId").OnTable("cmsContentVersion").OnColumn("ContentId").Ascending().WithOptions().NonClustered();
+            }
+            if (schemaResult.DbIndexDefinitions.Any(x => x.IndexName == "IX_cmsDocument_published") == false)
+            {
+                Create.Index("IX_cmsDocument_published").OnTable("cmsDocument").OnColumn("published").Ascending().WithOptions().NonClustered();
+            }
+            if (schemaResult.DbIndexDefinitions.Any(x => x.IndexName == "IX_cmsDocument_newest") == false)
+            {
+                Create.Index("IX_cmsDocument_newest").OnTable("cmsDocument").OnColumn("newest").Ascending().WithOptions().NonClustered();
+            }
         }
 
         public override void Down()

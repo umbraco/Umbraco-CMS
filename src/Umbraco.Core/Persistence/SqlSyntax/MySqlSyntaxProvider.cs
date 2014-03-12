@@ -130,7 +130,7 @@ ORDER BY TABLE_NAME, INDEX_NAME",
                 list =
                     indexes.Select(
                         item =>
-                        new Tuple<string, string, string, bool>(item.TABLE_NAME, item.INDEX_NAME, item.COLUMN_NAME, item.UNIQUE))
+                        new Tuple<string, string, string, bool>(item.TABLE_NAME, item.INDEX_NAME, item.COLUMN_NAME, item.UNIQUE == 1))
                          .ToList();
             }
             finally
