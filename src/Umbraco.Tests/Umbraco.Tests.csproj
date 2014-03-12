@@ -157,6 +157,10 @@
     <Compile Include="Membership\DynamicMemberContentTests.cs" />
     <Compile Include="Membership\MembershipProviderBaseTests.cs" />
     <Compile Include="Membership\UmbracoServiceMembershipProviderTests.cs" />
+    <Compile Include="Migrations\MigrationRunnerTests.cs" />
+    <Compile Include="Migrations\Stubs\FiveZeroMigration.cs" />
+    <Compile Include="Migrations\Stubs\FourElevenMigration.cs" />
+    <Compile Include="Migrations\Stubs\SixZeroMigration2.cs" />
     <Compile Include="MockTests.cs" />
     <Compile Include="Models\UmbracoEntityTests.cs" />
     <Compile Include="Mvc\UmbracoViewPageTests.cs" />
@@ -253,7 +257,7 @@
     </Compile>
     <Compile Include="Migrations\Stubs\AlterUserTableMigrationStub.cs" />
     <Compile Include="Migrations\Stubs\Dummy.cs" />
-    <Compile Include="Migrations\Stubs\FourNineMigration.cs" />
+    <Compile Include="Migrations\Stubs\SixZeroMigration1.cs" />
     <Compile Include="Migrations\TargetVersionSixthMigrationsTest.cs" />
     <Compile Include="Migrations\Upgrades\MySqlUpgradeTest.cs" />
     <Compile Include="Migrations\Upgrades\SqlCeDataUpgradeTest.cs" />

@@ -529,16 +529,7 @@ namespace Umbraco.Core
         {
             return ResolveTypesWithAttribute<BaseMapper, MapperForAttribute>();
         } 
-
-        /// <summary>
-        /// Returns all available IMigrations in application
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveMigrationTypes()
-        {
-            return ResolveTypes<IMigration>();
-        }
-
+        
         /// <summary>
         /// Returns all SqlSyntaxProviders with the SqlSyntaxProviderAttribute
         /// </summary>
