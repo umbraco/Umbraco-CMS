@@ -80,7 +80,7 @@ namespace Umbraco.Core.ObjectResolution
 
 	        public void Dispose()
 	        {
-                Reset();
+                ResetCollections();
 	        }
 	    }
 
@@ -141,7 +141,7 @@ namespace Umbraco.Core.ObjectResolution
 	    private void DisposeResources()
 	    {
             _legacyResolver.Dispose();
-            Reset();
+            ResetCollections();
 	    }
         
 	}
