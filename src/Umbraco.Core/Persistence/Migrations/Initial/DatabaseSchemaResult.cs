@@ -29,6 +29,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         public List<string> ValidConstraints { get; set; }
 
+        internal IEnumerable<DbIndexDefinition> DbIndexDefinitions { get; set; } 
+
         /// <summary>
         /// Determines the version of the currently installed database.
         /// </summary>

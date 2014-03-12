@@ -352,6 +352,7 @@
     <Compile Include="Models\TaggableObjectTypes.cs" />
     <Compile Include="Models\TemplateNode.cs" />
     <Compile Include="Models\UmbracoEntityExtensions.cs" />
+    <Compile Include="Persistence\DatabaseModelDefinitions\DbIndexDefinition.cs" />
     <Compile Include="Packaging\PackageBinaryInspector.cs" />
     <Compile Include="Persistence\EntityNotFoundException.cs" />
     <Compile Include="Persistence\Factories\MemberGroupFactory.cs" />
