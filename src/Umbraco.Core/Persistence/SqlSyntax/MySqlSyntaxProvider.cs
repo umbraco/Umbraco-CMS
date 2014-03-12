@@ -115,6 +115,31 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return list;
         }
 
+        public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db)
+        {
+            List<Tuple<string, string, string, bool>> list;
+            try
+            {
+                var indexes =
+                db.Fetch<dynamic>(@"SELECT DISTINCT
+    TABLE_NAME, INDEX_NAME, COLUMN_NAME, CASE NON_UNIQUE WHEN 1 THEN 0 ELSE 1 END AS `UNIQUE`
+FROM INFORMATION_SCHEMA.STATISTICS
+WHERE TABLE_SCHEMA = @TableSchema
+ORDER BY TABLE_NAME, INDEX_NAME",
+                    new { TableSchema = db.Connection.Database });
+                list =
+                    indexes.Select(
+                        item =>
+                        new Tuple<string, string, string, bool>(item.TABLE_NAME, item.INDEX_NAME, item.COLUMN_NAME, item.UNIQUE))
+                         .ToList();
+            }
+            finally
+            {
+                db.CloseSharedConnection();
+            }
+            return list;
+        }
+
         public override bool DoesTableExist(Database db, string tableName)
         {
             long result;

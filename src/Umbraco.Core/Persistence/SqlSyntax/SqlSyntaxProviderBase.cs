@@ -212,6 +212,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return new List<Tuple<string, string, string>>();
         }
 
+        public abstract IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db);
+
         public virtual bool DoesTableExist(Database db, string tableName)
         {
             return false;
