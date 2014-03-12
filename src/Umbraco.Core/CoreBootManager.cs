@@ -219,9 +219,6 @@ namespace Umbraco.Core
             // we're ready to serve content!
             ApplicationContext.IsReady = true;
 
-            //And now we can dispose of our startup handlers - save some memory
-            ApplicationEventsResolver.Current.Dispose();
-
 			return this;
 		}
 
