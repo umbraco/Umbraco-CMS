@@ -2,7 +2,7 @@ angular.module("umbraco.install").controller("Umbraco.Installer.DataBaseControll
 	
 	$scope.checking = false;
 	$scope.dbs = [
-					{name: 'Embedded database SQL MEH', id: 0},
+					{name: 'Embedded database SQL', id: 0},
 					{name: 'Microsft SQL Server', id: 1},
 					{name: 'MySQL', id: 2},
 					{name: 'Custom connection-string', id: -1}];
