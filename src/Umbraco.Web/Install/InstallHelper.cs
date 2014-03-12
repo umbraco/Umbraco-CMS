@@ -72,7 +72,10 @@ namespace Umbraco.Web.Install
                 Directory.Move(IOHelper.MapPath(SystemDirectories.Install), IOHelper.MapPath("~/app_data/temp/install_backup"));
 
             if (Directory.Exists(IOHelper.MapPath("~/Areas/UmbracoInstall")))
-                Directory.Delete(IOHelper.MapPath("~/Areas/UmbracoInstall"));
+            {                
+                Directory.Delete(IOHelper.MapPath("~/Areas/UmbracoInstall"), true);
+            }
+                
         }
 
         /// <summary>
