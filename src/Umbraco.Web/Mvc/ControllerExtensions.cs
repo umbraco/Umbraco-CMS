@@ -7,6 +7,22 @@ namespace Umbraco.Web.Mvc
 {
 	internal static class ControllerExtensions
     {
+	    internal static object GetDataTokenInViewContextHierarchy(this ControllerContext controllerContext, string dataTokenName)
+	    {
+	        if (controllerContext.RouteData.DataTokens.ContainsKey(dataTokenName))
+	        {
+	            return controllerContext.RouteData.DataTokens[dataTokenName];
+	        }
+
+	        if (controllerContext.ParentActionViewContext != null)
+	        {
+                //recurse!
+	            return controllerContext.ParentActionViewContext.GetDataTokenInViewContextHierarchy(dataTokenName);
+	        }
+
+	        return null;
+	    }
+
         /// <summary>
         /// Return the controller name from the controller type
         /// </summary>

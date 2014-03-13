@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
+using System.Web.Mvc;
 using System.Xml;
 using System.Xml.Linq;
 using umbraco.cms.businesslogic.member;
@@ -18,6 +19,7 @@ namespace Umbraco.Web.Models
     /// <summary>
     /// A readonly member profile model
     /// </summary>
+    [ModelBinder(typeof(ProfileModelBinder))]
     public class ProfileModel : PostRedirectModel
     {
 
@@ -96,7 +98,18 @@ namespace Umbraco.Web.Models
         /// <remarks>
         /// Adding items to this list on the front-end will not add properties to the member in the database.
         /// </remarks>
-        public List<UmbracoProperty> MemberProperties { get; set; }   
-       
+        public List<UmbracoProperty> MemberProperties { get; set; }
+
+        /// <summary>
+        /// A custom model binder for MVC because the default ctor performs a lookup!
+        /// </summary>
+        internal class ProfileModelBinder : DefaultModelBinder
+        {
+            protected override object CreateModel(ControllerContext controllerContext, ModelBindingContext bindingContext, Type modelType)
+            {
+                return ProfileModel.CreateModel();
+            }
+
+        }
     }
 }

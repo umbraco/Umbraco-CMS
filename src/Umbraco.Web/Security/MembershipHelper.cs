@@ -129,16 +129,20 @@ namespace Umbraco.Web.Security
         {
             model.Username = (model.UsernameIsEmail || model.Username == null) ? model.Email : model.Username;
 
-            var membershipUser = Membership.CreateUser(model.Username, model.Password, model.Email,
-                //TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
-                null, null,
-                true, out status);
+            MembershipUser membershipUser;
 
-            if (status != MembershipCreateStatus.Success) return null;
-            
             //update their real name 
             if (Membership.Provider.IsUmbracoMembershipProvider())
             {
+                membershipUser = ((UmbracoMembershipProviderBase)Membership.Provider).CreateUser(
+                    model.MemberTypeAlias,
+                    model.Username, model.Password, model.Email,
+                    //TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
+                    null, null,
+                    true, null, out status);
+
+                if (status != MembershipCreateStatus.Success) return null;
+
                 var member = _applicationContext.Services.MemberService.GetByUsername(membershipUser.UserName);
                 member.Name = model.Name;
 
@@ -155,7 +159,12 @@ namespace Umbraco.Web.Security
             }
             else
             {
-                //TODO: Support this scenario!
+                membershipUser = Membership.CreateUser(model.Username, model.Password, model.Email,
+                    //TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
+                    null, null,
+                    true, out status);
+
+                if (status != MembershipCreateStatus.Success) return null;
             }
 
             //Set member online
@@ -282,23 +291,8 @@ namespace Umbraco.Web.Security
 
                 var builtIns = Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
 
-                foreach (var prop in memberType.PropertyTypes
-                    .Where(x => builtIns.Contains(x.Alias) == false && memberType.MemberCanEditProperty(x.Alias)))
-                {
-                    var value = string.Empty;
-                    var propValue = member.Properties[prop.Alias];
-                    if (propValue != null)
-                    {
-                        value = propValue.Value.ToString();
-                    }
+                model.MemberProperties = GetMemberPropertiesViewModel(memberType, builtIns, member).ToList();
 
-                    model.MemberProperties.Add(new UmbracoProperty
-                    {
-                        Alias = prop.Alias,
-                        Name = prop.Name,
-                        Value = value
-                    });
-                }
                 return model;
             }
 
@@ -321,17 +315,10 @@ namespace Umbraco.Web.Security
                 if (memberType == null)
                     throw new InvalidOperationException("Could not find a member type with alias " + memberTypeAlias);
 
-                var props = memberType.PropertyTypes
-                    .Where(x => memberType.MemberCanEditProperty(x.Alias))
-                    .Select(prop => new UmbracoProperty
-                    {
-                        Alias = prop.Alias,
-                        Name = prop.Name,
-                        Value = string.Empty
-                    }).ToList();
-
+                var builtIns = Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();
                 var model = RegisterModel.CreateModel();
-                model.MemberProperties = props;
+                model.MemberTypeAlias = memberTypeAlias;
+                model.MemberProperties = GetMemberPropertiesViewModel(memberType, builtIns).ToList();
                 return model;
             }
             else
@@ -340,7 +327,64 @@ namespace Umbraco.Web.Security
                 model.MemberTypeAlias = string.Empty;
                 return model;
             }
-        } 
+        }
+
+        private IEnumerable<UmbracoProperty> GetMemberPropertiesViewModel(IMemberType memberType, IEnumerable<string> builtIns, IMember member = null)
+        {
+            var viewProperties = new List<UmbracoProperty>();
+
+            foreach (var prop in memberType.PropertyTypes
+                    .Where(x => builtIns.Contains(x.Alias) == false && memberType.MemberCanEditProperty(x.Alias)))
+            {
+                var value = string.Empty;
+                if (member != null)
+                {
+                    var propValue = member.Properties[prop.Alias];
+                    if (propValue != null)
+                    {
+                        value = propValue.Value.ToString();
+                    }    
+                }
+
+                var viewProperty = new UmbracoProperty
+                {
+                    Alias = prop.Alias,
+                    Name = prop.Name,
+                    Value = value
+                };
+
+                //TODO: Perhaps one day we'll ship with our own EditorTempates but for now developers 
+                // can just render their own.
+
+                ////This is a rudimentary check to see what data template we should render
+                //// if developers want to change the template they can do so dynamically in their views or controllers 
+                //// for a given property.
+                ////These are the default built-in MVC template types: “Boolean”, “Decimal”, “EmailAddress”, “HiddenInput”, “Html”, “Object”, “String”, “Text”, and “Url”
+                //// by default we'll render a text box since we've defined that metadata on the UmbracoProperty.Value property directly.
+                //if (prop.DataTypeId == new Guid(Constants.PropertyEditors.TrueFalse))
+                //{
+                //    viewProperty.EditorTemplate = "UmbracoBoolean";
+                //}
+                //else
+                //{                    
+                //    switch (prop.DataTypeDatabaseType)
+                //    {
+                //        case DataTypeDatabaseType.Integer:
+                //            viewProperty.EditorTemplate = "Decimal";
+                //            break;
+                //        case DataTypeDatabaseType.Ntext:
+                //            viewProperty.EditorTemplate = "Text";
+                //            break;
+                //        case DataTypeDatabaseType.Date:
+                //        case DataTypeDatabaseType.Nvarchar:
+                //            break;
+                //    }
+                //}
+
+                viewProperties.Add(viewProperty);
+            }
+            return viewProperties;
+        }
         #endregion
 
         /// <summary>
