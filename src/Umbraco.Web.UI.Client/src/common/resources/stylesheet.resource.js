@@ -63,7 +63,7 @@ function stylesheetResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "stylesheetApiBaseUrl",
                        "GetRules",
-                       [{ id: id }]) +"&rnd=" + Math.floor(Math.random()*1001), {cache: false}),
+                       [{ id: id }])),
                'Failed to retreive stylesheets ');
         },
 
@@ -92,7 +92,7 @@ function stylesheetResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "stylesheetApiBaseUrl",
                        "GetRulesByName",
-                       [{ name: name }]) +"&rnd=" + Math.floor(Math.random()*1001), {cache: false}),
+                       [{ name: name }])),
                'Failed to retreive stylesheets ');
         }
     };

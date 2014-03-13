@@ -83,6 +83,27 @@ namespace Umbraco.Core.Persistence.Repositories
             return nodeDto == null ? 0 : nodeDto.NodeId;
         }
 
+        //This should be used later to do GetAll properly without individual selections
+        private IEnumerable<Tuple<int, string>> GetStylesheetIds(string[] paths)
+        {
+            var sql = new Sql()
+                .Select("*")
+                .From<NodeDto>()
+                .Where("nodeObjectType = @NodeObjectType AND umbracoNode.text in (@aliases)",
+                    new 
+                    {
+                        NodeObjectType = UmbracoObjectTypes.Stylesheet.GetGuid(),
+                        aliases = paths.Select(x => x.TrimEnd(".css").Replace("\\", "/")).ToArray()
+                    });
+            var dtos = _dbwork.Database.Fetch<NodeDto>(sql);
+
+            return dtos.Select(x => new Tuple<int, string>(
+                //the id
+                x.NodeId,
+                //the original path requested for the id
+                paths.First(p => p.TrimEnd(".css").Replace("\\", "/") == x.Text)));
+        }
+
         public override IEnumerable<Stylesheet> GetAll(params string[] ids)
         {
             if (ids.Any())
