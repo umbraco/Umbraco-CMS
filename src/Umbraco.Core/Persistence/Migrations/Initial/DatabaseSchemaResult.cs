@@ -73,7 +73,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
             //if the error indicates a problem with the column cmsMacroProperty.macroPropertyType then it is not version 7 and the
             // last db change we made was the umbracoServer in 6.1
-            if (Errors.Any(x => x.Item1.Equals("Column") && (x.Item2.Equals("cmsMacroProperty,macroPropertyType"))))
+            if (Errors.Any(x => x.Item1.Equals("Column") && (x.Item2.InvariantEquals("cmsMacroProperty,macroPropertyType"))))
             {
                 return new Version(6, 1, 0);
             }

@@ -32,6 +32,15 @@ namespace Umbraco.Web.Install.InstallSteps
 
                 var result = _applicationContext.DatabaseContext.UpgradeSchemaAndData();
 
+                if (result.Success == false)
+                {
+                    return new InstallSetupResult("error",
+                    new
+                    {
+                        message = "The database failed to upgrade. ERROR: " + result.Message
+                    });
+                }
+
                 DatabaseInstallStep.HandleConnectionStrings();
             }
 

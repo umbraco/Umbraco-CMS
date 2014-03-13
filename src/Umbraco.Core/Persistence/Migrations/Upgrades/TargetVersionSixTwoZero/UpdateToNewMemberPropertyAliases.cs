@@ -32,13 +32,17 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
                     {"umbracoFailedPasswordAttemptsPropertyTypeAlias",    Constants.Conventions.Member.FailedPasswordAttempts}
                 };
 
+
+                //This query is structured to work with MySql, SQLCE and SqlServer:
+                // http://issues.umbraco.org/issue/U4-3876
+
                 const string propertyTypeUpdateSql = @"UPDATE cmsPropertyType
 SET Alias = @newAlias
 WHERE Alias = @oldAlias AND contentTypeId IN (
-SELECT DISTINCT cmsContentType.nodeId FROM cmsPropertyType
+SELECT nodeId FROM (SELECT DISTINCT cmsContentType.nodeId FROM cmsPropertyType
 INNER JOIN cmsContentType ON cmsPropertyType.contentTypeId = cmsContentType.nodeId
 INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id
-WHERE umbracoNode.nodeObjectType = @objectType)";
+WHERE umbracoNode.nodeObjectType = @objectType) x)";
 
                 const string xmlSelectSql = @"SELECT cmsContentXml.* FROM cmsContentXml 
 INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id

@@ -591,7 +591,7 @@ namespace Umbraco.Core
 
         private Result HandleInstallException(Exception ex)
         {
-            LogHelper.Info<DatabaseContext>("Database configuration failed with the following error and stack trace: " + ex.Message + "\n" + ex.StackTrace);
+            LogHelper.Error<DatabaseContext>("Database configuration failed", ex);
 
             if (_result != null)
             {
