@@ -36,7 +36,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             List<string> list;
             try
             {
+                //needs to be open to read the schema name
                 db.OpenSharedConnection();
+
                 var items =
                     db.Fetch<dynamic>(
                         "SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = @TableSchema",
@@ -55,7 +57,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             List<ColumnInfo> list;
             try
             {
+                //needs to be open to read the schema name
                 db.OpenSharedConnection();
+
                 var items =
                     db.Fetch<dynamic>(
                         "SELECT TABLE_NAME, COLUMN_NAME, ORDINAL_POSITION, COLUMN_DEFAULT, IS_NULLABLE, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = @TableSchema",
@@ -78,6 +82,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             List<Tuple<string, string>> list;
             try
             {
+                //needs to be open to read the schema name
+                db.OpenSharedConnection();
+
                 //Does not include indexes and constraints are named differently
                 var items =
                     db.Fetch<dynamic>(
@@ -97,6 +104,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             List<Tuple<string, string, string>> list;
             try
             {
+                //needs to be open to read the schema name
+                db.OpenSharedConnection();
+
                 //Does not include indexes and constraints are named differently
                 var items =
                     db.Fetch<dynamic>(
@@ -120,6 +130,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             List<Tuple<string, string, string, bool>> list;
             try
             {
+                //needs to be open to read the schema name
+                db.OpenSharedConnection();
+
                 var indexes =
                 db.Fetch<dynamic>(@"SELECT DISTINCT
     TABLE_NAME, INDEX_NAME, COLUMN_NAME, CASE NON_UNIQUE WHEN 1 THEN 0 ELSE 1 END AS `UNIQUE`
@@ -145,7 +158,9 @@ ORDER BY TABLE_NAME, INDEX_NAME",
             long result;
             try
             {
+                //needs to be open to read the schema name
                 db.OpenSharedConnection();
+
                 result =
                     db.ExecuteScalar<long>("SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLES " +
                                            "WHERE TABLE_NAME = @TableName AND " +
