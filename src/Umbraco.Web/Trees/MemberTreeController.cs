@@ -83,7 +83,7 @@ namespace Umbraco.Web.Trees
                     //TODO: We don't have a new API for this because we want to get rid of how this is displayed
                     nodes.AddRange(
                         Member.getAllOtherMembers()
-                                    .Select(m => CreateTreeNode(m.Id.ToInvariantString(), id, queryStrings, m.Text, "icon-user")));
+                                    .Select(m => CreateTreeNode(m.UniqueId.ToString("N"), id, queryStrings, m.Text, "icon-user")));
                 }
             }
             return nodes;
