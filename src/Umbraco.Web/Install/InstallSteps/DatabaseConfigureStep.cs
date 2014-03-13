@@ -33,43 +33,14 @@ namespace Umbraco.Web.Install.InstallSteps
                 database = new DatabaseModel();
             }
 
-            if (CheckConnection(database) == false)
+            var dbHelper = new DatabaseHelper();
+
+            if (dbHelper.CheckConnection(database, _applicationContext) == false)
             {
                 throw new InvalidOperationException("Could not connect to the database");
             }
             ConfigureConnection(database);
             return null;
-        }
-
-        private bool CheckConnection(DatabaseModel database)
-        {
-            string connectionString;
-            var dbContext = _applicationContext.DatabaseContext;
-            if (database.ConnectionString.IsNullOrWhiteSpace() == false)
-            {
-                connectionString = database.ConnectionString;
-            }
-            else if (database.DatabaseType == DatabaseType.SqlCe)
-            {
-                //we do not test this connection
-                return true;
-                //connectionString = dbContext.GetEmbeddedDatabaseConnectionString();
-            }
-            else if (database.IntegratedAuth)
-            {
-                connectionString = dbContext.GetIntegratedSecurityDatabaseConnectionString(
-                    database.Server, database.DatabaseName);
-            }
-            else
-            {
-                string providerName;
-                connectionString = dbContext.GetDatabaseConnectionString(
-                    database.Server, database.DatabaseName, database.Login, database.Password,
-                    database.DatabaseType.ToString(),
-                    out providerName);
-            }
-
-            return SqlExtensions.IsConnectionAvailable(connectionString);
         }
 
         private void ConfigureConnection(DatabaseModel database)

@@ -14,11 +14,13 @@ namespace Umbraco.Web.Install
         internal bool CheckConnection(DatabaseModel database, ApplicationContext applicationContext)
         {
             string connectionString;
+            DatabaseProviders provider;
             var dbContext = applicationContext.DatabaseContext;
 
             if (database.ConnectionString.IsNullOrWhiteSpace() == false)
             {
                 connectionString = database.ConnectionString;
+                provider = DbConnectionExtensions.DetectProviderFromConnectionString(connectionString);
             }
             else if (database.DatabaseType == DatabaseType.SqlCe)
             {
@@ -30,6 +32,7 @@ namespace Umbraco.Web.Install
             {
                 connectionString = dbContext.GetIntegratedSecurityDatabaseConnectionString(
                     database.Server, database.DatabaseName);
+                provider = DatabaseProviders.SqlServer;;
             }
             else
             {
@@ -38,9 +41,11 @@ namespace Umbraco.Web.Install
                     database.Server, database.DatabaseName, database.Login, database.Password,
                     database.DatabaseType.ToString(),
                     out providerName);
+
+                provider = database.DatabaseType == DatabaseType.MySql ? DatabaseProviders.MySql : DatabaseProviders.SqlServer;
             }
 
-            return SqlExtensions.IsConnectionAvailable(connectionString);
+            return DbConnectionExtensions.IsConnectionAvailable(connectionString, provider);
         }
     }
 }

@@ -38,8 +38,9 @@ namespace Umbraco.Web.Install.Controllers
         public ActionResult Index()
         {
             //if this is not an upgrade we will log in with the default user.
-            // It's not considered an upgrade if the ConfigurationStatus is missing or empty.
-            if (string.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus) == false)
+            // It's not considered an upgrade if the ConfigurationStatus is missing or empty or if the db is not configured.
+            if (string.IsNullOrWhiteSpace(GlobalSettings.ConfigurationStatus) == false
+                && ApplicationContext.Current.DatabaseContext.IsDatabaseConfigured)
             {
                 Version current;
                 if (Version.TryParse(GlobalSettings.ConfigurationStatus, out current))
