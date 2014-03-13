@@ -33,7 +33,7 @@ namespace Umbraco.Web.Controllers
                         return Redirect(model.RedirectUrl);
                     }
                     //redirect to current page by default
-                    TempData.Add("FormSuccess", true);
+                    TempData["FormSuccess"] = true;            
                     return RedirectToCurrentUmbracoPage();
                 case MembershipCreateStatus.InvalidUserName:
                     ModelState.AddModelError((model.UsernameIsEmail || model.Username == null)

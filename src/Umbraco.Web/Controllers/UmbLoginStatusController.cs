@@ -30,7 +30,7 @@ namespace Umbraco.Web.Controllers
             }
 
             //redirect to current page by default
-            TempData.Add("LogoutSuccess", true);
+            TempData["LogoutSuccess"] = true;            
             return RedirectToCurrentUmbracoPage();
         }
     }
