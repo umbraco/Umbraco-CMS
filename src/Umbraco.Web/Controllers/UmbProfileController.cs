@@ -41,7 +41,7 @@ namespace Umbraco.Web.Controllers
             }
 
             //redirect to current page by default
-            TempData.Add("ProfileUpdateSuccess", true);
+            TempData["ProfileUpdateSuccess"] = true;            
             return RedirectToCurrentUmbracoPage();
         }
     }
