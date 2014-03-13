@@ -4,6 +4,7 @@ using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -57,10 +58,15 @@ namespace Umbraco.Web.Trees
                 {
                     if (Membership.Provider.Name == Constants.Conventions.Member.UmbracoMemberProviderName)
                     {
+                        int totalRecs;
+                        var foundMembers = Services.MemberService.FindMembersByDisplayName(
+                            id.ToCharArray()[0].ToString(CultureInfo.InvariantCulture), 0, int.MaxValue, out totalRecs, StringPropertyMatchType.StartsWith)
+                            .ToArray();
+
                         //get the members from our member data layer
                         nodes.AddRange(
-                            Member.getMemberFromFirstLetter(id.ToCharArray()[0])
-                                        .Select(m => CreateTreeNode(m.UniqueId.ToString("N"), id, queryStrings, m.Text, "icon-user")));
+                            foundMembers
+                                .Select(m => CreateTreeNode(m.Key.ToString("N"), id, queryStrings, m.Name, "icon-user")));
                     }
                     else
                     {
@@ -74,6 +80,7 @@ namespace Umbraco.Web.Trees
                 else if (id == "others")
                 {
                     //others will only show up when in umbraco membership mode
+                    //TODO: We don't have a new API for this because we want to get rid of how this is displayed
                     nodes.AddRange(
                         Member.getAllOtherMembers()
                                     .Select(m => CreateTreeNode(m.Id.ToInvariantString(), id, queryStrings, m.Text, "icon-user")));
