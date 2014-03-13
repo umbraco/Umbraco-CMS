@@ -141,9 +141,14 @@ namespace umbraco.cms.businesslogic.member
                 }
             }
 
-            return ApplicationContext.Current.Services.MemberService.GetAllMembers(ids.ToArray())
-                .Select(x => new Member(x))
-                .ToArray();
+            if (ids.Any())
+            {
+                return ApplicationContext.Current.Services.MemberService.GetAllMembers(ids.ToArray())
+                    .Select(x => new Member(x))
+                    .ToArray();
+            }
+
+            return new Member[] { };
         }
 
         /// <summary>
