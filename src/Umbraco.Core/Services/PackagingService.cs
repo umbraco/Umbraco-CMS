@@ -1206,6 +1206,8 @@ namespace Umbraco.Core.Services
         internal InstallationSummary InstallPackage(string packageFilePath, int userId = 0)
         {
             //TODO Add events ?
+            //NOTE The PackageInstallation class should be passed as IPackageInstallation through the 
+            //constructor (probably as an overload to avoid breaking stuff), so that its extendable.
             var installer = new PackageInstallation(this, new PackageExtraction());
             return installer.InstallPackage(packageFilePath, userId);
         }
