@@ -74,7 +74,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 return new Version(6, 0, 0);
             }
 
-            //if the error is for an index
+            //if the error is for this IX_umbracoNodeTrashed which is added in 6.2, then it must mean we are on 6.1
             if (Errors.Any(x => x.Item1.Equals("Index") && (x.Item2.InvariantEquals("IX_umbracoNodeTrashed"))))
             {
                 return new Version(6, 1, 0);
