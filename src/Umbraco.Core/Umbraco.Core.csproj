@@ -211,6 +211,13 @@
     <Compile Include="Models\PublishedContent\PublishedContentModel.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentModelFactoryResolver.cs" />
     <Compile Include="Models\TemplateNode.cs" />
+    <Compile Include="Packaging\Models\InstallAction.cs" />
+    <Compile Include="Packaging\Models\InstallationSummary.cs" />
+    <Compile Include="Packaging\Models\MetaData.cs" />
+    <Compile Include="Packaging\Models\UninstallAction.cs" />
+    <Compile Include="Packaging\PackageBuilding.cs" />
+    <Compile Include="Packaging\PackageExtraction.cs" />
+    <Compile Include="Packaging\PackageInstallation.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\DbIndexDefinition.cs" />
     <Compile Include="Persistence\Factories\MemberGroupFactory.cs" />
     <Compile Include="Persistence\Mappers\MemberGroupMapper.cs" />
@@ -855,6 +862,9 @@
     <Compile Include="Constants-PropertyEditors.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
+	<Compile Include="Constants-Packaging.cs">
+	  <DependentUpon>Constants.cs</DependentUpon>
+    </Compile>
     <Compile Include="Constants-ObjectTypes.cs">
       <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
@@ -917,9 +927,7 @@
   <ItemGroup>
     <Content Include="Strings\Notes.txt" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Packaging\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\nuget.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
