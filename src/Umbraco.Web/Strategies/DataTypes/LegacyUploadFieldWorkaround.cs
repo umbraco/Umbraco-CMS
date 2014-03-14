@@ -81,10 +81,15 @@ namespace Umbraco.Web.Strategies.DataTypes
                         
 					var dimensions = isImageType ? GetDimensions(path, fileSystem) : null;
 
-					// only add dimensions to web images
-                    content.getProperty(uploadFieldConfigNode.WidthFieldAlias).Value = isImageType ? dimensions.Item1.ToString(CultureInfo.InvariantCulture) : string.Empty;
-                    content.getProperty(uploadFieldConfigNode.HeightFieldAlias).Value = isImageType ? dimensions.Item2.ToString(CultureInfo.InvariantCulture) : string.Empty;
-                    content.getProperty(uploadFieldConfigNode.LengthFieldAlias).Value = size == default(long) ? string.Empty : size.ToString(CultureInfo.InvariantCulture);
+					
+				    if (isImageType)
+				    {
+                        // only add dimensions to web images
+				        content.getProperty(uploadFieldConfigNode.WidthFieldAlias).Value = dimensions.Item1.ToString(CultureInfo.InvariantCulture);
+				        content.getProperty(uploadFieldConfigNode.HeightFieldAlias).Value = dimensions.Item2.ToString(CultureInfo.InvariantCulture);
+				    }
+
+				    content.getProperty(uploadFieldConfigNode.LengthFieldAlias).Value = size == default(long) ? string.Empty : size.ToString(CultureInfo.InvariantCulture);
                     content.getProperty(uploadFieldConfigNode.ExtensionFieldAlias).Value = string.IsNullOrEmpty(extension) ? string.Empty : extension;
 
 				}

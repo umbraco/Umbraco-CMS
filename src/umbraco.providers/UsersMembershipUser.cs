@@ -12,6 +12,7 @@ namespace umbraco.providers
     /// <summary>
     /// Wrapper for the umbraco.BusinessLogic.User class.
     /// </summary>
+    [Obsolete("This class is used by the legacy user's membership provider which is also obsolete, this shouldn't be referenced directly in code, the standard .Net MembershipUser base class object should be referenced instead.")]
     public class UsersMembershipUser : MembershipUser
     {
         #region Fields and Properties

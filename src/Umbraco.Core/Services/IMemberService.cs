@@ -8,7 +8,7 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Defines the MemberService, which is an easy access to operations involving (umbraco) members.
     /// </summary>
-    internal interface IMemberService : IMembershipMemberService
+    public interface IMemberService : IMembershipMemberService
     {
         /// <summary>
         /// Checks if a member with the id exists
@@ -16,20 +16,20 @@ namespace Umbraco.Core.Services
         /// <param name="id"></param>
         /// <returns></returns>
         bool Exists(int id);
-
-        /// <summary>
-        /// Get a member by its id
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        IMember GetById(int id);
-
+        
         /// <summary>
         /// Get a member by the unique key
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
         IMember GetByKey(Guid id);
+
+        /// <summary>
+        /// Gets a member by it's id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        IMember GetById(int id);
 
         /// <summary>
         /// Get all members for the member type alias
@@ -64,6 +64,17 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="memberTypeId"></param>
         void DeleteMembersOfType(int memberTypeId);
+
+        /// <summary>
+        /// Find members based on their display name
+        /// </summary>
+        /// <param name="displayNameToMatch"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <param name="totalRecords"></param>
+        /// <param name="matchType"></param>
+        /// <returns></returns>
+        IEnumerable<IMember> FindMembersByDisplayName(string displayNameToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
 
         /// <summary>
         /// Get members based on a property search

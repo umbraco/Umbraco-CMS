@@ -6,6 +6,53 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         //check the pre-values for multi-picker
         var multiPicker = $scope.model.config.multiPicker !== '0' ? true : false;
 
+        $scope.cropper = {crop: undefined, image: undefined};
+        
+                //Data sample
+                var __img = {
+                        //image to crop
+                        src: "assets/img/mocks/big-image.jpg",
+        
+                        //global gravity, used if not crop is specified
+                        gravity: {left: 0.5, top: 0.4},
+        
+                        crops:{
+                           thumbnail: 
+                                {   
+                                    //crop dimensions
+                                    width: 100,
+                                    height: 100,
+        
+                                    //crops in percentages
+                                    crop:{ "left": 0.31731772342645215,
+                                        "top": 0.17420325244997603,
+                                        "right": 0.36246473116627076,
+                                        "bottom": 0.30226197981593617
+                                        }
+                                },
+        
+                            banner: 
+                                 {
+                                     width: 340,
+                                     height: 90,
+        
+                                     crop:{ "left": 0.31731772342645215,
+                                         "top": 0.17420325244997603,
+                                         "right": 0.36246473116627076,
+                                         "bottom": 0.30226197981593617
+                                         }
+                                 },
+        
+                            highrise: 
+                                 {
+                                     width: 90, 
+                                     height: 340
+                                 },     
+                        }
+                };
+
+
+
         function setupViewModel() {
             $scope.images = [];
             $scope.ids = []; 
@@ -31,6 +78,11 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             $scope.ids.splice(index, 1);
             $scope.sync();
         };
+
+        $scope.edit = function(image){
+            $scope.currentImage = image;
+            $scope.cropper.image = __img;
+        }
 
         $scope.add = function() {
             dialogService.mediaPicker({

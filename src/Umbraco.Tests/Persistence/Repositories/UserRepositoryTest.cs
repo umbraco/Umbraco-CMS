@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Caching;
@@ -31,7 +32,7 @@ namespace Umbraco.Tests.Persistence.Repositories
         private UserRepository CreateRepository(IDatabaseUnitOfWork unitOfWork, out UserTypeRepository userTypeRepository)
         {
             userTypeRepository = new UserTypeRepository(unitOfWork, NullCacheProvider.Current);
-            var repository = new UserRepository(unitOfWork, NullCacheProvider.Current, userTypeRepository);
+            var repository = new UserRepository(unitOfWork, NullCacheProvider.Current, userTypeRepository, CacheHelper.CreateDisabledCacheHelper());
             return repository;
         }
 

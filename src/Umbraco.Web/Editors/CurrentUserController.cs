@@ -65,7 +65,7 @@ namespace Umbraco.Web.Editors
                 throw new NotSupportedException("Currently the user editor does not support providers that have RequiresQuestionAndAnswer specified");
             }
 
-            var passwordChangeResult = Security.ChangePassword(Security.CurrentUser.Username, data, userProvider);
+            var passwordChangeResult = Members.ChangePassword(Security.CurrentUser.Username, data, userProvider);
             if (passwordChangeResult.Success)
             {
                 //even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword

@@ -5,12 +5,14 @@ using System.Threading;
 using System.Web.Security;
 using System.Xml.Linq;
 using System.Xml.Linq;
+using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using System.Linq;
@@ -20,26 +22,31 @@ namespace Umbraco.Core.Services
     /// <summary>
     /// Represents the MemberService.
     /// </summary>
-    internal class MemberService : IMemberService
+    public class MemberService : IMemberService
     {
         private readonly RepositoryFactory _repositoryFactory;
+        private readonly IMemberGroupService _memberGroupService;
         private readonly IDatabaseUnitOfWorkProvider _uowProvider;
 
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
 
-        internal MemberService(RepositoryFactory repositoryFactory)
-            : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory)
+        public MemberService(RepositoryFactory repositoryFactory, IMemberGroupService memberGroupService)
+            : this(new PetaPocoUnitOfWorkProvider(), repositoryFactory, memberGroupService)
         {
         }
 
-        internal MemberService(IDatabaseUnitOfWorkProvider provider)
-            : this(provider, new RepositoryFactory())
+        public MemberService(IDatabaseUnitOfWorkProvider provider, IMemberGroupService memberGroupService)
+            : this(provider, new RepositoryFactory(), memberGroupService)
         {
         }
 
-        internal MemberService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory)
+        public MemberService(IDatabaseUnitOfWorkProvider provider, RepositoryFactory repositoryFactory, IMemberGroupService memberGroupService)
         {
+            if (provider == null) throw new ArgumentNullException("provider");
+            if (repositoryFactory == null) throw new ArgumentNullException("repositoryFactory");
+            if (memberGroupService == null) throw new ArgumentNullException("memberGroupService");
             _repositoryFactory = repositoryFactory;
+            _memberGroupService = memberGroupService;
             _uowProvider = provider;
         }
 
@@ -207,6 +214,56 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public IEnumerable<IMember> FindMembersByDisplayName(string displayNameToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
+            {
+                //var query = new Query<IMember>();
+                var sql = new Sql()
+                    .Select("*")
+                    .From<NodeDto>()
+                    .Where<NodeDto>(dto => dto.NodeObjectType == new Guid(Constants.ObjectTypes.Member));
+                
+                switch (matchType)
+                {
+                    case StringPropertyMatchType.Exact:
+                        sql.Where<NodeDto>(dto => dto.Text.Equals(displayNameToMatch));
+
+                        //query.Where(member => member.Name.Equals(displayNameToMatch));
+                        break;
+                    case StringPropertyMatchType.Contains:
+                        sql.Where<NodeDto>(dto => dto.Text.Contains(displayNameToMatch));
+                        
+                        //query.Where(member => member.Name.Contains(displayNameToMatch));
+                        break;
+                    case StringPropertyMatchType.StartsWith:
+                        sql.Where<NodeDto>(dto => dto.Text.StartsWith(displayNameToMatch));
+
+                        //query.Where(member => member.Name.StartsWith(displayNameToMatch));
+                        break;
+                    case StringPropertyMatchType.EndsWith:
+                        sql.Where<NodeDto>(dto => dto.Text.EndsWith(displayNameToMatch));
+
+                        //query.Where(member => member.Name.EndsWith(displayNameToMatch));
+                        break;
+                    case StringPropertyMatchType.Wildcard:
+                        sql.Where<NodeDto>(dto => dto.Text.SqlWildcard(displayNameToMatch, TextColumnType.NVarchar));
+                        
+                        //query.Where(member => member.Name.SqlWildcard(displayNameToMatch, TextColumnType.NVarchar));
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException("matchType");
+                }
+
+                var result = repository.GetPagedResultsByQuery<NodeDto>(sql, pageIndex, pageSize, out totalRecords,
+                    dtos => dtos.Select(x => x.NodeId).ToArray());
+
+                //ensure this result is sorted correct just in case
+                return result.OrderBy(x => x.Name);
+            }
+        }
+
         /// <summary>
         /// Does a search for members that contain the specified string in their email address
         /// </summary>
@@ -216,7 +273,7 @@ namespace Umbraco.Core.Services
         /// <param name="pageIndex"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>
-        public IEnumerable<IMember> FindMembersByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+        public IEnumerable<IMember> FindByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
@@ -248,7 +305,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IEnumerable<IMember> FindMembersByUsername(string login, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+        public IEnumerable<IMember> FindByUsername(string login, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
@@ -489,7 +546,7 @@ namespace Umbraco.Core.Services
         /// that have their last active date within the Membership.UserIsOnlineTimeWindow (which is in minutes). It isn't exact science
         /// but that is how MS have made theirs so we'll follow that principal.
         /// </remarks>
-        public int GetMemberCount(MemberCountType countType)
+        public int GetCount(MemberCountType countType)
         {
             using (var repository = _repositoryFactory.CreateMemberRepository(_uowProvider.GetUnitOfWork()))
             {
@@ -529,7 +586,7 @@ namespace Umbraco.Core.Services
 
         }
 
-        public IEnumerable<IMember> GetAllMembers(int pageIndex, int pageSize, out int totalRecords)
+        public IEnumerable<IMember> GetAll(int pageIndex, int pageSize, out int totalRecords)
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
@@ -538,11 +595,29 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IMember CreateMember(string email, string username, string password, IMemberType memberType)
+        public IMember CreateMember(string username, string email, string password, string memberTypeAlias)
+        {
+            var memberTypeService = ApplicationContext.Current.Services.MemberTypeService;
+            var memberType = memberTypeService.Get(memberTypeAlias);
+
+            var member = new Member(username, email.ToLower().Trim(), username, password, -1, memberType);
+
+            Created.RaiseEvent(new NewEventArgs<IMember>(member, false, memberTypeAlias, -1), this);
+
+            return member;
+        }
+
+        public IMember CreateMemberWithIdentity(string username, string email, string password, IMemberType memberType)
         {
             if (memberType == null) throw new ArgumentNullException("memberType");
 
-            var member = new Member(email, email, username, password, -1, memberType);
+            var member = new Member(username, email.ToLower().Trim(), username, password, -1, memberType);
+
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(member), this))
+            {
+                member.WasCancelled = true;
+                return member;
+            }
 
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
@@ -555,9 +630,12 @@ namespace Umbraco.Core.Services
                 CreateAndSaveMemberXml(xml, member.Id, uow.Database);
             }
 
+            Saved.RaiseEvent(new SaveEventArgs<IMember>(member, false), this);
+            Created.RaiseEvent(new NewEventArgs<IMember>(member, false, memberType.Alias, -1), this);
+
             return member;
         }
-
+        
         /// <summary>
         /// Creates and persists a new Member
         /// </summary>
@@ -566,7 +644,7 @@ namespace Umbraco.Core.Services
         /// <param name="password"></param>
         /// <param name="memberTypeAlias"></param>
         /// <returns></returns>
-        public IMember CreateMember(string email, string username, string password, string memberTypeAlias)
+        IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string password, string memberTypeAlias)
         {
             var uow = _uowProvider.GetUnitOfWork();
             IMemberType memberType;
@@ -582,7 +660,7 @@ namespace Umbraco.Core.Services
                 throw new ArgumentException(string.Format("No MemberType matching the passed in Alias: '{0}' was found", memberTypeAlias));
             }
 
-            return CreateMember(email, username, password, memberTypeAlias);
+            return CreateMemberWithIdentity(username, email, password, memberType);
         }
 
         /// <summary>
@@ -593,16 +671,17 @@ namespace Umbraco.Core.Services
         /// </remarks>
         /// <param name="id"></param>
         /// <returns></returns>
-        public IMember GetById(object id)
+        public IMember GetByProviderKey(object id)
         {
-            if (id is int)
-            {
-                return GetById((int)id);
-            }
-
-            if (id is Guid)
+            var asGuid = id.TryConvertTo<Guid>();
+            if (asGuid.Success)
             {
                 return GetByKey((Guid)id);
+            }
+            var asInt = id.TryConvertTo<int>();
+            if (asInt.Success)
+            {
+                return GetById((int)id);
             }
 
             return null;
@@ -660,39 +739,42 @@ namespace Umbraco.Core.Services
 
             Deleted.RaiseEvent(new DeleteEventArgs<IMember>(member, false), this);
         }
-
+        
         /// <summary>
         /// Saves an updated Member
         /// </summary>
-        /// <param name="member"></param>
+        /// <param name="entity"></param>
         /// <param name="raiseEvents"></param>
-        public void Save(IMember member, bool raiseEvents = true)
+        public void Save(IMember entity, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(member), this))
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(entity), this))
+                {
                     return;
+                }
+
             }
 
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                repository.AddOrUpdate(member);
+                repository.AddOrUpdate(entity);
                 uow.Commit();
 
-                var xml = member.ToXml();
-                CreateAndSaveMemberXml(xml, member.Id, uow.Database);
+                var xml = entity.ToXml();
+                CreateAndSaveMemberXml(xml, entity.Id, uow.Database);
             }
 
             if (raiseEvents)
-                Saved.RaiseEvent(new SaveEventArgs<IMember>(member, false), this);
+                Saved.RaiseEvent(new SaveEventArgs<IMember>(entity, false), this);
         }
 
-        public void Save(IEnumerable<IMember> members, bool raiseEvents = true)
+        public void Save(IEnumerable<IMember> entities, bool raiseEvents = true)
         {
             if (raiseEvents)
             {
-                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(members), this))
+                if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(entities), this))
                     return;
             }
             using (new WriteLock(Locker))
@@ -700,7 +782,7 @@ namespace Umbraco.Core.Services
                 var uow = _uowProvider.GetUnitOfWork();
                 using (var repository = _repositoryFactory.CreateMemberRepository(uow))
                 {
-                    foreach (var member in members)
+                    foreach (var member in entities)
                     {
                         repository.AddOrUpdate(member);
                     }
@@ -708,17 +790,141 @@ namespace Umbraco.Core.Services
                     //commit the whole lot in one go
                     uow.Commit();
 
-                    foreach (var member in members)
+                    foreach (var member in entities)
                     {
                         CreateAndSaveMemberXml(member.ToXml(), member.Id, uow.Database);
                     }
                 }
 
                 if (raiseEvents)
-                    Saved.RaiseEvent(new SaveEventArgs<IMember>(members, false), this);
+                    Saved.RaiseEvent(new SaveEventArgs<IMember>(entities, false), this);
             }
         }
 
+        #endregion
+
+        #region IMembershipRoleService Implementation
+
+        public void AddRole(string roleName)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+            {
+                repository.CreateIfNotExists(roleName);
+            }
+        }
+
+        public IEnumerable<string> GetAllRoles()
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+            {
+                var result = repository.GetAll();
+                return result.Select(x => x.Name).Distinct();
+            }
+        }
+
+        public IEnumerable<string> GetAllRoles(int memberId)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+            {
+                var result = repository.GetMemberGroupsForMember(memberId);
+                return result.Select(x => x.Name).Distinct();
+            }
+        }
+
+        public IEnumerable<string> GetAllRoles(string username)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+            {
+                var result = repository.GetMemberGroupsForMember(username);
+                return result.Select(x => x.Name).Distinct();
+            }
+        }
+
+        public IEnumerable<IMember> GetMembersInRole(string roleName)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
+            {
+                return repository.GetByMemberGroup(roleName);
+            }
+        }
+
+        public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberRepository(uow))
+            {
+                return repository.FindMembersInRole(roleName, usernameToMatch, matchType);
+            }
+        }
+
+        public bool DeleteRole(string roleName, bool throwIfBeingUsed)
+        {
+            using (new WriteLock(Locker))
+            {
+                if (throwIfBeingUsed)
+                {
+                    var inRole = GetMembersInRole(roleName);
+                    if (inRole.Any())
+                    {
+                        throw new InvalidOperationException("The role " + roleName + " is currently assigned to members");
+                    }
+                }
+
+                var uow = _uowProvider.GetUnitOfWork();
+                using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+                {
+                    var qry = new Query<IMemberGroup>().Where(g => g.Name == roleName);
+                    var found = repository.GetByQuery(qry).ToArray();
+
+                    foreach (var memberGroup in found)
+                    {
+                        _memberGroupService.Delete(memberGroup);
+                    }
+                    return found.Any();
+                }
+            }
+        }
+
+        public void AssignRoles(string[] usernames, string[] roleNames)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+            {
+                repository.AssignRoles(usernames, roleNames);
+            }
+        }
+
+        public void DissociateRoles(string[] usernames, string[] roleNames)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+            {
+                repository.DissociateRoles(usernames, roleNames);
+            }
+        }
+
+        public void AssignRoles(int[] memberIds, string[] roleNames)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+            {
+                repository.AssignRoles(memberIds, roleNames);
+            }
+        }
+
+        public void DissociateRoles(int[] memberIds, string[] roleNames)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateMemberGroupRepository(uow))
+            {
+                repository.DissociateRoles(memberIds, roleNames);
+            }
+        }
         #endregion
 
         /// <summary>
@@ -797,6 +1003,8 @@ namespace Umbraco.Core.Services
 
                     //bulk insert it into the database
                     uow.Database.BulkInsertRecords(xmlItems, tr);
+
+                    tr.Complete();
                 }
             }
         }
@@ -809,7 +1017,6 @@ namespace Umbraco.Core.Services
         }
 
         #region Event Handlers
-
 
         /// <summary>
         /// Occurs before Delete
@@ -825,12 +1032,21 @@ namespace Umbraco.Core.Services
         /// Occurs before Save
         /// </summary>
         public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saving;
+        
+        /// <summary>
+        /// Occurs after Create
+        /// </summary>
+        /// <remarks>
+        /// Please note that the Member object has been created, but might not have been saved
+        /// so it does not have an identity yet (meaning no Id has been set).
+        /// </remarks>
+        public static event TypedEventHandler<IMemberService, NewEventArgs<IMember>> Created;
 
         /// <summary>
         /// Occurs after Save
         /// </summary>
         public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saved;
-        
+
         #endregion
 
         /// <summary>
@@ -894,6 +1110,7 @@ namespace Umbraco.Core.Services
 
             return new Member(name, email, username, password, -1, memType);
         }
+
 
     }
 }

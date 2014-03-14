@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -29,6 +29,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
 
         public List<string> ValidConstraints { get; set; }
 
+        internal IEnumerable<DbIndexDefinition> DbIndexDefinitions { get; set; }
+
         /// <summary>
         /// Determines the version of the currently installed database.
         /// </summary>
@@ -39,7 +41,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         public Version DetermineInstalledVersion()
         {
             //If (ValidTables.Count == 0) database is empty and we return -> new Version(0, 0, 0);
-            if(ValidTables.Count == 0)
+            if (ValidTables.Count == 0)
                 return new Version(0, 0, 0);
 
             //If Errors is empty or if TableDefinitions tables + columns correspond to valid tables + columns then we're at current version
@@ -49,29 +51,29 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 return UmbracoVersion.Current;
 
             //If Errors contains umbracoApp or umbracoAppTree its pre-6.0.0 -> new Version(4, 10, 0);
-            if (Errors.Any(x => x.Item1.Equals("Table") && (x.Item2.Equals("umbracoApp") || x.Item2.Equals("umbracoAppTree"))))
+            if (Errors.Any(x => x.Item1.Equals("Table") && (x.Item2.InvariantEquals("umbracoApp") || x.Item2.InvariantEquals("umbracoAppTree"))))
             {
                 //If Errors contains umbracoUser2app or umbracoAppTree foreignkey to umbracoApp exists its pre-4.8.0 -> new Version(4, 7, 0);
                 if (Errors.Any(x =>
                                x.Item1.Equals("Constraint")
-                               && (x.Item2.Contains("umbracoUser2app_umbracoApp")
-                                   || x.Item2.Contains("umbracoAppTree_umbracoApp"))))
+                               && (x.Item2.InvariantContains("umbracoUser2app_umbracoApp")
+                                   || x.Item2.InvariantContains("umbracoAppTree_umbracoApp"))))
                 {
                     return new Version(4, 7, 0);
                 }
 
                 return new Version(4, 9, 0);
             }
-            
+
             //if the error is for umbracoServer
-            if (Errors.Any(x => x.Item1.Equals("Table") && (x.Item2.Equals("umbracoServer"))))
+            if (Errors.Any(x => x.Item1.Equals("Table") && (x.Item2.InvariantEquals("umbracoServer"))))
             {
                 return new Version(6, 0, 0);
             }
 
             //if the error indicates a problem with the column cmsMacroProperty.macroPropertyType then it is not version 7 and the
             // last db change we made was the umbracoServer in 6.1
-            if (Errors.Any(x => x.Item1.Equals("Column") && (x.Item2.Equals("cmsMacroProperty,macroPropertyType"))))
+            if (Errors.Any(x => x.Item1.Equals("Column") && (x.Item2.InvariantEquals("cmsMacroProperty,macroPropertyType"))))
             {
                 return new Version(6, 1, 0);
             }

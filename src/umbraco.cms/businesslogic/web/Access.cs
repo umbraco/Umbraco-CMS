@@ -15,25 +15,18 @@ namespace umbraco.cms.businesslogic.web
 	/// </summary>
 	public class Access
 	{
-		public Access()
-		{
-			//
-			// TODO: Add constructor logic here
-			//
-		}
-
-		static private Hashtable _checkedPages = new Hashtable();
+	    static private readonly Hashtable CheckedPages = new Hashtable();
 
 		//must be volatile for double check lock to work
 		static private volatile XmlDocument _accessXmlContent;
 		static private string _accessXmlSource;
 
-		private static void clearCheckPages() 
+		private static void ClearCheckPages() 
 		{
-			_checkedPages.Clear();
+			CheckedPages.Clear();
 		}
 
-        static object _locko = new object();
+        static readonly object Locko = new object();
 
 		public static XmlDocument AccessXml 
 		{
@@ -41,7 +34,7 @@ namespace umbraco.cms.businesslogic.web
             {
                 if (_accessXmlContent == null)
                 {
-                    lock (_locko)
+                    lock (Locko)
                     {
                         if (_accessXmlContent == null)
                         {
@@ -80,7 +73,7 @@ namespace umbraco.cms.businesslogic.web
 			new Access().FireBeforeAddMemberShipRoleToDocument(new Document(documentId), role, e);
 
 			if (!e.Cancel) {
-				XmlElement x = (XmlElement)getPage(documentId);
+				XmlElement x = (XmlElement)GetPage(documentId);
 
 				if (x == null)
 					throw new Exception("Document is not protected!");
@@ -89,7 +82,7 @@ namespace umbraco.cms.businesslogic.web
 						XmlElement groupXml = (XmlElement)AccessXml.CreateNode(XmlNodeType.Element, "group", "");
 						groupXml.SetAttribute("id", role);
 						x.AppendChild(groupXml);
-						save();
+						Save();
 					}
 				}
 
@@ -100,7 +93,7 @@ namespace umbraco.cms.businesslogic.web
 		[Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
 		public static void AddMemberGroupToDocument(int DocumentId, int MemberGroupId) 
 		{
-			XmlElement x = (XmlElement) getPage(DocumentId);
+			XmlElement x = (XmlElement) GetPage(DocumentId);
 			
 			if (x == null)
 				throw new Exception("Document is not protected!");
@@ -111,7 +104,7 @@ namespace umbraco.cms.businesslogic.web
 					XmlElement groupXml = (XmlElement) AccessXml.CreateNode(XmlNodeType.Element, "group", "");
 					groupXml.SetAttribute("id", MemberGroupId.ToString());
 					x.AppendChild(groupXml);
-					save();
+					Save();
 				}
 			}
 		}
@@ -119,7 +112,7 @@ namespace umbraco.cms.businesslogic.web
 		[Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
 		public static void AddMemberToDocument(int DocumentId, int MemberId) 
 		{
-			XmlElement x = (XmlElement) getPage(DocumentId);
+			XmlElement x = (XmlElement) GetPage(DocumentId);
 			
 			if (x == null)
 				throw new Exception("Document is not protected!");
@@ -129,7 +122,7 @@ namespace umbraco.cms.businesslogic.web
 					x.Attributes.GetNamedItem("memberId").Value = MemberId.ToString();
 				else
 					x.SetAttribute("memberId", MemberId.ToString());
-				save();
+				Save();
 			}
 		}
 		
@@ -139,7 +132,7 @@ namespace umbraco.cms.businesslogic.web
 			new Access().FireBeforeAddMembershipUserToDocument(new Document(documentId), membershipUserName, e);
 
 			if (!e.Cancel) {
-				XmlElement x = (XmlElement)getPage(documentId);
+				XmlElement x = (XmlElement)GetPage(documentId);
 
 				if (x == null)
 					throw new Exception("Document is not protected!");
@@ -148,7 +141,7 @@ namespace umbraco.cms.businesslogic.web
 						x.Attributes.GetNamedItem("memberId").Value = membershipUserName;
 					else
 						x.SetAttribute("memberId", membershipUserName);
-					save();
+					Save();
 				}
 
 				new Access().FireAfterAddMembershipUserToDocument(new Document(documentId), membershipUserName, e);
@@ -159,7 +152,7 @@ namespace umbraco.cms.businesslogic.web
 		[Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
 		public static void RemoveMemberGroupFromDocument(int DocumentId, int MemberGroupId) 
 		{
-			XmlElement x = (XmlElement) getPage(DocumentId);
+			XmlElement x = (XmlElement) GetPage(DocumentId);
 			
 			if (x == null)
 				throw new Exception("Document is not protected!");
@@ -169,7 +162,7 @@ namespace umbraco.cms.businesslogic.web
 				if (xGroup != null) 
 				{
 					x.RemoveChild(xGroup);
-					save();
+					Save();
 				}
 			}
 		}
@@ -180,7 +173,7 @@ namespace umbraco.cms.businesslogic.web
 			new Access().FireBeforeRemoveMemberShipRoleFromDocument(new Document(documentId), role, e);
 
 			if (!e.Cancel) {
-				XmlElement x = (XmlElement)getPage(documentId);
+				XmlElement x = (XmlElement)GetPage(documentId);
 
 				if (x == null)
 					throw new Exception("Document is not protected!");
@@ -188,7 +181,7 @@ namespace umbraco.cms.businesslogic.web
 					XmlNode xGroup = x.SelectSingleNode("group [@id = '" + role + "']");
 					if (xGroup != null) {
 						x.RemoveChild(xGroup);
-						save();
+						Save();
 					}
 				}
 
@@ -208,7 +201,7 @@ namespace umbraco.cms.businesslogic.web
 					hasChange = true;
 				}
 				if (hasChange)
-					save();
+					Save();
 			}
 
 			return hasChange;
@@ -222,7 +215,7 @@ namespace umbraco.cms.businesslogic.web
 
 			if (!e.Cancel) {
 
-				XmlElement x = (XmlElement)getPage(DocumentId);
+				XmlElement x = (XmlElement)GetPage(DocumentId);
 				if (x == null) {
 					x = (XmlElement)_accessXmlContent.CreateNode(XmlNodeType.Element, "page", "");
 					AccessXml.DocumentElement.AppendChild(x);
@@ -235,9 +228,9 @@ namespace umbraco.cms.businesslogic.web
 				x.SetAttribute("loginPage", LoginDocumentId.ToString());
 				x.SetAttribute("noRightsPage", ErrorDocumentId.ToString());
 				x.SetAttribute("simple", Simple.ToString());
-				save();
+				Save();
 
-				clearCheckPages();
+				ClearCheckPages();
 
 				new Access().FireAfterAddProtection(new Document(DocumentId), e);
 			}
@@ -245,7 +238,7 @@ namespace umbraco.cms.businesslogic.web
 
 		public static void RemoveProtection(int DocumentId) 
 		{
-			XmlElement x = (XmlElement) getPage(DocumentId);
+			XmlElement x = (XmlElement) GetPage(DocumentId);
 			if (x != null) 
 			{
 				//event
@@ -255,8 +248,8 @@ namespace umbraco.cms.businesslogic.web
 				if (!e.Cancel) {
 
 					x.ParentNode.RemoveChild(x);
-					save();
-					clearCheckPages();
+					Save();
+					ClearCheckPages();
 
 					new Access().FireAfterRemoveProtection(new Document(DocumentId), e);
 				}
@@ -264,7 +257,7 @@ namespace umbraco.cms.businesslogic.web
 			}
 		}
 
-		private static void save() 
+		private static void Save() 
 		{
 			SaveEventArgs e = new SaveEventArgs();
 
@@ -290,7 +283,7 @@ namespace umbraco.cms.businesslogic.web
 				isProtected = false;
 			else 
 			{
-				XmlNode currentNode = getPage(getProtectedPage(d.Path));
+				XmlNode currentNode = GetPage(GetProtectedPage(d.Path));
 				if (currentNode.SelectSingleNode("./group [@id=" + GroupId.ToString() + "]") != null) 
 				{
 					isProtected = true;
@@ -308,7 +301,7 @@ namespace umbraco.cms.businesslogic.web
 			if (!IsProtected(documentId, d.Path))
 				isProtected = false;
 			else {
-				XmlNode currentNode = getPage(getProtectedPage(d.Path));
+				XmlNode currentNode = GetPage(GetProtectedPage(d.Path));
 				if (currentNode.SelectSingleNode("./group [@id='" + role + "']") != null) {
 					isProtected = true;
 				}
@@ -323,7 +316,7 @@ namespace umbraco.cms.businesslogic.web
 			if (!IsProtected(documentId, path))
 				return null;
 			else {
-				XmlNode currentNode = getPage(getProtectedPage(path));
+				XmlNode currentNode = GetPage(GetProtectedPage(path));
 				foreach (XmlNode n in currentNode.SelectNodes("./group")) {
 					roles.Add(n.Attributes.GetNamedItem("id").Value);
 				}
@@ -341,7 +334,7 @@ namespace umbraco.cms.businesslogic.web
 				return null;
 			else 
 			{
-				XmlNode currentNode = getPage(getProtectedPage(d.Path));
+				XmlNode currentNode = GetPage(GetProtectedPage(d.Path));
 				cms.businesslogic.member.MemberGroup[] mg = new umbraco.cms.businesslogic.member.MemberGroup[currentNode.SelectNodes("./group").Count];
 				int count = 0;
 				foreach (XmlNode n in currentNode.SelectNodes("./group"))
@@ -363,7 +356,7 @@ namespace umbraco.cms.businesslogic.web
 			else if (GetProtectionType(DocumentId) != ProtectionType.Simple)
 				throw new Exception("Document isn't protected using Simple mechanism. Use GetAccessingMemberGroups instead");
 			else {
-				XmlNode currentNode = getPage(getProtectedPage(d.Path));
+				XmlNode currentNode = GetPage(GetProtectedPage(d.Path));
 				if (currentNode.Attributes.GetNamedItem("memberId") != null)
 					return new cms.businesslogic.member.Member(int.Parse(
 						currentNode.Attributes.GetNamedItem("memberId").Value));
@@ -382,7 +375,7 @@ namespace umbraco.cms.businesslogic.web
 			else if (GetProtectionType(documentId) != ProtectionType.Simple)
 				throw new Exception("Document isn't protected using Simple mechanism. Use GetAccessingMemberGroups instead");
 			else {
-				XmlNode currentNode = getPage(getProtectedPage(d.Path));
+				XmlNode currentNode = GetPage(GetProtectedPage(d.Path));
 				if (currentNode.Attributes.GetNamedItem("memberId") != null)
 					return Membership.GetUser(currentNode.Attributes.GetNamedItem("memberId").Value);
 				else
@@ -404,7 +397,7 @@ namespace umbraco.cms.businesslogic.web
 				hasAccess = true;
 			else 
 			{
-				XmlNode currentNode = getPage(getProtectedPage(d.Path));
+				XmlNode currentNode = GetPage(GetProtectedPage(d.Path));
 				if (Member != null) 
 				{
 					IDictionaryEnumerator ide = Member.Groups.GetEnumerator();
@@ -431,7 +424,7 @@ namespace umbraco.cms.businesslogic.web
 				return true;
 			else {
 				MembershipUser member = Membership.GetUser(memberId);
-				XmlNode currentNode = getPage(getProtectedPage(node.Path));
+				XmlNode currentNode = GetPage(GetProtectedPage(node.Path));
 
 				if (member != null) {
 					foreach(string role in Roles.GetRolesForUser()) {
@@ -445,41 +438,13 @@ namespace umbraco.cms.businesslogic.web
 			return hasAccess;
 		}
 
-		[Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
-		private static bool HasAccess(int DocumentId, string Path, cms.businesslogic.member.Member Member) 
-		{
-			bool hasAccess = false;
-
-			if (!IsProtected(DocumentId, Path))
-				hasAccess = true;
-			else 
-			{
-				XmlNode currentNode = getPage(getProtectedPage(Path));
-				if (Member != null) 
-				{
-					IDictionaryEnumerator ide = Member.Groups.GetEnumerator();
-					while(ide.MoveNext())
-					{
-						cms.businesslogic.member.MemberGroup mg = (cms.businesslogic.member.MemberGroup) ide.Value;
-						if (currentNode.SelectSingleNode("./group [@id=" + mg.Id.ToString() + "]") != null) 
-						{
-							hasAccess = true;
-							break;
-						}
-					}
-				}
-			}
-
-			return hasAccess;
-		}
-
-		public static bool HasAccess(int documentId, string path, MembershipUser member) {
+	    public static bool HasAccess(int documentId, string path, MembershipUser member) {
 			bool hasAccess = false;
 
 			if (!IsProtected(documentId, path))
 				hasAccess = true;
 			else {
-				XmlNode currentNode = getPage(getProtectedPage(path));
+				XmlNode currentNode = GetPage(GetProtectedPage(path));
 				if (member != null) {
 					string[] roles = Roles.GetRolesForUser(member.UserName);
 					foreach(string role in roles) {
@@ -496,7 +461,7 @@ namespace umbraco.cms.businesslogic.web
 
 		public static ProtectionType GetProtectionType(int DocumentId) 
 		{
-			XmlNode x = getPage(DocumentId);
+			XmlNode x = GetPage(DocumentId);
 			try 
 			{
 				if (bool.Parse(x.Attributes.GetNamedItem("simple").Value))
@@ -515,11 +480,11 @@ namespace umbraco.cms.businesslogic.web
 		{
 			bool isProtected = false;
 
-			if (!_checkedPages.ContainsKey(DocumentId)) 
+			if (!CheckedPages.ContainsKey(DocumentId)) 
 			{
 				foreach(string id in Path.Split(',')) 
 				{
-					if (getPage(int.Parse(id)) != null) 
+					if (GetPage(int.Parse(id)) != null) 
 					{
 						isProtected = true;
 						break;
@@ -529,39 +494,39 @@ namespace umbraco.cms.businesslogic.web
 				// Add thread safe updating to the hashtable
                 if (System.Web.HttpContext.Current != null)
     				System.Web.HttpContext.Current.Application.Lock();
-				if (!_checkedPages.ContainsKey(DocumentId))
-					_checkedPages.Add(DocumentId, isProtected);
+				if (!CheckedPages.ContainsKey(DocumentId))
+					CheckedPages.Add(DocumentId, isProtected);
                 if (System.Web.HttpContext.Current != null)
                     System.Web.HttpContext.Current.Application.UnLock();
 			}
 			else
-				isProtected = (bool) _checkedPages[DocumentId];
+				isProtected = (bool) CheckedPages[DocumentId];
 			
 			return isProtected;
 		}
 
 		public static int GetErrorPage(string Path) 
 		{
-			return int.Parse(getPage(getProtectedPage(Path)).Attributes.GetNamedItem("noRightsPage").Value);
+			return int.Parse(GetPage(GetProtectedPage(Path)).Attributes.GetNamedItem("noRightsPage").Value);
 		}
 
 		public static int GetLoginPage(string Path) 
 		{
-			return int.Parse(getPage(getProtectedPage(Path)).Attributes.GetNamedItem("loginPage").Value);
+			return int.Parse(GetPage(GetProtectedPage(Path)).Attributes.GetNamedItem("loginPage").Value);
 		}
 
-		private static int getProtectedPage(string Path) 
+		private static int GetProtectedPage(string Path) 
 		{
 			int protectedPage = 0;
 
 			foreach(string id in Path.Split(',')) 
-				if (getPage(int.Parse(id)) != null) 
+				if (GetPage(int.Parse(id)) != null) 
 					protectedPage = int.Parse(id);
 
 			return protectedPage;
 		}
 
-		private static XmlNode getPage(int documentId) 
+		private static XmlNode GetPage(int documentId) 
 		{
 			XmlNode x = AccessXml.SelectSingleNode("/access/page [@id=" + documentId.ToString() + "]");
 			return x;

@@ -130,6 +130,8 @@ ul.color-picker li a  {
   text-decoration: none;
 }
 
+
+
 .umb-thumbnails{
   position: relative;
 }
@@ -158,7 +160,8 @@ ul.color-picker li a  {
     background: white;
     margin: 5px;
     position: relative;
-    text-align: center
+    text-align: center;
+    vertical-align: top;
 }
 
 .umb-sortable-thumbnails li:hover a{
@@ -173,6 +176,11 @@ ul.color-picker li a  {
   display:block;
 }
 
+.umb-sortable-thumbnails li img.noScale{
+  max-width: none !important;
+  max-height: none !important;
+}
+
 .umb-sortable-thumbnails .icon-holder .icon{
   font-size: 60px;
   line-height: 70px;
@@ -181,6 +189,90 @@ ul.color-picker li a  {
 {
   color: @grayLight;
   display: block 
+}
+
+
+//
+// Cropper 
+// -------------------------------------------------
+
+.umb-cropper{
+  position: relative;
+  padding-bottom: 30px;
+}
+
+.umb-cropper img, .umb-cropper-gravity img{
+   position: absolute;
+   top: 0;
+   left: 0;
+ }
+
+ .umb-cropper .overlay, .umb-cropper-gravity .overlay {
+  top: 0;
+  left: 0;
+  cursor: move;
+  z-index: 6001;
+}
+
+.umb-cropper .viewport{
+    overflow: hidden;
+    position: relative;
+    border: 1px solid @grayLight;
+ }
+ 
+.umb-cropper-gravity .viewport{
+   overflow: hidden;
+   position: relative;
+   width: 400px;
+   height: 300px
+}
+
+
+.umb-cropper .viewport:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5999;
+  -moz-opacity: .75;
+  opacity: .75;
+  filter: alpha(opacity=7);
+  -webkit-box-shadow: inset 0 0 0 40px white,inset 0 0 0 41px rgba(0,0,0,.1),inset 0 0 40px 41px rgba(0,0,0,.2);
+  -moz-box-shadow: inset 0 0 0 40px white,inset 0 0 0 41px rgba(0,0,0,.1),inset 0 0 40px 41px rgba(0,0,0,.2);
+  box-shadow: inset 0 0 0 40px white,inset 0 0 0 41px rgba(0,0,0,.1),inset 0 0 40px 41px rgba(0,0,0,.2);
+}
+
+.umb-cropper-gravity .overlay{
+  width: 14px;
+  height: 14px;
+  text-align: center;
+  border-radius: 20px;
+  background: @blue;
+  border: 3px solid white;
+  opacity: 0.8;
+}
+
+.umb-cropper-gravity .overlay i{
+  font-size: 26px;
+  line-height: 26px;
+  opacity: 0.8 !important;
+}
+
+.umb-cropper .crop-container{
+    text-align: center;
+}
+
+.umb-cropper .crop-slider{
+   vertical-align: middle;
+   width: 250px;
+   padding-top: 12px;
+}
+
+.umb-cropper .crop-slider i{color: @gray;}
+.umb-cropper .crop-slider input{
+   margin-top: 7px;
 }
 
 
@@ -221,6 +313,7 @@ ul.color-picker li a  {
   left: 0;
   bottom: 0;
   height: 100%;
+  width: 100%;
 }
 
 
@@ -262,7 +355,7 @@ ul.color-picker li a  {
   vertical-align: center;
   font-size: 12px;
   background: @grayLighter;
-  color: @grayLight;
+  color: @black;
   text-decoration: none;
 }
 

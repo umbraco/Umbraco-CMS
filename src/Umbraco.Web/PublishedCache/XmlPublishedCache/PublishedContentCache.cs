@@ -462,5 +462,15 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         }
 
         #endregion
+
+        #region Fragments
+
+        public IPublishedContent CreateFragment(string contentTypeAlias, IDictionary<string, object> dataValues,
+            bool isPreviewing, bool managed)
+        {
+            return new PublishedFragment(contentTypeAlias, dataValues, isPreviewing, managed);
+        }
+
+        #endregion
     }
 }

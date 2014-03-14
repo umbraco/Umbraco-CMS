@@ -37,7 +37,6 @@
 	<file src="..\_BuildOutput\WebApp\App_Data\**" target="UmbracoFiles\App_Data" />
 	<file src="..\_BuildOutput\WebApp\App_Plugins\**" target="UmbracoFiles\App_Plugins" />
 	<file src="..\_BuildOutput\WebApp\config\splashes\**" target="UmbracoFiles\config\splashes" />
-	<file src="..\_BuildOutput\WebApp\install\**" target="UmbracoFiles\install" />
 	<file src="..\_BuildOutput\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
 	<file src="..\_BuildOutput\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
 	<file src="..\_BuildOutput\WebApp\Global.asax" target="UmbracoFiles\Global.asax" />

@@ -1,7 +1,55 @@
 <form ng-controller="Umbraco.Dialogs.MediaPickerController" id="fileupload" method="POST" enctype="multipart/form-data" 
 data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
 
-<div class="umb-panel umb-dialogs-mediapicker">
+<div class="umb-panel umb-dialogs-mediapicker" ng-if="target">
+ 	<div class="umb-panel-body no-header with-footer compact">
+ 			<umb-pane>
+ 				<umb-control-group ng-if="target.url">
+	 				<div class="thumbnail span6 clearfix">
+	 					<img ng-src="{{target.url}}" />
+	 				</div>
+ 				</umb-control-group>
+
+ 				<umb-control-group label="@general_url">
+ 					<input type="text"
+ 						localize="placeholder" 
+ 						placeholder="@general_url" 
+ 						class="umb-editor umb-textstring" 
+ 						ng-model="target.url"
+ 						ng-disabled="target.id"/>	
+ 				</umb-control-group>
+
+ 				<umb-control-group label="@content_titleOptional">
+ 					
+ 					<input type="text"
+ 						localize="placeholder" 
+ 						placeholder="@placeholders_entername" 
+ 						class="umb-editor umb-textstring" 
+ 						ng-model="target.name" />
+
+ 				</umb-control-group>
+ 			</umb-pane>
+ 		</div>
+
+ 		<div class="umb-panel-footer" >
+ 			<div class="umb-el-wrap umb-panel-buttons">
+ 		        <div class="btn-toolbar umb-btn-toolbar pull-right">
+ 		        	<a href ng-click="exitDetails()" class="btn btn-link">
+ 		        		<localize key="general_cancel">Cancel</localize>
+ 					</a>
+
+ 					<button
+ 						class="btn btn-primary"
+ 						ng-click="submit(target)">
+ 						<localize key="general_insert">Insert</localize>
+ 					</button>
+ 		        </div>
+ 			</div>
+ 		</div>
+</div>
+
+
+<div class="umb-panel umb-dialogs-mediapicker" ng-hide="target">
 	<div class="umb-panel-header">
 		
 		<div class="umb-el-wrap umb-panel-buttons">
@@ -64,23 +112,23 @@ data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupl
 
 
 	<div class="umb-panel-footer" >
-			<div class="umb-el-wrap umb-panel-buttons">
-		        <div class="btn-toolbar umb-btn-toolbar pull-right">
+		<div class="umb-el-wrap umb-panel-buttons">
+	        <div class="btn-toolbar umb-btn-toolbar pull-right">
 
-		        	<a href ng-click="close()" class="btn btn-link">
-		        		<localize key="general_cancel">Cancel</localize>
-					</a>
+	        	<a href ng-click="close()" class="btn btn-link">
+	        		<localize key="general_cancel">Cancel</localize>
+				</a>
 
-					<button
-						class="btn btn-primary"
-						ng-show="multiPicker" 
-						ng-click="submit(dialogData.selection)">
-						<localize key="buttons_select">Select</localize>({{dialogData.selection.length}})
-					</button>
+				<button
+					class="btn btn-primary"
+					ng-show="multiPicker" 
+					ng-click="submit(dialogData.selection)">
+					<localize key="buttons_select">Select</localize>({{dialogData.selection.length}})
+				</button>
 
-		        </div>
-			</div>
+	        </div>
 		</div>
+	</div>
 
 </div>
 

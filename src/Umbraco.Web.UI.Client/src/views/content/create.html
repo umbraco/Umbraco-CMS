@@ -9,7 +9,7 @@
 
 	<ul class="umb-actions umb-actions-child">
 
-		<li ng-repeat="docType in allowedTypes">
+		<li ng-repeat="docType in allowedTypes | orderBy:'name':false">
 		    <a href="#content/content/edit/{{currentNode.id}}?doctype={{docType.alias}}&create=true" ng-click="nav.hideNavigation()">
 		        
 		        <i class="large {{docType.icon}}"></i>

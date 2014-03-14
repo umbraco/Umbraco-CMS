@@ -28,6 +28,7 @@ namespace umbraco.providers.members
                 if (property != null)
                 {
                     property.Value = 1;
+                    sender.Save();
                 }
             }            
         }

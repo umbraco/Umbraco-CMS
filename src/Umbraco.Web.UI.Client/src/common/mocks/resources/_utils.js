@@ -60,7 +60,6 @@ angular.module('umbraco.mocks').
                         active: true,
                         properties: [                            
                             { alias: "list", label: "List", view: "listview", value: "", hideLabel: true, config:{entityType: "content"} },
-                            { alias: "media", label: "Media picker", view: "mediapicker", value: "" ,config:{} }
                         ]
                     },
                     {
@@ -70,8 +69,6 @@ angular.module('umbraco.mocks').
                             { alias: "valTest", label: "Validation test", view: "validationtest", value: "asdfasdf" },
                             { alias: "bodyText", label: "Body Text", description: "Here you enter the primary article contents", view: "rte", value: "<p>askjdkasj lasjd</p>", config: {} },
                             { alias: "textarea", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
-                            { alias: "map", label: "Map", view: "googlemaps", value: "37.4419,-122.1419", config: { mapType: "ROADMAP", zoom: 4 } },
-                            
                             { alias: "media", label: "Media picker", view: "mediapicker", value: "1234,23242,23232,23231", config: {multiPicker: 1} }
                         ]
                     },
@@ -90,8 +87,6 @@ angular.module('umbraco.mocks').
                             { alias: "valTest4", label: "Validation test", view: "validationtest", value: "asdfasdf" },
                             { alias: "bodyText4", label: "Body Text", description: "Here you enter the primary article contents", view: "rte", value: "<p>askjdkasj lasjd</p>", config: {} },
                             { alias: "textarea4", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
-                            { alias: "map4", label: "Map", view: "googlemaps", value: "37.4419,-122.1419", config: { mapType: "ROADMAP", zoom: 4 } },
-                            
                             { alias: "content4", label: "Content picker", view: "contentpicker", value: "1234,23242,23232,23231" }
                         ]
                     },
@@ -102,8 +97,6 @@ angular.module('umbraco.mocks').
                             { alias: "valTest5", label: "Validation test", view: "validationtest", value: "asdfasdf" },
                             { alias: "bodyText5", label: "Body Text", description: "Here you enter the primary article contents", view: "rte", value: "<p>askjdkasj lasjd</p>", config: {} },
                             { alias: "textarea5", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
-                            { alias: "map5", label: "Map", view: "googlemaps", value: "37.4419,-122.1419", config: { mapType: "ROADMAP", zoom: 4 } },
-                            
                             { alias: "content5", label: "Content picker", view: "contentpicker", value: "1234,23242,23232,23231" }
                         ]
                     },
@@ -114,8 +107,6 @@ angular.module('umbraco.mocks').
                             { alias: "valTest6", label: "Validation test", view: "validationtest", value: "asdfasdf" },
                             { alias: "bodyText6", label: "Body Text", description: "Here you enter the primary article contents", view: "rte", value: "<p>askjdkasj lasjd</p>", config: {} },
                             { alias: "textarea6", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
-                            { alias: "map6", label: "Map", view: "googlemaps", value: "37.4419,-122.1419", config: { mapType: "ROADMAP", zoom: 4 } },
-                            
                             { alias: "content6", label: "Content picker", view: "contentpicker", value: "1234,23242,23232,23231" }
                         ]
                     },
@@ -126,8 +117,6 @@ angular.module('umbraco.mocks').
                             { alias: "valTest7", label: "Validation test", view: "validationtest", value: "asdfasdf" },
                             { alias: "bodyText7", label: "Body Text", description: "Here you enter the primary article contents", view: "rte", value: "<p>askjdkasj lasjd</p>", config: {} },
                             { alias: "textarea7", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
-                            { alias: "map7", label: "Map", view: "googlemaps", value: "37.4419,-122.1419", config: { mapType: "ROADMAP", zoom: 4 } },
-                            
                             { alias: "content7", label: "Content picker", view: "contentpicker", value: "1234,23242,23232,23231" }
                         ]
                     },

@@ -28,6 +28,7 @@
     </script>
 
 </asp:Content>
+
 <asp:Content ContentPlaceHolderID="body" runat="server">
     <cc1:UmbracoPanel ID="Panel1" Text="Install package" runat="server" Width="496px"
         Height="584px">
@@ -35,6 +36,7 @@
 
         <cc1:Feedback ID="fb" Style="margin-top: 7px;" runat="server" />
         <cc1:Pane ID="pane_upload" runat="server" Text="Install from local package file">
+
             <cc1:PropertyPanel runat="server" Text="">
                 <div class="alert alert-warning">
                     <h4>
@@ -94,6 +96,7 @@
             <cc1:PropertyPanel ID="PropertyPanel2" runat="server">
                 <asp:Button ID="Button1" OnClick="fetchProtectedPackage" Text="Login" runat="server" /></cc1:PropertyPanel>
         </cc1:Pane>
+
         <asp:Panel ID="pane_acceptLicense" runat="server" Visible="false">
             <br />
             <div class="alert alert-warning">
@@ -103,6 +106,7 @@
                     notifies you the install is completed.
                 </p>
             </div>
+
             <cc1:Pane ID="pane_acceptLicenseInner" runat="server">
                 <cc1:PropertyPanel ID="PropertyPanel3" runat="server" Text="Name">
                     <asp:Label ID="LabelName" runat="server" /></cc1:PropertyPanel>
@@ -121,8 +125,8 @@
                 <cc1:PropertyPanel ID="pp_unsecureFiles" runat="server" Visible="false" Text="&nbsp;">
                     
                     <div class="alert alert-error" style="width: 370px;">
-                        <h4>
-                            Binary files in the package!</h4>
+                        <h4>Binary files in the package!</h4>
+                        
                         <a class="toggle-report" href="#">Read more...</a>
                         <div style="display:none;">
                             <p>
@@ -140,6 +144,7 @@
                             </p>
                         </div>
                     </div>
+
                 </cc1:PropertyPanel>
 
                 <cc1:PropertyPanel ID="LegacyPropertyEditorPanel" runat="server" Visible="false" Text="&nbsp;">
@@ -158,6 +163,7 @@
                         </div>
                     </div>
                 </cc1:PropertyPanel>
+
                 <cc1:PropertyPanel ID="BinaryFileErrorsPanel" runat="server" Visible="false" Text="&nbsp;">
                     <div class="alert alert-error" style="width: 370px;">
                         <h4>
@@ -198,6 +204,7 @@
                         </div>
                     </div>
                 </cc1:PropertyPanel>
+
                 <cc1:PropertyPanel ID="pp_templateConflicts" runat="server" Visible="false" Text="&nbsp;">
                     <div class="alert alert-error" style="width: 370px;">
                         <h4>
@@ -219,6 +226,7 @@
                         </div>
                     </div>
                 </cc1:PropertyPanel>
+
                 <cc1:PropertyPanel ID="pp_stylesheetConflicts" runat="server" Visible="false" Text="&nbsp;">
                     <div class="alert alert-error" style="width: 370px;">
                         <h4>
@@ -240,6 +248,7 @@
                         </div>
                     </div>
                 </cc1:PropertyPanel>
+
                 <cc1:PropertyPanel runat="server" Text=" ">
                     <br />
                     <div style="display: none;" id="installingMessage">
@@ -251,6 +260,7 @@
                         OnClick="startInstall"></asp:Button>
                 </cc1:PropertyPanel>
             </cc1:Pane>
+
         </asp:Panel>
         <cc1:Pane ID="pane_installing" runat="server" Visible="false" Text="Installing package">
             <cc1:PropertyPanel runat="server">
@@ -258,7 +268,9 @@
                 <asp:Literal ID="lit_installStatus" runat="server" />
             </cc1:PropertyPanel>
         </cc1:Pane>
+
         <cc1:Pane ID="pane_optional" runat="server" Visible="false" />
+        
         <cc1:Pane ID="pane_success" runat="server" Text="Package is installed" Visible="false">
             <cc1:PropertyPanel runat="server">
               
@@ -276,12 +288,14 @@
 
             </cc1:PropertyPanel>
         </cc1:Pane>
+
         <cc1:Pane ID="pane_refresh" runat="server" Text="Browser is reloading" Visible="false">
             <cc1:PropertyPanel runat="server">
                 
                 <div class="alert alert-block">
                     Please wait while the browser is reloaded...
                 </div>
+
                 <script type="text/javascript">
                     
                     //This is all a bit zany with double encoding because we have a URL in a hash (#) url part
@@ -291,7 +305,14 @@
                     var umbPath = "<%=GlobalSettings.Path%>";
                     setTimeout(function () {
 
+                       
+
                         var mainWindow = UmbClientMgr.mainWindow();
+
+                        //kill the tree and template cache
+                        if (mainWindow.UmbClientMgr) {
+                            mainWindow.UmbClientMgr._packageInstalled();
+                        }
 
                         var baseUrl = mainWindow.location.href.substr(0, mainWindow.location.href.indexOf("#/developer/framed/"));
                         var framedUrl = baseUrl + "#/developer/framed/";

@@ -16,7 +16,7 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
-        /// Increases the version number in ClientDependency.config by 1
+        /// Changes the version number in ClientDependency.config to a random value to avoid stale caches
         /// </summary>
         internal bool IncreaseVersionNumber()
         {
@@ -28,9 +28,9 @@ namespace Umbraco.Core.Configuration
 
                     var versionAttribute = clientDependencyConfigXml.Root.Attribute("version");
 
-                    int oldVersion;
-                    int.TryParse(versionAttribute.Value, out oldVersion);
-                    var newVersion = oldVersion + 1;
+                    //Set the new version to the hashcode of now
+                    var oldVersion = versionAttribute.Value;
+                    var newVersion = Math.Abs(DateTime.UtcNow.GetHashCode());
 
                     versionAttribute.SetValue(newVersion);
                     clientDependencyConfigXml.Save(_fileName, SaveOptions.DisableFormatting);

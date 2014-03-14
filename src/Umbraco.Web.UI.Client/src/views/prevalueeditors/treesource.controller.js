@@ -37,10 +37,13 @@ angular.module('umbraco')
 		};
 
 		$scope.clear = function() {
-		    $scope.model.value.id = undefined;
-		    $scope.node = undefined;
+			$scope.model.value.id = undefined;
+			$scope.node = undefined;
+			$scope.model.value.query = undefined;
 		};
 		
+
+		//we always need to ensure we dont submit anything broken
 	    $scope.$on("formSubmitting", function (ev, args) {
 	    	if($scope.model.value.type === "member"){
 	    		$scope.model.value.id = -1;

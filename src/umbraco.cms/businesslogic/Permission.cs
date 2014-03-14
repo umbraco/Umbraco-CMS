@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Specialized;
 using System.Data;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Umbraco.Core;
 using Umbraco.Core.Events;
 using umbraco.DataLayer;
 using umbraco.cms.businesslogic;
@@ -12,6 +14,9 @@ using DeleteEventArgs = umbraco.cms.businesslogic.DeleteEventArgs;
 
 namespace umbraco.BusinessLogic
 {
+
+    //TODO: Wrap this in the new services/repo layer!
+
     /// <summary>
     /// Summary description for Permission.
     /// </summary>
@@ -167,7 +172,7 @@ namespace umbraco.BusinessLogic
         }
         private static string Converter(int from)
         {
-            return from.ToString();
+            return from.ToString(CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -186,16 +191,11 @@ namespace umbraco.BusinessLogic
         [MethodImpl(MethodImplOptions.Synchronized)]
         public static void UpdateCruds(User user, CMSNode node, string permissions)
         {
-            // delete all settings on the node for this user
-            //false = do not raise events
-            DeletePermissions(user, node, false);
+            ApplicationContext.Current.Services.UserService.ReplaceUserPermissions(
+                user.Id, 
+                permissions.ToCharArray(), 
+                node.Id);
 
-            // Loop through the permissions and create them
-            foreach (char c in permissions)
-            {
-                //false = don't raise events since we'll raise a custom event after
-                MakeNew(user, node, c, false);
-            }
             OnUpdated(new UserPermission(user, node, permissions.ToCharArray()), new SaveEventArgs());
         }
 

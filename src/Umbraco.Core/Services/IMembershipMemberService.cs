@@ -6,16 +6,16 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
 {
-
     /// <summary>
     /// Defines part of the MemberService, which is specific to methods used by the membership provider.
     /// </summary>
     /// <remarks>
     /// Idea is to have this is an isolated interface so that it can be easily 'replaced' in the membership provider impl.
     /// </remarks>
-    internal interface IMembershipMemberService : IMembershipMemberService<IMember>
+    public interface IMembershipMemberService : IMembershipMemberService<IMember>, IMembershipRoleService<IMember>
     {
-        IMember CreateMember(string email, string username, string password, IMemberType memberType);
+        IMember CreateMember(string username, string email, string password, string memberType);
+        IMember CreateMemberWithIdentity(string username, string email, string password, IMemberType memberType);
     }
 
     /// <summary>
@@ -24,7 +24,7 @@ namespace Umbraco.Core.Services
     /// <remarks>
     /// Idea is to have this is an isolated interface so that it can be easily 'replaced' in the membership provider impl.
     /// </remarks>
-    internal interface IMembershipMemberService<T> : IService
+    public interface IMembershipMemberService<T> : IService
         where T : class, IMembershipUser
     {
         /// <summary>
@@ -48,9 +48,14 @@ namespace Umbraco.Core.Services
         /// <param name="password"></param>
         /// <param name="memberTypeAlias"></param>
         /// <returns></returns>
-        T CreateMember(string username, string email, string password, string memberTypeAlias);
+        T CreateWithIdentity(string username, string email, string password, string memberTypeAlias);
 
-        T GetById(object id);
+        /// <summary>
+        /// Gets the member by the provider key
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        T GetByProviderKey(object id);
 
         /// <summary>
         /// Get a member by email
@@ -62,20 +67,20 @@ namespace Umbraco.Core.Services
         T GetByUsername(string login);
 
         void Delete(T membershipUser);
+        
+        void Save(T entity, bool raiseEvents = true);
 
-        void Save(T membershipUser, bool raiseEvents = true);
+        void Save(IEnumerable<T> entities, bool raiseEvents = true);
 
-        void Save(IEnumerable<T> members, bool raiseEvents = true);
+        IEnumerable<T> FindByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
 
-        IEnumerable<T> FindMembersByEmail(string emailStringToMatch, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
-
-        IEnumerable<T> FindMembersByUsername(string login, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
+        IEnumerable<T> FindByUsername(string login, int pageIndex, int pageSize, out int totalRecords, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith);
 
         /// <summary>
         /// Gets the total number of members based on the count type
         /// </summary>
         /// <returns></returns>
-        int GetMemberCount(MemberCountType countType);
+        int GetCount(MemberCountType countType);
 
         /// <summary>
         /// Gets a list of paged member data
@@ -84,6 +89,6 @@ namespace Umbraco.Core.Services
         /// <param name="pageSize"></param>
         /// <param name="totalRecords"></param>
         /// <returns></returns>
-        IEnumerable<T> GetAllMembers(int pageIndex, int pageSize, out int totalRecords);
+        IEnumerable<T> GetAll(int pageIndex, int pageSize, out int totalRecords);
     }
 }

@@ -99,6 +99,16 @@ function entityResource($q, $http, umbRequestHelper) {
                'Failed to retreive entity data for id ' + id);
         },
         
+        getByQuery: function (query, nodeContextId, type) {            
+            return umbRequestHelper.resourcePromise(
+               $http.get(
+                   umbRequestHelper.getApiUrl(
+                       "entityApiBaseUrl",
+                       "GetByQuery",
+                       [{query: query},{ nodeContextId: nodeContextId}, {type: type }])),
+               'Failed to retreive entity data for query ' + query);
+        },
+
         /**
          * @ngdoc method
          * @name umbraco.resources.entityResource#getByIds

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using umbraco.cms.presentation.create.controls;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
@@ -22,6 +23,66 @@ namespace Umbraco.Tests.Services
         public override void TearDown()
         {
             base.TearDown();
+        }
+
+        [Test]
+        public void Member_Cannot_Edit_Property()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            //re-get
+            memberType = ServiceContext.MemberTypeService.Get(memberType.Id);
+            foreach (var p in memberType.PropertyTypes)
+            {
+                Assert.IsFalse(memberType.MemberCanEditProperty(p.Alias));
+            }
+        }
+
+        [Test]
+        public void Member_Can_Edit_Property()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var prop = memberType.PropertyTypes.First().Alias;
+            memberType.SetMemberCanEditProperty(prop, true);
+            ServiceContext.MemberTypeService.Save(memberType);
+            //re-get
+            memberType = ServiceContext.MemberTypeService.Get(memberType.Id);
+            foreach (var p in memberType.PropertyTypes.Where(x => x.Alias != prop))
+            {
+                Assert.IsFalse(memberType.MemberCanEditProperty(p.Alias));
+            }
+            Assert.IsTrue(memberType.MemberCanEditProperty(prop));
+        }
+
+        [Test]
+        public void Member_Cannot_View_Property()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            //re-get
+            memberType = ServiceContext.MemberTypeService.Get(memberType.Id);
+            foreach (var p in memberType.PropertyTypes)
+            {
+                Assert.IsFalse(memberType.MemberCanViewProperty(p.Alias));
+            }
+        }
+
+        [Test]
+        public void Member_Can_View_Property()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            var prop = memberType.PropertyTypes.First().Alias;
+            memberType.SetMemberCanViewProperty(prop, true);
+            ServiceContext.MemberTypeService.Save(memberType);
+            //re-get
+            memberType = ServiceContext.MemberTypeService.Get(memberType.Id);
+            foreach (var p in memberType.PropertyTypes.Where(x => x.Alias != prop))
+            {
+                Assert.IsFalse(memberType.MemberCanViewProperty(p.Alias));
+            }
+            Assert.IsTrue(memberType.MemberCanViewProperty(prop));
         }
 
         [Test]

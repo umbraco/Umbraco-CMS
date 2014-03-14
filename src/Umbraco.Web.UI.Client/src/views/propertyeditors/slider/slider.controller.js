@@ -90,7 +90,7 @@
     //tell the assetsService to load the bootstrap slider
     //libs from the plugin folder
     assetsService
-        .loadJs("lib/slider/bootstrap-slider.js")
+        .loadJs("lib/slider/js/bootstrap-slider.js")
         .then(function () {
 
             createSlider();

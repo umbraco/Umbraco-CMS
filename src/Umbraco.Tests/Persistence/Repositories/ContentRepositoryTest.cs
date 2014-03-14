@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -38,8 +39,8 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);
             var tagRepository = new TagsRepository(unitOfWork, NullCacheProvider.Current);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);
-            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository, tagRepository);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);            
+            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
             return repository;
         }
 
@@ -53,7 +54,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 contentType.AllowedContentTypes = new List<ContentTypeSort>
                 {
                     new ContentTypeSort
@@ -69,7 +70,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
 
                 // Act
-                repository.AssignEntityPermissions(parentPage, 'A', new object[] { 0 });
+                repository.AssignEntityPermission(parentPage, 'A', new int[] { 0 });
                 var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
                 repository.AddOrUpdate(childPage);
                 unitOfWork.Commit();
@@ -105,7 +106,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
-                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
                 Content textpage = MockedContent.CreateSimpleContent(contentType);
 
                 // Act
@@ -129,7 +130,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
 
@@ -163,7 +164,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
-                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 Content textpage = MockedContent.CreateSimpleContent(contentType);
 
                 // Act
@@ -193,7 +194,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
-                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 Content textpage = MockedContent.CreateSimpleContent(contentType);
 
                 // Act

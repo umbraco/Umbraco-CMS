@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Globalization;
 using System.Linq;
 using Umbraco.Core.Models;
@@ -8,6 +9,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Caching;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 
 namespace Umbraco.Core.Persistence.Repositories
@@ -119,6 +121,15 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             ((DataTypeDefinition)entity).AddingEntity();
 
+            //Cannot add a duplicate data type
+            var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
+INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
+WHERE umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + "= @name", new {name = entity.Name});
+            if (exists > 0)
+            {
+                throw new DuplicateNameException("A data type with the name " + entity.Name + " already exists");
+            }
+
             var factory = new DataTypeDefinitionFactory(NodeObjectTypeId);
             var dto = factory.BuildDto(entity);
 
@@ -154,6 +165,18 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistUpdatedItem(IDataTypeDefinition entity)
         {
+
+            //Cannot change to a duplicate alias
+            var exists = Database.ExecuteScalar<int>(@"SELECT COUNT(*) FROM cmsDataType
+INNER JOIN umbracoNode ON cmsDataType.nodeId = umbracoNode.id
+WHERE umbracoNode." + SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("text") + @"= @name
+AND umbracoNode.id <> @id", 
+                    new { id = entity.Id, name = entity.Name });
+            if (exists > 0)
+            {
+                throw new DuplicateNameException("A data type with the name " + entity.Name + " already exists");
+            }
+
             //Updates Modified date and Version Guid
             ((DataTypeDefinition)entity).UpdatingEntity();
 

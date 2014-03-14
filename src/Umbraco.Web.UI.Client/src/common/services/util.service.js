@@ -1,35 +1,38 @@
 /*Contains multiple services for various helper tasks */
 
-function packageHelper(assetsService, treeService, eventsService) {
+function packageHelper(assetsService, treeService, eventsService, $templateCache) {
 
     return {
 
         /** Called when a package is installed, this resets a bunch of data and ensures the new package assets are loaded in */
         packageInstalled: function () {
-            //assetsService._reloadApplicationAssets().then(function() {
-            //    treeService.clearCache();
-            //    //send event
-            //    //eventsService.emit("app.reInitialize");
 
-            //    //TODO: This doesn't work and will end in an infinite browser load loop, we can't really 
-            //    // re-bootstrap anyways since that would be the same as loading the whole browser window.
-            //    //angular.bootstrap(document, ['umbraco']);
-            //});
+            //clears the tree
+            treeService.clearCache();
+
+            //clears the template cache
+            $templateCache.removeAll();
+
+            //emit event to notify anything else
+            eventsService.emit("app.reInitialize");
         }
 
     };
 }
 angular.module('umbraco.services').factory('packageHelper', packageHelper);
 
-function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, umbRequestHelper) {
+function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, mediaHelper, umbRequestHelper) {
     return {
         /** sets the image's url - will check if it is a folder or a real image */
         setImageUrl: function(img) {
             //get the image property (if one exists)
-            var imageProp = imageHelper.getImagePropertyValue({ imageModel: img });
-            if (!imageProp) {
+            //var imageProp = imageHelper.getImagePropertyValue({ imageModel: img });
+            img.thumbnail = mediaHelper.resolveFile(img);
+            if (!img.thumbnail){
                 img.thumbnail = "none";
             }
+
+            /*
             else {
 
                 //get the proxy url for big thumbnails (this ensures one is always generated)
@@ -38,7 +41,7 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, um
                     "GetBigThumbnail",
                     [{ mediaId: img.id }]);
                 img.thumbnail = thumbnailUrl;
-            }
+            }*/
         },
 
         /** sets the images original size properties - will check if it is a folder and if so will just make it square */
@@ -527,13 +530,13 @@ function umbDataFormatter() {
                         //we know the current property matches an alias, now we need to determine which membership provider property it was for
                         // by looking at the key
                         switch (foundAlias[0]) {
-                            case "umbracoLockPropertyTypeAlias":
+                            case "umbracoMemberLockedOut":
                                 saveModel.isLockedOut = prop.value.toString() === "1" ? true : false;
                                 break;
-                            case "umbracoApprovePropertyTypeAlias":
+                            case "umbracoMemberApproved":
                                 saveModel.isApproved = prop.value.toString() === "1" ? true : false;
                                 break;
-                            case "umbracoCommentPropertyTypeAlias":
+                            case "umbracoMemberComments":
                                 saveModel.comments = prop.value;
                                 break;
                         }

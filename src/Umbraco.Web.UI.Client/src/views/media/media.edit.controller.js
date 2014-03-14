@@ -6,7 +6,7 @@
  * @description
  * The controller for the media editor
  */
-function mediaEditController($scope, $routeParams, appState, mediaResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService, formHelper, umbModelMapper, editorState, umbRequestHelper, $http) {
+function mediaEditController($scope, $routeParams, appState, mediaResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService, formHelper, umbModelMapper, editorState, umbRequestHelper, $http) {
 
     //setup scope vars
     $scope.nav = navigationService;
@@ -59,6 +59,13 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
 
                 syncTreeNode($scope.content, data.path, true);
                 
+            });
+
+        //We fetch all ancestors of the node to generate the footer breadcrump navigation
+        entityResource.getAncestors($routeParams.id, "media")
+            .then(function(anc) {
+                anc.pop();
+                $scope.ancestors = anc;
             });
     }
     

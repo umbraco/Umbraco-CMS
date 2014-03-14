@@ -7,7 +7,7 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Mvc
 {
-	/// <summary>
+    /// <summary>
 	/// Redirects to an Umbraco page by Id or Entity
 	/// </summary>
 	public class RedirectToUmbracoPageResult : ActionResult

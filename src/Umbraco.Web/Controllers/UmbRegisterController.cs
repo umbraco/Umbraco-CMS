@@ -1,7 +1,11 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Web.Mvc;
+using System.Web.Security;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.member;
+using Umbraco.Core;
+using Umbraco.Core.Security;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 
@@ -12,73 +16,63 @@ namespace Umbraco.Web.Controllers
         [HttpPost]
         public ActionResult HandleRegisterMember([Bind(Prefix = "registerModel")]RegisterModel model)
         {
-            //TODO: Use new Member API and use the MemberShipProvider variables for validating password strength etc
-            if (ModelState.IsValid)
+            if (ModelState.IsValid == false)
             {
-                model.Username = (model.UsernameIsEmail || model.Username == null) ? model.Email : model.Username;
+                return CurrentUmbracoPage();
+            }
 
-                var member = Member.GetMemberFromLoginName(model.Username);
-                if (member != null)
-                {
-                    ModelState.AddModelError((model.UsernameIsEmail || model.Username == null) 
-                                                ? "registerModel.Email" 
-                                                : "registerModel.Username",
-                                                "A member with this username already exists.");
+            MembershipCreateStatus status;
+            var member = Members.RegisterMember(model, out status, model.LoginOnSuccess);
 
-                    return CurrentUmbracoPage();
-                }
-
-                member = Member.GetMemberFromEmail(model.Email);
-                if (member != null)
-                {
-                    ModelState.AddModelError("registerModel.Email", "A member with this e-mail address already exists.");
-
-                    return CurrentUmbracoPage();
-                }
-
-                member = CreateNewMember(model);
-
-                // Log member in
-                Member.AddMemberToCache(member);
-
-                if (model.RedirectOnSucces)
-                {
-                    return Redirect(model.RedirectUrl);
-                }
-
-                TempData.Add("FormSuccess", true);
-                return RedirectToCurrentUmbracoPage();
+            switch (status)
+            {
+                case MembershipCreateStatus.Success:
+                    //if there is a specified path to redirect to then use it
+                    if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
+                    {
+                        return Redirect(model.RedirectUrl);
+                    }
+                    //redirect to current page by default
+                    TempData["FormSuccess"] = true;            
+                    return RedirectToCurrentUmbracoPage();
+                case MembershipCreateStatus.InvalidUserName:
+                    ModelState.AddModelError((model.UsernameIsEmail || model.Username == null)
+                        ? "registerModel.Email"
+                        : "registerModel.Username",
+                        "Username is not valid");
+                    break;
+                case MembershipCreateStatus.InvalidPassword:
+                    ModelState.AddModelError("registerModel.Password", "The password is not strong enough");
+                    break;
+                case MembershipCreateStatus.InvalidQuestion:
+                case MembershipCreateStatus.InvalidAnswer:
+                    //TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
+                    throw new NotImplementedException(status.ToString());
+                case MembershipCreateStatus.InvalidEmail:
+                    ModelState.AddModelError("registerModel.Email", "Email is invalid");
+                    break;
+                case MembershipCreateStatus.DuplicateUserName:
+                    ModelState.AddModelError((model.UsernameIsEmail || model.Username == null)
+                        ? "registerModel.Email"
+                        : "registerModel.Username",
+                        "A member with this username already exists.");
+                    break;
+                case MembershipCreateStatus.DuplicateEmail:
+                    ModelState.AddModelError("registerModel.Email", "A member with this e-mail address already exists");
+                    break;
+                case MembershipCreateStatus.UserRejected:
+                case MembershipCreateStatus.InvalidProviderUserKey:
+                case MembershipCreateStatus.DuplicateProviderUserKey:
+                case MembershipCreateStatus.ProviderError:
+                    //don't add a field level error, just model level
+                    ModelState.AddModelError("registerModel", "An error occurred creating the member: " + status);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
             }
 
             return CurrentUmbracoPage();
         }
 
-        private static Member CreateNewMember(RegisterModel model)
-        {
-            var user = new User(0);
-
-            var mt = MemberType.GetByAlias(model.MemberTypeAlias) ?? MemberType.MakeNew(user, model.MemberTypeAlias);
-
-            var member = Member.MakeNew(model.Username, mt, user);
-
-            if (model.Name != null)
-            {
-                member.Text = model.Name;
-            }
-
-            member.Email = model.Email;
-            member.Password = model.Password;
-
-            if (model.MemberProperties != null)
-            {
-                foreach (var property in model.MemberProperties.Where(p => p.Value != null))
-                {
-                    member.getProperty(property.Alias).Value = property.Value;
-                }
-            }
-
-            member.Save();
-            return member;
-        }
     }
 }

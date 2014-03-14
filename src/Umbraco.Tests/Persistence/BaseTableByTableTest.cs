@@ -26,8 +26,7 @@ namespace Umbraco.Tests.Persistence
             string path = TestHelper.CurrentAssemblyDirectory;
             AppDomain.CurrentDomain.SetData("DataDirectory", path);
 
-            RepositoryResolver.Current = new RepositoryResolver(
-                new RepositoryFactory());
+            RepositoryResolver.Current = new RepositoryResolver(new RepositoryFactory(true));
 
             //disable cache
             var cacheHelper = CacheHelper.CreateDisabledCacheHelper();

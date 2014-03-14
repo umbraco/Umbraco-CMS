@@ -6,7 +6,7 @@
  * @description
  * The controller for the content editor
  */
-function ContentEditController($scope, $routeParams, $q, $timeout, $window, appState, contentResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http) {
+function ContentEditController($scope, $routeParams, $q, $timeout, $window, appState, contentResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, treeService, fileManager, formHelper, umbRequestHelper, keyboardService, umbModelMapper, editorState, $http) {
 
     //setup scope vars
     $scope.defaultButton = null;
@@ -15,6 +15,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.currentNode = null; //the editors affiliated node
     
+
     //This sets up the action buttons based on what permissions the user has.
     //The allowedActions parameter contains a list of chars, each represents a button by permission so 
     //here we'll build the buttons according to the chars of the user.
@@ -52,6 +53,7 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
                 }
             }
 
+
             //if we are not creating, then we should add unpublish too, 
             // so long as it's already published and if the user has access to publish
             if (!$routeParams.create) {
@@ -59,6 +61,15 @@ function ContentEditController($scope, $routeParams, $q, $timeout, $window, appS
                     $scope.subButtons.push(createButtonDefinition("Z"));
                 }
             }
+        }
+
+        //We fetch all ancestors of the node to generate the footer breadcrump navigation
+        if (!$routeParams.create) {
+        entityResource.getAncestors(content.id, "document")
+            .then(function(anc) {
+                anc.pop();
+                $scope.ancestors = anc; 
+            });
         }
     }
 

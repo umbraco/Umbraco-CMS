@@ -478,6 +478,10 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
             // I'm not sure that _properties contains all properties including those without a value,
             // neither that GetProperty will return a property without a value vs. null... @zpqrtbnk
 
+            // List of properties that will appear in the XML and do not match
+            // anything in the ContentType, so they must be ignored.
+            private static readonly string[] IgnoredKeys = { "version", "isDoc", "key" };
+
 			public DictionaryPublishedContent(
 				IDictionary<string, string> valueDictionary, 
 				Func<DictionaryPublishedContent, IPublishedContent> getParent,
@@ -528,8 +532,8 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 				{
 				    IPublishedProperty property = null;
 
-                    // must ignore that one
-				    if (i.Key == "version" || i.Key == "isDoc") continue;
+                    // must ignore those
+				    if (IgnoredKeys.Contains(i.Key)) continue;
 
                     if (i.Key.InvariantStartsWith("__"))
 				    {
@@ -540,6 +544,26 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                     {
                         // use property type to ensure proper conversion
                         var propertyType = _contentType.GetPropertyType(i.Key);
+
+                        // note: this is where U4-4144 and -3665 were born
+                        //
+                        // because propertyType is null, the XmlPublishedProperty ctor will throw
+                        // it's null because i.Key is not a valid property alias for the type...
+                        // the alias is case insensitive (verified) so it means it really is not
+                        // a correct alias. 
+                        //
+                        // in every cases this is after a ConvertFromXPathNavigator, so it means
+                        // that we get some properties from the XML that are not valid properties.
+                        // no idea which property. could come from the cache in library, could come
+                        // from so many places really.
+
+                        // workaround: just ignore that property
+                        if (propertyType == null)
+                        {
+                            LogHelper.Warn<PublishedMediaCache>("Dropping property \"" + i.Key + "\" because it does not belong to the content type.");
+                            continue;
+                        }
+
                         property = new XmlPublishedProperty(propertyType, false, i.Value); // false :: never preview a media
                     }
 

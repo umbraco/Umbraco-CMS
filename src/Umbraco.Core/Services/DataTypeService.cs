@@ -226,17 +226,17 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = _uowProvider.GetUnitOfWork())
                 {
-                    var sortOrderObj =
-                        uow.Database.ExecuteScalar<object>(
-                            "SELECT max(sortorder) FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = id });
-                    int sortOrder;
-                    if (sortOrderObj == null || int.TryParse(sortOrderObj.ToString(), out sortOrder) == false)
-                    {
-                        sortOrder = 1;
-                    }
-
                     using (var transaction = uow.Database.GetTransaction())
                     {
+                        var sortOrderObj =
+                        uow.Database.ExecuteScalar<object>(
+                            "SELECT max(sortorder) FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = id });
+                        int sortOrder;
+                        if (sortOrderObj == null || int.TryParse(sortOrderObj.ToString(), out sortOrder) == false)
+                        {
+                            sortOrder = 1;
+                        }
+
                         foreach (var value in values)
                         {
                             var dto = new DataTypePreValueDto { DataTypeNodeId = id, Value = value, SortOrder = sortOrder };

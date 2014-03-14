@@ -6,7 +6,7 @@ namespace Umbraco.Core.Persistence.Migrations
     /// Represents the Migration attribute, which is used to mark classes as
     /// database migrations with Up/Down methods for pushing changes UP or pulling them DOWN.
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class)]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class MigrationAttribute : Attribute
     {
         public MigrationAttribute(string targetVersion, int sortOrder, string product)

@@ -60,7 +60,7 @@
     </Reference>
     <Reference Include="Examine, Version=0.1.52.2941, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\Examine.0.1.52.2941\lib\Examine.dll</HintPath>
+      <HintPath>..\packages\Examine.0.1.55.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="ICSharpCode.SharpZipLib, Version=0.86.0.518, Culture=neutral, PublicKeyToken=1b03e6acf1164f73, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -169,9 +169,15 @@
     <Compile Include="AngularIntegration\JsInitializationTests.cs" />
     <Compile Include="AngularIntegration\ServerVariablesParserTests.cs" />
     <Compile Include="AttemptTests.cs" />
+    <Compile Include="Membership\DynamicMemberContentTests.cs" />
     <Compile Include="Membership\MembershipProviderBaseTests.cs" />
     <Compile Include="Membership\UmbracoServiceMembershipProviderTests.cs" />
+    <Compile Include="Migrations\MigrationRunnerTests.cs" />
+    <Compile Include="Migrations\Stubs\FiveZeroMigration.cs" />
+    <Compile Include="Migrations\Stubs\FourElevenMigration.cs" />
+    <Compile Include="Migrations\Stubs\SixZeroMigration2.cs" />
     <Compile Include="MockTests.cs" />
+    <Compile Include="Models\UmbracoEntityTests.cs" />
     <Compile Include="Mvc\UmbracoViewPageTests.cs" />
     <Compile Include="Persistence\Auditing\AuditTests.cs" />
     <Compile Include="BootManagers\CoreBootManagerTests.cs" />
@@ -317,7 +323,7 @@
     </Compile>
     <Compile Include="Migrations\Stubs\AlterUserTableMigrationStub.cs" />
     <Compile Include="Migrations\Stubs\Dummy.cs" />
-    <Compile Include="Migrations\Stubs\FourNineMigration.cs" />
+    <Compile Include="Migrations\Stubs\SixZeroMigration1.cs" />
     <Compile Include="Migrations\TargetVersionSixthMigrationsTest.cs" />
     <Compile Include="Migrations\Upgrades\MySqlUpgradeTest.cs" />
     <Compile Include="Migrations\Upgrades\SqlCeDataUpgradeTest.cs" />
@@ -650,7 +656,9 @@
     <Content Include="Services\Importing\uBlogsy-Package.xml" />
     <Content Include="Services\Importing\XsltSearch-Package.xml" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Install\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\amd64\*.* "$(TargetDir)amd64\" /Y /F /E /D

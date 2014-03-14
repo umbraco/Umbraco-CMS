@@ -1,5 +1,8 @@
 using System;
 using System.Data;
+using System.Linq;
+using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Querying;
 using umbraco.DataLayer;
 using System.Collections;
 using umbraco.cms.businesslogic.web;
@@ -16,8 +19,15 @@ namespace umbraco.cms.businesslogic.member
 	/// </summary>
 	public class MemberGroup : CMSNode
 	{
-        private static Guid _objectType = new Guid(Constants.ObjectTypes.MemberGroup);
-        private string _oldGroupName;
+        private static readonly Guid MemberGroupObjectType = new Guid(Constants.ObjectTypes.MemberGroup);
+
+	    private IMemberGroup _memberGroupItem;
+
+        internal MemberGroup(IMemberGroup memberGroup)
+            : base(memberGroup)
+        {
+            _memberGroupItem = memberGroup;
+        }
 
 		/// <summary>
 		/// Initialize a new object of the MemberGroup class
@@ -41,13 +51,11 @@ namespace umbraco.cms.businesslogic.member
         {
             get
             {
-                return base.Text;
+                return _memberGroupItem.Name;
             }
             set
             {
-                // in order to be able to update access.xml if name changes we need to store a reference to the old name
-                _oldGroupName = Text;
-                base.Text = value;
+                _memberGroupItem.Name = value;
             }
         }
 
@@ -57,17 +65,23 @@ namespace umbraco.cms.businesslogic.member
         [Obsolete("Use System.Web.Security.Role.DeleteRole")]
         public override void delete()
         {
-            DeleteEventArgs e = new DeleteEventArgs();
+            var e = new DeleteEventArgs();
             FireBeforeDelete(e);
-            if (!e.Cancel) {
-                // delete member specific data!
-                SqlHelper.ExecuteNonQuery("Delete from cmsMember2MemberGroup where memberGroup = @id",
-                    SqlHelper.CreateParameter("@id", Id));
+            if (e.Cancel) return;
 
-                // Delete all content and cmsnode specific data!
-                base.delete();
-                FireAfterDelete(e);
+            if (_memberGroupItem != null)
+            {
+                ApplicationContext.Current.Services.MemberGroupService.Delete(_memberGroupItem);
             }
+            else
+            {
+                var memberGroup = ApplicationContext.Current.Services.MemberGroupService.GetById(Id);
+                ApplicationContext.Current.Services.MemberGroupService.Delete(memberGroup);
+            }
+            
+            // Delete all content and cmsnode specific data!
+            base.delete();
+            FireAfterDelete(e);
         }
 
 
@@ -76,18 +90,13 @@ namespace umbraco.cms.businesslogic.member
         /// </summary>
         public override void Save()
         {
-            SaveEventArgs e = new SaveEventArgs();
+            var e = new SaveEventArgs();
             FireBeforeSave(e);
+            if (e.Cancel) return;
 
-            // if the name has changed we need to update the public access
-            if (_oldGroupName != Text)
-            {
-                Access.RenameMemberShipRole(_oldGroupName, Text);
-            }
+            ApplicationContext.Current.Services.MemberGroupService.Save(_memberGroupItem);
 
-            if (!e.Cancel) {
-                FireAfterSave(e);
-            }
+            FireAfterSave(e);
         }
 
 		/// <summary>
@@ -98,82 +107,51 @@ namespace umbraco.cms.businesslogic.member
 		{
 			get
 			{
-				Guid[] tmp = getAllUniquesFromObjectType(_objectType);
-				MemberGroup[] retval = new MemberGroup[tmp.Length];
-
-				int i = 0;
-				foreach(Guid g in tmp)
-				{
-					retval[i]= new MemberGroup(g);
-					i++;
-				}
-				return retval;
+			    var result = ApplicationContext.Current.Services.MemberGroupService.GetAll();
+			    return result.Select(x => new MemberGroup(x)).ToArray();
 			}
 		}
 
-        public int[] GetMembersAsIds() {
-            ArrayList retval = new ArrayList();
-            IRecordsReader dr = SqlHelper.ExecuteReader("select member from cmsMember2MemberGroup where memberGroup = @memberGroup",
-                SqlHelper.CreateParameter("@memberGroup", Id));
-            while (dr.Read()) {
-                retval.Add(dr.GetInt("member"));
-            }
-            dr.Close();
+	    public int[] GetMembersAsIds()
+	    {
+            var result = ApplicationContext.Current.Services.MemberService.GetMembersInRole(_memberGroupItem.Name);
+	        return result.Select(x => x.Id).ToArray();
+	    }
 
-            return (int[])retval.ToArray(typeof(int));
-        }
+	    [Obsolete("Use System.Web.Security.Roles.FindUsersInRole")]
+	    public Member[] GetMembers()
+	    {
+	        var result = ApplicationContext.Current.Services.MemberService.GetMembersInRole(_memberGroupItem.Name);
+            return result.Select(x => new Member(x)).ToArray();
+	    }
 
-        [Obsolete("Use System.Web.Security.Roles.FindUsersInRole")]
-        public Member[] GetMembers() {
-            ArrayList retval = new ArrayList();
-            IRecordsReader dr = SqlHelper.ExecuteReader("select member from cmsMember2MemberGroup where memberGroup = @memberGroup",
-                SqlHelper.CreateParameter("@memberGroup", Id));
-            while (dr.Read()) {
-                retval.Add(new Member(dr.GetInt("member")));
-            }
-            dr.Close();
+	    public Member[] GetMembers(string usernameToMatch)
+	    {
 
-            return (Member[])retval.ToArray(typeof(Member));
-        }
+	        var result = ApplicationContext.Current.Services.MemberService.FindMembersInRole(
+	            _memberGroupItem.Name, usernameToMatch, StringPropertyMatchType.StartsWith);
 
-        public Member[] GetMembers(string usernameToMatch) {
-            ArrayList retval = new ArrayList();
-            IRecordsReader dr = SqlHelper.ExecuteReader("select member from cmsMember2MemberGroup inner join cmsMember on cmsMember.nodeId = cmsMember2MemberGroup.member where loginName like @username and memberGroup = @memberGroup",
-                SqlHelper.CreateParameter("@memberGroup", Id), SqlHelper.CreateParameter("@username", usernameToMatch + "%"));
-            while (dr.Read()) {
-                retval.Add(new Member(dr.GetInt("member")));
-            }
-            dr.Close();
+	        return result.Select(x => new Member(x)).ToArray();
+	    }
 
-            return (Member[])retval.ToArray(typeof(Member));
-        }
+	    public bool HasMember(int memberId)
+	    {
+	        return SqlHelper.ExecuteScalar<int>("select count(member) from cmsMember2MemberGroup where member = @member and memberGroup = @memberGroup",
+	            SqlHelper.CreateParameter("@member", memberId),
+	            SqlHelper.CreateParameter("@memberGroup", Id)) > 0;
+	    }
 
-        public bool HasMember(int memberId) {
-            return SqlHelper.ExecuteScalar<int>("select count(member) from cmsMember2MemberGroup where member = @member and memberGroup = @memberGroup",
-                SqlHelper.CreateParameter("@member", memberId),
-                SqlHelper.CreateParameter("@memberGroup", Id)) > 0; 
-        }
-
-		/// <summary>
+	    /// <summary>
 		/// Get a membergroup by it's name
 		/// </summary>
 		/// <param name="name">Name of the membergroup</param>
 		/// <returns>If a MemberGroup with the given name exists, it will return this, else: null</returns>
-        public static MemberGroup GetByName(string name) 
-		{
-			try 
-			{
-				return
-					new MemberGroup(SqlHelper.ExecuteScalar<int>(
-								    "select id from umbracoNode where Text = @text and nodeObjectType = @objectType",
-								    SqlHelper.CreateParameter("@text", name),
-								    SqlHelper.CreateParameter("@objectType", _objectType)));
-			} 
-			catch 
-			{
-				return null;
-			}
-		}
+        public static MemberGroup GetByName(string name)
+	    {
+	        var found = ApplicationContext.Current.Services.MemberGroupService.GetByName(name);
+	        if (found == null) return null;
+            return new MemberGroup(found);
+	    }
 
 
 		/// <summary>
@@ -184,15 +162,40 @@ namespace umbraco.cms.businesslogic.member
 		/// <returns>The new MemberGroup</returns>
 		public static MemberGroup MakeNew(string Name, BusinessLogic.User u) 
 		{
-			Guid newId = Guid.NewGuid();
-			CMSNode.MakeNew(-1,_objectType, u.Id, 1,  Name, newId);
-			MemberGroup mg = new MemberGroup(newId);
-            NewEventArgs e = new NewEventArgs();
+		    var group = new global::Umbraco.Core.Models.MemberGroup {Name = Name};
+		    ApplicationContext.Current.Services.MemberGroupService.Save(group);
+
+            var mg = new MemberGroup(group);
+            var e = new NewEventArgs();
             mg.OnNew(e);
             return mg;
 		}
 
-        //EVENTS
+	    protected override void setupNode()
+	    {
+            if (Id == -1)
+            {
+                base.setupNode();
+                return;
+            }
+
+            var group = ApplicationContext.Current.Services.MemberGroupService.GetById(Id);
+
+            if (group == null)
+                throw new ArgumentException(string.Format("No Member exists with id '{0}'", Id));
+
+            SetupNode(group);
+        }
+
+        private void SetupNode(IMemberGroup group)
+        {
+            _memberGroupItem = group;            
+
+            //Setting private properties 
+            base.PopulateCMSNodeFromUmbracoEntity(_memberGroupItem, MemberGroupObjectType);
+        }
+
+	    //EVENTS
         /// <summary>
         /// The save event handler
         /// </summary>

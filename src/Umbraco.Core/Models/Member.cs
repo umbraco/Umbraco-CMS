@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Models
 {
@@ -13,7 +15,7 @@ namespace Umbraco.Core.Models
     public class Member : ContentBase, IMember
     {
         private readonly IMemberType _contentType;
-        private string _contentTypeAlias;
+        private readonly string _contentTypeAlias;
         private string _username;
         private string _email;
         private string _password;
@@ -28,18 +30,23 @@ namespace Umbraco.Core.Models
         public Member(string name, IMemberType contentType)
             : base(name, -1, contentType, new PropertyCollection())
         {
+            _contentTypeAlias = contentType.Alias;
             _contentType = contentType;
+            IsApproved = true;
         }
 
+        //TODO: Should we just get rid of this one? no reason to have a level set.
         internal Member(string name, string email, string username, string password, int parentId, IMemberType contentType)
             : base(name, parentId, contentType, new PropertyCollection())
         {
             Mandate.ParameterNotNull(contentType, "contentType");
 
+            _contentTypeAlias = contentType.Alias;
             _contentType = contentType;
             _email = email;
             _username = username;
             _password = password;
+            IsApproved = true;
         }
 
         public Member(string name, string email, string username, string password, IMemberType contentType)
@@ -47,10 +54,12 @@ namespace Umbraco.Core.Models
         {
             Mandate.ParameterNotNull(contentType, "contentType");
 
+            _contentTypeAlias = contentType.Alias;
             _contentType = contentType;
             _email = email;
             _username = username;
             _password = password;
+            IsApproved = true;
         }
 
         //public Member(string name, string email, string username, string password, IContentBase parent, IMemberType contentType)
@@ -136,7 +145,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the Password Question
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoPasswordRetrievalQuestionPropertyTypeAlias
+        /// Alias: umbracoMemberPasswordRetrievalQuestion
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -144,12 +153,19 @@ namespace Umbraco.Core.Models
         {
             get
             {
+                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.PasswordQuestion, "PasswordQuestion", default(string));
+                if (a.Success == false) return a.Result;
+
                 return Properties[Constants.Conventions.Member.PasswordQuestion].Value == null
                     ? string.Empty
                     : Properties[Constants.Conventions.Member.PasswordQuestion].Value.ToString();
             }
             set
             {
+                if (WarnIfPropertyTypeNotFoundOnSet(
+                    Constants.Conventions.Member.PasswordQuestion,
+                    "PasswordQuestion") == false) return;
+
                 Properties[Constants.Conventions.Member.PasswordQuestion].Value = value;
             }
         }
@@ -158,7 +174,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the Password Answer
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoPasswordRetrievalAnswerPropertyTypeAlias
+        /// Alias: umbracoMemberPasswordRetrievalAnswer
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -166,12 +182,19 @@ namespace Umbraco.Core.Models
         {
             get
             {
+                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.PasswordAnswer, "PasswordAnswer", default(string));
+                if (a.Success == false) return a.Result;
+
                 return Properties[Constants.Conventions.Member.PasswordAnswer].Value == null
                     ? string.Empty
                     : Properties[Constants.Conventions.Member.PasswordAnswer].Value.ToString();
             }
             set
             {
+                if (WarnIfPropertyTypeNotFoundOnSet(
+                    Constants.Conventions.Member.PasswordAnswer,
+                    "PasswordAnswer") == false) return;
+
                 Properties[Constants.Conventions.Member.PasswordAnswer].Value = value;
             }
         }
@@ -180,7 +203,7 @@ namespace Umbraco.Core.Models
         /// Gets or set the comments for the member
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoCommentPropertyTypeAlias
+        /// Alias: umbracoMemberComments
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -188,12 +211,19 @@ namespace Umbraco.Core.Models
         {
             get
             {
+                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.Comments, "Comments", default(string));
+                if (a.Success == false) return a.Result;
+
                 return Properties[Constants.Conventions.Member.Comments].Value == null
                     ? string.Empty
                     : Properties[Constants.Conventions.Member.Comments].Value.ToString();
             }
             set
             {
+                if (WarnIfPropertyTypeNotFoundOnSet(
+                    Constants.Conventions.Member.Comments,
+                    "Comments") == false) return;
+
                 Properties[Constants.Conventions.Member.Comments].Value = value;
             }
         }
@@ -202,7 +232,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets a boolean indicating whether the Member is approved
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoApprovePropertyTypeAlias
+        /// Alias: umbracoMemberApproved
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -210,17 +240,25 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.IsApproved].Value == null)
-                    return default(bool);
+                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.IsApproved, "IsApproved", 
+                    //This is the default value if the prop is not found
+                    true);
+                if (a.Success == false) return a.Result;
 
-                if (Properties[Constants.Conventions.Member.IsApproved].Value is bool)
-                    return (bool)Properties[Constants.Conventions.Member.IsApproved].Value;
-
-                //TODO: Use TryConvertTo<T> instead
-                return (bool)Convert.ChangeType(Properties[Constants.Conventions.Member.IsApproved].Value, typeof(bool));
+                var tryConvert = Properties[Constants.Conventions.Member.IsApproved].Value.TryConvertTo<bool>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                //if the property exists but it cannot be converted, we will assume true
+                return true;
             }
             set
             {
+                if (WarnIfPropertyTypeNotFoundOnSet(
+                    Constants.Conventions.Member.IsApproved,
+                    "IsApproved") == false) return;
+
                 Properties[Constants.Conventions.Member.IsApproved].Value = value;
             }
         }
@@ -229,7 +267,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets a boolean indicating whether the Member is locked out
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoLockPropertyTypeAlias
+        /// Alias: umbracoMemberLockedOut
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -237,17 +275,23 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.IsLockedOut].Value == null)
-                    return default(bool);
-
-                if (Properties[Constants.Conventions.Member.IsLockedOut].Value is bool)
-                    return (bool)Properties[Constants.Conventions.Member.IsLockedOut].Value;
-
+                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.IsLockedOut, "IsLockedOut", false);
+                if (a.Success == false) return a.Result;
+                
+                var tryConvert = Properties[Constants.Conventions.Member.IsLockedOut].Value.TryConvertTo<bool>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return false;
                 //TODO: Use TryConvertTo<T> instead
-                return (bool)Convert.ChangeType(Properties[Constants.Conventions.Member.IsLockedOut].Value, typeof(bool));
             }
             set
             {
+                if (WarnIfPropertyTypeNotFoundOnSet(
+                    Constants.Conventions.Member.IsLockedOut,
+                    "IsLockedOut") == false) return;
+
                 Properties[Constants.Conventions.Member.IsLockedOut].Value = value;
             }
         }
@@ -256,7 +300,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the date for last login
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoLastLoginPropertyTypeAlias
+        /// Alias: umbracoMemberLastLogin
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -264,17 +308,23 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.LastLoginDate].Value == null)
-                    return default(DateTime);
-
-                if (Properties[Constants.Conventions.Member.LastLoginDate].Value is DateTime)
-                    return (DateTime)Properties[Constants.Conventions.Member.LastLoginDate].Value;
-
+                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.LastLoginDate, "LastLoginDate", default(DateTime));
+                if (a.Success == false) return a.Result;
+                
+                var tryConvert = Properties[Constants.Conventions.Member.LastLoginDate].Value.TryConvertTo<DateTime>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(DateTime);
                 //TODO: Use TryConvertTo<T> instead
-                return (DateTime)Convert.ChangeType(Properties[Constants.Conventions.Member.LastLoginDate].Value, typeof(DateTime));
             }
             set
             {
+                if (WarnIfPropertyTypeNotFoundOnSet(
+                    Constants.Conventions.Member.LastLoginDate,
+                    "LastLoginDate") == false) return;
+
                 Properties[Constants.Conventions.Member.LastLoginDate].Value = value;
             }
         }
@@ -283,7 +333,7 @@ namespace Umbraco.Core.Models
         /// Gest or sets the date for last password change
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoMemberLastPasswordChange
+        /// Alias: umbracoMemberLastPasswordChangeDate
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -291,17 +341,23 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value == null)
-                    return default(DateTime);
+                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.LastPasswordChangeDate, "LastPasswordChangeDate", default(DateTime));
+                if (a.Success == false) return a.Result;
 
-                if (Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value is DateTime)
-                    return (DateTime)Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value;
-
+                var tryConvert = Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value.TryConvertTo<DateTime>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(DateTime);
                 //TODO: Use TryConvertTo<T> instead
-                return (DateTime)Convert.ChangeType(Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value, typeof(DateTime));
             }
             set
             {
+                if (WarnIfPropertyTypeNotFoundOnSet(
+                    Constants.Conventions.Member.LastPasswordChangeDate,
+                    "LastPasswordChangeDate") == false) return;
+
                 Properties[Constants.Conventions.Member.LastPasswordChangeDate].Value = value;
             }
         }
@@ -310,7 +366,7 @@ namespace Umbraco.Core.Models
         /// Gets or sets the date for when Member was locked out
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoMemberLastLockout
+        /// Alias: umbracoMemberLastLockoutDate
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -318,17 +374,23 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.LastLockoutDate].Value == null)
-                    return default(DateTime);
-
-                if (Properties[Constants.Conventions.Member.LastLockoutDate].Value is DateTime)
-                    return (DateTime)Properties[Constants.Conventions.Member.LastLockoutDate].Value;
-
+                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.LastLockoutDate, "LastLockoutDate", default(DateTime));
+                if (a.Success == false) return a.Result;
+                
+                var tryConvert = Properties[Constants.Conventions.Member.LastLockoutDate].Value.TryConvertTo<DateTime>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(DateTime);
                 //TODO: Use TryConvertTo<T> instead
-                return (DateTime)Convert.ChangeType(Properties[Constants.Conventions.Member.LastLockoutDate].Value, typeof(DateTime));
             }
             set
             {
+                if (WarnIfPropertyTypeNotFoundOnSet(
+                    Constants.Conventions.Member.LastLockoutDate,
+                    "LastLockoutDate") == false) return;
+
                 Properties[Constants.Conventions.Member.LastLockoutDate].Value = value;
             }
         }
@@ -338,7 +400,7 @@ namespace Umbraco.Core.Models
         /// This is the number of times the password was entered incorrectly upon login.
         /// </summary>
         /// <remarks>
-        /// Alias: umbracoFailedPasswordAttemptsPropertyTypeAlias
+        /// Alias: umbracoMemberFailedPasswordAttempts
         /// Part of the standard properties collection.
         /// </remarks>
         [IgnoreDataMember]
@@ -346,18 +408,24 @@ namespace Umbraco.Core.Models
         {
             get
             {
-                if (Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value == null)
-                    return default(int);
-
-                if (Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value is int)
-                    return (int)Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value;
-
+                var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.FailedPasswordAttempts, "FailedPasswordAttempts", 0);
+                if (a.Success == false) return a.Result;
+                
+                var tryConvert = Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value.TryConvertTo<int>();
+                if (tryConvert.Success)
+                {
+                    return tryConvert.Result;
+                }
+                return default(int);
                 //TODO: Use TryConvertTo<T> instead
-                return (int)Convert.ChangeType(Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value, typeof(int));
             }
             set
             {
-                Properties[Constants.Conventions.Member.LastLockoutDate].Value = value;
+                if (WarnIfPropertyTypeNotFoundOnSet(
+                    Constants.Conventions.Member.FailedPasswordAttempts,
+                    "FailedPasswordAttempts") == false) return;
+
+                Properties[Constants.Conventions.Member.FailedPasswordAttempts].Value = value;
             }
         }
 
@@ -368,14 +436,6 @@ namespace Umbraco.Core.Models
         public virtual string ContentTypeAlias
         {
             get { return _contentTypeAlias; }
-            internal set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _contentTypeAlias = value;
-                    return _contentTypeAlias;
-                }, _contentTypeAlias, DefaultContentTypeAliasSelector);
-            }
         }
 
         /// <summary>
@@ -471,5 +531,73 @@ namespace Umbraco.Core.Models
         internal bool BoolPropertyValue { get; set; }
         internal DateTime DateTimePropertyValue { get; set; }
         internal string PropertyTypeAlias { get; set; }
+
+        private Attempt<T> WarnIfPropertyTypeNotFoundOnGet<T>(string propertyAlias, string propertyName, T defaultVal)
+        {
+            Action doLog = () => LogHelper.Warn<Member>(
+                        "Trying to access the '"
+                        + propertyName
+                        + "' property on "
+                        + typeof(Member)
+                        + " but the "
+                        + propertyAlias
+                        + " property does not exist on the member type so a default value is returned. Ensure that you have a property type with alias: "
+                        + propertyAlias
+                        + " configured on your member type in order to use the '"
+                        + propertyName
+                        + "' property on the model correctly.");     
+
+            //if the property doesn't exist, then do the logging and return a failure
+            if (Properties.Contains(propertyAlias) == false)
+            {
+                //we'll put a warn in the log if this entity has been persisted
+                if (HasIdentity)
+                {
+                    doLog();
+                }
+                return Attempt<T>.Fail(defaultVal);
+            }
+
+            //if the property doesn't have an identity but we do, then do logging and return failure
+            var prop = Properties.Single(x => x.Alias == propertyAlias);
+            if (prop.HasIdentity == false && HasIdentity)
+            {
+                doLog();
+                return Attempt<T>.Fail(defaultVal);
+            }
+
+            return Attempt<T>.Succeed();
+        }
+
+        private bool WarnIfPropertyTypeNotFoundOnSet(string propertyAlias, string propertyname)
+        {
+            Action doLog = () => LogHelper.Warn<Member>("An attempt was made to set a value on the property '"
+                        + propertyname
+                        + "' on type "
+                        + typeof(Member)
+                        + " but the property type "
+                        + propertyAlias
+                        + " does not exist on the member type, ensure that this property type exists so that setting this property works correctly.");
+
+            //if the property doesn't exist, then do the logging and return a failure
+            if (Properties.Contains(propertyAlias) == false)
+            {
+                if (HasIdentity)
+                {
+                    doLog();
+                }
+                return false;
+            }
+
+            //if the property doesn't have an identity but we do, then do logging and return failure
+            var prop = Properties.Single(x => x.Alias == propertyAlias);
+            if (prop.HasIdentity == false && HasIdentity)
+            {
+                doLog();
+                return false;
+            }
+
+            return true;
+        }
     }
 }

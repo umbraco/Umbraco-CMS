@@ -24,23 +24,26 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IMemberTypeRepository _memberTypeRepository;
         private readonly ITagsRepository _tagRepository;
+        private readonly IMemberGroupRepository _memberGroupRepository;
 
-        public MemberRepository(IDatabaseUnitOfWork work, IMemberTypeRepository memberTypeRepository, ITagsRepository tagRepository)
+        public MemberRepository(IDatabaseUnitOfWork work, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagsRepository tagRepository)
             : base(work)
         {
             if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
             if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _memberTypeRepository = memberTypeRepository;
             _tagRepository = tagRepository;
+            _memberGroupRepository = memberGroupRepository;
         }
 
-        public MemberRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMemberTypeRepository memberTypeRepository, ITagsRepository tagRepository)
+        public MemberRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagsRepository tagRepository)
             : base(work, cache)
         {
             if (memberTypeRepository == null) throw new ArgumentNullException("memberTypeRepository");
             if (tagRepository == null) throw new ArgumentNullException("tagRepository");
             _memberTypeRepository = memberTypeRepository;
             _tagRepository = tagRepository;
+            _memberGroupRepository = memberGroupRepository;
         }
 
         #region Overrides of RepositoryBase<int, IMembershipUser>
@@ -169,6 +172,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                            {
+                               "DELETE FROM cmsTask WHERE nodeId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
                                "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
                                "DELETE FROM umbracoRelation WHERE parentId = @Id",
@@ -242,7 +246,12 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Create the PropertyData for this version - cmsPropertyData
             var propertyFactory = new PropertyFactory(entity.ContentType, entity.Version, entity.Id);
-            var propertyDataDtos = propertyFactory.BuildDto(((Member)entity).Properties);
+            //Add Properties
+            // - don't try to save the property if it doesn't exist (or doesn't have an ID) on the content type
+            // - this can occur if the member type doesn't contain the built-in properties that the
+            // - member object contains.        
+            var propsToPersist = entity.Properties.Where(x => x.PropertyType.HasIdentity).ToArray();
+            var propertyDataDtos = propertyFactory.BuildDto(propsToPersist);
             var keyDictionary = new Dictionary<int, int>();
 
             //Add Properties
@@ -253,7 +262,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
 
             //Update Properties with its newly set Id
-            foreach (var property in ((Member)entity).Properties)
+            foreach (var property in propsToPersist)
             {
                 property.Id = keyDictionary[property.PropertyTypeId];
             }
@@ -338,12 +347,10 @@ namespace Umbraco.Core.Persistence.Repositories
             //Add Properties
             // - don't try to save the property if it doesn't exist (or doesn't have an ID) on the content type
             // - this can occur if the member type doesn't contain the built-in properties that the
-            // - member object contains.
-            var existingProperties = entity.Properties
-                .Where(property => entity.ContentType.PropertyTypes.Any(x => x.Alias == property.Alias && x.HasIdentity))
-                .ToList();
+            // - member object contains.            
+            var propsToPersist = entity.Properties.Where(x => x.PropertyType.HasIdentity).ToArray();
 
-            var propertyDataDtos = propertyFactory.BuildDto(existingProperties);
+            var propertyDataDtos = propertyFactory.BuildDto(propsToPersist);
 
             foreach (var propertyDataDto in propertyDataDtos)
             {
@@ -428,6 +435,57 @@ namespace Umbraco.Core.Persistence.Repositories
 
         #endregion
 
+        public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)
+        {
+            //get the group id
+            var grpQry = new Query<IMemberGroup>().Where(group => group.Name.Equals(roleName));
+            var memberGroup = _memberGroupRepository.GetByQuery(grpQry).FirstOrDefault();
+            if (memberGroup == null) return Enumerable.Empty<IMember>();
+
+            // get the members by username
+            var query = new Query<IMember>();
+            switch (matchType)
+            {
+                case StringPropertyMatchType.Exact:
+                    query.Where(member => member.Username.Equals(usernameToMatch));
+                    break;
+                case StringPropertyMatchType.Contains:
+                    query.Where(member => member.Username.Contains(usernameToMatch));
+                    break;
+                case StringPropertyMatchType.StartsWith:
+                    query.Where(member => member.Username.StartsWith(usernameToMatch));
+                    break;
+                case StringPropertyMatchType.EndsWith:
+                    query.Where(member => member.Username.EndsWith(usernameToMatch));
+                    break;
+                case StringPropertyMatchType.Wildcard:
+                    query.Where(member => member.Username.SqlWildcard(usernameToMatch, TextColumnType.NVarchar));
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("matchType");
+            }
+            var matchedMembers = GetByQuery(query).ToArray();
+
+            var membersInGroup = new List<IMember>();
+            //then we need to filter the matched members that are in the role
+            //since the max sql params are 2100 on sql server, we'll reduce that to be safe for potentially other servers and run the queries in batches
+            var inGroups = matchedMembers.InGroupsOf(1000);
+            foreach (var batch in inGroups)
+            {
+                var memberIdBatch = batch.Select(x => x.Id);
+                var sql = new Sql().Select("*").From<Member2MemberGroupDto>()
+                    .Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id)
+                    .Where("Member IN (@memberIds)", new { memberIds = memberIdBatch });
+                var memberIdsInGroup = Database.Fetch<Member2MemberGroupDto>(sql)
+                    .Select(x => x.Member).ToArray();
+
+                membersInGroup.AddRange(matchedMembers.Where(x => memberIdsInGroup.Contains(x.Id)));
+            }
+
+            return membersInGroup;
+
+        }
+
         /// <summary>
         /// Get all members in a specific group
         /// </summary>
@@ -435,9 +493,13 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <returns></returns>
         public IEnumerable<IMember> GetByMemberGroup(string groupName)
         {
-            var subquery = GetSubquery().Where<NodeDto>(x => x.Text == groupName);
+            var grpQry = new Query<IMemberGroup>().Where(group => group.Name.Equals(groupName));
+            var memberGroup = _memberGroupRepository.GetByQuery(grpQry).FirstOrDefault();
+            if (memberGroup == null) return Enumerable.Empty<IMember>();
+            var subQuery = new Sql().Select("Member").From<Member2MemberGroupDto>().Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id);
+
             var sql = GetBaseQuery(false)
-                .Append(new Sql("WHERE umbracoNode.id IN (" + subquery.SQL + ")", subquery.Arguments))
+                .Append(new Sql("WHERE umbracoNode.id IN (" + subQuery.SQL + ")", subQuery.Arguments))
                 .OrderByDescending<ContentVersionDto>(x => x.VersionDate)
                 .OrderBy<NodeDto>(x => x.SortOrder);
 
@@ -503,7 +565,6 @@ namespace Umbraco.Core.Persistence.Repositories
                 resultQuery = sql;
             }
             
-
             //get the referenced column name
             var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
             //now find the mapped column name
@@ -515,8 +576,19 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             //need to ensure the order by is in brackets, see: https://github.com/toptensoftware/PetaPoco/issues/177
             resultQuery.OrderBy(string.Format("({0})", mappedField));
+            
+            var result = GetPagedResultsByQuery<MemberDto>(resultQuery, pageIndex, pageSize, out totalRecords, 
+                dtos => dtos.Select(x => x.NodeId).ToArray());
+            
+            //now we need to ensure this result is also ordered by the same order by clause
+            return result.OrderBy(orderBy.Compile());
+        }
 
-            var pagedResult = Database.Page<MemberDto>(pageIndex + 1, pageSize, resultQuery);
+        public IEnumerable<IMember> GetPagedResultsByQuery<TDto>(
+            Sql sql, int pageIndex, int pageSize, out int totalRecords,
+            Func<IEnumerable<TDto>, int[]> resolveIds)
+        {
+            var pagedResult = Database.Page<TDto>(pageIndex + 1, pageSize, sql);
 
             totalRecords = Convert.ToInt32(pagedResult.TotalItems);
 
@@ -525,10 +597,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 return Enumerable.Empty<IMember>();
             }
-            var result = GetAll(pagedResult.Items.Select(x => x.NodeId).ToArray());
-            
-            //now we need to ensure this result is also ordered by the same order by clause
-            return result.OrderBy(orderBy.Compile());
+            return GetAll(resolveIds(pagedResult.Items)).ToArray();
         }
 
         private IMember BuildFromDto(List<MemberReadOnlyDto> dtos)
@@ -548,6 +617,8 @@ namespace Umbraco.Core.Persistence.Repositories
             var factory = new MemberReadOnlyFactory(memberTypes);
             var member = factory.BuildEntity(dto);
 
+            member.Properties = GetPropertyCollection(dto.NodeId, dto.VersionId, member.ContentType, dto.CreateDate, dto.UpdateDate);
+
             return member;
         }
 
@@ -561,8 +632,15 @@ namespace Umbraco.Core.Persistence.Repositories
             var memberTypeList = _memberTypeRepository.GetAll();
             memberTypeList.ForEach(x => memberTypes.Add(x.Alias, x));
 
+            var entities = new List<IMember>();
             var factory = new MemberReadOnlyFactory(memberTypes);
-            return dtos.Select(factory.BuildEntity);
+            foreach (var dto in dtos)
+            {
+                var entity = factory.BuildEntity(dto);
+                entity.Properties = GetPropertyCollection(dto.NodeId, dto.VersionId, entity.ContentType, dto.CreateDate, dto.UpdateDate);
+                entities.Add(entity);
+            }
+            return entities;
         }
     }
 }

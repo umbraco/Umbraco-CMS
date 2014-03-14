@@ -34,7 +34,7 @@ angular.module("umbraco")
 
             //queue rules loading
             angular.forEach(editorConfig.stylesheets, function(val, key){
-                stylesheets.push("/css/" + val + ".css?" + new Date().getTime());
+                stylesheets.push("../css/" + val + ".css?" + new Date().getTime());
                 
                 await.push(stylesheetResource.getRulesByName(val).then(function(rules) {
                     angular.forEach(rules, function(rule) {
@@ -64,6 +64,79 @@ angular.module("umbraco")
             //wait for queue to end
             $q.all(await).then(function () {
                 
+
+            //create a baseline Config to exten upon
+            var baseLineConfigObj = {
+                mode: "exact",
+                skin: "umbraco",
+                plugins: plugins,
+                valid_elements: validElements,
+                invalid_elements: invalidElements,
+                extended_valid_elements: extendedValidElements,
+                menubar: false,
+                statusbar: false,
+                height: editorConfig.dimensions.height,
+                width: editorConfig.dimensions.width,
+                toolbar: toolbar,
+                content_css: stylesheets.join(','),
+                relative_urls: false,
+                style_formats: styleFormats
+            };
+
+
+        if(tinyMceConfig.customConfig){
+            angular.extend(baseLineConfigObj, tinyMceConfig.customConfig);
+        }    
+        
+        //set all the things that user configs should not be able to override
+        baseLineConfigObj.elements = $scope.model.alias + "_rte";
+        baseLineConfigObj.setup = function (editor) {
+
+                    //set the reference
+                    tinyMceEditor = editor;
+
+                    //enable browser based spell checking
+                    editor.on('init', function(e) {
+                        editor.getBody().setAttribute('spellcheck', true);
+                    });
+
+                    //We need to listen on multiple things here because of the nature of tinymce, it doesn't 
+                    //fire events when you think!
+                    //The change event doesn't fire when content changes, only when cursor points are changed and undo points
+                    //are created. the blur event doesn't fire if you insert content into the editor with a button and then 
+                    //press save. 
+                    //We have a couple of options, one is to do a set timeout and check for isDirty on the editor, or we can 
+                    //listen to both change and blur and also on our own 'saving' event. I think this will be best because a 
+                    //timer might end up using unwanted cpu and we'd still have to listen to our saving event in case they clicked
+                    //save before the timeout elapsed.
+                    editor.on('change', function (e) {
+                        angularHelper.safeApply($scope, function () {
+                            $scope.model.value = editor.getContent();
+                        });
+                    });
+
+                    editor.on('blur', function (e) {
+                        angularHelper.safeApply($scope, function () {
+                            $scope.model.value = editor.getContent();
+                        });
+                    });
+                    
+                    //Create the insert media plugin
+                    tinyMceService.createMediaPicker(editor, $scope);
+
+                    //Create the embedded plugin
+                    tinyMceService.createInsertEmbeddedMedia(editor, $scope);
+
+                    //Create the insert link plugin
+                    tinyMceService.createLinkPicker(editor, $scope);
+
+                    //Create the insert macro plugin
+                    tinyMceService.createInsertMacro(editor, $scope);
+                };
+
+
+        
+
                 /** Loads in the editor */
                 function loadTinyMce() {
                     
@@ -71,63 +144,13 @@ angular.module("umbraco")
                     //the elements needed
                     $timeout(function () {
                         tinymce.DOM.events.domLoaded = true;
-                        tinymce.init({
-                            mode: "exact",
-                            elements: $scope.model.alias + "_rte",
-                            skin: "umbraco",
-                            plugins: plugins,
-                            valid_elements: validElements,
-                            invalid_elements: invalidElements,
-                            extended_valid_elements: extendedValidElements,
-                            menubar: false,
-                            statusbar: false,
-                            height: editorConfig.dimensions.height,
-                            width: editorConfig.dimensions.width,
-                            toolbar: toolbar,
-                            content_css: stylesheets.join(','),
-                            relative_urls: false,
-                            style_formats: styleFormats,
-                            setup: function (editor) {
-
-                                //set the reference
-                                tinyMceEditor = editor;
-
-                                //We need to listen on multiple things here because of the nature of tinymce, it doesn't 
-                                //fire events when you think!
-                                //The change event doesn't fire when content changes, only when cursor points are changed and undo points
-                                //are created. the blur event doesn't fire if you insert content into the editor with a button and then 
-                                //press save. 
-                                //We have a couple of options, one is to do a set timeout and check for isDirty on the editor, or we can 
-                                //listen to both change and blur and also on our own 'saving' event. I think this will be best because a 
-                                //timer might end up using unwanted cpu and we'd still have to listen to our saving event in case they clicked
-                                //save before the timeout elapsed.
-                                editor.on('change', function (e) {
-                                    angularHelper.safeApply($scope, function () {
-                                        $scope.model.value = editor.getContent();
-                                    });
-                                });
-                                editor.on('blur', function (e) {
-                                    angularHelper.safeApply($scope, function () {
-                                        $scope.model.value = editor.getContent();
-                                    });
-                                });
-                                
-                                //Create the insert media plugin
-                                tinyMceService.createMediaPicker(editor, $scope);
-
-                                //Create the embedded plugin
-                                tinyMceService.createInsertEmbeddedMedia(editor, $scope);
-
-                                //Create the insert link plugin
-                                tinyMceService.createLinkPicker(editor, $scope);
-
-                                //Create the insert macro plugin
-                                tinyMceService.createInsertMacro(editor, $scope);
-                            }
-                        });
-                    }, 200);
+                        tinymce.init(baseLineConfigObj);
+                    }, 200, false);
                 }
                 
+
+
+
                 loadTinyMce();
 
                 //here we declare a special method which will be called whenever the value has changed from the server
