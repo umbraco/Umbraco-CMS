@@ -141,50 +141,31 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 result.TableDefinitions.Add(tableDefinition);
             }
 
-            //Check tables in configured database against tables in schema
-            var tablesInDatabase = SqlSyntaxContext.SqlSyntaxProvider.GetTablesInSchema(_database).ToList();
-            var tablesInSchema = result.TableDefinitions.Select(x => x.Name).ToList();
-            //Add valid and invalid table differences to the result object
-            var validTableDifferences = tablesInDatabase.Intersect(tablesInSchema, StringComparer.InvariantCultureIgnoreCase);
-            foreach (var tableName in validTableDifferences)
-            {
-                result.ValidTables.Add(tableName);
-            }
-            var invalidTableDifferences =
-                tablesInDatabase.Except(tablesInSchema, StringComparer.InvariantCultureIgnoreCase)
-                                .Union(tablesInSchema.Except(tablesInDatabase, StringComparer.InvariantCultureIgnoreCase));
-            foreach (var tableName in invalidTableDifferences)
-            {
-                result.Errors.Add(new Tuple<string, string>("Table", tableName));
-            }
+            ValidateDbTables(result);
 
-            //Check columns in configured database against columns in schema
-            var columnsInDatabase = SqlSyntaxContext.SqlSyntaxProvider.GetColumnsInSchema(_database);
-            var columnsPerTableInDatabase = columnsInDatabase.Select(x => string.Concat(x.TableName, ",", x.ColumnName)).ToList();
-            var columnsPerTableInSchema = result.TableDefinitions.SelectMany(x => x.Columns.Select(y => string.Concat(y.TableName, ",", y.Name))).ToList();
-            //Add valid and invalid column differences to the result object
-            var validColumnDifferences = columnsPerTableInDatabase.Intersect(columnsPerTableInSchema, StringComparer.InvariantCultureIgnoreCase);
-            foreach (var column in validColumnDifferences)
-            {
-                result.ValidColumns.Add(column);
-            }
-            var invalidColumnDifferences = columnsPerTableInDatabase.Except(columnsPerTableInSchema, StringComparer.InvariantCultureIgnoreCase);
-            foreach (var column in invalidColumnDifferences)
-            {
-                result.Errors.Add(new Tuple<string, string>("Column", column));
-            }
+            ValidateDbColumns(result);
 
+            ValidateDbIndexes(result);
+
+            ValidateDbConstraints(result);
+
+            return result;
+        }
+
+        private void ValidateDbConstraints(DatabaseSchemaResult result)
+        {
             //MySql doesn't conform to the "normal" naming of constraints, so there is currently no point in doing these checks.
             //TODO: At a later point we do other checks for MySql, but ideally it should be necessary to do special checks for different providers.
             // ALso note that to get the constraints for MySql we have to open a connection which we currently have not.
             if (SqlSyntaxContext.SqlSyntaxProvider is MySqlSyntaxProvider)
-                return result;
+                return;
 
             //Check constraints in configured database against constraints in schema
             var constraintsInDatabase = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerColumn(_database).DistinctBy(x => x.Item3).ToList();
             var foreignKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("FK_")).Select(x => x.Item3).ToList();
             var primaryKeysInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("PK_")).Select(x => x.Item3).ToList();
             var indexesInDatabase = constraintsInDatabase.Where(x => x.Item3.InvariantStartsWith("IX_")).Select(x => x.Item3).ToList();
+            var indexesInSchema = result.TableDefinitions.SelectMany(x => x.Indexes.Select(y => y.Name)).ToList();
             var unknownConstraintsInDatabase =
                 constraintsInDatabase.Where(
                     x =>
@@ -192,7 +173,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                     x.Item3.InvariantStartsWith("IX_") == false).Select(x => x.Item3).ToList();
             var foreignKeysInSchema = result.TableDefinitions.SelectMany(x => x.ForeignKeys.Select(y => y.Name)).ToList();
             var primaryKeysInSchema = result.TableDefinitions.SelectMany(x => x.Columns.Select(y => y.PrimaryKeyName)).ToList();
-            var indexesInSchema = result.TableDefinitions.SelectMany(x => x.Indexes.Select(y => y.Name)).ToList();
+
             //Add valid and invalid foreign key differences to the result object
             foreach (var unknown in unknownConstraintsInDatabase)
             {
@@ -205,40 +186,121 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                     result.Errors.Add(new Tuple<string, string>("Unknown", unknown));
                 }
             }
+
+            //Foreign keys:
+
             var validForeignKeyDifferences = foreignKeysInDatabase.Intersect(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase);
             foreach (var foreignKey in validForeignKeyDifferences)
             {
                 result.ValidConstraints.Add(foreignKey);
             }
-            var invalidForeignKeyDifferences = foreignKeysInDatabase.Except(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase);
+            var invalidForeignKeyDifferences =
+                foreignKeysInDatabase.Except(foreignKeysInSchema, StringComparer.InvariantCultureIgnoreCase)
+                                .Union(foreignKeysInSchema.Except(foreignKeysInDatabase, StringComparer.InvariantCultureIgnoreCase));
             foreach (var foreignKey in invalidForeignKeyDifferences)
             {
                 result.Errors.Add(new Tuple<string, string>("Constraint", foreignKey));
             }
+
+
+            //Primary keys:
+
             //Add valid and invalid primary key differences to the result object
             var validPrimaryKeyDifferences = primaryKeysInDatabase.Intersect(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase);
             foreach (var primaryKey in validPrimaryKeyDifferences)
             {
                 result.ValidConstraints.Add(primaryKey);
             }
-            var invalidPrimaryKeyDifferences = primaryKeysInDatabase.Except(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase);
+            var invalidPrimaryKeyDifferences =
+                primaryKeysInDatabase.Except(primaryKeysInSchema, StringComparer.InvariantCultureIgnoreCase)
+                                .Union(primaryKeysInSchema.Except(primaryKeysInDatabase, StringComparer.InvariantCultureIgnoreCase));
             foreach (var primaryKey in invalidPrimaryKeyDifferences)
             {
                 result.Errors.Add(new Tuple<string, string>("Constraint", primaryKey));
             }
+
+            //Constaints:
+
+            //NOTE: SD: The colIndex checks above should really take care of this but I need to keep this here because it was here before
+            // and some schema validation checks might rely on this data remaining here!
             //Add valid and invalid index differences to the result object
             var validIndexDifferences = indexesInDatabase.Intersect(indexesInSchema, StringComparer.InvariantCultureIgnoreCase);
             foreach (var index in validIndexDifferences)
             {
                 result.ValidConstraints.Add(index);
             }
-            var invalidIndexDifferences = indexesInDatabase.Except(indexesInSchema, StringComparer.InvariantCultureIgnoreCase);
+            var invalidIndexDifferences =
+                indexesInDatabase.Except(indexesInSchema, StringComparer.InvariantCultureIgnoreCase)
+                                .Union(indexesInSchema.Except(indexesInDatabase, StringComparer.InvariantCultureIgnoreCase));
             foreach (var index in invalidIndexDifferences)
             {
                 result.Errors.Add(new Tuple<string, string>("Constraint", index));
             }
+        }
 
-            return result;
+        private void ValidateDbColumns(DatabaseSchemaResult result)
+        {
+            //Check columns in configured database against columns in schema
+            var columnsInDatabase = SqlSyntaxContext.SqlSyntaxProvider.GetColumnsInSchema(_database);
+            var columnsPerTableInDatabase = columnsInDatabase.Select(x => string.Concat(x.TableName, ",", x.ColumnName)).ToList();
+            var columnsPerTableInSchema = result.TableDefinitions.SelectMany(x => x.Columns.Select(y => string.Concat(y.TableName, ",", y.Name))).ToList();
+            //Add valid and invalid column differences to the result object
+            var validColumnDifferences = columnsPerTableInDatabase.Intersect(columnsPerTableInSchema, StringComparer.InvariantCultureIgnoreCase);
+            foreach (var column in validColumnDifferences)
+            {
+                result.ValidColumns.Add(column);
+            }
+
+            var invalidColumnDifferences =
+                columnsPerTableInDatabase.Except(columnsPerTableInSchema, StringComparer.InvariantCultureIgnoreCase)
+                                .Union(columnsPerTableInSchema.Except(columnsPerTableInDatabase, StringComparer.InvariantCultureIgnoreCase));
+            foreach (var column in invalidColumnDifferences)
+            {
+                result.Errors.Add(new Tuple<string, string>("Column", column));
+            }
+        }
+
+        private void ValidateDbTables(DatabaseSchemaResult result)
+        {
+            //Check tables in configured database against tables in schema
+            var tablesInDatabase = SqlSyntaxContext.SqlSyntaxProvider.GetTablesInSchema(_database).ToList();
+            var tablesInSchema = result.TableDefinitions.Select(x => x.Name).ToList();
+            //Add valid and invalid table differences to the result object
+            var validTableDifferences = tablesInDatabase.Intersect(tablesInSchema, StringComparer.InvariantCultureIgnoreCase);
+            foreach (var tableName in validTableDifferences)
+            {
+                result.ValidTables.Add(tableName);
+            }
+
+            var invalidTableDifferences =
+                tablesInDatabase.Except(tablesInSchema, StringComparer.InvariantCultureIgnoreCase)
+                                .Union(tablesInSchema.Except(tablesInDatabase, StringComparer.InvariantCultureIgnoreCase));
+            foreach (var tableName in invalidTableDifferences)
+            {
+                result.Errors.Add(new Tuple<string, string>("Table", tableName));
+            }
+        }
+
+        private void ValidateDbIndexes(DatabaseSchemaResult result)
+        {
+            //These are just column indexes NOT constraints or Keys
+            var colIndexesInDatabase = result.DbIndexDefinitions.Where(x => x.IndexName.InvariantStartsWith("IX_")).Select(x => x.IndexName).ToList();
+            var indexesInSchema = result.TableDefinitions.SelectMany(x => x.Indexes.Select(y => y.Name)).ToList();
+
+            //Add valid and invalid index differences to the result object
+            var validColIndexDifferences = colIndexesInDatabase.Intersect(indexesInSchema, StringComparer.InvariantCultureIgnoreCase);
+            foreach (var index in validColIndexDifferences)
+            {
+                result.ValidIndexes.Add(index);
+            }
+
+            var invalidColIndexDifferences =
+                colIndexesInDatabase.Except(indexesInSchema, StringComparer.InvariantCultureIgnoreCase)
+                                .Union(indexesInSchema.Except(colIndexesInDatabase, StringComparer.InvariantCultureIgnoreCase));
+            foreach (var index in invalidColIndexDifferences)
+            {
+                result.Errors.Add(new Tuple<string, string>("Index", index));
+            }
         }
 
         #region Events

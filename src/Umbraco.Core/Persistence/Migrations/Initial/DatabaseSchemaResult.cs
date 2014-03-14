@@ -17,6 +17,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             ValidTables = new List<string>();
             ValidColumns = new List<string>();
             ValidConstraints = new List<string>();
+            ValidIndexes = new List<string>();
         }
 
         public List<Tuple<string, string>> Errors { get; set; }
@@ -28,6 +29,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         public List<string> ValidColumns { get; set; }
 
         public List<string> ValidConstraints { get; set; }
+
+        public List<string> ValidIndexes { get; set; }
 
         internal IEnumerable<DbIndexDefinition> DbIndexDefinitions { get; set; }
 
@@ -45,7 +48,7 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 return new Version(0, 0, 0);
 
             //If Errors is empty or if TableDefinitions tables + columns correspond to valid tables + columns then we're at current version
-            if (!Errors.Any() ||
+            if (Errors.Any() == false ||
                 (TableDefinitions.All(x => ValidTables.Contains(x.Name))
                  && TableDefinitions.SelectMany(definition => definition.Columns).All(x => ValidColumns.Contains(x.Name))))
                 return UmbracoVersion.Current;
@@ -69,6 +72,12 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             if (Errors.Any(x => x.Item1.Equals("Table") && (x.Item2.InvariantEquals("umbracoServer"))))
             {
                 return new Version(6, 0, 0);
+            }
+
+            //if the error is for an index
+            if (Errors.Any(x => x.Item1.Equals("Index") && (x.Item2.InvariantEquals("IX_umbracoNodeTrashed"))))
+            {
+                return new Version(6, 1, 0);
             }
 
             return UmbracoVersion.Current;
@@ -106,6 +115,13 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
             {
                 sb.AppendLine("The following constraints (Primary Keys, Foreign Keys and Indexes) were found in the database, but are not in the current schema:");
                 sb.AppendLine(string.Join(",", Errors.Where(x => x.Item1.Equals("Constraint")).Select(x => x.Item2)));
+                sb.AppendLine(" ");
+            }
+            //Index error summary
+            if (Errors.Any(x => x.Item1.Equals("Index")))
+            {
+                sb.AppendLine("The following indexes were found in the database, but are not in the current schema:");
+                sb.AppendLine(string.Join(",", Errors.Where(x => x.Item1.Equals("Index")).Select(x => x.Item2)));
                 sb.AppendLine(" ");
             }
             //Unknown constraint error summary

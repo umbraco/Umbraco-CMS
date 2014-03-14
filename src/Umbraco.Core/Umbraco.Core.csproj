@@ -214,6 +214,9 @@
     <Compile Include="Persistence\DatabaseModelDefinitions\DbIndexDefinition.cs" />
     <Compile Include="Persistence\Factories\MemberGroupFactory.cs" />
     <Compile Include="Persistence\Mappers\MemberGroupMapper.cs" />
+    <Compile Include="Persistence\Migrations\CatastrophicDataLossException.cs" />
+    <Compile Include="Persistence\Migrations\SchemaMigration.cs" />
+    <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\ChangePasswordColumn.cs" />
     <Compile Include="Persistence\Migrations\Upgrades\TargetVersionSixTwoZero\UpdateToNewMemberPropertyAliases.cs" />
     <Compile Include="Persistence\Querying\SqlStringExtensions.cs" />
     <Compile Include="Persistence\Querying\StringPropertyMatchType.cs" />

@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
 using System.Linq;
+using System.Web;
 using System.Web.Configuration;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
@@ -426,6 +427,13 @@ namespace Umbraco.Core
 
             if (_result == null)
             {
+
+                if (SystemUtilities.GetCurrentTrustLevel() != AspNetHostingPermissionLevel.Unrestricted
+                    && ProviderName == "MySql.Data.MySqlClient")
+                {
+                    throw new InvalidOperationException("Cannot use MySql in Medium Trust configuration");
+                }
+
                 var database = new UmbracoDatabase(_connectionString, ProviderName);
                 var dbSchema = new DatabaseSchemaCreation(database);
                 _result = dbSchema.ValidateSchema();
@@ -434,15 +442,15 @@ namespace Umbraco.Core
         }
 
         internal Result CreateDatabaseSchemaAndData()
-        {
-            var readyForInstall = CheckReadyForInstall();
-            if (readyForInstall.Success == false)
-            {
-                return readyForInstall.Result;
-            }
-            
+        {   
             try
             {
+                var readyForInstall = CheckReadyForInstall();
+                if (readyForInstall.Success == false)
+                {
+                    return readyForInstall.Result;
+                }
+
                 LogHelper.Info<DatabaseContext>("Database configuration status: Started");
 
                 string message;
@@ -500,14 +508,15 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal Result UpgradeSchemaAndData()
         {
-            var readyForInstall = CheckReadyForInstall();
-            if (readyForInstall.Success == false)
-            {
-                return readyForInstall.Result;
-            }
-
             try
             {
+
+                var readyForInstall = CheckReadyForInstall();
+                if (readyForInstall.Success == false)
+                {
+                    return readyForInstall.Result;
+                }
+
                 LogHelper.Info<DatabaseContext>("Database upgrade started");
 
                 var database = new UmbracoDatabase(_connectionString, ProviderName);
@@ -567,6 +576,12 @@ namespace Umbraco.Core
 
         private Attempt<Result> CheckReadyForInstall()
         {
+            if (SystemUtilities.GetCurrentTrustLevel() != AspNetHostingPermissionLevel.Unrestricted
+                    && ProviderName == "MySql.Data.MySqlClient")
+            {
+                throw new InvalidOperationException("Cannot use MySql in Medium Trust configuration");
+            }
+
             if (_configured == false || (string.IsNullOrEmpty(_connectionString) || string.IsNullOrEmpty(ProviderName)))
             {
                 return Attempt.Fail(new Result

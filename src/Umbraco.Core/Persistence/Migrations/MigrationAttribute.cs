@@ -7,7 +7,7 @@ namespace Umbraco.Core.Persistence.Migrations
     /// database migrations with Up/Down methods for pushing changes UP or pulling them DOWN.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    public class MigrationAttribute : Attribute
+    public sealed class MigrationAttribute : Attribute
     {
         public MigrationAttribute(string targetVersion, int sortOrder, string product)
         {

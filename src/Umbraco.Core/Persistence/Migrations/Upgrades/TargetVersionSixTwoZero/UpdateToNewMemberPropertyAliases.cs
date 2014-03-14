@@ -34,10 +34,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
                 const string propertyTypeUpdateSql = @"UPDATE cmsPropertyType
 SET Alias = @newAlias
 WHERE Alias = @oldAlias AND contentTypeId IN (
-SELECT DISTINCT cmsContentType.nodeId FROM cmsPropertyType
+SELECT nodeId FROM (SELECT DISTINCT cmsContentType.nodeId FROM cmsPropertyType
 INNER JOIN cmsContentType ON cmsPropertyType.contentTypeId = cmsContentType.nodeId
 INNER JOIN umbracoNode ON cmsContentType.nodeId = umbracoNode.id
-WHERE umbracoNode.nodeObjectType = @objectType)";
+WHERE umbracoNode.nodeObjectType = @objectType) x)";
 
                 const string xmlSelectSql = @"SELECT cmsContentXml.* FROM cmsContentXml 
 INNER JOIN umbracoNode ON cmsContentXml.nodeId = umbracoNode.id
