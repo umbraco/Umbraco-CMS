@@ -5,11 +5,13 @@ using System.Linq;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Routing;
+using System.Web.Security;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Configuration
 {
@@ -265,7 +267,7 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                return ConfiguredMembershipProvidersLegacyEncoding(Constants.Conventions.Member.UmbracoMemberProviderName);
+                return IsConfiguredMembershipProviderUsingLegacyEncoding(Constants.Conventions.Member.UmbracoMemberProviderName);
             }
             set
             {
@@ -281,7 +283,7 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                return ConfiguredMembershipProvidersLegacyEncoding(Constants.Conventions.User.UmbracoUsersProviderName);
+                return IsConfiguredMembershipProviderUsingLegacyEncoding(Constants.Conventions.Member.UmbracoMemberProviderName);
             }
             set
             {
@@ -366,22 +368,17 @@ namespace Umbraco.Core.Configuration
             
             webConfigXml.Save(webConfigFilename, SaveOptions.DisableFormatting);
         }
-        
-        private static bool ConfiguredMembershipProvidersLegacyEncoding(string providerName)
+
+        private static bool IsConfiguredMembershipProviderUsingLegacyEncoding(string providerName)
         {
-            var webConfigFilename = GetFullWebConfigFileName();
-            var webConfigXml = XDocument.Load(webConfigFilename, LoadOptions.PreserveWhitespace);
+            //check if this can even be configured.
+            var membershipProvider = Membership.Providers[providerName] as MembershipProviderBase;
+            if (membershipProvider == null)
+            {
+                return false;
+            }
 
-            var membershipConfigs = webConfigXml.XPathSelectElements("configuration/system.web/membership/providers/add").ToList();
-
-            var provider = membershipConfigs.SingleOrDefault(c => c.Attribute("name") != null && c.Attribute("name").Value == providerName);
-            
-            var useLegacyEncodingAttribute = provider.Attribute("useLegacyEncoding");
-            
-            bool useLegacyEncoding;
-            bool.TryParse(useLegacyEncodingAttribute.Value, out useLegacyEncoding);
-
-            return useLegacyEncoding;
+            return membershipProvider.UseLegacyEncoding;
         }
 
         /// <summary>
