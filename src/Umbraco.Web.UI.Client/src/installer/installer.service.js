@@ -56,15 +56,15 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 
 	//calculates the offset of the progressbar on the installaer
 	function calculateProgress(steps, next) {
+		var sorted = _.sortBy(steps, "serverOrder");
+
 		var pct = "100%";
-		var f = _.find(steps, function(item, index) {
-			if(item.name == next){
-				pct = Math.floor((index+1 / steps.length * 100)) + "%";
-				return true;
-			}else{
-				return false;
+		for (var i = sorted.length - 1; i >= 0; i--) {
+			if(sorted[i].name == next){
+				pct = Math.floor((i+1) / steps.length  * 100) + "%";
+				break;
 			}
-		});
+		}
 	    return  pct;
 	}
 
