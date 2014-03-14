@@ -7,8 +7,12 @@ using System.Linq;
 using System.Web.Script.Services;
 using System.Web.Services;
 using System.Xml;
+using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
+using Umbraco.Web;
 using Umbraco.Web.WebServices;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
@@ -160,12 +164,16 @@ namespace umbraco.presentation.webservices
                 if (parentNode != null)
                     content.SortNodes(ref parentNode);
 
+                //send notifications! TODO: This should be put somewhere centralized instead of hard coded directly here
+                ApplicationContext.Services.NotificationService.SendNotification(contentService.GetById(parentId), ActionSort.Instance, UmbracoContext, ApplicationContext);
+
             }
             catch (Exception ex)
             {
                 LogHelper.Error<nodeSorter>("Could not update content sort order", ex);
             }
         }
+        
     }
 
     [Serializable]

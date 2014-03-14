@@ -115,15 +115,15 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\AutoMapper.3.0.0\lib\net40\AutoMapper.Net4.dll</HintPath>
     </Reference>
-    <Reference Include="ClientDependency.Core, Version=1.7.1.1, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ClientDependency.Core">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\ClientDependency.1.7.1.1\lib\ClientDependency.Core.dll</HintPath>
     </Reference>
-    <Reference Include="ClientDependency.Core.Mvc, Version=1.7.0.4, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ClientDependency.Core.Mvc">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\ClientDependency-Mvc.1.7.0.4\lib\ClientDependency.Core.Mvc.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=0.1.52.2941, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Examine">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Examine.0.1.52.2941\lib\Examine.dll</HintPath>
     </Reference>
@@ -616,6 +616,7 @@
     <Compile Include="Umbraco\TreeInit.aspx.designer.cs">
       <DependentUpon>treeInit.aspx</DependentUpon>
     </Compile>
+    <Content Include="Umbraco\ClientRedirect.aspx" />
     <Content Include="Umbraco\create.aspx" />
     <Content Include="Umbraco\Logout.aspx" />
     <Content Include="Umbraco\umbraco.aspx" />
@@ -2135,13 +2136,13 @@
     </Content>
     <Content Include="Umbraco\Scripting\templates\cshtml\MultinodeTree-picker.cshtml" />
     <Content Include="Umbraco\Views\Default.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\EmptyTemplate.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\Empty.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\EditProfile.cshtml" />
-    <Content Include="Umbraco\PartialViewMacros\Templates\EmptyTemplate.cshtml" />
+    <Content Include="Umbraco\PartialViewMacros\Templates\Empty.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\Login.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\LoginStatus.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\RegisterMember.cshtml" />
-    <Content Include="Umbraco\PartialViewMacros\Templates\EmptyTemplate %28ForUseWithCustomViews%29.cshtml">
+    <Content Include="Umbraco\PartialViewMacros\Templates\Empty %28ForUseWithCustomViews%29.cshtml">
       <SubType>Code</SubType>
     </Content>
     <Content Include="Umbraco\PartialViewMacros\Templates\ListAncestorsFromCurrentPage.cshtml" />
@@ -2161,7 +2162,7 @@
     <Content Include="Umbraco\PartialViewMacros\Templates\Navigation.cshtml" />
     <Content Include="Umbraco\PartialViewMacros\Templates\SiteMap.cshtml" />
     <Content Include="Umbraco\PartialViews\Templates\Breadcrumb.cshtml" />
-    <Content Include="Umbraco\PartialViews\Templates\EmptyTemplate %28ForUseWithCustomViews%29.cshtml" />
+    <Content Include="Umbraco\PartialViews\Templates\Empty %28ForUseWithCustomViews%29.cshtml" />
     <Content Include="Umbraco\PartialViews\Templates\ListAncestorsFromCurrentPage.cshtml" />
     <Content Include="Umbraco\PartialViews\Templates\ListChildPagesFromCurrentPage.cshtml" />
     <Content Include="Umbraco\PartialViews\Templates\ListChildPagesOrderedByDate.cshtml" />
@@ -2667,10 +2668,16 @@ xcopy "$(ProjectDir)"..\packages\SqlServerCE.4.0.0.0\x86\*.* "$(TargetDir)x86\" 
     <!-- Transform the local Web.config file in Visual Studio -->
     <TransformXml Source="$(ProjectDir)Web.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="$(ProjectDir)Web.$(Configuration).config.transformed" Condition="$(BuildingInsideVisualStudio) == true" />
     <!-- Always transform the Template file when not in VS (ie: build.bat) -->
-    <TransformXml Source="$(ProjectDir)Web.Template.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="$(ProjectDir)Web.$(Configuration).config.transformed" Condition="$(BuildingInsideVisualStudio) != true" />
+    <TransformXml Source="$(ProjectDir)Web.Template.config" Transform="$(ProjectDir)web.Template.$(Configuration).config" Destination="Web.$(Configuration).config.transformed" Condition="$(BuildingInsideVisualStudio) != true" />
+    <!-- Only runs if the Belle build folder doesn't yet exist -->
+    <CallTarget Targets="BelleBuild" Condition="!Exists('$(ProjectDir)\..\Umbraco.Web.UI.Client\build')" />
   </Target>
   <Target Name="AfterBuild">
     <Copy SourceFiles="$(ProjectDir)Web.$(Configuration).config.transformed" DestinationFiles="$(ProjectDir)Web.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="$(BuildingInsideVisualStudio) == true" />
+  </Target>
+  <Target Name="BelleBuild" BeforeTargets="Rebuild">
+    <!-- Only runs when a Rebuild is requested -->
+    <Exec WorkingDirectory="$(ProjectDir)\..\..\build\" Command="BuildBelle.bat" ConsoleToMSBuild="true" IgnoreExitCode="true" ContinueOnError="WarnAndContinue" />
   </Target>
   <Import Project="..\packages\Microsoft.Bcl.Build.1.0.10\tools\Microsoft.Bcl.Build.targets" Condition="Exists('..\packages\Microsoft.Bcl.Build.1.0.10\tools\Microsoft.Bcl.Build.targets')" />
   <Target Name="EnsureBclBuildImported" BeforeTargets="BeforeBuild" Condition="'$(BclBuildImported)' == ''">

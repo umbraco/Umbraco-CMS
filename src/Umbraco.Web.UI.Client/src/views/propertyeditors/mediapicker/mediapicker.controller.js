@@ -32,14 +32,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             $scope.sync();
         };
 
-        $scope.edit = function(image){
-            $scope.currentImage = image;
-            $scope.currentImage.crop ={};
-            if(!$scope.currentImage.crop){
-                //$scope.currentImage.crop = { "left": 0.31731772342645215, "top": 0.17420325244997603, "right": 0.36246473116627076, "bottom": 0.30226197981593617 };
-            }
-        }
-
         $scope.add = function() {
             dialogService.mediaPicker({
                 multiPicker: multiPicker,
@@ -65,7 +57,10 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
        $scope.sortableOptions = {
            update: function(e, ui) {
-                var r = [];
+               var r = [];
+               //TODO: Instead of doing this with a half second delay would be better to use a watch like we do in the 
+               // content picker. THen we don't have to worry about setting ids, render models, models, we just set one and let the 
+               // watch do all the rest.
                 $timeout(function(){
                     angular.forEach($scope.images, function(value, key){
                         r.push(value.id);

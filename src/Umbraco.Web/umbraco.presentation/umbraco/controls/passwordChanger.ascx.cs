@@ -75,9 +75,9 @@ namespace umbraco.controls
             get { return ChangingPasswordModel.NewPassword; }
         }
 
-        protected override void OnInit(EventArgs e)
+        protected override void OnLoad(EventArgs e)
         {
-            base.OnInit(e);
+            base.OnLoad(e);
 
             if (Membership.Providers[MembershipProviderName] == null)
             {

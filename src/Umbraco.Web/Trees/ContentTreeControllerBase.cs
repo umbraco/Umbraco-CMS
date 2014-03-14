@@ -69,7 +69,7 @@ namespace Umbraco.Web.Trees
         protected abstract int UserStartNode { get; }
 
         protected abstract TreeNodeCollection PerformGetTreeNodes(string id, FormDataCollection queryStrings);
-        
+
         protected abstract MenuItemCollection PerformGetMenuForNode(string id, FormDataCollection queryStrings);
 
         protected abstract UmbracoObjectTypes UmbracoObjectType { get; }
@@ -88,7 +88,7 @@ namespace Umbraco.Web.Trees
             {
                 //just return their single start node, it will show up under the 'Content' label
                 var startNode = Services.EntityService.Get(UserStartNode, UmbracoObjectType);
-                return new[] {startNode};
+                return new[] { startNode };
             }
 
             return Services.EntityService.GetChildren(iid, UmbracoObjectType).ToArray();
@@ -116,8 +116,8 @@ namespace Umbraco.Web.Trees
             {
                 var nodes = new TreeNodeCollection();
                 var altStartId = string.Empty;
-                
-                if(queryStrings.HasKey(TreeQueryStringParameters.StartNodeId))
+
+                if (queryStrings.HasKey(TreeQueryStringParameters.StartNodeId))
                     altStartId = queryStrings.GetValue<string>(TreeQueryStringParameters.StartNodeId);
 
 
@@ -154,7 +154,7 @@ namespace Umbraco.Web.Trees
                         // for the time being we'll just load the dashboard of the section.
                         //queryStrings.GetValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/recyclebin"));    
                         queryStrings.GetValue<string>("application")));
-                        
+
                 }
 
                 return nodes;
@@ -176,12 +176,12 @@ namespace Umbraco.Web.Trees
         {
             //before we get the children we need to see if this is a container node
             var current = Services.EntityService.Get(int.Parse(id), UmbracoObjectType);
-            if (current != null && current.AdditionalData.ContainsKey("IsContainer") && current.AdditionalData["IsContainer"] is bool && (bool)current.AdditionalData["IsContainer"])
+
+            if (current != null && current.IsContainer())
             {
                 //no children!
                 return new TreeNodeCollection();
             }
-
             return PerformGetTreeNodes(id, queryStrings);
         }
 

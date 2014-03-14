@@ -5,6 +5,15 @@ angular.module('umbraco')
 	
 	function($scope, dialogService, entityResource, $log, iconHelper){
 
+	    if (!$scope.model) {
+	        $scope.model = {};
+	    }
+	    if (!$scope.model.value) {
+	        $scope.model.value = {
+	            type: "content"
+	        };
+	    }
+
 		if($scope.model.value.id && $scope.model.value.type !== "member"){
 			var ent = "Document";
 			if($scope.model.value.type === "media"){

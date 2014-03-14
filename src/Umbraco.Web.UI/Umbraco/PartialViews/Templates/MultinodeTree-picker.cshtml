@@ -10,10 +10,10 @@
 
 @* Lists each selected value from the picker as a link *@
 <ul>
-	@foreach(var id in CurrentPage.PropertyWithPicker){
+	@foreach(var id in CurrentPage.PropertyWithPicker.Split(',')){
 
 		@*For each link, get the node, and display its name and url*@
-		var content = Umbraco.Content(id.InnerText);
+		var content = Umbraco.Content(id);
 
 		<li><a href="@content.Url">@content.Name</a></li>	
 	}

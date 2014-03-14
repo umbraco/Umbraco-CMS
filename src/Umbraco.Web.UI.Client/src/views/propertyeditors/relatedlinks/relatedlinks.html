@@ -51,7 +51,6 @@
                     </td>
                 </tr>
                 <tr>
-                    <form ng-submit="add()">
                     <td><input type="text" ng-model="newCaption" placeholder="Enter a new caption" val-highlight="hasError"/></td>
                         <td>
                             <div ng-show="addExternal">
@@ -68,10 +67,9 @@
                     <td><input type="checkbox" ng-model="newNewWindow"/> </td>
                         <td>
                         <div class="btn-group">
-                            <input type="submit" class="btn btn-default" value="Add"/>
+                            <button class="btn btn-default" ng-click="add($event)">Add</button>
                         </div>
                     </td>
-                    </form>
                 </tr>
             </tbody>
         </table>

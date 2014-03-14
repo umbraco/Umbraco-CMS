@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Security.Authentication;
+using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.Script.Services;
 using System.Web.Services;
@@ -97,6 +98,11 @@ namespace Umbraco.Web.UI.Install
 
             HandleConnectionStrings();
 
+            //After upgrading we must restart the app pool - the reason is because PetaPoco caches a lot of the mapping logic
+            // and after we upgrade a db, some of the mapping needs to be updated so we restart the app pool to clear it's cache or
+            // else we can end up with YSODs
+            ApplicationContext.Current.RestartApplicationPool(new HttpContextWrapper(HttpContext.Current));
+            
             var js = new JavaScriptSerializer();
             var jsonResult = js.Serialize(result);
             return jsonResult;

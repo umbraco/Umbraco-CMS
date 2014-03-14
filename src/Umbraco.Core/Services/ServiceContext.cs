@@ -29,6 +29,7 @@ namespace Umbraco.Core.Services
         private Lazy<ISectionService> _sectionService;
         private Lazy<IMacroService> _macroService;
         private Lazy<IMemberTypeService> _memberTypeService;
+        private Lazy<INotificationService> _notificationService;
 
         /// <summary>
         /// public ctor - will generally just be used for unit testing
@@ -101,6 +102,9 @@ namespace Umbraco.Core.Services
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
 
+            if (_notificationService == null)
+                _notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, _userService.Value, _contentService.Value));
+
             if (_serverRegistrationService == null)
                 _serverRegistrationService = new Lazy<ServerRegistrationService>(() => new ServerRegistrationService(provider, repositoryFactory.Value));
 
@@ -129,7 +133,7 @@ namespace Umbraco.Core.Services
                 _localizationService = new Lazy<ILocalizationService>(() => new LocalizationService(provider, repositoryFactory.Value));
 
             if (_packagingService == null)
-                _packagingService = new Lazy<IPackagingService>(() => new PackagingService(_contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, repositoryFactory.Value, provider));
+                _packagingService = new Lazy<IPackagingService>(() => new PackagingService(_contentService.Value, _contentTypeService.Value, _mediaService.Value, _macroService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, repositoryFactory.Value, provider));
 
             if (_entityService == null)
                 _entityService = new Lazy<IEntityService>(() => new EntityService(provider, repositoryFactory.Value, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value));
@@ -151,6 +155,14 @@ namespace Umbraco.Core.Services
 
             if (_tagService == null)
                 _tagService = new Lazy<ITagService>(() => new TagService(provider, repositoryFactory.Value));
+        }
+
+        /// <summary>
+        /// Gets the <see cref="INotificationService"/>
+        /// </summary>
+        internal INotificationService NotificationService
+        {
+            get { return _notificationService.Value; }
         }
 
         /// <summary>

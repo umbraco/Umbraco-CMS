@@ -41,7 +41,7 @@
  * </pre>  
  */
 angular.module('umbraco.services')
-.factory('assetsService', function ($q, $log, angularHelper, umbRequestHelper, $rootScope) {
+.factory('assetsService', function ($q, $log, angularHelper, umbRequestHelper, $rootScope, $http) {
 
     var initAssetsLoaded = false;
 

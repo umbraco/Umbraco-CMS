@@ -59,8 +59,8 @@ angular.module('umbraco.mocks').
                         id: 1, 
                         active: true,
                         properties: [                            
-                            { alias: "list", label: "List", view: "listview", value: "", hideLabel: true },
-                            { alias: "media", label: "Media picker", view: "mediapicker", value: "" }
+                            { alias: "list", label: "List", view: "listview", value: "", hideLabel: true, config:{entityType: "content"} },
+                            { alias: "media", label: "Media picker", view: "mediapicker", value: "" ,config:{} }
                         ]
                     },
                     {
@@ -72,7 +72,7 @@ angular.module('umbraco.mocks').
                             { alias: "textarea", label: "textarea", view: "textarea", value: "ajsdka sdjkds", config: { rows: 4 } },
                             { alias: "map", label: "Map", view: "googlemaps", value: "37.4419,-122.1419", config: { mapType: "ROADMAP", zoom: 4 } },
                             
-                            { alias: "content", label: "Content picker", view: "contentpicker", value: "1234,23242,23232,23231" }
+                            { alias: "media", label: "Media picker", view: "mediapicker", value: "1234,23242,23232,23231", config: {multiPicker: 1} }
                         ]
                     },
                     {

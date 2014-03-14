@@ -25,6 +25,13 @@ namespace Umbraco.Web.UI.JavaScript
         /// </summary>
         public string GetStylesheetInitialization(HttpContextBase httpContext)
         {
+            var result = GetStylesheetInitializationArray(httpContext);
+
+            return ParseMain(result);
+        }
+
+        public JArray GetStylesheetInitializationArray(HttpContextBase httpContext)
+        {
             var merged = new JArray();    
             foreach (var m in _parser.GetManifests())
             {
@@ -37,7 +44,7 @@ namespace Umbraco.Web.UI.JavaScript
             //now we need to merge in any found cdf declarations on property editors
             ManifestParser.MergeJArrays(merged, ScanPropertyEditors(ClientDependencyType.Css, httpContext));
 
-            return ParseMain(merged);
+            return merged;
         }
 
        

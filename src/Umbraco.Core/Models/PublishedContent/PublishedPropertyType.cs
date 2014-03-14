@@ -80,11 +80,8 @@ namespace Umbraco.Core.Models.PublishedContent
 
         private void InitializeConverters()
         {
-            var converters = PropertyValueConvertersResolver.Current.Converters.ToArray();
-
-            var defaultConverters = converters
-                .Where(x => x.GetType().GetCustomAttribute<DefaultPropertyValueConverterAttribute>(false) != null)
-                .ToArray();
+            var converters = PropertyValueConvertersResolver.Current.Converters.ToArray();            
+            var defaultConvertersWithAttributes = PropertyValueConvertersResolver.Current.DefaultConverters;
 
             _converter = null;
             
@@ -98,8 +95,14 @@ namespace Umbraco.Core.Models.PublishedContent
             else if (foundConverters.Length > 1)
             {
                 //more than one was found, we need to first figure out if one of these is an Umbraco default value type converter
-                var nonDefault = foundConverters.Except(defaultConverters).ToArray();
-                if (nonDefault.Length > 1)
+                //get the non-default and see if we have one
+                var nonDefault = foundConverters.Except(defaultConvertersWithAttributes.Select(x => x.Item1)).ToArray();
+                if (nonDefault.Length == 1)
+                {
+                    //there's only 1 custom converter registered that so use it
+                    _converter = nonDefault[0];
+                }
+                else if (nonDefault.Length > 1)
                 {
                     //this is not allowed, there cannot be more than 1 custom converter
                     throw new InvalidOperationException(
@@ -109,9 +112,31 @@ namespace Umbraco.Core.Models.PublishedContent
                                       ContentType.Alias, PropertyTypeAlias,
                                       nonDefault[1].GetType().FullName, nonDefault[0].GetType().FullName));
                 }
+                else 
+                {
+                    //we need to remove any converters that have been shadowed by another converter
+                    var foundDefaultConvertersWithAttributes = defaultConvertersWithAttributes.Where(x => foundConverters.Contains(x.Item1));
+                    var shadowedTypes = foundDefaultConvertersWithAttributes.SelectMany(x => x.Item2.DefaultConvertersToShadow);
+                    var shadowedDefaultConverters = foundConverters.Where(x => shadowedTypes.Contains(x.GetType()));
+                    var nonShadowedDefaultConverters = foundConverters.Except(shadowedDefaultConverters).ToArray();
 
-                //there's only 1 custom converter registered that so use it
-                _converter = nonDefault[0];
+                    if (nonShadowedDefaultConverters.Length == 1)
+                    {
+                        //assign to the single default converter
+                        _converter = nonShadowedDefaultConverters[0];    
+                    }
+                    else if (nonShadowedDefaultConverters.Length > 1)
+                    {
+                        //this is not allowed, there cannot be more than 1 custom converter
+                        throw new InvalidOperationException(
+                            string.Format("Type '{2}' cannot be an IPropertyValueConverter"
+                                          + " for property '{1}' of content type '{0}' because type '{3}' has already been detected as a converter"
+                                          + " for that property, and only one converter can exist for a property.",
+                                          ContentType.Alias, PropertyTypeAlias,
+                                          nonShadowedDefaultConverters[1].GetType().FullName, nonShadowedDefaultConverters[0].GetType().FullName));
+                    }
+                }
+                
             }
             
             // get the cache levels, quietely fixing the inconsistencies (no need to throw, really)

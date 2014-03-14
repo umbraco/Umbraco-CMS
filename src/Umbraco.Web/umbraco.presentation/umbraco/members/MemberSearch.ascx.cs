@@ -6,6 +6,7 @@ using Examine.LuceneEngine.SearchCriteria;
 using Examine.SearchCriteria;
 using umbraco.cms.businesslogic.member;
 using System.Web.Security;
+using Umbraco.Core.Security;
 
 namespace umbraco.presentation.umbraco.members
 {
@@ -13,7 +14,7 @@ namespace umbraco.presentation.umbraco.members
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Member.InUmbracoMemberMode())
+            if (Membership.Provider.IsUmbracoMembershipProvider())
 
                 ButtonSearch.Text = ui.Text("search");
         }
@@ -22,7 +23,7 @@ namespace umbraco.presentation.umbraco.members
         {
             resultsPane.Visible = true;
 
-            if (Member.InUmbracoMemberMode())
+            if (Membership.Provider.IsUmbracoMembershipProvider())
             {
                 var query = searchQuery.Text.ToLower();
                 var internalSearcher = UmbracoContext.Current.InternalMemberSearchProvider;

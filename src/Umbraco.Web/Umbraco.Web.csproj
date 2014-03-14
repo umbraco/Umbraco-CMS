@@ -102,7 +102,7 @@
     <Reference Include="AutoMapper.Net4">
       <HintPath>..\packages\AutoMapper.3.0.0\lib\net40\AutoMapper.Net4.dll</HintPath>
     </Reference>
-    <Reference Include="ClientDependency.Core, Version=1.7.1.1, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="ClientDependency.Core">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\ClientDependency.1.7.1.1\lib\ClientDependency.Core.dll</HintPath>
     </Reference>
@@ -110,7 +110,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\xmlrpcnet.2.5.0\lib\net20\CookComputing.XmlRpcV2.dll</HintPath>
     </Reference>
-    <Reference Include="Examine, Version=0.1.52.2941, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Examine">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\packages\Examine.0.1.52.2941\lib\Examine.dll</HintPath>
     </Reference>
@@ -305,6 +305,7 @@
     <Compile Include="Models\ContentEditing\ListViewAwareContentItemDisplayBase.cs" />
     <Compile Include="Models\IRenderModel.cs" />
     <Compile Include="Models\RenderModelOfTContent.cs" />
+    <Compile Include="Mvc\JsonNetResult.cs" />
     <Compile Include="Mvc\MinifyJavaScriptResultAttribute.cs" />
     <Compile Include="Mvc\EnsurePublishedContentRequestAttribute.cs" />
     <Compile Include="Mvc\UmbracoTemplatePageOfTContent.cs" />
@@ -338,6 +339,7 @@
     <Compile Include="Models\TagModel.cs" />
     <Compile Include="Models\UpgradeCheckResponse.cs" />
     <Compile Include="Models\PasswordChangedModel.cs" />
+    <Compile Include="NotificationServiceExtensions.cs" />
     <Compile Include="PropertyEditors\ColorListPreValueEditor.cs" />
     <Compile Include="PropertyEditors\EmailAddressPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ListViewPropertyEditor.cs" />
@@ -407,6 +409,7 @@
     <Compile Include="Routing\UrlProviderExtensions.cs" />
     <Compile Include="Strategies\Migrations\ClearCsrfCookiesAfterUpgrade.cs" />
     <Compile Include="Strategies\Migrations\ClearMediaXmlCacheForDeletedItemsAfterUpgrade.cs" />
+    <Compile Include="Strategies\NotificationsHandler.cs" />
     <Compile Include="TagQuery.cs" />
     <Compile Include="Trees\CoreTreeAttribute.cs" />
     <Compile Include="Trees\DataTypeTreeController.cs" />
@@ -422,10 +425,16 @@
     <Compile Include="umbraco.presentation\umbraco\create.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\create\Language.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\DLRScripting.ascx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\xslt.ascx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="umbraco.presentation\umbraco\developer\Packages\Installer.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\cruds.aspx.cs">
@@ -643,6 +652,9 @@
     <Compile Include="umbraco.presentation\umbraco\developer\Packages\directoryBrowser.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
+    <Compile Include="umbraco.presentation\umbraco\dialogs\ProtectPage.aspx.cs">
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\emptyTrashcan.aspx.cs">
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
@@ -675,6 +687,7 @@
     <Compile Include="Editors\MediaController.cs" />
     <Compile Include="UrlHelperRenderExtensions.cs" />
     <Compile Include="WebApi\Binders\ContentItemBaseBinder.cs" />
+    <Compile Include="WebApi\IsBackOfficeAttribute.cs" />
     <Compile Include="WebApi\Binders\ContentItemBinder.cs" />
     <Compile Include="WebApi\Binders\MediaItemBinder.cs" />
     <Compile Include="WebApi\Filters\EnsureUserPermissionForContentAttribute.cs" />
@@ -1199,13 +1212,6 @@
     <Compile Include="umbraco.presentation\umbraco\create\dialogHandler_temp.cs">
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\language.ascx.cs">
-      <DependentUpon>language.ascx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\create\language.ascx.designer.cs">
-      <DependentUpon>language.ascx</DependentUpon>
-    </Compile>
     <Compile Include="umbraco.presentation\umbraco\create\media.ascx.cs">
       <DependentUpon>media.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -1360,20 +1366,6 @@
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\notifications.aspx.designer.cs">
       <DependentUpon>notifications.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx.cs">
-      <DependentUpon>installer.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx.designer.cs">
-      <DependentUpon>installer.aspx</DependentUpon>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\protectPage.aspx.cs">
-      <DependentUpon>protectPage.aspx</DependentUpon>
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
-    <Compile Include="umbraco.presentation\umbraco\dialogs\protectPage.aspx.designer.cs">
-      <DependentUpon>protectPage.aspx</DependentUpon>
     </Compile>
     <Compile Include="umbraco.presentation\umbraco\dialogs\RegexWs.aspx.cs">
       <DependentUpon>RegexWs.aspx</DependentUpon>
@@ -1872,10 +1864,6 @@
     <Content Include="umbraco.presentation\umbraco\dialogs\notifications.aspx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\developer\Packages\installer.aspx" />
-    <Content Include="umbraco.presentation\umbraco\dialogs\protectPage.aspx">
-      <SubType>ASPXCodeBehind</SubType>
-    </Content>
     <Content Include="umbraco.presentation\umbraco\dialogs\RegexWs.aspx" />
     <Content Include="umbraco.presentation\umbraco\dialogs\rollBack.aspx">
       <SubType>ASPXCodeBehind</SubType>
@@ -1930,11 +1918,10 @@
     <Content Include="umbraco.presentation\umbraco\create\content.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\create\language.ascx">
+    <Content Include="umbraco.presentation\umbraco\create\media.ascx" />
+    <Content Include="umbraco.presentation\umbraco\create\member.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\create\media.ascx" />
-    <Content Include="umbraco.presentation\umbraco\create\member.ascx" />
     <Content Include="umbraco.presentation\umbraco\create\nodeType.ascx" />
     <Content Include="umbraco.presentation\umbraco\create\simple.ascx">
       <SubType>ASPXCodeBehind</SubType>

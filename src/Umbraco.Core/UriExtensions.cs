@@ -14,24 +14,93 @@ namespace Umbraco.Core
     /// </summary>
     public static class UriExtensions
     {
-        
         /// <summary>
         /// Checks if the current uri is a back office request
         /// </summary>
         /// <param name="url"></param>
+        /// <param name="applicationPath">
+        /// The current application path or VirtualPath
+        /// </param>
         /// <returns></returns>
-        internal static bool IsBackOfficeRequest(this Uri url)
+        /// <remarks>
+        /// There are some special routes we need to check to properly determine this:
+        /// 
+        ///     If any route has an extension in the path like .aspx = back office
+        /// 
+        ///     These are def back office:
+        ///         /Umbraco/RestServices   = back office
+        ///         /Umbraco/BackOffice     = back office
+        ///     If it's not any of the above, and there's no extension then we cannot determine if it's back office or front-end
+        ///     so we can only assume that it is not back office. This will occur if people use an UmbracoApiController for the backoffice
+        ///     but do not inherit from UmbracoAuthorizedApiController and do not use [IsBackOffice] attribute.
+        /// 
+        ///     These are def front-end: 
+        ///         /Umbraco/Surface        = front-end
+        ///         /Umbraco/Api            = front-end
+        ///     But if we've got this far we'll just have to assume it's front-end anyways.
+        /// 
+        /// </remarks>
+        internal static bool IsBackOfficeRequest(this Uri url, string applicationPath)
         {
-        
-            var authority = url.GetLeftPart(UriPartial.Authority);
-            var afterAuthority = url.GetLeftPart(UriPartial.Query)
-                                    .TrimStart(authority)
-                                    .TrimStart("/");
+            applicationPath = applicationPath ?? string.Empty;
 
+            var fullUrlPath = url.AbsolutePath.TrimStart(new[] {'/'});
+            var appPath = applicationPath.TrimStart(new[] {'/'});
+            var urlPath = fullUrlPath.TrimStart(appPath).EnsureStartsWith('/');
             
-
             //check if this is in the umbraco back office
-            return afterAuthority.InvariantStartsWith(GlobalSettings.Path.TrimStart("/"));
+            var isUmbracoPath = urlPath.InvariantStartsWith(GlobalSettings.Path.EnsureStartsWith('/'));
+            //if not, then def not back office
+            if (isUmbracoPath == false) return false;
+
+            //if its the normal /umbraco path
+            if (urlPath.InvariantEquals("/" + GlobalSettings.UmbracoMvcArea)
+                || urlPath.InvariantEquals("/" + GlobalSettings.UmbracoMvcArea + "/"))
+            {
+                return true;
+            }
+
+            //check for a file extension
+            var extension = Path.GetExtension(url.LocalPath);
+            //has an extension, def back office
+            if (extension.IsNullOrWhiteSpace() == false) return true;
+            //check for special case asp.net calls like:
+            //  /umbraco/webservices/legacyAjaxCalls.asmx/js which will return a null file extension but are still considered extension'd requests
+            if (urlPath.InvariantContains(".asmx/")
+                || urlPath.InvariantContains(".aspx/")
+                || urlPath.InvariantContains(".ashx/")
+                || urlPath.InvariantContains(".axd/")
+                || urlPath.InvariantContains(".svc/"))
+            {
+                return true;
+            }
+
+            //check for special back office paths
+            if (urlPath.InvariantStartsWith("/" + GlobalSettings.UmbracoMvcArea + "/BackOffice/")
+                || urlPath.InvariantStartsWith("/" + GlobalSettings.UmbracoMvcArea + "/RestServices/"))
+            {
+                return true;
+            }
+
+            //check for special front-end paths
+            if (urlPath.InvariantStartsWith("/" + GlobalSettings.UmbracoMvcArea + "/Surface/")
+                || urlPath.InvariantStartsWith("/" + GlobalSettings.UmbracoMvcArea + "/Api/"))
+            {
+                return false;
+            }
+
+            //if its none of the above, we will have to try to detect if it's a PluginController route, we can detect this by 
+            // checking how many parts the route has, for example, all PluginController routes will be routed like
+            // Umbraco/MYPLUGINAREA/MYCONTROLLERNAME/{action}/{id}
+            // so if the path contains at a minimum 3 parts: Umbraco + MYPLUGINAREA + MYCONTROLLERNAME then we will have to assume it is a 
+            // plugin controller for the front-end.
+            if (urlPath.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries).Length >= 3)
+            {
+                return false;
+            }
+
+            //if its anything else we can assume it's back office
+            return true;
         }
 
         /// <summary>

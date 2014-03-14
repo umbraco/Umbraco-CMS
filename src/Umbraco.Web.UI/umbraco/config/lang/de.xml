@@ -497,15 +497,15 @@ Wenn Sie sich für Runway entscheiden, können Sie optional Blöcke nutzen, die 
   <area alias="notifications">
     <key alias="editNotifications">Bearbeiten Sie Ihre Benachrichtigungseinstellungen für '%0%'</key>
     <key alias="mailBody">
-Hallo %0%,
+      Hallo %0%,
 
-die Aufgabe '%1%' (von Benutzer '%3%') an der Seite '%2%' wurde ausgeführt.
+      die Aufgabe '%1%' (von Benutzer '%3%') an der Seite '%2%' wurde ausgeführt.
 
-Zum Bearbeiten verwenden Sie bitte diesen Link: http://%4%/umbraco/actions/editContent.aspx?id=%5%
+      Zum Bearbeiten verwenden Sie bitte diesen Link: http://%4%/#/content/content/edit/%5%
 
-Einen schönen Tag wünscht
-Ihr freundlicher Umbraco-Robot
-</key>
+      Einen schönen Tag wünscht
+      Ihr freundlicher Umbraco-Robot
+    </key>
     <key alias="mailBodyHtml">
 &lt;p&gt;Hallo %0%,&lt;/p&gt;
 

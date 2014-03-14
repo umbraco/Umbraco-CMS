@@ -191,7 +191,7 @@ namespace Umbraco.Core.Services
                 using (var uow = _uowProvider.GetUnitOfWork())
                 {
                     var repository = _repositoryFactory.CreateMemberRepository(uow);
-                    //NOTE What about content that has the contenttype as part of its composition?
+                    //TODO: What about content that has the contenttype as part of its composition?
                     var query = Query<IMember>.Builder.Where(x => x.ContentTypeId == memberTypeId);
                     var members = repository.GetByQuery(query).ToArray();
 
@@ -635,7 +635,7 @@ namespace Umbraco.Core.Services
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                var query = Query<IMember>.Builder.Where(x => x.Username == userName);
+                var query = Query<IMember>.Builder.Where(x => x.Username.Equals(userName));
                 var member = repository.GetByQuery(query).FirstOrDefault();
 
                 return member;

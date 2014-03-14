@@ -121,6 +121,11 @@ namespace Umbraco.Core.Configuration.UmbracoSettings
             get { return UrlReplacing.RemoveDoubleDashes; }
         }
 
+        bool IRequestHandlerSection.ConvertUrlsToAscii
+        {
+            get { return UrlReplacing.ConvertUrlsToAscii; }
+        }
+
         IEnumerable<IChar> IRequestHandlerSection.CharCollection
         {
             get { return UrlReplacing.CharCollection; }

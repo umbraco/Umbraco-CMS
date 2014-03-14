@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Web.Mvc;
 using Umbraco.Core;
 using Umbraco.Core.Services;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Web.Mvc
 {
@@ -86,14 +87,17 @@ namespace Umbraco.Web.Mvc
             
 		    return MetadataStorage.GetOrAdd(type, type1 =>
 		        {
-                    var attribute = type.GetCustomAttribute<PluginControllerAttribute>(false);
+                    var pluginAttribute = type.GetCustomAttribute<PluginControllerAttribute>(false);
+                    //check if any inherited class of this type contains the IsBackOffice attribute
+		            var backOfficeAttribute = type.GetCustomAttribute<IsBackOfficeAttribute>(true);
 
                     var meta = new PluginControllerMetadata()
                     {
-                        AreaName = attribute == null ? null : attribute.AreaName,
+                        AreaName = pluginAttribute == null ? null : pluginAttribute.AreaName,
                         ControllerName = ControllerExtensions.GetControllerName(type),
                         ControllerNamespace = type.Namespace,
-                        ControllerType = type
+                        ControllerType = type,
+                        IsBackOffice = backOfficeAttribute != null
                     };
 
                     MetadataStorage.TryAdd(type, meta);

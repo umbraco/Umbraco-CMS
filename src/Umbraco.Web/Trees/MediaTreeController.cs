@@ -78,9 +78,7 @@ namespace Umbraco.Web.Trees
             var entity = (UmbracoEntity)e;
 
             //Special check to see if it ia a container, if so then we'll hide children.
-            var isContainer = entity.AdditionalData.ContainsKey("IsContainer")
-                && entity.AdditionalData["IsContainer"] is bool
-                && (bool)entity.AdditionalData["IsContainer"];
+            var isContainer = entity.IsContainer();
 
             var node = CreateTreeNode(
                 e.Id.ToInvariantString(),

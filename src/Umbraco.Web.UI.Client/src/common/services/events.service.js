@@ -65,7 +65,7 @@ function eventsService($q, $rootScope) {
 		    return $rootScope.$on(name, callback);
 		},
 		
-        /** pass in the result of subscribe to this method, or just call the method returned from subscribe to unsubscribe */
+        /** pass in the result of 'on' to this method, or just call the method returned from 'on' to unsubscribe */
 		unsubscribe: function(handle) {
 		    if (angular.isFunction(handle)) {
 		        handle();

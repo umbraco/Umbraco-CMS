@@ -161,10 +161,10 @@ namespace Umbraco.Web.UI.Install.Steps
             DatabasePassword.Text = GetConnectionStringValue(connectionStringBuilder, "password");
             if (string.IsNullOrEmpty(DatabasePassword.Text)) DatabasePassword.Text = GetConnectionStringValue(connectionStringBuilder, "pwd");
 
-            toggleVisible(DatabaseServerItem, !ManualConnectionString && !IsEmbeddedDatabase);
-            toggleVisible(DatabaseUsernameItem, !ManualConnectionString && !IsEmbeddedDatabase);
-            toggleVisible(DatabasePasswordItem, !ManualConnectionString && !IsEmbeddedDatabase);
-            toggleVisible(DatabaseNameItem, !ManualConnectionString && !IsEmbeddedDatabase);
+            ToggleVisible(DatabaseServerItem, !ManualConnectionString && !IsEmbeddedDatabase);
+            ToggleVisible(DatabaseUsernameItem, !ManualConnectionString && !IsEmbeddedDatabase);
+            ToggleVisible(DatabasePasswordItem, !ManualConnectionString && !IsEmbeddedDatabase);
+            ToggleVisible(DatabaseNameItem, !ManualConnectionString && !IsEmbeddedDatabase);
 
             if (IsNewInstall || IsEmbeddedDatabase)
                 dbinit.Text = "$('#databaseOptionEmbedded').click();$('#databaseOptionEmbedded').change();";
@@ -243,15 +243,15 @@ namespace Umbraco.Web.UI.Install.Steps
         /// <param name="e">The event arguments.</param>
         protected void DatabaseType_SelectedIndexChanged(object sender, EventArgs e)
         {
-            toggleVisible(DatabaseServerItem, !ManualConnectionString && !IsEmbeddedDatabase);
-            toggleVisible(DatabaseUsernameItem, !ManualConnectionString && !IsEmbeddedDatabase);
-            toggleVisible(DatabasePasswordItem, !ManualConnectionString && !IsEmbeddedDatabase);
-            toggleVisible(DatabaseNameItem, !ManualConnectionString && !IsEmbeddedDatabase);
+            ToggleVisible(DatabaseServerItem, !ManualConnectionString && !IsEmbeddedDatabase);
+            ToggleVisible(DatabaseUsernameItem, !ManualConnectionString && !IsEmbeddedDatabase);
+            ToggleVisible(DatabasePasswordItem, !ManualConnectionString && !IsEmbeddedDatabase);
+            ToggleVisible(DatabaseNameItem, !ManualConnectionString && !IsEmbeddedDatabase);
 
             //toggleVisible(DatabaseConnectionString, ManualConnectionString);
         }
 
-        private static void toggleVisible(HtmlGenericControl div, bool visible)
+        private static void ToggleVisible(HtmlGenericControl div, bool visible)
         {
             if (!visible)
                 div.Attributes["style"] = "display: none;";

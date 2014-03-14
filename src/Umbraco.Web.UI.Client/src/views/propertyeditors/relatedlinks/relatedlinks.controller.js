@@ -43,7 +43,7 @@
                 $scope.model.value.splice(idx, 1);               
             };
 
-            $scope.add = function () {
+            $scope.add = function ($event) {
                 if ($scope.newCaption == "") {
                     $scope.hasError = true;
                 } else {
@@ -79,6 +79,7 @@
                     $scope.newInternalName = '';
 
                 }
+                $event.preventDefault();
             };
 
             $scope.switch = function ($event) {

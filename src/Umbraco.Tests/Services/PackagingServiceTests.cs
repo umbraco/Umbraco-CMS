@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using NUnit.Framework;
@@ -20,6 +21,23 @@ namespace Umbraco.Tests.Services
         public override void TearDown()
         {
             base.TearDown();
+        }
+
+        [Test]
+        public void PackagingService_Can_Export_Macro()
+        {
+            // Arrange
+            var macro = new Macro("test1", "Test", "~/usercontrol/blah.ascx", "MyAssembly", "test.xslt", "~/views/macropartials/test.cshtml");
+            ServiceContext.MacroService.Save(macro);
+
+            // Act
+            var element = ServiceContext.PackagingService.Export(macro);
+
+            // Assert
+            Assert.That(element, Is.Not.Null);
+            Assert.That(element.Element("name").Value, Is.EqualTo("Test"));
+            Assert.That(element.Element("alias").Value, Is.EqualTo("test1"));
+            Console.Write(element.ToString());
         }
 
         [Test]
