@@ -25,7 +25,7 @@ namespace Umbraco.Core.Services
     /// Represents the Packaging Service, which provides import/export functionality for the Core models of the API
     /// using xml representation. This is primarily used by the Package functionality.
     /// </summary>
-    public class PackagingService : IService
+    public class PackagingService : IPackagingService
     {
         private readonly IContentService _contentService;
         private readonly IContentTypeService _contentTypeService;
@@ -1178,6 +1178,48 @@ namespace Umbraco.Core.Services
                 _fileService.SaveTemplate(templates, userId);
 
             return templates;
+        }
+
+        public IEnumerable<ILanguage> ImportLanguage(XElement element, int userId = 0)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<IFile> ImportStylesheets(XElement element, int userId = 0)
+        {
+            throw new NotImplementedException();
+
+
+            //foreach (XmlNode n in xmlNodeList.OfType<XmlNode>())
+            //{
+            //    StyleSheet s = StyleSheet.MakeNew(
+            //        currentUser,
+            //        XmlHelper.GetNodeValue(n.SelectSingleNode("Name")),
+            //        XmlHelper.GetNodeValue(n.SelectSingleNode("FileName")),
+            //        XmlHelper.GetNodeValue(n.SelectSingleNode("Content")));
+
+            //    foreach (XmlNode prop in n.SelectNodes("Properties/Property"))
+            //    {
+            //        StylesheetProperty sp = StylesheetProperty.MakeNew(
+            //            xmlHelper.GetNodeValue(prop.SelectSingleNode("Name")),
+            //            s,
+            //            currentUser);
+            //        sp.Alias = XmlHelper.GetNodeValue(prop.SelectSingleNode("Alias"));
+            //        sp.value = XmlHelper.GetNodeValue(prop.SelectSingleNode("Value"));
+            //    }
+            //    s.saveCssToFile();
+            //    s.Save();
+            //}
+        }
+
+        public IEnumerable<IMacro> ImportMacros(XElement xElement, int userId = 0)
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement xElement, int userId = 0)
+        {
+            throw new NotImplementedException();
         }
 
         private bool IsMasterPageSyntax(string code)
