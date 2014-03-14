@@ -69,7 +69,7 @@ namespace Umbraco.Core.Persistence.Migrations
             {
                 ExecuteMigrations(schemaMigrationContext, database);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 //if this fails then the transaction will be rolled back, BUT if we are using MySql this is not the case,
                 //since it does not support schema changes in a transaction, see: http://dev.mysql.com/doc/refman/5.0/en/implicit-commit.html
@@ -77,11 +77,21 @@ namespace Umbraco.Core.Persistence.Migrations
 
                 if (databaseProvider == DatabaseProviders.MySql)
                 {
-                    var downgrades = OrderedDowngradeMigrations(foundMigrations.Where(x => (x is SchemaMigration))).ToList();
-                    var downgradeMigrationContext = InitializeMigrations(downgrades, database, databaseProvider, false);
-                    //lets hope that works! - if something cannot be rolled back then a CatastrophicDataLossException should
-                    // be thrown.
-                    ExecuteMigrations(downgradeMigrationContext, database);
+                    try
+                    {
+                        var downgrades = OrderedDowngradeMigrations(foundMigrations.Where(x => (x is SchemaMigration))).ToList();
+                        var downgradeMigrationContext = InitializeMigrations(downgrades, database, databaseProvider, false);
+                        //lets hope that works! - if something cannot be rolled back then a CatastrophicDataLossException should
+                        // be thrown.
+                        ExecuteMigrations(downgradeMigrationContext, database);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new CatastrophicDataLossException(
+                            "An error occurred running a schema migration but the changes could not be rolled back. Error: " + ex.Message + ". In some cases, it may be required that the database be restored to it's original state before running this upgrade process again.",
+                            ex);
+
+                    }
                 }
 
                 //continue throwing the exception

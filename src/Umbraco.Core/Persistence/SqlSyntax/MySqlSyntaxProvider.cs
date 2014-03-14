@@ -218,7 +218,7 @@ ORDER BY TABLE_NAME, INDEX_NAME",
         {
             string primaryKey = string.Empty;
             var columnDefinition = table.Columns.FirstOrDefault(x => x.IsPrimaryKey);
-            if (columnDefinition != null && columnDefinition.PrimaryKeyColumns.Contains(",") == false)
+            if (columnDefinition != null)
             {
                 string columns = string.IsNullOrEmpty(columnDefinition.PrimaryKeyColumns)
                                  ? GetQuotedColumnName(columnDefinition.Name)
