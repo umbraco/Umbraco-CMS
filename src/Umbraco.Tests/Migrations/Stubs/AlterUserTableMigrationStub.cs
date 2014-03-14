@@ -17,4 +17,18 @@ namespace Umbraco.Tests.Migrations.Stubs
         {
         }
     }
+
+
+    [MigrationAttribute("6.0.0", 0, "Test")]
+    public class DropForeignKeyMigrationStub : SchemaMigration
+    {
+        public override void Up()
+        {
+            Delete.ForeignKey().FromTable("umbracoUser2app").ForeignColumn("app").ToTable("umbracoApp").PrimaryColumn("appAlias");
+        }
+
+        public override void Down()
+        {
+        }
+    }
 }

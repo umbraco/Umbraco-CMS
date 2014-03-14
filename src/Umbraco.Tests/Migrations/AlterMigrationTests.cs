@@ -17,6 +17,30 @@ namespace Umbraco.Tests.Migrations
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
         }
 
+        [NUnit.Framework.Ignore("this doesn't actually test anything")]
+        [Test]
+        public void Drop_Foreign_Key()
+        {
+            // Arrange
+            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null);
+            var stub = new DropForeignKeyMigrationStub();
+
+            // Act
+            stub.GetUpExpressions(context);
+
+            // Assert
+            Assert.That(context.Expressions.Any(), Is.True);
+
+            //Console output
+            Console.WriteLine("Number of expressions in context: {0}", context.Expressions.Count);
+            Console.WriteLine("");
+            foreach (var expression in context.Expressions)
+            {
+                Console.WriteLine(expression.ToString());
+            }
+        }
+
+        [NUnit.Framework.Ignore("this doesn't actually test anything")]
         [Test]
         public void Can_Get_Up_Migration_From_MigrationStub()
         {

@@ -74,19 +74,23 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                 return new Version(6, 0, 0);
             }
 
-            //if the error indicates a problem with the column cmsMacroProperty.macroPropertyType then it is not version 7 and the
-            // last db change we made was the umbracoServer in 6.1
+            //if the error indicates a problem with the column cmsMacroProperty.macroPropertyType then it is not version 7 
+            // since these columns get removed in v7
             if (Errors.Any(x => x.Item1.Equals("Column") && (x.Item2.InvariantEquals("cmsMacroProperty,macroPropertyType"))))
             {
-                return new Version(6, 1, 0);
+                //if the error is for this IX_umbracoNodeTrashed which is added in 6.2 AND in 7.1 but we do not have the above columns
+                // then it must mean that we aren't on 6.2 so must be 6.1
+                if (Errors.Any(x => x.Item1.Equals("Index") && (x.Item2.InvariantEquals("IX_umbracoNodeTrashed"))))
+                {
+                    return new Version(6, 1, 0);
+                }
+                else
+                {
+                    //if there are no errors for that index, then the person must have 6.2 installed
+                    return new Version(6, 2, 0);
+                }
             }
-            //if the error is for an index
-            if (Errors.Any(x => x.Item1.Equals("Index") && (x.Item2.InvariantEquals("IX_umbracoNodeTrashed"))))
-            {
-                return new Version(6, 1, 0);
-            }
-
-
+            
             return UmbracoVersion.Current;
         }
 

@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     /// Creates a unique index on the macro alias so we cannot have duplicates by alias
     /// </summary>
     [Migration("7.0.0", 4, GlobalSettings.UmbracoMigrationName)]
-    public class AddIndexToCmsMacroTable : MigrationBase
+    public class AddIndexToCmsMacroTable : SchemaMigration
     {
         public override void Up()
         {
@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 }).ToArray();
 
             //make sure it doesn't already exist
-            if (dbIndexes.Any(x => x.IndexName == "IX_cmsMacro_Alias") == false)
+            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsMacro_Alias") == false))
             {
                 Create.Index("IX_cmsMacro_Alias").OnTable("cmsMacro").OnColumn("macroAlias").Unique();            
             }
@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
         public override void Down()
         {
-            throw new NotSupportedException("Cannot downgrade from a version 7 database to a prior version");
+            Delete.Index("IX_cmsMacro_Alias").OnTable("cmsMacro");
         }
     }
 }

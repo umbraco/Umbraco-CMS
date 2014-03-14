@@ -5,7 +5,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 {
 
     [Migration("7.0.0", 0, GlobalSettings.UmbracoMigrationName)]
-    public class AddPropertyEditorAliasColumn : MigrationBase
+    public class AddPropertyEditorAliasColumn : SchemaMigration
     {
         public override void Up()
         {               
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
         public override void Down()
         {
-            throw new NotSupportedException("Cannot downgrade from a version 7 database to a prior version");
+            Delete.Column("propertyEditorAlias").FromTable("cmsDataType");
         }
     }
 }

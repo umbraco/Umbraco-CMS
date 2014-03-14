@@ -17,8 +17,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
 
         public override void Down()
         {
-            Delete.ForeignKey("FK_cmsPropertyTypeGroup_cmsPropertyTypeGroup").OnTable("cmsPropertyTypeGroup");
-
+            Delete.ForeignKey().FromTable("cmsPropertyTypeGroup").ForeignColumn("parentGroupId").ToTable("cmsPropertyTypeGroup").PrimaryColumn("id");
+            
             Delete.Column("parentGroupId").FromTable("cmsPropertyTypeGroup");
         }
     }

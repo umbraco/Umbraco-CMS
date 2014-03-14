@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     /// Creats a unique index across two columns so we cannot have duplicate property aliases for one macro
     /// </summary>
     [Migration("7.0.0", 5, GlobalSettings.UmbracoMigrationName)]
-    public class AddIndexToCmsMacroPropertyTable : MigrationBase
+    public class AddIndexToCmsMacroPropertyTable : SchemaMigration
     {
         public override void Up()
         {
@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 }).ToArray();
 
             //make sure it doesn't already exist
-            if (dbIndexes.Any(x => x.IndexName == "IX_cmsMacroProperty_Alias") == false)
+            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsMacroProperty_Alias") == false))
             {
                 Create.Index("IX_cmsMacroProperty_Alias").OnTable("cmsMacroProperty")
                   .OnColumn("macro")
@@ -38,7 +38,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
         public override void Down()
         {
-            throw new NotSupportedException("Cannot downgrade from a version 7 database to a prior version");
+            Delete.Index("IX_cmsMacroProperty_Alias").OnTable("cmsMacroProperty");
         }
     }
 }
