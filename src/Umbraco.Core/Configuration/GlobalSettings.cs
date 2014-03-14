@@ -283,7 +283,7 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                return IsConfiguredMembershipProviderUsingLegacyEncoding(Constants.Conventions.Member.UmbracoMemberProviderName);
+                return IsConfiguredMembershipProviderUsingLegacyEncoding(Constants.Conventions.User.UmbracoUsersProviderName);
             }
             set
             {

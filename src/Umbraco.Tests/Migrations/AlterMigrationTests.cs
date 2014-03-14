@@ -17,6 +17,7 @@ namespace Umbraco.Tests.Migrations
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
         }
 
+        [NUnit.Framework.Ignore("this doesn't actually test anything")]
         [Test]
         public void Can_Get_Up_Migration_From_MigrationStub()
         {
