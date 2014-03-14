@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
 {
     [Migration("7.1.0", 0, GlobalSettings.UmbracoMigrationName)]
     [Migration("6.2.0", 0, GlobalSettings.UmbracoMigrationName)]
-    public class AdditionalIndexesAndKeys : MigrationBase
+    public class AdditionalIndexesAndKeys : SchemaMigration
     {
         public override void Up()
         {
@@ -45,22 +45,10 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
 
         public override void Down()
         {
-            throw new NotImplementedException();
-        }
-    }
-
-    [Migration("6.2.0", 2, GlobalSettings.UmbracoMigrationName)]
-    public class ChangePasswordColumn : MigrationBase
-    {
-        public override void Up()
-        {
-            //up to 500 chars
-            Alter.Table("umbracoUser").AlterColumn("userPassword").AsString(500).NotNullable();
-        }
-
-        public override void Down()
-        {
-            throw new NotImplementedException();
+            Delete.Index("IX_umbracoNodeTrashed").OnTable("umbracoNode");
+            Delete.Index("IX_cmsContentVersion_ContentId").OnTable("cmsContentVersion");
+            Delete.Index("IX_cmsDocument_published").OnTable("cmsDocument");
+            Delete.Index("IX_cmsDocument_newest").OnTable("cmsDocument");
         }
     }
 }

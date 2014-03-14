@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Persistence.Migrations.Syntax.IfDatabase;
 
 namespace Umbraco.Core.Persistence.Migrations
 {
-	/// <summary>
+    /// <summary>
     /// Represents the Migration Runner, which is used to apply migrations to
     /// the umbraco database.
     /// </summary>
@@ -45,19 +46,62 @@ namespace Umbraco.Core.Persistence.Migrations
         {
             LogHelper.Info<MigrationRunner>("Initializing database migrations");
 
-	        var foundMigrations = MigrationResolver.Current.Migrations;
+	        var foundMigrations = MigrationResolver.Current.Migrations.ToArray();
 
-            var migrations = isUpgrade
-                                 ? OrderedUpgradeMigrations(foundMigrations).ToList()
-                                 : OrderedDowngradeMigrations(foundMigrations).ToList();
+            //filter all schema migrations
+            var schemaMigrations = isUpgrade
+                                 ? OrderedUpgradeMigrations(foundMigrations.Where(x => (x is SchemaMigration))).ToList()
+                                 : OrderedDowngradeMigrations(foundMigrations.Where(x => (x is SchemaMigration))).ToList();
+
+            //filter all non-schema migrations
+            var dataMigrations = isUpgrade
+                                 ? OrderedUpgradeMigrations(foundMigrations.Where(x => (x is SchemaMigration) == false)).ToList()
+                                 : OrderedDowngradeMigrations(foundMigrations.Where(x => (x is SchemaMigration) == false)).ToList();
             
             //SD: Why do we want this?
-            if (Migrating.IsRaisedEventCancelled(new MigrationEventArgs(migrations, _configuredVersion, _targetVersion, true), this))
+            if (Migrating.IsRaisedEventCancelled(new MigrationEventArgs(dataMigrations, _configuredVersion, _targetVersion, true), this))
                 return false;
 
             //Loop through migrations to generate sql
-            var context = ExecuteMigrations(migrations, database, databaseProvider, isUpgrade);
+            var schemaMigrationContext = InitializeMigrations(schemaMigrations, database, databaseProvider, isUpgrade);
+            
+            try
+            {
+                ExecuteMigrations(schemaMigrationContext, database);
+            }
+            catch (Exception)
+            {
+                //if this fails then the transaction will be rolled back, BUT if we are using MySql this is not the case,
+                //since it does not support schema changes in a transaction, see: http://dev.mysql.com/doc/refman/5.0/en/implicit-commit.html
+                //so in that case we have to downgrade
 
+                if (databaseProvider == DatabaseProviders.MySql)
+                {
+                    var downgrades = OrderedDowngradeMigrations(foundMigrations.Where(x => (x is SchemaMigration))).ToList();
+                    var downgradeMigrationContext = InitializeMigrations(downgrades, database, databaseProvider, false);
+                    //lets hope that works! - if something cannot be rolled back then a CatastrophicDataLossException should
+                    // be thrown.
+                    ExecuteMigrations(downgradeMigrationContext, database);
+                }
+
+                //continue throwing the exception
+                throw;
+            }
+
+            //Ok, we've made it this far, now we can execute our data migrations
+
+            //Loop through migrations to generate sql
+            var dataMigrationContext = InitializeMigrations(dataMigrations, database, databaseProvider, isUpgrade);
+            //run them - if this fails the data will be rolled back
+            ExecuteMigrations(dataMigrationContext, database);
+
+            Migrated.RaiseEvent(new MigrationEventArgs(dataMigrations, dataMigrationContext, _configuredVersion, _targetVersion, false), this);
+
+            return true;
+        }
+
+	    private void ExecuteMigrations(IMigrationContext context, Database database)
+	    {
             //Transactional execution of the sql that was generated from the found migrations
             using (var transaction = database.GetTransaction())
             {
@@ -78,13 +122,9 @@ namespace Umbraco.Core.Persistence.Migrations
 
                 transaction.Complete();
             }
+	    }
 
-            Migrated.RaiseEvent(new MigrationEventArgs(migrations, context, _configuredVersion, _targetVersion, false), this);
-
-            return true;
-        }
-
-        internal MigrationContext ExecuteMigrations(List<IMigration> migrations, Database database, DatabaseProviders databaseProvider, bool isUpgrade = true)
+        internal MigrationContext InitializeMigrations(List<IMigration> migrations, Database database, DatabaseProviders databaseProvider, bool isUpgrade = true)
 	    {
             //Loop through migrations to generate sql
             var context = new MigrationContext(databaseProvider, database);
