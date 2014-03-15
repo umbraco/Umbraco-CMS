@@ -352,6 +352,13 @@
     <Compile Include="Models\TaggableObjectTypes.cs" />
     <Compile Include="Models\TemplateNode.cs" />
     <Compile Include="Models\UmbracoEntityExtensions.cs" />
+    <Compile Include="Packaging\Models\InstallAction.cs" />
+    <Compile Include="Packaging\Models\InstallationSummary.cs" />
+    <Compile Include="Packaging\Models\MetaData.cs" />
+    <Compile Include="Packaging\Models\UninstallAction.cs" />
+    <Compile Include="Packaging\PackageBuilding.cs" />
+    <Compile Include="Packaging\PackageExtraction.cs" />
+    <Compile Include="Packaging\PackageInstallation.cs" />
     <Compile Include="Persistence\DatabaseModelDefinitions\DbIndexDefinition.cs" />
     <Compile Include="Packaging\PackageBinaryInspector.cs" />
     <Compile Include="Persistence\EntityNotFoundException.cs" />
@@ -1085,6 +1092,9 @@
     </Compile>
     <Compile Include="Constants-PropertyEditors.cs">
       <DependentUpon>Constants.cs</DependentUpon>
+    </Compile>
+	<Compile Include="Constants-Packaging.cs">
+	  <DependentUpon>Constants.cs</DependentUpon>
     </Compile>
     <Compile Include="Constants-ObjectTypes.cs">
       <DependentUpon>Constants.cs</DependentUpon>
