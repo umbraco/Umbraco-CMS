@@ -7,7 +7,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
 {
-    [Migration("6.2.0", 0, GlobalSettings.UmbracoMigrationName)]
+    [Migration("6.2.0", 1, GlobalSettings.UmbracoMigrationName)]
     public class AdditionalIndexesAndKeys : SchemaMigration
     {
         public override void Up()

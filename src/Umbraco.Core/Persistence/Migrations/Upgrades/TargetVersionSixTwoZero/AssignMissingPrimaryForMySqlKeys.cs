@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.SqlSyntax;
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
 {
     //see: http://issues.umbraco.org/issue/U4-4430
-    [Migration("6.2.0", 3, GlobalSettings.UmbracoMigrationName)]
+    [Migration("6.2.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class AssignMissingPrimaryForMySqlKeys : SchemaMigration
     {
         public override void Up()
