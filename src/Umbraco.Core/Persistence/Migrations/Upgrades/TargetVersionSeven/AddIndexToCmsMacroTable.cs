@@ -24,7 +24,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 }).ToArray();
 
             //make sure it doesn't already exist
-            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsMacro_Alias") == false))
+            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsMacro_Alias")) == false)
             {
                 Create.Index("IX_cmsMacro_Alias").OnTable("cmsMacro").OnColumn("macroAlias").Unique();            
             }

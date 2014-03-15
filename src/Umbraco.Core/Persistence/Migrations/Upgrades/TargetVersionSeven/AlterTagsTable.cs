@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                   .OnUpdate(Rule.None); 
 
             //make sure it doesn't already exist
-            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsTags") == false))
+            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsTags")) == false)
             {
                 //add an index to tag/group since it's queried often
                 Create.Index("IX_cmsTags").OnTable("cmsTags").OnColumn("tag").Ascending().OnColumn("group").Ascending().WithOptions().NonClustered();
