@@ -12,6 +12,8 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Packaging;
+using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -1197,6 +1199,22 @@ namespace Umbraco.Core.Services
         #endregion
 
         #region Stylesheets
+        #endregion
+
+        #region Installation
+
+        internal InstallationSummary InstallPackage(string packageFilePath, int userId = 0)
+        {
+            //TODO Add events ?
+            //NOTE The PackageInstallation class should be passed as IPackageInstallation through the 
+            //constructor (probably as an overload to avoid breaking stuff), so that its extendable.
+            var installer = new PackageInstallation(this, new PackageExtraction());
+            return installer.InstallPackage(packageFilePath, userId);
+        }
+
+        #endregion
+
+        #region Package Building
         #endregion
     }
 }
