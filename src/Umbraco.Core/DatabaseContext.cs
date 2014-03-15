@@ -538,11 +538,11 @@ namespace Umbraco.Core
                 
                 //DO the upgrade!
 
-                var configuredVersion = string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus)
+                var currentVersion = string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus)
                                                 ? installedVersion
                                                 : new Version(GlobalSettings.ConfigurationStatus);
                 var targetVersion = UmbracoVersion.Current;
-                var runner = new MigrationRunner(configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+                var runner = new MigrationRunner(currentVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
                 var upgraded = runner.Execute(database, true);
                 message = message + "<p>Upgrade completed!</p>";
 

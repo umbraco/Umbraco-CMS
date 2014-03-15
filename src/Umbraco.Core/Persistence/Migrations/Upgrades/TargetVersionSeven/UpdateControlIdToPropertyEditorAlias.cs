@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     /// Updates the data in the changed propertyEditorAlias column after it has been changed by ChangeControlIdColumn
     /// </summary>
     [Migration("7.0.0", 1, GlobalSettings.UmbracoMigrationName)]
-    public class UpdateControlIdToPropertyEditorAlias : MigrationBase
+    public class UpdateControlIdToPropertyEditorAlias : SchemaMigration
     {
         public override void Up()
         {

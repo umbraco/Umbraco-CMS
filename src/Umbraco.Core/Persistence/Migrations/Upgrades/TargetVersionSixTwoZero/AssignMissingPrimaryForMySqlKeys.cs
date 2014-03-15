@@ -6,7 +6,8 @@ using Umbraco.Core.Persistence.SqlSyntax;
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
 {
     //see: http://issues.umbraco.org/issue/U4-4430
-    [Migration("6.2.0", 3, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.1.0", 0, GlobalSettings.UmbracoMigrationName)]
+    [Migration("6.2.0", 0, GlobalSettings.UmbracoMigrationName)]
     public class AssignMissingPrimaryForMySqlKeys : SchemaMigration
     {
         public override void Up()
@@ -53,14 +54,6 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
                     Create.PrimaryKey("PK_cmsContentPreviewXml")
                         .OnTable("cmsPreviewXml")
                         .Columns(new[] { "nodeId", "versionId" });
-                }
-
-                //This should be 2 because this table has 2 keys
-                if (constraints.Count(x => x.Item1.InvariantEquals("cmsTagRelationship") && x.Item3.InvariantEquals("PRIMARY")) == 0)
-                {
-                    Create.PrimaryKey("PK_cmsTagRelationship")
-                        .OnTable("cmsTagRelationship")
-                        .Columns(new[] { "nodeId", "tagId" });
                 }
 
                 //This should be 2 because this table has 2 keys

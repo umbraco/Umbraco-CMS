@@ -1668,7 +1668,8 @@ namespace Umbraco.Core.Services
         #endregion
 
         #region Package Building
-        
+        #endregion
+
         #region Event Handlers
         /// <summary>
         /// Occurs before Importing Content
