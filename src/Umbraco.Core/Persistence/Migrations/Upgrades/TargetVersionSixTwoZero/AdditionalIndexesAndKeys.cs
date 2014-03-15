@@ -24,19 +24,19 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
 
             //do not create any indexes if they already exist in the database
 
-            if (dbIndexes.Any(x => x.IndexName == "IX_umbracoNodeTrashed") == false)
+            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoNodeTrashed")) == false)
             {
                 Create.Index("IX_umbracoNodeTrashed").OnTable("umbracoNode").OnColumn("trashed").Ascending().WithOptions().NonClustered();    
             }
-            if (dbIndexes.Any(x => x.IndexName == "IX_cmsContentVersion_ContentId") == false)
+            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsContentVersion_ContentId")) == false)
             {
                 Create.Index("IX_cmsContentVersion_ContentId").OnTable("cmsContentVersion").OnColumn("ContentId").Ascending().WithOptions().NonClustered();
             }
-            if (dbIndexes.Any(x => x.IndexName == "IX_cmsDocument_published") == false)
+            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsDocument_published")) == false)
             {
                 Create.Index("IX_cmsDocument_published").OnTable("cmsDocument").OnColumn("published").Ascending().WithOptions().NonClustered();
             }
-            if (dbIndexes.Any(x => x.IndexName == "IX_cmsDocument_newest") == false)
+            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsDocument_newest")) == false)
             {
                 Create.Index("IX_cmsDocument_newest").OnTable("cmsDocument").OnColumn("newest").Ascending().WithOptions().NonClustered();
             }
