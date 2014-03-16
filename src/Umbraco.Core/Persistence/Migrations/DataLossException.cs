@@ -5,15 +5,15 @@ namespace Umbraco.Core.Persistence.Migrations
     /// <summary>
     /// Used if a migration has executed but the whole process has failed and cannot be rolled back
     /// </summary>
-    internal class CatastrophicDataLossException : Exception
+    internal class DataLossException : Exception
     {
-        public CatastrophicDataLossException(string msg)
+        public DataLossException(string msg)
             : base(msg)
         {
             
         }
 
-        public CatastrophicDataLossException(string msg, Exception inner)
+        public DataLossException(string msg, Exception inner)
             : base(msg, inner)
         {
             

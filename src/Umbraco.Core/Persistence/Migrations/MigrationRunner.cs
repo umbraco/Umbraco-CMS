@@ -48,26 +48,21 @@ namespace Umbraco.Core.Persistence.Migrations
 
 	        var foundMigrations = MigrationResolver.Current.Migrations.ToArray();
 
-            //filter all schema migrations
-            var schemaMigrations = isUpgrade
-                                 ? OrderedUpgradeMigrations(foundMigrations.Where(x => (x is SchemaMigration))).ToList()
-                                 : OrderedDowngradeMigrations(foundMigrations.Where(x => (x is SchemaMigration))).ToList();
-
             //filter all non-schema migrations
-            var dataMigrations = isUpgrade
-                                 ? OrderedUpgradeMigrations(foundMigrations.Where(x => (x is SchemaMigration) == false)).ToList()
-                                 : OrderedDowngradeMigrations(foundMigrations.Where(x => (x is SchemaMigration) == false)).ToList();
+            var migrations = isUpgrade
+                                 ? OrderedUpgradeMigrations(foundMigrations).ToList()
+                                 : OrderedDowngradeMigrations(foundMigrations).ToList();
             
             //SD: Why do we want this?
-            if (Migrating.IsRaisedEventCancelled(new MigrationEventArgs(dataMigrations, _configuredVersion, _targetVersion, true), this))
+            if (Migrating.IsRaisedEventCancelled(new MigrationEventArgs(migrations, _configuredVersion, _targetVersion, true), this))
                 return false;
 
             //Loop through migrations to generate sql
-            var schemaMigrationContext = InitializeMigrations(schemaMigrations, database, databaseProvider, isUpgrade);
+            var migrationContext = InitializeMigrations(migrations, database, databaseProvider, isUpgrade);
             
             try
             {
-                ExecuteMigrations(schemaMigrationContext, database);
+                ExecuteMigrations(migrationContext, database);
             }
             catch (Exception ex)
             {
@@ -77,35 +72,16 @@ namespace Umbraco.Core.Persistence.Migrations
 
                 if (databaseProvider == DatabaseProviders.MySql)
                 {
-                    try
-                    {
-                        var downgrades = OrderedDowngradeMigrations(foundMigrations.Where(x => (x is SchemaMigration))).ToList();
-                        var downgradeMigrationContext = InitializeMigrations(downgrades, database, databaseProvider, false);
-                        //lets hope that works! - if something cannot be rolled back then a CatastrophicDataLossException should
-                        // be thrown.
-                        ExecuteMigrations(downgradeMigrationContext, database);
-                    }
-                    catch (Exception e)
-                    {
-                        throw new CatastrophicDataLossException(
+                    throw new DataLossException(
                             "An error occurred running a schema migration but the changes could not be rolled back. Error: " + ex.Message + ". In some cases, it may be required that the database be restored to it's original state before running this upgrade process again.",
                             ex);
-
-                    }
                 }
 
                 //continue throwing the exception
                 throw;
             }
 
-            //Ok, we've made it this far, now we can execute our data migrations
-
-            //Loop through migrations to generate sql
-            var dataMigrationContext = InitializeMigrations(dataMigrations, database, databaseProvider, isUpgrade);
-            //run them - if this fails the data will be rolled back
-            ExecuteMigrations(dataMigrationContext, database);
-
-            Migrated.RaiseEvent(new MigrationEventArgs(dataMigrations, dataMigrationContext, _configuredVersion, _targetVersion, false), this);
+            Migrated.RaiseEvent(new MigrationEventArgs(migrations, migrationContext, _configuredVersion, _targetVersion, false), this);
 
             return true;
         }

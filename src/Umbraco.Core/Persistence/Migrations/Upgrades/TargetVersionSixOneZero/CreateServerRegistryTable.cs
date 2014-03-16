@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixOneZero
 {
    
     [Migration("6.1.0", 0, GlobalSettings.UmbracoMigrationName)]
-    public class CreateServerRegistryTable : SchemaMigration
+    public class CreateServerRegistryTable : MigrationBase
     {
         public override void Up()
         {
