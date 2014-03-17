@@ -12,6 +12,7 @@ namespace Umbraco.Tests.BusinessLogic
     ///to contain all ApplicationTreeTest Unit Tests
     ///</summary>
     [TestFixture()]
+    [TestFixture()]
     public class ApplicationTreeTest :  BaseTest
     {
 
