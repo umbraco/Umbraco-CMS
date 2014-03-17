@@ -102,14 +102,17 @@ namespace umbraco.presentation.umbraco.dialogs
 
                     if (Access.GetProtectionType(documentId) == ProtectionType.Simple)
                     {
-                        MembershipUser m = Access.GetAccessingMembershipUser(documentId);                        
-                        pane_simple.Visible = true;
-                        pp_pass.Visible = false;
-                        simpleLogin.Visible = false;
-                        SimpleLoginLabel.Visible = true;
-                        SimpleLoginLabel.Text = m.UserName;
-                        pane_advanced.Visible = false;
-                        bt_protect.CommandName = "simple";
+                        MembershipUser m = Access.GetAccessingMembershipUser(documentId);
+                        if (m != null)
+                        {
+                            pane_simple.Visible = true;
+                            pp_pass.Visible = false;
+                            simpleLogin.Visible = false;
+                            SimpleLoginLabel.Visible = true;
+                            SimpleLoginLabel.Text = m.UserName;
+                            pane_advanced.Visible = false;
+                            bt_protect.CommandName = "simple";    
+                        }
 
                     }
                     else if (Access.GetProtectionType(documentId) == ProtectionType.Advanced)
