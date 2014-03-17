@@ -8,10 +8,10 @@ using System.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using umbraco.BusinessLogic;
 using System.Security.Cryptography;
 using System.Web.Util;
 using System.Collections.Specialized;
@@ -21,6 +21,7 @@ using System.Security.Permissions;
 using System.Runtime.CompilerServices;
 using Member = umbraco.cms.businesslogic.member.Member;
 using MemberType = umbraco.cms.businesslogic.member.MemberType;
+using User = umbraco.BusinessLogic.User;
 
 #endregion
 
