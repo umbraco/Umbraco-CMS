@@ -172,7 +172,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
                     x.Item3.InvariantStartsWith("FK_") == false && x.Item3.InvariantStartsWith("PK_") == false &&
                     x.Item3.InvariantStartsWith("IX_") == false).Select(x => x.Item3).ToList();
             var foreignKeysInSchema = result.TableDefinitions.SelectMany(x => x.ForeignKeys.Select(y => y.Name)).ToList();
-            var primaryKeysInSchema = result.TableDefinitions.SelectMany(x => x.Columns.Select(y => y.PrimaryKeyName)).ToList();
+            var primaryKeysInSchema = result.TableDefinitions.SelectMany(x => x.Columns.Select(y => y.PrimaryKeyName))
+                .Where(x => x.IsNullOrWhiteSpace() == false).ToList();
 
             //Add valid and invalid foreign key differences to the result object
             foreach (var unknown in unknownConstraintsInDatabase)
@@ -284,7 +285,8 @@ namespace Umbraco.Core.Persistence.Migrations.Initial
         private void ValidateDbIndexes(DatabaseSchemaResult result)
         {
             //These are just column indexes NOT constraints or Keys
-            var colIndexesInDatabase = result.DbIndexDefinitions.Where(x => x.IndexName.InvariantStartsWith("IX_")).Select(x => x.IndexName).ToList();
+            //var colIndexesInDatabase = result.DbIndexDefinitions.Where(x => x.IndexName.InvariantStartsWith("IX_")).Select(x => x.IndexName).ToList();
+            var colIndexesInDatabase = result.DbIndexDefinitions.Select(x => x.IndexName).ToList();
             var indexesInSchema = result.TableDefinitions.SelectMany(x => x.Indexes.Select(y => y.Name)).ToList();
 
             //Add valid and invalid index differences to the result object

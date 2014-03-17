@@ -40,6 +40,17 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
             {
                 Create.Index("IX_cmsDocument_newest").OnTable("cmsDocument").OnColumn("newest").Ascending().WithOptions().NonClustered();
             }
+
+            //we want to drop the umbracoUserLogins_Index index since it is named incorrectly and then re-create it so 
+            // it follows the standard naming convention
+            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("umbracoUserLogins_Index")))
+            {
+                Delete.Index("umbracoUserLogins_Index").OnTable("umbracoUserLogins");                
+            }
+            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_umbracoUserLogins_Index")) == false)
+            {
+                Create.Index("IX_umbracoUserLogins_Index").OnTable("umbracoUserLogins").OnColumn("contextID").Ascending().WithOptions().Clustered();
+            }
         }
 
         public override void Down()
