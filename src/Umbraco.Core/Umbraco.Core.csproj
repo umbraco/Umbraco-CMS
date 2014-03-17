@@ -805,7 +805,7 @@
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="Services\LocalizationService.cs" />
     <Compile Include="Services\MediaService.cs" />
-    <Compile Include="Services\MemberCountType.cs" />
+    <Compile Include="Models\Membership\MemberCountType.cs" />
     <Compile Include="Services\MemberGroupService.cs" />
     <Compile Include="Services\MemberService.cs" />
     <Compile Include="Services\MemberTypeService.cs" />
