@@ -10,8 +10,8 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence
 {
-    
-    [TestFixture]
+
+    [TestFixture, RequiresSTA]
     public class DatabaseContextTests
     {
 	    private DatabaseContext _dbContext;
