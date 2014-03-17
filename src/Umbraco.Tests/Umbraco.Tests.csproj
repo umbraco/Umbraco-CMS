@@ -182,7 +182,6 @@
     <Compile Include="Persistence\Auditing\AuditTests.cs" />
     <Compile Include="BootManagers\CoreBootManagerTests.cs" />
     <Compile Include="BootManagers\WebBootManagerTests.cs" />
-    <Compile Include="BusinessLogic\DictionaryTest.cs" />
     <Compile Include="Cache\ObjectCacheProviderTests.cs" />
     <Compile Include="Cache\CacheProviderTests.cs" />
     <Compile Include="Cache\HttpRequestCacheProviderTests.cs" />
@@ -399,6 +398,7 @@
     <Compile Include="Resolvers\ActionsResolverTests.cs" />
     <Compile Include="AsynchronousRollingFileAppenderTests.cs" />
     <Compile Include="TestHelpers\BaseUmbracoConfigurationTest.cs" />
+    <Compile Include="TestHelpers\DatabaseTestBehaviorAttribute.cs" />
     <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserType.cs" />

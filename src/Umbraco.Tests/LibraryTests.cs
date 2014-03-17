@@ -57,10 +57,6 @@ namespace Umbraco.Tests
 			UmbracoContext.Current = null;
 		}
 
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NoDatabasePerFixture; }
-        }
 
 	    [Test]
 	    public void Json_To_Xml_Object()

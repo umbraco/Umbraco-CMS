@@ -9,6 +9,7 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class PetaPocoExtensionsTest : BaseDatabaseFactoryTest
     {

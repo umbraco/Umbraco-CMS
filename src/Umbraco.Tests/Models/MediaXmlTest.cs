@@ -12,6 +12,7 @@ using umbraco.interfaces;
 
 namespace Umbraco.Tests.Models
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
     public class MediaXmlTest : BaseDatabaseFactoryTest
     {

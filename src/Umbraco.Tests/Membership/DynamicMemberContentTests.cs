@@ -17,14 +17,10 @@ using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.Membership
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NoDatabasePerFixture)]
     [TestFixture]
     public class DynamicMemberContentTests : PublishedContentTestBase
     {
-
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NoDatabasePerFixture; }
-        }
 
         public override void Initialize()
         {

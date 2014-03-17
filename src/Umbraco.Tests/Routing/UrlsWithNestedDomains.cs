@@ -11,6 +11,7 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
 	[TestFixture]
 	public class UrlsWithNestedDomains : BaseRoutingTest
 	{

@@ -15,13 +15,10 @@ using Umbraco.Core.Strings;
 
 namespace Umbraco.Tests.Routing
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
 	[TestFixture]
 	public class RenderRouteHandlerTests : BaseRoutingTest
 	{
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NewSchemaPerFixture; }
-        }
 
 		public override void Initialize()
 		{                       
