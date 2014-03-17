@@ -382,7 +382,7 @@ namespace Umbraco.Web.Editors
                 //that will get mapped to the display object
                 if (shouldReFetchMember)
                 {
-                    RefetchMemberData(contentItem);
+                    RefetchMemberData(contentItem, LookupType.ByKey);
                 }
                 return null;
             }
@@ -394,7 +394,7 @@ namespace Umbraco.Web.Editors
                 //that will get mapped to the display object
                 if (shouldReFetchMember)
                 {
-                    RefetchMemberData(contentItem);
+                    RefetchMemberData(contentItem, LookupType.ByKey);
                 }
 
                 //even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
@@ -410,33 +410,59 @@ namespace Umbraco.Web.Editors
             return null;
         }
 
+        private enum LookupType
+        {
+            ByKey,
+            ByUserName
+        }
+
         /// <summary>
-        /// Re-fetches the database data to map to the PersistedContent object and re-maps the posted properties so that the display object is up-to-date
+        /// Re-fetches the database data to map to the PersistedContent object and re-assigns the already mapped the posted properties so that the display object is up-to-date
         /// </summary>
         /// <param name="contentItem"></param>
         /// <remarks>
         /// This is done during an update if the membership provider has changed some underlying data - we need to ensure that our model is consistent with that data
         /// </remarks>
-        private void RefetchMemberData(MemberSave contentItem)
+        private void RefetchMemberData(MemberSave contentItem, LookupType lookup)
         {
+            var currProps = contentItem.PersistedContent.Properties.ToArray();
+            
             switch (MembershipScenario)
             {
                 case MembershipScenario.NativeUmbraco:
-                    //Go and re-fetch the persisted item
-                    contentItem.PersistedContent = Services.MemberService.GetByKey(contentItem.Key);
-                    //remap the values to save
-                    MapPropertyValues(contentItem);
+                    switch (lookup)
+                    {
+                        case LookupType.ByKey:
+                            //Go and re-fetch the persisted item
+                            contentItem.PersistedContent = Services.MemberService.GetByKey(contentItem.Key);                    
+                            break;
+                        case LookupType.ByUserName:
+                            contentItem.PersistedContent = Services.MemberService.GetByUsername(contentItem.Username.Trim());
+                            break;                        
+                    }
                     break;
                 case MembershipScenario.CustomProviderWithUmbracoLink:
                 case MembershipScenario.StandaloneCustomProvider:
                 default:
                     var membershipUser = Membership.GetUser(contentItem.Key, false);
                     //Go and re-fetch the persisted item
-                    contentItem.PersistedContent = Mapper.Map<MembershipUser, IMember>(membershipUser);
-                    //remap the values to save
-                    MapPropertyValues(contentItem);
+                    contentItem.PersistedContent = Mapper.Map<MembershipUser, IMember>(membershipUser);                    
                     break;
             }
+
+            //re-assign the mapped values that are not part of the membership provider properties.
+            var builtInAliases = Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();            
+            foreach (var p in contentItem.PersistedContent.Properties)
+            {
+                var valueMapped = currProps.SingleOrDefault(x => x.Alias == p.Alias);
+                if (builtInAliases.Contains(p.Alias) == false && valueMapped != null)
+                {
+                    p.Value = valueMapped.Value;
+                    p.TagSupport.Behavior = valueMapped.TagSupport.Behavior;
+                    p.TagSupport.Enable = valueMapped.TagSupport.Enable;
+                    p.TagSupport.Tags = valueMapped.TagSupport.Tags;
+                }
+            }            
         }
 
         /// <summary>
@@ -533,20 +559,7 @@ namespace Umbraco.Web.Editors
                         Membership.UpdateUser(membershipUser);
                     }
 
-                    //if we're using the umbraco provider, we'll have to go re-fetch the IMember since the provider
-                    // has now updated it separately but we need to maintain all the correct bound data
-                    if (MembershipScenario == MembershipScenario.NativeUmbraco)
-                    {
-                        //Go and re-fetch the persisted item
-                        contentItem.PersistedContent = Services.MemberService.GetByUsername(contentItem.Username.Trim());
-                        if (contentItem.PersistedContent == null)
-                        {
-                            throw new EntityNotFoundException("The member was successfully created but the entity could not be resolved with the username " + contentItem.Username.Trim());
-                        }
-                        //remap the values to save
-                        MapPropertyValues(contentItem);
-                    }
-
+                    RefetchMemberData(contentItem, LookupType.ByUserName);
 
                     break;
                 case MembershipCreateStatus.InvalidUserName:
