@@ -238,7 +238,16 @@ angular.module("umbraco.directives")
 						}
 					});
 
-
+					//ie hack
+					if(window.navigator.userAgent.indexOf("MSIE ")){
+						var ranger = element.find("input");
+						ranger.bind("change",function(){
+							scope.$apply(function(){
+								scope.dimensions.scale.current = ranger.val();
+							});
+						});	
+					}
+					
 					//// INIT /////
 					$image.load(function(){
 						$timeout(function(){
