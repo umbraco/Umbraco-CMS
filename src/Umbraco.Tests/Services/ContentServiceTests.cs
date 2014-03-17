@@ -14,7 +14,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
-	/// <summary>
+    /// <summary>
     /// Tests covering all methods in the ContentService class.
     /// This is more of an integration test as it involves multiple layers
     /// as well as configuration.
