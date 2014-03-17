@@ -1,0 +1,58 @@
+<form novalidate name="contentForm"
+    ng-controller="Umbraco.Dialogs.Content.EditController"
+    ng-show="loaded"
+    ng-submit="save()"
+    val-form-manager>
+
+	<div class="umb-panel">
+		<div class="umb-panel-header">
+			<h1>{{model.entity.name}}</h1>
+		</div>
+
+		<div class="umb-panel-body with-footer">
+			<div id="tab{{tab.id}}" ng-repeat="tab in model.entity.tabs">
+			    <div class="umb-pane">
+			        <umb-property 
+			            property="property"
+			            ng-repeat="property in tab.properties">
+			            <umb-editor model="property"></umb-editor>
+			        </umb-property>				
+			    </div>
+			 </div>    
+		</div>
+
+
+		<div class="umb-panel-footer" >
+			<div class="umb-el-wrap umb-panel-buttons">
+		        <div class="btn-toolbar umb-btn-toolbar pull-right">
+		        	<a href ng-click="close()" class="btn btn-link">
+		        		<localize key="general_cancel">Cancel</localize>
+					</a>
+		        </div>
+
+		        <div class="btn-group dropup" ng-if="defaultButton" >
+	                <!-- primary button -->
+	                <a class="btn btn-success" href="#" ng-click="performAction(model.defaultButton)" prevent-default>
+	                    <localize key="{{model.defaultButton.labelKey}}">{{defaultButton.labelKey}}</localize>                            
+	                </a>
+	                
+	                <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" ng-if="subButtons.length > 0">
+	                    <span class="caret"></span>
+	                </a>
+	                
+	                <!-- sub buttons -->
+	                <ul class="dropdown-menu bottom-up" role="menu" aria-labelledby="dLabel"  
+	                	ng-if="model.subButtons.length > 0">
+	                    <li ng-repeat="btn in model.subButtons">
+	                        <a href="#" ng-click="performAction(btn)" ng-disabled="true" prevent-default>
+	                            <localize key="{{btn.labelKey}}">{{btn.labelKey}}</localize>
+	                        </a>
+	                    </li>
+	                </ul>
+		        </div>
+		        
+		      </div>
+			</div>
+		</div>
+	</div>
+</form>
