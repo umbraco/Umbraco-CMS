@@ -162,7 +162,11 @@ namespace Umbraco.Core.IO
                             _size = new Size(fileWidth, fileHeight);
                         }
                     }
-                }           
+                }
+                else
+                {
+                    _size = new Size(-1, -1);
+                }                
             }
             return _size.Value;
         }
@@ -186,7 +190,7 @@ namespace Umbraco.Core.IO
             {
                 EnsureFileSupportsResizing();
 
-                var fileNameThumb = DoResize(GetDimensions().Width, GetDimensions().Height, maxWidthHeight, fileNameAddition);
+                var fileNameThumb = DoResize(-1, -1, maxWidthHeight, fileNameAddition);
 
                 return _fs.GetUrl(fileNameThumb);    
             }
