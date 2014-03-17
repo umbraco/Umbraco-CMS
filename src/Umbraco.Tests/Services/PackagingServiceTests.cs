@@ -9,7 +9,7 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Services
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class PackagingServiceTests : BaseServiceTest
     {

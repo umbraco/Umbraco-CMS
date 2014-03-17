@@ -294,9 +294,14 @@ namespace Umbraco.Core
                     "AutoMapper,",
                     "AutoMapper.",
                     "AzureDirectory,",
-                    "itextsharp,",
-                    "Lucene.Net,",
+                    "itextsharp,",            
                     "UrlRewritingNet."
+                    "HtmlAgilityPack,",                 
+                    "MiniProfiler,",
+                    "Moq,",
+                    "nunit.framework,",
+                    "TidyNet,",
+                    "WebDriver,"
                 };
 
         /// <summary>
