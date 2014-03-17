@@ -49,6 +49,10 @@ namespace Umbraco.Tests.TestHelpers
 
         private ApplicationContext _appContext;
 
+        private string _dbPath;
+        //used to store (globally) the pre-built db with schema and initial data
+        private static Byte[] _dbBytes;
+
         [SetUp]
         public override void Initialize()
         {
@@ -135,7 +139,7 @@ namespace Umbraco.Tests.TestHelpers
                 Core.Configuration.GlobalSettings.UmbracoConnectionName, 
                 GetDbConnectionString());
 
-            string dbFilePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
+            _dbPath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
 
             //create a new database file if
             // - is the first test in the session
@@ -144,7 +148,7 @@ namespace Umbraco.Tests.TestHelpers
             // - _isFirstTestInFixture + DbInitBehavior.NewDbFileAndSchemaPerFixture
 
             //if this is the first test in the session, always ensure a new db file is created
-            if (_isFirstRunInTestSession || !File.Exists(dbFilePath) 
+            if (_isFirstRunInTestSession || File.Exists(_dbPath) == false 
                 || DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest
                 || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture))
             {
@@ -163,8 +167,15 @@ namespace Umbraco.Tests.TestHelpers
                 //Create the Sql CE database
                 using (DisposableTimer.TraceDuration<BaseDatabaseFactoryTest>("Create database file"))
                 {
-                    var engine = new SqlCeEngine(settings.ConnectionString);
-                    engine.CreateDatabase();
+                    if (_dbBytes != null)
+                    {
+                        File.WriteAllBytes(_dbPath, _dbBytes);
+                    }
+                    else
+                    {
+                        var engine = new SqlCeEngine(settings.ConnectionString);
+                        engine.CreateDatabase();   
+                    }
                 }
                 
             }
@@ -210,12 +221,19 @@ namespace Umbraco.Tests.TestHelpers
             // - NewDbFileAndSchemaPerTest
             // - _isFirstTestInFixture + DbInitBehavior.NewDbFileAndSchemaPerFixture
 
-            if (_isFirstRunInTestSession
+            if (_dbBytes == null && 
+                (_isFirstRunInTestSession
                 || DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest
-                || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture))
+                || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture)))
             {
                 //Create the umbraco database and its base data
                 DatabaseContext.Database.CreateDatabaseSchema(false);
+
+                //close the connections, we're gonna read this baby in as a byte array so we don't have to re-initialize the 
+                // damn db for each test
+                CloseDbConnections();
+
+                _dbBytes = File.ReadAllBytes(_dbPath);
             }            
         }
 
