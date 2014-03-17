@@ -301,7 +301,12 @@ namespace umbraco.NodeFactory
 				_pageXmlNode = ((IHasXmlNode)library.GetXmlNodeById(NodeId.ToString()).Current).GetNode();
 			else
 			{
-				if (presentation.UmbracoContext.Current != null)
+			    if (UmbracoContext.Current != null)
+			    {
+			        var cache = UmbracoContext.Current.ContentCache.InnerCache as Umbraco.Web.PublishedCache.XmlPublishedCache.PublishedContentCache;
+                    _pageXmlNode = cache.GetXml(UmbracoContext.Current, false).DocumentElement;
+			    }
+				else if (presentation.UmbracoContext.Current != null)
 				{
 					_pageXmlNode = umbraco.presentation.UmbracoContext.Current.GetXml().DocumentElement;
 				}

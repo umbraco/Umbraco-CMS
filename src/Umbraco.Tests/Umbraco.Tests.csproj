@@ -287,6 +287,7 @@
     <Compile Include="PropertyEditors\LegacyPropertyEditorIdToAliasConverterTests.cs" />
     <Compile Include="PropertyEditors\PropertyEditorValueEditorTests.cs" />
     <Compile Include="PublishedContent\PublishedContentRequestEngineTests.cs" />
+    <Compile Include="PublishedContent\RootNodeTests.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\CallingMethodTests.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\Subpage.cs" />
     <Compile Include="PublishedContent\StronglyTypedModels\Textpage.cs" />
