@@ -34,7 +34,7 @@ namespace Umbraco.Web.umbraco.presentation
 
                 if (doc == null)
                 {
-                    Id = -1;
+                    Id = 0;
                     return;
                 }
 
