@@ -11,7 +11,7 @@ namespace Umbraco.Tests.Services
     /// <summary>
     /// Tests covering the DataTypeService
     /// </summary>
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
     public class DataTypeServiceTests : BaseServiceTest
     {

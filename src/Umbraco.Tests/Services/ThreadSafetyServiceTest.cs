@@ -18,7 +18,7 @@ using umbraco.interfaces;
 
 namespace Umbraco.Tests.Services
 {
-    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
 	[TestFixture, RequiresSTA]
 	public class ThreadSafetyServiceTest : BaseDatabaseFactoryTest
 	{
