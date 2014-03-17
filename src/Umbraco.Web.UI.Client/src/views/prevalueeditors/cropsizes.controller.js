@@ -17,6 +17,11 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesControlle
 			$scope.newItem = item;
 		};
 
+		$scope.cancel = function(evt) {
+			evt.preventDefault();
+			$scope.newItem = null;
+		};
+
 		$scope.add = function (evt) {
 			evt.preventDefault();
 
@@ -29,7 +34,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.CropSizesControlle
 					return;
 				}
 			
-			$scope.newItem = undefined;
+			$scope.newItem = null;
 			//there was an error, do the highlight (will be set back by the directive)
 			$scope.hasError = true;
 			}

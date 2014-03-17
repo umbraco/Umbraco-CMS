@@ -42,7 +42,6 @@ namespace Umbraco.Web.PropertyEditors
         {
             _internalPreValues = new Dictionary<string, object>
                 {
-                    {"crops", "[]"},
                     {"focalPoint", "{left: 0.5, top: 0.5}"},
                     {"src", ""}
                 };
