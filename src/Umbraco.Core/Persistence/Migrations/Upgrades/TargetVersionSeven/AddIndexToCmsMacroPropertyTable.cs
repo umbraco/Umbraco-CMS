@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     /// Creats a unique index across two columns so we cannot have duplicate property aliases for one macro
     /// </summary>
     [Migration("7.0.0", 5, GlobalSettings.UmbracoMigrationName)]
-    public class AddIndexToCmsMacroPropertyTable : SchemaMigration
+    public class AddIndexToCmsMacroPropertyTable : MigrationBase
     {
         public override void Up()
         {

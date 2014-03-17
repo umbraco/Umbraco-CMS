@@ -100,7 +100,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
         public override void Down()
         {
-            throw new CatastrophicDataLossException("Cannot downgrade from a version 7 database to a prior version, the database schema has already been modified");
+            throw new DataLossException("Cannot downgrade from a version 7 database to a prior version, the database schema has already been modified");
         }
     }
 }

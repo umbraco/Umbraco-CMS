@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
 {
     [Migration("7.1.0", 1, GlobalSettings.UmbracoMigrationName)]
     [Migration("6.2.0", 1, GlobalSettings.UmbracoMigrationName)]
-    public class AdditionalIndexesAndKeys : SchemaMigration
+    public class AdditionalIndexesAndKeys : MigrationBase
     {
         public override void Up()
         {

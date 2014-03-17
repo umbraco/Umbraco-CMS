@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     /// editorAlias column (and maintaing data so we can reference it)
     /// </summary>
     [Migration("7.0.0", 6, GlobalSettings.UmbracoMigrationName)]
-    public class AlterCmsMacroPropertyTable : SchemaMigration
+    public class AlterCmsMacroPropertyTable : MigrationBase
     {
         public override void Up()
         {
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
         public override void Down()
         {
-            throw new CatastrophicDataLossException("Cannot downgrade from a version 7 database to a prior version, the database schema has already been modified");
+            throw new DataLossException("Cannot downgrade from a version 7 database to a prior version, the database schema has already been modified");
         }
     }
 }

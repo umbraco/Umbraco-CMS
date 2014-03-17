@@ -20,7 +20,7 @@ namespace Umbraco.Tests.Migrations.Stubs
 
 
     [MigrationAttribute("6.0.0", 0, "Test")]
-    public class DropForeignKeyMigrationStub : SchemaMigration
+    public class DropForeignKeyMigrationStub : MigrationBase
     {
         public override void Up()
         {

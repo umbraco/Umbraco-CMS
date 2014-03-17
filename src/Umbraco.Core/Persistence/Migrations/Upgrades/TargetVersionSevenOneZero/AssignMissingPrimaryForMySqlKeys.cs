@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSevenOneZero
     // we will get exceptions because it is trying to create the PK two times.
 
     [Migration("7.0.0", "7.1.0", 0, GlobalSettings.UmbracoMigrationName)]
-    public class AssignMissingPrimaryForMySqlKeys : SchemaMigration
+    public class AssignMissingPrimaryForMySqlKeys : MigrationBase
     {
         public override void Up()
         {
