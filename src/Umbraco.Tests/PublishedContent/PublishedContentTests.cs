@@ -18,11 +18,6 @@ namespace Umbraco.Tests.PublishedContent
 	[TestFixture]
     public class PublishedContentTests : PublishedContentTestBase
 	{
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NoDatabasePerFixture; }
-        }
-
         private PluginManager _pluginManager;
 
         public override void Initialize()

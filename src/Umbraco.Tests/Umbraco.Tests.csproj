@@ -167,7 +167,6 @@
     <Compile Include="Persistence\Auditing\AuditTests.cs" />
     <Compile Include="BootManagers\CoreBootManagerTests.cs" />
     <Compile Include="BootManagers\WebBootManagerTests.cs" />
-    <Compile Include="BusinessLogic\DictionaryTest.cs" />
     <Compile Include="CodeFirst\Attributes\AliasAttribute.cs" />
     <Compile Include="CodeFirst\Attributes\ContentTypeAttribute.cs" />
     <Compile Include="CodeFirst\Attributes\DescriptionAttribute.cs" />
@@ -246,7 +245,6 @@
     <Compile Include="CoreStrings\DefaultShortStringHelperTests.cs" />
     <Compile Include="CoreStrings\LegacyStringExtensionsTests.cs" />
     <Compile Include="CoreStrings\MockShortStringHelper.cs" />
-    <Compile Include="LegacyApi\MediaTypeTests.cs" />
     <Compile Include="Macros\MacroTests.cs" />
     <Compile Include="Migrations\AlterMigrationTests.cs" />
     <Compile Include="Migrations\TargetVersionSixthOneZeroMigrationsTest.cs" />
@@ -334,6 +332,7 @@
     <Compile Include="AsynchronousRollingFileAppenderTests.cs" />
     <Compile Include="BusinessLogic\ApplicationTest.cs" />
     <Compile Include="BusinessLogic\ApplicationTreeTest.cs" />
+    <Compile Include="TestHelpers\DatabaseTestBehaviorAttribute.cs" />
     <Compile Include="TestHelpers\Entities\MockedMember.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserType.cs" />

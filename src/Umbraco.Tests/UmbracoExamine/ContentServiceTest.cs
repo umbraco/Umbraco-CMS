@@ -7,6 +7,7 @@ using UmbracoExamine.DataServices;
 
 namespace Umbraco.Tests.UmbracoExamine
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
     public class ContentServiceTest : BaseDatabaseFactoryTest
     {

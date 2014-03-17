@@ -14,16 +14,10 @@ using System.Linq;
 
 namespace Umbraco.Tests.PublishedContent
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
     public class DynamicNodeTests : DynamicDocumentTestsBase<DynamicNode, DynamicNodeList>
     {
-        /// <summary>
-        /// We only need a new schema per fixture... speeds up testing
-        /// </summary>
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NewSchemaPerFixture; }
-        }
 
         public override void Initialize()
         {

@@ -17,6 +17,7 @@ using umbraco.interfaces;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class MediaRepositoryTest : BaseDatabaseFactoryTest
     {

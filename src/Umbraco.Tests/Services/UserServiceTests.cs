@@ -15,6 +15,7 @@ namespace Umbraco.Tests.Services
     /// <summary>
     /// Tests covering the UserService
     /// </summary>
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture, RequiresSTA]
     public class UserServiceTests : BaseServiceTest
     {
