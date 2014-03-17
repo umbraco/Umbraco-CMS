@@ -3,7 +3,7 @@
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
 {
     [Migration("6.0.0", 6, GlobalSettings.UmbracoMigrationName)]
-    public class RemoveMasterContentTypeColumn : SchemaMigration
+    public class RemoveMasterContentTypeColumn : MigrationBase
     {
         public override void Up()
         {

@@ -4,7 +4,7 @@ using Umbraco.Core.Configuration;
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
 {
     [Migration("6.0.0", 7, GlobalSettings.UmbracoMigrationName)]
-    public class RenameTabIdColumn : SchemaMigration
+    public class RenameTabIdColumn : MigrationBase
     {
         public override void Up()
         {

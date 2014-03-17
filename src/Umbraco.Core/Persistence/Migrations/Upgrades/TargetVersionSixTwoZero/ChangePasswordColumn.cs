@@ -5,7 +5,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
 {
     [Migration("7.1.0", 2, GlobalSettings.UmbracoMigrationName)]
     [Migration("6.2.0", 2, GlobalSettings.UmbracoMigrationName)]
-    public class ChangePasswordColumn : SchemaMigration
+    public class ChangePasswordColumn : MigrationBase
     {
         public override void Up()
         {

@@ -532,7 +532,7 @@ namespace Umbraco.Core
 
         public static bool InvariantContains(this IEnumerable<string> compare, string compareTo)
         {
-            return compare.Contains(compareTo, new DelegateEqualityComparer<string>((source, dest) => source.Equals(dest, StringComparison.InvariantCultureIgnoreCase), x => x.GetHashCode()));
+            return compare.Contains(compareTo, StringComparer.InvariantCultureIgnoreCase);
         }
 
         /// <summary>

@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
         public override void Down()
         {
             //This cannot be rolled back!!
-            throw new CatastrophicDataLossException("Cannot rollback migration " + typeof(DeleteAppTables) + " the db tables umbracoAppTree and umbracoApp have been droppped");
+            throw new DataLossException("Cannot rollback migration " + typeof(DeleteAppTables) + " the db tables umbracoAppTree and umbracoApp have been droppped");
         }
     }
 }

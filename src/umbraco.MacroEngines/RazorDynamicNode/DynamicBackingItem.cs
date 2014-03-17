@@ -32,6 +32,16 @@ namespace umbraco.MacroEngines
         }
         public DynamicBackingItem(int Id)
         {
+            if (Id == -1)
+            {
+                //this is a special check, previously passing in -1 would return a real node, the root node. Though
+                // it has no properties (defaults apply), you could access descendants, children, etc...
+                //This is how this used to work before a large refactor - which I think may have broken other legacy logic too :(
+                
+                this.content = new NodeFactory.Node(Id);
+                return;
+            }
+
             var n = CompatibilityHelper.ConvertToNode(UmbracoContext.Current.ContentCache.GetById(Id));
            
             this.content = n;
@@ -57,7 +67,19 @@ namespace umbraco.MacroEngines
             }
             else
             {
-                this.content = CompatibilityHelper.ConvertToNode(UmbracoContext.Current.ContentCache.GetById(Id));
+                if (Id == -1)
+                {
+                    //this is a special check, previously passing in -1 would return a real node, the root node. Though
+                    // it has no properties (defaults apply), you could access descendants, children, etc...
+                    //This is how this used to work before a large refactor - which I think may have broken other legacy logic too :(
+
+                    this.content = new NodeFactory.Node(Id);
+                }
+                else
+                {
+                    this.content = CompatibilityHelper.ConvertToNode(UmbracoContext.Current.ContentCache.GetById(Id));    
+                }
+                
                 this.Type = Type;
             }
         }
