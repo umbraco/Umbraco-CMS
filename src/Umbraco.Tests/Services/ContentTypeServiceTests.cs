@@ -394,7 +394,7 @@ namespace Umbraco.Tests.Services
             return contentType;
         }
 
-		private IEnumerable<IContentType> CreateContentTypeHierarchy()
+		private IContentType[] CreateContentTypeHierarchy()
 		{
 			//create the master type
 			var masterContentType = MockedContentTypes.CreateSimpleContentType("masterContentType", "MasterContentType");
@@ -413,7 +413,7 @@ namespace Umbraco.Tests.Services
 				list.Add(contentType);				
 			}
 
-			return list;
+		    return list.ToArray();
 		}
 	}
 }

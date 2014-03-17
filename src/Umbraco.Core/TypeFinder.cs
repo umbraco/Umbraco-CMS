@@ -290,7 +290,15 @@ namespace Umbraco.Core
                     "HtmlAgilityPack.",
                     "TidyNet.",
                     "ICSharpCode.",
-                    "CookComputing."
+                    "CookComputing.",
+                    "AutoMapper,",
+                    "HtmlAgilityPack,",
+                    "itextsharp,",
+                    "MiniProfiler,",
+                    "Moq,",
+                    "nunit.framework,",
+                    "TidyNet,",
+                    "WebDriver,"
                 };
 
         /// <summary>
