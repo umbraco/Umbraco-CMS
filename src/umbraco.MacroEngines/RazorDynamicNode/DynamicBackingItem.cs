@@ -34,9 +34,8 @@ namespace umbraco.MacroEngines
         {
             if (Id == -1)
             {
-                //this is a special check, previously passing in -1 would return a real node, the root node. Though
-                // it has no properties (defaults apply), you could access descendants, children, etc...
-                //This is how this used to work before a large refactor - which I think may have broken other legacy logic too :(
+                // passing in -1 needs to return a real node, the "root" node, which has no 
+                // properties (defaults apply) but can be used to access descendants, children, etc.
                 
                 this.content = new NodeFactory.Node(Id);
                 return;
@@ -69,9 +68,8 @@ namespace umbraco.MacroEngines
             {
                 if (Id == -1)
                 {
-                    //this is a special check, previously passing in -1 would return a real node, the root node. Though
-                    // it has no properties (defaults apply), you could access descendants, children, etc...
-                    //This is how this used to work before a large refactor - which I think may have broken other legacy logic too :(
+                    // passing in -1 needs to return a real node, the "root" node, which has no 
+                    // properties (defaults apply) but can be used to access descendants, children, etc.
 
                     this.content = new NodeFactory.Node(Id);
                 }

@@ -96,11 +96,14 @@ angular.module('umbraco')
         });
     })
     .run(function(mediaHelper){
-        mediaHelper.registerFileResolver("Umbraco.ImageCropper", function (property) {
+
+        if(mediaHelper && mediaHelper.registerFileResolver){
+            mediaHelper.registerFileResolver("Umbraco.ImageCropper", function (property) {
                     if (property.value.src) {
                         return property.value.src;
                     } else if (angular.isString(property.value)) {
                         return property.value;
                     }
                 });
+        }
     });
