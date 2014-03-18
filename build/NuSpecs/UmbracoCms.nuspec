@@ -32,6 +32,7 @@
 	<file src="..\_BuildOutput\WebApp\xslt\**" target="Content\xslt" />
 	<file src="..\_BuildOutput\WebApp\default.aspx" target="Content\default.aspx" />
 	<file src="..\_BuildOutput\WebApp\Web.config" target="Content\Web.config" />
+	<file src="..\_BuildOutput\WebApp\Global.asax" target="Content\Global.asax" />
 	<file src="..\_BuildOutput\WebApp\App_Browsers\**" target="UmbracoFiles\App_Browsers" />
 	<file src="..\_BuildOutput\WebApp\App_Code\**" target="UmbracoFiles\App_Code" />
 	<file src="..\_BuildOutput\WebApp\App_Data\**" target="UmbracoFiles\App_Data" />
@@ -39,7 +40,6 @@
 	<file src="..\_BuildOutput\WebApp\config\splashes\**" target="UmbracoFiles\config\splashes" />
 	<file src="..\_BuildOutput\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
 	<file src="..\_BuildOutput\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
-	<file src="..\_BuildOutput\WebApp\Global.asax" target="UmbracoFiles\Global.asax" />
 	<file src="..\_BuildOutput\WebApp\Web.config" target="UmbracoFiles\Web.config" />
     <file src="tools\install.ps1" target="tools\install.ps1" />
     <file src="tools\Readme.txt" target="tools\Readme.txt" />
