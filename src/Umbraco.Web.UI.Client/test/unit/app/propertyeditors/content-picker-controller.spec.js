@@ -16,7 +16,8 @@ describe('Content picker controller tests', function () {
                         alias: "property",
                         value:"1233,1231,23121",
                         label: "My content picker",
-                        description: "desc"
+                        description: "desc",
+                        config: {}
                       };
 
         //have the contentMocks register its expect urls on the httpbackend
