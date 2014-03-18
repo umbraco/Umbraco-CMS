@@ -14,7 +14,9 @@ namespace umbraco.presentation.umbraco.members
     {
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (Membership.Provider.IsUmbracoMembershipProvider())
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+
+            if (provider.IsUmbracoMembershipProvider())
 
                 ButtonSearch.Text = ui.Text("search");
         }
@@ -22,8 +24,8 @@ namespace umbraco.presentation.umbraco.members
         protected void ButtonSearch_Click(object sender, EventArgs e)
         {
             resultsPane.Visible = true;
-
-            if (Membership.Provider.IsUmbracoMembershipProvider())
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            if (provider.IsUmbracoMembershipProvider())
             {
                 var query = searchQuery.Text.ToLower();
                 var internalSearcher = UmbracoContext.Current.InternalMemberSearchProvider;
@@ -56,7 +58,7 @@ namespace umbraco.presentation.umbraco.members
                 IEnumerable<MemberSearchResult> results;
                 if (searchQuery.Text.Contains("@"))
                 {
-                    results = from MembershipUser x in Membership.FindUsersByEmail(searchQuery.Text)
+                    results = from MembershipUser x in provider.FindUsersByEmail(searchQuery.Text)
                         select
                             new MemberSearchResult()
                             {
@@ -68,7 +70,7 @@ namespace umbraco.presentation.umbraco.members
                 }
                 else
                 {
-                    results = from MembershipUser x in Membership.FindUsersByName(searchQuery.Text + "%")
+                    results = from MembershipUser x in provider.FindUsersByName(searchQuery.Text + "%")
                         select
                             new MemberSearchResult()
                             {

@@ -89,6 +89,18 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method
+        /// </summary>
+        /// <param name="password"></param>
+        /// <remarks>
+        /// This method exists so that Umbraco developers can use one entry point to create/update members if they choose to.
+        /// </remarks>
+        public void SavePassword(string password)
+        {
+            
+        }
+
+        /// <summary>
         /// Checks if a member with the id exists
         /// </summary>
         /// <param name="id"></param>
@@ -576,23 +588,23 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IMember CreateMember(string username, string email, string password, string memberTypeAlias)
+        public IMember CreateMember(string username, string email, string memberTypeAlias)
         {
             var memberTypeService = ApplicationContext.Current.Services.MemberTypeService;
             var memberType = memberTypeService.Get(memberTypeAlias);
 
-            var member = new Member(username, email.ToLower().Trim(), username, password, -1, memberType);
+            var member = new Member(username, email.ToLower().Trim(), username, memberType);
 
             Created.RaiseEvent(new NewEventArgs<IMember>(member, false, memberTypeAlias, -1), this);
 
             return member;
         }
 
-        public IMember CreateMemberWithIdentity(string username, string email, string password, IMemberType memberType)
+        public IMember CreateMemberWithIdentity(string username, string email, IMemberType memberType)
         {
             if (memberType == null) throw new ArgumentNullException("memberType");
 
-            var member = new Member(username, email.ToLower().Trim(), username, password, -1, memberType);
+            var member = new Member(username, email.ToLower().Trim(), username, memberType);
 
             if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(member), this))
             {
@@ -622,10 +634,10 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="email"></param>
         /// <param name="username"></param>
-        /// <param name="password"></param>
+        /// <param name="rawPasswordValue"></param>
         /// <param name="memberTypeAlias"></param>
         /// <returns></returns>
-        IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string password, string memberTypeAlias)
+        IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string rawPasswordValue, string memberTypeAlias)
         {
             var uow = _uowProvider.GetUnitOfWork();
             IMemberType memberType;
@@ -641,7 +653,7 @@ namespace Umbraco.Core.Services
                 throw new ArgumentException(string.Format("No MemberType matching the passed in Alias: '{0}' was found", memberTypeAlias));
             }
 
-            return CreateMemberWithIdentity(username, email, password, memberType);
+            return CreateMemberWithIdentity(username, email, memberType);
         }
 
         /// <summary>

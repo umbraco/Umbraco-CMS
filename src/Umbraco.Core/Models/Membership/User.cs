@@ -40,13 +40,13 @@ namespace Umbraco.Core.Models.Membership
             _startMediaId = -1;
         }
 
-        public User(string name, string email, string username, string password, IUserType userType)
+        public User(string name, string email, string username, string rawPasswordValue, IUserType userType)
             : this(userType)
         {
             _name = name;
             _email = email;
             _username = username;
-            _password = password;
+            _rawPasswordValue = rawPasswordValue;
             _isApproved = true;
             _isLockedOut = false;
             _startContentId = -1;
@@ -67,7 +67,7 @@ namespace Umbraco.Core.Models.Membership
 
         private string _username;
         private string _email;
-        private string _password;
+        private string _rawPasswordValue;
         private bool _isApproved;
         private bool _isLockedOut;
         private string _language;
@@ -84,7 +84,7 @@ namespace Umbraco.Core.Models.Membership
         
         private static readonly PropertyInfo UsernameSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Username);
         private static readonly PropertyInfo EmailSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Email);
-        private static readonly PropertyInfo PasswordSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Password);
+        private static readonly PropertyInfo PasswordSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.RawPasswordValue);
         private static readonly PropertyInfo IsLockedOutSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.IsLockedOut);
         private static readonly PropertyInfo IsApprovedSelector = ExpressionHelper.GetPropertyInfo<User, bool>(x => x.IsApproved);
         private static readonly PropertyInfo LanguageSelector = ExpressionHelper.GetPropertyInfo<User, string>(x => x.Language);
@@ -204,16 +204,16 @@ namespace Umbraco.Core.Models.Membership
             }
         }
         [DataMember]
-        public string Password
+        public string RawPasswordValue
         {
-            get { return _password; }
+            get { return _rawPasswordValue; }
             set
             {
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _password = value;
-                    return _password;
-                }, _password, PasswordSelector);
+                    _rawPasswordValue = value;
+                    return _rawPasswordValue;
+                }, _rawPasswordValue, PasswordSelector);
             }
         }
 
@@ -251,7 +251,7 @@ namespace Umbraco.Core.Models.Membership
         [IgnoreDataMember]
         public string PasswordQuestion { get; set; }
         [IgnoreDataMember]
-        public string PasswordAnswer { get; set; }
+        public string RawPasswordAnswerValue { get; set; }
         [IgnoreDataMember]
         public string Comments { get; set; }
         [IgnoreDataMember]

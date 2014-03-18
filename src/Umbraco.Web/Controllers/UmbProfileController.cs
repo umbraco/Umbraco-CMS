@@ -16,7 +16,8 @@ namespace Umbraco.Web.Controllers
         [HttpPost]
         public ActionResult HandleUpdateProfile([Bind(Prefix = "profileModel")] ProfileModel model)
         {
-            if (Membership.Provider.IsUmbracoMembershipProvider() == false)
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            if (provider.IsUmbracoMembershipProvider() == false)
             {
                 throw new NotSupportedException("Profile editing with the " + typeof(UmbProfileController) + " is not supported when not using the default Umbraco membership provider");
             }

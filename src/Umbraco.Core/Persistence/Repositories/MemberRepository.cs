@@ -321,7 +321,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 changedCols.Add("LoginName");
             }
             // DO NOT update the password if it is null or empty
-            if (dirtyEntity.IsPropertyDirty("Password") && entity.Password.IsNullOrWhiteSpace() == false)
+            if (dirtyEntity.IsPropertyDirty("Password") && entity.RawPasswordValue.IsNullOrWhiteSpace() == false)
             {
                 changedCols.Add("Password");
             }

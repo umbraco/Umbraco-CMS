@@ -94,7 +94,7 @@ namespace Umbraco.Core.Services
                     Email = email,
                     Language = Configuration.GlobalSettings.DefaultUILanguage,
                     Name = username,
-                    Password = password,
+                    RawPasswordValue = password,
                     DefaultPermissions = userType.Permissions,
                     Username = username,
                     StartContentId = -1,
@@ -115,7 +115,7 @@ namespace Umbraco.Core.Services
             }
         }
 
-        IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string password, string memberTypeAlias)
+        IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string rawPasswordValue, string memberTypeAlias)
         {
             var userType = GetUserTypeByAlias(memberTypeAlias);
             if (userType == null)
@@ -123,7 +123,7 @@ namespace Umbraco.Core.Services
                 throw new ArgumentException("The user type " + memberTypeAlias + " could not be resolved");
             }
 
-            return CreateUserWithIdentity(username, email, password, userType);
+            return CreateUserWithIdentity(username, email, rawPasswordValue, userType);
         }
 
         public IUser GetById(int id)

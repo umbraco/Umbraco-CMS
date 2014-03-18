@@ -162,7 +162,7 @@ namespace umbraco.BusinessLogic
             }
             set
             {
-                _user.Password = value;
+                _user.RawPasswordValue = value;
             }
         }
 
@@ -173,7 +173,7 @@ namespace umbraco.BusinessLogic
         public string GetPassword()
         {
             if (_lazyId.HasValue) SetupUser(_lazyId.Value);
-            return _user.Password;
+            return _user.RawPasswordValue;
         }
 
         /// <summary>
@@ -548,7 +548,7 @@ namespace umbraco.BusinessLogic
         public static int getUserId(string lname, string passw)
         {
             var found = ApplicationContext.Current.Services.UserService.GetByUsername(lname);
-            return found.Password == passw ? found.Id : -1;
+            return found.RawPasswordValue == passw ? found.Id : -1;
         }
 
         /// <summary>

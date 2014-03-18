@@ -13,6 +13,7 @@ using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
@@ -409,7 +410,9 @@ namespace Umbraco.Web
 		{
 			if (IsProtected(nodeId, path))
 			{
-                return _membershipHelper.IsLoggedIn() && Access.HasAccess(nodeId, path, Membership.GetUser());
+                var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+			    var username = provider.GetCurrentUserName();
+                return _membershipHelper.IsLoggedIn() && Access.HasAccess(nodeId, path, provider.GetUser(username, true));
 			}
 			return true;
 		}

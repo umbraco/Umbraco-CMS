@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Factories
                              NodeId = entity.Id,
                              Email = entity.Email,
                              LoginName = entity.Username,
-                             Password = entity.Password,
+                             Password = entity.RawPasswordValue,
                              ContentVersionDto = BuildDto(entity as Member)
                          };
             return member;

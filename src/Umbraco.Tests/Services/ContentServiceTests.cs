@@ -90,7 +90,7 @@ namespace Umbraco.Tests.Services
                 Name = "Test",
                 Email = "test@test.com",
                 Username = "test",
-                Password = "test"
+                RawPasswordValue = "test"
             };
             ServiceContext.UserService.Save(user);
             var content = new Content("Test", -1, ServiceContext.ContentTypeService.GetContentType("umbTextpage"));

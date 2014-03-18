@@ -48,12 +48,12 @@ namespace Umbraco.Core.Persistence.Mappers
 
             CacheMap<Member, MemberDto>(src => src.Email, dto => dto.Email);
             CacheMap<Member, MemberDto>(src => src.Username, dto => dto.LoginName);
-            CacheMap<Member, MemberDto>(src => src.Password, dto => dto.Password);
+            CacheMap<Member, MemberDto>(src => src.RawPasswordValue, dto => dto.Password);
 
             CacheMap<Member, PropertyDataDto>(src => src.IsApproved, dto => dto.Integer);
             CacheMap<Member, PropertyDataDto>(src => src.IsLockedOut, dto => dto.Integer);
             CacheMap<Member, PropertyDataDto>(src => src.Comments, dto => dto.Text);
-            CacheMap<Member, PropertyDataDto>(src => src.PasswordAnswer, dto => dto.VarChar);
+            CacheMap<Member, PropertyDataDto>(src => src.RawPasswordAnswerValue, dto => dto.VarChar);
             CacheMap<Member, PropertyDataDto>(src => src.PasswordQuestion, dto => dto.VarChar);
             CacheMap<Member, PropertyDataDto>(src => src.FailedPasswordAttempts, dto => dto.Integer);
             CacheMap<Member, PropertyDataDto>(src => src.LastLockoutDate, dto => dto.Date);

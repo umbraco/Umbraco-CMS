@@ -39,9 +39,11 @@ namespace umbraco
         public loadMemberTypes(string application) : base(application) { }
 
         protected override void CreateRootNode(ref XmlTreeNode rootNode)
-        {                              
+        {
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+ 
             // only show member types if we're using umbraco members on the website
-            if (Membership.Provider.IsUmbracoMembershipProvider())
+            if (provider.IsUmbracoMembershipProvider())
             {
 				rootNode.NodeType = "init" + TreeAlias;
 				rootNode.NodeID = "init";

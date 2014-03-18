@@ -51,9 +51,11 @@ namespace umbraco.cms.presentation.members
         {
             _membershipHelper = new MembershipHelper(UmbracoContext.Current);
 
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+
             // Add password changer
             var passwordChanger = (passwordChanger)LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx");
-            passwordChanger.MembershipProviderName = Membership.Provider.Name;
+            passwordChanger.MembershipProviderName = Constants.Conventions.Member.UmbracoMemberProviderName;
             //Add a custom validation message for the password changer
             var passwordValidation = new CustomValidator
             {
@@ -73,11 +75,11 @@ namespace umbraco.cms.presentation.members
             MemberPasswordTxt.Controls.Add(passwordChanger);
             MemberPasswordTxt.Controls.Add(validatorContainer);
 
-            if (Membership.Provider.IsUmbracoMembershipProvider())
+            if (provider.IsUmbracoMembershipProvider())
             {
                 _memberEntity = new Member(int.Parse(Request.QueryString["id"]));
-                
-                _membershipUser = Membership.GetUser(_memberEntity.LoginName, false);
+
+                _membershipUser = provider.GetUser(_memberEntity.LoginName, false);
                 _contentControl = new ContentControl(_memberEntity, ContentControl.publishModes.NoPublish, "TabView1");
                 _contentControl.Width = Unit.Pixel(666);
                 _contentControl.Height = Unit.Pixel(666);
@@ -132,7 +134,7 @@ namespace umbraco.cms.presentation.members
                 menuSave.Click += MenuSaveClick;
                 menuSave.AltText = ui.Text("buttons", "save", null);
 
-                _membershipUser = Membership.GetUser(Request.QueryString["id"], false);
+                _membershipUser = provider.GetUser(Request.QueryString["id"], false);
                 MemberLoginNameTxt.Text = _membershipUser.UserName;
                 if (IsPostBack == false)
                 {
@@ -177,7 +179,7 @@ namespace umbraco.cms.presentation.members
 
             p.addProperty(ui.Text("membergroup"), _memberGroups);
 
-            if (Membership.Provider.IsUmbracoMembershipProvider())
+            if (provider.IsUmbracoMembershipProvider())
             {
                 _contentControl.tpProp.Controls.Add(p);
                 _contentControl.Save += tmp_save;
@@ -202,10 +204,12 @@ namespace umbraco.cms.presentation.members
 
         void MemberEmailExistCheck_ServerValidate(object source, ServerValidateEventArgs args)
         {
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+
             var oldEmail = _memberEntity.Email.ToLower();
             var newEmail = MemberEmail.Text.ToLower();
 
-            var requireUniqueEmail = Membership.Provider.RequiresUniqueEmail;
+            var requireUniqueEmail = provider.RequiresUniqueEmail;
 
             var howManyMembersWithEmail = 0;
             var membersWithEmail = Member.GetMembersFromEmail(newEmail);
@@ -256,11 +260,13 @@ namespace umbraco.cms.presentation.members
         private void ChangePassword(passwordChanger passwordChangerControl, MembershipUser membershipUser, CustomValidator passwordChangerValidator)
         {
             //Change the password            
+
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
             
             if (passwordChangerControl.IsChangingPassword)
             {
                 var changePassResult = _membershipHelper.ChangePassword(
-                    membershipUser.UserName, passwordChangerControl.ChangingPasswordModel, Membership.Provider);
+                    membershipUser.UserName, passwordChangerControl.ChangingPasswordModel, provider);
 
                 if (changePassResult.Success)
                 {
@@ -279,6 +285,7 @@ namespace umbraco.cms.presentation.members
 
         private bool UpdateWithMembershipProvider(MembershipUser membershipUser, string email, IDataType isApprovedDt, IDataType commentsDt, bool performUnlock)
         {
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
             var membershipHelper = new MembershipHelper(ApplicationContext, new HttpContextWrapper(Context));
             //set the writable properties that we are editing
             
@@ -305,7 +312,7 @@ namespace umbraco.cms.presentation.members
             var unlockSuccess = false;
             if (performUnlock)
             {
-                unlockSuccess = Membership.Provider.UnlockUser(membershipUser.UserName);
+                unlockSuccess = provider.UnlockUser(membershipUser.UserName);
                 if (unlockSuccess == false)
                 {
                     LogHelper.Warn<EditMember>("Could not unlock the member " + membershipUser.UserName);
@@ -316,7 +323,7 @@ namespace umbraco.cms.presentation.members
                 }
             }
 
-            return membershipHelper.UpdateMember(membershipUser, Membership.Provider, email, isApproved, comment: comments).Success
+            return membershipHelper.UpdateMember(membershipUser, provider, email, isApproved, comment: comments).Success
                 || unlockSuccess;
         }
 
@@ -339,6 +346,8 @@ namespace umbraco.cms.presentation.members
 
         protected void tmp_save(object sender, EventArgs e)
         {
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+
             Page.Validate();
             if (Page.IsValid == false)
             {
@@ -353,14 +362,14 @@ namespace umbraco.cms.presentation.members
             {
                 // hide validation summaries
 
-                if (Membership.Provider.IsUmbracoMembershipProvider())
+                if (provider.IsUmbracoMembershipProvider())
                 {
                     foreach (uicontrols.TabPage tp in _contentControl.GetPanels())
                     {
                         tp.ErrorControl.Visible = false;
                     }
 
-                    var memberTypeProvider = (IUmbracoMemberTypeMembershipProvider) Membership.Provider;
+                    var memberTypeProvider = (IUmbracoMemberTypeMembershipProvider)provider;
                     
                     //update the membership provider                    
                     var commentsProp = _contentControl.DataTypes.GetValue(memberTypeProvider.CommentPropertyTypeAlias);
@@ -400,7 +409,7 @@ namespace umbraco.cms.presentation.members
                 var passwordChangerValidator = (CustomValidator)MemberPasswordTxt.Controls[1].Controls[0].Controls[0];
                 ChangePassword(passwordChangerControl, _membershipUser, passwordChangerValidator);
 
-                if (Membership.Provider.IsUmbracoMembershipProvider())
+                if (provider.IsUmbracoMembershipProvider())
                 {
                     //Hrm, with the membership provider you cannot change the login name - I guess this will do that 
                     // in the underlying data layer
