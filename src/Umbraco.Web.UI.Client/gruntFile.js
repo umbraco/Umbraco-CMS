@@ -301,7 +301,9 @@ module.exports = function (grunt) {
 
     jshint:{
       dev:{
-         files:['<%= src.common %>', '<%= src.specs %>', '<%= src.scenarios %>', '<%= src.samples %>'],
+         files: {
+            src: ['<%= src.common %>', '<%= src.specs %>', '<%= src.scenarios %>', '<%= src.samples %>']
+         },
          options:{
            curly:true,
            eqeqeq:true,
@@ -324,8 +326,10 @@ module.exports = function (grunt) {
          }
       },
       build:{
-         files:['<%= src.prod %>'],
-         options:{
+         files: {
+          src: ['<%= src.prod %>']
+          },
+          options:{
            curly:true,
            eqeqeq:true,
            immed:true,
