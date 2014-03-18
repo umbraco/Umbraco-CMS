@@ -311,7 +311,10 @@ namespace Umbraco.Core.Persistence.Repositories
             Database.Update(dto.ContentVersionDto);
 
             //Updates the cmsMember entry if it has changed
+            
+            //NOTE: these cols are the REAL column names in the db
             var changedCols = new List<string>();
+
             if (dirtyEntity.IsPropertyDirty("Email"))
             {
                 changedCols.Add("Email");
@@ -323,7 +326,7 @@ namespace Umbraco.Core.Persistence.Repositories
             // DO NOT update the password if it is null or empty
             if (dirtyEntity.IsPropertyDirty("RawPasswordValue") && entity.RawPasswordValue.IsNullOrWhiteSpace() == false)
             {
-                changedCols.Add("RawPasswordValue");
+                changedCols.Add("Password");
             }
             //only update the changed cols
             if (changedCols.Count > 0)

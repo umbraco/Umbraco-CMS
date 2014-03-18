@@ -233,8 +233,7 @@ namespace umbraco.cms.businesslogic.member
                 throw new Exception(string.Format("Duplicate User name! A member with the user name {0} already exists", loginName));
 
             var model = ApplicationContext.Current.Services.MemberService.CreateMemberWithIdentity(
-                loginName, Email.ToLower(), mbt.MemberTypeItem);
-            model.Name = Name;
+                loginName, Email.ToLower(), Name, mbt.MemberTypeItem);
 
             //The content object will only have the 'WasCancelled' flag set to 'True' if the 'Saving' event has been cancelled, so we return null.
             if (((Entity)model).WasCancelled)
