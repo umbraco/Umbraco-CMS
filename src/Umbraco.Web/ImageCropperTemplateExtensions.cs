@@ -32,7 +32,6 @@ namespace Umbraco.Web
             }
         }
 
-
        public static string GetCropUrl(
             this IPublishedContent mediaItem,
             int? width = null,
@@ -40,19 +39,19 @@ namespace Umbraco.Web
             int? quality = null,
             Mode? mode = null,
             Anchor? anchor = null,
-            string imageCropperAlias = null,
-            string imageCropperCropId = null,
+            string propertyAlias = null,
+            string cropAlias = null,
             string furtherOptions = null,
             bool slimmage = false)
         {
             string imageCropperValue = null;
 
-            if (mediaItem.HasPropertyAndValueAndCrop(imageCropperAlias, imageCropperCropId))
+            if (mediaItem.HasPropertyAndValueAndCrop(propertyAlias, cropAlias))
             {
-                imageCropperValue = mediaItem.GetPropertyValueHack(imageCropperAlias);
+                imageCropperValue = mediaItem.GetPropertyValue<string>(propertyAlias);
             }
 
-            return mediaItem != null ? GetCropUrl(mediaItem.Url, width, height, quality, mode, anchor, imageCropperValue, imageCropperCropId, furtherOptions, slimmage) : string.Empty;
+            return mediaItem != null ? GetCropUrl(mediaItem.Url, width, height, quality, mode, anchor, imageCropperValue, cropAlias, furtherOptions, slimmage) : string.Empty;
         }
 
 
@@ -71,17 +70,12 @@ namespace Umbraco.Web
             if (!string.IsNullOrEmpty(imageUrl))
             {
                 var imageResizerUrl = new StringBuilder();
-                imageResizerUrl.Append(imageUrl);
+                //imageResizerUrl.Append(imageUrl);
 
                 if (!string.IsNullOrEmpty(imageCropperValue) && imageCropperValue.DetectIsJson())
                 {
-                    var allTheCrops = imageCropperValue.SerializeToCropDataSet();
-                    if (allTheCrops != null && allTheCrops.Crops.Any())
-                    {
-
-                        if(allTheCrops.HasCrop(cropAlias))
-                            imageResizerUrl.Append(allTheCrops.GetCropUrl(cropAlias));
-                    }
+                    var cropDataSet = imageCropperValue.SerializeToCropDataSet();
+                    imageResizerUrl.Append(cropDataSet.Src + cropDataSet.GetCropUrl(cropAlias));
                 }
                 else
                 {

@@ -52,115 +52,45 @@ namespace Umbraco.Web
 
 
         internal static bool HasPropertyAndValue(this IPublishedContent publishedContent, string propertyAlias)
-        {
-            try
+        {              
+            if (propertyAlias != null && publishedContent.HasProperty(propertyAlias)
+                && publishedContent.HasValue(propertyAlias))
             {
-               
-                if (propertyAlias != null && publishedContent.HasProperty(propertyAlias)
-                    && publishedContent.HasValue(propertyAlias))
+                var propertyAliasValue = publishedContent.GetPropertyValue<string>(propertyAlias);
+                if (propertyAliasValue.DetectIsJson() && propertyAliasValue.Length <= 2)
                 {
-                    var propertyAliasValue = publishedContent.GetPropertyValue<string>(propertyAlias);
-                    if (propertyAliasValue.DetectIsJson() && propertyAliasValue.Length <= 2)
-                    {
-                        return false;
-                    }
-                    return true;
+                    return false;
                 }
-            }
-            catch (Exception ex)
-            {
-                LogHelper.Warn<IPublishedContent>("The cache unicorn is not happy with node id: " + publishedContent.Id + " - http://issues.umbraco.org/issue/U4-4146");
-                
-                var cropsProperty = publishedContent.Properties.FirstOrDefault(x => x.PropertyTypeAlias == propertyAlias);
-
-                if (cropsProperty != null && !string.IsNullOrEmpty(cropsProperty.Value.ToString()))
-                {
-                    var propertyAliasValue = cropsProperty.Value.ToString();
-                    if (propertyAliasValue.DetectIsJson() && propertyAliasValue.Length <= 2)
-                    {
-                        return false;
-                    }
-                    return true;
-                }
-            }
+                return true;
+            }           
             return false;
         }
 
         internal static bool HasPropertyAndValueAndCrop(this IPublishedContent publishedContent, string propertyAlias, string cropAlias)
         {
-            try
+            if (propertyAlias != null && publishedContent.HasProperty(propertyAlias)
+                && publishedContent.HasValue(propertyAlias))
             {
-                if (propertyAlias != null && publishedContent.HasProperty(propertyAlias)
-                    && publishedContent.HasValue(propertyAlias))
+                var propertyAliasValue = publishedContent.GetPropertyValue<string>(propertyAlias);
+                if (propertyAliasValue.DetectIsJson() && propertyAliasValue.Length <= 2)
                 {
-                    var propertyAliasValue = publishedContent.GetPropertyValue<string>(propertyAlias);
-                    if (propertyAliasValue.DetectIsJson() && propertyAliasValue.Length <= 2)
-                    {
-                        return false;
-                    }
-                    var allTheCrops = propertyAliasValue.SerializeToCropDataSet();
-                    if (allTheCrops != null && allTheCrops.Crops.Any())
-                    {
-                        var crop = cropAlias != null
-                                       ? allTheCrops.Crops.First(x => x.Alias ==cropAlias)
-                                       : allTheCrops.Crops.First();
-                        if (crop != null)
-                        {
-                            return true;
-                        }
-                    }
                     return false;
                 }
-            }
-            catch (Exception ex)
-            {
-                LogHelper.Warn<IPublishedContent>("The cache unicorn is not happy with node id: " + publishedContent.Id + " - http://issues.umbraco.org/issue/U4-4146");
-                var cropsProperty = publishedContent.Properties.FirstOrDefault(x => x.PropertyTypeAlias == propertyAlias);
-
-                if (cropsProperty != null && !string.IsNullOrEmpty(cropsProperty.Value.ToString()))
+                var allTheCrops = propertyAliasValue.SerializeToCropDataSet();
+                if (allTheCrops != null && allTheCrops.Crops.Any())
                 {
-                    var propertyAliasValue = cropsProperty.Value.ToString();
-                    if (propertyAliasValue.DetectIsJson() && propertyAliasValue.Length <= 2)
+                    var crop = cropAlias != null
+                                    ? allTheCrops.Crops.First(x => x.Alias ==cropAlias)
+                                    : allTheCrops.Crops.First();
+                    if (crop != null)
                     {
-                        return false;
+                        return true;
                     }
-                    var allTheCrops = propertyAliasValue.SerializeToCropDataSet();
-                    if (allTheCrops != null && allTheCrops.Crops.Any())
-                    {
-                        var crop = cropAlias != null
-                                       ? allTheCrops.Crops.First(x => x.Alias ==cropAlias)
-                                       : allTheCrops.Crops.First();
-                        if (crop != null)
-                        {
-                            return true;
-                        }
-                    }
-                    return false;
                 }
-            }
+                return false;
+            }            
             return false;
         }
 
-        internal static string GetPropertyValueHack(this IPublishedContent publishedContent, string propertyAlias)
-        {
-            string propertyValue = null;
-            try
-            {
-                if (propertyAlias != null && publishedContent.HasProperty(propertyAlias)
-                    && publishedContent.HasValue(propertyAlias))
-                {
-                    propertyValue = publishedContent.GetPropertyValue<string>(propertyAlias);
-                }
-            }
-            catch (Exception ex)
-            {
-                var cropsProperty = publishedContent.Properties.FirstOrDefault(x => x.PropertyTypeAlias == propertyAlias);
-                if (cropsProperty != null)
-                {
-                    propertyValue = cropsProperty.Value.ToString();
-                }
-            }
-            return propertyValue;
-        }
     }
 }
