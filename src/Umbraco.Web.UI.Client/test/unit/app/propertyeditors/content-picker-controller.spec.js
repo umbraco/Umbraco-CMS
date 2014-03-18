@@ -20,6 +20,11 @@ describe('Content picker controller tests', function () {
                         config: {}
                       };
 
+        //this controller requires an angular form controller applied to it
+        scope.contentPickerForm = angularHelper.getNullForm("contentPickerForm");
+        scope.contentPickerForm.minCount = angularHelper.getNullForm("minCount");
+        scope.contentPickerForm.maxCount = angularHelper.getNullForm("maxCount");
+        
         //have the contentMocks register its expect urls on the httpbackend
         //see /mocks/content.mocks.js for how its setup
         entityMocks.register();
