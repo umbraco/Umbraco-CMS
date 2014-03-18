@@ -159,7 +159,8 @@ namespace umbraco.cms.businesslogic.member
         public static Member[] getMemberFromFirstLetter(char letter)
         {
             int totalRecs;
-            return ApplicationContext.Current.Services.MemberService.FindByUsername(
+
+            return ApplicationContext.Current.Services.MemberService.FindMembersByDisplayName(
                 letter.ToString(CultureInfo.InvariantCulture), 0, int.MaxValue, out totalRecs, StringPropertyMatchType.StartsWith)
                                      .Select(x => new Member(x))
                                      .ToArray();

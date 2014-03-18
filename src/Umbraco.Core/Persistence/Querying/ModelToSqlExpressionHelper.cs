@@ -227,41 +227,6 @@ namespace Umbraco.Core.Persistence.Querying
 
         }
 
-        private string HandleStringComparison(string col, string val, string verb, TextColumnType columnType)
-        {
-            switch (verb)
-            {
-                case "SqlWildcard":
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnWildcardComparison(col, RemoveQuote(val), columnType);
-                case "Equals":
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnEqualComparison(col, RemoveQuote(val), columnType);
-                case "StartsWith":
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnStartsWithComparison(col, RemoveQuote(val), columnType);                   
-                case "EndsWith":
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnEndsWithComparison(col, RemoveQuote(val), columnType);
-                case "Contains":
-                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnContainsComparison(col, RemoveQuote(val), columnType);
-                case "InvariantEquals":
-                case "SqlEquals":
-                    //recurse
-                    return HandleStringComparison(col, val, "Equals", columnType);
-                case "InvariantStartsWith":
-                case "SqlStartsWith":
-                    //recurse
-                    return HandleStringComparison(col, val, "StartsWith", columnType);
-                case "InvariantEndsWith":
-                case "SqlEndsWith":
-                    //recurse
-                    return HandleStringComparison(col, val, "EndsWith", columnType);
-                case "InvariantContains":
-                case "SqlContains":
-                    //recurse
-                    return HandleStringComparison(col, val, "Contains", columnType);
-                default:
-                    throw new ArgumentOutOfRangeException("verb");
-            }
-        }
-
         protected virtual string VisitMethodCall(MethodCallExpression m)
         {
             List<Object> args = this.VisitExpressionList(m.Arguments);

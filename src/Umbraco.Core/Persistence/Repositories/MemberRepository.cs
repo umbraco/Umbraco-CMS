@@ -559,7 +559,6 @@ namespace Umbraco.Core.Persistence.Repositories
                 resultQuery = sql;
             }
             
-
             //get the referenced column name
             var expressionMember = ExpressionHelper.GetMemberInfo(orderBy);
             //now find the mapped column name
@@ -571,8 +570,19 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             //need to ensure the order by is in brackets, see: https://github.com/toptensoftware/PetaPoco/issues/177
             resultQuery.OrderBy(string.Format("({0})", mappedField));
+            
+            var result = GetPagedResultsByQuery<MemberDto>(resultQuery, pageIndex, pageSize, out totalRecords, 
+                dtos => dtos.Select(x => x.NodeId).ToArray());
+            
+            //now we need to ensure this result is also ordered by the same order by clause
+            return result.OrderBy(orderBy.Compile());
+        }
 
-            var pagedResult = Database.Page<MemberDto>(pageIndex + 1, pageSize, resultQuery);
+        public IEnumerable<IMember> GetPagedResultsByQuery<TDto>(
+            Sql sql, int pageIndex, int pageSize, out int totalRecords,
+            Func<IEnumerable<TDto>, int[]> resolveIds)
+        {
+            var pagedResult = Database.Page<TDto>(pageIndex + 1, pageSize, sql);
 
             totalRecords = Convert.ToInt32(pagedResult.TotalItems);
 
@@ -581,10 +591,7 @@ namespace Umbraco.Core.Persistence.Repositories
             {
                 return Enumerable.Empty<IMember>();
             }
-            var result = GetAll(pagedResult.Items.Select(x => x.NodeId).ToArray());
-            
-            //now we need to ensure this result is also ordered by the same order by clause
-            return result.OrderBy(orderBy.Compile());
+            return GetAll(resolveIds(pagedResult.Items)).ToArray();
         }
 
         private IMember BuildFromDto(List<MemberReadOnlyDto> dtos)

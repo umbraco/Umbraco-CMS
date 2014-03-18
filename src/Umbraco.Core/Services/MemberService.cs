@@ -251,30 +251,48 @@ namespace Umbraco.Core.Services
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                var query = new Query<IMember>();
-
+                //var query = new Query<IMember>();
+                var sql = new Sql()
+                    .Select("*")
+                    .From<NodeDto>()
+                    .Where<NodeDto>(dto => dto.NodeObjectType == new Guid(Constants.ObjectTypes.Member));
+                
                 switch (matchType)
                 {
                     case StringPropertyMatchType.Exact:
-                        query.Where(member => member.Name.Equals(displayNameToMatch));
+                        sql.Where<NodeDto>(dto => dto.Text.Equals(displayNameToMatch));
+
+                        //query.Where(member => member.Name.Equals(displayNameToMatch));
                         break;
                     case StringPropertyMatchType.Contains:
-                        query.Where(member => member.Name.Contains(displayNameToMatch));
+                        sql.Where<NodeDto>(dto => dto.Text.Contains(displayNameToMatch));
+                        
+                        //query.Where(member => member.Name.Contains(displayNameToMatch));
                         break;
                     case StringPropertyMatchType.StartsWith:
-                        query.Where(member => member.Name.StartsWith(displayNameToMatch));
+                        sql.Where<NodeDto>(dto => dto.Text.StartsWith(displayNameToMatch));
+
+                        //query.Where(member => member.Name.StartsWith(displayNameToMatch));
                         break;
                     case StringPropertyMatchType.EndsWith:
-                        query.Where(member => member.Name.EndsWith(displayNameToMatch));
+                        sql.Where<NodeDto>(dto => dto.Text.EndsWith(displayNameToMatch));
+
+                        //query.Where(member => member.Name.EndsWith(displayNameToMatch));
                         break;
                     case StringPropertyMatchType.Wildcard:
-                        query.Where(member => member.Name.SqlWildcard(displayNameToMatch, TextColumnType.NVarchar));
+                        sql.Where<NodeDto>(dto => dto.Text.SqlWildcard(displayNameToMatch, TextColumnType.NVarchar));
+                        
+                        //query.Where(member => member.Name.SqlWildcard(displayNameToMatch, TextColumnType.NVarchar));
                         break;
                     default:
                         throw new ArgumentOutOfRangeException("matchType");
                 }
 
-                return repository.GetPagedResultsByQuery(query, pageIndex, pageSize, out totalRecords, dto => dto.Name);
+                var result = repository.GetPagedResultsByQuery<NodeDto>(sql, pageIndex, pageSize, out totalRecords,
+                    dtos => dtos.Select(x => x.NodeId).ToArray());
+
+                //ensure this result is sorted correct just in case
+                return result.OrderBy(x => x.Name);
             }
         }
 
