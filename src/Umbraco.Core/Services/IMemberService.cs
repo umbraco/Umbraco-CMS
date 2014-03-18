@@ -13,11 +13,12 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method
         /// </summary>
+        /// <param name="member">The member to save the password for</param>
         /// <param name="password"></param>
         /// <remarks>
         /// This method exists so that Umbraco developers can use one entry point to create/update members if they choose to.
         /// </remarks>
-        void SavePassword(string password);
+        void SavePassword(IMember member, string password);
 
         /// <summary>
         /// Checks if a member with the id exists

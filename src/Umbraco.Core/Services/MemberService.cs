@@ -7,6 +7,7 @@ using System.Xml.Linq;
 using Umbraco.Core.Auditing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -15,6 +16,7 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Persistence.UnitOfWork;
 using System.Linq;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Services
 {
@@ -91,13 +93,32 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method
         /// </summary>
+        /// <param name="member">The member to save the password for</param>
         /// <param name="password"></param>
         /// <remarks>
         /// This method exists so that Umbraco developers can use one entry point to create/update members if they choose to.
         /// </remarks>
-        public void SavePassword(string password)
+        public void SavePassword(IMember member, string password)
         {
-            
+            if (member == null) throw new ArgumentNullException("member");
+
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            if (provider.IsUmbracoMembershipProvider())
+            {
+                provider.ChangePassword(member.Username, "", password);
+            }
+
+            //go re-fetch the member and update the properties that may have changed
+            var result = GetByUsername(member.Username);
+            if (result != null)
+            {
+                //should never be null but it could have been deleted by another thread.
+                member.RawPasswordValue = result.RawPasswordValue;
+                member.LastPasswordChangeDate = result.LastPasswordChangeDate;
+                member.UpdateDate = member.UpdateDate;             
+            }
+
+            throw new NotSupportedException("When using a non-Umbraco membership provider you must change the member password by using the MembershipProvider.ChangePassword method");
         }
 
         /// <summary>
