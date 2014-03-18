@@ -133,9 +133,10 @@ namespace umbraco.cms.businesslogic.language
         public static void setText(int languageId, Guid key, string value)
         {
             if (!hasText(key, languageId)) throw new ArgumentException("Key does not exist");
-            
+
+            var v = ApplicationContext.Current.DatabaseContext.Database.EscapeSqlIdentifier("value");
             ApplicationContext.Current.DatabaseContext.Database.Update<LanguageTextDto>(
-                "set [value] = @value where LanguageId = @languageId And UniqueId = @key", 
+                "set " + v + " = @value where LanguageId = @languageId And UniqueId = @key",
                 new { value = value, languageId = languageId, key = key });
         }
 
