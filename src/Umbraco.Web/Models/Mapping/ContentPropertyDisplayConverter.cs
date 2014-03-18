@@ -35,6 +35,7 @@ namespace Umbraco.Web.Models.Mapping
             display.Description = originalProp.PropertyType.Description;
             display.Label = originalProp.PropertyType.Name;
             display.HideLabel = valEditor.HideLabel;
+            display.Mandatory = originalProp.PropertyType.Mandatory;
             
             if (display.PropertyEditor == null)
             {

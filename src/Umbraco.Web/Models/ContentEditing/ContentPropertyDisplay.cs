@@ -31,5 +31,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "hideLabel")]
         public bool HideLabel { get; set; }
+
+        [DataMember(Name = "mandatory")]
+        public bool Mandatory { get; set; }
     }
 }
