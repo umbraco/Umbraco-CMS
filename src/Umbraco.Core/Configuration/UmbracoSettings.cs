@@ -658,7 +658,7 @@ namespace Umbraco.Core.Configuration
 			{
 				string defaultProvider = GetKey("/settings/providers/users/DefaultBackofficeProvider");
 				if (String.IsNullOrEmpty(defaultProvider))
-                    defaultProvider = Constants.Conventions.User.UmbracoUsersProviderName;
+                    defaultProvider = "UsersMembershipProvider";
 
 				return defaultProvider;
 			}

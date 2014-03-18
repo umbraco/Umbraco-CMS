@@ -93,20 +93,10 @@ namespace Umbraco.Core
 				/// </summary>
 				public const string Image = "Image";
 			}
-
-
-            /// <summary>
-            /// Constants for Umbraco user
-            /// </summary>
-		    public static class User
-		    {
-                public static readonly string UmbracoUsersProviderName = "UsersMembershipProvider";
-		    }
-
+            
 		    /// <summary>
 		    /// Constants for Umbraco Member property aliases.
-		    /// </summary>
-		    
+		    /// </summary>		    
 		    public static class Member
 		    {
                 public static readonly string UmbracoMemberProviderName = "UmbracoMembershipProvider";
