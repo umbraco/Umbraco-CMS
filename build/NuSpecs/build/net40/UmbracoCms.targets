@@ -2,9 +2,12 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Target Name="AddUmbracoFilesToOutput">
     <ItemGroup>
-      <UmbracoFiles Include=".\umbraco\**\*;" />
+	  <UmbracoFiles Include=".\umbraco\**\*;" />
       <UmbracoClientFiles Include=".\umbraco_client\**\*;" />
       <AppBrowsersFiles Include=".\App_Browsers\**\*" />
+	  <GlobalAsaxFile Include=".\Global.asax;" />
+	  <SplashesFiles Include=".\Config\Splashes\**\*;" />
+	  
       <FilesForPackagingFromProject Include="%(UmbracoFiles.Identity)">
         <DestinationRelativePath>umbraco\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
       </FilesForPackagingFromProject>
@@ -13,6 +16,12 @@
       </FilesForPackagingFromProject>
       <FilesForPackagingFromProject Include="%(AppBrowsersFiles.Identity)">
         <DestinationRelativePath>App_Browsers\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
+      </FilesForPackagingFromProject>
+      <FilesForPackagingFromProject Include="%(GlobalAsaxFile.Identity)">
+        <DestinationRelativePath>%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
+      </FilesForPackagingFromProject>
+      <FilesForPackagingFromProject Include="%(SplashesFiles.Identity)">
+        <DestinationRelativePath>Config\Splashes\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
       </FilesForPackagingFromProject>
     </ItemGroup>
   </Target>
