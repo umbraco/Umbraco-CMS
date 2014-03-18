@@ -9,9 +9,19 @@ namespace Umbraco.Core.Models.Membership
         object ProviderUserKey { get; set; }
         string Username { get; set; }
         string Email { get; set; }
-        string Password { get; set; }
+
+        /// <summary>
+        /// Gets or sets the raw password value
+        /// </summary>
+        string RawPasswordValue { get; set; }
+        
         string PasswordQuestion { get; set; }
-        string PasswordAnswer { get; set; }
+        
+        /// <summary>
+        /// Gets or sets the raw password answer value
+        /// </summary>
+        string RawPasswordAnswerValue { get; set; }
+        
         string Comments { get; set; }
         bool IsApproved { get; set; }
         bool IsLockedOut { get; set; }

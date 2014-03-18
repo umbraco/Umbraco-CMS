@@ -31,7 +31,7 @@ namespace Umbraco.Core.Persistence.Mappers
             CacheMap<User, UserDto>(src => src.Id, dto => dto.Id);
             CacheMap<User, UserDto>(src => src.Email, dto => dto.Email);
             CacheMap<User, UserDto>(src => src.Username, dto => dto.Login);
-            CacheMap<User, UserDto>(src => src.Password, dto => dto.Password);
+            CacheMap<User, UserDto>(src => src.RawPasswordValue, dto => dto.Password);
             CacheMap<User, UserDto>(src => src.Name, dto => dto.UserName);
             //NOTE: This column in the db is *not* used!
             //CacheMap<User, UserDto>(src => src.DefaultPermissions, dto => dto.DefaultPermissions);

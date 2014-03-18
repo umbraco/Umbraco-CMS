@@ -2,6 +2,7 @@ using System.Web.Security;
 using Umbraco.Core;
 using umbraco.cms.businesslogic;
 using umbraco.cms.businesslogic.member;
+using Umbraco.Core.Security;
 
 namespace umbraco.providers.members
 {
@@ -20,7 +21,7 @@ namespace umbraco.providers.members
             //This is a bit of a hack to ensure that the member is approved when created since many people will be using
             // this old api to create members on the front-end and they need to be approved - which is based on whether or not 
             // the Umbraco membership provider is configured.
-            var provider = Membership.Provider as UmbracoMembershipProvider;
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider() as UmbracoMembershipProvider;
             if (provider != null)
             {
                 var approvedField = provider.ApprovedPropertyTypeAlias;

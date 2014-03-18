@@ -46,7 +46,8 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public bool IsUmbracoMembershipProviderActive()
         {
-            return Membership.Provider.IsUmbracoMembershipProvider();
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            return provider.IsUmbracoMembershipProvider();
         }
 
         /// <summary>
@@ -64,7 +65,8 @@ namespace Umbraco.Web.Security
             }
 
             //get the current membership user
-            var membershipUser = Membership.GetUser();
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            var membershipUser = provider.GetCurrentUser();
             //NOTE: This should never happen since they are logged in
             if (membershipUser == null) throw new InvalidOperationException("Could not find member with username " + _httpContext.User.Identity.Name);
 
@@ -74,7 +76,7 @@ namespace Umbraco.Web.Security
                 if (model.Email.InvariantEquals(membershipUser.Email) == false)
                 {
                     //Use the membership provider to change the email since that is configured to do the checks to check for unique emails if that is configured.
-                    var requiresUpdating = UpdateMember(membershipUser, Membership.Provider, model.Email);
+                    var requiresUpdating = UpdateMember(membershipUser, provider, model.Email);
                     membershipUser = requiresUpdating.Result;
                 }
             }
@@ -130,11 +132,11 @@ namespace Umbraco.Web.Security
             model.Username = (model.UsernameIsEmail || model.Username == null) ? model.Email : model.Username;
 
             MembershipUser membershipUser;
-
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
             //update their real name 
-            if (Membership.Provider.IsUmbracoMembershipProvider())
+            if (provider.IsUmbracoMembershipProvider())
             {
-                membershipUser = ((UmbracoMembershipProviderBase)Membership.Provider).CreateUser(
+                membershipUser = ((UmbracoMembershipProviderBase)provider).CreateUser(
                     model.MemberTypeAlias,
                     model.Username, model.Password, model.Email,
                     //TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
@@ -159,16 +161,16 @@ namespace Umbraco.Web.Security
             }
             else
             {
-                membershipUser = Membership.CreateUser(model.Username, model.Password, model.Email,
+                membershipUser = provider.CreateUser(model.Username, model.Password, model.Email,
                     //TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
                     null, null,
-                    true, out status);
+                    true, null, out status);
 
                 if (status != MembershipCreateStatus.Success) return null;
             }
 
             //Set member online
-            Membership.GetUser(model.Username, true);
+            provider.GetUser(model.Username, true);
 
             //Log them in
             FormsAuthentication.SetAuthCookie(membershipUser.UserName, true);
@@ -184,13 +186,14 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public bool Login(string username, string password)
         {
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
             //Validate credentials
-            if (Membership.ValidateUser(username, password) == false)
+            if (provider.ValidateUser(username, password) == false)
             {
                 return false;
             }
             //Set member online
-            var member = Membership.GetUser(username, true);
+            var member = provider.GetUser(username, true);
             if (member == null)
             {
                 //this should not happen
@@ -206,46 +209,50 @@ namespace Umbraco.Web.Security
 
         public IPublishedContent GetByProviderKey(object key)
         {
-            if (Membership.Provider.IsUmbracoMembershipProvider() == false)
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            if (provider.IsUmbracoMembershipProvider() == false)
             {
                 throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
             }
 
             var result = _applicationContext.Services.MemberService.GetByProviderKey(key);
-            return result == null ? null : new MemberPublishedContent(result, Membership.GetUser(result.Username));
+            return result == null ? null : new MemberPublishedContent(result, provider.GetUser(result.Username, false));
         }
 
         public IPublishedContent GetById(int memberId)
         {
-            if (Membership.Provider.IsUmbracoMembershipProvider() == false)
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            if (provider.IsUmbracoMembershipProvider() == false)
             {
                 throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
             }
 
             var result = _applicationContext.Services.MemberService.GetById(memberId);
-            return result == null ? null : new MemberPublishedContent(result, Membership.GetUser(result.Username));
+            return result == null ? null : new MemberPublishedContent(result, provider.GetUser(result.Username, false));
         }
 
         public IPublishedContent GetByUsername(string username)
         {
-            if (Membership.Provider.IsUmbracoMembershipProvider() == false)
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            if (provider.IsUmbracoMembershipProvider() == false)
             {
                 throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
             }
 
             var result = _applicationContext.Services.MemberService.GetByUsername(username);
-            return result == null ? null : new MemberPublishedContent(result, Membership.GetUser(result.Username));
+            return result == null ? null : new MemberPublishedContent(result, provider.GetUser(result.Username, false));
         }
 
         public IPublishedContent GetByEmail(string email)
         {
-            if (Membership.Provider.IsUmbracoMembershipProvider() == false)
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            if (provider.IsUmbracoMembershipProvider() == false)
             {
                 throw new NotSupportedException("Cannot access this method unless the Umbraco membership provider is active");
             }
 
             var result = _applicationContext.Services.MemberService.GetByEmail(email);
-            return result == null ? null : new MemberPublishedContent(result, Membership.GetUser(result.Username));
+            return result == null ? null : new MemberPublishedContent(result, provider.GetUser(result.Username, false));
         }
         
         #endregion
@@ -263,9 +270,11 @@ namespace Umbraco.Web.Security
                 return null;
             }
 
-            if (Membership.Provider.IsUmbracoMembershipProvider())
-            {
-                var membershipUser = Membership.GetUser();
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+
+            if (provider.IsUmbracoMembershipProvider())
+            {                
+                var membershipUser = provider.GetCurrentUser();
                 var member = GetCurrentMember();
                 //this shouldn't happen
                 if (member == null) return null;
@@ -308,7 +317,8 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public RegisterModel CreateRegistrationModel(string memberTypeAlias = null)
         {
-            if (Membership.Provider.IsUmbracoMembershipProvider())
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            if (provider.IsUmbracoMembershipProvider())
             {
                 memberTypeAlias = memberTypeAlias ?? Constants.Conventions.MemberTypes.DefaultAlias;
                 var memberType = _applicationContext.Services.MemberTypeService.Get(memberTypeAlias);
@@ -400,8 +410,10 @@ namespace Umbraco.Web.Security
                 model.IsLoggedIn = false;
                 return model;
             }
-            
-            if (Membership.Provider.IsUmbracoMembershipProvider())
+
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+
+            if (provider.IsUmbracoMembershipProvider())
             {
                 var member = GetCurrentMember();
                 //this shouldn't happen
@@ -412,7 +424,7 @@ namespace Umbraco.Web.Security
             }
             else
             {
-                var member = Membership.GetUser();
+                var member = provider.GetCurrentUser();
                 //this shouldn't happen
                 if (member == null) return null;
                 model.Name = member.UserName;
@@ -467,8 +479,10 @@ namespace Umbraco.Web.Security
             }
             else
             {
+                var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+
                 string username;
-                if (Membership.Provider.IsUmbracoMembershipProvider())
+                if (provider.IsUmbracoMembershipProvider())
                 {
                     var member = GetCurrentMember();
                     username = member.Username;
@@ -489,7 +503,7 @@ namespace Umbraco.Web.Security
                 }
                 else
                 {
-                    var member = Membership.GetUser();
+                    var member = provider.GetCurrentUser();
                     username = member.UserName;
                 }
                 
@@ -722,11 +736,14 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         private IMember GetCurrentMember()
         {
-            if (Membership.Provider.IsUmbracoMembershipProvider() == false)
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+
+            if (provider.IsUmbracoMembershipProvider() == false)
             {
                 throw new NotSupportedException("An IMember model can only be retreived when using the built-in Umbraco membership providers");
             }
-            var member = _applicationContext.Services.MemberService.GetByUsername(_httpContext.User.Identity.Name);
+            var username = provider.GetCurrentUserName();
+            var member = _applicationContext.Services.MemberService.GetByUsername(username);
             return member;
         }
 

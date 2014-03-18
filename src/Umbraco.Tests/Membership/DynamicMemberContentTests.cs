@@ -66,7 +66,7 @@ namespace Umbraco.Tests.Membership
 
 
             var mpc = new MemberPublishedContent(
-                new Member("test name", "test@email.com", "test username", "test password", -1, 
+                new Member("test name", "test@email.com", "test username", "test password",
                     Mock.Of<IMemberType>(type => type.Alias == "Member")),
                 m);                
 
@@ -107,7 +107,7 @@ namespace Umbraco.Tests.Membership
 
 
             var mpc = new MemberPublishedContent(
-                new Member("test name", "test@email.com", "test username", "test password", -1,
+                new Member("test name", "test@email.com", "test username", "test password",
                     Mock.Of<IMemberType>(type => type.Alias == "Member")) ,
                 m);
 

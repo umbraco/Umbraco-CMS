@@ -92,6 +92,8 @@ function openContentItem(id) {
         /// <param name="Tree">The tree.</param>
         public override void Render(ref XmlDocument Tree)
         {
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+
             string letter = "";
             string ContentItemParent = "";
             if (HttpContext.Current.Request.QueryString.ToString().IndexOf("letter") >= 0)
@@ -158,7 +160,7 @@ function openContentItem(id) {
                     }
                     else
                     {
-                        if (Membership.Provider.IsUmbracoMembershipProvider())
+                        if (provider.IsUmbracoMembershipProvider())
                         {
                             foreach (Member m in Member.getMemberFromFirstLetter(letter.ToCharArray()[0]))
                             {
@@ -178,7 +180,7 @@ function openContentItem(id) {
                         else
                         {
                             int total;
-                            foreach (System.Web.Security.MembershipUser u in System.Web.Security.Membership.Provider.FindUsersByName(letter + "%", 0, 9999, out total))
+                            foreach (MembershipUser u in provider.FindUsersByName(letter + "%", 0, 9999, out total))
                             {
                                 XmlElement treeElement = Tree.CreateElement("tree");
 
@@ -222,7 +224,7 @@ function openContentItem(id) {
                 }
 
                 //Add folder named "Others", only supported by umbraco
-                if (Membership.Provider.IsUmbracoMembershipProvider())
+                if (provider.IsUmbracoMembershipProvider())
                 {
                     XmlElement treeElementOther = Tree.CreateElement("tree");
                     treeElementOther.SetAttribute("menu", "");

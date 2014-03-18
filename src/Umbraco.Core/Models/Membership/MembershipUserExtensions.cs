@@ -4,7 +4,7 @@ using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models.Membership
 {
-    internal static class MembershipExtensions
+    internal static class MembershipUserExtensions
     {
         internal static UmbracoMembershipMember AsConcreteMembershipUser(this IMembershipUser member, string providerName)
         {

@@ -78,7 +78,7 @@ namespace Umbraco.Web.Security.Providers
             string salt;
             var encodedPassword = EncryptOrHashNewPassword(newPassword, out salt);
 
-            m.Password = FormatPasswordForStorage(encodedPassword, salt);
+            m.RawPasswordValue = FormatPasswordForStorage(encodedPassword, salt);
             m.LastPasswordChangeDate = DateTime.Now;
 
             MemberService.Save(m);
@@ -105,7 +105,7 @@ namespace Umbraco.Web.Security.Providers
             }
 
             member.PasswordQuestion = newPasswordQuestion;
-            member.PasswordAnswer = EncryptString(newPasswordAnswer);
+            member.RawPasswordAnswerValue = EncryptString(newPasswordAnswer);
 
             MemberService.Save(member);
 
@@ -157,7 +157,7 @@ namespace Umbraco.Web.Security.Providers
                 memberTypeAlias);
             
             member.PasswordQuestion = passwordQuestion;
-            member.PasswordAnswer = EncryptString(passwordAnswer);
+            member.RawPasswordAnswerValue = EncryptString(passwordAnswer);
             member.IsApproved = isApproved;
             member.LastLoginDate = DateTime.Now;
             member.LastPasswordChangeDate = DateTime.Now;
@@ -287,12 +287,12 @@ namespace Umbraco.Web.Security.Providers
 
             var encAnswer = EncryptString(answer);
 
-            if (RequiresQuestionAndAnswer && m.PasswordAnswer != encAnswer)
+            if (RequiresQuestionAndAnswer && m.RawPasswordAnswerValue != encAnswer)
             {
                 throw new ProviderException("Incorrect password answer");
             }
 
-            var decodedPassword = DecryptPassword(m.Password);
+            var decodedPassword = DecryptPassword(m.RawPasswordValue);
 
             return decodedPassword;
         }
@@ -406,14 +406,14 @@ namespace Umbraco.Web.Security.Providers
 
             var encAnswer = EncryptString(answer);
 
-            if (RequiresQuestionAndAnswer && m.PasswordAnswer != encAnswer)
+            if (RequiresQuestionAndAnswer && m.RawPasswordAnswerValue != encAnswer)
             {
                 throw new ProviderException("Incorrect password answer");
             }
 
             string salt;
             var encodedPassword = EncryptOrHashNewPassword(generatedPassword, out salt);
-            m.Password = FormatPasswordForStorage(encodedPassword, salt);
+            m.RawPasswordValue = FormatPasswordForStorage(encodedPassword, salt);
             m.LastPasswordChangeDate = DateTime.Now;
             MemberService.Save(m);
             
@@ -507,7 +507,7 @@ namespace Umbraco.Web.Security.Providers
                 return false;
             }
 
-            var authenticated = CheckPassword(password, member.Password);
+            var authenticated = CheckPassword(password, member.RawPasswordValue);
 
             if (authenticated == false)
             {
