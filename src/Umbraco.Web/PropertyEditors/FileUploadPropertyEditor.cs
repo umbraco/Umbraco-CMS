@@ -66,7 +66,7 @@ namespace Umbraco.Web.PropertyEditors
         static void AutoFillProperties(IContentBase model)
         {
             var mediaFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            foreach (var p in model.Properties)
+            foreach (var p in model.Properties.Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias))
             {
                 var uploadFieldConfigNode =
                     UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties

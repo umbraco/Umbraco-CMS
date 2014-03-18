@@ -63,7 +63,7 @@ namespace Umbraco.Web.PropertyEditors
         static void AutoFillProperties(IContentBase model)
         {
             var mediaFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            foreach (var p in model.Properties.Where(x => x.PropertyType.Alias == Constants.PropertyEditors.ImageCropperAlias))
+            foreach (var p in model.Properties.Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.ImageCropperAlias))
             {
                 var uploadFieldConfigNode =
                     UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties
@@ -71,18 +71,28 @@ namespace Umbraco.Web.PropertyEditors
 
                 if (uploadFieldConfigNode != null)
                 {
-                    if (p.Value != null){
-                         var json = p.Value as JObject;
-                         if (json != null && json["src"] != null)
-                             model.PopulateFileMetaDataProperties(uploadFieldConfigNode, json["src"].Value<string>());
-                         else if (p.Value is string)
-                         {
-                             var config = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(p.PropertyType.DataTypeDefinitionId).FirstOrDefault();
-                             var crops = !string.IsNullOrEmpty(config) ? config : "[]";
-                             p.Value = "{src: '" + p.Value + "', crops: " + crops + "}";
-                             model.PopulateFileMetaDataProperties(uploadFieldConfigNode, p.Value);
-                         }
-                    }else
+                    if (p.Value != null)
+                    {
+                        JObject json = null;
+                        try
+                        {
+                            json = JObject.Parse((string)p.Value);
+                        }
+                        catch (Newtonsoft.Json.JsonException ex)
+                        {
+
+                        }
+                        if (json != null && json["src"] != null)
+                            model.PopulateFileMetaDataProperties(uploadFieldConfigNode, json["src"].Value<string>());
+                        else if (p.Value is string)
+                        {
+                            var config = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(p.PropertyType.DataTypeDefinitionId).FirstOrDefault();
+                            var crops = !string.IsNullOrEmpty(config) ? config : "[]";
+                            p.Value = "{src: '" + p.Value + "', crops: " + crops + "}";
+                            model.PopulateFileMetaDataProperties(uploadFieldConfigNode, p.Value);
+                        }
+                    }
+                    else
                         model.ResetFileMetaDataProperties(uploadFieldConfigNode);
                 }
             }
