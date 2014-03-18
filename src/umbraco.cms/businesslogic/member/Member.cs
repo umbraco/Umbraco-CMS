@@ -1082,11 +1082,10 @@ namespace umbraco.cms.businesslogic.member
             if (HttpContext.Current.User.Identity.IsAuthenticated)
             {
                 var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-                var username = provider.GetCurrentUserName();
-                var member = provider.GetUser(username, true);
+                var member = provider.GetCurrentUser();
                 if (member == null)
                 {
-                    throw new InvalidOperationException("No member object found with username " + username);
+                    throw new InvalidOperationException("No member object found with username " + provider.GetCurrentUserName());
                 }
                 int.TryParse(member.ProviderUserKey.ToString(), out currentMemberId);
             }
@@ -1105,11 +1104,10 @@ namespace umbraco.cms.businesslogic.member
                 if (HttpContext.Current.User.Identity.IsAuthenticated)
                 {
                     var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-                    var username = provider.GetCurrentUserName();
-                    var member = provider.GetUser(username, true);
+                    var member = provider.GetCurrentUser();
                     if (member == null)
                     {
-                        throw new InvalidOperationException("No member object found with username " + username);
+                        throw new InvalidOperationException("No member object found with username " + provider.GetCurrentUserName());
                     }
 
                     int currentMemberId = 0;

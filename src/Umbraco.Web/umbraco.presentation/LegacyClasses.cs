@@ -423,8 +423,7 @@ namespace umbraco
                     HttpContext.Current.Trace.Write("umbracoRequestHandler", "Page protected");
 
                     var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-                    var username = provider.GetCurrentUserName();
-                    var user = provider.GetUser(username, true);
+                    var user = provider.GetCurrentUser();
 
                     if (user == null || !library.IsLoggedOn())
                     {

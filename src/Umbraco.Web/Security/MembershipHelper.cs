@@ -66,8 +66,7 @@ namespace Umbraco.Web.Security
 
             //get the current membership user
             var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-            var username = provider.GetCurrentUserName();
-            var membershipUser = provider.GetUser(username, true);
+            var membershipUser = provider.GetCurrentUser();
             //NOTE: This should never happen since they are logged in
             if (membershipUser == null) throw new InvalidOperationException("Could not find member with username " + _httpContext.User.Identity.Name);
 
@@ -274,9 +273,8 @@ namespace Umbraco.Web.Security
             var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
 
             if (provider.IsUmbracoMembershipProvider())
-            {
-                var username = provider.GetCurrentUserName();
-                var membershipUser = provider.GetUser(username, true);
+            {                
+                var membershipUser = provider.GetCurrentUser();
                 var member = GetCurrentMember();
                 //this shouldn't happen
                 if (member == null) return null;
@@ -426,8 +424,7 @@ namespace Umbraco.Web.Security
             }
             else
             {
-                var username = provider.GetCurrentUserName();
-                var member = provider.GetUser(username, true);
+                var member = provider.GetCurrentUser();
                 //this shouldn't happen
                 if (member == null) return null;
                 model.Name = member.UserName;
@@ -506,8 +503,7 @@ namespace Umbraco.Web.Security
                 }
                 else
                 {
-                    var currUsername = provider.GetCurrentUserName();
-                    var member = provider.GetUser(currUsername, true);
+                    var member = provider.GetCurrentUser();
                     username = member.UserName;
                 }
                 

@@ -19,15 +19,7 @@ namespace Umbraco.Web.UI.Install.Steps
 
         protected MembershipProvider CurrentProvider
         {
-            get
-            {
-                var provider = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider];
-                if (provider == null)
-                {
-                    throw new InvalidOperationException("No MembershipProvider found with name " + UmbracoSettings.DefaultBackofficeProvider);
-                }
-                return provider;
-            }
+            get { return MembershipProviderExtensions.GetUsersMembershipProvider(); }
         }
 
         protected void ChangePasswordClick(object sender, EventArgs e)

@@ -49,6 +49,25 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
+        /// Method to get the Umbraco Users membership provider based on it's alias
+        /// </summary>
+        /// <returns></returns>
+        public static MembershipProvider GetUsersMembershipProvider()
+        {
+            if (Membership.Providers[Constants.Conventions.User.UmbracoUsersProviderName] == null)
+            {
+                throw new InvalidOperationException("No membership provider found with name " + Constants.Conventions.User.UmbracoUsersProviderName);
+            }
+            return Membership.Providers[Constants.Conventions.User.UmbracoUsersProviderName];
+        }
+
+        public static MembershipUser GetCurrentUser(this MembershipProvider membershipProvider)
+        {
+            var username = membershipProvider.GetCurrentUserName();
+            return membershipProvider.GetUser(username, true);
+        }
+
+        /// <summary>
         /// Just returns the current user's login name (just a wrapper).
         /// </summary>
         /// <param name="membershipProvider"></param>

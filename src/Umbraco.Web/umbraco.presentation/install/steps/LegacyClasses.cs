@@ -13,6 +13,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Security;
 using umbraco.DataLayer;
 using umbraco.presentation.install.utills;
 using umbraco.providers;
@@ -523,19 +524,21 @@ namespace umbraco.presentation.install
         {
             Page.Validate();
 
+            var provider = MembershipProviderExtensions.GetUsersMembershipProvider();
+
             if (Page.IsValid)
             {
                 User u = User.GetUser(0);
-                MembershipUser user = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(0, true);
+                var user = provider.GetUser(0, true);
                 user.ChangePassword(u.GetPassword(), tb_password.Text.Trim());
 
                 // Is it using the default membership provider
-                if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is UsersMembershipProvider)
+                if (provider is UsersMembershipProvider)
                 {
                     // Save user in membership provider
-                    UsersMembershipUser umbracoUser = user as UsersMembershipUser;
+                    var umbracoUser = user as UsersMembershipUser;
                     umbracoUser.FullName = tb_name.Text.Trim();
-                    Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].UpdateUser(umbracoUser);
+                    provider.UpdateUser(umbracoUser);
 
                     // Save user details
                     u.Email = tb_email.Text.Trim();
@@ -543,7 +546,7 @@ namespace umbraco.presentation.install
                 else
                 {
                     u.Name = tb_name.Text.Trim();
-                    if (!(Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] is ActiveDirectoryMembershipProvider)) Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].UpdateUser(user);
+                    if ((provider is ActiveDirectoryMembershipProvider) == false) provider.UpdateUser(user);
                 }
 
                 // we need to update the login name here as it's set to the old name when saving the user via the membership provider!
@@ -555,8 +558,8 @@ namespace umbraco.presentation.install
                 {
                     try
                     {
-                        System.Net.WebClient client = new System.Net.WebClient();
-                        NameValueCollection values = new NameValueCollection();
+                        var client = new System.Net.WebClient();
+                        var values = new NameValueCollection();
                         values.Add("name", tb_name.Text);
                         values.Add("email", tb_email.Text);
 

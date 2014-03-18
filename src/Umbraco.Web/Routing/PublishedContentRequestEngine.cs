@@ -522,8 +522,7 @@ namespace Umbraco.Web.Routing
 				try
 				{
                     var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-				    var username = provider.GetCurrentUserName();
-                    user = provider.GetUser(username, true);
+                    user = provider.GetCurrentUser();
 				}
 				catch (ArgumentException)
 				{
