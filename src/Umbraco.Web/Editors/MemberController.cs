@@ -242,7 +242,7 @@ namespace Umbraco.Web.Editors
                 //save the item
                 //NOTE: We are setting the password to NULL - this indicates to the system to not actually save the password
                 // so it will not get overwritten!
-                contentItem.PersistedContent.Password = null;
+                contentItem.PersistedContent.RawPasswordValue = null;
 
                 //create/save the IMember
                 Services.MemberService.Save(contentItem.PersistedContent);

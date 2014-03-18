@@ -127,7 +127,7 @@ namespace Umbraco.Web.WebApi.Binders
                 FilterMembershipProviderProperties(contentType);
 
                 //return the new member with the details filled in
-                return new Member(model.Name, model.Email, model.Username, model.Password.NewPassword, -1, contentType);
+                return new Member(model.Name, model.Email, model.Username, model.Password.NewPassword, contentType);
             }
             else
             {
@@ -142,7 +142,7 @@ namespace Umbraco.Web.WebApi.Binders
                 if (memberType != null)
                 {
                     FilterContentTypeProperties(memberType, memberType.PropertyTypes.Select(x => x.Alias).ToArray());
-                    return new Member(model.Name, model.Email, model.Username, Guid.NewGuid().ToString("N"), -1, memberType);
+                    return new Member(model.Name, model.Email, model.Username, Guid.NewGuid().ToString("N"), memberType);
                 }
 
                 //generate a member for a generic membership provider

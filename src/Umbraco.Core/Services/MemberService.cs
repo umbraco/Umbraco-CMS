@@ -1212,7 +1212,7 @@ namespace Umbraco.Core.Services
 
             memType.PropertyGroups.Add(propGroup);
 
-            return new Member(name, email, username, password, -1, memType);
+            return new Member(name, email, username, password, memType);
         }
 
 

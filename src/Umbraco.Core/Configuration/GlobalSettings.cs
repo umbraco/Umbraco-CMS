@@ -287,11 +287,11 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                return IsConfiguredMembershipProviderUsingLegacyEncoding(UmbracoSettings.DefaultBackofficeProvider);
+                return IsConfiguredMembershipProviderUsingLegacyEncoding(UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider);
             }
             set
             {
-                SetMembershipProvidersLegacyEncoding(UmbracoSettings.DefaultBackofficeProvider, value);
+                SetMembershipProvidersLegacyEncoding(UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider, value);
             }
         }
 		

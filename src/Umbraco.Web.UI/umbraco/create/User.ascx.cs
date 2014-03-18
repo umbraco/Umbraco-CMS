@@ -28,7 +28,7 @@ namespace Umbraco.Web.UI.Umbraco.Create
         /// <param name="e"></param>
         protected void LoginExistsCheck(object sender, ServerValidateEventArgs e)
         {
-            var provider = MembershipProviderExtensions.GetUsersMembershipProvider();
+            var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
 
             var user = provider.GetUser(Login.Text.Replace(" ", "").ToLower(), false);
 
@@ -46,7 +46,7 @@ namespace Umbraco.Web.UI.Umbraco.Create
         /// <param name="e"></param>
         protected void EmailExistsCheck(object sender, ServerValidateEventArgs e)
         {
-            var provider = MembershipProviderExtensions.GetUsersMembershipProvider();
+            var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
 
             var found = provider.GetUserNameByEmail(Email.Text.ToLower());
 

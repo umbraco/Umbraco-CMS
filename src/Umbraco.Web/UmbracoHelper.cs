@@ -501,7 +501,7 @@ namespace Umbraco.Web
 		{
 			if (IsProtected(nodeId, path))
 			{
-                var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+                var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
                 return _membershipHelper.IsLoggedIn() && Access.HasAccess(nodeId, path, provider.GetCurrentUser());
 			}
 			return true;

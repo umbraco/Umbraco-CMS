@@ -521,7 +521,7 @@ namespace Umbraco.Web.Routing
 				System.Web.Security.MembershipUser user = null;
 				try
 				{
-                    var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
                     user = provider.GetCurrentUser();
 				}
 				catch (ArgumentException)

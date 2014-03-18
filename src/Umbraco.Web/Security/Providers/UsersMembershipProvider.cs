@@ -33,7 +33,7 @@ namespace Umbraco.Web.Security.Providers
 
         public override string ProviderName
         {
-            get { return UmbracoSettings.DefaultBackofficeProvider; }
+            get { return UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider; }
         }
 
         /// <summary>

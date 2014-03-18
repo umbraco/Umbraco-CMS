@@ -72,7 +72,7 @@ namespace umbraco.cms.presentation.user
 
         private MembershipProvider BackOfficeProvider
         {
-            get { return MembershipProviderExtensions.GetUsersMembershipProvider(); }
+            get { return global::Umbraco.Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider(); }
         }
 
         protected void Page_Load(object sender, EventArgs e)

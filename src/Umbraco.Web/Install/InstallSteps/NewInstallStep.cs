@@ -84,10 +84,12 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             get
             {
+                var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
+
                 return new
                 {
-                    minCharLength = Membership.Providers[Constants.Conventions.User.UmbracoUsersProviderName].MinRequiredPasswordLength,
-                    minNonAlphaNumericLength = Membership.Providers[Constants.Conventions.User.UmbracoUsersProviderName].MinRequiredNonAlphanumericCharacters
+                    minCharLength = provider.MinRequiredPasswordLength,
+                    minNonAlphaNumericLength = provider.MinRequiredNonAlphanumericCharacters
                 };
             }
         }

@@ -41,10 +41,10 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(member => member.Key, expression => expression.MapFrom(user => user.ProviderUserKey.TryConvertTo<Guid>().Result.ToString("N")))
                   //This is a special case for password - we don't actually care what the password is but it either needs to be something or nothing
                   // so we'll set it to something if the member is actually created, otherwise nothing if it is a new member.
-                  .ForMember(member => member.Password, expression => expression.MapFrom(user => user.CreationDate > DateTime.MinValue ? Guid.NewGuid().ToString("N") : ""))
+                  .ForMember(member => member.RawPasswordValue, expression => expression.MapFrom(user => user.CreationDate > DateTime.MinValue ? Guid.NewGuid().ToString("N") : ""))
                     //TODO: Support these eventually
                   .ForMember(member => member.PasswordQuestion, expression => expression.Ignore())
-                  .ForMember(member => member.PasswordAnswer, expression => expression.Ignore());
+                  .ForMember(member => member.RawPasswordAnswerValue, expression => expression.Ignore());
 
             //FROM IMember TO MediaItemDisplay
             config.CreateMap<IMember, MemberDisplay>()
@@ -129,7 +129,7 @@ namespace Umbraco.Web.Models.Mapping
                         Config = new Dictionary<string, object>(Membership.Provider.GetConfiguration())
                             {
                                 //the password change toggle will only be displayed if there is already a password assigned.
-                                {"hasPassword", member.Password.IsNullOrWhiteSpace() == false}
+                                {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}
                             }
                     },
                 new ContentPropertyDisplay

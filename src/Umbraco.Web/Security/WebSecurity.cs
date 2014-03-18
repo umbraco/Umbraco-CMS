@@ -149,7 +149,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         internal bool ValidateBackOfficeCredentials(string username, string password)
         {
-            var membershipProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
+            var membershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
             return membershipProvider != null && membershipProvider.ValidateUser(username, password);
         }
         
@@ -220,7 +220,7 @@ namespace Umbraco.Web.Security
                 Email = email,
                 Language = GlobalSettings.DefaultUILanguage,
                 Name = membershipUser.UserName,
-                Password = Guid.NewGuid().ToString("N"), //Need to set this to something - will not be used though
+                RawPasswordValue = Guid.NewGuid().ToString("N"), //Need to set this to something - will not be used though
                 DefaultPermissions = writer.Permissions,
                 Username = membershipUser.UserName,
                 StartContentId = -1,
