@@ -17,7 +17,6 @@ namespace Umbraco.Tests.Migrations
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
         }
 
-        [NUnit.Framework.Ignore("this doesn't actually test anything")]
         [Test]
         public void Drop_Foreign_Key()
         {
@@ -29,15 +28,9 @@ namespace Umbraco.Tests.Migrations
             stub.GetUpExpressions(context);
 
             // Assert
-            Assert.That(context.Expressions.Any(), Is.True);
+            Assert.That(context.Expressions.Count(), Is.EqualTo(1));
+            Assert.That(context.Expressions.Single().ToString(), Is.EqualTo("ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoUser_id]"));
 
-            //Console output
-            Console.WriteLine("Number of expressions in context: {0}", context.Expressions.Count);
-            Console.WriteLine("");
-            foreach (var expression in context.Expressions)
-            {
-                Console.WriteLine(expression.ToString());
-            }
         }
 
         [NUnit.Framework.Ignore("this doesn't actually test anything")]
