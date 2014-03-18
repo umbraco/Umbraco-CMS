@@ -45,6 +45,7 @@ namespace Umbraco.Web.Editors
         public MemberController()
             : this(UmbracoContext.Current)
         {
+            _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
         }
 
         /// <summary>
@@ -54,7 +55,10 @@ namespace Umbraco.Web.Editors
         public MemberController(UmbracoContext umbracoContext)
             : base(umbracoContext)
         {
+            _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
         }
+
+        private MembershipProvider _provider;
 
         /// <summary>
         /// Ensure all GUIDs are formatted without hyphens
@@ -116,7 +120,7 @@ namespace Umbraco.Web.Editors
 
                 case MembershipScenario.StandaloneCustomProvider:
                 default:
-                    foundMembershipMember = Membership.GetUser(key, false);
+                    foundMembershipMember = _provider.GetUser(key, false);
                     if (foundMembershipMember == null)
                     {
                         HandleContentNotFound(key);
@@ -205,7 +209,7 @@ namespace Umbraco.Web.Editors
             }
 
             //TODO: WE need to support this! - requires UI updates, etc...
-            if (Membership.Provider.RequiresQuestionAndAnswer)
+            if (_provider.RequiresQuestionAndAnswer)
             {
                 throw new NotSupportedException("Currently the member editor does not support providers that have RequiresQuestionAndAnswer specified");
             }
@@ -316,11 +320,11 @@ namespace Umbraco.Web.Editors
         {
             //Get the member from the provider
 
-            var membershipUser = Membership.Provider.GetUser(contentItem.PersistedContent.Key, false);
+            var membershipUser = _provider.GetUser(contentItem.PersistedContent.Key, false);
             if (membershipUser == null)
             {
                 //This should never happen! so we'll let it YSOD if it does.
-                throw new InvalidOperationException("Could not get member from membership provider " + Membership.Provider.Name + " with key " + contentItem.PersistedContent.Key);
+                throw new InvalidOperationException("Could not get member from membership provider " + _provider.Name + " with key " + contentItem.PersistedContent.Key);
             }
 
             var shouldReFetchMember = false;
@@ -328,7 +332,7 @@ namespace Umbraco.Web.Editors
             //Update the membership user if it has changed
             try
             {
-                var requiredUpdating = Members.UpdateMember(membershipUser, Membership.Provider,
+                var requiredUpdating = Members.UpdateMember(membershipUser, _provider,
                     contentItem.Email.Trim(),
                     contentItem.IsApproved,
                     comment: contentItem.Comments);
@@ -352,7 +356,7 @@ namespace Umbraco.Web.Editors
             {
                 try
                 {
-                    var result = Membership.Provider.UnlockUser(membershipUser.UserName);
+                    var result = _provider.UnlockUser(membershipUser.UserName);
                     if (result == false)
                     {
                         //it wasn't successful - but it won't really tell us why.
@@ -387,7 +391,7 @@ namespace Umbraco.Web.Editors
                 return null;
             }
 
-            var passwordChangeResult = Members.ChangePassword(membershipUser.UserName, contentItem.Password, Membership.Provider);
+            var passwordChangeResult = Members.ChangePassword(membershipUser.UserName, contentItem.Password, _provider);
             if (passwordChangeResult.Success)
             {
                 //If the provider has changed some values, these values need to be reflected in the member object 
@@ -444,11 +448,13 @@ namespace Umbraco.Web.Editors
                 case MembershipScenario.CustomProviderWithUmbracoLink:
                 case MembershipScenario.StandaloneCustomProvider:
                 default:
-                    var membershipUser = Membership.GetUser(contentItem.Key, false);
+                    var membershipUser = _provider.GetUser(contentItem.Key, false);
                     //Go and re-fetch the persisted item
                     contentItem.PersistedContent = Mapper.Map<MembershipUser, IMember>(membershipUser);                    
                     break;
             }
+
+            UpdateName(contentItem);
 
             //re-assign the mapped values that are not part of the membership provider properties.
             var builtInAliases = Constants.Conventions.Member.GetStandardPropertyTypeStubs().Select(x => x.Key).ToArray();            
@@ -495,7 +501,7 @@ namespace Umbraco.Web.Editors
             {
                 case MembershipScenario.NativeUmbraco:
                     //We are using the umbraco membership provider, create the member using the membership provider first.
-                    var umbracoMembershipProvider = (UmbracoMembershipProviderBase)Membership.Provider;
+                    var umbracoMembershipProvider = (UmbracoMembershipProviderBase)_provider;
                     //TODO: We are not supporting q/a - passing in empty here
                     membershipUser = umbracoMembershipProvider.CreateUser(
                         contentItem.ContentTypeAlias, contentItem.Username,
@@ -512,7 +518,7 @@ namespace Umbraco.Web.Editors
                     Services.MemberService.Save(contentItem.PersistedContent);
 
                     //TODO: We are not supporting q/a - passing in empty here
-                    membershipUser = Membership.CreateUser(
+                    membershipUser = _provider.CreateUser(
                         contentItem.Username,
                         contentItem.Password.NewPassword,
                         contentItem.Email,
@@ -529,7 +535,7 @@ namespace Umbraco.Web.Editors
                    
                     var newKey = Guid.NewGuid();
                     //TODO: We are not supporting q/a - passing in empty here
-                    membershipUser = Membership.CreateUser(
+                    membershipUser = _provider.CreateUser(
                         contentItem.Username,
                         contentItem.Password.NewPassword,
                         contentItem.Email,
@@ -556,7 +562,7 @@ namespace Umbraco.Web.Editors
                     if (contentItem.Comments.IsNullOrWhiteSpace() == false)
                     {
                         membershipUser.Comment = contentItem.Comments;
-                        Membership.UpdateUser(membershipUser);
+                        _provider.UpdateUser(membershipUser);
                     }
 
                     RefetchMemberData(contentItem, LookupType.ByUserName);
@@ -640,17 +646,17 @@ namespace Umbraco.Web.Editors
                     {
                         Services.MemberService.Delete(foundMember);
                     }
-                    foundMembershipUser = Membership.GetUser(key, false);
+                    foundMembershipUser = _provider.GetUser(key, false);
                     if (foundMembershipUser != null)
                     {
-                        Membership.DeleteUser(foundMembershipUser.UserName, true);
+                        _provider.DeleteUser(foundMembershipUser.UserName, true);
                     }
                     break;
                 case MembershipScenario.StandaloneCustomProvider:
-                    foundMembershipUser = Membership.GetUser(key, false);
+                    foundMembershipUser = _provider.GetUser(key, false);
                     if (foundMembershipUser != null)
                     {
-                        Membership.DeleteUser(foundMembershipUser.UserName, true);
+                        _provider.DeleteUser(foundMembershipUser.UserName, true);
                     }
                     break;
                 default:

@@ -6,6 +6,7 @@ using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi.Filters;
@@ -42,6 +43,7 @@ namespace Umbraco.Web.WebApi.Binders
         protected override IMember GetExisting(MemberSave model)
         {
             var scenario = ApplicationContext.Services.MemberService.GetMembershipScenario();
+            var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
             switch (scenario)
             {
                 case MembershipScenario.NativeUmbraco:
@@ -49,7 +51,7 @@ namespace Umbraco.Web.WebApi.Binders
                 case MembershipScenario.CustomProviderWithUmbracoLink:
                 case MembershipScenario.StandaloneCustomProvider:
                 default:
-                    var membershipUser = Membership.GetUser(model.Key, false);
+                    var membershipUser = provider.GetUser(model.Key, false);
                     if (membershipUser == null)
                     {
                         throw new InvalidOperationException("Could not find member with key " + model.Key);
@@ -115,7 +117,9 @@ namespace Umbraco.Web.WebApi.Binders
         /// </remarks>
         protected override IMember CreateNew(MemberSave model)
         {
-            if (Membership.Provider.Name == Constants.Conventions.Member.UmbracoMemberProviderName)
+            var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+
+            if (provider.IsUmbracoMembershipProvider())
             {
                 var contentType = ApplicationContext.Services.MemberTypeService.Get(model.ContentTypeAlias);
                 if (contentType == null)

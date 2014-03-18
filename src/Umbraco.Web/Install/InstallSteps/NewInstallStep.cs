@@ -32,11 +32,7 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             get
             {
-                var provider = Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider];
-                if (provider == null)
-                {
-                    throw new InvalidOperationException("No MembershipProvider found with name " + UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider);
-                }
+                var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
                 return provider;
             }
         }

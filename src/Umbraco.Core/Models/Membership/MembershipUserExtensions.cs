@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Web.Security;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.Models.Membership
@@ -32,7 +33,8 @@ namespace Umbraco.Core.Models.Membership
         {
             if (_scenario.HasValue == false)
             {
-                if (System.Web.Security.Membership.Provider.Name == Constants.Conventions.Member.UmbracoMemberProviderName)
+                var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+                if (provider.IsUmbracoMembershipProvider())
                 {
                     return MembershipScenario.NativeUmbraco;
                 }
