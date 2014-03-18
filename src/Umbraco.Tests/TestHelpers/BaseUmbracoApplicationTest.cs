@@ -34,8 +34,7 @@ namespace Umbraco.Tests.TestHelpers
             using (DisposableTimer.TraceDuration<BaseUmbracoApplicationTest>("init", "init"))
             {
                 TestHelper.InitializeContentDirectories();
-                TestHelper.EnsureUmbracoSettingsConfig();
-
+                
                 InitializeLegacyMappingsForCoreEditors();
 
                 SetupPluginManager();

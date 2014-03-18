@@ -405,6 +405,11 @@
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserType.cs" />
     <Compile Include="TestHelpers\RequiresAutoMapperMappingsAttribute.cs" />
+    <Compile Include="TreesAndSections\ResourceFiles.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>ResourceFiles.resx</DependentUpon>
+    </Compile>
     <Compile Include="TreesAndSections\SectionTests.cs" />
     <Compile Include="TreesAndSections\ApplicationTreeTest.cs" />
     <Compile Include="PublishedContent\DynamicPublishedContentCustomExtensionMethods.cs" />
@@ -526,6 +531,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="packages.config" />
+    <EmbeddedResource Include="TreesAndSections\applications.config" />
+    <EmbeddedResource Include="TreesAndSections\trees.config" />
     <None Include="UmbracoExamine\TestFiles\Converting_file_to_PDF.pdf" />
     <None Include="UmbracoExamine\TestFiles\PDFStandards.PDF" />
     <None Include="UmbracoExamine\TestFiles\SurviorFlipCup.pdf" />
@@ -601,6 +608,10 @@
     <EmbeddedResource Include="Services\Importing\ImportResources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ImportResources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TreesAndSections\ResourceFiles.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ResourceFiles.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Include="UmbracoExamine\TestFiles.resx">
       <Generator>ResXFileCodeGenerator</Generator>
