@@ -5,7 +5,8 @@ using System.Data;
 using System.Linq;
 
 using Umbraco.Core;
-
+using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
 using umbraco.DataLayer;
 using umbraco.BusinessLogic;
 using System.Collections.Generic;
@@ -133,11 +134,11 @@ namespace umbraco.cms.businesslogic.language
         public static void setText(int languageId, Guid key, string value)
         {
             if (!hasText(key, languageId)) throw new ArgumentException("Key does not exist");
-
-            var v = ApplicationContext.Current.DatabaseContext.Database.EscapeSqlIdentifier("value");
+            
             ApplicationContext.Current.DatabaseContext.Database.Update<LanguageTextDto>(
-                "set " + v + " = @value where LanguageId = @languageId And UniqueId = @key",
-                new { value = value, languageId = languageId, key = key });
+                string.Format("set {0} = @value where LanguageId = @languageId And UniqueId = @key",
+                    SqlSyntaxContext.SqlSyntaxProvider.GetQuotedColumnName("value")),
+                new {value = value, languageId = languageId, key = key});
         }
 
         /// <summary>
