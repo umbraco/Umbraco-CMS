@@ -69,23 +69,18 @@ namespace Umbraco.Tests.TestHelpers
             
         }
         
-        private static readonly object Locker = new object();
-        private static volatile bool _legacyMappingInit = false;
+        private static readonly object Locker = new object();        
 
         private static void InitializeLegacyMappingsForCoreEditors()
         {
-            if (_legacyMappingInit == false)
+            lock (Locker)
             {
-                lock (Locker)
+                if (LegacyPropertyEditorIdToAliasConverter.Count() == 0)
                 {
-                    if (_legacyMappingInit == false)
-                    {
-                        _legacyMappingInit = true;
-                        //Create the legacy prop-eds mapping
-                        LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
-                    }
+                    //Create the legacy prop-eds mapping
+                    LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
                 }
-            }
+            }         
         }
         
         /// <summary>
