@@ -35,7 +35,10 @@ namespace Umbraco.Web.Models.Mapping
             display.Description = originalProp.PropertyType.Description;
             display.Label = originalProp.PropertyType.Name;
             display.HideLabel = valEditor.HideLabel;
-            display.Mandatory = originalProp.PropertyType.Mandatory;
+            
+            //add the validation information
+            display.Validation.Mandatory = originalProp.PropertyType.Mandatory;
+            display.Validation.Pattern = originalProp.PropertyType.ValidationRegExp;
             
             if (display.PropertyEditor == null)
             {

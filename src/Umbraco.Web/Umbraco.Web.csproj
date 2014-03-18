@@ -340,6 +340,7 @@
     <Compile Include="MediaPropertyExtensions.cs" />
     <Compile Include="Models\ContentEditing\EntityTypeSearchResult.cs" />
     <Compile Include="Models\ContentEditing\ListViewAwareContentItemDisplayBase.cs" />
+    <Compile Include="Models\ContentEditing\PropertyTypeValidation.cs" />
     <Compile Include="Models\ImageCropData.cs" />
     <Compile Include="Models\IRenderModel.cs" />
     <Compile Include="Models\PostRedirectModel.cs" />
