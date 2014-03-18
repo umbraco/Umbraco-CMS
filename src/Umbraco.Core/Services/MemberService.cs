@@ -609,23 +609,95 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IMember CreateMember(string username, string email, string memberTypeAlias)
+        /// <summary>
+        /// Creates a member object
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="email"></param>
+        /// <param name="name"></param>
+        /// <param name="memberTypeAlias"></param>
+        /// <returns></returns>
+        public IMember CreateMember(string username, string email, string name, string memberTypeAlias)
         {
-            var memberTypeService = ApplicationContext.Current.Services.MemberTypeService;
-            var memberType = memberTypeService.Get(memberTypeAlias);
+            var memberType = FindMemberTypeByAlias(memberTypeAlias);
+            return CreateMember(username, email, name, memberType);
+        }
 
-            var member = new Member(username, email.ToLower().Trim(), username, memberType);
+        /// <summary>
+        /// Creates a new member object
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="email"></param>
+        /// <param name="name"></param>
+        /// <param name="memberType"></param>
+        /// <returns></returns>
+        public IMember CreateMember(string username, string email, string name, IMemberType memberType)
+        {
+            var member = new Member(name, email.ToLower().Trim(), username, memberType);
 
-            Created.RaiseEvent(new NewEventArgs<IMember>(member, false, memberTypeAlias, -1), this);
+            Created.RaiseEvent(new NewEventArgs<IMember>(member, false, memberType.Alias, -1), this);
 
             return member;
         }
 
+        /// <summary>
+        /// Creates a member with an Id
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="email"></param>
+        /// <param name="name"></param>
+        /// <param name="memberTypeAlias"></param>
+        /// <returns></returns>
+        public IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias)
+        {
+            var memberType = FindMemberTypeByAlias(memberTypeAlias);
+            return CreateMemberWithIdentity(username, email, name, memberType);
+        }
+
+        /// <summary>
+        /// Creates a member with an Id, the username will be used as their name
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="email"></param>
+        /// <param name="memberType"></param>
+        /// <returns></returns>
         public IMember CreateMemberWithIdentity(string username, string email, IMemberType memberType)
+        {
+            return CreateMemberWithIdentity(username, email, username, memberType);
+        }
+
+        /// <summary>
+        /// Creates a member with an Id
+        /// </summary>
+        /// <param name="username"></param>
+        /// <param name="email"></param>
+        /// <param name="name"></param>
+        /// <param name="memberType"></param>
+        /// <returns></returns>
+        public IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType)
+        {
+            return CreateMemberWithIdentity(username, email, name, "", memberType);
+        }
+
+        /// <summary>
+        /// Creates and persists a new Member
+        /// </summary>
+        /// <param name="email"></param>
+        /// <param name="username"></param>
+        /// <param name="rawPasswordValue"></param>
+        /// <param name="memberTypeAlias"></param>
+        /// <returns></returns>
+        IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string rawPasswordValue, string memberTypeAlias)
+        {
+            var memberType = FindMemberTypeByAlias(memberTypeAlias);
+            return CreateMemberWithIdentity(username, email, memberType);
+        }
+
+        private IMember CreateMemberWithIdentity(string username, string email, string name, string rawPasswordValue, IMemberType memberType)
         {
             if (memberType == null) throw new ArgumentNullException("memberType");
 
-            var member = new Member(username, email.ToLower().Trim(), username, memberType);
+            var member = new Member(name, email.ToLower().Trim(), username, rawPasswordValue, memberType);
 
             if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMember>(member), this))
             {
@@ -648,33 +720,6 @@ namespace Umbraco.Core.Services
             Created.RaiseEvent(new NewEventArgs<IMember>(member, false, memberType.Alias, -1), this);
 
             return member;
-        }
-        
-        /// <summary>
-        /// Creates and persists a new Member
-        /// </summary>
-        /// <param name="email"></param>
-        /// <param name="username"></param>
-        /// <param name="rawPasswordValue"></param>
-        /// <param name="memberTypeAlias"></param>
-        /// <returns></returns>
-        IMember IMembershipMemberService<IMember>.CreateWithIdentity(string username, string email, string rawPasswordValue, string memberTypeAlias)
-        {
-            var uow = _uowProvider.GetUnitOfWork();
-            IMemberType memberType;
-
-            using (var repository = _repositoryFactory.CreateMemberTypeRepository(uow))
-            {
-                var query = Query<IMemberType>.Builder.Where(x => x.Alias == memberTypeAlias);
-                memberType = repository.GetByQuery(query).FirstOrDefault();
-            }
-
-            if (memberType == null)
-            {
-                throw new ArgumentException(string.Format("No MemberType matching the passed in Alias: '{0}' was found", memberTypeAlias));
-            }
-
-            return CreateMemberWithIdentity(username, email, memberType);
         }
 
         /// <summary>
@@ -937,7 +982,32 @@ namespace Umbraco.Core.Services
                 repository.DissociateRoles(memberIds, roleNames);
             }
         }
+
+        
+
         #endregion
+
+        private IMemberType FindMemberTypeByAlias(string memberTypeAlias)
+        {
+            using (var repository = _repositoryFactory.CreateMemberTypeRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<IMemberType>.Builder.Where(x => x.Alias == memberTypeAlias);
+                var types = repository.GetByQuery(query);
+
+                if (types.Any() == false)
+                    throw new Exception(
+                        string.Format("No MemberType matching the passed in Alias: '{0}' was found",
+                                      memberTypeAlias));
+
+                var contentType = types.First();
+
+                if (contentType == null)
+                    throw new Exception(string.Format("MemberType matching the passed in Alias: '{0}' was null",
+                                                      memberTypeAlias));
+
+                return contentType;
+            }
+        }
 
         /// <summary>
         /// Rebuilds all xml content in the cmsContentXml table for all media

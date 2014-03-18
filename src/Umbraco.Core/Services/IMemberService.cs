@@ -5,11 +5,17 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Services
 {
+
     /// <summary>
     /// Defines the MemberService, which is an easy access to operations involving (umbraco) members.
     /// </summary>
     public interface IMemberService : IMembershipMemberService
     {
+        IMember CreateMember(string username, string email, string name, string memberTypeAlias);
+        IMember CreateMember(string username, string email, string name, IMemberType memberType);
+        IMember CreateMemberWithIdentity(string username, string email, string name, string memberTypeAlias);
+        IMember CreateMemberWithIdentity(string username, string email, string name, IMemberType memberType);
+        
         /// <summary>
         /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method
         /// </summary>

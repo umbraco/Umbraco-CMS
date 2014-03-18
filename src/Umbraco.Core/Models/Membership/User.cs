@@ -27,6 +27,7 @@ namespace Umbraco.Core.Models.Membership
             if (userType == null) throw new ArgumentNullException("userType");
 
             _userType = userType;
+            _defaultPermissions = _userType.Permissions;
             //Groups = new List<object> { userType };
             SessionTimeout = 60;
             _sectionCollection = new ObservableCollection<string>();
@@ -38,6 +39,8 @@ namespace Umbraco.Core.Models.Membership
             _isLockedOut = false;
             _startContentId = -1;
             _startMediaId = -1;
+            //cannot be null
+            _rawPasswordValue = "";
         }
 
         public User(string name, string email, string username, string rawPasswordValue, IUserType userType)

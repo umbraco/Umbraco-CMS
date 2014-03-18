@@ -9,6 +9,7 @@ using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Services
 {
@@ -75,7 +76,23 @@ namespace Umbraco.Core.Services
             }
         }
 
-        public IUser CreateUserWithIdentity(string username, string email, string password, IUserType userType)
+        public IUser CreateUserWithIdentity(string username, string email, IUserType userType)
+        {
+            return CreateUserWithIdentity(username, email, "", userType);
+        }
+
+        IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string rawPasswordValue, string memberTypeAlias)
+        {
+            var userType = GetUserTypeByAlias(memberTypeAlias);
+            if (userType == null)
+            {
+                throw new ArgumentException("The user type " + memberTypeAlias + " could not be resolved");
+            }
+
+            return CreateUserWithIdentity(username, email, rawPasswordValue, userType);
+        }
+
+        private IUser CreateUserWithIdentity(string username, string email, string rawPasswordValue, IUserType userType)
         {
             if (userType == null) throw new ArgumentNullException("userType");
 
@@ -94,8 +111,7 @@ namespace Umbraco.Core.Services
                     Email = email,
                     Language = Configuration.GlobalSettings.DefaultUILanguage,
                     Name = username,
-                    RawPasswordValue = password,
-                    DefaultPermissions = userType.Permissions,
+                    RawPasswordValue = rawPasswordValue,                    
                     Username = username,
                     StartContentId = -1,
                     StartMediaId = -1,
@@ -113,17 +129,6 @@ namespace Umbraco.Core.Services
 
                 return user;
             }
-        }
-
-        IUser IMembershipMemberService<IUser>.CreateWithIdentity(string username, string email, string rawPasswordValue, string memberTypeAlias)
-        {
-            var userType = GetUserTypeByAlias(memberTypeAlias);
-            if (userType == null)
-            {
-                throw new ArgumentException("The user type " + memberTypeAlias + " could not be resolved");
-            }
-
-            return CreateUserWithIdentity(username, email, rawPasswordValue, userType);
         }
 
         public IUser GetById(int id)
@@ -185,6 +190,37 @@ namespace Umbraco.Core.Services
             //clear out the user logins!
             var uow = _uowProvider.GetUnitOfWork();
             uow.Database.Execute("delete from umbracoUserLogins where userID = @id", new {id = membershipUser.Id});
+        }
+
+        /// <summary>
+        /// This is simply a helper method which essentially just wraps the MembershipProvider's ChangePassword method
+        /// </summary>
+        /// <param name="user">The user to save the password for</param>
+        /// <param name="password"></param>
+        /// <remarks>
+        /// This method exists so that Umbraco developers can use one entry point to create/update users if they choose to.
+        /// </remarks>
+        public void SavePassword(IUser user, string password)
+        {
+            if (user == null) throw new ArgumentNullException("user");
+
+            var provider = MembershipProviderExtensions.GetUsersMembershipProvider();
+            if (provider.IsUmbracoMembershipProvider())
+            {
+                provider.ChangePassword(user.Username, "", password);
+            }
+
+            //go re-fetch the member and update the properties that may have changed
+            var result = GetByUsername(user.Username);
+            if (result != null)
+            {
+                //should never be null but it could have been deleted by another thread.
+                user.RawPasswordValue = result.RawPasswordValue;
+                user.LastPasswordChangeDate = result.LastPasswordChangeDate;
+                user.UpdateDate = user.UpdateDate;
+            }
+
+            throw new NotSupportedException("When using a non-Umbraco membership provider you must change the user password by using the MembershipProvider.ChangePassword method");
         }
 
         /// <summary>
