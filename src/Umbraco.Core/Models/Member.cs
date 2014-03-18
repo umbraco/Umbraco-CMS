@@ -23,6 +23,15 @@ namespace Umbraco.Core.Models
         private Type _userTypeKey;
 
         /// <summary>
+        /// Constructor for creating an empty Member object
+        /// </summary>
+        /// <param name="contentType">ContentType for the current Content object</param>
+        public Member(IMemberType contentType)
+            : base("", -1, contentType, new PropertyCollection())
+        {
+        }
+
+        /// <summary>
         /// Constructor for creating a Member object
         /// </summary>
         /// <param name="name">Name of the content</param>
