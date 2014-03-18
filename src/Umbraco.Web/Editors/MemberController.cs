@@ -148,7 +148,7 @@ namespace Umbraco.Web.Editors
                         throw new HttpResponseException(HttpStatusCode.NotFound);
                     }
 
-                    emptyContent = new Member("", contentType);
+                    emptyContent = new Member(contentType);
                     emptyContent.AdditionalData["NewPassword"] = Membership.GeneratePassword(Membership.MinRequiredPasswordLength, Membership.MinRequiredNonAlphanumericCharacters);
                     return Mapper.Map<IMember, MemberDisplay>(emptyContent);
                 case MembershipScenario.CustomProviderWithUmbracoLink:
