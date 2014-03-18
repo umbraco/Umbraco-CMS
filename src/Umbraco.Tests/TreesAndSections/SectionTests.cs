@@ -12,6 +12,8 @@ namespace Umbraco.Tests.TreesAndSections
     ///This is a test class for ApplicationTest and is intended
     ///to contain all ApplicationTest Unit Tests
     ///</summary>
+    [RequiresAutoMapperMappings]
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture()]
     public class SectionTests : BaseDatabaseFactoryTest
     {

@@ -12,9 +12,21 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 5, GlobalSettings.UmbracoMigrationName)]
     public class AddIndexToCmsMacroPropertyTable : MigrationBase
     {
+        private readonly bool _skipIndexCheck;
+
+        internal AddIndexToCmsMacroPropertyTable(bool skipIndexCheck)
+        {
+            _skipIndexCheck = skipIndexCheck;
+        }
+
+        public AddIndexToCmsMacroPropertyTable()
+        {
+            
+        }
+
         public override void Up()
         {
-            var dbIndexes = SqlSyntaxContext.SqlSyntaxProvider.GetDefinedIndexes(Context.Database)
+            var dbIndexes = _skipIndexCheck ? new DbIndexDefinition[]{} : SqlSyntaxContext.SqlSyntaxProvider.GetDefinedIndexes(Context.Database)
                 .Select(x => new DbIndexDefinition()
                 {
                     TableName = x.Item1,

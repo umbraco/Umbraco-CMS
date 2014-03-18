@@ -295,7 +295,7 @@ namespace Umbraco.Core
                     "AutoMapper.",
                     "AzureDirectory,",
                     "itextsharp,",            
-                    "UrlRewritingNet."
+                    "UrlRewritingNet.",
                     "HtmlAgilityPack,",                 
                     "MiniProfiler,",
                     "Moq,",

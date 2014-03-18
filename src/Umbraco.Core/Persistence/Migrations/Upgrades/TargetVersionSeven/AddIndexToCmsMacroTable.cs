@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -12,9 +13,21 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 4, GlobalSettings.UmbracoMigrationName)]
     public class AddIndexToCmsMacroTable : MigrationBase
     {
+        private readonly bool _skipIndexCheck;
+
+        internal AddIndexToCmsMacroTable(bool skipIndexCheck)
+        {
+            _skipIndexCheck = skipIndexCheck;
+        }
+
+        public AddIndexToCmsMacroTable()
+        {
+            
+        }
+
         public override void Up()
         {
-            var dbIndexes = SqlSyntaxContext.SqlSyntaxProvider.GetDefinedIndexes(Context.Database)
+            var dbIndexes = _skipIndexCheck ? new DbIndexDefinition[] { } : SqlSyntaxContext.SqlSyntaxProvider.GetDefinedIndexes(Context.Database)
                 .Select(x => new DbIndexDefinition()
                 {
                     TableName = x.Item1,

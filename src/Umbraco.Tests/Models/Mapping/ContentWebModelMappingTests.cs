@@ -16,6 +16,8 @@ using umbraco;
 
 namespace Umbraco.Tests.Models.Mapping
 {
+    [RequiresAutoMapperMappings]
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
     public class ContentWebModelMappingTests : BaseDatabaseFactoryTest
     {
@@ -23,11 +25,6 @@ namespace Umbraco.Tests.Models.Mapping
         public class TestPropertyEditor : PropertyEditor
         {
             
-        }
-
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NewSchemaPerFixture; }
         }
 
         //protected override void FreezeResolution()

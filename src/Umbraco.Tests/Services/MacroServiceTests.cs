@@ -3,9 +3,11 @@ using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Services
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
     public class MacroServiceTests : BaseServiceTest
     {

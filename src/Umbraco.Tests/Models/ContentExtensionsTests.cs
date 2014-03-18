@@ -1,13 +1,16 @@
 ﻿using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Models
 {
     [TestFixture]
-    public class ContentExtensionsTests
+    public class ContentExtensionsTests : BaseUmbracoConfigurationTest
     {
+      
+
         [Test]
         public void Should_Create_New_Version_When_Publishing()
         {

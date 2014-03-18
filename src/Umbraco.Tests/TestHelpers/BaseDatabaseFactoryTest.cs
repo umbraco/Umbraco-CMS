@@ -82,7 +82,7 @@ namespace Umbraco.Tests.TestHelpers
 
             base.Initialize();
 
-            using (DisposableTimer.TraceDuration<BaseDatabaseFactoryTest>("base db init"))
+            using (DisposableTimer.TraceDuration<BaseDatabaseFactoryTest>("init"))
             {
                 //TODO: Somehow make this faster - takes 5s +
 
@@ -251,17 +251,20 @@ namespace Umbraco.Tests.TestHelpers
         [TearDown]
         public override void TearDown()
         {
-            _isFirstTestInFixture = false; //ensure this is false before anything!
-
-            if (DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest)
+            using (DisposableTimer.TraceDuration<BaseDatabaseFactoryTest>("teardown"))
             {
-                RemoveDatabaseFile();
-            }      
-           
-            AppDomain.CurrentDomain.SetData("DataDirectory", null);
+                _isFirstTestInFixture = false; //ensure this is false before anything!
 
-            SqlSyntaxContext.SqlSyntaxProvider = null;
+                if (DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest)
+                {
+                    RemoveDatabaseFile();
+                }
 
+                AppDomain.CurrentDomain.SetData("DataDirectory", null);
+
+                SqlSyntaxContext.SqlSyntaxProvider = null;
+            }
+            
             base.TearDown();
         }
 
