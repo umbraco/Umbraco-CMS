@@ -129,7 +129,7 @@ function mediaHelper(umbRequestHelper) {
             _mediaFileResolvers[propertyEditorAlias] = func;
         },
 
-        resolveFile : function(mediaItem){
+        resolveFile : function(mediaItem, thumbnail){
             var _props = [];
 
             //we either have properties raw on the object, or spread out on tabs
@@ -149,7 +149,7 @@ function mediaHelper(umbRequestHelper) {
                 var property = _.find(_props, function(property){ return property.editor === key; });
                 
                 if(property){
-                    var file = resolver(property);
+                    var file = resolver(property, mediaItem, thumbnail);
                     if(file){
                         result = file;
                     }
