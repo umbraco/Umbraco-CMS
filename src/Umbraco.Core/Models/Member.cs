@@ -29,6 +29,16 @@ namespace Umbraco.Core.Models
         public Member(IMemberType contentType)
             : base("", -1, contentType, new PropertyCollection())
         {
+            Mandate.ParameterNotNull(contentType, "contentType");
+
+            _contentTypeAlias = contentType.Alias;
+            _contentType = contentType;
+            IsApproved = true;
+
+            //this cannot be null but can be empty
+            _rawPasswordValue = "";
+            _email = "";
+            _username = "";
         }
 
         /// <summary>
@@ -37,7 +47,7 @@ namespace Umbraco.Core.Models
         /// <param name="name">Name of the content</param>
         /// <param name="contentType">ContentType for the current Content object</param>
         public Member(string name, IMemberType contentType)
-            : base(name, -1, contentType, new PropertyCollection())
+            : this(contentType)
         {
             Mandate.ParameterNotNull(contentType, "contentType");
             Mandate.ParameterNotNullOrEmpty(name, "name");
