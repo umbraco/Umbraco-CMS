@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Hosting;
 using System.Web.Security;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Security
@@ -54,11 +55,11 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         public static MembershipProvider GetUsersMembershipProvider()
         {
-            if (Membership.Providers[Constants.Conventions.User.UmbracoUsersProviderName] == null)
+            if (Membership.Providers[UmbracoSettings.DefaultBackofficeProvider] == null)
             {
-                throw new InvalidOperationException("No membership provider found with name " + Constants.Conventions.User.UmbracoUsersProviderName);
+                throw new InvalidOperationException("No membership provider found with name " + UmbracoSettings.DefaultBackofficeProvider);
             }
-            return Membership.Providers[Constants.Conventions.User.UmbracoUsersProviderName];
+            return Membership.Providers[UmbracoSettings.DefaultBackofficeProvider];
         }
 
         public static MembershipUser GetCurrentUser(this MembershipProvider membershipProvider)

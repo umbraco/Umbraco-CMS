@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -32,7 +33,7 @@ namespace Umbraco.Web.Security.Providers
 
         public override string ProviderName
         {
-            get { return Constants.Conventions.User.UmbracoUsersProviderName; }
+            get { return UmbracoSettings.DefaultBackofficeProvider; }
         }
 
         /// <summary>
