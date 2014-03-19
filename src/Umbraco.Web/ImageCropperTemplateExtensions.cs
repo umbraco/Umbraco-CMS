@@ -73,13 +73,12 @@ namespace Umbraco.Web
             if (!string.IsNullOrEmpty(imageUrl))
             {
                 var imageResizerUrl = new StringBuilder();
-               // imageResizerUrl.Append(imageUrl);
 
                 if (!string.IsNullOrEmpty(imageCropperValue) && imageCropperValue.DetectIsJson())
                 {
                     var cropDataSet = imageCropperValue.SerializeToCropDataSet();
                     imageResizerUrl.Append(cropDataSet.Src);
-                    var crop = cropDataSet.Crops.FirstOrDefault(x => x.Alias == cropAlias);
+                    var crop = cropDataSet.Crops.FirstOrDefault(x => cropAlias != null && x.Alias.ToLowerInvariant() == cropAlias.ToLowerInvariant());
                     if (crop != null && crop.Coordinates != null)
                     {
                         imageResizerUrl.Append("?crop=");
