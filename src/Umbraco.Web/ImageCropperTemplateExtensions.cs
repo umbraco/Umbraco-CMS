@@ -70,15 +70,42 @@ namespace Umbraco.Web
             if (!string.IsNullOrEmpty(imageUrl))
             {
                 var imageResizerUrl = new StringBuilder();
-                //imageResizerUrl.Append(imageUrl);
+               // imageResizerUrl.Append(imageUrl);
 
                 if (!string.IsNullOrEmpty(imageCropperValue) && imageCropperValue.DetectIsJson())
                 {
                     var cropDataSet = imageCropperValue.SerializeToCropDataSet();
-                    imageResizerUrl.Append(cropDataSet.Src + cropDataSet.GetCropUrl(cropAlias));
+                    imageResizerUrl.Append(cropDataSet.Src);
+                    var crop = cropDataSet.Crops.FirstOrDefault(x => x.Alias == cropAlias);
+                    if (crop != null && crop.Coordinates != null)
+                    {
+                        imageResizerUrl.Append("?crop=");
+                        imageResizerUrl.Append(crop.Coordinates.X1).Append(",");
+                        imageResizerUrl.Append(crop.Coordinates.Y1).Append(",");
+                        imageResizerUrl.Append(crop.Coordinates.X2).Append(",");
+                        imageResizerUrl.Append(crop.Coordinates.Y2);
+                        imageResizerUrl.Append("&cropmode=percentage");
+                    }
+                    else
+                    {
+                        if (cropDataSet.HasFocalPoint())
+                        {
+                            imageResizerUrl.Append("?center=" + cropDataSet.FocalPoint.Top + "," + cropDataSet.FocalPoint.Left);
+                            imageResizerUrl.Append("&mode=crop");
+                        }
+                        else
+                        {
+                            imageResizerUrl.Append("?anchor=center");
+                            imageResizerUrl.Append("&mode=crop");
+                        }
+
+                    }
+
+                    //imageResizerUrl.Append(cropDataSet.Src + cropDataSet.GetCropUrl(cropAlias));
                 }
                 else
                 {
+                    imageResizerUrl.Append(imageUrl);
                     if (mode == null)
                     {
                         mode = Mode.Pad;
