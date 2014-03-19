@@ -19,7 +19,7 @@ namespace Umbraco.Web.PropertyEditors
         static ImageCropperPropertyEditor()
         {
             MediaService.Saving += MediaServiceSaving;
-            MediaService.Creating += MediaServiceCreating;
+            MediaService.Created += MediaServiceCreated;
         }
 
         /// <summary>
@@ -47,7 +47,7 @@ namespace Umbraco.Web.PropertyEditors
                 };
         }
 
-        static void MediaServiceCreating(IMediaService sender, Core.Events.NewEventArgs<IMedia> e)
+        static void MediaServiceCreated(IMediaService sender, Core.Events.NewEventArgs<IMedia> e)
         {
             AutoFillProperties(e.Entity);
         }
@@ -62,7 +62,6 @@ namespace Umbraco.Web.PropertyEditors
 
         static void AutoFillProperties(IContentBase model)
         {
-            var mediaFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
             foreach (var p in model.Properties.Where(x => x.PropertyType.Alias == Constants.PropertyEditors.ImageCropperAlias))
             {
                 var uploadFieldConfigNode =
@@ -78,9 +77,9 @@ namespace Umbraco.Web.PropertyEditors
                          else if (p.Value is string)
                          {
                              var config = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(p.PropertyType.DataTypeDefinitionId).FirstOrDefault();
-                             var crops = !string.IsNullOrEmpty(config) ? config : "[]";
+                             var crops = string.IsNullOrEmpty(config) == false ? config : "[]";
                              p.Value = "{src: '" + p.Value + "', crops: " + crops + "}";
-                             model.PopulateFileMetaDataProperties(uploadFieldConfigNode, p.Value);
+                             model.PopulateFileMetaDataProperties(uploadFieldConfigNode, p.Value == null ? string.Empty : p.Value.ToString());
                          }
                     }else
                         model.ResetFileMetaDataProperties(uploadFieldConfigNode);
