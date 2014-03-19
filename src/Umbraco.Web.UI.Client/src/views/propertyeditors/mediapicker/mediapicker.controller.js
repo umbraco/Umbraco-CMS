@@ -15,20 +15,26 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             $scope.ids = []; 
 
             if ($scope.model.value) {
-                $scope.ids = $scope.model.value.split(',');
+                var ids = $scope.model.value.split(',');
 
-                mediaResource.getByIds($scope.ids).then(function (medias) {
+                mediaResource.getByIds(ids).then(function (medias) {
                     //img.media = media;
                     _.each(medias, function (media, i) {
                         
-                        if(!media.thumbnail){
-                            media.thumbnail = mediaHelper.resolveFile(media, true);
-                        }
+                        //only show non-trashed items
+                        if(media.parent > -21){
+                            if(!media.thumbnail){
+                                media.thumbnail = mediaHelper.resolveFile(media, true);
+                            }
 
-                        //media.src = mediaHelper.getImagePropertyValue({ imageModel: media });
-                        //media.thumbnail = mediaHelper.getThumbnailFromPath(media.src);
-                        $scope.images.push(media);
+                            //media.src = mediaHelper.getImagePropertyValue({ imageModel: media });
+                            //media.thumbnail = mediaHelper.getThumbnailFromPath(media.src);
+                            $scope.images.push(media);
+                            $scope.ids.push(media.id);   
+                        }
                     });
+
+                    $scope.sync();
                 });
             }
         }

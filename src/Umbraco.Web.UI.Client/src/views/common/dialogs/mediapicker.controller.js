@@ -72,15 +72,6 @@ angular.module("umbraco")
                         if(data.items){
                              $scope.images = data.items;
                         }
-                       
-
-                        //update the thumbnail property
-                        //_.each($scope.images, function(img) {
-                        //    img.thumbnail = imageHelper.getThumbnail({ imageModel: img, scope: $scope });
-                        //});
-
-                        //reject all images that have an empty thumbnail - this can occur if there's an image item
-                        // that doesn't have an uploaded image.
 
                         if($scope.onlyImages){
                             $scope.images = _.reject($scope.images, function(item) {
@@ -109,17 +100,10 @@ angular.module("umbraco")
                         $scope.select(image);
                         image.cssclass = ($scope.dialogData.selection.indexOf(image) > -1) ? "selected" : "";
                     }else {
-
-                        $scope.target= {};
-                        $scope.target.id = image.id;
-                        $scope.target.name = image.name;
+                        $scope.target= image;
                         $scope.target.url = mediaHelper.resolveFile(image); // getMediaPropertyValue({mediaModel: image});
-
-                        //$scope.submit(image);
                     }
                 }
-
-                
             };
 
             $scope.exitDetails = function(){
