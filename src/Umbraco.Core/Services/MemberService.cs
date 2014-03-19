@@ -253,7 +253,6 @@ namespace Umbraco.Core.Services
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateMemberRepository(uow))
             {
-                //var query = new Query<IMember>();
                 var sql = new Sql()
                     .Select("*")
                     .From<NodeDto>()
@@ -263,32 +262,24 @@ namespace Umbraco.Core.Services
                 {
                     case StringPropertyMatchType.Exact:
                         sql.Where<NodeDto>(dto => dto.Text.Equals(displayNameToMatch));
-
-                        //query.Where(member => member.Name.Equals(displayNameToMatch));
                         break;
                     case StringPropertyMatchType.Contains:
-                        sql.Where<NodeDto>(dto => dto.Text.Contains(displayNameToMatch));
-                        
-                        //query.Where(member => member.Name.Contains(displayNameToMatch));
+                        sql.Where<NodeDto>(dto => dto.Text.Contains(displayNameToMatch));                        
                         break;
                     case StringPropertyMatchType.StartsWith:
                         sql.Where<NodeDto>(dto => dto.Text.StartsWith(displayNameToMatch));
-
-                        //query.Where(member => member.Name.StartsWith(displayNameToMatch));
                         break;
                     case StringPropertyMatchType.EndsWith:
                         sql.Where<NodeDto>(dto => dto.Text.EndsWith(displayNameToMatch));
-
-                        //query.Where(member => member.Name.EndsWith(displayNameToMatch));
                         break;
                     case StringPropertyMatchType.Wildcard:
-                        sql.Where<NodeDto>(dto => dto.Text.SqlWildcard(displayNameToMatch, TextColumnType.NVarchar));
-                        
-                        //query.Where(member => member.Name.SqlWildcard(displayNameToMatch, TextColumnType.NVarchar));
+                        sql.Where<NodeDto>(dto => dto.Text.SqlWildcard(displayNameToMatch, TextColumnType.NVarchar));                        
                         break;
                     default:
                         throw new ArgumentOutOfRangeException("matchType");
                 }
+
+                sql.OrderBy<NodeDto>(dto => dto.Text);
 
                 var result = repository.GetPagedResultsByQuery<NodeDto>(sql, pageIndex, pageSize, out totalRecords,
                     dtos => dtos.Select(x => x.NodeId).ToArray());
