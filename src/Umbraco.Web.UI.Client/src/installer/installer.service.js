@@ -229,41 +229,58 @@ angular.module("umbraco.install").factory('installerService', function($rootScop
 			service.status.feedback = getDescriptionForStepAtIndex(service.status.steps, 0);
 			service.status.progress = 0;
 
-			function processInstallStep(){
-				$http.post(Umbraco.Sys.ServerVariables.installApiBaseUrl + "PostPerformInstall",
-					_installerModel).then(function(response){
-						if(!response.data.complete){
-							
-							//progress feedback
-							service.status.progress = calculateProgress(service.status.steps, response.data.nextStep);
+			function processInstallStep() {
 
-							if(response.data.view){
-								//set the current view and model to whatever the process returns, the view is responsible for retriggering install();
-								var v = resolveView(response.data.view);
-								service.status.current = {view: v, model: response.data.model};
+			    $http.post(Umbraco.Sys.ServerVariables.installApiBaseUrl + "PostPerformInstall", _installerModel)
+			        .success(function(data, status, headers, config) {
+			            if (!data.complete) {
 
-								//turn off loading bar and feedback
-								service.switchToConfiguration();
-							}
-							else {
-							    var desc = getDescriptionForStepName(service.status.steps, response.data.nextStep);
-								if (desc) {
-									service.status.feedback = desc;
-								}
-								processInstallStep();
-							}
-						}
-						else {
-							service.complete();
-						}
-					}, function(err){
-							//this is where we handle installer error
-							var v = err.data.view ? resolveView(err.data.view) : resolveView("error");
-							var model = err.data.model ? err.data.model : err.data;
+			                //progress feedback
+			                service.status.progress = calculateProgress(service.status.steps, data.nextStep);
 
-							service.status.current = {view: v, model: model};
-							service.switchToConfiguration();
-					});
+			                if (data.view) {
+			                    //set the current view and model to whatever the process returns, the view is responsible for retriggering install();
+			                    var v = resolveView(data.view);
+			                    service.status.current = { view: v, model: data.model };
+
+			                    //turn off loading bar and feedback
+			                    service.switchToConfiguration();
+			                }
+			                else {
+			                    var desc = getDescriptionForStepName(service.status.steps, data.nextStep);
+			                    if (desc) {
+			                        service.status.feedback = desc;
+			                    }
+			                    processInstallStep();
+			                }
+			            }
+			            else {
+			                service.complete();
+			            }
+			        }).error(function(data, status, headers, config) {
+			            //need to handle 500's separately, this will happen if something goes wrong outside
+			            // of the installer (like app startup events or something) and these will get returned as text/html
+			            // not as json. If this happens we can't actually load in external views since they will YSOD as well!
+                        // so we need to display this in our own internal way
+			            
+			            if (status >= 500 && status < 600) {			                
+			                service.status.current = { view: "ysod", model: null };
+			                var ysod = data;
+                            //we need to manually write the html to the iframe - the html contains full html markup
+			                $timeout(function () {
+			                    document.getElementById('ysod').contentDocument.write(ysod);
+			                }, 500);
+			            }
+			            else {
+			                //this is where we handle installer error
+			                var v = data.view ? resolveView(data.view) : resolveView("error");
+			                var model = data.model ? data.model : data;
+			                service.status.current = { view: v, model: model };			                
+			            }
+
+			            service.switchToConfiguration();
+			            
+			        });
 			}
 			processInstallStep();
 		},
