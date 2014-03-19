@@ -10,7 +10,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
         {
             Alter.Table("cmsPropertyTypeGroup").AddColumn("parentGroupId").AsInt16().Nullable();
 
-            Create.ForeignKey("FK_cmsPropertyTypeGroup_cmsPropertyTypeGroup")
+            Create.ForeignKey("FK_cmsPropertyTypeGroup_cmsPropertyTypeGroup_id")
                 .FromTable("cmsPropertyTypeGroup").ForeignColumn("parentGroupId")
                 .ToTable("cmsPropertyTypeGroup").PrimaryColumn("id").OnDeleteOrUpdate(Rule.None);
         }
