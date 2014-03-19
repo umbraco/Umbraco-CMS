@@ -148,7 +148,7 @@ function mediaHelper(umbRequestHelper) {
             //we either have properties raw on the object, or spread out on tabs
             var result = "";
             if(mediaItem.properties){
-                return _iterateProps(mediaItem.properties);
+                result = _iterateProps(mediaItem.properties);
             }else if(mediaItem.tabs){
                 for(var tab in mediaItem.tabs) {
                     if(mediaItem.tabs[tab].properties){
