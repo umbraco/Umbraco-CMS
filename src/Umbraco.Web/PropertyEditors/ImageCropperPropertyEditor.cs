@@ -86,10 +86,12 @@ namespace Umbraco.Web.PropertyEditors
                             model.PopulateFileMetaDataProperties(uploadFieldConfigNode, json["src"].Value<string>());
                         else if (p.Value is string)
                         {
+                            var src = p.Value;
                             var config = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(p.PropertyType.DataTypeDefinitionId).FirstOrDefault();
                             var crops = !string.IsNullOrEmpty(config) ? config : "[]";
                             p.Value = "{src: '" + p.Value + "', crops: " + crops + "}";
-                            model.PopulateFileMetaDataProperties(uploadFieldConfigNode, p.Value);
+                            //Only provide the source path, not the whole JSON value
+                            model.PopulateFileMetaDataProperties(uploadFieldConfigNode, src);
                         }
                     }
                     else
