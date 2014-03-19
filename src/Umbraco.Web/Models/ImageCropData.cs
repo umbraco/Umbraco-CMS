@@ -24,10 +24,9 @@ namespace Umbraco.Web.Models
         public string GetCropUrl(string alias)
         {
 
-            var crop = Crops.FirstOrDefault(x => x.Alias == alias);
+            var crop = Crops.GetCrop(alias);
             if(crop == null)
                 return null;
-
 
 
             StringBuilder sb = new StringBuilder();

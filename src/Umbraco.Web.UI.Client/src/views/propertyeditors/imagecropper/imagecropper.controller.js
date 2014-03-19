@@ -95,14 +95,29 @@ angular.module('umbraco')
             }
         });
     })
-    .run(function(mediaHelper){
-
+    .run(function(mediaHelper, umbRequestHelper){
         if(mediaHelper && mediaHelper.registerFileResolver){
-            mediaHelper.registerFileResolver("Umbraco.ImageCropper", function (property) {
+            mediaHelper.registerFileResolver("Umbraco.ImageCropper", function (property, entity, thumbnail) {
                     if (property.value.src) {
-                        return property.value.src;
+                        
+                        if(thumbnail === true){
+                            return property.value.src + "?width=600&mode=max";
+                        }else{
+                            return property.value.src;
+                        }
+                        
+                    //this is a fallback in case the cropper has been asssigned a upload field
                     } else if (angular.isString(property.value)) {
-                        return property.value;
+                        if(thumbnail){
+                            var thumbnailUrl = umbRequestHelper.getApiUrl(
+                                "imagesApiBaseUrl",
+                                "GetBigThumbnail",
+                                [{ mediaId: entity.id }]);
+
+                            return thumbnailUrl;
+                        }else{
+                            return property.value;
+                        }
                     }
                 });
         }

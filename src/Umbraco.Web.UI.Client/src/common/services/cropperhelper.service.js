@@ -44,6 +44,21 @@ function cropperHelper(umbRequestHelper, $http) {
 			return { width:srcWidth*ratio, height:srcHeight*ratio, ratio: ratio};
 		},
 
+		scaleToMaxSize : function(srcWidth, srcHeight, maxSize) {
+			
+			var retVal = {height: srcHeight, width: srcWidth};
+
+			if(srcWidth > maxSize ||srcHeight > maxSize){
+				var ratio = [maxSize / srcWidth, maxSize / srcHeight ];
+				ratio = Math.min(ratio[0], ratio[1]);
+				
+				retVal.height = srcHeight * ratio;
+				retVal.width = srcWidth * ratio;
+			}
+			
+			return retVal;			
+		},
+
 		//returns a ng-style object with top,left,width,height pixel measurements
 		//expects {left,right,top,bottom} - {width,height}, {width,height}, int
 		//offset is just to push the image position a number of pixels from top,left    

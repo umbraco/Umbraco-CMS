@@ -14,12 +14,8 @@
                     <i class="icon large {{img.icon}}"></i>
                     {{img.name}}
                 </div>
-                
-                
+            
                 <div ng-switch-default class="umb-photo" ng-style="img.thumbStyle" alt="{{img.name}}"></div>
-                
-                
-
             </a>
 
             <a href ng-click="clickHandler(img, $event, true)" ng-show="img.contentTypeAlias === 'Folder'" class="selector-overlay">

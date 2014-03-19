@@ -24,7 +24,7 @@ namespace Umbraco.Web
                 try
                 {
                     var imageCropperSettings = JsonConvert.DeserializeObject<List<ImageCropData>>(json);
-                    ic = imageCropperSettings.First(p => p.Alias == id);
+                    ic = imageCropperSettings.GetCrop(id);
                 }
                 catch { }
             }
@@ -86,6 +86,26 @@ namespace Umbraco.Web
             return false;
         }
 
+        internal static ImageCropData GetCrop(this ImageCropDataSet dataset, string cropAlias)
+        {
+            if (dataset == null || dataset.Crops == null || !dataset.Crops.Any())
+                return null;
+
+            return dataset.Crops.GetCrop(cropAlias);
+        }
+
+        internal static ImageCropData GetCrop(this IEnumerable<ImageCropData> dataset, string cropAlias){
+            if (dataset == null || !dataset.Any())
+                return null;
+
+            if (string.IsNullOrEmpty(cropAlias))
+                return dataset.FirstOrDefault();
+
+            return dataset.FirstOrDefault(x => x.Alias.ToLowerInvariant() == cropAlias.ToLowerInvariant());
+        }
+
+
+
         internal static bool HasPropertyAndValueAndCrop(this IPublishedContent publishedContent, string propertyAlias, string cropAlias)
         {
             try
@@ -99,18 +119,14 @@ namespace Umbraco.Web
                         return false;
                     }
                     var allTheCrops = propertyAliasValue.SerializeToCropDataSet();
-                    if (allTheCrops != null && allTheCrops.Crops.Any())
-                    {
-                        var crop = cropAlias != null
-                                       ? allTheCrops.Crops.First(x => x.Alias ==cropAlias)
-                                       : allTheCrops.Crops.First();
-                        if (crop != null)
-                        {
-                            return true;
-                        }
-                    }
+                    var selectedCrop = allTheCrops.GetCrop(cropAlias);
+
+                    if (selectedCrop != null)
+                        return true;
+
                     return false;
-                }
+
+               }
             }
             catch (Exception ex)
             {
@@ -125,17 +141,7 @@ namespace Umbraco.Web
                         return false;
                     }
                     var allTheCrops = propertyAliasValue.SerializeToCropDataSet();
-                    if (allTheCrops != null && allTheCrops.Crops.Any())
-                    {
-                        var crop = cropAlias != null
-                                       ? allTheCrops.Crops.First(x => x.Alias ==cropAlias)
-                                       : allTheCrops.Crops.First();
-                        if (crop != null)
-                        {
-                            return true;
-                        }
-                    }
-                    return false;
+                    return allTheCrops.GetCrop(cropAlias) != null;
                 }
             }
             return false;

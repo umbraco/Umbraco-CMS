@@ -211,7 +211,7 @@ ul.color-picker li a  {
 
 .umb-cropper{
   position: relative;
-  padding-bottom: 30px;
+  padding: 10px;
 }
 
 .umb-cropper img, .umb-cropper-gravity img{
@@ -230,7 +230,7 @@ ul.color-picker li a  {
 .umb-cropper .viewport{
     overflow: hidden;
     position: relative;
-    border: 1px solid @grayLight;
+    margin: auto;
  }
  
 .umb-cropper-gravity .viewport{
@@ -252,9 +252,9 @@ ul.color-picker li a  {
   -moz-opacity: .75;
   opacity: .75;
   filter: alpha(opacity=7);
-  -webkit-box-shadow: inset 0 0 0 40px white,inset 0 0 0 41px rgba(0,0,0,.1),inset 0 0 40px 41px rgba(0,0,0,.2);
-  -moz-box-shadow: inset 0 0 0 40px white,inset 0 0 0 41px rgba(0,0,0,.1),inset 0 0 40px 41px rgba(0,0,0,.2);
-  box-shadow: inset 0 0 0 40px white,inset 0 0 0 41px rgba(0,0,0,.1),inset 0 0 40px 41px rgba(0,0,0,.2);
+  -webkit-box-shadow: inset 0 0 0 20px white,inset 0 0 0 21px rgba(0,0,0,.1),inset 0 0 20px 21px rgba(0,0,0,.2);
+  -moz-box-shadow: inset 0 0 0 20px white,inset 0 0 0 21px rgba(0,0,0,.1),inset 0 0 20px 21px rgba(0,0,0,.2);
+  box-shadow: inset 0 0 0 20px white,inset 0 0 0 21px rgba(0,0,0,.1),inset 0 0 20px 21px rgba(0,0,0,.2);
 }
 
 .umb-cropper-gravity .overlay{
@@ -279,13 +279,15 @@ ul.color-picker li a  {
 
 .umb-cropper .crop-slider{
    vertical-align: middle;
-   width: 250px;
-   padding-top: 12px;
+   padding: 10px 50px 10px 50px;
+   border-top: 1px solid @grayLighter;
+   margin-top: 10px;
 }
 
 .umb-cropper .crop-slider i{color: @gray;}
 .umb-cropper .crop-slider input{
    margin-top: 7px;
+   width: 320px;
 }
 
 

@@ -124,10 +124,19 @@ function fileUploadController($scope, $element, $compile, imageHelper, fileManag
 };
 angular.module("umbraco")
     .controller('Umbraco.PropertyEditors.FileUploadController', fileUploadController)
-    .run(function(mediaHelper){
+    .run(function(mediaHelper, umbRequestHelper){
         if(mediaHelper && mediaHelper.registerFileResolver){
-            mediaHelper.registerFileResolver("Umbraco.UploadField", function(property){
-                return property.value;
+            mediaHelper.registerFileResolver("Umbraco.UploadField", function(property, entity, thumbnail){
+                if(thumbnail){
+                    var thumbnailUrl = umbRequestHelper.getApiUrl(
+                        "imagesApiBaseUrl",
+                        "GetBigThumbnail",
+                        [{ mediaId: entity.id }]);
+
+                    return thumbnailUrl;
+                }else{
+                    return property.value;
+                }
             });
         }
     });

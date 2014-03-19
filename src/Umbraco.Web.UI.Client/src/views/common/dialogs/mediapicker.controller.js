@@ -6,6 +6,8 @@ angular.module("umbraco")
             var dialogOptions = $scope.$parent.dialogOptions;
             $scope.onlyImages = dialogOptions.onlyImages;
             $scope.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
+            $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
+
 
             $scope.options = {
                 url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
@@ -51,7 +53,9 @@ angular.module("umbraco")
                     entityResource.getAncestors(folder.id, "media")
                         .then(function(anc) {
                             // anc.splice(0,1);  
-                            $scope.path = anc;
+                            $scope.path = _.filter(anc, function (f) {
+                                return f.path.indexOf($scope.startNodeId) !== -1;
+                            });
                         });
                 }
                 else {
@@ -152,7 +156,6 @@ angular.module("umbraco")
 
             //default root item
             if(!$scope.target){
-                $scope.gotoFolder();    
+                $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });  
             }
-            
         });
