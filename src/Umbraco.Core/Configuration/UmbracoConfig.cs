@@ -34,38 +34,19 @@ namespace Umbraco.Core.Configuration
         {
             if (_umbracoSettings == null)
             {
-                var umbracoSettings = ConfigurationManager.GetSection("umbracoConfiguration/settings") as IUmbracoSettingsSection;
-                if (umbracoSettings == null)
-                {
-                    var ex = new ConfigurationErrorsException("Could not load the " + typeof (IUmbracoSettingsSection) + " from config file, ensure the web.config and umbracoSettings.config files are formatted correctly");
-                    LogHelper.Error<UmbracoConfig>("Could not load umbracoSettings.config", ex);
-                    throw ex;
-
-                }
+                var umbracoSettings = ConfigurationManager.GetSection("umbracoConfiguration/settings") as IUmbracoSettingsSection;                
                 SetUmbracoSettings(umbracoSettings);
             }
 
             if (_baseRestExtensions == null)
             {
-                var baseRestExtensions = ConfigurationManager.GetSection("umbracoConfiguration/BaseRestExtensions") as IBaseRestSection;
-                if (baseRestExtensions == null)
-                {
-                    var ex = new ConfigurationErrorsException("Could not load the " + typeof(IBaseRestSection) + " from config file, ensure the web.config and BaseRestExtensions.config files are formatted correctly");
-                    LogHelper.Error<UmbracoConfig>("Could not load BaseRestExtensions.config", ex);
-                    throw ex;
-                }
+                var baseRestExtensions = ConfigurationManager.GetSection("umbracoConfiguration/BaseRestExtensions") as IBaseRestSection;                
                 SetBaseRestExtensions(baseRestExtensions);
             }
 
             if (_dashboardSection == null)
             {
-                var dashboardConfig = ConfigurationManager.GetSection("umbracoConfiguration/dashBoard") as IDashboardSection;
-                if (dashboardConfig == null)
-                {
-                    var ex = new ConfigurationErrorsException("Could not load the " + typeof(IDashboardSection) + " from config file, ensure the web.config and Dashboard.config files are formatted correctly");
-                    LogHelper.Error<UmbracoConfig>("Could not load Dashboard.config", ex);
-                    throw ex;
-                }
+                var dashboardConfig = ConfigurationManager.GetSection("umbracoConfiguration/dashBoard") as IDashboardSection;                
                 SetDashboardSettings(dashboardConfig);
             }
         }
@@ -92,6 +73,13 @@ namespace Umbraco.Core.Configuration
         /// </summary>
         public IDashboardSection DashboardSettings()
         {
+            if (_dashboardSection == null)
+            {
+                var ex = new ConfigurationErrorsException("Could not load the " + typeof(IDashboardSection) + " from config file, ensure the web.config and Dashboard.config files are formatted correctly");
+                LogHelper.Error<UmbracoConfig>("Config error", ex);
+                throw ex;
+            }
+
             return _dashboardSection;
         }        
 
@@ -112,6 +100,13 @@ namespace Umbraco.Core.Configuration
         /// </summary>
         public IUmbracoSettingsSection UmbracoSettings()
         {
+            if (_umbracoSettings == null)
+            {
+                var ex = new ConfigurationErrorsException("Could not load the " + typeof (IUmbracoSettingsSection) + " from config file, ensure the web.config and umbracoSettings.config files are formatted correctly");
+                LogHelper.Error<UmbracoConfig>("Config error", ex);
+                throw ex;
+            }
+
             return _umbracoSettings;
         }
         
@@ -126,6 +121,13 @@ namespace Umbraco.Core.Configuration
         /// </summary>
         public IBaseRestSection BaseRestExtensions()
         {
+            if (_baseRestExtensions == null)
+            {
+                var ex = new ConfigurationErrorsException("Could not load the " + typeof(IBaseRestSection) + " from config file, ensure the web.config and BaseRestExtensions.config files are formatted correctly");
+                LogHelper.Error<UmbracoConfig>("Config error", ex);
+                throw ex;
+            }
+
             return _baseRestExtensions;
         }
 
