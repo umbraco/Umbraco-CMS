@@ -30,8 +30,8 @@
             <dependency id="ClientDependency-Mvc" version="[1.7.0, 2.0.0)" />
             <dependency id="AutoMapper" version="[3.0.0, 4.0.0)" />
             <dependency id="Newtonsoft.Json" version="[4.5.11, 5.0.0)" />
-            <dependency id="ImageProcessor" version="[1.8.5, 2.0.0)" />
-            <dependency id="ImageProcessor.Web" version="[3.1.1, 4.0.0)" />
+            <dependency id="ImageProcessor" version="[1.8.6.1, 2.0.0)" />
+            <dependency id="ImageProcessor.Web" version="[3.2.0, 4.0.0)" />
         </dependencies>
     </metadata>
     <files>
