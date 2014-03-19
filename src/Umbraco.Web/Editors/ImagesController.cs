@@ -56,6 +56,9 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         public HttpResponseMessage GetBigThumbnail(string originalImagePath)
         {
+            if (string.IsNullOrWhiteSpace(originalImagePath))
+                return Request.CreateResponse(HttpStatusCode.OK);
+
             return GetResized(originalImagePath, 500, "big-thumb");
         }
 
