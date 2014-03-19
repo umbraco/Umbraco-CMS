@@ -28,14 +28,10 @@ namespace umbraco.editorControls.imagecropper
 
             try
             {
-                if (relativePath.Contains("//"))
-                {
-                    Path = _fs.GetFullPath(relativePath);
-                }
-                else
-                {
-                    Path = IOHelper.MapPath(relativePath);
-                }
+                RelativePath = relativePath;
+
+                //This get's the IFileSystem's path based on the URL (i.e. /media/blah/blah.jpg )
+                Path = _fs.GetRelativePath(relativePath);
 
                 image = Image.FromStream(_fs.OpenFile(Path));
                 Name = _fs.GetFileName(Path);
@@ -43,8 +39,7 @@ namespace umbraco.editorControls.imagecropper
                 Width = image.Width;
                 Height = image.Height;
                 Aspect = (float)Width / Height;
-
-                RelativePath = relativePath;
+                
             }
             catch (Exception)
             {
