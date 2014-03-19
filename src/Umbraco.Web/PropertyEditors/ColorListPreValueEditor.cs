@@ -17,13 +17,13 @@ namespace Umbraco.Web.PropertyEditors
             var field = Fields.First();
 
             //use a custom editor too
-            field.View = "multicolorpicker";
+            field.View = "views/propertyeditors/colorpicker/colorpicker.prevalues.html";
             //change the description
             field.Description = "Add and remove colors";
             //change the label
             field.Name = "Add color";
             //need to have some custom validation happening here
-            //field.Validators.Add(new ColorListValidator()); // This should no longer be necessary
+            field.Validators.Add(new ColorListValidator()); 
         }
 
         internal class ColorListValidator : IPropertyValidator

@@ -1,4 +1,4 @@
-angular.module("umbraco").controller("Umbraco.Editors.MultiValuesController",
+angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiValuesController",
     function ($scope, $timeout) {
        
         //NOTE: We need to make each item an object, not just a string because you cannot 2-way bind to a primitive.

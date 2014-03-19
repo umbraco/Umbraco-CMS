@@ -1,5 +1,5 @@
 /***
-Spectrum Colorpicker v1.2.0
+Spectrum Colorpicker v1.3.3
 https://github.com/bgrins/spectrum
 Author: Brian Grinstead
 License: MIT
@@ -18,6 +18,14 @@ License: MIT
 }
 .sp-container.sp-flat {
     position: relative;
+}
+
+/* Fix for * { box-sizing: border-box; } */
+.sp-container,
+.sp-container * {
+    -webkit-box-sizing: content-box;
+       -moz-box-sizing: content-box;
+            box-sizing: content-box;
 }
 
 /* http://ansciath.tumblr.com/post/7347495869/css-aspect-ratio */
