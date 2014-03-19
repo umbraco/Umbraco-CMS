@@ -22,7 +22,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     _.each(medias, function (media, i) {
                         
                         //only show non-trashed items
-                        if(media.parent > -21){
+                        if(media.parentId >= -1){
                             if(!media.thumbnail){
                                 media.thumbnail = mediaHelper.resolveFile(media, true);
                             }
