@@ -41,17 +41,21 @@ namespace Umbraco.Web
             Anchor? anchor = null,
             string propertyAlias = null,
             string cropAlias = null,
-            string furtherOptions = null,
-            bool slimmage = false)
+            string furtherOptions = null)
         {
             string imageCropperValue = null;
+
+           string mediaItemUrl = null;
 
             if (mediaItem.HasPropertyAndValueAndCrop(propertyAlias, cropAlias))
             {
                 imageCropperValue = mediaItem.GetPropertyValue<string>(propertyAlias);
             }
 
-            return mediaItem != null ? GetCropUrl(mediaItem.Url, width, height, quality, mode, anchor, imageCropperValue, cropAlias, furtherOptions, slimmage) : string.Empty;
+           //this probably shouldn't be needed but it is currently as mediaItem.Url is populated with full crop JSON
+           mediaItemUrl = mediaItem.Url.DetectIsJson() ? mediaItem.Url.SerializeToCropDataSet().Src : mediaItem.Url;
+
+           return mediaItem != null ? GetCropUrl(mediaItemUrl, width, height, quality, mode, anchor, imageCropperValue, cropAlias, furtherOptions) : string.Empty;
         }
 
 
@@ -64,8 +68,7 @@ namespace Umbraco.Web
             Anchor? anchor = null,
             string imageCropperValue = null,
             string cropAlias = null,
-            string furtherOptions = null,
-            bool slimmage = false)
+            string furtherOptions = null)
         {
             if (!string.IsNullOrEmpty(imageUrl))
             {
@@ -100,8 +103,6 @@ namespace Umbraco.Web
                         }
 
                     }
-
-                    //imageResizerUrl.Append(cropDataSet.Src + cropDataSet.GetCropUrl(cropAlias));
                 }
                 else
                 {
@@ -131,19 +132,6 @@ namespace Umbraco.Web
                 if (height != null)
                 {
                     imageResizerUrl.Append("&height=" + height);
-                }
-
-                if (slimmage)
-                {
-                    if (width == null)
-                    {
-                        imageResizerUrl.Append("&width=300");
-                    }
-                    if (quality == null)
-                    {
-                        imageResizerUrl.Append("&quality=90");
-                    }
-                    imageResizerUrl.Append("&slimmage=true");
                 }
 
                 if (furtherOptions != null)
