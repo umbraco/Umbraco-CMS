@@ -5,13 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Web.Models;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Web
 {
     public static class ImageCropperTemplateExtensions
     {
-        
+
         //this only takes the crop json into account
         public static string GetCropUrl(this IPublishedContent mediaItem, string propertyAlias, string cropAlias)
         {
@@ -32,30 +33,30 @@ namespace Umbraco.Web
             }
         }
 
-       public static string GetCropUrl(
-            this IPublishedContent mediaItem,
-            int? width = null,
-            int? height = null,
-            int? quality = null,
-            Mode? mode = null,
-            Anchor? anchor = null,
-            string propertyAlias = null,
-            string cropAlias = null,
-            string furtherOptions = null)
+        public static string GetCropUrl(
+             this IPublishedContent mediaItem,
+             int? width = null,
+             int? height = null,
+             int? quality = null,
+             ImageCropMode? imageCropMode = null,
+             ImageCropAnchor? imageCropAnchor = null,
+             string propertyAlias = null,
+             string cropAlias = null,
+             string furtherOptions = null)
         {
             string imageCropperValue = null;
 
-           string mediaItemUrl = null;
+            string mediaItemUrl = null;
 
             if (mediaItem.HasPropertyAndValueAndCrop(propertyAlias, cropAlias))
             {
                 imageCropperValue = mediaItem.GetPropertyValue<string>(propertyAlias);
             }
 
-           //this probably shouldn't be needed but it is currently as mediaItem.Url is populated with full crop JSON
-           mediaItemUrl = mediaItem.Url.DetectIsJson() ? mediaItem.Url.SerializeToCropDataSet().Src : mediaItem.Url;
+            //this probably shouldn't be needed but it is currently as mediaItem.Url is populated with full crop JSON
+            mediaItemUrl = mediaItem.Url.DetectIsJson() ? mediaItem.Url.SerializeToCropDataSet().Src : mediaItem.Url;
 
-           return mediaItem != null ? GetCropUrl(mediaItemUrl, width, height, quality, mode, anchor, imageCropperValue, cropAlias, furtherOptions) : string.Empty;
+            return mediaItemUrl != null ? GetCropUrl(mediaItemUrl, width, height, quality, imageCropMode, imageCropAnchor, imageCropperValue, cropAlias, furtherOptions) : string.Empty;
         }
 
 
@@ -64,8 +65,8 @@ namespace Umbraco.Web
             int? width = null,
             int? height = null,
             int? quality = null,
-            Mode? mode = null,
-            Anchor? anchor = null,
+            ImageCropMode? imageCropMode = null,
+            ImageCropAnchor? imageCropAnchor = null,
             string imageCropperValue = null,
             string cropAlias = null,
             string furtherOptions = null)
@@ -106,15 +107,15 @@ namespace Umbraco.Web
                 else
                 {
                     imageResizerUrl.Append(imageUrl);
-                    if (mode == null)
+                    if (imageCropMode == null)
                     {
-                        mode = Mode.Pad;
+                        imageCropMode = ImageCropMode.Pad;
                     }
-                    imageResizerUrl.Append("?mode=" + mode.ToString().ToLower());
+                    imageResizerUrl.Append("?mode=" + imageCropMode.ToString().ToLower());
 
-                    if (anchor != null)
+                    if (imageCropAnchor != null)
                     {
-                        imageResizerUrl.Append("&anchor=" + anchor.ToString().ToLower());
+                        imageResizerUrl.Append("&anchor=" + imageCropAnchor.ToString().ToLower());
                     }
                 }
 
@@ -146,21 +147,6 @@ namespace Umbraco.Web
 
 
 
-        public enum Mode
-        {
-            Crop,
-            Max,
-            Strech,
-            Pad
-        }
-
-        public enum Anchor
-        {
-            Center,
-            Top,
-            Right,
-            Bottom,
-            Left
-        }
+       
     }
 }
