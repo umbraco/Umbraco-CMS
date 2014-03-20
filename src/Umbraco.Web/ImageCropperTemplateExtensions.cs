@@ -13,6 +13,11 @@ namespace Umbraco.Web
     public static class ImageCropperTemplateExtensions
     {
 
+        public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias)
+        {
+            return mediaItem.GetCropUrl(Constants.Conventions.Media.File, cropAlias);
+        }
+
         //this only takes the crop json into account
         public static string GetCropUrl(this IPublishedContent mediaItem, string propertyAlias, string cropAlias)
         {
@@ -53,18 +58,10 @@ namespace Umbraco.Web
                 imageCropperValue = mediaItem.GetPropertyValue<string>(propertyAlias);
             }
 
-            //get the raw value (this will be json)
-            var urlValue = mediaItem.GetPropertyValue<string>(Constants.Conventions.Media.File);
-            
-            mediaItemUrl = urlValue.DetectIsJson() 
-                ? mediaItem.Url.SerializeToCropDataSet().Src 
-                : urlValue;
-
-            return mediaItemUrl != null 
-                ? GetCropUrl(mediaItemUrl, width, height, quality, imageCropMode, imageCropAnchor, imageCropperValue, cropAlias, furtherOptions) 
+            return mediaItem.Url != null
+                ? GetCropUrl(mediaItem.Url, width, height, quality, imageCropMode, imageCropAnchor, imageCropperValue, cropAlias, furtherOptions)
                 : string.Empty;
         }
-
 
         public static string GetCropUrl(
             this string imageUrl,
@@ -151,8 +148,5 @@ namespace Umbraco.Web
             return string.Empty;
         }
 
-
-
-       
     }
 }
