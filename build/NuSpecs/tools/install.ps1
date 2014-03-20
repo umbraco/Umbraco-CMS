@@ -22,6 +22,10 @@ if ($project) {
 	$webConfigSource = Join-Path $projectDestinationPath "Web.config"
 	Copy-Item $webConfigSource $backupPath -Force
 	
+	# Copy Config files from package to project folder
+	$configFilesPath = Join-Path $rootPath "Content\Config\*.config"
+	Copy-Item $umbracoFilesPath $configPath -Force
+	
 	# Copy Web.config from package to project folder
 	$umbracoFilesPath = Join-Path $rootPath "UmbracoFiles\Web.config"
 	Copy-Item $umbracoFilesPath $projectDestinationPath -Force
