@@ -48,7 +48,8 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
         //create a dictionary for the macro params
         var paramDictionary = {};
         _.each($scope.macroParams, function (item) {
-            paramDictionary[item.alias] = item.value;
+            //each value needs to be xml escaped!! since the value get's stored as an xml attribute
+            paramDictionary[item.alias] = _.escape(item.value);
         });
         
         //need to find the macro alias for the selected id

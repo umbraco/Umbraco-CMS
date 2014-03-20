@@ -251,7 +251,10 @@ namespace Umbraco.Web
             {
                 //TODO: We are doing at ToLower here because for some insane reason the UpdateMacroModel method of macro.cs 
                 // looks for a lower case match. WTF. the whole macro concept needs to be rewritten.
-                macroProps.Add(i.Key.ToLower(), i.Value);
+                
+                
+                //NOTE: the value could have html encoded values, so we need to deal with that
+                macroProps.Add(i.Key.ToLower(), (i.Value is string) ? HttpUtility.HtmlDecode(i.Value.ToString()) : i.Value);
             }
             var macroControl = m.renderMacro(macroProps,
                 umbracoPage.Elements,

@@ -96,14 +96,14 @@ angular.module('umbraco')
 	        $scope.model.value = trim($scope.ids.join(), ",");
 
             //Validate!
-	        if ($scope.model.config.minNumber && parseInt($scope.model.config.minNumber) > $scope.renderModel.length) {
+	        if ($scope.model.config && $scope.model.config.minNumber && parseInt($scope.model.config.minNumber) > $scope.renderModel.length) {
 	            $scope.contentPickerForm.minCount.$setValidity("minCount", false);
 	        }
 	        else {
 	            $scope.contentPickerForm.minCount.$setValidity("minCount", true);
 	        }
 
-	        if ($scope.model.config.maxNumber && parseInt($scope.model.config.maxNumber) < $scope.renderModel.length) {
+	        if ($scope.model.config && $scope.model.config.maxNumber && parseInt($scope.model.config.maxNumber) < $scope.renderModel.length) {
 	            $scope.contentPickerForm.maxCount.$setValidity("maxCount", false);
 	        }
 	        else {

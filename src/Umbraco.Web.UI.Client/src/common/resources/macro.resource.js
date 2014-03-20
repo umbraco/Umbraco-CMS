@@ -58,7 +58,11 @@ function macroResource($q, $http, umbRequestHelper) {
                         var json = angular.toJson(val);
                         //then we need to url encode it so that it's safe
                         val = encodeURIComponent(json);
-                    }                    
+                    }
+                    else {
+                        //we still need to encode the string, it could contain line breaks, etc...
+                        val = encodeURIComponent(val);
+                    }
 
                     query += "&macroParams[" + counter + "].key=" + key + "&macroParams[" + counter + "].value=" + val;
                     counter++;
