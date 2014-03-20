@@ -65,7 +65,7 @@ namespace Umbraco.Web.PropertyEditors
 
         static void AutoFillProperties(IContentBase model)
         {
-            foreach (var p in model.Properties)
+            foreach (var p in model.Properties.Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.UploadFieldAlias))
             {
                 var uploadFieldConfigNode =
                     UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties
