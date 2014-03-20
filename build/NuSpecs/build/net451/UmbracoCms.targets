@@ -4,6 +4,7 @@
 	<ItemGroup>
 	  <AppBrowsersFiles Include="..\packages\UmbracoCms.7.1.0-RC\UmbracoFiles\App_Browsers\**\*" />
 	  <SplashesFiles Include="..\packages\UmbracoCms.7.1.0-RC\UmbracoFiles\Config\Splashes\**\*;" />
+	  <SqlCeBinFiles Include="..\packages\UmbracoCms.7.1.0-RC\UmbracoFiles\bin\**\*;" />
       <UmbracoFiles Include="..\packages\UmbracoCms.7.1.0-RC\UmbracoFiles\umbraco\**\*;" />
       <UmbracoClientFiles Include="..\packages\UmbracoCms.7.1.0-RC\UmbracoFiles\umbraco_client\**\*;" />
     </ItemGroup>
@@ -13,6 +14,9 @@
 	<Copy SourceFiles="%(SplashesFiles.FullPath)"
           DestinationFiles="Config\Splashes\%(RecursiveDir)%(Filename)%(Extension)"
           Condition="!Exists('Config\Splashes\%(RecursiveDir)%(Filename)%(Extension)')" />
+	<Copy SourceFiles="%(SqlCeBinFiles.FullPath)"
+          DestinationFiles="bin\%(RecursiveDir)%(Filename)%(Extension)"
+          Condition="!Exists('bin\%(RecursiveDir)%(Filename)%(Extension)')" />
 	<Copy SourceFiles="%(UmbracoFiles.FullPath)"
           DestinationFiles="umbraco\%(RecursiveDir)%(Filename)%(Extension)"
           Condition="!Exists('umbraco\%(RecursiveDir)%(Filename)%(Extension)')" />
@@ -22,26 +26,42 @@
   </Target>
   <Target Name="AddUmbracoFilesToOutput">
     <ItemGroup>
+      <AppBrowsersFiles Include=".\App_Browsers\**\*" />
+	  <AppCodeFiles Include=".\App_Code\**\*" />
+	  <AppPluginsFiles Include=".\App_Plugins\**\*" />
+	  <GlobalAsaxFile Include=".\Global.asax;" />
+	  <SqlCeAmd64Files Include=".\bin\amd64\**\*" />
+	  <SqlCeX86Files Include=".\bin\x86\**\*" />
+	  <SplashesFiles Include=".\Config\Splashes\**\*;" />
 	  <UmbracoFiles Include=".\umbraco\**\*;" />
       <UmbracoClientFiles Include=".\umbraco_client\**\*;" />
-      <AppBrowsersFiles Include=".\App_Browsers\**\*" />
-	  <GlobalAsaxFile Include=".\Global.asax;" />
-	  <SplashesFiles Include=".\Config\Splashes\**\*;" />
 	  
+      <FilesForPackagingFromProject Include="%(AppBrowsersFiles.Identity)">
+        <DestinationRelativePath>App_Browsers\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
+      </FilesForPackagingFromProject>
+	  <FilesForPackagingFromProject Include="%(AppCodeFiles.Identity)">
+        <DestinationRelativePath>App_Code\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
+      </FilesForPackagingFromProject>
+	  <FilesForPackagingFromProject Include="%(AppPluginsFiles.Identity)">
+        <DestinationRelativePath>App_Plugins\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
+      </FilesForPackagingFromProject>
+      <FilesForPackagingFromProject Include="%(GlobalAsaxFile.Identity)">
+        <DestinationRelativePath>%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
+      </FilesForPackagingFromProject>
+      <FilesForPackagingFromProject Include="%(SqlCeAmd64Files.Identity)">
+        <DestinationRelativePath>bin\amd64\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
+      </FilesForPackagingFromProject>
+      <FilesForPackagingFromProject Include="%(SqlCeX86Files.Identity)">
+        <DestinationRelativePath>bin\x86\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
+      </FilesForPackagingFromProject>
+      <FilesForPackagingFromProject Include="%(SplashesFiles.Identity)">
+        <DestinationRelativePath>Config\Splashes\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
+      </FilesForPackagingFromProject>
       <FilesForPackagingFromProject Include="%(UmbracoFiles.Identity)">
         <DestinationRelativePath>umbraco\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
       </FilesForPackagingFromProject>
       <FilesForPackagingFromProject Include="%(UmbracoClientFiles.Identity)">
         <DestinationRelativePath>umbraco_client\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
-      </FilesForPackagingFromProject>
-      <FilesForPackagingFromProject Include="%(AppBrowsersFiles.Identity)">
-        <DestinationRelativePath>App_Browsers\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
-      </FilesForPackagingFromProject>
-      <FilesForPackagingFromProject Include="%(GlobalAsaxFile.Identity)">
-        <DestinationRelativePath>%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
-      </FilesForPackagingFromProject>
-      <FilesForPackagingFromProject Include="%(SplashesFiles.Identity)">
-        <DestinationRelativePath>Config\Splashes\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
       </FilesForPackagingFromProject>
     </ItemGroup>
   </Target>
