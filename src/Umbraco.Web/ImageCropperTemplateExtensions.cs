@@ -51,15 +51,26 @@ namespace Umbraco.Web
         {
             string imageCropperValue = null;
 
-            string mediaItemUrl = null;
+            string mediaItemUrl;
 
             if (mediaItem.HasPropertyAndValueAndCrop(propertyAlias, cropAlias))
             {
                 imageCropperValue = mediaItem.GetPropertyValue<string>(propertyAlias);
+
+                //get the raw value (this will be json)
+                var urlValue = mediaItem.GetPropertyValue<string>(propertyAlias);
+
+                mediaItemUrl = urlValue.DetectIsJson()
+                    ? urlValue.SerializeToCropDataSet().Src
+                    : urlValue;
+            }
+            else
+            {
+                mediaItemUrl = mediaItem.Url;
             }
 
-            return mediaItem.Url != null
-                ? GetCropUrl(mediaItem.Url, width, height, quality, imageCropMode, imageCropAnchor, imageCropperValue, cropAlias, furtherOptions)
+            return mediaItemUrl != null
+                ? GetCropUrl(mediaItemUrl, width, height, quality, imageCropMode, imageCropAnchor, imageCropperValue, cropAlias, furtherOptions)
                 : string.Empty;
         }
 
