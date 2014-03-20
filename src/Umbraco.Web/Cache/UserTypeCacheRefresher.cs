@@ -29,16 +29,19 @@ namespace Umbraco.Web.Cache
         public override void RefreshAll()
         {
             RuntimeCacheProvider.Current.Clear(typeof (IUserType));
+            base.RefreshAll();
         }
 
         public override void Refresh(int id)
         {
             RuntimeCacheProvider.Current.Delete(typeof(IUserType), id);
+            base.Refresh(id);
         }
 
         public override void Remove(int id)
         {
             RuntimeCacheProvider.Current.Delete(typeof(IUserType), id);
+            base.Remove(id);
         }
 
     }

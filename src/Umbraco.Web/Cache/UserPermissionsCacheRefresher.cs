@@ -31,17 +31,20 @@ namespace Umbraco.Web.Cache
 
         public override void RefreshAll()
         {
-            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.UserPermissionsCacheKey);         
+            ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.UserPermissionsCacheKey);    
+            base.RefreshAll();
         }
 
         public override void Refresh(int id)
         {
             Remove(id);
+            base.Refresh(id);
         }
 
         public override void Remove(int id)
         {
             ApplicationContext.Current.ApplicationCache.ClearCacheItem(string.Format("{0}{1}", CacheKeys.UserPermissionsCacheKey, id));
+            base.Remove(id);
         }
     }
 }
