@@ -26,73 +26,55 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
         {
             if (database != null)
             {
-                try
+                var dtSql = new Sql().Select("nodeId").From<DataTypeDto>().Where<DataTypeDto>(dto => dto.PropertyEditorAlias == Constants.PropertyEditors.RelatedLinksAlias);
+                var dataTypeIds = database.Fetch<int>(dtSql);
+
+                var propertyData =
+                    database.Fetch<PropertyDataDto>(
+                        "WHERE propertyTypeId in (SELECT id from cmsPropertyType where dataTypeID IN (@dataTypeIds))", new { dataTypeIds = dataTypeIds });
+                foreach (var data in propertyData)
                 {
-                    var propertyData =
-                        database.Fetch<PropertyDataDto>(
-                            "WHERE propertyTypeId in (SELECT id from cmsPropertyType where dataTypeID = 1040)");
-                    foreach (var data in propertyData)
+                    if (!string.IsNullOrEmpty(data.Text))
                     {
-                        if (!string.IsNullOrEmpty(data.Text))
+                        //var cs = ApplicationContext.Current.Services.ContentService;
+
+                        //fetch the current data (that's in xml format)
+                        var xml = new XmlDocument();
+                        xml.LoadXml(data.Text);
+
+                        if (xml != null)
                         {
-                             //var cs = ApplicationContext.Current.Services.ContentService;
+                            var links = new List<ExpandoObject>();
 
-                            //fetch the current data (that's in xml format)
-                            var xml = new XmlDocument();
-                            xml.LoadXml(data.Text);
-
-                            if (xml != null)
+                            //loop all the stored links
+                            foreach (XmlNode node in xml.DocumentElement.ChildNodes)
                             {
-                                var links = new List<ExpandoObject>();
+                                var title = node.Attributes["title"].Value;
+                                var type = node.Attributes["type"].Value;
+                                var newwindow = node.Attributes["newwindow"].Value.Equals("1") ? true : false;
+                                var lnk = node.Attributes["link"].Value;
 
-                                //loop all the stored links
-                                foreach (XmlNode node in xml.DocumentElement.ChildNodes)
-                                {
-                                    var title = node.Attributes["title"].Value;
-                                    var type = node.Attributes["type"].Value;
-                                    var newwindow = node.Attributes["newwindow"].Value.Equals("1") ? true : false;
-                                    var lnk = node.Attributes["link"].Value;
+                                //create the links in the format the new prop editor expects it to be
+                                var link = new ExpandoObject() as IDictionary<string, Object>;
+                                link.Add("title", title);
+                                link.Add("caption", title);
+                                link.Add("link", lnk);
+                                link.Add("newWindow", newwindow);
+                                link.Add("type", type.Equals("internal") ? "internal" : "external");
+                                link.Add("internal", type.Equals("internal") ? lnk : null);
 
-                                    //create the links in the format the new prop editor expects it to be
-                                    var link = new ExpandoObject() as IDictionary<string, Object>;
-                                    link.Add("title", title);
-                                    link.Add("caption", title);
-                                    link.Add("link", lnk);
-                                    link.Add("newWindow", newwindow);
-                                    link.Add("type", type.Equals("internal") ? "internal" : "external");
-                                    link.Add("internal", type.Equals("internal") ? lnk : null);
-                                  
-                                    link.Add("edit", false);
-                                    link.Add("isInternal", type.Equals("internal"));
+                                link.Add("edit", false);
+                                link.Add("isInternal", type.Equals("internal"));
 
-                                    //try
-                                    //{
-                                    //    if (type.Equals("internal"))
-                                    //    {
-                                    //        int nodeId;
-                                    //        if (int.TryParse(lnk, out nodeId))
-                                    //            link.Add("internalName", cs.GetById(nodeId).Name);
-                                    //    }
-                                    //}
-                                    //catch (Exception ex)
-                                    //{
-                                    //    LogHelper.Error<UpdateRelatedLinksData>("Exception was thrown when trying to update related links property data, fetching internal node id", ex);
-                                    //}
-
-                                    links.Add((ExpandoObject) link);
-                                }
-
-                                //store the serialized data
-                                data.Text = JsonConvert.SerializeObject(links);
-
-                                database.Update(data);
+                                links.Add((ExpandoObject)link);
                             }
+
+                            //store the serialized data
+                            data.Text = JsonConvert.SerializeObject(links);
+
+                            database.Update(data);
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    LogHelper.Error<UpdateRelatedLinksData>("Exception was thrown when trying to update related links property data", ex);
                 }
             }
             return string.Empty;

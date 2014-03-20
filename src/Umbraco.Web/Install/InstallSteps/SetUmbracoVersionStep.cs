@@ -27,14 +27,7 @@ namespace Umbraco.Web.Install.InstallSteps
         public override InstallSetupResult Execute(object model)
         {
             // Update configurationStatus
-            try
-            {
-                GlobalSettings.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
-            }
-            catch (Exception ex)
-            {
-                LogHelper.Error<SetUmbracoVersionStep>("An error occurred updating the config status", ex);
-            }
+            GlobalSettings.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
 
             // Update ClientDependency version
             var clientDependencyConfig = new ClientDependencyConfiguration();
