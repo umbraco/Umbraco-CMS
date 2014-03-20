@@ -51,7 +51,7 @@ namespace Umbraco.Web
         {
             string imageCropperValue = null;
 
-            string mediaItemUrl = null;
+            string mediaItemUrl;
 
             if (mediaItem.HasPropertyAndValueAndCrop(propertyAlias, cropAlias))
             {
@@ -63,6 +63,10 @@ namespace Umbraco.Web
                 mediaItemUrl = urlValue.DetectIsJson()
                     ? urlValue.SerializeToCropDataSet().Src
                     : urlValue;
+            }
+            else
+            {
+                mediaItemUrl = mediaItem.Url;
             }
 
             return mediaItemUrl != null
