@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -71,23 +73,25 @@ namespace Umbraco.Web.PropertyEditors
                 if (uploadFieldConfigNode != null)
                 {
                     if (p.Value != null)
-                    {
+                    {                        
                         JObject json = null;
                         try
                         {
                             json = JObject.Parse((string)p.Value);
                         }
-                        catch (Newtonsoft.Json.JsonException ex)
+                        catch (JsonException ex)
                         {
-
+                            LogHelper.Error<ImageCropperPropertyEditor>("Could not parse the value into a JSON structure! Value: " + p.Value, ex);
                         }
                         if (json != null && json["src"] != null)
+                        {
                             model.PopulateFileMetaDataProperties(uploadFieldConfigNode, json["src"].Value<string>());
+                        }
                         else if (p.Value is string)
                         {
-                            var src = p.Value;
+                            var src = p.Value == null ? string.Empty : p.Value.ToString();
                             var config = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(p.PropertyType.DataTypeDefinitionId).FirstOrDefault();
-                             var crops = string.IsNullOrEmpty(config) == false ? config : "[]";
+                            var crops = string.IsNullOrEmpty(config) == false ? config : "[]";
                             p.Value = "{src: '" + p.Value + "', crops: " + crops + "}";
                             //Only provide the source path, not the whole JSON value
                             model.PopulateFileMetaDataProperties(uploadFieldConfigNode, src);
