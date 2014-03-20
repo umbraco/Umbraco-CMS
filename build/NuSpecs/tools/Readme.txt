@@ -1,8 +1,11 @@
 A note about running Umbraco from Visual Studio.
 
-When upgrading your website using NuGet, make sure to backup all of your config files and web.config. 
+When upgrading your website using NuGet you should answer "No" to the questions to overwrite the Web.config 
+file (and config files in the config folder). 
+We will overwrite Web.config anyway but we keep a backup in the App_Data\ConfigBackup folder. There you'll 
+find a folder with the current date and time in which the backup has been placed. Make sure to merge the 
+new file with the old backup files before you proceed.
 Only the web.config will be overwritten by default to ensure that it has the necessary settings from the current release. 
-This means that you'll have to merge the files if you made any changes to the previous config files.
 
 The config files found in the config folder will usually not be changed for patch releases, so they can usually be skipped,
 but the web.config will have to have its previous "umbracoConfigurationStatus"-appsetting and "umbracoDbDSN" connection string
