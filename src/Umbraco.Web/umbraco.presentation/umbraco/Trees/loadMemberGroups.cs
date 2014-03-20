@@ -63,7 +63,10 @@ function openMemberGroup(id) {
 
         public override void Render(ref XmlTree tree)
         {
-            foreach(string role in Roles.GetAllRoles()) {
+            var roles = Roles.GetAllRoles();
+            Array.Sort(roles);
+
+            foreach(string role in roles) {
 //            MemberGroup[] MemberGroups = MemberGroup.GetAll;
             
 //            for (int i = 0; i < MemberGroups.Length; i++)
