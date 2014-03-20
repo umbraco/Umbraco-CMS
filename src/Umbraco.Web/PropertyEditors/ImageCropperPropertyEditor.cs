@@ -96,7 +96,7 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class ImageCropperPreValueEditor : PreValueEditor
         {
-            [PreValueField("crops", "Crop sizes", "cropsizes")]
+            [PreValueField("crops", "Crop sizes", "views/propertyeditors/imagecropper/imagecropper.prevalues.html")]
             public string Crops { get; set; }
         }
     }
