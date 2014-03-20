@@ -41,7 +41,8 @@
 						center="model.value.focalPoint" />
 				</div>
 
-				<p>Previews</p>
+				<hr />
+
 				<ul class="umb-sortable-thumbnails" >
 					<li ng-repeat="(key,value) in model.value.crops">
 						<a href title="{{value.alias}}: {{value.height}}px x {{value.width}}px" ng-click="crop(value)">
@@ -56,7 +57,7 @@
 					</li>
 				</ul>
 
-				<a href class="btn btn-link" ng-click="clear()"><i class="icon-delete red"></i> Remove file</a></li>
+				<a href class="btn btn-link" ng-click="clear()"><i class="icon-delete red"></i> Remove file</a>
 			</div>
 	</div>
 </div>

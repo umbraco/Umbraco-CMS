@@ -4,7 +4,7 @@ angular.module('umbraco')
     .controller("Umbraco.PropertyEditors.ImageCropperController",
     function ($rootScope, $routeParams, $scope, $log, mediaHelper, cropperHelper, $timeout, editorState, umbRequestHelper, fileManager) {
 
-        var config = $scope.model.config;
+        var config =  angular.copy($scope.model.config);
         
         //move previously saved value to the editor
         if ($scope.model.value) {
@@ -52,8 +52,8 @@ angular.module('umbraco')
 
             //clear the ui
             $scope.imageSrc = undefined;
-            if ($scope.model.value.src) {
-                delete $scope.model.value.src;
+            if ($scope.model.value) {
+                delete $scope.model.value;
             }
         };
 
@@ -67,15 +67,6 @@ angular.module('umbraco')
             }
         };
 
-
-        $scope.$on("imageFocalPointStart", function () {
-            $scope.tempShowPreviews = true;
-        });
-
-        $scope.$on("imageFocalPointStop", function () {
-            $scope.tempShowPreviews = false;
-        });
-
         //on image selected, update the cropper
         $scope.$on("filesSelected", function (ev, args) {
             $scope.model.value = config;
@@ -86,9 +77,11 @@ angular.module('umbraco')
 
                 var reader = new FileReader();
                 reader.onload = function (e) {
+
                     $scope.$apply(function () {
                         $scope.imageSrc = e.target.result;
                     });
+
                 };
 
                 reader.readAsDataURL(args.files[0]);

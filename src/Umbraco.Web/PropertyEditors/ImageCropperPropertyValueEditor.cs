@@ -42,6 +42,8 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns></returns>
         public override object ConvertEditorToDb(ContentPropertyData editorValue, object currentValue)
         {
+
+
             string oldFile = string.Empty;
             string newFile = string.Empty;
             JObject newJson = null;
@@ -117,6 +119,10 @@ namespace Umbraco.Web.PropertyEditors
                     }
                 }
             }
+
+            //incase we submit nothing back
+            if (editorValue.Value == null)
+                return null;
 
             return editorValue.Value.ToString();
         }
