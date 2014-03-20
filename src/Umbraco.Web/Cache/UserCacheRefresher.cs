@@ -32,11 +32,13 @@ namespace Umbraco.Web.Cache
             RuntimeCacheProvider.Current.Clear(typeof(IUser));
             ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.UserPermissionsCacheKey);
             ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.UserContextCacheKey);
+            base.RefreshAll();
         }
 
         public override void Refresh(int id)
         {
             Remove(id);
+            base.Refresh(id);
         }
 
         public override void Remove(int id)
@@ -48,6 +50,8 @@ namespace Umbraco.Web.Cache
             //we need to clear all UserContextCacheKey since we cannot invalidate based on ID since the cache is done so based
             //on the current contextId stored in the database
             ApplicationContext.Current.ApplicationCache.ClearCacheByKeySearch(CacheKeys.UserContextCacheKey);
+
+            base.Remove(id);
         }
 
     }
