@@ -19,12 +19,12 @@ if ($project) {
 		
 	# Create a backup of original web.config
 	$projectDestinationPath = Split-Path $project.FullName -Parent
-	$webConfigSource = Join-Path $projectDestinationPath "web.config"
+	$webConfigSource = Join-Path $projectDestinationPath "Web.config"
 	Copy-Item $webConfigSource $backupPath -Force
 	
-	# Copy umbraco files from package to project folder
-	$umbracoFilesPath = Join-Path $rootPath "UmbracoFiles\*"
-	Copy-Item $umbracoFilesPath $projectDestinationPath -Recurse -Force
+	# Copy Web.config from package to project folder
+	$umbracoFilesPath = Join-Path $rootPath "UmbracoFiles\Web.config"
+	Copy-Item $umbracoFilesPath $projectDestinationPath -Force
 	
 	# Open readme.txt file
 	$DTE.ItemOperations.OpenFile($toolsPath + '\Readme.txt')
