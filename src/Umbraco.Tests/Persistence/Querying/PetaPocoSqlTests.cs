@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Persistence.Querying
         public void Can_OrderBy_With_Type()
         {
             var expected = new Sql();
-            expected.Select("*").From("[cmsContent]").OrderBy("[cmsContent].[contentType]");
+            expected.Select("*").From("[cmsContent]").OrderBy("([cmsContent].[contentType])");
 
             var sql = new Sql();
             sql.Select("*").From<ContentDto>().OrderBy<ContentDto>(x => x.ContentTypeId);
