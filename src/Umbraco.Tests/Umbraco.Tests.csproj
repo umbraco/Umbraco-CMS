@@ -280,6 +280,7 @@
     <Compile Include="Persistence\Repositories\UserTypeRepositoryTest.cs" />
     <Compile Include="Models\Mapping\ContentWebModelMappingTests.cs" />
     <Compile Include="Persistence\SyntaxProvider\MySqlSyntaxProviderTests.cs" />
+    <Compile Include="PropertyEditors\ImageCropperTest.cs" />
     <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
     <Compile Include="PropertyEditors\ColorListValidatorTest.cs" />
     <Compile Include="PropertyEditors\DropDownPropertyPreValueEditorTests.cs" />
