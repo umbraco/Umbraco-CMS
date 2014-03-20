@@ -11,6 +11,9 @@
 	<Copy SourceFiles="%(AppBrowsersFiles.FullPath)"
           DestinationFiles="App_Browsers\%(RecursiveDir)%(Filename)%(Extension)"
           Condition="!Exists('App_Browsers\%(RecursiveDir)%(Filename)%(Extension)')" />
+	<Copy SourceFiles="%(AppPluginsFiles.FullPath)"
+          DestinationFiles="App_Plugins\%(RecursiveDir)%(Filename)%(Extension)"
+          Condition="!Exists('App_Plugins\%(RecursiveDir)%(Filename)%(Extension)')" />		  
 	<Copy SourceFiles="%(SplashesFiles.FullPath)"
           DestinationFiles="Config\Splashes\%(RecursiveDir)%(Filename)%(Extension)"
           Condition="!Exists('Config\Splashes\%(RecursiveDir)%(Filename)%(Extension)')" />
