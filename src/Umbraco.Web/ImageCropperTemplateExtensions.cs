@@ -32,7 +32,6 @@ namespace Umbraco.Web
             }
         }
 
-
        public static string GetCropUrl(
             this IPublishedContent mediaItem,
             int? width = null,
@@ -40,19 +39,23 @@ namespace Umbraco.Web
             int? quality = null,
             Mode? mode = null,
             Anchor? anchor = null,
-            string imageCropperAlias = null,
-            string imageCropperCropId = null,
-            string furtherOptions = null,
-            bool slimmage = false)
+            string propertyAlias = null,
+            string cropAlias = null,
+            string furtherOptions = null)
         {
             string imageCropperValue = null;
 
-            if (mediaItem.HasPropertyAndValueAndCrop(imageCropperAlias, imageCropperCropId))
+           string mediaItemUrl = null;
+
+            if (mediaItem.HasPropertyAndValueAndCrop(propertyAlias, cropAlias))
             {
-                imageCropperValue = mediaItem.GetPropertyValueHack(imageCropperAlias);
+                imageCropperValue = mediaItem.GetPropertyValue<string>(propertyAlias);
             }
 
-            return mediaItem != null ? GetCropUrl(mediaItem.Url, width, height, quality, mode, anchor, imageCropperValue, imageCropperCropId, furtherOptions, slimmage) : string.Empty;
+           //this probably shouldn't be needed but it is currently as mediaItem.Url is populated with full crop JSON
+           mediaItemUrl = mediaItem.Url.DetectIsJson() ? mediaItem.Url.SerializeToCropDataSet().Src : mediaItem.Url;
+
+           return mediaItem != null ? GetCropUrl(mediaItemUrl, width, height, quality, mode, anchor, imageCropperValue, cropAlias, furtherOptions) : string.Empty;
         }
 
 
@@ -65,26 +68,44 @@ namespace Umbraco.Web
             Anchor? anchor = null,
             string imageCropperValue = null,
             string cropAlias = null,
-            string furtherOptions = null,
-            bool slimmage = false)
+            string furtherOptions = null)
         {
             if (!string.IsNullOrEmpty(imageUrl))
             {
                 var imageResizerUrl = new StringBuilder();
-                imageResizerUrl.Append(imageUrl);
 
                 if (!string.IsNullOrEmpty(imageCropperValue) && imageCropperValue.DetectIsJson())
                 {
-                    var allTheCrops = imageCropperValue.SerializeToCropDataSet();
-                    if (allTheCrops != null && allTheCrops.Crops.Any())
+                    var cropDataSet = imageCropperValue.SerializeToCropDataSet();
+                    imageResizerUrl.Append(cropDataSet.Src);
+                    var crop = cropDataSet.Crops.FirstOrDefault(x => cropAlias != null && x.Alias.ToLowerInvariant() == cropAlias.ToLowerInvariant());
+                    if (crop != null && crop.Coordinates != null)
                     {
+                        imageResizerUrl.Append("?crop=");
+                        imageResizerUrl.Append(crop.Coordinates.X1).Append(",");
+                        imageResizerUrl.Append(crop.Coordinates.Y1).Append(",");
+                        imageResizerUrl.Append(crop.Coordinates.X2).Append(",");
+                        imageResizerUrl.Append(crop.Coordinates.Y2);
+                        imageResizerUrl.Append("&cropmode=percentage");
+                    }
+                    else
+                    {
+                        if (cropDataSet.HasFocalPoint())
+                        {
+                            imageResizerUrl.Append("?center=" + cropDataSet.FocalPoint.Top + "," + cropDataSet.FocalPoint.Left);
+                            imageResizerUrl.Append("&mode=crop");
+                        }
+                        else
+                        {
+                            imageResizerUrl.Append("?anchor=center");
+                            imageResizerUrl.Append("&mode=crop");
+                        }
 
-                        if(allTheCrops.HasCrop(cropAlias))
-                            imageResizerUrl.Append(allTheCrops.GetCropUrl(cropAlias));
                     }
                 }
                 else
                 {
+                    imageResizerUrl.Append(imageUrl);
                     if (mode == null)
                     {
                         mode = Mode.Pad;
@@ -110,19 +131,6 @@ namespace Umbraco.Web
                 if (height != null)
                 {
                     imageResizerUrl.Append("&height=" + height);
-                }
-
-                if (slimmage)
-                {
-                    if (width == null)
-                    {
-                        imageResizerUrl.Append("&width=300");
-                    }
-                    if (quality == null)
-                    {
-                        imageResizerUrl.Append("&quality=90");
-                    }
-                    imageResizerUrl.Append("&slimmage=true");
                 }
 
                 if (furtherOptions != null)
