@@ -128,11 +128,11 @@
       <HintPath>..\packages\Examine.0.1.55.2941\lib\Examine.dll</HintPath>
     </Reference>
     <Reference Include="ImageProcessor">
-      <HintPath>..\packages\ImageProcessor.1.8.4.0\lib\net45\ImageProcessor.dll</HintPath>
+      <HintPath>..\packages\ImageProcessor.1.8.6.1\lib\net45\ImageProcessor.dll</HintPath>
     </Reference>
     <Reference Include="ImageProcessor.Web, Version=3.1.1.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\packages\ImageProcessor.Web.3.1.1.0\lib\net45\ImageProcessor.Web.dll</HintPath>
+      <HintPath>..\packages\ImageProcessor.Web.3.2.0.0\lib\net45\ImageProcessor.Web.dll</HintPath>
     </Reference>
     <Reference Include="log4net, Version=1.2.11.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
