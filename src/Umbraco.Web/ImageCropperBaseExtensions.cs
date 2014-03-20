@@ -15,7 +15,7 @@ namespace Umbraco.Web
 {
     internal static class ImageCropperBaseExtensions
     {
-       
+
         internal static ImageCropData GetImageCrop(this string json, string id)
         {
             var ic = new ImageCropData();
@@ -26,7 +26,10 @@ namespace Umbraco.Web
                     var imageCropperSettings = JsonConvert.DeserializeObject<List<ImageCropData>>(json);
                     ic = imageCropperSettings.GetCrop(id);
                 }
-                catch { }
+                catch (Exception ex)
+                {
+                    LogHelper.Error(typeof(ImageCropperBaseExtensions), "Could not parse the json string: " + json, ex);
+                }
             }
             return ic;
         }
@@ -40,9 +43,9 @@ namespace Umbraco.Web
                 {
                     imageCrops = JsonConvert.DeserializeObject<ImageCropDataSet>(json);
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
-                    var e = ex;
+                    LogHelper.Error(typeof(ImageCropperBaseExtensions), "Could not parse the json string: " + json, ex);
                 }
             }
 
@@ -57,7 +60,8 @@ namespace Umbraco.Web
             return dataset.Crops.GetCrop(cropAlias);
         }
 
-        internal static ImageCropData GetCrop(this IEnumerable<ImageCropData> dataset, string cropAlias){
+        internal static ImageCropData GetCrop(this IEnumerable<ImageCropData> dataset, string cropAlias)
+        {
             if (dataset == null || !dataset.Any())
                 return null;
 
@@ -92,7 +96,7 @@ namespace Umbraco.Web
                     }
                 }
                 return false;
-            }            
+            }
             return false;
         }
 
