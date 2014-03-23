@@ -14,6 +14,7 @@ namespace umbraco.presentation.umbracobase
         public string allowType;
         public string allowMember;
         public bool returnXml;
+		public string contentType;
 
         public RestExtensionMethod()
         {

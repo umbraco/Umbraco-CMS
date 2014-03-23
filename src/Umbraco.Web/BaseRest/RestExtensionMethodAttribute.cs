@@ -13,6 +13,7 @@ namespace Umbraco.Web.BaseRest
 		public string AllowType { get; set; }
 		public string AllowMember { get; set; }
 		public bool ReturnXml { get; set; }
+		public string ContentType { get; set; }
 
 		public RestExtensionMethodAttribute()
 		{

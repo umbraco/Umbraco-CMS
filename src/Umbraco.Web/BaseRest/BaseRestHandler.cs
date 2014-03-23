@@ -78,7 +78,9 @@ namespace Umbraco.Web.BaseRest
 			else
 			{
 				if (!method.ReturnXml)
-					context.Response.ContentType = "text/html";
+				{
+					context.Response.ContentType = String.IsNullOrWhiteSpace(method.ContentType) ? "text/html" : method.ContentType;
+				}
 
 				TrySetCulture();
 
