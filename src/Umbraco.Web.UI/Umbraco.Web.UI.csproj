@@ -587,9 +587,6 @@
     <None Include="Config\BaseRestExtensions.Release.config">
       <DependentUpon>BaseRestExtensions.config</DependentUpon>
     </None>
-    <Content Include="Config\imageprocessor\security.config" />
-    <Content Include="Config\imageprocessor\processing.config" />
-    <Content Include="Config\imageprocessor\cache.config" />
     <None Include="Config\log4net.Release.config">
       <DependentUpon>log4net.config</DependentUpon>
     </None>
