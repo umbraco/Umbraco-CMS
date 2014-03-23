@@ -19,7 +19,7 @@ namespace umbraco.presentation.umbracobase
         private string _alias;
         private bool _isAllowed;
         private bool _returnXml = true;
-		private string _contentType;
+        private string _contentType;
 
         public Type type
         {
@@ -57,11 +57,11 @@ namespace umbraco.presentation.umbracobase
             set { _returnXml = value; }
         }
 
-		public string contentType
-		{
-			get { return _contentType; }
-			set { _contentType = value; }
-		}
+        public string contentType
+        {
+            get { return _contentType; }
+            set { _contentType = value; }
+        }
 
         public restExtension()
         { }
@@ -156,7 +156,7 @@ namespace umbraco.presentation.umbracobase
                                     this.assembly = t.Assembly;
                                     this.type = t;
                                     this.returnXML = attribute.returnXml;
-	                                this.contentType = attribute.contentType;
+                                    this.contentType = attribute.contentType;
                                 } 
                             }
                         }
@@ -185,7 +185,7 @@ namespace umbraco.presentation.umbracobase
                     this.alias = extensionAlias;
                     this.assembly = returnAssembly;
                     this.type = returnType;
-					this.contentType = baseExt.Attributes["contentType"] != null ? baseExt.Attributes["contentType"].Value : String.Empty;
+                    this.contentType = baseExt.Attributes["contentType"] != null ? baseExt.Attributes["contentType"].Value : String.Empty;
                 }
             }
             else

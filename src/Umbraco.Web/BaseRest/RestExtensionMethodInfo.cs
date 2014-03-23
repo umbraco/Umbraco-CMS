@@ -248,7 +248,7 @@ namespace Umbraco.Web.BaseRest
                 // got it!
 			    info = new RestExtensionMethodInfo(attribute.GetAllowAll(),
 			                                       attribute.GetAllowGroup(), attribute.GetAllowType(), attribute.GetAllowMember(),
-												   attribute.returnXml, attribute.contentType,
+                                                   attribute.returnXml, attribute.contentType,
 			                                       method);
 
 			    // cache
@@ -313,7 +313,7 @@ namespace Umbraco.Web.BaseRest
                 // got it!
                 info = new RestExtensionMethodInfo(attribute.AllowAll,
                                                    attribute.AllowGroup, attribute.AllowType, attribute.AllowMember,
-												   attribute.ReturnXml, attribute.ContentType,
+                                                   attribute.ReturnXml, attribute.ContentType,
                                                    method);
 
                 // cache
