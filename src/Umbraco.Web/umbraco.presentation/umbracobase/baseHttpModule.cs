@@ -205,7 +205,7 @@ namespace umbraco.presentation.umbracobase
                                     }
                                     else
                                     {
-                                        HttpContext.Current.Response.ContentType = "text/html";
+                                        HttpContext.Current.Response.ContentType = String.IsNullOrWhiteSpace(myExtension.contentType) ? "text/html" : myExtension.contentType;
                                         return strResponse;
                                     }
                             }

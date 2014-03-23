@@ -43,7 +43,7 @@ namespace Umbraco.Web.BaseRest
 			Exists = false;
 		}
 
-		private RestExtensionMethodInfo(bool allowAll, string allowGroup, string allowType, string allowMember, bool returnXml, MethodInfo method)
+		private RestExtensionMethodInfo(bool allowAll, string allowGroup, string allowType, string allowMember, bool returnXml, string contentType, MethodInfo method)
 		{
 			Exists = true;
 			_allowAll = allowAll;
@@ -51,6 +51,7 @@ namespace Umbraco.Web.BaseRest
 			_allowTypes = SplitString(allowType);
 			_allowMembers = SplitString(allowMember);
 			ReturnXml = returnXml;
+			ContentType = contentType;
 			_method = method;
 		}
 
@@ -65,6 +66,7 @@ namespace Umbraco.Web.BaseRest
 
 		public bool Exists { get; private set; }
 		public bool ReturnXml { get; private set; }
+		public string ContentType { get; private set; }
 
 		#region Discovery
 
@@ -134,10 +136,11 @@ namespace Umbraco.Web.BaseRest
 
 			var allowAll = GetAttribute(mNode, "allowAll");
 			var returnXml = GetAttribute(mNode, "returnXml");
+			var contentType = GetAttribute(mNode, "contentType");
 
 			var info = new RestExtensionMethodInfo(allowAll != null && allowAll.ToLower() == "true",
 				GetAttribute(mNode, "allowGroup"), GetAttribute(mNode, "allowType"), GetAttribute(mNode, "allowMember"),
-				returnXml == null || returnXml.ToLower() != "false",
+				returnXml == null || returnXml.ToLower() != "false", contentType,
 				method);
 
 			return info;
@@ -197,7 +200,7 @@ namespace Umbraco.Web.BaseRest
 
 			var info = new RestExtensionMethodInfo(configMethod.AllowAll,
 				configMethod.AllowGroup, configMethod.AllowType, configMethod.AllowMember,
-				configMethod.ReturnXml,
+				configMethod.ReturnXml, configMethod.ContentType,
 				method);
 
 			return info;
@@ -245,7 +248,7 @@ namespace Umbraco.Web.BaseRest
                 // got it!
 			    info = new RestExtensionMethodInfo(attribute.GetAllowAll(),
 			                                       attribute.GetAllowGroup(), attribute.GetAllowType(), attribute.GetAllowMember(),
-			                                       attribute.returnXml,
+                                                   attribute.returnXml, attribute.contentType,
 			                                       method);
 
 			    // cache
@@ -310,7 +313,7 @@ namespace Umbraco.Web.BaseRest
                 // got it!
                 info = new RestExtensionMethodInfo(attribute.AllowAll,
                                                    attribute.AllowGroup, attribute.AllowType, attribute.AllowMember,
-                                                   attribute.ReturnXml,
+                                                   attribute.ReturnXml, attribute.ContentType,
                                                    method);
 
                 // cache

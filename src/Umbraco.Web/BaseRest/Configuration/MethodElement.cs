@@ -10,6 +10,7 @@ namespace Umbraco.Web.BaseRest.Configuration
 		const string KeyAllowType = "allowType";
 		const string KeyAllowMember = "allowMember";
 		const string KeyReturnXml = "returnXml";
+		const string KeyContentType = "contentType";
 
 		[ConfigurationProperty(KeyName, IsKey = true, IsRequired = true)]
 		public string Name
@@ -45,6 +46,12 @@ namespace Umbraco.Web.BaseRest.Configuration
 		public bool ReturnXml
 		{
 			get { return (bool)base[KeyReturnXml]; }
+		}
+
+		[ConfigurationProperty(KeyContentType, IsKey = false, IsRequired = false, DefaultValue = null)]
+		public string ContentType
+		{
+			get { return (string)base[KeyContentType]; }
 		}
 	}
 }
