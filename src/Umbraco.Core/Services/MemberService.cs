@@ -1023,7 +1023,7 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
-        /// Rebuilds all xml content in the cmsContentXml table for all media
+        /// Rebuilds all xml content in the cmsContentXml table for all members
         /// </summary>
         /// <param name="memberTypeIds">
         /// Only rebuild the xml structures for the content type ids passed in, if none then rebuilds the structures
