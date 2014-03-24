@@ -4,11 +4,11 @@
 	<ItemGroup>
 	  <AppBrowsersFiles Include="..\packages\UmbracoCms.6.2.0-RC\UmbracoFiles\App_Browsers\**\*" />
 	  <AppPluginsFiles Include="..\packages\UmbracoCms.6.2.0-RC\UmbracoFiles\App_Plugins\**\*" />
-	  <SplashesFiles Include="..\packages\UmbracoCms.6.2.0-RC\UmbracoFiles\Config\Splashes\**\*;" />
-	  <SqlCeBinFiles Include="..\packages\UmbracoCms.6.2.0-RC\UmbracoFiles\bin\**\*;" />
-	  <InstallFiles Include="..\packages\UmbracoCms.6.2.0-RC\UmbracoFiles\install\**\*;" />
-      <UmbracoFiles Include="..\packages\UmbracoCms.6.2.0-RC\UmbracoFiles\umbraco\**\*;" />
-      <UmbracoClientFiles Include="..\packages\UmbracoCms.6.2.0-RC\UmbracoFiles\umbraco_client\**\*;" />
+	  <SplashesFiles Include="..\packages\UmbracoCms.6.2.0-RC\UmbracoFiles\Config\Splashes\**\*" />
+	  <SqlCeBinFiles Include="..\packages\UmbracoCms.6.2.0-RC\UmbracoFiles\bin\**\*" />
+	  <InstallFiles Include="..\packages\UmbracoCms.6.2.0-RC\UmbracoFiles\install\**\*" />
+      <UmbracoFiles Include="..\packages\UmbracoCms.6.2.0-RC\UmbracoFiles\umbraco\**\*" />
+      <UmbracoClientFiles Include="..\packages\UmbracoCms.6.2.0-RC\UmbracoFiles\umbraco_client\**\*" />
     </ItemGroup>
 	<Copy SourceFiles="%(AppBrowsersFiles.FullPath)"
           DestinationFiles="App_Browsers\%(RecursiveDir)%(Filename)%(Extension)"
@@ -37,12 +37,12 @@
       <AppBrowsersFiles Include=".\App_Browsers\**\*" />
 	  <AppCodeFiles Include=".\App_Code\**\*" />
 	  <AppPluginsFiles Include=".\App_Plugins\**\*" />
-	  <GlobalAsaxFile Include=".\Global.asax;" />
+	  <GlobalAsaxFile Include=".\Global.asax" />
 	  <SqlCeAmd64Files Include=".\bin\amd64\**\*" />
 	  <SqlCeX86Files Include=".\bin\x86\**\*" />
-	  <SplashesFiles Include=".\Config\Splashes\**\*;" />
-	  <UmbracoFiles Include=".\umbraco\**\*;" />
-      <UmbracoClientFiles Include=".\umbraco_client\**\*;" />
+	  <SplashesFiles Include=".\Config\Splashes\**\*" />
+	  <UmbracoFiles Include=".\umbraco\**\*" />
+      <UmbracoClientFiles Include=".\umbraco_client\**\*" />
 	  
       <FilesForPackagingFromProject Include="%(AppBrowsersFiles.Identity)">
         <DestinationRelativePath>App_Browsers\%(RecursiveDir)%(Filename)%(Extension)</DestinationRelativePath>
