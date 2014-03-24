@@ -158,7 +158,10 @@ namespace umbraco.cms.presentation.members
             _memberGroups.ID = "Membergroups";
             _memberGroups.Width = 175;
             var selectedMembers = "";
-            foreach (var role in Roles.GetAllRoles())
+			var roles = Roles.GetAllRoles();
+            		Array.Sort(roles);
+
+			foreach(var role in roles)
             {
                 // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
                 if (role.StartsWith("__umbracoRole") == false)
