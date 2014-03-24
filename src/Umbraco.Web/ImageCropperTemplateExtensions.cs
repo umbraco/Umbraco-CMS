@@ -10,20 +10,90 @@ using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Web
 {
+    /// <summary>
+    /// Provides extension methods for getting ImageProcessor Url from the core Image Cropper property editor
+    /// </summary>
     public static class ImageCropperTemplateExtensions
     {
-
+        /// <summary>
+        /// Gets the ImageProcessor Url by the crop alias (from the "umbracoFile" property alias) on the IPublishedContent item
+        /// </summary>
+        /// <param name="mediaItem">
+        /// The IPublishedContent item.
+        /// </param>
+        /// <param name="cropAlias">
+        /// The crop alias e.g. thumbnail
+        /// </param>
+        /// <returns>
+        /// The ImageProcessor.Web Url.
+        /// </returns>
         public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias)
         {
-            return mediaItem.GetCropUrl(Constants.Conventions.Media.File, cropAlias);
+            return mediaItem.GetCropUrl(cropAlias: cropAlias, useCropDimensions: true);
         }
 
-        // this only takes the crop json into account
+        /// <summary>
+        /// Gets the ImageProcessor Url by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
+        /// </summary>
+        /// <param name="mediaItem">
+        /// The IPublishedContent item.
+        /// </param>
+        /// <param name="propertyAlias">
+        /// The property alias of the property containing the Json data e.g. umbracoFile
+        /// </param>
+        /// <param name="cropAlias">
+        /// The crop alias e.g. thumbnail
+        /// </param>
+        /// <returns>
+        /// The ImageProcessor.Web Url.
+        /// </returns>
         public static string GetCropUrl(this IPublishedContent mediaItem, string propertyAlias, string cropAlias)
         {
             return mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true);
         }
 
+        /// <summary>
+        /// Gets the ImageProcessor Url from the IPublishedContent item.
+        /// </summary>
+        /// <param name="mediaItem">
+        /// The IPublishedContent item.
+        /// </param>
+        /// <param name="width">
+        /// The width of the output image.
+        /// </param>
+        /// <param name="height">
+        /// The height of the output image.
+        /// </param>
+        /// <param name="quality">
+        /// Quality percentage of the output image.
+        /// </param>
+        /// <param name="imageCropMode">
+        /// The image crop mode.
+        /// </param>
+        /// <param name="imageCropAnchor">
+        /// The image crop anchor.
+        /// </param>
+        /// <param name="propertyAlias">
+        /// Property alias of the property containing the Json data.
+        /// </param>
+        /// <param name="cropAlias">
+        /// The crop alias.
+        /// </param>
+        /// <param name="useFocalPoint">
+        /// Use focal point, to generate an output image using the focal point instead of the predefined crop
+        /// </param>
+        /// <param name="useCropDimensions">
+        /// Use crop dimensions to have the output image sized according to the predefined crop sizes, this will override the width and height parameters>.
+        /// </param>
+        /// <param name="cacheBuster">
+        /// Add a random number at the end of the generated string
+        /// </param>
+        /// <param name="furtherOptions">
+        /// The further options.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         public static string GetCropUrl(
              this IPublishedContent mediaItem,
              int? width = null,
@@ -63,6 +133,48 @@ namespace Umbraco.Web
                 : string.Empty;
         }
 
+        /// <summary>
+        /// Gets the ImageProcessor Url from the image path.
+        /// </summary>
+        /// <param name="imageUrl">
+        /// The image url.
+        /// </param>
+        /// <param name="width">
+        /// The width of the output image.
+        /// </param>
+        /// <param name="height">
+        /// The height of the output image.
+        /// </param>
+        /// <param name="quality">
+        /// Quality percentage of the output image.
+        /// </param>
+        /// <param name="imageCropMode">
+        /// The image crop mode.
+        /// </param>
+        /// <param name="imageCropAnchor">
+        /// The image crop anchor.
+        /// </param>
+        /// <param name="imageCropperValue">
+        /// The Json data from the Umbraco Core Image Cropper property editor
+        /// </param>
+        /// <param name="cropAlias">
+        /// The crop alias.
+        /// </param>
+        /// <param name="useFocalPoint">
+        /// Use focal point, to generate an output image using the focal point instead of the predefined crop
+        /// </param>
+        /// <param name="useCropDimensions">
+        /// Use crop dimensions to have the output image sized according to the predefined crop sizes, this will override the width and height parameters>.
+        /// </param>
+        /// <param name="cacheBuster">
+        /// Add a random number at the end of the generated string
+        /// </param>
+        /// <param name="furtherOptions">
+        /// The further options.
+        /// </param>
+        /// <returns>
+        /// The <see cref="string"/>.
+        /// </returns>
         public static string GetCropUrl(
             this string imageUrl,
             int? width = null,
@@ -77,22 +189,23 @@ namespace Umbraco.Web
             bool cacheBuster = true, 
             string furtherOptions = null)
         {
-            if (!string.IsNullOrEmpty(imageUrl))
+            if (string.IsNullOrEmpty(imageUrl) == false)
             {
                 var imageResizerUrl = new StringBuilder();
 
-                if (!string.IsNullOrEmpty(imageCropperValue) && imageCropperValue.DetectIsJson())
+                if (string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson())
                 {
                     var cropDataSet = imageCropperValue.SerializeToCropDataSet();
                     if (cropDataSet != null)
                     {
                         var cropUrl = cropDataSet.GetCropUrl(cropAlias, false, useFocalPoint, cacheBuster);
                         
-                        // if crop alias has been specified but not found we should return null
+                        // if crop alias has been specified but not found in the Json we should return null
                         if (string.IsNullOrEmpty(cropAlias) == false && cropUrl == null)
                         {
                             return null;
                         }
+
                         imageResizerUrl.Append(cropDataSet.Src);
                         imageResizerUrl.Append(cropDataSet.GetCropUrl(cropAlias, useCropDimensions, useFocalPoint, cacheBuster));
                     }
@@ -104,6 +217,7 @@ namespace Umbraco.Web
                     {
                         imageCropMode = ImageCropMode.Pad;
                     }
+
                     imageResizerUrl.Append("?mode=" + imageCropMode.ToString().ToLower());
 
                     if (imageCropAnchor != null)
@@ -133,10 +247,9 @@ namespace Umbraco.Web
                 }
 
                 return imageResizerUrl.ToString();
-
             }
+
             return string.Empty;
         }
-
     }
 }

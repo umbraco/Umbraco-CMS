@@ -34,5 +34,12 @@ namespace Umbraco.Tests.PropertyEditors
             Assert.AreEqual(mediaPath + "?center=0.80827067669172936,0.96&mode=crop&width=100&height=100", urlString);
         }
 
+        [Test]
+        public void GetCropUrlFurtherOptionsTest()
+        {
+            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, width: 200, height: 300, cacheBuster: false, furtherOptions: "&filter=comic&roundedcorners=radius-26|bgcolor-fff");
+            Assert.AreEqual(mediaPath + "?center=0.80827067669172936,0.96&mode=crop&width=200&height=300&filter=comic&roundedcorners=radius-26|bgcolor-fff", urlString);
+        }
+
     }
 }
