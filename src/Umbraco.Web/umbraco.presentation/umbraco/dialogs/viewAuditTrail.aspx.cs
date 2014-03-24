@@ -38,14 +38,9 @@ namespace umbraco.presentation.umbraco.dialogs
 			if (action == "new")
 				action = "create";
 			ArrayList actions = BusinessLogic.Actions.Action.GetAll();
-			foreach (interfaces.IAction a in actions) 
+			foreach (interfaces.IAction a in actions)
 			{
-                if (string.Compare(a.Alias, action, true) == 0) {
-                    if(a.Icon.StartsWith("."))
-						return "<div class=\"menuSpr " + a.Icon.Trim('.') + "\"><span>" + ui.Text(action) + "</span></div>";
-                    else
-                        return "<img alt=\"" + ui.Text(a.Alias) + "\" src=\"../images/" + a.Icon + " width=\"16\" height=\"16\"/> " + ui.Text(action);
-                }
+			    return ui.Text(action);
             }
             return	action;		
 		}
