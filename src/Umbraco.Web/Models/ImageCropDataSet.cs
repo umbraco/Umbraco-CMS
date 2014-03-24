@@ -20,16 +20,22 @@ namespace Umbraco.Web.Models
         public IEnumerable<ImageCropData> Crops { get; set; }
 
 
-        public string GetCropUrl(string alias, bool addCropDimensions = true, bool addRandom = true)
+        public string GetCropUrl(string alias, bool addCropDimensions = true, bool useFocalPoint = false, bool cacheBuster = true)
         {
 
             var crop = Crops.GetCrop(alias);
-            if(crop == null)
+
+            if(crop == null && !string.IsNullOrEmpty(alias))
                 return null;
 
-
             var sb = new StringBuilder();
-            if (crop.Coordinates != null)
+
+            if (useFocalPoint && HasFocalPoint() || (crop != null && crop.Coordinates == null && HasFocalPoint()) || (string.IsNullOrEmpty(alias) && HasFocalPoint()))
+            {
+                sb.Append("?center=" + FocalPoint.Top.ToString(System.Globalization.CultureInfo.InvariantCulture) + "," + FocalPoint.Left.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                sb.Append("&mode=crop");
+            }
+            else if (crop != null && crop.Coordinates != null)
             {
                 sb.Append("?crop=");
                 sb.Append(crop.Coordinates.X1.ToString(System.Globalization.CultureInfo.InvariantCulture)).Append(",");
@@ -39,26 +45,17 @@ namespace Umbraco.Web.Models
                 sb.Append("&cropmode=percentage");
             }
             else
-            {
-                if (HasFocalPoint())
-                {
-                    sb.Append("?center=" + FocalPoint.Top.ToString(System.Globalization.CultureInfo.InvariantCulture) + "," + FocalPoint.Left.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                    sb.Append("&mode=crop");
-                }
-                else
-                {
-                    sb.Append("?anchor=center");
-                    sb.Append("&mode=crop");
-                }
+            {                
+                sb.Append("?anchor=center");
+                sb.Append("&mode=crop");
+            }           
 
-            }
-
-            if (addCropDimensions)
+            if (crop!= null && addCropDimensions)
             {
                 sb.Append("&width=").Append(crop.Width);
                 sb.Append("&height=").Append(crop.Height);
             }
-            if (addRandom)
+            if (cacheBuster)
             {
                 sb.Append("&rnd=").Append(DateTime.Now.Ticks);
             }
