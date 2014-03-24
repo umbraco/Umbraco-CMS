@@ -117,7 +117,7 @@ namespace Umbraco.Web.Editors
             var ext = Path.GetExtension(imagePath);
 
             //we need to check if it is an image by extension
-            if (UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.InvariantContains(ext) == false)
+            if (UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.InvariantContains(ext.TrimStart('.')) == false)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }

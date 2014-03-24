@@ -198,7 +198,7 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
 
                 //in this case, a single image will not fit into the row so we need to crop/center
                 // width the full width and the min display height
-                if (imgs.length > 1 && imageRowHeight.imgCount === 1) {
+                if (imageRowHeight.imgCount === 1) {
                     sizes.push({
                         width: targetWidth,
                         //ensure that the height is rounded
