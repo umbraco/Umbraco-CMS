@@ -59,7 +59,7 @@
                             <!-- sub buttons -->
                             <ul class="dropdown-menu bottom-up" role="menu" aria-labelledby="dLabel"  ng-if="subButtons.length > 0">
                                 <li ng-repeat="btn in subButtons">
-                                    <a href="#" ng-click="performAction(btn)" ng-disabled="true" prevent-default>
+                                    <a href="#" ng-click="performAction(btn)" prevent-default>
                                         <localize key="{{btn.labelKey}}">{{btn.labelKey}}</localize>
                                     </a>
                                 </li>
