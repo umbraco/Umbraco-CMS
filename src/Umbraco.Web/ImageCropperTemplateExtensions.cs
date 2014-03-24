@@ -64,6 +64,12 @@ namespace Umbraco.Web
         /// <param name="height">
         /// The height of the output image.
         /// </param>
+        /// <param name="propertyAlias">
+        /// Property alias of the property containing the Json data.
+        /// </param>
+        /// <param name="cropAlias">
+        /// The crop alias.
+        /// </param>
         /// <param name="quality">
         /// Quality percentage of the output image.
         /// </param>
@@ -73,13 +79,7 @@ namespace Umbraco.Web
         /// <param name="imageCropAnchor">
         /// The image crop anchor.
         /// </param>
-        /// <param name="propertyAlias">
-        /// Property alias of the property containing the Json data.
-        /// </param>
-        /// <param name="cropAlias">
-        /// The crop alias.
-        /// </param>
-        /// <param name="useFocalPoint">
+        /// <param name="preferFocalPoint">
         /// Use focal point, to generate an output image using the focal point instead of the predefined crop
         /// </param>
         /// <param name="useCropDimensions">
@@ -98,12 +98,12 @@ namespace Umbraco.Web
              this IPublishedContent mediaItem,
              int? width = null,
              int? height = null,
+             string propertyAlias = Constants.Conventions.Media.File,
+             string cropAlias = null,
              int? quality = null,
              ImageCropMode? imageCropMode = null,
              ImageCropAnchor? imageCropAnchor = null,
-             string propertyAlias = Constants.Conventions.Media.File,
-             string cropAlias = null,
-             bool useFocalPoint = false,
+             bool preferFocalPoint = false,
              bool useCropDimensions = false,
              bool cacheBuster = true, 
              string furtherOptions = null)
@@ -129,7 +129,7 @@ namespace Umbraco.Web
             }
 
             return mediaItemUrl != null
-                ? GetCropUrl(mediaItemUrl, width, height, quality, imageCropMode, imageCropAnchor, imageCropperValue, cropAlias, useFocalPoint,  useCropDimensions, cacheBuster, furtherOptions)
+                ? GetCropUrl(mediaItemUrl, width, height, imageCropperValue, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions)
                 : string.Empty;
         }
 
@@ -160,8 +160,8 @@ namespace Umbraco.Web
         /// <param name="cropAlias">
         /// The crop alias.
         /// </param>
-        /// <param name="useFocalPoint">
-        /// Use focal point, to generate an output image using the focal point instead of the predefined crop
+        /// <param name="preferFocalPoint">
+        /// Use focal point to generate an output image using the focal point instead of the predefined crop if there is one
         /// </param>
         /// <param name="useCropDimensions">
         /// Use crop dimensions to have the output image sized according to the predefined crop sizes, this will override the width and height parameters>.
@@ -179,12 +179,12 @@ namespace Umbraco.Web
             this string imageUrl,
             int? width = null,
             int? height = null,
+            string imageCropperValue = null,
+            string cropAlias = null,
             int? quality = null,
             ImageCropMode? imageCropMode = null,
             ImageCropAnchor? imageCropAnchor = null,
-            string imageCropperValue = null,
-            string cropAlias = null,
-            bool useFocalPoint = false,
+            bool preferFocalPoint = false,
             bool useCropDimensions = false,
             bool cacheBuster = true, 
             string furtherOptions = null)
@@ -198,7 +198,7 @@ namespace Umbraco.Web
                     var cropDataSet = imageCropperValue.SerializeToCropDataSet();
                     if (cropDataSet != null)
                     {
-                        var cropUrl = cropDataSet.GetCropUrl(cropAlias, false, useFocalPoint, cacheBuster);
+                        var cropUrl = cropDataSet.GetCropUrl(cropAlias, false, preferFocalPoint, cacheBuster);
                         
                         // if crop alias has been specified but not found in the Json we should return null
                         if (string.IsNullOrEmpty(cropAlias) == false && cropUrl == null)
@@ -207,7 +207,7 @@ namespace Umbraco.Web
                         }
 
                         imageResizerUrl.Append(cropDataSet.Src);
-                        imageResizerUrl.Append(cropDataSet.GetCropUrl(cropAlias, useCropDimensions, useFocalPoint, cacheBuster));
+                        imageResizerUrl.Append(cropDataSet.GetCropUrl(cropAlias, useCropDimensions, preferFocalPoint, cacheBuster));
                     }
                 }
                 else

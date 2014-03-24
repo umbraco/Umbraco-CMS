@@ -30,7 +30,7 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void GetCropUrl_FocalPointTest()
         {
-            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, cropAlias: "thumb", useFocalPoint: true, useCropDimensions: true, cacheBuster: false);
+            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, cropAlias: "thumb", preferFocalPoint: true, useCropDimensions: true, cacheBuster: false);
             Assert.AreEqual(mediaPath + "?center=0.80827067669172936,0.96&mode=crop&width=100&height=100", urlString);
         }
 

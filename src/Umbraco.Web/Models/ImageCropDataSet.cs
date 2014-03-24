@@ -20,7 +20,7 @@ namespace Umbraco.Web.Models
         public IEnumerable<ImageCropData> Crops { get; set; }
 
 
-        public string GetCropUrl(string alias, bool addCropDimensions = true, bool useFocalPoint = false, bool cacheBuster = true)
+        public string GetCropUrl(string alias, bool useCropDimensions = true, bool useFocalPoint = false, bool cacheBuster = true)
         {
 
             var crop = Crops.GetCrop(alias);
@@ -50,17 +50,19 @@ namespace Umbraco.Web.Models
             {                
                 sb.Append("?anchor=center");
                 sb.Append("&mode=crop");
-            }           
+            }
 
-            if (crop != null && addCropDimensions)
+            if (crop != null && useCropDimensions)
             {
                 sb.Append("&width=").Append(crop.Width);
                 sb.Append("&height=").Append(crop.Height);
             }
+
             if (cacheBuster)
             {
                 sb.Append("&rnd=").Append(DateTime.Now.Ticks);
             }
+
             return sb.ToString();
 
         }
