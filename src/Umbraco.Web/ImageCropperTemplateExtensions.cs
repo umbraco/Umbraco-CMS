@@ -18,31 +18,10 @@ namespace Umbraco.Web
             return mediaItem.GetCropUrl(Constants.Conventions.Media.File, cropAlias);
         }
 
-        //this only takes the crop json into account
+        // this only takes the crop json into account
         public static string GetCropUrl(this IPublishedContent mediaItem, string propertyAlias, string cropAlias)
         {
-            mediaItem.HasProperty(propertyAlias);
-            var property = mediaItem.GetPropertyValue<string>(propertyAlias);
-
-            if (string.IsNullOrEmpty(property))
-                return string.Empty;
-
-            if (property.DetectIsJson())
-            {
-                var cropDataSet = property.SerializeToCropDataSet();
-
-                var cropUrl = cropDataSet.GetCropUrl(cropAlias);
-
-                if (cropUrl != null)
-                {
-                    return cropDataSet.Src + cropUrl;
-                }
-                return null;
-            }
-            else
-            {
-                return property;
-            }
+            return mediaItem.GetCropUrl(propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true);
         }
 
         public static string GetCropUrl(
@@ -55,6 +34,7 @@ namespace Umbraco.Web
              string propertyAlias = Constants.Conventions.Media.File,
              string cropAlias = null,
              bool useFocalPoint = false,
+             bool useCropDimensions = false,
              bool cacheBuster = true, 
              string furtherOptions = null)
         {
@@ -66,7 +46,7 @@ namespace Umbraco.Web
             {
                 imageCropperValue = mediaItem.GetPropertyValue<string>(propertyAlias);
 
-                //get the raw value (this will be json)
+                // get the raw value (this will be json)
                 var urlValue = mediaItem.GetPropertyValue<string>(propertyAlias);
 
                 mediaItemUrl = urlValue.DetectIsJson()
@@ -79,7 +59,7 @@ namespace Umbraco.Web
             }
 
             return mediaItemUrl != null
-                ? GetCropUrl(mediaItemUrl, width, height, quality, imageCropMode, imageCropAnchor, imageCropperValue, cropAlias, useFocalPoint, cacheBuster, furtherOptions)
+                ? GetCropUrl(mediaItemUrl, width, height, quality, imageCropMode, imageCropAnchor, imageCropperValue, cropAlias, useFocalPoint,  useCropDimensions, cacheBuster, furtherOptions)
                 : string.Empty;
         }
 
@@ -93,6 +73,7 @@ namespace Umbraco.Web
             string imageCropperValue = null,
             string cropAlias = null,
             bool useFocalPoint = false,
+            bool useCropDimensions = false,
             bool cacheBuster = true, 
             string furtherOptions = null)
         {
@@ -113,7 +94,7 @@ namespace Umbraco.Web
                             return null;
                         }
                         imageResizerUrl.Append(cropDataSet.Src);
-                        imageResizerUrl.Append(cropDataSet.GetCropUrl(cropAlias, false, useFocalPoint, cacheBuster));
+                        imageResizerUrl.Append(cropDataSet.GetCropUrl(cropAlias, useCropDimensions, useFocalPoint, cacheBuster));
                     }
                 }
                 else
@@ -136,12 +117,12 @@ namespace Umbraco.Web
                     imageResizerUrl.Append("&quality=" + quality);
                 }
 
-                if (width != null)
+                if (width != null && useCropDimensions == false)
                 {
                     imageResizerUrl.Append("&width=" + width);
                 }
 
-                if (height != null)
+                if (height != null && useCropDimensions == false)
                 {
                     imageResizerUrl.Append("&height=" + height);
                 }
