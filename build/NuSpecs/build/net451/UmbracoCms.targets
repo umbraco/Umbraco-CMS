@@ -28,6 +28,10 @@
           DestinationFiles="umbraco_client\%(RecursiveDir)%(Filename)%(Extension)"
           Condition="!Exists('umbraco_client\%(RecursiveDir)%(Filename)%(Extension)')" />
   </Target>
+	<Copy SourceFiles="%(UmbracoClientFiles.FullPath)"
+          DestinationFiles="umbraco_client\%(RecursiveDir)%(Filename)%(Extension)"
+          Condition="!Exists('umbraco_client\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
   <Target Name="AddUmbracoFilesToOutput">
     <ItemGroup>
       <AppBrowsersFiles Include=".\App_Browsers\**\*" />
