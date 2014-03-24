@@ -55,7 +55,7 @@ namespace umbraco.providers
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config) 
         {
             if (config == null) throw new ArgumentNullException("config");
-            if (string.IsNullOrEmpty(name)) name = Constants.Conventions.User.UmbracoUsersProviderName;
+            if (string.IsNullOrEmpty(name)) name = UmbracoSettings.DefaultBackofficeProvider;
 
             base.Initialize(name, config);
         }

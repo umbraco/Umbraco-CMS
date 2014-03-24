@@ -166,8 +166,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
         protected override void PersistNewItem(IMemberType entity)
         {
-            ((MemberType)entity).AddingEntity();
+            ValidateAlias(entity);
 
+            ((MemberType)entity).AddingEntity();
+            
             //By Convention we add 9 stnd PropertyTypes to an Umbraco MemberType
             entity.AddPropertyGroup(Constants.Conventions.Member.StandardPropertiesGroupName);
             var standardPropertyTypes = Constants.Conventions.Member.GetStandardPropertyTypeStubs();

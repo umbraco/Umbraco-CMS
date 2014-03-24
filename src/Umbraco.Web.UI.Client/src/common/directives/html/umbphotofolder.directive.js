@@ -14,6 +14,8 @@ angular.module("umbraco.directives.html")
             templateUrl: 'views/directives/html/umb-photo-folder.html',
             link: function(scope, element, attrs, ngModel) {
 
+                var lastWatch = null;
+
                 ngModel.$render = function() {
                     if (ngModel.$modelValue) {
 
@@ -37,7 +39,15 @@ angular.module("umbraco.directives.html")
                             scope.rows = umbPhotoFolderHelper.buildGrid(photos, fixedRowWidth, maxHeight, startingIndex, minHeight, idealImgPerRow, margin);
 
                             if (attrs.filterBy) {
-                                scope.$watch(attrs.filterBy, function(newVal, oldVal) {
+
+                                //we track the watches that we create, we don't want to create multiple, so clear it
+                                // if it already exists before creating another.
+                                if (lastWatch) {
+                                    lastWatch();
+                                }
+
+                                //TODO: Need to debounce this so it doesn't filter too often!
+                                lastWatch = scope.$watch(attrs.filterBy, function (newVal, oldVal) {
                                     if (newVal && newVal !== oldVal) {
                                         var p = $filter('filter')(photos, newVal, false);
                                         scope.baseline = 0;

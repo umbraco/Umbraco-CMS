@@ -6,7 +6,7 @@ angular.module('umbraco')
 	function($scope, dialogService, entityResource, editorState, $log, iconHelper, $routeParams){
 	    $scope.renderModel = [];
 	    $scope.ids = $scope.model.value ? $scope.model.value.split(',') : [];
-
+        
 	    //configuration
 	    $scope.cfg = {
 	        multiPicker: "0",
@@ -94,6 +94,21 @@ angular.module('umbraco')
 	            return i.id;
 	        });
 	        $scope.model.value = trim($scope.ids.join(), ",");
+
+            //Validate!
+	        if ($scope.model.config && $scope.model.config.minNumber && parseInt($scope.model.config.minNumber) > $scope.renderModel.length) {
+	            $scope.contentPickerForm.minCount.$setValidity("minCount", false);
+	        }
+	        else {
+	            $scope.contentPickerForm.minCount.$setValidity("minCount", true);
+	        }
+
+	        if ($scope.model.config && $scope.model.config.maxNumber && parseInt($scope.model.config.maxNumber) < $scope.renderModel.length) {
+	            $scope.contentPickerForm.maxCount.$setValidity("maxCount", false);
+	        }
+	        else {
+	            $scope.contentPickerForm.maxCount.$setValidity("maxCount", true);
+	        }
 	    });
 
 	    $scope.$on("formSubmitting", function (ev, args) {

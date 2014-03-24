@@ -17,14 +17,10 @@ angular.module("umbraco.directives")
 					height: '@',
 					crop: "=",
 					center: "=",
+					maxSize: '@'
 				},
 
 				link: function(scope, element, attrs) {
-					//if image is over this, we re-calculate the editors global ratio
-					//this will not have an effect on the result, since that is returned in percentage
-					scope.maxHeight = 500;
-					scope.maxWidth = 600;
-					
 					scope.width = 400;
 					scope.height = 320;
 
@@ -32,7 +28,7 @@ angular.module("umbraco.directives")
 						image: {},
 						cropper:{},
 						viewport:{},
-						margin: 40,
+						margin: 20,
 						scale: {
 							min: 0.3,
 							max: 3,
@@ -44,8 +40,8 @@ angular.module("umbraco.directives")
 					//live rendering of viewport and image styles
 					scope.style = function () {
 						return { 
-							'height': (parseInt(scope.height, 10) + 2 * scope.dimensions.margin) + 'px',
-							'width': (parseInt(scope.width, 10) + 2 * scope.dimensions.margin) + 'px' 
+							'height': (parseInt(scope.dimensions.viewport.height, 10)) + 'px',
+							'width': (parseInt(scope.dimensions.viewport.width, 10)) + 'px' 
 						};
 					};
 				
@@ -83,11 +79,28 @@ angular.module("umbraco.directives")
 
 						scope.dimensions.image = image;
 
-						scope.dimensions.viewport.width = $viewport.width();
-						scope.dimensions.viewport.height = $viewport.height();
+						//unscaled editor size
+						//var viewPortW =  $viewport.width();
+						//var viewPortH =  $viewport.height();
+						var _viewPortW =  parseInt(scope.width, 10);
+						var _viewPortH =  parseInt(scope.height, 10);
 
-						scope.dimensions.cropper.width = scope.dimensions.viewport.width - 2 * scope.dimensions.margin;
-						scope.dimensions.cropper.height = scope.dimensions.viewport.height - 2 * scope.dimensions.margin;
+						//if we set a constraint we will scale it down if needed
+						if(scope.maxSize){	
+							var ratioCalculation = cropperHelper.scaleToMaxSize(
+									_viewPortW, 
+									_viewPortH,
+									scope.maxSize);
+
+							//so if we have a max size, override the thumb sizes
+							_viewPortW = ratioCalculation.width;
+							_viewPortH = ratioCalculation.height;	
+						}
+
+						scope.dimensions.viewport.width = _viewPortW + 2 * scope.dimensions.margin;
+						scope.dimensions.viewport.height = _viewPortH + 2 * scope.dimensions.margin;
+						scope.dimensions.cropper.width = _viewPortW; // scope.dimensions.viewport.width - 2 * scope.dimensions.margin;
+						scope.dimensions.cropper.height = _viewPortH; //  scope.dimensions.viewport.height - 2 * scope.dimensions.margin;
 					};
 
 
@@ -238,7 +251,16 @@ angular.module("umbraco.directives")
 						}
 					});
 
-
+					//ie hack
+					if(window.navigator.userAgent.indexOf("MSIE ")){
+						var ranger = element.find("input");
+						ranger.bind("change",function(){
+							scope.$apply(function(){
+								scope.dimensions.scale.current = ranger.val();
+							});
+						});	
+					}
+					
 					//// INIT /////
 					$image.load(function(){
 						$timeout(function(){

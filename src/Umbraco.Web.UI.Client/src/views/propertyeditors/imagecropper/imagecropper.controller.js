@@ -1,11 +1,11 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-angular.module('umbraco')   
+angular.module('umbraco')
     .controller("Umbraco.PropertyEditors.ImageCropperController",
     function ($rootScope, $routeParams, $scope, $log, mediaHelper, cropperHelper, $timeout, editorState, umbRequestHelper, fileManager) {
 
-        var config = $scope.model.config;
-        
+        var config = angular.copy($scope.model.config);
+
         //move previously saved value to the editor
         if ($scope.model.value) {
             //backwards compat with the old file upload (incase some-one swaps them..)
@@ -52,8 +52,8 @@ angular.module('umbraco')
 
             //clear the ui
             $scope.imageSrc = undefined;
-            if ($scope.model.value.src) {
-                delete $scope.model.value.src;
+            if ($scope.model.value) {
+                delete $scope.model.value;
             }
         };
 
@@ -67,15 +67,6 @@ angular.module('umbraco')
             }
         };
 
-
-        $scope.$on("imageFocalPointStart", function () {
-            $scope.tempShowPreviews = true;
-        });
-
-        $scope.$on("imageFocalPointStop", function () {
-            $scope.tempShowPreviews = false;
-        });
-
         //on image selected, update the cropper
         $scope.$on("filesSelected", function (ev, args) {
             $scope.model.value = config;
@@ -86,21 +77,53 @@ angular.module('umbraco')
 
                 var reader = new FileReader();
                 reader.onload = function (e) {
+
                     $scope.$apply(function () {
                         $scope.imageSrc = e.target.result;
                     });
+
                 };
 
                 reader.readAsDataURL(args.files[0]);
             }
         });
     })
-    .run(function(mediaHelper){
-        mediaHelper.registerFileResolver("Umbraco.ImageCropper", function (property) {
-                    if (property.value.src) {
+    .run(function (mediaHelper, umbRequestHelper) {
+        if (mediaHelper && mediaHelper.registerFileResolver) {
+            mediaHelper.registerFileResolver("Umbraco.ImageCropper", function (property, entity, thumbnail) {
+                if (property.value.src) {
+
+                    if (thumbnail === true) {
+                        return property.value.src + "?width=600&mode=max";
+                    }
+                    else {
                         return property.value.src;
-                    } else if (angular.isString(property.value)) {
+                    }
+
+                    //this is a fallback in case the cropper has been asssigned a upload field
+                }
+                else if (angular.isString(property.value)) {
+                    if (thumbnail) {
+
+                        if (mediaHelper.detectIfImageByExtension(property.value)) {
+                            var thumbnailUrl = umbRequestHelper.getApiUrl(
+                                "imagesApiBaseUrl",
+                                "GetBigThumbnail",
+                                [{ originalImagePath: property.value }]);
+
+                            return thumbnailUrl;
+                        }
+                        else {
+                            return null;
+                        }
+
+                    }
+                    else {
                         return property.value;
                     }
-                });
+                }
+
+                return null;
+            });
+        }
     });

@@ -7,6 +7,7 @@ using umbraco.cms.businesslogic.web;
 
 namespace Umbraco.Tests.Routing
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
     public class ContentFinderByAliasWithDomainsTests : ContentFinderByAliasTests
     {
@@ -18,11 +19,6 @@ namespace Umbraco.Tests.Routing
             TestHelper.DropForeignKeys("umbracoDomains");
 
             InitializeLanguagesAndDomains();
-        }
-
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NewSchemaPerFixture; }
         }
 
         void InitializeLanguagesAndDomains()

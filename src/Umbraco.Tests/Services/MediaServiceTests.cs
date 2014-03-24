@@ -4,10 +4,12 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
     public class MediaServiceTests : BaseServiceTest
     {

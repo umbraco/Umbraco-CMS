@@ -14,6 +14,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class MemberRepositoryTest : BaseDatabaseFactoryTest
     {
@@ -200,7 +201,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(sut.Properties.Any(x => x.HasIdentity == false || x.Id == 0), Is.False);
                 Assert.That(sut.Name, Is.EqualTo("Johnny Hefty"));
                 Assert.That(sut.Email, Is.EqualTo("johnny@example.com"));
-                Assert.That(sut.Password, Is.EqualTo("123"));
+                Assert.That(sut.RawPasswordValue, Is.EqualTo("123"));
                 Assert.That(sut.Username, Is.EqualTo("hefty"));      
             }
         }
@@ -258,12 +259,12 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 sut = repository.Get(member.Id);
                 //when the password is null it will not overwrite what is already there.
-                sut.Password = null;
+                sut.RawPasswordValue = null;
                 repository.AddOrUpdate(sut);
                 unitOfWork.Commit();
                 sut = repository.Get(member.Id);
 
-                Assert.That(sut.Password, Is.EqualTo("123"));
+                Assert.That(sut.RawPasswordValue, Is.EqualTo("123"));
             }
         }
 

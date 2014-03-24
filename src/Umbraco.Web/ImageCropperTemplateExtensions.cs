@@ -5,13 +5,19 @@ using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Web.Models;
 using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Web
 {
     public static class ImageCropperTemplateExtensions
     {
-        
+
+        public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias)
+        {
+            return mediaItem.GetCropUrl(Constants.Conventions.Media.File, cropAlias);
+        }
+
         //this only takes the crop json into account
         public static string GetCropUrl(this IPublishedContent mediaItem, string propertyAlias, string cropAlias)
         {
@@ -32,68 +38,98 @@ namespace Umbraco.Web
             }
         }
 
-
-       public static string GetCropUrl(
-            this IPublishedContent mediaItem,
-            int? width = null,
-            int? height = null,
-            int? quality = null,
-            Mode? mode = null,
-            Anchor? anchor = null,
-            string imageCropperAlias = null,
-            string imageCropperCropId = null,
-            string furtherOptions = null,
-            bool slimmage = false)
+        public static string GetCropUrl(
+             this IPublishedContent mediaItem,
+             int? width = null,
+             int? height = null,
+             int? quality = null,
+             ImageCropMode? imageCropMode = null,
+             ImageCropAnchor? imageCropAnchor = null,
+             string propertyAlias = null,
+             string cropAlias = null,
+             string furtherOptions = null)
         {
             string imageCropperValue = null;
 
-            if (mediaItem.HasPropertyAndValueAndCrop(imageCropperAlias, imageCropperCropId))
+            string mediaItemUrl;
+
+            if (mediaItem.HasPropertyAndValueAndCrop(propertyAlias, cropAlias))
             {
-                imageCropperValue = mediaItem.GetPropertyValueHack(imageCropperAlias);
+                imageCropperValue = mediaItem.GetPropertyValue<string>(propertyAlias);
+
+                //get the raw value (this will be json)
+                var urlValue = mediaItem.GetPropertyValue<string>(propertyAlias);
+
+                mediaItemUrl = urlValue.DetectIsJson()
+                    ? urlValue.SerializeToCropDataSet().Src
+                    : urlValue;
+            }
+            else
+            {
+                mediaItemUrl = mediaItem.Url;
             }
 
-            return mediaItem != null ? GetCropUrl(mediaItem.Url, width, height, quality, mode, anchor, imageCropperValue, imageCropperCropId, furtherOptions, slimmage) : string.Empty;
+            return mediaItemUrl != null
+                ? GetCropUrl(mediaItemUrl, width, height, quality, imageCropMode, imageCropAnchor, imageCropperValue, cropAlias, furtherOptions)
+                : string.Empty;
         }
-
 
         public static string GetCropUrl(
             this string imageUrl,
             int? width = null,
             int? height = null,
             int? quality = null,
-            Mode? mode = null,
-            Anchor? anchor = null,
+            ImageCropMode? imageCropMode = null,
+            ImageCropAnchor? imageCropAnchor = null,
             string imageCropperValue = null,
             string cropAlias = null,
-            string furtherOptions = null,
-            bool slimmage = false)
+            string furtherOptions = null)
         {
             if (!string.IsNullOrEmpty(imageUrl))
             {
                 var imageResizerUrl = new StringBuilder();
-                imageResizerUrl.Append(imageUrl);
 
                 if (!string.IsNullOrEmpty(imageCropperValue) && imageCropperValue.DetectIsJson())
                 {
-                    var allTheCrops = imageCropperValue.SerializeToCropDataSet();
-                    if (allTheCrops != null && allTheCrops.Crops.Any())
+                    var cropDataSet = imageCropperValue.SerializeToCropDataSet();
+                    imageResizerUrl.Append(cropDataSet.Src);
+                    var crop = cropDataSet.Crops.FirstOrDefault(x => cropAlias != null && x.Alias.ToLowerInvariant() == cropAlias.ToLowerInvariant());
+                    if (crop != null && crop.Coordinates != null)
                     {
+                        imageResizerUrl.Append("?crop=");
+			            imageResizerUrl.Append(crop.Coordinates.X1.ToString(System.Globalization.CultureInfo.InvariantCulture)).Append(",");
+            			imageResizerUrl.Append(crop.Coordinates.Y1.ToString(System.Globalization.CultureInfo.InvariantCulture)).Append(",");
+			            imageResizerUrl.Append(crop.Coordinates.X2.ToString(System.Globalization.CultureInfo.InvariantCulture)).Append(",");
+            			imageResizerUrl.Append(crop.Coordinates.Y2.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                        imageResizerUrl.Append("&cropmode=percentage");
+                    }
+                    else
+                    {
+                        if (cropDataSet.HasFocalPoint())
+                        {
+                            imageResizerUrl.Append("?center=" + cropDataSet.FocalPoint.Top.ToString(System.Globalization.CultureInfo.InvariantCulture) + "," + cropDataSet.FocalPoint.Left.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                            imageResizerUrl.Append("&mode=crop");
+                        }
+                        else
+                        {
+                            imageResizerUrl.Append("?anchor=center");
+                            imageResizerUrl.Append("&mode=crop");
+                        }
 
-                        if(allTheCrops.HasCrop(cropAlias))
-                            imageResizerUrl.Append(allTheCrops.GetCropUrl(cropAlias));
                     }
                 }
                 else
                 {
-                    if (mode == null)
+                    imageResizerUrl.Append(imageUrl);
+                    if (imageCropMode == null)
                     {
-                        mode = Mode.Pad;
+                        imageCropMode = ImageCropMode.Pad;
                     }
-                    imageResizerUrl.Append("?mode=" + mode.ToString().ToLower());
+                    imageResizerUrl.Append("?mode=" + imageCropMode.ToString().ToLower());
 
-                    if (anchor != null)
+                    if (imageCropAnchor != null)
                     {
-                        imageResizerUrl.Append("&anchor=" + anchor.ToString().ToLower());
+                        imageResizerUrl.Append("&anchor=" + imageCropAnchor.ToString().ToLower());
                     }
                 }
 
@@ -112,19 +148,6 @@ namespace Umbraco.Web
                     imageResizerUrl.Append("&height=" + height);
                 }
 
-                if (slimmage)
-                {
-                    if (width == null)
-                    {
-                        imageResizerUrl.Append("&width=300");
-                    }
-                    if (quality == null)
-                    {
-                        imageResizerUrl.Append("&quality=90");
-                    }
-                    imageResizerUrl.Append("&slimmage=true");
-                }
-
                 if (furtherOptions != null)
                 {
                     imageResizerUrl.Append(furtherOptions);
@@ -136,23 +159,5 @@ namespace Umbraco.Web
             return string.Empty;
         }
 
-
-
-        public enum Mode
-        {
-            Crop,
-            Max,
-            Strech,
-            Pad
-        }
-
-        public enum Anchor
-        {
-            Center,
-            Top,
-            Right,
-            Bottom,
-            Left
-        }
     }
 }

@@ -149,7 +149,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         internal bool ValidateBackOfficeCredentials(string username, string password)
         {
-            var membershipProvider = Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider];
+            var membershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
             return membershipProvider != null && membershipProvider.ValidateUser(username, password);
         }
         
@@ -161,7 +161,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         internal MembershipUser GetBackOfficeMembershipUser(string username, bool setOnline)
         {
-            var membershipProvider = Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider];
+            var membershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
             return membershipProvider != null ? membershipProvider.GetUser(username, setOnline) : null;
         }
 
@@ -178,12 +178,13 @@ namespace Umbraco.Web.Security
         {
             //get the membership user (set user to be 'online' in the provider too)
             var membershipUser = GetBackOfficeMembershipUser(username, true);
+            var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
 
             if (membershipUser == null)
             {
                 throw new InvalidOperationException(
                     "The username & password validated but the membership provider '" +
-                    Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider].Name +
+                    provider.Name +
                     "' did not return a MembershipUser with the username supplied");
             }
 
@@ -191,7 +192,7 @@ namespace Umbraco.Web.Security
             var user = _applicationContext.Services.UserService.GetByUsername(membershipUser.UserName);
 
             //we're using the built-in membership provider so the user will already be available
-            if (Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider] is UsersMembershipProvider)
+            if (provider.IsUmbracoUsersProvider())
             {
                 if (user == null)
                 {
@@ -220,7 +221,7 @@ namespace Umbraco.Web.Security
                 Email = email,
                 Language = GlobalSettings.DefaultUILanguage,
                 Name = membershipUser.UserName,
-                Password = Guid.NewGuid().ToString("N"), //Need to set this to something - will not be used though
+                RawPasswordValue = Guid.NewGuid().ToString("N"), //Need to set this to something - will not be used though
                 DefaultPermissions = writer.Permissions,
                 Username = membershipUser.UserName,
                 StartContentId = -1,

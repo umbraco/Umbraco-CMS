@@ -47,7 +47,30 @@ namespace Umbraco.Web.Models
 						var prop = GetProperty(Constants.Conventions.Media.File);
 						if (prop == null)
 							throw new NotSupportedException("Cannot resolve a Url for a media item when there is no 'umbracoFile' property defined.");
-						_url = prop.Value.ToString();
+
+				        if (prop.Value == null)
+				        {
+				            _url = string.Empty;
+				            return _url;
+				        }
+
+				        var propType = ContentType.GetPropertyType(Constants.Conventions.Media.File);
+                        
+                        //This is a hack - since we now have 2 properties that support a URL: upload and cropper, we need to detect this since we always
+                        // want to return the normal URL and the cropper stores data as json
+                        switch (propType.PropertyEditorAlias)
+				        {
+                            case Constants.PropertyEditors.UploadFieldAlias:
+                                _url = prop.Value.ToString();
+				                break;
+                            case Constants.PropertyEditors.ImageCropperAlias:
+                                //get the url from the json format
+                                var val = prop.Value.ToString();
+				                var crops = val.SerializeToCropDataSet();
+                                _url = crops != null ? crops.Src : string.Empty;                                
+				                break;
+				        }
+                        
 						break;
 					default:
 						throw new NotSupportedException();

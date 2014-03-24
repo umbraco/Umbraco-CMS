@@ -28,7 +28,9 @@ namespace Umbraco.Web.UI.Umbraco.Create
         /// <param name="e"></param>
         protected void LoginExistsCheck(object sender, ServerValidateEventArgs e)
         {
-            var user = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUser(Login.Text.Replace(" ", "").ToLower(), false);
+            var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
+
+            var user = provider.GetUser(Login.Text.Replace(" ", "").ToLower(), false);
 
             if (Login.Text != "" && user != null)
                 e.IsValid = false;
@@ -44,9 +46,11 @@ namespace Umbraco.Web.UI.Umbraco.Create
         /// <param name="e"></param>
         protected void EmailExistsCheck(object sender, ServerValidateEventArgs e)
         {
-            var found = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].GetUserNameByEmail(Email.Text.ToLower());
+            var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
 
-            if (Email.Text != "" && found.IsNullOrWhiteSpace() == false && Membership.Providers[UmbracoSettings.DefaultBackofficeProvider].RequiresUniqueEmail)
+            var found = provider.GetUserNameByEmail(Email.Text.ToLower());
+
+            if (Email.Text != "" && found.IsNullOrWhiteSpace() == false && provider.RequiresUniqueEmail)
                 e.IsValid = false;
             else
                 e.IsValid = true;

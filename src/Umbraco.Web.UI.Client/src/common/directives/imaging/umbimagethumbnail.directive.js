@@ -19,12 +19,14 @@ angular.module("umbraco.directives")
 					width: '@',
 					height: '@',
 					center: "=",
-					crop: "="
+					crop: "=",
+					maxSize: '@'
 				},
 				
 				link: function(scope, element, attrs) {
 					//// INIT /////
 					var $image = element.find("img");
+
 					$image.load(function(){
 						$timeout(function(){
 							$image.width("auto");
@@ -33,6 +35,21 @@ angular.module("umbraco.directives")
 							scope.image = {};
 							scope.image.width = $image[0].width;
 							scope.image.height = $image[0].height;
+
+							//we force a lower thumbnail size to fit the max size
+							//we do not compare to the image dimensions, but the thumbs
+							if(scope.maxSize){
+								var ratioCalculation = cropperHelper.calculateAspectRatioFit(
+										scope.width, 
+										scope.height,
+										scope.maxSize, 
+										scope.maxSize, 
+										true);
+
+								//so if we have a max size, override the thumb sizes
+								scope.width = ratioCalculation.width;
+								scope.height = ratioCalculation.height;
+							}
 
 							setPreviewStyle();	
 						});

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core
 {
@@ -14,7 +15,7 @@ namespace Umbraco.Core
         public static IEnumerable<IEnumerable<T>> InGroupsOf<T>(this IEnumerable<T> source, int groupSize)
         {
             if (source == null)
-               throw new NullReferenceException("source");
+                throw new NullReferenceException("source");
 
             // enumerate the source only once!
             return new InGroupsEnumerator<T>(source, groupSize).Groups();
@@ -125,23 +126,13 @@ namespace Umbraco.Core
         }
 
         /// <summary>The flatten list.</summary>
-        /// <param name="items">The items.</param>
-        /// <param name="selectChild">The select child.</param>
-        /// <typeparam name="TItem">Item type</typeparam>
+        /// <param name="e">The items.</param>
+        /// <param name="f">The select child.</param>
+        /// <typeparam name="T">Item type</typeparam>
         /// <returns>list of TItem</returns>
-        [SuppressMessage("Microsoft.Design", "CA1006:DoNotNestGenericTypesInMemberSignatures", Justification = "By design")]
-        public static IEnumerable<TItem> FlattenList<TItem>(this IEnumerable<TItem> items, Func<TItem, IEnumerable<TItem>> selectChild)
+        public static IEnumerable<T> FlattenList<T>(this IEnumerable<T> e, Func<T, IEnumerable<T>> f)
         {
-            IEnumerable<TItem> children = items != null && items.Any()
-                                              ? items.SelectMany(selectChild).FlattenList(selectChild)
-                                              : Enumerable.Empty<TItem>();
-
-            if (items != null)
-            {
-                return items.Concat(children);
-            }
-
-            return null;
+            return e.SelectMany(c => f(c).FlattenList(f)).Concat(e);
         }
 
         /// <summary>

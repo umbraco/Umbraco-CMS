@@ -10,7 +10,8 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence
 {
-    [TestFixture]
+
+    [TestFixture, RequiresSTA]
     public class DatabaseContextTests
     {
 	    private DatabaseContext _dbContext;
@@ -74,6 +75,9 @@ namespace Umbraco.Tests.Persistence
             //Create the Sql CE database
             var engine = new SqlCeEngine(settings.ConnectionString.Replace("UmbracoPetaPocoTests", "DatabaseContextTests"));
             engine.CreateDatabase();
+
+            //re-map the dbcontext to the new conn string
+            _dbContext = new DatabaseContext(new DefaultDatabaseFactory(engine.LocalConnectionString, "System.Data.SqlServerCe.4.0"));
 
             SqlSyntaxContext.SqlSyntaxProvider = SqlCeSyntax.Provider;
 

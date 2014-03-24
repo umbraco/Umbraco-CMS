@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.IO;
+using NUnit.Framework;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using System;
@@ -13,9 +14,42 @@ namespace Umbraco.Tests.TreesAndSections
     ///This is a test class for ApplicationTreeTest and is intended
     ///to contain all ApplicationTreeTest Unit Tests
     ///</summary>
-    [TestFixture()]
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
+    [TestFixture, RequiresSTA]
     public class ApplicationTreeTest : BaseDatabaseFactoryTest
     {
+        [SetUp]
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            var treesConfig = TestHelper.MapPathForTest("~/TEMP/TreesAndSections/trees.config");
+            var appConfig = TestHelper.MapPathForTest("~/TEMP/TreesAndSections/applications.config");
+            Directory.CreateDirectory(TestHelper.MapPathForTest("~/TEMP/TreesAndSections"));
+            using (var writer = File.CreateText(treesConfig))
+            {
+                writer.Write(ResourceFiles.trees);
+            }
+            using (var writer = File.CreateText(appConfig))
+            {
+                writer.Write(ResourceFiles.applications);
+            }
+
+            ApplicationTreeService.TreeConfigFilePath = treesConfig;
+            SectionService.AppConfigFilePath = appConfig;
+        }
+
+        [TearDown]
+        public override void TearDown()
+        {
+            base.TearDown();
+            if (Directory.Exists(TestHelper.MapPathForTest("~/TEMP/TreesAndSections")))
+            {
+                Directory.Delete(TestHelper.MapPathForTest("~/TEMP/TreesAndSections"), true);    
+            }
+            ApplicationTreeService.TreeConfigFilePath = null;
+            SectionService.AppConfigFilePath = null;
+        }
 
         /// <summary>
         /// Creates a new app tree linked to an application, then delete the application and make sure the tree is gone as well

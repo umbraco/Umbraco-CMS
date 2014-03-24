@@ -51,6 +51,10 @@ namespace Umbraco.Tests.TestHelpers
 
         private ApplicationContext _appContext;
 
+        private string _dbPath;
+        //used to store (globally) the pre-built db with schema and initial data
+        private static Byte[] _dbBytes;
+
         [SetUp]
         public override void Initialize()
         {
@@ -99,9 +103,13 @@ namespace Umbraco.Tests.TestHelpers
         /// <summary>
         /// The database behavior to use for the test/fixture
         /// </summary>
-        protected virtual DatabaseBehavior DatabaseTestBehavior
+        protected DatabaseBehavior DatabaseTestBehavior
         {
-            get { return DatabaseBehavior.NewSchemaPerTest; }
+            get
+            {
+                var att = this.GetType().GetCustomAttribute<DatabaseTestBehaviorAttribute>(false);
+                return att != null ? att.Behavior : DatabaseBehavior.NoDatabasePerFixture;
+            }
         }
 
         protected virtual string GetDbProviderName()
@@ -133,7 +141,7 @@ namespace Umbraco.Tests.TestHelpers
                 Core.Configuration.GlobalSettings.UmbracoConnectionName, 
                 GetDbConnectionString());
 
-            string dbFilePath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
+            _dbPath = string.Concat(path, "\\UmbracoPetaPocoTests.sdf");
 
             //create a new database file if
             // - is the first test in the session
@@ -142,33 +150,38 @@ namespace Umbraco.Tests.TestHelpers
             // - _isFirstTestInFixture + DbInitBehavior.NewDbFileAndSchemaPerFixture
 
             //if this is the first test in the session, always ensure a new db file is created
-            if (_isFirstRunInTestSession || !File.Exists(dbFilePath) 
+            if (_isFirstRunInTestSession || File.Exists(_dbPath) == false 
                 || DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest
                 || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture))
             {
-                
-                RemoveDatabaseFile(ex =>
+
+                using (DisposableTimer.TraceDuration<BaseDatabaseFactoryTest>("Remove database file"))
+                {
+                    RemoveDatabaseFile(ex =>
                     {
                         //if this doesn't work we have to make sure everything is reset! otherwise
                         // well run into issues because we've already set some things up
                         TearDown();
                         throw ex;
                     });
+                }
 
                 //Create the Sql CE database
-                var engine = new SqlCeEngine(settings.ConnectionString);
-                engine.CreateDatabase();
+                using (DisposableTimer.TraceDuration<BaseDatabaseFactoryTest>("Create database file"))
+                {
+                    if (_dbBytes != null)
+                    {
+                        File.WriteAllBytes(_dbPath, _dbBytes);
+                    }
+                    else
+                    {
+                        var engine = new SqlCeEngine(settings.ConnectionString);
+                        engine.CreateDatabase();   
+                    }
+                }
+                
             }
 
-            //clear the database if
-            // - NewSchemaPerTest
-            // - _isFirstTestInFixture + DbInitBehavior.NewSchemaPerFixture
-
-            else if (DatabaseTestBehavior == DatabaseBehavior.NewSchemaPerTest
-                || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewSchemaPerFixture))
-            {
-                DatabaseContext.Database.UninstallDatabaseSchema();
-            }
         }
 
         /// <summary>
@@ -210,49 +223,48 @@ namespace Umbraco.Tests.TestHelpers
 
             //create the schema and load default data if:
             // - is the first test in the session
-            // - NewSchemaPerTest
             // - NewDbFileAndSchemaPerTest
-            // - _isFirstTestInFixture + DbInitBehavior.NewSchemaPerFixture
             // - _isFirstTestInFixture + DbInitBehavior.NewDbFileAndSchemaPerFixture
 
-            if (_isFirstRunInTestSession
-                || DatabaseTestBehavior == DatabaseBehavior.NewSchemaPerTest
+            if (_dbBytes == null && 
+                (_isFirstRunInTestSession
                 || DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest
-                || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewSchemaPerFixture)
-                || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture))
+                || (_isFirstTestInFixture && DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture)))
             {
                 //Create the umbraco database and its base data
                 DatabaseContext.Database.CreateDatabaseSchema(false);
+
+                //close the connections, we're gonna read this baby in as a byte array so we don't have to re-initialize the 
+                // damn db for each test
+                CloseDbConnections();
+
+                _dbBytes = File.ReadAllBytes(_dbPath);
             }            
         }
 
         [TestFixtureTearDown]
         public void FixtureTearDown()
         {
-            if (DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerFixture)
-            {
-                RemoveDatabaseFile();
-            }
+            RemoveDatabaseFile();
         }
 
         [TearDown]
         public override void TearDown()
         {
-            _isFirstTestInFixture = false; //ensure this is false before anything!
-
-            if (DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest)
+            using (DisposableTimer.TraceDuration<BaseDatabaseFactoryTest>("teardown"))
             {
-                RemoveDatabaseFile();
+                _isFirstTestInFixture = false; //ensure this is false before anything!
+
+                if (DatabaseTestBehavior == DatabaseBehavior.NewDbFileAndSchemaPerTest)
+                {
+                    RemoveDatabaseFile();
+                }
+
+                AppDomain.CurrentDomain.SetData("DataDirectory", null);
+
+                SqlSyntaxContext.SqlSyntaxProvider = null;
             }
-            else if (DatabaseTestBehavior == DatabaseBehavior.NewSchemaPerTest)
-            {
-                DatabaseContext.Database.UninstallDatabaseSchema();
-            }           
-           
-            AppDomain.CurrentDomain.SetData("DataDirectory", null);
-
-            SqlSyntaxContext.SqlSyntaxProvider = null;
-
+            
             base.TearDown();
         }
 

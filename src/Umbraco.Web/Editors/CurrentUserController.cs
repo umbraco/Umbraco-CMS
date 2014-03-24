@@ -36,11 +36,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IDictionary<string, object> GetMembershipProviderConfig()
         {
-            var provider = Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider];
-            if (provider == null)
-            {
-                throw new InvalidOperationException("No back office membership provider found with the name " + UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider);
-            }
+            var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();            
             return provider.GetConfiguration();
         } 
 
@@ -53,11 +49,7 @@ namespace Umbraco.Web.Editors
         /// </returns>
         public ModelWithNotifications<string> PostChangePassword(ChangingPasswordModel data)
         {
-            var userProvider = Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider];
-            if (userProvider == null)
-            {
-                throw new InvalidOperationException("No membership provider found with the name " + UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider);
-            }
+            var userProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
 
             //TODO: WE need to support this! - requires UI updates, etc...
             if (userProvider.RequiresQuestionAndAnswer)

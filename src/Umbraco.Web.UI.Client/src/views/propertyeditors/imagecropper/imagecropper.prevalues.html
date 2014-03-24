@@ -1,0 +1,49 @@
+<div ng-controller="Umbraco.PrevalueEditors.CropSizesController" class="umb-editor umb-cropsizes">
+
+
+    <div class="control-group" ng-if="model.value.length > 0">
+        <ul class="unstyled list-icons"
+            ui-sortable
+            ng-model="model.value">
+            <li ng-repeat="node in model.value">
+                <i class="icon icon-delete red hover-show pull-right" ng-click="remove(node, $event)"></i>
+                <i class="icon icon-picture handle hover-hide"></i>
+
+                <a href prevent-default ng-click="edit(node, $event)">{{node.alias}}</a>
+                <br /><small>{{node.width}}px &times; {{node.height}}px</small>
+            </li>
+        </ul>
+    </div>
+
+    <div class="form" ng-show="newItem">
+        <h4>Define crop</h4>
+        <p>
+            Give the crop an alias and it's default width and height.
+        </p>
+
+        <div class="control-group">
+            <label>Alias</label>
+            <input name="newItem.alias" type="text"
+                   ng-model="newItem.alias" val-highlight="hasError" />
+        </div>
+
+        <div class="control-group">
+            <label>Size</label>
+            <input name="newItem.width" type="number" placeholder="Width"
+                   ng-model="newItem.width" class="umb-editor-tiny" val-highlight="hasError" />
+            &times;
+            <input name="newItem.height" type="number" placeholder="Height"
+                   ng-model="newItem.height" class="umb-editor-tiny" val-highlight="hasError" />
+        </div>
+
+        <div class="control-group">
+            <button class="btn btn-small" ng-click="add($event)">Save crop</button>
+            <a href class="btn btn-small btn-link" ng-click="cancel($event)">Cancel</a>
+        </div>
+    </div>
+
+    <div class="control-group" ng-hide="newItem">
+        <button class="btn btn-small" ng-click="newItem = {}" prevent-default>Add new crop</button>
+    </div>
+
+</div>

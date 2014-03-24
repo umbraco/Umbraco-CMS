@@ -13,9 +13,8 @@ namespace Umbraco.Core.Services
     /// Idea is to have this is an isolated interface so that it can be easily 'replaced' in the membership provider impl.
     /// </remarks>
     public interface IMembershipMemberService : IMembershipMemberService<IMember>, IMembershipRoleService<IMember>
-    {
-        IMember CreateMember(string username, string email, string password, string memberType);
-        IMember CreateMemberWithIdentity(string username, string email, string password, IMemberType memberType);
+    {        
+        IMember CreateMemberWithIdentity(string username, string email, IMemberType memberType);
     }
 
     /// <summary>
@@ -45,10 +44,12 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="username"></param>
         /// <param name="email"></param>
-        /// <param name="password"></param>
+        /// <param name="rawPasswordValue">
+        /// This value should be the encoded/encrypted/hashed value for the password that will be stored in the database
+        /// </param>
         /// <param name="memberTypeAlias"></param>
         /// <returns></returns>
-        T CreateWithIdentity(string username, string email, string password, string memberTypeAlias);
+        T CreateWithIdentity(string username, string email, string rawPasswordValue, string memberTypeAlias);
 
         /// <summary>
         /// Gets the member by the provider key

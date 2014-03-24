@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.SqlSyntax;
 
@@ -41,7 +42,7 @@ namespace Umbraco.Core.Persistence.Migrations.Syntax.Delete.Expressions
 
             if (string.IsNullOrEmpty(ForeignKey.Name))
             {
-                ForeignKey.Name = string.Format("FK_{0}_{1}", ForeignKey.ForeignTable, ForeignKey.PrimaryTable);
+                ForeignKey.Name = string.Format("FK_{0}_{1}_{2}", ForeignKey.ForeignTable, ForeignKey.PrimaryTable, ForeignKey.PrimaryColumns.First());
             }
 
             return string.Format(SqlSyntaxContext.SqlSyntaxProvider.DeleteConstraint,

@@ -2,6 +2,7 @@
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
 {
+    
     [Migration("6.0.0", 10, GlobalSettings.UmbracoMigrationName)]
     public class DeleteAppTables : MigrationBase
     {
@@ -14,6 +15,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSix
 
         public override void Down()
         {
+            //This cannot be rolled back!!
+            throw new DataLossException("Cannot rollback migration " + typeof(DeleteAppTables) + " the db tables umbracoAppTree and umbracoApp have been droppped");
         }
     }
 }

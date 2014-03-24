@@ -13,6 +13,7 @@ using Umbraco.Web;
 
 namespace Umbraco.Tests.CodeFirst
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NoDatabasePerFixture)]
     [TestFixture]
     public class StronglyTypedMapperTest : PublishedContentTestBase
     {
@@ -93,11 +94,6 @@ namespace Umbraco.Tests.CodeFirst
             TestHelper.CleanUmbracoSettingsConfig();
 
             base.TearDown();
-        }
-
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NoDatabasePerFixture; }
         }
 
         protected override string GetXmlContent(int templateId)

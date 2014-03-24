@@ -8,10 +8,10 @@ using System.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
-using umbraco.BusinessLogic;
 using System.Security.Cryptography;
 using System.Web.Util;
 using System.Collections.Specialized;
@@ -21,6 +21,7 @@ using System.Security.Permissions;
 using System.Runtime.CompilerServices;
 using Member = umbraco.cms.businesslogic.member.Member;
 using MemberType = umbraco.cms.businesslogic.member.MemberType;
+using User = umbraco.BusinessLogic.User;
 
 #endregion
 
@@ -49,7 +50,9 @@ namespace umbraco.providers.members
         #region Fields
 
         private string _defaultMemberTypeAlias = "Member";
-        private string _providerName = Member.UmbracoMemberProviderName;       
+        private string _providerName = Member.UmbracoMemberProviderName;
+        private volatile bool _hasDefaultMember = false;
+        private static readonly object Locker = new object();
 
         #endregion
 
@@ -119,11 +122,14 @@ namespace umbraco.providers.members
             
             // test for membertype (if not specified, choose the first member type available)
             if (config["defaultMemberTypeAlias"] != null)
+            {
                 _defaultMemberTypeAlias = config["defaultMemberTypeAlias"];
-            else if (MemberType.GetAll.Length == 1)
-                _defaultMemberTypeAlias = MemberType.GetAll[0].Alias;
-            else
-                throw new ProviderException("No default MemberType alias is specified in the web.config string. Please add a 'defaultMemberTypeAlias' to the add element in the provider declaration in web.config");
+                if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
+                {
+                    throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
+                }
+                _hasDefaultMember = true;
+            }
 
             // test for approve status
             if (config["umbracoApprovePropertyTypeAlias"] != null)
@@ -234,7 +240,26 @@ namespace umbraco.providers.members
 
         public override string DefaultMemberTypeAlias
         {
-            get { return _defaultMemberTypeAlias; }
+            get
+            {
+                if (_hasDefaultMember == false)
+                {
+                    lock (Locker)
+                    {
+                        if (_hasDefaultMember == false)
+                        {
+                            var types = MemberType.GetAll;
+                            if (types.Length == 1)
+                                _defaultMemberTypeAlias = types[0].Alias;
+                            else
+                                throw new ProviderException("No default MemberType alias is specified in the web.config string. Please add a 'defaultMemberTypeAlias' to the add element in the provider declaration in web.config");
+
+                            _hasDefaultMember = true;
+                        }
+                    }
+                }
+                return _defaultMemberTypeAlias;
+            }
         }
 
         /// <summary>

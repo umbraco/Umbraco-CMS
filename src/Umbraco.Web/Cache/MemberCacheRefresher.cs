@@ -47,7 +47,7 @@ namespace Umbraco.Web.Cache
         public override void Refresh(IMember instance)
         {
             ClearCache(instance.Id);
-            base.Remove(instance);
+            base.Refresh(instance);
         }
 
         public override void Remove(IMember instance)

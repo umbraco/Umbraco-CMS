@@ -13,6 +13,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class TagRepositoryTest : BaseDatabaseFactoryTest
     {
@@ -553,7 +554,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content1);
                 unitOfWork.Commit();
-                var mediaType = MockedContentTypes.CreateImageMediaType();
+                var mediaType = MockedContentTypes.CreateImageMediaType("image2");
                 mediaTypeRepository.AddOrUpdate(mediaType);
                 unitOfWork.Commit();
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
@@ -609,7 +610,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content1);
                 unitOfWork.Commit();
-                var mediaType = MockedContentTypes.CreateImageMediaType();
+                var mediaType = MockedContentTypes.CreateImageMediaType("image2");
                 mediaTypeRepository.AddOrUpdate(mediaType);
                 unitOfWork.Commit();
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);

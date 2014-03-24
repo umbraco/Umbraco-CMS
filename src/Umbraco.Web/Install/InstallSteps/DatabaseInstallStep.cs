@@ -25,11 +25,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             if (result.Success == false)
             {
-                return new InstallSetupResult("error",
-                new
-                {
-                    message = "The database failed to install. ERROR: " + result.Message
-                });
+                throw new InstallException("The database failed to install. ERROR: " + result.Message);
             }
             
             if (result.RequiresUpgrade == false)

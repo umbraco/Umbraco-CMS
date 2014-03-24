@@ -10,19 +10,28 @@
 	    <umb-single-file-upload></umb-single-file-upload>
 	</span>
 	
+
 	<div ng-if="imageSrc">
-		<div style="border-bottom: 1px solid #f8f8f8; padding-bottom: 10px; margin-bottom: 15px;">
 			<div ng-if="currentCrop">
-				<div style="margin-bottom: 10px">
-					<umb-image-crop
-					 height="{{currentCrop.height}}"
-					 width= "{{currentCrop.width}}" 
-					 crop="currentCrop.coordinates"
-					 center="model.value.focalPoint"
-					 src="imageSrc" />
+				<div style="position: relative; margin-bottom: 10px; width: 492px; border: 1px solid #f8f8f8;">
+
+					<i ng-click="done()" style="opacity: 0.5; position: absolute; top: 3px; right: 3px" class="icon icon-delete btn-round"></i>
+
+					<div>
+						<umb-image-crop
+						 height="{{currentCrop.height}}"
+						 width= "{{currentCrop.width}}" 
+						 crop="currentCrop.coordinates"
+						 center="model.value.focalPoint"
+						 max-size="450"
+						 src="imageSrc" />
+					</div>
+
+					 <a href style="margin:auto; text-align: center; font-size: 11px;" class="btn btn-link red"
+					 		ng-click="currentCrop.coordinates = undefined; done()">
+					 		Reset
+					 </a>
 				</div>
-				
-				<a href class="btn btn-success" ng-click="done()">Done</a>
 			</div>
 
 			<div ng-if="!currentCrop">
@@ -31,31 +40,24 @@
 						src="imageSrc" 
 						center="model.value.focalPoint" />
 				</div>
-				
-				<a href class="btn btn-link" ng-click="clear()"><i class="icon-delete red"></i> Remove file</a></li>
-				<a href class="btn btn-link" ng-click="togglePreviews()"><i class="icon-picture"></i> Toggle crop previews</a></li>
-				
+
+				<hr />
+
+				<ul class="umb-sortable-thumbnails" >
+					<li ng-repeat="(key,value) in model.value.crops">
+						<a href title="{{value.alias}}: {{value.height}}px x {{value.width}}px" ng-click="crop(value)">
+							<umb-image-thumbnail
+								center="model.value.focalPoint"
+								crop="value.coordinates"
+								src="imageSrc"
+								height="{{value.height}}"
+								width="{{value.width}}"
+								max-size="40"/>
+						</a>
+					</li>
+				</ul>
+
+				<a href class="btn btn-link" ng-click="clear()"><i class="icon-delete red"></i> Remove file</a>
 			</div>
-		</div>		
-
-		<ul ng-animate="'fade'" class="umb-sortable-thumbnails" ng-if="showPreviews || tempShowPreviews">
-			<li class="tipmenu" ng-repeat="(key,value) in model.value.crops">
-				<a href ng-click="crop(value)">
-					<umb-image-thumbnail
-						center="model.value.focalPoint"
-						crop="value.coordinates"
-						src="imageSrc"
-						height="{{value.height}}"
-						width="{{value.width}}" />
-				</a>
-
-				<div class="tooltip bottom" ng-if="value.coordinates">
-					<div class="tooltip-arrow"></div>
-					<div class="tooltip-inner">
-						<a href ng-click="value.coordinates = undefined">Reset</a>
-					</div>
-				</div>
-			</li>
-		</ul>
 	</div>
 </div>

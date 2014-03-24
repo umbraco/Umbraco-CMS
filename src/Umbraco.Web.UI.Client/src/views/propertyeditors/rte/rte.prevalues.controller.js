@@ -2,14 +2,6 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
     function ($scope, $timeout, $log, tinyMceService, stylesheetResource) {
         var cfg = tinyMceService.defaultPrevalues();
 
-        if (!$scope.model.value.stylesheets) {
-            $scope.model.value.stylesheets = [];
-        }
-        if (!$scope.model.value.toolbar) {
-            $scope.model.value.toolbar = [];
-        }
-
-
         if($scope.model.value){
             if(angular.isString($scope.model.value)){
                 $scope.model.value = cfg;
@@ -18,11 +10,18 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
             $scope.model.value = cfg;
         }
 
+        if (!$scope.model.value.stylesheets) {
+            $scope.model.value.stylesheets = [];
+        }
+        if (!$scope.model.value.toolbar) {
+            $scope.model.value.toolbar = [];
+        }
+
         tinyMceService.configuration().then(function(config){
             $scope.tinyMceConfig = config;
 
         });
-            
+
         stylesheetResource.getAll().then(function(stylesheets){
             $scope.stylesheets = stylesheets;
         });

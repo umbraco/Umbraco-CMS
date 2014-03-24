@@ -13,11 +13,13 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixOneZero
     {
         public override void Up()
         {
-            base.Context.Database.CreateTable<ServerRegistrationDto>();
+            //NOTE: This isn't the correct way to do this but to manually create this table with the Create syntax is a pain in the arse
+            Context.Database.CreateTable<ServerRegistrationDto>();            
         }
 
         public override void Down()
         {
+            Delete.Table("umbracoServer");
         }
     }
 }

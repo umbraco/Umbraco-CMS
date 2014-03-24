@@ -18,7 +18,7 @@ namespace Umbraco.Tests.Migrations
 
             var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> {new MultiMigration()});
 
-            var ctx = runner.ExecuteMigrations(
+            var ctx = runner.InitializeMigrations(
                 //new List<IMigration> {new DoRunMigration(), new DoNotRunMigration()},
                 migrations.ToList(),
                 new Database("umbracoDbDSN")
@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Migrations
 
             var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration() });
 
-            var ctx = runner.ExecuteMigrations(
+            var ctx = runner.InitializeMigrations(
                 //new List<IMigration> {new DoRunMigration(), new DoNotRunMigration()},
                 migrations.ToList(),
                 new Database("umbracoDbDSN")
@@ -50,7 +50,7 @@ namespace Umbraco.Tests.Migrations
 
             var migrations = runner.OrderedUpgradeMigrations(new List<IMigration> { new MultiMigration() });
 
-            var ctx = runner.ExecuteMigrations(
+            var ctx = runner.InitializeMigrations(
                 //new List<IMigration> {new DoRunMigration(), new DoNotRunMigration()},
                 migrations.ToList(),
                 new Database("umbracoDbDSN")

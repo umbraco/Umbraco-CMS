@@ -6,6 +6,7 @@ using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi.Filters;
@@ -42,6 +43,7 @@ namespace Umbraco.Web.WebApi.Binders
         protected override IMember GetExisting(MemberSave model)
         {
             var scenario = ApplicationContext.Services.MemberService.GetMembershipScenario();
+            var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
             switch (scenario)
             {
                 case MembershipScenario.NativeUmbraco:
@@ -49,7 +51,7 @@ namespace Umbraco.Web.WebApi.Binders
                 case MembershipScenario.CustomProviderWithUmbracoLink:
                 case MembershipScenario.StandaloneCustomProvider:
                 default:
-                    var membershipUser = Membership.GetUser(model.Key, false);
+                    var membershipUser = provider.GetUser(model.Key, false);
                     if (membershipUser == null)
                     {
                         throw new InvalidOperationException("Could not find member with key " + model.Key);
@@ -115,7 +117,9 @@ namespace Umbraco.Web.WebApi.Binders
         /// </remarks>
         protected override IMember CreateNew(MemberSave model)
         {
-            if (Membership.Provider.Name == Constants.Conventions.Member.UmbracoMemberProviderName)
+            var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+
+            if (provider.IsUmbracoMembershipProvider())
             {
                 var contentType = ApplicationContext.Services.MemberTypeService.Get(model.ContentTypeAlias);
                 if (contentType == null)
@@ -127,7 +131,7 @@ namespace Umbraco.Web.WebApi.Binders
                 FilterMembershipProviderProperties(contentType);
 
                 //return the new member with the details filled in
-                return new Member(model.Name, model.Email, model.Username, model.Password.NewPassword, -1, contentType);
+                return new Member(model.Name, model.Email, model.Username, model.Password.NewPassword, contentType);
             }
             else
             {
@@ -142,7 +146,7 @@ namespace Umbraco.Web.WebApi.Binders
                 if (memberType != null)
                 {
                     FilterContentTypeProperties(memberType, memberType.PropertyTypes.Select(x => x.Alias).ToArray());
-                    return new Member(model.Name, model.Email, model.Username, Guid.NewGuid().ToString("N"), -1, memberType);
+                    return new Member(model.Name, model.Email, model.Username, Guid.NewGuid().ToString("N"), memberType);
                 }
 
                 //generate a member for a generic membership provider

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Net;
 using System.Text;
 using System.Web.Http;
-using System.Web.Http.Controllers;
 using System.Web.Http.ModelBinding;
 using AutoMapper;
 using Examine.LuceneEngine;
@@ -14,7 +13,6 @@ using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi;
 using System.Linq;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Models;
@@ -35,16 +33,10 @@ namespace Umbraco.Web.Editors
     /// <remarks>
     /// Some objects such as macros are not based on CMSNode
     /// </remarks>
+    [EntityControllerConfiguration]
     [PluginController("UmbracoApi")]
     public class EntityController : UmbracoAuthorizedJsonController
     {
-        protected override void Initialize(HttpControllerContext controllerContext)
-        {
-            base.Initialize(controllerContext);
-
-            controllerContext.Configuration.Services.Replace(typeof(IHttpActionSelector), new EntityControllerActionSelector());
-        }
-
         [HttpGet]
         public IEnumerable<EntityBasic> Search(string query, UmbracoEntityTypes type)
         {
@@ -226,9 +218,7 @@ namespace Umbraco.Web.Editors
 
             return query;
         }
-
         
-
         public EntityBasic GetById(int id, UmbracoEntityTypes type)
         {
             return GetResultForId(id, type);
@@ -241,6 +231,15 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
             return GetResultForIds(ids, type);
+        }
+
+        public IEnumerable<EntityBasic> GetByKeys([FromUri]Guid[] ids, UmbracoEntityTypes type)
+        {
+            if (ids == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return GetResultForKeys(ids, type);
         }
 
         public IEnumerable<EntityBasic> GetChildren(int id, UmbracoEntityTypes type)
@@ -409,13 +408,9 @@ namespace Umbraco.Web.Editors
             switch (entityType)
             {
                 case UmbracoEntityTypes.Domain:
-
                 case UmbracoEntityTypes.Language:
-
                 case UmbracoEntityTypes.User:
-
                 case UmbracoEntityTypes.Macro:
-
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + entityType);
             }
@@ -436,17 +431,11 @@ namespace Umbraco.Web.Editors
             switch (entityType)
             {
                 case UmbracoEntityTypes.PropertyType:
-
                 case UmbracoEntityTypes.PropertyGroup:
-
                 case UmbracoEntityTypes.Domain:
-
                 case UmbracoEntityTypes.Language:
-
                 case UmbracoEntityTypes.User:
-
                 case UmbracoEntityTypes.Macro:
-
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + entityType);
             }
@@ -515,6 +504,28 @@ namespace Umbraco.Web.Editors
             }
         }
 
+        private IEnumerable<EntityBasic> GetResultForKeys(IEnumerable<Guid> keys, UmbracoEntityTypes entityType)
+        {
+            var objectType = ConvertToObjectType(entityType);
+            if (objectType.HasValue)
+            {
+                return keys.Select(id => Mapper.Map<EntityBasic>(Services.EntityService.GetByKey(id, objectType.Value)))
+                          .WhereNotNull();
+            }
+            //now we need to convert the unknown ones
+            switch (entityType)
+            {
+                case UmbracoEntityTypes.PropertyType:
+                case UmbracoEntityTypes.PropertyGroup:
+                case UmbracoEntityTypes.Domain:
+                case UmbracoEntityTypes.Language:
+                case UmbracoEntityTypes.User:
+                case UmbracoEntityTypes.Macro:
+                default:
+                    throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + entityType);
+            }
+        }
+
         private IEnumerable<EntityBasic> GetResultForIds(IEnumerable<int> ids, UmbracoEntityTypes entityType)
         {
             var objectType = ConvertToObjectType(entityType);
@@ -527,17 +538,11 @@ namespace Umbraco.Web.Editors
             switch (entityType)
             {
                 case UmbracoEntityTypes.PropertyType:
-                
                 case UmbracoEntityTypes.PropertyGroup:
-
                 case UmbracoEntityTypes.Domain:
-
                 case UmbracoEntityTypes.Language:
-
                 case UmbracoEntityTypes.User:
-
                 case UmbracoEntityTypes.Macro:
-
                 default:
                     throw new NotSupportedException("The " + typeof(EntityController) + " does not currently support data for the type " + entityType);
             }

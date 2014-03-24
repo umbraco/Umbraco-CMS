@@ -14,7 +14,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
         public override void Down()
         {
-            throw new NotSupportedException("Cannot downgrade from a version 7 database to a prior version");
+            Delete.Column("propertyEditorAlias").FromTable("cmsDataType");
         }
     }
 }

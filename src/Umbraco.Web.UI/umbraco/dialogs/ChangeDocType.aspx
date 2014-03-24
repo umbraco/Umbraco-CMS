@@ -15,7 +15,12 @@
     
     #propertyMapping tbody tr td{border-bottom:1px solid #efefef}
     #propertyMapping td{padding: 4px; ;}  
-    body.umbracoDialog { overflow: scroll; }
+    body.umbracoDialog { overflow: auto; }
+    .umb-dialog .umb-control-group .umb-el-wrap { overflow: hidden; }
+    .umb-dialog .umb-control-group .umb-el-wrap label { float: left; width: 140px; font-weight: bold; }
+    .umb-dialog .umb-control-group .umb-el-wrap label:after { content:":"; }
+    .umb-dialog .umb-control-group .umb-el-wrap .controls-row { float: left; width: 280px; padding-top: 8px; }
+    .umb-dialog .umb-control-group .umb-el-wrap .controls-row select { width: auto; }
     </style>
 
 </asp:Content>

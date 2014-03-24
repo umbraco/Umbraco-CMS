@@ -64,15 +64,18 @@ namespace umbraco
             var email = nameAndMail.Length > 0 ? nameAndMail[1] : "";
             var password = nameAndMail.Length > 1 ? nameAndMail[2] : "";
             var loginName = nameAndMail.Length > 2 ? nameAndMail[3] : "";
-            if (Membership.Provider.IsUmbracoMembershipProvider() && TypeID != -1)
+
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+
+            if (provider.IsUmbracoMembershipProvider() && TypeID != -1)
             {
                 var dt = new MemberType(TypeID);
-                var provider = (UmbracoMembershipProviderBase)Membership.Provider;
+                var castedProvider = (UmbracoMembershipProviderBase)provider;
                 MembershipCreateStatus status;
                 
                 //First create with the membership provider
                 //TODO: We are not supporting q/a - passing in empty here
-                var created = provider.CreateUser(dt.Alias, 
+                var created = castedProvider.CreateUser(dt.Alias, 
                     loginName.Replace(" ", "").ToLower(), //dunno why we're doing this but that's how it has been so i'll leave it i guess
                     password, email, "", "", true, Guid.NewGuid(), out status);
                 if (status != MembershipCreateStatus.Success)
@@ -93,7 +96,7 @@ namespace umbraco
             else
             {
                 MembershipCreateStatus mc;
-                Membership.CreateUser(name, password, email, "empty", "empty", true, out mc);
+                provider.CreateUser(name, password, email, "empty", "empty", true, null, out mc);
                 if (mc != MembershipCreateStatus.Success)
                 {
                     throw new Exception("Error creating Member: " + mc);
@@ -106,9 +109,10 @@ namespace umbraco
 
         public override bool PerformDelete()
         {            
-            var u = Membership.GetUser(Alias);
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+            var u = provider.GetUser(Alias, false);
             if (u == null) return false;
-            Membership.DeleteUser(u.UserName, true);
+            provider.DeleteUser(u.UserName, true);
             return true;
 
 

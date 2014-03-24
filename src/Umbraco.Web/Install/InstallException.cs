@@ -26,5 +26,19 @@ namespace Umbraco.Web.Install
             View = view;
             ViewModel = viewModel;
         }
+
+        public InstallException(string message, object viewModel)
+        {
+            _message = message;
+            View = "error";
+            ViewModel = viewModel;
+        }
+
+        public InstallException(string message)
+        {
+            _message = message;
+            View = "error";
+            ViewModel = null;
+        }
     }
 }

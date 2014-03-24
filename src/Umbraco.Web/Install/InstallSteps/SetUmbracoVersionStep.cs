@@ -4,6 +4,7 @@ using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Web.Cache;
 using Umbraco.Web.Install.Models;
 using Umbraco.Web.Security;
 using GlobalSettings = umbraco.GlobalSettings;
@@ -26,15 +27,14 @@ namespace Umbraco.Web.Install.InstallSteps
 
         public override InstallSetupResult Execute(object model)
         {
+            //This is synonymous with library.RefreshContent() - but we don't want to use library
+            // for anything anymore so welll use the method that it is wrapping. This will just make sure
+            // the correct xml structure exists in the xml cache file. This is required by some upgrade scripts
+            // that may modify the cmsContentXml table directly.
+            DistributedCache.Instance.RefreshAllPageCache();
+
             // Update configurationStatus
-            try
-            {
-                GlobalSettings.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
-            }
-            catch (Exception ex)
-            {
-                LogHelper.Error<SetUmbracoVersionStep>("An error occurred updating the config status", ex);
-            }
+            GlobalSettings.ConfigurationStatus = UmbracoVersion.Current.ToString(3);
 
             // Update ClientDependency version
             var clientDependencyConfig = new ClientDependencyConfiguration();

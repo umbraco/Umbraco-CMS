@@ -2,10 +2,10 @@ angular.module("umbraco.install").controller("Umbraco.Installer.DataBaseControll
 	
 	$scope.checking = false;
 	$scope.dbs = [
-					{name: 'Embedded database SQL', id: 0},
-					{name: 'Microsft SQL Server', id: 1},
+					{name: 'Microsoft SQL Server Compact (SQL CE)', id: 0},
+					{name: 'Microsoft SQL Server', id: 1},
 					{name: 'MySQL', id: 2},
-					{name: 'Custom connection-string', id: -1}];
+					{name: 'Custom connection string', id: -1}];
 
 	if(installerService.status.current.model.dbType === undefined){
 		installerService.status.current.model.dbType = 0;

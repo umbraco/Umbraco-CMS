@@ -32,6 +32,15 @@ namespace umbraco.MacroEngines
         }
         public DynamicBackingItem(int Id)
         {
+            if (Id == -1)
+            {
+                // passing in -1 needs to return a real node, the "root" node, which has no 
+                // properties (defaults apply) but can be used to access descendants, children, etc.
+                
+                this.content = new NodeFactory.Node(Id);
+                return;
+            }
+
             var n = CompatibilityHelper.ConvertToNode(UmbracoContext.Current.ContentCache.GetById(Id));
            
             this.content = n;
@@ -57,7 +66,18 @@ namespace umbraco.MacroEngines
             }
             else
             {
-                this.content = CompatibilityHelper.ConvertToNode(UmbracoContext.Current.ContentCache.GetById(Id));
+                if (Id == -1)
+                {
+                    // passing in -1 needs to return a real node, the "root" node, which has no 
+                    // properties (defaults apply) but can be used to access descendants, children, etc.
+
+                    this.content = new NodeFactory.Node(Id);
+                }
+                else
+                {
+                    this.content = CompatibilityHelper.ConvertToNode(UmbracoContext.Current.ContentCache.GetById(Id));    
+                }
+                
                 this.Type = Type;
             }
         }

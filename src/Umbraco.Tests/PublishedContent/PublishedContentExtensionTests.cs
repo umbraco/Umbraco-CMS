@@ -9,18 +9,14 @@ using Umbraco.Web;
 
 namespace Umbraco.Tests.PublishedContent
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
 	[TestFixture]
     public class PublishedContentExtensionTests : PublishedContentTestBase
 	{
 		private UmbracoContext ctx;
 		private string xmlContent = "";
 		private bool createContentTypes = true;
-
-		protected override DatabaseBehavior DatabaseTestBehavior
-		{
-			get { return DatabaseBehavior.NewSchemaPerFixture; }
-		}
-
+        
 		protected override string GetXmlContent(int templateId)
 		{
 			return xmlContent;

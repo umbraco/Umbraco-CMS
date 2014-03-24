@@ -25,10 +25,18 @@
     <div id="overlay"  ng-cloak ng-animate="'fade'" ng-show="installer.done"></div>
 
     <div id="installer" class="absolute-center clearfix"
-        ng-cloak
-        ng-animate="'fade'"
-        ng-show="installer.configuring">
-        <div ng-if="installer.current" ng-include="installer.current.view"></div>
+         ng-cloak
+         ng-animate="'fade'"
+         ng-show="installer.configuring">
+        
+        <div ng-if="installer.current" ng-switch on="installer.current.view">
+            <div ng-switch-when="ysod">
+                <h1>A server error occurred</h1>
+                <p>This is most likely due to an error during application startup</p>
+                <iframe id="ysod"></iframe>
+            </div>
+            <div ng-switch-default ng-include="installer.current.view"></div>    
+        </div>
     </div>
 
 

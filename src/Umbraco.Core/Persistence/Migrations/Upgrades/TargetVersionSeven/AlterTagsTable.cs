@@ -20,24 +20,18 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                     ColumnName = x.Item3,
                     IsUnique = x.Item4
                 }).ToArray();
-
-            var constraints = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerColumn(Context.Database).DistinctBy(x => x.Item3).ToList();
-
-            //make sure it doesn't already exist
-            if (constraints.Any(x => x.Item3 == "FK_cmsTags_cmsTags") == false)
-            {
-                //add a foreign key to the parent id column too!
-                Create.ForeignKey("FK_cmsTags_cmsTags")
-                      .FromTable("cmsTags")
-                      .ForeignColumn("ParentId")
-                      .ToTable("cmsTags")
-                      .PrimaryColumn("id")
-                      .OnDelete(Rule.None)
-                      .OnUpdate(Rule.None);    
-            }
+            
+            //add a foreign key to the parent id column too!
+            Create.ForeignKey("FK_cmsTags_cmsTags")
+                  .FromTable("cmsTags")
+                  .ForeignColumn("ParentId")
+                  .ToTable("cmsTags")
+                  .PrimaryColumn("id")
+                  .OnDelete(Rule.None)
+                  .OnUpdate(Rule.None); 
 
             //make sure it doesn't already exist
-            if (dbIndexes.Any(x => x.IndexName == "IX_cmsTags") == false)
+            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsTags")) == false)
             {
                 //add an index to tag/group since it's queried often
                 Create.Index("IX_cmsTags").OnTable("cmsTags").OnColumn("tag").Ascending().OnColumn("group").Ascending().WithOptions().NonClustered();
@@ -47,7 +41,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
         public override void Down()
         {
-            throw new NotImplementedException();
+            throw new DataLossException("Cannot downgrade from a version 7 database to a prior version, the database schema has already been modified");
         }
     }
 }

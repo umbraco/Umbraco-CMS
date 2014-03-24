@@ -37,7 +37,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
             if (dbHelper.CheckConnection(database, _applicationContext) == false)
             {
-                throw new InvalidOperationException("Could not connect to the database");
+                throw new InstallException("Could not connect to the database");
             }
             ConfigureConnection(database);
             return null;

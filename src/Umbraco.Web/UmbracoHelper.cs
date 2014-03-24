@@ -13,6 +13,7 @@ using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
@@ -250,7 +251,10 @@ namespace Umbraco.Web
             {
                 //TODO: We are doing at ToLower here because for some insane reason the UpdateMacroModel method of macro.cs 
                 // looks for a lower case match. WTF. the whole macro concept needs to be rewritten.
-                macroProps.Add(i.Key.ToLower(), i.Value);
+                
+                
+                //NOTE: the value could have html encoded values, so we need to deal with that
+                macroProps.Add(i.Key.ToLower(), (i.Value is string) ? HttpUtility.HtmlDecode(i.Value.ToString()) : i.Value);
             }
             var macroControl = m.renderMacro(macroProps,
                 umbracoPage.Elements,
@@ -500,7 +504,8 @@ namespace Umbraco.Web
 		{
 			if (IsProtected(nodeId, path))
 			{
-                return _membershipHelper.IsLoggedIn() && Access.HasAccess(nodeId, path, Membership.GetUser());
+                var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+                return _membershipHelper.IsLoggedIn() && Access.HasAccess(nodeId, path, provider.GetCurrentUser());
 			}
 			return true;
 		}

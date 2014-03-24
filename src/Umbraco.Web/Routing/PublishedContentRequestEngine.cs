@@ -8,6 +8,7 @@ using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 
 using umbraco;
 using umbraco.cms.businesslogic.web;
@@ -520,7 +521,8 @@ namespace Umbraco.Web.Routing
 				System.Web.Security.MembershipUser user = null;
 				try
 				{
-					user = System.Web.Security.Membership.GetUser();
+                    var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+                    user = provider.GetCurrentUser();
 				}
 				catch (ArgumentException)
 				{

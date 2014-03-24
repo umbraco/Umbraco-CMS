@@ -14,6 +14,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class UserRepositoryTest : BaseDatabaseFactoryTest
     {
@@ -139,7 +140,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //resolved.DefaultPermissions = "ZYX";
                 resolved.Language = "fr";
                 resolved.IsApproved = false;
-                resolved.Password = "new";
+                resolved.RawPasswordValue = "new";
                 resolved.IsLockedOut = true;
                 resolved.StartContentId = 10;
                 resolved.StartMediaId = 11;
@@ -157,7 +158,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 //Assert.That(updatedItem.DefaultPermissions, Is.EqualTo(resolved.DefaultPermissions));
                 Assert.That(updatedItem.Language, Is.EqualTo(resolved.Language));
                 Assert.That(updatedItem.IsApproved, Is.EqualTo(resolved.IsApproved));
-                Assert.That(updatedItem.Password, Is.EqualTo(resolved.Password));
+                Assert.That(updatedItem.RawPasswordValue, Is.EqualTo(resolved.RawPasswordValue));
                 Assert.That(updatedItem.IsLockedOut, Is.EqualTo(resolved.IsLockedOut));
                 Assert.That(updatedItem.StartContentId, Is.EqualTo(resolved.StartContentId));
                 Assert.That(updatedItem.StartMediaId, Is.EqualTo(resolved.StartMediaId));
@@ -513,7 +514,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             Assert.That(updatedItem.DefaultPermissions, Is.EqualTo(originalUser.DefaultPermissions));
             Assert.That(updatedItem.Language, Is.EqualTo(originalUser.Language));
             Assert.That(updatedItem.IsApproved, Is.EqualTo(originalUser.IsApproved));
-            Assert.That(updatedItem.Password, Is.EqualTo(originalUser.Password));
+            Assert.That(updatedItem.RawPasswordValue, Is.EqualTo(originalUser.RawPasswordValue));
             Assert.That(updatedItem.IsLockedOut, Is.EqualTo(originalUser.IsLockedOut));
             Assert.That(updatedItem.StartContentId, Is.EqualTo(originalUser.StartContentId));
             Assert.That(updatedItem.StartMediaId, Is.EqualTo(originalUser.StartMediaId));

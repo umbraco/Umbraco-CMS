@@ -138,6 +138,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
     TABLE_NAME, INDEX_NAME, COLUMN_NAME, CASE NON_UNIQUE WHEN 1 THEN 0 ELSE 1 END AS `UNIQUE`
 FROM INFORMATION_SCHEMA.STATISTICS
 WHERE TABLE_SCHEMA = @TableSchema
+AND INDEX_NAME <> COLUMN_NAME AND INDEX_NAME <> 'PRIMARY'
 ORDER BY TABLE_NAME, INDEX_NAME",
                     new { TableSchema = db.Connection.Database });
                 list =
@@ -217,7 +218,7 @@ ORDER BY TABLE_NAME, INDEX_NAME",
         {
             string primaryKey = string.Empty;
             var columnDefinition = table.Columns.FirstOrDefault(x => x.IsPrimaryKey);
-            if (columnDefinition != null && columnDefinition.PrimaryKeyColumns.Contains(",") == false)
+            if (columnDefinition != null)
             {
                 string columns = string.IsNullOrEmpty(columnDefinition.PrimaryKeyColumns)
                                  ? GetQuotedColumnName(columnDefinition.Name)

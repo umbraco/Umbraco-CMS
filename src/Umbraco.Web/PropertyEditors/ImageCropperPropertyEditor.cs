@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
@@ -19,7 +21,7 @@ namespace Umbraco.Web.PropertyEditors
         static ImageCropperPropertyEditor()
         {
             MediaService.Saving += MediaServiceSaving;
-            MediaService.Creating += MediaServiceCreating;
+            MediaService.Created += MediaServiceCreated;
         }
 
         /// <summary>
@@ -42,13 +44,12 @@ namespace Umbraco.Web.PropertyEditors
         {
             _internalPreValues = new Dictionary<string, object>
                 {
-                    {"crops", "[]"},
                     {"focalPoint", "{left: 0.5, top: 0.5}"},
                     {"src", ""}
                 };
         }
 
-        static void MediaServiceCreating(IMediaService sender, Core.Events.NewEventArgs<IMedia> e)
+        static void MediaServiceCreated(IMediaService sender, Core.Events.NewEventArgs<IMedia> e)
         {
             AutoFillProperties(e.Entity);
         }
@@ -63,8 +64,7 @@ namespace Umbraco.Web.PropertyEditors
 
         static void AutoFillProperties(IContentBase model)
         {
-            var mediaFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
-            foreach (var p in model.Properties.Where(x => x.PropertyType.Alias == Constants.PropertyEditors.ImageCropperAlias))
+            foreach (var p in model.Properties.Where(x => x.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.ImageCropperAlias))
             {
                 var uploadFieldConfigNode =
                     UmbracoConfig.For.UmbracoSettings().Content.ImageAutoFillProperties
@@ -72,18 +72,32 @@ namespace Umbraco.Web.PropertyEditors
 
                 if (uploadFieldConfigNode != null)
                 {
-                    if (p.Value != null){
-                         var json = p.Value as JObject;
-                         if (json != null && json["src"] != null)
-                             model.PopulateFileMetaDataProperties(uploadFieldConfigNode, json["src"].Value<string>());
-                         else if (p.Value is string)
-                         {
-                             var config = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(p.PropertyType.DataTypeDefinitionId).FirstOrDefault();
-                             var crops = !string.IsNullOrEmpty(config) ? config : "[]";
-                             p.Value = "{src: '" + p.Value + "', crops: " + crops + "}";
-                             model.PopulateFileMetaDataProperties(uploadFieldConfigNode, p.Value);
-                         }
-                    }else
+                    if (p.Value != null)
+                    {                        
+                        JObject json = null;
+                        try
+                        {
+                            json = JObject.Parse((string)p.Value);
+                        }
+                        catch (JsonException ex)
+                        {
+                            LogHelper.Error<ImageCropperPropertyEditor>("Could not parse the value into a JSON structure! Value: " + p.Value, ex);
+                        }
+                        if (json != null && json["src"] != null)
+                        {
+                            model.PopulateFileMetaDataProperties(uploadFieldConfigNode, json["src"].Value<string>());
+                        }
+                        else if (p.Value is string)
+                        {
+                            var src = p.Value == null ? string.Empty : p.Value.ToString();
+                            var config = ApplicationContext.Current.Services.DataTypeService.GetPreValuesByDataTypeId(p.PropertyType.DataTypeDefinitionId).FirstOrDefault();
+                            var crops = string.IsNullOrEmpty(config) == false ? config : "[]";
+                            p.Value = "{src: '" + p.Value + "', crops: " + crops + "}";
+                            //Only provide the source path, not the whole JSON value
+                            model.PopulateFileMetaDataProperties(uploadFieldConfigNode, src);
+                        }
+                    }
+                    else
                         model.ResetFileMetaDataProperties(uploadFieldConfigNode);
                 }
             }
@@ -98,7 +112,7 @@ namespace Umbraco.Web.PropertyEditors
 
         internal class ImageCropperPreValueEditor : PreValueEditor
         {
-            [PreValueField("crops", "Crop sizes", "cropsizes")]
+            [PreValueField("crops", "Crop sizes", "views/propertyeditors/imagecropper/imagecropper.prevalues.html")]
             public string Crops { get; set; }
         }
     }

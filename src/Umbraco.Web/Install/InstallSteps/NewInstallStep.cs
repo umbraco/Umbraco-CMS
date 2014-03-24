@@ -32,11 +32,7 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             get
             {
-                var provider = Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider];
-                if (provider == null)
-                {
-                    throw new InvalidOperationException("No MembershipProvider found with name " + UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider);
-                }
+                var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
                 return provider;
             }
         }
@@ -84,10 +80,12 @@ namespace Umbraco.Web.Install.InstallSteps
         {
             get
             {
+                var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
+
                 return new
                 {
-                    minCharLength = Membership.Providers[Constants.Conventions.User.UmbracoUsersProviderName].MinRequiredPasswordLength,
-                    minNonAlphaNumericLength = Membership.Providers[Constants.Conventions.User.UmbracoUsersProviderName].MinRequiredNonAlphanumericCharacters
+                    minCharLength = provider.MinRequiredPasswordLength,
+                    minNonAlphaNumericLength = provider.MinRequiredNonAlphanumericCharacters
                 };
             }
         }

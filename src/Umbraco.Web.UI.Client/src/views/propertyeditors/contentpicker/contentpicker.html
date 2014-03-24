@@ -1,33 +1,44 @@
 <div ng-controller="Umbraco.PropertyEditors.ContentPickerController" class="umb-editor umb-contentpicker">
+    
+    <ng-form name="contentPickerForm">
 
-	<ul class="unstyled list-icons" 
-		ui-sortable
-		ng-model="renderModel">	
-		<li ng-repeat="node in renderModel">
+        <ul class="unstyled list-icons" 
+            ui-sortable
+            ng-model="renderModel">
+            	
+            <li ng-repeat="node in renderModel">
 
-			<i class="icon icon-navigation handle"></i>
+                <i class="icon icon-navigation handle"></i>
 
-			<a href="#" prevent-default ng-click="remove($index)">
-				<i class="icon icon-delete red hover-show"></i>
-				<i class="{{node.icon}} hover-hide"></i> 
-					{{node.name}}
-			</a>
-		</li>
-	</ul>
+                <a href="#" prevent-default ng-click="remove($index)">
+                    <i class="icon icon-delete red hover-show"></i>
+                    <i class="{{node.icon}} hover-hide"></i> 
+                    {{node.name}}
+                </a>
+            </li>
+        </ul>
 
-    <ul class="unstyled list-icons" ng-show="cfg.multiPicker === true || renderModel.length === 0">	
-        <li>
-            <i class="icon icon-add blue"></i>
-            <a href="#" ng-click="openContentPicker()" prevent-default>
-                <localize key="general_add">Add</localize>
-            </a>
-        </li>
-    </ul>
+        <ul class="unstyled list-icons" ng-show="cfg.multiPicker === true || renderModel.length === 0">	
+            <li>
+                <i class="icon icon-add blue"></i>
+                <a href="#" ng-click="openContentPicker()" prevent-default>
+                    <localize key="general_add">Add</localize>
+                </a>
+            </li>
+        </ul>
+        
+        <!--These are here because we need ng-form fields to validate against-->
+        <input type="hidden" name="minCount" ng-model="renderModel" />
+        <input type="hidden" name="maxCount" ng-model="renderModel" />
 
-    <div ng-if="model.config.minNumber && model.config.minNumber > renderModel.length">
-    	You need to add atleast {{model.config.minNumber-renderModel.length}} items
-    </div>
-    <div ng-if="model.config.maxNumber && model.config.maxNumber < renderModel.length">
-    	You can only have {{model.config.maxNumber}} items selected
-    </div>
+        <div class="help-inline" val-msg-for="minCount" val-toggle-msg="minCount">
+            You need to add at least {{model.config.minNumber-renderModel.length}} items
+        </div>
+        
+        <div class="help-inline" val-msg-for="maxCount" val-toggle-msg="maxCount">
+            You can only have {{model.config.maxNumber}} items selected
+        </div>
+        
+
+    </ng-form>
 </div>

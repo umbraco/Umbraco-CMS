@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
@@ -15,24 +16,24 @@ namespace Umbraco.Web.Security.Providers
     /// </summary>
     public class UsersMembershipProvider : UmbracoMembershipProvider<IMembershipUserService, IUser>, IUsersMembershipProvider
     {
-        
+
         public UsersMembershipProvider()
             : this(ApplicationContext.Current.Services.UserService)
-        {            
+        {
         }
 
         public UsersMembershipProvider(IMembershipMemberService<IUser> memberService)
             : base(memberService)
-        {            
+        {
         }
 
         private string _defaultMemberTypeAlias = "writer";
         private volatile bool _hasDefaultMember = false;
         private static readonly object Locker = new object();
 
-        public override string ProviderName 
+        public override string ProviderName
         {
-            get { return Constants.Conventions.User.UmbracoUsersProviderName; }
+            get { return UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider; }
         }
 
         /// <summary>
@@ -46,7 +47,7 @@ namespace Umbraco.Web.Security.Providers
         protected override MembershipUser ConvertToMembershipUser(IUser entity)
         {
             //the provider user key is always the int id
-            return entity.AsConcreteMembershipUser(Name);            
+            return entity.AsConcreteMembershipUser(Name);
         }
 
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
@@ -62,8 +63,8 @@ namespace Umbraco.Web.Security.Providers
                     throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
                 }
                 _hasDefaultMember = true;
-            }    
-        }        
+            }
+        }
 
         public override string DefaultMemberTypeAlias
         {
@@ -81,9 +82,9 @@ namespace Umbraco.Web.Security.Providers
                                 throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
                             }
                             _hasDefaultMember = true;
-                        }                        
+                        }
                     }
-                }   
+                }
                 return _defaultMemberTypeAlias;
             }
         }

@@ -5,9 +5,11 @@ using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Services.Importing;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Services
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class PackagingServiceTests : BaseServiceTest
     {

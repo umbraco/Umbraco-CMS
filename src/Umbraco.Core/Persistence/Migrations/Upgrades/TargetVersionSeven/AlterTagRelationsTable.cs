@@ -4,6 +4,8 @@ using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 {
@@ -25,12 +27,28 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
         {
             //create a new col which we will make a foreign key, but first needs to be populated with data.
             Alter.Table("cmsTagRelationship").AddColumn("propertyTypeId").AsInt32().Nullable();
-
+            
             //drop the foreign key on umbracoNode.  Must drop foreign key first before primary key can be removed in MySql.
-            Delete.ForeignKey("FK_cmsTagRelationship_umbracoNode_id").OnTable("cmsTagRelationship");
 
-            //we need to drop the primary key
-            Delete.PrimaryKey("PK_cmsTagRelationship").FromTable("cmsTagRelationship");
+            Delete.ForeignKey().FromTable("cmsTagRelationship").ForeignColumn("nodeId").ToTable("umbracoNode").PrimaryColumn("id");
+
+            //we need to drop the primary key, this is sql specific since MySQL has never had primary keys on this table
+            // at least since 6.0 and the new installation way but perhaps it had them way back in 4.x so we need to check
+            // it exists before trying to drop it.
+            if (Context.CurrentDatabaseProvider == DatabaseProviders.MySql)
+            {
+                var constraints = SqlSyntaxContext.SqlSyntaxProvider.GetConstraintsPerColumn(Context.Database).Distinct().ToArray();
+                //this will let us know if this pk exists on this table
+                if (constraints.Count(x => x.Item1.InvariantEquals("cmsTagRelationship") && x.Item3.InvariantEquals("PRIMARY")) > 0)
+                {
+                    Delete.PrimaryKey("PK_cmsTagRelationship").FromTable("cmsTagRelationship");
+                }
+            }
+            else
+            {
+                Delete.PrimaryKey("PK_cmsTagRelationship").FromTable("cmsTagRelationship");
+            }
+            
         }
 
         private void Upgrade()
@@ -115,7 +133,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
         public override void Down()
         {
-            throw new NotSupportedException();
+            throw new DataLossException("Cannot downgrade from a version 7 database to a prior version, the database schema has already been modified");
         }
 
         /// <summary>

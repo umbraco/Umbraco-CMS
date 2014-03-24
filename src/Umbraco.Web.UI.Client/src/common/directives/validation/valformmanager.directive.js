@@ -12,7 +12,7 @@
 * Another thing this directive does is to ensure that any .control-group that contains form elements that are invalid will
 * be marked with the 'error' css class. This ensures that labels included in that control group are styled correctly.
 **/
-function valFormManager(serverValidationManager, $rootScope, $log, notificationsService) {
+function valFormManager(serverValidationManager, $rootScope, $log, $timeout, notificationsService) {
     return {
         require: "form",
         restrict: "A",
@@ -58,7 +58,7 @@ function valFormManager(serverValidationManager, $rootScope, $log, notifications
             });
 
             //if we wish to turn of the unsaved changes confirmation msg
-            //this is th place to do it
+            //this is the place to do it
             var locationEvent = $rootScope.$on('$locationChangeStart', function(event, url){
                     if (!formCtrl.$dirty) {
                         return;
@@ -81,6 +81,10 @@ function valFormManager(serverValidationManager, $rootScope, $log, notifications
                     locationEvent();
                 }
             });
+
+            $timeout(function(){
+                formCtrl.$setPristine();
+            }, 1000);
         }
     };
 }

@@ -6,8 +6,8 @@ using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSixTwoZero
 {
-    [Migration("7.1.0", 2, GlobalSettings.UmbracoMigrationName)]
-    [Migration("6.2.0", 2, GlobalSettings.UmbracoMigrationName)]
+    [Migration("7.1.0", 4, GlobalSettings.UmbracoMigrationName)]
+    [Migration("6.2.0", 4, GlobalSettings.UmbracoMigrationName)]
     public class UpdateToNewMemberPropertyAliases : MigrationBase
     {
         public override void Up()

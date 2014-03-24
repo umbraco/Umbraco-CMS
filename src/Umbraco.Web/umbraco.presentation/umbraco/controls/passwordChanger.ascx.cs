@@ -15,7 +15,7 @@ using Umbraco.Web.Models;
 
 namespace umbraco.controls
 {
-    public partial class passwordChanger : System.Web.UI.UserControl
+    public partial class passwordChanger : UserControl
     {
         public string MembershipProviderName { get; set; }
 

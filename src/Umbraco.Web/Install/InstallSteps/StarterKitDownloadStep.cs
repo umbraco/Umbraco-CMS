@@ -53,11 +53,11 @@ namespace Umbraco.Web.Install.InstallSteps
             var repo = global::umbraco.cms.businesslogic.packager.repositories.Repository.getByGuid(RepoGuid);
             if (repo == null)
             {
-                throw new InvalidOperationException("No repository found with id " + RepoGuid);
+                throw new InstallException("No repository found with id " + RepoGuid);
             }
             if (repo.HasConnection() == false)
             {
-                throw new InvalidOperationException("Cannot connect to repository");                
+                throw new InstallException("Cannot connect to repository");                
             }
             var installer = new Installer();
 

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Linq;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
@@ -12,9 +13,21 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
     [Migration("7.0.0", 4, GlobalSettings.UmbracoMigrationName)]
     public class AddIndexToCmsMacroTable : MigrationBase
     {
+        private readonly bool _skipIndexCheck;
+
+        internal AddIndexToCmsMacroTable(bool skipIndexCheck)
+        {
+            _skipIndexCheck = skipIndexCheck;
+        }
+
+        public AddIndexToCmsMacroTable()
+        {
+            
+        }
+
         public override void Up()
         {
-            var dbIndexes = SqlSyntaxContext.SqlSyntaxProvider.GetDefinedIndexes(Context.Database)
+            var dbIndexes = _skipIndexCheck ? new DbIndexDefinition[] { } : SqlSyntaxContext.SqlSyntaxProvider.GetDefinedIndexes(Context.Database)
                 .Select(x => new DbIndexDefinition()
                 {
                     TableName = x.Item1,
@@ -24,7 +37,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 }).ToArray();
 
             //make sure it doesn't already exist
-            if (dbIndexes.Any(x => x.IndexName == "IX_cmsMacro_Alias") == false)
+            if (dbIndexes.Any(x => x.IndexName.InvariantEquals("IX_cmsMacro_Alias")) == false)
             {
                 Create.Index("IX_cmsMacro_Alias").OnTable("cmsMacro").OnColumn("macroAlias").Unique();            
             }
@@ -33,7 +46,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
         public override void Down()
         {
-            throw new NotSupportedException("Cannot downgrade from a version 7 database to a prior version");
+            Delete.Index("IX_cmsMacro_Alias").OnTable("cmsMacro");
         }
     }
 }

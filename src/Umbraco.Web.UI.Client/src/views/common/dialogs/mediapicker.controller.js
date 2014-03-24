@@ -6,6 +6,8 @@ angular.module("umbraco")
             var dialogOptions = $scope.$parent.dialogOptions;
             $scope.onlyImages = dialogOptions.onlyImages;
             $scope.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
+            $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
+
 
             $scope.options = {
                 url: umbRequestHelper.getApiUrl("mediaApiBaseUrl", "PostAddFile"),
@@ -51,7 +53,9 @@ angular.module("umbraco")
                     entityResource.getAncestors(folder.id, "media")
                         .then(function(anc) {
                             // anc.splice(0,1);  
-                            $scope.path = anc;
+                            $scope.path = _.filter(anc, function (f) {
+                                return f.path.indexOf($scope.startNodeId) !== -1;
+                            });
                         });
                 }
                 else {
@@ -68,15 +72,6 @@ angular.module("umbraco")
                         if(data.items){
                              $scope.images = data.items;
                         }
-                       
-
-                        //update the thumbnail property
-                        //_.each($scope.images, function(img) {
-                        //    img.thumbnail = imageHelper.getThumbnail({ imageModel: img, scope: $scope });
-                        //});
-
-                        //reject all images that have an empty thumbnail - this can occur if there's an image item
-                        // that doesn't have an uploaded image.
 
                         if($scope.onlyImages){
                             $scope.images = _.reject($scope.images, function(item) {
@@ -105,17 +100,10 @@ angular.module("umbraco")
                         $scope.select(image);
                         image.cssclass = ($scope.dialogData.selection.indexOf(image) > -1) ? "selected" : "";
                     }else {
-
-                        $scope.target= {};
-                        $scope.target.id = image.id;
-                        $scope.target.name = image.name;
+                        $scope.target= image;
                         $scope.target.url = mediaHelper.resolveFile(image); // getMediaPropertyValue({mediaModel: image});
-
-                        //$scope.submit(image);
                     }
                 }
-
-                
             };
 
             $scope.exitDetails = function(){
@@ -152,7 +140,6 @@ angular.module("umbraco")
 
             //default root item
             if(!$scope.target){
-                $scope.gotoFolder();    
+                $scope.gotoFolder({ id: $scope.startNodeId, name: "Media", icon: "icon-folder" });  
             }
-            
         });
