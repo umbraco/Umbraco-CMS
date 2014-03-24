@@ -25,12 +25,14 @@ namespace Umbraco.Web.Models
 
             var crop = Crops.GetCrop(alias);
 
-            if(crop == null && !string.IsNullOrEmpty(alias))
+            if (crop == null && string.IsNullOrEmpty(alias) == false)
+            {
                 return null;
+            }
 
             var sb = new StringBuilder();
 
-            if (useFocalPoint && HasFocalPoint() || (crop != null && crop.Coordinates == null && HasFocalPoint()) || (string.IsNullOrEmpty(alias) && HasFocalPoint()))
+            if ((useFocalPoint && HasFocalPoint()) || (crop != null && crop.Coordinates == null && HasFocalPoint()) || (string.IsNullOrEmpty(alias) && HasFocalPoint()))
             {
                 sb.Append("?center=" + FocalPoint.Top.ToString(System.Globalization.CultureInfo.InvariantCulture) + "," + FocalPoint.Left.ToString(System.Globalization.CultureInfo.InvariantCulture));
                 sb.Append("&mode=crop");
@@ -50,7 +52,7 @@ namespace Umbraco.Web.Models
                 sb.Append("&mode=crop");
             }           
 
-            if (crop!= null && addCropDimensions)
+            if (crop != null && addCropDimensions)
             {
                 sb.Append("&width=").Append(crop.Width);
                 sb.Append("&height=").Append(crop.Height);
@@ -65,7 +67,7 @@ namespace Umbraco.Web.Models
 
         public bool HasFocalPoint()
         {
-            return (FocalPoint != null && FocalPoint.Top != 0.5m && FocalPoint.Top != 0.5m);
+            return FocalPoint != null && FocalPoint.Top != 0.5m && FocalPoint.Top != 0.5m;
         }
 
         public bool HasCrop(string alias)
