@@ -7,7 +7,7 @@ namespace Umbraco.Core.Sync
     /// <summary>
     /// Defines a server messenger for server sync and distrubuted cache
     /// </summary>
-    internal interface IServerMessenger
+    public interface IServerMessenger
     {
 
         /// <summary>
