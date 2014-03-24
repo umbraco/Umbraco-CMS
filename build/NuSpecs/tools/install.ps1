@@ -1,8 +1,8 @@
 param($rootPath, $toolsPath, $package, $project)
 
-if ($project) {	
-    $dateTime = Get-Date -Format yyyyMMdd-HHmmss
-    $backupPath = Join-Path (Split-Path $project.FullName -Parent) "\App_Data\NuGetBackup\$dateTime"
+if ($project) {
+	$dateTime = Get-Date -Format yyyyMMdd-HHmmss
+	$backupPath = Join-Path (Split-Path $project.FullName -Parent) "\App_Data\NuGetBackup\$dateTime"
 	
 	# Create backup folder if it doesn't exist yet
 	New-Item -ItemType Directory -Force -Path $backupPath
@@ -19,19 +19,19 @@ if ($project) {
 	# Copy umbraco and umbraco_files from package to project folder
 	# This is only done when these folders already exist because we 
 	# only want to do this for upgrades
-    $umbracoFolder = Join-Path $projectDestinationPath "Umbraco\"
+	$umbracoFolder = Join-Path $projectDestinationPath "Umbraco\"
 	if(Test-Path $umbracoFolder) {
-        $umbracoFolderSource = Join-Path $rootPath "UmbracoFiles\Umbraco"
+		$umbracoFolderSource = Join-Path $rootPath "UmbracoFiles\Umbraco"
 		Copy-Item $umbracoFolder $backupPath -Force
-        robocopy $umbracoFolderSource $umbracoFolder /e /xf UI.xml
-    }
+		robocopy $umbracoFolderSource $umbracoFolder /e /xf UI.xml
+	}
 
-    $umbracoClientFolder = Join-Path $projectDestinationPath "Umbraco_Client"	
-    if(Test-Path $umbracoClientFolder) {
-        $umbracoClientFolderSource = Join-Path $rootPath "UmbracoFiles\Umbraco_Client"
+	$umbracoClientFolder = Join-Path $projectDestinationPath "Umbraco_Client"	
+	if(Test-Path $umbracoClientFolder) {
+		$umbracoClientFolderSource = Join-Path $rootPath "UmbracoFiles\Umbraco_Client"
 		Copy-Item $umbracoClientFolder $backupPath -Force
-        robocopy $umbracoFolderSource $umbracoClientFolder /e
-    }
+		robocopy $umbracoFolderSource $umbracoClientFolder /e
+	}
 
 	# Open readme.txt file
 	$DTE.ItemOperations.OpenFile($toolsPath + '\Readme.txt')
