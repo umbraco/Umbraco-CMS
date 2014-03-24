@@ -20,7 +20,7 @@ namespace Umbraco.Web.Models
         public IEnumerable<ImageCropData> Crops { get; set; }
 
 
-        public string GetCropUrl(string alias, bool useCropDimensions = true, bool useFocalPoint = false, bool cacheBuster = true)
+        public string GetCropUrl(string alias, bool useCropDimensions = true, bool useFocalPoint = false, string cacheBusterValue = null)
         {
 
             var crop = Crops.GetCrop(alias);
@@ -58,9 +58,9 @@ namespace Umbraco.Web.Models
                 sb.Append("&height=").Append(crop.Height);
             }
 
-            if (cacheBuster)
+            if (cacheBusterValue != null)
             {
-                sb.Append("&rnd=").Append(DateTime.Now.Ticks);
+                sb.Append("&rnd=").Append(cacheBusterValue);
             }
 
             return sb.ToString();

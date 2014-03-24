@@ -10,6 +10,8 @@ using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Web
 {
+    using System.Globalization;
+
     /// <summary>
     /// Provides extension methods for getting ImageProcessor Url from the core Image Cropper property editor
     /// </summary>
@@ -86,7 +88,7 @@ namespace Umbraco.Web
         /// Use crop dimensions to have the output image sized according to the predefined crop sizes, this will override the width and height parameters>.
         /// </param>
         /// <param name="cacheBuster">
-        /// Add a random number at the end of the generated string
+        /// Add a serialised date of the last edit of the item to ensure client cache refresh when updated
         /// </param>
         /// <param name="furtherOptions">
         /// The further options.
@@ -128,8 +130,10 @@ namespace Umbraco.Web
                 mediaItemUrl = mediaItem.Url;
             }
 
+            var cacheBusterValue = cacheBuster ? mediaItem.UpdateDate.ToFileTimeUtc().ToString(CultureInfo.InvariantCulture) : null;
+
             return mediaItemUrl != null
-                ? GetCropUrl(mediaItemUrl, width, height, imageCropperValue, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions)
+                ? GetCropUrl(mediaItemUrl, width, height, imageCropperValue, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions)
                 : string.Empty;
         }
 
@@ -166,8 +170,8 @@ namespace Umbraco.Web
         /// <param name="useCropDimensions">
         /// Use crop dimensions to have the output image sized according to the predefined crop sizes, this will override the width and height parameters>.
         /// </param>
-        /// <param name="cacheBuster">
-        /// Add a random number at the end of the generated string
+        /// <param name="cacheBusterValue">
+        /// Add a serialised date of the last edit of the item to ensure client cache refresh when updated
         /// </param>
         /// <param name="furtherOptions">
         /// The further options.
@@ -186,7 +190,7 @@ namespace Umbraco.Web
             ImageCropAnchor? imageCropAnchor = null,
             bool preferFocalPoint = false,
             bool useCropDimensions = false,
-            bool cacheBuster = true, 
+            string cacheBusterValue = null, 
             string furtherOptions = null)
         {
             if (string.IsNullOrEmpty(imageUrl) == false)
@@ -198,7 +202,7 @@ namespace Umbraco.Web
                     var cropDataSet = imageCropperValue.SerializeToCropDataSet();
                     if (cropDataSet != null)
                     {
-                        var cropUrl = cropDataSet.GetCropUrl(cropAlias, false, preferFocalPoint, cacheBuster);
+                        var cropUrl = cropDataSet.GetCropUrl(cropAlias, false, preferFocalPoint, cacheBusterValue);
                         
                         // if crop alias has been specified but not found in the Json we should return null
                         if (string.IsNullOrEmpty(cropAlias) == false && cropUrl == null)
@@ -207,7 +211,7 @@ namespace Umbraco.Web
                         }
 
                         imageResizerUrl.Append(cropDataSet.Src);
-                        imageResizerUrl.Append(cropDataSet.GetCropUrl(cropAlias, useCropDimensions, preferFocalPoint, cacheBuster));
+                        imageResizerUrl.Append(cropDataSet.GetCropUrl(cropAlias, useCropDimensions, preferFocalPoint, cacheBusterValue));
                     }
                 }
                 else

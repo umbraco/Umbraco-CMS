@@ -16,28 +16,28 @@ namespace Umbraco.Tests.PropertyEditors
         [Test]
         public void GetCropUrl_CropAliasTest()
         {
-            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, cropAlias: "Thumb", cacheBuster: false, useCropDimensions: true);
+            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, cropAlias: "Thumb", useCropDimensions: true);
             Assert.AreEqual(mediaPath + "?crop=0.58729977382575338,0.055768992440203169,0,0.32457553600198386&cropmode=percentage&width=100&height=100", urlString);
         }
 
         [Test]
         public void GetCropUrl_WidthHeightTest()
         {
-            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, width: 200, height: 300, cacheBuster: false);
+            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, width: 200, height: 300);
             Assert.AreEqual(mediaPath + "?center=0.80827067669172936,0.96&mode=crop&width=200&height=300", urlString);
         }
 
         [Test]
         public void GetCropUrl_FocalPointTest()
         {
-            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, cropAlias: "thumb", preferFocalPoint: true, useCropDimensions: true, cacheBuster: false);
+            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, cropAlias: "thumb", preferFocalPoint: true, useCropDimensions: true);
             Assert.AreEqual(mediaPath + "?center=0.80827067669172936,0.96&mode=crop&width=100&height=100", urlString);
         }
 
         [Test]
         public void GetCropUrlFurtherOptionsTest()
         {
-            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, width: 200, height: 300, cacheBuster: false, furtherOptions: "&filter=comic&roundedcorners=radius-26|bgcolor-fff");
+            var urlString = mediaPath.GetCropUrl(imageCropperValue: cropperJson, width: 200, height: 300, furtherOptions: "&filter=comic&roundedcorners=radius-26|bgcolor-fff");
             Assert.AreEqual(mediaPath + "?center=0.80827067669172936,0.96&mode=crop&width=200&height=300&filter=comic&roundedcorners=radius-26|bgcolor-fff", urlString);
         }
 
