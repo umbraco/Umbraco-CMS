@@ -93,30 +93,7 @@ namespace Umbraco.Web
                 {
                     var cropDataSet = imageCropperValue.SerializeToCropDataSet();
                     imageResizerUrl.Append(cropDataSet.Src);
-                    var crop = cropDataSet.Crops.FirstOrDefault(x => cropAlias != null && x.Alias.ToLowerInvariant() == cropAlias.ToLowerInvariant());
-                    if (crop != null && crop.Coordinates != null)
-                    {
-                        imageResizerUrl.Append("?crop=");
-			            imageResizerUrl.Append(crop.Coordinates.X1.ToString(System.Globalization.CultureInfo.InvariantCulture)).Append(",");
-            			imageResizerUrl.Append(crop.Coordinates.Y1.ToString(System.Globalization.CultureInfo.InvariantCulture)).Append(",");
-			            imageResizerUrl.Append(crop.Coordinates.X2.ToString(System.Globalization.CultureInfo.InvariantCulture)).Append(",");
-            			imageResizerUrl.Append(crop.Coordinates.Y2.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                        imageResizerUrl.Append("&cropmode=percentage");
-                    }
-                    else
-                    {
-                        if (cropDataSet.HasFocalPoint())
-                        {
-                            imageResizerUrl.Append("?center=" + cropDataSet.FocalPoint.Top.ToString(System.Globalization.CultureInfo.InvariantCulture) + "," + cropDataSet.FocalPoint.Left.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                            imageResizerUrl.Append("&mode=crop");
-                        }
-                        else
-                        {
-                            imageResizerUrl.Append("?anchor=center");
-                            imageResizerUrl.Append("&mode=crop");
-                        }
-
-                    }
+                    imageResizerUrl.Append(cropDataSet.GetCropUrl(cropAlias, false, false));
                 }
                 else
                 {

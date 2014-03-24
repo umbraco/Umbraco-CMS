@@ -20,7 +20,7 @@ namespace Umbraco.Web.Models
         public IEnumerable<ImageCropData> Crops { get; set; }
 
 
-        public string GetCropUrl(string alias)
+        public string GetCropUrl(string alias, bool addCropDimensions = true, bool addRandom = true)
         {
 
             var crop = Crops.GetCrop(alias);
@@ -28,21 +28,21 @@ namespace Umbraco.Web.Models
                 return null;
 
 
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             if (crop.Coordinates != null)
             {
                 sb.Append("?crop=");
-                sb.Append(crop.Coordinates.X1).Append(",");
-                sb.Append(crop.Coordinates.Y1).Append(",");
-                sb.Append(crop.Coordinates.X2).Append(",");
-                sb.Append(crop.Coordinates.Y2);
+                sb.Append(crop.Coordinates.X1.ToString(System.Globalization.CultureInfo.InvariantCulture)).Append(",");
+                sb.Append(crop.Coordinates.Y1.ToString(System.Globalization.CultureInfo.InvariantCulture)).Append(",");
+                sb.Append(crop.Coordinates.X2.ToString(System.Globalization.CultureInfo.InvariantCulture)).Append(",");
+                sb.Append(crop.Coordinates.Y2.ToString(System.Globalization.CultureInfo.InvariantCulture));
                 sb.Append("&cropmode=percentage");
             }
             else
             {
                 if (HasFocalPoint())
                 {
-                    sb.Append("?center=" + FocalPoint.Top + "," + FocalPoint.Left);
+                    sb.Append("?center=" + FocalPoint.Top.ToString(System.Globalization.CultureInfo.InvariantCulture) + "," + FocalPoint.Left.ToString(System.Globalization.CultureInfo.InvariantCulture));
                     sb.Append("&mode=crop");
                 }
                 else
@@ -53,9 +53,15 @@ namespace Umbraco.Web.Models
 
             }
 
-            sb.Append("&width=").Append(crop.Width);
-            sb.Append("&height=").Append(crop.Height);
-            sb.Append("&rnd=").Append(DateTime.Now.Ticks);
+            if (addCropDimensions)
+            {
+                sb.Append("&width=").Append(crop.Width);
+                sb.Append("&height=").Append(crop.Height);
+            }
+            if (addRandom)
+            {
+                sb.Append("&rnd=").Append(DateTime.Now.Ticks);
+            }
             return sb.ToString();
 
         }
