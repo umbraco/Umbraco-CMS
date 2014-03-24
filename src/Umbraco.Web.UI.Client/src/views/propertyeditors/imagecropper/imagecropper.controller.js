@@ -1,11 +1,11 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-angular.module('umbraco')   
+angular.module('umbraco')
     .controller("Umbraco.PropertyEditors.ImageCropperController",
     function ($rootScope, $routeParams, $scope, $log, mediaHelper, cropperHelper, $timeout, editorState, umbRequestHelper, fileManager) {
 
-        var config =  angular.copy($scope.model.config);
-        
+        var config = angular.copy($scope.model.config);
+
         //move previously saved value to the editor
         if ($scope.model.value) {
             //backwards compat with the old file upload (incase some-one swaps them..)
@@ -88,30 +88,42 @@ angular.module('umbraco')
             }
         });
     })
-    .run(function(mediaHelper, umbRequestHelper){
-        if(mediaHelper && mediaHelper.registerFileResolver){
+    .run(function (mediaHelper, umbRequestHelper) {
+        if (mediaHelper && mediaHelper.registerFileResolver) {
             mediaHelper.registerFileResolver("Umbraco.ImageCropper", function (property, entity, thumbnail) {
-                    if (property.value.src) {
-                        
-                        if(thumbnail === true){
-                            return property.value.src + "?width=600&mode=max";
-                        }else{
-                            return property.value.src;
-                        }
-                        
+                if (property.value.src) {
+
+                    if (thumbnail === true) {
+                        return property.value.src + "?width=600&mode=max";
+                    }
+                    else {
+                        return property.value.src;
+                    }
+
                     //this is a fallback in case the cropper has been asssigned a upload field
-                    } else if (angular.isString(property.value)) {
-                        if(thumbnail){
+                }
+                else if (angular.isString(property.value)) {
+                    if (thumbnail) {
+
+                        if (mediaHelper.detectIfImageByExtension(property.value)) {
                             var thumbnailUrl = umbRequestHelper.getApiUrl(
                                 "imagesApiBaseUrl",
                                 "GetBigThumbnail",
-                                [{ mediaId: entity.id }]);
+                                [{ originalImagePath: property.value }]);
 
                             return thumbnailUrl;
-                        }else{
-                            return property.value;
                         }
+                        else {
+                            return null;
+                        }
+
                     }
-                });
+                    else {
+                        return property.value;
+                    }
+                }
+
+                return null;
+            });
         }
     });

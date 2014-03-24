@@ -127,14 +127,22 @@ angular.module("umbraco")
     .run(function(mediaHelper, umbRequestHelper){
         if(mediaHelper && mediaHelper.registerFileResolver){
             mediaHelper.registerFileResolver("Umbraco.UploadField", function(property, entity, thumbnail){
-                if(thumbnail){
-                    var thumbnailUrl = umbRequestHelper.getApiUrl(
-                        "imagesApiBaseUrl",
-                        "GetBigThumbnail",
-                        [{ mediaId: entity.id }]);
+                if (thumbnail) {
 
-                    return thumbnailUrl;
-                }else{
+                    if (mediaHelper.detectIfImageByExtension(property.value)) {
+                        var thumbnailUrl = umbRequestHelper.getApiUrl(
+                            "imagesApiBaseUrl",
+                            "GetBigThumbnail",
+                            [{ originalImagePath: property.value }]);
+                            
+                        return thumbnailUrl;
+                    }
+                    else {
+                        return null;
+                    }
+                    
+                }
+                else {
                     return property.value;
                 }
             });

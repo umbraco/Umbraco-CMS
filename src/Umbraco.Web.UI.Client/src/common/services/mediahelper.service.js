@@ -219,6 +219,11 @@ function mediaHelper(umbRequestHelper) {
          */
         getThumbnailFromPath: function (imagePath) {
 
+            //If the path is not an image we cannot get a thumb
+            if (!this.detectIfImageByExtension(imagePath)) {
+                return null;
+            }
+
             //get the proxy url for big thumbnails (this ensures one is always generated)
             var thumbnailUrl = umbRequestHelper.getApiUrl(
                 "imagesApiBaseUrl",
