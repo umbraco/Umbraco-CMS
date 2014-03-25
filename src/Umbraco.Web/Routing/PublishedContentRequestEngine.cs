@@ -519,6 +519,7 @@ namespace Umbraco.Web.Routing
 				LogHelper.Debug<PublishedContentRequestEngine>("{0}Page is protected, check for access", () => tracePrefix);
 
 				System.Web.Security.MembershipUser user = null;
+			    System.Web.Security.MembershipUser backOfficeUser = null;
 				try
 				{
                     var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
@@ -528,6 +529,22 @@ namespace Umbraco.Web.Routing
 				{
 					LogHelper.Debug<PublishedContentRequestEngine>("{0}Membership.GetUser returned ArgumentException", () => tracePrefix);
 				}
+
+                try
+                {
+                    var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
+                    backOfficeUser = provider.GetCurrentUser();
+                }
+                catch (ArgumentException)
+                {
+                    LogHelper.Debug<PublishedContentRequestEngine>("{0}UsersMembership.GetUser returned ArgumentException", () => tracePrefix);
+                }
+			    
+                if (backOfficeUser != null && _pcr.RoutingContext.UmbracoContext.InPreviewMode)
+			    {
+                    LogHelper.Debug<PublishedContentRequestEngine>("{0}In preview mode. Ignoring other access checks", () => tracePrefix);
+                    return;
+			    }
 
 				if (user == null || !Member.IsLoggedOn())
 				{
