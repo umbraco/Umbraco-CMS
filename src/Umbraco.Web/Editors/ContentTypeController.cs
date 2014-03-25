@@ -26,7 +26,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]    
     public class ContentTypeController : UmbracoAuthorizedJsonController
     {
-        private ICultureDictionary cultureDictionary;
+        private ICultureDictionary _cultureDictionary;
 
         /// <summary>
         /// Constructor
@@ -52,7 +52,7 @@ namespace Umbraco.Web.Editors
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
             IEnumerable<IContentType> types;
-            if (contentId == Core.Constants.System.Root)
+            if (contentId == Constants.System.Root)
             {
                 types = Services.ContentTypeService.GetAllContentTypes().ToList();
 
@@ -83,10 +83,10 @@ namespace Umbraco.Web.Editors
             return basics;
         }
 
-        // This should really be centralized and used anywhere globalization applies.
+        // TODO: This should really be centralized and used anywhere globalization applies.
         internal string TranslateItem(string text)
         {
-            if (!text.StartsWith("#"))
+            if (text.StartsWith("#") == false)
                 return text;
 
             text = text.Substring(1);
@@ -98,8 +98,8 @@ namespace Umbraco.Web.Editors
             get
             {
                 return
-                    cultureDictionary ??
-                    (cultureDictionary = CultureDictionaryFactoryResolver.Current.Factory.CreateDictionary());
+                    _cultureDictionary ??
+                    (_cultureDictionary = CultureDictionaryFactoryResolver.Current.Factory.CreateDictionary());
             }
         }
     }

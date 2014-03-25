@@ -16,7 +16,7 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class TabsAndPropertiesResolver : ValueResolver<IContentBase, IEnumerable<Tab<ContentPropertyDisplay>>>
     {
-        private ICultureDictionary cultureDictionary;
+        private ICultureDictionary _cultureDictionary;
         protected IEnumerable<string> IgnoreProperties { get; set; }
 
         public TabsAndPropertiesResolver()
@@ -207,7 +207,7 @@ namespace Umbraco.Web.Models.Mapping
             return aggregateTabs;
         }
 
-        // This should really be centralized and used anywhere globalization applies.
+        // TODO: This should really be centralized and used anywhere globalization applies.
         internal string TranslateItem(string text)
         {
             var cultureDictionary = CultureDictionary;
@@ -216,7 +216,7 @@ namespace Umbraco.Web.Models.Mapping
 
         private static string TranslateItem(string text, ICultureDictionary cultureDictionary)
         {
-            if (!text.StartsWith("#"))
+            if (text.StartsWith("#") == false)
                 return text;
 
             text = text.Substring(1);
@@ -228,8 +228,8 @@ namespace Umbraco.Web.Models.Mapping
             get
             {
                 return 
-                    cultureDictionary ?? 
-                    (cultureDictionary = CreateDictionary());
+                    _cultureDictionary ?? 
+                    (_cultureDictionary = CreateDictionary());
             }
         }
 
