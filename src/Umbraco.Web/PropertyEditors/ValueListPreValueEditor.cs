@@ -64,7 +64,17 @@ namespace Umbraco.Web.PropertyEditors
             var arrayOfVals = dictionary.Select(item => item.Value).ToList();
 
             //the items list will be a dictionary of it's id -> value we need to use the id for persistence for backwards compatibility
-            return new Dictionary<string, object> { { "items", arrayOfVals.ToDictionary(x => x.Id, x => x.Value) } };
+            return new Dictionary<string, object> { { "items", arrayOfVals.ToDictionary(x => x.Id, x => PreValueAsDictionary(x)) } };
+        }
+
+        /// <summary>
+        /// Formats the prevalue as a dictionary (as we need to return not just the value, but also the sort-order, to the client)
+        /// </summary>
+        /// <param name="preValue">The prevalue to format</param>
+        /// <returns>Dictionary object containing the prevalue formatted with the field names as keys and the value of those fields as the values</returns>
+        private IDictionary<string, object> PreValueAsDictionary(PreValue preValue)
+        {
+            return new Dictionary<string, object>() { { "value", preValue.Value }, {"sortOrder", preValue.SortOrder } };
         }
 
         /// <summary>
