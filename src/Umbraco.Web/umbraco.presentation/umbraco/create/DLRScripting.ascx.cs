@@ -37,6 +37,24 @@ namespace umbraco.presentation.create
             LoadTemplates(template, filetype.SelectedValue);
         }
 
+        protected void MacroExistsValidator_OnServerValidate(object source, ServerValidateEventArgs args)
+        {
+            if (createMacro.Checked)
+            {
+                //TODO: Shouldn't this use our string functions to create the alias ?
+                var fileName = rename.Text + "." + filetype.SelectedValue;
+                var name = fileName
+                    .Substring(0, (fileName.LastIndexOf('.') + 1)).Trim('.')
+                    .SplitPascalCasing().ToFirstUpperInvariant();
+
+                var macro = ApplicationContext.Current.Services.MacroService.GetByAlias(name);
+                if (macro != null)
+                {
+                    args.IsValid = false;
+                }
+            }
+        }
+
         protected void sbmt_Click(object sender, System.EventArgs e)
         {
             if (Page.IsValid)
@@ -89,6 +107,8 @@ namespace umbraco.presentation.create
                 }
             }
         }
+
+        protected global::System.Web.UI.WebControls.CustomValidator MacroExistsValidator;
 
         /// <summary>
         /// rename control.

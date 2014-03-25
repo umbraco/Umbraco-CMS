@@ -1854,7 +1854,9 @@
     <Content Include="umbraco.presentation\umbraco\controls\ProgressBar.ascx">
       <SubType>ASPXCodeBehind</SubType>
     </Content>
-    <Content Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericProperty.ascx" />
+    <Content Include="umbraco.presentation\umbraco\controls\GenericProperties\GenericProperty.ascx">
+      <SubType>ASPXCodeBehind</SubType>
+    </Content>
     <Content Include="umbraco.presentation\umbraco\controls\Images\ImageViewerUpdater.asmx" />
     <Content Include="umbraco.presentation\umbraco\controls\Images\UploadMediaImage.ascx">
       <SubType>ASPXCodeBehind</SubType>

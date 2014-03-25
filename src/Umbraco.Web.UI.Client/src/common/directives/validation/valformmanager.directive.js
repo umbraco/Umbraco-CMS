@@ -59,21 +59,23 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
 
             //if we wish to turn of the unsaved changes confirmation msg
             //this is the place to do it
-            var locationEvent = $rootScope.$on('$locationChangeStart', function(event, url){
+            var locationEvent = $rootScope.$on('$locationChangeStart', function (event, nextLocation, currentLocation) {
                     if (!formCtrl.$dirty) {
                         return;
                     }
                     
-                    var path = url.split("#")[1];
-                    if(path.indexOf("%253") || path.indexOf("%252")){
-                        path = decodeURIComponent(path);
+                    var path = nextLocation.split("#")[1];
+                    if (path) {
+                        if (path.indexOf("%253") || path.indexOf("%252")) {
+                            path = decodeURIComponent(path);
+                        }
+
+                        var msg = { view: "confirmroutechange", args: { path: path, listener: locationEvent } };
+                        notificationsService.add(msg);
+
+                        event.preventDefault();
                     }
                     
-                    var msg = {view: "confirmroutechange", args: {path: path, listener: locationEvent}};
-                    notificationsService.add(msg);
-
-                    event.preventDefault();
-                    return;
             });
 
             scope.$on('$destroy', function() {

@@ -70,35 +70,5 @@ namespace Umbraco.Web
 
             return dataset.FirstOrDefault(x => x.Alias.ToLowerInvariant() == cropAlias.ToLowerInvariant());
         }
-
-
-
-        internal static bool HasPropertyAndValueAndCrop(this IPublishedContent publishedContent, string propertyAlias, string cropAlias)
-        {
-            if (propertyAlias != null && publishedContent.HasProperty(propertyAlias)
-                && publishedContent.HasValue(propertyAlias))
-            {
-                var propertyAliasValue = publishedContent.GetPropertyValue<string>(propertyAlias);
-                if (propertyAliasValue.DetectIsJson() && propertyAliasValue.Length <= 2)
-                {
-                    return false;
-                }
-                var allTheCrops = propertyAliasValue.SerializeToCropDataSet();
-                if (allTheCrops != null && allTheCrops.Crops.Any())
-                {
-                    var crop = cropAlias != null
-                                    ? allTheCrops.Crops.First(x => x.Alias.ToLowerInvariant() == cropAlias.ToLowerInvariant())
-
-                                    : allTheCrops.Crops.First();
-                    if (crop != null)
-                    {
-                        return true;
-                    }
-                }
-                return false;
-            }
-            return false;
-        }
-
     }
 }

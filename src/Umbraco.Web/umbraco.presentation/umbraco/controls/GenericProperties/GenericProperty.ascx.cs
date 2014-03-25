@@ -100,7 +100,6 @@ namespace umbraco.controls.GenericProperties
 		{
 			tbName.Text = "";
 			tbAlias.Text = "";
-	        lblAlias.Text = "";
 			tbValidation.Text = "";
 			tbDescription.Text = "";
 			ddlTab.SelectedIndex = 0;
@@ -141,7 +140,6 @@ namespace umbraco.controls.GenericProperties
 				//form.Attributes.Add("style", "display: none;");
 				tbName.Text = PropertyType.GetRawName();
 				tbAlias.Text = PropertyType.Alias;
-                lblAlias.Text = PropertyType.Alias;
 				FullHeader.Text = PropertyType.GetRawName() + " (" + PropertyType.Alias + "), Type: " + PropertyType.DataTypeDefinition.Text;;
 				Header.Text = PropertyType.GetRawName();
 				
@@ -154,7 +152,6 @@ namespace umbraco.controls.GenericProperties
                 DeleteButton.Visible = AllowPropertyEdit;
                 DeleteButton2.Visible = AllowPropertyEdit;
                 tbAlias.Visible = AllowPropertyEdit;
-                lblAlias.Visible = AllowPropertyEdit == false;
                 PropertyPanel5.Visible = AllowPropertyEdit;
                 PropertyPanel6.Visible = AllowPropertyEdit;
                 PropertyPanel3.Visible = AllowPropertyEdit;

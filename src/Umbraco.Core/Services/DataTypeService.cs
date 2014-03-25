@@ -138,7 +138,7 @@ namespace Umbraco.Core.Services
             using (var uow = _uowProvider.GetUnitOfWork())
             {
                 var dtos = uow.Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = id });
-                var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value), x.Alias, x.SortOrder)).ToList();
+                var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value, x.SortOrder), x.Alias, x.SortOrder)).ToList();
 
                 return PreValueConverter.ConvertToPreValuesCollection(list);
             }
