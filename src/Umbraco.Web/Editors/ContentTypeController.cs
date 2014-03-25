@@ -2,6 +2,8 @@
 using System.Net;
 using System.Web.Http;
 using AutoMapper;
+using Umbraco.Core;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
@@ -24,6 +26,8 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]    
     public class ContentTypeController : UmbracoAuthorizedJsonController
     {
+        private ICultureDictionary cultureDictionary;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -47,28 +51,56 @@ namespace Umbraco.Web.Editors
         /// <param name="contentId"></param>
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
+            IEnumerable<IContentType> types;
             if (contentId == Core.Constants.System.Root)
             {
-                var types = Services.ContentTypeService.GetAllContentTypes();
+                types = Services.ContentTypeService.GetAllContentTypes().ToList();
 
                 //if no allowed root types are set, just return everythibg
                 if(types.Any(x => x.AllowedAsRoot))
                     types = types.Where(x => x.AllowedAsRoot);
-
-                return types.Select(Mapper.Map<IContentType, ContentTypeBasic>);
             }
-
-            var contentItem = Services.ContentService.GetById(contentId);
-            if (contentItem == null)
+            else
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
+                var contentItem = Services.ContentService.GetById(contentId);
+                if (contentItem == null)
+                {
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                }
+                types = contentItem.ContentType.AllowedContentTypes
+                    .Select(x => Services.ContentTypeService.GetContentType(x.Id.Value))
+                    .ToList();
             }
 
+            var basics = types.Select(Mapper.Map<IContentType, ContentTypeBasic>).ToList();
 
-            return contentItem.ContentType.AllowedContentTypes
-                .Select(x => Services.ContentTypeService.GetContentType(x.Id.Value))
-                .Select(Mapper.Map<IContentType, ContentTypeBasic>);
-            
+            foreach (var basic in basics)
+            {
+                basic.Name = TranslateItem(basic.Name);
+                basic.Description = TranslateItem(basic.Description);
+            }
+
+            return basics;
+        }
+
+        // This should really be centralized and used anywhere globalization applies.
+        internal string TranslateItem(string text)
+        {
+            if (!text.StartsWith("#"))
+                return text;
+
+            text = text.Substring(1);
+            return CultureDictionary[text].IfNullOrWhiteSpace(text);
+        }
+
+        private ICultureDictionary CultureDictionary
+        {
+            get
+            {
+                return
+                    cultureDictionary ??
+                    (cultureDictionary = CultureDictionaryFactoryResolver.Current.Factory.CreateDictionary());
+            }
         }
     }
 }
