@@ -310,7 +310,12 @@
   </Target>
 
   <Target Name="SetVersionNumber" Condition="'$(BUILD_RELEASE)'!=''">
-    <!-- Match & replace 3 and 4 digit version numbers and -beta (if it's there) -->
+	<PropertyGroup>
+		<NewVersion>$(BUILD_RELEASE)</NewVersion>
+		<NewVersion Condition="'$(BUILD_COMMENT)'!=''">$(BUILD_RELEASE)-$(BUILD_COMMENT)</NewVersion>
+	</PropertyGroup>
+	
+	<!-- Match & replace 3 and 4 digit version numbers and -beta (if it's there) -->
     <FileUpdate
       Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
       Regex="(\d+)\.(\d+)\.(\d+)(.(\d+))?"
@@ -319,5 +324,10 @@
     <FileUpdate Files="..\src\Umbraco.Core\Configuration\UmbracoVersion.cs"
       Regex="CurrentComment { get { return &quot;([a-zA-Z]+)?&quot;"
       ReplacementText="CurrentComment { get { return &quot;$(BUILD_COMMENT)&quot;"/>
+	
+	<XmlPoke XmlInputPath=".\NuSpecs\build\UmbracoCms.targets"
+             Namespaces="&lt;Namespace Prefix='x' Uri='http://schemas.microsoft.com/developer/msbuild/2003' /&gt;"
+			 Query="//x:UmbracoVersion"
+			 Value="$(NewVersion)" />
   </Target>
 </Project>

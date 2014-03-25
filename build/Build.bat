@@ -30,6 +30,7 @@ echo This file is only here so that the containing folder will be included in th
 ECHO Adding Web.config transform files to the NuGet package
 ren .\_BuildOutput\WebApp\MacroScripts\Web.config Web.config.transform
 ren .\_BuildOutput\WebApp\Views\Web.config Web.config.transform
+ren .\_BuildOutput\WebApp\Xslt\Web.config Web.config.transform
 
 ECHO Packing the NuGet release files
 ..\src\.nuget\NuGet.exe pack NuSpecs\UmbracoCms.Core.nuspec -Version %version%
