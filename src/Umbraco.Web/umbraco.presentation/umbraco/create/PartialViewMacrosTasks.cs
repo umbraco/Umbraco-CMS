@@ -75,6 +75,7 @@ namespace umbraco
             // Create macro?
             if (ParentID == 1)
             {
+                //TODO: Shouldn't this use our string functions to create the alias ?
                 var name = fileName
                     .Substring(0, (fileName.LastIndexOf('.') + 1)).Trim('.')
                     .SplitPascalCasing().ToFirstUpperInvariant();
