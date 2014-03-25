@@ -26,6 +26,13 @@ namespace Umbraco.Web.PropertyEditors
             field.Validators.Add(new ColorListValidator()); 
         }
 
+        public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
+        {
+            var dictionary = persistedPreVals.FormatAsDictionary();
+            var arrayOfVals = dictionary.Select(item => item.Value).ToList();
+            return new Dictionary<string, object> { { "items", arrayOfVals.ToDictionary(x => x.Id, x => x.Value) } };
+        }
+
         internal class ColorListValidator : IPropertyValidator
         {
             public IEnumerable<ValidationResult> Validate(object value, PreValueCollection preValues, PropertyEditor editor)

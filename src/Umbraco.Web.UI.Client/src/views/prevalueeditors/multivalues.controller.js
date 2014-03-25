@@ -11,7 +11,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.MultiValuesControl
             //make an array from the dictionary
             var items = [];
             for (var i in $scope.model.value) { 
-                items.push({
+                items.push({ 
                     value: $scope.model.value[i].value,
                     sortOrder: $scope.model.value[i].sortOrder,
                     id: i

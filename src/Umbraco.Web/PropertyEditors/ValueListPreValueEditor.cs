@@ -64,7 +64,8 @@ namespace Umbraco.Web.PropertyEditors
             var arrayOfVals = dictionary.Select(item => item.Value).ToList();
 
             //the items list will be a dictionary of it's id -> value we need to use the id for persistence for backwards compatibility
-            return new Dictionary<string, object> { { "items", arrayOfVals.ToDictionary(x => x.Id, x => PreValueAsDictionary(x)) } };
+
+            return new Dictionary<string, object> {{"items", arrayOfVals.ToDictionary(x => x.Id, PreValueAsDictionary)}};
         }
 
         /// <summary>
