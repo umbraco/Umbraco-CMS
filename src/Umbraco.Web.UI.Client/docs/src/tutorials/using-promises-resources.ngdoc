@@ -23,7 +23,7 @@ Here's an example of the usage in an Umbraco resource. This example is the metho
         
         return umbRequestHelper.resourcePromise(
             $http.get(getTreeMenuUrl(node)),
-            "Failed to retreive data for a node's menu " + node.id);
+            "Failed to retrieve data for a node's menu " + node.id);
     }
 
 HTTP error handling is performed automatically inside of the `umbRequestHelper.resourcePromise` and inside of Umbraco's response interceptors.
