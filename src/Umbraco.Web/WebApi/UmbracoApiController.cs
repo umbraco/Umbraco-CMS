@@ -33,7 +33,7 @@ namespace Umbraco.Web.WebApi
         private readonly MembershipHelper _membershipHelper;
 
         /// <summary>
-        /// Tries to retreive the current HttpContext if one exists.
+        /// Tries to retrieve the current HttpContext if one exists.
         /// </summary>
         /// <returns></returns>
         protected Attempt<HttpContextBase> TryGetHttpContext()

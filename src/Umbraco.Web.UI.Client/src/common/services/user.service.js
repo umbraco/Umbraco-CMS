@@ -72,7 +72,7 @@ angular.module('umbraco.services')
                 if (currentUser.remainingAuthSeconds > 30) {
 
                     //we need to check when the last time the timeout was set from the server, if 
-                    // it has been more than 30 seconds then we'll manually go and retreive it from the 
+                    // it has been more than 30 seconds then we'll manually go and retrieve it from the 
                     // server - this helps to keep our local countdown in check with the true timeout.
                     if (lastServerTimeoutSet != null) {
                         var now = new Date();

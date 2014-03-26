@@ -34,7 +34,7 @@ function mediaTypeResource($q, $http, umbRequestHelper) {
                        "mediaTypeApiBaseUrl",
                        "GetAllowedChildren",
                        [{ contentId: mediaId }])),
-               'Failed to retreive data for media id ' + mediaId);
+               'Failed to retrieve data for media id ' + mediaId);
         }
 
     };

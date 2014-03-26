@@ -45,7 +45,7 @@ function currentUserResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "currentUserApiBaseUrl",
                        "GetMembershipProviderConfig")),
-               'Failed to retreive membership provider config');
+               'Failed to retrieve membership provider config');
         },
     };
 }

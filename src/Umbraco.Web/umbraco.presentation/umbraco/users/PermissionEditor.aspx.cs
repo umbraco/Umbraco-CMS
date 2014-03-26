@@ -72,7 +72,7 @@ namespace umbraco.cms.presentation.user
         }
 
         /// <summary>
-        /// Since Umbraco stores users in cache, we'll use this method to retreive our user object by the selected id
+        /// Since Umbraco stores users in cache, we'll use this method to retrieve our user object by the selected id
         /// </summary>
         protected umbraco.BusinessLogic.User UmbracoUser
         {

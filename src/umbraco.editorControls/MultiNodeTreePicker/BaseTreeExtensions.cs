@@ -102,7 +102,7 @@ namespace umbraco.editorControls.MultiNodeTreePicker
         /// </summary>
         /// <remarks>
         /// The data type definition id is persisted between request as a query string.
-        /// This is used to retreive values from the cookie which are easier persisted values
+        /// This is used to retrieve values from the cookie which are easier persisted values
         /// than trying to append everything to custom query strings.
         /// </remarks>
         /// <param name="tree"></param>
