@@ -8,7 +8,7 @@ angular.module("umbraco.directives")
                 //Initial click, select entire text
                 this.select();
                 //Set the edit mode so subsequent clicks work normally
-                $(el).data("editmode", true)
+                $(el).data("editmode", true);
             }
         }).
         bind("blur", function () {
