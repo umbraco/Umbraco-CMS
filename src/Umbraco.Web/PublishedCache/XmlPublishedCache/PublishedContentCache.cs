@@ -338,7 +338,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
         private Func<UmbracoContext, bool, XmlDocument> _xmlDelegate;
 
         /// <summary>
-        /// Gets/sets the delegate used to retreive the Xml content, generally the setter is only used for unit tests
+        /// Gets/sets the delegate used to retrieve the Xml content, generally the setter is only used for unit tests
         /// and by default if it is not set will use the standard delegate which ONLY works when in the context an Http Request
         /// </summary>
         /// <remarks>
