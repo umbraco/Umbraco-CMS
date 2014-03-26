@@ -46,10 +46,10 @@
 
         submitSucces: function(t) {
             if (t != 'true') {
-                top.UmbSpeechBubble.ShowMessage('error', this._opts.text.cssErrorHeader, this._opts.text.cssErrorText);
+                top.UmbSpeechBubble.ShowMessage('error', unescape(this._opts.text.cssErrorHeader), unescape(this._opts.text.cssErrorText));
             }
             else {
-                top.UmbSpeechBubble.ShowMessage('save', this._opts.text.cssSavedHeader, this._opts.text.cssSavedText);
+                top.UmbSpeechBubble.ShowMessage('save', unescape(this._opts.text.cssSavedHeader), unescape(this._opts.text.cssSavedText));
             }
 
             UmbClientMgr.mainTree().setActiveTreeType('stylesheets');
@@ -60,7 +60,7 @@
         },
 
         submitFailure: function(t) {
-            top.UmbSpeechBubble.ShowMessage('error', this._opts.text.cssErrorHeader, this._opts.text.cssErrorText);
+            top.UmbSpeechBubble.ShowMessage('error', unescape(this._opts.text.cssErrorHeader), unescape(this._opts.text.cssErrorText));
         }
     });
 })(jQuery);

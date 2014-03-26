@@ -23,10 +23,10 @@
                     saveButton: $("#<%= ((Control)SaveButton).ClientID %>"),
                     editorSourceElement: $('#<%= editorSource.ClientID %>'),
                     text: {
-                        fileErrorHeader: '<%= umbraco.ui.Text("speechBubbles", "fileErrorHeader") %>',
-                        fileSavedHeader: '<%= umbraco.ui.Text("speechBubbles", "fileSavedHeader") %>',
+                        fileErrorHeader: '<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "fileErrorHeader")) %>',
+                        fileSavedHeader: '<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "fileSavedHeader")) %>',
                         fileSavedText: '',
-                        fileErrorText: '<%= umbraco.ui.Text("speechBubbles", "fileErrorText") %>',
+                        fileErrorText: '<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "fileErrorText")) %>',
                     }
                 });
                 editor.init();
