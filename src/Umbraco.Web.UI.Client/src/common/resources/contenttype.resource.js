@@ -67,7 +67,7 @@ function contentTypeResource($q, $http, umbRequestHelper) {
                        "contentTypeApiBaseUrl",
                        "GetAllowedChildren",
                        [{ contentId: contentId }])),
-               'Failed to retreive data for content id ' + contentId);
+               'Failed to retrieve data for content id ' + contentId);
         }
 
     };
