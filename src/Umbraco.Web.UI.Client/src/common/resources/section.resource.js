@@ -20,7 +20,7 @@ function sectionResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "sectionApiBaseUrl",
                        "GetSections")),
-               'Failed to retreive data for sections');
+               'Failed to retrieve data for sections');
 
 		}
     };
