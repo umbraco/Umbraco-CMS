@@ -801,7 +801,7 @@ namespace umbraco.BusinessLogic
         /// </summary>
         /// <param name="id">The id.</param>
         /// <returns></returns>
-        [Obsolete("The legacy user object should no longer be used, use the WebSecurity class to access the current user or the UserService to retreive a user by id")]
+        [Obsolete("The legacy user object should no longer be used, use the WebSecurity class to access the current user or the UserService to retrieve a user by id")]
         public static User GetUser(int id)
         {
             var result = ApplicationContext.Current.Services.UserService.GetUserById(id);
