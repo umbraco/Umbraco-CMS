@@ -433,7 +433,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                //In order to update the ContentVersion we need to retreive its primary key id
+                //In order to update the ContentVersion we need to retrieve its primary key id
                 var contentVerDto = Database.SingleOrDefault<ContentVersionDto>("WHERE VersionId = @Version", new { Version = entity.Version });
                 contentVersionDto.Id = contentVerDto.Id;
 
