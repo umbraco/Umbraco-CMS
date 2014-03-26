@@ -315,7 +315,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 /// </summary>
                 /// <param name="path">The path of the node</param>
                 /// <param name="forceReload">If true, will ensure that the node to be synced is synced with data from the server</param>
-                /// <param name="newId">This parameter is only used when we don't have a real unique ID for a node, for example for a file. If a filename changes we don't know what the new one is since we are syncing the tree to the old original path. Once we retreive the results the sync the tree we need to find the result by it's new id and update the node.</param>
+                /// <param name="newId">This parameter is only used when we don't have a real unique ID for a node, for example for a file. If a filename changes we don't know what the new one is since we are syncing the tree to the old original path. Once we retrieve the results the sync the tree we need to find the result by it's new id and update the node.</param>
 
                 this._debug("syncTree: " + path + ", " + forceReload);
 
@@ -874,7 +874,7 @@ Umbraco.Sys.registerNamespace("Umbraco.Controls");
                 /// <param name="forceReload">If true, will ensure that the node to be synced is synced with data from the server</param>
                 /// <param name="numPaths">the number of id's deep to search starting from the end of the path. Used in recursion.</param>
                 /// <param name="numAsync">the number of async calls made so far to sync. Used in recursion and used to determine if the found node has been loaded by ajax.</param>
-                /// <param name="newId">This parameter is only used when we don't have a real unique ID for a node, for example for a file. If a filename changes we don't know what the new one is since we are syncing the tree to the old original path. Once we retreive the results the sync the tree we need to find the result by it's new id and update the node.</param>
+                /// <param name="newId">This parameter is only used when we don't have a real unique ID for a node, for example for a file. If a filename changes we don't know what the new one is since we are syncing the tree to the old original path. Once we retrieve the results the sync the tree we need to find the result by it's new id and update the node.</param>
 
                 this._debug("_syncTree");
 
