@@ -101,7 +101,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="factoryGuid"></param>
-        /// <param name="getNumericId">The callback method to retreive the ID from an instance</param>
+        /// <param name="getNumericId">The callback method to retrieve the ID from an instance</param>
         /// <param name="instances">The instances containing Ids</param>
         /// <remarks>
         /// This method is much better for performance because it does not need to re-lookup an object instance
