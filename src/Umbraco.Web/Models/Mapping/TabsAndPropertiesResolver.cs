@@ -216,6 +216,11 @@ namespace Umbraco.Web.Models.Mapping
 
         private static string TranslateItem(string text, ICultureDictionary cultureDictionary)
         {
+            if (text == null)
+            {
+                return null;
+            }
+
             if (text.StartsWith("#") == false)
                 return text;
 
