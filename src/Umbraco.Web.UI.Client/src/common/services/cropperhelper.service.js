@@ -22,7 +22,7 @@ function cropperHelper(umbRequestHelper, $http) {
 						"imageCropperApiBaseUrl",
 						"GetConfiguration",
 						[{ mediaTypeAlias: mediaTypeAlias}])),
-				'Failed to retreive tinymce configuration');
+				'Failed to retrieve tinymce configuration');
 		},
 
 
