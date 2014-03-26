@@ -96,7 +96,7 @@ function entityResource($q, $http, umbRequestHelper) {
                        "entityApiBaseUrl",
                        "GetById",
                        [{ id: id}, {type: type }])),
-               'Failed to retreive entity data for id ' + id);
+               'Failed to retrieve entity data for id ' + id);
         },
         
         getByQuery: function (query, nodeContextId, type) {            
@@ -106,7 +106,7 @@ function entityResource($q, $http, umbRequestHelper) {
                        "entityApiBaseUrl",
                        "GetByQuery",
                        [{query: query},{ nodeContextId: nodeContextId}, {type: type }])),
-               'Failed to retreive entity data for query ' + query);
+               'Failed to retrieve entity data for query ' + query);
         },
 
         /**
