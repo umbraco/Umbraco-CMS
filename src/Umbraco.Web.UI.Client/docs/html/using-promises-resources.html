@@ -125,7 +125,7 @@ loadMenu: function (node) {
 
     return umbRequestHelper.resourcePromise(
         $http.get(getTreeMenuUrl(node)),
-        &quot;Failed to retreive data for a node&#39;s menu &quot; + node.id);
+        &quot;Failed to retrieve data for a node&#39;s menu &quot; + node.id);
 }</code></pre>
 <p>HTTP error handling is performed automatically inside of the <code>umbRequestHelper.resourcePromise</code> and inside of Umbraco&#39;s response interceptors.</p>
 <h2>Consuming Umbraco resources</h2>
