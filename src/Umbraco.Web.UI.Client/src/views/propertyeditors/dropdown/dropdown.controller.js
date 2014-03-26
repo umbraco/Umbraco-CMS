@@ -13,14 +13,28 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownController
         $scope.model.config = config;
         
         if (angular.isArray($scope.model.config.items)) {
-            //now we need to format the items in the array because we always want to have a dictionary
-            var newItems = {};
-            for (var i = 0; i < $scope.model.config.items.length; i++) {
-                newItems[$scope.model.config.items[i]] = $scope.model.config.items[i];
+
+            //ensure the items are sorted by the provided sort order
+            $scope.model.config.items.sort(function (a, b) { return (a.sortOrder > b.sortOrder) ? 1 : ((b.sortOrder > a.sortOrder) ? -1 : 0); });
+
+        }
+        else if (angular.isObject($scope.model.config.items)) {
+
+            //now we need to format the items in the dictionary because we always want to have an array
+            var newItems = [];
+            var vals = _.values($scope.model.config.items);
+            var keys = _.keys($scope.model.config.items);
+            for (var i = 0; i < vals.length; i++) {
+                newItems.push({ id: keys[i], sortOrder: vals[i].sortOrder, value: vals[i].value });
             }
+
+            //ensure the items are sorted by the provided sort order
+            newItems.sort(function (a, b) { return (a.sortOrder > b.sortOrder) ? 1 : ((b.sortOrder > a.sortOrder) ? -1 : 0); });
+
+            //re-assign
             $scope.model.config.items = newItems;
         }
-        else if (!angular.isObject($scope.model.config.items)) {
+        else {
             throw "The items property must be either an array or a dictionary";
         }
         

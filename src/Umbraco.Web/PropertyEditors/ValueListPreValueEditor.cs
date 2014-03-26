@@ -61,11 +61,14 @@ namespace Umbraco.Web.PropertyEditors
         public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
         {
             var dictionary = persistedPreVals.FormatAsDictionary();
-            var arrayOfVals = dictionary.Select(item => item.Value).ToList();
-
+            var arrayOfVals = dictionary.Select(item => item.Value)
+                //ensure they are sorted - though this isn't too important because in json in may not maintain
+                // the sorted order and the js has to sort anyways.
+                .OrderBy(x => x.SortOrder)
+                .ToList();
+          
             //the items list will be a dictionary of it's id -> value we need to use the id for persistence for backwards compatibility
-
-            return new Dictionary<string, object> {{"items", arrayOfVals.ToDictionary(x => x.Id, PreValueAsDictionary)}};
+            return new Dictionary<string, object> {{"items", arrayOfVals.ToDictionary(x => x.Id, x => PreValueAsDictionary(x))}};
         }
 
         /// <summary>

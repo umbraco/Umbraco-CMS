@@ -1,12 +1,12 @@
-﻿<div class="umb-editor umb-radiobuttons">
+﻿<div class="umb-editor umb-radiobuttons" ng-controller="Umbraco.PropertyEditors.RadioButtonsController">
     <ul class="unstyled">
-        <li ng-repeat="(key, val) in model.config.items">
+        <li ng-repeat="item in model.config.items">
             <label class="radio">
                 <input type="radio" name="checkboxlist"
-                       value="{{key}}"
+                       value="{{item.id}}"
                        ng-model="model.value" />
-                {{val}}
+                {{item.value}}
             </label>
         </li>
-    </ul>    
+    </ul>
 </div>
