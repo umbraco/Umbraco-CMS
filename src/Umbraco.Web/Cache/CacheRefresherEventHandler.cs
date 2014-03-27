@@ -143,24 +143,18 @@ namespace Umbraco.Web.Cache
             // the unpublishing event handles that, and for examine with unpublished content indexes, we want to keep that data 
             // in the index, it's not until it's complete deleted that we want to remove it.
 
-            //SD: We are not using this, i was going to use this for the PublicAccessCacheRefresher but we need
-            // to store the public access in the db otherwise we're gonna end up with problems in certain LB
-            // scenarios
-
-            ////public access events
-            //Access.AfterSave += Access_AfterSave;
+            //public access events
+            Access.AfterSave += Access_AfterSave;
         }
 
-        //SD: We are not using this, i was going to use this for the PublicAccessCacheRefresher but we need
-        // to store the public access in the db otherwise we're gonna end up with problems in certain LB
-        // scenarios
+        #region Public access event handlers
 
-        //#region Public access event handlers
-        //static void Access_AfterSave(Access sender, SaveEventArgs e)
-        //{
-        //    DistributedCache.Instance.RefreshPublicAccess();
-        //} 
-        //#endregion
+        static void Access_AfterSave(Access sender, SaveEventArgs e)
+        {
+            DistributedCache.Instance.RefreshPublicAccess();
+        } 
+
+        #endregion
 
         #region Content service event handlers
 

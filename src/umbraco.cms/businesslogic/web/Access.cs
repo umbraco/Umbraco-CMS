@@ -95,29 +95,26 @@ namespace umbraco.cms.businesslogic.web
             new Access().FireAfterAddMemberShipRoleToDocument(new Document(documentId), role, e);
         }
         
-        //SD: We are not using this, i was going to use this for the PublicAccessCacheRefresher but we need
-        // to store the public access in the db otherwise we're gonna end up with problems in certain LB
-        // scenarios
-
-        //internal static void Reload(XmlDocument newDoc)
-        //{
-        //    //NOTE: This would be better to use our normal ReaderWriter lock but because we are emitting an 
-        //    // event inside of the WriteLock and code can then listen to the event and call this method we end
-        //    // up in a dead-lock. This specifically happens in the PublicAccessCacheRefresher.
-        //    //So instead we use the load locker which is what is used for the static XmlDocument instance, we'll 
-        //    // lock that, set the doc to null which will cause any reader threads to block for the AccessXml instance
-        //    // then save the doc and re-load it, then all blocked threads can carry on.
-        //    lock(LoadLocker)
-        //    {
-        //        _accessXmlContent = null;
-
-        //        newDoc.Save(_accessXmlSource);
-
-        //        _accessXmlContent = new XmlDocument();
-        //        _accessXmlContent.Load(_accessXmlSource);
-        //        ClearCheckPages();
-        //    }   
-        //}
+        /// <summary>
+        /// Used to refresh cache among servers in an LB scenario
+        /// </summary>
+        /// <param name="newDoc"></param>
+        internal static void UpdateInMemoryDocument(XmlDocument newDoc)
+        {
+            //NOTE: This would be better to use our normal ReaderWriter lock but because we are emitting an 
+            // event inside of the WriteLock and code can then listen to the event and call this method we end
+            // up in a dead-lock. This specifically happens in the PublicAccessCacheRefresher.
+            //So instead we use the load locker which is what is used for the static XmlDocument instance, we'll 
+            // lock that, set the doc to null which will cause any reader threads to block for the AccessXml instance
+            // then save the doc and re-load it, then all blocked threads can carry on.
+            lock (LoadLocker)
+            {
+                _accessXmlContent = null;
+                _accessXmlContent = new XmlDocument();
+                _accessXmlContent.LoadXml(newDoc.OuterXml);
+                ClearCheckPages();
+            }
+        }
 
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
         public static void AddMemberGroupToDocument(int DocumentId, int MemberGroupId)

@@ -7,75 +7,71 @@ using Umbraco.Core.Cache;
 
 namespace Umbraco.Web.Cache
 {
-    //SD: We are not using this, i was going to use this for the PublicAccessCacheRefresher but we need
-    // to store the public access in the db otherwise we're gonna end up with problems in certain LB
-    // scenarios
+    public sealed class PublicAccessCacheRefresher : JsonCacheRefresherBase<PublicAccessCacheRefresher>
+    {
+        #region Static helpers
 
-    //public sealed class PublicAccessCacheRefresher : JsonCacheRefresherBase<PublicAccessCacheRefresher>
-    //{
-    //    #region Static helpers
+        internal static JsonPayload DeserializeFromJsonPayload(string json)
+        {
+            return JsonConvert.DeserializeObject<JsonPayload>(json);
+        }
 
-    //    internal static JsonPayload DeserializeFromJsonPayload(string json)
-    //    {
-    //        return JsonConvert.DeserializeObject<JsonPayload>(json);
-    //    }
+        internal static string SerializeToJsonPayload(XmlDocument doc)
+        {
+            return JsonConvert.SerializeObject(FromXml(doc));
+        }
 
-    //    internal static string SerializeToJsonPayload(XmlDocument doc)
-    //    {
-    //        return JsonConvert.SerializeObject(FromXml(doc));
-    //    }
+        internal static JsonPayload FromXml(XmlDocument doc)
+        {
+            if (doc == null) return null;
 
-    //    internal static JsonPayload FromXml(XmlDocument doc)
-    //    {
-    //        if (doc == null) return null;
+            var payload = new JsonPayload
+            {
+                XmlContent = doc.OuterXml
+            };
+            return payload;
+        }
 
-    //        var payload = new JsonPayload
-    //        {
-    //            XmlContent = doc.OuterXml
-    //        };
-    //        return payload;
-    //    }
+        #endregion
 
-    //    #endregion
+        #region Sub classes
 
-    //    #region Sub classes
+        internal class JsonPayload
+        {
+            public string XmlContent { get; set; }
+        }
 
-    //    internal class JsonPayload
-    //    {
-    //        public string XmlContent { get; set; }
-    //    }
+        #endregion
 
-    //    #endregion
+        protected override PublicAccessCacheRefresher Instance
+        {
+            get { return this; }
+        }
 
-    //    protected override PublicAccessCacheRefresher Instance
-    //    {
-    //        get { return this; }
-    //    }
+        public override Guid UniqueIdentifier
+        {
+            get { return new Guid(DistributedCache.PublicAccessCacheRefresherId); }
+        }
 
-    //    public override Guid UniqueIdentifier
-    //    {
-    //        get { return new Guid(DistributedCache.PublicAccessCacheRefresherId); }
-    //    }
+        public override string Name
+        {
+            get { return "Public access cache refresher"; }
+        }
 
-    //    public override string Name
-    //    {
-    //        get { return "Public access cache refresher"; }
-    //    }
+        public override void Refresh(string jsonPayload)
+        {
+            if (jsonPayload.IsNullOrWhiteSpace()) return;
+            var deserialized = DeserializeFromJsonPayload(jsonPayload);
+            if (deserialized == null) return;
+            var xDoc = new XmlDocument();
+            xDoc.LoadXml(deserialized.XmlContent);
+            ClearCache(xDoc);
+            base.Refresh(jsonPayload);
+        }
 
-    //    public override void Refresh(string jsonPayload)
-    //    {
-    //        if (jsonPayload.IsNullOrWhiteSpace()) return;
-    //        var deserialized = DeserializeFromJsonPayload(jsonPayload);
-    //        if (deserialized == null) return;
-    //        var xDoc = new XmlDocument();
-    //        xDoc.LoadXml(deserialized.XmlContent);
-    //        ClearCache(xDoc);
-    //        base.Refresh(jsonPayload);
-    //    }
-
-    //    private void ClearCache(XmlDocument xDoc)
-    //    {
-    //        Access.Reload(xDoc);
-    //    }
-    //}
+        private void ClearCache(XmlDocument xDoc)
+        {
+            Access.UpdateInMemoryDocument(xDoc);
+        }
+    }
 }
