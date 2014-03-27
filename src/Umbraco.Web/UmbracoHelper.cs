@@ -1383,7 +1383,7 @@ namespace Umbraco.Web
 
         public string GetPreValueAsString(int id)
         {
-            var ds = UmbracoContext.Application.Services.DataTypeService;
+            var ds = _umbracoContext.Application.Services.DataTypeService;
             return ds.GetPreValueAsString(id);
         }
 
