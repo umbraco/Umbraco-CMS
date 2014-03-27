@@ -2,6 +2,7 @@ using System;
 using System.Data;
 using System.Globalization;
 using System.Threading;
+using System.Web;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
@@ -23,47 +24,68 @@ namespace umbraco.cms.businesslogic.web
         static private readonly Hashtable CheckedPages = new Hashtable();
 
         static private volatile XmlDocument _accessXmlContent;
-        static private string _accessXmlSource;
+        static private string _accessXmlFilePath;
         private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
         private static readonly object LoadLocker = new object();
 
+        [Obsolete("Do not access this property directly, it is not thread safe, use GetXmlDocumentCopy instead")]
         public static XmlDocument AccessXml
         {
-            get
+            get { return GetXmlDocument(); }
+        }
+
+        //private method to initialize and return the in-memory xmldocument
+        private static XmlDocument GetXmlDocument()
+        {
+            if (_accessXmlContent == null)
             {
-                if (_accessXmlContent == null)
+                lock (LoadLocker)
                 {
-                    lock (LoadLocker)
+                    if (_accessXmlContent == null)
                     {
-                        if (_accessXmlContent == null)
+                        if (_accessXmlFilePath == null)
                         {
-                            if (_accessXmlSource == null)
-                            {
-                                //if we pop it here it'll make for better stack traces ;)
-                                _accessXmlSource = IOHelper.MapPath(SystemFiles.AccessXml);
-                            }
-
-                            _accessXmlContent = new XmlDocument();
-
-                            if (File.Exists(_accessXmlSource) == false)
-                            {
-                                var file = new FileInfo(_accessXmlSource);
-                                if (Directory.Exists(file.DirectoryName) == false)
-                                {
-                                    Directory.CreateDirectory(file.Directory.FullName); //ensure the folder exists!	
-                                }
-                                var f = File.Open(_accessXmlSource, FileMode.Create);
-                                var sw = new StreamWriter(f);
-                                sw.WriteLine("<access/>");
-                                sw.Close();
-                                f.Close();
-                            }
-                            _accessXmlContent.Load(_accessXmlSource);
+                            //if we pop it here it'll make for better stack traces ;)
+                            _accessXmlFilePath = IOHelper.MapPath(SystemFiles.AccessXml);
                         }
+
+                        _accessXmlContent = new XmlDocument();
+
+                        if (File.Exists(_accessXmlFilePath) == false)
+                        {
+                            var file = new FileInfo(_accessXmlFilePath);
+                            if (Directory.Exists(file.DirectoryName) == false)
+                            {
+                                Directory.CreateDirectory(file.Directory.FullName); //ensure the folder exists!	
+                            }
+                            var f = File.Open(_accessXmlFilePath, FileMode.Create);
+                            var sw = new StreamWriter(f);
+                            sw.WriteLine("<access/>");
+                            sw.Close();
+                            f.Close();
+                        }
+                        _accessXmlContent.Load(_accessXmlFilePath);
                     }
                 }
-                return _accessXmlContent;
             }
+            return _accessXmlContent;
+        }
+
+        //used by all other methods in this class to read and write the document which 
+        // is thread safe and only clones once per request so it's still fast.
+        public static XmlDocument GetXmlDocumentCopy()
+        {
+            if (HttpContext.Current == null)
+            {
+                return (XmlDocument)GetXmlDocument().Clone();    
+            }
+
+            if (HttpContext.Current.Items.Contains(typeof (Access)) == false)
+            {
+                HttpContext.Current.Items.Add(typeof (Access), GetXmlDocument().Clone());
+            }
+
+            return (XmlDocument)HttpContext.Current.Items[typeof(Access)];
         }
 
         #region Manipulation methods
@@ -85,10 +107,10 @@ namespace umbraco.cms.businesslogic.web
 
                 if (x.SelectSingleNode("group [@id = '" + role + "']") == null)
                 {
-                    var groupXml = (XmlElement)AccessXml.CreateNode(XmlNodeType.Element, "group", "");
+                    var groupXml = (XmlElement)x.OwnerDocument.CreateNode(XmlNodeType.Element, "group", "");
                     groupXml.SetAttribute("id", role);
                     x.AppendChild(groupXml);
-                    Save();
+                    Save(x.OwnerDocument);
                 }
             }
 
@@ -110,6 +132,7 @@ namespace umbraco.cms.businesslogic.web
             lock (LoadLocker)
             {
                 _accessXmlContent = null;
+                //do a real clone
                 _accessXmlContent = new XmlDocument();
                 _accessXmlContent.LoadXml(newDoc.OuterXml);
                 ClearCheckPages();
@@ -128,10 +151,10 @@ namespace umbraco.cms.businesslogic.web
             {
                 if (x.SelectSingleNode("group [@id = '" + MemberGroupId + "']") == null)
                 {
-                    var groupXml = (XmlElement)AccessXml.CreateNode(XmlNodeType.Element, "group", "");
+                    var groupXml = (XmlElement)x.OwnerDocument.CreateNode(XmlNodeType.Element, "group", "");
                     groupXml.SetAttribute("id", MemberGroupId.ToString(CultureInfo.InvariantCulture));
                     x.AppendChild(groupXml);
-                    Save();
+                    Save(x.OwnerDocument);
                 }
             }
         }
@@ -154,7 +177,7 @@ namespace umbraco.cms.businesslogic.web
                 {
                     x.SetAttribute("memberId", MemberId.ToString(CultureInfo.InvariantCulture));
                 }
-                Save();
+                Save(x.OwnerDocument);
             }
         }
 
@@ -177,7 +200,7 @@ namespace umbraco.cms.businesslogic.web
                     x.Attributes.GetNamedItem("memberId").Value = membershipUserName;
                 else
                     x.SetAttribute("memberId", membershipUserName);
-                Save();
+                Save(x.OwnerDocument);
             }
 
             new Access().FireAfterAddMembershipUserToDocument(new Document(documentId), membershipUserName, e);
@@ -197,7 +220,7 @@ namespace umbraco.cms.businesslogic.web
                 if (xGroup == null) return;
 
                 x.RemoveChild(xGroup);
-                Save();
+                Save(x.OwnerDocument);
             }
         }
 
@@ -218,7 +241,7 @@ namespace umbraco.cms.businesslogic.web
                 if (xGroup != null)
                 {
                     x.RemoveChild(xGroup);
-                    Save();
+                    Save(x.OwnerDocument);
                 }
             }
 
@@ -232,14 +255,15 @@ namespace umbraco.cms.businesslogic.web
 
             using (new WriteLock(Locker))
             {
+                var xDoc = GetXmlDocumentCopy();
                 oldRolename = oldRolename.Replace("'", "&apos;");
-                foreach (XmlNode x in AccessXml.SelectNodes("//group [@id = '" + oldRolename + "']"))
+                foreach (XmlNode x in xDoc.SelectNodes("//group [@id = '" + oldRolename + "']"))
                 {
                     x.Attributes["id"].Value = newRolename;
                     hasChange = true;
                 }
                 if (hasChange)
-                    Save();
+                    Save(xDoc);
             }
 
             return hasChange;
@@ -258,8 +282,10 @@ namespace umbraco.cms.businesslogic.web
 
                 if (x == null)
                 {
-                    x = (XmlElement)AccessXml.CreateNode(XmlNodeType.Element, "page", "");
-                    AccessXml.DocumentElement.AppendChild(x);
+                    var xDoc = GetXmlDocumentCopy();
+
+                    x = (XmlElement)xDoc.CreateNode(XmlNodeType.Element, "page", "");
+                    x.OwnerDocument.DocumentElement.AppendChild(x);
                 }
                 // if using simple mode, make sure that all existing groups are removed
                 else if (Simple)
@@ -270,7 +296,7 @@ namespace umbraco.cms.businesslogic.web
                 x.SetAttribute("loginPage", LoginDocumentId.ToString());
                 x.SetAttribute("noRightsPage", ErrorDocumentId.ToString());
                 x.SetAttribute("simple", Simple.ToString());
-                Save();
+                Save(x.OwnerDocument);
                 ClearCheckPages();
             }
 
@@ -291,7 +317,7 @@ namespace umbraco.cms.businesslogic.web
                 if (x == null) return;
 
                 x.ParentNode.RemoveChild(x);
-                Save();
+                Save(x.OwnerDocument);
                 ClearCheckPages();
             }
 
@@ -574,7 +600,7 @@ namespace umbraco.cms.businesslogic.web
         } 
         #endregion
 
-        public static ProtectionType GetProtectionTypeInternal(int DocumentId)
+        private static ProtectionType GetProtectionTypeInternal(int DocumentId)
         {
             //NOTE: No locks here! the locking is done in callers to this method
 
@@ -621,7 +647,7 @@ namespace umbraco.cms.businesslogic.web
             return isProtected;
         }
 
-        private static void Save()
+        private static void Save(XmlDocument newDoc)
         {
             //NOTE: No locks here! the locking is done in callers to this method
 
@@ -631,9 +657,13 @@ namespace umbraco.cms.businesslogic.web
 
             if (e.Cancel) return;
 
-            var f = File.Open(_accessXmlSource, FileMode.Create);
-            AccessXml.Save(f);
-            f.Close();
+            using (var f = File.Open(_accessXmlFilePath, FileMode.Create))
+            {
+                newDoc.Save(f);
+                f.Close();
+                //set the underlying in-mem object to null so it gets re-read
+                _accessXmlContent = null;
+            }
 
             new Access().FireAfterSave(e);
         }
@@ -654,8 +684,9 @@ namespace umbraco.cms.businesslogic.web
         private static XmlNode GetPage(int documentId)
         {
             //NOTE: No locks here! the locking is done in callers to this method
+            var xDoc = GetXmlDocumentCopy();
 
-            XmlNode x = AccessXml.SelectSingleNode("/access/page [@id=" + documentId + "]");
+            var x = xDoc.SelectSingleNode("/access/page [@id=" + documentId + "]");
             return x;
         }
 

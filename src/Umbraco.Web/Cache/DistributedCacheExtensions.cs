@@ -20,7 +20,7 @@ namespace Umbraco.Web.Cache
         {
             dc.RefreshByJson(new Guid(DistributedCache.PublicAccessCacheRefresherId),
                 PublicAccessCacheRefresher.SerializeToJsonPayload(
-                    Access.AccessXml));
+                    Access.GetXmlDocumentCopy()));
         }
 
         #endregion
