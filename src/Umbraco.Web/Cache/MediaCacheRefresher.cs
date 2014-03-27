@@ -4,13 +4,13 @@ using System.Globalization;
 using System.Web.Script.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using umbraco.interfaces;
 using System.Linq;
 
 namespace Umbraco.Web.Cache
 {
-
     /// <summary>
     /// A cache refresher to ensure media cache is updated
     /// </summary>

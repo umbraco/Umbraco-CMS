@@ -14,6 +14,17 @@ namespace Umbraco.Web.Cache
     /// </summary>
     internal static class DistributedCacheExtensions
     {
+        #region Public access
+
+        public static void RefreshPublicAccess(this DistributedCache dc)
+        {
+            dc.RefreshByJson(new Guid(DistributedCache.PublicAccessCacheRefresherId),
+                PublicAccessCacheRefresher.SerializeToJsonPayload(
+                    Access.AccessXml));
+        }
+
+        #endregion
+
         #region Application tree cache
         public static void RefreshAllApplicationTreeCache(this DistributedCache dc)
         {
