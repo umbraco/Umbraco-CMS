@@ -96,7 +96,8 @@ namespace UmbracoExamine.DataServices
 		[SecuritySafeCritical]
 		private static XmlNode GetPage(int documentId)
         {
-            var x = Access.AccessXml.SelectSingleNode("/access/page [@id=" + documentId.ToString() + "]");
+            var xDoc = Access.GetXmlDocumentCopy();
+            var x = xDoc.SelectSingleNode("/access/page [@id=" + documentId.ToString() + "]");
             return x;
         }
 
