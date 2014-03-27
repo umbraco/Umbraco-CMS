@@ -28,10 +28,10 @@ function macroService() {
             var paramMatch;
             var returnVal = {
                 macroAlias: alias,
-                marcoParamsDictionary: {}
+                macroParamsDictionary: {}
             };
             while (paramMatch = paramExpression.exec(paramsChunk)) {
-                returnVal.marcoParamsDictionary[paramMatch[1]] = paramMatch[2];
+                returnVal.macroParamsDictionary[paramMatch[1]] = paramMatch[2];
             }
             return returnVal;
         },
@@ -53,9 +53,9 @@ function macroService() {
 
             var macroString = '<?UMBRACO_MACRO macroAlias=\"' + args.macroAlias + "\" ";
 
-            if (args.marcoParamsDictionary) {
+            if (args.macroParamsDictionary) {
 
-                _.each(args.marcoParamsDictionary, function (val, key) {
+                _.each(args.macroParamsDictionary, function (val, key) {
                     //check for null
                     val = val ? val : "";
                     //need to detect if the val is a string or an object
@@ -96,9 +96,9 @@ function macroService() {
             
             var macroString = '<umbraco:Macro ';
 
-            if (args.marcoParamsDictionary) {
+            if (args.macroParamsDictionary) {
                 
-                _.each(args.marcoParamsDictionary, function (val, key) {
+                _.each(args.macroParamsDictionary, function (val, key) {
                     var keyVal = key + "=\"" + (val ? val : "") + "\" ";
                     macroString += keyVal;
                 });
@@ -127,11 +127,11 @@ function macroService() {
 
             var hasParams = false;
             var paramString;
-            if (args.marcoParamsDictionary) {
+            if (args.macroParamsDictionary) {
                 
                 paramString = ", new {";
 
-                _.each(args.marcoParamsDictionary, function(val, key) {
+                _.each(args.macroParamsDictionary, function(val, key) {
 
                     hasParams = true;
                     
