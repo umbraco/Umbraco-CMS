@@ -103,11 +103,11 @@ namespace Umbraco.Tests.PropertyEditors
 
             Assert.AreEqual(1, result.Count);
             Assert.IsTrue(result.ContainsKey("items"));
-            var items = result["items"] as IDictionary<int, string>;
+            var items = result["items"] as IDictionary<int, IDictionary<string, object>>;
             Assert.IsNotNull(items);
-            Assert.AreEqual("Item 1", items[1]);
-            Assert.AreEqual("Item 2", items[2]);
-            Assert.AreEqual("Item 3", items[3]);
+            Assert.AreEqual("Item 1", items[1]["value"]);
+            Assert.AreEqual("Item 2", items[2]["value"]);
+            Assert.AreEqual("Item 3", items[3]["value"]);
         }
 
     }
