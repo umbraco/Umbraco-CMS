@@ -20,7 +20,7 @@
 @*NOTE: This RenderJsHere code should be put on your main template page where the rest of your script tags are placed*@
 @Html.RenderJsHere()
 
-@if (Members.IsLoggedIn())
+@if (Members.IsLoggedIn() && profileModel != null)
 {   
     if (success)
     {

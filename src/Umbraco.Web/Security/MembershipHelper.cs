@@ -277,8 +277,15 @@ namespace Umbraco.Web.Security
             {                
                 var membershipUser = provider.GetCurrentUser();
                 var member = GetCurrentMember();
-                //this shouldn't happen
-                if (member == null) return null;
+                //this shouldn't happen but will if the member is deleted in the back office while the member is trying
+                // to use the front-end!
+                if (member == null)
+                {
+                    //log them out since they've been removed
+                    FormsAuthentication.SignOut();
+
+                    return null;
+                }
 
                 var model = ProfileModel.CreateModel();
                 model.Name = member.Name;
@@ -417,8 +424,15 @@ namespace Umbraco.Web.Security
             if (provider.IsUmbracoMembershipProvider())
             {
                 var member = GetCurrentMember();
-                //this shouldn't happen
-                if (member == null) return model;
+                //this shouldn't happen but will if the member is deleted in the back office while the member is trying
+                // to use the front-end!
+                if (member == null)
+                {
+                    //log them out since they've been removed
+                    FormsAuthentication.SignOut();
+                    model.IsLoggedIn = false;
+                    return model;
+                }
                 model.Name = member.Name;
                 model.Username = member.Username;
                 model.Email = member.Email;
@@ -426,8 +440,15 @@ namespace Umbraco.Web.Security
             else
             {
                 var member = provider.GetCurrentUser();
-                //this shouldn't happen
-                if (member == null) return null;
+                //this shouldn't happen but will if the member is deleted in the back office while the member is trying
+                // to use the front-end!
+                if (member == null)
+                {
+                    //log them out since they've been removed
+                    FormsAuthentication.SignOut();
+                    model.IsLoggedIn = false;
+                    return model;
+                }
                 model.Name = member.UserName;
                 model.Username = member.UserName;
                 model.Email = member.Email;
