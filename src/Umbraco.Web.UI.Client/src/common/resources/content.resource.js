@@ -288,7 +288,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "contentApiBaseUrl",
                        "GetById",
                        [{ id: id }])),
-               'Failed to retreive data for content id ' + id);
+               'Failed to retrieve data for content id ' + id);
         },
         
         /**
@@ -325,7 +325,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "contentApiBaseUrl",
                        "GetByIds",
                        idQuery)),
-               'Failed to retreive data for content with multiple ids');
+               'Failed to retrieve data for content with multiple ids');
         },
 
         
@@ -369,7 +369,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "contentApiBaseUrl",
                        "GetEmpty",
                        [{ contentTypeAlias: alias }, { parentId: parentId }])),
-               'Failed to retreive data for empty content item type ' + alias);
+               'Failed to retrieve data for empty content item type ' + alias);
         },
 
         /**
@@ -465,7 +465,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                            { orderDirection: options.orderDirection },
                            { filter: options.filter }
                        ])),
-               'Failed to retreive children for content item ' + parentId);
+               'Failed to retrieve children for content item ' + parentId);
         },
 
         /**

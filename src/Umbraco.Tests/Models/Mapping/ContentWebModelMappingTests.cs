@@ -4,12 +4,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Web.Dictionary;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Models.Mapping;
 using umbraco;
@@ -21,6 +24,14 @@ namespace Umbraco.Tests.Models.Mapping
     [TestFixture]
     public class ContentWebModelMappingTests : BaseDatabaseFactoryTest
     {
+        protected override void FreezeResolution()
+        {
+            CultureDictionaryFactoryResolver.Current = new CultureDictionaryFactoryResolver(
+                Mock.Of<ICultureDictionaryFactory>());
+
+            base.FreezeResolution();
+        }
+
         [PropertyEditor("Test.Test", "Test", "~/Test.html")]
         public class TestPropertyEditor : PropertyEditor
         {

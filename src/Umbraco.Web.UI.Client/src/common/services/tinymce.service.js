@@ -24,7 +24,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                       umbRequestHelper.getApiUrl(
                           "rteApiBaseUrl",
                           "GetConfiguration")),
-                  'Failed to retreive tinymce configuration');
+                  'Failed to retrieve tinymce configuration');
         },
 
         /**
@@ -250,7 +250,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
 
                 //need to wrap in safe apply since this might be occuring outside of angular
                 angularHelper.safeApply($scope, function() {
-                    macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.marcoParamsDictionary)
+                    macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.macroParamsDictionary)
                     .then(function (htmlResult) {
 
                         $macroDiv.removeClass("loading");

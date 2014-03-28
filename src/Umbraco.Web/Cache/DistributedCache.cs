@@ -54,6 +54,7 @@ namespace Umbraco.Web.Cache
         public const string StylesheetPropertyCacheRefresherId = "2BC7A3A4-6EB1-4FBC-BAA3-C9E7B6D36D38";
         public const string DataTypeCacheRefresherId = "35B16C25-A17E-45D7-BC8F-EDAB1DCC28D2";
         public const string DictionaryCacheRefresherId = "D1D7E227-F817-4816-BFE9-6C39B6152884";
+        public const string PublicAccessCacheRefresherId = "1DB08769-B104-4F8B-850E-169CAC1DF2EC";
 
         #endregion
 
@@ -101,7 +102,7 @@ namespace Umbraco.Web.Cache
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="factoryGuid"></param>
-        /// <param name="getNumericId">The callback method to retreive the ID from an instance</param>
+        /// <param name="getNumericId">The callback method to retrieve the ID from an instance</param>
         /// <param name="instances">The instances containing Ids</param>
         /// <remarks>
         /// This method is much better for performance because it does not need to re-lookup an object instance

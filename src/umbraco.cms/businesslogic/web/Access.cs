@@ -1,11 +1,16 @@
 using System;
 using System.Data;
+using System.Globalization;
+using System.Threading;
+using System.Web;
 using System.Xml;
+using System.Xml.Linq;
 using System.Xml.XPath;
 using System.Collections;
 using System.IO;
 
 using System.Web.Security;
+using Umbraco.Core;
 using Umbraco.Core.IO;
 using Umbraco.Core.Security;
 
@@ -18,98 +23,138 @@ namespace umbraco.cms.businesslogic.web
     {
         static private readonly Hashtable CheckedPages = new Hashtable();
 
-        //must be volatile for double check lock to work
         static private volatile XmlDocument _accessXmlContent;
-        static private string _accessXmlSource;
+        static private string _accessXmlFilePath;
+        private static readonly ReaderWriterLockSlim Locker = new ReaderWriterLockSlim();
+        private static readonly object LoadLocker = new object();
 
-        private static void ClearCheckPages()
-        {
-            CheckedPages.Clear();
-        }
-
-        static readonly object Locko = new object();
-
+        [Obsolete("Do not access this property directly, it is not thread safe, use GetXmlDocumentCopy instead")]
         public static XmlDocument AccessXml
         {
-            get
+            get { return GetXmlDocument(); }
+        }
+
+        //private method to initialize and return the in-memory xmldocument
+        private static XmlDocument GetXmlDocument()
+        {
+            if (_accessXmlContent == null)
             {
-                if (_accessXmlContent == null)
+                lock (LoadLocker)
                 {
-                    lock (Locko)
+                    if (_accessXmlContent == null)
                     {
-                        if (_accessXmlContent == null)
+                        if (_accessXmlFilePath == null)
                         {
-                            if (_accessXmlSource == null)
-                            {
-                                //if we pop it here it'll make for better stack traces ;)
-                                _accessXmlSource = IOHelper.MapPath(SystemFiles.AccessXml, true);
-                            }
-
-                            _accessXmlContent = new XmlDocument();
-
-                            if (!System.IO.File.Exists(_accessXmlSource))
-                            {
-                                var file = new FileInfo(_accessXmlSource);
-                                if (!Directory.Exists(file.DirectoryName))
-                                {
-                                    Directory.CreateDirectory(file.Directory.FullName); //ensure the folder exists!	
-                                }
-                                System.IO.FileStream f = System.IO.File.Open(_accessXmlSource, FileMode.Create);
-                                System.IO.StreamWriter sw = new StreamWriter(f);
-                                sw.WriteLine("<access/>");
-                                sw.Close();
-                                f.Close();
-                            }
-                            _accessXmlContent.Load(_accessXmlSource);
+                            //if we pop it here it'll make for better stack traces ;)
+                            _accessXmlFilePath = IOHelper.MapPath(SystemFiles.AccessXml);
                         }
+
+                        _accessXmlContent = new XmlDocument();
+
+                        if (File.Exists(_accessXmlFilePath) == false)
+                        {
+                            var file = new FileInfo(_accessXmlFilePath);
+                            if (Directory.Exists(file.DirectoryName) == false)
+                            {
+                                Directory.CreateDirectory(file.Directory.FullName); //ensure the folder exists!	
+                            }
+                            var f = File.Open(_accessXmlFilePath, FileMode.Create);
+                            var sw = new StreamWriter(f);
+                            sw.WriteLine("<access/>");
+                            sw.Close();
+                            f.Close();
+                        }
+                        _accessXmlContent.Load(_accessXmlFilePath);
                     }
                 }
-                return _accessXmlContent;
             }
+            return _accessXmlContent;
         }
+
+        //used by all other methods in this class to read and write the document which 
+        // is thread safe and only clones once per request so it's still fast.
+        public static XmlDocument GetXmlDocumentCopy()
+        {
+            if (HttpContext.Current == null)
+            {
+                return (XmlDocument)GetXmlDocument().Clone();    
+            }
+
+            if (HttpContext.Current.Items.Contains(typeof (Access)) == false)
+            {
+                HttpContext.Current.Items.Add(typeof (Access), GetXmlDocument().Clone());
+            }
+
+            return (XmlDocument)HttpContext.Current.Items[typeof(Access)];
+        }
+
+        #region Manipulation methods
 
         public static void AddMembershipRoleToDocument(int documentId, string role)
         {
             //event
-            AddMemberShipRoleToDocumentEventArgs e = new AddMemberShipRoleToDocumentEventArgs();
+            var e = new AddMemberShipRoleToDocumentEventArgs();
             new Access().FireBeforeAddMemberShipRoleToDocument(new Document(documentId), role, e);
 
-            if (!e.Cancel)
+            if (e.Cancel) return;
+
+            using (new WriteLock(Locker))
             {
-                XmlElement x = (XmlElement)GetPage(documentId);
+                var x = (XmlElement)GetPage(documentId);
 
                 if (x == null)
                     throw new Exception("Document is not protected!");
-                else
-                {
-                    if (x.SelectSingleNode("group [@id = '" + role + "']") == null)
-                    {
-                        XmlElement groupXml = (XmlElement)AccessXml.CreateNode(XmlNodeType.Element, "group", "");
-                        groupXml.SetAttribute("id", role);
-                        x.AppendChild(groupXml);
-                        Save();
-                    }
-                }
 
-                new Access().FireAfterAddMemberShipRoleToDocument(new Document(documentId), role, e);
+                if (x.SelectSingleNode("group [@id = '" + role + "']") == null)
+                {
+                    var groupXml = (XmlElement)x.OwnerDocument.CreateNode(XmlNodeType.Element, "group", "");
+                    groupXml.SetAttribute("id", role);
+                    x.AppendChild(groupXml);
+                    Save(x.OwnerDocument);
+                }
+            }
+
+            new Access().FireAfterAddMemberShipRoleToDocument(new Document(documentId), role, e);
+        }
+        
+        /// <summary>
+        /// Used to refresh cache among servers in an LB scenario
+        /// </summary>
+        /// <param name="newDoc"></param>
+        internal static void UpdateInMemoryDocument(XmlDocument newDoc)
+        {
+            //NOTE: This would be better to use our normal ReaderWriter lock but because we are emitting an 
+            // event inside of the WriteLock and code can then listen to the event and call this method we end
+            // up in a dead-lock. This specifically happens in the PublicAccessCacheRefresher.
+            //So instead we use the load locker which is what is used for the static XmlDocument instance, we'll 
+            // lock that, set the doc to null which will cause any reader threads to block for the AccessXml instance
+            // then save the doc and re-load it, then all blocked threads can carry on.
+            lock (LoadLocker)
+            {
+                _accessXmlContent = null;
+                //do a real clone
+                _accessXmlContent = new XmlDocument();
+                _accessXmlContent.LoadXml(newDoc.OuterXml);
+                ClearCheckPages();
             }
         }
 
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
         public static void AddMemberGroupToDocument(int DocumentId, int MemberGroupId)
         {
-            XmlElement x = (XmlElement)GetPage(DocumentId);
+            var x = (XmlElement)GetPage(DocumentId);
 
             if (x == null)
                 throw new Exception("Document is not protected!");
-            else
+
+            using (new WriteLock(Locker))
             {
-                if (x.SelectSingleNode("group [@id = '" + MemberGroupId.ToString() + "']") == null)
+                if (x.SelectSingleNode("group [@id = '" + MemberGroupId + "']") == null)
                 {
-                    XmlElement groupXml = (XmlElement)AccessXml.CreateNode(XmlNodeType.Element, "group", "");
-                    groupXml.SetAttribute("id", MemberGroupId.ToString());
+                    var groupXml = (XmlElement)x.OwnerDocument.CreateNode(XmlNodeType.Element, "group", "");
+                    groupXml.SetAttribute("id", MemberGroupId.ToString(CultureInfo.InvariantCulture));
                     x.AppendChild(groupXml);
-                    Save();
+                    Save(x.OwnerDocument);
                 }
             }
         }
@@ -117,122 +162,130 @@ namespace umbraco.cms.businesslogic.web
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
         public static void AddMemberToDocument(int DocumentId, int MemberId)
         {
-            XmlElement x = (XmlElement)GetPage(DocumentId);
+            var x = (XmlElement)GetPage(DocumentId);
 
             if (x == null)
                 throw new Exception("Document is not protected!");
-            else
+
+            using (new WriteLock(Locker))
             {
                 if (x.Attributes.GetNamedItem("memberId") != null)
-                    x.Attributes.GetNamedItem("memberId").Value = MemberId.ToString();
+                {
+                    x.Attributes.GetNamedItem("memberId").Value = MemberId.ToString(CultureInfo.InvariantCulture);
+                }
                 else
-                    x.SetAttribute("memberId", MemberId.ToString());
-                Save();
+                {
+                    x.SetAttribute("memberId", MemberId.ToString(CultureInfo.InvariantCulture));
+                }
+                Save(x.OwnerDocument);
             }
         }
 
         public static void AddMembershipUserToDocument(int documentId, string membershipUserName)
         {
             //event
-            AddMembershipUserToDocumentEventArgs e = new AddMembershipUserToDocumentEventArgs();
+            var e = new AddMembershipUserToDocumentEventArgs();
             new Access().FireBeforeAddMembershipUserToDocument(new Document(documentId), membershipUserName, e);
 
-            if (!e.Cancel)
+            if (e.Cancel) return;
+
+            using (new WriteLock(Locker))
             {
-                XmlElement x = (XmlElement)GetPage(documentId);
+                var x = (XmlElement)GetPage(documentId);
 
                 if (x == null)
                     throw new Exception("Document is not protected!");
-                else
-                {
-                    if (x.Attributes.GetNamedItem("memberId") != null)
-                        x.Attributes.GetNamedItem("memberId").Value = membershipUserName;
-                    else
-                        x.SetAttribute("memberId", membershipUserName);
-                    Save();
-                }
 
-                new Access().FireAfterAddMembershipUserToDocument(new Document(documentId), membershipUserName, e);
+                if (x.Attributes.GetNamedItem("memberId") != null)
+                    x.Attributes.GetNamedItem("memberId").Value = membershipUserName;
+                else
+                    x.SetAttribute("memberId", membershipUserName);
+                Save(x.OwnerDocument);
             }
 
+            new Access().FireAfterAddMembershipUserToDocument(new Document(documentId), membershipUserName, e);
         }
 
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
         public static void RemoveMemberGroupFromDocument(int DocumentId, int MemberGroupId)
         {
-            XmlElement x = (XmlElement)GetPage(DocumentId);
-
-            if (x == null)
-                throw new Exception("Document is not protected!");
-            else
+            using (new WriteLock(Locker))
             {
-                XmlNode xGroup = x.SelectSingleNode("group [@id = '" + MemberGroupId.ToString() + "']");
-                if (xGroup != null)
-                {
-                    x.RemoveChild(xGroup);
-                    Save();
-                }
+                var x = (XmlElement)GetPage(DocumentId);
+
+                if (x == null)
+                    throw new Exception("Document is not protected!");
+
+                var xGroup = x.SelectSingleNode("group [@id = '" + MemberGroupId + "']");
+                if (xGroup == null) return;
+
+                x.RemoveChild(xGroup);
+                Save(x.OwnerDocument);
             }
         }
 
         public static void RemoveMembershipRoleFromDocument(int documentId, string role)
         {
-
-            RemoveMemberShipRoleFromDocumentEventArgs e = new RemoveMemberShipRoleFromDocumentEventArgs();
+            var e = new RemoveMemberShipRoleFromDocumentEventArgs();
             new Access().FireBeforeRemoveMemberShipRoleFromDocument(new Document(documentId), role, e);
 
-            if (!e.Cancel)
-            {
-                XmlElement x = (XmlElement)GetPage(documentId);
+            if (e.Cancel) return;
 
+            using (new WriteLock(Locker))
+            {
+                var x = (XmlElement)GetPage(documentId);
                 if (x == null)
                     throw new Exception("Document is not protected!");
-                else
-                {
-                    XmlNode xGroup = x.SelectSingleNode("group [@id = '" + role + "']");
-                    if (xGroup != null)
-                    {
-                        x.RemoveChild(xGroup);
-                        Save();
-                    }
-                }
+                var xGroup = x.SelectSingleNode("group [@id = '" + role + "']");
 
-                new Access().FireAfterRemoveMemberShipRoleFromDocument(new Document(documentId), role, e);
+                if (xGroup != null)
+                {
+                    x.RemoveChild(xGroup);
+                    Save(x.OwnerDocument);
+                }
             }
+
+            new Access().FireAfterRemoveMemberShipRoleFromDocument(new Document(documentId), role, e);
         }
 
         public static bool RenameMemberShipRole(string oldRolename, string newRolename)
         {
-            bool hasChange = false;
-            if (oldRolename != newRolename)
+            var hasChange = false;
+            if (oldRolename == newRolename) return false;
+
+            using (new WriteLock(Locker))
             {
+                var xDoc = GetXmlDocumentCopy();
                 oldRolename = oldRolename.Replace("'", "&apos;");
-                foreach (XmlNode x in AccessXml.SelectNodes("//group [@id = '" + oldRolename + "']"))
+                foreach (XmlNode x in xDoc.SelectNodes("//group [@id = '" + oldRolename + "']"))
                 {
                     x.Attributes["id"].Value = newRolename;
                     hasChange = true;
                 }
                 if (hasChange)
-                    Save();
+                    Save(xDoc);
             }
 
             return hasChange;
-
         }
 
         public static void ProtectPage(bool Simple, int DocumentId, int LoginDocumentId, int ErrorDocumentId)
         {
-            AddProtectionEventArgs e = new AddProtectionEventArgs();
+            var e = new AddProtectionEventArgs();
             new Access().FireBeforeAddProtection(new Document(DocumentId), e);
 
-            if (!e.Cancel)
-            {
+            if (e.Cancel) return;
 
-                XmlElement x = (XmlElement)GetPage(DocumentId);
+            using (new WriteLock(Locker))
+            {
+                var x = (XmlElement)GetPage(DocumentId);
+
                 if (x == null)
                 {
-                    x = (XmlElement)_accessXmlContent.CreateNode(XmlNodeType.Element, "page", "");
-                    AccessXml.DocumentElement.AppendChild(x);
+                    var xDoc = GetXmlDocumentCopy();
+
+                    x = (XmlElement)xDoc.CreateNode(XmlNodeType.Element, "page", "");
+                    x.OwnerDocument.DocumentElement.AppendChild(x);
                 }
                 // if using simple mode, make sure that all existing groups are removed
                 else if (Simple)
@@ -243,67 +296,53 @@ namespace umbraco.cms.businesslogic.web
                 x.SetAttribute("loginPage", LoginDocumentId.ToString());
                 x.SetAttribute("noRightsPage", ErrorDocumentId.ToString());
                 x.SetAttribute("simple", Simple.ToString());
-                Save();
-
+                Save(x.OwnerDocument);
                 ClearCheckPages();
-
-                new Access().FireAfterAddProtection(new Document(DocumentId), e);
             }
+
+            new Access().FireAfterAddProtection(new Document(DocumentId), e);
         }
 
         public static void RemoveProtection(int DocumentId)
         {
-            XmlElement x = (XmlElement)GetPage(DocumentId);
-            if (x != null)
+            //event
+            var e = new RemoveProtectionEventArgs();
+            new Access().FireBeforeRemoveProtection(new Document(DocumentId), e);
+
+            if (e.Cancel) return;
+
+            using (new WriteLock(Locker))
             {
-                //event
-                RemoveProtectionEventArgs e = new RemoveProtectionEventArgs();
-                new Access().FireBeforeRemoveProtection(new Document(DocumentId), e);
+                var x = (XmlElement)GetPage(DocumentId);
+                if (x == null) return;
 
-                if (!e.Cancel)
-                {
-
-                    x.ParentNode.RemoveChild(x);
-                    Save();
-                    ClearCheckPages();
-
-                    new Access().FireAfterRemoveProtection(new Document(DocumentId), e);
-                }
-
+                x.ParentNode.RemoveChild(x);
+                Save(x.OwnerDocument);
+                ClearCheckPages();
             }
-        }
 
-        private static void Save()
-        {
-            SaveEventArgs e = new SaveEventArgs();
+            new Access().FireAfterRemoveProtection(new Document(DocumentId), e);
+        } 
+        #endregion
 
-            new Access().FireBeforeSave(e);
-
-            if (!e.Cancel)
-            {
-                System.IO.FileStream f = System.IO.File.Open(_accessXmlSource, FileMode.Create);
-                AccessXml.Save(f);
-                f.Close();
-
-                new Access().FireAfterSave(e);
-            }
-        }
+        #region Reading methods
 
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
         public static bool IsProtectedByGroup(int DocumentId, int GroupId)
         {
             bool isProtected = false;
 
-            cms.businesslogic.web.Document d = new Document(DocumentId);
+            var d = new Document(DocumentId);
 
-            if (!IsProtected(DocumentId, d.Path))
-                isProtected = false;
-            else
+            using (new ReadLock(Locker))
             {
-                XmlNode currentNode = GetPage(GetProtectedPage(d.Path));
-                if (currentNode.SelectSingleNode("./group [@id=" + GroupId.ToString() + "]") != null)
+                if (IsProtectedInternal(DocumentId, d.Path))
                 {
-                    isProtected = true;
+                    var currentNode = GetPage(GetProtectedPage(d.Path));
+                    if (currentNode.SelectSingleNode("./group [@id=" + GroupId + "]") != null)
+                    {
+                        isProtected = true;
+                    }
                 }
             }
 
@@ -314,16 +353,17 @@ namespace umbraco.cms.businesslogic.web
         {
             bool isProtected = false;
 
-            CMSNode d = new CMSNode(documentId);
+            var d = new CMSNode(documentId);
 
-            if (!IsProtected(documentId, d.Path))
-                isProtected = false;
-            else
+            using (new ReadLock(Locker))
             {
-                XmlNode currentNode = GetPage(GetProtectedPage(d.Path));
-                if (currentNode.SelectSingleNode("./group [@id='" + role + "']") != null)
+                if (IsProtectedInternal(documentId, d.Path))
                 {
-                    isProtected = true;
+                    var currentNode = GetPage(GetProtectedPage(d.Path));
+                    if (currentNode.SelectSingleNode("./group [@id='" + role + "']") != null)
+                    {
+                        isProtected = true;
+                    }
                 }
             }
 
@@ -332,32 +372,34 @@ namespace umbraco.cms.businesslogic.web
 
         public static string[] GetAccessingMembershipRoles(int documentId, string path)
         {
-            ArrayList roles = new ArrayList();
+            var roles = new ArrayList();
 
-            if (!IsProtected(documentId, path))
-                return null;
-            else
+            using (new ReadLock(Locker))
             {
-                XmlNode currentNode = GetPage(GetProtectedPage(path));
+                if (IsProtectedInternal(documentId, path) == false)
+                    return null;
+
+                var currentNode = GetPage(GetProtectedPage(path));
                 foreach (XmlNode n in currentNode.SelectNodes("./group"))
                 {
                     roles.Add(n.Attributes.GetNamedItem("id").Value);
                 }
-                return (string[])roles.ToArray(typeof(string));
             }
 
+            return (string[])roles.ToArray(typeof(string));
         }
 
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
-        public static cms.businesslogic.member.MemberGroup[] GetAccessingGroups(int DocumentId)
+        public static member.MemberGroup[] GetAccessingGroups(int DocumentId)
         {
-            cms.businesslogic.web.Document d = new Document(DocumentId);
+            var d = new Document(DocumentId);
 
-            if (!IsProtected(DocumentId, d.Path))
-                return null;
-            else
+            using (new ReadLock(Locker))
             {
-                XmlNode currentNode = GetPage(GetProtectedPage(d.Path));
+                if (IsProtectedInternal(DocumentId, d.Path) == false)
+                    return null;
+
+                var currentNode = GetPage(GetProtectedPage(d.Path));
                 var mg = new member.MemberGroup[currentNode.SelectNodes("./group").Count];
                 int count = 0;
                 foreach (XmlNode n in currentNode.SelectNodes("./group"))
@@ -371,76 +413,79 @@ namespace umbraco.cms.businesslogic.web
         }
 
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
-        public static cms.businesslogic.member.Member GetAccessingMember(int DocumentId)
+        public static member.Member GetAccessingMember(int DocumentId)
         {
-            cms.businesslogic.web.Document d = new Document(DocumentId);
+            var d = new Document(DocumentId);
 
-            if (!IsProtected(DocumentId, d.Path))
-                return null;
-            else if (GetProtectionType(DocumentId) != ProtectionType.Simple)
-                throw new Exception("Document isn't protected using Simple mechanism. Use GetAccessingMemberGroups instead");
-            else
+            using (new ReadLock(Locker))
             {
-                XmlNode currentNode = GetPage(GetProtectedPage(d.Path));
-                if (currentNode.Attributes.GetNamedItem("memberId") != null)
-                    return new cms.businesslogic.member.Member(int.Parse(
-                        currentNode.Attributes.GetNamedItem("memberId").Value));
-                else
-                    throw new Exception("Document doesn't contain a memberId. This might be caused if document is protected using umbraco RC1 or older.");
+                if (IsProtectedInternal(DocumentId, d.Path) == false)
+                    return null;
 
+                if (GetProtectionTypeInternal(DocumentId) != ProtectionType.Simple)
+                    throw new Exception("Document isn't protected using Simple mechanism. Use GetAccessingMemberGroups instead");
+
+                var currentNode = GetPage(GetProtectedPage(d.Path));
+                if (currentNode.Attributes.GetNamedItem("memberId") != null)
+                    return new member.Member(int.Parse(
+                        currentNode.Attributes.GetNamedItem("memberId").Value));
             }
 
+            throw new Exception("Document doesn't contain a memberId. This might be caused if document is protected using umbraco RC1 or older.");
         }
 
         public static MembershipUser GetAccessingMembershipUser(int documentId)
         {
-            CMSNode d = new CMSNode(documentId);
+            var d = new CMSNode(documentId);
 
-            if (!IsProtected(documentId, d.Path))
-                return null;
-            else if (GetProtectionType(documentId) != ProtectionType.Simple)
-                throw new Exception("Document isn't protected using Simple mechanism. Use GetAccessingMemberGroups instead");
-            else
+            using (new ReadLock(Locker))
             {
-                XmlNode currentNode = GetPage(GetProtectedPage(d.Path));
+                if (IsProtectedInternal(documentId, d.Path) == false)
+                    return null;
+
+                if (GetProtectionTypeInternal(documentId) != ProtectionType.Simple)
+                    throw new Exception("Document isn't protected using Simple mechanism. Use GetAccessingMemberGroups instead");
+
+                var currentNode = GetPage(GetProtectedPage(d.Path));
                 if (currentNode.Attributes.GetNamedItem("memberId") != null)
                 {
                     var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
 
                     return provider.GetUser(currentNode.Attributes.GetNamedItem("memberId").Value, true);
                 }
-                else
-                {
-                    throw new Exception("Document doesn't contain a memberId. This might be caused if document is protected using umbraco RC1 or older.");
-                }
-
             }
 
+            throw new Exception("Document doesn't contain a memberId. This might be caused if document is protected using umbraco RC1 or older.");
         }
 
 
         [Obsolete("This method is no longer supported. Use the ASP.NET MemberShip methods instead", true)]
-        public static bool HasAccess(int DocumentId, cms.businesslogic.member.Member Member)
+        public static bool HasAccess(int DocumentId, member.Member Member)
         {
             bool hasAccess = false;
 
-            cms.businesslogic.web.Document d = new Document(DocumentId);
+            var d = new Document(DocumentId);
 
-            if (!IsProtected(DocumentId, d.Path))
-                hasAccess = true;
-            else
+            using (new ReadLock(Locker))
             {
-                XmlNode currentNode = GetPage(GetProtectedPage(d.Path));
-                if (Member != null)
+                if (IsProtectedInternal(DocumentId, d.Path) == false)
                 {
-                    IDictionaryEnumerator ide = Member.Groups.GetEnumerator();
-                    while (ide.MoveNext())
+                    hasAccess = true;
+                }
+                else
+                {
+                    var currentNode = GetPage(GetProtectedPage(d.Path));
+                    if (Member != null)
                     {
-                        cms.businesslogic.member.MemberGroup mg = (cms.businesslogic.member.MemberGroup)ide.Value;
-                        if (currentNode.SelectSingleNode("./group [@id=" + mg.Id.ToString() + "]") != null)
+                        var ide = Member.Groups.GetEnumerator();
+                        while (ide.MoveNext())
                         {
-                            hasAccess = true;
-                            break;
+                            var mg = (member.MemberGroup)ide.Value;
+                            if (currentNode.SelectSingleNode("./group [@id=" + mg.Id.ToString() + "]") != null)
+                            {
+                                hasAccess = true;
+                                break;
+                            }
                         }
                     }
                 }
@@ -454,41 +499,19 @@ namespace umbraco.cms.businesslogic.web
             bool hasAccess = false;
             var node = new CMSNode(documentId);
 
-            if (IsProtected(documentId, node.Path) == false)
-                return true;
-
-            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-
-            var member = provider.GetUser(memberId, true);
-            var currentNode = GetPage(GetProtectedPage(node.Path));
-
-            if (member != null)
+            using (new ReadLock(Locker))
             {
-                foreach (string role in Roles.GetRolesForUser())
-                {
-                    if (currentNode.SelectSingleNode("./group [@id='" + role + "']") != null)
-                    {
-                        hasAccess = true;
-                        break;
-                    }
-                }
-            }
-            return hasAccess;
-        }
+                if (IsProtectedInternal(documentId, node.Path) == false)
+                    return true;
 
-        public static bool HasAccess(int documentId, string path, MembershipUser member)
-        {
-            bool hasAccess = false;
+                var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
 
-            if (!IsProtected(documentId, path))
-                hasAccess = true;
-            else
-            {
-                XmlNode currentNode = GetPage(GetProtectedPage(path));
+                var member = provider.GetUser(memberId, true);
+                var currentNode = GetPage(GetProtectedPage(node.Path));
+
                 if (member != null)
                 {
-                    string[] roles = Roles.GetRolesForUser(member.UserName);
-                    foreach (string role in roles)
+                    foreach (string role in Roles.GetRolesForUser())
                     {
                         if (currentNode.SelectSingleNode("./group [@id='" + role + "']") != null)
                         {
@@ -502,28 +525,105 @@ namespace umbraco.cms.businesslogic.web
             return hasAccess;
         }
 
+        public static bool HasAccess(int documentId, string path, MembershipUser member)
+        {
+            bool hasAccess = false;
+
+            using (new ReadLock(Locker))
+            {
+                if (IsProtectedInternal(documentId, path) == false)
+                {
+                    hasAccess = true;
+                }
+                else
+                {
+                    XmlNode currentNode = GetPage(GetProtectedPage(path));
+                    if (member != null)
+                    {
+                        string[] roles = Roles.GetRolesForUser(member.UserName);
+                        foreach (string role in roles)
+                        {
+                            if (currentNode.SelectSingleNode("./group [@id='" + role + "']") != null)
+                            {
+                                hasAccess = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return hasAccess;
+        }
+
         public static ProtectionType GetProtectionType(int DocumentId)
         {
-            XmlNode x = GetPage(DocumentId);
-            try
+            using (new ReadLock(Locker))
             {
-                if (bool.Parse(x.Attributes.GetNamedItem("simple").Value))
-                    return ProtectionType.Simple;
-                else
-                    return ProtectionType.Advanced;
-            }
-            catch
-            {
-                return ProtectionType.NotProtected;
+                XmlNode x = GetPage(DocumentId);
+                try
+                {
+                    return bool.Parse(x.Attributes.GetNamedItem("simple").Value)
+                        ? ProtectionType.Simple
+                        : ProtectionType.Advanced;
+                }
+                catch
+                {
+                    return ProtectionType.NotProtected;
+                }
             }
 
         }
 
         public static bool IsProtected(int DocumentId, string Path)
         {
+            using (new ReadLock(Locker))
+            {
+                return IsProtectedInternal(DocumentId, Path);
+            }
+        }
+
+        public static int GetErrorPage(string Path)
+        {
+            using (new ReadLock(Locker))
+            {
+                return int.Parse(GetPage(GetProtectedPage(Path)).Attributes.GetNamedItem("noRightsPage").Value);
+            }
+        }
+
+        public static int GetLoginPage(string Path)
+        {
+            using (new ReadLock(Locker))
+            {
+                return int.Parse(GetPage(GetProtectedPage(Path)).Attributes.GetNamedItem("loginPage").Value);
+            }
+        } 
+        #endregion
+
+        private static ProtectionType GetProtectionTypeInternal(int DocumentId)
+        {
+            //NOTE: No locks here! the locking is done in callers to this method
+
+            XmlNode x = GetPage(DocumentId);
+            try
+            {
+                return bool.Parse(x.Attributes.GetNamedItem("simple").Value)
+                    ? ProtectionType.Simple
+                    : ProtectionType.Advanced;
+            }
+            catch
+            {
+                return ProtectionType.NotProtected;
+            }
+        }
+
+        private static bool IsProtectedInternal(int DocumentId, string Path)
+        {
+            //NOTE: No locks here! the locking is done in callers to this method
+
             bool isProtected = false;
 
-            if (!CheckedPages.ContainsKey(DocumentId))
+            if (CheckedPages.ContainsKey(DocumentId) == false)
             {
                 foreach (string id in Path.Split(','))
                 {
@@ -534,32 +634,44 @@ namespace umbraco.cms.businesslogic.web
                     }
                 }
 
-                // Add thread safe updating to the hashtable
-                if (System.Web.HttpContext.Current != null)
-                    System.Web.HttpContext.Current.Application.Lock();
-                if (!CheckedPages.ContainsKey(DocumentId))
+                if (CheckedPages.ContainsKey(DocumentId) == false)
+                {
                     CheckedPages.Add(DocumentId, isProtected);
-                if (System.Web.HttpContext.Current != null)
-                    System.Web.HttpContext.Current.Application.UnLock();
+                }
             }
             else
+            {
                 isProtected = (bool)CheckedPages[DocumentId];
+            }
 
             return isProtected;
         }
 
-        public static int GetErrorPage(string Path)
+        private static void Save(XmlDocument newDoc)
         {
-            return int.Parse(GetPage(GetProtectedPage(Path)).Attributes.GetNamedItem("noRightsPage").Value);
-        }
+            //NOTE: No locks here! the locking is done in callers to this method
 
-        public static int GetLoginPage(string Path)
-        {
-            return int.Parse(GetPage(GetProtectedPage(Path)).Attributes.GetNamedItem("loginPage").Value);
+            var e = new SaveEventArgs();
+
+            new Access().FireBeforeSave(e);
+
+            if (e.Cancel) return;
+
+            using (var f = File.Open(_accessXmlFilePath, FileMode.Create))
+            {
+                newDoc.Save(f);
+                f.Close();
+                //set the underlying in-mem object to null so it gets re-read
+                _accessXmlContent = null;
+            }
+
+            new Access().FireAfterSave(e);
         }
 
         private static int GetProtectedPage(string Path)
         {
+            //NOTE: No locks here! the locking is done in callers to this method
+
             int protectedPage = 0;
 
             foreach (string id in Path.Split(','))
@@ -571,10 +683,17 @@ namespace umbraco.cms.businesslogic.web
 
         private static XmlNode GetPage(int documentId)
         {
-            XmlNode x = AccessXml.SelectSingleNode("/access/page [@id=" + documentId.ToString() + "]");
+            //NOTE: No locks here! the locking is done in callers to this method
+            var xDoc = GetXmlDocumentCopy();
+
+            var x = xDoc.SelectSingleNode("/access/page [@id=" + documentId + "]");
             return x;
         }
 
+        private static void ClearCheckPages()
+        {
+            CheckedPages.Clear();
+        }
 
         //Event delegates
         public delegate void SaveEventHandler(Access sender, SaveEventArgs e);

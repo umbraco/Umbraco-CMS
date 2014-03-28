@@ -35,7 +35,7 @@ function stylesheetResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "stylesheetApiBaseUrl",
                        "GetAll")),
-               'Failed to retreive stylesheets ');
+               'Failed to retrieve stylesheets ');
         },
 
         /**
@@ -64,7 +64,7 @@ function stylesheetResource($q, $http, umbRequestHelper) {
                        "stylesheetApiBaseUrl",
                        "GetRules",
                        [{ id: id }])),
-               'Failed to retreive stylesheets ');
+               'Failed to retrieve stylesheets ');
         },
 
         /**

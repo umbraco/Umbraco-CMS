@@ -29,7 +29,7 @@ function treeResource($q, $http, umbRequestHelper) {
               
             return umbRequestHelper.resourcePromise(
                 $http.get(getTreeMenuUrl(node)),
-                "Failed to retreive data for a node's menu " + node.id);
+                "Failed to retrieve data for a node's menu " + node.id);
         },
 
         /** Loads in the data to display the nodes for an application */
@@ -60,7 +60,7 @@ function treeResource($q, $http, umbRequestHelper) {
                         "treeApplicationApiBaseUrl",
                         "GetApplicationTrees",
                             query)),
-                'Failed to retreive data for application tree ' + options.section);
+                'Failed to retrieve data for application tree ' + options.section);
         },
         
         /** Loads in the data to display the child nodes for a given node */

@@ -390,7 +390,7 @@ function updateChecker($http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "updateCheckApiBaseUrl",
                        "GetCheck")),
-               'Failed to retreive update status');
+               'Failed to retrieve update status');
         }  
     };
 }

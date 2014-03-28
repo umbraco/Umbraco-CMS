@@ -10,25 +10,25 @@
       <table cellspacing="0" cellpadding="4" border="0">
         <tr>
           <th width="30%">
-            <%=umbraco.ui.Text("name", base.getUser())%>:
+            <%=umbraco.ui.Text("name", UmbracoUser)%>:
           </th>
           <td class="propertyContent">
             <asp:TextBox ID="NameTxt" Width="350px" runat="server" /><br />
-            <small><%=umbraco.ui.Text("stylesheet", "nameHelp", base.getUser())%></small>
+            <small><%=umbraco.ui.Text("stylesheet", "nameHelp", UmbracoUser)%></small>
           </td>
         </tr>
         <tr>
           <th width="30%">
-            <%=umbraco.ui.Text("alias", base.getUser())%>:
+            <%=umbraco.ui.Text("alias", UmbracoUser)%>:
           </th>
           <td class="propertyContent">
             <asp:TextBox ID="AliasTxt" Width="350px" runat="server" /><br />
-            <small><%=umbraco.ui.Text("stylesheet", "aliasHelp", base.getUser())%></small>
+            <small><%=umbraco.ui.Text("stylesheet", "aliasHelp", UmbracoUser)%></small>
           </td>
         </tr>
         <tr>
           <th width="30%">
-            <%=umbraco.ui.Text("styles", base.getUser())%>:
+            <%=umbraco.ui.Text("styles", UmbracoUser)%>:
           </th>
           <td class="propertyContent">
             <asp:TextBox ID="Content" Style="width: 350px" TextMode="MultiLine" runat="server" />
@@ -38,7 +38,7 @@
         </tr>
         <tr>
           <th width="30%">
-            <%=umbraco.ui.Text("preview", base.getUser())%>:
+            <%=umbraco.ui.Text("preview", UmbracoUser)%>:
           </th>
           <td class="propertyContent">
             <div id="preview" style="padding: 10px; border: 1px solid #ccc; width: 330px;">

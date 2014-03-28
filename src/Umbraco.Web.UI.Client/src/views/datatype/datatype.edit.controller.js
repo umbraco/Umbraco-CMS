@@ -13,7 +13,7 @@ function DataTypeEditController($scope, $routeParams, $location, appState, navig
     $scope.currentSection = appState.getSectionState("currentSection");
     $scope.currentNode = null; //the editors affiliated node
 
-    //method used to configure the pre-values when we retreive them from the server
+    //method used to configure the pre-values when we retrieve them from the server
     function createPreValueProps(preVals) {
         $scope.preValues = [];
         for (var i = 0; i < preVals.length; i++) {

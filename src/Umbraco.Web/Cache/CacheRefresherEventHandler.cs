@@ -142,9 +142,19 @@ namespace Umbraco.Web.Cache
             //NOTE: we do not listen for the trashed event because there is no cache to update for content in that case since
             // the unpublishing event handles that, and for examine with unpublished content indexes, we want to keep that data 
             // in the index, it's not until it's complete deleted that we want to remove it.
+
+            //public access events
+            Access.AfterSave += Access_AfterSave;
         }
 
-        
+        #region Public access event handlers
+
+        static void Access_AfterSave(Access sender, SaveEventArgs e)
+        {
+            DistributedCache.Instance.RefreshPublicAccess();
+        } 
+
+        #endregion
 
         #region Content service event handlers
 

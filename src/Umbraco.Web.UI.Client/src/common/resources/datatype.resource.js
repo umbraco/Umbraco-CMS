@@ -40,7 +40,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "dataTypeApiBaseUrl",
                        "GetPreValues",
                        [{ editorAlias: editorAlias }, { dataTypeId: dataTypeId }])),
-               'Failed to retreive pre values for editor alias ' + editorAlias);
+               'Failed to retrieve pre values for editor alias ' + editorAlias);
         },
 
         /**
@@ -71,7 +71,7 @@ function dataTypeResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "dataTypeApiBaseUrl",
                        "GetById",
                        [{ id: id }])),
-               'Failed to retreive data for data type id ' + id);
+               'Failed to retrieve data for data type id ' + id);
         },
 
         getAll: function () {

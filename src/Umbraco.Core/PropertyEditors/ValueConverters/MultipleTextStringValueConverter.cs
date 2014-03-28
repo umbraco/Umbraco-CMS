@@ -31,6 +31,10 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             var sourceString = source.ToString();
             if (string.IsNullOrWhiteSpace(sourceString)) return Enumerable.Empty<string>();
 
+            //SD: I have no idea why this logic is here, I'm pretty sure we've never saved the multiple txt string
+            // as xml in the database, it's always been new line delimited. Will ask Stephen about this.
+            // In the meantime, we'll do this xml check, see if it parses and if not just continue with 
+            // splitting by newline
             var values = new List<string>();
             var pos = sourceString.IndexOf("<value>", StringComparison.Ordinal);
             while (pos >= 0)
@@ -41,6 +45,13 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
                 values.Add(value);
                 pos = sourceString.IndexOf("<value>", pos, StringComparison.Ordinal);
             }
+            
+            // Fall back on normal behaviour
+            if (values.Any() == false)
+            {
+                return sourceString.Split(Environment.NewLine.ToCharArray());
+            }
+
             return values.ToArray();
         }
 

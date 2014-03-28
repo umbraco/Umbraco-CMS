@@ -125,7 +125,7 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
                 }
                 catch (Exception ex)
                 {                
-                    LogHelper.Error<PublishedMediaCache>("Could not retreive the InternalIndexer", ex);
+                    LogHelper.Error<PublishedMediaCache>("Could not retrieve the InternalIndexer", ex);
                     //something didn't work, continue returning null.
                 }
             }

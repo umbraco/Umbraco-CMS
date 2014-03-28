@@ -86,6 +86,11 @@ namespace Umbraco.Web.Editors
         // TODO: This should really be centralized and used anywhere globalization applies.
         internal string TranslateItem(string text)
         {
+            if (text == null)
+            {
+                return null;
+            }
+
             if (text.StartsWith("#") == false)
                 return text;
 

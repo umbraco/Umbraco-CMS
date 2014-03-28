@@ -17,7 +17,7 @@ namespace Umbraco.Web.WebApi
     public static class HttpRequestMessageExtensions
     {
         /// <summary>
-        /// Tries to retreive the current HttpContext if one exists.
+        /// Tries to retrieve the current HttpContext if one exists.
         /// </summary>
         /// <returns></returns>
         public static Attempt<HttpContextBase> TryGetHttpContext(this HttpRequestMessage request)

@@ -15,7 +15,7 @@ function memberTypeResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "memberTypeApiBaseUrl",
                        "GetAllTypes")),
-               'Failed to retreive data for member types id');
+               'Failed to retrieve data for member types id');
         }
 
     };

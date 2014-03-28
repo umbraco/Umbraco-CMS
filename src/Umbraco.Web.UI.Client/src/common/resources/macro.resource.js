@@ -27,7 +27,7 @@ function macroResource($q, $http, umbRequestHelper) {
                        "macroApiBaseUrl",
                        "GetMacroParameters",
                        [{ macroId: macroId }])),
-               'Failed to retreive macro parameters for macro with id  ' + macroId);
+               'Failed to retrieve macro parameters for macro with id  ' + macroId);
         },
         
         /**
@@ -75,7 +75,7 @@ function macroResource($q, $http, umbRequestHelper) {
                        "macroApiBaseUrl",
                        "GetMacroResultAsHtmlForEditor",
                        query)),
-               'Failed to retreive macro result for macro with alias  ' + macroAlias);
+               'Failed to retrieve macro result for macro with alias  ' + macroAlias);
         }
             
     };

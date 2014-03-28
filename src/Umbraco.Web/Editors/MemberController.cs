@@ -270,7 +270,7 @@ namespace Umbraco.Web.Editors
             }
 
             //set the generated password (if there was one) - in order to do this we'll chuck the gen'd password into the
-            // additional data of the IUmbracoEntity of the persisted item - then we can retreive this in the model mapper and set 
+            // additional data of the IUmbracoEntity of the persisted item - then we can retrieve this in the model mapper and set 
             // the value to be given to the UI. Hooray for AdditionalData :)
             contentItem.PersistedContent.AdditionalData["GeneratedPassword"] = generatedPassword;
 

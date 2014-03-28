@@ -27,7 +27,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, enti
             // from the server so that we can load in the actions menu.
             umbRequestHelper.resourcePromise(
                 $http.get(content.treeNodeUrl),
-                'Failed to retreive data for child node ' + content.id).then(function (node) {
+                'Failed to retrieve data for child node ' + content.id).then(function (node) {
                     $scope.currentNode = node;
                 });
         }
