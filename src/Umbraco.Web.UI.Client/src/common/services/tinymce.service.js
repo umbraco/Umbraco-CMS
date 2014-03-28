@@ -105,7 +105,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                         scope: $scope, callback: function (img) {
 
                             if (img) {
-                                var imagePropVal = imageHelper.getImagePropertyValue({ imageModel: img, scope: $scope });
+                                
                                 var data = {
                                     alt: img.name,
                                     src: (img.url) ? img.url : "nothing.jpg",
