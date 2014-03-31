@@ -25,7 +25,8 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownController
             var vals = _.values($scope.model.config.items);
             var keys = _.keys($scope.model.config.items);
             for (var i = 0; i < vals.length; i++) {
-                newItems.push({ id: keys[i], sortOrder: vals[i].sortOrder, value: vals[i].value });
+                var label = vals[i].value ? vals[i].value : vals[i]; 
+                newItems.push({ id: keys[i], sortOrder: vals[i].sortOrder, value: label });
             }
 
             //ensure the items are sorted by the provided sort order
