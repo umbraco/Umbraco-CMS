@@ -3,8 +3,7 @@
 
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 <asp:Content ContentPlaceHolderID="body" runat="server">
-    <cc1:UmbracoPanel ID="Panel1" runat="server" Width="608px" Height="336px" hasMenu="true"
-        Style="text-align: center">
+    <cc1:UmbracoPanel ID="Panel1" runat="server" Width="608px" Height="336px" hasMenu="true">
         <cc1:Pane ID="Pane7" runat="server">
             <cc1:PropertyPanel runat="server" ID="pp_language">
                 <asp:DropDownList ID="Cultures" runat="server">
