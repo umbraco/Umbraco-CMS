@@ -536,11 +536,11 @@ To manage your website, simply open the umbraco back office and start adding con
   <area alias="login">
     <key alias="greeting0">Happy super sunday</key>
     <key alias="greeting1">Happy manic monday </key>
-    <key alias="greeting2">Happy tremendous tuesday</key>
+    <key alias="greeting2">Happy tubular tuesday</key>
     <key alias="greeting3">Happy wonderful wednesday</key>
     <key alias="greeting4">Happy thunder thursday</key>
-    <key alias="greeting5">Happy friendly friday</key>
-    <key alias="greeting6">Happy shiny saturday</key>
+    <key alias="greeting5">Happy funky friday</key>
+    <key alias="greeting6">Happy caturday</key>
     <key alias="instruction">log in below</key>
     <key alias="timeout">Session timed out</key>
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
