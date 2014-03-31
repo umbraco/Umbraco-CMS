@@ -35,7 +35,6 @@ namespace Umbraco.Core.Persistence.Mappers
                 CacheMap<Tag, TagDto>(src => src.Id, dto => dto.Id);
                 CacheMap<Tag, TagDto>(src => src.Text, dto => dto.Tag);
                 CacheMap<Tag, TagDto>(src => src.Group, dto => dto.Group);
-                //CacheMap<Tag, TagDto>(src => src., dto => dto.ParentId); // Doesn't seem to be enabled - RJF
             }
         }
 
