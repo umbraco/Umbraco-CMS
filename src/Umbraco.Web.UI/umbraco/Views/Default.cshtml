@@ -53,7 +53,7 @@
         Umbraco.Sys.ServerVariables = {
             "umbracoUrls": {                
                 "authenticationApiBaseUrl": "@(Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>(controller => controller.PostLogin(null)))",
-                "serverVarsJs": '@Url.Action("ServerVariables", "BackOffice")'
+                "serverVarsJs": '@Url.GetUrlWithCacheBust("ServerVariables", "BackOffice")'
             }
         };       
     </script>
