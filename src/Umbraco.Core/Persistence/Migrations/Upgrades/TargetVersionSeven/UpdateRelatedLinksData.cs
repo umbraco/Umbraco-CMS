@@ -33,7 +33,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
                 var propertyData =
                     database.Fetch<PropertyDataDto>(
                         "WHERE propertyTypeId in (SELECT id from cmsPropertyType where dataTypeID IN (@dataTypeIds))", new { dataTypeIds = dataTypeIds });
-
+                if (!propertyData.Any()) return string.Empty;
+                
                 var nodesIdsWithProperty = propertyData.Select(x => x.NodeId).Distinct();
                 var cmsContentXmlEntries = database.Fetch<ContentXmlDto>(
                         "WHERE nodeId in (@nodeIds)", new { nodeIds = nodesIdsWithProperty });
