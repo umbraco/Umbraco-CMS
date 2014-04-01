@@ -958,6 +958,10 @@ namespace Umbraco.Core.Services
                 }
             }
         }
+        public void AssignRole(string username, string roleName)
+        {
+            AssignRoles(new[] { username }, new[] { roleName });
+        }
 
         public void AssignRoles(string[] usernames, string[] roleNames)
         {
@@ -968,6 +972,11 @@ namespace Umbraco.Core.Services
             }
         }
 
+        public void DissociateRole(string username, string roleName)
+        {
+            DissociateRoles(new[] { username }, new[] { roleName });
+        }
+
         public void DissociateRoles(string[] usernames, string[] roleNames)
         {
             var uow = _uowProvider.GetUnitOfWork();
@@ -975,6 +984,11 @@ namespace Umbraco.Core.Services
             {
                 repository.DissociateRoles(usernames, roleNames);
             }
+        }
+        
+        public void AssignRole(int memberId, string roleName)
+        {
+            AssignRoles(new[] { memberId }, new[] { roleName });
         }
 
         public void AssignRoles(int[] memberIds, string[] roleNames)
@@ -984,6 +998,11 @@ namespace Umbraco.Core.Services
             {
                 repository.AssignRoles(memberIds, roleNames);
             }
+        }
+
+        public void DissociateRole(int memberId, string roleName)
+        {
+            DissociateRoles(new[] { memberId }, new[] { roleName });
         }
 
         public void DissociateRoles(int[] memberIds, string[] roleNames)
