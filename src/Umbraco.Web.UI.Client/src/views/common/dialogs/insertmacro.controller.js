@@ -31,7 +31,8 @@ function InsertMacroController($scope, entityResource, macroResource, umbPropEdi
                                 return item.alias == key;
                             });
                             if (prop) {
-                                prop.value = val;
+                                //we need to unescape values as they have most likely been escaped while inserted 
+                                prop.value = _.unescape(val);
                             }
                         });
 
