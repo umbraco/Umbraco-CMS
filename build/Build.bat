@@ -12,6 +12,9 @@ ECHO Installing the Microsoft.Bcl.Build package before anything else, otherwise 
 SET nuGetFolder=%CD%\..\src\packages\
 ..\src\.nuget\NuGet.exe install ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder%
 
+ECHO Removing the belle build folder to make sure everything is clean as a whistle
+RD ..\src\Umbraco.Web.UI.Client\build /Q /S
+
 ECHO Performing MSBuild and producing Umbraco binaries zip files
 %windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe "Build.proj" /p:BUILD_RELEASE=%release% /p:BUILD_COMMENT=%comment%
 
