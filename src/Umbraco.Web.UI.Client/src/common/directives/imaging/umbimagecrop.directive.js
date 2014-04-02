@@ -185,14 +185,21 @@ angular.module("umbraco.directives")
 							top = constraints.top.min;
 						}
 
-						scope.dimensions.image.left = left;
-						scope.dimensions.image.top = top;
+						if(scope.dimensions.image.left !== left){
+							scope.dimensions.image.left = left;
+						}	
+						
+						if(scope.dimensions.image.top !== top){
+							scope.dimensions.image.top = top;
+						}
 					};	
-					
+
+
 					//sets scope.crop to the recalculated % based crop	
 					var calculateCropBox = function(){
 						scope.crop = cropperHelper.pixelsToCoordinates(scope.dimensions.image, scope.dimensions.cropper.width, scope.dimensions.cropper.height, scope.dimensions.margin);	
 					};
+
 
 					//Drag and drop positioning, using jquery ui draggable
 					var onStartDragPosition, top, left;
@@ -204,6 +211,9 @@ angular.module("umbraco.directives")
 						},
 						stop: function(event, ui){
 							scope.$apply(function(){
+								//make sure that every validates one more time...
+								validatePosition(ui.position.left, ui.position.top);
+
 								calculateCropBox();
 								scope.dimensions.image.rnd = Math.random();
 							});
@@ -227,8 +237,6 @@ angular.module("umbraco.directives")
 
 						//sets constaints for the cropper
 						setConstraints();
-
-
 						scope.loaded = true;
 					};
 
@@ -243,11 +251,16 @@ angular.module("umbraco.directives")
 							}
 					});
 
+					var throttledResizing = _.throttle(function(){
+						resizeImageToScale(scope.dimensions.scale.current);
+						calculateCropBox();	
+					}, 300);
+
+					
 					//happens when we change the scale
 					scope.$watch("dimensions.scale.current", function(){
 						if(scope.loaded){
-							resizeImageToScale(scope.dimensions.scale.current);
-							calculateCropBox();
+							throttledResizing();
 						}
 					});
 

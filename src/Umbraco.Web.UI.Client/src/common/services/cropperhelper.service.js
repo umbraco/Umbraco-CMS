@@ -85,9 +85,7 @@ function cropperHelper(umbRequestHelper, $http) {
 			return style;
 		},
 
-		//returns a ng-style object with top,left,width,height pixel measurements
-		//expects {left,right,top,bottom} - {width,height}, {width,height}, int
-		//offset is just to push the image position a number of pixels from top,left    
+		 
 		coordinatesToPixels : function(coordinates, originalSize, offset){
 
 			var coordinates_px = {
@@ -115,6 +113,12 @@ function cropperHelper(umbRequestHelper, $http) {
 			crop.y1 = y1_px / image.height;
 			crop.x2 = x2_px / image.width;
 			crop.y2 = y2_px / image.height;
+
+			_.forEach(crop, function(coord){
+				if(coord < 0){
+					coord = 0;
+				}
+			});
 
 			return crop;
 		},
