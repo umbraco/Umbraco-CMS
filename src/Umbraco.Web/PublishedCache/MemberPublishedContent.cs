@@ -6,6 +6,8 @@ using System.Web.Security;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 
 namespace Umbraco.Web.PublishedCache
@@ -18,7 +20,7 @@ namespace Umbraco.Web.PublishedCache
 
         private readonly IMember _member;
         private readonly MembershipUser _membershipUser;
-        private readonly List<IPublishedProperty> _properties;
+        private readonly IPublishedProperty[] _properties;
         private readonly PublishedContentType _publishedMemberType;
 
         public MemberPublishedContent(IMember member, MembershipUser membershipUser)
@@ -28,20 +30,17 @@ namespace Umbraco.Web.PublishedCache
 
             _member = member;
             _membershipUser = membershipUser;
-            _properties = new List<IPublishedProperty>();
             _publishedMemberType = PublishedContentType.Get(PublishedItemType.Member, _member.ContentTypeAlias);
             if (_publishedMemberType == null)
             {
                 throw new InvalidOperationException("Could not get member type with alias " + _member.ContentTypeAlias);
             }
-            foreach (var propType in _publishedMemberType.PropertyTypes)
-            {
-                var val = _member.Properties.Any(x => x.Alias == propType.PropertyTypeAlias) == false
-                    ? string.Empty 
-                    : _member.Properties[propType.PropertyTypeAlias].Value;
-                _properties.Add(new RawValueProperty(propType, val ?? string.Empty));
-            }
+
+            _properties = PublishedProperty.MapProperties(_publishedMemberType.PropertyTypes, _member.Properties,
+                (t, p, v) => new RawValueProperty(t, v ?? string.Empty))
+                .ToArray();
         }
+
 
         #region Membership provider member properties
         public string Email

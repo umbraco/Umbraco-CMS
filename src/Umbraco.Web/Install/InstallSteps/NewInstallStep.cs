@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Configuration;
 using System.Web.Security;
 using Umbraco.Core;
@@ -69,7 +70,19 @@ namespace Umbraco.Web.Install.InstallSteps
             admin.Username = user.Email.Trim();
 
             _applicationContext.Services.UserService.Save(admin);
-            
+
+
+            if (user.SubscribeToNewsLetter)
+            {
+                try
+                {
+                    var client = new System.Net.WebClient();
+                    var values = new NameValueCollection { { "name", admin.Name }, { "email", admin.Email} };
+                    client.UploadValues("http://umbraco.org/base/Ecom/SubmitEmail/installer.aspx", values);
+                }
+                catch { /* fail in silence */ }
+            }
+
             return null;
         }
 

@@ -13,5 +13,8 @@ namespace Umbraco.Web.Install.Models
         
         [DataMember(Name = "password")]
         public string Password { get; set; }
+
+        [DataMember(Name = "subscribeToNewsLetter")]
+        public bool SubscribeToNewsLetter { get; set; }
     }
 }
