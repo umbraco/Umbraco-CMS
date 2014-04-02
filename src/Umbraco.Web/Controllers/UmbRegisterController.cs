@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Security;
+using System.Web.Services.Description;
 using umbraco.BusinessLogic;
 using umbraco.cms.businesslogic.member;
 using Umbraco.Core;
@@ -23,6 +24,11 @@ namespace Umbraco.Web.Controllers
 
             MembershipCreateStatus status;
             var member = Members.RegisterMember(model, out status, model.LoginOnSuccess);
+
+            // Save the password
+            var memberService = Services.MemberService;
+            var m = memberService.GetByUsername(member.UserName);
+            memberService.SavePassword(m, model.Password);
 
             switch (status)
             {
