@@ -24,9 +24,8 @@ angular.module("umbraco.directives.html")
 
                             scope.clickHandler = scope.$eval(element.attr('on-click'));
 
-                            //todo: this doesn't do anything
-                            var imagesOnly = element.attr('imagesOnly');
-
+                            
+                            var imagesOnly =  element.attr('images-only') === "true";
                             var margin = element.attr('border') ? parseInt(element.attr('border'), 10) : 5;
                             var startingIndex = element.attr('baseline') ? parseInt(element.attr('baseline'), 10) : 0;
                             var minWidth = element.attr('min-width') ? parseInt(element.attr('min-width'), 10) : 420;
@@ -36,7 +35,7 @@ angular.module("umbraco.directives.html")
                             var fixedRowWidth = Math.max(element.width(), minWidth);
 
                             scope.containerStyle = { width: fixedRowWidth + "px" };
-                            scope.rows = umbPhotoFolderHelper.buildGrid(photos, fixedRowWidth, maxHeight, startingIndex, minHeight, idealImgPerRow, margin);
+                            scope.rows = umbPhotoFolderHelper.buildGrid(photos, fixedRowWidth, maxHeight, startingIndex, minHeight, idealImgPerRow, margin, imagesOnly);
 
                             if (attrs.filterBy) {
 
@@ -51,7 +50,7 @@ angular.module("umbraco.directives.html")
                                     if (newVal && newVal !== oldVal) {
                                         var p = $filter('filter')(photos, newVal, false);
                                         scope.baseline = 0;
-                                        var m = umbPhotoFolderHelper.buildGrid(p, fixedRowWidth, maxHeight, startingIndex, minHeight, idealImgPerRow, margin);
+                                        var m = umbPhotoFolderHelper.buildGrid(p, fixedRowWidth, maxHeight, startingIndex, minHeight, idealImgPerRow, margin, imagesOnly);
                                         scope.rows = m;
                                     }
                                 });
