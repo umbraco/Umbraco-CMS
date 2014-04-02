@@ -508,6 +508,15 @@ namespace Umbraco.Tests.PublishedContent
             Assert.AreEqual(1173, result.Id);
 		}
 
+	    [Test]
+	    public void U4_4559()
+	    {
+	        var doc = GetNode(1174);
+	        var result = doc.AncestorOrSelf(1);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(1046, result.Id);
+	    }
+
 		[Test]
 		public void Ancestors_Or_Self()
 		{

@@ -72,7 +72,16 @@ namespace Umbraco.Tests.PublishedContent
 			Assert.IsTrue(ddoc.HasProperty(Constants.Conventions.Content.UrlAlias));
 		}
 
-		/// <summary>
+        [Test]
+        public void U4_4559()
+        {
+            var doc = GetDynamicNode(1174);
+            var result = doc.AncestorOrSelf(1);
+            Assert.IsNotNull(result);
+            Assert.AreEqual(1046, result.Id);
+        }
+        
+        /// <summary>
 		/// Test class to mimic UmbracoHelper when returning docs
 		/// </summary>
 		public class TestHelper
