@@ -4,8 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.PropertyEditors;
 
@@ -18,6 +16,32 @@ namespace Umbraco.Core.Models.PublishedContent
     /// if the property type changes, then a new class needs to be created.</remarks>
     public class PublishedPropertyType
     {
+        #region Constructors
+
+        // clone
+        private PublishedPropertyType(PublishedPropertyType orig)
+        {
+            ContentType = orig.ContentType;
+            PropertyTypeAlias = orig.PropertyTypeAlias;
+            DataTypeId = orig.DataTypeId;
+            PropertyEditorAlias = orig.PropertyEditorAlias;
+            _converter = orig._converter;
+            _sourceCacheLevel = orig._sourceCacheLevel;
+            _objectCacheLevel = orig._objectCacheLevel;
+            _xpathCacheLevel = orig._xpathCacheLevel;
+            _clrType = orig._clrType;
+
+            // do NOT copy the reduced cache levels
+            // as we should NOT clone a nested / detached type
+        }
+
+        /// <summary>
+        /// Initialize a new instance of the <see cref="PublishedPropertyType"/> class within a <see cref="PublishedContentType"/>,
+        /// with a <see cref="PropertyType"/>.
+        /// </summary>
+        /// <param name="contentType">The published content type.</param>
+        /// <param name="propertyType">The property type.</param>
+        /// <remarks>The new published property type belongs to the published content type and corresponds to the property type.</remarks>
         public PublishedPropertyType(PublishedContentType contentType, PropertyType propertyType)
         {
             // PropertyEditor [1:n] DataTypeDefinition [1:n] PropertyType
@@ -31,10 +55,68 @@ namespace Umbraco.Core.Models.PublishedContent
             InitializeConverters();
         }
 
-        // for unit tests
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PublishedPropertyType"/> class with an existing <see cref="PublishedPropertyType"/>
+        /// and a new property type alias.
+        /// </summary>
+        /// <param name="propertyTypeAlias">The new property type alias.</param>
+        /// <param name="propertyType">The existing published property type.</param>
+        /// <remarks>
+        /// <para>The new published property type does not belong to a published content type.</para>
+        /// <para>It is a copy of the initial published property type, with a different alias.</para>
+        /// </remarks>
+        internal PublishedPropertyType(string propertyTypeAlias, PublishedPropertyType propertyType)
+            : this(propertyTypeAlias, propertyType.DataTypeId, propertyType.PropertyEditorAlias)
+        { }
+
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PublishedPropertyType"/> class with a property type alias and a property editor alias.
+        /// </summary>
+        /// <param name="propertyTypeAlias">The property type alias.</param>
+        /// <param name="propertyEditorAlias">The property editor alias.</param>
+        /// <remarks>
+        /// <para>The new published property type does not belong to a published content type.</para>
+        /// <para>It is based upon the property editor, but has no datatype definition. This will work as long
+        /// as the datatype definition is not required to process (eg to convert) the property values. For
+        /// example, this may not work if the related IPropertyValueConverter requires the datatype definition
+        /// to make decisions, fetch prevalues, etc.</para>
+        /// <para>The value of <paramref name="propertyEditorAlias"/> is assumed to be valid.</para>
+        /// </remarks>
+        internal PublishedPropertyType(string propertyTypeAlias, string propertyEditorAlias)
+            : this(propertyTypeAlias, 0, propertyEditorAlias)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PublishedPropertyType"/> class with a property type alias and a datatype definition.
+        /// </summary>
+        /// <param name="propertyTypeAlias">The property type alias.</param>
+        /// <param name="dataTypeDefinition">The datatype definition.</param>
+        /// <remarks>
+        /// <para>The new published property type does not belong to a published content type.</para>
+        /// </remarks>
+        internal PublishedPropertyType(string propertyTypeAlias, IDataTypeDefinition dataTypeDefinition)
+            : this(propertyTypeAlias, dataTypeDefinition.Id, dataTypeDefinition.PropertyEditorAlias)
+        { }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PublishedPropertyType"/> class with a property type alias,
+        /// a datatype definition identifier, and a property editor alias.
+        /// </summary>
+        /// <param name="propertyTypeAlias">The property type alias.</param>
+        /// <param name="dataTypeDefinitionId">The datatype definition identifier.</param>
+        /// <param name="propertyEditorAlias">The property editor alias.</param>
+        /// <remarks>
+        /// <para>The new published property type does not belong to a published content type.</para>
+        /// <para>The values of <paramref name="dataTypeDefinitionId"/> and <paramref name="propertyEditorAlias"/> are
+        /// assumed to be valid and consistent.</para>
+        /// </remarks>
         internal PublishedPropertyType(string propertyTypeAlias, int dataTypeDefinitionId, string propertyEditorAlias)
         {
-            // ContentType to be set by PublishedContentType when creating it
+            // ContentType 
+            // - in unit tests, to be set by PublishedContentType when creating it
+            // - in detached types, remains null
+
             PropertyTypeAlias = propertyTypeAlias;
 
             DataTypeId = dataTypeDefinitionId;
@@ -42,6 +124,8 @@ namespace Umbraco.Core.Models.PublishedContent
 
             InitializeConverters();
         }
+
+        #endregion
 
         #region Property type
 
@@ -287,6 +371,133 @@ namespace Umbraco.Core.Models.PublishedContent
             {
                 // NOTE: ignore preview, because IPropertyEditorValueConverter does not support it
                 return _converter.ConvertPropertyValue(source).Result;
+            }
+        }
+
+        #endregion
+
+        #region Detached
+
+        private PropertyCacheLevel _sourceCacheLevelReduced = 0;
+        private PropertyCacheLevel _objectCacheLevelReduced = 0;
+        private PropertyCacheLevel _xpathCacheLevelReduced = 0;
+
+        internal bool IsDetachedOrNested
+        {
+            // enough to test source
+            get { return _sourceCacheLevelReduced != 0; }
+        }
+
+        /// <summary>
+        /// Creates a detached clone of this published property type.
+        /// </summary>
+        /// <returns>A detached clone of this published property type.</returns>
+        /// <remarks>
+        /// <para>Only a published property type that has not already been detached or nested, can be detached.</para>
+        /// <para>Use detached published property type when creating detached properties outside of a published content.</para>
+        /// </remarks>
+        public PublishedPropertyType Detached()
+        {
+            // verify
+            if (IsDetachedOrNested)
+                throw new Exception("PublishedPropertyType is already detached/nested.");
+
+            var detached = new PublishedPropertyType(this);
+            detached._sourceCacheLevel 
+                = detached._objectCacheLevel 
+                = detached._xpathCacheLevel 
+                = PropertyCacheLevel.Content;
+            // set to none to a) indicate it's detached / nested and b) make sure any nested
+            // types switch all their cache to .Content
+            detached._sourceCacheLevelReduced 
+                = detached._objectCacheLevelReduced
+                = detached._xpathCacheLevelReduced
+                = PropertyCacheLevel.None;
+
+            return detached;
+        }
+
+        /// <summary>
+        /// Creates a nested clone of this published property type within a specified container published property type.
+        /// </summary>
+        /// <param name="containerType">The container published property type.</param>
+        /// <returns>A nested clone of this published property type</returns>
+        /// <remarks>
+        /// <para>Only a published property type that has not already been detached or nested, can be nested.</para>
+        /// <para>Use nested published property type when creating detached properties within a published content.</para>
+        /// </remarks>
+        public PublishedPropertyType Nested(PublishedPropertyType containerType)
+        {
+            // verify
+            if (IsDetachedOrNested)
+                throw new Exception("PublishedPropertyType is already detached/nested.");
+
+            var nested = new PublishedPropertyType(this);
+
+            // before we reduce, both xpath and object are >= source, and
+            // the way reduce works, the relative order of resulting xpath, object and source are preserved
+
+            // Reduce() will set _xxxCacheLevelReduced thus indicating that the type is detached / nested
+
+            Reduce(_sourceCacheLevel, _sourceCacheLevelReduced, ref nested._sourceCacheLevel, ref nested._sourceCacheLevelReduced);
+            Reduce(_objectCacheLevel, _objectCacheLevelReduced, ref nested._objectCacheLevel, ref nested._objectCacheLevelReduced);
+            Reduce(_xpathCacheLevel, _xpathCacheLevelReduced, ref nested._xpathCacheLevel, ref nested._xpathCacheLevelReduced);
+
+            return nested;
+        }
+
+        private static void Reduce(
+            PropertyCacheLevel containerCacheLevel, PropertyCacheLevel containerCacheLevelReduced,
+            ref PropertyCacheLevel nestedCacheLevel, ref PropertyCacheLevel nestedCacheLevelReduced)
+        {
+            // initialize if required
+            if (containerCacheLevelReduced == 0)
+                containerCacheLevelReduced = containerCacheLevel;
+
+            switch (containerCacheLevelReduced)
+            {
+                case PropertyCacheLevel.None:
+                    // once .None, force .Content for everything
+                    nestedCacheLevel = PropertyCacheLevel.Content;
+                    nestedCacheLevelReduced = PropertyCacheLevel.None; // and propagate
+                    break;
+
+                case PropertyCacheLevel.Request:
+                    // once .Request, force .Content for everything
+                    nestedCacheLevel = PropertyCacheLevel.Content;
+                    nestedCacheLevelReduced = PropertyCacheLevel.Request; // and propagate
+                    break;
+
+                case PropertyCacheLevel.Content:
+                    // as long as .Content, accept anything
+                    nestedCacheLevelReduced = nestedCacheLevel; // and it becomes the nested reduced
+                    break;
+
+                case PropertyCacheLevel.ContentCache:
+                    // once .ContentCache, accept .Request and .Content but not .ContentCache
+                    switch (nestedCacheLevel)
+                    {
+                        case PropertyCacheLevel.Request:
+                        case PropertyCacheLevel.None:
+                            // accept
+                            nestedCacheLevelReduced = nestedCacheLevel; // and it becomes the nested reduced
+                            break;
+                        case PropertyCacheLevel.Content:
+                            // accept
+                            nestedCacheLevelReduced = PropertyCacheLevel.ContentCache; // and propagate
+                            break;
+                        case PropertyCacheLevel.ContentCache:
+                            // force .Content
+                            nestedCacheLevel = PropertyCacheLevel.Content;
+                            nestedCacheLevelReduced = PropertyCacheLevel.ContentCache; // and propagate
+                            break;
+                        default:
+                            throw new Exception("Unsupported PropertyCacheLevel value.");
+                    }
+                    break;
+
+                default:
+                    throw new Exception("Unsupported PropertyCacheLevel value.");
             }
         }
 

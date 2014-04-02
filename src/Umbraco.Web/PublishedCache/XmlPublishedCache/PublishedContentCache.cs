@@ -463,12 +463,13 @@ namespace Umbraco.Web.PublishedCache.XmlPublishedCache
 
         #endregion
 
-        #region Fragments
+        #region Detached
 
-        public IPublishedContent CreateFragment(string contentTypeAlias, IDictionary<string, object> dataValues,
-            bool isPreviewing, bool managed)
+        public IPublishedProperty CreateDetachedProperty(PublishedPropertyType propertyType, object value, bool isPreviewing)
         {
-            return new PublishedFragment(contentTypeAlias, dataValues, isPreviewing, managed);
+            if (propertyType.IsDetachedOrNested == false)
+                throw new ArgumentException("Property type is neither detached nor nested.", "propertyType");
+            return new XmlPublishedProperty(propertyType, isPreviewing, value.ToString());
         }
 
         #endregion

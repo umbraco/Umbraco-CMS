@@ -308,6 +308,7 @@
     <Compile Include="Editors\ImagesController.cs" />
     <Compile Include="Models\ContentEditing\ContentBaseItemSave.cs" />
     <Compile Include="Models\ContentEditing\MediaItemSave.cs" />
+    <Compile Include="Models\DetachedContent.cs" />
     <Compile Include="Models\ImageCropAnchor.cs" />
     <Compile Include="Models\ImageCropCoordinates.cs" />
     <Compile Include="Models\ImageCropDataSet.cs" />
@@ -356,8 +357,6 @@
     <Compile Include="Mvc\RedirectToUmbracoUrlResult.cs" />
     <Compile Include="PublishedCache\MemberPublishedContent.cs" />
     <Compile Include="PublishedCache\RawValueProperty.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\PublishedFragment.cs" />
-    <Compile Include="PublishedCache\XmlPublishedCache\PublishedFragmentProperty.cs" />
     <Compile Include="Models\RenderModelOfTContent.cs" />
     <Compile Include="Mvc\JsonNetResult.cs" />
     <Compile Include="Mvc\MinifyJavaScriptResultAttribute.cs" />

@@ -9,6 +9,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
+using Umbraco.Web.Models;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -632,5 +633,61 @@ namespace Umbraco.Tests.PublishedContent
 
 			Assert.AreEqual((int)1178, (int)result.Id);
 		}
-	}
+
+        [Test]
+        public void DetachedProperty1()
+        {
+            var type = new PublishedPropertyType("detached", Constants.PropertyEditors.IntegerAlias);
+            var prop = PublishedProperty.GetDetached(type.Detached(), "5548");
+            Assert.IsInstanceOf<int>(prop.Value);
+            Assert.AreEqual(5548, prop.Value);
+        }
+
+	    public void CreateDetachedContentSample()
+	    {
+            bool previewing = false;
+            var t = PublishedContentType.Get(PublishedItemType.Content, "detachedSomething");
+            var values = new Dictionary<string, object>();
+            var properties = t.PropertyTypes.Select(x =>
+            {
+                object value;
+                if (values.TryGetValue(x.PropertyTypeAlias, out value) == false) value = null;
+                return PublishedProperty.GetDetached(x.Detached(), value, previewing);
+            });
+            // and if you want some sort of "model" it's up to you really...
+            var c = new DetachedContent(properties);
+        }
+
+	    public void CreatedDetachedContentInConverterSample()
+	    {
+            // the converter args
+	        PublishedPropertyType argPropertyType = null;
+	        object argSource = null;
+	        bool argPreview = false;
+
+	        var pt1 = new PublishedPropertyType("legend", 0, Constants.PropertyEditors.TextboxAlias);
+	        var pt2 = new PublishedPropertyType("image", 0, Constants.PropertyEditors.MediaPickerAlias);
+	        string val1 = "";
+	        int val2 = 0;
+
+            var c = new ImageWithLegendModel(
+                PublishedProperty.GetDetached(pt1.Nested(argPropertyType), val1, argPreview),
+                PublishedProperty.GetDetached(pt2.Nested(argPropertyType), val2, argPreview));
+        }
+
+	    class ImageWithLegendModel
+	    {
+	        private IPublishedProperty _legendProperty;
+	        private IPublishedProperty _imageProperty;
+
+	        public ImageWithLegendModel(IPublishedProperty legendProperty, IPublishedProperty imageProperty)
+	        {
+	            _legendProperty = legendProperty;
+	            _imageProperty = imageProperty;
+	        }
+
+            public string Legend { get { return _legendProperty.GetValue<string>(); } }
+            public IPublishedContent Image { get { return _imageProperty.GetValue<IPublishedContent>(); } }
+        }
+    }
 }

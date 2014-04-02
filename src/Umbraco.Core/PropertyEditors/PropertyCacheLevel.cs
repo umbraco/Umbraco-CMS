@@ -6,6 +6,10 @@
     /// <remarks>By default, <c>Request</c> is assumed.</remarks>
     public enum PropertyCacheLevel
     {
+        // note: we use the relative values in PublishedPropertyType to ensure that
+        // object level >= source level
+        // xpath level >= source level
+
         /// <summary>
         /// Indicates that the property value can be cached at the content level, ie it can be
         /// cached until the content itself is modified.
