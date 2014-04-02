@@ -24,6 +24,11 @@ namespace Umbraco.Web.Controllers
             MembershipCreateStatus status;
             var member = Members.RegisterMember(model, out status, model.LoginOnSuccess);
 
+            // Save the password
+            var memberService = Services.MemberService;
+            var m = memberService.GetByUsername(member.UserName);
+            memberService.SavePassword(m, model.Password);
+
             switch (status)
             {
                 case MembershipCreateStatus.Success:
