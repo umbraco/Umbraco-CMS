@@ -23,15 +23,15 @@ angular.module('umbraco.services').factory('packageHelper', packageHelper);
 
 function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, mediaHelper, umbRequestHelper) {
     return {
-        /** sets the image's url - will check if it is a folder or a real image */
-        setImageUrl: function(img) {
-            //get the image property (if one exists)
-            img.thumbnail = mediaHelper.resolveFile(img, true);
-            img.image = mediaHelper.resolveFile(img, false);
+        /** sets the image's url, thumbnail and if its a folder */
+        setImageData: function(img) {
+            
+            img.isFolder = !mediaHelper.hasFilePropertyType(img);
 
-           // if (!img.thumbnail){
-           //     img.thumbnail = "none";
-           // }
+            if(!img.isFolder){
+                img.thumbnail = mediaHelper.resolveFile(img, true);
+                img.image = mediaHelper.resolveFile(img, false);    
+            }
         },
 
         /** sets the images original size properties - will check if it is a folder and if so will just make it square */
@@ -252,15 +252,22 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
         },
 
         /** Creates the image grid with calculated widths/heights for images to fill the grid nicely */
-        buildGrid: function(images, maxRowWidth, maxRowHeight, startingIndex, minDisplayHeight, idealImgPerRow, margin) {
+        buildGrid: function(images, maxRowWidth, maxRowHeight, startingIndex, minDisplayHeight, idealImgPerRow, margin,imagesOnly) {
 
             var rows = [];
             var imagesProcessed = 0;
 
             //first fill in all of the original image sizes and URLs
             for (var i = startingIndex; i < images.length; i++) {
-                this.setImageUrl(images[i]);
+                var item = images[0];
+
+                this.setImageData(images[i]);
                 this.setOriginalSize(images[i], maxRowHeight);
+
+                if(imagesOnly && !item.isFolder && !item.thumbnail){
+                    images.splice(i, 1);
+                    i--;
+                }
             }
 
             while ((imagesProcessed + startingIndex) < images.length) {

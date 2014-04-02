@@ -162,6 +162,36 @@ function mediaHelper(umbRequestHelper) {
             return result;            
         },
 
+        /*jshint loopfunc: true */
+        hasFilePropertyType : function(mediaItem){
+           function _iterateProps(props){
+               var result = false;
+               for(var resolver in _mediaFileResolvers) {
+                   var property = _.find(props, function(property){ return property.editor === resolver; });
+                   if(property){
+                       result = true;
+                       break;
+                   }
+               }
+               return result;
+           }
+
+           //we either have properties raw on the object, or spread out on tabs
+           var result = false;
+           if(mediaItem.properties){
+               result = _iterateProps(mediaItem.properties);
+           }else if(mediaItem.tabs){
+               for(var tab in mediaItem.tabs) {
+                   if(mediaItem.tabs[tab].properties){
+                       result = _iterateProps(mediaItem.tabs[tab].properties);
+                       if(result){
+                           break;
+                       }
+                   }
+               }
+           }
+           return result;
+        },
 
         /**
          * @ngdoc function
