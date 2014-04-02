@@ -55,13 +55,20 @@ namespace Umbraco.Web.Models
                     var v = p == null || p.Value == null ? null : p.Value;
                     if (v != null)
                     {
-                        var dataType = dataTypesResolver.DataTypes.SingleOrDefault(qq => qq.Id == x.PropertyEditorGuid);
+                        // note - not sure about the performance here
+                        var dataTypeDefinition = global::umbraco.cms.businesslogic.datatype.DataTypeDefinition
+                            .GetDataTypeDefinition(x.DataTypeId);
+                        var dataType = dataTypeDefinition.DataType;
                         if (dataType != null)
                         {
                             var data = dataType.Data;
                             data.Value = v;
                             var n = data.ToXMl(new XmlDocument());
-                            v = n.InnerXml;
+                            if (n.NodeType == XmlNodeType.CDATA || n.NodeType == XmlNodeType.Text)
+                                v = n.InnerText;
+                            else if (n.NodeType == XmlNodeType.Element)
+                                v = n.InnerXml;
+                            // note - is there anything else we should take care of?
                         }
                     }
                     // fixme - means that the IPropertyValueConverter will always get a string
