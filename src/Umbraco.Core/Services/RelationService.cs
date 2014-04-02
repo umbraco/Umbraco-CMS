@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence;
@@ -326,14 +327,18 @@ namespace Umbraco.Core.Services
                 Save(relationType);
 
             var relation = new Relation(parent.Id, child.Id, relationType);
+            if (SavingRelation.IsRaisedEventCancelled(new SaveEventArgs<IRelation>(relation), this))
+                return relation;
+
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateRelationRepository(uow))
             {
                 repository.AddOrUpdate(relation);
                 uow.Commit();
-
-                return relation;
             }
+
+            SavedRelation.RaiseEvent(new SaveEventArgs<IRelation>(relation, false), this);
+            return relation;
         }
 
         /// <summary>
@@ -350,14 +355,18 @@ namespace Umbraco.Core.Services
                 throw new ArgumentNullException(string.Format("No RelationType with Alias '{0}' exists.", relationTypeAlias));
 
             var relation = new Relation(parent.Id, child.Id, relationType);
+            if (SavingRelation.IsRaisedEventCancelled(new SaveEventArgs<IRelation>(relation), this))
+                return relation;
+
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateRelationRepository(uow))
             {
                 repository.AddOrUpdate(relation);
                 uow.Commit();
-
-                return relation;
             }
+
+            SavedRelation.RaiseEvent(new SaveEventArgs<IRelation>(relation, false), this);
+            return relation;
         }
 
         /// <summary>
@@ -389,17 +398,71 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Checks whether two items are related
+        /// </summary>
+        /// <param name="parentId">Id of the Parent relation</param>
+        /// <param name="childId">Id of the Child relation</param>
+        /// <returns>Returns <c>True</c> if any relations exists with the given Ids, otherwise <c>False</c></returns>
+        public bool AreRelated(int parentId, int childId)
+        {
+            using (var repository = _repositoryFactory.CreateRelationRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = new Query<IRelation>().Where(x => x.ParentId == parentId && x.ChildId == childId);
+                return repository.GetByQuery(query).Any();
+            }
+        }
+
+        /// <summary>
+        /// Checks whether two items are related with a given relation type alias
+        /// </summary>
+        /// <param name="parentId">Id of the Parent relation</param>
+        /// <param name="childId">Id of the Child relation</param>
+        /// <param name="relationTypeAlias">Alias of the relation type</param>
+        /// <returns>Returns <c>True</c> if any relations exists with the given Ids and relation type, otherwise <c>False</c></returns>
+        public bool AreRelated(int parentId, int childId, string relationTypeAlias)
+        {
+            var relType = GetRelationTypeByAlias(relationTypeAlias);
+            if(relType == null)
+                return false;
+
+            return AreRelated(parentId, childId, relType);
+        }
+
+
+        /// <summary>
+        /// Checks whether two items are related with a given relation type
+        /// </summary>
+        /// <param name="parentId">Id of the Parent relation</param>
+        /// <param name="childId">Id of the Child relation</param>
+        /// <param name="relationTypeAlias">Type of relation</param>
+        /// <returns>Returns <c>True</c> if any relations exists with the given Ids and relation type, otherwise <c>False</c></returns>
+        public bool AreRelated(int parentId, int childId, IRelationType relationType)
+        {
+            using (var repository = _repositoryFactory.CreateRelationRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = new Query<IRelation>().Where(x => x.ParentId == parentId && x.ChildId == childId && x.RelationTypeId == relationType.Id);
+                return repository.GetByQuery(query).Any();
+            }
+        }
+
+
+        /// <summary>
         /// Saves a <see cref="Relation"/>
         /// </summary>
         /// <param name="relation">Relation to save</param>
         public void Save(IRelation relation)
         {
+            if (SavingRelation.IsRaisedEventCancelled(new SaveEventArgs<IRelation>(relation), this))
+                return;
+
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateRelationRepository(uow))
             {
                 repository.AddOrUpdate(relation);
                 uow.Commit();
             }
+
+            SavedRelation.RaiseEvent(new SaveEventArgs<IRelation>(relation, false), this);
         }
 
         /// <summary>
@@ -408,12 +471,17 @@ namespace Umbraco.Core.Services
         /// <param name="relationType">RelationType to Save</param>
         public void Save(IRelationType relationType)
         {
+            if (SavingRelationType.IsRaisedEventCancelled(new SaveEventArgs<IRelationType>(relationType), this))
+                return;
+
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateRelationTypeRepository(uow))
             {
                 repository.AddOrUpdate(relationType);
                 uow.Commit();
             }
+
+            SavedRelationType.RaiseEvent(new SaveEventArgs<IRelationType>(relationType, false), this);
         }
 
         /// <summary>
@@ -422,12 +490,17 @@ namespace Umbraco.Core.Services
         /// <param name="relation">Relation to Delete</param>
         public void Delete(IRelation relation)
         {
+            if (DeletingRelation.IsRaisedEventCancelled(new DeleteEventArgs<IRelation>(relation), this))
+                return;
+
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateRelationRepository(uow))
             {
                 repository.Delete(relation);
                 uow.Commit();
             }
+
+            DeletedRelation.RaiseEvent(new DeleteEventArgs<IRelation>(relation, false), this);
         }
 
         /// <summary>
@@ -436,12 +509,17 @@ namespace Umbraco.Core.Services
         /// <param name="relationType">RelationType to Delete</param>
         public void Delete(IRelationType relationType)
         {
+            if (DeletingRelationType.IsRaisedEventCancelled(new DeleteEventArgs<IRelationType>(relationType), this))
+                return;
+
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateRelationTypeRepository(uow))
             {
                 repository.Delete(relationType);
                 uow.Commit();
             }
+
+            DeletedRelationType.RaiseEvent(new DeleteEventArgs<IRelationType>(relationType, false), this);
         }
 
         /// <summary>
@@ -450,18 +528,21 @@ namespace Umbraco.Core.Services
         /// <param name="relationType"><see cref="RelationType"/> to Delete Relations for</param>
         public void DeleteRelationsOfType(IRelationType relationType)
         {
+            var relations = new List<IRelation>();
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateRelationRepository(uow))
             {
                 var query = new Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
-                var list = repository.GetByQuery(query).ToList();
+                relations.AddRange(repository.GetByQuery(query).ToList());
 
-                foreach (var relation in list)
+                foreach (var relation in relations)
                 {
                     repository.Delete(relation);
                 }
                 uow.Commit();
             }
+
+            DeletedRelation.RaiseEvent(new DeleteEventArgs<IRelation>(relations, false), this);
         }
 
         #region Private Methods
@@ -479,6 +560,48 @@ namespace Umbraco.Core.Services
             }
             return relations;
         }
+        #endregion
+
+        #region Events Handlers
+        /// <summary>
+        /// Occurs before Deleting a Relation
+        /// </summary>		
+        public static event TypedEventHandler<IRelationService, DeleteEventArgs<IRelation>> DeletingRelation;
+
+        /// <summary>
+        /// Occurs after a Relation is Deleted
+        /// </summary>
+        public static event TypedEventHandler<IRelationService, DeleteEventArgs<IRelation>> DeletedRelation;
+
+        /// <summary>
+        /// Occurs before Saving a Relation
+        /// </summary>
+        public static event TypedEventHandler<IRelationService, SaveEventArgs<IRelation>> SavingRelation;
+
+        /// <summary>
+        /// Occurs after a Relation is Saved
+        /// </summary>
+        public static event TypedEventHandler<IRelationService, SaveEventArgs<IRelation>> SavedRelation;
+
+        /// <summary>
+        /// Occurs before Deleting a RelationType
+        /// </summary>		
+        public static event TypedEventHandler<IRelationService, DeleteEventArgs<IRelationType>> DeletingRelationType;
+
+        /// <summary>
+        /// Occurs after a RelationType is Deleted
+        /// </summary>
+        public static event TypedEventHandler<IRelationService, DeleteEventArgs<IRelationType>> DeletedRelationType;
+
+        /// <summary>
+        /// Occurs before Saving a RelationType
+        /// </summary>
+        public static event TypedEventHandler<IRelationService, SaveEventArgs<IRelationType>> SavingRelationType;
+
+        /// <summary>
+        /// Occurs after a RelationType is Saved
+        /// </summary>
+        public static event TypedEventHandler<IRelationService, SaveEventArgs<IRelationType>> SavedRelationType;
         #endregion
     }
 }
