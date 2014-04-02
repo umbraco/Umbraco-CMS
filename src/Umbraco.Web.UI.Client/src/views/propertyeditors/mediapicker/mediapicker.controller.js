@@ -87,7 +87,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     $scope.ids = r;
                     $scope.sync();
                 }, 500, false);
-                
             }
         };
 

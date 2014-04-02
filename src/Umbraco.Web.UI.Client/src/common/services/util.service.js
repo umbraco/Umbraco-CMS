@@ -29,9 +29,9 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
             img.thumbnail = mediaHelper.resolveFile(img, true);
             img.image = mediaHelper.resolveFile(img, false);
 
-            if (!img.thumbnail){
-                img.thumbnail = "none";
-            }
+           // if (!img.thumbnail){
+           //     img.thumbnail = "none";
+           // }
         },
 
         /** sets the images original size properties - will check if it is a folder and if so will just make it square */

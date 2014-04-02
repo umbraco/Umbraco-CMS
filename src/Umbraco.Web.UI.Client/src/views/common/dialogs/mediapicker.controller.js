@@ -4,7 +4,9 @@ angular.module("umbraco")
         function ($scope, mediaResource, umbRequestHelper, entityResource, $log, mediaHelper, eventsService, treeService, $cookies) {
 
             var dialogOptions = $scope.$parent.dialogOptions;
+
             $scope.onlyImages = dialogOptions.onlyImages;
+            $scope.showDetails = dialogOptions.showDetails;
             $scope.multiPicker = (dialogOptions.multiPicker && dialogOptions.multiPicker !== "0") ? true : false;
             $scope.startNodeId = dialogOptions.startNodeId ? dialogOptions.startNodeId : -1;
 
@@ -96,12 +98,15 @@ angular.module("umbraco")
                 }else{
                     eventsService.emit("dialogs.mediaPicker.select", image);
                     
+                    //we have 3 options add to collection (if multi) show details, or submit it right back to the callback
                     if ($scope.multiPicker) {
                         $scope.select(image);
                         image.cssclass = ($scope.dialogData.selection.indexOf(image) > -1) ? "selected" : "";
-                    }else {
+                    }else if($scope.showDetails) {
                         $scope.target= image;
                         $scope.target.url = mediaHelper.resolveFile(image);
+                    }else{
+                        $scope.submit(image);
                     }
                 }
             };
@@ -114,6 +119,7 @@ angular.module("umbraco")
                 $scope.target = undefined;
             };
 
+            /*
             $scope.selectFolder= function(folder) {
                 if ($scope.multiPicker) {
                     $scope.select(folder);
@@ -136,7 +142,7 @@ angular.module("umbraco")
                         $scope.submit(image);
                     }
                 }
-            };
+            };*/
 
             //default root item
             if(!$scope.target){

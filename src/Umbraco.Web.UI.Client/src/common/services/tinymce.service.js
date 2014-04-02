@@ -102,6 +102,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                     dialogService.mediaPicker({
                         currentTarget: currentTarget,
                         onlyImages: true,
+                        showDetails: true,
                         scope: $scope, callback: function (img) {
 
                             if (img) {
