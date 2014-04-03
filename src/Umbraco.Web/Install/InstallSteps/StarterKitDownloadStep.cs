@@ -21,16 +21,16 @@ namespace Umbraco.Web.Install.InstallSteps
 
         private const string RepoGuid = "65194810-1f85-11dd-bd0b-0800200c9a66";
 
+        //adding a package guid hardcoded, so we can change the sent package remotely, currently this just points to txt kit
+        //but a future starterkit will be inserted under the same guid on our.
+        private const string PackageGuid = "69E44BEB-15FF-4CEE-8B64-0A7DAE498657";
+
         public override InstallSetupResult Execute(Guid? starterKitId)
         {
             //if there is no value assigned then use the default starter kit
             if (starterKitId.HasValue == false)
             {
-                //get a default package GUID (currently the first one found)
-                var r = new org.umbraco.our.Repository();
-                var modules = r.Modules();
-                var defaultPackageId = modules.First().RepoGuid;
-                starterKitId = defaultPackageId;
+                starterKitId = Guid.Parse(PackageGuid); 
             }
             else if (starterKitId.Value == Guid.Empty)
             {
