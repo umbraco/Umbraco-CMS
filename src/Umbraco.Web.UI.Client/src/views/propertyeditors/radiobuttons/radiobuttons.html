@@ -2,7 +2,7 @@
     <ul class="unstyled">
         <li ng-repeat="item in model.config.items">
             <label class="radio">
-                <input type="radio" name="checkboxlist"
+                <input type="radio" name="radiobuttons-{{model.alias}}"
                        value="{{item.id}}"
                        ng-model="model.value" />
                 {{item.value}}
