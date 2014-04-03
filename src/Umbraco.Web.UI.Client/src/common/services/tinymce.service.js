@@ -121,11 +121,16 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                                     var size = editor.dom.getSize(imgElm);
 
                                     var newSize = imageHelper.scaleToMaxSize(500, size.w, size.h);
+
                                     var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
                                     editor.dom.setAttrib(imgElm, 'style', s);
-                                    editor.dom.setAttrib(imgElm, 'rel', newSize.width + "," + newSize.height);
                                     editor.dom.setAttrib(imgElm, 'id', null);
 
+                                    if(img.url){
+                                        var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
+                                        editor.dom.setAttrib(imgElm, 'data-mce-src', src);
+                                    }
+                                 
                                 }, 500);
                             }
                         }

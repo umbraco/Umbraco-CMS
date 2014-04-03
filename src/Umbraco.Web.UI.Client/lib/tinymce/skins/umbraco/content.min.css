@@ -93,3 +93,6 @@ td.mce-item-selected, th.mce-item-selected {
         background-size: 18px;
         background-position-x: 99%;
     }
+
+/* TINYMCE IMAGE RESIZING LIMITS */
+#mceResizeHandlen, #mceResizeHandles, #mceResizeHandlee, #mceResizeHandlew{display: none !important; visibility: hidden !important;}

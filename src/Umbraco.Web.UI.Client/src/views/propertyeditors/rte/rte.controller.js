@@ -109,18 +109,57 @@ angular.module("umbraco")
                     //listen to both change and blur and also on our own 'saving' event. I think this will be best because a 
                     //timer might end up using unwanted cpu and we'd still have to listen to our saving event in case they clicked
                     //save before the timeout elapsed.
-                    editor.on('change', function (e) {
-                        angularHelper.safeApply($scope, function () {
-                            $scope.model.value = editor.getContent();
-                        });
-                    });
 
+                    //this doesnt actually work... 
+                    //editor.on('change', function (e) {
+                    //    angularHelper.safeApply($scope, function () {
+                    //        $scope.model.value = editor.getContent();
+                    //    });
+                    //});
+
+                    //when we leave the editor (maybe)
                     editor.on('blur', function (e) {
+                        editor.save();
                         angularHelper.safeApply($scope, function () {
                             $scope.model.value = editor.getContent();
                         });
                     });
                     
+                    //when buttons modify content
+                    editor.on('ExecCommand', function (e) {
+                        editor.save();
+                        angularHelper.safeApply($scope, function () {
+                            $scope.model.value = editor.getContent();
+                        });
+                    });
+
+                    // Update model on keypress
+                    editor.on('KeyUp', function (e) {
+                      editor.save();
+                      angularHelper.safeApply($scope, function () {
+                          $scope.model.value = editor.getContent();
+                      });
+                    });
+
+                    // Update model on change, i.e. copy/pasted text, plugins altering content
+                    editor.on('SetContent', function (e) {
+                      if(!e.initial){
+                        editor.save();
+                        angularHelper.safeApply($scope, function () {
+                            $scope.model.value = editor.getContent();
+                        });
+                      }
+                    });    
+
+
+                    editor.on('ObjectResized', function(e) {
+                        var qs = "?width=" + e.width + "px&height=" + e.height + "px";
+                        var srcAttr =  $(e.target).attr("src");
+                        var path = srcAttr.split("?")[0];
+                        $(e.target).attr("data-mce-src", path + qs);
+                    });
+
+
                     //Create the insert media plugin
                     tinyMceService.createMediaPicker(editor, $scope);
 
@@ -165,7 +204,6 @@ angular.module("umbraco")
                 
                 //listen for formSubmitting event (the result is callback used to remove the event subscription)
                 var unsubscribe = $scope.$on("formSubmitting", function () {
-
                     //TODO: Here we should parse out the macro rendered content so we can save on a lot of bytes in data xfer
                     // we do parse it out on the server side but would be nice to do that on the client side before as well.
                     $scope.model.value = tinyMceEditor.getContent();
