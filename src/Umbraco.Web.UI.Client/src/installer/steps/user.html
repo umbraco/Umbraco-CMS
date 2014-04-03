@@ -6,7 +6,7 @@
 <form name="myForm" class="form-horizontal" novalidate ng-submit="validateAndInstall();">
 
 	<div class="row">	
-		<div class="span8">
+		<div class="span12">
 			<div class="pull-right">
 				<div class="control-group">
 					<label class="control-label" for="name">Name</label>
@@ -27,7 +27,8 @@
 				<div class="control-group">
 					<label class="control-label" for="password">Password</label>
 					<div class="controls">
-					    <input type="password" name="installer.current.model.password" 
+						<!-- why isn't this masked: http://www.nngroup.com/articles/stop-password-masking/ -->
+					    <input type="text" name="installer.current.model.password" 
 					           ng-minlength="{{installer.current.model.minCharLength}}" 
 					           ng-pattern="passwordPattern"
                                required 
@@ -45,7 +46,7 @@
 					<div class="controls">
 						<label class="checkbox" for="subscribeToNewsLetter">
 							<input type="checkbox" name="subscribeToNewsLetter"
-							ng-model="installer.current.model.subscribeToNewsLetter"  /> Subscribe to our newsletter</label>
+							ng-model="installer.current.model.subscribeToNewsLetter"  /> Keep me updated on <br/>Umbraco Versions, Security Bulletins and Community News</label>
 					</div>
 				</div>
 
