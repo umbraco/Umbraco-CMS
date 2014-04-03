@@ -129,6 +129,27 @@ namespace Umbraco.Core.Services
         }
 
         /// <summary>
+        /// Gets a list of <see cref="Relation"/> objects by their parent entity
+        /// </summary>
+        /// <param name="parent">Parent Entity to retrieve relations for</param>
+        /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
+        public IEnumerable<IRelation> GetByParent(IUmbracoEntity parent)
+        {
+            return GetByParentId(parent.Id);
+        }
+
+        /// <summary>
+        /// Gets a list of <see cref="Relation"/> objects by their parent entity
+        /// </summary>
+        /// <param name="parent">Parent Entity to retrieve relations for</param>
+        /// <param name="relationTypeAlias">Alias of the type of relation to retrieve</param>
+        /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
+        public IEnumerable<IRelation> GetByParent(IUmbracoEntity parent, string relationTypeAlias)
+        {
+            return GetByParent(parent).Where(relation => relation.RelationType.Alias == relationTypeAlias);
+        }
+
+        /// <summary>
         /// Gets a list of <see cref="Relation"/> objects by their child Id
         /// </summary>
         /// <param name="id">Id of the child to retrieve relations for</param>
@@ -140,6 +161,27 @@ namespace Umbraco.Core.Services
                 var query = new Query<IRelation>().Where(x => x.ChildId == id);
                 return repository.GetByQuery(query);
             }
+        }
+
+        /// <summary>
+        /// Gets a list of <see cref="Relation"/> objects by their child Entity
+        /// </summary>
+        /// <param name="child">Child Entity to retrieve relations for</param>
+        /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
+        public IEnumerable<IRelation> GetByChild(IUmbracoEntity child)
+        {
+            return GetByChildId(child.Id);
+        }
+
+        /// <summary>
+        /// Gets a list of <see cref="Relation"/> objects by their child Entity
+        /// </summary>
+        /// <param name="child">Child Entity to retrieve relations for</param>
+        /// <param name="relationTypeAlias">Alias of the type of relation to retrieve</param>
+        /// <returns>An enumerable list of <see cref="Relation"/> objects</returns>
+        public IEnumerable<IRelation> GetByChild(IUmbracoEntity child, string relationTypeAlias)
+        {
+            return GetByChild(child).Where(relation => relation.RelationType.Alias == relationTypeAlias);
         }
 
         /// <summary>
@@ -422,7 +464,7 @@ namespace Umbraco.Core.Services
         public bool AreRelated(int parentId, int childId, string relationTypeAlias)
         {
             var relType = GetRelationTypeByAlias(relationTypeAlias);
-            if(relType == null)
+            if (relType == null)
                 return false;
 
             return AreRelated(parentId, childId, relType);
@@ -443,6 +485,29 @@ namespace Umbraco.Core.Services
                 var query = new Query<IRelation>().Where(x => x.ParentId == parentId && x.ChildId == childId && x.RelationTypeId == relationType.Id);
                 return repository.GetByQuery(query).Any();
             }
+        }
+
+        /// <summary>
+        /// Checks whether two items are related
+        /// </summary>
+        /// <param name="parent">Parent entity</param>
+        /// <param name="child">Child entity</param>
+        /// <returns>Returns <c>True</c> if any relations exist between the entities, otherwise <c>False</c></returns>
+        public bool AreRelated(IUmbracoEntity parent, IUmbracoEntity child)
+        {
+            return AreRelated(parent.Id, child.Id);
+        }
+
+        /// <summary>
+        /// Checks whether two items are related
+        /// </summary>
+        /// <param name="parent">Parent entity</param>
+        /// <param name="child">Child entity</param>
+        /// <param name="relationTypeAlias">Alias of the type of relation to create</param>
+        /// <returns>Returns <c>True</c> if any relations exist between the entities, otherwise <c>False</c></returns>
+        public bool AreRelated(IUmbracoEntity parent, IUmbracoEntity child, string relationTypeAlias)
+        {
+            return AreRelated(parent.Id, child.Id, relationTypeAlias);
         }
 
 
