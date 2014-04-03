@@ -70,9 +70,11 @@ function valFormManager(serverValidationManager, $rootScope, $log, $timeout, not
                             path = decodeURIComponent(path);
                         }
 
-                        var msg = { view: "confirmroutechange", args: { path: path, listener: locationEvent } };
-                        notificationsService.add(msg);
-
+                        if(!notificationsService.hasView()){
+                            var msg = { view: "confirmroutechange", args: { path: path, listener: locationEvent } };
+                            notificationsService.add(msg);
+                        }
+                        
                         event.preventDefault();
                     }
                     

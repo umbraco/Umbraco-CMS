@@ -25,6 +25,18 @@ angular.module('umbraco.services')
 .factory('notificationsService', function ($rootScope, $timeout, angularHelper) {
 
 	var nArray = [];
+	function setViewPath(view){
+		if(view.indexOf('/') < 0)
+		{
+			view = "views/common/notifications/" + view;
+		}
+
+		if(view.indexOf('.html') < 0)
+		{
+			view = view + ".html";
+		}
+		return view;
+	}
 
 	var service = {
 
@@ -50,16 +62,7 @@ angular.module('umbraco.services')
 			angularHelper.safeApply($rootScope, function () {
 
 				if(item.view){
-					if(item.view.indexOf('/') < 0)
-					{
-						item.view = "views/common/notifications/" + item.view;
-					}
-
-					if(item.view.indexOf('.html') < 0)
-					{
-						item.view = item.view + ".html";
-					}
-
+					item.view = setViewPath(item.view);
 					item.sticky = true;
 					item.type = "form";
 					item.headline = null;
@@ -100,6 +103,14 @@ angular.module('umbraco.services')
 
 		},
 
+		hasView : function(view){
+			if(!view){
+				return _.find(nArray, function(notification){ return notification.view;});
+			}else{
+				view = setViewPath(view).toLowerCase();
+				return _.find(nArray, function(notification){ return notification.view.toLowerCase() === view;});
+			}	
+		},
 		addView: function(view, args){
 			var item = {
 				args: args,
