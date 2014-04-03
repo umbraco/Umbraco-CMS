@@ -58,12 +58,18 @@ function mediaHelper(umbRequestHelper) {
 
             var mediaVal;
 
-            //our default images might store one or many images (as csv)
-            var split = imageProp.value.split(',');
-            var self = this;
-            mediaVal = _.map(split, function (item) {
-                return { file: item, isImage: self.detectIfImageByExtension(item) };
-            });
+            if (typeof imageProp.value == "string") {
+                //our default images might store one or many images (as csv)
+                var split = imageProp.value.split(',');
+                var self = this;
+                mediaVal = _.map(split, function (item) {
+                    return { file: item, isImage: self.detectIfImageByExtension(item) };
+                });
+            }
+            else if (imageProp.value.src) {
+                //Handle imagecropper items
+                mediaVal = [{ file: imageProp.value.src, isImage: this.detectIfImageByExtension(imageProp.value.src) }];
+            }
 
             //for now we'll just return the first image in the collection.
             //TODO: we should enable returning many to be displayed in the picker if the uploader supports many.
