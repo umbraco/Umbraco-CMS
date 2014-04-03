@@ -87,6 +87,14 @@ angular.module('umbraco')
                 reader.readAsDataURL(args.files[0]);
             }
         });
+
+        var unsubscribe = $scope.$on("formSubmitting", function () {
+            $scope.done();
+        });
+
+        $scope.$on('$destroy', function () {
+            unsubscribe();
+        });
     })
     .run(function (mediaHelper, umbRequestHelper) {
         if (mediaHelper && mediaHelper.registerFileResolver) {

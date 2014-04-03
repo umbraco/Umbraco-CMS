@@ -17,10 +17,10 @@
                 <div ng-if="img.thumbnail" class="umb-photo" ng-style="img.thumbStyle" alt="{{img.name}}"></div>
             </a>
 
-            <a href ng-click="clickHandler(img, $event, true)" ng-show="img.contentTypeAlias === 'Folder'" class="selector-overlay">
+            <a href ng-click="clickHandler(img, $event, true)" 
+                ng-if="img.isFolder" class="selector-overlay">
                 <localize key="buttons_select">Select</localize>
 			</a>
-
         </div>
     </div>
 </div>

@@ -106,7 +106,6 @@ angular.module("umbraco.directives")
 
 					//when loading an image without any crop info, we center and fit it
 					var resizeImageToEditor = function(){
-						
 						//returns size fitting the cropper	
 						var size = cropperHelper.calculateAspectRatioFit(
 								scope.dimensions.image.width, 
@@ -254,7 +253,7 @@ angular.module("umbraco.directives")
 					var throttledResizing = _.throttle(function(){
 						resizeImageToScale(scope.dimensions.scale.current);
 						calculateCropBox();	
-					}, 300);
+					}, 100);
 
 					
 					//happens when we change the scale

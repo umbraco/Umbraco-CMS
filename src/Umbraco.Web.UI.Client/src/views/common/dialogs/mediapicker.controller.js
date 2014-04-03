@@ -67,19 +67,8 @@ angular.module("umbraco")
                 //mediaResource.rootMedia()
                 mediaResource.getChildren(folder.id)
                     .then(function(data) {
-
-                        $scope.images = [];
-
                         $scope.searchTerm = "";
-                        if(data.items){
-                             $scope.images = data.items;
-                        }
-
-                        if($scope.onlyImages){
-                            $scope.images = _.reject($scope.images, function(item) {
-                                return item.contentTypeAlias.toLowerCase() !== "folder" && item.thumbnail === "";
-                            });    
-                        }
+                        $scope.images = data.items ? data.items : [];
                     });
 
                 $scope.options.formData.currentFolder = folder.id;
@@ -93,7 +82,7 @@ angular.module("umbraco")
             $scope.clickHandler = function(image, ev, select) {
                 ev.preventDefault();
                 
-                if (image.contentTypeAlias.toLowerCase() == 'folder' && !select) {
+                if (image.isFolder && !select) {
                     $scope.gotoFolder(image);
                 }else{
                     eventsService.emit("dialogs.mediaPicker.select", image);
@@ -119,30 +108,7 @@ angular.module("umbraco")
                 $scope.target = undefined;
             };
 
-            /*
-            $scope.selectFolder= function(folder) {
-                if ($scope.multiPicker) {
-                    $scope.select(folder);
-                }
-                else {
-                    $scope.submit(folder);
-                }                
-            };
-
-            $scope.selectMediaItem = function(image) {
-                if (image.contentTypeAlias.toLowerCase() == 'folder') {
-                    $scope.gotoFolder(image);
-                }else{
-                    eventsService.emit("dialogs.mediaPicker.select", image);
-                    
-                    if ($scope.multiPicker) {
-                        $scope.select(image);
-                    }
-                    else {
-                        $scope.submit(image);
-                    }
-                }
-            };*/
+           
 
             //default root item
             if(!$scope.target){
