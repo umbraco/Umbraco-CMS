@@ -117,6 +117,8 @@ namespace umbraco.presentation.umbraco.dialogs
 
             if (_roles.Length > 0)
             {
+                Array.Sort(_roles);
+                
                 foreach (string role in _roles)
                 {
                     ListItem li = new ListItem(role, role);
