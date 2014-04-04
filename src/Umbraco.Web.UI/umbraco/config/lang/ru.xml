@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <language alias="ru" intName="Russian" localName="русский" lcid="" culture="ru-RU">
   <creator>
-    <name>Alexander Bryukhov (Unico Design company)</name>
+    <name>Alexander Bryukhov, Roman Voropaev (Unico Design Ltd., Novosibirsk, RU)</name>
     <link>http://unicodsgn.com</link>
   </creator>
   <area alias="actions">
     <key alias="assignDomain">Языки и домены</key>
     <key alias="auditTrail">История исправлений</key>
     <key alias="browse">Просмотреть</key>
+    <key alias="changeDocType">Изменить тип документа</key>
     <key alias="copy">Копировать</key>
     <key alias="create">Создать</key>
     <key alias="createPackage">Создать пакет</key>
@@ -41,26 +42,22 @@
     <key alias="domainCreated">Создан новый домен '%0%'</key>
     <key alias="domainDeleted">Домен '%0%' удален</key>
     <key alias="domainExists">Домен с именем '%0%' уже существует</key>
-    <key alias="domainHelp">
-      <![CDATA[Примеры допустимых доменных имен: "example.com", "www.example.com", "example.com:8080" или
+    <key alias="domainHelp"><![CDATA[Примеры допустимых доменных имен: "example.com", "www.example.com", "example.com:8080" или
         "https://www.example.com/".<br /><br />Также здесь допустимы части адресов URL первого уровня, например "example.com/en",
-        однако их следует по возможности избегать. Рекомендуется использовать настройку культуры (языка), расположенную выше.]]>
-    </key>
+        однако их следует по возможности избегать. Рекомендуется использовать настройку культуры (языка), расположенную выше.]]></key>
     <key alias="domainUpdated">Домен '%0%' обновлен</key>
     <key alias="duplicateDomain">Такой домен уже назначен.</key>
-    <key alias="invalidNode">Недопустимый узел.</key>
-    <key alias="invalidDomain">Недопустимый формат домена.</key>
-    <key alias="language">Язык</key>
     <key alias="inherit">Унаследовать</key>
+    <key alias="invalidDomain">Недопустимый формат домена.</key>
+    <key alias="invalidNode">Недопустимый узел.</key>
+    <key alias="language">Язык</key>
     <key alias="orEdit">Править существующие домены</key>
     <key alias="permissionDenied">Недостаточно полномочий.</key>
     <key alias="remove">удалить</key>
-    <key alias="setLanguage">Язык (культура)</key>
-    <key alias="setLanguageHelp">
-      <![CDATA[Установите язык (культуру) для всех дочерних узлов,<br /> или унаследуйте язык от родительских узлов.<br />
-		Эта установка будет применена также и к текущему узлу, если только для него ниже явно не задан домен.]]>
-    </key>
     <key alias="setDomains">Домены</key>
+    <key alias="setLanguage">Язык (культура)</key>
+    <key alias="setLanguageHelp"><![CDATA[Установите язык (культуру) для всех дочерних узлов,<br /> или унаследуйте язык от родительских узлов.<br />
+		Эта установка будет применена также и к текущему узлу, если только для него ниже явно не задан домен.]]></key>
   </area>
   <area alias="auditTrails">
     <key alias="atViewingFor">Наблюдать за</key>
@@ -88,9 +85,29 @@
     <key alias="saveToPublish">Сохранить и направить на публикацию</key>
     <key alias="showPage">Предварительный просмотр</key>
     <key alias="showPageDisabled">Предварительный просмотр запрещен, так как документу не сопоставлен шаблон</key>
-    <key alias="styleShow">Показать стили</key>
     <key alias="styleChoose">Выбрать стиль</key>
+    <key alias="styleShow">Показать стили</key>
     <key alias="tableInsert">Вставить таблицу</key>
+  </area>
+  <area alias="changeDocType">
+    <key alias="changeDocTypeInstruction">Чтобы сменить тип документа для выбранного узла, сначала выберите тип из списка разрешенных для данного расположения.</key>
+    <key alias="changeDocTypeInstruction2">Затем подтвердите и/или исправьте сопоставление свойств текущего типа документа свойствам нового и нажмите "Сохранить".</key>
+    <key alias="contentRepublished">Узел переопубликован.</key>
+    <key alias="currentProperty">Текущее свойство</key>
+    <key alias="currentType">Текущий тип</key>
+    <key alias="docTypeCannotBeChanged">Тип документа не может быть изменен, так как для данного расположения нет разрешенных альтернатив.</key>
+    <key alias="docTypeChanged">Тип документа изменен</key>
+    <key alias="mapProperties">Сопоставление свойств</key>
+    <key alias="mapToProperty">Сопоставлено свойству</key>
+    <key alias="newTemplate">Новый шаблон</key>
+    <key alias="newType">Новый тип</key>
+    <key alias="none">нет</key>
+    <key alias="selectedContent">Узел</key>
+    <key alias="selectNewDocType">Выберите новый тип документа</key>
+    <key alias="successMessage">Тип документа выбранного узла успешно изменен на [new type] и следующие свойства были перенесены:</key>
+    <key alias="to">в</key>
+    <key alias="validationErrorPropertyWithMoreThanOneMapping">Невозможно закончить перенос свойств, так как одно или более свойства имеют больше чем одно сопоставление.</key>
+    <key alias="validDocTypesNote">Показаны только допустимые для данного расположения альтернативные типы.</key>
   </area>
   <area alias="content">
     <key alias="about">Об этой странице</key>
@@ -109,10 +126,12 @@
     <key alias="mediaLinks">Ссылка на медиа-элементы</key>
     <key alias="mediatype">Тип медиа-контента</key>
     <key alias="membergroup">Группа участников</key>
+    <key alias="memberof">Член групп(ы)</key>
     <key alias="memberrole">Роль участника</key>
     <key alias="membertype">Тип участника</key>
     <key alias="noDate">Дата не указана</key>
     <key alias="nodeName">Заголовок страницы</key>
+    <key alias="notmemberof">Не является членом групп(ы)</key>
     <key alias="otherElements">Свойства</key>
     <key alias="parentNotPublished">Этот документ опубликован, но скрыт, потому что его родительский документ '%0%' не опубликован</key>
     <key alias="parentNotPublishedAnomaly">ВНИМАНИЕ: этот документ опубликован, но его нет в глобальном кэше (внутренняя ошибка)</key>
@@ -238,6 +257,7 @@
     <key alias="contentTypeAliasAndNameNotNull">Укажите, пожалуйста, алиас и имя для этого свойства!</key>
     <key alias="dissallowedMediaType">Использование данного типа файлов на сайте запрещено администратором</key>
     <key alias="filePermissionsError">Ошибка доступа к указанному файлу или папке</key>
+    <key alias="missingPropertyEditorErrorMessage">Ошибка в конфигурации типа данных, используемого для свойства, проверьте тип данных</key>
     <key alias="missingTitle">Укажите заголовок</key>
     <key alias="missingType">Выберите тип</key>
     <key alias="pictureResizeBiggerThanOrg">Вы пытаетесь увеличить изображение по сравнению с его исходным размером. Уверены, что хотите сделать это?</key>
@@ -248,8 +268,8 @@
     <key alias="stylesNoStylesOnPage">Не определен ни один доступный стиль</key>
     <key alias="tableColMergeLeft">Поместите курсор в левую из двух ячеек, которые хотите объединить</key>
     <key alias="tableSplitNotSplittable">Нельзя разделить ячейку, которая не была до этого объединена</key>
-    <key alias="xsltErrorText">XSLT-документ не был сохранен, т.к. он содержит одну или несколько ошибок</key>
     <key alias="xsltErrorHeader">Ошибка в XSLT-документе</key>
+    <key alias="xsltErrorText">XSLT-документ не был сохранен, т.к. он содержит одну или несколько ошибок</key>
   </area>
   <area alias="general">
     <key alias="about">О системе</key>
@@ -612,19 +632,15 @@
     <key alias="paSimpleHelp">Применяйте, если хотите установить самый простой способ доступа к документу - явно указанные имя пользователя и пароль</key>
   </area>
   <area alias="publish">
-    <key alias="contentPublishedFailedInvalid">
-      <![CDATA[
-      Документ %0% не может быть опубликован, так как не все его свойства прошли проверку согласно установленным правилам валидации.
-    ]]>
-    </key>
     <key alias="contentPublishedFailedByEvent"><![CDATA[
 		Документ %0% не может быть опубликован. Операцию отменил установленный в системе пакет дополнений.
 		]]></key>
-    <key alias="contentPublishedFailedByParent">
-      <![CDATA[
+    <key alias="contentPublishedFailedByParent"><![CDATA[
       Документ %0% не может быть опубликован, так как не опубликован его родительский документ.
-    ]]>
-    </key>
+    ]]></key>
+    <key alias="contentPublishedFailedInvalid"><![CDATA[
+      Документ %0% не может быть опубликован, так как не все его свойства прошли проверку согласно установленным правилам валидации.
+    ]]></key>
     <key alias="includeUnpublished">Включая неопубликованные дочерние документы</key>
     <key alias="inProgress">Идет публикация. Пожалуйста, подождите...</key>
     <key alias="inProgressCounter">%0% из %1% документов опубликованы...</key>
@@ -674,14 +690,15 @@
     <key alias="users">Пользователи</key>
   </area>
   <area alias="settings">
+    <key alias="asAContentMasterType">в качестве родительского типа. Вкладки родительского типа не показаны и могут быть изменены непосредственно в родительском типе</key>
     <key alias="contentTypeEnabled">Родительский тип контента разрешен</key>
     <key alias="contentTypeUses">Данный тип контента использует</key>
-    <key alias="asAContentMasterType">в качестве родительского типа. Вкладки родительского типа не показаны и могут быть изменены непосредственно в родительском типе</key>
     <key alias="defaulttemplate">Шаблон по-умолчанию</key>
     <key alias="dictionary editor egenskab">Словарная статья</key>
     <key alias="importDocumentTypeHelp">Чтобы импортировать тип документа, найдите файл ".udt" на своем компьютере, нажав на кнопку "Обзор", затем нажмите "Импортировать" (на следующем экране будет запрошено подтверждение для этой операции).</key>
     <key alias="newtabname">Заголовок новой вкладки</key>
     <key alias="nodetype">Тип узла (документа)</key>
+    <key alias="noPropertiesDefinedOnTab">Для данной вкладки не определены свойства. Кликните по ссылке "Click here to add a new property" сверху, чтобы создать новое свойство.</key>
     <key alias="objecttype">Тип</key>
     <key alias="stylesheet">Стили CSS</key>
     <key alias="stylesheet editor egenskab">Правило стиля CSS</key>
@@ -903,18 +920,18 @@
     <key alias="password">Пароль</key>
     <key alias="passwordChanged">Ваш пароль доступа изменен!</key>
     <key alias="passwordConfirm">Подвердите новый пароль</key>
-		<key alias="passwordCurrent">Текущий пароль</key>
-		<key alias="passwordEnterNew">Укажите новый пароль</key>
-		<key alias="passwordInvalid">Текущий пароль указан неверно</key>
-		<key alias="passwordIsBlank">Пароль не может быть пустым</key>
+    <key alias="passwordCurrent">Текущий пароль</key>
+    <key alias="passwordEnterNew">Укажите новый пароль</key>
+    <key alias="passwordInvalid">Текущий пароль указан неверно</key>
+    <key alias="passwordIsBlank">Пароль не может быть пустым</key>
     <key alias="passwordIsDifferent">Новый пароль и его подтверждение не совпадают. Попробуйте еще раз</key>
     <key alias="passwordMismatch">Новый пароль и его подтверждение не совпадают</key>
     <key alias="permissionReplaceChildren">Заменить разрешения для дочерних документов</key>
     <key alias="permissionSelectedPages">Вы изменяете разрешения для следующих документов:</key>
     <key alias="permissionSelectPages">Выберите документы для изменения их разрешений</key>
+    <key alias="resetPassword">Сбросить пароль</key>
     <key alias="searchAllChildren">Поиск всех дочерних документов</key>
     <key alias="startnode">Начальный узел содержимого </key>
-    <key alias="translator">Переводчик</key>
     <key alias="username">Имя пользователя</key>
     <key alias="userPermissions">Разрешения для пользователя</key>
     <key alias="usertype">Тип пользователя</key>
