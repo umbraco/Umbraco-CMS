@@ -38,7 +38,7 @@ namespace Umbraco.Web
 		/// Begins to process a request.
 		/// </summary>
 		/// <param name="httpContext"></param>
-        static void BeginRequest(HttpContextBase httpContext)
+        protected virtual void BeginRequest(HttpContextBase httpContext)
 		{
 
             //we need to set the initial url in our ApplicationContext, this is so our keep alive service works and this must
@@ -87,7 +87,7 @@ namespace Umbraco.Web
         /// So we handle it here and explicitly execute the MVC controller.
 		/// 
 		/// </remarks>
-		void ProcessRequest(HttpContextBase httpContext)
+		protected virtual void ProcessRequest(HttpContextBase httpContext)
 		{
 			// do not process if client-side request
 			if (httpContext.Request.Url.IsClientSideRequest())
@@ -164,7 +164,7 @@ namespace Umbraco.Web
         /// * An installer request
         /// * A /base request (since these can be back office web service requests)
         /// </remarks>
-        static void AuthenticateRequest(object sender, EventArgs e)
+        protected virtual void AuthenticateRequest(object sender, EventArgs e)
         {
             var app = (HttpApplication)sender;
             var http = new HttpContextWrapper(app.Context);
@@ -519,7 +519,7 @@ namespace Umbraco.Web
         /// TODO: This needs an overhaul, see the error report created here:
         ///   https://docs.google.com/document/d/1neGE3q3grB4lVJfgID1keWY2v9JYqf-pw75sxUUJiyo/edit		
         /// </remarks>
-        static void PersistXmlCache(HttpContextBase httpContext)
+        protected virtual void PersistXmlCache(HttpContextBase httpContext)
         {
             if (content.Instance.IsXmlQueuedForPersistenceToFile)
             {
