@@ -139,8 +139,10 @@ namespace Umbraco.Core.Services
         private static string GetUninstallActions(XElement actionsElement)
         {
             //saving the uninstall actions untill the package is uninstalled.
-            return actionsElement.Elements(Constants.Packaging.ActionNodeName).Where(e => e.HasAttributes && e.Attribute(Constants.Packaging.UndoNodeAttribute) != null && e.Attribute(Constants.Packaging.UndoNodeAttribute).Value.Equals("false()", StringComparison.InvariantCultureIgnoreCase) == false) // SelectNodes("Actions/Action [@undo != false()]");
-                .Select(m => m.Value).Aggregate((workingSentence, next) => next + workingSentence);
+            return actionsElement.Elements(Constants.Packaging.ActionNodeName)
+                .Where(e => e.HasAttributes && e.Attribute(Constants.Packaging.UndoNodeAttribute) != null && e.Attribute(Constants.Packaging.UndoNodeAttribute)
+                    .Value.Equals("false()", StringComparison.InvariantCultureIgnoreCase) == false)  // SelectNodes("Actions/Action [@undo != false()]");
+                    .Select(m => m.Value).Aggregate((workingSentence, next) => next + workingSentence);
         }
 
         private static IEnumerable<KeyValuePair<string, XElement>> GetInstallActions(XElement actionsElement)
