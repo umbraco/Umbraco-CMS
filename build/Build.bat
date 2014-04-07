@@ -1,5 +1,5 @@
 @ECHO OFF
-SET release=7.1.0
+SET release=7.1.1
 SET comment=
 SET version=%release%
 
