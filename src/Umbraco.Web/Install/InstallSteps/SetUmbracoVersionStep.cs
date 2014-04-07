@@ -48,6 +48,11 @@ namespace Umbraco.Web.Install.InstallSteps
             //// login token from a previous version when we didn't have csrf tokens in place
             //var security = new WebSecurity(new HttpContextWrapper(Context), ApplicationContext.Current);
             //security.ClearCurrentLogin();
+
+            //reports the ended install
+            InstallHelper ih = new InstallHelper(UmbracoContext.Current);
+            ih.InstallStatus(true, "");
+
             return null;
         }
 

@@ -69,6 +69,9 @@ namespace Umbraco.Web.Install.Controllers
             //get the base umbraco folder
             ViewBag.UmbracoBaseFolder = IOHelper.ResolveUrl(SystemDirectories.Umbraco);
 
+            InstallHelper ih = new InstallHelper(_umbracoContext);
+            ih.InstallStatus(false, "");
+
             //always ensure full path (see NOTE in the class remarks)
             return View(GlobalSettings.Path.EnsureEndsWith('/') + "install/views/index.cshtml");
         }

@@ -7,12 +7,14 @@ using System.Linq;
 using System.Web;
 using System.Web.Script.Serialization;
 using System.Web.UI;
+using umbraco.BusinessLogic;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Install.InstallSteps;
 using Umbraco.Web.Install.Models;
+
 
 namespace Umbraco.Web.Install
 {
@@ -88,8 +90,50 @@ namespace Umbraco.Web.Install
             if (Directory.Exists(IOHelper.MapPath("~/Areas/UmbracoInstall")))
             {                
                 Directory.Delete(IOHelper.MapPath("~/Areas/UmbracoInstall"), true);
+            }   
+        }
+
+        internal void InstallStatus(bool isCompleted, string errorMsg)
+        {
+            try
+            {
+                string userAgent = _umbContext.HttpContext.Request.UserAgent;
+
+                // Check for current install Id
+                Guid installId = Guid.NewGuid();
+                StateHelper.Cookies.Cookie installCookie = new StateHelper.Cookies.Cookie("umb_installId", 1);
+                if (!String.IsNullOrEmpty(installCookie.GetValue()))
+                {
+                    if (Guid.TryParse(installCookie.GetValue(), out installId))
+                    {
+                        // check that it's a valid Guid
+                        if (installId == Guid.Empty)
+                            installId = Guid.NewGuid();
+                    }
+                }
+                installCookie.SetValue(installId.ToString());
+
+                string dbProvider = String.Empty;
+                if (!IsBrandNewInstall)
+                    dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
+
+                org.umbraco.update.CheckForUpgrade check = new org.umbraco.update.CheckForUpgrade();
+                check.Install(installId,
+                    !IsBrandNewInstall,
+                    isCompleted,
+                    DateTime.Now,
+                    UmbracoVersion.Current.Major,
+                    UmbracoVersion.Current.Minor,
+                    UmbracoVersion.Current.Build,
+                    UmbracoVersion.CurrentComment,
+                    errorMsg,
+                    userAgent,
+                    dbProvider);
             }
-                
+            catch (Exception ex)
+            {
+
+            }
         }
 
         /// <summary>
