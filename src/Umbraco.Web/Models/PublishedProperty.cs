@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -25,58 +26,56 @@ namespace Umbraco.Web.Models
         /// <remarks>Ensures that all conversions took place correctly.</remarks>
         internal static IEnumerable<IPublishedProperty> MapProperties(
             IEnumerable<PublishedPropertyType> propertyTypes, IEnumerable<Property> properties,
-            Func<PublishedPropertyType, Property, object, IPublishedProperty> map)
+            Func<PublishedPropertyType, object, IPublishedProperty> map)
         {
-            var peResolver = DataTypesResolver.Current;
-            var dtService = ApplicationContext.Current.Services.DataTypeService;
-            return MapProperties(propertyTypes, properties, peResolver, dtService, map);
+            return propertyTypes.Select(x =>
+            {
+                var property = properties.SingleOrDefault(xx => xx.Alias == x.PropertyTypeAlias);
+                var value = property == null ? null : property.Value;
+                return map(x, ConvertPropertyValueFromDbToData(x, value));
+            });
         }
 
         /// <summary>
-        /// Maps a collection of Property to a collection of IPublishedProperty for a specified collection of PublishedPropertyType.
+        /// Converts a database property value to a "data" value ie a value that we can pass to
+        /// IPropertyValueConverter.
         /// </summary>
-        /// <param name="propertyTypes">The published property types.</param>
-        /// <param name="properties">The properties.</param>
-        /// <param name="map">A mapping function.</param>
-        /// <param name="dataTypesResolver">A DataTypesResolver instance.</param>
-        /// <param name="dataTypeService">An IDataTypeService instance.</param>
-        /// <returns>A collection of IPublishedProperty corresponding to the collection of PublishedPropertyType
-        /// and taking values from the collection of Property.</returns>
-        /// <remarks>Ensures that all conversions took place correctly.</remarks>
-        internal static IEnumerable<IPublishedProperty> MapProperties(
-            IEnumerable<PublishedPropertyType> propertyTypes, IEnumerable<Property> properties,
-            DataTypesResolver dataTypesResolver, IDataTypeService dataTypeService,
-            Func<PublishedPropertyType, Property, object, IPublishedProperty> map)
+        /// <param name="propertyType">The published property type.</param>
+        /// <param name="value">The value.</param>
+        /// <returns>The converted value.</returns>
+        internal static object ConvertPropertyValueFromDbToData(PublishedPropertyType propertyType, object value)
         {
-            return propertyTypes
-                .Select(x =>
-                {
-                    var p = properties.SingleOrDefault(xx => xx.Alias == x.PropertyTypeAlias);
-                    var v = p == null || p.Value == null ? null : p.Value;
-                    if (v != null)
-                    {
-                        // note - not sure about the performance here
-                        var dataTypeDefinition = global::umbraco.cms.businesslogic.datatype.DataTypeDefinition
-                            .GetDataTypeDefinition(x.DataTypeId);
-                        var dataType = dataTypeDefinition.DataType;
-                        if (dataType != null)
-                        {
-                            var data = dataType.Data;
-                            data.Value = v;
-                            var n = data.ToXMl(new XmlDocument());
-                            if (n.NodeType == XmlNodeType.CDATA || n.NodeType == XmlNodeType.Text)
-                                v = n.InnerText;
-                            else if (n.NodeType == XmlNodeType.Element)
-                                v = n.InnerXml;
-                            // note - is there anything else we should take care of?
-                        }
-                    }
-                    // fixme - means that the IPropertyValueConverter will always get a string
-                    // fixme   and never an int or DateTime that's in the DB unless the value editor has
-                    // fixme   a way to say it's OK to use what's in the DB?
+            if (value == null) return null;
 
-                    return map(x, p, v);
-                });
+            // We are converting to string, even for database values which are integer or
+            // DateTime, which is not optimum. Doing differently would require that we have a way to tell
+            // whether the conversion to XML string changes something or not... which we don't, and we
+            // don't want to implement it as PropertyValueEditor.ConvertDbToXml/String should die anyway.
+
+            // Don't think about improving the situation here: this is a corner case and the real
+            // thing to do is to get rig of PropertyValueEditor.ConvertDbToXml/String.
+
+            // works but better use the new API
+            //var dataTypeDefinition = global::umbraco.cms.businesslogic.datatype.DataTypeDefinition.GetDataTypeDefinition(propertyType.DataTypeId);
+            //var dataType = dataTypeDefinition.DataType;
+
+            // transient resolver will create a new object each time we call it
+            // so it is safe to alter DataTypeDefinitionId, Data, etc.
+            var dataType = DataTypesResolver.Current.GetById(propertyType.PropertyEditorGuid);
+            if (dataType != null)
+            {
+                dataType.DataTypeDefinitionId = propertyType.DataTypeId; // required else conversion fails
+                var data = dataType.Data;
+                data.Value = value;
+                var n = data.ToXMl(new XmlDocument());
+                if (n.NodeType == XmlNodeType.CDATA || n.NodeType == XmlNodeType.Text)
+                    value = n.InnerText;
+                else if (n.NodeType == XmlNodeType.Element)
+                    value = n.InnerXml;
+                // assuming there are no other node types that we need to take care of
+            }
+
+            return value;
         }
     }
 }
