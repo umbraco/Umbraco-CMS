@@ -15,49 +15,6 @@ namespace Umbraco.Core.Services
 {
     public class PackageInstallerService : IPackageInstallerService
     {
-        #region consts
-        private const string UMBPACKAGE_NODENAME = "umbPackage";
-        private const string DATA_TYPES_NODENAME = "DataTypes";
-        private const string PACKAGE_XML_FILE_NAME = "package.xml";
-        private const string UMBRACO_PACKAGE_EXTENTION = ".umb";
-        private const string DATA_TYPE_NODENAME = "DataType";
-        private const string LANGUAGES_NODENAME = "Languages";
-        private const string FILES_NODENAME = "Files";
-        private const string STYLESHEETS_NODENAME = "Stylesheets";
-        private const string TEMPLATES_NODENAME = "Templates";
-        private const string ORGNAME_NODENAME = "orgName";
-        private const string NAME_NODENAME = "Name";
-        private const string TEMPLATE_NODENAME = "Template";
-        private const string ALIAS_NODENAME = "Alias";
-        private const string DICTIONARYITEMS_NODENAME = "DictionaryItems";
-        private const string MACROS_NODENAME = "macros";
-        private const string DOCUMENTSET_NODENAME = "DocumentSet";
-        private const string DOCUMENTTYPES_NODENAME = "DocumentTypes";
-        private const string DOCUMENTTYPE_NODENAME = "DocumentType";
-        private const string FILE_NODENAME = "file";
-        private const string ORGPATH_NODENAME = "orgPath";
-        private const string GUID_NODENAME = "guid";
-        private const string STYLESHEET_NODENAME = "styleSheet";
-        private const string MACRO_NODENAME = "macro";
-        private const string INFO_NODENAME = "info";
-        private const string PACKAGE_REQUIREMENTS_MAJOR_XPATH = "/package/requirements/major";
-        private const string PACKAGE_REQUIREMENTS_MINOR_XPATH = "/package/requirements/minor";
-        private const string PACKAGE_REQUIREMENTS_PATCH_XPATH = "/package/requirements/patch";
-        private const string PACKAGE_NAME_XPATH = "/package/name";
-        private const string PACKAGE_VERSION_XPATH = "/package/version";
-        private const string PACKAGE_URL_XPATH = "/package/url";
-        private const string PACKAGE_LICENSE_XPATH = "/package/license";
-        private const string AUTHOR_NAME_XPATH = "/author/name";
-        private const string AUTHOR_WEBSITE_XPATH = "/author/website";
-        private const string README_XPATH = "/readme";
-        private const string CONTROL_NODENAME = "control";
-        private const string ACTION_NODENAME = "Action";
-        private const string ACTIONS_NODENAME = "Actions";
-        private const string UNDO_NODEATTRIBUTE = "undo";
-        private const string RUNAT_NODEATTRIBUTE = "runat";
-
-        #endregion
-
         private readonly IPackageValidationHelper _packageValidationHelper;
         private readonly IPackagingService _packagingService;
         private readonly IUnpackHelper _unpackHelper;
@@ -118,7 +75,7 @@ namespace Umbraco.Core.Services
 
 
             // Check if the file is a valid package
-            if (fi.Extension.Equals(UMBRACO_PACKAGE_EXTENTION, StringComparison.InvariantCultureIgnoreCase) == false)
+            if (fi.Extension.Equals(Constants.Packaging.UmbracoPackageExtention, StringComparison.InvariantCultureIgnoreCase) == false)
             {
                 throw new Exception("Error - file isn't a package (doesn't have a .umb extension). Check if the file automatically got named '.zip' upon download.");
             }
@@ -131,7 +88,7 @@ namespace Umbraco.Core.Services
         {
             FileInfo packageFileInfo = GetPackageFileInfo(packageFilePath);
 
-            string configXmlContent = _unpackHelper.ReadTextFileFromArchive(packageFileInfo.FullName, PACKAGE_XML_FILE_NAME);
+            string configXmlContent = _unpackHelper.ReadTextFileFromArchive(packageFileInfo.FullName, Constants.Packaging.PackageXmlFileName);
 
             return XDocument.Parse(configXmlContent);
         }
@@ -140,7 +97,7 @@ namespace Umbraco.Core.Services
         private XElement GetConfigXmlRootElementFromPackageFile(string packageFilePath)
         {
             var document = GetConfigXmlDocFromPackageFile(packageFilePath);
-            if (document.Root == null || document.Root.Name.LocalName.Equals(UMBPACKAGE_NODENAME) == false) { throw new ArgumentException("xml does not have a root node called \"umbPackage\"", packageFilePath); }
+            if (document.Root == null || document.Root.Name.LocalName.Equals(Constants.Packaging.UmbPackageNodeName) == false) { throw new ArgumentException("xml does not have a root node called \"umbPackage\"", packageFilePath); }
             return document.Root;
         }
 
@@ -148,19 +105,19 @@ namespace Umbraco.Core.Services
         private PackageInstallationSummary InstallFromDirectory(string packageDir, int userId)
         {
             var configXml = GetConfigXmlDocFromPackageDirectory(packageDir);
-            var rootElement = configXml.XPathSelectElement(UMBPACKAGE_NODENAME);
-            if (rootElement == null) { throw new ArgumentException("File does not have a root node called \"" + UMBPACKAGE_NODENAME + "\"", packageDir); }
+            var rootElement = configXml.XPathSelectElement(Constants.Packaging.UmbPackageNodeName);
+            if (rootElement == null) { throw new ArgumentException("File does not have a root node called \"" + Constants.Packaging.UmbPackageNodeName + "\"", packageDir); }
 
-            var dataTypes = rootElement.Element(DATA_TYPES_NODENAME);
-            var languages = rootElement.Element(LANGUAGES_NODENAME);
-            var dictionaryItems = rootElement.Element(DICTIONARYITEMS_NODENAME);
-            var macroes = rootElement.Element(MACROS_NODENAME);
-            var files = rootElement.Element(FILES_NODENAME);
-            var templates = rootElement.Element(TEMPLATES_NODENAME);
-            var documentTypes = rootElement.Element(DOCUMENTTYPES_NODENAME);
-            var styleSheets = rootElement.Element(STYLESHEETS_NODENAME);
-            var documentSet = rootElement.Element(DOCUMENTSET_NODENAME);
-            var actions = rootElement.Element(ACTIONS_NODENAME);
+            var dataTypes = rootElement.Element(Constants.Packaging.DataTypesNodeName);
+            var languages = rootElement.Element(Constants.Packaging.LanguagesNodeName);
+            var dictionaryItems = rootElement.Element(Constants.Packaging.DictionaryitemsNodeName);
+            var macroes = rootElement.Element(Constants.Packaging.MacrosNodeName);
+            var files = rootElement.Element(Constants.Packaging.FilesNodeName);
+            var templates = rootElement.Element(Constants.Packaging.TemplatesNodeName);
+            var documentTypes = rootElement.Element(Constants.Packaging.DocumentTypesNodeName);
+            var styleSheets = rootElement.Element(Constants.Packaging.StylesheetsNodeName);
+            var documentSet = rootElement.Element(Constants.Packaging.DocumentSetNodeName);
+            var actions = rootElement.Element(Constants.Packaging.ActionsNodeName);
 
             return new PackageInstallationSummary
             {
@@ -182,7 +139,7 @@ namespace Umbraco.Core.Services
         private static string GetUninstallActions(XElement actionsElement)
         {
             //saving the uninstall actions untill the package is uninstalled.
-            return actionsElement.Elements(ACTION_NODENAME).Where(e => e.HasAttributes && e.Attribute(UNDO_NODEATTRIBUTE) != null && e.Attribute(UNDO_NODEATTRIBUTE).Value.Equals("false()", StringComparison.InvariantCultureIgnoreCase) == false) // SelectNodes("Actions/Action [@undo != false()]");
+            return actionsElement.Elements(Constants.Packaging.ActionNodeName).Where(e => e.HasAttributes && e.Attribute(Constants.Packaging.UndoNodeAttribute) != null && e.Attribute(Constants.Packaging.UndoNodeAttribute).Value.Equals("false()", StringComparison.InvariantCultureIgnoreCase) == false) // SelectNodes("Actions/Action [@undo != false()]");
                 .Select(m => m.Value).Aggregate((workingSentence, next) => next + workingSentence);
         }
 
@@ -190,44 +147,44 @@ namespace Umbraco.Core.Services
         {
             if (actionsElement == null) { return Enumerable.Empty<KeyValuePair<string, XElement>>(); }
 
-            if (string.Equals(ACTIONS_NODENAME, actionsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"" + ACTIONS_NODENAME + "\" as root", "actionsElement"); }
+            if (string.Equals(Constants.Packaging.ActionsNodeName, actionsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"" + Constants.Packaging.ActionsNodeName + "\" as root", "actionsElement"); }
 
-            return actionsElement.Elements(ACTION_NODENAME)
+            return actionsElement.Elements(Constants.Packaging.ActionNodeName)
                 .Where(
                     e =>
                         e.HasAttributes &&
-                        (e.Attribute(RUNAT_NODEATTRIBUTE) == null ||
-                         e.Attribute(RUNAT_NODEATTRIBUTE).Value.Equals("uninstall", StringComparison.InvariantCultureIgnoreCase) ==
+                        (e.Attribute(Constants.Packaging.RunatNodeAttribute) == null ||
+                         e.Attribute(Constants.Packaging.RunatNodeAttribute).Value.Equals("uninstall", StringComparison.InvariantCultureIgnoreCase) ==
                          false)) // .SelectNodes("Actions/Action [@runat != 'uninstall']")
                 .Select(elemet =>
                 {
-                    var aliasAttr = elemet.Attribute(ALIAS_NODENAME);
+                    var aliasAttr = elemet.Attribute(Constants.Packaging.AliasNodeName);
                     if (aliasAttr == null)
-                        throw new ArgumentException("missing \"" + ALIAS_NODENAME + "\" atribute in alias element", "actionsElement");
+                        throw new ArgumentException("missing \"" + Constants.Packaging.AliasNodeName + "\" atribute in alias element", "actionsElement");
                     return new {elemet, alias = aliasAttr.Value};
                 }).ToDictionary(x => x.alias, x => x.elemet);
         }
 
         private IEnumerable<int> InstallDocuments(XElement documentsElement, int userId = 0)
         {
-            if (string.Equals(DOCUMENTSET_NODENAME, documentsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"DocumentSet\" as root", "documentsElement"); }
+            if (string.Equals(Constants.Packaging.DocumentSetNodeName, documentsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"" + Constants.Packaging.DocumentSetNodeName + "\" as root", "documentsElement"); }
             return _packagingService.ImportContent(documentsElement, -1, userId).Select(c => c.Id);
         }
 
         private IEnumerable<int> InstallStylesheets(XElement styleSheetsElement, int userId = 0)
         {
-            if (string.Equals(STYLESHEETS_NODENAME, styleSheetsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"Stylesheets\" as root", "styleSheetsElement"); }
+            if (string.Equals(Constants.Packaging.StylesheetsNodeName, styleSheetsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"" + Constants.Packaging.StylesheetsNodeName + "\" as root", "styleSheetsElement"); }
             return _packagingService.ImportStylesheets(styleSheetsElement, userId).Select(f => f.Id);
         }
 
         private IEnumerable<int> InstallDocumentTypes(XElement documentTypes, int userId = 0)
         {
-            if (string.Equals(DOCUMENTTYPES_NODENAME, documentTypes.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false)
+            if (string.Equals(Constants.Packaging.DocumentTypesNodeName, documentTypes.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false)
             {
-                if (string.Equals(DOCUMENTTYPE_NODENAME, documentTypes.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false)
-                    throw new ArgumentException("Must be \"" + DOCUMENTTYPES_NODENAME + "\" as root", "documentTypes");
+                if (string.Equals(Constants.Packaging.DocumentTypeNodeName, documentTypes.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false)
+                    throw new ArgumentException("Must be \"" + Constants.Packaging.DocumentTypesNodeName + "\" as root", "documentTypes");
 
-                documentTypes = new XElement(DOCUMENTTYPES_NODENAME, documentTypes);
+                documentTypes = new XElement(Constants.Packaging.DocumentTypesNodeName, documentTypes);
             }
 
             return _packagingService.ImportContentTypes(documentTypes, userId).Select(ct => ct.Id);
@@ -235,29 +192,29 @@ namespace Umbraco.Core.Services
 
         private IEnumerable<int> InstallTemplats(XElement templateElement, int userId = 0)
         {
-            if (string.Equals(TEMPLATES_NODENAME, templateElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"" + TEMPLATES_NODENAME + "\" as root", "templateElement"); }
+            if (string.Equals(Constants.Packaging.TemplatesNodeName, templateElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"" + Constants.Packaging.TemplatesNodeName + "\" as root", "templateElement"); }
             return _packagingService.ImportTemplates(templateElement, userId).Select(t => t.Id);
         }
 
 
         private static IEnumerable<KeyValuePair<string, bool>> InstallFiles(string packageDir, XElement filesElement)
         {
-            if (string.Equals(FILES_NODENAME, filesElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("root element must be \"" + FILES_NODENAME + "\"", "filesElement"); }
+            if (string.Equals(Constants.Packaging.FilesNodeName, filesElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("root element must be \"" + Constants.Packaging.FilesNodeName + "\"", "filesElement"); }
 
             string basePath = HostingEnvironment.ApplicationPhysicalPath;
-            
-            var xmlNodeList = filesElement.Elements(FILE_NODENAME);
+
+            var xmlNodeList = filesElement.Elements(Constants.Packaging.FileNodeName);
 
             return xmlNodeList.Select(e =>
             {
-                var orgPathElement = e.Element(ORGPATH_NODENAME);
-                if (orgPathElement == null) { throw new ArgumentException("Missing element \"" + ORGPATH_NODENAME + "\"", "filesElement"); }
+                var orgPathElement = e.Element(Constants.Packaging.OrgPathNodeName);
+                if (orgPathElement == null) { throw new ArgumentException("Missing element \"" + Constants.Packaging.OrgPathNodeName + "\"", "filesElement"); }
 
-                var guidElement = e.Element(GUID_NODENAME);
-                if (guidElement == null) { throw new ArgumentException("Missing element \"" + GUID_NODENAME + "\"", "filesElement"); }
+                var guidElement = e.Element(Constants.Packaging.GuidNodeName);
+                if (guidElement == null) { throw new ArgumentException("Missing element \"" + Constants.Packaging.GuidNodeName + "\"", "filesElement"); }
 
-                var orgNameElement = e.Element(ORGNAME_NODENAME);
-                if (orgNameElement == null) { throw new ArgumentException("Missing element \"" + ORGNAME_NODENAME + "\"", "filesElement"); }
+                var orgNameElement = e.Element(Constants.Packaging.OrgnameNodeName);
+                if (orgNameElement == null) { throw new ArgumentException("Missing element \"" + Constants.Packaging.OrgnameNodeName + "\"", "filesElement"); }
 
 
                 var destPath = GetFileName(basePath, orgPathElement.Value);
@@ -276,28 +233,28 @@ namespace Umbraco.Core.Services
 
         private IEnumerable<int> InstallMacros(XElement macroElements, int userId = 0)
         {
-            if (string.Equals(MACROS_NODENAME, macroElements.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"Templates\" as root", "macroElements"); }
+            if (string.Equals(Constants.Packaging.MacrosNodeName, macroElements.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"" + Constants.Packaging.MacrosNodeName + "\" as root", "macroElements"); }
             return _packagingService.ImportMacros(macroElements, userId).Select(m => m.Id);
         }
 
         private IEnumerable<int> InstallDictionaryItems(XElement dictionaryItemsElement, int userId = 0)
         {
-            if (string.Equals(DICTIONARYITEMS_NODENAME, dictionaryItemsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"Templates\" as root", "dictionaryItemsElement"); }
+            if (string.Equals(Constants.Packaging.DictionaryitemsNodeName, dictionaryItemsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"" + Constants.Packaging.DictionaryitemsNodeName + "\" as root", "dictionaryItemsElement"); }
             return _packagingService.ImportDictionaryItems(dictionaryItemsElement, userId).Select(di => di.Id);
         }
 
         private IEnumerable<int> InstallLanguages(XElement languageElement, int userId = 0)
         {
-            if (string.Equals(LANGUAGES_NODENAME, languageElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"Templates\" as root", "languageElement"); }
+            if (string.Equals(Constants.Packaging.LanguagesNodeName, languageElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Must be \"Templates\" as root", "languageElement"); }
             return _packagingService.ImportLanguage(languageElement, userId).Select(l => l.Id);
         }
 
         private IEnumerable<int> InstallDataTypes(XElement dataTypeElements, int userId = 0)
         {
-            if (string.Equals(DATA_TYPES_NODENAME, dataTypeElements.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false)
+            if (string.Equals(Constants.Packaging.DataTypesNodeName, dataTypeElements.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false)
             {
 
-                if (string.Equals(DATA_TYPE_NODENAME, dataTypeElements.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false)
+                if (string.Equals(Constants.Packaging.DataTypeNodeName, dataTypeElements.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false)
                 {
                     throw new ArgumentException("Must be \"Templates\" as root", "dataTypeElements");
                 }
@@ -307,18 +264,18 @@ namespace Umbraco.Core.Services
 
         private static XDocument GetConfigXmlDocFromPackageDirectory(string packageDir)
         {
-            string packageXmlPath = Path.Combine(packageDir, PACKAGE_XML_FILE_NAME);
-            if (File.Exists(packageXmlPath) == false) { throw new FileNotFoundException("Could not find " + PACKAGE_XML_FILE_NAME + " in package"); }
+            string packageXmlPath = Path.Combine(packageDir, Constants.Packaging.PackageXmlFileName);
+            if (File.Exists(packageXmlPath) == false) { throw new FileNotFoundException("Could not find " + Constants.Packaging.PackageXmlFileName + " in package"); }
             return XDocument.Load(packageXmlPath);
         }
 
 
         private PackageImportIssues FindImportIssues(XElement rootElement)
         {
-            var files = rootElement.Element(FILES_NODENAME);
-            var styleSheets = rootElement.Element(STYLESHEETS_NODENAME);
-            var templates = rootElement.Element(TEMPLATES_NODENAME);
-            var alias = rootElement.Element(MACROS_NODENAME);
+            var files = rootElement.Element(Constants.Packaging.FilesNodeName);
+            var styleSheets = rootElement.Element(Constants.Packaging.StylesheetsNodeName);
+            var templates = rootElement.Element(Constants.Packaging.TemplatesNodeName);
+            var alias = rootElement.Element(Constants.Packaging.MacrosNodeName);
             var packageImportIssues = new PackageImportIssues
             {
                 UnsecureFiles = files == null ? Enumerable.Empty<string>() : FindUnsecureFiles(files),
@@ -332,27 +289,27 @@ namespace Umbraco.Core.Services
 
         private IEnumerable<string> FindUnsecureFiles(XElement fileElement)
         {
-            if (string.Equals(FILES_NODENAME, fileElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("the root element must be \"Files\"", "fileElement"); }
+            if (string.Equals(Constants.Packaging.FilesNodeName, fileElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("the root element must be \"Files\"", "fileElement"); }
 
-            return fileElement.Elements(FILE_NODENAME)
+            return fileElement.Elements(Constants.Packaging.FileNodeName)
                 .Where(FileNodeIsUnsecure)
                     .Select(n =>
                     {
-                        var xElement = n.Element(ORGNAME_NODENAME);
-                        if (xElement == null) { throw new ArgumentException("missing a element: " + ORGNAME_NODENAME, "n"); }
+                        var xElement = n.Element(Constants.Packaging.OrgnameNodeName);
+                        if (xElement == null) { throw new ArgumentException("missing a element: " + Constants.Packaging.OrgnameNodeName, "n"); }
                         return xElement.Value;
                     });
         }
 
         private IEnumerable<KeyValuePair<string, string>> FindConflictingStylesheetNames(XElement stylesheetNotes)
         {
-            if (string.Equals(STYLESHEETS_NODENAME, stylesheetNotes.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("the root element must be \"Stylesheets\"", "stylesheetNotes"); }
+            if (string.Equals(Constants.Packaging.StylesheetsNodeName, stylesheetNotes.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("the root element must be \"Stylesheets\"", "stylesheetNotes"); }
 
-            return stylesheetNotes.Elements(STYLESHEET_NODENAME)
+            return stylesheetNotes.Elements(Constants.Packaging.StylesheetNodeName)
                     .Select(n =>
                     {
-                        var xElement = n.Element(NAME_NODENAME);
-                        if (xElement == null) { throw new ArgumentException("Missing \"" + NAME_NODENAME + "\" element", "stylesheetNotes"); }
+                        var xElement = n.Element(Constants.Packaging.NameNodeName);
+                        if (xElement == null) { throw new ArgumentException("Missing \"" + Constants.Packaging.NameNodeName + "\" element", "stylesheetNotes"); }
 
                         string name = xElement.Value;
 
@@ -369,13 +326,13 @@ namespace Umbraco.Core.Services
 
         private IEnumerable<KeyValuePair<string, string>> FindConflictingTemplateAliases(XElement templateNotes)
         {
-            if (string.Equals(TEMPLATES_NODENAME, templateNotes.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Node must be a \"" + TEMPLATES_NODENAME + "\" node", "templateNotes"); }
+            if (string.Equals(Constants.Packaging.TemplatesNodeName, templateNotes.Name.LocalName, StringComparison.InvariantCultureIgnoreCase) == false) { throw new ArgumentException("Node must be a \"" + Constants.Packaging.TemplatesNodeName + "\" node", "templateNotes"); }
 
-            return templateNotes.Elements(TEMPLATE_NODENAME)
+            return templateNotes.Elements(Constants.Packaging.TemplateNodeName)
                     .Select(n =>
                     {
-                        var alias = n.Element(ALIAS_NODENAME);
-                        if (alias == null) { throw new ArgumentException("missing a \"" + ALIAS_NODENAME + "\" element", "templateNotes"); }
+                        var alias = n.Element(Constants.Packaging.AliasNodeName);
+                        if (alias == null) { throw new ArgumentException("missing a \"" + Constants.Packaging.AliasNodeName + "\" element", "templateNotes"); }
                         string aliasStr = alias.Value;
 
                         ITemplate existingTemplate;
@@ -392,11 +349,11 @@ namespace Umbraco.Core.Services
 
         private IEnumerable<KeyValuePair<string, string>> FindConflictingMacroAliases(XElement macroNodes)
         {
-            return  macroNodes.Elements(MACRO_NODENAME)
+            return macroNodes.Elements(Constants.Packaging.MacroNodeName)
                     .Select(n =>
                     {
-                        var xElement = n.Element(ALIAS_NODENAME);
-                        if (xElement == null) { throw new ArgumentException("missing a \"" + ALIAS_NODENAME + "\" element", "macroNodes"); }
+                        var xElement = n.Element(Constants.Packaging.AliasNodeName);
+                        if (xElement == null) { throw new ArgumentException("missing a \"" + Constants.Packaging.AliasNodeName + "\" element", "macroNodes"); }
                         string alias = xElement.Value;
 
                         IMacro existingMacro;
@@ -414,8 +371,8 @@ namespace Umbraco.Core.Services
         private bool FileNodeIsUnsecure(XElement fileNode)
         {
             string basePath = HostingEnvironment.ApplicationPhysicalPath;
-            var orgName = fileNode.Element(ORGNAME_NODENAME);
-            if (orgName == null) { throw new ArgumentException("Missing element \"" + ORGNAME_NODENAME + "\"", "fileNode"); }
+            var orgName = fileNode.Element(Constants.Packaging.OrgnameNodeName);
+            if (orgName == null) { throw new ArgumentException("Missing element \"" + Constants.Packaging.OrgnameNodeName + "\"", "fileNode"); }
 
             string destPath = GetFileName(basePath, orgName.Value);
 
@@ -429,22 +386,22 @@ namespace Umbraco.Core.Services
 
         private PackageMetaData GetMetaData(XElement xRootElement)
         {
-            XElement infoElement = xRootElement.Element(INFO_NODENAME);
+            XElement infoElement = xRootElement.Element(Constants.Packaging.InfoNodeName);
 
-            if (infoElement == null) { throw new ArgumentException("Did not hold a \"" + INFO_NODENAME + "\" element", "xRootElement"); }
+            if (infoElement == null) { throw new ArgumentException("Did not hold a \"" + Constants.Packaging.InfoNodeName + "\" element", "xRootElement"); }
 
-            var majorElement = infoElement.XPathSelectElement(PACKAGE_REQUIREMENTS_MAJOR_XPATH);
-            var minorElement = infoElement.XPathSelectElement(PACKAGE_REQUIREMENTS_MINOR_XPATH);
-            var patchElement = infoElement.XPathSelectElement(PACKAGE_REQUIREMENTS_PATCH_XPATH);
-            var nameElement = infoElement.XPathSelectElement(PACKAGE_NAME_XPATH);
-            var versionElement = infoElement.XPathSelectElement(PACKAGE_VERSION_XPATH);
-            var urlElement = infoElement.XPathSelectElement(PACKAGE_URL_XPATH);
-            var licenseElement = infoElement.XPathSelectElement(PACKAGE_LICENSE_XPATH);
-            var authorNameElement = infoElement.XPathSelectElement(AUTHOR_NAME_XPATH);
-            var authorUrlElement = infoElement.XPathSelectElement(AUTHOR_WEBSITE_XPATH);
-            var readmeElement = infoElement.XPathSelectElement(README_XPATH);
+            var majorElement = infoElement.XPathSelectElement(Constants.Packaging.PackageRequirementsMajorXpath);
+            var minorElement = infoElement.XPathSelectElement(Constants.Packaging.PackageRequirementsMinorXpath);
+            var patchElement = infoElement.XPathSelectElement(Constants.Packaging.PackageRequirementsPatchXpath);
+            var nameElement = infoElement.XPathSelectElement(Constants.Packaging.PackageNameXpath);
+            var versionElement = infoElement.XPathSelectElement(Constants.Packaging.PackageVersionXpath);
+            var urlElement = infoElement.XPathSelectElement(Constants.Packaging.PackageUrlXpath);
+            var licenseElement = infoElement.XPathSelectElement(Constants.Packaging.PackageLicenseXpath);
+            var authorNameElement = infoElement.XPathSelectElement(Constants.Packaging.AuthorNameXpath);
+            var authorUrlElement = infoElement.XPathSelectElement(Constants.Packaging.AuthorWebsiteXpath);
+            var readmeElement = infoElement.XPathSelectElement(Constants.Packaging.ReadmeXpath);
 
-            var controlElement = xRootElement.Element(CONTROL_NODENAME);
+            var controlElement = xRootElement.Element(Constants.Packaging.ControlNodeName);
 
             int val;
 
