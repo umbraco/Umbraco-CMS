@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -32,10 +33,10 @@ namespace umbraco.presentation.umbraco.dialogs
         protected ContentPicker errorPagePicker = new ContentPicker();
 
         override protected void OnInit(EventArgs e)
-        {           
+        {
             base.OnInit(e);
         }
-        
+
         protected void selectMode(object sender, EventArgs e)
         {
             p_mode.Visible = false;
@@ -111,7 +112,7 @@ namespace umbraco.presentation.umbraco.dialogs
                             SimpleLoginLabel.Visible = true;
                             SimpleLoginLabel.Text = m.UserName;
                             pane_advanced.Visible = false;
-                            bt_protect.CommandName = "simple";    
+                            bt_protect.CommandName = "simple";
                         }
 
                     }
@@ -131,9 +132,9 @@ namespace umbraco.presentation.umbraco.dialogs
             _memberGroups.ID = "Membergroups";
             _memberGroups.Width = 175;
             var selectedGroups = "";
-            var roles = Roles.GetAllRoles();
+            var roles = Roles.GetAllRoles().OrderBy(x => x);
 
-            if (roles.Length > 0)
+            if (roles.Any())
             {
                 foreach (string role in roles)
                 {
@@ -185,7 +186,7 @@ namespace umbraco.presentation.umbraco.dialogs
             if (Page.IsValid)
             {
                 int pageId = int.Parse(helper.Request("nodeId"));
-                
+
                 if (e.CommandName == "simple")
                 {
                     var memberLogin = simpleLogin.Visible ? simpleLogin.Text : SimpleLoginLabel.Text;
@@ -222,7 +223,7 @@ namespace umbraco.presentation.umbraco.dialogs
                     }
                     else if (pp_pass.Visible)
                     {
-                        SimpleLoginNameValidator.IsValid = false;                        
+                        SimpleLoginNameValidator.IsValid = false;
                         SimpleLoginLabel.Visible = true;
                         SimpleLoginLabel.Text = memberLogin;
                         simpleLogin.Visible = false;
@@ -567,6 +568,6 @@ namespace umbraco.presentation.umbraco.dialogs
         /// </remarks>
         protected global::System.Web.UI.WebControls.PlaceHolder js;
 
-        
+
     }
 }
