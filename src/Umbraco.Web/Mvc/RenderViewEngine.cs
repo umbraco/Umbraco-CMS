@@ -92,25 +92,27 @@ namespace Umbraco.Web.Mvc
 		/// <param name="controllerContext"></param>
 		/// <param name="isPartial"></param>
 		/// <returns></returns>
-		private bool ShouldFindView(ControllerContext controllerContext, bool isPartial)
-		{
-		    var umbracoToken = controllerContext.GetDataTokenInViewContextHierarchy("umbraco");
+        private bool ShouldFindView(ControllerContext controllerContext, bool isPartial)
+        {
+            //first check if we're rendering a partial view for the back office, or surface controller, etc...
+            //anything that is not IUmbracoRenderModel as this should only pertain to Umbraco views.
+            if (isPartial
+                && controllerContext.RouteData.DataTokens.ContainsKey("umbraco")
+                && !(controllerContext.RouteData.DataTokens["umbraco"] is RenderModel))
+            {
+                return true;
+            }
 
-			//first check if we're rendering a partial view for the back office, or surface controller, etc...
-			//anything that is not IUmbracoRenderModel as this should only pertain to Umbraco views.
-			if (isPartial && umbracoToken is RenderModel)
-			{
-				return true;
-			}
+            //only find views if we're rendering the umbraco front end
+            if (controllerContext.RouteData.DataTokens.ContainsKey("umbraco")
+                && controllerContext.RouteData.DataTokens["umbraco"] != null
+                && controllerContext.RouteData.DataTokens["umbraco"] is RenderModel)
+            {
+                return true;
+            }
 
-			//only find views if we're rendering the umbraco front end
-            if (umbracoToken is RenderModel)
-			{
-				return true;
-			}
-
-			return false;
-		}
+            return false;
+        }
 
 	}
 }
