@@ -100,15 +100,14 @@ data-file-upload="options" data-file-upload-progress="" data-ng-class="{'fileupl
 	<div class="umb-panel-body with-footer">
         <div style="height: 10px; margin: 10px 0px 10px 0px" class="umb-loader" 
         	ng-hide="active() == 0"></div>
-
         <umb-photo-folder 
-        	min-height="75" 
+        	min-height="105" 
         	min-width="150"
         	max-height="250"
             ideal-items-per-row="3"
         	on-click="clickHandler"
         	ng-model="images"
-        	images-only="true"
+        	images-only="{{onlyImages}}"
         	filter-by="searchTerm"/>
 	</div>	
 
