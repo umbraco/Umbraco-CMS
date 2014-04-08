@@ -26,6 +26,8 @@ angular.module("umbraco.directives.html")
 
                             
                             var imagesOnly =  element.attr('images-only') === "true";
+                           
+                            
                             var margin = element.attr('border') ? parseInt(element.attr('border'), 10) : 5;
                             var startingIndex = element.attr('baseline') ? parseInt(element.attr('baseline'), 10) : 0;
                             var minWidth = element.attr('min-width') ? parseInt(element.attr('min-width'), 10) : 420;

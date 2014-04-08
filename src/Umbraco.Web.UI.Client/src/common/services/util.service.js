@@ -259,10 +259,10 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, me
 
             //first fill in all of the original image sizes and URLs
             for (var i = startingIndex; i < images.length; i++) {
-                var item = images[0];
+                var item = images[i];
 
-                this.setImageData(images[i]);
-                this.setOriginalSize(images[i], maxRowHeight);
+                this.setImageData(item);
+                this.setOriginalSize(item, maxRowHeight);
 
                 if(imagesOnly && !item.isFolder && !item.thumbnail){
                     images.splice(i, 1);

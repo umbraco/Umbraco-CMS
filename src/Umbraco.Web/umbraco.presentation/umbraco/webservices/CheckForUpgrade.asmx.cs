@@ -26,8 +26,8 @@ namespace umbraco.presentation.webservices
         {
             if (!AuthorizeRequest()) return null;
 
-            var check = new global::umbraco.presentation.org.umbraco.update.CheckForUpgrade();                        
-            org.umbraco.update.UpgradeResult result = check.CheckUpgrade(UmbracoVersion.Current.Major,
+            var check = new global::Umbraco.Web.org.umbraco.update.CheckForUpgrade();
+            var result = check.CheckUpgrade(UmbracoVersion.Current.Major,
                                                                          UmbracoVersion.Current.Minor,
                                                                          UmbracoVersion.Current.Build,
                                                                          UmbracoVersion.CurrentComment);
@@ -74,7 +74,7 @@ namespace umbraco.presentation.webservices
             if (!String.IsNullOrEmpty(global::Umbraco.Core.Configuration.GlobalSettings.ConfigurationStatus))
             dbProvider = ApplicationContext.Current.DatabaseContext.DatabaseProvider.ToString();
 
-            org.umbraco.update.CheckForUpgrade check = new global::umbraco.presentation.org.umbraco.update.CheckForUpgrade();
+            var check = new global::Umbraco.Web.org.umbraco.update.CheckForUpgrade();
             check.Install(installId,
                 isUpgrade,
                 isCompleted,

@@ -24,7 +24,7 @@ namespace Umbraco.Web.Editors
             {
                 try
                 {
-                    var check = new global::umbraco.presentation.org.umbraco.update.CheckForUpgrade();
+                    var check = new org.umbraco.update.CheckForUpgrade();
                     var result = check.CheckUpgrade(UmbracoVersion.Current.Major,
                                                     UmbracoVersion.Current.Minor,
                                                     UmbracoVersion.Current.Build,
