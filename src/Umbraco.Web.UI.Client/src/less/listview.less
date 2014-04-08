@@ -87,7 +87,8 @@
 }
 
 .umb-listview .selected i.icon, .umb-listview tr:hover i.icon{display: none}
-.umb-listview .selected input[type="checkbox"], .umb-listview tr:hover input[type="checkbox"]{display: inline-block;}
+.umb-listview .selected input[type="checkbox"], 
+.umb-listview tr:hover input[type="checkbox"]{display: inline-block !important;}
 .umb-listview .inactive{color: @grayLight;}
 
 .umb-listview .selected td{font-weight: bold;}
@@ -171,10 +172,14 @@
   position: relative
 }
 
+
+.umb-listview  .table-striped thead input[type="checkbox"] {
+  margin-left: 7px;
+}
+
 .umb-listview  .table-striped tbody input[type="checkbox"] {
   display: none;
-  top: 10px;
-  left:10px;
+  margin-left: 7px;
   z-index: 5;
 }
 
