@@ -43,7 +43,7 @@
   <Ribbon>
 <AddRibbonButton>
 <Label>Site Admin</Label>
-<Uri>/umbraco/default.aspx</Uri>
+<Uri>/umbraco/</Uri>
 <ImageUri>http://cdn.umbraco.org/cdn/umbraco/images/webmatrix/umbraco.png</ImageUri>
 </AddRibbonButton>
     
