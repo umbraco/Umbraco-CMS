@@ -1384,7 +1384,7 @@ namespace Umbraco.Web
             {
                 if (b4)
                 {
-                    if (c == content)
+                    if (c.Id == content.Id)
                         b4 = false;
                     else if (wrap && wrapped == null && predicate(c))
                         wrapped = c;
