@@ -1,8 +1,8 @@
 {
   "author": "Umbraco HQ",
   "name": "umbraco",
-  "homepage": "https://github.com/umbraco/umbraco-cms/tree/7.0.0",
-  "version": "7.0.0-Beta",
+  "homepage": "https://github.com/umbraco/umbraco-cms/tree/7.1.2",
+  "version": "7.1.2",
   "repository": {
     "type": "git",
     "url": "git@github.com:umbraco/umbraco-cms.git"
@@ -13,7 +13,7 @@
   "licenses": [
     {
       "type": "MIT",
-      "url": "https://github.com/umbraco/Umbraco-CMS/blob/7.0.0/docs/License.txt"
+      "url": "https://github.com/umbraco/Umbraco-CMS/blob/7.1.2/docs/License.txt"
     }
   ],
   "engines": {
