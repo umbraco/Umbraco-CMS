@@ -1,5 +1,6 @@
 module.exports = function (grunt) {
 
+
   // Default task.
   grunt.registerTask('default', ['jshint:dev','build','karma:unit']);
   grunt.registerTask('dev', ['jshint:dev', 'build', 'webserver', 'open:dev', 'watch']);
@@ -28,6 +29,7 @@ module.exports = function (grunt) {
 
   // Project configuration.
   grunt.initConfig({
+    buildVersion: grunt.option('buildversion') || '7',
     connect: {
              devserver: {
                options: {
@@ -59,7 +61,7 @@ module.exports = function (grunt) {
     vsdir: '../Umbraco.Web.Ui/umbraco',
     pkg: grunt.file.readJSON('package.json'),
     banner:
-    '/*! <%= pkg.title || pkg.name %> - v<%= pkg.version %> - <%= grunt.template.today("yyyy-mm-dd") %>\n' +
+    '/*! <%= pkg.title || pkg.name %> - v<%= buildVersion %> - <%= grunt.template.today("yyyy-mm-dd") %>\n' +
     '<%= pkg.homepage ? " * " + pkg.homepage + "\\n" : "" %>' +
     ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>;\n' +
     ' * Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>\n */\n',

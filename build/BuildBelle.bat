@@ -23,7 +23,7 @@ CD %CD%\..\src\Umbraco.Web.UI.Client\
 ECHO Do npm install and the grunt build of Belle
 call npm install
 call npm install -g grunt-cli
-call grunt build
+call grunt build --buildversion=8.1.1
 
 ECHO Reset path to what it was before
 path=%oldPath%
