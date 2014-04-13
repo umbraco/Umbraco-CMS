@@ -8,14 +8,6 @@ namespace Umbraco.Tests.Routing
 	[TestFixture]
 	public class ContentFinderByPageIdQueryTests : BaseRoutingTest
 	{
-		/// <summary>
-		/// We don't need a db for this test, will run faster without one
-		/// </summary>
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NoDatabasePerFixture; }
-        }
-
 		[TestCase("/?umbPageId=1046", 1046)]
 		[TestCase("/?UMBPAGEID=1046", 1046)]
 		[TestCase("/default.aspx?umbPageId=1046", 1046)] //TODO: Should this match??

@@ -9,6 +9,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 
 namespace Umbraco.Web.Mvc
 {
@@ -84,6 +85,7 @@ namespace Umbraco.Web.Mvc
         }
 
         private UmbracoHelper _helper;
+        private MembershipHelper _membershipHelper;
 
         /// <summary>
         /// Gets an UmbracoHelper
@@ -110,6 +112,14 @@ namespace Umbraco.Web.Mvc
         }
 
         /// <summary>
+        /// Returns the MemberHelper instance
+        /// </summary>
+        public MembershipHelper Members
+        {
+            get { return _membershipHelper ?? (_membershipHelper = new MembershipHelper(UmbracoContext)); }
+        }
+
+        /// <summary>
         /// Ensure that the current view context is added to the route data tokens so we can extract it if we like
         /// </summary>
         /// <remarks>
@@ -131,6 +141,7 @@ namespace Umbraco.Web.Mvc
         // maps model
         protected override void SetViewData(ViewDataDictionary viewData)
         {
+            // if view data contains no model, nothing to do
             var source = viewData.Model;
             if (source == null)
             {
@@ -138,6 +149,8 @@ namespace Umbraco.Web.Mvc
                 return;
             }
 
+            // get the type of the view data model (what we have)
+            // get the type of this view model (what we want)
             var sourceType = source.GetType();
             var targetType = typeof (TModel);
 
@@ -150,13 +163,15 @@ namespace Umbraco.Web.Mvc
 
             // try to grab the content
             // if no content is found, return, nothing we can do
-            var sourceContent = source as IPublishedContent;
+            var sourceContent = source as IPublishedContent; // check if what we have is an IPublishedContent
             if (sourceContent == null && sourceType.Implements<IRenderModel>())
             {
+                // else check if it's an IRenderModel => get the content
                 sourceContent = ((IRenderModel)source).Content;
             }
             if (sourceContent == null)
             {
+                // else check if we can convert it to a content
                 var attempt = source.TryConvertTo<IPublishedContent>();
                 if (attempt.Success) sourceContent = attempt.Result;
             }

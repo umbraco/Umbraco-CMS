@@ -5,10 +5,12 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
 	[TestFixture, RequiresSTA]
 	public class ContentTypeServiceTests : BaseServiceTest
 	{
@@ -392,7 +394,7 @@ namespace Umbraco.Tests.Services
             return contentType;
         }
 
-		private IEnumerable<IContentType> CreateContentTypeHierarchy()
+		private IContentType[] CreateContentTypeHierarchy()
 		{
 			//create the master type
 			var masterContentType = MockedContentTypes.CreateSimpleContentType("masterContentType", "MasterContentType");
@@ -411,7 +413,7 @@ namespace Umbraco.Tests.Services
 				list.Add(contentType);				
 			}
 
-			return list;
+		    return list.ToArray();
 		}
 	}
 }

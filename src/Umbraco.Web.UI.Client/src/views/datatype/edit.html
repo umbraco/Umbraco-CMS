@@ -15,18 +15,16 @@
 
             <div class="span5">
                 <div class="btn-toolbar pull-right umb-btn-toolbar">
-                    
                     <umb-options-menu ng-show="currentNode"
                         current-node="currentNode" 
                         current-section="{{currentSection}}">                        
                     </umb-options-menu>
-
                 </div>
             </div>
         </umb-header>
         
         <div class="umb-panel-body umb-scrollable row-fluid">
-            <div class="tab-content form-horizontal">
+            <div class="tab-content form-horizontal" style="padding-bottom: 90px">
                 <div class="umb-pane">
                     
                     <umb-property property="properties.selectedEditor">                        
@@ -53,7 +51,7 @@
                     </umb-property>
 
 
-                    <div class="umb-tab-buttons">
+                    <div class="umb-tab-buttons" detect-fold>
                         <div class="btn-group">
                             <button type="submit" data-hotkey="ctrl+s" class="btn btn-success">
                                 <localize key="buttons_save">Save</localize>

@@ -21,6 +21,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Sync;
 using Umbraco.Web.Dictionary;
+using Umbraco.Web.Install;
 using Umbraco.Web.Macros;
 using Umbraco.Web.Media;
 using Umbraco.Web.Media.ThumbnailProviders;
@@ -102,6 +103,9 @@ namespace Umbraco.Web
             renderer.Initialize("Umbraco.DependencyPathRenderer", new NameValueCollection { { "compositeFileHandlerPath", "~/DependencyHandler.axd" } });
             ClientDependencySettings.Instance.MvcRendererCollection.Add(renderer);
 
+            InstallHelper insHelper = new InstallHelper(UmbracoContext.Current);
+            insHelper.DeleteLegacyInstaller();
+
             return this;
         }
 
@@ -117,7 +121,7 @@ namespace Umbraco.Web
             //see: http://issues.umbraco.org/issue/U4-1717
             var httpContext = new HttpContextWrapper(UmbracoApplication.Context);
             UmbracoContext.EnsureContext(
-                httpContext, 
+                httpContext,
                 ApplicationContext,
                 new WebSecurity(httpContext, ApplicationContext));
         }
@@ -148,10 +152,10 @@ namespace Umbraco.Web
         /// <returns></returns>
         public override IBootManager Complete(Action<ApplicationContext> afterComplete)
         {
-			//Wrap viewengines in the profiling engine
-	        WrapViewEngines(ViewEngines.Engines);
+            //Wrap viewengines in the profiling engine
+            WrapViewEngines(ViewEngines.Engines);
 
-	        //set routes
+            //set routes
             CreateRoutes();
 
             base.Complete(afterComplete);
@@ -162,20 +166,20 @@ namespace Umbraco.Web
             return this;
         }
 
-		internal static void WrapViewEngines(IList<IViewEngine> viewEngines)
-	    {
-			if (viewEngines == null || viewEngines.Count == 0) return;
+        internal static void WrapViewEngines(IList<IViewEngine> viewEngines)
+        {
+            if (viewEngines == null || viewEngines.Count == 0) return;
 
-			var originalEngines = viewEngines.Select(e => e).ToArray();
-			viewEngines.Clear();
-			foreach (var engine in originalEngines)
-			{
-				var wrappedEngine = engine is ProfilingViewEngine ? engine : new ProfilingViewEngine(engine);
-				viewEngines.Add(wrappedEngine);
-			}
-	    }
+            var originalEngines = viewEngines.Select(e => e).ToArray();
+            viewEngines.Clear();
+            foreach (var engine in originalEngines)
+            {
+                var wrappedEngine = engine is ProfilingViewEngine ? engine : new ProfilingViewEngine(engine);
+                viewEngines.Add(wrappedEngine);
+            }
+        }
 
-	    /// <summary>
+        /// <summary>
         /// Creates the application cache based on the HttpRuntime cache
         /// </summary>
         protected override void CreateApplicationCache()
@@ -190,7 +194,7 @@ namespace Umbraco.Web
         protected internal void CreateRoutes()
         {
             var umbracoPath = GlobalSettings.UmbracoMvcArea;
-            
+
             //Create the front-end route
             var defaultRoute = RouteTable.Routes.MapRoute(
                 "Umbraco_default",
@@ -199,17 +203,14 @@ namespace Umbraco.Web
                 );
             defaultRoute.RouteHandler = new RenderRouteHandler(ControllerBuilder.Current.GetControllerFactory());
 
+            //register install routes
+            RouteTable.Routes.RegisterArea<UmbracoInstallArea>();
+
             //register all back office routes
-            RouteBackOfficeControllers();
+            RouteTable.Routes.RegisterArea<BackOfficeArea>();
 
             //plugin controllers must come first because the next route will catch many things
             RoutePluginControllers();
-        }
-
-        private void RouteBackOfficeControllers()
-        {
-            var backOfficeArea = new BackOfficeArea();
-            RouteTable.Routes.RegisterArea(backOfficeArea);
         }
         
         private void RoutePluginControllers()
@@ -248,6 +249,7 @@ namespace Umbraco.Web
             }
         }
 
+
         private void RouteLocalApiController(Type controller, string umbracoPath)
         {
             var meta = PluginController.GetMetadata(controller);
@@ -256,18 +258,17 @@ namespace Umbraco.Web
             var routePath = meta.IsBackOffice == false
                                 ? umbracoPath + "/Api/" + meta.ControllerName + "/{action}/{id}"
                                 : umbracoPath + "/BackOffice/Api/" + meta.ControllerName + "/{action}/{id}";
-            
+
             var route = RouteTable.Routes.MapHttpRoute(
                 string.Format("umbraco-{0}-{1}", "api", meta.ControllerName),
-                routePath, 
-                new {controller = meta.ControllerName, id = UrlParameter.Optional});                
+                routePath,
+                new { controller = meta.ControllerName, id = UrlParameter.Optional },
+                new[] { meta.ControllerNamespace });
             //web api routes don't set the data tokens object
             if (route.DataTokens == null)
-            {                
+            {
                 route.DataTokens = new RouteValueDictionary();
             }
-            route.DataTokens.Add("Namespaces", new[] {meta.ControllerNamespace}); //look in this namespace to create the controller
-            route.DataTokens.Add("UseNamespaceFallback", false); //Don't look anywhere else except this namespace!
             route.DataTokens.Add("umbraco", "api"); //ensure the umbraco token is set
         }
         private void RouteLocalSurfaceController(Type controller, string umbracoPath)
@@ -276,7 +277,7 @@ namespace Umbraco.Web
             var route = RouteTable.Routes.MapRoute(
                 string.Format("umbraco-{0}-{1}", "surface", meta.ControllerName),
                 umbracoPath + "/Surface/" + meta.ControllerName + "/{action}/{id}",//url to match
-                new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },                
+                new { controller = meta.ControllerName, action = "Index", id = UrlParameter.Optional },
                 new[] { meta.ControllerNamespace }); //look in this namespace to create the controller
             route.DataTokens.Add("umbraco", "surface"); //ensure the umbraco token is set                
             route.DataTokens.Add("UseNamespaceFallback", false); //Don't look anywhere else except this namespace!
@@ -302,7 +303,7 @@ namespace Umbraco.Web
                 //we should not proceed to change this if the app/database is not configured since there will 
                 // be no user, plus we don't need to have server messages sent if this is the case.
                 if (ApplicationContext.IsConfigured && ApplicationContext.DatabaseContext.IsDatabaseConfigured)
-                {                    
+                {
                     try
                     {
                         var user = User.GetUser(UmbracoConfig.For.UmbracoSettings().DistributedCall.UserId);
@@ -317,7 +318,7 @@ namespace Umbraco.Web
                 LogHelper.Warn<WebBootManager>("Could not initialize the DefaultServerMessenger, the application is not configured or the database is not configured");
                 return null;
             }));
-            
+
             SurfaceControllerResolver.Current = new SurfaceControllerResolver(
                 PluginManager.Current.ResolveSurfaceControllers());
 
@@ -347,7 +348,7 @@ namespace Umbraco.Web
 					});
 
             UrlProviderResolver.Current = new UrlProviderResolver(
-                    //typeof(AliasUrlProvider), // not enabled by default
+                //typeof(AliasUrlProvider), // not enabled by default
                     typeof(DefaultUrlProvider)
                 );
 
@@ -359,12 +360,12 @@ namespace Umbraco.Web
                 // implement INotFoundHandler support... remove once we get rid of it
                 new ContentLastChanceFinderByNotFoundHandlers());
 
-			ContentFinderResolver.Current = new ContentFinderResolver(
+            ContentFinderResolver.Current = new ContentFinderResolver(
                 // all built-in finders in the correct order, devs can then modify this list
                 // on application startup via an application event handler.
-                typeof (ContentFinderByPageIdQuery),
-                typeof (ContentFinderByNiceUrl),
-                typeof (ContentFinderByIdPath),
+                typeof(ContentFinderByPageIdQuery),
+                typeof(ContentFinderByNiceUrl),
+                typeof(ContentFinderByIdPath),
 
                 // these will be handled by ContentFinderByNotFoundHandlers so they can be enabled/disabled
                 // via the config file... soon as we get rid of INotFoundHandler support, we must enable
@@ -374,8 +375,8 @@ namespace Umbraco.Web
                 //typeof (ContentFinderByUrlAlias),
 
                 // implement INotFoundHandler support... remove once we get rid of it
-                typeof (ContentFinderByNotFoundHandlers)
-			);
+                typeof(ContentFinderByNotFoundHandlers)
+            );
 
             SiteDomainHelperResolver.Current = new SiteDomainHelperResolver(new SiteDomainHelper());
 

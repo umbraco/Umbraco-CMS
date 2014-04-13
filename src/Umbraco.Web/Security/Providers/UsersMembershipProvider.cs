@@ -4,7 +4,9 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Security.Providers
@@ -12,30 +14,40 @@ namespace Umbraco.Web.Security.Providers
     /// <summary>
     /// Custom Membership Provider for Umbraco Users (User authentication for Umbraco Backend CMS)  
     /// </summary>
-    internal class UsersMembershipProvider : UmbracoServiceMembershipProvider<IMembershipUserService, IUser>
+    public class UsersMembershipProvider : UmbracoMembershipProvider<IMembershipUserService, IUser>, IUsersMembershipProvider
     {
-        
+
         public UsersMembershipProvider()
             : this(ApplicationContext.Current.Services.UserService)
-        {            
+        {
         }
 
         public UsersMembershipProvider(IMembershipMemberService<IUser> memberService)
             : base(memberService)
-        {            
+        {
         }
 
         private string _defaultMemberTypeAlias = "writer";
+        private volatile bool _hasDefaultMember = false;
+        private static readonly object Locker = new object();
 
-        public override string ProviderName 
+        public override string ProviderName
         {
-            get { return "UsersMembershipProvider"; }
+            get { return UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider; }
+        }
+
+        /// <summary>
+        /// For backwards compatibility, this provider supports this option
+        /// </summary>
+        public override bool AllowManuallyChangingPassword
+        {
+            get { return true; }
         }
 
         protected override MembershipUser ConvertToMembershipUser(IUser entity)
         {
             //the provider user key is always the int id
-            return entity.AsConcreteMembershipUser(Name);            
+            return entity.AsConcreteMembershipUser(Name);
         }
 
         public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
@@ -46,20 +58,35 @@ namespace Umbraco.Web.Security.Providers
             if (config["defaultUserTypeAlias"] != null)
             {
                 _defaultMemberTypeAlias = config["defaultUserTypeAlias"];
-            }
-            else
-            {
-                var defaultFromService = MemberService.GetDefaultMemberType();
-                if (defaultFromService.IsNullOrWhiteSpace())
+                if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
                 {
                     throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
                 }
-            }    
-        }        
+                _hasDefaultMember = true;
+            }
+        }
 
         public override string DefaultMemberTypeAlias
         {
-            get { return _defaultMemberTypeAlias; }
+            get
+            {
+                if (_hasDefaultMember == false)
+                {
+                    lock (Locker)
+                    {
+                        if (_hasDefaultMember == false)
+                        {
+                            _defaultMemberTypeAlias = MemberService.GetDefaultMemberType();
+                            if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
+                            {
+                                throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
+                            }
+                            _hasDefaultMember = true;
+                        }
+                    }
+                }
+                return _defaultMemberTypeAlias;
+            }
         }
     }
 }

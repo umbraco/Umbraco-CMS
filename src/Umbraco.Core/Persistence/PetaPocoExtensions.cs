@@ -57,11 +57,20 @@ namespace Umbraco.Core.Persistence
 
             using (var tr = db.GetTransaction())
             {
-                db.BulkInsertRecords(collection, tr);
+                db.BulkInsertRecords(collection, tr, true);
             }
         }
 
-        public static void BulkInsertRecords<T>(this Database db, IEnumerable<T> collection, Transaction tr)
+        /// <summary>
+        /// Performs the bulk insertion in the context of a current transaction with an optional parameter to complete the transaction
+        /// when finished
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="db"></param>
+        /// <param name="collection"></param>
+        /// <param name="tr"></param>
+        /// <param name="commitTrans"></param>
+        public static void BulkInsertRecords<T>(this Database db, IEnumerable<T> collection, Transaction tr, bool commitTrans = false)
         {
             //don't do anything if there are no records.
             if (collection.Any() == false)
@@ -95,11 +104,17 @@ namespace Umbraco.Core.Persistence
                     }
                 }
 
-                tr.Complete();
+                if (commitTrans)
+                {
+                    tr.Complete();    
+                }
             }
             catch
             {
-                tr.Dispose();
+                if (commitTrans)
+                {
+                    tr.Dispose();    
+                }
                 throw;
             }
         }

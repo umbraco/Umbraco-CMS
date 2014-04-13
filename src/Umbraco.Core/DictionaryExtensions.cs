@@ -15,6 +15,25 @@ namespace Umbraco.Core
 	///</summary>
 	internal static class DictionaryExtensions
 	{
+
+        /// <summary>
+        /// Method to Get a value by the key. If the key doesn't exist it will create a new TVal object for the key and return it.
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TVal"></typeparam>
+        /// <param name="dict"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+	    public static TVal GetOrCreate<TKey, TVal>(this IDictionary<TKey, TVal> dict, TKey key)
+            where TVal : class, new()
+	    {
+	        if (dict.ContainsKey(key) == false)
+	        {
+                dict.Add(key, new TVal());
+	        }
+            return dict[key];
+	    }
+
         /// <summary>
         /// Updates an item with the specified key with the specified value
         /// </summary>

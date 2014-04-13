@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Web;
+using System.Web.Compilation;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
@@ -359,8 +360,9 @@ namespace Umbraco.Web.Mvc
 
             // so we have a template, so we should have a rendering engine
             if (pcr.RenderingEngine == RenderingEngine.WebForms) // back to webforms ?                
-                return (global::umbraco.UmbracoDefault)System.Web.Compilation.BuildManager.CreateInstanceFromVirtualPath("~/default.aspx", typeof(global::umbraco.UmbracoDefault));
-            else if (pcr.RenderingEngine != RenderingEngine.Mvc) // else ?
+                return GetWebFormsHandler();
+            
+            if (pcr.RenderingEngine != RenderingEngine.Mvc) // else ?
                 return new PublishedContentNotFoundHandler("In addition, no rendering engine exists to render the custom 404.");
 
             return null;
@@ -383,6 +385,14 @@ namespace Umbraco.Web.Mvc
             if (postedInfo != null)
             {
                 return HandlePostedValues(requestContext, postedInfo);
+            }
+
+            //Now we can check if we are supposed to render WebForms when the route has not been hijacked
+            if (publishedContentRequest.RenderingEngine == RenderingEngine.WebForms 
+                && publishedContentRequest.HasTemplate 
+                && routeDef.HasHijackedRoute == false)
+            {
+                return GetWebFormsHandler();
             }
 
             //here we need to check if there is no hijacked route and no template assigned, if this is the case
@@ -435,9 +445,20 @@ namespace Umbraco.Web.Mvc
             return new UmbracoMvcHandler(requestContext);
         }
 
+        /// <summary>
+        /// Returns the handler for webforms requests
+        /// </summary>
+        /// <returns></returns>
+        internal static IHttpHandler GetWebFormsHandler()
+        {
+            return (global::umbraco.UmbracoDefault)BuildManager.CreateInstanceFromVirtualPath("~/default.aspx", typeof(global::umbraco.UmbracoDefault));
+        }
+
         private SessionStateBehavior GetSessionStateBehavior(RequestContext requestContext, string controllerName)
         {
             return _controllerFactory.GetControllerSessionBehavior(requestContext, controllerName);
         }
+
+        
     }
 }

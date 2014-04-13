@@ -27,7 +27,7 @@ function macroResource($q, $http, umbRequestHelper) {
                        "macroApiBaseUrl",
                        "GetMacroParameters",
                        [{ macroId: macroId }])),
-               'Failed to retreive macro parameters for macro with id  ' + macroId);
+               'Failed to retrieve macro parameters for macro with id  ' + macroId);
         },
         
         /**
@@ -58,7 +58,11 @@ function macroResource($q, $http, umbRequestHelper) {
                         var json = angular.toJson(val);
                         //then we need to url encode it so that it's safe
                         val = encodeURIComponent(json);
-                    }                    
+                    }
+                    else {
+                        //we still need to encode the string, it could contain line breaks, etc...
+                        val = encodeURIComponent(val);
+                    }
 
                     query += "&macroParams[" + counter + "].key=" + key + "&macroParams[" + counter + "].value=" + val;
                     counter++;
@@ -71,7 +75,7 @@ function macroResource($q, $http, umbRequestHelper) {
                        "macroApiBaseUrl",
                        "GetMacroResultAsHtmlForEditor",
                        query)),
-               'Failed to retreive macro result for macro with alias  ' + macroAlias);
+               'Failed to retrieve macro result for macro with alias  ' + macroAlias);
         }
             
     };

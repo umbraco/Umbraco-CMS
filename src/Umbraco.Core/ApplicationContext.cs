@@ -165,6 +165,9 @@ namespace Umbraco.Core
         /// </remarks>
         internal string OriginalRequestUrl { get; set; }
 
+        /// <summary>
+        /// Checks if the version configured matches the assembly version
+        /// </summary>
 		private bool Configured
 		{
 			get

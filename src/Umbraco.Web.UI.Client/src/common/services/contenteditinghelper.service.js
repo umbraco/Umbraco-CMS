@@ -31,6 +31,111 @@ function contentEditingHelper($location, $routeParams, notificationsService, ser
             return allProps;
         },
 
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.contentEditingHelper#configureButtons
+         * @methodOf umbraco.services.contentEditingHelper
+         * @function
+         *
+         * @description
+         * Returns a letter array for buttons, with the primary one first based on content model, permissions and editor state
+         */
+         getAllowedActions : function(content, creating){
+
+                //This is the ideal button order but depends on circumstance, we'll use this array to create the button list
+                // Publish, SendToPublish, Save
+                var actionOrder = ["U", "H", "A"];
+                var defaultActions;
+                var actions = [];
+
+                //Create the first button (primary button)
+                //We cannot have the Save or SaveAndPublish buttons if they don't have create permissions when we are creating a new item.
+                if (!creating || _.contains(content.allowedActions, "C")) {
+                    for (var b in actionOrder) {
+                        if (_.contains(content.allowedActions, actionOrder[b])) {
+                            defaultAction = actionOrder[b];
+                            break;
+                        }
+                    }
+                }
+                
+                actions.push(defaultAction);
+
+                //Now we need to make the drop down button list, this is also slightly tricky because:
+                //We cannot have any buttons if there's no default button above.
+                //We cannot have the unpublish button (Z) when there's no publish permission.    
+                //We cannot have the unpublish button (Z) when the item is not published.           
+                if (defaultAction) {
+                    //get the last index of the button order
+                    var lastIndex = _.indexOf(actionOrder, defaultAction);
+
+                    //add the remaining
+                    for (var i = lastIndex + 1; i < actionOrder.length; i++) {
+                        if (_.contains(content.allowedActions, actionOrder[i])) {
+                            actions.push(actionOrder[i]);
+                        }
+                    }
+
+                    //if we are not creating, then we should add unpublish too, 
+                    // so long as it's already published and if the user has access to publish
+                    if (!creating) {
+                        if (content.publishDate && _.contains(content.allowedActions,"U")) {
+                            actions.push("Z");
+                        }
+                    }
+                }
+
+                return actions;
+         },
+
+         /**
+          * @ngdoc method
+          * @name umbraco.services.contentEditingHelper#getButtonFromAction
+          * @methodOf umbraco.services.contentEditingHelper
+          * @function
+          *
+          * @description
+          * Returns a button object to render a button for the tabbed editor
+          * currently only returns built in system buttons for content and media actions
+          * returns label, alias, action char and hot-key
+          */
+          getButtonFromAction : function(ch){
+            switch (ch) {
+                case "U":
+                    return {
+                        letter: ch,
+                        labelKey: "buttons_saveAndPublish",
+                        handler: "saveAndPublish",
+                        hotKey: "ctrl+p"
+                    };
+                case "H":
+                    //send to publish
+                    return {
+                        letter: ch,
+                        labelKey: "buttons_saveToPublish",
+                        handler: "sendToPublish",
+                        hotKey: "ctrl+p"
+                    };
+                case "A":
+                    return {
+                        letter: ch,
+                        labelKey: "buttons_save",
+                        handler: "save",
+                        hotKey: "ctrl+s"
+                    };
+                case "Z":
+                    return {
+                        letter: ch,
+                        labelKey: "content_unPublish",
+                        handler: "unPublish"
+                    };
+
+                default:
+                    return null;
+            }
+
+          },
         /**
          * @ngdoc method
          * @name umbraco.services.contentEditingHelper#reBindChangedProperties

@@ -1,0 +1,21 @@
+<div class="btn-group dropup" ng-if="defaultButton" >
+    <!-- primary button -->
+    <a class="btn btn-success" href="#" ng-click="performAction(defaultButton)" prevent-default>
+        <localize key="{{defaultButton.labelKey}}">{{defaultButton.labelKey}}</localize>
+    </a>
+    
+    <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" 
+        ng-if="buttons.length > 0">
+        <span class="caret"></span>
+    </a>
+    
+    <!-- sub buttons -->
+    <ul class="dropdown-menu bottom-up" role="menu" aria-labelledby="dLabel"  
+    	ng-if="buttons.length > 0">
+        <li ng-repeat="btn in model.subButtons">
+            <a href="#" ng-click="performAction(btn)" ng-disabled="true" prevent-default>
+                <localize key="{{btn.labelKey}}">{{btn.labelKey}}</localize>
+            </a>
+        </li>
+    </ul>
+</div>

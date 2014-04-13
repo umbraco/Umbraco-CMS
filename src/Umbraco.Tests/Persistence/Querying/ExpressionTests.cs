@@ -2,7 +2,10 @@
 using System.Linq.Expressions;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.Querying
@@ -35,5 +38,60 @@ namespace Umbraco.Tests.Persistence.Querying
 
             Assert.AreEqual("[umbracoNode].[parentID] = -1", result);
         }
+
+        [Test]
+        public void Equals_Operator_For_Value_Gets_Escaped()
+        {
+            Expression<Func<IUser, bool>> predicate = user => user.Username == "hello@world.com";
+            var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IUser>();
+            var result = modelToSqlExpressionHelper.Visit(predicate);
+
+            Console.WriteLine("Model to Sql ExpressionHelper: \n" + result);
+
+            Assert.AreEqual("[umbracoUser].[userLogin] = 'hello@@world.com'", result);
+        }
+
+        [Test]
+        public void Equals_Method_For_Value_Gets_Escaped()
+        {
+            Expression<Func<IUser, bool>> predicate = user => user.Username.Equals("hello@world.com");
+            var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IUser>();
+            var result = modelToSqlExpressionHelper.Visit(predicate);
+
+            Console.WriteLine("Model to Sql ExpressionHelper: \n" + result);
+
+            Assert.AreEqual("upper([umbracoUser].[userLogin]) = 'HELLO@@WORLD.COM'", result);
+        }
+
+        [Test]
+        public void Model_Expression_Value_Does_Not_Get_Double_Escaped()
+        {
+            //mysql escapes backslashes, so we'll test with that
+            SqlSyntaxContext.SqlSyntaxProvider = MySqlSyntax.Provider;
+
+            Expression<Func<IUser, bool>> predicate = user => user.Username.Equals("mydomain\\myuser");
+            var modelToSqlExpressionHelper = new ModelToSqlExpressionHelper<IUser>();
+            var result = modelToSqlExpressionHelper.Visit(predicate);
+
+            Console.WriteLine("Model to Sql ExpressionHelper: \n" + result);
+
+            Assert.AreEqual("upper(`umbracoUser`.`userLogin`) = 'MYDOMAIN\\\\MYUSER'", result);
+        }
+
+        [Test]
+        public void Poco_Expression_Value_Does_Not_Get_Double_Escaped()
+        {
+            //mysql escapes backslashes, so we'll test with that
+            SqlSyntaxContext.SqlSyntaxProvider = MySqlSyntax.Provider;
+
+            Expression<Func<UserDto, bool>> predicate = user => user.Login.StartsWith("mydomain\\myuser");
+            var modelToSqlExpressionHelper = new PocoToSqlExpressionHelper<UserDto>();
+            var result = modelToSqlExpressionHelper.Visit(predicate);
+
+            Console.WriteLine("Poco to Sql ExpressionHelper: \n" + result);
+
+            Assert.AreEqual("upper(`umbracoUser`.`userLogin`) like 'MYDOMAIN\\\\MYUSER%'", result);
+        }
+
     }
 }

@@ -91,12 +91,12 @@ namespace umbraco.cms.businesslogic.media
         /// <param name="Text">The name of the MediaType</param>
         /// <returns>The new MediaType</returns>
         [Obsolete("Obsolete, Use Umbraco.Core.Models.MediaType and Umbraco.Core.Services.ContentTypeService.Save()", false)]
-        public static MediaType MakeNew(BusinessLogic.User u, string Text)
+        public static MediaType MakeNew(User u, string Text)
         {
             return MakeNew(u, Text, -1);
         }
 
-        internal static MediaType MakeNew(BusinessLogic.User u, string text, int parentId)
+        internal static MediaType MakeNew(User u, string text, int parentId)
         {
             var mediaType = new Umbraco.Core.Models.MediaType(parentId) { Name = text, Alias = text, CreatorId = u.Id, Thumbnail = "folder.png", Icon = "folder.gif" };
             ApplicationContext.Current.Services.ContentTypeService.Save(mediaType, u.Id);
@@ -132,10 +132,6 @@ namespace umbraco.cms.businesslogic.media
                 var current = User.GetCurrent();
                 int userId = current == null ? 0 : current.Id;
                 ApplicationContext.Current.Services.ContentTypeService.Save(_mediaType, userId);
-
-                //Ensure that MediaTypes are reloaded from db by clearing cache
-                InMemoryCacheProvider.Current.Clear();
-                RuntimeCacheProvider.Current.Clear();
 
                 base.Save();
 

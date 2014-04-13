@@ -14,20 +14,18 @@ namespace Umbraco.Core.Models
     public class MemberType : ContentTypeCompositionBase, IMemberType
     {
         //Dictionary is divided into string: PropertyTypeAlias, Tuple: MemberCanEdit, VisibleOnProfile, PropertyTypeId
-        private IDictionary<string, Tuple<bool, bool, int>> _memberTypePropertyTypes;
         private string _alias;
 
         public MemberType(int parentId) : base(parentId)
         {
-            _memberTypePropertyTypes = new Dictionary<string, Tuple<bool, bool, int>>();
+            MemberTypePropertyTypes = new Dictionary<string, MemberTypePropertyProfileAccess>();
         }
 
         public MemberType(IContentTypeComposition parent) : base(parent)
         {
-            _memberTypePropertyTypes = new Dictionary<string, Tuple<bool, bool, int>>();
+            MemberTypePropertyTypes = new Dictionary<string, MemberTypePropertyProfileAccess>();
         }
 
-        private static readonly PropertyInfo MemberTypePropertyTypesSelector = ExpressionHelper.GetPropertyInfo<MemberType, IDictionary<string, Tuple<bool, bool, int>>>(x => x.MemberTypePropertyTypes);
         private static readonly PropertyInfo AliasSelector = ExpressionHelper.GetPropertyInfo<MemberType, string>(x => x.Alias);
 
         /// <summary>
@@ -46,28 +44,19 @@ namespace Umbraco.Core.Models
 
                 SetPropertyValueAndDetectChanges(o =>
                 {
-                    _alias = value == "_umbracoSystemDefaultProtectType" ? value : value.ToSafeAlias();
+                    _alias = value == "_umbracoSystemDefaultProtectType" 
+                        ? value 
+                        : (value == null ? string.Empty : value.ToSafeAlias() );
                     return _alias;
                 }, _alias, AliasSelector);
             }
         }
 
         /// <summary>
-        /// Gets or Sets a Dictionary of Tuples (MemberCanEdit, VisibleOnProfile, PropertyTypeId) by the PropertyTypes' alias.
+        /// Gets or Sets a Dictionary of Tuples (MemberCanEdit, VisibleOnProfile) by the PropertyTypes' alias.
         /// </summary>
         [DataMember]
-        internal IDictionary<string, Tuple<bool, bool, int>> MemberTypePropertyTypes
-        {
-            get { return _memberTypePropertyTypes; }
-            set
-            {
-                SetPropertyValueAndDetectChanges(o =>
-                {
-                    _memberTypePropertyTypes = value;
-                    return _memberTypePropertyTypes;
-                }, _memberTypePropertyTypes, MemberTypePropertyTypesSelector);
-            }
-        }
+        internal IDictionary<string, MemberTypePropertyProfileAccess> MemberTypePropertyTypes { get; private set; }
 
         /// <summary>
         /// Gets a boolean indicating whether a Property is editable by the Member.
@@ -78,7 +67,7 @@ namespace Umbraco.Core.Models
         {
             if (MemberTypePropertyTypes.ContainsKey(propertyTypeAlias))
             {
-                return MemberTypePropertyTypes[propertyTypeAlias].Item1;
+                return MemberTypePropertyTypes[propertyTypeAlias].IsEditable;
             }
 
             return false;
@@ -93,7 +82,7 @@ namespace Umbraco.Core.Models
         {
             if (MemberTypePropertyTypes.ContainsKey(propertyTypeAlias))
             {
-                return MemberTypePropertyTypes[propertyTypeAlias].Item2;
+                return MemberTypePropertyTypes[propertyTypeAlias].IsVisible;
             }
 
             return false;
@@ -108,13 +97,11 @@ namespace Umbraco.Core.Models
         {
             if (MemberTypePropertyTypes.ContainsKey(propertyTypeAlias))
             {
-                var tuple = MemberTypePropertyTypes[propertyTypeAlias];
-                MemberTypePropertyTypes[propertyTypeAlias] = new Tuple<bool, bool, int>(value, tuple.Item2, tuple.Item3);
+                MemberTypePropertyTypes[propertyTypeAlias].IsEditable = value;
             }
             else
             {
-                var propertyType = PropertyTypes.First(x => x.Alias.Equals(propertyTypeAlias));
-                var tuple = new Tuple<bool, bool, int>(value, false, propertyType.Id);
+                var tuple = new MemberTypePropertyProfileAccess(false, value);
                 MemberTypePropertyTypes.Add(propertyTypeAlias, tuple);
             }
         }
@@ -128,13 +115,11 @@ namespace Umbraco.Core.Models
         {
             if (MemberTypePropertyTypes.ContainsKey(propertyTypeAlias))
             {
-                var tuple = MemberTypePropertyTypes[propertyTypeAlias];
-                MemberTypePropertyTypes[propertyTypeAlias] = new Tuple<bool, bool, int>(tuple.Item1, value, tuple.Item3);
+                MemberTypePropertyTypes[propertyTypeAlias].IsVisible = value;
             }
             else
             {
-                var propertyType = PropertyTypes.First(x => x.Alias.Equals(propertyTypeAlias));
-                var tuple = new Tuple<bool, bool, int>(false, value, propertyType.Id);
+                var tuple = new MemberTypePropertyProfileAccess(value, false);
                 MemberTypePropertyTypes.Add(propertyTypeAlias, tuple);
             }
         }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Xml.Linq;
 using Newtonsoft.Json;
@@ -127,7 +128,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <returns></returns>
         public DataTypeDatabaseType GetDatabaseType()
         {
-            switch (ValueType.ToUpper())
+            switch (ValueType.ToUpper(CultureInfo.InvariantCulture))
             {
                 case "INT":
                 case "INTEGER":

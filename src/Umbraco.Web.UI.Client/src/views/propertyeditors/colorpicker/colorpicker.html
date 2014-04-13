@@ -1,13 +1,13 @@
 ﻿<div ng-controller="Umbraco.PropertyEditors.ColorPickerController">
 
 	<div ng-if="!isConfigured" >
-		<localize key="colorpicker_noColors">You havn't defined any colors</localize>
+		<localize key="colorpicker_noColors">You haven't defined any colors</localize>
 	</div>
 
     <ul class="thumbnails color-picker">
         <li ng-repeat="(key, val) in model.config.items" ng-class="{active: model.value === val}">
-            <a ng-click="selectItem(val)" class="thumbnail" style="background-color:#{{val}}">
-                
+            <a ng-click="selectItem(val)" class="thumbnail" hex-bg-color="{{val}}">
+
             </a>
         </li>
     </ul>

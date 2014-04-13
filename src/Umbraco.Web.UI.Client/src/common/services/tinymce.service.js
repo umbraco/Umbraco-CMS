@@ -24,7 +24,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                       umbRequestHelper.getApiUrl(
                           "rteApiBaseUrl",
                           "GetConfiguration")),
-                  'Failed to retreive entity data for id '); 
+                  'Failed to retrieve tinymce configuration');
         },
 
         /**
@@ -85,18 +85,34 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                 icon: 'custom icon-picture',
                 tooltip: 'Media Picker',
                 onclick: function () {
+
+                    var selectedElm = editor.selection.getNode(),
+                        currentTarget;
+
+
+                    if(selectedElm.nodeName === 'IMG'){
+                        var img = $(selectedElm);
+                        currentTarget = {
+                            name: img.attr("alt"),
+                            url: img.attr("src"),
+                            id: img.attr("rel")
+                        };
+                    }
+
                     dialogService.mediaPicker({
+                        currentTarget: currentTarget,
                         onlyImages: true,
+                        showDetails: true,
                         scope: $scope, callback: function (img) {
 
                             if (img) {
-                                var imagePropVal = imageHelper.getImagePropertyValue({ imageModel: img, scope: $scope });
+                                
                                 var data = {
-                                    alt: "Some description",
-                                    src: (imagePropVal) ? imagePropVal : "nothing.jpg",
+                                    alt: img.name,
+                                    src: (img.url) ? img.url : "nothing.jpg",
+                                    rel: img.id,
                                     id: '__mcenew'
                                 };
-
 
                                 editor.insertContent(editor.dom.createHTML('img', data));
 
@@ -105,11 +121,16 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
                                     var size = editor.dom.getSize(imgElm);
 
                                     var newSize = imageHelper.scaleToMaxSize(500, size.w, size.h);
+
                                     var s = "width: " + newSize.width + "px; height:" + newSize.height + "px;";
                                     editor.dom.setAttrib(imgElm, 'style', s);
-                                    editor.dom.setAttrib(imgElm, 'rel', newSize.width + "," + newSize.height);
                                     editor.dom.setAttrib(imgElm, 'id', null);
 
+                                    if(img.url){
+                                        var src = img.url + "?width=" + newSize.width + "&height=" + newSize.height;
+                                        editor.dom.setAttrib(imgElm, 'data-mce-src', src);
+                                    }
+                                 
                                 }, 500);
                             }
                         }
@@ -131,8 +152,6 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
         */
         createLinkPicker: function (editor, $scope) {
 
-            
-            
             /*
             editor.addButton('link', {
                 icon: 'custom icon-link',
@@ -237,7 +256,7 @@ function tinyMceService(dialogService, $log, imageHelper, $http, $timeout, macro
 
                 //need to wrap in safe apply since this might be occuring outside of angular
                 angularHelper.safeApply($scope, function() {
-                    macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.marcoParamsDictionary)
+                    macroResource.getMacroResultAsHtmlForEditor(macroData.macroAlias, contentId, macroData.macroParamsDictionary)
                     .then(function (htmlResult) {
 
                         $macroDiv.removeClass("loading");

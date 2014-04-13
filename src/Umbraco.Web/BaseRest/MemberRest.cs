@@ -100,14 +100,14 @@ namespace Umbraco.Web.BaseRest
 							{
 								prop.Value = value;
 								ret = "True";
-								m.XmlGenerate(new XmlDocument());
+							    m.Save();
 							}
 						}
 						else
 						{
 							prop.Value = value;
 							ret = "True";
-							m.XmlGenerate(new XmlDocument());
+                            m.Save();
 						}
 
 					}

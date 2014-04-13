@@ -27,8 +27,8 @@ angular.module('umbraco')
 		
 		function collectDetails(macro){
 			macro.details = "";
-			if(macro.marcoParamsDictionary){
-				angular.forEach((macro.marcoParamsDictionary), function(value, key){
+			if(macro.macroParamsDictionary){
+				angular.forEach((macro.macroParamsDictionary), function(value, key){
 					macro.details += key + ": " + value + " ";	
 				});	
 			}		

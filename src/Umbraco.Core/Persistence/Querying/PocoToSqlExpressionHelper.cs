@@ -243,18 +243,41 @@ namespace Umbraco.Core.Persistence.Querying
                 args.RemoveAt(0);
             }
 
+            //TODO: We should probably add the same logic we've done for ModelToSqlExpressionHelper with checking for:
+            // InvariantStartsWith, InvariantEndsWith, SqlWildcard, etc...
+            // since we should be able to easily handle that with the Poco objects too.
+
             switch (m.Method.Name)
             {
                 case "ToUpper":
                     return string.Format("upper({0})", r);
                 case "ToLower":
                     return string.Format("lower({0})", r);
+                case "SqlWildcard":
                 case "StartsWith":
-                    return string.Format("upper({0}) like '{1}%'", r, EscapeAtArgument(RemoveQuote(args[0].ToString().ToUpper())));
                 case "EndsWith":
-                    return string.Format("upper({0}) like '%{1}'", r, EscapeAtArgument(RemoveQuote(args[0].ToString()).ToUpper()));
                 case "Contains":
-                    return string.Format("upper({0}) like '%{1}%'", r, EscapeAtArgument(RemoveQuote(args[0].ToString()).ToUpper()));
+                case "Equals":
+                case "SqlStartsWith":
+                case "SqlEndsWith":
+                case "SqlContains":
+                case "SqlEquals":
+                case "InvariantStartsWith":
+                case "InvariantEndsWith":
+                case "InvariantContains":
+                case "InvariantEquals":
+                    //default
+                    var colType = TextColumnType.NVarchar;
+                    //then check if this arg has been passed in
+                    if (m.Arguments.Count > 1)
+                    {
+                        var colTypeArg = m.Arguments.FirstOrDefault(x => x is ConstantExpression && x.Type == typeof(TextColumnType));
+                        if (colTypeArg != null)
+                        {
+                            colType = (TextColumnType)((ConstantExpression)colTypeArg).Value;
+                        }
+                    }
+                    return HandleStringComparison(r.ToString(), args[0].ToString(), m.Method.Name, colType);
                 case "Substring":
                     var startIndex = Int32.Parse(args[0].ToString()) + 1;
                     if (args.Count == 2)

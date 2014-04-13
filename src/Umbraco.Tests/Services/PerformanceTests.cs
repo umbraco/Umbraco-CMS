@@ -26,6 +26,7 @@ namespace Umbraco.Tests.Services
     /// This is more of an integration test as it involves multiple layers
     /// as well as configuration.
     /// </summary>
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
     [NUnit.Framework.Ignore("These should not be run by the server, only directly as they are only benchmark tests")]
     public class PerformanceTests : BaseDatabaseFactoryTest
@@ -46,13 +47,6 @@ namespace Umbraco.Tests.Services
             return "System.Data.SqlClient";
         }
 
-        /// <summary>
-        /// new schema per test
-        /// </summary>
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NewSchemaPerTest; }
-        }
 
         /// <summary>
         /// don't create anything, we're testing against our own server
@@ -229,6 +223,8 @@ namespace Umbraco.Tests.Services
 
 
                         DatabaseContext.Database.BulkInsertRecords(xmlItems, tr);
+
+                        tr.Complete();
                     }
                 }
             }

@@ -7,25 +7,20 @@
 
             <a href="#media/media/edit/{{img.id}}"
                 ng-click="clickHandler(img, $event, false)"
-                ng-switch="img.thumbnail"
                 title="{{img.name}}">
 
-                <div ng-style="img.style" class="umb-non-thumbnail" ng-switch-when="none">
+                <div ng-style="img.style" class="umb-non-thumbnail" ng-if="!img.thumbnail">
                     <i class="icon large {{img.icon}}"></i>
                     {{img.name}}
                 </div>
-                
-                
-                <div ng-switch-default class="umb-photo" ng-style="img.thumbStyle" alt="{{img.name}}"></div>
-                
-                
-
+            
+                <div ng-if="img.thumbnail" class="umb-photo" ng-style="img.thumbStyle" alt="{{img.name}}"></div>
             </a>
 
-            <a href ng-click="clickHandler(img, $event, true)" ng-show="img.contentTypeAlias === 'Folder'" class="selector-overlay">
+            <a href ng-click="clickHandler(img, $event, true)" 
+                ng-if="img.isFolder" class="selector-overlay">
                 <localize key="buttons_select">Select</localize>
 			</a>
-
         </div>
     </div>
 </div>

@@ -13,12 +13,6 @@ namespace Umbraco.Tests.PublishedContent
     [TestFixture]
     public class PublishedContentRequestEngineTests : BaseRoutingTest
     {
-
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NoDatabasePerFixture; }
-        }
-
         [Test]
         public void Ctor_Throws_On_Null_PCR()
         {

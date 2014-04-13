@@ -10,7 +10,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class PreviewXmlDto
     {
         [Column("nodeId")]
-        [PrimaryKeyColumn(AutoIncrement = false, Name = "", OnColumns = "nodeId, versionId")]
+        [PrimaryKeyColumn(AutoIncrement = false, Name = "PK_cmsContentPreviewXml", OnColumns = "nodeId, versionId")]
         [ForeignKey(typeof(ContentDto), Column = "nodeId")]
         public int NodeId { get; set; }
 

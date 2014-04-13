@@ -21,9 +21,18 @@ namespace Umbraco.Core.Models
 
         public RelationType(Guid childObjectType, Guid parentObjectType, string @alias)
         {
+            Mandate.ParameterNotNullOrEmpty(@alias, "alias");
             _childObjectType = childObjectType;
             _parentObjectType = parentObjectType;
             _alias = alias;
+            Name = _alias;
+        }
+
+        public RelationType(Guid childObjectType, Guid parentObjectType, string @alias, string name)
+            :this(childObjectType, parentObjectType, @alias)
+        {
+            Mandate.ParameterNotNullOrEmpty(name, "name");
+            Name = name;
         }
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<RelationType, string>(x => x.Name);

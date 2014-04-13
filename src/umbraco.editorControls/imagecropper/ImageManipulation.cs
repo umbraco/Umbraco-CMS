@@ -2,35 +2,39 @@
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Drawing;
+using Umbraco.Core.IO;
 using System.IO;
+
 
 namespace umbraco.editorControls.imagecropper
 {
     [Obsolete("IDataType and all other references to the legacy property editors are no longer used this will be removed from the codebase in future versions")]
     public class ImageTransform
     {
+        private static readonly MediaFileSystem _fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+
         public static void Execute(string sourceFile, string name, int cropX, int cropY, int cropWidth, int cropHeight, int sizeWidth, int sizeHeight, long quality)
         {
-            if (!File.Exists(sourceFile)) return;
 
-            string path = sourceFile.Substring(0, sourceFile.LastIndexOf('\\'));
+            if (!_fs.FileExists(sourceFile)) return;
+
+
+            string path = string.Empty;
+
+            //http or local filesystem
+            if (sourceFile.Contains("/"))
+                path = sourceFile.Substring(0, sourceFile.LastIndexOf('/'));
+            else
+                path = sourceFile.Substring(0, sourceFile.LastIndexOf('\\'));
 
             // TODO: Make configurable and move to imageInfo
             //if(File.Exists(String.Format(@"{0}\{1}.jpg", path, name))) return;
 
-            byte[] buffer = null;
+            //Do we need this check as we are always working with images that are already in a folder??
+            //DirectoryInfo di = new DirectoryInfo(path);
+            //if (!di.Exists) di.Create();
 
-            using (FileStream fs = new FileStream(sourceFile, FileMode.Open, FileAccess.Read))
-            {
-                buffer = new byte[fs.Length];
-                fs.Read(buffer, 0, (int)fs.Length);
-                fs.Close();
-            }
-
-            Image image = Image.FromStream(new MemoryStream(buffer));
-
-            DirectoryInfo di = new DirectoryInfo(path);
-            if (!di.Exists) di.Create();
+            Image image = Image.FromStream(_fs.OpenFile(sourceFile));
 
             using (Image croppedImage = CropImage(image, new Rectangle(cropX, cropY, cropWidth, cropHeight)))
             {
@@ -58,7 +62,13 @@ namespace umbraco.editorControls.imagecropper
             EncoderParameters encoderParams = new EncoderParameters(1);
             encoderParams.Param[0] = qualityParam;
 
-            img.Save(path, jpegCodec, encoderParams);
+            var fileStream = new MemoryStream();
+
+            img.Save(fileStream, jpegCodec, encoderParams);
+            fileStream.Position = 0;
+            _fs.AddFile(path, fileStream, true);
+            //just to be sure
+            fileStream.Dispose();
         }
 
         private static ImageCodecInfo GetEncoderInfo(string mimeType)

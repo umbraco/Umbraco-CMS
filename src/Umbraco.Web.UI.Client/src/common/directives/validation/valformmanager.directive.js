@@ -12,7 +12,7 @@
 * Another thing this directive does is to ensure that any .control-group that contains form elements that are invalid will
 * be marked with the 'error' css class. This ensures that labels included in that control group are styled correctly.
 **/
-function valFormManager(serverValidationManager) {
+function valFormManager(serverValidationManager, $rootScope, $log, $timeout, notificationsService) {
     return {
         require: "form",
         restrict: "A",
@@ -49,8 +49,46 @@ function valFormManager(serverValidationManager) {
 
             //listen for the forms saved event
             scope.$on(savedEvent, function (ev, args) {
+                //remove validation class
                 element.removeClass(className);
+
+                //clear form state as at this point we retrieve new data from the server
+                //and all validation will have cleared at this point    
+                formCtrl.$setPristine();
             });
+
+            //if we wish to turn of the unsaved changes confirmation msg
+            //this is the place to do it
+            var locationEvent = $rootScope.$on('$locationChangeStart', function (event, nextLocation, currentLocation) {
+                    if (!formCtrl.$dirty) {
+                        return;
+                    }
+                    
+                    var path = nextLocation.split("#")[1];
+                    if (path) {
+                        if (path.indexOf("%253") || path.indexOf("%252")) {
+                            path = decodeURIComponent(path);
+                        }
+
+                        if(!notificationsService.hasView()){
+                            var msg = { view: "confirmroutechange", args: { path: path, listener: locationEvent } };
+                            notificationsService.add(msg);
+                        }
+                        
+                        event.preventDefault();
+                    }
+                    
+            });
+
+            scope.$on('$destroy', function() {
+                if(locationEvent){
+                    locationEvent();
+                }
+            });
+
+            $timeout(function(){
+                formCtrl.$setPristine();
+            }, 1000);
         }
     };
 }

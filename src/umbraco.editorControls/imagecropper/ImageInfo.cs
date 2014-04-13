@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Drawing;
 using System.IO;
+using System.Net;
 using System.Web;
-using umbraco.editorControls.imagecropper;
 using Umbraco.Core.IO;
+//using Umbraco.Core.IO;
+
 
 namespace umbraco.editorControls.imagecropper
 {
@@ -19,47 +21,34 @@ namespace umbraco.editorControls.imagecropper
         public string Path { get; set; }
         public string RelativePath { get; set; }
 
+        private readonly MediaFileSystem _fs;
+
         public ImageInfo(string relativePath)
         {
-            RelativePath = relativePath;
-            Path = IOHelper.MapPath(relativePath);
-            if (File.Exists(Path))
+            _fs = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
+
+            try
             {
-                string fileName = Path.Substring(Path.LastIndexOf('\\') + 1);
-                Name = fileName.Substring(0, fileName.LastIndexOf('.'));
+                RelativePath = relativePath;
 
-                byte[] buffer = null;
+                //This get's the IFileSystem's path based on the URL (i.e. /media/blah/blah.jpg )
+                Path = _fs.GetRelativePath(relativePath);
 
-                using (FileStream fs = new FileStream(Path, FileMode.Open, FileAccess.Read))
-                {
-                    buffer = new byte[fs.Length];
-                    fs.Read(buffer, 0, (int) fs.Length);
-                    fs.Close();
-                }
-
-                try
-                {
-                    image = Image.FromStream(new MemoryStream(buffer));
-
-                    Width = image.Width;
-                    Height = image.Height;
-                    Aspect = (float) Width/Height;
-                    DateStamp = File.GetLastWriteTime(Path);
-                }
-                catch (Exception)
-                {
-                    Width = 0;
-                    Height = 0;
-                    Aspect = 0;
-                }
-
+                image = Image.FromStream(_fs.OpenFile(Path));
+                Name = _fs.GetFileName(Path);
+                DateStamp = _fs.GetLastModified(Path).Date;
+                Width = image.Width;
+                Height = image.Height;
+                Aspect = (float)Width / Height;
+                
             }
-            else
+            catch (Exception)
             {
                 Width = 0;
                 Height = 0;
                 Aspect = 0;
             }
+
         }
 
         public bool Exists
@@ -67,10 +56,10 @@ namespace umbraco.editorControls.imagecropper
             get { return Width > 0 && Height > 0; }
         }
 
-        public string Directory
-        {
-            get { return Path.Substring(0, Path.LastIndexOf('\\')); }
-        }
+        //public string Directory
+        //{
+        //    get { return Path.Substring(0, Path.LastIndexOf('\\')); }
+        //}
 
         public void GenerateThumbnails(SaveData saveData, Config config)
         {
@@ -78,18 +67,20 @@ namespace umbraco.editorControls.imagecropper
             {
                 for (int i = 0; i < config.presets.Count; i++)
                 {
-                    Crop crop = (Crop) saveData.data[i];
-                    Preset preset = (Preset) config.presets[i];
+                    Crop crop = (Crop)saveData.data[i];
+                    Preset preset = (Preset)config.presets[i];
 
                     // Crop rectangle bigger than actual image
-                    if(crop.X2 - crop.X > Width || crop.Y2 - crop.Y > Height)
+                    if (crop.X2 - crop.X > Width || crop.Y2 - crop.Y > Height)
                     {
                         crop = preset.Fit(this);
                     }
 
+                    var tmpName = Name.Substring(0, Name.LastIndexOf('.'));
+
                     ImageTransform.Execute(
                         Path,
-                        String.Format("{0}_{1}", Name, preset.Name),
+                        String.Format("{0}_{1}", tmpName, preset.Name),
                         crop.X,
                         crop.Y,
                         crop.X2 - crop.X,

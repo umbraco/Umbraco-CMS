@@ -35,7 +35,7 @@ function stylesheetResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "stylesheetApiBaseUrl",
                        "GetAll")),
-               'Failed to retreive stylesheets ');
+               'Failed to retrieve stylesheets ');
         },
 
         /**
@@ -63,8 +63,8 @@ function stylesheetResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "stylesheetApiBaseUrl",
                        "GetRules",
-                       [{ id: id }]) +"&rnd=" + Math.floor(Math.random()*1001), {cache: false}),
-               'Failed to retreive stylesheets ');
+                       [{ id: id }])),
+               'Failed to retrieve stylesheets ');
         },
 
         /**
@@ -92,7 +92,7 @@ function stylesheetResource($q, $http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "stylesheetApiBaseUrl",
                        "GetRulesByName",
-                       [{ name: name }]) +"&rnd=" + Math.floor(Math.random()*1001), {cache: false}),
+                       [{ name: name }])),
                'Failed to retreive stylesheets ');
         }
     };

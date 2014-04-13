@@ -350,8 +350,13 @@ namespace umbraco.presentation.developer.packages
         /// <param name="packageId"></param>
         /// <param name="dir"></param>
         private void PerformPostInstallCleanup(int packageId, string dir)
-        {
+        {   
             _installer.InstallCleanUp(packageId, dir);
+
+            // Update ClientDependency version
+            var clientDependencyConfig = new Umbraco.Core.Configuration.ClientDependencyConfiguration();
+            var clientDependencyUpdated = clientDependencyConfig.IncreaseVersionNumber();
+            
             //clear the tree cache - we'll do this here even though the browser will reload, but just in case it doesn't can't hurt.
             ClientTools.ClearClientTreeCache().RefreshTree("packager");
             TreeDefinitionCollection.Instance.ReRegisterTrees();

@@ -152,6 +152,7 @@
     <key alias="sortDone">Sorteringsordningen har uppdaterats</key>
     <key alias="sortHelp">För att sortera noderna, dra i dem eller klicka på någon av kolumnrubrikerna. Du kan markera flera noder samtidigt genom att hålla nere SHIFT eller CONTROL medan du klickar</key>
     <key alias="statistics">Statistik</key>
+    <key alias="target">Mål</key>
     <key alias="titleOptional">Titel (valfritt)</key>
     <key alias="type">Typ</key>
     <key alias="unPublish">Avpublicera</key>
@@ -269,6 +270,7 @@
     <key alias="contentTypeAliasAndNameNotNull">Du måste ange både alias och namn för den nya egenskapstypen!</key>
     <key alias="dissallowedMediaType">Filtypen är icke godkännd av administratören</key>
     <key alias="filePermissionsError">Ett fel upptäcktes i läsningen/skrivningen till den aktuella filen eller mappen</key>
+    <key alias="missingPropertyEditorErrorMessage">Det finns ett konfigurationsfel med datatypen som används för denna egenskapen, vänligen undersök datatypen</key>
     <key alias="missingTitle">Du måste skriva en rubrik</key>
     <key alias="missingType">Du måste välja en typ</key>
     <key alias="pictureResizeBiggerThanOrg">Du kommer att göra bilden större än originalstorleken. Är du säker på att du vill fortsätta?</key>
@@ -465,19 +467,24 @@
   </area>
   <area alias="login">
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - {0} <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
-    <key alias="greeting1">Happy super sunday</key>
-    <key alias="greeting2">Happy manic monday</key>
-    <key alias="greeting3">Happy tremendous tuesday</key>
-    <key alias="greeting4">Happy wonderfull wednesday</key>
-    <key alias="greeting5">Happy thunder thursday</key>
-    <key alias="greeting6">Happy friendly friday</key>
-    <key alias="greeting7">Happy shiny saturday</key>
+    <key alias="greeting0">Happy super sunday</key>
+    <key alias="greeting1">Happy manic monday</key>
+    <key alias="greeting2">Happy tremendous tuesday</key>
+    <key alias="greeting3">Happy wonderfull wednesday</key>
+    <key alias="greeting4">Happy thunder thursday</key>
+    <key alias="greeting5">Happy friendly friday</key>
+    <key alias="greeting6">Happy shiny saturday</key>
     <key alias="instruction">Logga in nedan</key>
+    <key alias="timeout">Sessionen har nått sin maxgräns</key>
   </area>
   <area alias="main">
     <key alias="dashboard">Översikt</key>
     <key alias="sections">Sektioner</key>
     <key alias="tree">Innehåll</key>
+  </area>
+  <area alias="media">
+    <key alias="clickToUpload">Klicka för att ladda upp</key>
+    <key alias="dropFilesHere">Släpp dina filer här...</key>
   </area>
   <area alias="moveOrCopy">
     <key alias="choose">Välj sida ovan...</key>
@@ -559,7 +566,7 @@
     <key alias="paSimpleHelp">Välj detta alternativ om du vill skydda sidan med ett enkelt användarnamn och lösenord. Alla loggar då in med samma inloggningsuppgifter.</key>
   </area>
   <area alias="publish">
-    <key alias="contentPublishedFailedAwaitingRelease"><![CDATA[ {0} kunde inte publiceras på grund av dess tidsinställda publicering.]]></key>
+    <key alias="contentPublishedFailedAwaitingRelease"> {0} kunde inte publiceras på grund av dess tidsinställda publicering.</key>
     <key alias="contentPublishedFailedByEvent">{0} kunde inte publiceras på grund av att ett tredjepartstillägg avbröt publiceringen.</key>
     <key alias="contentPublishedFailedByParent">{0} kan inte publiceras, på grund av att överordnad nod inte är publicerad.</key>
     <key alias="contentPublishedFailedInvalid">{0} kunde inte publiceras på grund av följande orsaker:  {1}  passerade inte valideringen.</key>
@@ -622,6 +629,7 @@
     <key alias="nodetype">Nodtyp</key>
     <key alias="noPropertiesDefinedOnTab">Inga egenskaper definierade i denna sektion. Klicka på "Lägg till ny egenskap" länken vid toppen för att skapa en ny egenskap.</key>
     <key alias="objecttype">Typ</key>
+    <key alias="script">Skript</key>
     <key alias="stylesheet">Stilmall</key>
     <key alias="stylesheet editor egenskab">Egenskap för stilmall</key>
     <key alias="tab">Flik</key>

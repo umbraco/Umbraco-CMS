@@ -59,14 +59,32 @@ namespace Umbraco.Core.Services
             _repositoryFactory = repositoryFactory;
         }
 
-        //TODO: There are various ways to expose permission setting on this service, we just need to list out the different ways we'll need to 
-        // be able to acheive this for the core, for now this is here so I can run a unit test.
-        internal void AssignContentPermissions(IContent entity, char permission, IEnumerable<object> userIds)
+        /// <summary>
+        /// Assigns a single permission to the current content item for the specified user ids
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="permission"></param>
+        /// <param name="userIds"></param>
+        public void AssignContentPermission(IContent entity, char permission, IEnumerable<int> userIds)
         {
             var uow = _uowProvider.GetUnitOfWork();
             using (var repository = _repositoryFactory.CreateContentRepository(uow))
             {
-                repository.AssignEntityPermissions(entity, permission, userIds);
+                repository.AssignEntityPermission(entity, permission, userIds);
+            }
+        }
+
+        /// <summary>
+        /// Gets the list of permissions for the content item
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        public IEnumerable<EntityPermission> GetPermissionsForEntity(IContent content)
+        {
+            var uow = _uowProvider.GetUnitOfWork();
+            using (var repository = _repositoryFactory.CreateContentRepository(uow))
+            {
+                return repository.GetPermissionsForEntity(content.Id);
             }
         }
 
@@ -158,7 +176,15 @@ namespace Umbraco.Core.Services
             var contentType = FindContentTypeByAlias(contentTypeAlias);
             var content = new Content(name, parentId, contentType);
 
+            //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
+            // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parentId), this))
+            {
+                content.WasCancelled = true;
+                return content;
+            }
+
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
             {
                 content.WasCancelled = true;
                 return content;
@@ -172,6 +198,8 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(content);
                 uow.Commit();
             }
+
+            Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
 
             Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parentId), this);
 
@@ -198,7 +226,15 @@ namespace Umbraco.Core.Services
             var contentType = FindContentTypeByAlias(contentTypeAlias);
             var content = new Content(name, parent, contentType);
 
+            //NOTE: I really hate the notion of these Creating/Created events - they are so inconsistent, I've only just found
+            // out that in these 'WithIdentity' methods, the Saving/Saved events were not fired, wtf. Anyways, they're added now.
             if (Creating.IsRaisedEventCancelled(new NewEventArgs<IContent>(content, contentTypeAlias, parent), this))
+            {
+                content.WasCancelled = true;
+                return content;
+            }
+
+            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IContent>(content), this))
             {
                 content.WasCancelled = true;
                 return content;
@@ -212,6 +248,8 @@ namespace Umbraco.Core.Services
                 repository.AddOrUpdate(content);
                 uow.Commit();
             }
+
+            Saved.RaiseEvent(new SaveEventArgs<IContent>(content, false), this);
 
             Created.RaiseEvent(new NewEventArgs<IContent>(content, false, contentTypeAlias, parent), this);
 
@@ -628,10 +666,10 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to publish</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        [Obsolete("Use PublishWithStatus instead, that method will provide more detailed information on the outcome")]
         public bool Publish(IContent content, int userId = 0)
         {
             var result = SaveAndPublishDo(content, userId);
+            LogHelper.Info<ContentService>("Call was made to ContentService.Publish, use PublishWithStatus instead since that method will provide more detailed information on the outcome");
 	        return result.Success;
         }
 
@@ -1220,6 +1258,7 @@ namespace Umbraco.Core.Services
             }
         }
 
+
         /// <summary>
         /// Sends an <see cref="IContent"/> to Publication, which executes handlers and events for the 'Send to Publication' action.
         /// </summary>
@@ -1458,6 +1497,8 @@ namespace Umbraco.Core.Services
 
                     //bulk insert it into the database
                     uow.Database.BulkInsertRecords(xmlItems, tr);
+
+                    tr.Complete();    
                 }
 
                 Audit.Add(AuditTypes.Publish, "RebuildXmlStructures completed, the xml has been regenerated in the database", 0, -1);
@@ -1929,7 +1970,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Occurs before Create
         /// </summary>
-        [Obsolete("This event should not be used, it was originally created for backwards compatibility for the legacy API. To modify a new document before it is saved use the Saving event")]
+        [Obsolete("Use the Created event instead, the Creating and Created events both offer the same functionality, Creating event has been deprecated.")]
         public static event TypedEventHandler<IContentService, NewEventArgs<IContent>> Creating;
 
         /// <summary>
@@ -1939,7 +1980,6 @@ namespace Umbraco.Core.Services
         /// Please note that the Content object has been created, but might not have been saved
         /// so it does not have an identity yet (meaning no Id has been set).
         /// </remarks>
-        [Obsolete("This event should not be used, it was originally created for backwards compatibility for the legacy API. To modify a new document before it is saved use the Saving event")]
         public static event TypedEventHandler<IContentService, NewEventArgs<IContent>> Created;
 
         /// <summary>

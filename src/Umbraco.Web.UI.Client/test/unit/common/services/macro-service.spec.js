@@ -11,30 +11,33 @@ describe('macro service tests', function () {
 
         it('can parse syntax for macros', function () {
 
-            var result = macroService.parseMacroSyntax("<?UMBRACO_MACRO macroAlias='Map' test1=\"asdf\" test2='hello' />");
+            var result = macroService.parseMacroSyntax("<?UMBRACO_MACRO macroAlias='Map' test=\"asdf\" test2='hello' />");
+
+            console.log(result.macroParamsDictionary.test);
 
             expect(result).not.toBeNull();
             expect(result.macroAlias).toBe("Map");
-            expect(result.marcoParamsDictionary.test1).not.toBeUndefined();
-            expect(result.marcoParamsDictionary.test1).toBe("asdf");
-            expect(result.marcoParamsDictionary.test2).not.toBeUndefined();
-            expect(result.marcoParamsDictionary.test2).toBe("hello");
+            expect(result.macroParamsDictionary).not.toBeUndefined();
+
+            expect(result.macroParamsDictionary.test).not.toBeUndefined();
+            expect(result.macroParamsDictionary.test).toBe("asdf");
+
+            expect(result.macroParamsDictionary.test2).not.toBeUndefined();
+            expect(result.macroParamsDictionary.test2).toBe("hello");
 
 
         });
 
         it('can parse syntax for macros with aliases containing dots', function () {
 
-            var result = macroService.parseMacroSyntax("<?UMBRACO_MACRO macroAlias='Map.Test' test1=\"asdf\" test2='hello' />");
+            var result = macroService.parseMacroSyntax("<?UMBRACO_MACRO macroAlias='Map.Test' test=\"asdf\" test2='hello' />");
 
             expect(result).not.toBeNull();
             expect(result.macroAlias).toBe("Map.Test");
-            expect(result.marcoParamsDictionary.test1).not.toBeUndefined();
-            expect(result.marcoParamsDictionary.test1).toBe("asdf");
-            expect(result.marcoParamsDictionary.test2).not.toBeUndefined();
-            expect(result.marcoParamsDictionary.test2).toBe("hello");
-
-
+            expect(result.macroParamsDictionary.test).not.toBeUndefined();
+            expect(result.macroParamsDictionary.test).toBe("asdf");
+            expect(result.macroParamsDictionary.test2).not.toBeUndefined();
+            expect(result.macroParamsDictionary.test2).toBe("hello");
         });
         
         it('can parse syntax for macros with body', function () {
@@ -43,10 +46,10 @@ describe('macro service tests', function () {
 
             expect(result).not.toBeNull();
             expect(result.macroAlias).toBe("Map");
-            expect(result.marcoParamsDictionary.test1).not.toBeUndefined();
-            expect(result.marcoParamsDictionary.test1).toBe("asdf");
-            expect(result.marcoParamsDictionary.test2).not.toBeUndefined();
-            expect(result.marcoParamsDictionary.test2).toBe("hello");
+            expect(result.macroParamsDictionary.test1).not.toBeUndefined();
+            expect(result.macroParamsDictionary.test1).toBe("asdf");
+            expect(result.macroParamsDictionary.test2).not.toBeUndefined();
+            expect(result.macroParamsDictionary.test2).toBe("hello");
 
 
         });
@@ -59,7 +62,7 @@ describe('macro service tests', function () {
 
             var syntax = macroService.generateMacroSyntax({
                 macroAlias: "myMacro",
-                marcoParamsDictionary: {
+                macroParamsDictionary: {
                     param1: "value1",
                     param2: "value2",
                     param3: "value3"
@@ -75,7 +78,7 @@ describe('macro service tests', function () {
 
             var syntax = macroService.generateMacroSyntax({
                 macroAlias: "myMacro",
-                marcoParamsDictionary: {}
+                macroParamsDictionary: {}
             });
 
             expect(syntax).
@@ -87,7 +90,7 @@ describe('macro service tests', function () {
 
             var syntax = macroService.generateWebFormsSyntax({
                 macroAlias: "myMacro",
-                marcoParamsDictionary: {
+                macroParamsDictionary: {
                     param1: "value1",
                     param2: "value2",
                     param3: "value3"
@@ -103,7 +106,7 @@ describe('macro service tests', function () {
 
             var syntax = macroService.generateWebFormsSyntax({
                 macroAlias: "myMacro",
-                marcoParamsDictionary: {}
+                macroParamsDictionary: {}
             });
 
             expect(syntax).
@@ -115,7 +118,7 @@ describe('macro service tests', function () {
 
             var syntax = macroService.generateMvcSyntax({
                 macroAlias: "myMacro",
-                marcoParamsDictionary: {
+                macroParamsDictionary: {
                     param1: "value1",
                     param2: "value2",
                     param3: "value3"
@@ -132,7 +135,7 @@ describe('macro service tests', function () {
 
             var syntax = macroService.generateMvcSyntax({
                 macroAlias: "myMacro",
-                marcoParamsDictionary: {}
+                macroParamsDictionary: {}
             });
 
             expect(syntax).

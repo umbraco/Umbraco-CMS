@@ -9,6 +9,7 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
 	[TestFixture]
 	public class NiceUrlProviderTests : BaseRoutingTest
 	{
@@ -31,7 +32,7 @@ namespace Umbraco.Tests.Routing
         }
 
 		/// <summary>
-		/// This checks that when we retreive a NiceUrl for multiple items that there are no issues with cache overlap 
+		/// This checks that when we retrieve a NiceUrl for multiple items that there are no issues with cache overlap 
 		/// and that they are all cached correctly.
         /// </summary>
 		[Test]

@@ -22,17 +22,20 @@ namespace Umbraco.Core.Persistence.Repositories
     internal class UserRepository : PetaPocoRepositoryBase<int, IUser>, IUserRepository
     {
         private readonly IUserTypeRepository _userTypeRepository;
+        private readonly CacheHelper _cacheHelper;
 
-        public UserRepository(IDatabaseUnitOfWork work, IUserTypeRepository userTypeRepository)
+        public UserRepository(IDatabaseUnitOfWork work, IUserTypeRepository userTypeRepository, CacheHelper cacheHelper)
             : base(work)
         {
             _userTypeRepository = userTypeRepository;
+            _cacheHelper = cacheHelper;
         }
 
-        public UserRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IUserTypeRepository userTypeRepository)
+        public UserRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IUserTypeRepository userTypeRepository, CacheHelper cacheHelper)
             : base(work, cache)
         {
             _userTypeRepository = userTypeRepository;
+            _cacheHelper = cacheHelper;
         }
 
         #region Overrides of RepositoryBase<int,IUser>
@@ -128,6 +131,8 @@ namespace Umbraco.Core.Persistence.Repositories
         {            
             var list = new List<string>
                            {
+                               "DELETE FROM cmsTask WHERE userId = @Id",
+                               "DELETE FROM cmsTask WHERE parentUserId = @Id",
                                "DELETE FROM umbracoUser2NodePermission WHERE userId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE userId = @Id",
                                "DELETE FROM umbracoUserLogins WHERE userId = @Id",
@@ -315,10 +320,22 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="userId"></param>
         /// <param name="entityIds"></param>
         /// <returns></returns>        
-        public IEnumerable<EntityPermission> GetUserPermissionsForEntities(object userId, params int[] entityIds)
+        public IEnumerable<EntityPermission> GetUserPermissionsForEntities(int userId, params int[] entityIds)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
             return repo.GetUserPermissionsForEntities(userId, entityIds);
+        }
+
+        /// <summary>
+        /// Replaces the same permission set for a single user to any number of entities
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="permissions"></param>
+        /// <param name="entityIds"></param>
+        public void ReplaceUserPermissions(int userId, IEnumerable<char> permissions, params int[] entityIds)
+        {
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
+            repo.ReplaceUserPermissions(userId, permissions, entityIds);
         }
 
         #endregion

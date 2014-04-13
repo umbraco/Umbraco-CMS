@@ -23,7 +23,7 @@ describe('Drop down controller tests', function () {
             expect(scope.model.config.items).toBeDefined();
             expect(scope.model.config.multiple).toBeDefined();
         });
-        
+    
         it("should convert simple array to dictionary", function () {
             
             scope.model = {
@@ -37,12 +37,13 @@ describe('Drop down controller tests', function () {
                 $routeParams: routeParams
             });
              
-            expect(scope.model.config.items["value0"]).toBe("value0");
-            expect(scope.model.config.items["value1"]).toBe("value1");
-            expect(scope.model.config.items["value2"]).toBe("value2");
-            
+            //this should be the expected format based on the changes made to the sortable prevalues
+            expect(scope.model.config.items[0].value).toBe("value0");
+            expect(scope.model.config.items[1].value).toBe("value1");
+            expect(scope.model.config.items[2].value).toBe("value2"); 
         });
         
+
         it("should allow an existing valid dictionary", function () {
 
             scope.model = {

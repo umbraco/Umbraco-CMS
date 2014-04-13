@@ -141,9 +141,21 @@ namespace Umbraco.Core.Models.PublishedContent
             if (GetPublishedContentTypeCallback != null)
                 return GetPublishedContentTypeCallback(alias);
 
-            var contentType = itemType == PublishedItemType.Content
-                ? (IContentTypeComposition) ApplicationContext.Current.Services.ContentTypeService.GetContentType(alias)
-                : (IContentTypeComposition) ApplicationContext.Current.Services.ContentTypeService.GetMediaType(alias);
+            IContentTypeComposition contentType;
+            switch (itemType)
+            {
+                case PublishedItemType.Content:
+                    contentType = ApplicationContext.Current.Services.ContentTypeService.GetContentType(alias);
+                    break;
+                case PublishedItemType.Media:
+                    contentType = ApplicationContext.Current.Services.ContentTypeService.GetMediaType(alias);
+                    break;
+                case PublishedItemType.Member:
+                    contentType = ApplicationContext.Current.Services.MemberTypeService.Get(alias);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException("itemType");
+            }
 
             if (contentType == null)
                 throw new Exception(string.Format("ContentTypeService failed to find a {0} type with alias \"{1}\".",

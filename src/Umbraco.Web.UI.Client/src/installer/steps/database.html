@@ -1,0 +1,121 @@
+<div ng-controller="Umbraco.Installer.DataBaseController">
+
+	<h1>Configure your database</h1>
+	<p>
+		Enter connection and authentication details for the database you want to install Umbraco on
+	</p>
+
+	<form name="myForm" class="form-horizontal" novalidate ng-submit="validateAndForward();">
+		<div class="control-group">
+			<legend>What type of database do you use?</legend>
+			<label class="control-label" for="dbType">Database type</label>
+			    <div class="controls">
+			    	<select name="dbType" ng-options="db.id as db.name for db in dbs"  ng-model="installer.current.model.dbType" required>
+			    	</select>
+				</div>
+		</div>
+
+		<div class="controls" ng-if="installer.current.model.dbType == 0">
+				<p>Great!, no need to configure anything then, you simply click the <strong>continue</strong> button below to continue to the next step</p>
+		</div>
+
+
+
+		<div ng-if="installer.current.model.dbType < 0">
+
+			<legend>What is the exact connectionstring we should use?</legend>
+			<div class="control-group">
+				<label class="control-label" for="server">Connection string</label>
+				  <div class="controls">
+
+					<textarea class="input-block-level" required ng-model="installer.current.model.connectionString" rows="5">
+					</textarea>
+					<small class="inline-help">Enter a valid database connection string.</small>
+				</div>
+			</div>
+		</div>
+
+		<div ng-if="installer.current.model.dbType > 0">
+				<div class="row">
+					<legend>Where do we find your database?</legend>
+					<div class="span6">
+						<div class="control-group">
+							<label class="control-label" for="server">Server</label>
+							<div class="controls">
+								<input type="text" name="server" placeholder="127.0.0.1/SQLEXPRESS" required ng-model="installer.current.model.server" />
+								<small class="inline-help">Enter server domain or IP</small>
+							</div>
+						</div>
+					</div>
+
+					<div class="span6">
+						<div class="control-group">
+							<label class="control-label" for="databaseName">Database name</label>
+							<div class="controls">
+								<input type="text" name="installer.current.model.databaseName"
+									placeholder="umbraco-cms"
+									required ng-model="installer.current.model.databaseName"  />
+								<small class="inline-help">Enter the name of the database</small>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				<div class="row">
+					  <legend>What credentials are used to access the database?</legend>
+						<div class="span6">
+							<div class="control-group" ng-if="!installer.current.model.integratedAuth">
+								<label class="control-label" for="login">Login</label>
+								<div class="controls">
+									<input type="text" name="login"
+										placeholder="databaseuser"
+										required ng-model="installer.current.model.login"  />
+									<small class="inline-help">Enter the database user name</small>
+								</div>
+							</div>
+						</div>
+
+						<div class="span6">
+							<div class="control-group" ng-if="!installer.current.model.integratedAuth">
+							<label class="control-label" for="password">Password</label>
+								<div class="controls">
+								<input type="password" name="password"
+									placeholder="umbraco-cms"
+									required ng-model="installer.current.model.password"  />
+									<small class="inline-help">Enter the database password</small>
+								</div>
+							</div>
+						</div>
+
+						<div class="span12 control-group" ng-if="installer.current.model.dbType == 1">
+							<div class="controls">
+							<label class="checkbox" for="integratedAuth">
+								<input type="checkbox" name="integratedAuth"
+								placeholder="umbraco-cms"
+								ng-model="installer.current.model.integratedAuth"  /> Use integrated authentication</label>
+							</div>
+						</div>
+			  </div>
+		</div>
+
+		<div class="row">
+			<div class="control-group" ng-class="{disabled:myForm.$invalid}">
+				<div class="controls">
+					<input type="submit" ng-disabled="myForm.$invalid || checking"  
+						value="Continue" class="btn btn-success" />
+                    
+					    <span class="inline-help" ng-if="checking" ng-animate="'fade'">
+	                    	Validating your database connection...
+	                    </span>
+
+						<span class="inline-help error" ng-if="invalidDbDns" ng-animate="'fade'">
+							Could not connect to database
+						</span>
+                </div>
+			</div>
+		</div>
+
+
+	</form>
+</div>

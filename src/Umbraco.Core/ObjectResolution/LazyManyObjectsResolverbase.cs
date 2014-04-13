@@ -18,7 +18,7 @@ namespace Umbraco.Core.ObjectResolution
 	/// <para>Important notes about this resolver: it does not support Insert or Remove and therefore does not support any ordering unless 
     /// the types are marked with the WeightedPluginAttribute.</para>
 	/// </remarks>
-	internal abstract class LazyManyObjectsResolverBase<TResolver, TResolved> : ManyObjectsResolverBase<TResolver, TResolved>
+    public abstract class LazyManyObjectsResolverBase<TResolver, TResolved> : ManyObjectsResolverBase<TResolver, TResolved>
 		where TResolved : class
         where TResolver : ResolverBase
 	{

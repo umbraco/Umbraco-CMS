@@ -13,6 +13,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public ContentPropertyDisplay()
         {
             Config = new Dictionary<string, object>();
+            Validation = new PropertyTypeValidation();
         }
 
         [DataMember(Name = "label", IsRequired = true)]
@@ -31,5 +32,8 @@ namespace Umbraco.Web.Models.ContentEditing
 
         [DataMember(Name = "hideLabel")]
         public bool HideLabel { get; set; }
+
+        [DataMember(Name = "validation")]
+        public PropertyTypeValidation Validation { get; set; }
     }
 }

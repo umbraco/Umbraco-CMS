@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <base href="/belle/" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Install Umbraco</title>
+    <link rel="stylesheet" href="assets/css/installer.css" />
+</head>
+
+<body ng-class="{touch:touchDevice, installing:installer.current.installing}" ng-controller="Umbraco.InstallerController" id="umbracoInstallPageBody">
+
+    <img src="assets/img/application/logo_white.png" id="logo" />
+
+    <div id="installer" class="absolute-center clearfix" ng-if="installer.current">
+        <div ng-include="installer.current.view"></div>
+    </div>
+
+<div id="overlay"></div>
+    <script src="lib/yepnope/yepnope.min.js"></script>
+    <script src="js/install.loader.js"></script>
+</body>
+</html>

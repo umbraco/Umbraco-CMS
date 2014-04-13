@@ -33,7 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories
             var sql = GetBaseQuery(false);
             sql.Where(GetBaseWhereClause(), new { Id = id });
 
-            var languageDto = Database.First<LanguageDto>(sql);
+            var languageDto = Database.FirstOrDefault<LanguageDto>(sql);
             if (languageDto == null)
                 return null;
 

@@ -36,11 +36,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public IDictionary<string, object> GetMembershipProviderConfig()
         {
-            var provider = Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider];
-            if (provider == null)
-            {
-                throw new InvalidOperationException("No back office membership provider found with the name " + UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider);
-            }
+            var provider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();            
             return provider.GetConfiguration();
         } 
 
@@ -53,11 +49,7 @@ namespace Umbraco.Web.Editors
         /// </returns>
         public ModelWithNotifications<string> PostChangePassword(ChangingPasswordModel data)
         {
-            var userProvider = Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider];
-            if (userProvider == null)
-            {
-                throw new InvalidOperationException("No membership provider found with the name " + UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider);
-            }
+            var userProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
 
             //TODO: WE need to support this! - requires UI updates, etc...
             if (userProvider.RequiresQuestionAndAnswer)
@@ -65,7 +57,7 @@ namespace Umbraco.Web.Editors
                 throw new NotSupportedException("Currently the user editor does not support providers that have RequiresQuestionAndAnswer specified");
             }
 
-            var passwordChangeResult = Security.ChangePassword(Security.CurrentUser.Username, data, userProvider);
+            var passwordChangeResult = Members.ChangePassword(Security.CurrentUser.Username, data, userProvider);
             if (passwordChangeResult.Success)
             {
                 //even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword

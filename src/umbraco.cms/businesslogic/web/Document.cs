@@ -56,9 +56,8 @@ namespace umbraco.cms.businesslogic.web
         /// <param name="id">The id of the document</param>
         /// <param name="Version">The version of the document</param>
         public Document(int id, Guid Version)
-            : base(id)
+            : base(id, Version)
         {
-            this.Version = Version;
         }
 
         /// <summary>

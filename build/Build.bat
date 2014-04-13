@@ -1,5 +1,5 @@
 @ECHO OFF
-SET release=7.0.2
+SET release=7.1.1
 SET comment=
 SET version=%release%
 
@@ -11,6 +11,9 @@ ReplaceIISExpressPortNumber.exe ..\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj %rel
 ECHO Installing the Microsoft.Bcl.Build package before anything else, otherwise you'd have to run build.cmd twice
 SET nuGetFolder=%CD%\..\src\packages\
 ..\src\.nuget\NuGet.exe install ..\src\Umbraco.Web.UI\packages.config -OutputDirectory %nuGetFolder%
+
+ECHO Removing the belle build folder to make sure everything is clean as a whistle
+RD ..\src\Umbraco.Web.UI.Client\build /Q /S
 
 ECHO Performing MSBuild and producing Umbraco binaries zip files
 %windir%\Microsoft.NET\Framework\v4.0.30319\msbuild.exe "Build.proj" /p:BUILD_RELEASE=%release% /p:BUILD_COMMENT=%comment%
@@ -30,6 +33,7 @@ echo This file is only here so that the containing folder will be included in th
 ECHO Adding Web.config transform files to the NuGet package
 ren .\_BuildOutput\WebApp\MacroScripts\Web.config Web.config.transform
 ren .\_BuildOutput\WebApp\Views\Web.config Web.config.transform
+ren .\_BuildOutput\WebApp\Xslt\Web.config Web.config.transform
 
 ECHO Packing the NuGet release files
 ..\src\.nuget\NuGet.exe pack NuSpecs\UmbracoCms.Core.nuspec -Version %version%

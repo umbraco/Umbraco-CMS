@@ -6,6 +6,7 @@ using System.Web.UI.WebControls;
 using umbraco.cms.presentation.Trees;
 using umbraco.cms.businesslogic.web;
 using System.Linq;
+using umbraco.controls;
 
 namespace umbraco.settings
 {
@@ -42,9 +43,10 @@ namespace umbraco.settings
         protected override bool OnBubbleEvent(object source, EventArgs args)
         {
             bool handled = false;
-            if (args is controls.SaveClickEventArgs)
+            var eventArgs = args as SaveClickEventArgs;
+            if (eventArgs != null)
             {
-                var e = (controls.SaveClickEventArgs)args;
+                var e = eventArgs;
                 if (e.Message == "Saved")
                 {
                     ClientTools.ShowSpeechBubble(e.IconType, ui.Text("contentTypeSavedHeader"), "");

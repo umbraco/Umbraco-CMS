@@ -34,7 +34,7 @@ namespace Umbraco.Core
     /// it will use the cached resolved plugins that it has already found which means that no assembly scanning is necessary. This leads
     /// to much faster startup times.
     /// </remarks>
-    internal class PluginManager
+    public class PluginManager
     {
         private readonly ApplicationContext _appContext;
         private const string CacheKey = "umbraco-plugins.list";
@@ -107,7 +107,7 @@ namespace Umbraco.Core
         /// <remarks>
         /// The setter is generally only used for unit tests
         /// </remarks>
-        internal static PluginManager Current
+        public static PluginManager Current
         {
             get
             {
@@ -508,15 +508,6 @@ namespace Umbraco.Core
         }
 
         /// <summary>
-        /// Returns all available PropertyValueConverter
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolvePropertyValueConverters()
-        {
-            return ResolveTypes<IPropertyValueConverter>();
-        }
-
-        /// <summary>
         /// Returns all available IDataType in application
         /// </summary>
         /// <returns></returns>
@@ -560,16 +551,7 @@ namespace Umbraco.Core
         {
             return ResolveTypesWithAttribute<BaseMapper, MapperForAttribute>();
         } 
-
-        /// <summary>
-        /// Returns all available IMigrations in application
-        /// </summary>
-        /// <returns></returns>
-        internal IEnumerable<Type> ResolveMigrationTypes()
-        {
-            return ResolveTypes<IMigration>();
-        }
-
+        
         /// <summary>
         /// Returns all SqlSyntaxProviders with the SqlSyntaxProviderAttribute
         /// </summary>
@@ -783,12 +765,13 @@ namespace Umbraco.Core
             UpdateCachedPluginsFile<T>(typeList.GetTypes(), resolutionKind);
         }
 
+        #region Public Methods
         /// <summary>
         /// Generic method to find the specified type and cache the result
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        internal IEnumerable<Type> ResolveTypes<T>(bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
+        public IEnumerable<Type> ResolveTypes<T>(bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
         {
             return ResolveTypes<T>(
                 () => TypeFinder.FindClassesOfType<T>(specificAssemblies ?? AssembliesToScan),
@@ -802,11 +785,11 @@ namespace Umbraco.Core
         /// <typeparam name="T"></typeparam>
         /// <typeparam name="TAttribute"></typeparam>
         /// <returns></returns>
-        internal IEnumerable<Type> ResolveTypesWithAttribute<T, TAttribute>(bool cacheResult = true)
+        public IEnumerable<Type> ResolveTypesWithAttribute<T, TAttribute>(bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
             where TAttribute : Attribute
         {
             return ResolveTypes<T>(
-                () => TypeFinder.FindClassesOfTypeWithAttribute<T, TAttribute>(AssembliesToScan),
+                () => TypeFinder.FindClassesOfTypeWithAttribute<T, TAttribute>(specificAssemblies ?? AssembliesToScan),
                 TypeResolutionKind.FindTypesWithAttribute,
                 cacheResult);
         }
@@ -816,14 +799,15 @@ namespace Umbraco.Core
         /// </summary>
         /// <typeparam name="TAttribute"></typeparam>
         /// <returns></returns>
-        internal IEnumerable<Type> ResolveAttributedTypes<TAttribute>(bool cacheResult = true)
+        public IEnumerable<Type> ResolveAttributedTypes<TAttribute>(bool cacheResult = true, IEnumerable<Assembly> specificAssemblies = null)
             where TAttribute : Attribute
         {
             return ResolveTypes<TAttribute>(
-                () => TypeFinder.FindClassesWithAttribute<TAttribute>(AssembliesToScan),
+                () => TypeFinder.FindClassesWithAttribute<TAttribute>(specificAssemblies ?? AssembliesToScan),
                 TypeResolutionKind.FindAttributedTypes,
                 cacheResult);
-        }
+        } 
+        #endregion
 
         /// <summary>
         /// Used for unit tests

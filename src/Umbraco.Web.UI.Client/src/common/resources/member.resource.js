@@ -53,7 +53,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "memberApiBaseUrl",
                        "GetByKey",
                        [{ key: key }])),
-               'Failed to retreive data for member id ' + key);
+               'Failed to retrieve data for member id ' + key);
         },
 
         /**
@@ -125,7 +125,7 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
                             "memberApiBaseUrl",
                             "GetEmpty",
                             [{ contentTypeAlias: alias }])),
-                    'Failed to retreive data for empty member item type ' + alias);
+                    'Failed to retrieve data for empty member item type ' + alias);
             }
             else {
                 return umbRequestHelper.resourcePromise(

@@ -16,6 +16,7 @@ using umbraco.BusinessLogic;
 
 namespace Umbraco.Tests.PublishedCache
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
 	[TestFixture]
     public class PublishMediaCacheTests : BaseWebTest
 	{

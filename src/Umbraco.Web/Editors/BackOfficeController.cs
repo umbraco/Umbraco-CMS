@@ -111,6 +111,10 @@ namespace Umbraco.Web.Editors
                                 {"serverVarsJs", Url.Action("Application", "BackOffice")},
                                 //API URLs
                                 {
+                                    "embedApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<RteEmbedController>(
+                                        controller => controller.GetEmbed("",0,0))
+                                },
+                                {
                                     "contentApiBaseUrl", Url.GetUmbracoApiServiceBaseUrl<ContentController>(
                                         controller => controller.PostSave(null))
                                 },
@@ -252,7 +256,7 @@ namespace Umbraco.Web.Editors
                             : string.Format("{0}-{1}", UmbracoVersion.Current.ToString(3), UmbracoVersion.CurrentComment);
 
             app.Add("version", version);
-
+            app.Add("cdf", ClientDependency.Core.Config.ClientDependencySettings.Instance.Version);
             return app;
         }
         

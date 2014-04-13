@@ -6,7 +6,7 @@ using Umbraco.Core;
 namespace umbraco.cms.businesslogic.cache
 {
     /// <summary>
-    /// Used to easily store and retreive items from the cache.
+    /// Used to easily store and retrieve items from the cache.
     /// </summary>
     /// <remarks>
     /// This whole class will become obsolete, however one of the methods is still used that is not ported over to the new CacheHelper

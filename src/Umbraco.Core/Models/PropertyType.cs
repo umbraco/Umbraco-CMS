@@ -15,6 +15,7 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class PropertyType : Entity, IEquatable<PropertyType>
     {
+        private readonly bool _isExplicitDbType;
         private string _name;
         private string _alias;
         private string _description;
@@ -30,16 +31,29 @@ namespace Umbraco.Core.Models
         public PropertyType(IDataTypeDefinition dataTypeDefinition)
         {
             if(dataTypeDefinition.HasIdentity)
-                DataTypeDefinitionId = dataTypeDefinition.Id;
+                _dataTypeDefinitionId = dataTypeDefinition.Id;
 
-            PropertyEditorAlias = dataTypeDefinition.PropertyEditorAlias;
-            DataTypeDatabaseType = dataTypeDefinition.DatabaseType;
+            _propertyEditorAlias = dataTypeDefinition.PropertyEditorAlias;
+            _dataTypeDatabaseType = dataTypeDefinition.DatabaseType;
         }
         
         internal PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType)
+            : this(propertyEditorAlias, dataTypeDatabaseType, false)
         {
             PropertyEditorAlias = propertyEditorAlias;
-            DataTypeDatabaseType = dataTypeDatabaseType;
+        }
+
+        /// <summary>
+        /// Used internally to assign an explicity database type for this property type regardless of what the underlying data type/property editor is.
+        /// </summary>
+        /// <param name="propertyEditorAlias"></param>
+        /// <param name="dataTypeDatabaseType"></param>
+        /// <param name="isExplicitDbType"></param>
+        internal PropertyType(string propertyEditorAlias, DataTypeDatabaseType dataTypeDatabaseType, bool isExplicitDbType)
+        {
+            _isExplicitDbType = isExplicitDbType;
+            _propertyEditorAlias = propertyEditorAlias;
+            _dataTypeDatabaseType = dataTypeDatabaseType;
         }
 
         private static readonly PropertyInfo NameSelector = ExpressionHelper.GetPropertyInfo<PropertyType, string>(x => x.Name);
@@ -165,6 +179,9 @@ namespace Umbraco.Core.Models
             get { return _dataTypeDatabaseType; }
             set
             {
+                //don't allow setting this if an explicit declaration has been made in the ctor
+                if (_isExplicitDbType) return;
+
                 SetPropertyValueAndDetectChanges(o =>
                 {
                     _dataTypeDatabaseType = value;

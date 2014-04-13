@@ -1,50 +1,49 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Web.Mvc;
+using System.Web.Security;
 using System.Xml;
 using umbraco.cms.businesslogic.member;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
+using Umbraco.Core.Security;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Controllers
 {
     public class UmbProfileController : SurfaceController
     {
         [HttpPost]
-        public ActionResult HandleUpdateProfile([Bind(Prefix="profileModel")]ProfileModel model)
+        public ActionResult HandleUpdateProfile([Bind(Prefix = "profileModel")] ProfileModel model)
         {
-            //TODO: Use new Member API
-            if (ModelState.IsValid)
+            var provider = global::Umbraco.Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+            if (provider.IsUmbracoMembershipProvider() == false)
             {
-                var member = Member.GetCurrentMember();
-                if (member != null)
-                {
-                    if (model.Name != null)
-                    {
-                        member.Text = model.Name;
-                    }
-
-                    member.Email = model.Email;
-                    member.LoginName = model.Email;
-
-                    if (model.MemberProperties != null)
-                    {
-                        foreach (var property in model.MemberProperties.Where(p => p.Value != null))
-                        {
-                            member.getProperty(property.Alias).Value = property.Value;
-                        }
-                    }
-
-                    member.Save();
-
-                    member.XmlGenerate(new XmlDocument());
-
-                    Member.AddMemberToCache(member);
-
-                    Response.Redirect("/");
-                }
+                throw new NotSupportedException("Profile editing with the " + typeof(UmbProfileController) + " is not supported when not using the default Umbraco membership provider");
             }
 
-            return CurrentUmbracoPage();
+            if (ModelState.IsValid == false)
+            {
+                return CurrentUmbracoPage();
+            }
+
+            var updateAttempt = Members.UpdateMemberProfile(model);
+            if (updateAttempt.Success == false)
+            {
+                //don't add a field level error, just model level
+                ModelState.AddModelError("profileModel", updateAttempt.Exception.Message);
+                return CurrentUmbracoPage();
+            }
+
+            //if there is a specified path to redirect to then use it
+            if (model.RedirectUrl.IsNullOrWhiteSpace() == false)
+            {
+                return Redirect(model.RedirectUrl);
+            }
+
+            //redirect to current page by default
+            TempData["ProfileUpdateSuccess"] = true;            
+            return RedirectToCurrentUmbracoPage();
         }
     }
 }

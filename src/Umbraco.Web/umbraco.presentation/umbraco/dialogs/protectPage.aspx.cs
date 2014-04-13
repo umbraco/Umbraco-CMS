@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using System.Linq;
 using System.Web.Security;
 using System.Web.UI;
 using System.Web.UI.WebControls;
@@ -32,10 +33,10 @@ namespace umbraco.presentation.umbraco.dialogs
         protected ContentPicker errorPagePicker = new ContentPicker();
 
         override protected void OnInit(EventArgs e)
-        {           
+        {
             base.OnInit(e);
         }
-        
+
         protected void selectMode(object sender, EventArgs e)
         {
             p_mode.Visible = false;
@@ -102,14 +103,17 @@ namespace umbraco.presentation.umbraco.dialogs
 
                     if (Access.GetProtectionType(documentId) == ProtectionType.Simple)
                     {
-                        MembershipUser m = Access.GetAccessingMembershipUser(documentId);                        
-                        pane_simple.Visible = true;
-                        pp_pass.Visible = false;
-                        simpleLogin.Visible = false;
-                        SimpleLoginLabel.Visible = true;
-                        SimpleLoginLabel.Text = m.UserName;
-                        pane_advanced.Visible = false;
-                        bt_protect.CommandName = "simple";
+                        MembershipUser m = Access.GetAccessingMembershipUser(documentId);
+                        if (m != null)
+                        {
+                            pane_simple.Visible = true;
+                            pp_pass.Visible = false;
+                            simpleLogin.Visible = false;
+                            SimpleLoginLabel.Visible = true;
+                            SimpleLoginLabel.Text = m.UserName;
+                            pane_advanced.Visible = false;
+                            bt_protect.CommandName = "simple";
+                        }
 
                     }
                     else if (Access.GetProtectionType(documentId) == ProtectionType.Advanced)
@@ -128,9 +132,9 @@ namespace umbraco.presentation.umbraco.dialogs
             _memberGroups.ID = "Membergroups";
             _memberGroups.Width = 175;
             var selectedGroups = "";
-            var roles = Roles.GetAllRoles();
+            var roles = Roles.GetAllRoles().OrderBy(x => x);
 
-            if (roles.Length > 0)
+            if (roles.Any())
             {
                 foreach (string role in roles)
                 {
@@ -177,23 +181,25 @@ namespace umbraco.presentation.umbraco.dialogs
             //reset
             SimpleLoginNameValidator.IsValid = true;
 
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+
             if (Page.IsValid)
             {
                 int pageId = int.Parse(helper.Request("nodeId"));
-                
+
                 if (e.CommandName == "simple")
                 {
                     var memberLogin = simpleLogin.Visible ? simpleLogin.Text : SimpleLoginLabel.Text;
 
-                    var member = Membership.GetUser(memberLogin);
+                    var member = provider.GetUser(memberLogin, false);
                     if (member == null)
                     {
                         var tempEmail = "u" + Guid.NewGuid().ToString("N") + "@example.com";
 
                         // this needs to work differently depending on umbraco members or external membership provider
-                        if (Membership.Provider.IsUmbracoMembershipProvider() == false)
+                        if (provider.IsUmbracoMembershipProvider() == false)
                         {
-                            member = Membership.CreateUser(memberLogin, simplePassword.Text, tempEmail);
+                            member = provider.CreateUser(memberLogin, simplePassword.Text, tempEmail);
                         }
                         else
                         {
@@ -202,9 +208,9 @@ namespace umbraco.presentation.umbraco.dialogs
                             {
                                 MemberType.MakeNew(BusinessLogic.User.GetUser(0), Constants.Conventions.MemberTypes.SystemDefaultProtectType);
                             }
-                            var provider = Membership.Provider.AsUmbracoMembershipProvider();
+                            var castedProvider = provider.AsUmbracoMembershipProvider();
                             MembershipCreateStatus status;
-                            member = provider.CreateUser(Constants.Conventions.MemberTypes.SystemDefaultProtectType,
+                            member = castedProvider.CreateUser(Constants.Conventions.MemberTypes.SystemDefaultProtectType,
                                                 memberLogin, simplePassword.Text, tempEmail, null, null, true, null, out status);
                             if (status != MembershipCreateStatus.Success)
                             {
@@ -217,7 +223,7 @@ namespace umbraco.presentation.umbraco.dialogs
                     }
                     else if (pp_pass.Visible)
                     {
-                        SimpleLoginNameValidator.IsValid = false;                        
+                        SimpleLoginNameValidator.IsValid = false;
                         SimpleLoginLabel.Visible = true;
                         SimpleLoginLabel.Text = memberLogin;
                         simpleLogin.Visible = false;
@@ -562,6 +568,6 @@ namespace umbraco.presentation.umbraco.dialogs
         /// </remarks>
         protected global::System.Web.UI.WebControls.PlaceHolder js;
 
-        
+
     }
 }

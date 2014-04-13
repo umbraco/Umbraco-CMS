@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
 using Umbraco.Core.Persistence;
@@ -12,6 +13,7 @@ using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class TagRepositoryTest : BaseDatabaseFactoryTest
     {
@@ -552,7 +554,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content1);
                 unitOfWork.Commit();
-                var mediaType = MockedContentTypes.CreateImageMediaType();
+                var mediaType = MockedContentTypes.CreateImageMediaType("image2");
                 mediaTypeRepository.AddOrUpdate(mediaType);
                 unitOfWork.Commit();
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
@@ -608,7 +610,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var content1 = MockedContent.CreateSimpleContent(contentType);
                 contentRepository.AddOrUpdate(content1);
                 unitOfWork.Commit();
-                var mediaType = MockedContentTypes.CreateImageMediaType();
+                var mediaType = MockedContentTypes.CreateImageMediaType("image2");
                 mediaTypeRepository.AddOrUpdate(mediaType);
                 unitOfWork.Commit();
                 var media1 = MockedMedia.CreateMediaImage(mediaType, -1);
@@ -694,7 +696,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);
             var tagRepository = new TagsRepository(unitOfWork, NullCacheProvider.Current);
             contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);
-            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository, tagRepository);
+            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
             return repository;
         }
 

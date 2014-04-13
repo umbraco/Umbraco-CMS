@@ -1,4 +1,5 @@
 using Umbraco.Web.UI;
+using System.Globalization;
 using Umbraco.Core.Security;
 
 namespace umbraco.cms.presentation.create.controls
@@ -23,12 +24,14 @@ namespace umbraco.cms.presentation.create.controls
 
         protected void Page_Load(object sender, System.EventArgs e)
         {
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+
             sbmt.Text = ui.Text("create");
-            if (Membership.Provider.IsUmbracoMembershipProvider())
+            if (provider.IsUmbracoMembershipProvider())
             {
                 nameLiteral.Text = ui.Text("name");
                 memberChooser.Attributes.Add("style", "padding-top: 10px");
-                foreach (cms.businesslogic.member.MemberType dt in cms.businesslogic.member.MemberType.GetAll)
+                foreach (var dt in MemberType.GetAll)
                 {
                     ListItem li = new ListItem();
                     li.Text = dt.Text;
@@ -42,9 +45,14 @@ namespace umbraco.cms.presentation.create.controls
                 memberChooser.Visible = false;
             }
 
-            string[] pwRules = { Membership.MinRequiredPasswordLength.ToString(), Membership.MinRequiredNonAlphanumericCharacters.ToString() };
+            string[] pwRules =
+            {
+                provider.MinRequiredPasswordLength.ToString(CultureInfo.InvariantCulture),
+                provider.MinRequiredNonAlphanumericCharacters.ToString(CultureInfo.InvariantCulture)
+            };
+
             PasswordRules.Text = PasswordRules.Text = ui.Text(
-                "errorHandling", "", pwRules, BasePages.UmbracoEnsuredPage.CurrentUser);
+                "errorHandling", "", pwRules, UmbracoEnsuredPage.CurrentUser);
 
             if (!IsPostBack)
             {
@@ -56,7 +64,7 @@ namespace umbraco.cms.presentation.create.controls
                 emailExistsCheck.ErrorMessage = ui.Text("errorHandling", "errorExistsWithoutTab", "E-mail", BasePages.UmbracoEnsuredPage.CurrentUser);
                 memberTypeRequired.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", "Member Type", BasePages.UmbracoEnsuredPage.CurrentUser);
                 Password.Text =
-                    Membership.GeneratePassword(Membership.MinRequiredPasswordLength, Membership.MinRequiredNonAlphanumericCharacters);
+                    Membership.GeneratePassword(provider.MinRequiredPasswordLength, provider.MinRequiredNonAlphanumericCharacters);
 
 
             }
@@ -108,7 +116,9 @@ namespace umbraco.cms.presentation.create.controls
         /// <param name="e"></param>
         protected void EmailExistsCheck(object sender, ServerValidateEventArgs e)
         {
-            if (Email.Text != "" && Member.GetMemberFromEmail(Email.Text.ToLower()) != null && Membership.Providers[Member.UmbracoMemberProviderName].RequiresUniqueEmail)
+            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
+
+            if (Email.Text != "" && Member.GetMemberFromEmail(Email.Text.ToLower()) != null && provider.RequiresUniqueEmail)
                 e.IsValid = false;
             else
                 e.IsValid = true;

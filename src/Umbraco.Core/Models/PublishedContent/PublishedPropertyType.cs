@@ -269,7 +269,7 @@ namespace Umbraco.Core.Models.PublishedContent
                 : Enumerable.Empty<IPropertyValueConverter>();
         }
 
-        class CompatConverter : PropertyValueConverterBase
+        private class CompatConverter : PropertyValueConverterBase
         {
             private readonly IPropertyEditorValueConverter _converter;
 

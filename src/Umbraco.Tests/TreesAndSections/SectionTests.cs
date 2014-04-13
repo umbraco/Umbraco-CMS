@@ -1,4 +1,5 @@
-﻿using NUnit.Framework;
+﻿using System.IO;
+using NUnit.Framework;
 using Umbraco.Core.Services;
 using Umbraco.Tests.TestHelpers;
 using umbraco.BusinessLogic;
@@ -12,9 +13,44 @@ namespace Umbraco.Tests.TreesAndSections
     ///This is a test class for ApplicationTest and is intended
     ///to contain all ApplicationTest Unit Tests
     ///</summary>
+    [RequiresAutoMapperMappings]
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture()]
     public class SectionTests : BaseDatabaseFactoryTest
     {
+
+        [SetUp]
+        public override void Initialize()
+        {
+            base.Initialize();
+
+            var treesConfig = TestHelper.MapPathForTest("~/TEMP/TreesAndSections/trees.config");
+            var appConfig = TestHelper.MapPathForTest("~/TEMP/TreesAndSections/applications.config");
+            Directory.CreateDirectory(TestHelper.MapPathForTest("~/TEMP/TreesAndSections"));
+            using (var writer = File.CreateText(treesConfig))
+            {
+                writer.Write(ResourceFiles.trees);
+            }
+            using (var writer = File.CreateText(appConfig))
+            {
+                writer.Write(ResourceFiles.applications);
+            }
+
+            ApplicationTreeService.TreeConfigFilePath = treesConfig;
+            SectionService.AppConfigFilePath = appConfig;
+        }
+
+        [TearDown]
+        public override void TearDown()
+        {
+            base.TearDown();
+            if (Directory.Exists(TestHelper.MapPathForTest("~/TEMP/TreesAndSections")))
+            {
+                Directory.Delete(TestHelper.MapPathForTest("~/TEMP/TreesAndSections"), true);
+            }
+            ApplicationTreeService.TreeConfigFilePath = null;
+            SectionService.AppConfigFilePath = null;
+        }
 
         /// <summary>
         /// Create a new application and delete it

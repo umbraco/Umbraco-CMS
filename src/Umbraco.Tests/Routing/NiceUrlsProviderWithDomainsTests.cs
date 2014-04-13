@@ -12,6 +12,7 @@ using umbraco.cms.businesslogic.language;
 
 namespace Umbraco.Tests.Routing
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
 	[TestFixture]
 	public class NiceUrlsProviderWithDomainsTests : BaseRoutingTest
 	{
@@ -28,11 +29,6 @@ namespace Umbraco.Tests.Routing
         }
 
         private IUmbracoSettingsSection _umbracoSettings;
-
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NewSchemaPerFixture; }
-        }
 
         protected override void FreezeResolution()
         {

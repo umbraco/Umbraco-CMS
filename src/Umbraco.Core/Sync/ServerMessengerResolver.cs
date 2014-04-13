@@ -5,7 +5,7 @@ namespace Umbraco.Core.Sync
     /// <summary>
     /// A resolver to return the currently registered IServerMessenger object
     /// </summary>
-    internal class ServerMessengerResolver : SingleObjectResolverBase<ServerMessengerResolver, IServerMessenger>
+    public sealed class ServerMessengerResolver : SingleObjectResolverBase<ServerMessengerResolver, IServerMessenger>
     {
         internal ServerMessengerResolver(IServerMessenger factory)
             : base(factory)

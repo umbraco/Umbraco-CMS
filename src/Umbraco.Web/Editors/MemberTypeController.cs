@@ -41,7 +41,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         public IEnumerable<ContentTypeBasic> GetAllTypes()
         {
-            return Services.MemberTypeService.GetAllMemberTypes()
+            return Services.MemberTypeService.GetAll()
                            .Select(Mapper.Map<IMemberType, ContentTypeBasic>);
         }
     }

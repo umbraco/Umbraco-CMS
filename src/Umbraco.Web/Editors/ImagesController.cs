@@ -5,6 +5,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Media;
 using Umbraco.Web.Mvc;
@@ -56,6 +57,9 @@ namespace Umbraco.Web.Editors
         /// </remarks>
         public HttpResponseMessage GetBigThumbnail(string originalImagePath)
         {
+            if (string.IsNullOrWhiteSpace(originalImagePath))
+                return Request.CreateResponse(HttpStatusCode.OK);
+
             return GetResized(originalImagePath, 500, "big-thumb");
         }
 
@@ -111,6 +115,13 @@ namespace Umbraco.Web.Editors
         {
             var mediaFileSystem = FileSystemProviderManager.Current.GetFileSystemProvider<MediaFileSystem>();
             var ext = Path.GetExtension(imagePath);
+
+            //we need to check if it is an image by extension
+            if (UmbracoConfig.For.UmbracoSettings().Content.ImageFileTypes.InvariantContains(ext.TrimStart('.')) == false)
+            {
+                return Request.CreateResponse(HttpStatusCode.NotFound);
+            }
+
             var thumbFilePath = imagePath.TrimEnd(ext) + "_" + suffix + ".jpg";
             var fullOrgPath = mediaFileSystem.GetFullPath(mediaFileSystem.GetRelativePath(imagePath));
             var fullNewPath = mediaFileSystem.GetFullPath(mediaFileSystem.GetRelativePath(thumbFilePath));

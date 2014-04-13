@@ -294,9 +294,14 @@ namespace Umbraco.Core
                     "AutoMapper,",
                     "AutoMapper.",
                     "AzureDirectory,",
-                    "itextsharp,",
-                    "Lucene.Net,",
-                    "UrlRewritingNet."
+                    "itextsharp,",            
+                    "UrlRewritingNet.",
+                    "HtmlAgilityPack,",                 
+                    "MiniProfiler,",
+                    "Moq,",
+                    "nunit.framework,",
+                    "TidyNet,",
+                    "WebDriver,"
                 };
 
         /// <summary>
@@ -525,8 +530,12 @@ namespace Umbraco.Core
 
                 //now filter the types based on the onlyConcreteClasses flag, not interfaces, not static classes
                 var filteredTypes = allSubTypes
-                    .Where(t => (TypeHelper.IsNonStaticClass(t)
+                    .Where(t => (TypeHelper.IsNonStaticClass(t)                                 
+                                //Do not include nested private classes - since we are in full trust now this will find those too!
+                                 && t.IsNestedPrivate == false   
                                  && (onlyConcreteClasses == false || t.IsAbstract == false)
+                                 //Do not include classes that are flagged to hide from the type finder
+                                 && t.GetCustomAttribute<HideFromTypeFinderAttribute>() == null
                                  && additionalFilter(t)))
                     .ToArray();
 

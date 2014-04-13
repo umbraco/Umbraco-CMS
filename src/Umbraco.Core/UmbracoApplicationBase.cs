@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using StackExchange.Profiling;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.ObjectResolution;
 
 namespace Umbraco.Core
 {
@@ -40,6 +41,9 @@ namespace Umbraco.Core
                 .Initialize()
                 .Startup(appContext => OnApplicationStarting(sender, e))
                 .Complete(appContext => OnApplicationStarted(sender, e));
+
+            //And now we can dispose of our startup handlers - save some memory
+            ApplicationEventsResolver.Current.Dispose();
         }
 
         /// <summary>

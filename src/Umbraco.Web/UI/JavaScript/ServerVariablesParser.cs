@@ -10,7 +10,7 @@ namespace Umbraco.Web.UI.JavaScript
         /// <summary>
         /// Could allow developers to add custom variables on startup
         /// </summary>
-        public static EventHandler<Dictionary<string, object>> Parsing;
+        public static event EventHandler<Dictionary<string, object>> Parsing;
 
         internal const string Token = "##Variables##";
 
@@ -24,7 +24,8 @@ namespace Umbraco.Web.UI.JavaScript
             }
 
             var json = JObject.FromObject(items);
-            return vars.Replace(Token, json.ToString());            
+            return vars.Replace(Token, json.ToString());  
+          
         }
         
     }

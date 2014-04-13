@@ -24,9 +24,12 @@ namespace Umbraco.Tests.AngularIntegration
         [Test]
         public void Parse_Main()
         {
-            var result = JsInitialization.ParseMain(new[] { "[World]", "Hello" });
+            var noCache = Resources.JsNoCache;
+            noCache = noCache.Replace("##rnd##", "(new Date).getTime()");
+            var result = JsInitialization.ParseMain(new[] { noCache, "[World]", "Hello" });
 
-            Assert.AreEqual(@"yepnope({
+            Assert.AreEqual(noCache + @"
+yepnope({
     load: [
          'lib/jquery/jquery-2.0.3.min.js',
          'lib/angular/1.1.5/angular.min.js',

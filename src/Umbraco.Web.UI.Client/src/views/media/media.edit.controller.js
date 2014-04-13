@@ -6,7 +6,7 @@
  * @description
  * The controller for the media editor
  */
-function mediaEditController($scope, $routeParams, appState, mediaResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService, formHelper, umbModelMapper, editorState, umbRequestHelper, $http) {
+function mediaEditController($scope, $routeParams, appState, mediaResource, entityResource, navigationService, notificationsService, angularHelper, serverValidationManager, contentEditingHelper, fileManager, treeService, formHelper, umbModelMapper, editorState, umbRequestHelper, $http) {
 
     //setup scope vars
     $scope.nav = navigationService;
@@ -27,7 +27,7 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
             // from the server so that we can load in the actions menu.
             umbRequestHelper.resourcePromise(
                 $http.get(content.treeNodeUrl),
-                'Failed to retreive data for child node ' + content.id).then(function (node) {
+                'Failed to retrieve data for child node ' + content.id).then(function (node) {
                     $scope.currentNode = node;
                 });
         }
@@ -59,6 +59,13 @@ function mediaEditController($scope, $routeParams, appState, mediaResource, navi
 
                 syncTreeNode($scope.content, data.path, true);
                 
+            });
+
+        //We fetch all ancestors of the node to generate the footer breadcrump navigation
+        entityResource.getAncestors($routeParams.id, "media")
+            .then(function(anc) {
+                anc.pop();
+                $scope.ancestors = anc;
             });
     }
     

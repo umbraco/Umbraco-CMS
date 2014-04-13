@@ -137,7 +137,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "mediaApiBaseUrl",
                        "GetById",
                        [{ id: id }])),
-               'Failed to retreive data for media id ' + id);
+               'Failed to retrieve data for media id ' + id);
         },
 
         /**
@@ -204,7 +204,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "mediaApiBaseUrl",
                        "GetByIds",
                        idQuery)),
-               'Failed to retreive data for media ids ' + ids);
+               'Failed to retrieve data for media ids ' + ids);
         },
 
         /**
@@ -247,7 +247,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                        "mediaApiBaseUrl",
                        "GetEmpty",
                        [{ contentTypeAlias: alias }, { parentId: parentId }])),
-               'Failed to retreive data for empty media item type ' + alias);
+               'Failed to retrieve data for empty media item type ' + alias);
 
         },
 
@@ -258,7 +258,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "mediaApiBaseUrl",
                        "GetRootMedia")),
-               'Failed to retreive data for root media');
+               'Failed to retrieve data for root media');
 
         },
 
@@ -326,7 +326,7 @@ function mediaResource($q, $http, umbDataFormatter, umbRequestHelper) {
                            { orderDirection: options.orderDirection },
                            { filter: options.filter }
                        ])),
-               'Failed to retreive children for media item ' + parentId);
+               'Failed to retrieve children for media item ' + parentId);
         },
         
         /**

@@ -243,7 +243,6 @@ namespace Umbraco.Core
 
             //stop the timer and log the output
             _timer.Dispose();
-
 			return this;
 		}
 
@@ -287,7 +286,7 @@ namespace Umbraco.Core
                 () => PluginManager.Current.ResolveAssignedMapperTypes());
 
 			RepositoryResolver.Current = new RepositoryResolver(
-				new RepositoryFactory());
+                new RepositoryFactory(ApplicationCache));
 
 		    SqlSyntaxProvidersResolver.Current = new SqlSyntaxProvidersResolver(
                 new[] { typeof(MySqlSyntaxProvider), typeof(SqlCeSyntaxProvider), typeof(SqlServerSyntaxProvider) })
@@ -312,17 +311,15 @@ namespace Umbraco.Core
 
             //the database migration objects
             MigrationResolver.Current = new MigrationResolver(
-                () => PluginManager.Current.ResolveMigrationTypes());
+                () => PluginManager.Current.ResolveTypes<IMigration>());
 
             // todo: remove once we drop IPropertyEditorValueConverter support.
             PropertyEditorValueConvertersResolver.Current = new PropertyEditorValueConvertersResolver(
 				PluginManager.Current.ResolvePropertyEditorValueConverters());
 
-			//add the internal ones, these are not public currently so need to add them manually
-            PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
-                PluginManager.Current.ResolvePropertyValueConverters());
-				// fixme - why not use the following syntax?
-                //PluginManager.Current.ResolveTypes<IPropertyValueConverter>());
+			// need to filter out the ones we dont want!!
+		    PropertyValueConvertersResolver.Current = new PropertyValueConvertersResolver(
+		        PluginManager.Current.ResolveTypes<IPropertyValueConverter>());                
 
             // use the new DefaultShortStringHelper
             ShortStringHelperResolver.Current = new ShortStringHelperResolver(

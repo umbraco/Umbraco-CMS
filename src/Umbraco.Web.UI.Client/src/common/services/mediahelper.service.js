@@ -4,6 +4,10 @@
 * @description A helper object used for dealing with media items
 **/
 function mediaHelper(umbRequestHelper) {
+    
+    //container of fileresolvers
+    var _mediaFileResolvers = {};
+
     return {
         /**
          * @ngdoc function
@@ -41,7 +45,7 @@ function mediaHelper(umbRequestHelper) {
 
                 //this performs a simple check to see if we have a media file as value
                 //it doesnt catch everything, but better then nothing
-                if (item.value.indexOf(mediaRoot) === 0) {
+                if (angular.isString(item.value) &&  item.value.indexOf(mediaRoot) === 0) {
                     return true;
                 }
 
@@ -121,6 +125,74 @@ function mediaHelper(umbRequestHelper) {
             return "";
         },
 
+        registerFileResolver: function(propertyEditorAlias, func){
+            _mediaFileResolvers[propertyEditorAlias] = func;
+        },
+
+        /*jshint loopfunc: true */
+        resolveFile : function(mediaItem, thumbnail){
+            var _props = [];
+            function _iterateProps(props){
+                var result = null;
+                for(var resolver in _mediaFileResolvers) {
+                    var property = _.find(props, function(property){ return property.editor === resolver; });
+                    if(property){
+                        result = _mediaFileResolvers[resolver](property, mediaItem, thumbnail);
+                        break;
+                    }
+                }
+
+                return result;    
+            }
+
+            //we either have properties raw on the object, or spread out on tabs
+            var result = "";
+            if(mediaItem.properties){
+                result = _iterateProps(mediaItem.properties);
+            }else if(mediaItem.tabs){
+                for(var tab in mediaItem.tabs) {
+                    if(mediaItem.tabs[tab].properties){
+                        result = _iterateProps(mediaItem.tabs[tab].properties);
+                        if(result){
+                            break;
+                        }
+                    }
+                }
+            }
+            return result;            
+        },
+
+        /*jshint loopfunc: true */
+        hasFilePropertyType : function(mediaItem){
+           function _iterateProps(props){
+               var result = false;
+               for(var resolver in _mediaFileResolvers) {
+                   var property = _.find(props, function(property){ return property.editor === resolver; });
+                   if(property){
+                       result = true;
+                       break;
+                   }
+               }
+               return result;
+           }
+
+           //we either have properties raw on the object, or spread out on tabs
+           var result = false;
+           if(mediaItem.properties){
+               result = _iterateProps(mediaItem.properties);
+           }else if(mediaItem.tabs){
+               for(var tab in mediaItem.tabs) {
+                   if(mediaItem.tabs[tab].properties){
+                       result = _iterateProps(mediaItem.tabs[tab].properties);
+                       if(result){
+                           break;
+                       }
+                   }
+               }
+           }
+           return result;
+        },
+
         /**
          * @ngdoc function
          * @name umbraco.services.mediaHelper#scaleToMaxSize
@@ -177,6 +249,11 @@ function mediaHelper(umbRequestHelper) {
          */
         getThumbnailFromPath: function (imagePath) {
 
+            //If the path is not an image we cannot get a thumb
+            if (!this.detectIfImageByExtension(imagePath)) {
+                return null;
+            }
+
             //get the proxy url for big thumbnails (this ensures one is always generated)
             var thumbnailUrl = umbRequestHelper.getApiUrl(
                 "imagesApiBaseUrl",
@@ -205,75 +282,7 @@ function mediaHelper(umbRequestHelper) {
             var ext = lowered.substr(lowered.lastIndexOf(".") + 1);
             return ("," + Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes + ",").indexOf("," + ext + ",") !== -1;
         }
+        
     };
 }
 angular.module('umbraco.services').factory('mediaHelper', mediaHelper);
-
-/**
-* @ngdoc service
-* @name umbraco.services.imageHelper
-* @deprecated
-**/
-function imageHelper(umbRequestHelper, mediaHelper) {
-    return {
-        /**
-         * @ngdoc function
-         * @name umbraco.services.imageHelper#getImagePropertyValue
-         * @methodOf umbraco.services.imageHelper
-         * @function    
-         *
-         * @deprecated
-         */
-        getImagePropertyValue: function (options) {
-            return mediaHelper.getImagePropertyValue(options);
-        },
-        /**
-         * @ngdoc function
-         * @name umbraco.services.imageHelper#getThumbnail
-         * @methodOf umbraco.services.imageHelper
-         * @function    
-         *
-         * @deprecated
-         */
-        getThumbnail: function (options) {
-            return mediaHelper.getThumbnail(options);
-        },
-
-        /**
-         * @ngdoc function
-         * @name umbraco.services.imageHelper#scaleToMaxSize
-         * @methodOf umbraco.services.imageHelper
-         * @function    
-         *
-         * @deprecated
-         */
-        scaleToMaxSize: function (maxSize, width, height) {
-            return mediaHelper.scaleToMaxSize(maxSize, width, height);
-        },
-
-        /**
-         * @ngdoc function
-         * @name umbraco.services.imageHelper#getThumbnailFromPath
-         * @methodOf umbraco.services.imageHelper
-         * @function    
-         *
-         * @deprecated
-         */
-        getThumbnailFromPath: function (imagePath) {
-            return mediaHelper.getThumbnailFromPath(imagePath);
-        },
-
-        /**
-         * @ngdoc function
-         * @name umbraco.services.imageHelper#detectIfImageByExtension
-         * @methodOf umbraco.services.imageHelper
-         * @function    
-         *
-         * @deprecated
-         */
-        detectIfImageByExtension: function (imagePath) {
-            return mediaHelper.detectIfImageByExtension(imagePath);
-        }
-    };
-}
-angular.module('umbraco.services').factory('imageHelper', imageHelper);

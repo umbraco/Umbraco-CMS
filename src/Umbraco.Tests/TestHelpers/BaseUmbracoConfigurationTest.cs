@@ -19,14 +19,22 @@ namespace Umbraco.Tests.TestHelpers
         [SetUp]
         public virtual void Initialize()
         {
-            SettingsForTests.Reset();
+            using (DisposableTimer.TraceDuration<BaseUmbracoConfigurationTest>("init"))
+            {
+                SettingsForTests.Reset();
+            }
+            
         }
 
         [TearDown]
         public virtual void TearDown()
         {
             //reset settings
-            SettingsForTests.Reset();            
+            using (DisposableTimer.TraceDuration<BaseUmbracoConfigurationTest>("teardown"))
+            {
+                SettingsForTests.Reset();            
+            }
+            
         }
     }
 }

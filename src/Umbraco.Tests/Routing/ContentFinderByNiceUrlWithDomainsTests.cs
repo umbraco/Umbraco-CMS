@@ -11,6 +11,7 @@ using System.Configuration;
 
 namespace Umbraco.Tests.Routing
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
 	[TestFixture]
 	public class ContentFinderByNiceUrlWithDomainsTests : BaseRoutingTest
 	{

@@ -240,6 +240,11 @@ namespace Umbraco.Web.Trees
                         new LegacyUrlAction(
                             "dialogs/publish.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
                             ui.GetText("actions", "publish")));
+                case "UmbClientMgr.appActions().actionChangeDocType()":
+                    return Attempt.Succeed(
+                        new LegacyUrlAction(
+                            "dialogs/ChangeDocType.aspx?id=" + nodeId + "&rnd=" + DateTime.UtcNow.Ticks,
+                            ui.GetText("actions", "changeDocType")));
                 case "UmbClientMgr.appActions().actionToPublish()":
                     return Attempt.Succeed(
                         new LegacyUrlAction(

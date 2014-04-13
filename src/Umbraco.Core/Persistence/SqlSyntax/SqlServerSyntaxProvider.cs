@@ -151,6 +151,22 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return items.Select(item => new Tuple<string, string, string>(item.TABLE_NAME, item.COLUMN_NAME, item.CONSTRAINT_NAME)).ToList();
         }
 
+        public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db)
+        {
+            var items =
+                db.Fetch<dynamic>(
+                    @"select T.name as TABLE_NAME, I.name as INDEX_NAME, AC.Name as COLUMN_NAME,
+CASE WHEN I.is_unique_constraint = 1 OR  I.is_unique = 1 THEN 1 ELSE 0 END AS [UNIQUE]
+from sys.tables as T inner join sys.indexes as I on T.[object_id] = I.[object_id] 
+   inner join sys.index_columns as IC on IC.[object_id] = I.[object_id] and IC.[index_id] = I.[index_id] 
+   inner join sys.all_columns as AC on IC.[object_id] = AC.[object_id] and IC.[column_id] = AC.[column_id] 
+WHERE I.name NOT LIKE 'PK_%'
+order by T.name, I.name");
+            return items.Select(item => new Tuple<string, string, string, bool>(item.TABLE_NAME, item.INDEX_NAME, item.COLUMN_NAME, 
+                item.UNIQUE == 1)).ToList();
+            
+        }
+
         public override bool DoesTableExist(Database db, string tableName)
         {
             var result =

@@ -27,10 +27,13 @@ namespace Umbraco.Web.WebApi
             UmbracoContext = umbracoContext;
             InstanceId = Guid.NewGuid();
             Umbraco = new UmbracoHelper(umbracoContext);
+            _membershipHelper = new MembershipHelper(UmbracoContext);
         }
 
+        private readonly MembershipHelper _membershipHelper;
+
         /// <summary>
-        /// Tries to retreive the current HttpContext if one exists.
+        /// Tries to retrieve the current HttpContext if one exists.
         /// </summary>
         /// <returns></returns>
         protected Attempt<HttpContextBase> TryGetHttpContext()
@@ -78,6 +81,14 @@ namespace Umbraco.Web.WebApi
         public WebSecurity Security
         {
             get { return UmbracoContext.Security; }
+        }
+
+        /// <summary>
+        /// Returns the MemberHelper instance
+        /// </summary>
+        public MembershipHelper Members
+        {
+            get { return _membershipHelper; }
         }
 
         /// <summary>

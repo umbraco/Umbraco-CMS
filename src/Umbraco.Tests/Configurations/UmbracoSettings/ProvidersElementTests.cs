@@ -1,4 +1,5 @@
 ﻿using NUnit.Framework;
+using Umbraco.Core;
 
 namespace Umbraco.Tests.Configurations.UmbracoSettings
 {

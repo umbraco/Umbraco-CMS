@@ -24,8 +24,9 @@ namespace Umbraco.Core.Persistence.Repositories
         private readonly IContentTypeRepository _contentTypeRepository;
         private readonly ITemplateRepository _templateRepository;
         private readonly ITagsRepository _tagRepository;
+        private readonly CacheHelper _cacheHelper;
 
-        public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository)
+        public ContentRepository(IDatabaseUnitOfWork work, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository, CacheHelper cacheHelper)
             : base(work)
         {
             if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");
@@ -34,11 +35,12 @@ namespace Umbraco.Core.Persistence.Repositories
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
 		    _tagRepository = tagRepository;
+            _cacheHelper = cacheHelper;
 
 		    EnsureUniqueNaming = true;
         }
 
-        public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository)
+        public ContentRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IContentTypeRepository contentTypeRepository, ITemplateRepository templateRepository, ITagsRepository tagRepository, CacheHelper cacheHelper)
             : base(work, cache)
         {
             if (contentTypeRepository == null) throw new ArgumentNullException("contentTypeRepository");
@@ -47,6 +49,7 @@ namespace Umbraco.Core.Persistence.Repositories
             _contentTypeRepository = contentTypeRepository;
             _templateRepository = templateRepository;
             _tagRepository = tagRepository;
+            _cacheHelper = cacheHelper;
 
             EnsureUniqueNaming = true;
         }
@@ -139,6 +142,7 @@ namespace Umbraco.Core.Persistence.Repositories
         {
             var list = new List<string>
                            {
+                               "DELETE FROM cmsTask WHERE nodeId = @Id",
                                "DELETE FROM umbracoUser2NodeNotify WHERE nodeId = @Id",
                                "DELETE FROM umbracoUser2NodePermission WHERE nodeId = @Id",
                                "DELETE FROM umbracoRelation WHERE parentId = @Id",
@@ -274,7 +278,7 @@ namespace Umbraco.Core.Persistence.Repositories
 
             //Assign the same permissions to it as the parent node
             // http://issues.umbraco.org/issue/U4-2161     
-            var permissionsRepo = new PermissionRepository<IContent>(UnitOfWork);
+            var permissionsRepo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
             var parentPermissions = permissionsRepo.GetPermissionsForEntity(entity.ParentId).ToArray();
             //if there are parent permissions then assign them, otherwise leave null and permissions will become the
             // user's default permissions.
@@ -283,9 +287,9 @@ namespace Umbraco.Core.Persistence.Repositories
                 var userPermissions = (
                     from perm in parentPermissions 
                     from p in perm.AssignedPermissions 
-                    select new Tuple<object, string>(perm.UserId, p)).ToList();
+                    select new Tuple<int, string>(perm.UserId, p)).ToList();
                 
-                permissionsRepo.AssignEntityPermissions(entity, userPermissions);
+                permissionsRepo.ReplaceEntityPermissions(entity, userPermissions);
                 //flag the entity's permissions changed flag so we can track those changes.
                 //Currently only used for the cache refreshers to detect if we should refresh all user permissions cache.
                 ((Content) entity).PermissionsChanged = true;
@@ -429,7 +433,7 @@ namespace Umbraco.Core.Persistence.Repositories
             }
             else
             {
-                //In order to update the ContentVersion we need to retreive its primary key id
+                //In order to update the ContentVersion we need to retrieve its primary key id
                 var contentVerDto = Database.SingleOrDefault<ContentVersionDto>("WHERE VersionId = @Version", new { Version = entity.Version });
                 contentVersionDto.Id = contentVerDto.Id;
 
@@ -555,15 +559,21 @@ namespace Umbraco.Core.Persistence.Repositories
             return GetByVersion(dto.ContentVersionDto.VersionId);
         }
         
-        public void AssignEntityPermissions(IContent entity, char permission, IEnumerable<object> userIds)
+        /// <summary>
+        /// Assigns a single permission to the current content item for the specified user ids
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="permission"></param>
+        /// <param name="userIds"></param>        
+        public void AssignEntityPermission(IContent entity, char permission, IEnumerable<int> userIds)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork);
-            repo.AssignEntityPermissions(entity, permission, userIds);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
+            repo.AssignEntityPermission(entity, permission, userIds);
         }
 
         public IEnumerable<EntityPermission> GetPermissionsForEntity(int entityId)
         {
-            var repo = new PermissionRepository<IContent>(UnitOfWork);
+            var repo = new PermissionRepository<IContent>(UnitOfWork, _cacheHelper);
             return repo.GetPermissionsForEntity(entityId);
         }
 
@@ -594,33 +604,6 @@ namespace Umbraco.Core.Persistence.Repositories
             // http://issues.umbraco.org/issue/U4-1946
             ((Entity)content).ResetDirtyProperties(false);
             return content;
-        }
-
-        private PropertyCollection GetPropertyCollection(int id, Guid versionId, IContentType contentType, DateTime createDate, DateTime updateDate)
-        {
-            var sql = new Sql();
-            sql.Select("*")
-                .From<PropertyDataDto>()
-                .InnerJoin<PropertyTypeDto>()
-                .On<PropertyDataDto, PropertyTypeDto>(left => left.PropertyTypeId, right => right.Id)
-                .Where<PropertyDataDto>(x => x.NodeId == id)
-                .Where<PropertyDataDto>(x => x.VersionId == versionId);
-
-            var propertyDataDtos = Database.Fetch<PropertyDataDto, PropertyTypeDto>(sql);
-            var propertyFactory = new PropertyFactory(contentType, versionId, id, createDate, updateDate);
-            var properties = propertyFactory.BuildEntity(propertyDataDtos);
-
-            var newProperties = properties.Where(x => x.HasIdentity == false);
-            foreach (var property in newProperties)
-            {
-                var propertyDataDto = new PropertyDataDto{ NodeId = id, PropertyTypeId = property.PropertyTypeId, VersionId = versionId };
-                int primaryKey = Convert.ToInt32(Database.Insert(propertyDataDto));
-
-                property.Version = versionId;
-                property.Id = primaryKey;
-            }
-
-            return new PropertyCollection(properties);
         }
 
         private string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)

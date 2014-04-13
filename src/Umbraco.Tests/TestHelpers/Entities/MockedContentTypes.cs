@@ -252,11 +252,11 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return mediaType;
         }
 
-        public static MediaType CreateImageMediaType()
+        public static MediaType CreateImageMediaType(string alias = Constants.Conventions.MediaTypes.Image)
         {
             var mediaType = new MediaType(-1)
             {
-                Alias = Constants.Conventions.MediaTypes.Image,
+                Alias = alias,
                 Name = "Image",
                 Description = "ContentType used for images",
                 Icon = ".sprTreeDoc3",

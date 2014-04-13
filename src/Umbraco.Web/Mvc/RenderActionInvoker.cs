@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Web.Mvc;
 
 namespace Umbraco.Web.Mvc
@@ -25,7 +26,13 @@ namespace Umbraco.Web.Mvc
                 //check if the controller is an instance of IRenderMvcController
 				if (controllerContext.Controller is IRenderMvcController)
 				{
-					return new ReflectedActionDescriptor(controllerContext.Controller.GetType().GetMethod("Index"), "Index", controllerDescriptor);
+				    return new ReflectedActionDescriptor(
+				        controllerContext.Controller.GetType().GetMethods()
+				            .First(x => x.Name == "Index" &&
+				                        x.GetCustomAttributes(typeof (NonActionAttribute), false).Any() == false),
+				        "Index",
+				        controllerDescriptor);
+
 				}
 			}
 			return ad;

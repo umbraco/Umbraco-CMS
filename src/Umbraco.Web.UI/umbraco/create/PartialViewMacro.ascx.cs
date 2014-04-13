@@ -11,6 +11,8 @@ namespace Umbraco.Web.UI.Umbraco.Create
 {
 	public partial class PartialViewMacro : UserControl
 	{
+        
+
 		protected override void OnLoad(EventArgs e)
 		{
 			base.OnLoad(e);
@@ -43,7 +45,7 @@ namespace Umbraco.Web.UI.Umbraco.Create
             }
         }
 
-		protected void SubmitButton_Click(object sender, System.EventArgs e)
+		protected void SubmitButton_Click(object sender, EventArgs e)
 		{
 			if (Page.IsValid)
 			{			
@@ -64,5 +66,23 @@ namespace Umbraco.Web.UI.Umbraco.Create
 					.CloseModalWindow();				
 			}
 		}
+
+	    protected void MacroExistsValidator_OnServerValidate(object source, ServerValidateEventArgs args)
+	    {
+	        if (CreateMacroCheckBox.Checked)
+	        {
+                //TODO: Shouldn't this use our string functions to create the alias ?
+                var fileName = FileName.Text + ".cshtml";
+                var name = fileName
+                    .Substring(0, (fileName.LastIndexOf('.') + 1)).Trim('.')
+                    .SplitPascalCasing().ToFirstUpperInvariant();
+
+                var macro = ApplicationContext.Current.Services.MacroService.GetByAlias(name);
+                if (macro != null)
+                {
+                    args.IsValid = false;
+                }    
+	        }
+	    }
 	}
 }

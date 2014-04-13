@@ -24,6 +24,9 @@
 
      <cc1:PropertyPanel runat="server">
         <asp:CheckBox ID="createMacro" Runat="server" Checked="true" Text="Create Macro"></asp:CheckBox>
+         <asp:CustomValidator ErrorMessage="<br/>A macro already exists with the specified name" ID="MacroExistsValidator" 
+            Display="Dynamic" ForeColor="red"
+            runat="server" OnServerValidate="MacroExistsValidator_OnServerValidate"/>
     </cc1:PropertyPanel>
 </cc1:Pane>
 

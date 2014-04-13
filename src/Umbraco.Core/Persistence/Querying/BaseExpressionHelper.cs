@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Globalization;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Querying
 {
@@ -8,6 +9,41 @@ namespace Umbraco.Core.Persistence.Querying
     /// </summary>
     internal class BaseExpressionHelper
     {
+        protected string HandleStringComparison(string col, string val, string verb, TextColumnType columnType)
+        {
+            switch (verb)
+            {
+                case "SqlWildcard":
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnWildcardComparison(col, RemoveQuote(val), columnType);
+                case "Equals":
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnEqualComparison(col, RemoveQuote(val), columnType);
+                case "StartsWith":
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnStartsWithComparison(col, RemoveQuote(val), columnType);
+                case "EndsWith":
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnEndsWithComparison(col, RemoveQuote(val), columnType);
+                case "Contains":
+                    return SqlSyntaxContext.SqlSyntaxProvider.GetStringColumnContainsComparison(col, RemoveQuote(val), columnType);
+                case "InvariantEquals":
+                case "SqlEquals":
+                    //recurse
+                    return HandleStringComparison(col, val, "Equals", columnType);
+                case "InvariantStartsWith":
+                case "SqlStartsWith":
+                    //recurse
+                    return HandleStringComparison(col, val, "StartsWith", columnType);
+                case "InvariantEndsWith":
+                case "SqlEndsWith":
+                    //recurse
+                    return HandleStringComparison(col, val, "EndsWith", columnType);
+                case "InvariantContains":
+                case "SqlContains":
+                    //recurse
+                    return HandleStringComparison(col, val, "Contains", columnType);
+                default:
+                    throw new ArgumentOutOfRangeException("verb");
+            }
+        }
+
         public virtual string GetQuotedValue(object value, Type fieldType, Func<object, string> escapeCallback = null, Func<Type, bool> shouldQuoteCallback = null)
         {
             if (value == null) return "NULL";
@@ -25,7 +61,7 @@ namespace Umbraco.Core.Persistence.Querying
             {
                 //if (TypeSerializer.CanCreateFromString(fieldType))
                 //{
-                //    return "'" + EscapeParam(TypeSerializer.SerializeToString(value)) + "'";
+                //    return "'" + escapeCallback(TypeSerializer.SerializeToString(value)) + "'";
                 //}
 
                 throw new NotSupportedException(
@@ -46,27 +82,24 @@ namespace Umbraco.Core.Persistence.Querying
 
             if (fieldType == typeof(DateTime))
             {
-                return "'" + EscapeParam(((DateTime)value).ToIsoString()) + "'";
+                return "'" + escapeCallback(((DateTime)value).ToIsoString()) + "'";
             }
 
             if (fieldType == typeof(bool))
                 return ((bool)value) ? Convert.ToString(1, CultureInfo.InvariantCulture) : Convert.ToString(0, CultureInfo.InvariantCulture);
 
-            return ShouldQuoteValue(fieldType)
-                       ? "'" + EscapeParam(value) + "'"
+            return shouldQuoteCallback(fieldType)
+                       ? "'" + escapeCallback(value) + "'"
                        : value.ToString();
         }
 
         public virtual string EscapeParam(object paramValue)
         {
-            return paramValue.ToString().Replace("'", "''");
+            return paramValue == null 
+                ? string.Empty 
+                : SqlSyntaxContext.SqlSyntaxProvider.EscapeString(paramValue.ToString());
         }
-
-        public virtual string EscapeAtArgument(string exp)
-        {
-            return PetaPocoExtensions.EscapeAtSymbols(exp);
-        }
-
+        
         public virtual bool ShouldQuoteValue(Type fieldType)
         {
             return true;

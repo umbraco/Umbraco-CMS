@@ -9,7 +9,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 	if(dialogOptions.currentTarget){
 		$scope.target = dialogOptions.currentTarget;
 
-		//if we a node ID, we fetch the current node to build the form data
+		//if we have a node ID, we fetch the current node to build the form data
 		if($scope.target.id){
 
 			if(!$scope.target.path) {
@@ -30,7 +30,7 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 		dialogService.mediaPicker({callback: function(media){
 					$scope.target.id = undefined;
 					$scope.target.name = media.name;
-					$scope.target.url = mediaHelper.getMediaPropertyValue({mediaModel: media});
+					$scope.target.url = mediaHelper.resolveFile(media);
 				}});
 	};
 

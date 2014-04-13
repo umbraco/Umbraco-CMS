@@ -87,7 +87,8 @@
 }
 
 .umb-listview .selected i.icon, .umb-listview tr:hover i.icon{display: none}
-.umb-listview .selected input[type="checkbox"], .umb-listview tr:hover input[type="checkbox"]{display: inline-block;}
+.umb-listview .selected input[type="checkbox"], 
+.umb-listview tr:hover input[type="checkbox"]{display: inline-block !important;}
 .umb-listview .inactive{color: @grayLight;}
 
 .umb-listview .selected td{font-weight: bold;}
@@ -120,7 +121,7 @@
   font-weight: 400
 }
 
-.table-striped tbody > tr:nth-child(even) > td, .table-striped tbody > tr:nth-child(even) > th {
+.umb-listview .table-striped tbody > tr:nth-child(even) > td, .umb-listview .table-striped tbody > tr:nth-child(even) > th {
   background-color: @grayLighter
 }
 
@@ -167,21 +168,23 @@
 
 /* TEMP */
 
-.table-striped tbody td {
+.umb-listview .table-striped tbody td {
   position: relative
 }
 
-.table-striped tbody input[type="checkbox"] {
-  display: block;
-  position: absolute;
-  top: 10px;
-  left:10px;
+
+.umb-listview  .table-striped thead input[type="checkbox"] {
+  margin-left: 7px;
+}
+
+.umb-listview  .table-striped tbody input[type="checkbox"] {
+  display: none;
+  margin-left: 7px;
   z-index: 5;
 }
 
-.table-striped tbody i {
+.umb-listview .table-striped tbody i {
   display: block;
-  position: absolute;
   top: 10px;
   left:6px;
   padding: 0 0 0 4px;
@@ -191,7 +194,7 @@
   height: 20px;
 }
 
-.table-striped tbody > tr:nth-child(even) > td i, .table-striped tbody > tr:nth-child(even) > th i{
+.umb-listview .table-striped tbody > tr:nth-child(even) > td i, .umb-listview .table-striped tbody > tr:nth-child(even) > th i{
   background-color: @grayLighter
 }
 
