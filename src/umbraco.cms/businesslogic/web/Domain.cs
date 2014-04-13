@@ -143,7 +143,7 @@ namespace umbraco.cms.businesslogic.web
             return GetDomains(false);
         }
 
-        internal static IEnumerable<Domain> GetDomains(bool includeWildcards)
+        public static IEnumerable<Domain> GetDomains(bool includeWildcards)
         {
             var domains = ApplicationContext.Current.ApplicationCache.GetCacheItem(
                 CacheKeys.DomainCacheKey,
@@ -151,8 +151,7 @@ namespace umbraco.cms.businesslogic.web
                 () =>
                     {
                         var result = new List<Domain>();
-                        using (var dr = SqlHelper.ExecuteReader(
-                            "select id, domainName from umbracoDomains"))
+                        using (var dr = SqlHelper.ExecuteReader("SELECT id, domainName FROM umbracoDomains ORDER BY id"))
                         {
                             while (dr.Read())
                             {
@@ -177,7 +176,7 @@ namespace umbraco.cms.businesslogic.web
 
         public static Domain GetDomain(string DomainName)
         {
-        	return GetDomains().FirstOrDefault(d => d.Name == DomainName);
+            return GetDomains().FirstOrDefault(d => d.Name.InvariantEquals(DomainName));
         }
 
         public static int GetRootFromDomain(string DomainName)
@@ -190,6 +189,11 @@ namespace umbraco.cms.businesslogic.web
         public static Domain[] GetDomainsById(int nodeId)
         {
 			return GetDomains().Where(d => d._root == nodeId).ToArray();
+        }
+
+        public static Domain[] GetDomainsById(int nodeId, bool includeWildcards)
+        {
+            return GetDomains(includeWildcards).Where(d => d._root == nodeId).ToArray();
         }
 
         public static bool Exists(string DomainName)

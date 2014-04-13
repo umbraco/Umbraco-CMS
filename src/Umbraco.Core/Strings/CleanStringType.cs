@@ -14,25 +14,20 @@ namespace Umbraco.Core.Strings
         // note: you have 32 bits at your disposal
         // 0xffffffff
 
-        /// <summary>
-        /// Flag mask for casing.
-        /// </summary>
-        CaseMask = 0x3f, // 0xff - 8 possible values
-
-        /// <summary>
-        /// Flag mask for encoding.
-        /// </summary>
-        CodeMask = 0x700, // 0xff00 - 8 possible values
-
-        /// <summary>
-        /// Flag mask for role.
-        /// </summary>
-        RoleMask = 0x030000, // 0xff0000 - 8 possible values
+        // no value
 
         /// <summary>
         /// No value.
         /// </summary>
         None = 0x00,
+
+
+        // casing values
+
+        /// <summary>
+        /// Flag mask for casing.
+        /// </summary>
+        CaseMask = PascalCase | CamelCase | Unchanged | LowerCase | UpperCase | UmbracoCase,
 
         /// <summary>
         /// Pascal casing eg "PascalCase".
@@ -66,9 +61,18 @@ namespace Umbraco.Core.Strings
         /// and is pascal otherwise.</remarks>
         UmbracoCase = 0x20,
 
+
+        // encoding values
+
+        /// <summary>
+        /// Flag mask for encoding.
+        /// </summary>
+        CodeMask = Unicode | Utf8 | Ascii,
+
         /// <summary>
         /// Unicode encoding.
         /// </summary>
+        [Obsolete("Use .Utf8 instead.")]
         Unicode = 0x0100,
 
         /// <summary>
@@ -81,14 +85,32 @@ namespace Umbraco.Core.Strings
         /// </summary>
         Ascii = 0x0400,
 
+
+        // role values
+
+        /// <summary>
+        /// Flag mask for role.
+        /// </summary>
+        RoleMask = UrlSegment | Alias | FileName | ConvertCase,
+
         /// <summary>
         ///  Url role.
         /// </summary>
-        Url = 0x010000,
+        UrlSegment = 0x010000,
 
         /// <summary>
         /// Alias role.
         /// </summary>
-        Alias = 0x020000
+        Alias = 0x020000,
+
+        /// <summary>
+        /// FileName role.
+        /// </summary>
+        FileName = 0x040000,
+
+        /// <summary>
+        /// ConvertCase role.
+        /// </summary>
+        ConvertCase = 0x080000
     }
 }

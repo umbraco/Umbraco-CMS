@@ -35,10 +35,6 @@
     <key alias="toPublish">Send to publication</key>
     <key alias="translate">Translate</key>
     <key alias="update">Update</key>
-    <key alias="exportContourForm">Export form</key>
-    <key alias="importContourForm">Import form</key>
-    <key alias="archiveContourForm">Archive form</key>
-    <key alias="unarchiveContourForm">Unarchive form</key>
     <key alias="defaultValue">Default value</key>
   </area>
   <area alias="assignDomain">
@@ -67,13 +63,10 @@
   <area alias="auditTrails">
     <key alias="atViewingFor">Viewing for</key>
   </area>
-
-  
   <area alias="buttons">
     <key alias="select">Select</key>
     <key alias="selectCurrentFolder">Select current folder</key>
     <key alias="somethingElse">Do something else</key>
-    
     <key alias="bold">Bold</key>
     <key alias="deindent">Cancel Paragraph Indent</key>
     <key alias="formFieldInsert">Insert form field</key>
@@ -164,7 +157,6 @@
     <key alias="urls">Link to document</key>
     <key alias="memberof">Member of group(s)</key>
     <key alias="notmemberof">Not a member of group(s)</key>
-    
     <key alias="childItems" version="7.0">Child items</key>
     <key alias="target" version="7.0">Target</key>
   </area>
@@ -176,9 +168,7 @@
     <key alias="chooseNode">Where do you want to create the new %0%</key>
     <key alias="createUnder">Create an item under</key>
     <key alias="updateData">Choose a type and a title</key>
-
     <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available. You must enable these in the settings section under <strong>"document types"</strong>.]]></key>
-
     <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available. You must enable these in the settings section under <strong>"media types"</strong>.]]></key>
   </area>
   <area alias="dashboard">
@@ -252,7 +242,6 @@
     <key alias="search">Type to search...</key>
     <key alias="filter">Type to filter...</key>
   </area>
-
   <area alias="editcontenttype">
     <key alias="allowedchildnodetypes">Allowed child nodetypes</key>
     <key alias="create">Create</key>
@@ -306,6 +295,7 @@
     <key alias="tableSplitNotSplittable">You cannot split a cell that hasn't been merged.</key>
     <key alias="xsltErrorHeader">Error in XSLT source</key>
     <key alias="xsltErrorText">The XSLT has not been saved, because it contained error(s)</key>
+    <key alias="missingPropertyEditorErrorMessage">There is a configuration error with the data type used for this property, please check the data type</key>
   </area>
   <area alias="general">
     <key alias="about">About</key>
@@ -404,7 +394,6 @@
     <key alias="width">Width</key>
     <key alias="yes">Yes</key>
     <key alias="folder">Folder</key>
-
     <key alias="searchResults">Search results</key>
   </area>
   <area alias="graphicheadline">
@@ -547,17 +536,14 @@ To manage your website, simply open the umbraco back office and start adding con
   <area alias="login">
     <key alias="greeting0">Happy super sunday</key>
     <key alias="greeting1">Happy manic monday </key>
-    <key alias="greeting2">Happy tremendous tuesday</key>
+    <key alias="greeting2">Happy tubular tuesday</key>
     <key alias="greeting3">Happy wonderful wednesday</key>
     <key alias="greeting4">Happy thunder thursday</key>
-    <key alias="greeting5">Happy friendly friday</key>
-    <key alias="greeting6">Happy shiny saturday</key>
-    
+    <key alias="greeting5">Happy funky friday</key>
+    <key alias="greeting6">Happy caturday</key>
     <key alias="instruction">log in below</key>
     <key alias="timeout">Session timed out</key>
-
     <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.org" style="text-decoration: none" target="_blank">umbraco.org</a></p> ]]></key>
-   
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>
@@ -587,7 +573,7 @@ To manage your website, simply open the umbraco back office and start adding con
       has been performed on the page '%2%'
       by the user '%3%'
 
-      Go to http://%4%/actions/editContent.aspx?id=%5% to edit.
+      Go to http://%4%/#/content/content/edit/%5% to edit.
 
       Have a nice day!
 
@@ -596,14 +582,12 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="mailBodyHtml"><![CDATA[<p>Hi %0%</p>
 
 		  <p>This is an automated mail to inform you that the task <strong>'%1%'</strong> 
-		  has been performed on the page <a href="http://%4%/actions/preview.aspx?id=%5%"><strong>'%2%'</strong></a>
+		  has been performed on the page <a href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a>
 		  by the user <strong>'%3%'</strong>
 	  </p>
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISH&nbsp;&nbsp;</a> &nbsp; 
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
-				<a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;DELETE&nbsp;&nbsp;&nbsp;&nbsp;</a>
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
 				<br />
 		  </div>
 		  <p>
@@ -615,9 +599,7 @@ To manage your website, simply open the umbraco back office and start adding con
 
 		  <div style="margin: 8px 0; padding: 8px; display: block;">
 				<br />
-				<a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISH&nbsp;&nbsp;</a> &nbsp; 
-				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/actions/editContent.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
-				<a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;DELETE&nbsp;&nbsp;&nbsp;&nbsp;</a>
+				<a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;EDIT&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; 
 				<br />
 		  </div>
 
@@ -748,8 +730,6 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="statistics">Statistics</key>
     <key alias="translation">Translation</key>
     <key alias="users">Users</key>
-    <key alias="contour" version="4.0">Umbraco Contour</key>
-
     <key alias="help" version="7.0">Help</key>
   </area>
   <area alias="settings">
@@ -1001,7 +981,6 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="usertype">User type</key>
     <key alias="userTypes">User types</key>
     <key alias="writer">Writer</key>
-
     <key alias="yourProfile" version="7.0">Your profile</key>
     <key alias="yourHistory" version="7.0">Your recent history</key>
     <key alias="sessionExpires" version="7.0">Session expires in</key>

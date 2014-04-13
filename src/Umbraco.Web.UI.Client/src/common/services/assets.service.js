@@ -41,9 +41,20 @@
  * </pre>  
  */
 angular.module('umbraco.services')
-.factory('assetsService', function ($q, $log, angularHelper, umbRequestHelper, $rootScope) {
+.factory('assetsService', function ($q, $log, angularHelper, umbRequestHelper, $rootScope, $http) {
 
     var initAssetsLoaded = false;
+    var appendRnd = function(url){
+        //if we don't have a global umbraco obj yet, the app is bootstrapping
+        if(!Umbraco.Sys.ServerVariables.application){
+            return url;
+        }
+
+        var rnd = Umbraco.Sys.ServerVariables.isDebuggingEnabled ?  (new Date()).getTime() : Umbraco.Sys.ServerVariables.application.version +"."+Umbraco.Sys.ServerVariables.application.cdf;
+        var _op = (url.indexOf("?")>0) ? "&" : "?";
+        url = url + _op + "umb__rnd=" + rnd;
+        return url;
+    };
 
     return {
         
@@ -85,25 +96,23 @@ angular.module('umbraco.services')
          * @param {Number} timeout in milliseconds
          * @returns {Promise} Promise object which resolves when the file has loaded
          */
-        loadCss : function(path, scope, attributes, timeout){
-            var deferred = $q.defer();
-            var t = timeout || 5000;
-            var a = attributes || undefined;
+         loadCss : function(path, scope, attributes, timeout){
+             var deferred = $q.defer();
+             var t = timeout || 5000;
+             var a = attributes || undefined;
 
-            yepnope.injectCss(path, function () {
+             yepnope.injectCss(appendRnd(path), function () {
+                 if (!scope) {
+                      deferred.resolve(true);
+                  }else{
+                      angularHelper.safeApply(scope, function () {
+                          deferred.resolve(true);
+                      });
+                  }
+             },a,t);
 
-             if (!scope) {
-                 deferred.resolve(true);
-             }else{
-                 angularHelper.safeApply(scope, function () {
-                     deferred.resolve(true);
-                 });
-             }
-
-            },a,t);
-
-            return deferred.promise;
-        },
+             return deferred.promise;
+         },
         
         /**
          * @ngdoc method
@@ -123,9 +132,8 @@ angular.module('umbraco.services')
             var deferred = $q.defer();
             var t = timeout || 5000;
             var a = attributes || undefined;
-
-            yepnope.injectJs(path, function () {
-
+            
+            yepnope.injectJs(appendRnd(path), function () {
               if (!scope) {
                   deferred.resolve(true);
               }else{
@@ -133,8 +141,8 @@ angular.module('umbraco.services')
                       deferred.resolve(true);
                   });
               }
-
             },a,t);
+
 
             return deferred.promise;
         },
@@ -155,14 +163,14 @@ angular.module('umbraco.services')
          */
         load: function (pathArray, scope) {
             var deferred = $q.defer();
-           
+        
             var nonEmpty = _.reject(pathArray, function(item) {
                 return item === undefined || item === "";
             });
 
+
             //don't load anything if there's nothing to load
             if (nonEmpty.length > 0) {
-
                 yepnope({
                     load: pathArray,
                     complete: function() {

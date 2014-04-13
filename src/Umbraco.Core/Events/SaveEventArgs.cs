@@ -49,8 +49,5 @@ namespace Umbraco.Core.Events
 		{
 			get { return EventObject; }
 		}
-
-
-
 	}
 }

@@ -14,6 +14,17 @@ namespace Umbraco.Web.Cache
     /// </summary>
     internal static class DistributedCacheExtensions
     {
+        #region Public access
+
+        public static void RefreshPublicAccess(this DistributedCache dc)
+        {
+            dc.RefreshByJson(new Guid(DistributedCache.PublicAccessCacheRefresherId),
+                PublicAccessCacheRefresher.SerializeToJsonPayload(
+                    Access.GetXmlDocumentCopy()));
+        }
+
+        #endregion
+
         #region Application tree cache
         public static void RefreshAllApplicationTreeCache(this DistributedCache dc)
         {
@@ -124,8 +135,7 @@ namespace Umbraco.Web.Cache
         }
 
         #endregion
-
-
+        
         #region Data type cache
         /// <summary>
         /// Refreshes the cache amongst servers for a data type
@@ -233,29 +243,97 @@ namespace Umbraco.Web.Cache
         public static void RemovePageCache(this DistributedCache dc, int documentId)
         {
             dc.Remove(new Guid(DistributedCache.PageCacheRefresherId), documentId);
-        } 
+        }
+
+        /// <summary>
+        /// invokes the unpublished page cache refresher
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="content"></param>
+        public static void RefreshUnpublishedPageCache(this DistributedCache dc, params IContent[] content)
+        {
+            dc.Refresh(new Guid(DistributedCache.UnpublishedPageCacheRefresherId), x => x.Id, content);
+        }
+
+        /// <summary>
+        /// invokes the unpublished page cache refresher
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="content"></param>
+        public static void RemoveUnpublishedPageCache(this DistributedCache dc, params IContent[] content)
+        {
+            dc.Remove(new Guid(DistributedCache.UnpublishedPageCacheRefresherId), x => x.Id, content);
+        }
+
         #endregion
 
         #region Member cache
+
         /// <summary>
-        /// Refreshes the cache amongst servers for a member
+        /// Refreshes the cache among servers for a member
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="members"></param>
+        public static void RefreshMemberCache(this DistributedCache dc, params IMember[] members)
+        {
+            dc.Refresh(new Guid(DistributedCache.MemberCacheRefresherId), x => x.Id, members);
+        }
+
+        /// <summary>
+        /// Removes the cache among servers for a member
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="members"></param>
+        public static void RemoveMemberCache(this DistributedCache dc, params IMember[] members)
+        {
+            dc.Remove(new Guid(DistributedCache.MemberCacheRefresherId), x => x.Id, members);
+        } 
+
+        /// <summary>
+        /// Refreshes the cache among servers for a member
         /// </summary>
         /// <param name="dc"></param>
         /// <param name="memberId"></param>
+        [Obsolete("Use the RefreshMemberCache with strongly typed IMember objects instead")]
         public static void RefreshMemberCache(this DistributedCache dc, int memberId)
         {
             dc.Refresh(new Guid(DistributedCache.MemberCacheRefresherId), memberId);
         }
 
         /// <summary>
-        /// Removes the cache amongst servers for a member
+        /// Removes the cache among servers for a member
         /// </summary>
         /// <param name="dc"></param>
         /// <param name="memberId"></param>
+        [Obsolete("Use the RemoveMemberCache with strongly typed IMember objects instead")]
         public static void RemoveMemberCache(this DistributedCache dc, int memberId)
         {
             dc.Remove(new Guid(DistributedCache.MemberCacheRefresherId), memberId);
         } 
+
+        #endregion
+
+        #region Member group cache
+        /// <summary>
+        /// Refreshes the cache among servers for a member group
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="memberGroupId"></param>
+        public static void RefreshMemberGroupCache(this DistributedCache dc, int memberGroupId)
+        {
+            dc.Refresh(new Guid(DistributedCache.MemberGroupCacheRefresherId), memberGroupId);
+        }
+
+        /// <summary>
+        /// Removes the cache among servers for a member group
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="memberGroupId"></param>
+        public static void RemoveMemberGroupCache(this DistributedCache dc, int memberGroupId)
+        {
+            dc.Remove(new Guid(DistributedCache.MemberGroupCacheRefresherId), memberGroupId);
+        }
+
         #endregion
 
         #region Media Cache
@@ -268,7 +346,7 @@ namespace Umbraco.Web.Cache
         public static void RefreshMediaCache(this DistributedCache dc, params IMedia[] media)
         {
             dc.RefreshByJson(new Guid(DistributedCache.MediaCacheRefresherId), 
-                MediaCacheRefresher.SerializeToJsonPayload(media));
+                MediaCacheRefresher.SerializeToJsonPayload(MediaCacheRefresher.OperationType.Saved, media));
         }
 
         /// <summary>
@@ -281,6 +359,7 @@ namespace Umbraco.Web.Cache
         /// to clear all of the cache but the media item will be removed before the other servers can
         /// look it up. Only here for legacy purposes.
         /// </remarks>
+        [Obsolete("Ensure to clear with other RemoveMediaCache overload")]
         public static void RemoveMediaCache(this DistributedCache dc, int mediaId)
         {
             dc.Remove(new Guid(DistributedCache.MediaCacheRefresherId), mediaId);
@@ -290,11 +369,14 @@ namespace Umbraco.Web.Cache
         /// Removes the cache amongst servers for media items
         /// </summary>
         /// <param name="dc"></param>
+        /// <param name="isPermanentlyDeleted"></param>
         /// <param name="media"></param>
-        public static void RemoveMediaCache(this DistributedCache dc, params IMedia[] media)
+        public static void RemoveMediaCache(this DistributedCache dc, bool isPermanentlyDeleted, params IMedia[] media)
         {
-            dc.RefreshByJson(new Guid(DistributedCache.MediaCacheRefresherId), 
-                MediaCacheRefresher.SerializeToJsonPayload(media));
+            dc.RefreshByJson(new Guid(DistributedCache.MediaCacheRefresherId),
+                MediaCacheRefresher.SerializeToJsonPayload(
+                    isPermanentlyDeleted ? MediaCacheRefresher.OperationType.Deleted : MediaCacheRefresher.OperationType.Trashed,
+                    media));
         } 
 
         #endregion
@@ -382,7 +464,7 @@ namespace Umbraco.Web.Cache
         } 
         #endregion
 
-        #region Content type cache
+        #region Document type cache
 
         /// <summary>
         /// Remove all cache for a given content type
@@ -393,24 +475,8 @@ namespace Umbraco.Web.Cache
         {
             if (contentType != null)
             {
-                //dc.Refresh(new Guid(DistributedCache.ContentTypeCacheRefresherId), x => x.Id, contentType);
                 dc.RefreshByJson(new Guid(DistributedCache.ContentTypeCacheRefresherId),
                     ContentTypeCacheRefresher.SerializeToJsonPayload(false, contentType));
-            }
-        }
-
-        /// <summary>
-        /// Remove all cache for a given media type
-        /// </summary>
-        /// <param name="dc"></param>
-        /// <param name="mediaType"></param>
-        public static void RefreshMediaTypeCache(this DistributedCache dc, IMediaType mediaType)
-        {
-            if (mediaType != null)
-            {
-                //dc.Refresh(new Guid(DistributedCache.ContentTypeCacheRefresherId), x => x.Id, mediaType);
-                dc.RefreshByJson(new Guid(DistributedCache.ContentTypeCacheRefresherId),
-                    ContentTypeCacheRefresher.SerializeToJsonPayload(false, mediaType));
             }
         }
 
@@ -423,9 +489,26 @@ namespace Umbraco.Web.Cache
         {
             if (contentType != null)
             {
-                //dc.Remove(new Guid(DistributedCache.ContentTypeCacheRefresherId), x => x.Id, contentType);
                 dc.RefreshByJson(new Guid(DistributedCache.ContentTypeCacheRefresherId),
                     ContentTypeCacheRefresher.SerializeToJsonPayload(true, contentType));
+            }
+        }
+
+        #endregion
+
+        #region Media type cache
+
+        /// <summary>
+        /// Remove all cache for a given media type
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="mediaType"></param>
+        public static void RefreshMediaTypeCache(this DistributedCache dc, IMediaType mediaType)
+        {
+            if (mediaType != null)
+            {
+                dc.RefreshByJson(new Guid(DistributedCache.ContentTypeCacheRefresherId),
+                    ContentTypeCacheRefresher.SerializeToJsonPayload(false, mediaType));
             }
         }
 
@@ -438,12 +521,45 @@ namespace Umbraco.Web.Cache
         {
             if (mediaType != null)
             {
-                //dc.Remove(new Guid(DistributedCache.ContentTypeCacheRefresherId), x => x.Id, mediaType);
                 dc.RefreshByJson(new Guid(DistributedCache.ContentTypeCacheRefresherId),
                     ContentTypeCacheRefresher.SerializeToJsonPayload(true, mediaType));
             }
-        } 
+        }
+
         #endregion
+
+        #region Media type cache
+
+        /// <summary>
+        /// Remove all cache for a given media type
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="memberType"></param>
+        public static void RefreshMemberTypeCache(this DistributedCache dc, IMemberType memberType)
+        {
+            if (memberType != null)
+            {
+                dc.RefreshByJson(new Guid(DistributedCache.ContentTypeCacheRefresherId),
+                    ContentTypeCacheRefresher.SerializeToJsonPayload(false, memberType));
+            }
+        }
+
+        /// <summary>
+        /// Remove all cache for a given media type
+        /// </summary>
+        /// <param name="dc"></param>
+        /// <param name="memberType"></param>
+        public static void RemoveMemberTypeCache(this DistributedCache dc, IMemberType memberType)
+        {
+            if (memberType != null)
+            {
+                dc.RefreshByJson(new Guid(DistributedCache.ContentTypeCacheRefresherId),
+                    ContentTypeCacheRefresher.SerializeToJsonPayload(true, memberType));
+            }
+        }
+
+        #endregion
+
 
         #region Stylesheet Cache
 

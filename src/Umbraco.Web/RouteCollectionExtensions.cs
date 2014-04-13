@@ -3,11 +3,38 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web.Mvc;
 using System.Web.Routing;
+using System.Web.Http;
 
 namespace Umbraco.Web
 {
-	internal static class RouteCollectionExtensions
+    internal static class RouteCollectionExtensions
 	{
+        /// <summary>
+        /// Routes a webapi controller with namespaces
+        /// </summary>
+        /// <param name="routes"></param>
+        /// <param name="name"></param>
+        /// <param name="url"></param>
+        /// <param name="defaults"></param>
+        /// <param name="namespaces"></param>
+        /// <returns></returns>
+        public static Route MapHttpRoute(this RouteCollection routes, string name, string url, object defaults, string[] namespaces)
+        {
+            var apiRoute = routes.MapHttpRoute(
+                name,
+                url,
+                defaults);
+
+            //web api routes don't set the data tokens object
+            if (apiRoute.DataTokens == null)
+            {
+                apiRoute.DataTokens = new RouteValueDictionary();
+            }
+            apiRoute.DataTokens.Add("Namespaces", namespaces); //look in this namespace to create the controller
+            apiRoute.DataTokens.Add("UseNamespaceFallback", false); //Don't look anywhere else except this namespace!
+
+            return apiRoute;
+        }
 
 		public static void IgnoreStandardExclusions(this RouteCollection routes)
 		{
@@ -43,11 +70,11 @@ namespace Umbraco.Web
 		/// <typeparam name="T"></typeparam>
 		/// <param name="routes"></param>
 		public static void RegisterArea<T>(this RouteCollection routes)
-			where T : AreaRegistration
+			where T : AreaRegistration, new()
 		{
 
 			// instantiate the area registration
-			var area = Activator.CreateInstance<T>();
+		    var area = new T();
 
 			// create a context, which is just the name and routes collection
 			var context = new AreaRegistrationContext(area.AreaName, routes);

@@ -82,7 +82,7 @@ namespace Umbraco.Web
                         throw new InvalidOperationException("Cannot resolve a Url for a content item when UmbracoContext.Current is null.");
                     if (UmbracoContext.Current.UrlProvider == null)
                         throw new InvalidOperationException("Cannot resolve a Url for a content item when UmbracoContext.Current.UrlProvider is null.");
-                    return UmbracoContext.Current.UrlProvider.GetUrl(content.Id);
+                    return UmbracoContext.Current.UrlProvider.GetUrl(content.Id, true);
                 case PublishedItemType.Media:
                     throw new NotSupportedException("AbsoluteUrl is not supported for media types.");
                 default:
@@ -1335,6 +1335,15 @@ namespace Umbraco.Web
             return content.ContentSet.ElementAtOrDefault(content.GetIndex() + 1);
         }
 
+		public static IPublishedContent Next(this IPublishedContent current, Func<IPublishedContent, bool> func) {
+			IPublishedContent next = current.Next();
+			while (next != null) {
+				if (func(next)) return next;
+				next = next.Next();
+			}
+			return null;
+		}
+
         public static IPublishedContent Next(this IPublishedContent content, int number)
 		{
             if (number < 0)
@@ -1395,6 +1404,15 @@ namespace Umbraco.Web
 		{
             return content.ContentSet.ElementAtOrDefault(content.GetIndex() - 1);
         }
+
+		public static IPublishedContent Previous(this IPublishedContent current, Func<IPublishedContent, bool> func) {
+			IPublishedContent prev = current.Previous();
+			while (prev != null) {
+				if (func(prev)) return prev;
+				prev = prev.Previous();
+			}
+			return null;
+		}
 
 		public static IPublishedContent Previous(this IPublishedContent content, int number)
 		{

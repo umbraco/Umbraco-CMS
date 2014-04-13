@@ -18,6 +18,7 @@ using umbraco.interfaces;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class ContentRepositoryTest : BaseDatabaseFactoryTest
     {
@@ -39,14 +40,14 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var templateRepository = new TemplateRepository(unitOfWork, NullCacheProvider.Current);
             var tagRepository = new TagsRepository(unitOfWork, NullCacheProvider.Current);
-            contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);
-            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository, tagRepository);
+            contentTypeRepository = new ContentTypeRepository(unitOfWork, NullCacheProvider.Current, templateRepository);            
+            var repository = new ContentRepository(unitOfWork, NullCacheProvider.Current, contentTypeRepository, templateRepository, tagRepository, CacheHelper.CreateDisabledCacheHelper());
             return repository;
         }
 
         [Test]
         public void Ensures_Permissions_Are_Set_If_Parent_Entity_Permissions_Exist()
-        {           
+        {
             // Arrange
             var provider = new PetaPocoUnitOfWorkProvider();
             var unitOfWork = provider.GetUnitOfWork();
@@ -54,7 +55,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 contentType.AllowedContentTypes = new List<ContentTypeSort>
                 {
                     new ContentTypeSort
@@ -70,7 +71,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 unitOfWork.Commit();
 
                 // Act
-            repository.AssignEntityPermissions(parentPage, 'A', new object[] {0});
+                repository.AssignEntityPermission(parentPage, 'A', new int[] { 0 });
                 var childPage = MockedContent.CreateSimpleContent(contentType, "child", parentPage);
                 repository.AddOrUpdate(childPage);
                 unitOfWork.Commit();
@@ -78,9 +79,9 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 var permissions = repository.GetPermissionsForEntity(childPage.Id);
                 Assert.AreEqual(1, permissions.Count());
-            Assert.AreEqual("A", permissions.Single().AssignedPermissions.First());
+                Assert.AreEqual("A", permissions.Single().AssignedPermissions.First());
             }
-            
+
         }
 
         [Test]
@@ -106,7 +107,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
-                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
                 Content textpage = MockedContent.CreateSimpleContent(contentType);
 
                 // Act
@@ -130,7 +131,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
-                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 contentTypeRepository.AddOrUpdate(contentType);
                 unitOfWork.Commit();
 
@@ -138,7 +139,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var anotherTextpage = MockedContent.CreateSimpleContent(contentType, "@lightgiants", -1);
 
                 // Act
-                
+
                 repository.AddOrUpdate(textpage);
                 repository.AddOrUpdate(anotherTextpage);
                 unitOfWork.Commit();
@@ -164,7 +165,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
-                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 Content textpage = MockedContent.CreateSimpleContent(contentType);
 
                 // Act
@@ -182,7 +183,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(subpage.HasIdentity, Is.True);
                 Assert.That(textpage.Id, Is.EqualTo(subpage.ParentId));
             }
-            
+
         }
 
         [Test]
@@ -194,7 +195,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             ContentTypeRepository contentTypeRepository;
             using (var repository = CreateRepository(unitOfWork, out contentTypeRepository))
             {
-                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage", "Textpage");
+                ContentType contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage1", "Textpage");
                 Content textpage = MockedContent.CreateSimpleContent(contentType);
 
                 // Act
@@ -253,7 +254,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(updatedContent.Id, Is.EqualTo(content.Id));
                 Assert.That(updatedContent.Name, Is.EqualTo(content.Name));
             }
-            
+
         }
 
         [Test]
@@ -283,7 +284,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Assert
                 Assert.That(content1, Is.Null);
-            }            
+            }
         }
 
         [Test]
@@ -327,7 +328,7 @@ namespace Umbraco.Tests.Persistence.Repositories
 
                 // Assert
                 Assert.That(result.Count(), Is.GreaterThanOrEqualTo(2));
-            }            
+            }
         }
 
         [Test]
@@ -346,7 +347,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(contents, Is.Not.Null);
                 Assert.That(contents.Any(), Is.True);
                 Assert.That(contents.Count(), Is.EqualTo(2));
-            }            
+            }
         }
 
         [Test]
@@ -367,7 +368,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(contents.Count(), Is.GreaterThanOrEqualTo(4));
             }
 
-            
+
         }
 
         [Test]
@@ -386,7 +387,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(exists, Is.True);
             }
 
-            
+
         }
 
         [Test]
@@ -426,7 +427,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(textpage.Key.ToString().ToUpper(), Is.EqualTo("B58B3AD4-62C2-4E27-B1BE-837BD7C533E0"));
                 Assert.That(subpage.Key.ToString().ToUpper(), Is.EqualTo("FF11402B-7E53-4654-81A7-462AC2108059"));
                 Assert.That(trashed.Key, Is.Not.EqualTo(Guid.Empty));
-            }            
+            }
         }
 
         [Test]
@@ -445,7 +446,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 // Assert
                 Assert.That(content, Is.Not.Null);
                 Assert.That(content.Id, Is.EqualTo(NodeDto.NodeIdSeed + 1));
-            }           
+            }
 
         }
 
@@ -474,7 +475,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(latest.Name, Is.EqualTo("Tekst Side 1"));
                 Assert.That(english.Name, Is.EqualTo("Text Page 1"));
                 Assert.That(danish.Name, Is.EqualTo("Tekst Side 1"));
-            }            
+            }
         }
 
         public void CreateTestData()

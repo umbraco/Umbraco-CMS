@@ -1,4 +1,4 @@
-<%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoPage.Master" Title="Assembly Browser" Codebehind="assemblyBrowser.aspx.cs" AutoEventWireup="True"
+<%@ Page Language="c#" MasterPageFile="../../masterpages/umbracoDialog.Master" Title="Assembly Browser" Codebehind="assemblyBrowser.aspx.cs" AutoEventWireup="True"
   Inherits="umbraco.developer.assemblyBrowser" %>
 <%@ Register TagPrefix="wc1" Namespace="umbraco.controls" Assembly="umbraco" %>
 <%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
@@ -7,7 +7,8 @@
 
 
 <asp:Content ContentPlaceHolderID="body" runat="server">
-<h3 style="MARGIN-LEFT: 0px"><asp:Label id="AssemblyName" runat="server"></asp:Label></h3>
+<h4><asp:Label id="AssemblyName" runat="server"></asp:Label></h4>
+
 <asp:Panel id="ChooseProperties" runat="server">
 					<p class="guiDialogTiny">The following list shows the Public Properties from the 
 						Control. By checking the Properties and click the "Save Properties" button at 

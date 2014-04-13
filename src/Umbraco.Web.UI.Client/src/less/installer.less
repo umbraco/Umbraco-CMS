@@ -1,0 +1,291 @@
+// Core variables and mixins
+@import "fonts.less"; // Loading fonts
+@import "variables.less"; // Modify this for custom colors, font-sizes, etc
+@import "mixins.less";
+@import "buttons.less";
+@import "forms.less";
+
+// Grid system and page structure
+@import "../../lib/bootstrap/less/scaffolding.less";
+@import "../../lib/bootstrap/less/grid.less";
+@import "../../lib/bootstrap/less/layouts.less";
+
+@import "../../lib/bootstrap/less/thumbnails.less";
+@import "../../lib/bootstrap/less/media.less";
+
+
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak], .ng-cloak, .x-ng-cloak {
+  display: none !important;
+}
+
+
+html {
+  background: url('../img/installer.jpg') no-repeat center center fixed;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+
+  font-family: @baseFontFamily;
+  font-size: @baseFontSize;
+  line-height: @baseLineHeight;
+  color: @textColor;
+
+  vertical-align: center;
+  text-align: center;
+}
+
+#logo{
+	position: absolute;
+	top: 20px;
+	left: 20px;
+	opacity: 0.8;
+  z-index: 777;
+}
+
+#installer{
+	margin: auto;
+	background: white;
+  width: 750px;
+  height: 600px;
+  text-align: left;
+  padding: 30px;
+  overflow:hidden;
+  z-index: 667;
+}
+
+#overlay{
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background: @blackLight;
+  z-index: 666;
+}
+
+.loading #overlay{
+    opacity: 0.5;
+    display: block !important;
+}
+
+
+#fact{
+  color: #fff;
+  text-shadow: 0px 0px 4px black;
+  font-size: 25px;
+  text-align: left;
+  line-height: 35px;
+  z-index: 667;
+  height: 600px;
+  width: 750px;
+}
+
+#fact h2{
+  font-size: 35px;
+  border-bottom: 1px solid white;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  color: white;
+} 
+
+#fact a{color: white;}
+
+#feedback{
+  color: #fff;
+  text-shadow: 0px 0px 4px black;
+  font-size: 14px;
+  text-align: center;
+  line-height: 20px;
+  z-index: 667;
+  bottom: 20px;
+  right: 0;
+  left: 0;
+  height: 25px;
+  position: absolute;
+}
+
+
+h1{
+  border-bottom: 1px solid @grayLighter;
+  padding-bottom: 10px;
+  color: @gray;
+}
+
+.error h1, .error .message, span.error{ color: @red;}
+
+legend{font-size: 14px; font-weight: bold}
+
+input.ng-dirty.ng-invalid{border-color: #b94a48; color: #b94a48;}
+.disabled{
+  opacity: 0.6;
+}
+
+.controls{
+	text-align: left
+}
+
+.controls small{display: block; color: @gray;}
+
+.absolute-center {
+  margin: auto;
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+}
+
+.fade-hide, .fade-show {
+    -webkit-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+    -moz-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+    -o-transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+    transition:all cubic-bezier(0.250, 0.460, 0.450, 0.940) 0.5s;
+}
+.fade-hide {
+    opacity:1;
+}
+.fade-hide.fade-hide-active {
+    opacity:0;
+}
+.fade-show {
+    opacity:0;
+}
+.fade-show.fade-show-active {
+    opacity:1;
+}
+
+
+.umb-loader{
+background-color: white;
+margin-top:0;
+margin-left:-100%;
+-moz-animation-name:bounce_loadingProgressG;
+-moz-animation-duration:1s;
+-moz-animation-iteration-count:infinite;
+-moz-animation-timing-function:linear;
+-webkit-animation-name:bounce_loadingProgressG;
+-webkit-animation-duration:1s;
+-webkit-animation-iteration-count:infinite;
+-webkit-animation-timing-function:linear;
+-ms-animation-name:bounce_loadingProgressG;
+-ms-animation-duration:1s;
+-ms-animation-iteration-count:infinite;
+-ms-animation-timing-function:linear;
+-o-animation-name:bounce_loadingProgressG;
+-o-animation-duration:1s;
+-o-animation-iteration-count:infinite;
+-o-animationtiming-function:linear;
+animation-name:bounce_loadingProgressG;
+animation-duration:1s;
+animation-iteration-count:infinite;
+animation-timing-function:linear;
+width:100%;
+height: 5px;
+}
+
+
+    @-moz-keyframes bounce_loadingProgressG{
+    0%{
+    margin-left:-100%;
+    }
+
+    100%{
+    margin-left:100%;
+    }
+
+    }
+
+    @-webkit-keyframes bounce_loadingProgressG{
+    0%{
+    margin-left:-100%;
+    }
+
+    100%{
+    margin-left:100%;
+    }
+
+    }
+
+    @-ms-keyframes bounce_loadingProgressG{
+    0%{
+    margin-left:-100%;
+    }
+
+    100%{
+    margin-left:100%;
+    }
+
+    }
+
+    @-o-keyframes bounce_loadingProgressG{
+    0%{
+    margin-left:-100%;
+    }
+
+    100%{
+    margin-left:100%;
+    }
+
+    }
+
+    @keyframes bounce_loadingProgressG{
+    0%{
+    margin-left:-100%;
+    }
+    100%{
+    margin-left:100%;
+    }
+}
+
+//loader defaults
+.umb-loader-container, .umb-loader-done{
+	height: 3px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  overflow: hidden;
+  width: 0%;
+  z-index: 777;
+}
+
+.umb-loader-done{
+   right: 0%;
+   background: white;
+}
+
+
+.permissions-report {
+    overflow:auto;
+    height:320px;
+    margin:0;
+    display:block;
+    padding:0;
+}
+.permissions-report > li {
+    list-style:none;
+}
+.permissions-report h4 {
+    margin:7px;
+}
+
+.upgrade-report {
+    overflow:auto;
+    height:280px;
+    display:block;
+}
+
+select {
+    width:320px;
+}
+
+#ysod {
+    height:500px;
+    width:100%;
+    overflow:auto;
+    border:none;
+}

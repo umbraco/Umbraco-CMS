@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Configuration.Provider;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Configuration;
+using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Security.Providers
@@ -10,155 +14,79 @@ namespace Umbraco.Web.Security.Providers
     /// <summary>
     /// Custom Membership Provider for Umbraco Users (User authentication for Umbraco Backend CMS)  
     /// </summary>
-    internal class UsersMembershipProvider : MembershipProvider
+    public class UsersMembershipProvider : UmbracoMembershipProvider<IMembershipUserService, IUser>, IUsersMembershipProvider
     {
-        private IMembershipUserService _userService;
 
-        protected IMembershipUserService UserService
+        public UsersMembershipProvider()
+            : this(ApplicationContext.Current.Services.UserService)
         {
-            get { return _userService ?? (_userService = ApplicationContext.Current.Services.UserService); }
         }
 
-        public override MembershipUser CreateUser(string username, string password, string email, string passwordQuestion, string passwordAnswer,
-                                                  bool isApproved, object providerUserKey, out MembershipCreateStatus status)
+        public UsersMembershipProvider(IMembershipMemberService<IUser> memberService)
+            : base(memberService)
         {
-            //Assuming the password is hashed
-            var hash = new HMACSHA1();
-            hash.Key = Encoding.Unicode.GetBytes(password);
-            var encodedPassword = Convert.ToBase64String(hash.ComputeHash(Encoding.Unicode.GetBytes(password)));
-
-            //var user = _userService.CreateUser();
-            //status = MembershipCreateStatus.Success;
-            //return new UmbracoMembershipUser<User>(user);
-            throw new System.NotImplementedException();
         }
 
-        public override bool ChangePasswordQuestionAndAnswer(string username, string password, string newPasswordQuestion,
-                                                             string newPasswordAnswer)
+        private string _defaultMemberTypeAlias = "writer";
+        private volatile bool _hasDefaultMember = false;
+        private static readonly object Locker = new object();
+
+        public override string ProviderName
         {
-            throw new System.NotImplementedException();
+            get { return UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider; }
         }
 
-        public override string GetPassword(string username, string answer)
+        /// <summary>
+        /// For backwards compatibility, this provider supports this option
+        /// </summary>
+        public override bool AllowManuallyChangingPassword
         {
-            throw new System.NotImplementedException();
+            get { return true; }
         }
 
-        public override bool ChangePassword(string username, string oldPassword, string newPassword)
+        protected override MembershipUser ConvertToMembershipUser(IUser entity)
         {
-            throw new System.NotImplementedException();
+            //the provider user key is always the int id
+            return entity.AsConcreteMembershipUser(Name);
         }
 
-        public override string ResetPassword(string username, string answer)
+        public override void Initialize(string name, System.Collections.Specialized.NameValueCollection config)
         {
-            throw new System.NotImplementedException();
+            base.Initialize(name, config);
+
+            // test for membertype (if not specified, choose the first member type available)
+            if (config["defaultUserTypeAlias"] != null)
+            {
+                _defaultMemberTypeAlias = config["defaultUserTypeAlias"];
+                if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
+                {
+                    throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
+                }
+                _hasDefaultMember = true;
+            }
         }
 
-        public override void UpdateUser(MembershipUser user)
+        public override string DefaultMemberTypeAlias
         {
-            throw new System.NotImplementedException();
-        }
-
-        public override bool ValidateUser(string username, string password)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override bool UnlockUser(string userName)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override MembershipUser GetUser(object providerUserKey, bool userIsOnline)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override MembershipUser GetUser(string username, bool userIsOnline)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override string GetUserNameByEmail(string email)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override bool DeleteUser(string username, bool deleteAllRelatedData)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override MembershipUserCollection GetAllUsers(int pageIndex, int pageSize, out int totalRecords)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override int GetNumberOfUsersOnline()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override MembershipUserCollection FindUsersByName(string usernameToMatch, int pageIndex, int pageSize, out int totalRecords)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override MembershipUserCollection FindUsersByEmail(string emailToMatch, int pageIndex, int pageSize, out int totalRecords)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override bool EnablePasswordRetrieval
-        {
-            get { throw new System.NotImplementedException(); }
-        }
-
-        public override bool EnablePasswordReset
-        {
-            get { throw new System.NotImplementedException(); }
-        }
-
-        public override bool RequiresQuestionAndAnswer
-        {
-            get { throw new System.NotImplementedException(); }
-        }
-
-        public override string ApplicationName { get; set; }
-
-        public override int MaxInvalidPasswordAttempts
-        {
-            get { throw new System.NotImplementedException(); }
-        }
-
-        public override int PasswordAttemptWindow
-        {
-            get { throw new System.NotImplementedException(); }
-        }
-
-        public override bool RequiresUniqueEmail
-        {
-            get { throw new System.NotImplementedException(); }
-        }
-
-        public override MembershipPasswordFormat PasswordFormat
-        {
-            get { throw new System.NotImplementedException(); }
-        }
-
-        public override int MinRequiredPasswordLength
-        {
-            get { throw new System.NotImplementedException(); }
-        }
-
-        public override int MinRequiredNonAlphanumericCharacters
-        {
-            get { throw new System.NotImplementedException(); }
-        }
-
-        public override string PasswordStrengthRegularExpression
-        {
-            get { throw new System.NotImplementedException(); }
+            get
+            {
+                if (_hasDefaultMember == false)
+                {
+                    lock (Locker)
+                    {
+                        if (_hasDefaultMember == false)
+                        {
+                            _defaultMemberTypeAlias = MemberService.GetDefaultMemberType();
+                            if (_defaultMemberTypeAlias.IsNullOrWhiteSpace())
+                            {
+                                throw new ProviderException("No default user type alias is specified in the web.config string. Please add a 'defaultUserTypeAlias' to the add element in the provider declaration in web.config");
+                            }
+                            _hasDefaultMember = true;
+                        }
+                    }
+                }
+                return _defaultMemberTypeAlias;
+            }
         }
     }
 }

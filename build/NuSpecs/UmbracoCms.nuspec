@@ -4,7 +4,7 @@
         <id>UmbracoCms</id>
         <version>7.0.0</version>
         <title>Umbraco Cms</title>
-        <authors>Morten Christensen</authors>
+        <authors>Umbraco HQ</authors>
         <owners>Umbraco HQ</owners>
         <licenseUrl>http://umbraco.codeplex.com/license</licenseUrl>
         <projectUrl>http://umbraco.com/</projectUrl>
@@ -19,8 +19,6 @@
         </dependencies>
     </metadata>
   <files>
-	<file src="..\_BuildOutput\WebApp\bin\amd64\**" target="Content\bin\amd64" />
-	<file src="..\_BuildOutput\WebApp\bin\x86\**" target="Content\bin\x86" />
 	<file src="..\_BuildOutput\Configs\**" target="Content\config" exclude="..\_BuildOutput\Configs\Web.config.transform" />
 	<file src="..\_BuildOutput\WebApp\css\**" target="Content\css" />
 	<file src="..\_BuildOutput\WebApp\macroScripts\**" target="Content\macroScripts" exclude="..\_BuildOutput\WebApp\macroScripts\Web.config" />
@@ -32,15 +30,14 @@
 	<file src="..\_BuildOutput\WebApp\xslt\**" target="Content\xslt" />
 	<file src="..\_BuildOutput\WebApp\default.aspx" target="Content\default.aspx" />
 	<file src="..\_BuildOutput\WebApp\Web.config" target="Content\Web.config" />
+	<file src="..\_BuildOutput\WebApp\Global.asax" target="Content\Global.asax" />
 	<file src="..\_BuildOutput\WebApp\App_Browsers\**" target="UmbracoFiles\App_Browsers" />
-	<file src="..\_BuildOutput\WebApp\App_Code\**" target="UmbracoFiles\App_Code" />
-	<file src="..\_BuildOutput\WebApp\App_Data\**" target="UmbracoFiles\App_Data" />
-	<file src="..\_BuildOutput\WebApp\App_Plugins\**" target="UmbracoFiles\App_Plugins" />
+	<file src="..\_BuildOutput\WebApp\App_Plugins\**" target="UmbracoFiles\App_Plugins" />	
+	<file src="..\_BuildOutput\WebApp\bin\amd64\**" target="UmbracoFiles\bin\amd64" />
+	<file src="..\_BuildOutput\WebApp\bin\x86\**" target="UmbracoFiles\bin\x86" />
 	<file src="..\_BuildOutput\WebApp\config\splashes\**" target="UmbracoFiles\config\splashes" />
-	<file src="..\_BuildOutput\WebApp\install\**" target="UmbracoFiles\install" />
 	<file src="..\_BuildOutput\WebApp\umbraco\**" target="UmbracoFiles\umbraco" />
 	<file src="..\_BuildOutput\WebApp\umbraco_client\**" target="UmbracoFiles\umbraco_client" />
-	<file src="..\_BuildOutput\WebApp\Global.asax" target="UmbracoFiles\Global.asax" />
 	<file src="..\_BuildOutput\WebApp\Web.config" target="UmbracoFiles\Web.config" />
     <file src="tools\install.ps1" target="tools\install.ps1" />
     <file src="tools\Readme.txt" target="tools\Readme.txt" />

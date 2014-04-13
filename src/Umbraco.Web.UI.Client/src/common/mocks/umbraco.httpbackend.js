@@ -18,7 +18,6 @@ function initBackEnd($httpBackend, contentMocks, mediaMocks, treeMocks, userMock
     utilMocks.register();
     localizationMocks.register();
     prevaluesMocks.register();
-    
     entityMocks.register();
 
 	$httpBackend.whenGET(/^views\//).passThrough();

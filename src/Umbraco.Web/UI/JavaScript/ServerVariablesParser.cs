@@ -4,14 +4,13 @@ using Newtonsoft.Json.Linq;
 
 namespace Umbraco.Web.UI.JavaScript
 {
- 
-    internal class ServerVariablesParser
+    public sealed class ServerVariablesParser
     {
 
         /// <summary>
-        /// Could allow developers to add custom variables on startup - not sure if we want to allow that ? maybe.
+        /// Could allow developers to add custom variables on startup
         /// </summary>
-        internal static EventHandler<Dictionary<string, object>> Parsing;
+        public static event EventHandler<Dictionary<string, object>> Parsing;
 
         internal const string Token = "##Variables##";
 
@@ -25,7 +24,8 @@ namespace Umbraco.Web.UI.JavaScript
             }
 
             var json = JObject.FromObject(items);
-            return vars.Replace(Token, json.ToString());            
+            return vars.Replace(Token, json.ToString());  
+          
         }
         
     }

@@ -1,16 +1,19 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Threading;
+using System.Xml;
+using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Rdbms;
+using Umbraco.Core.Packaging;
+using Umbraco.Core.Packaging.Models;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.UnitOfWork;
@@ -22,11 +25,12 @@ namespace Umbraco.Core.Services
     /// Represents the Packaging Service, which provides import/export functionality for the Core models of the API
     /// using xml representation. This is primarily used by the Package functionality.
     /// </summary>
-    public class PackagingService : IService
+    public class PackagingService : IPackagingService
     {
         private readonly IContentService _contentService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IMediaService _mediaService;
+        private readonly IMacroService _macroService;
         private readonly IDataTypeService _dataTypeService;
         private readonly IFileService _fileService;
         private readonly ILocalizationService _localizationService;
@@ -38,6 +42,7 @@ namespace Umbraco.Core.Services
         public PackagingService(IContentService contentService,
             IContentTypeService contentTypeService,
             IMediaService mediaService,
+            IMacroService macroService,
             IDataTypeService dataTypeService,
             IFileService fileService,
             ILocalizationService localizationService,
@@ -47,6 +52,7 @@ namespace Umbraco.Core.Services
             _contentService = contentService;
             _contentTypeService = contentTypeService;
             _mediaService = mediaService;
+            _macroService = macroService;
             _dataTypeService = dataTypeService;
             _fileService = fileService;
             _localizationService = localizationService;
@@ -55,49 +61,7 @@ namespace Umbraco.Core.Services
 
             _importedContentTypes = new Dictionary<string, IContentType>();
         }
-
-        #region Generic export methods
-
-        internal void ExportToFile(string absoluteFilePath, string nodeType, int id)
-        {
-            XElement xml = null;
-
-            if (nodeType.Equals("content", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var content = _contentService.GetById(id);
-                xml = Export(content);
-            }
-
-            if (nodeType.Equals("media", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var media = _mediaService.GetById(id);
-                xml = Export(media);
-            }
-
-            if (nodeType.Equals("contenttype", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var contentType = _contentTypeService.GetContentType(id);
-                xml = Export(contentType);
-            }
-
-            if (nodeType.Equals("mediatype", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var mediaType = _contentTypeService.GetMediaType(id);
-                xml = Export(mediaType);
-            }
-
-            if (nodeType.Equals("datatype", StringComparison.InvariantCultureIgnoreCase))
-            {
-                var dataType = _dataTypeService.GetDataTypeDefinitionById(id);
-                xml = Export(dataType);
-            }
-
-            if (xml != null)
-                xml.Save(absoluteFilePath);
-        }
-
-        #endregion
-
+        
         #region Content
 
         /// <summary>
@@ -105,11 +69,18 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="content">Content to export</param>
         /// <param name="deep">Optional parameter indicating whether to include descendents</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Content object</returns>
-        internal XElement Export(IContent content, bool deep = false)
+        public XElement Export(IContent content, bool deep = false, bool raiseEvents = true)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
             var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : content.ContentType.Alias.ToSafeAliasWithForcingCheck();
+
+            if (raiseEvents)
+            {
+                if (ExportingContent.IsRaisedEventCancelled(new ExportEventArgs<IContent>(content, nodeName), this))
+                    return new XElement(nodeName);
+            }
 
             var xml = Export(content, nodeName);
             xml.Add(new XAttribute("nodeType", content.ContentType.Id));
@@ -126,11 +97,14 @@ namespace Umbraco.Core.Services
                 AddChildXml(descendants, currentChildren, xml);
             }
 
+            if(raiseEvents)
+                ExportedContent.RaiseEvent(new ExportEventArgs<IContent>(content, xml, false), this);
+
             return xml;
         }
 
         /// <summary>
-        /// Part of the export of IContent and IMedia which is shared
+        /// Part of the export of IContent and IMedia and IMember which is shared
         /// </summary>
         /// <param name="contentBase">Base Content or Media to export</param>
         /// <param name="nodeName">Name of the node</param>
@@ -142,6 +116,7 @@ namespace Umbraco.Core.Services
 
             var xml = new XElement(nodeName,
                                    new XAttribute("id", contentBase.Id),
+                                   new XAttribute("key", contentBase.Key.ToString("D")),
                                    new XAttribute("parentID", contentBase.Level > 1 ? contentBase.ParentId : -1),
                                    new XAttribute("level", contentBase.Level),
                                    new XAttribute("creatorID", contentBase.CreatorId),
@@ -153,8 +128,10 @@ namespace Umbraco.Core.Services
                                    new XAttribute("path", contentBase.Path),
                                    new XAttribute("isDoc", ""));
 
-            foreach (var property in contentBase.Properties.Where(p => p != null))
+            foreach (var property in contentBase.Properties.Where(p => p != null && p.Value != null && p.Value.ToString().IsNullOrWhiteSpace() == false))
+            {
                 xml.Add(property.ToXml());
+            }
 
             return xml;
         }
@@ -187,9 +164,16 @@ namespace Umbraco.Core.Services
         /// <param name="element">Xml to import</param>
         /// <param name="parentId">Optional parent Id for the content being imported</param>
         /// <param name="userId">Optional Id of the user performing the import</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated content</returns>
-        public IEnumerable<IContent> ImportContent(XElement element, int parentId = -1, int userId = 0)
+        public IEnumerable<IContent> ImportContent(XElement element, int parentId = -1, int userId = 0, bool raiseEvents = true)
         {
+            if (raiseEvents)
+            {
+                if (ImportingContent.IsRaisedEventCancelled(new ImportEventArgs<IContent>(element), this))
+                    return Enumerable.Empty<IContent>();
+            }
+
             var name = element.Name.LocalName;
             if (name.Equals("DocumentSet"))
             {
@@ -202,6 +186,8 @@ namespace Umbraco.Core.Services
                 if (contents.Any())
                     _contentService.Save(contents, userId);
 
+                if(raiseEvents)
+                    ImportedContent.RaiseEvent(new ImportEventArgs<IContent>(contents, element, false), this);
                 return contents;
             }
 
@@ -214,6 +200,8 @@ namespace Umbraco.Core.Services
                 if (contents.Any())
                     _contentService.Save(contents, userId);
 
+                if(raiseEvents)
+                    ImportedContent.RaiseEvent(new ImportEventArgs<IContent>(contents, element, false), this);
                 return contents;
             }
 
@@ -318,7 +306,7 @@ namespace Umbraco.Core.Services
                     if (propertyType != null && propertyType.PropertyEditorAlias == Constants.PropertyEditors.CheckBoxListAlias)
                     {
                         var database = ApplicationContext.Current.DatabaseContext.Database;
-                        var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNo" + "deId = @Id", new { Id = propertyType.DataTypeDefinitionId });
+                        var dtos = database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = propertyType.DataTypeDefinitionId });
 
                         var propertyValueList = new List<string>();
                         foreach (var preValue in propertyValue.Split(','))
@@ -344,9 +332,16 @@ namespace Umbraco.Core.Services
         /// Exports an <see cref="IContentType"/> to xml as an <see cref="XElement"/>
         /// </summary>
         /// <param name="contentType">ContentType to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the ContentType item.</returns>
-        public XElement Export(IContentType contentType)
+        public XElement Export(IContentType contentType, bool raiseEvents = true)
         {
+            if (raiseEvents)
+            {
+                if (ExportingContentType.IsRaisedEventCancelled(new ExportEventArgs<IContentType>(contentType, "DocumentType"), this))
+                    return new XElement("DocumentType");
+            }
+
             var info = new XElement("Info",
                                     new XElement("Name", contentType.Name),
                                     new XElement("Alias", contentType.Alias),
@@ -380,7 +375,11 @@ namespace Umbraco.Core.Services
             foreach (var propertyType in contentType.PropertyTypes)
             {
                 var definition = _dataTypeService.GetDataTypeDefinitionById(propertyType.DataTypeDefinitionId);
-                var propertyGroup = contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
+                
+                var propertyGroup = propertyType.PropertyGroupId == null 
+                                                ? null 
+                                                : contentType.PropertyGroups.FirstOrDefault(x => x.Id == propertyType.PropertyGroupId.Value);
+                
                 var genericProperty = new XElement("GenericProperty",
                                                    new XElement("Name", propertyType.Name),
                                                    new XElement("Alias", propertyType.Alias),
@@ -407,6 +406,10 @@ namespace Umbraco.Core.Services
                                    structure,
                                    genericProperties,
                                    tabs);
+
+            if (raiseEvents)
+                ExportedContentType.RaiseEvent(new ExportEventArgs<IContentType>(contentType, xml, false), this);
+
             return xml;
         }
 
@@ -415,8 +418,9 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="element">Xml to import</param>
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated ContentTypes</returns>
-        public IEnumerable<IContentType> ImportContentTypes(XElement element, int userId = 0)
+        public IEnumerable<IContentType> ImportContentTypes(XElement element, int userId = 0, bool raiseEvents = true)
         {
             return ImportContentTypes(element, true, userId);
         }
@@ -427,9 +431,16 @@ namespace Umbraco.Core.Services
         /// <param name="element">Xml to import</param>
         /// <param name="importStructure">Boolean indicating whether or not to import the </param>
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated ContentTypes</returns>
-        public IEnumerable<IContentType> ImportContentTypes(XElement element, bool importStructure, int userId = 0)
+        public IEnumerable<IContentType> ImportContentTypes(XElement element, bool importStructure, int userId = 0, bool raiseEvents = true)
         {
+            if (raiseEvents)
+            {
+                if (ImportingContentType.IsRaisedEventCancelled(new ImportEventArgs<IContentType>(element), this))
+                    return Enumerable.Empty<IContentType>();
+            }
+
             var name = element.Name.LocalName;
             if (name.Equals("DocumentTypes") == false && name.Equals("DocumentType") == false)
             {
@@ -475,6 +486,9 @@ namespace Umbraco.Core.Services
                 if (updatedContentTypes.Any())
                     _contentTypeService.Save(updatedContentTypes, userId);
             }
+
+            if (raiseEvents)
+                ImportedContentType.RaiseEvent(new ImportEventArgs<IContentType>(list, element, false), this);
 
             return list;
         }
@@ -584,9 +598,18 @@ namespace Umbraco.Core.Services
             {
                 var id = tab.Element("Id").Value;//Do we need to use this for tracking?
                 var caption = tab.Element("Caption").Value;
+
                 if (contentType.PropertyGroups.Contains(caption) == false)
                 {
                     contentType.AddPropertyGroup(caption);
+
+                    int sortOrder;
+                    if(tab.Element("SortOrder") != null && 
+                        int.TryParse(tab.Element("SortOrder").Value, out sortOrder))
+                    {
+                        // Override the sort order with the imported value
+                        contentType.PropertyGroups[caption].SortOrder = sortOrder;
+                    }
                 }
             }
         }
@@ -710,6 +733,11 @@ namespace Umbraco.Core.Services
             return contentType;
         }
 
+        /// <summary>
+        /// Used during Content import to ensure that the ContentType of a content item exists
+        /// </summary>
+        /// <param name="contentTypeAlias"></param>
+        /// <returns></returns>
         private IContentType FindContentTypeByAlias(string contentTypeAlias)
         {
             using (var repository = _repositoryFactory.CreateContentTypeRepository(_uowProvider.GetUnitOfWork()))
@@ -737,24 +765,36 @@ namespace Umbraco.Core.Services
         #region DataTypes
 
         /// <summary>
-        /// Export a list of data types
+        /// Exports a list of Data Types
         /// </summary>
-        /// <param name="dataTypeDefinitions"></param>
-        /// <returns></returns>
-        internal XElement Export(IEnumerable<IDataTypeDefinition >dataTypeDefinitions)
+        /// <param name="dataTypeDefinitions">List of data types to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition objects</returns>
+        public XElement Export(IEnumerable<IDataTypeDefinition> dataTypeDefinitions, bool raiseEvents = true)
         {
             var container = new XElement("DataTypes");
-            foreach (var d in dataTypeDefinitions)
+            foreach (var dataTypeDefinition in dataTypeDefinitions)
             {
-                container.Add(Export(d));
+                container.Add(Export(dataTypeDefinition, raiseEvents));
             }
             return container;
         }
 
-        internal XElement Export(IDataTypeDefinition dataTypeDefinition)
+        /// <summary>
+        /// Exports a single Data Type
+        /// </summary>
+        /// <param name="dataTypeDefinition">Data type to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDataTypeDefinition object</returns>
+        public XElement Export(IDataTypeDefinition dataTypeDefinition, bool raiseEvents = true)
         {
-            var prevalues = new XElement("PreValues");
+            if (raiseEvents)
+            {
+                if (ExportingDataType.IsRaisedEventCancelled(new ExportEventArgs<IDataTypeDefinition>(dataTypeDefinition, "DataType"), this))
+                    return new XElement("DataType");
+            }
 
+            var prevalues = new XElement("PreValues");
             var prevalueList = _dataTypeService.GetPreValuesCollectionByDataTypeId(dataTypeDefinition.Id)
                 .FormatAsDictionary();
 
@@ -763,7 +803,7 @@ namespace Umbraco.Core.Services
             {
                 var prevalue = new XElement("PreValue");
                 prevalue.Add(new XAttribute("Id", pv.Value.Id));
-                prevalue.Add(new XAttribute("Value", pv.Value.Value));
+                prevalue.Add(new XAttribute("Value", pv.Value.Value == null ? "" : pv.Value.Value));
                 prevalue.Add(new XAttribute("Alias", pv.Key));
                 prevalue.Add(new XAttribute("SortOrder", sort));
                 prevalues.Add(prevalue);
@@ -777,6 +817,9 @@ namespace Umbraco.Core.Services
             xml.Add(new XAttribute("Definition", dataTypeDefinition.Key));
             xml.Add(new XAttribute("DatabaseType", dataTypeDefinition.DatabaseType.ToString()));
 
+            if (raiseEvents)
+                ExportedDataType.RaiseEvent(new ExportEventArgs<IDataTypeDefinition>(dataTypeDefinition, xml, false), this);
+
             return xml;
         }
 
@@ -784,10 +827,17 @@ namespace Umbraco.Core.Services
         /// Imports and saves package xml as <see cref="IDataTypeDefinition"/>
         /// </summary>
         /// <param name="element">Xml to import</param>
-        /// <param name="userId"></param>
+        /// <param name="userId">Optional id of the user</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated DataTypeDefinitions</returns>
-        public IEnumerable<IDataTypeDefinition> ImportDataTypeDefinitions(XElement element, int userId = 0)
+        public IEnumerable<IDataTypeDefinition> ImportDataTypeDefinitions(XElement element, int userId = 0, bool raiseEvents = true)
         {
+            if (raiseEvents)
+            {
+                if (ImportingDataType.IsRaisedEventCancelled(new ImportEventArgs<IDataTypeDefinition>(element), this))
+                    return Enumerable.Empty<IDataTypeDefinition>();
+            }
+
             var name = element.Name.LocalName;
             if (name.Equals("DataTypes") == false && name.Equals("DataType") == false)
             {
@@ -797,7 +847,7 @@ namespace Umbraco.Core.Services
             var dataTypes = new Dictionary<string, IDataTypeDefinition>();
             var dataTypeElements = name.Equals("DataTypes")
                                        ? (from doc in element.Elements("DataType") select doc).ToList()
-                                       : new List<XElement> { element.Element("DataType") };
+                                       : new List<XElement> { element };
 
             foreach (var dataTypeElement in dataTypeElements)
             {
@@ -850,6 +900,10 @@ namespace Umbraco.Core.Services
 
                 SavePrevaluesFromXml(list, dataTypeElements);
             }
+
+            if (raiseEvents)
+                ImportedDataType.RaiseEvent(new ImportEventArgs<IDataTypeDefinition>(list, element, false), this);
+
             return list;
         }
 
@@ -882,15 +936,403 @@ namespace Umbraco.Core.Services
         #endregion
 
         #region Dictionary Items
+
+        /// <summary>
+        /// Exports a list of <see cref="IDictionaryItem"/> items to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="dictionaryItem">List of dictionary items to export</param>
+        /// <param name="includeChildren">Optional boolean indicating whether or not to include children</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDictionaryItem objects</returns>
+        public XElement Export(IEnumerable<IDictionaryItem> dictionaryItem, bool includeChildren = true, bool raiseEvents = true)
+        {
+            var xml = new XElement("DictionaryItems");
+            foreach (var item in dictionaryItem)
+            {
+                xml.Add(Export(item, includeChildren, raiseEvents));
+            }
+            return xml;
+        }
+
+        /// <summary>
+        /// Exports a single <see cref="IDictionaryItem"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="dictionaryItem">Dictionary Item to export</param>
+        /// <param name="includeChildren">Optional boolean indicating whether or not to include children</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IDictionaryItem object</returns>
+        public XElement Export(IDictionaryItem dictionaryItem, bool includeChildren, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (ExportingDictionaryItem.IsRaisedEventCancelled(new ExportEventArgs<IDictionaryItem>(dictionaryItem, "DictionaryItem"), this))
+                    return new XElement("DictionaryItem");
+            }
+
+            var xml = new XElement("DictionaryItem", new XAttribute("Key", dictionaryItem.ItemKey));
+            foreach (var translation in dictionaryItem.Translations)
+            {
+                xml.Add(new XElement("Value",
+                    new XAttribute("LanguageId", translation.Language.Id),
+                    new XAttribute("LanguageCultureAlias", translation.Language.IsoCode),
+                    new XCData(translation.Value)));
+            }
+
+            if (includeChildren)
+            {
+                var children = _localizationService.GetDictionaryItemChildren(dictionaryItem.Key);
+                foreach (var child in children)
+                {
+                    xml.Add(Export(child, true));
+                }
+            }
+
+            if (raiseEvents)
+                ExportedDictionaryItem.RaiseEvent(new ExportEventArgs<IDictionaryItem>(dictionaryItem, xml, false), this);
+
+            return xml;
+        }
+
+        /// <summary>
+        /// Imports and saves the 'DictionaryItems' part of the package xml as a list of <see cref="IDictionaryItem"/>
+        /// </summary>
+        /// <param name="dictionaryItemElementList">Xml to import</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns>An enumerable list of dictionary items</returns>
+        public IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement dictionaryItemElementList, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (ImportingDictionaryItem.IsRaisedEventCancelled(new ImportEventArgs<IDictionaryItem>(dictionaryItemElementList), this))
+                    return Enumerable.Empty<IDictionaryItem>();
+            }
+
+            var languages = _localizationService.GetAllLanguages().ToList();
+            return ImportDictionaryItems(dictionaryItemElementList, languages, raiseEvents);
+        }
+
+        private IEnumerable<IDictionaryItem> ImportDictionaryItems(XElement dictionaryItemElementList, List<ILanguage> languages, bool raiseEvents)
+        {
+            var items = new List<IDictionaryItem>();
+            foreach (var dictionaryItemElement in dictionaryItemElementList.Elements("DictionaryItem"))
+                items.AddRange(ImportDictionaryItem(dictionaryItemElement, languages, raiseEvents));
+
+            if (raiseEvents)
+                ImportedDictionaryItem.RaiseEvent(new ImportEventArgs<IDictionaryItem>(items, dictionaryItemElementList, false), this);
+
+            return items;
+        }
+
+        private IEnumerable<IDictionaryItem> ImportDictionaryItem(XElement dictionaryItemElement, List<ILanguage> languages, bool raiseEvents)
+        {
+            var items = new List<IDictionaryItem>();
+
+            IDictionaryItem dictionaryItem;
+            var key = dictionaryItemElement.Attribute("Key").Value;
+            if (_localizationService.DictionaryItemExists(key))
+                dictionaryItem = GetAndUpdateDictionaryItem(key, dictionaryItemElement, languages);
+            else
+                dictionaryItem = CreateNewDictionaryItem(key, dictionaryItemElement, languages);
+            _localizationService.Save(dictionaryItem);
+            items.Add(dictionaryItem);
+            items.AddRange(ImportDictionaryItems(dictionaryItemElement, languages, raiseEvents));
+            return items;
+        }
+
+        private IDictionaryItem GetAndUpdateDictionaryItem(string key, XElement dictionaryItemElement, List<ILanguage> languages)
+        {
+            var dictionaryItem = _localizationService.GetDictionaryItemByKey(key);
+            var translations = dictionaryItem.Translations.ToList();
+            foreach (var valueElement in dictionaryItemElement.Elements("Value").Where(v => DictionaryValueIsNew(translations, v)))
+                AddDictionaryTranslation(translations, valueElement, languages);
+            dictionaryItem.Translations = translations;
+            return dictionaryItem;
+        }
+
+        private static DictionaryItem CreateNewDictionaryItem(string key, XElement dictionaryItemElement, List<ILanguage> languages)
+        {
+            var dictionaryItem = new DictionaryItem(key);
+            var translations = new List<IDictionaryTranslation>();
+
+            foreach (var valueElement in dictionaryItemElement.Elements("Value"))
+                AddDictionaryTranslation(translations, valueElement, languages);
+
+            dictionaryItem.Translations = translations;
+            return dictionaryItem;
+        }
+
+        private static bool DictionaryValueIsNew(IEnumerable<IDictionaryTranslation> translations, XElement valueElement)
+        {
+            return translations.All(t =>
+                String.Compare(t.Language.IsoCode, valueElement.Attribute("LanguageCultureAlias").Value, StringComparison.InvariantCultureIgnoreCase) != 0
+                );
+        }
+
+        private static void AddDictionaryTranslation(ICollection<IDictionaryTranslation> translations, XElement valueElement, IEnumerable<ILanguage> languages)
+        {
+            var languageId = valueElement.Attribute("LanguageCultureAlias").Value;
+            var language = languages.SingleOrDefault(l => l.IsoCode == languageId);
+            if (language == null)
+                return;
+            var translation = new DictionaryTranslation(language, valueElement.Value);
+            translations.Add(translation);
+        }
+
         #endregion
 
         #region Files
         #endregion
 
         #region Languages
+
+        /// <summary>
+        /// Exports a list of <see cref="ILanguage"/> items to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="languages">List of Languages to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the ILanguage objects</returns>
+        public XElement Export(IEnumerable<ILanguage> languages, bool raiseEvents = true)
+        {
+            var xml = new XElement("Languages");
+            foreach (var language in languages)
+            {
+                xml.Add(Export(language, raiseEvents));
+            }
+            return xml;
+        }
+
+        /// <summary>
+        /// Exports a single <see cref="ILanguage"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="language">Language to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the ILanguage object</returns>
+        public XElement Export(ILanguage language, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (ExportingLanguage.IsRaisedEventCancelled(new ExportEventArgs<ILanguage>(language, "Language"), this))
+                    return new XElement("Language");
+            }
+
+            var xml = new XElement("Language",
+                new XAttribute("Id", language.Id),
+                new XAttribute("CultureAlias", language.IsoCode),
+                new XAttribute("FriendlyName", language.CultureName));
+
+            if (raiseEvents)
+                ExportedLanguage.RaiseEvent(new ExportEventArgs<ILanguage>(language, xml, false), this);
+
+            return xml;
+        }
+
+        /// <summary>
+        /// Imports and saves the 'Languages' part of a package xml as a list of <see cref="ILanguage"/>
+        /// </summary>
+        /// <param name="languageElementList">Xml to import</param>
+        /// <param name="userId">Optional id of the User performing the operation</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns>An enumerable list of generated languages</returns>
+        public IEnumerable<ILanguage> ImportLanguages(XElement languageElementList, int userId = 0, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (ImportingLanguage.IsRaisedEventCancelled(new ImportEventArgs<ILanguage>(languageElementList), this))
+                    return Enumerable.Empty<ILanguage>();
+            }
+
+            var list = new List<ILanguage>();
+            foreach (var languageElement in languageElementList.Elements("Language"))
+            {
+                var isoCode = languageElement.Attribute("CultureAlias").Value;
+                var existingLanguage = _localizationService.GetLanguageByIsoCode(isoCode);
+                if (existingLanguage == null)
+                {
+                    var langauge = new Language(isoCode)
+                                   {
+                                       CultureName = languageElement.Attribute("FriendlyName").Value
+                                   };
+                    _localizationService.Save(langauge);
+                    list.Add(langauge);
+                }
+            }
+
+            if (raiseEvents)
+                ImportedLanguage.RaiseEvent(new ImportEventArgs<ILanguage>(list, languageElementList, false), this);
+
+            return list;
+        }
+
         #endregion
 
         #region Macros
+
+        /// <summary>
+        /// Imports and saves the 'Macros' part of a package xml as a list of <see cref="IMacro"/>
+        /// </summary>
+        /// <param name="element">Xml to import</param>
+        /// <param name="userId">Optional id of the User performing the operation</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns></returns>
+        public IEnumerable<IMacro> ImportMacros(XElement element, int userId = 0, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (ImportingMacro.IsRaisedEventCancelled(new ImportEventArgs<IMacro>(element), this))
+                    return Enumerable.Empty<IMacro>();
+            }
+
+            var name = element.Name.LocalName;
+            if (name.Equals("Macros") == false && name.Equals("macro") == false)
+            {
+                throw new ArgumentException("The passed in XElement is not valid! It does not contain a root element called 'Macros' for multiple imports or 'macro' for a single import.");
+            }
+
+            var macroElements = name.Equals("Macros")
+                                       ? (from doc in element.Elements("macro") select doc).ToList()
+                                       : new List<XElement> { element };
+
+            var macros = macroElements.Select(ParseMacroElement).ToList();
+
+            foreach (var macro in macros)
+            {
+                _macroService.Save(macro, userId);
+            }
+
+            if (raiseEvents)
+                ImportedMacro.RaiseEvent(new ImportEventArgs<IMacro>(macros, element, false), this);
+
+            return macros;
+        }
+
+        private IMacro ParseMacroElement(XElement macroElement)
+        {
+            var macroName = macroElement.Element("name").Value;
+            var macroAlias = macroElement.Element("alias").Value;
+            var controlType = macroElement.Element("scriptType").Value;
+            var controlAssembly = macroElement.Element("scriptAssembly").Value;
+            var xsltPath = macroElement.Element("xslt").Value;
+            var scriptPath = macroElement.Element("scriptingFile").Value;
+
+            //Following xml elements are treated as nullable properties
+            var useInEditorElement = macroElement.Element("useInEditor");
+            var useInEditor = false;
+            if (useInEditorElement != null && string.IsNullOrEmpty(useInEditorElement.Value) == false)
+            {
+                useInEditor = bool.Parse(useInEditorElement.Value);
+            }
+            var cacheDurationElement = macroElement.Element("refreshRate");
+            var cacheDuration = 0;
+            if (cacheDurationElement != null && string.IsNullOrEmpty(cacheDurationElement.Value) == false)
+            {
+                cacheDuration = int.Parse(cacheDurationElement.Value);
+            }
+            var cacheByMemberElement = macroElement.Element("cacheByMember");
+            var cacheByMember = false;
+            if (cacheByMemberElement != null && string.IsNullOrEmpty(cacheByMemberElement.Value) == false)
+            {
+                cacheByMember = bool.Parse(cacheByMemberElement.Value);
+            }
+            var cacheByPageElement = macroElement.Element("cacheByPage");
+            var cacheByPage = false;
+            if (cacheByPageElement != null && string.IsNullOrEmpty(cacheByPageElement.Value) == false)
+            {
+                cacheByPage = bool.Parse(cacheByPageElement.Value);
+            }
+            var dontRenderElement = macroElement.Element("dontRender");
+            var dontRender = true;
+            if (dontRenderElement != null && string.IsNullOrEmpty(dontRenderElement.Value) == false)
+            {
+                dontRender = bool.Parse(dontRenderElement.Value);
+            }
+
+            var existingMacro = _macroService.GetByAlias(macroAlias) as Macro; 
+            var macro = existingMacro ?? new Macro(macroAlias, macroName, controlType, controlAssembly, xsltPath, scriptPath,
+                cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration);
+
+            var properties = macroElement.Element("properties");
+            if (properties != null)
+            {
+                int sortOrder = 0;
+                foreach (var property in properties.Elements())
+                {
+                    var propertyName = property.Attribute("name").Value;
+                    var propertyAlias = property.Attribute("alias").Value;
+                    var editorAlias = property.Attribute("propertyType").Value;
+                    var sortOrderAttribute = property.Attribute("sortOrder");
+                    if (sortOrderAttribute != null)
+                    {
+                        sortOrder = int.Parse(sortOrderAttribute.Value);
+                    }
+
+                    if (macro.Properties.Any(x => x.Alias == propertyAlias)) continue;
+                    macro.Properties.Add(new MacroProperty(propertyAlias, propertyName, sortOrder, editorAlias));
+                    sortOrder++;
+                }
+            }
+            return macro;
+        }
+
+        /// <summary>
+        /// Exports a list of <see cref="IMacro"/> items to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="macros">Macros to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IMacro objects</returns>
+        public XElement Export(IEnumerable<IMacro> macros, bool raiseEvents = true)
+        {
+            var xml = new XElement("Macros");
+            foreach (var item in macros)
+            {
+                xml.Add(Export(item, raiseEvents));
+            }
+            return xml;
+        }
+
+        /// <summary>
+        /// Exports a single <see cref="IMacro"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="macro">Macro to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the IMacro object</returns>
+        public XElement Export(IMacro macro, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (ExportingMacro.IsRaisedEventCancelled(new ExportEventArgs<IMacro>(macro, "macro"), this))
+                    return new XElement("macro");
+            }
+
+            var xml = new XElement("macro");
+            xml.Add(new XElement("name", macro.Name));
+            xml.Add(new XElement("alias", macro.Alias));
+            xml.Add(new XElement("scriptType", macro.ControlType));
+            xml.Add(new XElement("scriptAssembly", macro.ControlAssembly));
+            xml.Add(new XElement("scriptingFile", macro.ScriptPath));
+            xml.Add(new XElement("xslt", macro.XsltPath));
+            xml.Add(new XElement("useInEditor", macro.UseInEditor.ToString()));
+            xml.Add(new XElement("dontRender", macro.DontRender.ToString()));
+            xml.Add(new XElement("refreshRate", macro.CacheDuration.ToString(CultureInfo.InvariantCulture)));
+            xml.Add(new XElement("cacheByMember", macro.CacheByMember.ToString()));
+            xml.Add(new XElement("cacheByPage", macro.CacheByPage.ToString()));
+
+            var properties = new XElement("properties");
+            foreach (var property in macro.Properties)
+            {
+                properties.Add(new XElement("property", 
+                    new XAttribute("name", property.Name), 
+                    new XAttribute("alias", property.Alias),
+                    new XAttribute("sortOrder", property.SortOrder),
+                    new XAttribute("propertyType", property.EditorAlias)));
+            }
+            xml.Add(properties);
+
+            if (raiseEvents)
+                ExportedMacro.RaiseEvent(new ExportEventArgs<IMacro>(macro, xml, false), this);
+
+            return xml;
+        }
+
         #endregion
 
         #region Members
@@ -911,7 +1353,6 @@ namespace Umbraco.Core.Services
 
             xml.Add(new XAttribute("loginName", member.Username));
             xml.Add(new XAttribute("email", member.Email));
-            xml.Add(new XAttribute("key", member.Key));
 
             return xml;
         }
@@ -925,11 +1366,18 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="media">Media to export</param>
         /// <param name="deep">Optional parameter indicating whether to include descendents</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns><see cref="XElement"/> containing the xml representation of the Media object</returns>
-        internal XElement Export(IMedia media, bool deep = false)
+        public XElement Export(IMedia media, bool deep = false, bool raiseEvents = true)
         {
             //nodeName should match Casing.SafeAliasWithForcingCheck(content.ContentType.Alias);
             var nodeName = UmbracoConfig.For.UmbracoSettings().Content.UseLegacyXmlSchema ? "node" : media.ContentType.Alias.ToSafeAliasWithForcingCheck();
+
+            if (raiseEvents)
+            {
+                if (ExportingMedia.IsRaisedEventCancelled(new ExportEventArgs<IMedia>(media, nodeName), this))
+                    return new XElement(nodeName);
+            }
 
             var xml = Export(media, nodeName);
             xml.Add(new XAttribute("nodeType", media.ContentType.Id));
@@ -945,6 +1393,9 @@ namespace Umbraco.Core.Services
                 var currentChildren = descendants.Where(x => x.ParentId == media.Id);
                 AddChildXml(descendants, currentChildren, xml);
             }
+
+            if(raiseEvents)
+                ExportedMedia.RaiseEvent(new ExportEventArgs<IMedia>(media, xml, false), this);
 
             return xml;
         }
@@ -1046,9 +1497,16 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="element">Xml to import</param>
         /// <param name="userId">Optional user id</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
         /// <returns>An enumrable list of generated Templates</returns>
-        public IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = 0)
+        public IEnumerable<ITemplate> ImportTemplates(XElement element, int userId = 0, bool raiseEvents = true)
         {
+            if (raiseEvents)
+            {
+                if (ImportingTemplate.IsRaisedEventCancelled(new ImportEventArgs<ITemplate>(element), this))
+                    return Enumerable.Empty<ITemplate>();
+            }
+
             var name = element.Name.LocalName;
             if (name.Equals("Templates") == false && name.Equals("Template") == false)
             {
@@ -1117,6 +1575,9 @@ namespace Umbraco.Core.Services
             if (templates.Any())
                 _fileService.SaveTemplate(templates, userId);
 
+            if(raiseEvents)
+                ImportedTemplate.RaiseEvent(new ImportEventArgs<ITemplate>(templates, element, false), this);
+
             return templates;
         }
 
@@ -1136,6 +1597,227 @@ namespace Umbraco.Core.Services
             return IOHelper.MapPath(SystemDirectories.Masterpages + "/" + alias.Replace(" ", "") + ".master");
         }
 
+        /// <summary>
+        /// Exports a list of <see cref="ITemplate"/> items to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="templates">List of Templates to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the ITemplate objects</returns>
+        public XElement Export(IEnumerable<ITemplate> templates, bool raiseEvents = true)
+        {
+            var xml = new XElement("Templates");
+            foreach (var item in templates)
+            {
+                xml.Add(Export(item, raiseEvents));
+            }
+            return xml;
+        }
+
+        /// <summary>
+        /// Exports a single <see cref="ITemplate"/> item to xml as an <see cref="XElement"/>
+        /// </summary>
+        /// <param name="template">Template to export</param>
+        /// <param name="raiseEvents">Optional parameter indicating whether or not to raise events</param>
+        /// <returns><see cref="XElement"/> containing the xml representation of the ITemplate object</returns>
+        public XElement Export(ITemplate template, bool raiseEvents = true)
+        {
+            if (raiseEvents)
+            {
+                if (ExportingTemplate.IsRaisedEventCancelled(new ExportEventArgs<ITemplate>(template, "Template"), this))
+                    return new XElement("Template");
+            }
+
+            var xml = new XElement("Template");
+            xml.Add(new XElement("Name", template.Name));
+            xml.Add(new XElement("Alias", template.Alias));
+            xml.Add(new XElement("Design", new XCData(template.Content)));
+
+            var concreteTemplate = template as Template;
+            if (concreteTemplate != null && concreteTemplate.MasterTemplateId != null)
+            {
+                if (concreteTemplate.MasterTemplateId.IsValueCreated &&
+                    concreteTemplate.MasterTemplateId.Value != default(int))
+                {
+                    xml.Add(new XElement("Master", concreteTemplate.MasterTemplateId.ToString()));
+                    xml.Add(new XElement("MasterAlias", concreteTemplate.MasterTemplateAlias));
+                }
+            }
+
+            if (raiseEvents)
+                ExportedTemplate.RaiseEvent(new ExportEventArgs<ITemplate>(template, xml, false), this);
+
+            return xml;
+        }
+
+        #endregion
+
+        #region Stylesheets
+        #endregion
+
+        #region Installation
+
+        internal InstallationSummary InstallPackage(string packageFilePath, int userId = 0)
+        {
+            //TODO Add events ?
+            //NOTE The PackageInstallation class should be passed as IPackageInstallation through the 
+            //constructor (probably as an overload to avoid breaking stuff), so that its extendable.
+            var installer = new PackageInstallation(this, new PackageExtraction());
+            return installer.InstallPackage(packageFilePath, userId);
+        }
+
+        #endregion
+
+        #region Package Building
+        #endregion
+
+        #region Event Handlers
+        /// <summary>
+        /// Occurs before Importing Content
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<IContent>> ImportingContent;
+
+        /// <summary>
+        /// Occurs after Content is Imported and Saved
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<IContent>> ImportedContent;
+
+        
+        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IContent>> ExportingContent;
+
+        /// <summary>
+        /// Occurs after Content is Exported to Xml
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IContent>> ExportedContent;
+
+        /// <summary>
+        /// Occurs before Exporting Media
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IMedia>> ExportingMedia;
+
+        /// <summary>
+        /// Occurs after Media is Exported to Xml
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IMedia>> ExportedMedia;
+
+        /// <summary>
+        /// Occurs before Importing ContentType
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<IContentType>> ImportingContentType;
+
+        /// <summary>
+        /// Occurs after ContentType is Imported and Saved
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<IContentType>> ImportedContentType;
+
+        /// <summary>
+        /// Occurs before Exporting ContentType
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IContentType>> ExportingContentType;
+
+        /// <summary>
+        /// Occurs after ContentType is Exported to Xml
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IContentType>> ExportedContentType;
+
+        /// <summary>
+        /// Occurs before Importing DataType
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<IDataTypeDefinition>> ImportingDataType;
+
+        /// <summary>
+        /// Occurs after DataType is Imported and Saved
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<IDataTypeDefinition>> ImportedDataType;
+
+        /// <summary>
+        /// Occurs before Exporting DataType
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IDataTypeDefinition>> ExportingDataType;
+
+        /// <summary>
+        /// Occurs after DataType is Exported to Xml
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IDataTypeDefinition>> ExportedDataType;
+
+        /// <summary>
+        /// Occurs before Importing DictionaryItem
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<IDictionaryItem>> ImportingDictionaryItem;
+
+        /// <summary>
+        /// Occurs after DictionaryItem is Imported and Saved
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<IDictionaryItem>> ImportedDictionaryItem;
+
+        /// <summary>
+        /// Occurs before Exporting DictionaryItem
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IDictionaryItem>> ExportingDictionaryItem;
+
+        /// <summary>
+        /// Occurs after DictionaryItem is Exported to Xml
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IDictionaryItem>> ExportedDictionaryItem;
+
+        /// <summary>
+        /// Occurs before Importing Macro
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<IMacro>> ImportingMacro;
+
+        /// <summary>
+        /// Occurs after Macro is Imported and Saved
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<IMacro>> ImportedMacro;
+
+        /// <summary>
+        /// Occurs before Exporting Macro
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IMacro>> ExportingMacro;
+
+        /// <summary>
+        /// Occurs after Macro is Exported to Xml
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ExportEventArgs<IMacro>> ExportedMacro;
+
+        /// <summary>
+        /// Occurs before Importing Language
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<ILanguage>> ImportingLanguage;
+
+        /// <summary>
+        /// Occurs after Language is Imported and Saved
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<ILanguage>> ImportedLanguage;
+
+        /// <summary>
+        /// Occurs before Exporting Language
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ExportEventArgs<ILanguage>> ExportingLanguage;
+
+        /// <summary>
+        /// Occurs after Language is Exported to Xml
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ExportEventArgs<ILanguage>> ExportedLanguage;
+
+        /// <summary>
+        /// Occurs before Importing Template
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<ITemplate>> ImportingTemplate;
+
+        /// <summary>
+        /// Occurs after Template is Imported and Saved
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ImportEventArgs<ITemplate>> ImportedTemplate;
+
+        /// <summary>
+        /// Occurs before Exporting Template
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ExportEventArgs<ITemplate>> ExportingTemplate;
+
+        /// <summary>
+        /// Occurs after Template is Exported to Xml
+        /// </summary>
+        public static event TypedEventHandler<IPackagingService, ExportEventArgs<ITemplate>> ExportedTemplate;
         #endregion
     }
 }

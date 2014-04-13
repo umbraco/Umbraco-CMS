@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Text;
 using System.Threading.Tasks;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web.WebApi
 {
@@ -32,8 +33,16 @@ namespace Umbraco.Web.WebApi
             
             using (var memStream = new MemoryStream())
             {
-                //Let the base class do all the processing using our custom stream
-                await base.WriteToStreamAsync(type, value, memStream, content, transportContext);
+                try
+                {
+                    //Let the base class do all the processing using our custom stream
+                    await base.WriteToStreamAsync(type, value, memStream, content, transportContext);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.Error<AngularJsonMediaTypeFormatter>("An error occurred writing to the output stream", ex);
+                    throw;
+                }
 
                 memStream.Flush();
                 memStream.Position = 0;

@@ -2,11 +2,13 @@
     <div class="input-append date datepicker" style="position: relative;" id="datepicker{{model.alias}}">        
         <input  name="datepicker" data-format="{{model.config.format}}" type="text" 
                 ng-model="model.value"   
+                ng-required="model.validation.mandatory"   
                 val-server="value" />
         <span class="add-on">
             <i data-time-icon="icon-time" data-date-icon="icon-calendar"></i>
         </span>        
     </div>
 
+    <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="required">Required</span>
     <span class="help-inline" val-msg-for="datepicker" val-toggle-msg="valServer">{{propertyForm.datepicker.errorMsg}}</span>
 </div>

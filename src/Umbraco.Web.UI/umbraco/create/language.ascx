@@ -1,11 +1,18 @@
-<%@ Control Language="c#" AutoEventWireup="True" Codebehind="language.ascx.cs" Inherits="umbraco.cms.presentation.create.controls.language" TargetSchema="http://schemas.microsoft.com/intellisense/ie5"%>
-<input type="hidden" name="nodeType">
+<%@ Control Language="c#" AutoEventWireup="True" Inherits="umbraco.cms.presentation.create.controls.language" TargetSchema="http://schemas.microsoft.com/intellisense/ie5"%>
+<%@ Register TagPrefix="cc1" Namespace="umbraco.uicontrols" Assembly="controls" %>
 
-<div style="MARGIN-TOP: 25px"><%=umbraco.ui.Text("choose")%> <%=umbraco.ui.Text("language")%>:<br />
-<asp:DropDownList ID="Cultures" runat="server" Width="350px" CssClass="bigInput"></asp:DropDownList>
-</div>
+<input type="hidden" name="nodeType"/>
 
-<div style="padding-top: 25px;">
-<asp:Button id="sbmt" Runat="server" style="MARGIN-TOP: 14px" Width="90" onclick="sbmt_Click"></asp:Button>
-&nbsp; <em><%= umbraco.ui.Text("or") %></em> &nbsp;<a href="#" style="color: blue"  onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
-</div>
+<cc1:Pane runat="server">
+    <cc1:PropertyPanel runat="server" Text="Name" id="pp1">
+        <asp:DropDownList ID="Cultures" runat="server" CssClass="input-block-level"></asp:DropDownList>
+        <asp:RequiredFieldValidator ID="RequiredFieldValidator1" ErrorMessage="*" ControlToValidate="Cultures" runat="server">*</asp:RequiredFieldValidator>
+    </cc1:PropertyPanel>
+</cc1:Pane>
+
+<cc1:Pane runat="server" CssClass="btn-toolbar umb-btn-toolbar">
+    <a href="#" class="btn btn-link" onclick="UmbClientMgr.closeModalWindow()"><%=umbraco.ui.Text("cancel")%></a>
+    <asp:Button ID="sbmt" CssClass="btn btn-primary" OnClick="sbmt_Click" runat="server" Text='<%#umbraco.ui.Text("create") %>'></asp:Button>
+</cc1:Pane>
+
+    

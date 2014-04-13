@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web;
@@ -14,6 +15,30 @@ namespace Umbraco.Web
     /// </remarks> 
     internal static class HttpCookieExtensions
     {
+        /// <summary>
+        /// Removes the cookie from the request and the response if it exists
+        /// </summary>
+        /// <param name="http"></param>
+        /// <param name="cookieName"></param>
+        public static void ExpireCookie(this HttpContextBase http, string cookieName)
+        {
+            //remove from the request
+            http.Request.Cookies.Remove(cookieName);
+
+            //expire from the response
+            var angularCookie = http.Response.Cookies[cookieName];
+            if (angularCookie != null)
+            {
+                //this will expire immediately and be removed from the browser
+                angularCookie.Expires = DateTime.Now.AddYears(-1);
+            }
+            else
+            {
+                //ensure there's def an expired cookie
+                http.Response.Cookies.Add(new HttpCookie(cookieName) { Expires = DateTime.Now.AddYears(-1) });
+            }
+        }
+
         public static string GetPreviewCookieValue(this HttpRequestMessage request)
         {
             var cookie = request.Headers.GetCookies(Constants.Web.PreviewCookieName).FirstOrDefault();

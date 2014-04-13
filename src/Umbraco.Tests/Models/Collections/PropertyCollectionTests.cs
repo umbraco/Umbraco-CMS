@@ -10,12 +10,13 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Models.Collections
 {
     [TestFixture]
-    public class PropertyCollectionTests
+    public class PropertyCollectionTests : BaseUmbracoConfigurationTest
     {
         [Test]
         public void SimpleOrder_Returns_Null_On_FirstOrDefault_When_Empty()

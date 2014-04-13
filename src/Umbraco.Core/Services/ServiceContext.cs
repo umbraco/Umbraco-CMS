@@ -21,7 +21,7 @@ namespace Umbraco.Core.Services
         private Lazy<IDataTypeService> _dataTypeService;
         private Lazy<IFileService> _fileService;
         private Lazy<ILocalizationService> _localizationService;
-        private Lazy<PackagingService> _packagingService;
+        private Lazy<IPackagingService> _packagingService;
         private Lazy<ServerRegistrationService> _serverRegistrationService;
         private Lazy<IEntityService> _entityService;
         private Lazy<IRelationService> _relationService;
@@ -29,6 +29,8 @@ namespace Umbraco.Core.Services
         private Lazy<ISectionService> _sectionService;
         private Lazy<IMacroService> _macroService;
         private Lazy<IMemberTypeService> _memberTypeService;
+        private Lazy<IMemberGroupService> _memberGroupService;
+        private Lazy<INotificationService> _notificationService;
 
         /// <summary>
         /// public ctor - will generally just be used for unit testing
@@ -45,6 +47,7 @@ namespace Umbraco.Core.Services
         /// <param name="sectionService"></param>
         /// <param name="treeService"></param>
         /// <param name="tagService"></param>
+        /// <param name="memberGroupService"></param>
         public ServiceContext(
             IContentService contentService, 
             IMediaService mediaService, 
@@ -52,9 +55,10 @@ namespace Umbraco.Core.Services
             IDataTypeService dataTypeService, 
             IFileService fileService, 
             ILocalizationService localizationService, 
-            PackagingService packagingService, 
+            IPackagingService packagingService, 
             IEntityService entityService,
             IRelationService relationService,
+            IMemberGroupService memberGroupService,
             ISectionService sectionService,
             IApplicationTreeService treeService,
             ITagService tagService)
@@ -66,10 +70,11 @@ namespace Umbraco.Core.Services
             _dataTypeService = new Lazy<IDataTypeService>(() => dataTypeService);
             _fileService = new Lazy<IFileService>(() => fileService);
             _localizationService = new Lazy<ILocalizationService>(() => localizationService);
-            _packagingService = new Lazy<PackagingService>(() => packagingService);
+            _packagingService = new Lazy<IPackagingService>(() => packagingService);
             _entityService = new Lazy<IEntityService>(() => entityService);
             _relationService = new Lazy<IRelationService>(() => relationService);
             _sectionService = new Lazy<ISectionService>(() => sectionService);
+            _memberGroupService = new Lazy<IMemberGroupService>(() => memberGroupService);
             _treeService = new Lazy<IApplicationTreeService>(() => treeService);
         }
 
@@ -101,6 +106,9 @@ namespace Umbraco.Core.Services
             var provider = dbUnitOfWorkProvider;
             var fileProvider = fileUnitOfWorkProvider;
 
+            if (_notificationService == null)
+                _notificationService = new Lazy<INotificationService>(() => new NotificationService(provider, _userService.Value, _contentService.Value));
+
             if (_serverRegistrationService == null)
                 _serverRegistrationService = new Lazy<ServerRegistrationService>(() => new ServerRegistrationService(provider, repositoryFactory.Value));
 
@@ -108,7 +116,7 @@ namespace Umbraco.Core.Services
                 _userService = new Lazy<IUserService>(() => new UserService(provider, repositoryFactory.Value));
 
             if (_memberService == null)
-                _memberService = new Lazy<IMemberService>(() => new MemberService(provider, repositoryFactory.Value));
+                _memberService = new Lazy<IMemberService>(() => new MemberService(provider, repositoryFactory.Value, _memberGroupService.Value));
 
             if (_contentService == null)
                 _contentService = new Lazy<IContentService>(() => new ContentService(provider, repositoryFactory.Value, publishingStrategy));
@@ -129,7 +137,7 @@ namespace Umbraco.Core.Services
                 _localizationService = new Lazy<ILocalizationService>(() => new LocalizationService(provider, repositoryFactory.Value));
 
             if (_packagingService == null)
-                _packagingService = new Lazy<PackagingService>(() => new PackagingService(_contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, repositoryFactory.Value, provider));
+                _packagingService = new Lazy<IPackagingService>(() => new PackagingService(_contentService.Value, _contentTypeService.Value, _mediaService.Value, _macroService.Value, _dataTypeService.Value, _fileService.Value, _localizationService.Value, repositoryFactory.Value, provider));
 
             if (_entityService == null)
                 _entityService = new Lazy<IEntityService>(() => new EntityService(provider, repositoryFactory.Value, _contentService.Value, _contentTypeService.Value, _mediaService.Value, _dataTypeService.Value));
@@ -147,10 +155,21 @@ namespace Umbraco.Core.Services
                 _macroService = new Lazy<IMacroService>(() => new MacroService(provider, repositoryFactory.Value));
 
             if (_memberTypeService == null)
-                _memberTypeService = new Lazy<IMemberTypeService>(() => new MemberTypeService(provider, repositoryFactory.Value));
+                _memberTypeService = new Lazy<IMemberTypeService>(() => new MemberTypeService(provider, repositoryFactory.Value, _memberService.Value));
 
             if (_tagService == null)
                 _tagService = new Lazy<ITagService>(() => new TagService(provider, repositoryFactory.Value));
+            if (_memberGroupService == null)
+                _memberGroupService = new Lazy<IMemberGroupService>(() => new MemberGroupService(provider, repositoryFactory.Value));
+            
+        }
+
+        /// <summary>
+        /// Gets the <see cref="INotificationService"/>
+        /// </summary>
+        internal INotificationService NotificationService
+        {
+            get { return _notificationService.Value; }
         }
 
         /// <summary>
@@ -244,7 +263,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the <see cref="PackagingService"/>
         /// </summary>
-        public PackagingService PackagingService
+        public IPackagingService PackagingService
         {
             get { return _packagingService.Value; }
         }
@@ -252,7 +271,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the <see cref="UserService"/>
         /// </summary>
-        internal IUserService UserService
+        public IUserService UserService
         {
             get { return _userService.Value; }
         }
@@ -260,7 +279,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the <see cref="MemberService"/>
         /// </summary>
-        internal IMemberService MemberService
+        public IMemberService MemberService
         {
             get { return _memberService.Value; }
         }
@@ -284,9 +303,17 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the MemberTypeService
         /// </summary>
-        internal IMemberTypeService MemberTypeService
+        public IMemberTypeService MemberTypeService
         {
             get { return _memberTypeService.Value; }
+        }
+
+        /// <summary>
+        /// Gets the MemberGroupService
+        /// </summary>
+        public IMemberGroupService MemberGroupService
+        {
+            get { return _memberGroupService.Value; }
         }
         
     }

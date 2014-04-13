@@ -93,6 +93,19 @@ ul.color-picker li a  {
   border:none;
 }
 
+/* pre-value editor */
+
+.control-group.color-picker-preval pre {
+    display: inline; 
+    margin-right: 20px; 
+    margin-left: 10px;
+}
+
+.control-group.color-picker-preval label {
+    border:solid white 1px;
+    padding:6px;
+}
+
 
 //
 // Media picker
@@ -130,6 +143,8 @@ ul.color-picker li a  {
   text-decoration: none;
 }
 
+
+
 .umb-thumbnails{
   position: relative;
 }
@@ -158,7 +173,8 @@ ul.color-picker li a  {
     background: white;
     margin: 5px;
     position: relative;
-    text-align: center
+    text-align: center;
+    vertical-align: top;
 }
 
 .umb-sortable-thumbnails li:hover a{
@@ -171,6 +187,12 @@ ul.color-picker li a  {
   max-height:100%;
   margin:auto;
   display:block;
+  background-image: url(../img/checkered-background.png);
+}
+
+.umb-sortable-thumbnails li img.noScale{
+  max-width: none !important;
+  max-height: none !important;
 }
 
 .umb-sortable-thumbnails .icon-holder .icon{
@@ -185,6 +207,92 @@ ul.color-picker li a  {
 
 
 //
+// Cropper 
+// -------------------------------------------------
+
+.umb-cropper{
+  position: relative;
+  padding: 10px;
+}
+
+.umb-cropper img, .umb-cropper-gravity img{
+   position: absolute;
+   top: 0;
+   left: 0;
+ }
+
+ .umb-cropper .overlay, .umb-cropper-gravity .overlay {
+  top: 0;
+  left: 0;
+  cursor: move;
+  z-index: 6001;
+}
+
+.umb-cropper .viewport{
+    overflow: hidden;
+    position: relative;
+    margin: auto;
+ }
+ 
+.umb-cropper-gravity .viewport{
+   overflow: hidden;
+   position: relative;
+   width: 400px;
+   height: 300px
+}
+
+
+.umb-cropper .viewport:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 5999;
+  -moz-opacity: .75;
+  opacity: .75;
+  filter: alpha(opacity=7);
+  -webkit-box-shadow: inset 0 0 0 20px white,inset 0 0 0 21px rgba(0,0,0,.1),inset 0 0 20px 21px rgba(0,0,0,.2);
+  -moz-box-shadow: inset 0 0 0 20px white,inset 0 0 0 21px rgba(0,0,0,.1),inset 0 0 20px 21px rgba(0,0,0,.2);
+  box-shadow: inset 0 0 0 20px white,inset 0 0 0 21px rgba(0,0,0,.1),inset 0 0 20px 21px rgba(0,0,0,.2);
+}
+
+.umb-cropper-gravity .overlay{
+  width: 14px;
+  height: 14px;
+  text-align: center;
+  border-radius: 20px;
+  background: @blue;
+  border: 3px solid white;
+  opacity: 0.8;
+}
+
+.umb-cropper-gravity .overlay i{
+  font-size: 26px;
+  line-height: 26px;
+  opacity: 0.8 !important;
+}
+
+.umb-cropper .crop-container{
+    text-align: center;
+}
+
+.umb-cropper .crop-slider{
+   vertical-align: middle;
+   padding: 10px 50px 10px 50px;
+   border-top: 1px solid @grayLighter;
+   margin-top: 10px;
+}
+
+.umb-cropper .crop-slider i{color: @gray;}
+.umb-cropper .crop-slider input{
+   margin-top: 7px;
+   width: 320px;
+}
+
+
+//
 // folder-browser
 // --------------------------------------------------
 .umb-folderbrowser .add-link{
@@ -194,6 +302,10 @@ ul.color-picker li a  {
   text-align: center;
   border: 1px @grayLight dashed;
   line-height: 120px
+}
+
+.umb-folderbrowser .selector-overlay{
+  display: none !important;
 }
 
 .umb-upload-drop-zone .info, .umb-upload-button-big{
@@ -221,6 +333,7 @@ ul.color-picker li a  {
   left: 0;
   bottom: 0;
   height: 100%;
+  width: 100%;
 }
 
 
@@ -233,6 +346,8 @@ ul.color-picker li a  {
   overflow-y: hidden;
   position: relative;
 }
+
+
 
 .umb-photo-folder .picrow div, .umb-photo-preview{
   margin: 0px;
@@ -262,7 +377,7 @@ ul.color-picker li a  {
   vertical-align: center;
   font-size: 12px;
   background: @grayLighter;
-  color: @grayLight;
+  color: @black;
   text-decoration: none;
 }
 
@@ -283,11 +398,11 @@ ul.color-picker li a  {
 
 .umb-photo-folder .umb-non-thumbnail i{
   color: @grayLight;
-  font-size: 70px;
-  line-height: 80px;
+  font-size: 50px;
+  line-height: 60px;
   display: block;
   margin: auto;
-  padding-top: 25%;
+  padding-top: 20px;
 }
 
 .umb-photo-folder .selected{

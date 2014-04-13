@@ -16,6 +16,7 @@ using umbraco.BusinessLogic;
 using umbraco.businesslogic.Exceptions;
 using umbraco.cms.businesslogic.media;
 using Umbraco.Core;
+using Umbraco.Core.Security;
 
 namespace umbraco.presentation.umbraco.webservices
 {
@@ -224,7 +225,7 @@ namespace umbraco.presentation.umbraco.webservices
 
             if (!string.IsNullOrEmpty(username) && !string.IsNullOrEmpty(password))
             {
-                var mp = Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider];
+                var mp = MembershipProviderExtensions.GetUsersMembershipProvider();
                 if (mp != null && mp.ValidateUser(username, password))
                 {
                     var user = new User(username);

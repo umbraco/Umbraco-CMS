@@ -13,8 +13,10 @@ using Umbraco.Core;
 using Umbraco.Core.Dictionary;
 using Umbraco.Core.Dynamics;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Xml;
 using Umbraco.Web.Routing;
+using Umbraco.Web.Security;
 using Umbraco.Web.Templates;
 using umbraco;
 using System.Collections.Generic;
@@ -33,6 +35,7 @@ namespace Umbraco.Web
 		private readonly UmbracoContext _umbracoContext;
 		private readonly IPublishedContent _currentPage;
 	    private PublishedContentQuery _query;
+        private readonly MembershipHelper _membershipHelper;
         private TagQuery _tag;
 
         /// <summary>
@@ -78,10 +81,11 @@ namespace Umbraco.Web
         {
             if (content == null) throw new ArgumentNullException("content");
             if (query == null) throw new ArgumentNullException("query");
+            _membershipHelper = new MembershipHelper(_umbracoContext);
             _currentPage = content;
             _query = query;
         }
-
+        
 		/// <summary>
 		/// Custom constructor setting the current page to the parameter passed in
 		/// </summary>
@@ -92,6 +96,7 @@ namespace Umbraco.Web
 		{			
 			if (content == null) throw new ArgumentNullException("content");
 			_currentPage = content;
+		    _membershipHelper = new MembershipHelper(_umbracoContext);
 		}
 
 		/// <summary>
@@ -103,6 +108,7 @@ namespace Umbraco.Web
 			if (umbracoContext == null) throw new ArgumentNullException("umbracoContext");
 			if (umbracoContext.RoutingContext == null) throw new NullReferenceException("The RoutingContext on the UmbracoContext cannot be null");
 			_umbracoContext = umbracoContext;
+            _membershipHelper = new MembershipHelper(_umbracoContext);
 			if (_umbracoContext.IsFrontEndUmbracoRequest)
 			{
 				_currentPage = _umbracoContext.PublishedContentRequest.PublishedContent;
@@ -114,6 +120,7 @@ namespace Umbraco.Web
         {
             if (query == null) throw new ArgumentNullException("query");
             _query = query;
+            _membershipHelper = new MembershipHelper(_umbracoContext);
         }
 
         /// <summary>
@@ -244,7 +251,10 @@ namespace Umbraco.Web
             {
                 //TODO: We are doing at ToLower here because for some insane reason the UpdateMacroModel method of macro.cs 
                 // looks for a lower case match. WTF. the whole macro concept needs to be rewritten.
-                macroProps.Add(i.Key.ToLower(), i.Value);
+                
+                
+                //NOTE: the value could have html encoded values, so we need to deal with that
+                macroProps.Add(i.Key.ToLower(), (i.Value is string) ? HttpUtility.HtmlDecode(i.Value.ToString()) : i.Value);
             }
             var macroControl = m.renderMacro(macroProps,
                 umbracoPage.Elements,
@@ -494,7 +504,8 @@ namespace Umbraco.Web
 		{
 			if (IsProtected(nodeId, path))
 			{
-				return Member.IsLoggedOn() && Access.HasAccess(nodeId, path, Membership.GetUser());
+                var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+                return _membershipHelper.IsLoggedIn() && Access.HasAccess(nodeId, path, provider.GetCurrentUser());
 			}
 			return true;
 		}
@@ -505,11 +516,7 @@ namespace Umbraco.Web
 		/// <returns>True is the current user is logged in</returns>
 		public bool MemberIsLoggedOn()
 		{
-			/*
-			   MembershipUser u = Membership.GetUser();
-			   return u != null;           
-			*/
-			return Member.IsLoggedOn();
+		    return _membershipHelper.IsLoggedIn();
 		} 
 
 		#endregion
@@ -571,9 +578,51 @@ namespace Umbraco.Web
 
 		#endregion
 
-		#region Content
+        #region Members
 
-		public IPublishedContent TypedContent(object id)
+        public IPublishedContent TypedMember(object id)
+        {
+            var asInt = id.TryConvertTo<int>();
+            return asInt ? _membershipHelper.GetById(asInt.Result) : _membershipHelper.GetByProviderKey(id);
+        }
+
+        public IPublishedContent TypedMember(int id)
+        {
+            return _membershipHelper.GetById(id);
+        }
+
+        public IPublishedContent TypedMember(string id)
+        {
+            var asInt = id.TryConvertTo<int>();
+            return asInt ? _membershipHelper.GetById(asInt.Result) : _membershipHelper.GetByProviderKey(id);
+        }
+
+        public dynamic Member(object id)
+        {
+            var asInt = id.TryConvertTo<int>();
+            return asInt
+                ? _membershipHelper.GetById(asInt.Result).AsDynamic()
+                : _membershipHelper.GetByProviderKey(id).AsDynamic();
+        }
+
+        public dynamic Member(int id)
+        {
+            return _membershipHelper.GetById(id).AsDynamic();
+        }
+
+        public dynamic Member(string id)
+        {
+            var asInt = id.TryConvertTo<int>();
+            return asInt
+                ? _membershipHelper.GetById(asInt.Result).AsDynamic()
+                : _membershipHelper.GetByProviderKey(id).AsDynamic();
+        }
+
+        #endregion
+
+        #region Content
+
+        public IPublishedContent TypedContent(object id)
 		{
 		    int intId;
             return ConvertIdObjectToInt(id, out intId) ? ContentQuery.TypedContent(intId) : null;
@@ -1239,6 +1288,16 @@ namespace Umbraco.Web
 		}
 
 		#endregion
+
+        #region Prevalues
+
+        public string GetPreValueAsString(int id)
+        {
+            var ds = _umbracoContext.Application.Services.DataTypeService;
+            return ds.GetPreValueAsString(id);
+        }
+
+        #endregion
 
         /// <summary>
         /// This is used in methods like BeginUmbracoForm and SurfaceAction to generate an encrypted string which gets submitted in a request for which

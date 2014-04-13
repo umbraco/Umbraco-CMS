@@ -32,6 +32,7 @@ namespace Umbraco.Tests.PublishedContent
     /// <summary>
     /// Tests the typed extension methods on IPublishedContent using the DefaultPublishedMediaStore
     /// </summary>
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
     public class PublishedMediaTests : PublishedContentTestBase
     {
@@ -73,7 +74,7 @@ namespace Umbraco.Tests.PublishedContent
         [Test]
         public void Get_Property_Value_Uses_Converter()
         {            
-            var mType = MockedContentTypes.CreateImageMediaType();
+            var mType = MockedContentTypes.CreateImageMediaType("image2");
             //lets add an RTE to this
             mType.PropertyGroups.First().PropertyTypes.Add(
                 new PropertyType("test", DataTypeDatabaseType.Nvarchar)

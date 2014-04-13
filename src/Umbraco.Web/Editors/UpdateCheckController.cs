@@ -8,9 +8,11 @@ using System.Threading.Tasks;
 using System.Web.Http.Filters;
 using Umbraco.Core.Configuration;
 using Umbraco.Web.Models;
+using Umbraco.Web.Mvc;
 
 namespace Umbraco.Web.Editors
 {
+    [PluginController("UmbracoApi")]
     public class UpdateCheckController : UmbracoAuthorizedJsonController
     {
         [UpdateCheckResponseFilter]
@@ -22,7 +24,7 @@ namespace Umbraco.Web.Editors
             {
                 try
                 {
-                    var check = new global::umbraco.presentation.org.umbraco.update.CheckForUpgrade();
+                    var check = new org.umbraco.update.CheckForUpgrade();
                     var result = check.CheckUpgrade(UmbracoVersion.Current.Major,
                                                     UmbracoVersion.Current.Minor,
                                                     UmbracoVersion.Current.Build,

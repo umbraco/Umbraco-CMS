@@ -12,7 +12,7 @@ namespace Umbraco.Core.PropertyEditors
     /// <remarks>
     /// This resolver will contain any property editors defined in manifests as well!
     /// </remarks>
-    internal class PropertyEditorResolver : LazyManyObjectsResolverBase<PropertyEditorResolver, PropertyEditor>
+    public class PropertyEditorResolver : LazyManyObjectsResolverBase<PropertyEditorResolver, PropertyEditor>
     {
         public PropertyEditorResolver(Func<IEnumerable<Type>> typeListProducerList)
             : base(typeListProducerList, ObjectLifetimeScope.Application)

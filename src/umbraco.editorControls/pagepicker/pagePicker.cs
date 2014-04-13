@@ -1,4 +1,5 @@
 using System;
+using System.Web;
 using System.Web.UI;
 
 using umbraco.cms.presentation.Trees;
@@ -9,6 +10,7 @@ using umbraco.interfaces;
 using System.Web.UI.WebControls;
 using System.Web.UI.HtmlControls;
 using umbraco.editorControls.pagepicker;
+using umbraco.uicontrols;
 using umbraco.uicontrols.TreePicker;
 namespace umbraco.editorControls
 {
@@ -21,13 +23,18 @@ namespace umbraco.editorControls
     {
 
         public pagePicker() : base() { }
-        public pagePicker(interfaces.IData data) : base(data) { }
+        public pagePicker(IData data) : base(data) { }
         
         public override string TreePickerUrl
         {
             get
             {
-                return TreeService.GetPickerUrl(Umbraco.Core.Constants.Applications.Content, "content");
+                if (Context.Request.QueryString["id"] != null)
+                {
+                    return TreeUrlGenerator.GetPickerUrl(Umbraco.Core.Constants.Applications.Content, "content") + "&selected=" + Context.Request.QueryString["id"];
+                }
+
+                return TreeUrlGenerator.GetPickerUrl(Umbraco.Core.Constants.Applications.Content, "content");
             }
         }
 

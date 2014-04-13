@@ -82,9 +82,9 @@
     </Compile>
     <Compile Include="members\Helper.cs" />
     <Compile Include="members\MembershipEventHandler.cs" />
-    <Compile Include="members\MembersMembershipProvider.cs" />
-    <Compile Include="members\MembersProfileProvider.cs" />
-    <Compile Include="members\MembersRoleProvider.cs" />
+    <Compile Include="members\UmbracoMembershipProvider.cs" />
+    <Compile Include="members\UmbracoProfileProvider.cs" />
+    <Compile Include="members\UmbracoRoleProvider.cs" />
     <Compile Include="SecUtility.cs" />
     <Compile Include="UsersMembershipProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -129,6 +129,9 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

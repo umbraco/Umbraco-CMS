@@ -81,9 +81,16 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets a <see cref="ILanguage"/> by its culture code
         /// </summary>
-        /// <param name="culture">Culture Code</param>
+        /// <param name="cultureName">Culture Code - also refered to as the Friendly name</param>
         /// <returns><see cref="ILanguage"/></returns>
-        ILanguage GetLanguageByCultureCode(string culture);
+        ILanguage GetLanguageByCultureCode(string cultureName);
+
+        /// <summary>
+        /// Gets a <see cref="Language"/> by its iso code
+        /// </summary>
+        /// <param name="isoCode">Iso Code of the language (ie. en-US)</param>
+        /// <returns><see cref="Language"/></returns>
+        ILanguage GetLanguageByIsoCode(string isoCode);
 
         /// <summary>
         /// Gets all available languages

@@ -72,8 +72,11 @@ namespace Umbraco.Core.Strings
             var opos = 0;
 
             for (var ipos = 0; ipos < input.Length; ipos++)
-                if (char.IsSurrogate(input[ipos]))
-                    ipos++;
+                if (char.IsSurrogate(input[ipos])) // ignore high surrogate
+                {
+                    ipos++; // and skip low surrogate
+                    output[opos++] = '?';
+                }
                 else
                     ToAscii(input, ipos, output, ref opos);
 
@@ -3312,6 +3315,243 @@ namespace Umbraco.Core.Strings
                     case '\uFF5E':  // Ã¯Â½Å¾  [FULLWIDTH TILDE]
                         output[opos++] = '~';
                         break;
+
+                    // BEGIN CUSTOM TRANSLITERATION OF CYRILIC CHARS
+
+                    #region Cyrilic chars
+
+                    // russian uppercase "А Б В Г Д Е Ё Ж З И Й К Л М Н О П Р С Т У Ф Х Ц Ч Ш Щ Ъ Ы Ь Э Ю Я"
+                    // russian lowercase "а б в г д е ё ж з и й к л м н о п р с т у ф х ц ч ш щ ъ ы ь э ю я"
+
+                    // notes
+                    // read http://www.vesic.org/english/blog/c-sharp/transliteration-easy-way-microsoft-transliteration-utility/
+                    //    should we look into MS Transliteration Utility (http://msdn.microsoft.com/en-US/goglobal/bb688104.aspx)
+                    // also UnicodeSharpFork https://bitbucket.org/DimaStefantsov/unidecodesharpfork
+                    // also Transliterator http://transliterator.codeplex.com/
+                    //
+                    // in any case it would be good to generate all those "case" statements instead of writing them by hand
+                    // time for a T4 template?
+                    // also we should support extensibility so ppl can register more cases in external code
+
+                    // fixme
+                    // transliterates Анастасия as Anastasiya, and not Anastasia
+                    // Ольга --> Ol'ga, Татьяна --> Tat'yana -- that's bad (?)
+                    // Note: should ä (german umlaut) become a or ae ?
+
+                    case '\u0410': // А
+                        output[opos++] = 'A';
+                        break;
+                    case '\u0430': // а
+                        output[opos++] = 'a';
+                        break;
+                    case '\u0411': // Б
+                        output[opos++] = 'B';
+                        break;
+                    case '\u0431': // б
+                        output[opos++] = 'b';
+                        break;
+                    case '\u0412': // В
+                        output[opos++] = 'V';
+                        break;
+                    case '\u0432': // в
+                        output[opos++] = 'v';
+                        break;
+                    case '\u0413': // Г
+                        output[opos++] = 'G';
+                        break;
+                    case '\u0433': // г
+                        output[opos++] = 'g';
+                        break;
+                    case '\u0414': // Д
+                        output[opos++] = 'D';
+                        break;
+                    case '\u0434': // д
+                        output[opos++] = 'd';
+                        break;
+                    case '\u0415': // Е
+                        output[opos++] = 'E';
+                        break;
+                    case '\u0435': // е
+                        output[opos++] = 'e';
+                        break;
+                    case '\u0401': // Ё
+                        output[opos++] = 'E'; // alt. Yo
+                        break;
+                    case '\u0451': // ё
+                        output[opos++] = 'e'; // alt. yo
+                        break;
+                    case '\u0416': // Ж
+                        output[opos++] = 'Z';
+                        output[opos++] = 'h';
+                        break;
+                    case '\u0436': // ж
+                        output[opos++] = 'z';
+                        output[opos++] = 'h';
+                        break;
+                    case '\u0417': // З
+                        output[opos++] = 'Z';
+                        break;
+                    case '\u0437': // з
+                        output[opos++] = 'z';
+                        break;
+                    case '\u0418': // И
+                        output[opos++] = 'I';
+                        break;
+                    case '\u0438': // и
+                        output[opos++] = 'i';
+                        break;
+                    case '\u0419': // Й
+                        output[opos++] = 'I'; // alt. Y, J
+                        break;
+                    case '\u0439': // й
+                        output[opos++] = 'i'; // alt. y, j
+                        break;
+                    case '\u041A': // К
+                        output[opos++] = 'K';
+                        break;
+                    case '\u043A': // к
+                        output[opos++] = 'k';
+                        break;
+                    case '\u041B': // Л
+                        output[opos++] = 'L';
+                        break;
+                    case '\u043B': // л
+                        output[opos++] = 'l';
+                        break;
+                    case '\u041C': // М
+                        output[opos++] = 'M';
+                        break;
+                    case '\u043C': // м
+                        output[opos++] = 'm';
+                        break;
+                    case '\u041D': // Н
+                        output[opos++] = 'N';
+                        break;
+                    case '\u043D': // н
+                        output[opos++] = 'n';
+                        break;
+                    case '\u041E': // О
+                        output[opos++] = 'O';
+                        break;
+                    case '\u043E': // о
+                        output[opos++] = 'o';
+                        break;
+                    case '\u041F': // П
+                        output[opos++] = 'P';
+                        break;
+                    case '\u043F': // п
+                        output[opos++] = 'p';
+                        break;
+                    case '\u0420': // Р
+                        output[opos++] = 'R';
+                        break;
+                    case '\u0440': // р
+                        output[opos++] = 'r';
+                        break;
+                    case '\u0421': // С 
+                        output[opos++] = 'S';
+                        break;
+                    case '\u0441': // с
+                        output[opos++] = 's';
+                        break;
+                    case '\u0422': // Т
+                        output[opos++] = 'T';
+                        break;
+                    case '\u0442': // т
+                        output[opos++] = 't';
+                        break;
+                    case '\u0423': // У
+                        output[opos++] = 'U';
+                        break;
+                    case '\u0443': // у
+                        output[opos++] = 'u';
+                        break;
+                    case '\u0424': // Ф
+                        output[opos++] = 'F';
+                        break;
+                    case '\u0444': // ф
+                        output[opos++] = 'f';
+                        break;
+                    case '\u0425': // Х
+                        output[opos++] = 'K'; // alt. X
+                        output[opos++] = 'h';
+                        break;
+                    case '\u0445': // х
+                        output[opos++] = 'k'; // alt. x
+                        output[opos++] = 'h';
+                        break;
+                    case '\u0426': // Ц
+                        output[opos++] = 'F';
+                        break;
+                    case '\u0446': // ц
+                        output[opos++] = 'f';
+                        break;
+                    case '\u0427': // Ч
+                        output[opos++] = 'C';  // alt. Ts, C
+                        output[opos++] = 'h';
+                        break;
+                    case '\u0447': // ч
+                        output[opos++] = 'c';  // alt. ts, c
+                        output[opos++] = 'h';
+                        break;
+                    case '\u0428': // Ш
+                        output[opos++] = 'S'; // alt. Ch, S
+                        output[opos++] = 'h';
+                        break;
+                    case '\u0448': // ш
+                        output[opos++] = 's'; // alt. ch, s
+                        output[opos++] = 'h';
+                        break;
+                    case '\u0429': // Щ
+                        output[opos++] = 'S'; // alt. Shch, Sc
+                        output[opos++] = 'h';
+                        break;
+                    case '\u0449': // щ
+                        output[opos++] = 's'; // alt. shch, sc
+                        output[opos++] = 'h';
+                        break;
+                    case '\u042A': // Ъ
+                        output[opos++] = '"'; // "
+                        break;
+                    case '\u044A': // ъ
+                        output[opos++] = '"'; // "
+                        break;
+                    case '\u042B': // Ы
+                        output[opos++] = 'Y';
+                        break;
+                    case '\u044B': // ы
+                        output[opos++] = 'y';
+                        break;
+                    case '\u042C': // Ь
+                        output[opos++] = '\''; // '
+                        break;
+                    case '\u044C': // ь
+                        output[opos++] = '\''; // '
+                        break;
+                    case '\u042D': // Э
+                        output[opos++] = 'E';
+                        break;
+                    case '\u044D': // э
+                        output[opos++] = 'e';
+                        break;
+                    case '\u042E': // Ю
+                        output[opos++] = 'Y'; // alt. Ju
+                        output[opos++] = 'u';
+                        break;
+                    case '\u044E': // ю
+                        output[opos++] = 'y'; // alt. ju
+                        output[opos++] = 'u';
+                        break;
+                    case '\u042F': // Я
+                        output[opos++] = 'Y'; // alt. Ja
+                        output[opos++] = 'a';
+                        break;
+                    case '\u044F': // я
+                        output[opos++] = 'y'; // alt. ja
+                        output[opos++] = 'a';
+                        break;
+
+                    #endregion
 
                     // BEGIN EXTRA
                     /*

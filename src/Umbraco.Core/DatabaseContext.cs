@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Data.SqlServerCe;
 using System.IO;
 using System.Linq;
+using System.Web;
 using System.Web.Configuration;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
@@ -113,8 +114,8 @@ namespace Umbraco.Core
         public void ConfigureEmbeddedDatabaseConnection()
         {
             const string providerName = "System.Data.SqlServerCe.4.0";
-            const string connectionString = @"Data Source=|DataDirectory|\Umbraco.sdf;Flush Interval=1;";
 
+            var connectionString = GetEmbeddedDatabaseConnectionString();
             SaveConnectionString(connectionString, providerName);
 
             var path = Path.Combine(GlobalSettings.FullpathToRoot, "App_Data", "Umbraco.sdf");
@@ -122,9 +123,21 @@ namespace Umbraco.Core
             {
                 var engine = new SqlCeEngine(connectionString);
                 engine.CreateDatabase();
+
+                // SD: Pretty sure this should be in a using clause but i don't want to cause unknown side-effects here
+                // since it's been like this for quite some time
+                //using (var engine = new SqlCeEngine(connectionString))
+                //{
+                //    engine.CreateDatabase();    
+                //}
             }
 
             Initialize(providerName);
+        }
+
+        public string GetEmbeddedDatabaseConnectionString()
+        {
+            return @"Data Source=|DataDirectory|\Umbraco.sdf;Flush Interval=1;";
         }
 
         /// <summary>
@@ -149,25 +162,27 @@ namespace Umbraco.Core
         /// <param name="password">Database Password</param>
         /// <param name="databaseProvider">Type of the provider to be used (Sql, Sql Azure, Sql Ce, MySql)</param>
         public void ConfigureDatabaseConnection(string server, string databaseName, string user, string password, string databaseProvider)
-        {
-            string connectionString;
-            string providerName = "System.Data.SqlClient";
-            if (databaseProvider.ToLower().Contains("mysql"))
-            {
-                providerName = "MySql.Data.MySqlClient";
-                connectionString = string.Format("Server={0}; Database={1};Uid={2};Pwd={3}", server, databaseName, user, password);
-            }
-            else if (databaseProvider.ToLower().Contains("azure"))
-            {
-                connectionString = BuildAzureConnectionString(server, databaseName, user, password);
-            }
-            else
-            {
-                connectionString = string.Format("server={0};database={1};user id={2};password={3}", server, databaseName, user, password);
-            }
+        {            
+            string providerName;
+            var connectionString = GetDatabaseConnectionString(server, databaseName, user, password, databaseProvider, out providerName);
 
             SaveConnectionString(connectionString, providerName);
             Initialize(providerName);
+        }
+
+        public string GetDatabaseConnectionString(string server, string databaseName, string user, string password, string databaseProvider, out string providerName)
+        {
+            providerName = "System.Data.SqlClient";
+            if (databaseProvider.ToLower().Contains("mysql"))
+            {
+                providerName = "MySql.Data.MySqlClient";
+                return string.Format("Server={0}; Database={1};Uid={2};Pwd={3}", server, databaseName, user, password);
+            }
+            if (databaseProvider.ToLower().Contains("azure"))
+            {
+                return BuildAzureConnectionString(server, databaseName, user, password);
+            }
+            return string.Format("server={0};database={1};user id={2};password={3}", server, databaseName, user, password);
         }
 
         /// <summary>
@@ -178,10 +193,14 @@ namespace Umbraco.Core
         public void ConfigureIntegratedSecurityDatabaseConnection(string server, string databaseName)
         {
             const string providerName = "System.Data.SqlClient";
-            string connectionString = String.Format("Server={0};Database={1};Integrated Security=true", server, databaseName);
-
+            var connectionString = GetIntegratedSecurityDatabaseConnectionString(server, databaseName);
             SaveConnectionString(connectionString, providerName);
             Initialize(providerName);
+        }
+
+        public string GetIntegratedSecurityDatabaseConnectionString(string server, string databaseName)
+        {
+            return String.Format("Server={0};Database={1};Integrated Security=true", server, databaseName);            
         }
 
         internal string BuildAzureConnectionString(string server, string databaseName, string user, string password)
@@ -417,6 +436,13 @@ namespace Umbraco.Core
 
             if (_result == null)
             {
+
+                if (SystemUtilities.GetCurrentTrustLevel() != AspNetHostingPermissionLevel.Unrestricted
+                    && ProviderName == "MySql.Data.MySqlClient")
+                {
+                    throw new InvalidOperationException("Cannot use MySql in Medium Trust configuration");
+                }
+
                 var database = new UmbracoDatabase(_connectionString, ProviderName);
                 var dbSchema = new DatabaseSchemaCreation(database);
                 _result = dbSchema.ValidateSchema();
@@ -425,15 +451,15 @@ namespace Umbraco.Core
         }
 
         internal Result CreateDatabaseSchemaAndData()
-        {
-            var readyForInstall = CheckReadyForInstall();
-            if (readyForInstall.Success == false)
-            {
-                return readyForInstall.Result;
-            }
-            
+        {   
             try
             {
+                var readyForInstall = CheckReadyForInstall();
+                if (readyForInstall.Success == false)
+                {
+                    return readyForInstall.Result;
+                }
+
                 LogHelper.Info<DatabaseContext>("Database configuration status: Started");
 
                 string message;
@@ -491,14 +517,15 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal Result UpgradeSchemaAndData()
         {
-            var readyForInstall = CheckReadyForInstall();
-            if (readyForInstall.Success == false)
-            {
-                return readyForInstall.Result;
-            }
-
             try
             {
+
+                var readyForInstall = CheckReadyForInstall();
+                if (readyForInstall.Success == false)
+                {
+                    return readyForInstall.Result;
+                }
+
                 LogHelper.Info<DatabaseContext>("Database upgrade started");
 
                 var database = new UmbracoDatabase(_connectionString, ProviderName);
@@ -511,11 +538,11 @@ namespace Umbraco.Core
                 
                 //DO the upgrade!
 
-                var configuredVersion = string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus)
+                var currentVersion = string.IsNullOrEmpty(GlobalSettings.ConfigurationStatus)
                                                 ? installedVersion
                                                 : new Version(GlobalSettings.ConfigurationStatus);
                 var targetVersion = UmbracoVersion.Current;
-                var runner = new MigrationRunner(configuredVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
+                var runner = new MigrationRunner(currentVersion, targetVersion, GlobalSettings.UmbracoMigrationName);
                 var upgraded = runner.Execute(database, true);
                 message = message + "<p>Upgrade completed!</p>";
 
@@ -558,6 +585,12 @@ namespace Umbraco.Core
 
         private Attempt<Result> CheckReadyForInstall()
         {
+            if (SystemUtilities.GetCurrentTrustLevel() != AspNetHostingPermissionLevel.Unrestricted
+                    && ProviderName == "MySql.Data.MySqlClient")
+            {
+                throw new InvalidOperationException("Cannot use MySql in Medium Trust configuration");
+            }
+
             if (_configured == false || (string.IsNullOrEmpty(_connectionString) || string.IsNullOrEmpty(ProviderName)))
             {
                 return Attempt.Fail(new Result
@@ -573,7 +606,7 @@ namespace Umbraco.Core
 
         private Result HandleInstallException(Exception ex)
         {
-            LogHelper.Info<DatabaseContext>("Database configuration failed with the following error and stack trace: " + ex.Message + "\n" + ex.StackTrace);
+            LogHelper.Error<DatabaseContext>("Database configuration failed", ex);
 
             if (_result != null)
             {
@@ -596,6 +629,35 @@ namespace Umbraco.Core
             public string Message { get; set; }
             public bool Success { get; set; }
             public string Percentage { get; set; }
+        }
+
+        internal bool IsConnectionStringConfigured(ConnectionStringSettings databaseSettings)
+        {
+            var dbIsSqlCe = false;
+            if (databaseSettings != null && databaseSettings.ProviderName != null)
+                dbIsSqlCe = databaseSettings.ProviderName == "System.Data.SqlServerCe.4.0";
+            var sqlCeDatabaseExists = false;
+            if (dbIsSqlCe)
+            {
+                var parts = databaseSettings.ConnectionString.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                var dataSourcePart = parts.FirstOrDefault(x => x.InvariantStartsWith("Data Source="));
+                if (dataSourcePart != null)
+                {
+                    var datasource = dataSourcePart.Replace("|DataDirectory|", AppDomain.CurrentDomain.GetData("DataDirectory").ToString());
+                    var filePath = datasource.Replace("Data Source=", string.Empty);
+                    sqlCeDatabaseExists = File.Exists(filePath);                    
+                }
+            }
+
+            // Either the connection details are not fully specified or it's a SQL CE database that doesn't exist yet
+            if (databaseSettings == null
+                || string.IsNullOrWhiteSpace(databaseSettings.ConnectionString) || string.IsNullOrWhiteSpace(databaseSettings.ProviderName)
+                || (dbIsSqlCe && sqlCeDatabaseExists == false))
+            {
+                return false;
+            }
+
+            return true;
         }
     }
 }

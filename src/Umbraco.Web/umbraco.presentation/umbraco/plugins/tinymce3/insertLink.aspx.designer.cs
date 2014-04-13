@@ -31,15 +31,6 @@ namespace umbraco.presentation.plugins.tinymce3 {
         protected global::umbraco.uicontrols.UmbracoClientDependencyLoader ClientLoader;
         
         /// <summary>
-        /// JsInclude2 control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::ClientDependency.Core.Controls.JsInclude JsInclude2;
-        
-        /// <summary>
         /// JsInclude1 control.
         /// </summary>
         /// <remarks>
@@ -136,7 +127,7 @@ namespace umbraco.presentation.plugins.tinymce3 {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.controls.Tree.TreeControl TreeControl2;
+        protected global::System.Web.UI.UserControl TreeControl2;
         
         /// <summary>
         /// pane_media control.
@@ -154,6 +145,6 @@ namespace umbraco.presentation.plugins.tinymce3 {
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.controls.Tree.TreeControl TreeControl1;
+        protected global::System.Web.UI.UserControl TreeControl1;
     }
 }

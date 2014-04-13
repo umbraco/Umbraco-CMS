@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Mappers;
@@ -22,7 +23,13 @@ namespace Umbraco.Core.Models.Membership
         [DataMember]
         public string Name { get; set; }
 
+        /// <summary>
+        /// The set of default permissions for the user type
+        /// </summary>
+        /// <remarks>
+        /// By default each permission is simply a single char but we've made this an enumerable{string} to support a more flexible permissions structure in the future.
+        /// </remarks>
         [DataMember]
-        public string Permissions { get; set; }
+        public IEnumerable<string> Permissions { get; set; }
     }
 }

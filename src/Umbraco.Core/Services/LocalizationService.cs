@@ -146,9 +146,9 @@ namespace Umbraco.Core.Services
 	        {
 		        repository.AddOrUpdate(dictionaryItem);
 		        uow.Commit();
-
-		        SavedDictionaryItem.RaiseEvent(new SaveEventArgs<IDictionaryItem>(dictionaryItem, false), this);
 	        }
+
+            SavedDictionaryItem.RaiseEvent(new SaveEventArgs<IDictionaryItem>(dictionaryItem, false), this);
 
 	        Audit.Add(AuditTypes.Save, "Save DictionaryItem performed by user", userId, dictionaryItem.Id);
         }
@@ -170,9 +170,9 @@ namespace Umbraco.Core.Services
 		        //NOTE: The recursive delete is done in the repository
 		        repository.Delete(dictionaryItem);
 		        uow.Commit();
-
-		        DeletedDictionaryItem.RaiseEvent(new DeleteEventArgs<IDictionaryItem>(dictionaryItem, false), this);
 	        }
+
+            DeletedDictionaryItem.RaiseEvent(new DeleteEventArgs<IDictionaryItem>(dictionaryItem, false), this);
 
 	        Audit.Add(AuditTypes.Delete, "Delete DictionaryItem performed by user", userId, dictionaryItem.Id);
         }
@@ -193,13 +193,29 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets a <see cref="Language"/> by its culture code
         /// </summary>
-        /// <param name="culture">Culture Code</param>
+        /// <param name="cultureName">Culture Name - also refered to as the Friendly name</param>
         /// <returns><see cref="Language"/></returns>
-        public ILanguage GetLanguageByCultureCode(string culture)
+        public ILanguage GetLanguageByCultureCode(string cultureName)
         {
             using (var repository = _repositoryFactory.CreateLanguageRepository(_uowProvider.GetUnitOfWork()))
             {
-                var query = Query<ILanguage>.Builder.Where(x => x.CultureName == culture);
+                var query = Query<ILanguage>.Builder.Where(x => x.CultureName == cultureName);
+                var items = repository.GetByQuery(query);
+
+                return items.FirstOrDefault();
+            }
+        }
+
+        /// <summary>
+        /// Gets a <see cref="Language"/> by its iso code
+        /// </summary>
+        /// <param name="isoCode">Iso Code of the language (ie. en-US)</param>
+        /// <returns><see cref="Language"/></returns>
+        public ILanguage GetLanguageByIsoCode(string isoCode)
+        {
+            using (var repository = _repositoryFactory.CreateLanguageRepository(_uowProvider.GetUnitOfWork()))
+            {
+                var query = Query<ILanguage>.Builder.Where(x => x.IsoCode == isoCode);
                 var items = repository.GetByQuery(query);
 
                 return items.FirstOrDefault();
@@ -234,9 +250,9 @@ namespace Umbraco.Core.Services
 	        {
 		        repository.AddOrUpdate(language);
 		        uow.Commit();
-
-		        SavedLanguage.RaiseEvent(new SaveEventArgs<ILanguage>(language, false), this);
 	        }
+
+            SavedLanguage.RaiseEvent(new SaveEventArgs<ILanguage>(language, false), this);
 
 	        Audit.Add(AuditTypes.Save, "Save Language performed by user", userId, language.Id);
         }
@@ -257,9 +273,9 @@ namespace Umbraco.Core.Services
 		        //NOTE: There isn't any constraints in the db, so possible references aren't deleted
 		        repository.Delete(language);
 		        uow.Commit();
-
-		        DeletedLanguage.RaiseEvent(new DeleteEventArgs<ILanguage>(language, false), this);
 	        }
+
+            DeletedLanguage.RaiseEvent(new DeleteEventArgs<ILanguage>(language, false), this);
 
 	        Audit.Add(AuditTypes.Delete, "Delete Language performed by user", userId, language.Id);
         }

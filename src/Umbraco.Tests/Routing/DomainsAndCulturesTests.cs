@@ -10,6 +10,7 @@ using umbraco.cms.businesslogic.language;
 
 namespace Umbraco.Tests.Routing
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerFixture)]
     [TestFixture]
     class DomainsAndCulturesTests : BaseRoutingTest
     {

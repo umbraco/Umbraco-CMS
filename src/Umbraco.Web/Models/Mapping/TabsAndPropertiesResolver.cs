@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using AutoMapper;
 using Umbraco.Core;
+using Umbraco.Core.Dictionary;
 using Umbraco.Core.Models;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Models.ContentEditing;
@@ -15,6 +16,7 @@ namespace Umbraco.Web.Models.Mapping
     /// </summary>
     internal class TabsAndPropertiesResolver : ValueResolver<IContentBase, IEnumerable<Tab<ContentPropertyDisplay>>>
     {
+        private ICultureDictionary _cultureDictionary;
         protected IEnumerable<string> IgnoreProperties { get; set; }
 
         public TabsAndPropertiesResolver()
@@ -92,7 +94,7 @@ namespace Umbraco.Web.Models.Mapping
                         {
                             Alias = string.Format("{0}doctype", Constants.PropertyEditors.InternalGenericPropertiesPrefix),
                             Label = ui.Text("content", "documentType"),
-                            Value = display.ContentTypeName,
+                            Value = TranslateItem(display.ContentTypeName, CreateDictionary()),
                             View = labelEditor
                         }
                 };
@@ -165,6 +167,13 @@ namespace Umbraco.Web.Models.Mapping
                         Mapper.Map<IEnumerable<Property>, IEnumerable<ContentPropertyDisplay>>(
                             propsForGroup));
                 }
+
+                // Not sure whether it's a good idea to add this to the ContentPropertyDisplay mapper
+                foreach (var prop in aggregateProperties)
+                {
+                    prop.Label = TranslateItem(prop.Label);
+                    prop.Description = TranslateItem(prop.Description);
+                }
                 
                 //then we'll just use the root group's data to make the composite tab
                 var rootGroup = propertyGroups.Single(x => x.ParentId == null);
@@ -172,7 +181,7 @@ namespace Umbraco.Web.Models.Mapping
                     {
                         Id = rootGroup.Id,
                         Alias = rootGroup.Name,
-                        Label = TranslateTab(rootGroup.Name),
+                        Label = TranslateItem(rootGroup.Name),
                         Properties = aggregateProperties,
                         IsActive = false
                     });
@@ -198,33 +207,40 @@ namespace Umbraco.Web.Models.Mapping
             return aggregateTabs;
         }
 
-        private string TranslateTab(string tabName)
+        // TODO: This should really be centralized and used anywhere globalization applies.
+        internal string TranslateItem(string text)
         {
-            
-            if (!tabName.StartsWith("#"))
-                return tabName;
+            var cultureDictionary = CultureDictionary;
+            return TranslateItem(text, cultureDictionary);
+        }
 
-            return tabName.Substring(1);
+        private static string TranslateItem(string text, ICultureDictionary cultureDictionary)
+        {
+            if (text == null)
+            {
+                return null;
+            }
 
-            /*
-             * The below currently doesnt work on my machine, since the dictonary always creates an entry with lang id = 0, but I dont have a lang id zero
-             * so the query always fails, which is odd
-             * 
-            var local = ApplicationContext.Current.Services.LocalizationService;
-            var dic = local.GetDictionaryItemByKey(tabName);
-            if (dic == null || !dic.Translations.Any())
-                return tabName;
+            if (text.StartsWith("#") == false)
+                return text;
 
-            var lang = local.GetLanguageByCultureCode(UmbracoContext.Current.Security.CurrentUser.Language);
-            if (lang == null)
-                return tabName;
+            text = text.Substring(1);
+            return cultureDictionary[text].IfNullOrWhiteSpace(text);
+        }
 
+        private ICultureDictionary CultureDictionary
+        {
+            get
+            {
+                return 
+                    _cultureDictionary ?? 
+                    (_cultureDictionary = CreateDictionary());
+            }
+        }
 
-            var translation = dic.Translations.Where(x => x.Language == lang).FirstOrDefault();
-            if (translation == null)
-                return tabName;
-
-            return translation.Value;*/
+        private static ICultureDictionary CreateDictionary()
+        {
+            return CultureDictionaryFactoryResolver.Current.Factory.CreateDictionary();
         }
     }
 }

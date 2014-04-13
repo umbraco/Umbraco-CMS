@@ -10,6 +10,7 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using umbraco;
 using System.Linq;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Models.Mapping
 {
@@ -40,10 +41,10 @@ namespace Umbraco.Web.Models.Mapping
                   .ForMember(member => member.Key, expression => expression.MapFrom(user => user.ProviderUserKey.TryConvertTo<Guid>().Result.ToString("N")))
                   //This is a special case for password - we don't actually care what the password is but it either needs to be something or nothing
                   // so we'll set it to something if the member is actually created, otherwise nothing if it is a new member.
-                  .ForMember(member => member.Password, expression => expression.MapFrom(user => user.CreationDate > DateTime.MinValue ? Guid.NewGuid().ToString("N") : ""))
+                  .ForMember(member => member.RawPasswordValue, expression => expression.MapFrom(user => user.CreationDate > DateTime.MinValue ? Guid.NewGuid().ToString("N") : ""))
                     //TODO: Support these eventually
                   .ForMember(member => member.PasswordQuestion, expression => expression.Ignore())
-                  .ForMember(member => member.PasswordAnswer, expression => expression.Ignore());
+                  .ForMember(member => member.RawPasswordAnswerValue, expression => expression.Ignore());
 
             //FROM IMember TO MediaItemDisplay
             config.CreateMap<IMember, MemberDisplay>()
@@ -100,6 +101,8 @@ namespace Umbraco.Web.Models.Mapping
         /// </remarks>
         private static void MapGenericCustomProperties(IMemberService memberService, IMember member, MemberDisplay display)
         {
+            var membersProvider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+
             TabsAndPropertiesResolver.MapGenericProperties(
                 member, display,
                 GetLoginProperty(memberService, member, display),
@@ -119,16 +122,16 @@ namespace Umbraco.Web.Models.Mapping
                         // only when creating a new member and we want to have a generated password pre-filled.
                         Value = new Dictionary<string, object>
                             {
-                                {"generatedPassword", member.AdditionalData.ContainsKey("GeneratedPassword") ? member.AdditionalData["GeneratedPassword"] : null},
-                                {"newPassword", member.AdditionalData.ContainsKey("NewPassword") ? member.AdditionalData["NewPassword"] : null},
+                                {"generatedPassword", member.GetAdditionalDataValueIgnoreCase("GeneratedPassword", null) },
+                                {"newPassword", member.GetAdditionalDataValueIgnoreCase("NewPassword", null) },
                             },
                         //TODO: Hard coding this because the changepassword doesn't necessarily need to be a resolvable (real) property editor
                         View = "changepassword",
                         //initialize the dictionary with the configuration from the default membership provider
-                        Config = new Dictionary<string, object>(Membership.Provider.GetConfiguration())
+                        Config = new Dictionary<string, object>(membersProvider.GetConfiguration())
                             {
                                 //the password change toggle will only be displayed if there is already a password assigned.
-                                {"hasPassword", member.Password.IsNullOrWhiteSpace() == false}
+                                {"hasPassword", member.RawPasswordValue.IsNullOrWhiteSpace() == false}
                             }
                     },
                 new ContentPropertyDisplay
@@ -141,7 +144,7 @@ namespace Umbraco.Web.Models.Mapping
                     });
 
             //check if there's an approval field
-            var provider = Membership.Provider as global::umbraco.providers.members.UmbracoMembershipProvider;
+            var provider = membersProvider as global::umbraco.providers.members.UmbracoMembershipProvider;
             if (member.HasIdentity == false && provider != null)
             {
                 var approvedField = provider.ApprovedPropertyTypeAlias;
@@ -219,8 +222,10 @@ namespace Umbraco.Web.Models.Mapping
         {
             protected override IEnumerable<ContentPropertyDto> ResolveCore(IMember source)
             {
+                var defaultProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+
                 //remove all membership properties, these values are set with the membership provider.
-                var exclude = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
+                var exclude = defaultProps.Select(x => x.Value.Alias).ToArray();
                 
                 return source.Properties
                              .Where(x => exclude.Contains(x.Alias) == false)
@@ -240,6 +245,8 @@ namespace Umbraco.Web.Models.Mapping
         {
             protected override IEnumerable<Tab<ContentPropertyDisplay>> ResolveCore(IContentBase content)
             {
+                var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+
                 IgnoreProperties = content.PropertyTypes
                     .Where(x => x.HasIdentity == false)
                     .Select(x => x.Alias)
@@ -247,9 +254,9 @@ namespace Umbraco.Web.Models.Mapping
 
                 var result = base.ResolveCore(content).ToArray();
 
-                if (Membership.Provider.Name != Constants.Conventions.Member.UmbracoMemberProviderName)
+                if (provider.IsUmbracoMembershipProvider() == false)
                 {
-                    //it's a generic provider so update the locked out property based on our know constant alias
+                    //it's a generic provider so update the locked out property based on our known constant alias
                     var isLockedOutProperty = result.SelectMany(x => x.Properties).FirstOrDefault(x => x.Alias == Constants.Conventions.Member.IsLockedOut);
                     if (isLockedOutProperty != null && isLockedOutProperty.Value.ToString() != "1")
                     {
@@ -261,7 +268,7 @@ namespace Umbraco.Web.Models.Mapping
                 }
                 else
                 {
-                    var umbracoProvider = (global::umbraco.providers.members.UmbracoMembershipProvider)Membership.Provider;
+                    var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)provider;
 
                     //This is kind of a hack because a developer is supposed to be allowed to set their property editor - would have been much easier
                     // if we just had all of the membeship provider fields on the member table :(
@@ -291,11 +298,13 @@ namespace Umbraco.Web.Models.Mapping
 
             protected override MembershipScenario ResolveCore(IMember source)
             {
-                if (Membership.Provider.Name == Constants.Conventions.Member.UmbracoMemberProviderName)
+                var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+
+                if (provider.IsUmbracoMembershipProvider())
                 {
                     return MembershipScenario.NativeUmbraco;
                 }
-                var memberType = _memberTypeService.Value.GetMemberType(Constants.Conventions.MemberTypes.Member);
+                var memberType = _memberTypeService.Value.Get(Constants.Conventions.MemberTypes.DefaultAlias);
                 return memberType != null
                            ? MembershipScenario.CustomProviderWithUmbracoLink
                            : MembershipScenario.StandaloneCustomProvider;
@@ -309,7 +318,9 @@ namespace Umbraco.Web.Models.Mapping
         {
             protected override IDictionary<string, string> ResolveCore(IMember source)
             {
-                if (Membership.Provider.Name != Constants.Conventions.Member.UmbracoMemberProviderName)
+                var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+
+                if (provider.IsUmbracoMembershipProvider() == false)
                 {
                     return new Dictionary<string, string>
                     {
@@ -320,7 +331,7 @@ namespace Umbraco.Web.Models.Mapping
                 }
                 else
                 {
-                    var umbracoProvider = (global::umbraco.providers.members.UmbracoMembershipProvider)Membership.Provider;
+                    var umbracoProvider = (IUmbracoMemberTypeMembershipProvider)provider;
 
                     return new Dictionary<string, string>
                     {

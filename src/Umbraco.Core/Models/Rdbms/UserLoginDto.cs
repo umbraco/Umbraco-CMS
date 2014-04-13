@@ -9,7 +9,7 @@ namespace Umbraco.Core.Models.Rdbms
     internal class UserLoginDto
     {
         [Column("contextID")]
-        [Index(IndexTypes.Clustered, Name = "umbracoUserLogins_Index")]
+        [Index(IndexTypes.Clustered, Name = "IX_umbracoUserLogins_Index")]
         public Guid ContextId { get; set; }
 
         [Column("userID")]

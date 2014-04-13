@@ -4,6 +4,8 @@ using System.Linq;
 using System.Net.Http.Formatting;
 using System.Web.Security;
 using Umbraco.Core;
+using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.Security;
 using Umbraco.Web.Models.Trees;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi.Filters;
@@ -28,6 +30,13 @@ namespace Umbraco.Web.Trees
     [CoreTree]
     public class MemberTreeController : TreeController
     {
+        public MemberTreeController()
+        {
+            _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+        }
+
+        private MembershipProvider _provider;
+
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
@@ -43,7 +52,7 @@ namespace Umbraco.Web.Trees
                     nodes.Add(folder);
                 }
                 //list out 'Others' if the membership provider is umbraco
-                if (Membership.Provider.Name == Constants.Conventions.Member.UmbracoMemberProviderName)
+                if (_provider.IsUmbracoMembershipProvider())
                 {
                     var folder = CreateTreeNode("others", id, queryStrings, "Others", "icon-folder-close", true);
                     folder.NodeType = "member-folder";
@@ -55,12 +64,17 @@ namespace Umbraco.Web.Trees
                 //if it is a letter
                 if (id.Length == 1 && char.IsLower(id, 0))
                 {
-                    if (Membership.Provider.Name == Constants.Conventions.Member.UmbracoMemberProviderName)
+                    if (_provider.IsUmbracoMembershipProvider())
                     {
+                        int totalRecs;
+                        var foundMembers = Services.MemberService.FindMembersByDisplayName(
+                            id.ToCharArray()[0].ToString(CultureInfo.InvariantCulture), 0, int.MaxValue, out totalRecs, StringPropertyMatchType.StartsWith)
+                            .ToArray();
+
                         //get the members from our member data layer
                         nodes.AddRange(
-                            Member.getMemberFromFirstLetter(id.ToCharArray()[0])
-                                        .Select(m => CreateTreeNode(m.UniqueId.ToString("N"), id, queryStrings, m.Text, "icon-user")));
+                            foundMembers
+                                .Select(m => CreateTreeNode(m.Key.ToString("N"), id, queryStrings, m.Name, "icon-user")));
                     }
                     else
                     {
@@ -74,9 +88,10 @@ namespace Umbraco.Web.Trees
                 else if (id == "others")
                 {
                     //others will only show up when in umbraco membership mode
+                    //TODO: We don't have a new API for this because we want to get rid of how this is displayed
                     nodes.AddRange(
                         Member.getAllOtherMembers()
-                                    .Select(m => CreateTreeNode(m.Id.ToInvariantString(), id, queryStrings, m.Text, "icon-user")));
+                                    .Select(m => CreateTreeNode(m.UniqueId.ToString("N"), id, queryStrings, m.Text, "icon-user")));
                 }
             }
             return nodes;
@@ -93,15 +108,15 @@ namespace Umbraco.Web.Trees
         protected virtual MembershipUserCollection FindUsersByName(char letter)
         {
             int total;
-            if (Membership.Provider is SqlMembershipProvider)
+            if (_provider is SqlMembershipProvider)
             {
                 //this provider uses the % syntax
-                return Membership.Provider.FindUsersByName(letter + "%", 0, 9999, out total);
+                return _provider.FindUsersByName(letter + "%", 0, 9999, out total);
             }
             else
             {
                 //the AD provider - and potentiall all other providers will use the asterisk syntax.
-                return Membership.Provider.FindUsersByName(letter + "*", 0, 9999, out total);
+                return _provider.FindUsersByName(letter + "*", 0, 9999, out total);
             }
             
         }
@@ -129,7 +144,7 @@ namespace Umbraco.Web.Trees
             if (id == Constants.System.Root.ToInvariantString())
             {
                 // root actions      
-                if (Membership.Provider.Name == Constants.Conventions.Member.UmbracoMemberProviderName)
+                if (_provider.IsUmbracoMembershipProvider())
                 {
                     //set default
                     menu.DefaultMenuAlias = ActionNew.Instance.Alias;

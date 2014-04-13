@@ -15,7 +15,7 @@ namespace Umbraco.Core.Models.Mapping
     /// All automapper configurations are done during startup
     /// inside an Automapper Initialize call which is better for performance
     /// </remarks>
-    internal interface IMapperConfiguration : IApplicationEventHandler
+    public interface IMapperConfiguration : IApplicationEventHandler
     {
         void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext);
     }

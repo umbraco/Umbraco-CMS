@@ -5,6 +5,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Web.UI;
 using umbraco.BusinessLogic;
+using Umbraco.Core.Security;
 using umbraco.DataLayer;
 using umbraco.BasePages;
 using Umbraco.Core.IO;
@@ -33,15 +34,32 @@ namespace umbraco
             //BusinessLogic.User.MakeNew(Alias, Alias, "", BusinessLogic.UserType.GetUserType(1));
             //return true;
 
+            var provider = MembershipProviderExtensions.GetUsersMembershipProvider();
+
             var status = MembershipCreateStatus.ProviderError;
             try
             {
                 // Password is auto-generated. They are they required to change the password by editing the user information.
-                var u = Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider].CreateUser(Alias,
-                    Membership.GeneratePassword(
-                    Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider].MinRequiredPasswordLength,
-                    Membership.Providers[UmbracoConfig.For.UmbracoSettings().Providers.DefaultBackOfficeUserProvider].MinRequiredNonAlphanumericCharacters),
-                    "", "", "", true, null, out status);
+
+                var password = Membership.GeneratePassword(
+                    provider.MinRequiredPasswordLength,
+                    provider.MinRequiredNonAlphanumericCharacters);
+
+                var parts = Alias.Split(new[] {'|'}, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length != 2)
+                {
+                    return false;
+                }
+                var login = parts[0];
+                var email = parts[1];
+
+                var u = provider.CreateUser(
+                    login, password, email.Trim().ToLower(), "", "", true, null, out status);
+
+                if (u == null)
+                {
+                    return false;
+                }
 
                 _returnUrl = string.Format("users/EditUser.aspx?id={0}", u.ProviderUserKey);
 

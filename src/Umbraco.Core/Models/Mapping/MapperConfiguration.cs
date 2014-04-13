@@ -8,7 +8,7 @@ namespace Umbraco.Core.Models.Mapping
     /// <remarks>
     /// Use this class if your mapper configuration isn't also explicitly an ApplicationEventHandler.
     /// </remarks>
-    internal abstract class MapperConfiguration : ApplicationEventHandler, IMapperConfiguration
+    public abstract class MapperConfiguration : ApplicationEventHandler, IMapperConfiguration
     {
         public abstract void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext);
     }

@@ -302,12 +302,12 @@ namespace Umbraco.Core.Services
         /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
         public virtual IEnumerable<IUmbracoEntity> GetAll<T>() where T : IUmbracoEntity
         {
-            var typeFullName = typeof (T).FullName;
+            var typeFullName = typeof(T).FullName;
             Mandate.That<NotSupportedException>(_supportedObjectTypes.ContainsKey(typeFullName), () =>
-                                                                                                           {
-                                                                                                               throw new NotSupportedException
-                                                                                                                   ("The passed in type is not supported");
-                                                                                                           });
+            {
+                throw new NotSupportedException
+                    ("The passed in type is not supported");
+            });
             var objectType = _supportedObjectTypes[typeFullName].Item1;
 
             return GetAll(objectType);
@@ -430,7 +430,7 @@ namespace Umbraco.Core.Services
             if (attribute == null)
                 throw new NullReferenceException("The passed in UmbracoObjectType does not contain an UmbracoObjectTypeAttribute, which is used to retrieve the Type.");
 
-            if(attribute.ModelType == null)
+            if (attribute.ModelType == null)
                 throw new NullReferenceException("The passed in UmbracoObjectType does not contain a Type definition");
 
             return attribute.ModelType;

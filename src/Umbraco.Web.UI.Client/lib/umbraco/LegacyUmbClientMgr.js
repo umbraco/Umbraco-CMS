@@ -364,6 +364,12 @@ Umbraco.Sys.registerNamespace("Umbraco.Application");
                     getRootScope().$emit("app.closeDialogs", undefined);
                 }                
             },
+            /* This is used for the package installer to call in order to reload all app assets so we don't have to reload the window */
+            _packageInstalled: function() {
+                var injector = getRootInjector();
+                var packageHelper = injector.get("packageHelper");
+                packageHelper.packageInstalled();
+            },
             _debug: function(strMsg) {
                 if (this._isDebug) {
                     Sys.Debug.trace("UmbClientMgr: " + strMsg);

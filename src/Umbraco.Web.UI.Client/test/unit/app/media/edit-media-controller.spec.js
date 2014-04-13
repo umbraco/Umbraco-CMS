@@ -5,8 +5,7 @@ describe('edit media controller tests', function () {
     beforeEach(module('umbraco'));
 
     //inject the contentMocks service
-    beforeEach(inject(function ($rootScope, $controller, angularHelper, $httpBackend, mediaMocks, mocksUtils) {
-
+    beforeEach(inject(function ($rootScope, $controller, angularHelper, $httpBackend, mediaMocks, entityMocks, mocksUtils) {
         //for these tests we don't want any authorization to occur
         mocksUtils.disableAuth();
 
@@ -16,6 +15,7 @@ describe('edit media controller tests', function () {
         //have the contentMocks register its expect urls on the httpbackend
         //see /mocks/content.mocks.js for how its setup
         mediaMocks.register();
+        entityMocks.register();
 
         //this controller requires an angular form controller applied to it
         scope.contentForm = angularHelper.getNullForm("contentForm");
@@ -47,7 +47,7 @@ describe('edit media controller tests', function () {
         });
 
         it('it should have a tabs collection', function () {
-          expect(scope.content.tabs.length).toBe(5);
+          expect(scope.content.tabs.length).toBe(1);
         });
 
         it('it should have a properties collection on each tab', function () {

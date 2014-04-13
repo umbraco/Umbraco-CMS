@@ -28,9 +28,10 @@ namespace Umbraco.Core.Persistence.Repositories
 
         public override Script Get(string id)
         {
-            if(!FileSystem.FileExists(id))
+            if(FileSystem.FileExists(id) == false)
             {
-                throw new Exception(string.Format("The file {0} was not found", id));
+                return null;
+                //throw new Exception(string.Format("The file {0} was not found", id));
             }
 
             string content = string.Empty;

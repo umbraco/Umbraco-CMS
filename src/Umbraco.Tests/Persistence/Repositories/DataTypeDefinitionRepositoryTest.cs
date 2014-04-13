@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Data;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -13,6 +14,7 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class DataTypeDefinitionRepositoryTest : BaseDatabaseFactoryTest
     {
@@ -26,6 +28,57 @@ namespace Umbraco.Tests.Persistence.Repositories
         {
             var dataTypeDefinitionRepository = new DataTypeDefinitionRepository(unitOfWork, NullCacheProvider.Current);
             return dataTypeDefinitionRepository;
+        }
+
+        [Test]
+        public void Can_Create()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            int id;
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var dataTypeDefinition = new DataTypeDefinition(-1, new Guid(Constants.PropertyEditors.RadioButtonList)) {Name = "test"};
+
+                repository.AddOrUpdate(dataTypeDefinition);
+
+                unitOfWork.Commit();
+                id = dataTypeDefinition.Id;
+                Assert.That(id, Is.GreaterThan(0));
+            }
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                // Act
+                var dataTypeDefinition = repository.Get(id);
+
+                // Assert
+                Assert.That(dataTypeDefinition, Is.Not.Null);
+                Assert.That(dataTypeDefinition.HasIdentity, Is.True);
+            }
+        }
+
+        [Test]
+        public void Cannot_Create_Duplicate_Name()
+        {
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            int id;
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var dataTypeDefinition = new DataTypeDefinition(-1, new Guid(Constants.PropertyEditors.RadioButtonList)) { Name = "test" };
+                repository.AddOrUpdate(dataTypeDefinition);
+                unitOfWork.Commit();
+                id = dataTypeDefinition.Id;
+                Assert.That(id, Is.GreaterThan(0));
+            }
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                var dataTypeDefinition = new DataTypeDefinition(-1, new Guid(Constants.PropertyEditors.RadioButtonList)) { Name = "test" };
+                repository.AddOrUpdate(dataTypeDefinition);
+
+                Assert.Throws<DuplicateNameException>(unitOfWork.Commit);
+                
+            }
         }
 
         [Test]

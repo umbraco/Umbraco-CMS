@@ -4,6 +4,6 @@ namespace Umbraco.Core.Persistence.Repositories
 {
     public interface IRelationTypeRepository : IRepositoryQueryable<int, IRelationType>
     {
-         
+
     }
 }

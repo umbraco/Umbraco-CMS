@@ -11,6 +11,8 @@ namespace Umbraco.Web.UI.Umbraco.Create
 {
 	public partial class PartialViewMacro : UserControl
 	{
+        
+
 		protected override void OnLoad(EventArgs e)
 		{
 			base.OnLoad(e);
@@ -24,16 +26,16 @@ namespace Umbraco.Web.UI.Umbraco.Create
             var path = IOHelper.MapPath(SystemDirectories.Umbraco + "/PartialViewMacros/Templates/");
             list.Items.Clear();
 
-            // always add the options of empty templates
-            list.Items.Add(new ListItem("Empty Template", "EmptyTemplate.cshtml"));
-            list.Items.Add(new ListItem("Empty Template (For Use With Custom Views)", "EmptyTemplate (ForUseWithCustomViews).cshtml"));
+            // always add the options of empty snippets
+            list.Items.Add(new ListItem("Empty", "Empty.cshtml"));
+            list.Items.Add(new ListItem("Empty (For Use With Custom Views)", "Empty (ForUseWithCustomViews).cshtml"));
 
             if (System.IO.Directory.Exists(path))
             {
                 const string extension = ".cshtml";
 
-                //Already adding Empty Template as the first item, so don't add it again
-                foreach (var fileInfo in new System.IO.DirectoryInfo(path).GetFiles("*" + extension).Where(f => f.Name.StartsWith("EmptyTemplate") == false))
+                //Already adding Empty as the first item, so don't add it again
+                foreach (var fileInfo in new System.IO.DirectoryInfo(path).GetFiles("*" + extension).Where(f => f.Name.StartsWith("Empty") == false))
                 {
                     var filename = System.IO.Path.GetFileName(fileInfo.FullName);
 
@@ -43,7 +45,7 @@ namespace Umbraco.Web.UI.Umbraco.Create
             }
         }
 
-		protected void SubmitButton_Click(object sender, System.EventArgs e)
+		protected void SubmitButton_Click(object sender, EventArgs e)
 		{
 			if (Page.IsValid)
 			{			
@@ -64,5 +66,23 @@ namespace Umbraco.Web.UI.Umbraco.Create
 					.CloseModalWindow();				
 			}
 		}
+
+	    protected void MacroExistsValidator_OnServerValidate(object source, ServerValidateEventArgs args)
+	    {
+	        if (CreateMacroCheckBox.Checked)
+	        {
+                //TODO: Shouldn't this use our string functions to create the alias ?
+                var fileName = FileName.Text + ".cshtml";
+                var name = fileName
+                    .Substring(0, (fileName.LastIndexOf('.') + 1)).Trim('.')
+                    .SplitPascalCasing().ToFirstUpperInvariant();
+
+                var macro = ApplicationContext.Current.Services.MacroService.GetByAlias(name);
+                if (macro != null)
+                {
+                    args.IsValid = false;
+                }    
+	        }
+	    }
 	}
 }

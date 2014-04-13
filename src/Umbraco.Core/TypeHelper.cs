@@ -6,7 +6,7 @@ using System.Reflection;
 
 namespace Umbraco.Core
 {
-	/// <summary>
+    /// <summary>
 	/// A utility class for type checking, this provides internal caching so that calls to these methods will be faster
 	/// than doing a manual type check in c#
 	/// </summary>

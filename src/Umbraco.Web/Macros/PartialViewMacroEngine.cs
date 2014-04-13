@@ -118,19 +118,15 @@ namespace Umbraco.Web.Macros
             routeVals.Values.Add("action", "Index");
             routeVals.DataTokens.Add("umbraco-context", umbCtx); //required for UmbracoViewPage
 
-			//lets render this controller as a child action if we are currently executing using MVC 
-			//(otherwise don't do this since we're using webforms)
-			var mvcHandler = http.CurrentHandler as MvcHandler;
+			//lets render this controller as a child action
 			var viewContext = new ViewContext {ViewData = new ViewDataDictionary()};;
-			if (mvcHandler != null)
-			{
-				//try and extract the current view context from the route values, this would be set in the UmbracoViewPage.
-				if (mvcHandler.RequestContext.RouteData.DataTokens.ContainsKey(Umbraco.Web.Mvc.Constants.DataTokenCurrentViewContext))
-				{
-					viewContext = (ViewContext) mvcHandler.RequestContext.RouteData.DataTokens[Umbraco.Web.Mvc.Constants.DataTokenCurrentViewContext];
-				}
-				routeVals.DataTokens.Add("ParentActionViewContext", viewContext);
-			}
+            //try and extract the current view context from the route values, this would be set in the UmbracoViewPage or in 
+            // the UmbracoPageResult if POSTing to an MVC controller but rendering in Webforms
+            if (http.Request.RequestContext.RouteData.DataTokens.ContainsKey(Mvc.Constants.DataTokenCurrentViewContext))
+            {
+                viewContext = (ViewContext)http.Request.RequestContext.RouteData.DataTokens[Mvc.Constants.DataTokenCurrentViewContext];
+            }
+            routeVals.DataTokens.Add("ParentActionViewContext", viewContext);
 
             var request = new RequestContext(http, routeVals);
             string output;

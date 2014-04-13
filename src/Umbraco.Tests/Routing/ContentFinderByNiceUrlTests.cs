@@ -12,13 +12,7 @@ namespace Umbraco.Tests.Routing
 	[TestFixture]
 	public class ContentFinderByNiceUrlTests : BaseRoutingTest
 	{
-		/// <summary>
-		/// We don't need a db for this test, will run faster without one
-		/// </summary>
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NoDatabasePerFixture; }
-        }
+	
 
 		[TestCase("/", 1046)]
 		[TestCase("/default.aspx", 1046)] //this one is actually rather important since this is the path that comes through when we are running in pre-IIS 7 for the root document '/' !

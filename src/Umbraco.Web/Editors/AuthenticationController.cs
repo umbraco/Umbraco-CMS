@@ -30,6 +30,7 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [ValidationFilter]
     [AngularJsonOnlyConfiguration]
+    [IsBackOffice]
     public class AuthenticationController : UmbracoApiController
     {
         

@@ -12,10 +12,11 @@ namespace umbraco.providers
     /// <summary>
     /// Custom Roles Provider for Umbraco
     /// </summary>
+    [Obsolete("This is not used and no methods are implemented, it will be removed in future versions")]
     public class UsersRoleProvider : RoleProvider
     {
         #region
-        private string _ApplicationName;
+        private string _applicationName;
         #endregion
 
         #region Properties
@@ -28,7 +29,7 @@ namespace umbraco.providers
         {
             get
             {
-                return _ApplicationName;
+                return _applicationName;
             }
             set
             {
@@ -38,7 +39,7 @@ namespace umbraco.providers
                 if (value.Length > 0x100)
                     throw new ProviderException("Provider application name too long.");
 
-                _ApplicationName = value;
+                _applicationName = value;
             }
         } 
         #endregion
@@ -70,9 +71,9 @@ namespace umbraco.providers
             // Initialize the abstract base class.
             base.Initialize(name, config);
 
-            this._ApplicationName = config["applicationName"];
-            if (string.IsNullOrEmpty(this._ApplicationName))
-                this._ApplicationName = SecUtility.GetDefaultAppName();
+            this._applicationName = config["applicationName"];
+            if (string.IsNullOrEmpty(this._applicationName))
+                this._applicationName = SecUtility.GetDefaultAppName();
         }
         #endregion
 

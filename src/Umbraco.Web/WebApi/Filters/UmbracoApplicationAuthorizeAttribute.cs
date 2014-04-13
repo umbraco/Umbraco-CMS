@@ -7,7 +7,7 @@ namespace Umbraco.Web.WebApi.Filters
     /// <summary>
     /// Ensures that the current user has access to the specified application
     /// </summary>
-    internal sealed class UmbracoApplicationAuthorizeAttribute : AuthorizeAttribute
+    public sealed class UmbracoApplicationAuthorizeAttribute : AuthorizeAttribute
     {
         /// <summary>
         /// Can be used by unit tests to enable/disable this filter

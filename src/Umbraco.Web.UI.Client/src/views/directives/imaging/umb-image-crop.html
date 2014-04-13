@@ -1,0 +1,19 @@
+<div class="umb-cropper umb-editor" ng-show="src">
+	<div class="crop-container">
+		<div class="viewport" ng-style="style()">
+			<img ng-src="{{src}}" ng-style="dimensions.image"/>
+			<div class="overlay" ng-style="dimensions.image"></div>
+		</div>
+	</div>
+
+	<div class="crop-slider">
+		<i class="icon-picture"></i>
+			<input
+				type="range" 
+				min="{{dimensions.scale.min}}" 
+				max="{{dimensions.scale.max}}" 
+				step="0.001" 
+				ng-model="dimensions.scale.current" />			
+				<i class="icon-picture" style="font-size: 22px"></i>	
+	</div>		
+</div>

@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
@@ -102,6 +103,41 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             DbTypeMap.Set<byte[]>(DbType.Binary, BlobColumnDefinition);
         }
 
+        public virtual string EscapeString(string val)
+        {
+            return PetaPocoExtensions.EscapeAtSymbols(val.Replace("'", "''"));
+        }
+
+        public virtual string GetStringColumnEqualComparison(string column, string value, TextColumnType columnType)
+        {
+            //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
+            return string.Format("upper({0}) = '{1}'", column, value.ToUpper());
+        }
+
+        public virtual string GetStringColumnStartsWithComparison(string column, string value, TextColumnType columnType)
+        {
+            //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
+            return string.Format("upper({0}) like '{1}%'", column, value.ToUpper());
+        }
+
+        public virtual string GetStringColumnEndsWithComparison(string column, string value, TextColumnType columnType)
+        {
+            //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
+            return string.Format("upper({0}) like '%{1}'", column, value.ToUpper());
+        }
+
+        public virtual string GetStringColumnContainsComparison(string column, string value, TextColumnType columnType)
+        {
+            //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
+            return string.Format("upper({0}) like '%{1}%'", column, value.ToUpper());
+        }
+
+        public virtual string GetStringColumnWildcardComparison(string column, string value, TextColumnType columnType)
+        {
+            //use the 'upper' method to always ensure strings are matched without case sensitivity no matter what the db setting.
+            return string.Format("upper({0}) like '{1}'", column, value.ToUpper());
+        }
+
         public virtual string GetQuotedTableName(string tableName)
         {
             return string.Format("\"{0}\"", tableName);
@@ -175,6 +211,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         {
             return new List<Tuple<string, string, string>>();
         }
+
+        public abstract IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db);
 
         public virtual bool DoesTableExist(Database db, string tableName)
         {

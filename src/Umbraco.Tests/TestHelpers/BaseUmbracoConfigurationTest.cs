@@ -19,14 +19,9 @@ namespace Umbraco.Tests.TestHelpers
         [SetUp]
         public virtual void Initialize()
         {
-            using (DisposableTimer.TraceDuration < BaseUmbracoConfigurationTest>("init"))
-            {                
-                //mock the Umbraco settings that we need
-                var settings = SettingsForTests.GetMockSettings();
-                //sets the global singleton to use the mocked format
-                SettingsForTests.ConfigureSettings(settings);
-                //set our local variable for tests to use (preferably)
-                UmbracoSettings = settings;    
+            using (DisposableTimer.TraceDuration<BaseUmbracoConfigurationTest>("init"))
+            {
+                SettingsForTests.Reset();
             }
             
         }
@@ -35,9 +30,11 @@ namespace Umbraco.Tests.TestHelpers
         public virtual void TearDown()
         {
             //reset settings
-            SettingsForTests.Reset();            
+            using (DisposableTimer.TraceDuration<BaseUmbracoConfigurationTest>("teardown"))
+            {
+                SettingsForTests.Reset();            
+            }
+            
         }
-
-        protected virtual IUmbracoSettingsSection UmbracoSettings { get; private set; }
     }
 }

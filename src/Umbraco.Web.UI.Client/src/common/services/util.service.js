@@ -1,22 +1,36 @@
 /*Contains multiple services for various helper tasks */
 
-function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, umbRequestHelper) {
-    return {
-        /** sets the image's url - will check if it is a folder or a real image */
-        setImageUrl: function(img) {
-            //get the image property (if one exists)
-            var imageProp = imageHelper.getImagePropertyValue({ imageModel: img });
-            if (!imageProp) {
-                img.thumbnail = "none";
-            }
-            else {
+function packageHelper(assetsService, treeService, eventsService, $templateCache) {
 
-                //get the proxy url for big thumbnails (this ensures one is always generated)
-                var thumbnailUrl = umbRequestHelper.getApiUrl(
-                    "imagesApiBaseUrl",
-                    "GetBigThumbnail",
-                    [{ mediaId: img.id }]);
-                img.thumbnail = thumbnailUrl;
+    return {
+
+        /** Called when a package is installed, this resets a bunch of data and ensures the new package assets are loaded in */
+        packageInstalled: function () {
+
+            //clears the tree
+            treeService.clearCache();
+
+            //clears the template cache
+            $templateCache.removeAll();
+
+            //emit event to notify anything else
+            eventsService.emit("app.reInitialize");
+        }
+
+    };
+}
+angular.module('umbraco.services').factory('packageHelper', packageHelper);
+
+function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, mediaHelper, umbRequestHelper) {
+    return {
+        /** sets the image's url, thumbnail and if its a folder */
+        setImageData: function(img) {
+            
+            img.isFolder = !mediaHelper.hasFilePropertyType(img);
+
+            if(!img.isFolder){
+                img.thumbnail = mediaHelper.resolveFile(img, true);
+                img.image = mediaHelper.resolveFile(img, false);    
             }
         },
 
@@ -184,7 +198,7 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, um
 
                 //in this case, a single image will not fit into the row so we need to crop/center
                 // width the full width and the min display height
-                if (imgs.length > 1 && imageRowHeight.imgCount === 1) {
+                if (imageRowHeight.imgCount === 1) {
                     sizes.push({
                         width: targetWidth,
                         //ensure that the height is rounded
@@ -238,15 +252,22 @@ function umbPhotoFolderHelper($compile, $log, $timeout, $filter, imageHelper, um
         },
 
         /** Creates the image grid with calculated widths/heights for images to fill the grid nicely */
-        buildGrid: function(images, maxRowWidth, maxRowHeight, startingIndex, minDisplayHeight, idealImgPerRow, margin) {
+        buildGrid: function(images, maxRowWidth, maxRowHeight, startingIndex, minDisplayHeight, idealImgPerRow, margin,imagesOnly) {
 
             var rows = [];
             var imagesProcessed = 0;
 
             //first fill in all of the original image sizes and URLs
             for (var i = startingIndex; i < images.length; i++) {
-                this.setImageUrl(images[i]);
-                this.setOriginalSize(images[i], maxRowHeight);
+                var item = images[i];
+
+                this.setImageData(item);
+                this.setOriginalSize(item, maxRowHeight);
+
+                if(imagesOnly && !item.isFolder && !item.thumbnail){
+                    images.splice(i, 1);
+                    i--;
+                }
             }
 
             while ((imagesProcessed + startingIndex) < images.length) {
@@ -376,7 +397,7 @@ function updateChecker($http, umbRequestHelper) {
                    umbRequestHelper.getApiUrl(
                        "updateCheckApiBaseUrl",
                        "GetCheck")),
-               'Failed to retreive update status');
+               'Failed to retrieve update status');
         }  
     };
 }
@@ -506,13 +527,13 @@ function umbDataFormatter() {
                         //we know the current property matches an alias, now we need to determine which membership provider property it was for
                         // by looking at the key
                         switch (foundAlias[0]) {
-                            case "umbracoLockPropertyTypeAlias":
+                            case "umbracoMemberLockedOut":
                                 saveModel.isLockedOut = prop.value.toString() === "1" ? true : false;
                                 break;
-                            case "umbracoApprovePropertyTypeAlias":
+                            case "umbracoMemberApproved":
                                 saveModel.isApproved = prop.value.toString() === "1" ? true : false;
                                 break;
-                            case "umbracoCommentPropertyTypeAlias":
+                            case "umbracoMemberComments":
                                 saveModel.comments = prop.value;
                                 break;
                         }

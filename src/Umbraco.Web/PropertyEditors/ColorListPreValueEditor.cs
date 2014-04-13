@@ -19,11 +19,18 @@ namespace Umbraco.Web.PropertyEditors
             //use a custom editor too
             field.View = "views/propertyeditors/colorpicker/colorpicker.prevalues.html";
             //change the description
-            field.Description = "Add and remove colors in HEX format without a prefixed '#'";
+            field.Description = "Add and remove colors";
             //change the label
             field.Name = "Add color";
             //need to have some custom validation happening here
-            field.Validators.Add(new ColorListValidator());
+            field.Validators.Add(new ColorListValidator()); 
+        }
+
+        public override IDictionary<string, object> ConvertDbToEditor(IDictionary<string, object> defaultPreVals, PreValueCollection persistedPreVals)
+        {
+            var dictionary = persistedPreVals.FormatAsDictionary();
+            var arrayOfVals = dictionary.Select(item => item.Value).ToList();
+            return new Dictionary<string, object> { { "items", arrayOfVals.ToDictionary(x => x.Id, x => x.Value) } };
         }
 
         internal class ColorListValidator : IPropertyValidator

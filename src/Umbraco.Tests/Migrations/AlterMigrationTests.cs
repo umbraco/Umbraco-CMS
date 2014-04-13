@@ -18,6 +18,23 @@ namespace Umbraco.Tests.Migrations
         }
 
         [Test]
+        public void Drop_Foreign_Key()
+        {
+            // Arrange
+            var context = new MigrationContext(DatabaseProviders.SqlServerCE, null);
+            var stub = new DropForeignKeyMigrationStub();
+
+            // Act
+            stub.GetUpExpressions(context);
+
+            // Assert
+            Assert.That(context.Expressions.Count(), Is.EqualTo(1));
+            Assert.That(context.Expressions.Single().ToString(), Is.EqualTo("ALTER TABLE [umbracoUser2app] DROP CONSTRAINT [FK_umbracoUser2app_umbracoUser_id]"));
+
+        }
+
+        [NUnit.Framework.Ignore("this doesn't actually test anything")]
+        [Test]
         public void Can_Get_Up_Migration_From_MigrationStub()
         {
             // Arrange

@@ -56,9 +56,8 @@ namespace umbraco.cms.businesslogic.web
         /// <param name="id">The id of the document</param>
         /// <param name="Version">The version of the document</param>
         public Document(int id, Guid Version)
-            : base(id)
+            : base(id, Version)
         {
-            this.Version = Version;
         }
 
         /// <summary>
@@ -1286,7 +1285,7 @@ namespace umbraco.cms.businesslogic.web
         public override void XmlPopulate(XmlDocument xd, ref XmlNode x, bool Deep)
         {
             string urlName = this.Content.GetUrlSegment().ToLower();
-            foreach (Property p in GenericProperties.Where(p => p != null))
+            foreach (Property p in GenericProperties.Where(p => p != null && p.Value != null && string.IsNullOrEmpty(p.Value.ToString()) == false))
                 x.AppendChild(p.ToXml(xd));
 
             // attributes

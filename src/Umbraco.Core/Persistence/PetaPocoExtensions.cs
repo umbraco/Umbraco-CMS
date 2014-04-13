@@ -21,14 +21,18 @@ namespace Umbraco.Core.Persistence
         /// <summary>
         /// This will escape single @ symbols for peta poco values so it doesn't think it's a parameter
         /// </summary>
-        /// <param name="db"></param>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static string EscapeAtSymbols(this Database db, string value)
+        public static string EscapeAtSymbols(string value)
         {
-            //this fancy regex will only match a single @ not a double, etc...
-            var regex = new Regex("(?<!@)@(?!@)");
-            return regex.Replace(value, "@@");
+            if (value.Contains("@"))
+            {
+                //this fancy regex will only match a single @ not a double, etc...
+                var regex = new Regex("(?<!@)@(?!@)");
+                return regex.Replace(value, "@@");    
+            }
+            return value;
+
         }
 
         public static void CreateTable<T>(this Database db)
@@ -53,11 +57,20 @@ namespace Umbraco.Core.Persistence
 
             using (var tr = db.GetTransaction())
             {
-                db.BulkInsertRecords(collection, tr);
+                db.BulkInsertRecords(collection, tr, true);
             }
         }
 
-        public static void BulkInsertRecords<T>(this Database db, IEnumerable<T> collection, Transaction tr)
+        /// <summary>
+        /// Performs the bulk insertion in the context of a current transaction with an optional parameter to complete the transaction
+        /// when finished
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="db"></param>
+        /// <param name="collection"></param>
+        /// <param name="tr"></param>
+        /// <param name="commitTrans"></param>
+        public static void BulkInsertRecords<T>(this Database db, IEnumerable<T> collection, Transaction tr, bool commitTrans = false)
         {
             //don't do anything if there are no records.
             if (collection.Any() == false)
@@ -91,11 +104,17 @@ namespace Umbraco.Core.Persistence
                     }
                 }
 
-                tr.Complete();
+                if (commitTrans)
+                {
+                    tr.Complete();    
+                }
             }
             catch
             {
-                tr.Dispose();
+                if (commitTrans)
+                {
+                    tr.Dispose();    
+                }
                 throw;
             }
         }
@@ -334,6 +353,14 @@ namespace Umbraco.Core.Persistence
         {
             var creation = new DatabaseSchemaCreation(db);
             creation.UninstallDatabaseSchema();
+        }
+
+        internal static void CreateDatabaseSchemaDo(this Database db, bool guardConfiguration)
+        {
+            if (guardConfiguration && ApplicationContext.Current.IsConfigured)
+                throw new Exception("Umbraco is already configured!");
+
+            CreateDatabaseSchemaDo(db);
         }
 
         internal static void CreateDatabaseSchemaDo(this Database db)

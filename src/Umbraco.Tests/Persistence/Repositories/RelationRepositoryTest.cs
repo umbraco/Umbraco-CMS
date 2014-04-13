@@ -16,12 +16,13 @@ using umbraco.interfaces;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class RelationRepositoryTest : BaseDatabaseFactoryTest
     {
         [SetUp]
         public override void Initialize()
-        {           
+        {
             base.Initialize();
 
             CreateTestData();
@@ -42,7 +43,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             var unitOfWork = provider.GetUnitOfWork();
 
             // Act
-            var repository = RepositoryResolver.Current.ResolveByType<IRelationRepository>(unitOfWork);            
+            var repository = RepositoryResolver.Current.ResolveByType<IRelationRepository>(unitOfWork);
 
             // Assert
             Assert.That(repository, Is.Not.Null);

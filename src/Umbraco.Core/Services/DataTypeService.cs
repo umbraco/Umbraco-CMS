@@ -138,7 +138,7 @@ namespace Umbraco.Core.Services
             using (var uow = _uowProvider.GetUnitOfWork())
             {
                 var dtos = uow.Database.Fetch<DataTypePreValueDto>("WHERE datatypeNodeId = @Id", new { Id = id });
-                var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value), x.Alias, x.SortOrder)).ToList();
+                var list = dtos.Select(x => new Tuple<PreValue, string, int>(new PreValue(x.Id, x.Value, x.SortOrder), x.Alias, x.SortOrder)).ToList();
 
                 return PreValueConverter.ConvertToPreValuesCollection(list);
             }
@@ -226,17 +226,17 @@ namespace Umbraco.Core.Services
             {
                 using (var uow = _uowProvider.GetUnitOfWork())
                 {
-                    var sortOrderObj =
-                        uow.Database.ExecuteScalar<object>(
-                            "SELECT max(sortorder) FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = id });
-                    int sortOrder;
-                    if (sortOrderObj == null || int.TryParse(sortOrderObj.ToString(), out sortOrder) == false)
-                    {
-                        sortOrder = 1;
-                    }
-
                     using (var transaction = uow.Database.GetTransaction())
                     {
+                        var sortOrderObj =
+                        uow.Database.ExecuteScalar<object>(
+                            "SELECT max(sortorder) FROM cmsDataTypePreValues WHERE datatypeNodeId = @DataTypeId", new { DataTypeId = id });
+                        int sortOrder;
+                        if (sortOrderObj == null || int.TryParse(sortOrderObj.ToString(), out sortOrder) == false)
+                        {
+                            sortOrder = 1;
+                        }
+
                         foreach (var value in values)
                         {
                             var dto = new DataTypePreValueDto { DataTypeNodeId = id, Value = value, SortOrder = sortOrder };

@@ -30,7 +30,7 @@ namespace umbraco.cms.businesslogic
     /// Besides data definition, the ContentType also defines the sorting and grouping (in tabs) of Properties/Datafields
     /// on the Content and which Content (by ContentType) can be created as child to the Content of the ContentType.
     /// </summary>
-    [Obsolete("Obsolete, Use Umbraco.Core.Models.ContentType or Umbraco.Core.Models.MediaType", false)]
+    [Obsolete("Obsolete, Use Umbraco.Core.Models.ContentType or Umbraco.Core.Models.MediaType or  or Umbraco.Core.Models.MemberType", false)]
     public class ContentType : CMSNode
     {
         #region Constructors
@@ -59,6 +59,7 @@ namespace umbraco.cms.businesslogic
         /// <param name="icon"></param>
         /// <param name="thumbnail"></param>
         /// <param name="masterContentType"></param>
+        /// <param name="isContainer"></param>
         /// <remarks>
         /// This is like creating a ContentType node using optimized mode but this lets you set
         /// all of the properties that are initialized normally from the database.
@@ -175,7 +176,7 @@ namespace umbraco.cms.businesslogic
         public static ContentType GetContentType(int id)
         {
             return ApplicationContext.Current.ApplicationCache.GetCacheItem
-                (string.Format("UmbracoContentType{0}", id),
+                (string.Format("{0}{1}", CacheKeys.ContentTypeCacheKey, id),
                  TimeSpan.FromMinutes(30),
                  () => new ContentType(id));
         }
@@ -200,9 +201,16 @@ namespace umbraco.cms.businesslogic
         /// <param name="IconUrl">The Iconurl of Contents of this ContentType</param>
         protected static void Create(int NodeId, string Alias, string IconUrl)
         {
+            Create(NodeId, Alias, IconUrl, true);
+        }
+
+        internal static void Create(int nodeId, string alias, string iconUrl, bool formatAlias)
+        {
             SqlHelper.ExecuteNonQuery(
-                                      "Insert into cmsContentType (nodeId,alias,icon) values (" + NodeId + ",'" + helpers.Casing.SafeAliasWithForcingCheck(Alias) +
-                                      "','" + IconUrl + "')");
+                                      "Insert into cmsContentType (nodeId,alias,icon) values (" + 
+                                      nodeId + ",'" +
+                                      (formatAlias ? helpers.Casing.SafeAliasWithForcingCheck(alias) : alias) +
+                                      "','" + iconUrl + "')");
         }
 
         /// <summary>
@@ -1142,6 +1150,15 @@ namespace umbraco.cms.businesslogic
                     return;
                 }
             }
+            else if (nodeObjectType == new Guid(Constants.ObjectTypes.MemberType))
+            {
+                var memberType = ApplicationContext.Current.Services.MemberTypeService.Get(Id);
+                if (memberType != null)
+                {
+                    PopulateContentTypeFromContentTypeBase(memberType);
+                    return;
+                }
+            }
 
             // TODO: Load master content types
             using (var dr = SqlHelper.ExecuteReader("Select allowAtRoot, isContainer, Alias,icon,thumbnail,description from cmsContentType where nodeid=" + Id)
@@ -1176,9 +1193,8 @@ namespace umbraco.cms.businesslogic
             RemoveFromDataTypeCache(ct.Alias);
 
             // clear anything that uses this as master content type
-            //TODO: Update to load all content types
-            //Should this include "ct.nodeObjectType == media.MediaType._objectType" ?
-            if (ct.nodeObjectType == DocumentType._objectType)
+            if (ct.nodeObjectType == DocumentType._objectType 
+                || ct.nodeObjectType == media.MediaType._objectType)
             {
                 //NOTE Changed from "DocumentType.GetAllAsList().FindAll(dt => dt.MasterContentType == id)" to loading master contenttypes directly from the db.
                 //Related to http://issues.umbraco.org/issue/U4-1714

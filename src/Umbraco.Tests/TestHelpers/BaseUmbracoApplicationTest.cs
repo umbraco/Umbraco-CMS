@@ -1,4 +1,7 @@
-﻿using AutoMapper;
+﻿using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
+using AutoMapper;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Models.Mapping;
@@ -28,13 +31,11 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.Initialize();
 
-            using (DisposableTimer.TraceDuration<BaseUmbracoApplicationTest>("init"))
+            using (DisposableTimer.TraceDuration<BaseUmbracoApplicationTest>("init", "init"))
             {
                 TestHelper.InitializeContentDirectories();
-                TestHelper.EnsureUmbracoSettingsConfig();
-
-                //Create the legacy prop-eds mapping
-                LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
+                
+                InitializeLegacyMappingsForCoreEditors();
 
                 SetupPluginManager();
 
@@ -52,33 +53,60 @@ namespace Umbraco.Tests.TestHelpers
         {
             base.TearDown();
 
-            //reset settings
-            SettingsForTests.Reset();
-            UmbracoContext.Current = null;
-            TestHelper.CleanContentDirectories();
-            TestHelper.CleanUmbracoSettingsConfig();
-            //reset the app context, this should reset most things that require resetting like ALL resolvers
-            ObjectExtensions.DisposeIfDisposable(ApplicationContext.Current);
-            ApplicationContext.Current = null;
-            ResetPluginManager();
-            LegacyPropertyEditorIdToAliasConverter.Reset();
+            using (DisposableTimer.TraceDuration<BaseUmbracoApplicationTest>("teardown"))
+            {
+                //reset settings
+                SettingsForTests.Reset();
+                UmbracoContext.Current = null;
+                TestHelper.CleanContentDirectories();
+                TestHelper.CleanUmbracoSettingsConfig();
+                //reset the app context, this should reset most things that require resetting like ALL resolvers
+                ObjectExtensions.DisposeIfDisposable(ApplicationContext.Current);
+                ApplicationContext.Current = null;
+                ResetPluginManager();                
+            }
+            
         }
         
+        private static readonly object Locker = new object();        
+
+        private static void InitializeLegacyMappingsForCoreEditors()
+        {
+            lock (Locker)
+            {
+                if (LegacyPropertyEditorIdToAliasConverter.Count() == 0)
+                {
+                    //Create the legacy prop-eds mapping
+                    LegacyPropertyEditorIdToAliasConverter.CreateMappingsForCoreEditors();
+                }
+            }         
+        }
+        
+        /// <summary>
+        /// If this class requires auto-mapper mapping initialization then init them
+        /// </summary>
+        /// <remarks>
+        /// This is an opt-in option because initializing the mappers takes about 500ms which equates to quite a lot
+        /// of time with every test.
+        /// </remarks>
         private void InitializeMappers()
         {
-            Mapper.Initialize(configuration =>
+            if (this.GetType().GetCustomAttribute<RequiresAutoMapperMappingsAttribute>(false) != null)
             {
-                var mappers = PluginManager.Current.FindAndCreateInstances<IMapperConfiguration>(
-                    specificAssemblies: new[]
+                Mapper.Initialize(configuration =>
+                {
+                    var mappers = PluginManager.Current.FindAndCreateInstances<IMapperConfiguration>(
+                        specificAssemblies: new[]
                         {
                             typeof(ContentModelMapper).Assembly,
                             typeof(ApplicationRegistrar).Assembly
                         });
-                foreach (var mapper in mappers)
-                {
-                    mapper.ConfigureMappings(configuration, ApplicationContext);
-                }
-            });       
+                    foreach (var mapper in mappers)
+                    {
+                        mapper.ConfigureMappings(configuration, ApplicationContext);
+                    }
+                });      
+            }
         }
 
         /// <summary>
@@ -128,7 +156,20 @@ namespace Umbraco.Tests.TestHelpers
         {
             if (PluginManager.Current == null || PluginManagerResetRequired)
             {
-                PluginManager.Current = new PluginManager(false);    
+                PluginManager.Current = new PluginManager(false);
+                PluginManager.Current.AssembliesToScan = new[]
+                {
+                    Assembly.Load("Umbraco.Core"),
+                    Assembly.Load("umbraco"),
+                    Assembly.Load("Umbraco.Tests"),
+                    Assembly.Load("businesslogic"),
+                    Assembly.Load("cms"),
+                    Assembly.Load("controls"),
+                    Assembly.Load("umbraco.editorControls"),
+                    Assembly.Load("umbraco.MacroEngines"),
+                    Assembly.Load("umbraco.providers"),
+                    Assembly.Load("Umbraco.Web.UI"),
+                };
             }
         }
 

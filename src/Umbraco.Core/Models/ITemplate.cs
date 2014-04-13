@@ -10,5 +10,11 @@
         /// </summary>
         /// <returns><see cref="RenderingEngine"/></returns>
         RenderingEngine GetTypeOfRenderingEngine();
+
+        /// <summary>
+        /// Set the mastertemplate
+        /// </summary>
+        /// <param name="masterTemplate"></param>
+        void SetMasterTemplate(ITemplate masterTemplate);
     }
 }

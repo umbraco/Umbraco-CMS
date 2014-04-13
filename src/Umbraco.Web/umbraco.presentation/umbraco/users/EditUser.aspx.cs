@@ -11,8 +11,10 @@ using System.Web.UI.WebControls;
 using System.Xml;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Security;
 using Umbraco.Web;
 using Umbraco.Web.Models;
+using Umbraco.Web.Security;
 using umbraco.BasePages;
 using umbraco.BusinessLogic;
 using umbraco.businesslogic.Exceptions;
@@ -36,7 +38,7 @@ namespace umbraco.cms.presentation.user
     {
         public EditUser()
         {
-            CurrentApp = BusinessLogic.DefaultApps.users.ToString();
+            CurrentApp = DefaultApps.users.ToString();
         }
         protected HtmlTable macroProperties;
         protected TextBox uname = new TextBox();
@@ -49,8 +51,8 @@ namespace umbraco.cms.presentation.user
         protected CheckBox NoConsole = new CheckBox();
         protected CheckBox Disabled = new CheckBox();
 
-        protected controls.ContentPicker mediaPicker = new umbraco.controls.ContentPicker();
-        protected controls.ContentPicker contentPicker = new umbraco.controls.ContentPicker();
+        protected ContentPicker mediaPicker = new ContentPicker();
+        protected ContentPicker contentPicker = new ContentPicker();
 
         protected TextBox cName = new TextBox();
         protected CheckBox cFulltree = new CheckBox();
@@ -58,30 +60,24 @@ namespace umbraco.cms.presentation.user
         protected DropDownList cDescription = new DropDownList();
         protected DropDownList cCategories = new DropDownList();
         protected DropDownList cExcerpt = new DropDownList();
-        protected controls.ContentPicker cMediaPicker = new umbraco.controls.ContentPicker();
-        protected controls.ContentPicker cContentPicker = new umbraco.controls.ContentPicker();
+        protected ContentPicker cMediaPicker = new ContentPicker();
+        protected ContentPicker cContentPicker = new ContentPicker();
         protected CustomValidator sectionValidator = new CustomValidator();
 
         protected Pane pp = new Pane();
 
         private User u;
 
+        private MembershipHelper _membershipHelper;
+
         private MembershipProvider BackOfficeProvider
         {
-            get
-            {
-                var provider = Membership.Providers[UmbracoSettings.DefaultBackofficeProvider];
-                if (provider == null)
-                {
-                    throw new ProviderException("The membership provider " + UmbracoSettings.DefaultBackofficeProvider + " was not found");
-                }
-                return provider;
-            }
+            get { return global::Umbraco.Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider(); }
         }
 
         protected void Page_Load(object sender, EventArgs e)
         {
-
+            _membershipHelper = new MembershipHelper(UmbracoContext.Current);
             int UID = int.Parse(Request.QueryString["id"]);
             u = BusinessLogic.User.GetUser(UID);
 
@@ -118,13 +114,23 @@ namespace umbraco.cms.presentation.user
             {
                 XmlDocument x = new XmlDocument();
                 x.Load(f);
-                ListItem li =
-                    new ListItem(x.DocumentElement.Attributes.GetNamedItem("intName").Value,
-                                 x.DocumentElement.Attributes.GetNamedItem("alias").Value);
-                if (x.DocumentElement.Attributes.GetNamedItem("alias").Value == u.Language)
-                    li.Selected = true;
 
-                userLanguage.Items.Add(li);
+                var alias = x.DocumentElement.Attributes.GetNamedItem("alias").Value;
+
+                //ensure that only unique languages are added
+                if (userLanguage.Items.FindByValue(alias) == null)
+                {
+                    ListItem li =
+                   new ListItem(x.DocumentElement.Attributes.GetNamedItem("intName").Value,
+                                alias);
+
+
+                    if (x.DocumentElement.Attributes.GetNamedItem("alias").Value == u.Language)
+                        li.Selected = true;
+
+                    userLanguage.Items.Add(li);
+                }
+               
             }
 
             // Console access and disabling
@@ -158,14 +164,6 @@ namespace umbraco.cms.presentation.user
             var passwordChanger = (passwordChanger) LoadControl(SystemDirectories.Umbraco + "/controls/passwordChanger.ascx");
             passwordChanger.MembershipProviderName = UmbracoSettings.DefaultBackofficeProvider;
             
-            //This is a hack to allow the admin to change a user's password to whatever they want - this will only work if we are using the
-            // default umbraco membership provider. 
-            // See the notes below in the ChangePassword method.
-            if (BackOfficeProvider is UsersMembershipProvider)
-            {
-                passwordChanger.ShowOldPassword = false;
-            }
-
             //Add a custom validation message for the password changer
             var passwordValidation = new CustomValidator
                 {
@@ -196,10 +194,9 @@ namespace umbraco.cms.presentation.user
             Pane ppNodes = new Pane();
             ppNodes.addProperty(ui.Text("user", "startnode", UmbracoUser), content);
             ppNodes.addProperty(ui.Text("user", "mediastartnode", UmbracoUser), medias);
-
+            
             //Generel umrbaco access
             Pane ppAccess = new Pane();
-            
             ppAccess.addProperty(ui.Text("user", "noConsole", UmbracoUser), NoConsole);
             ppAccess.addProperty(ui.Text("user", "disabled", UmbracoUser), Disabled);
 
@@ -211,11 +208,12 @@ namespace umbraco.cms.presentation.user
             TabPage userInfo = UserTabs.NewTabPage(u.Name);
 
             userInfo.Controls.Add(pp);
-            userInfo.Controls.Add(ppNodes);
+            
             userInfo.Controls.Add(ppAccess);
-            userInfo.Controls.Add(ppModules);
-            userInfo.Style.Add("text-align", "center");
+            userInfo.Controls.Add(ppNodes);
 
+            userInfo.Controls.Add(ppModules);
+            
             userInfo.HasMenu = true;
 
             var save = userInfo.Menu.NewButton();
@@ -229,6 +227,7 @@ namespace umbraco.cms.presentation.user
             sectionValidator.ControlToValidate = lapps.ID;
             sectionValidator.ErrorMessage = ui.Text("errorHandling", "errorMandatoryWithoutTab", ui.Text("user", "modules", UmbracoUser), UmbracoUser);
             sectionValidator.CssClass = "error";
+            sectionValidator.Style.Add("color", "red"); 
 
             SetupForm();
             SetupChannel();
@@ -350,22 +349,10 @@ namespace umbraco.cms.presentation.user
 
             if (!IsPostBack)
             {
-                MembershipUser user = BackOfficeProvider.GetUser(u.LoginName, true);
+                MembershipUser user = BackOfficeProvider.GetUser(u.LoginName, false);
                 uname.Text = u.Name;
                 lname.Text = (user == null) ? u.LoginName : user.UserName;
                 email.Text = (user == null) ? u.Email : user.Email;
-
-                // Prevent users from changing information if logged in through active directory membership provider
-                // active directory-mapped accounts have empty passwords by default... so set update user fields to read only
-                // this will not be a security issue because empty passwords are not allowed in membership provider. 
-                // This might change in version 4.0
-                if (string.IsNullOrEmpty(u.GetPassword()))
-                {
-                    uname.ReadOnly = true;
-                    lname.ReadOnly = true;
-                    email.ReadOnly = true;
-                    passw.Visible = false;
-                }
 
                 contentPicker.Value = u.StartNodeId.ToString(CultureInfo.InvariantCulture);
                 mediaPicker.Value = u.StartMediaId.ToString(CultureInfo.InvariantCulture);
@@ -425,22 +412,8 @@ namespace umbraco.cms.presentation.user
 
                 var changePasswordModel = passwordChangerControl.ChangingPasswordModel;
 
-                // Is it using the default membership provider
-                if (BackOfficeProvider is UsersMembershipProvider)
-                {
-                    //This is a total hack so that an admin can change the password without knowing the previous one
-                    // we do this by simply passing in the already stored hashed/encrypted password in the database - 
-                    // this shouldn't be allowed but to maintain backwards compatibility we need to do this because
-                    // this logic was previously allowed.
-
-                    //For this editor, we set the passwordChanger.ShowOldPassword = false so that the old password
-                    // field doesn't appear because we know we are going to manually set it here.
-                    // We'll change the model to have the already encrypted password stored in the db and that will continue to validate.
-                    changePasswordModel.OldPassword = u.Password;
-                }
-
                 //now do the actual change
-                var changePassResult = UmbracoContext.Current.Security.ChangePassword(
+                var changePassResult = _membershipHelper.ChangePassword(
                     membershipUser.UserName, changePasswordModel, BackOfficeProvider);    
 
                 if (changePassResult.Success)
@@ -470,7 +443,7 @@ namespace umbraco.cms.presentation.user
             {
                 try
                 {
-                    var membershipUser = BackOfficeProvider.GetUser(u.LoginName, true);
+                    var membershipUser = BackOfficeProvider.GetUser(u.LoginName, false);
                     if (membershipUser == null)
                     {
                         throw new ProviderException("Could not find user in the membership provider with login name " + u.LoginName);
@@ -481,41 +454,22 @@ namespace umbraco.cms.presentation.user
 
                     //perform the changing password logic
                     ChangePassword(passwordChangerControl, membershipUser, passwordChangerValidator);
-                    
-                    // Is it using the default membership provider
-                    if (BackOfficeProvider is UsersMembershipProvider)
-                    {
-                        // Save user in membership provider
-                        UsersMembershipUser umbracoUser = membershipUser as UsersMembershipUser;
-                        umbracoUser.FullName = uname.Text.Trim();
-                        umbracoUser.Language = userLanguage.SelectedValue;
-                        umbracoUser.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
-                        BackOfficeProvider.UpdateUser(umbracoUser);
 
-                        // Save user details
-                        u.Email = email.Text.Trim();
-                        u.Language = userLanguage.SelectedValue;
-                    }
-                    else
-                    {
-                        u.Name = uname.Text.Trim();
-                        u.Language = userLanguage.SelectedValue;
-                        u.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
-                        //SD: This check must be here for some reason but apparently we don't want to try to 
-                        // update when the AD provider is active.
-                        if ((BackOfficeProvider is ActiveDirectoryMembershipProvider) == false)
-                        {
-                            BackOfficeProvider.UpdateUser(membershipUser);
-                        }
-                    }
+                    //update the membership provider
+                    UpdateMembershipProvider(membershipUser);
 
-
+                    //update the Umbraco user properties - even though we are updating some of these properties in the membership provider that is 
+                    // ok since the membership provider might be storing these details someplace totally different! But we want to keep our UI in sync.
+                    u.Name = uname.Text.Trim();
+                    u.Language = userLanguage.SelectedValue;
+                    u.UserType = UserType.GetUserType(int.Parse(userType.SelectedValue));
+                    u.Email = email.Text.Trim();                    
                     u.LoginName = lname.Text;
-                    //u.StartNodeId = int.Parse(startNode.Value);
-
+                    u.Disabled = Disabled.Checked;
+                    u.NoConsole = NoConsole.Checked;
 
                     int startNode;
-                    if (!int.TryParse(contentPicker.Value, out startNode))
+                    if (int.TryParse(contentPicker.Value, out startNode) == false)
                     {
                         //set to default if nothing is choosen
                         if (u.StartNodeId > 0)
@@ -523,17 +477,11 @@ namespace umbraco.cms.presentation.user
                         else
                             startNode = -1;
                     }
-                    u.StartNodeId = startNode;
-
-
-                    u.Disabled = Disabled.Checked;
+                    u.StartNodeId = startNode;                                        
                     
-                    u.NoConsole = NoConsole.Checked;
-                    //u.StartMediaId = int.Parse(mediaStartNode.Value);
-
-
+                    
                     int mstartNode;
-                    if (!int.TryParse(mediaPicker.Value, out mstartNode))
+                    if (int.TryParse(mediaPicker.Value, out mstartNode) == false)
                     {
                         //set to default if nothing is choosen
                         if (u.StartMediaId > 0)
@@ -544,7 +492,6 @@ namespace umbraco.cms.presentation.user
                     u.StartMediaId = mstartNode;
 
                     u.clearApplications();
-
                     foreach (ListItem li in lapps.Items)
                     {
                         if (li.Selected) u.addApplication(li.Value);
@@ -598,6 +545,20 @@ namespace umbraco.cms.presentation.user
             }
         }
 
+        private void UpdateMembershipProvider(MembershipUser membershipUser)
+        {
+            //SD: This check must be here for some reason but apparently we don't want to try to 
+            // update when the AD provider is active.
+            if ((BackOfficeProvider is ActiveDirectoryMembershipProvider) == false)
+            {
+                var membershipHelper = new MembershipHelper(ApplicationContext, new HttpContextWrapper(Context));
+                //set the writable properties that we are editing
+                membershipHelper.UpdateMember(membershipUser, BackOfficeProvider,
+                                              email.Text.Trim(),
+                                              Disabled.Checked == false);
+            }
+        }
+
         /// <summary>
         /// UserTabs control.
         /// </summary>
@@ -605,6 +566,6 @@ namespace umbraco.cms.presentation.user
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::umbraco.uicontrols.TabView UserTabs;
+        protected TabView UserTabs;
     }
 }

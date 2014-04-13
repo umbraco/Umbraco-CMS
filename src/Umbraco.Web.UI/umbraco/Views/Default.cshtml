@@ -2,13 +2,13 @@
 @using Umbraco.Core
 @using ClientDependency.Core
 @using ClientDependency.Core.Mvc
+@using Umbraco.Core.IO
 @using Umbraco.Web
 @using Umbraco.Web.Editors
 @using umbraco
+
 @inherits System.Web.Mvc.WebViewPage
-@{
-    Layout = null;
-}
+
 
 <!DOCTYPE html>
 
@@ -20,8 +20,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
 
     <title ng-bind="$root.locationTitle">Umbraco</title>
-    <link rel="stylesheet" href="assets/css/umbraco.css" />
-    <link rel="stylesheet" href="../umbraco_client/tree/treeicons.css" />
+    
+    @{ Html.RequiresCss("assets/css/umbraco.css", "Umbraco");}
+    @{ Html.RequiresCss("tree/treeicons.css", "UmbracoClient");}
+    @Html.RenderCssHere(
+        new BasicPath("Umbraco", IOHelper.ResolveUrl(SystemDirectories.Umbraco)),
+        new BasicPath("UmbracoClient", IOHelper.ResolveUrl(SystemDirectories.UmbracoClient)))
 
 </head>
 <body ng-class="{touch:touchDevice}" ng-controller="Umbraco.MainController" id="umbracoMainPageBody">
@@ -49,14 +53,14 @@
         Umbraco.Sys.ServerVariables = {
             "umbracoUrls": {                
                 "authenticationApiBaseUrl": "@(Url.GetUmbracoApiServiceBaseUrl<AuthenticationController>(controller => controller.PostLogin(null)))",
-                "serverVarsJs": '@Url.Action("ServerVariables", "BackOffice")'
+                "serverVarsJs": '@Url.GetUrlWithCacheBust("ServerVariables", "BackOffice")'
             }
         };       
     </script>
 
     @*And finally we can load in our angular app*@
     <script type="text/javascript" src="lib/yepnope/yepnope.min.js"></script>
-    <script type="text/javascript" src="@Url.Action("Application", "BackOffice")"></script>
+    <script type="text/javascript" src="@Url.GetUrlWithCacheBust("Application", "BackOffice")"></script>
 
 </body>
 </html>

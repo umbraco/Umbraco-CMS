@@ -18,13 +18,13 @@ namespace Umbraco.Core.Persistence.Repositories
     {
         private readonly IRelationTypeRepository _relationTypeRepository;
 
-		public RelationRepository(IDatabaseUnitOfWork work, IRelationTypeRepository relationTypeRepository)
-			: base(work)
+        public RelationRepository(IDatabaseUnitOfWork work, IRelationTypeRepository relationTypeRepository)
+            : base(work)
         {
             _relationTypeRepository = relationTypeRepository;
         }
 
-		public RelationRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IRelationTypeRepository relationTypeRepository)
+        public RelationRepository(IDatabaseUnitOfWork work, IRepositoryCacheProvider cache, IRelationTypeRepository relationTypeRepository)
             : base(work, cache)
         {
             _relationTypeRepository = relationTypeRepository;
@@ -42,7 +42,7 @@ namespace Umbraco.Core.Persistence.Repositories
                 return null;
 
             var relationType = _relationTypeRepository.Get(dto.RelationType);
-            if(relationType == null)
+            if (relationType == null)
                 throw new Exception(string.Format("RelationType with Id: {0} doesn't exist", dto.RelationType));
 
             var factory = new RelationFactory(relationType);

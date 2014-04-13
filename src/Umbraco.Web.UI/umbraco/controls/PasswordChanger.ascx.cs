@@ -18,7 +18,8 @@ namespace Umbraco.Web.UI.Umbraco.Controls
             umbPasswordChanger_passwordCurrent.Text = null;
             umbPasswordChanger_passwordNew.Text = null;
             umbPasswordChanger_passwordNewConfirm.Text = null;
-            
+            //reset the flag always
+            IsChangingPasswordField.Value = "false";
             this.DataBind();
         } 
 

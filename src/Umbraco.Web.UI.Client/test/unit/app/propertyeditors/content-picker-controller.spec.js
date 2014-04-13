@@ -16,9 +16,15 @@ describe('Content picker controller tests', function () {
                         alias: "property",
                         value:"1233,1231,23121",
                         label: "My content picker",
-                        description: "desc"
+                        description: "desc",
+                        config: {}
                       };
 
+        //this controller requires an angular form controller applied to it
+        scope.contentPickerForm = angularHelper.getNullForm("contentPickerForm");
+        scope.contentPickerForm.minCount = angularHelper.getNullForm("minCount");
+        scope.contentPickerForm.maxCount = angularHelper.getNullForm("maxCount");
+        
         //have the contentMocks register its expect urls on the httpbackend
         //see /mocks/content.mocks.js for how its setup
         entityMocks.register();
@@ -60,7 +66,7 @@ describe('Content picker controller tests', function () {
         it("Removing an item should update renderModel, ids and model.value", function(){
             
             scope.remove(1);
-
+            scope.$apply();
             expect(scope.renderModel.length).toBe(2);
             expect(scope.ids.length).toBe(2);
             expect(scope.model.value).toBe("1233,23121");
@@ -69,7 +75,7 @@ describe('Content picker controller tests', function () {
         it("Adding an item should update renderModel, ids and model.value", function(){
             
             scope.add({name: "meh", id: 666, icon: "woop"});
-
+            scope.$apply();
             expect(scope.renderModel.length).toBe(4);
             expect(scope.ids.length).toBe(4);
             expect(scope.model.value).toBe("1233,1231,23121,666");
@@ -77,12 +83,14 @@ describe('Content picker controller tests', function () {
 
         it("Adding a dublicate item should note update renderModel, ids and model.value", function(){
             
-            scope.add({name: "meh", id: 666, icon: "woop"});
+            scope.add({ name: "meh", id: 666, icon: "woop" });
+            scope.$apply();
             expect(scope.renderModel.length).toBe(4);
             expect(scope.ids.length).toBe(4);
             expect(scope.model.value).toBe("1233,1231,23121,666");
 
-            scope.add({name: "meh 2", id: 666, icon: "woop 2"});
+            scope.add({ name: "meh 2", id: 666, icon: "woop 2" });
+            scope.$apply();
             expect(scope.renderModel.length).toBe(4);
             expect(scope.ids.length).toBe(4);
             expect(scope.model.value).toBe("1233,1231,23121,666");

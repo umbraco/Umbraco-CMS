@@ -10,15 +10,17 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.UnitOfWork;
 using Umbraco.Core.Services;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.Services
 {
-	/// <summary>
+    /// <summary>
     /// Tests covering all methods in the ContentService class.
     /// This is more of an integration test as it involves multiple layers
     /// as well as configuration.
     /// </summary>
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture, RequiresSTA]
     public class ContentServiceTests : BaseServiceTest
     {
@@ -210,9 +212,9 @@ namespace Umbraco.Tests.Services
                     Name = "Test",
                     Email = "test@test.com",
                     Username = "test",
-                    Password = "test"
+                RawPasswordValue = "test"
                 };
-            ServiceContext.UserService.SaveUser(user);
+            ServiceContext.UserService.Save(user);
             var content = new Content("Test", -1, ServiceContext.ContentTypeService.GetContentType("umbTextpage"));
 
             // Act
@@ -583,7 +585,7 @@ namespace Umbraco.Tests.Services
             contentService.Save(content);
 
             var parent = contentService.GetById(NodeDto.NodeIdSeed + 1);
-            bool parentPublished = contentService.Publish(parent, 0);//Publish root Home node to enable publishing of '1048'
+            bool parentPublished = contentService.Publish(parent, 0);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
 
             // Act
             bool published = contentService.Publish(content, 0);
@@ -604,7 +606,7 @@ namespace Umbraco.Tests.Services
             contentService.Save(content, 0);
 
             var parent = contentService.GetById(NodeDto.NodeIdSeed + 1);
-            bool parentPublished = contentService.Publish(parent, 0);//Publish root Home node to enable publishing of '1048'
+            bool parentPublished = contentService.Publish(parent, 0);//Publish root Home node to enable publishing of 'NodeDto.NodeIdSeed + 3'
 
             // Act
             bool published = contentService.Publish(content, 0);

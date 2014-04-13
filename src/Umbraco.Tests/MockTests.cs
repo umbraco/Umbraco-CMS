@@ -38,6 +38,7 @@ namespace Umbraco.Tests
                     new Mock<IContentService>().Object,
                     new Mock<IContentTypeService>().Object,
                     new Mock<IMediaService>().Object,
+                    new Mock<IMacroService>().Object,
                     new Mock<IDataTypeService>().Object,
                     new Mock<IFileService>().Object,
                     new Mock<ILocalizationService>().Object,
@@ -48,6 +49,7 @@ namespace Umbraco.Tests
                     new Mock<IDatabaseUnitOfWorkProvider>().Object,
                     new RepositoryFactory(true),
                     new Mock<IEntityService>().Object),
+                    new Mock<IMemberGroupService>().Object,
                 new Mock<ISectionService>().Object,
                 new Mock<IApplicationTreeService>().Object,
                 new Mock<ITagService>().Object);
@@ -77,6 +79,7 @@ namespace Umbraco.Tests
                         new Mock<IContentService>().Object,
                         new Mock<IContentTypeService>().Object,
                         new Mock<IMediaService>().Object,
+                        new Mock<IMacroService>().Object,
                         new Mock<IDataTypeService>().Object,
                         new Mock<IFileService>().Object,
                         new Mock<ILocalizationService>().Object,
@@ -87,10 +90,12 @@ namespace Umbraco.Tests
                         new Mock<IDatabaseUnitOfWorkProvider>().Object,
                         new RepositoryFactory(true),
                         new Mock<IEntityService>().Object),
+                    new Mock<IMemberGroupService>().Object,
                     new Mock<ISectionService>().Object,
                     new Mock<IApplicationTreeService>().Object,
                     new Mock<ITagService>().Object),
                 CacheHelper.CreateDisabledCacheHelper());
+            
             Assert.Pass();
         }
         
@@ -111,7 +116,6 @@ namespace Umbraco.Tests
             Assert.AreNotEqual(appCtx, result);
         }
 
-        [NUnit.Framework.Ignore("Need to fix more stuff up, this is ignore because an exception occurs because it wants to ensure we have a resolver initialized - need to make that process better for testability")]
         [Test]
         public void Can_Get_Umbraco_Context()
         {

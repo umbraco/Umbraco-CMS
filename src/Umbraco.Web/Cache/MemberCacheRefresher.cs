@@ -1,6 +1,8 @@
 ﻿using System;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Caching;
 using umbraco.cms.businesslogic.member;
 using umbraco.interfaces;
 
@@ -12,7 +14,7 @@ namespace Umbraco.Web.Cache
     /// <remarks>
     /// This is not intended to be used directly in your code and it should be sealed but due to legacy code we cannot seal it.
     /// </remarks>
-    public class MemberCacheRefresher : CacheRefresherBase<MemberCacheRefresher>
+    public class MemberCacheRefresher : TypedCacheRefresherBase<MemberCacheRefresher, IMember>
     {
 
         protected override MemberCacheRefresher Instance
@@ -42,6 +44,18 @@ namespace Umbraco.Web.Cache
             base.Remove(id);
         }
 
+        public override void Refresh(IMember instance)
+        {
+            ClearCache(instance.Id);
+            base.Refresh(instance);
+        }
+
+        public override void Remove(IMember instance)
+        {
+            ClearCache(instance.Id);
+            base.Remove(instance);
+        }
+
         private void ClearCache(int id)
         {
             ApplicationContext.Current.ApplicationCache.ClearPartialViewCache();
@@ -50,6 +64,8 @@ namespace Umbraco.Web.Cache
                 ClearCacheByKeySearch(string.Format("{0}_{1}", CacheKeys.MemberLibraryCacheKey, id));
             ApplicationContext.Current.ApplicationCache.
                 ClearCacheByKeySearch(string.Format("{0}{1}", CacheKeys.MemberBusinessLogicCacheKey, id));
+
+            RuntimeCacheProvider.Current.Delete(typeof(IMember), id);
         }
     }
 }

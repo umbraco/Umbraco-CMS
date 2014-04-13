@@ -55,7 +55,7 @@ namespace Umbraco.Web.Strategies
         }
 
 
-        static void UmbracoModuleRouteAttempt(object sender, Routing.RoutableAttemptEventArgs e)
+        static void UmbracoModuleRouteAttempt(object sender, RoutableAttemptEventArgs e)
         {
             if (e.HttpContext.Request == null || e.HttpContext.Request.Url == null) return;
 
@@ -78,7 +78,7 @@ namespace Umbraco.Web.Strategies
             if (e.Outcome == EnsureRoutableOutcome.NotDocumentRequest)
             {
                 //check if this is in the umbraco back office
-                if (e.HttpContext.Request.Url.IsBackOfficeRequest())
+                if (e.HttpContext.Request.Url.IsBackOfficeRequest(HttpRuntime.AppDomainAppVirtualPath))
                 {
                     //yup it's a back office request!
                     using (var lck = new UpgradeableReadLock(Locker))

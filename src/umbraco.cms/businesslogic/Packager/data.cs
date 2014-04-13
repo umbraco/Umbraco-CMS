@@ -116,8 +116,8 @@ namespace umbraco.cms.businesslogic.packager
                 instance.Attributes.Append(xmlHelper.addAttribute(Source, "skinRepoGuid", ""));
 
                 XmlElement license = Source.CreateElement("license");
-                license.InnerText = "MIT license";
-                license.Attributes.Append(xmlHelper.addAttribute(Source, "url", "http://www.opensource.org/licenses/mit-license.php"));
+                license.InnerText = "MIT License";
+                license.Attributes.Append(xmlHelper.addAttribute(Source, "url", "http://opensource.org/licenses/MIT"));
                 instance.AppendChild(license);
 
                 XmlElement author = Source.CreateElement("author");

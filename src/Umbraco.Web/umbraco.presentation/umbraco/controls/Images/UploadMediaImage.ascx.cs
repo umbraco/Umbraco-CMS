@@ -76,8 +76,6 @@ namespace umbraco.controls.Images
             prop.Value = UploadField.Data.Value;
             media.Save();
 
-            // Generate xml on image
-            media.XmlGenerate(new XmlDocument());
             pane_upload.Visible = false;
             
             //this seems real ugly since we apparently already have the properties above (props)... but this data layer is insane and undecipherable:)

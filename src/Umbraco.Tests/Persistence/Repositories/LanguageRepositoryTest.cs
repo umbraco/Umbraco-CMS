@@ -10,6 +10,7 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class LanguageRepositoryTest : BaseDatabaseFactoryTest
     {
@@ -56,6 +57,22 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(language.HasIdentity, Is.True);
                 Assert.That(language.CultureName, Is.EqualTo("en-US"));
                 Assert.That(language.IsoCode, Is.EqualTo("en-US"));   
+            }
+        }
+
+        [Test]
+        public void Get_WhenIdDoesntExist_ReturnsNull()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            using (var repository = CreateRepository(unitOfWork))
+            {
+                // Act
+                var language = repository.Get(0);
+
+                // Assert
+                Assert.That(language, Is.Null);
             }
         }
 

@@ -26,9 +26,9 @@ namespace Umbraco.Tests.Macros
                 new NullCacheProvider());
             ApplicationContext.Current = new ApplicationContext(cacheHelper);
             ProfilerResolver.Current = new ProfilerResolver(new LogProfiler())
-                                           {
-                                               CanResolveBeforeFrozen = true
-                                           };
+            {
+                CanResolveBeforeFrozen = true
+            };
         }
 
         [TearDown]

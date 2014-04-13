@@ -22,8 +22,8 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
             
             Delete.Column("macroPropertyHidden").FromTable("cmsMacroProperty");
 
-            Delete.ForeignKey("FK_cmsMacroProperty_cmsMacroPropertyType_id").OnTable("cmsMacroProperty");
-
+            Delete.ForeignKey().FromTable("cmsMacroProperty").ForeignColumn("macroPropertyType").ToTable("cmsMacroPropertyType").PrimaryColumn("id");
+            
             Alter.Table("cmsMacroProperty").AddColumn("editorAlias").AsString(255).NotNullable().WithDefaultValue("");
 
             //we need to get the data and create the migration scripts before we change the actual schema bits below!
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Persistence.Migrations.Upgrades.TargetVersionSeven
 
         public override void Down()
         {
-            throw new NotSupportedException("Cannot downgrade from a version 7 database to a prior version");
+            throw new DataLossException("Cannot downgrade from a version 7 database to a prior version, the database schema has already been modified");
         }
     }
 }

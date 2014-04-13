@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Persistence.Querying
 {
@@ -203,13 +205,12 @@ namespace Umbraco.Core.Persistence.Querying
         {
             if (c.Value == null)
                 return "null";
-            else if (c.Value.GetType() == typeof(bool))
+            if (c.Value is bool)
             {
                 object o = GetQuotedValue(c.Value, c.Value.GetType());
                 return string.Format("({0}={1})", GetQuotedTrueValue(), o);
             }
-            else
-                return GetQuotedValue(c.Value, c.Value.GetType());
+            return GetQuotedValue(c.Value, c.Value.GetType());
         }
 
         protected virtual string VisitUnary(UnaryExpression u)
@@ -245,12 +246,31 @@ namespace Umbraco.Core.Persistence.Querying
                     return string.Format("upper({0})", r);
                 case "ToLower":
                     return string.Format("lower({0})", r);
+                case "SqlWildcard":
                 case "StartsWith":
-                    return string.Format("upper({0}) like '{1}%'", r, EscapeAtArgument(RemoveQuote(args[0].ToString().ToUpper())));
                 case "EndsWith":
-                    return string.Format("upper({0}) like '%{1}'", r, EscapeAtArgument(RemoveQuote(args[0].ToString()).ToUpper()));
                 case "Contains":
-                    return string.Format("{0} like '%{1}%'", r, EscapeAtArgument(RemoveQuote(args[0].ToString()).ToUpper()));
+                case "Equals":
+                case "SqlStartsWith":
+                case "SqlEndsWith":
+                case "SqlContains":
+                case "SqlEquals":
+                case "InvariantStartsWith":
+                case "InvariantEndsWith":
+                case "InvariantContains":
+                case "InvariantEquals":
+                    //default
+                    var colType = TextColumnType.NVarchar;
+                    //then check if this arg has been passed in
+                    if (m.Arguments.Count > 1)
+                    {
+                        var colTypeArg = m.Arguments.FirstOrDefault(x => x is ConstantExpression && x.Type == typeof(TextColumnType));
+                        if (colTypeArg != null)
+                        {
+                            colType = (TextColumnType) ((ConstantExpression) colTypeArg).Value;
+                        }
+                    }
+                    return HandleStringComparison(r.ToString(), args[0].ToString(), m.Method.Name, colType);
                 case "Substring":
                     var startIndex = Int32.Parse(args[0].ToString()) + 1;
                     if (args.Count == 2)

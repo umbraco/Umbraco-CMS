@@ -9,11 +9,11 @@
 function macroService() {
 
     return {
-        
+       
         /** parses the special macro syntax like <?UMBRACO_MACRO macroAlias="Map" /> and returns an object with the macro alias and it's parameters */
         parseMacroSyntax: function (syntax) {
 
-            var expression = /(<\?UMBRACO_MACRO macroAlias=["'](\w+?)["'].+?)(\/>|>.*?<\/\?UMBRACO_MACRO>)/im;
+            var expression = /(<\?UMBRACO_MACRO macroAlias=["']([\w\.]+?)["'][\s\S]+?)(\/>|>.*?<\/\?UMBRACO_MACRO>)/i;
             var match = expression.exec(syntax);
             if (!match || match.length < 3) {
                 return null;
@@ -23,14 +23,15 @@ function macroService() {
             //this will leave us with just the parameters
             var paramsChunk = match[1].trim().replace(new RegExp("UMBRACO_MACRO macroAlias=[\"']" + alias + "[\"']"), "").trim();
             
-            var paramExpression = new RegExp("(\\w+?)=['\"](.*?)['\"]", "g");
+            var paramExpression = /(\w+?)=['\"]([\s\S]*?)['\"]/g;
+            
             var paramMatch;
             var returnVal = {
                 macroAlias: alias,
-                marcoParamsDictionary: {}
+                macroParamsDictionary: {}
             };
             while (paramMatch = paramExpression.exec(paramsChunk)) {
-                returnVal.marcoParamsDictionary[paramMatch[1]] = paramMatch[2];
+                returnVal.macroParamsDictionary[paramMatch[1]] = paramMatch[2];
             }
             return returnVal;
         },
@@ -52,10 +53,24 @@ function macroService() {
 
             var macroString = '<?UMBRACO_MACRO macroAlias=\"' + args.macroAlias + "\" ";
 
-            if (args.marcoParamsDictionary) {
+            if (args.macroParamsDictionary) {
 
-                _.each(args.marcoParamsDictionary, function (val, key) {
-                    var keyVal = key + "=\"" + (val ? val : "") + "\" ";
+                _.each(args.macroParamsDictionary, function (val, key) {
+                    //check for null
+                    val = val ? val : "";
+                    //need to detect if the val is a string or an object
+                    var keyVal;
+                    if (angular.isString(val)) {
+                        keyVal = key + "=\"" + (val ? val : "") + "\" ";
+                    }
+                    else {
+                        //if it's not a string we'll send it through the json serializer
+                        var json = angular.toJson(val);
+                        //then we need to url encode it so that it's safe
+                        var encoded = encodeURIComponent(json);
+                        keyVal = key + "=\"" + encoded + "\" ";
+                    }
+                    
                     macroString += keyVal;
                 });
 
@@ -81,9 +96,9 @@ function macroService() {
             
             var macroString = '<umbraco:Macro ';
 
-            if (args.marcoParamsDictionary) {
+            if (args.macroParamsDictionary) {
                 
-                _.each(args.marcoParamsDictionary, function (val, key) {
+                _.each(args.macroParamsDictionary, function (val, key) {
                     var keyVal = key + "=\"" + (val ? val : "") + "\" ";
                     macroString += keyVal;
                 });
@@ -112,11 +127,11 @@ function macroService() {
 
             var hasParams = false;
             var paramString;
-            if (args.marcoParamsDictionary) {
+            if (args.macroParamsDictionary) {
                 
                 paramString = ", new {";
 
-                _.each(args.marcoParamsDictionary, function(val, key) {
+                _.each(args.macroParamsDictionary, function(val, key) {
 
                     hasParams = true;
                     

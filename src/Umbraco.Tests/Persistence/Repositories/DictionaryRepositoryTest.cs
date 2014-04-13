@@ -11,6 +11,7 @@ using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Persistence.Repositories
 {
+    [DatabaseTestBehavior(DatabaseBehavior.NewDbFileAndSchemaPerTest)]
     [TestFixture]
     public class DictionaryRepositoryTest : BaseDatabaseFactoryTest
     {
@@ -64,6 +65,38 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(dictionaryItem.Translations.Last().Value, Is.EqualTo("Læs mere"));
             }
             
+        }
+
+        [Test]
+        public void Get_Ignores_Item_WhenLanguageMissing()
+        {
+            // Arrange
+            var language = ServiceContext.LocalizationService.GetLanguageByCultureCode("en-US");
+            var itemMissingLanguage = new DictionaryItem("I have invalid language");
+            var translations = new List<IDictionaryTranslation>
+                                   {
+                                       new DictionaryTranslation(new Language("") { Id = 0 }, ""),
+                                       new DictionaryTranslation(language, "I have language")
+                                   };
+            itemMissingLanguage.Translations = translations;
+            ServiceContext.LocalizationService.Save(itemMissingLanguage);//Id 3?
+
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            LanguageRepository languageRepository;
+            using (var repository = CreateRepository(unitOfWork, out languageRepository))
+            {
+                // Act
+                var dictionaryItem = repository.Get(3);
+
+                // Assert
+                Assert.That(dictionaryItem, Is.Not.Null);
+                Assert.That(dictionaryItem.ItemKey, Is.EqualTo("I have invalid language"));
+                Assert.That(dictionaryItem.Translations.Any(), Is.True);
+                Assert.That(dictionaryItem.Translations.Any(x => x == null), Is.False);
+                Assert.That(dictionaryItem.Translations.First().Value, Is.EqualTo("I have language"));
+                Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(1));
+            }
         }
 
         [Test]
@@ -180,7 +213,6 @@ namespace Umbraco.Tests.Persistence.Repositories
             }
         }
 
-        [NUnit.Framework.Ignore]
         [Test]
         public void Can_Perform_Update_On_DictionaryRepository()
         {
@@ -207,6 +239,35 @@ namespace Umbraco.Tests.Persistence.Repositories
                 Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(2));
                 Assert.That(dictionaryItem.Translations.FirstOrDefault().Value, Is.EqualTo("Read even more"));
             }
+        }
+
+        [Test]
+        public void Can_Perform_Update_WithNewTranslation_On_DictionaryRepository()
+        {
+            // Arrange
+            var provider = new PetaPocoUnitOfWorkProvider();
+            var unitOfWork = provider.GetUnitOfWork();
+            var languageRepository = new LanguageRepository(unitOfWork);
+            var repository = new DictionaryRepository(unitOfWork, languageRepository);
+
+            var languageNo = new Language("nb-NO") { CultureName = "nb-NO" };
+            ServiceContext.LocalizationService.Save(languageNo);
+
+            // Act
+            var item = repository.Get(1);
+            var translations = item.Translations.ToList();
+            translations.Add(new DictionaryTranslation(languageNo, "Les mer"));
+            item.Translations = translations;
+
+            repository.AddOrUpdate(item);
+            unitOfWork.Commit();
+
+            var dictionaryItem = repository.Get(1);
+
+            // Assert
+            Assert.That(dictionaryItem, Is.Not.Null);
+            Assert.That(dictionaryItem.Translations.Count(), Is.EqualTo(3));
+            Assert.That(dictionaryItem.Translations.Single(t => t.Language.IsoCode == "nb-NO").Value, Is.EqualTo("Les mer"));
         }
 
         [Test]

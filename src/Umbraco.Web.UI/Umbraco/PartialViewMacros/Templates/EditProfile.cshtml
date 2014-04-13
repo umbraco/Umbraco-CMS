@@ -2,31 +2,38 @@
 
 @using System.Web.Mvc.Html
 @using ClientDependency.Core.Mvc
-@using umbraco.cms.businesslogic.member
 @using Umbraco.Web
-@using Umbraco.Web.Models
 @using Umbraco.Web.Controllers
 
 @{
-    var profileModel = new ProfileModel();
+    var profileModel = Members.GetCurrentMemberProfileModel();
 
     Html.EnableClientValidation();
     Html.EnableUnobtrusiveJavaScript();
     Html.RequiresJs("/umbraco_client/ui/jquery.js");
     Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.min.js");
     Html.RequiresJs("/umbraco_client/Application/JQuery/jquery.validate.unobtrusive.min.js");
+
+    var success = TempData["ProfileUpdateSuccess"] != null;
 }
 
-@if (Member.IsLoggedOn())
-{
-    @Html.RenderJsHere()
+@*NOTE: This RenderJsHere code should be put on your main template page where the rest of your script tags are placed*@
+@Html.RenderJsHere()
 
+@if (Members.IsLoggedIn() && profileModel != null)
+{   
+    if (success)
+    {
+        @* This message will show if RedirectOnSucces is set to false (default) *@
+        <p>Profile updated</p>
+    }
+    
     using (Html.BeginUmbracoForm<UmbProfileController>("HandleUpdateProfile"))
     {
         <fieldset>
             <legend>Edit profile</legend>
        
-            @Html.ValidationSummary(true)
+            @Html.ValidationSummary("profileModel", true)
 
             @Html.LabelFor(m => profileModel.Name)
             @Html.TextBoxFor(m => profileModel.Name)
@@ -41,14 +48,19 @@
             @for (var i = 0; i < profileModel.MemberProperties.Count; i++)
             {
                 @Html.LabelFor(m => profileModel.MemberProperties[i].Value, profileModel.MemberProperties[i].Name)
+                @* 
+                    By default this will render a textbox but if you want to change the editor template for this property you can 
+                    easily change it. For example, if you wanted to render a custom editor for this field called "MyEditor" you would
+                    create a file at ~/Views/Shared/EditorTemplates/MyEditor.cshtml", then you will change the next line of code to 
+                    render your specific editor template like:
+                    @Html.EditorFor(m => profileModel.MemberProperties[i].Value, "MyEditor")
+                *@
                 @Html.EditorFor(m => profileModel.MemberProperties[i].Value)
                 @Html.HiddenFor(m => profileModel.MemberProperties[i].Alias)
                 <br />
             }
-       
-            @Html.HiddenFor(m => profileModel.MemberTypeAlias)
 
             <button>Save</button>
         </fieldset>
-    }
+    }       
 }

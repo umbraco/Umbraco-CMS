@@ -1,5 +1,7 @@
 ﻿using System;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Models;
+using Umbraco.Core.Persistence.Caching;
 
 namespace Umbraco.Web.Cache
 {
@@ -25,6 +27,7 @@ namespace Umbraco.Web.Cache
 
         public override void Refresh(int id)
         {
+            RuntimeCacheProvider.Current.Clear(typeof(IDictionaryItem));
             global::umbraco.cms.businesslogic.Dictionary.ClearCache();
             //when a dictionary item is updated we must also clear the text cache!
             global::umbraco.cms.businesslogic.language.Item.ClearCache();
@@ -33,6 +36,7 @@ namespace Umbraco.Web.Cache
 
         public override void Remove(int id)
         {
+            RuntimeCacheProvider.Current.Clear(typeof(IDictionaryItem));
             global::umbraco.cms.businesslogic.Dictionary.ClearCache();
             //when a dictionary item is removed we must also clear the text cache!
             global::umbraco.cms.businesslogic.language.Item.ClearCache();

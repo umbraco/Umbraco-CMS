@@ -2,31 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
-    /// <summary>
-    /// Static class that provides simple access to the Sql Server SqlSyntax Provider
-    /// </summary>
-    internal static class SqlServerSyntax
-    {
-        public static ISqlSyntaxProvider Provider { get { return new SqlServerSyntaxProvider(); } }
-    }
-
-    /// <summary>
-    /// Represents the version name of SQL server (i.e. the year 2008, 2005, etc...)
-    /// </summary>
-    internal enum SqlServerVersionName
-    {
-        Invalid = -1,
-        V7 = 0,
-        V2000 = 1,
-        V2005 = 2,
-        V2008 = 3,
-        V2012 = 4,
-        Other = 5
-    }
-
     /// <summary>
     /// Represents an SqlSyntaxProvider for Sql Server
     /// </summary>
@@ -54,6 +33,76 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         /// Gets/sets the version of the current SQL server instance
         /// </summary>
         internal Lazy<SqlServerVersionName> VersionName { get; set; }
+
+        public override string GetStringColumnEqualComparison(string column, string value, TextColumnType columnType)
+        {
+            switch (columnType)
+            {
+                case TextColumnType.NVarchar:
+                    return base.GetStringColumnEqualComparison(column, value, columnType);
+                case TextColumnType.NText:
+                    //MSSQL doesn't allow for = comparison with NText columns but allows this syntax
+                    return string.Format("{0} LIKE '{1}'", column, value);
+                default:
+                    throw new ArgumentOutOfRangeException("columnType");
+            }
+        }
+
+        public override string GetStringColumnStartsWithComparison(string column, string value, TextColumnType columnType)
+        {
+            switch (columnType)
+            {
+                case TextColumnType.NVarchar:
+                    return base.GetStringColumnStartsWithComparison(column, value, columnType);
+                case TextColumnType.NText:
+                    //MSSQL doesn't allow for upper methods with NText columns
+                    return string.Format("{0} LIKE '{1}%'", column, value);
+                default:
+                    throw new ArgumentOutOfRangeException("columnType");
+            }
+        }
+
+        public override string GetStringColumnEndsWithComparison(string column, string value, TextColumnType columnType)
+        {
+            switch (columnType)
+            {
+                case TextColumnType.NVarchar:
+                    return base.GetStringColumnEndsWithComparison(column, value, columnType);
+                case TextColumnType.NText:
+                    //MSSQL doesn't allow for upper methods with NText columns
+                    return string.Format("{0} LIKE '%{1}'", column, value);
+                default:
+                    throw new ArgumentOutOfRangeException("columnType");
+            }
+        }
+
+        public override string GetStringColumnContainsComparison(string column, string value, TextColumnType columnType)
+        {
+            switch (columnType)
+            {
+                case TextColumnType.NVarchar:
+                    return base.GetStringColumnContainsComparison(column, value, columnType);
+                case TextColumnType.NText:
+                    //MSSQL doesn't allow for upper methods with NText columns
+                    return string.Format("{0} LIKE '%{1}%'", column, value);
+                default:
+                    throw new ArgumentOutOfRangeException("columnType");
+            }
+        }
+
+        public override string GetStringColumnWildcardComparison(string column, string value, TextColumnType columnType)
+        {
+            switch (columnType)
+            {
+                case TextColumnType.NVarchar:
+                    return base.GetStringColumnContainsComparison(column, value, columnType);
+                case TextColumnType.NText:
+                    //MSSQL doesn't allow for upper methods with NText columns
+                    return string.Format("{0} LIKE '{1}'", column, value);
+                default:
+                    throw new ArgumentOutOfRangeException("columnType");
+            }
+        }
 
         public override string GetQuotedTableName(string tableName)
         {
@@ -100,6 +149,22 @@ namespace Umbraco.Core.Persistence.SqlSyntax
                 db.Fetch<dynamic>(
                     "SELECT TABLE_NAME, COLUMN_NAME, CONSTRAINT_NAME FROM INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE");
             return items.Select(item => new Tuple<string, string, string>(item.TABLE_NAME, item.COLUMN_NAME, item.CONSTRAINT_NAME)).ToList();
+        }
+
+        public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db)
+        {
+            var items =
+                db.Fetch<dynamic>(
+                    @"select T.name as TABLE_NAME, I.name as INDEX_NAME, AC.Name as COLUMN_NAME,
+CASE WHEN I.is_unique_constraint = 1 OR  I.is_unique = 1 THEN 1 ELSE 0 END AS [UNIQUE]
+from sys.tables as T inner join sys.indexes as I on T.[object_id] = I.[object_id] 
+   inner join sys.index_columns as IC on IC.[object_id] = I.[object_id] and IC.[index_id] = I.[index_id] 
+   inner join sys.all_columns as AC on IC.[object_id] = AC.[object_id] and IC.[column_id] = AC.[column_id] 
+WHERE I.name NOT LIKE 'PK_%'
+order by T.name, I.name");
+            return items.Select(item => new Tuple<string, string, string, bool>(item.TABLE_NAME, item.INDEX_NAME, item.COLUMN_NAME, 
+                item.UNIQUE == 1)).ToList();
+            
         }
 
         public override bool DoesTableExist(Database db, string tableName)

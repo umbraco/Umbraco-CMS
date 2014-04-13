@@ -31,10 +31,10 @@
                 masterPageDropDown: $("#<%= MasterTemplate.ClientID %>"),
                 treeSyncPath: '<%=TemplateTreeSyncPath%>',
                 text: {
-                    templateErrorHeader: "<%= umbraco.ui.Text("speechBubbles", "templateErrorHeader") %>",
-                    templateSavedHeader: "<%= umbraco.ui.Text("speechBubbles", "templateSavedHeader") %>",
-                    templateErrorText: "<%= umbraco.ui.Text("speechBubbles", "templateErrorText") %>",
-                    templateSavedText: "<%= umbraco.ui.Text("speechBubbles", "templateSavedText") %>"
+                    templateErrorHeader: "<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "templateErrorHeader")) %>",
+                    templateSavedHeader: "<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "templateSavedHeader")) %>",
+                    templateErrorText: "<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "templateErrorText")) %>",
+                    templateSavedText: "<%= HttpUtility.JavaScriptStringEncode(umbraco.ui.Text("speechBubbles", "templateSavedText")) %>"
                 }
             });
 

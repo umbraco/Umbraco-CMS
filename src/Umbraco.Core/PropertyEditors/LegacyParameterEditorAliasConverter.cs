@@ -97,10 +97,7 @@ namespace Umbraco.Core.PropertyEditors
 
             CreateMap("mediaCurrent", Constants.PropertyEditors.MediaPickerAlias);
 
-            CreateMap("number", Constants.PropertyEditors.IntegerAlias);
-            
-
-            
+            CreateMap("number", Constants.PropertyEditors.IntegerAlias);   
         }
     }
 }

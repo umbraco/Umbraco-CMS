@@ -21,6 +21,7 @@ namespace umbraco.cms.businesslogic.propertytype
     /// <summary>
     /// Summary description for propertytype.
     /// </summary>
+    [Obsolete("Use the ContentTypeService instead")]
     public class PropertyType
     {
         #region Declarations

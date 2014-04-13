@@ -14,6 +14,8 @@ angular.module("umbraco.directives.html")
             templateUrl: 'views/directives/html/umb-photo-folder.html',
             link: function(scope, element, attrs, ngModel) {
 
+                var lastWatch = null;
+
                 ngModel.$render = function() {
                     if (ngModel.$modelValue) {
 
@@ -22,9 +24,10 @@ angular.module("umbraco.directives.html")
 
                             scope.clickHandler = scope.$eval(element.attr('on-click'));
 
-                            //todo: this doesn't do anything
-                            var imagesOnly = element.attr('imagesOnly');
-
+                            
+                            var imagesOnly =  element.attr('images-only') === "true";
+                           
+                            
                             var margin = element.attr('border') ? parseInt(element.attr('border'), 10) : 5;
                             var startingIndex = element.attr('baseline') ? parseInt(element.attr('baseline'), 10) : 0;
                             var minWidth = element.attr('min-width') ? parseInt(element.attr('min-width'), 10) : 420;
@@ -34,15 +37,22 @@ angular.module("umbraco.directives.html")
                             var fixedRowWidth = Math.max(element.width(), minWidth);
 
                             scope.containerStyle = { width: fixedRowWidth + "px" };
-
-                            scope.rows = umbPhotoFolderHelper.buildGrid(photos, fixedRowWidth, maxHeight, startingIndex, minHeight, idealImgPerRow, margin);
+                            scope.rows = umbPhotoFolderHelper.buildGrid(photos, fixedRowWidth, maxHeight, startingIndex, minHeight, idealImgPerRow, margin, imagesOnly);
 
                             if (attrs.filterBy) {
-                                scope.$watch(attrs.filterBy, function(newVal, oldVal) {
-                                    if (newVal !== oldVal) {
+
+                                //we track the watches that we create, we don't want to create multiple, so clear it
+                                // if it already exists before creating another.
+                                if (lastWatch) {
+                                    lastWatch();
+                                }
+
+                                //TODO: Need to debounce this so it doesn't filter too often!
+                                lastWatch = scope.$watch(attrs.filterBy, function (newVal, oldVal) {
+                                    if (newVal && newVal !== oldVal) {
                                         var p = $filter('filter')(photos, newVal, false);
                                         scope.baseline = 0;
-                                        var m = umbPhotoFolderHelper.buildGrid(p, fixedRowWidth, 400);
+                                        var m = umbPhotoFolderHelper.buildGrid(p, fixedRowWidth, maxHeight, startingIndex, minHeight, idealImgPerRow, margin, imagesOnly);
                                         scope.rows = m;
                                     }
                                 });

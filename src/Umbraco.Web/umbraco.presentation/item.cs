@@ -79,7 +79,7 @@ namespace umbraco
                 else
                 {
                     //check for published content and get its value using that
-                    if (publishedContent != null)
+                    if (publishedContent != null && publishedContent.HasProperty(_fieldName))
                     {
                         var pval = publishedContent.GetPropertyValue(_fieldName);
                         var rval = pval == null ? string.Empty : pval.ToString();
@@ -94,11 +94,22 @@ namespace umbraco
                     //now we check if the value is still empty and if so we'll check useIfEmpty
                     if (string.IsNullOrEmpty(_fieldContent))
                     {
+                        //if useIfEmpty is true
                         if (string.IsNullOrEmpty(helper.FindAttribute(attributes, "useIfEmpty")) == false)
                         {
-                            if (elements[helper.FindAttribute(attributes, "useIfEmpty")] != null && string.IsNullOrEmpty(elements[helper.FindAttribute(attributes, "useIfEmpty")].ToString()) == false)
+                            var altFieldName = helper.FindAttribute(attributes, "useIfEmpty");
+
+                            //check for published content and get its value using that
+                            if (publishedContent != null && publishedContent.HasProperty(altFieldName))
                             {
-                                _fieldContent = elements[helper.FindAttribute(attributes, "useIfEmpty")].ToString().Trim();
+                                var pval = publishedContent.GetPropertyValue(altFieldName);
+                                var rval = pval == null ? string.Empty : pval.ToString();
+                                _fieldContent = rval.IsNullOrWhiteSpace() ? _fieldContent : rval;
+                            }
+                            else if (elements[altFieldName] != null && string.IsNullOrEmpty(elements[altFieldName].ToString()) == false)
+                            {
+                                //get the vaue the legacy way (this will not parse locallinks, etc... since that is handled with ipublishedcontent)
+                                _fieldContent = elements[altFieldName].ToString().Trim();
                             }
                         }
                     }                    

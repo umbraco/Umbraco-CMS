@@ -15,6 +15,25 @@ namespace Umbraco.Core
 	///</summary>
 	internal static class DictionaryExtensions
 	{
+
+        /// <summary>
+        /// Method to Get a value by the key. If the key doesn't exist it will create a new TVal object for the key and return it.
+        /// </summary>
+        /// <typeparam name="TKey"></typeparam>
+        /// <typeparam name="TVal"></typeparam>
+        /// <param name="dict"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+	    public static TVal GetOrCreate<TKey, TVal>(this IDictionary<TKey, TVal> dict, TKey key)
+            where TVal : class, new()
+	    {
+	        if (dict.ContainsKey(key) == false)
+	        {
+                dict.Add(key, new TVal());
+	        }
+            return dict[key];
+	    }
+
         /// <summary>
         /// Updates an item with the specified key with the specified value
         /// </summary>
@@ -231,7 +250,7 @@ namespace Umbraco.Core
 		/// <returns>The contains key ignore case.</returns>
 		public static bool ContainsKeyIgnoreCase<TValue>(this IDictionary<string, TValue> dictionary, string key)
 		{
-			return dictionary.Keys.Any(i => i.Equals(key, StringComparison.CurrentCultureIgnoreCase));
+		    return dictionary.Keys.InvariantContains(key);
 		}
 
 		/// <summary>
@@ -257,9 +276,9 @@ namespace Umbraco.Core
 		/// <param name="key">The key.</param>
 		/// <typeparam name="TValue">The type</typeparam>
 		/// <returns>The entry</returns>
-		public static TValue GetEntryIgnoreCase<TValue>(this IDictionary<string, TValue> dictionary, string key)
+		public static TValue GetValueIgnoreCase<TValue>(this IDictionary<string, TValue> dictionary, string key)
 		{
-			return dictionary.GetEntryIgnoreCase(key, default(TValue));
+			return dictionary.GetValueIgnoreCase(key, default(TValue));
 		}
 
 		/// <summary>The get entry ignore case.</summary>
@@ -268,11 +287,11 @@ namespace Umbraco.Core
 		/// <param name="defaultValue">The default value.</param>
 		/// <typeparam name="TValue">The type</typeparam>
 		/// <returns>The entry</returns>
-		public static TValue GetEntryIgnoreCase<TValue>(this IDictionary<string, TValue> dictionary, string key, TValue defaultValue)
+		public static TValue GetValueIgnoreCase<TValue>(this IDictionary<string, TValue> dictionary, string key, TValue defaultValue)
 		{
-			key = dictionary.Keys.Where(i => i.Equals(key, StringComparison.CurrentCultureIgnoreCase)).FirstOrDefault();
+			key = dictionary.Keys.FirstOrDefault(i => i.InvariantEquals(key));
 
-			return !key.IsNullOrWhiteSpace()
+			return key.IsNullOrWhiteSpace() == false
 			       	? dictionary[key]
 			       	: defaultValue;
 		}

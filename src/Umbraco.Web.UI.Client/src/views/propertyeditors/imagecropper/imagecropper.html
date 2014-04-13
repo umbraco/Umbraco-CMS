@@ -1,0 +1,63 @@
+<div class="umb-editor umb-mediapicker" 
+	ng-controller="Umbraco.PropertyEditors.ImageCropperController">
+
+
+	<span class="fileinput-button umb-upload-button-big"
+	    style="margin-bottom: 5px;"
+	    ng-hide="imageSrc">
+	    <i class="icon icon-page-up"></i>
+	    <p><localize key="media_clickToUpload">Click to upload</localize></p>
+	    <umb-single-file-upload></umb-single-file-upload>
+	</span>
+	
+
+	<div ng-if="imageSrc">
+			<div ng-if="currentCrop">
+				<div style="position: relative; margin-bottom: 10px; width: 492px; border: 1px solid #f8f8f8;">
+
+					<i ng-click="done()" style="opacity: 0.5; position: absolute; top: 3px; right: 3px" class="icon icon-delete btn-round"></i>
+
+					<div>
+						<umb-image-crop
+						 height="{{currentCrop.height}}"
+						 width= "{{currentCrop.width}}" 
+						 crop="currentCrop.coordinates"
+						 center="model.value.focalPoint"
+						 max-size="450"
+						 src="imageSrc" />
+					</div>
+
+					 <a href style="margin:auto; text-align: center; font-size: 11px;" class="btn btn-link red"
+					 		ng-click="currentCrop.coordinates = undefined; done()">
+					 		Reset
+					 </a>
+				</div>
+			</div>
+
+			<div ng-if="!currentCrop">
+				<div>
+					<umb-image-gravity 
+						src="imageSrc" 
+						center="model.value.focalPoint" />
+				</div>
+
+				<hr />
+
+				<ul class="umb-sortable-thumbnails" >
+					<li ng-repeat="(key,value) in model.value.crops">
+						<a href title="{{value.alias}}: {{value.height}}px x {{value.width}}px" ng-click="crop(value)">
+							<umb-image-thumbnail
+								center="model.value.focalPoint"
+								crop="value.coordinates"
+								src="imageSrc"
+								height="{{value.height}}"
+								width="{{value.width}}"
+								max-size="40"/>
+						</a>
+					</li>
+				</ul>
+
+				<a href class="btn btn-link" ng-click="clear()"><i class="icon-delete red"></i> Remove file</a>
+			</div>
+	</div>
+</div>

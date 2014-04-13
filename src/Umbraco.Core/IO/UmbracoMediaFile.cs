@@ -206,11 +206,10 @@ namespace Umbraco.Core.IO
                     var fileNameThumb = string.IsNullOrWhiteSpace(fileNameAddition)
                         ? string.Format("{0}_UMBRACOSYSTHUMBNAIL.jpg", Path.Substring(0, Path.LastIndexOf(".", StringComparison.Ordinal)))
                         : string.Format("{0}_{1}.jpg", Path.Substring(0, Path.LastIndexOf(".", StringComparison.Ordinal)), fileNameAddition);
-
-
-                    var thumbnail = maxWidthHeight == -1 
-                        ?ImageHelper.GenerateThumbnail(image, maxWidthHeight, fileNameThumb, Extension, _fs)
-                        : ImageHelper.GenerateThumbnail(image, width, height, fileNameThumb, Extension, _fs);
+                    
+                    var thumbnail = maxWidthHeight == -1
+                        ? ImageHelper.GenerateThumbnail(image, width, height, fileNameThumb, Extension, _fs)
+                        : ImageHelper.GenerateThumbnail(image, maxWidthHeight, fileNameThumb, Extension, _fs);
 
                     return thumbnail.FileName;
                 }

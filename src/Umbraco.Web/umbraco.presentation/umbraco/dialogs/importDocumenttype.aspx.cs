@@ -80,6 +80,16 @@ namespace umbraco.presentation.umbraco.dialogs
 		    if (contentType != null)
 		        dtNameConfirm.Text = contentType.Name;
 
+            // Try to clean up the temporary file.
+            try
+            {
+                System.IO.File.Delete(tempFile.Value);
+            }
+            catch(Exception ex)
+            {
+                Umbraco.Core.Logging.LogHelper.Error(typeof(importDocumentType), "Error cleaning up temporary udt file in App_Data: " + ex.Message, ex);
+            }
+
 		    Wizard.Visible = false;
 			Confirm.Visible = false;
 			done.Visible = true;

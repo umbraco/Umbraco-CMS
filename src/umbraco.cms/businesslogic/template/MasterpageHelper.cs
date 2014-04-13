@@ -68,7 +68,8 @@ namespace umbraco.cms.businesslogic.template
 
         internal static string CreateDefaultMasterPageContent(Template template, string currentAlias)
         {
-            string design = GetMasterPageHeader(template) + "\n";
+            StringBuilder design = new StringBuilder();
+            design.Append(GetMasterPageHeader(template) + Environment.NewLine);
 
             if (template.HasMasterTemplate)
             {
@@ -76,65 +77,22 @@ namespace umbraco.cms.businesslogic.template
 
                 foreach (string cpId in master.contentPlaceholderIds())
                 {
-                    design += "<asp:content ContentPlaceHolderId=\"" + cpId +
-                              "\" runat=\"server\">\n\t\n</asp:content>\n\n";
+                    design.Append("<asp:content ContentPlaceHolderId=\"" + cpId + "\" runat=\"server\">" + 
+                                  Environment.NewLine +
+                                  Environment.NewLine +
+                                  "</asp:content>" +
+                                  Environment.NewLine +
+                                  Environment.NewLine);
                 }
             }
             else
             {
-                design += GetMasterContentElement(template) + "\n";
-                design += template.Design;
-                design += "\n</asp:Content>" + Environment.NewLine;
+                design.Append(GetMasterContentElement(template) + Environment.NewLine);
+                design.Append(template.Design + Environment.NewLine);
+                design.Append("</asp:Content>" + Environment.NewLine);
             }
 
-            return design;
-
-
-            /*
-            var masterPageContent = template.Design;
-
-            if (!IsMasterPageSyntax(masterPageContent))
-                masterPageContent = ConvertToMasterPageSyntax(template);
-
-            // Add header to master page if it doesn't exist
-            if (!masterPageContent.TrimStart().StartsWith("<%@"))
-            {
-                masterPageContent = GetMasterPageHeader(template) + "\n" + masterPageContent;
-            }
-            else
-            {
-                // verify that the masterpage attribute is the same as the masterpage
-                string masterHeader =
-                    masterPageContent.Substring(0, masterPageContent.IndexOf("%>") + 2).Trim(
-                        Environment.NewLine.ToCharArray());
-
-                // find the masterpagefile attribute
-                MatchCollection m = Regex.Matches(masterHeader, "(?<attributeName>\\S*)=\"(?<attributeValue>[^\"]*)\"",
-                                                  RegexOptions.IgnoreCase | RegexOptions.IgnorePatternWhitespace);
-                
-                foreach (Match attributeSet in m)
-                {
-                    if (attributeSet.Groups["attributeName"].Value.ToLower() == "masterpagefile")
-                    {
-                        // validate the masterpagefile
-                        string currentMasterPageFile = attributeSet.Groups["attributeValue"].Value;
-                        string currentMasterTemplateFile = ParentTemplatePath(template);
-
-                        if (currentMasterPageFile != currentMasterTemplateFile)
-                        {
-                            masterPageContent =
-                                masterPageContent.Replace(
-                                    attributeSet.Groups["attributeName"].Value + "=\"" + currentMasterPageFile + "\"",
-                                    attributeSet.Groups["attributeName"].Value + "=\"" + currentMasterTemplateFile +
-                                    "\"");
-                        }
-                    }
-                }
-
-            }
-            
-            return masterPageContent;
-             * */
+            return design.ToString();
         }
 
         internal static string UpdateMasterPageContent(Template template, string currentAlias)

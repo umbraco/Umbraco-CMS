@@ -174,7 +174,7 @@ namespace Umbraco.Tests.Services
 
         public void CreateTestData()
         {
-            //Create and Save ContentType "textpage" -> 1045
+            //Create and Save ContentType "textpage" -> NodeDto.NodeIdSeed
             ContentType contentType = MockedContentTypes.CreateTextpageContentType();
             ServiceContext.ContentTypeService.Save(contentType);
         }

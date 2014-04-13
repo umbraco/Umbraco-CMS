@@ -21,7 +21,7 @@ namespace Umbraco.Web.Editors
             base.OnActionExecuting(actionContext);
 
             //default provider!
-            var membershipProvider = Membership.Provider;
+            var membershipProvider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
             
             var contentItem = (MemberSave) actionContext.ActionArguments["contentItem"];
 

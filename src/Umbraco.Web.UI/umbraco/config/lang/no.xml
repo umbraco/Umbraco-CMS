@@ -459,9 +459,7 @@ Vennlig hilsen umbraco roboten
 	    &lt;/p&gt;
 		  &lt;div style="margin: 8px 0; padding: 8px; display: block;"&gt;
 				&lt;br /&gt;
-				&lt;a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/umbraco/actions/publish.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;PUBLISER&amp;nbsp;&amp;nbsp;&lt;/a&gt; &amp;nbsp; 
 				&lt;a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/umbraco/actions/editContent.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;REDIGER&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/a&gt; &amp;nbsp; 
-				&lt;a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/umbraco/actions/delete.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;SLETT&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/a&gt;
 				&lt;br /&gt;
 		  &lt;/div&gt;
 		  &lt;p&gt;
@@ -473,9 +471,7 @@ Vennlig hilsen umbraco roboten
 
 		  &lt;div style="margin: 8px 0; padding: 8px; display: block;"&gt;
 				&lt;br /&gt;
-				&lt;a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/umbraco/actions/publish.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;PUBLISER&amp;nbsp;&amp;nbsp;&lt;/a&gt; &amp;nbsp; 
 				&lt;a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/umbraco/actions/editContent.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;REDIGER&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/a&gt; &amp;nbsp; 
-				&lt;a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/umbraco/actions/delete.aspx?id=%5%"&gt;&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;SLETT&amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;&lt;/a&gt;
 				&lt;br /&gt;
 		  &lt;/div&gt;
 

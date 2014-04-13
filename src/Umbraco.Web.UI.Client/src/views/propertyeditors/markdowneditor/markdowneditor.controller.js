@@ -26,13 +26,9 @@ function ($scope, assetsService, dialogService, $log, imageHelper) {
 		    //subscribe to the image dialog clicks
 		    editor2.hooks.set("insertImageDialog", function (callback) {
 
-
 		        dialogService.mediaPicker({ callback: function (data) {
-		            $(data.selection).each(function (i, item) {
-		                var imagePropVal = imageHelper.getImagePropertyValue({ imageModel: item, scope: $scope });
-		                callback(imagePropVal);
-		            });
-		        }
+					callback(data.url);
+		        	}
 		        });
 
 		        return true; // tell the editor that we'll take care of getting the image url

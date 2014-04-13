@@ -17,10 +17,7 @@ namespace Umbraco.Tests.PublishedContent
 	[TestFixture]
     public abstract class DynamicDocumentTestsBase<TDocument, TDocumentList> : PublishedContentTestBase
 	{
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NoDatabasePerFixture; }
-        }
+        private IUmbracoSettingsSection _umbracoSettings;
 
         public override void Initialize()
         {
@@ -29,7 +26,11 @@ namespace Umbraco.Tests.PublishedContent
 
             base.Initialize();
 
-            var scriptingMock = Mock.Get(UmbracoSettings.Scripting);
+            //generate new mock settings and assign so we can configure in individual tests
+            _umbracoSettings = SettingsForTests.GenerateMockSettings();
+            SettingsForTests.ConfigureSettings(_umbracoSettings);
+
+            var scriptingMock = Mock.Get(_umbracoSettings.Scripting);
             scriptingMock.Setup(x => x.DataTypeModelStaticMappings).Returns(new List<IRazorStaticMapping>());
 
             // need to specify a custom callback for unit tests

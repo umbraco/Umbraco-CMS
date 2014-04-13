@@ -11,6 +11,20 @@ namespace Umbraco.Core.Services
     /// </summary>
     public interface IContentService : IService
     {
+        /// <summary>
+        /// Assigns a single permission to the current content item for the specified user ids
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="permission"></param>
+        /// <param name="userIds"></param>
+        void AssignContentPermission(IContent entity, char permission, IEnumerable<int> userIds);
+
+        /// <summary>
+        /// Gets the list of permissions for the content item
+        /// </summary>
+        /// <param name="content"></param>
+        /// <returns></returns>
+        IEnumerable<EntityPermission> GetPermissionsForEntity(IContent content);
 
         bool SendToPublication(IContent content, int userId = 0);
 
@@ -128,7 +142,7 @@ namespace Umbraco.Core.Services
         /// <param name="contents">Collection of <see cref="IContent"/> to save</param>
         /// <param name="userId">Optional Id of the User saving the Content</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
-        void Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);		
+        void Save(IEnumerable<IContent> contents, int userId = 0, bool raiseEvents = true);
 
         /// <summary>
         /// Deletes all content of specified type. All children of deleted content is moved to Recycle Bin.
@@ -249,7 +263,6 @@ namespace Umbraco.Core.Services
         /// <param name="content">The <see cref="IContent"/> to publish</param>
         /// <param name="userId">Optional Id of the User issueing the publishing</param>
         /// <returns>True if publishing succeeded, otherwise False</returns>
-        [Obsolete("Use PublishWithStatus instead, that method will provide more detailed information on the outcome")]
         bool Publish(IContent content, int userId = 0);
 
         /// <summary>

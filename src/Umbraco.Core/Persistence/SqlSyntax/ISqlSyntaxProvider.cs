@@ -2,29 +2,23 @@ using System;
 using System.Collections.Generic;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
-    internal static class SqlSyntaxProviderExtensions
-    {
-        /// <summary>
-        /// Returns the quotes tableName.columnName combo
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="tableName"></param>
-        /// <param name="columnName"></param>
-        /// <returns></returns>
-        public static string GetQuotedColumn(this ISqlSyntaxProvider sql, string tableName, string columnName)
-        {
-            return sql.GetQuotedTableName(tableName) + "." + sql.GetQuotedColumnName(columnName);
-        }
-    }
-
     /// <summary>
     /// Defines an SqlSyntaxProvider
     /// </summary>
     public interface ISqlSyntaxProvider
     {
+        string EscapeString(string val);
+
+        string GetStringColumnEqualComparison(string column, string value, TextColumnType columnType);
+        string GetStringColumnStartsWithComparison(string column, string value, TextColumnType columnType);
+        string GetStringColumnEndsWithComparison(string column, string value, TextColumnType columnType);
+        string GetStringColumnContainsComparison(string column, string value, TextColumnType columnType);
+        string GetStringColumnWildcardComparison(string column, string value, TextColumnType columnType);
+
         string GetQuotedTableName(string tableName);
         string GetQuotedColumnName(string columnName);
         string GetQuotedName(string name);
@@ -65,9 +59,12 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         bool SupportsClustered();
         bool SupportsIdentityInsert();
         bool? SupportsCaseInsensitiveQueries(Database db);
+
         IEnumerable<string> GetTablesInSchema(Database db);
         IEnumerable<ColumnInfo> GetColumnsInSchema(Database db);
         IEnumerable<Tuple<string, string>> GetConstraintsPerTable(Database db);
         IEnumerable<Tuple<string, string, string>> GetConstraintsPerColumn(Database db);
+
+        IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(Database db);
     }
 }

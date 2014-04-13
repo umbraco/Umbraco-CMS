@@ -246,12 +246,14 @@ namespace Umbraco.Core
 			    else if (destinationType == typeof(Double))
 			    {
 			        Double value;
-			        return Double.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			        var input2 = NormalizeNumberDecimalSeparator(input);
+			        return Double.TryParse(input2, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
 			    }
 			    else if (destinationType == typeof(Single))
 			    {
 			        Single value;
-			        return Single.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+                    var input2 = NormalizeNumberDecimalSeparator(input);
+                    return Single.TryParse(input2, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
 			    }
 			    else if (destinationType == typeof(Char))
 			    {
@@ -292,7 +294,20 @@ namespace Umbraco.Core
 			else if (destinationType == typeof(DateTime))
 			{
 				DateTime value;
-				return DateTime.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+			    if (DateTime.TryParse(input, out value))
+			    {
+			        switch (value.Kind)
+			        {
+			            case DateTimeKind.Unspecified:
+			            case DateTimeKind.Utc:
+                            return Attempt<object>.Succeed(value);
+			            case DateTimeKind.Local:
+			                return Attempt<object>.Succeed(value.ToUniversalTime());
+			            default:
+			                throw new ArgumentOutOfRangeException();
+			        }
+			    }
+			    return Attempt<object>.Fail();
 			}
 			else if (destinationType == typeof(DateTimeOffset))
 			{
@@ -307,7 +322,8 @@ namespace Umbraco.Core
 			else if (destinationType == typeof(Decimal))
 			{
 				Decimal value;
-				return Decimal.TryParse(input, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
+                var input2 = NormalizeNumberDecimalSeparator(input);
+                return Decimal.TryParse(input2, out value) ? Attempt<object>.Succeed(value) : Attempt<object>.Fail();
 			}
 			else if (destinationType == typeof(Version))
 			{
@@ -318,6 +334,14 @@ namespace Umbraco.Core
 
 			return null; // we can't decide...
 		}
+
+        private readonly static char[] NumberDecimalSeparatorsToNormalize = new[] {'.', ','};
+
+	    private static string NormalizeNumberDecimalSeparator(string s)
+	    {
+	        var normalized = System.Threading.Thread.CurrentThread.CurrentUICulture.NumberFormat.NumberDecimalSeparator[0];
+            return s.ReplaceMany(NumberDecimalSeparatorsToNormalize, normalized);
+	    }
 
 		internal static void CheckThrowObjectDisposed(this IDisposable disposable, bool isDisposed, string objectname)
 		{
@@ -526,7 +550,7 @@ namespace Umbraco.Core
 			if (type == typeof(bool)) return XmlConvert.ToString((bool)value);
 			if (type == typeof(byte)) return XmlConvert.ToString((byte)value);
 			if (type == typeof(char)) return XmlConvert.ToString((char)value);
-			if (type == typeof(DateTime)) return XmlConvert.ToString((DateTime)value, XmlDateTimeSerializationMode.RoundtripKind);
+            if (type == typeof(DateTime)) return XmlConvert.ToString((DateTime)value, XmlDateTimeSerializationMode.Unspecified);
 			if (type == typeof(DateTimeOffset)) return XmlConvert.ToString((DateTimeOffset)value);
 			if (type == typeof(decimal)) return XmlConvert.ToString((decimal)value);
 			if (type == typeof(double)) return XmlConvert.ToString((double)value);

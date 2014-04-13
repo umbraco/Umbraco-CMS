@@ -520,6 +520,11 @@ namespace Umbraco.Core
             return compare.StartsWith(compareTo, StringComparison.InvariantCultureIgnoreCase);
         }
 
+        public static bool InvariantEndsWith(this string compare, string compareTo)
+        {
+            return compare.EndsWith(compareTo, StringComparison.InvariantCultureIgnoreCase);
+        }
+
         public static bool InvariantContains(this string compare, string compareTo)
         {
             return compare.IndexOf(compareTo, StringComparison.OrdinalIgnoreCase) >= 0;
@@ -527,7 +532,7 @@ namespace Umbraco.Core
 
         public static bool InvariantContains(this IEnumerable<string> compare, string compareTo)
         {
-            return compare.Contains(compareTo, new DelegateEqualityComparer<string>((source, dest) => source.Equals(dest, StringComparison.InvariantCultureIgnoreCase), x => x.GetHashCode()));
+            return compare.Contains(compareTo, StringComparer.InvariantCultureIgnoreCase);
         }
 
         /// <summary>
@@ -866,9 +871,11 @@ namespace Umbraco.Core
                 if (_helper != null)
                     return _helper;
 
-                // there *has* to be a short string helper, even if the resolver has not
-                // been initialized - used the default one with default configuration.
-                _helper = new DefaultShortStringHelper().WithConfig(allowLeadingDigits: true);
+                // we don't want Umbraco to die because the resolver hasn't been initialized
+                // as the ShortStringHelper is too important, so as long as it's not there
+                // already, we use a default one. That should never happen, but...
+                Logging.LogHelper.Warn<IShortStringHelper>("ShortStringHelperResolver.HasCurrent == false, fallback to default.");
+                _helper = new DefaultShortStringHelper().WithDefaultConfig();
                 _helper.Freeze();
                 return _helper;
             }
@@ -1077,7 +1084,7 @@ namespace Umbraco.Core
             var cases2 = cases.ToCleanStringType() & CleanStringType.CaseMask;
             return legacy != null
                        ? legacy.LegacyConvertStringCase(phrase, cases2)
-                       : helper.CleanString(phrase, CleanStringType.Ascii | CleanStringType.Alias | cases2);
+                       : helper.CleanString(phrase, CleanStringType.Ascii | CleanStringType.ConvertCase | cases2);
         }
 
         // the new methods to clean a string (to alias, url segment...)

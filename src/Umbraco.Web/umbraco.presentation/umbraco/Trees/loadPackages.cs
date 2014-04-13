@@ -61,7 +61,7 @@ namespace umbraco
                         .OrderByDescending(x => Version.TryParse(x.Data.Version, out v) ? v : new Version())
                         .GroupBy(x => x.Data.Name)
                         .Select(x => x.First())
-                        .OrderBy(x => x.Data.Id);
+                        .OrderBy(x => x.Data.Name);
                     foreach (var p in uniquePackages)
                     {
                         var xNode = XmlTreeNode.Create(this);

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Models.Rdbms;
 
 namespace Umbraco.Core.Persistence.Relators
@@ -20,8 +21,12 @@ namespace Umbraco.Core.Persistence.Relators
             // Is this the same MemberReadOnlyDto as the current one we're processing
             if (Current != null && Current.UniqueId == a.UniqueId)
             {
-                // Yes, just add this PropertyDataReadOnlyDto to the current MemberReadOnlyDto's collection
-                Current.Properties.Add(p);
+                //This property may already be added so we need to check for that
+                if (Current.Properties.Any(x => x.Id == p.Id) == false)
+                {
+                    // Yes, just add this PropertyDataReadOnlyDto to the current MemberReadOnlyDto's collection
+                    Current.Properties.Add(p);
+                }                
 
                 // Return null to indicate we're not done with this MemberReadOnlyDto yet
                 return null;

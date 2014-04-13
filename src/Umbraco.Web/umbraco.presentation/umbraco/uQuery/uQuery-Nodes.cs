@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Xml.XPath;
-using umbraco;
 using umbraco.NodeFactory;
 using Umbraco.Core;
 
@@ -37,17 +36,17 @@ namespace umbraco
 			XPathExpression xPathExpression;
 
 			// Check to see if XPathExpression is in the cache
-			if (HttpContext.Current.Cache[xpath] == null)
-			{
+            if (HttpRuntime.Cache[xpath] == null)
+            {
 				// Build Compiled XPath expression
 				xPathExpression = xPathNavigator.Compile(xpath);
 
 				// Store in Cache
-				HttpContext.Current.Cache[xpath] = xPathExpression;
+				HttpRuntime.Cache[xpath] = xPathExpression;
 			}
 			else // Get from Cache
 			{
-				xPathExpression = (XPathExpression)HttpContext.Current.Cache[xpath];
+				xPathExpression = (XPathExpression)HttpRuntime.Cache[xpath];
 			}
 
 			// [LK] Interested in exploring options to call custom extension methods in XPath expressions.

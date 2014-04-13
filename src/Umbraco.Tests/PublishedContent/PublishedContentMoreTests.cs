@@ -18,10 +18,6 @@ namespace Umbraco.Tests.PublishedContent
     [TestFixture]
     public class PublishedContentMoreTests : PublishedContentTestBase
     {
-        protected override DatabaseBehavior DatabaseTestBehavior
-        {
-            get { return DatabaseBehavior.NoDatabasePerFixture; }
-        }
 
         // read http://stackoverflow.com/questions/7713326/extension-method-that-works-on-ienumerablet-and-iqueryablet
         // and http://msmvps.com/blogs/jon_skeet/archive/2010/10/28/overloading-and-generic-constraints.aspx

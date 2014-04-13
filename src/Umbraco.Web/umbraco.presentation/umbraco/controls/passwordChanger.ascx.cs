@@ -15,7 +15,7 @@ using Umbraco.Web.Models;
 
 namespace umbraco.controls
 {
-    public partial class passwordChanger : System.Web.UI.UserControl
+    public partial class passwordChanger : UserControl
     {
         public string MembershipProviderName { get; set; }
 
@@ -38,9 +38,12 @@ namespace umbraco.controls
                     var umbProvider = Provider as MembershipProviderBase;
                     if (umbProvider != null && umbProvider.AllowManuallyChangingPassword)
                     {
-                        return false;
+                        _showOldPassword = false;
                     }
-                    _showOldPassword = Provider.EnablePasswordRetrieval == false;    
+                    else
+                    {
+                        _showOldPassword = Provider.EnablePasswordRetrieval == false;
+                    }
                 }
                 return _showOldPassword.Value;
             }
@@ -75,9 +78,9 @@ namespace umbraco.controls
             get { return ChangingPasswordModel.NewPassword; }
         }
 
-        protected override void OnInit(EventArgs e)
+        protected override void OnLoad(EventArgs e)
         {
-            base.OnInit(e);
+            base.OnLoad(e);
 
             if (Membership.Providers[MembershipProviderName] == null)
             {

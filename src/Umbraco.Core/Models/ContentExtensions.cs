@@ -27,6 +27,20 @@ namespace Umbraco.Core.Models
         #region IContent
 
         /// <summary>
+        /// Returns true if this entity was just published as part of a recent save operation (i.e. it wasn't previously published)
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// This is helpful for determining if the published event will execute during the saved event for a content item.
+        /// </remarks>
+        internal static bool JustPublished(this IContent entity)
+        {
+            var dirty = (IRememberBeingDirty)entity;
+            return dirty.WasPropertyDirty("Published") && entity.Published;
+        }
+
+        /// <summary>
         /// Determines if a new version should be created
         /// </summary>
         /// <param name="entity"></param>
@@ -618,7 +632,7 @@ namespace Umbraco.Core.Models
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         internal static XElement ToDeepXml(this IContent content)
         {
-            return ApplicationContext.Current.Services.PackagingService.Export(content, true);
+            return ApplicationContext.Current.Services.PackagingService.Export(content, true, raiseEvents: false);
         }
 
         /// <summary>
@@ -628,7 +642,7 @@ namespace Umbraco.Core.Models
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         public static XElement ToXml(this IContent content)
         {
-            return ApplicationContext.Current.Services.PackagingService.Export(content);
+            return ApplicationContext.Current.Services.PackagingService.Export(content, raiseEvents: false);
         }
 
         /// <summary>
@@ -638,24 +652,19 @@ namespace Umbraco.Core.Models
         /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
         public static XElement ToXml(this IMedia media)
         {
-            return ApplicationContext.Current.Services.PackagingService.Export(media);
-        }
-
-        internal static XElement ToDeepXml(this IMedia media)
-        {
-            return ApplicationContext.Current.Services.PackagingService.Export(media, true);
+            return ApplicationContext.Current.Services.PackagingService.Export(media, raiseEvents: false);
         }
 
         /// <summary>
-        /// Creates the xml representation for the <see cref="IMedia"/> object
+        /// Creates the full xml representation for the <see cref="IMedia"/> object and all of it's descendants
         /// </summary>
-        /// <param name="member"><see cref="IContent"/> to generate xml for</param>
-        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
-        public static XElement ToXml(this IMember member)
+        /// <param name="media"><see cref="IMedia"/> to generate xml for</param>
+        /// <returns>Xml representation of the passed in <see cref="IMedia"/></returns>
+        internal static XElement ToDeepXml(this IMedia media)
         {
-            return ApplicationContext.Current.Services.PackagingService.Export(member);
+            return ApplicationContext.Current.Services.PackagingService.Export(media, true, raiseEvents: false);
         }
-        
+       
         /// <summary>
         /// Creates the xml representation for the <see cref="IContent"/> object
         /// </summary>
@@ -667,6 +676,16 @@ namespace Umbraco.Core.Models
             //TODO Do a proper implementation of this
             //If current IContent is published we should get latest unpublished version
             return content.ToXml();
+        }
+
+        /// <summary>
+        /// Creates the xml representation for the <see cref="IMember"/> object
+        /// </summary>
+        /// <param name="member"><see cref="IMember"/> to generate xml for</param>
+        /// <returns>Xml representation of the passed in <see cref="IContent"/></returns>
+        public static XElement ToXml(this IMember member)
+        {
+            return ((PackagingService)(ApplicationContext.Current.Services.PackagingService)).Export(member);
         }
         
         #endregion

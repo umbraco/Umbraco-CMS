@@ -5,7 +5,7 @@ namespace Umbraco.Core.Sync
     /// <summary>
     /// The resolver to return the currently registered IServerRegistrar object
     /// </summary>
-    internal class ServerRegistrarResolver : SingleObjectResolverBase<ServerRegistrarResolver, IServerRegistrar>
+    public sealed class ServerRegistrarResolver : SingleObjectResolverBase<ServerRegistrarResolver, IServerRegistrar>
     {
 
         internal ServerRegistrarResolver(IServerRegistrar factory)

@@ -98,9 +98,7 @@ namespace Umbraco.Web.Trees
             {
 
                 //Special check to see if it ia a container, if so then we'll hide children.
-                var isContainer = e.AdditionalData.ContainsKey("IsContainer")
-                    && e.AdditionalData["IsContainer"] is bool
-                    && (bool)e.AdditionalData["IsContainer"];
+                var isContainer = e.IsContainer();   // && (queryStrings.Get("isDialog") != "true");
 
                 var node = CreateTreeNode(
                     e.Id.ToInvariantString(),
@@ -238,10 +236,12 @@ namespace Umbraco.Web.Trees
             //need to ensure some of these are converted to the legacy system - until we upgrade them all to be angularized.
             menu.Items.Add<ActionMove>(ui.Text("actions", ActionMove.Instance.Alias), true);
             menu.Items.Add<ActionCopy>(ui.Text("actions", ActionCopy.Instance.Alias));
+            menu.Items.Add<ActionChangeDocType>(ui.Text("actions", ActionChangeDocType.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
 
             menu.Items.Add<ActionSort>(ui.Text("actions", ActionSort.Instance.Alias), true).ConvertLegacyMenuItem(item, "content", "content");
 
             menu.Items.Add<ActionRollback>(ui.Text("actions", ActionRollback.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
+            menu.Items.Add<ActionAudit>(ui.Text("actions", ActionAudit.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
             menu.Items.Add<ActionPublish>(ui.Text("actions", ActionPublish.Instance.Alias), true).ConvertLegacyMenuItem(item, "content", "content");
             menu.Items.Add<ActionToPublish>(ui.Text("actions", ActionToPublish.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");
             menu.Items.Add<ActionAssignDomain>(ui.Text("actions", ActionAssignDomain.Instance.Alias)).ConvertLegacyMenuItem(item, "content", "content");

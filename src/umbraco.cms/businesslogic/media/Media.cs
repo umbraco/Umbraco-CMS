@@ -23,18 +23,7 @@ namespace umbraco.cms.businesslogic.media
         #region Constants and static members
 
 	    protected internal IMedia MediaItem;
-        private const string m_SQLOptimizedMany = @"
-			select 
-				count(children.id) as children, cmsContentType.isContainer, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.createDate, umbracoNode.nodeUser, umbracoNode.text, 
-				cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.nodeId as contentTypeId
-			from umbracoNode 
-			left join umbracoNode children on children.parentId = umbracoNode.id
-			inner join cmsContent on cmsContent.nodeId = umbracoNode.id
-			inner join cmsContentType on cmsContentType.nodeId = cmsContent.contentType
-			where umbracoNode.nodeObjectType = @nodeObjectType AND {0}
-			group by cmsContentType.isContainer, umbracoNode.id, umbracoNode.uniqueId, umbracoNode.level, umbracoNode.parentId, umbracoNode.path, umbracoNode.sortOrder, umbracoNode.createDate, umbracoNode.nodeUser, umbracoNode.text, 
-				cmsContentType.icon, cmsContentType.alias, cmsContentType.thumbnail, cmsContentType.description, cmsContentType.nodeId
-			order by {1}"; 
+       
         #endregion
 
         #region Constructors

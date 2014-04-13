@@ -20,6 +20,16 @@ namespace umbraco.dialogs
 			base.OnLoad(e);
 			TreeParams = TreeRequestParams.FromQueryStrings().CreateTreeService();
 			DataBind();
+
+            if(Request.QueryString["selected"] != null && TreeParams.TreeType == "content") 
+            {
+                var currContent = Services.ContentService.GetById(int.Parse(Request.QueryString["selected"]));
+                if (currContent != null)
+                {
+                    if (currContent.ParentId > 0)
+                        DialogTree.SelectedNodePath = currContent.Path;    
+                }
+            }
 		}
 
 		protected TreeService TreeParams { get; private set; }

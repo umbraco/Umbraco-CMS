@@ -8,7 +8,7 @@
         _opts: null,
         
         _isRepeated: function (element) {
-            var inputs = $('#form1 input.domain');
+            var inputs = $('form input.domain');
             var elementName = element.attr('name');
             var repeated = false;
             inputs.each(function() {
@@ -65,22 +65,22 @@
                 duplicate: { duplicate: true }
             });
 
-            $('#form1').validate({
+            $('form').validate({
                 debug: true,
                 focusCleanup: true,
                 onkeyup: false
             });
 
-            $('#form1 input.domain').live('focus', function(event) {
+            $('form input.domain').live('focus', function(event) {
                 if (event.type != 'focusin') return;
                 $(this).nextAll('input').val(0);
             });
             
             // force validation *now*
-            $('#form1').valid();
+            $('form').valid();
 
             $('#btnSave').click(function () {
-                if (!$('#form1').valid())
+                if (!$('form').valid())
                     return false;
                 
                 var mask = $('#komask');
@@ -97,7 +97,7 @@
                         UmbClientMgr.closeModalWindow();
                     }
                     else {
-                        var inputs = $('#form1 input.domain');
+                        var inputs = $('form input.domain');
                         inputs.each(function() { $(this).nextAll('input').val(0); });
                         for (var i = 0; i < json.Domains.length; i++) {
                             var d = json.Domains[i];
@@ -108,7 +108,7 @@
                                         input.nextAll('input').val(1);
                                 });
                         }
-                        $('#form1').valid();
+                        $('form').valid();
                     }
                 })
                 .fail(function (xhr, textStatus, errorThrown) {

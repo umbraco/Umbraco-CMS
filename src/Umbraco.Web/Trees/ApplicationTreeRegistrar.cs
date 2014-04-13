@@ -50,7 +50,8 @@ namespace Umbraco.Web.Trees
                 .Select(x =>
                         new Tuple<Type, global::umbraco.businesslogic.TreeAttribute>(
                             x, 
-                            x.GetCustomAttributes<global::umbraco.businesslogic.TreeAttribute>(false).Single()))
+                            x.GetCustomAttributes<global::umbraco.businesslogic.TreeAttribute>(false).SingleOrDefault()))
+                .Where(x => x.Item2 != null)
                 .Where(x => applicationContext.Services.ApplicationTreeService.GetByAlias(x.Item2.Alias) == null
                     //make sure the legacy tree isn't added on top of the controller tree!        
                             && added.InvariantContains(x.Item2.Alias) == false)

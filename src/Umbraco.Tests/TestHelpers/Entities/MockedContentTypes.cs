@@ -252,11 +252,11 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return mediaType;
         }
 
-        public static MediaType CreateImageMediaType()
+        public static MediaType CreateImageMediaType(string alias = Constants.Conventions.MediaTypes.Image)
         {
             var mediaType = new MediaType(-1)
             {
-                Alias = Constants.Conventions.MediaTypes.Image,
+                Alias = alias,
                 Name = "Image",
                 Description = "ContentType used for images",
                 Icon = ".sprTreeDoc3",
@@ -281,12 +281,12 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return mediaType;
         }
 
-        public static MemberType CreateSimpleMemberType()
+        public static MemberType CreateSimpleMemberType(string alias = null, string name = null)
         {
             var contentType = new MemberType(-1)
             {
-                Alias = "simple",
-                Name = "Simple Page",
+                Alias = alias ?? "simple",
+                Name = name ?? "Simple Page",
                 Description = "Some member type",
                 Icon = ".sprTreeDoc3",
                 Thumbnail = "doc.png",

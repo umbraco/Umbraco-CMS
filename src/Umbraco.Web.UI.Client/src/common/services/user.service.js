@@ -61,7 +61,9 @@ angular.module('umbraco.services')
     there are no more seconds remaining.
     */
     function countdownUserTimeout() {
-        $timeout(function() {
+
+        $timeout(function () {
+
             if (currentUser) {
                 //countdown by 2 seconds since that is how long our timer is for.
                 currentUser.remainingAuthSeconds -= 2;
@@ -70,18 +72,24 @@ angular.module('umbraco.services')
                 if (currentUser.remainingAuthSeconds > 30) {
 
                     //we need to check when the last time the timeout was set from the server, if 
-                    // it has been more than 30 seconds then we'll manually go and retreive it from the 
+                    // it has been more than 30 seconds then we'll manually go and retrieve it from the 
                     // server - this helps to keep our local countdown in check with the true timeout.
                     if (lastServerTimeoutSet != null) {
                         var now = new Date();
                         var seconds = (now.getTime() - lastServerTimeoutSet.getTime()) / 1000;
+
                         if (seconds > 30) {
+
                             //first we'll set the lastServerTimeoutSet to null - this is so we don't get back in to this loop while we 
                             // wait for a response from the server otherwise we'll be making double/triple/etc... calls while we wait.
                             lastServerTimeoutSet = null;
+
                             //now go get it from the server
-                            authResource.getRemainingTimeoutSeconds().then(function(result) {
-                                setUserTimeoutInternal(result);
+                            //NOTE: the safeApply because our timeout is set to not run digests (performance reasons)
+                            angularHelper.safeApply($rootScope, function() {                                
+                                authResource.getRemainingTimeoutSeconds().then(function (result) {                            
+                                    setUserTimeoutInternal(result);
+                                });
                             });
                         }
                     }
@@ -91,10 +99,10 @@ angular.module('umbraco.services')
                 }
                 else {
 
-                    //we are either timed out or very close to timing out so we need to show the login dialog.                    
-                    //NOTE: the safeApply because our timeout is set to not run digests (performance reasons)
+                    //we are either timed out or very close to timing out so we need to show the login dialog.                                        
                     if (Umbraco.Sys.ServerVariables.umbracoSettings.keepUserLoggedIn !== true) {
-                        angularHelper.safeApply($rootScope, function() {
+                        //NOTE: the safeApply because our timeout is set to not run digests (performance reasons)
+                        angularHelper.safeApply($rootScope, function () {
                             userAuthExpired();
                         });
                     }
@@ -105,9 +113,13 @@ angular.module('umbraco.services')
                             //first we'll set the lastServerTimeoutSet to null - this is so we don't get back in to this loop while we 
                             // wait for a response from the server otherwise we'll be making double/triple/etc... calls while we wait.
                             lastServerTimeoutSet = null;
+
                             //now go get it from the server
-                            authResource.getRemainingTimeoutSeconds().then(function (result) {
-                                setUserTimeoutInternal(result);
+                            //NOTE: the safeApply because our timeout is set to not run digests (performance reasons)
+                            angularHelper.safeApply($rootScope, function() {
+                                authResource.getRemainingTimeoutSeconds().then(function (result) {
+                                    setUserTimeoutInternal(result);
+                                });
                             });
                         }
                         

@@ -151,6 +151,21 @@ namespace Umbraco.Core.Persistence.Caching
             _keyTracker.Remove(key);
         }
 
+        public void Delete(Type type, int entityId)
+        {
+            var key = GetCompositeId(type, entityId);
+            if (_memoryCache != null)
+            {
+                _memoryCache.Remove(key);
+            }
+            else
+            {
+                HttpRuntime.Cache.Remove(key);
+            }
+
+            _keyTracker.Remove(key);
+        }
+
         /// <summary>
         /// Clear cache by type
         /// </summary>

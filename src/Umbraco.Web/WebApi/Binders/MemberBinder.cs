@@ -6,6 +6,7 @@ using System.Web.Security;
 using AutoMapper;
 using Umbraco.Core;
 using Umbraco.Core.Models;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.WebApi.Filters;
@@ -42,6 +43,7 @@ namespace Umbraco.Web.WebApi.Binders
         protected override IMember GetExisting(MemberSave model)
         {
             var scenario = ApplicationContext.Services.MemberService.GetMembershipScenario();
+            var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
             switch (scenario)
             {
                 case MembershipScenario.NativeUmbraco:
@@ -49,7 +51,7 @@ namespace Umbraco.Web.WebApi.Binders
                 case MembershipScenario.CustomProviderWithUmbracoLink:
                 case MembershipScenario.StandaloneCustomProvider:
                 default:
-                    var membershipUser = Membership.GetUser(model.Key, false);
+                    var membershipUser = provider.GetUser(model.Key, false);
                     if (membershipUser == null)
                     {
                         throw new InvalidOperationException("Could not find member with key " + model.Key);
@@ -93,8 +95,10 @@ namespace Umbraco.Web.WebApi.Binders
                 throw new InvalidOperationException("Could not find member with key " + key);
             }
 
+            var standardProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+
             //remove all membership properties, these values are set with the membership provider.
-            var exclude = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
+            var exclude = standardProps.Select(x => x.Value.Alias).ToArray();
 
             foreach (var remove in exclude)
             {
@@ -113,9 +117,11 @@ namespace Umbraco.Web.WebApi.Binders
         /// </remarks>
         protected override IMember CreateNew(MemberSave model)
         {
-            if (Membership.Provider.Name == Constants.Conventions.Member.UmbracoMemberProviderName)
+            var provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
+
+            if (provider.IsUmbracoMembershipProvider())
             {
-                var contentType = ApplicationContext.Services.MemberTypeService.GetMemberType(model.ContentTypeAlias);
+                var contentType = ApplicationContext.Services.MemberTypeService.Get(model.ContentTypeAlias);
                 if (contentType == null)
                 {
                     throw new InvalidOperationException("No member type found wth alias " + model.ContentTypeAlias);
@@ -125,7 +131,7 @@ namespace Umbraco.Web.WebApi.Binders
                 FilterMembershipProviderProperties(contentType);
 
                 //return the new member with the details filled in
-                return new Member(model.Name, model.Email, model.Username, model.Password.NewPassword, -1, contentType);
+                return new Member(model.Name, model.Email, model.Username, model.Password.NewPassword, contentType);
             }
             else
             {
@@ -136,11 +142,11 @@ namespace Umbraco.Web.WebApi.Binders
 
                 //If the default Member type exists, we'll use that to create the IMember - that way we can associate the custom membership
                 // provider to our data - eventually we can support editing custom properties with a custom provider.
-                var memberType = ApplicationContext.Services.MemberTypeService.GetMemberType(Constants.Conventions.MemberTypes.Member);
+                var memberType = ApplicationContext.Services.MemberTypeService.Get(Constants.Conventions.MemberTypes.DefaultAlias);
                 if (memberType != null)
                 {
                     FilterContentTypeProperties(memberType, memberType.PropertyTypes.Select(x => x.Alias).ToArray());
-                    return new Member(model.Name, model.Email, model.Username, Guid.NewGuid().ToString("N"), -1, memberType);
+                    return new Member(model.Name, model.Email, model.Username, Guid.NewGuid().ToString("N"), memberType);
                 }
 
                 //generate a member for a generic membership provider
@@ -160,8 +166,9 @@ namespace Umbraco.Web.WebApi.Binders
         /// <param name="contentType"></param>
         private void FilterMembershipProviderProperties(IContentTypeBase contentType)
         {
+            var defaultProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
             //remove all membership properties, these values are set with the membership provider.
-            var exclude = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
+            var exclude = defaultProps.Select(x => x.Value.Alias).ToArray();
             FilterContentTypeProperties(contentType, exclude);
         }
 
@@ -190,7 +197,8 @@ namespace Umbraco.Web.WebApi.Binders
             protected override bool ValidateProperties(ContentItemBasic<ContentPropertyBasic, IMember> postedItem, HttpActionContext actionContext)
             {
                 var propertiesToValidate = postedItem.Properties.ToList();
-                var exclude = Constants.Conventions.Member.StandardPropertyTypeStubs.Select(x => x.Value.Alias).ToArray();
+                var defaultProps = Constants.Conventions.Member.GetStandardPropertyTypeStubs();
+                var exclude = defaultProps.Select(x => x.Value.Alias).ToArray();
                 foreach (var remove in exclude)
                 {
                     propertiesToValidate.RemoveAll(property => property.Alias == remove);

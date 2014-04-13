@@ -2,7 +2,7 @@
 
 <%
     // NH: Adds this inline check to avoid a simple codebehind file in the legacy project!
-    if (!umbraco.cms.helpers.url.ValidateProxyUrl(Request["url"], Request.Url.AbsoluteUri))
+    if (Request["url"].ToLower().Contains("booting.aspx") || !umbraco.cms.helpers.url.ValidateProxyUrl(Request["url"], Request.Url.AbsoluteUri))
     {
         throw new ArgumentException("Can't redirect to the requested url - it's not local or an approved proxy url",
                                     "url");

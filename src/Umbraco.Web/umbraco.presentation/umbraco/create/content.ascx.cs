@@ -43,7 +43,8 @@ namespace umbraco.cms.presentation.create.controls
                 {
                     string docDescription = "<em>No description available...</em>";
                     if (string.IsNullOrEmpty(dt.Description) == false)
-                        docDescription = dt.Description;
+                        docDescription = System.Web.HttpUtility.HtmlEncode(dt.Description);
+
                     docDescription = "<strong>" + dt.Text + "</strong><br/>" + docDescription.Replace(Environment.NewLine, "<br />");
                     docDescription = docDescription.Replace("'", "\\'");
 

@@ -4,12 +4,12 @@ namespace Umbraco.Core.Profiling
 {
 	public class ProfilingViewEngine: IViewEngine
 	{
-		private readonly IViewEngine _inner;
+		internal readonly IViewEngine Inner;
 		private readonly string _name;
 
 		public ProfilingViewEngine(IViewEngine inner)
 		{
-			_inner = inner;
+			Inner = inner;
 			_name = inner.GetType().Name;
 		}
 
@@ -17,7 +17,7 @@ namespace Umbraco.Core.Profiling
 		{
 			using (ProfilerResolver.Current.Profiler.Step(string.Format("{0}.FindPartialView, {1}, {2}", _name, partialViewName, useCache)))
 			{
-				return WrapResult(_inner.FindPartialView(controllerContext, partialViewName, useCache));
+				return WrapResult(Inner.FindPartialView(controllerContext, partialViewName, useCache));
 			}
 		}
 
@@ -25,7 +25,7 @@ namespace Umbraco.Core.Profiling
 		{
 			using (ProfilerResolver.Current.Profiler.Step(string.Format("{0}.FindView, {1}, {2}, {3}", _name, viewName, masterName, useCache)))
 			{
-				return WrapResult(_inner.FindView(controllerContext, viewName, masterName, useCache));
+				return WrapResult(Inner.FindView(controllerContext, viewName, masterName, useCache));
 			}
 		}
 
@@ -41,7 +41,7 @@ namespace Umbraco.Core.Profiling
 		{
 			using (ProfilerResolver.Current.Profiler.Step(string.Format("{0}.ReleaseView, {1}", _name, view.GetType().Name)))
 			{
-				_inner.ReleaseView(controllerContext, view);
+				Inner.ReleaseView(controllerContext, view);
 			}
 		}
 	}
