@@ -14,6 +14,8 @@ using umbraco.uicontrols;
 using umbraco.DataLayer;
 using umbraco.cms.presentation.Trees;
 using umbraco.cms.businesslogic.macro;
+using System.Text;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation.developer
 {
@@ -128,6 +130,49 @@ namespace umbraco.cms.presentation.developer
 							"&macroID=" + Request.QueryString["macroID"] + "&type=" + macroType.Text +
 								"', 'Browse Properties', true, 500, 475); return false\" class=\"guiInputButton\"><img src=\"../../images/editor/propertiesNew.gif\" align=\"absmiddle\" style=\"width: 18px; height: 17px; padding-right: 5px;\"/> Browse properties</button>"));
 			}
+
+            StringBuilder scriptCode = new StringBuilder();
+
+            #region Content Edit Link
+            if (!String.IsNullOrEmpty(m_macro.ScriptingFile) && !m_macro.ScriptingFile.StartsWith(SystemDirectories.MvcViews))
+            {
+                HyperLink documentTypeLink = new HyperLink();
+                documentTypeLink.NavigateUrl = "javascript:openDLRScript('" + m_macro.ScriptingFile + "');";
+                documentTypeLink.Text = "Edit Script";
+                documentTypeLink.Style.Add(HtmlTextWriterStyle.PaddingLeft, "10px");
+
+                macroName.Parent.Controls.Add(documentTypeLink);
+
+                new umbraco.loadPython(Constants.Applications.Developer).RenderJS(ref scriptCode);
+            }
+
+            if (!String.IsNullOrEmpty(m_macro.Xslt))
+            {
+                HyperLink documentTypeLink = new HyperLink();
+                documentTypeLink.NavigateUrl = "javascript:openXslt('" + m_macro.Xslt + "');";
+                documentTypeLink.Text = "Edit Xslt";
+                documentTypeLink.Style.Add(HtmlTextWriterStyle.PaddingLeft, "10px");
+
+                macroName.Parent.Controls.Add(documentTypeLink);
+
+                new umbraco.loadXslt(Constants.Applications.Developer).RenderJS(ref scriptCode);
+            }
+
+            if (!String.IsNullOrEmpty(m_macro.ScriptingFile) && m_macro.ScriptingFile.StartsWith(SystemDirectories.MvcViews))
+            {
+                HyperLink documentTypeLink = new HyperLink();
+                documentTypeLink.NavigateUrl = "javascript:openMacroPartialView('" + m_macro.ScriptingFile.Replace(SystemDirectories.MvcViews + "/MacroPartials/", "") + "');";
+                documentTypeLink.Text = "Edit Partial View";
+                documentTypeLink.Style.Add(HtmlTextWriterStyle.PaddingLeft, "10px");
+
+                macroName.Parent.Controls.Add(documentTypeLink);
+
+                new Umbraco.Web.Trees.PartialViewMacrosTree(Constants.Applications.Developer).RenderJS(ref scriptCode);
+            }
+            #endregion
+
+            // Add applicable scripts to page.
+            ClientScript.RegisterClientScriptBlock(this.GetType(), "EditLinkScripts", scriptCode.ToString(), true);
 		}
 
 		/// <summary>
@@ -359,6 +404,7 @@ namespace umbraco.cms.presentation.developer
 			save2.ImageUrl = SystemDirectories.Umbraco + "/images/editor/save.gif";
 
 			base.OnInit(e);
+
 		}
 
 		/// <summary>

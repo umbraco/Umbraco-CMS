@@ -10,6 +10,7 @@ using System.IO;
 using Umbraco.Core.IO;
 using umbraco.cms.businesslogic.property;
 using Umbraco.Core;
+using System.Text;
 
 namespace umbraco.cms.presentation
 {
@@ -36,6 +37,7 @@ namespace umbraco.cms.presentation
         {
             base.OnInit(e);
 
+
             int id = int.Parse(Request.QueryString["id"]);
 
             //Loading Media via new public service to ensure that the Properties are loaded correct
@@ -57,6 +59,8 @@ namespace umbraco.cms.presentation
             //this must be set to false as we don't want to proceed to save anything if the page is invalid
             _contentControl.SavePropertyDataWhenInvalid = false;
 
+            
+
             plc.Controls.Add(_contentControl);
 
             _contentControl.Save += new System.EventHandler(Save);
@@ -71,9 +75,32 @@ namespace umbraco.cms.presentation
             _mediaPropertiesPane.addProperty(ui.Text("content", "mediaLinks"), this._mediaFileLinksLiteral);
 
             // add the property pane to the page rendering
-            _contentControl.tpProp.Controls.AddAt(1, _mediaPropertiesPane);                       
+            _contentControl.tpProp.Controls.AddAt(1, _mediaPropertiesPane);
         }
 
+        protected override void OnInitComplete(EventArgs e)
+        {
+            base.OnInitComplete(e);
+
+            StringBuilder scriptCode = new StringBuilder();
+
+            #region Media Type Edit Link
+            if (UmbracoUser.Applications.SingleOrDefault(app => app.alias == Constants.Applications.Settings) != null)
+            {
+                HyperLink mediaTypeLink = new HyperLink();
+                mediaTypeLink.NavigateUrl = "javascript:parent.appClick('settings'); setTimeout(function() { openMediaType(" + _media.ContentType.Id + "); }, 500);";
+                mediaTypeLink.Text = "Edit Media Type";
+                mediaTypeLink.Style.Add(HtmlTextWriterStyle.PaddingLeft, "10px");
+                _contentControl.PropertiesPane.Controls[_contentControl.PropertiesPane.Controls.Count - 1].Controls.Add(mediaTypeLink);
+
+                new umbraco.loadMediaTypes(Constants.Applications.Media).RenderJS(ref scriptCode);
+            }
+            #endregion
+
+            if (!String.IsNullOrEmpty(scriptCode.ToString()))
+                ClientScript.RegisterClientScriptBlock(this.GetType(), "EditLinkScripts", scriptCode.ToString(), true);
+
+        }
         protected void Page_Load(object sender, System.EventArgs e)
         {
             if (!IsPostBack)

@@ -15,6 +15,9 @@ using umbraco.cms.helpers;
 using umbraco.cms.presentation.Trees;
 using Umbraco.Core;
 using umbraco.uicontrols;
+using System.Text;
+using umbraco.cms.businesslogic.macro;
+using System.Linq;
 
 namespace Umbraco.Web.UI.Umbraco.Settings.Views
 {
@@ -133,6 +136,8 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 		{
 			base.OnInit(e);
 
+            StringBuilder scriptCode = new StringBuilder();
+
 			//check if a templateId is assigned, meaning we are editing a template
 			if (!Request.QueryString["templateID"].IsNullOrWhiteSpace())
 			{
@@ -198,7 +203,34 @@ namespace Umbraco.Web.UI.Umbraco.Settings.Views
 			{
 				InitializeEditorForTemplate();	
 			}
-			
+
+            if (CurrentTreeType == "partialViewMacros")
+            {
+                #region Macro Link
+                // Lookup the pages content type and add a link to edit it directly.
+                Macro macro = Macro.GetAll().Where(s => s.ScriptingFile.Contains(Request.QueryString["file"])).FirstOrDefault();
+                if (macro != null)
+                {
+
+                    HyperLink documentTypeLink = new HyperLink();
+                    documentTypeLink.NavigateUrl = "javascript:openMacro(" + macro.Id + ");";
+                    documentTypeLink.Text = "Edit Macro";
+                    documentTypeLink.Style.Add(HtmlTextWriterStyle.PaddingLeft, "10px");
+
+                    pp_name.Controls.Add(documentTypeLink);
+
+                    scriptCode.Append(
+                    @"
+    function openMacro(id) {
+	    UmbClientMgr.contentFrame('developer/macros/editMacro.aspx?macroID=' + id);
+    }
+    ");
+                }
+                #endregion
+            }
+
+            // Add applicable scripts to page.
+            ClientScript.RegisterClientScriptBlock(this.GetType(), "EditLinkScripts", scriptCode.ToString(), true);
 		}
 
 		protected override void OnPreRender(EventArgs e)

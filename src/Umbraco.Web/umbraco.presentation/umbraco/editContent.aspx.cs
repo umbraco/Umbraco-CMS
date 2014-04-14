@@ -14,6 +14,7 @@ using umbraco.presentation;
 using System.Linq;
 using Image = System.Web.UI.WebControls.Image;
 using Umbraco.Core;
+using System.Text;
 
 namespace umbraco.cms.presentation
 {
@@ -45,6 +46,8 @@ namespace umbraco.cms.presentation
         override protected void OnInit(EventArgs e)
         {
             base.OnInit(e);
+
+            StringBuilder scriptCode = new StringBuilder();
 
             //validate!
             int id;
@@ -138,7 +141,20 @@ namespace umbraco.cms.presentation
             var documentType = new DocumentType(_document.ContentType.Id);
             _cControl.PropertiesPane.addProperty(ui.Text("documentType"), new LiteralControl(documentType.Text));
 
+            #region Document Type Edit Link
+            if (UmbracoUser.Applications.SingleOrDefault(app => app.alias == Constants.Applications.Settings) != null)
+            {
+                HyperLink documentTypeLink = new HyperLink();
+                documentTypeLink.NavigateUrl = "javascript:parent.appClick('settings'); setTimeout(function() { openNodeType(" + documentType.Id + "); }, 500);";
+                documentTypeLink.Text = "Edit Document Type";
+                documentTypeLink.Style.Add(HtmlTextWriterStyle.PaddingLeft, "10px");
 
+                _cControl.PropertiesPane.Controls[_cControl.PropertiesPane.Controls.Count - 1].Controls.Add(documentTypeLink);
+
+                new umbraco.loadNodeTypes(Constants.Applications.Settings).RenderJS(ref scriptCode);
+            }
+            #endregion
+            
             //template picker
             _cControl.PropertiesPane.addProperty(ui.Text("template"), template);
             int defaultTemplate;
@@ -168,6 +184,19 @@ namespace umbraco.cms.presentation
                 template.Controls.Add(_ddlDefaultTemplate);
             }
 
+            #region Template Edit Link
+            if (UmbracoUser.Applications.SingleOrDefault(app => app.alias == Constants.Applications.Settings) != null)
+            {
+                HyperLink tempateLink = new HyperLink();
+                tempateLink.NavigateUrl = "javascript:parent.appClick('settings'); setTimeout(function() { openView(" + defaultTemplate + "); }, 500);";
+                tempateLink.Text = "Edit Template";
+                tempateLink.Style.Add(HtmlTextWriterStyle.PaddingLeft, "10px");
+
+                _cControl.PropertiesPane.Controls[_cControl.PropertiesPane.Controls.Count - 1].Controls.Add(tempateLink);
+
+                new umbraco.loadTemplates(Constants.Applications.Settings).RenderJS(ref scriptCode);
+            }
+            #endregion
 
             // Editable update date, release date and expire date added by NH 13.12.04
             _dp.ID = "updateDate";
@@ -195,7 +224,8 @@ namespace umbraco.cms.presentation
             // add preview to properties pane too
             AddPreviewButton(_cControl.tpProp.Menu, _document.Id);
 
-
+            if(!String.IsNullOrEmpty(scriptCode.ToString()))
+                ClientScript.RegisterClientScriptBlock(this.GetType(), "EditLinkScripts", scriptCode.ToString(), true);
         }
 
         protected void Page_Load(object sender, EventArgs e)

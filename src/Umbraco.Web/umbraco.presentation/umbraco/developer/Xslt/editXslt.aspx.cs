@@ -13,6 +13,10 @@ using umbraco.uicontrols;
 using System.Net;
 using umbraco.cms.presentation.Trees;
 using umbraco.cms.helpers;
+using System.Text;
+using umbraco.cms.businesslogic.macro;
+using System.Linq;
+using Umbraco.Core;
 
 namespace umbraco.cms.presentation.developer
 {
@@ -46,8 +50,10 @@ namespace umbraco.cms.presentation.developer
 		}
 
 		protected override void OnInit(EventArgs e)
-		{			
-			base.OnInit(e);
+		{
+            base.OnInit(e);
+
+            StringBuilder scriptCode = new StringBuilder();
             
             SaveButton = UmbracoPanel1.Menu.NewIcon();
             SaveButton.ImageURL = SystemDirectories.Umbraco + "/images/editor/save.gif";
@@ -115,6 +121,26 @@ namespace umbraco.cms.presentation.developer
 			SR.Close();
 
 			editorSource.Text = S;
+
+
+            #region Macro Edit Link
+            // Lookup the pages content type and add a link to edit it directly.
+            Macro macro = Macro.GetAll().FirstOrDefault(s => s.ScriptingFile == Request.QueryString["file"]);
+            if (macro != null)
+            {
+                HyperLink macroLink = new HyperLink();
+                macroLink.NavigateUrl = "javascript:openMacro(" + macro.Id + ");";
+                macroLink.Text = "Edit Macro";
+                macroLink.Style.Add(HtmlTextWriterStyle.PaddingLeft, "10px");
+
+                pp_filename.Controls.Add(macroLink);
+
+                new umbraco.loadMacros(Constants.Applications.Developer).RenderJS(ref scriptCode);
+            }
+            #endregion
+
+            if (!String.IsNullOrEmpty(scriptCode.ToString()))
+                ClientScript.RegisterClientScriptBlock(this.GetType(), "EditLinkScripts", scriptCode.ToString(), true);
 		}
 
 
