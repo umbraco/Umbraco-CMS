@@ -33,7 +33,9 @@ function entityPicker($scope, entityResource) {
     else {
         //if it's multiple, change the value to an array
         if ($scope.model.config.multiple === "1") {
-            $scope.model.value = $scope.model.value.split(',');
+            if (_.isString($scope.model.value)) {
+                $scope.model.value = $scope.model.value.split(',');
+            }
         }
     }
 }

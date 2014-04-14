@@ -320,5 +320,16 @@
         };
     }
 
+    if (!String.prototype.detectIsJson) {
+
+        /** Rudimentary check to see if the string is a json encoded string */
+        String.prototype.detectIsJson = function () {
+            if ((this.startsWith("{") && this.endsWith("}")) || (this.startsWith("[") || this.endsWith("]"))) {
+                return true;
+            }
+            return false;
+        };
+    }
+
 
 })();

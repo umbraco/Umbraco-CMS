@@ -48,8 +48,8 @@ namespace Umbraco.Core
         internal static bool DetectIsJson(this string input)
         {
             input = input.Trim();
-            return input.StartsWith("{") && input.EndsWith("}")
-                   || input.StartsWith("[") && input.EndsWith("]");
+            return (input.StartsWith("{") && input.EndsWith("}"))
+                   || (input.StartsWith("[") && input.EndsWith("]"));
         }
 
         internal static string ReplaceNonAlphanumericChars(this string input, char replacement)

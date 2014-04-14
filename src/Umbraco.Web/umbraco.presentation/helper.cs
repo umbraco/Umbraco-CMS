@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Web;
 using Umbraco.Core;
@@ -70,23 +71,53 @@ namespace umbraco
             return attributeValue;
         }
 
+        /// <summary>
+        /// This method will parse the attribute value to look for some special syntax such as
+        ///     [@requestKey]
+        ///     [%sessionKey]
+        ///     [#pageElement]
+        ///     [$recursiveValue]
+        /// </summary>
+        /// <param name="pageElements"></param>
+        /// <param name="attributeValue"></param>
+        /// <returns></returns>
+        /// <remarks>
+        /// You can even apply fallback's separated by comma's like:
+        /// 
+        ///     [@requestKey],[%sessionKey]
+        /// 
+        /// </remarks>
         public static string parseAttribute(IDictionary pageElements, string attributeValue)
         {
             // Check for potential querystring/cookie variables
-            if (attributeValue.Length > 3 && attributeValue.Substring(0, 1) == "[")
+            // SD: not sure why we are checking for len 3 here?
+            if (attributeValue.Length > 3 && attributeValue.StartsWith("["))
             {
-                string[] attributeValueSplit = (attributeValue).Split(',');
-                foreach (string attributeValueItem in attributeValueSplit)
+                var attributeValueSplit = (attributeValue).Split(',');
+
+                //before proceeding, we don't want to process anything here unless each item starts/ends with a [ ]
+                // this is because the attribute value could actually just be a json array like [1,2,3] which we don't want to parse
+
+                if (attributeValueSplit.All(x =>
+                    //must end with [
+                    x.EndsWith("]") &&
+                    //must start with [ and a special char
+                    (x.StartsWith("[@") || x.StartsWith("[%") || x.StartsWith("[#") || x.StartsWith("[$"))) == false)
+                {
+                    return attributeValue;
+                }
+
+                foreach (var attributeValueItem in attributeValueSplit)
                 {
                     attributeValue = attributeValueItem;
 
                     // Check for special variables (always in square-brackets like [name])
-                    if (attributeValueItem.Substring(0, 1) == "[" &&
-                        attributeValueItem.Substring(attributeValueItem.Length - 1, 1) == "]")
+                    if (attributeValueItem.StartsWith("[") &&
+                        attributeValueItem.EndsWith("]"))
                     {
                         // find key name
-                        string keyName = attributeValueItem.Substring(2, attributeValueItem.Length - 3);
-                        string keyType = attributeValueItem.Substring(1, 1);
+                        var keyName = attributeValueItem.Substring(2, attributeValueItem.Length - 3);
+                        var keyType = attributeValueItem.Substring(1, 1);
 
                         switch (keyType)
                         {
