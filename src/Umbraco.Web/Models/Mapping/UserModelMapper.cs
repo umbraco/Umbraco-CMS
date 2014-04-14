@@ -13,12 +13,13 @@ namespace Umbraco.Web.Models.Mapping
         public override void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<IUser, UserDetail>()
-                  .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => GetIntId(user.Id)))
-                  .ForMember(detail => detail.UserType, opt => opt.MapFrom(user => user.UserType.Alias))
-                  .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => ui.Culture(user)))
-                  .ForMember(
-                      detail => detail.EmailHash,
-                      opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().ToMd5()));
+                .ForMember(detail => detail.UserId, opt => opt.MapFrom(user => GetIntId(user.Id)))
+                .ForMember(detail => detail.UserType, opt => opt.MapFrom(user => user.UserType.Alias))
+                .ForMember(detail => detail.Culture, opt => opt.MapFrom(user => ui.Culture(user)))
+                .ForMember(
+                    detail => detail.EmailHash,
+                    opt => opt.MapFrom(user => user.Email.ToLowerInvariant().Trim().ToMd5()))
+                .ForMember(detail => detail.SecondsUntilTimeout, opt => opt.Ignore());
 
             config.CreateMap<IProfile, UserBasic>()
                   .ForMember(detail => detail.UserId, opt => opt.MapFrom(profile => GetIntId(profile.Id)));

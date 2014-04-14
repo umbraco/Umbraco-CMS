@@ -31,63 +31,84 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM MembershipUser TO IMember - used when using a non-umbraco membership provider
             config.CreateMap<MembershipUser, IMember>()
-                  .ConstructUsing(user => MemberService.CreateGenericMembershipProviderMember(user.UserName, user.Email, user.UserName, ""))
-                  //we're giving this entity an ID - we cannot really map it but it needs an id so the system knows it's not a new entity
-                  .ForMember(member => member.Id, expression => expression.MapFrom(user => int.MaxValue))
-                  .ForMember(member => member.Comments, expression => expression.MapFrom(user => user.Comment))
-                  .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
-                  .ForMember(member => member.UpdateDate, expression => expression.MapFrom(user => user.LastActivityDate))
-                  .ForMember(member => member.LastPasswordChangeDate, expression => expression.MapFrom(user => user.LastPasswordChangedDate))
-                  .ForMember(member => member.Key, expression => expression.MapFrom(user => user.ProviderUserKey.TryConvertTo<Guid>().Result.ToString("N")))
-                  //This is a special case for password - we don't actually care what the password is but it either needs to be something or nothing
-                  // so we'll set it to something if the member is actually created, otherwise nothing if it is a new member.
-                  .ForMember(member => member.RawPasswordValue, expression => expression.MapFrom(user => user.CreationDate > DateTime.MinValue ? Guid.NewGuid().ToString("N") : ""))
-                    //TODO: Support these eventually
-                  .ForMember(member => member.PasswordQuestion, expression => expression.Ignore())
-                  .ForMember(member => member.RawPasswordAnswerValue, expression => expression.Ignore());
+                .ConstructUsing(user => MemberService.CreateGenericMembershipProviderMember(user.UserName, user.Email, user.UserName, ""))
+                //we're giving this entity an ID - we cannot really map it but it needs an id so the system knows it's not a new entity
+                .ForMember(member => member.Id, expression => expression.MapFrom(user => int.MaxValue))
+                .ForMember(member => member.Comments, expression => expression.MapFrom(user => user.Comment))
+                .ForMember(member => member.CreateDate, expression => expression.MapFrom(user => user.CreationDate))
+                .ForMember(member => member.UpdateDate, expression => expression.MapFrom(user => user.LastActivityDate))
+                .ForMember(member => member.LastPasswordChangeDate, expression => expression.MapFrom(user => user.LastPasswordChangedDate))
+                .ForMember(member => member.Key, expression => expression.MapFrom(user => user.ProviderUserKey.TryConvertTo<Guid>().Result.ToString("N")))
+                //This is a special case for password - we don't actually care what the password is but it either needs to be something or nothing
+                // so we'll set it to something if the member is actually created, otherwise nothing if it is a new member.
+                .ForMember(member => member.RawPasswordValue, expression => expression.MapFrom(user => user.CreationDate > DateTime.MinValue ? Guid.NewGuid().ToString("N") : ""))
+                .ForMember(member => member.Properties, expression => expression.Ignore())
+                .ForMember(member => member.CreatorId, expression => expression.Ignore())
+                .ForMember(member => member.Level, expression => expression.Ignore())
+                .ForMember(member => member.Name, expression => expression.Ignore())
+                .ForMember(member => member.ParentId, expression => expression.Ignore())
+                .ForMember(member => member.Path, expression => expression.Ignore())
+                .ForMember(member => member.SortOrder, expression => expression.Ignore())
+                .ForMember(member => member.AdditionalData, expression => expression.Ignore())
+                .ForMember(member => member.FailedPasswordAttempts, expression => expression.Ignore())
+                //TODO: Support these eventually
+                .ForMember(member => member.PasswordQuestion, expression => expression.Ignore())
+                .ForMember(member => member.RawPasswordAnswerValue, expression => expression.Ignore());
 
             //FROM IMember TO MediaItemDisplay
             config.CreateMap<IMember, MemberDisplay>()
-                  .ForMember(
-                      dto => dto.Owner,
-                      expression => expression.ResolveUsing<OwnerResolver<IMember>>())
-                  .ForMember(
-                      dto => dto.Icon,
-                      expression => expression.MapFrom(content => content.ContentType.Icon))
-                  .ForMember(
-                      dto => dto.ContentTypeAlias,
-                      expression => expression.MapFrom(content => content.ContentType.Alias))
-                  .ForMember(
-                      dto => dto.ContentTypeName,
-                      expression => expression.MapFrom(content => content.ContentType.Name))
-                  .ForMember(display => display.Properties, expression => expression.Ignore())
-                  .ForMember(display => display.Tabs,
-                             expression => expression.ResolveUsing<MemberTabsAndPropertiesResolver>())
-                  .ForMember(display => display.MemberProviderFieldMapping,
-                             expression => expression.ResolveUsing<MemberProviderFieldMappingResolver>())
-                    .ForMember(display => display.MembershipScenario,
-                            expression => expression.ResolveUsing(new MembershipScenarioMappingResolver(new Lazy<IMemberTypeService>(() => applicationContext.Services.MemberTypeService))))
-                  .AfterMap((member, display) => MapGenericCustomProperties(applicationContext.Services.MemberService, member, display));
+                .ForMember(
+                    dto => dto.Owner,
+                    expression => expression.ResolveUsing<OwnerResolver<IMember>>())
+                .ForMember(
+                    dto => dto.Icon,
+                    expression => expression.MapFrom(content => content.ContentType.Icon))
+                .ForMember(
+                    dto => dto.ContentTypeAlias,
+                    expression => expression.MapFrom(content => content.ContentType.Alias))
+                .ForMember(
+                    dto => dto.ContentTypeName,
+                    expression => expression.MapFrom(content => content.ContentType.Name))
+                .ForMember(display => display.Properties, expression => expression.Ignore())
+                .ForMember(display => display.Tabs,
+                    expression => expression.ResolveUsing<MemberTabsAndPropertiesResolver>())
+                .ForMember(display => display.MemberProviderFieldMapping,
+                    expression => expression.ResolveUsing<MemberProviderFieldMappingResolver>())
+                .ForMember(display => display.MembershipScenario,
+                    expression => expression.ResolveUsing(new MembershipScenarioMappingResolver(new Lazy<IMemberTypeService>(() => applicationContext.Services.MemberTypeService))))
+                .ForMember(display => display.Notifications, expression => expression.Ignore())
+                .ForMember(display => display.Errors, expression => expression.Ignore())
+                .ForMember(display => display.Published, expression => expression.Ignore())
+                .ForMember(display => display.Updator, expression => expression.Ignore())
+                .ForMember(display => display.Alias, expression => expression.Ignore())
+                .AfterMap((member, display) => MapGenericCustomProperties(applicationContext.Services.MemberService, member, display));
 
             //FROM IMember TO ContentItemBasic<ContentPropertyBasic, IMember>
             config.CreateMap<IMember, ContentItemBasic<ContentPropertyBasic, IMember>>()
-                  .ForMember(
-                      dto => dto.Owner,
-                      expression => expression.ResolveUsing<OwnerResolver<IMember>>())
-                  .ForMember(
-                      dto => dto.Icon,
-                      expression => expression.MapFrom(content => content.ContentType.Icon))
-                  .ForMember(
-                      dto => dto.ContentTypeAlias,
-                      expression => expression.MapFrom(content => content.ContentType.Alias));
+                .ForMember(
+                    dto => dto.Owner,
+                    expression => expression.ResolveUsing<OwnerResolver<IMember>>())
+                .ForMember(
+                    dto => dto.Icon,
+                    expression => expression.MapFrom(content => content.ContentType.Icon))
+                .ForMember(
+                    dto => dto.ContentTypeAlias,
+                    expression => expression.MapFrom(content => content.ContentType.Alias))
+                .ForMember(x => x.Published, expression => expression.Ignore())
+                .ForMember(x => x.Updator, expression => expression.Ignore())
+                .ForMember(x => x.Alias, expression => expression.Ignore());
 
             //FROM IMember TO ContentItemDto<IMember>
             config.CreateMap<IMember, ContentItemDto<IMember>>()
-                  .ForMember(
-                      dto => dto.Owner,
-                      expression => expression.ResolveUsing<OwnerResolver<IMember>>())
+                .ForMember(
+                    dto => dto.Owner,
+                    expression => expression.ResolveUsing<OwnerResolver<IMember>>())
+                .ForMember(x => x.Published, expression => expression.Ignore())
+                .ForMember(x => x.Updator, expression => expression.Ignore())
+                .ForMember(x => x.Icon, expression => expression.Ignore())
+                .ForMember(x => x.Alias, expression => expression.Ignore())
                 //do no map the custom member properties (currently anyways, they were never there in 6.x)
-                  .ForMember(dto => dto.Properties, expression => expression.ResolveUsing<MemberDtoPropertiesValueResolver>());
+                .ForMember(dto => dto.Properties, expression => expression.ResolveUsing<MemberDtoPropertiesValueResolver>());
         }
 
         /// <summary>

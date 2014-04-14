@@ -62,6 +62,10 @@ namespace Umbraco.Web.Models.Mapping
                                                            ? new[] {"Cannot generate urls without a current Umbraco Context"}
                                                            : content.GetContentUrls()))
                   .ForMember(display => display.Properties, expression => expression.Ignore())
+                  .ForMember(display => display.TreeNodeUrl, expression => expression.Ignore())
+                  .ForMember(display => display.Notifications, expression => expression.Ignore())
+                  .ForMember(display => display.Errors, expression => expression.Ignore())
+                  .ForMember(display => display.Alias, expression => expression.Ignore())
                   .ForMember(display => display.Tabs, expression => expression.ResolveUsing<TabsAndPropertiesResolver>())
                   .ForMember(display => display.AllowedActions, expression => expression.ResolveUsing(
                       new ActionButtonsResolver(new Lazy<IUserService>(() => applicationContext.Services.UserService))))
@@ -69,24 +73,28 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM IContent TO ContentItemBasic<ContentPropertyBasic, IContent>
             config.CreateMap<IContent, ContentItemBasic<ContentPropertyBasic, IContent>>()
-                  .ForMember(
-                      dto => dto.Owner,
-                      expression => expression.ResolveUsing<OwnerResolver<IContent>>())
-                  .ForMember(
-                      dto => dto.Updator,
-                      expression => expression.ResolveUsing<CreatorResolver>())
-                  .ForMember(
-                      dto => dto.Icon,
-                      expression => expression.MapFrom(content => content.ContentType.Icon))
-                  .ForMember(
-                      dto => dto.ContentTypeAlias,
-                      expression => expression.MapFrom(content => content.ContentType.Alias));
+                .ForMember(
+                    dto => dto.Owner,
+                    expression => expression.ResolveUsing<OwnerResolver<IContent>>())
+                .ForMember(
+                    dto => dto.Updator,
+                    expression => expression.ResolveUsing<CreatorResolver>())
+                .ForMember(
+                    dto => dto.Icon,
+                    expression => expression.MapFrom(content => content.ContentType.Icon))
+                .ForMember(
+                    dto => dto.ContentTypeAlias,
+                    expression => expression.MapFrom(content => content.ContentType.Alias))
+                .ForMember(display => display.Alias, expression => expression.Ignore());
 
             //FROM IContent TO ContentItemDto<IContent>
             config.CreateMap<IContent, ContentItemDto<IContent>>()
                 .ForMember(
-                      dto => dto.Owner,
-                      expression => expression.ResolveUsing<OwnerResolver<IContent>>());
+                    dto => dto.Owner,
+                    expression => expression.ResolveUsing<OwnerResolver<IContent>>())
+                .ForMember(display => display.Updator, expression => expression.Ignore())
+                .ForMember(display => display.Icon, expression => expression.Ignore())
+                .ForMember(display => display.Alias, expression => expression.Ignore());
 
 
         }

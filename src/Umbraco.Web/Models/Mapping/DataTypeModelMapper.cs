@@ -21,17 +21,21 @@ namespace Umbraco.Web.Models.Mapping
         {
             var lazyDataTypeService = new Lazy<IDataTypeService>(() => applicationContext.Services.DataTypeService);
 
-            config.CreateMap<PropertyEditor, PropertyEditorBasic>();
+            config.CreateMap<PropertyEditor, PropertyEditorBasic>();                
 
             //just maps the standard properties, does not map the value!
-            config.CreateMap<PreValueField, PreValueFieldDisplay>();
+            config.CreateMap<PreValueField, PreValueFieldDisplay>()
+                .ForMember(x => x.Value, expression => expression.Ignore());
 
             config.CreateMap<IDataTypeDefinition, DataTypeDisplay>()
-                  .ForMember(display => display.AvailableEditors, expression => expression.ResolveUsing<AvailablePropertyEditorsResolver>())
-                  .ForMember(display => display.PreValues, expression => expression.ResolveUsing(
-                      new PreValueDisplayResolver(lazyDataTypeService)))
-                  .ForMember(display => display.SelectedEditor, expression => expression.MapFrom(
-                      definition => definition.PropertyEditorAlias.IsNullOrWhiteSpace() ? null : definition.PropertyEditorAlias));
+                .ForMember(display => display.AvailableEditors, expression => expression.ResolveUsing<AvailablePropertyEditorsResolver>())
+                .ForMember(display => display.PreValues, expression => expression.ResolveUsing(
+                    new PreValueDisplayResolver(lazyDataTypeService)))
+                .ForMember(display => display.SelectedEditor, expression => expression.MapFrom(
+                    definition => definition.PropertyEditorAlias.IsNullOrWhiteSpace() ? null : definition.PropertyEditorAlias))
+                .ForMember(x => x.Notifications, expression => expression.Ignore())
+                .ForMember(x => x.Icon, expression => expression.Ignore())
+                .ForMember(x => x.Alias, expression => expression.Ignore());
 
             //gets a list of PreValueFieldDisplay objects from the data type definition
             config.CreateMap<IDataTypeDefinition, IEnumerable<PreValueFieldDisplay>>()
@@ -42,14 +46,21 @@ namespace Umbraco.Web.Models.Mapping
                       });
 
             config.CreateMap<DataTypeSave, IDataTypeDefinition>()
-                  .ConstructUsing(save => new DataTypeDefinition(-1, save.SelectedEditor) {CreateDate = DateTime.Now})
+                .ConstructUsing(save => new DataTypeDefinition(-1, save.SelectedEditor) {CreateDate = DateTime.Now})
+                .ForMember(definition => definition.Id, expression => expression.MapFrom(save => Convert.ToInt32(save.Id)))
                 //we have to ignore the Key otherwise this will reset the UniqueId field which should never change!
-                // http://issues.umbraco.org/issue/U4-3911
-                  .ForMember(definition => definition.Key, expression => expression.Ignore())
-                  .ForMember(definition => definition.Path, expression => expression.Ignore())
-                  .ForMember(definition => definition.PropertyEditorAlias, expression => expression.MapFrom(save => save.SelectedEditor))
-                  .ForMember(definition => definition.ParentId, expression => expression.MapFrom(save => -1))
-                  .ForMember(definition => definition.DatabaseType, expression => expression.ResolveUsing<DatabaseTypeResolver>());
+                // http://issues.umbraco.org/issue/U4-3911                
+                .ForMember(definition => definition.Key, expression => expression.Ignore())
+                .ForMember(definition => definition.Path, expression => expression.Ignore())
+                .ForMember(definition => definition.PropertyEditorAlias, expression => expression.MapFrom(save => save.SelectedEditor))
+                .ForMember(definition => definition.ParentId, expression => expression.MapFrom(save => -1))
+                .ForMember(definition => definition.DatabaseType, expression => expression.ResolveUsing<DatabaseTypeResolver>())
+                .ForMember(x => x.ControlId, expression => expression.Ignore())
+                .ForMember(x => x.CreatorId, expression => expression.Ignore())
+                .ForMember(x => x.Level, expression => expression.Ignore())
+                .ForMember(x => x.SortOrder, expression => expression.Ignore())
+                .ForMember(x => x.CreateDate, expression => expression.Ignore())
+                .ForMember(x => x.UpdateDate, expression => expression.Ignore());
 
             //Converts a property editor to a new list of pre-value fields - used when creating a new data type or changing a data type with new pre-vals
             config.CreateMap<PropertyEditor, IEnumerable<PreValueFieldDisplay>>()

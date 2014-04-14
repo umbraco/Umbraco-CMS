@@ -20,9 +20,10 @@ namespace Umbraco.Web.Models.Mapping
 
             //FROM Property TO ContentPropertyBasic
             config.CreateMap<PropertyGroup, Tab<ContentPropertyDisplay>>()
-                  .ForMember(tab => tab.Label, expression => expression.MapFrom(@group => @group.Name))
-                  .ForMember(tab => tab.IsActive, expression => expression.UseValue(true))
-                  .ForMember(tab => tab.Properties, expression => expression.Ignore());
+                .ForMember(tab => tab.Label, expression => expression.MapFrom(@group => @group.Name))
+                .ForMember(tab => tab.IsActive, expression => expression.UseValue(true))
+                .ForMember(tab => tab.Properties, expression => expression.Ignore())
+                .ForMember(tab => tab.Alias, expression => expression.Ignore());
 
             //FROM Property TO ContentPropertyBasic
             config.CreateMap<Property, ContentPropertyBasic>()

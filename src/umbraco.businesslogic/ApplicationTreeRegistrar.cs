@@ -24,7 +24,13 @@ namespace umbraco.BusinessLogic
         public void ConfigureMappings(IConfiguration config, ApplicationContext applicationContext)
         {
             config.CreateMap<Umbraco.Core.Models.ApplicationTree, ApplicationTree>()
-                  .ReverseMap(); //two way
+                .ForMember(x => x.Silent, opt => opt.Ignore())
+                .ForMember(x => x.AssemblyName, opt => opt.Ignore())
+                .ForMember(x => x.Action, opt => opt.Ignore());
+
+            config.CreateMap<ApplicationTree, Umbraco.Core.Models.ApplicationTree>();
+
+            //.ReverseMap(); //two way
         }
 
     }
