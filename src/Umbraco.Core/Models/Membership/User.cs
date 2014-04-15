@@ -438,6 +438,13 @@ namespace Umbraco.Core.Models.Membership
             }
         }
 
+        public override object DeepClone()
+        {
+            var clone = (User)base.DeepClone();
+            clone.UserType = (UserType)UserType.DeepClone();
+            return clone;
+        }
+
         /// <summary>
         /// Internal class used to wrap the user in a profile
         /// </summary>
@@ -460,6 +467,24 @@ namespace Umbraco.Core.Models.Membership
             {
                 get { return _user.Name; }
                 set { _user.Name = value; }
+            }
+
+            protected bool Equals(UserProfile other)
+            {
+                return _user.Equals(other._user);
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) return false;
+                return Equals((UserProfile) obj);
+            }
+
+            public override int GetHashCode()
+            {
+                return _user.GetHashCode();
             }
         }
     }
