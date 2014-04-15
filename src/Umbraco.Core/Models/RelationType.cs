@@ -118,5 +118,6 @@ namespace Umbraco.Core.Models
                 }, _childObjectType, ChildObjectTypeSelector);
             }
         }
+
     }
 }

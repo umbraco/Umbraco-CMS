@@ -107,5 +107,12 @@ namespace Umbraco.Core.Models
         {
             get { return _relationType.Id; }
         }
+
+        public override object DeepClone()
+        {
+            var clone = (Relation)base.DeepClone();
+            clone.RelationType = (RelationType)RelationType.DeepClone();
+            return clone;
+        }
     }
 }

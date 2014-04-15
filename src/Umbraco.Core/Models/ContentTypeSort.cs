@@ -42,5 +42,27 @@ namespace Umbraco.Core.Models
             clone.Id = new Lazy<int>(() => id);
             return clone;
         }
+
+        protected bool Equals(ContentTypeSort other)
+        {
+            return Id.Value.Equals(other.Id.Value) && string.Equals(Alias, other.Alias);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((ContentTypeSort) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Id.GetHashCode()*397) ^ Alias.GetHashCode();
+            }
+        }
+
     }
 }

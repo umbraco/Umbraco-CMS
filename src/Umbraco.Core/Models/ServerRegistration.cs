@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Reflection;
 using Umbraco.Core.Models.EntityBase;
 using Umbraco.Core.Persistence.Mappers;
@@ -34,7 +35,7 @@ namespace Umbraco.Core.Models
         {
             UpdateDate = updateDate;
             CreateDate = createDate;
-            Key = Id.ToString().EncodeAsGuid();
+            Key = Id.ToString(CultureInfo.InvariantCulture).EncodeAsGuid();
             Id = id;
             ServerAddress = serverAddress;
             ComputerName = computerName;
@@ -51,7 +52,7 @@ namespace Umbraco.Core.Models
         {
             CreateDate = createDate;
             UpdateDate = createDate;
-            Key = 0.ToString().EncodeAsGuid();
+            Key = 0.ToString(CultureInfo.InvariantCulture).EncodeAsGuid();
             ServerAddress = serverAddress;
             ComputerName = computerName;
         }

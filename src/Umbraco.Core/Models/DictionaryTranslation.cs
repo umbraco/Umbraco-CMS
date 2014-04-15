@@ -65,5 +65,12 @@ namespace Umbraco.Core.Models
                 }, _value, ValueSelector);
             }
         }
+
+        public override object DeepClone()
+        {
+            var clone = (DictionaryTranslation)base.DeepClone();
+            clone.Language = (ILanguage)Language.DeepClone();
+            return clone;
+        }
     }
 }

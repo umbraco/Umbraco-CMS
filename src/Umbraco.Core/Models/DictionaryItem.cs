@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.Serialization;
 using Umbraco.Core.Models.EntityBase;
@@ -95,6 +96,13 @@ namespace Umbraco.Core.Models
             //If ParentId is not set we should default to the root parent id
             if(ParentId == Guid.Empty)
                 _parentId = new Guid("41c7638d-f529-4bff-853e-59a0c2fb1bde");
+        }
+
+        public override object DeepClone()
+        {
+            var clone = (DictionaryItem)base.DeepClone();
+            clone.Translations = Translations.Select(x => (IDictionaryTranslation) x.DeepClone()).ToList();
+            return clone;
         }
     }
 }

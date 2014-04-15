@@ -11,6 +11,25 @@ namespace Umbraco.Tests.Models
     public class ContentTypeTests
     {
         [Test]
+        public void Can_Deep_Clone_Content_Type_Sort()
+        {
+            var contentType = new ContentTypeSort(new Lazy<int>(() => 3), 4, "test");
+            var clone = (ContentTypeSort) contentType.DeepClone();
+            Assert.AreNotSame(clone, contentType);
+            Assert.AreEqual(clone, contentType);
+            Assert.AreEqual(clone.Id.Value, contentType.Id.Value);
+            Assert.AreEqual(clone.SortOrder, contentType.SortOrder);
+            Assert.AreEqual(clone.Alias, contentType.Alias);
+
+            //This double verifies by reflection
+            var allProps = clone.GetType().GetProperties();
+            foreach (var propertyInfo in allProps)
+            {
+                Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(contentType, null));
+            }
+        }
+
+        [Test]
         public void Can_Deep_Clone_Content_Type()
         {
             // Arrange
