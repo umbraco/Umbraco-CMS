@@ -28,7 +28,8 @@ angular.module("umbraco").controller("Umbraco.Dialogs.LinkPickerController",
 
 	$scope.switchToMediaPicker = function(){
 		dialogService.mediaPicker({callback: function(media){
-					$scope.target.id = undefined;
+					$scope.target.id = media.id;
+		            $scope.target.isMedia = true;
 					$scope.target.name = media.name;
 					$scope.target.url = mediaHelper.resolveFile(media);
 				}});
