@@ -420,9 +420,9 @@ namespace Umbraco.Tests.Models.Collections
             return _hash.Value;
         }*/
         
-        public T DeepClone<T>() where T : IDeepCloneable
+        public object DeepClone()
         {
-            return (T)this.MemberwiseClone();
+            return this.MemberwiseClone();
         }
     }
 }

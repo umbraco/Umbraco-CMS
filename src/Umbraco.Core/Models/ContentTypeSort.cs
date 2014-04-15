@@ -35,12 +35,12 @@ namespace Umbraco.Core.Models
         public string Alias { get; set; }
 
 
-        public T DeepClone<T>() where T: IDeepCloneable
+        public object DeepClone()
         {
             var clone = (ContentTypeSort)MemberwiseClone();
             var id = Id.Value;
             clone.Id = new Lazy<int>(() => id);
-            return (T)(IDeepCloneable)clone;
+            return clone;
         }
     }
 }

@@ -419,11 +419,11 @@ namespace Umbraco.Core.Models
             return clone;
         }
 
-        public override T DeepClone<T>()
+        public override object DeepClone()
         {
-            var clone = base.DeepClone<T>();
+            var clone = base.DeepClone();
 
-            var asPropertyType = (PropertyType)(object)clone;
+            var asPropertyType = (PropertyType)clone;
 
             if (PropertyGroupId != null)
             {

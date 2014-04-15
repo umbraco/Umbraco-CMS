@@ -105,11 +105,11 @@ namespace Umbraco.Core.Models
         /// <returns>True if file is valid, otherwise false</returns>
         public abstract bool IsValid();
 
-        public override T DeepClone<T>()
+        public override object DeepClone()
         {
-            var clone = base.DeepClone<T>();
+            var clone = base.DeepClone();
 
-            var asFile = (File)(object)clone;
+            var asFile = (File)clone;
             asFile._alias = Alias;
             asFile._name = Name;
 

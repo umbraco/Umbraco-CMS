@@ -197,11 +197,11 @@ namespace Umbraco.Core.Models
             MasterTemplateId = new Lazy<int>(() => masterTemplate.Id);
         }
 
-        public override T DeepClone<T>()
+        public override object DeepClone()
         {
-            var clone = base.DeepClone<T>();
+            var clone = base.DeepClone();
 
-            var asTemplate = (Template)(object)clone;
+            var asTemplate = (Template)clone;
             asTemplate._alias = Alias;
             asTemplate._name = Name;
 

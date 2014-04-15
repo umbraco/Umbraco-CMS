@@ -143,12 +143,12 @@ namespace Umbraco.Core.Models
             return _propertyType.IsPropertyValueValid(value);
         }
 
-        public override T DeepClone<T>()
+        public override object DeepClone()
         {
-            var clone = base.DeepClone<T>();
+            var clone = base.DeepClone();
 
-            var asProperty = (Property)(object)clone;
-            asProperty._propertyType = PropertyType.DeepClone<PropertyType>();
+            var asProperty = (Property)clone;
+            asProperty._propertyType = (PropertyType)PropertyType.DeepClone();
             asProperty.ResetDirtyProperties(true);
 
             var tracksChanges = clone as TracksChangesEntityBase;

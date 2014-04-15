@@ -448,6 +448,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Returns a collection of the result of the last validation process, this collection contains all invalid properties.
         /// </summary>
+        [IgnoreDataMember]
         internal IEnumerable<Property> LastInvalidProperties
         {
             get { return _lastInvalidProperties; }
@@ -470,13 +471,13 @@ namespace Umbraco.Core.Models
             }
         }
         
-        public override T DeepClone<T>()
+        public override object DeepClone()
         {
-            var clone = base.DeepClone<T>();
+            var clone = base.DeepClone();
 
             //cast to this object to set the complex properties
             var asContentBase = (IContentBase)clone;
-            asContentBase.Properties = Properties.DeepClone<PropertyCollection>();
+            asContentBase.Properties = (PropertyCollection)Properties.DeepClone();
 
             var tracksChanges = clone as TracksChangesEntityBase;
             if (tracksChanges != null)

@@ -175,12 +175,12 @@ namespace Umbraco.Core.Models
             return clone;
         }
 
-        public override T DeepClone<T>()
+        public override object DeepClone()
         {
-            var clone = base.DeepClone<T>();
+            var clone = base.DeepClone();
 
-            var contentType = (ContentType)(object)clone;
-            contentType.AllowedTemplates = AllowedTemplates.Select(t => t.DeepClone<ITemplate>()).ToArray();
+            var contentType = (ContentType)clone;
+            contentType.AllowedTemplates = AllowedTemplates.Select(t => (ITemplate)t.DeepClone()).ToArray();
             contentType.ResetDirtyProperties(true);
 
             return clone;

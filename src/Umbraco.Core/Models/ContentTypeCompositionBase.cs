@@ -218,13 +218,13 @@ namespace Umbraco.Core.Models
                 .Union(ContentTypeComposition.SelectMany(x => x.CompositionIds()));
         }
 
-        public override T DeepClone<T>()
+        public override object DeepClone()
         {
-            var clone = base.DeepClone<T>();
+            var clone = base.DeepClone();
 
-            var contentType = (ContentTypeCompositionBase)(object)clone;
+            var contentType = (ContentTypeCompositionBase)clone;
             contentType.RemovedContentTypeKeyTracker = new List<int>();
-            contentType._contentTypeComposition = ContentTypeComposition.Select(x => x.DeepClone<IContentTypeComposition>()).ToList();            
+            contentType._contentTypeComposition = ContentTypeComposition.Select(x => (IContentTypeComposition)x.DeepClone()).ToList();            
             contentType.ResetDirtyProperties(true);
 
             return clone;

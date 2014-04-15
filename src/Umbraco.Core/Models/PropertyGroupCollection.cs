@@ -134,14 +134,14 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public T DeepClone<T>() where T : IDeepCloneable
+        public object DeepClone()
         {
             var newGroup = new PropertyGroupCollection();
             foreach (var p in this)
             {
-                newGroup.Add(p.DeepClone<PropertyGroup>());
+                newGroup.Add((PropertyGroup)p.DeepClone());
             }            
-            return (T)(object)newGroup;
+            return newGroup;
         }
     }
 }

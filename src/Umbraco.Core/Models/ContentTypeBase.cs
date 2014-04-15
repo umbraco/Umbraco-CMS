@@ -578,16 +578,16 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public override T DeepClone<T>()
+        public override object DeepClone()
         {
-            var clone = base.DeepClone<T>();
+            var clone = base.DeepClone();
 
-            var contentType = (ContentTypeBase)(object)clone;
+            var contentType = (ContentTypeBase)clone;
             contentType._additionalData = new Dictionary<string, object>();
             contentType._additionalData.MergeLeft(_additionalData);
-            contentType.AllowedContentTypes = AllowedContentTypes.Select(x => x.DeepClone<ContentTypeSort>()).ToList();
-            contentType.PropertyGroups = PropertyGroups.DeepClone<PropertyGroupCollection>();
-            contentType.PropertyTypes = PropertyTypes.Select(x => x.DeepClone<PropertyType>()).ToList();
+            contentType.AllowedContentTypes = AllowedContentTypes.Select(x => (ContentTypeSort)x.DeepClone()).ToList();
+            contentType.PropertyGroups = (PropertyGroupCollection)PropertyGroups.DeepClone();
+            contentType.PropertyTypes = PropertyTypes.Select(x => (PropertyType)x.DeepClone()).ToList();
 
             contentType.ResetDirtyProperties(true);
 

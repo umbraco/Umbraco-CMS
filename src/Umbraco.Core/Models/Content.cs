@@ -336,26 +336,6 @@ namespace Umbraco.Core.Models
             }
         }
 
-        ///// <summary>
-        ///// Creates a clone of the current entity
-        ///// </summary>
-        ///// <returns></returns>
-        //public IContent Clone()
-        //{
-        //    var clone = (Content)this.MemberwiseClone();
-        //    clone.Key = Guid.Empty;
-        //    clone.Version = Guid.NewGuid();
-        //    clone.ResetIdentity();
-
-        //    foreach (var property in clone.Properties)
-        //    {
-        //        property.ResetIdentity();
-        //        property.Version = clone.Version;
-        //    }
-
-        //    return clone;
-        //}
-
         /// <summary>
         /// Indicates whether a specific property on the current <see cref="IContent"/> entity is dirty.
         /// </summary>
@@ -437,13 +417,12 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
-        /// TODO: Remove this as it's really only a shallow clone and not thread safe
-        /// Creates a clone of the current entity
+        /// Creates a deep clone of the current entity with its identity and it's property identities reset
         /// </summary>
         /// <returns></returns>
         public IContent Clone()
         {
-            var clone = (Content)this.MemberwiseClone();
+            var clone = (Content)DeepClone();
             clone.Key = Guid.Empty;
             clone.Version = Guid.NewGuid();
             clone.ResetIdentity();
@@ -457,17 +436,17 @@ namespace Umbraco.Core.Models
             return clone;
         }
 
-        public override T DeepClone<T>()
+        public override object DeepClone()
         {
-            var clone = base.DeepClone<T>();
+            var clone = base.DeepClone();
 
-            var asContent = (Content)(object)clone;
+            var asContent = (Content)clone;
             if (Template != null)
             {
-                asContent.Template = Template.DeepClone<ITemplate>();    
+                asContent.Template = (ITemplate)Template.DeepClone();    
             }
             
-            asContent._contentType = ContentType.DeepClone<IContentType>();
+            asContent._contentType = (IContentType)ContentType.DeepClone();
             asContent.ResetDirtyProperties(true);
 
             return clone;

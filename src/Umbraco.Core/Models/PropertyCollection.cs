@@ -201,14 +201,14 @@ namespace Umbraco.Core.Models
         /// Create a deep clone of this property collection
         /// </summary>
         /// <returns></returns>
-        public T DeepClone<T>() where T: IDeepCloneable
+        public object DeepClone()
         {
             var newList = new PropertyCollection();
             foreach (var p in this)
             {
-                newList.Add(p.DeepClone<Property>());
+                newList.Add((Property)p.DeepClone());
             }
-            return (T)(object)newList;
+            return newList;
         }
     }
 }
