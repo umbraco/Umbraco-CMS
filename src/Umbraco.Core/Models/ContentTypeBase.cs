@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -583,8 +583,7 @@ namespace Umbraco.Core.Models
             var clone = base.DeepClone();
 
             var contentType = (ContentTypeBase)clone;
-            contentType._additionalData = new Dictionary<string, object>();
-            contentType._additionalData.MergeLeft(_additionalData);
+            
             contentType.AllowedContentTypes = AllowedContentTypes.Select(x => (ContentTypeSort)x.DeepClone()).ToList();
             contentType.PropertyGroups = (PropertyGroupCollection)PropertyGroups.DeepClone();
             contentType.PropertyTypes = PropertyTypes.Select(x => (PropertyType)x.DeepClone()).ToList();
