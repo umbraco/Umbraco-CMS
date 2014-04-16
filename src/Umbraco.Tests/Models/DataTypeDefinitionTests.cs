@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests.Models
 {
@@ -50,5 +51,32 @@ namespace Umbraco.Tests.Models
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(dtd, null));
             }
         }
+
+        [Test]
+        public void Can_Serialize_Without_Error()
+        {
+            var ss = new SerializationService(new JsonNetSerializer());
+
+            var dtd = new DataTypeDefinition(9, Guid.NewGuid())
+            {
+                CreateDate = DateTime.Now,
+                CreatorId = 5,
+                DatabaseType = DataTypeDatabaseType.Nvarchar,
+                Id = 4,
+                Key = Guid.NewGuid(),
+                Level = 7,
+                Name = "Test",
+                ParentId = 9,
+                Path = "-1,2",
+                SortOrder = 8,
+                Trashed = true,
+                UpdateDate = DateTime.Now
+            };
+
+            var result = ss.ToStream(dtd);
+            var json = result.ResultStream.ToJsonString();
+            Console.WriteLine(json);
+        }
+    
     }
 }

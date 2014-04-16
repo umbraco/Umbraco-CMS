@@ -14,7 +14,7 @@ namespace Umbraco.Core.Models
     [DataContract(IsReference = true)]
     public class Member : ContentBase, IMember
     {
-        private readonly IMemberType _contentType;
+        private IMemberType _contentType;
         private readonly string _contentTypeAlias;
         private string _username;
         private string _email;
@@ -153,7 +153,7 @@ namespace Umbraco.Core.Models
         /// <summary>
         /// Gets or sets the raw password value
         /// </summary>
-        [DataMember]
+        [IgnoreDataMember]
         public string RawPasswordValue
         {
             get { return _rawPasswordValue; }
@@ -180,7 +180,7 @@ namespace Umbraco.Core.Models
         /// Alias: umbracoPasswordRetrievalQuestionPropertyTypeAlias
         /// Part of the standard properties collection.
         /// </remarks>
-        [IgnoreDataMember]
+        [DataMember]
         public string PasswordQuestion
         {
             get
@@ -240,7 +240,7 @@ namespace Umbraco.Core.Models
         /// Alias: umbracoCommentPropertyTypeAlias
         /// Part of the standard properties collection.
         /// </remarks>
-        [IgnoreDataMember]
+        [DataMember]
         public string Comments
         {
             get
@@ -269,7 +269,7 @@ namespace Umbraco.Core.Models
         /// Alias: umbracoApprovePropertyTypeAlias
         /// Part of the standard properties collection.
         /// </remarks>
-        [IgnoreDataMember]
+        [DataMember]
         public bool IsApproved
         {
             get
@@ -304,7 +304,7 @@ namespace Umbraco.Core.Models
         /// Alias: umbracoLockPropertyTypeAlias
         /// Part of the standard properties collection.
         /// </remarks>
-        [IgnoreDataMember]
+        [DataMember]
         public bool IsLockedOut
         {
             get
@@ -336,7 +336,7 @@ namespace Umbraco.Core.Models
         /// Alias: umbracoLastLoginPropertyTypeAlias
         /// Part of the standard properties collection.
         /// </remarks>
-        [IgnoreDataMember]
+        [DataMember]
         public DateTime LastLoginDate
         {
             get
@@ -368,7 +368,7 @@ namespace Umbraco.Core.Models
         /// Alias: umbracoMemberLastPasswordChange
         /// Part of the standard properties collection.
         /// </remarks>
-        [IgnoreDataMember]
+        [DataMember]
         public DateTime LastPasswordChangeDate
         {
             get
@@ -400,7 +400,7 @@ namespace Umbraco.Core.Models
         /// Alias: umbracoMemberLastLockout
         /// Part of the standard properties collection.
         /// </remarks>
-        [IgnoreDataMember]
+        [DataMember]
         public DateTime LastLockoutDate
         {
             get
@@ -433,7 +433,7 @@ namespace Umbraco.Core.Models
         /// Alias: umbracoFailedPasswordAttemptsPropertyTypeAlias
         /// Part of the standard properties collection.
         /// </remarks>
-        [IgnoreDataMember]
+        [DataMember]
         public int FailedPasswordAttempts
         {
             get
@@ -554,11 +554,17 @@ namespace Umbraco.Core.Models
         /* Internal experiment - only used for mapping queries. 
          * Adding these to have first level properties instead of the Properties collection.
          */
+        [IgnoreDataMember]
         internal string LongStringPropertyValue { get; set; }
+        [IgnoreDataMember]
         internal string ShortStringPropertyValue { get; set; }
+        [IgnoreDataMember]
         internal int IntegerropertyValue { get; set; }
+        [IgnoreDataMember]
         internal bool BoolPropertyValue { get; set; }
+        [IgnoreDataMember]
         internal DateTime DateTimePropertyValue { get; set; }
+        [IgnoreDataMember]
         internal string PropertyTypeAlias { get; set; }
 
         private Attempt<T> WarnIfPropertyTypeNotFoundOnGet<T>(string propertyAlias, string propertyName, T defaultVal)
@@ -627,6 +633,18 @@ namespace Umbraco.Core.Models
             }
 
             return true;
+        }
+
+        public override object DeepClone()
+        {
+            var clone = (Member)base.DeepClone();
+
+            //need to manually clone this since it's not settable
+            clone._contentType = (IMemberType)ContentType.DeepClone();
+            clone.ResetDirtyProperties(true);
+
+            return clone;
+
         }
     }
 }

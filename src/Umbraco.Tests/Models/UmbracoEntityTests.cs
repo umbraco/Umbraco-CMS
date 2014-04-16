@@ -1,6 +1,7 @@
 ﻿using System;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests.Models
 {
@@ -94,6 +95,50 @@ namespace Umbraco.Tests.Models
             {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(item, null));
             }
+        }
+
+        [Test]
+        public void Can_Serialize_Without_Error()
+        {
+            var ss = new SerializationService(new JsonNetSerializer());
+
+            var item = new UmbracoEntity()
+            {
+                Id = 3,
+                ContentTypeAlias = "test1",
+                CreatorId = 4,
+                Key = Guid.NewGuid(),
+                UpdateDate = DateTime.Now,
+                CreateDate = DateTime.Now,
+                Name = "Test",
+                ParentId = 5,
+                SortOrder = 6,
+                Path = "-1,23",
+                Level = 7,
+                ContentTypeIcon = "icon",
+                ContentTypeThumbnail = "thumb",
+                HasChildren = true,
+                HasPendingChanges = true,
+                IsDraft = true,
+                IsPublished = true,
+                NodeObjectTypeId = Guid.NewGuid()
+            };
+            item.AdditionalData.Add("test1", 3);
+            item.AdditionalData.Add("test2", "valuie");
+            item.UmbracoProperties.Add(new UmbracoEntity.UmbracoProperty()
+            {
+                Value = "test",
+                DataTypeControlId = Guid.NewGuid()
+            });
+            item.UmbracoProperties.Add(new UmbracoEntity.UmbracoProperty()
+            {
+                Value = "test2",
+                DataTypeControlId = Guid.NewGuid()
+            });
+
+            var result = ss.ToStream(item);
+            var json = result.ResultStream.ToJsonString();
+            Console.WriteLine(json);
         }
     }
 }

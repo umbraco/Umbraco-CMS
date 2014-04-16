@@ -1,6 +1,7 @@
 using System;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests.Models
 {
@@ -48,6 +49,31 @@ namespace Umbraco.Tests.Models
             {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(item, null));
             }
+        }
+
+        [Test]
+        public void Can_Serialize_Without_Error()
+        {
+            var ss = new SerializationService(new JsonNetSerializer());
+
+            var item = new Template("-1,2,3", "Test", "test")
+            {
+                Id = 3,
+                CreateDate = DateTime.Now,
+                Key = Guid.NewGuid(),
+                UpdateDate = DateTime.Now,
+                Content = "blah",
+                CreatorId = 66,
+                Level = 55,
+                ParentId = 2,
+                SortOrder = 99,
+                MasterTemplateAlias = "master",
+                MasterTemplateId = new Lazy<int>(() => 88)
+            };
+
+            var result = ss.ToStream(item);
+            var json = result.ResultStream.ToJsonString();
+            Console.WriteLine(json);
         }
 
     }

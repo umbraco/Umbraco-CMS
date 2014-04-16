@@ -1,6 +1,7 @@
 using System;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests.Models
 {
@@ -38,5 +39,23 @@ namespace Umbraco.Tests.Models
 
         }
 
+        [Test]
+        public void Can_Serialize_Without_Error()
+        {
+            var ss = new SerializationService(new JsonNetSerializer());
+
+            var item = new TaskType("test")
+            {
+                Id = 3,
+                Alias = "test",
+                CreateDate = DateTime.Now,
+                Key = Guid.NewGuid(),
+                UpdateDate = DateTime.Now
+            };
+
+            var result = ss.ToStream(item);
+            var json = result.ResultStream.ToJsonString();
+            Console.WriteLine(json);
+        }
     }
 }

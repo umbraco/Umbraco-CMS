@@ -1,6 +1,8 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests.Models
 {
@@ -127,6 +129,23 @@ namespace Umbraco.Tests.Models
             Assert.That(stylesheet.IsFileValidCss(), Is.True);
             Assert.That(properties, Is.Not.Null);
             Assert.That(properties.Any(), Is.True);
+        }
+
+        [Test]
+        public void Can_Serialize_Without_Error()
+        {
+            var ss = new SerializationService(new JsonNetSerializer());
+
+            var stylesheet = new Stylesheet("/css/styles.css");
+            stylesheet.Content = @"@media screen and (min-width: 600px) and (min-width: 900px) {
+                                      .class {
+                                        background: #666;
+                                      }
+                                    }";
+
+            var result = ss.ToStream(stylesheet);
+            var json = result.ResultStream.ToJsonString();
+            Console.WriteLine(json);
         }
     }
 }

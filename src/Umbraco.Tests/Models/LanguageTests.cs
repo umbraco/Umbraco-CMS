@@ -1,6 +1,7 @@
 using System;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests.Models
 {
@@ -36,6 +37,26 @@ namespace Umbraco.Tests.Models
             {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(item, null));
             }
+        }
+
+        [Test]
+        public void Can_Serialize_Without_Error()
+        {
+            var ss = new SerializationService(new JsonNetSerializer());
+
+            var item = new Language("en-AU")
+            {
+                CreateDate = DateTime.Now,
+                CultureName = "AU",
+                Id = 11,
+                IsoCode = "en",
+                Key = Guid.NewGuid(),
+                UpdateDate = DateTime.Now
+            };
+
+            var result = ss.ToStream(item);
+            var json = result.ResultStream.ToJsonString();
+            Console.WriteLine(json);
         }
     }
 }

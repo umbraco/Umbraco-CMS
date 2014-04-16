@@ -1,6 +1,7 @@
 using System;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests.Models
 {
@@ -46,6 +47,30 @@ namespace Umbraco.Tests.Models
             {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(item, null));
             }
+        }
+
+        [Test]
+        public void Can_Serialize_Without_Error()
+        {
+            var ss = new SerializationService(new JsonNetSerializer());
+
+            var item = new Task(new TaskType("test") { Id = 3 })
+            {
+                AssigneeUserId = 4,
+                Closed = true,
+                Comment = "blah",
+                CreateDate = DateTime.Now,
+                EntityId = 99,
+                Id = 2,
+                Key = Guid.NewGuid(),
+                OwnerUserId = 89,
+                TaskType = new TaskType("asdf") { Id = 99 },
+                UpdateDate = DateTime.Now
+            };
+
+            var result = ss.ToStream(item);
+            var json = result.ResultStream.ToJsonString();
+            Console.WriteLine(json);
         }
 
     }

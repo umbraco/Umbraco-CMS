@@ -24,11 +24,13 @@ namespace Umbraco.Core.Models
             }
 
             var refProperties = inputType.GetProperties()
-                .Where(x => x.PropertyType.IsValueType == false
-                    //settable
-                            && x.CanWrite
-                    //non-indexed
-                            && x.GetIndexParameters().Any() == false);
+                .Where(x =>
+                    //reference type but not string
+                    x.PropertyType.IsValueType == false && x.PropertyType != typeof (string)
+                        //settable
+                    && x.CanWrite
+                        //non-indexed
+                    && x.GetIndexParameters().Any() == false);
 
             foreach (var propertyInfo in refProperties)
             {

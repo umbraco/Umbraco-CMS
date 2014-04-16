@@ -1,6 +1,7 @@
 using System;
 using NUnit.Framework;
 using Umbraco.Core.Models;
+using Umbraco.Core.Serialization;
 
 namespace Umbraco.Tests.Models
 {
@@ -86,5 +87,62 @@ namespace Umbraco.Tests.Models
             }
         }
 
+        [Test]
+        public void Can_Serialize_Without_Error()
+        {
+            var ss = new SerializationService(new JsonNetSerializer());
+
+            var pg = new PropertyGroup(
+                new PropertyTypeCollection(new[]
+                {
+                    new PropertyType(Guid.NewGuid(), DataTypeDatabaseType.Nvarchar)
+                    {
+                        Id = 3,
+                        Alias = "test",
+                        CreateDate = DateTime.Now,
+                        DataTypeDefinitionId = 5,
+                        DataTypeId = Guid.NewGuid(),
+                        Description = "testing",
+                        Key = Guid.NewGuid(),
+                        Mandatory = true,
+                        Name = "Test",
+                        PropertyGroupId = new Lazy<int>(() => 11),
+                        SortOrder = 9,
+                        UpdateDate = DateTime.Now,
+                        ValidationRegExp = "xxxx",
+                        DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar
+                    },
+                    new PropertyType(Guid.NewGuid(), DataTypeDatabaseType.Nvarchar)
+                    {
+                        Id = 4,
+                        Alias = "test2",
+                        CreateDate = DateTime.Now,
+                        DataTypeDefinitionId = 6,
+                        DataTypeId = Guid.NewGuid(),
+                        Description = "testing2",
+                        Key = Guid.NewGuid(),
+                        Mandatory = true,
+                        Name = "Test2",
+                        PropertyGroupId = new Lazy<int>(() => 12),
+                        SortOrder = 10,
+                        UpdateDate = DateTime.Now,
+                        ValidationRegExp = "yyyy",
+                        DataTypeDatabaseType = DataTypeDatabaseType.Nvarchar
+                    }
+                }))
+            {
+                Id = 77,
+                CreateDate = DateTime.Now,
+                Key = Guid.NewGuid(),
+                Name = "Group1",
+                SortOrder = 555,
+                UpdateDate = DateTime.Now,
+                ParentId = 9
+            };
+
+            var result = ss.ToStream(pg);
+            var json = result.ResultStream.ToJsonString();
+            Console.WriteLine(json);
+        }
     }
 }

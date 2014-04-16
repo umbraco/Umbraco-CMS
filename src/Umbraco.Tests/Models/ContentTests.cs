@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.EntityBase;
+using Umbraco.Core.Serialization;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 
@@ -223,6 +224,48 @@ namespace Umbraco.Tests.Models
             {
                 Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(content, null));
             }
+        }
+
+        [Test]
+        public void Can_Serialize_Without_Error()
+        {
+            var ss = new SerializationService(new JsonNetSerializer());
+
+            // Arrange
+            var contentType = MockedContentTypes.CreateTextpageContentType();
+            contentType.Id = 99;
+            var content = MockedContent.CreateTextpageContent(contentType, "Textpage", -1);
+            var i = 200;
+            foreach (var property in content.Properties)
+            {
+                property.Id = ++i;
+            }
+            content.Id = 10;
+            content.CreateDate = DateTime.Now;
+            content.CreatorId = 22;
+            content.ExpireDate = DateTime.Now;
+            content.Key = Guid.NewGuid();
+            content.Language = "en";
+            content.Level = 3;
+            content.Path = "-1,4,10";
+            content.ReleaseDate = DateTime.Now;
+            content.ChangePublishedState(PublishedState.Published);
+            content.SortOrder = 5;
+            content.Template = new Template("-1,2,3,4", "Test Template", "testTemplate")
+            {
+                Id = 88
+            };
+            content.Trashed = false;
+            content.UpdateDate = DateTime.Now;
+            content.Version = Guid.NewGuid();
+            content.WriterId = 23;
+
+            ((IUmbracoEntity)content).AdditionalData.Add("test1", 123);
+            ((IUmbracoEntity)content).AdditionalData.Add("test2", "hello");
+
+            var result = ss.ToStream(content);
+            var json = result.ResultStream.ToJsonString();
+            Console.WriteLine(json);
         }
 
         /*[Test]
