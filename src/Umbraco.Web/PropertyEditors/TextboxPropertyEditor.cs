@@ -12,6 +12,19 @@ namespace Umbraco.Web.PropertyEditors
 {
     [PropertyEditor(Constants.PropertyEditors.TextboxAlias, "Textbox", "textbox", IsParameterEditor = true)]
     public class TextboxPropertyEditor : PropertyEditor
-    {        
+    {
+        
+
+        protected override PreValueEditor CreatePreValueEditor()
+        {
+            return new TextboxPreValueEditor();
+        }
+
+        internal class TextboxPreValueEditor : PreValueEditor
+        {
+            [PreValueField("Maximum allowed characters", "number")]
+            public bool IsRequired { get; set; }
+        }
+
     }
 }
