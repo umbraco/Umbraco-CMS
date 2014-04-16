@@ -1,9 +1,10 @@
-﻿<div>
+﻿<div ng-controller="Umbraco.PropertyEditors.textboxController">
     <input type="text" name="textbox" ng-model="model.value" id="{{model.alias}}"
            class="umb-editor umb-textstring textstring"
            val-server="value"
-           ng-required="model.validation.mandatory" />
-
+           ng-required="model.validation.mandatory"
+           ng-keyup="model.change()" />
     <span class="help-inline" val-msg-for="textbox" val-toggle-msg="required">Required</span>
     <span class="help-inline" val-msg-for="textbox" val-toggle-msg="valServer"></span>
+    <div class="help" ng-if="model.maxlength"><strong>{{model.count}}</strong> characters left</div>
 </div>
