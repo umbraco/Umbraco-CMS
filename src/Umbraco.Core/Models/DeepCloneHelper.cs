@@ -48,13 +48,13 @@ namespace Umbraco.Core.Models
                 {
                     IList newList;
                     if (propertyInfo.PropertyType.IsGenericType
-                        && (propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof (IEnumerable<>)
-                            || propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof (ICollection<>)
+                        && (propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(IEnumerable<>)
+                            || propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(ICollection<>)
                             || propertyInfo.PropertyType.GetGenericTypeDefinition() == typeof(IList<>)))
                     {
                         //if it is a IEnumerable<>, IList<T> or ICollection<> we'll use a List<>
-                        var genericType = typeof (List<>).MakeGenericType(propertyInfo.PropertyType.GetGenericArguments());
-                        newList = (IList) Activator.CreateInstance(genericType);
+                        var genericType = typeof(List<>).MakeGenericType(propertyInfo.PropertyType.GetGenericArguments());
+                        newList = (IList)Activator.CreateInstance(genericType);
                     }
                     else if (propertyInfo.PropertyType.IsArray
                              || (propertyInfo.PropertyType.IsInterface && propertyInfo.PropertyType.IsGenericType == false))
@@ -86,20 +86,35 @@ namespace Umbraco.Core.Models
                     var enumerable = (IEnumerable)propertyInfo.GetValue(input, null);
                     if (enumerable == null) continue;
 
-                    var isDeepClonableItems = false;
+                    var isUsableType = true;
+
+                    //now clone each item
                     foreach (var o in enumerable)
                     {
+                        //first check if the item is deep cloneable and copy that way
                         var dc = o as IDeepCloneable;
                         if (dc != null)
                         {
-                            isDeepClonableItems = true;
                             newList.Add(dc.DeepClone());
                         }
-                        else if (isDeepClonableItems)
+                        else if (o is string || o.GetType().IsValueType)
                         {
-                            //if not all items are deep cloneable throw an exception
-                            throw new InvalidOperationException("Cannot deep clone items in a collection that are not all " + typeof(IDeepCloneable));
+                            //check if the item is a value type or a string, then we can just use it                         
+                            newList.Add(o);
                         }
+                        else
+                        {
+                            //this will occur if the item is not a string or value type or IDeepCloneable, in this case we cannot
+                            // clone each element, we'll need to skip this property, people will have to manually clone this list
+                            isUsableType = false;
+                            break;
+                        }
+                    }
+
+                    //if this was not usable, skip this property
+                    if (isUsableType == false)
+                    {
+                        continue;
                     }
 
                     if (propertyInfo.PropertyType.IsArray)

@@ -146,11 +146,19 @@ namespace Umbraco.Tests.Models
         {
             var test1 = new Test3()
             {
-                MyTest1 = new object[] { new Test1(), "hello" }
+                MyTest1 = new object[]
+                {
+                    new Test1(), "hello",
+                    //not cloneable so this property will get skipped
+                    new Test2()
+                }
             };
 
-            Assert.Throws<InvalidOperationException>(() => test1.DeepClone());
-            
+            var clone = (Test3)test1.DeepClone();
+
+            //it skipped this property so these will now be the same
+            Assert.AreSame(clone.MyTest1, test1.MyTest1);
+
         }
 
         public class Test1 : BaseCloneable
