@@ -157,7 +157,7 @@ namespace umbraco.presentation.umbraco.webservices
 
                         //Are we allowed to upload this?
                         var ext = uploadFile.FileName.Substring(uploadFile.FileName.LastIndexOf('.') + 1).ToLower();
-                        if (UmbracoConfig.For.UmbracoSettings().Content.DisallowedUploadFiles.Contains(ext))
+                        if (UmbracoSettings.DisallowedUploadFiles.Contains(ext))
                         {
                             LogHelper.Warn<MediaUploader>("Cannot upload file " + uploadFile + ", it is not an approved file type");
                             continue;
