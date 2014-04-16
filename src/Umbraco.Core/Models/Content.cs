@@ -438,16 +438,11 @@ namespace Umbraco.Core.Models
 
         public override object DeepClone()
         {
-            var clone = base.DeepClone();
+            var clone = (Content)base.DeepClone();
 
-            var asContent = (Content)clone;
-            if (Template != null)
-            {
-                asContent.Template = (ITemplate)Template.DeepClone();    
-            }
-            
-            asContent._contentType = (IContentType)ContentType.DeepClone();
-            asContent.ResetDirtyProperties(true);
+            //need to manually clone this since it's not settable
+            clone._contentType = (IContentType)ContentType.DeepClone();
+            clone.ResetDirtyProperties(true);
 
             return clone;
 

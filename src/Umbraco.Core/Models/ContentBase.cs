@@ -471,21 +471,5 @@ namespace Umbraco.Core.Models
             }
         }
         
-        public override object DeepClone()
-        {
-            var clone = base.DeepClone();
-
-            //cast to this object to set the complex properties
-            var asContentBase = (IContentBase)clone;
-            asContentBase.Properties = (PropertyCollection)Properties.DeepClone();
-
-            var tracksChanges = clone as TracksChangesEntityBase;
-            if (tracksChanges != null)
-            {
-                tracksChanges.ResetDirtyProperties(true);    
-            }
-
-            return clone;
-        }
     }
 }

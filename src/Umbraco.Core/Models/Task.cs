@@ -133,11 +133,5 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public override object DeepClone()
-        {
-            var clone = (Task) base.DeepClone();
-            clone.TaskType = (TaskType)TaskType.DeepClone();
-            return clone;
-        }
     }
 }

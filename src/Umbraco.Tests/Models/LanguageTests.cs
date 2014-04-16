@@ -13,9 +13,9 @@ namespace Umbraco.Tests.Models
             var item = new Language("en-AU")
             {
                 CreateDate = DateTime.Now,
-                CultureName = "en",
+                CultureName = "AU",
                 Id = 11,
-                IsoCode = "AU",
+                IsoCode = "en",
                 Key = Guid.NewGuid(),
                 UpdateDate = DateTime.Now               
             };

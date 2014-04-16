@@ -159,15 +159,5 @@ namespace Umbraco.Core.Models
             return clone;
         }
 
-        public override object DeepClone()
-        {
-            var clone = base.DeepClone();
-
-            var propertyGroup = (PropertyGroup)clone;
-            propertyGroup.PropertyTypes = (PropertyTypeCollection)PropertyTypes.DeepClone();
-            propertyGroup.ResetDirtyProperties(true);
-
-            return clone;
-        }
     }
 }

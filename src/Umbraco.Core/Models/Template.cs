@@ -199,17 +199,13 @@ namespace Umbraco.Core.Models
 
         public override object DeepClone()
         {
-            var clone = base.DeepClone();
+            var clone = (Template)base.DeepClone();
 
-            var asTemplate = (Template)clone;
-            asTemplate._alias = Alias;
-            asTemplate._name = Name;
+            //need to manually assign since they are readonly properties
+            clone._alias = Alias;
+            clone._name = Name;
 
-            var tracksChanges = clone as TracksChangesEntityBase;
-            if (tracksChanges != null)
-            {
-                tracksChanges.ResetDirtyProperties(true);
-            }
+            clone.ResetDirtyProperties(true);
 
             return clone;
         }

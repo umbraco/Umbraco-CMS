@@ -421,21 +421,16 @@ namespace Umbraco.Core.Models
 
         public override object DeepClone()
         {
-            var clone = base.DeepClone();
+            var clone = (PropertyType)base.DeepClone();
 
-            var asPropertyType = (PropertyType)clone;
-
+            //need to manually assign the Lazy value as it will not be automatically mapped
             if (PropertyGroupId != null)
             {
                 var propGroupId = PropertyGroupId.Value;
-                asPropertyType._propertyGroupId = new Lazy<int>(() => propGroupId);    
+                clone._propertyGroupId = new Lazy<int>(() => propGroupId);    
             }
 
-            var tracksChanges = clone as TracksChangesEntityBase;
-            if (tracksChanges != null)
-            {
-                tracksChanges.ResetDirtyProperties(true);
-            }
+            clone.ResetDirtyProperties(true);
 
             return clone;
         }

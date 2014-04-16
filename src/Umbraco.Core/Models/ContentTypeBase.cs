@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -576,21 +576,6 @@ namespace Umbraco.Core.Models
             {
                 propertyType.ResetDirtyProperties();
             }
-        }
-
-        public override object DeepClone()
-        {
-            var clone = base.DeepClone();
-
-            var contentType = (ContentTypeBase)clone;
-            
-            contentType.AllowedContentTypes = AllowedContentTypes.Select(x => (ContentTypeSort)x.DeepClone()).ToList();
-            contentType.PropertyGroups = (PropertyGroupCollection)PropertyGroups.DeepClone();
-            contentType.PropertyTypes = PropertyTypes.Select(x => (PropertyType)x.DeepClone()).ToList();
-
-            contentType.ResetDirtyProperties(true);
-
-            return clone;
         }
     }
 }

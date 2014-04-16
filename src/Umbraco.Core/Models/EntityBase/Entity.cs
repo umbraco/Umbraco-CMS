@@ -235,8 +235,10 @@ namespace Umbraco.Core.Models.EntityBase
         {
             //Memberwise clone on Entity will work since it doesn't have any deep elements
             // for any sub class this will work for standard properties as well that aren't complex object's themselves.
-            var clone = MemberwiseClone();
-            ((TracksChangesEntityBase)clone).ResetDirtyProperties(true);
+            var clone = (Entity)MemberwiseClone();
+            //Automatically deep clone ref properties that are IDeepCloneable
+            DeepCloneHelper.DeepCloneRefProperties(this, clone);
+            clone.ResetDirtyProperties(true);
             return clone;
 
             //Using data contract serializer - has issues

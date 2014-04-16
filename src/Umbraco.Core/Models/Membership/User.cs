@@ -437,14 +437,7 @@ namespace Umbraco.Core.Models.Membership
                 _removedSections.Add(e.OldItems.Cast<string>().First());
             }
         }
-
-        public override object DeepClone()
-        {
-            var clone = (User)base.DeepClone();
-            clone.UserType = (UserType)UserType.DeepClone();
-            return clone;
-        }
-
+        
         /// <summary>
         /// Internal class used to wrap the user in a profile
         /// </summary>

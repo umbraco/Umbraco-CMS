@@ -21,12 +21,6 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone.SortOrder, contentType.SortOrder);
             Assert.AreEqual(clone.Alias, contentType.Alias);
 
-            //This double verifies by reflection
-            var allProps = clone.GetType().GetProperties();
-            foreach (var propertyInfo in allProps)
-            {
-                Assert.AreEqual(propertyInfo.GetValue(clone, null), propertyInfo.GetValue(contentType, null));
-            }
         }
 
         [Test]
@@ -41,6 +35,8 @@ namespace Umbraco.Tests.Models
             {
                 propertyType.Id = ++i;
             }
+            contentType.AllowedTemplates = new[] { new Template("-1,2", "Name", "name") { Id = 200 }, new Template("-1,3", "Name2", "name2") { Id = 201 } };
+            contentType.AllowedContentTypes = new[] {new ContentTypeSort(new Lazy<int>(() => 888), 8, "sub"), new ContentTypeSort(new Lazy<int>(() => 889), 9, "sub2")};
             contentType.Id = 10;
             contentType.CreateDate = DateTime.Now;
             contentType.CreatorId = 22;
@@ -70,6 +66,12 @@ namespace Umbraco.Tests.Models
             Assert.AreEqual(clone, contentType);
             Assert.AreEqual(clone.Id, contentType.Id);
             Assert.AreEqual(((IUmbracoEntity)clone).AdditionalData, ((IUmbracoEntity)contentType).AdditionalData);
+            Assert.AreEqual(clone.AllowedTemplates.Count(), contentType.AllowedTemplates.Count());
+            for (var index = 0; index < contentType.AllowedTemplates.Count(); index++)
+            {
+                Assert.AreNotSame(clone.AllowedTemplates.ElementAt(index), contentType.AllowedTemplates.ElementAt(index));
+                Assert.AreEqual(clone.AllowedTemplates.ElementAt(index), contentType.AllowedTemplates.ElementAt(index));
+            }
             Assert.AreEqual(clone.PropertyGroups.Count, contentType.PropertyGroups.Count);
             for (var index = 0; index < contentType.PropertyGroups.Count; index++)
             {
@@ -82,6 +84,7 @@ namespace Umbraco.Tests.Models
                 Assert.AreNotSame(clone.PropertyTypes.ElementAt(index), contentType.PropertyTypes.ElementAt(index));
                 Assert.AreEqual(clone.PropertyTypes.ElementAt(index), contentType.PropertyTypes.ElementAt(index));
             }
+            
             Assert.AreEqual(clone.CreateDate, contentType.CreateDate);
             Assert.AreEqual(clone.CreatorId, contentType.CreatorId);
             Assert.AreEqual(clone.Key, contentType.Key);

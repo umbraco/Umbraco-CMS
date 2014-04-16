@@ -290,14 +290,7 @@ namespace Umbraco.Core.Models
         /// Some entities may expose additional data that other's might not, this custom data will be available in this collection
         /// </summary>
         public IList<UmbracoProperty> UmbracoProperties { get; set; }
-
-        public override object DeepClone()
-        {
-            var clone = (UmbracoEntity)base.DeepClone();
-            clone.UmbracoProperties = UmbracoProperties.Select(x => (UmbracoProperty) x.DeepClone()).ToList();
-            return clone;
-        }
-
+        
         internal class UmbracoProperty : IDeepCloneable
         {
             public Guid DataTypeControlId { get; set; }

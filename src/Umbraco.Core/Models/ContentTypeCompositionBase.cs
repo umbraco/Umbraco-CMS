@@ -220,12 +220,12 @@ namespace Umbraco.Core.Models
 
         public override object DeepClone()
         {
-            var clone = base.DeepClone();
+            var clone = (ContentTypeCompositionBase)base.DeepClone();
 
-            var contentType = (ContentTypeCompositionBase)clone;
-            contentType.RemovedContentTypeKeyTracker = new List<int>();
-            contentType._contentTypeComposition = ContentTypeComposition.Select(x => (IContentTypeComposition)x.DeepClone()).ToList();            
-            contentType.ResetDirtyProperties(true);
+            //need to manually assign since this is an internal field and will not be automatically mapped
+            clone.RemovedContentTypeKeyTracker = new List<int>();
+            clone._contentTypeComposition = ContentTypeComposition.Select(x => (IContentTypeComposition)x.DeepClone()).ToList();
+            clone.ResetDirtyProperties(true);
 
             return clone;
         }
