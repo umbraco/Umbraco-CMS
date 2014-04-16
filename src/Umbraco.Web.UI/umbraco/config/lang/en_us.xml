@@ -998,4 +998,7 @@ To manage your website, simply open the umbraco back office and start adding con
     <key alias="yourHistory" version="7.0">Your recent history</key>
     <key alias="sessionExpires" version="7.0">Session expires in</key>
   </area>
+  <area alias="textbox">
+    <key alias="characters_left">characters left</key>
+  </area>
 </language>

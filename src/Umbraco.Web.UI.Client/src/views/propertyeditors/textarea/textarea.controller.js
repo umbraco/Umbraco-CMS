@@ -1,4 +1,4 @@
-function textboxController($rootScope, $scope, $log) {
+function textAreaController($rootScope, $scope, $log) {
     $scope.model.maxlength = false;
     if($scope.model.config.maxChars) {
         $scope.model.maxlength = true;
@@ -23,4 +23,4 @@ function textboxController($rootScope, $scope, $log) {
         }
     }
 }
-angular.module('umbraco').controller("Umbraco.PropertyEditors.textboxController", textboxController);
+angular.module('umbraco').controller("Umbraco.PropertyEditors.textAreaController", textAreaController);

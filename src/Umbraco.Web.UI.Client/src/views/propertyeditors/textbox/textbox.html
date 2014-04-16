@@ -6,5 +6,8 @@
            ng-keyup="model.change()" />
     <span class="help-inline" val-msg-for="textbox" val-toggle-msg="required">Required</span>
     <span class="help-inline" val-msg-for="textbox" val-toggle-msg="valServer"></span>
-    <div class="help" ng-if="model.maxlength"><strong>{{model.count}}</strong> characters left</div>
+    <div class="help" ng-if="model.maxlength">
+        <strong>{{model.count}}</strong> 
+        <localize key="textbox_characters_left">characters left</localize>
+    </div>
 </div>

@@ -801,4 +801,7 @@ Mange hilsner fra umbraco robotten
     <key alias="yourHistory">Din historik</key>
     <key alias="sessionExpires">Session udløber</key>
   </area>
+  <area alias="textbox">
+    <key alias="characters_left">Karakterer tilbage</key>
+  </area>
 </language>
