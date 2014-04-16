@@ -430,6 +430,10 @@ namespace Umbraco.Web.Editors
 
                     mediaService.Save(f);
                 }
+                else
+                {
+                    LogHelper.Warn<MediaController>("Cannot upload file " + file + ", it is not an approved file type");
+                }
 
                 //now we can remove the temp file
                 System.IO.File.Delete(file.LocalFileName);
